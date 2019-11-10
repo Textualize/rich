@@ -46,9 +46,14 @@ class RichText:
     """Text with colored spans."""
 
     def __init__(
-        self, text: str = "", align: Literal["left", "center", "right"] = "left"
+        self,
+        text: str = "",
+        wrap=True,
+        align: Literal["left", "center", "right"] = "left",
     ) -> None:
         self._text: List[str] = [text]
+        self._wrap = wrap
+        self._align = align
         self._text_str: Optional[str] = text
         self._spans: List[TextSpan] = []
         self._length: int = len(text)
@@ -149,6 +154,14 @@ class RichText:
         self._text_str = None
 
     def split(self, separator="\n") -> List[RichText]:
+        """Split rich text in to lines, preserving styles.
+        
+        Args:
+            separator (str, optional): String to split on. Defaults to "\n".
+        
+        Returns:
+            List[RichText]: A list of rich text, one per line of the original.
+        """
         lines = self.text.split(separator)
         offset = 0
         offsets: List[int] = []
