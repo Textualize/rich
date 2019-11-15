@@ -25,6 +25,7 @@ from typing import (
 from .default_styles import DEFAULT_STYLES
 from . import errors
 from .style import Style
+from .styled_text import StyledText
 
 
 @dataclass
@@ -32,13 +33,9 @@ class ConsoleOptions:
     """Options for __console__ method."""
 
     max_width: int
+    is_terminal: bool
+    encoding: str
     min_width: int = 1
-
-
-@runtime_checkable
-class SupportsConsole(Protocol):
-    def __console__(self) -> StyledText:
-        ...
 
 
 class SupportsStr(Protocol):
@@ -50,21 +47,14 @@ class SupportsStr(Protocol):
 class ConsoleRenderable(Protocol):
     """An object that supports the console protocol."""
 
-    def __console_render__(
+    def __console__(
         self, console: Console, options: ConsoleOptions
-    ) -> Iterable[Union[SupportsConsole, StyledText]]:
+    ) -> Iterable[Union[ConsoleRenderable, StyledText]]:
         ...
 
 
-class StyledText(NamedTuple):
-    """A piece of text with associated style."""
-
-    text: str
-    style: Optional[Style] = None
-
-    def __repr__(self) -> str:
-        """Simplified repr."""
-        return f"StyleText({self.text!r}, {self.style!r})"
+RenderableType = Union[ConsoleRenderable, SupportsStr]
+RenderResult = Iterable[Union[ConsoleRenderable, StyledText]]
 
 
 class ConsoleDimensions(NamedTuple):
@@ -82,13 +72,13 @@ class StyleContext:
         self.style = style
 
     def __enter__(self) -> Console:
-        self.console._enter_buffer()
         self.console.push_style(self.style)
+        self.console._enter_buffer()
         return self.console
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
-        self.console.pop_style()
         self.console._exit_buffer()
+        self.console.pop_style()
 
 
 class Console:
@@ -96,13 +86,26 @@ class Console:
 
     default_style = Style.reset()
 
-    def __init__(self, styles: Dict[str, Style] = DEFAULT_STYLES, file: IO = None):
+    def __init__(
+        self,
+        styles: Dict[str, Style] = DEFAULT_STYLES,
+        file: IO = None,
+        width: int = None,
+        height: int = None,
+        markup: str = "markdown",
+    ):
         self._styles = ChainMap(styles)
         self.file = file or sys.stdout
-        self.style_stack: List[Style] = [Style()]
+        self._width = width
+        self._height = height
+        self._markup = markup
+
         self.buffer: List[StyledText] = []
-        self.current_style = Style()
         self._buffer_index = 0
+
+        default_style = Style()
+        self.style_stack: List[Style] = [default_style]
+        self.current_style = default_style
 
     # def push_styles(self, styles: Dict[str, Style]) -> None:
     #     """Push a new set of styles on to the style stack.
@@ -132,6 +135,71 @@ class Console:
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         self._exit_buffer()
 
+    @property
+    def encoding(self) -> str:
+        """Get the encoding of the console file.
+        
+        Returns:
+            str: A standard encoding string.
+        """
+        return getattr(self.file, "encoding", "utf-8")
+
+    @property
+    def is_terminal(self) -> bool:
+        """Check if the console is writing to a terminal.
+        
+        Returns:
+            bool: True if the console writting to a device capable of
+                understanding terminal codes, otherwise False.
+        """
+        isatty = getattr(self.file, "isatty", None)
+        return False if isatty is None else isatty()
+
+    @property
+    def options(self) -> ConsoleOptions:
+        """Get default console options."""
+        return ConsoleOptions(
+            max_width=self.width, encoding=self.encoding, is_terminal=self.is_terminal
+        )
+
+    def render(
+        self, renderable: RenderableType, options: ConsoleOptions
+    ) -> Iterable[StyledText]:
+        """Render an object in to an iterable of `StyledText` instances.
+
+        This method contains the logic for rendering objects with the console protocol. 
+        You are unlikely to need to use it directly, unless you are extending the library.
+
+        
+        Args:
+            renderable (RenderableType): An object supporting the console protocol, or
+                an object that may be converted to a string.
+            options (ConsoleOptions, optional): An options objects. Defaults to None.
+        
+        Returns:
+            Iterable[StyledText]: An iterable of styled text that may be rendered.
+        """
+
+        if isinstance(renderable, ConsoleRenderable):
+            render_iterable = renderable.__console__(self, options)
+        else:
+            render_iterable = self.render_str(str(renderable), options)
+
+        for render_output in render_iterable:
+            if isinstance(render_output, StyledText):
+                yield render_output
+            else:
+                yield from self.render(render_output, options)
+
+    def render_str(self, text: str, options: ConsoleOptions) -> Iterable[StyledText]:
+        """Render a string."""
+        if self._markup == "markdown":
+            from .markdown import Markdown
+
+            yield Markdown(text)
+        else:
+            yield StyledText(text, self.current_style)
+
     def get_style(self, name: str) -> Optional[Style]:
         """Get a named style, or `None` if it doesn't exist.
         
@@ -142,6 +210,21 @@ class Console:
             Optional[Style]: A Style object for the given name, or `None`.
         """
         return self._styles.get(name, None)
+
+    def parse_style(self, name: str) -> Optional[Style]:
+        """Get a named style, or parse a style definition.
+
+        Args:
+            name (str): The name of a style.
+        
+        Returns:
+            Optional[Style]: A Style object or `None` if it couldn't be found / parsed.
+
+        """
+        try:
+            return self._styles.get(name, None) or Style.parse(name)
+        except errors.StyleSyntaxError:
+            return None
 
     def push_style(self, style: Union[str, Style]) -> None:
         """Push a style on to the stack.
@@ -202,27 +285,22 @@ class Console:
         Returns:
             None: 
         """
-        write_style = self.current_style or self.get_style(style)
+        write_style = self.current_style or self.get_style(style or "none")
         self.buffer.append(StyledText(text, write_style))
         self._check_buffer()
 
-    def print(self, *objects: Union[ConsoleRenderable, SupportsStr]) -> None:
-        options = ConsoleOptions(max_width=self.width)
+    def print(self, *objects: RenderableType, sep: str = " ", end="\n") -> None:
+        options = self.options
         buffer_append = self.buffer.append
+        buffer_extend = self.buffer.extend
+        separator = StyledText(sep)
         with self:
-            for console_object in objects:
-                if isinstance(console_object, ConsoleRenderable):
-                    render = console_object.__console_render__(self, options)
-                    for console_output in render:
-                        if isinstance(console_output, SupportsConsole):
-                            styled_text = console_output.__console__()
-                        else:
-                            styled_text = console_output
-                        buffer_append(styled_text)
-                else:
-                    styled_text = StyledText(str(console_object), None)
-                    buffer_append(styled_text)
-            buffer_append(StyledText("\n"))
+            last_index = len(objects) - 1
+            for index, console_object in enumerate(objects):
+                buffer_extend(self.render(console_object, options))
+                if sep and index != last_index:
+                    buffer_append(separator)
+            buffer_append(StyledText(end))
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered."""
@@ -236,10 +314,12 @@ class Console:
         append = output.append
         for text, style in self.buffer:
             if style:
+                style = self.current_style.apply(style)
                 append(style.render(text, reset=True))
             else:
                 append(text)
         rendered = "".join(output)
+
         del self.buffer[:]
         return rendered
 
@@ -250,8 +330,14 @@ class Console:
         Returns:
             ConsoleDimensions: A named tuple containing the dimensions.
         """
+        if self._width is not None and self._height is not None:
+            return ConsoleDimensions(self._width, self._height)
+
         width, height = shutil.get_terminal_size()
-        return ConsoleDimensions(width, height)
+        return ConsoleDimensions(
+            width if self._width is None else self._width,
+            height if self._height is None else self._height,
+        )
 
     @property
     def width(self) -> int:
@@ -260,7 +346,7 @@ class Console:
         Returns:
             int: The width (in characters) of the console.
         """
-        width, _ = shutil.get_terminal_size()
+        width, _ = self.size
         return width
 
     # def write(self, console_object: Any) -> Console:
@@ -291,16 +377,20 @@ class Console:
 
 
 if __name__ == "__main__":
-    console = Console()
+    console = Console(width=80)
     # console.write_text("Hello", style="bold magenta on white", end="").write_text(
     #     " World!", "italic blue"
     # )
     # "[b]This is bold [style not bold]This is not[/style] this is[/b]"
 
-    console.write("Hello ")
-    with console.style("bold blue"):
-        console.write("World ")
-        with console.style("italic"):
-            console.write("in style")
-    console.write("!")
+    # console.write("Hello ")
+    # with console.style("bold blue"):
+    #     console.write("World ")
+    #     with console.style("italic"):
+    #         console.write("in style")
+    # console.write("!")
+
+    with console.style("dim on black"):
+        console.print("**Hello**, *World*!")
+        console.print("Hello, *World*!")
 

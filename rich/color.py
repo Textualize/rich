@@ -419,14 +419,15 @@ class Color(NamedTuple):
 
     def get_ansi_codes(self, foreground: bool = True) -> List[str]:
         """Get the ANSI escape codes for this color."""
-        if self.type == ColorType.DEFAULT:
+        _type = self.type
+        if _type == ColorType.DEFAULT:
             return ["39" if foreground else "49"]
 
-        elif self.type == ColorType.STANDARD:
+        elif _type == ColorType.STANDARD:
             assert self.number is not None
             return [str(30 + self.number if foreground else 40 + self.number)]
 
-        elif self.type == ColorType.EIGHT_BIT:
+        elif _type == ColorType.EIGHT_BIT:
             assert self.number is not None
             return ["38" if foreground else "48", "5", str(self.number)]
 

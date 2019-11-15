@@ -13,6 +13,7 @@ from .color import Color
 class Style:
     """A terminal style."""
 
+    name: Optional[str] = None
     color: Optional[str] = None
     back: Optional[str] = None
     bold: Optional[bool] = None
@@ -55,7 +56,11 @@ class Style:
         return " ".join(attributes) or "none"
 
     def __repr__(self):
-        return f"<style '{self}'>"
+        """Render a named style differently from an anonymous style."""
+        if self.name is None:
+            return f'<style "{self}">'
+        else:
+            return f'<style {self.name} "{self}">'
 
     def __post_init__(self) -> None:
         if self.color:
@@ -67,6 +72,7 @@ class Style:
     def reset(cls) -> Style:
         """Get a style to reset all attributes."""
         return Style(
+            "reset",
             color="default",
             back="default",
             dim=False,
@@ -80,7 +86,7 @@ class Style:
         )
 
     @classmethod
-    def parse(cls, style_definition: str) -> Style:
+    def parse(cls, style_definition: str, name: str = None) -> Style:
         """Parse style name(s) in to style object."""
         style_attributes = {
             "dim",
@@ -126,7 +132,7 @@ class Style:
                         f"unknown word {original_word!r} in style {style_definition!r}"
                     )
                 color = word
-        style = Style(color=color, back=back, **attributes)
+        style = Style(name, color=color, back=back, **attributes)
         return style
 
     @classmethod
@@ -196,7 +202,10 @@ class Style:
             append("9" if self.strike else "29")
 
         reset = "\x1b[0m" if reset else ""
-        return f"\x1b[{';'.join(attrs)}m{text or ''}{reset}"
+        if attrs:
+            return f"\x1b[{';'.join(attrs)}m{text or ''}{reset}"
+        else:
+            return f"{text or ''}{reset}"
 
     def test(self, text: Optional[str] = None) -> None:
         """Write test text with style to terminal.
@@ -249,4 +258,8 @@ if __name__ == "__main__":
     print(repr(style))
 
     style.test()
+
+    style = Style.parse("bold on black", name="markdown.header")
+    print(style)
+    print(repr(style))
 
