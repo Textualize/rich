@@ -297,15 +297,35 @@ class Console:
         self.buffer.append(StyledText(text, write_style))
         self._check_buffer()
 
-    def print(self, *objects: RenderableType) -> None:
+    def print(self, *objects: RenderableType, sep=" ", end="\n") -> None:
+        """Print to the console.
+        
+        Args:
+            *objects: Arbitrary objects to print to the console.
+            sep (str, optional): Separator to print between objects. Defaults to " ".
+            end (str, optional): Character to end print with. Defaults to "\n".
+        """
         if not objects:
             self.line()
             return
         options = self.options
         buffer_extend = self.buffer.extend
+        strings: List[str] = []
+
+        def check_strings() -> None:
+            """Check strings buffer."""
+            if strings:
+                text = f"{sep.join(strings)}{end}"
+                buffer_extend(self.render(text, options))
+
         with self:
             for console_object in objects:
-                buffer_extend(self.render(console_object, options))
+                if isinstance(console_object, (ConsoleRenderable, StyledText)):
+                    check_strings()
+                    buffer_extend(self.render(console_object, options))
+                else:
+                    strings.append(str(console_object))
+            check_strings()
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered."""
@@ -369,7 +389,8 @@ if __name__ == "__main__":
     #         console.write("in style")
     # console.write("!")
 
-    console.print("Hello")
+    console.print("Hello", "*World*")
+    console.print()
     with console.style("dim on black"):
         console.print("**Hello**, *World*!")
         console.print("Hello, *World*!")
