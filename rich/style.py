@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import sys
-from operator import truth
 from typing import Dict, Iterable, List, Mapping, Optional, Type
 
 from . import errors
@@ -16,7 +15,7 @@ class _Bit:
 
     def __get__(self, obj: Style, objtype: Type[Style]) -> Optional[bool]:
         if obj._set_attributes & self.bit:
-            return truth(obj._attributes & self.bit)
+            return obj._attributes & self.bit != 0
         return None
 
     def __set__(self, obj: Style, val: Optional[bool]) -> None:
@@ -50,30 +49,29 @@ class Style:
         reverse: bool = None,
         strike: bool = None,
     ):
-
         self.name = name
         self._color = None if color is None else Color.parse(color)
         self._back = None if back is None else Color.parse(back)
-
+        _bool = bool
         self._attributes = (
-            truth(bold)
-            | truth(dim) << 1
-            | truth(italic) << 2
-            | truth(underline) << 3
-            | truth(blink) << 4
-            | truth(blink2) << 5
-            | truth(reverse) << 6
-            | truth(strike) << 7
+            _bool(bold)
+            | _bool(dim) << 1
+            | _bool(italic) << 2
+            | _bool(underline) << 3
+            | _bool(blink) << 4
+            | _bool(blink2) << 5
+            | _bool(reverse) << 6
+            | _bool(strike) << 7
         )
         self._set_attributes = (
-            truth(bold is not None)
-            | truth(dim is not None) << 1
-            | truth(italic is not None) << 2
-            | truth(underline is not None) << 3
-            | truth(blink is not None) << 4
-            | truth(blink2 is not None) << 5
-            | truth(reverse is not None) << 6
-            | truth(strike is not None) << 7
+            _bool(bold is not None)
+            | _bool(dim is not None) << 1
+            | _bool(italic is not None) << 2
+            | _bool(underline is not None) << 3
+            | _bool(blink is not None) << 4
+            | _bool(blink2 is not None) << 5
+            | _bool(reverse is not None) << 6
+            | _bool(strike is not None) << 7
         )
 
     bold = _Bit(0)
@@ -129,7 +127,7 @@ class Style:
 
     @property
     def back(self) -> Optional[str]:
-        return self._back.name if self._beck is not None else None
+        return self._back.name if self._back is not None else None
 
     @back.setter
     def back(self, new_color: Optional[str]) -> None:
@@ -224,7 +222,13 @@ class Style:
         Returns:
             Style: A new Style instance with identical attributes.
         """
-        return replace(self)
+        style = self.__new__(Style)
+        style.name = self.name
+        style._color = self.color
+        style._back = self.back
+        style._attributes = self._attributes
+        style._set_attributes = self._attributes
+        return style
 
     def render(
         self, text: str = "", *, current_style: Style = None, reset=False
@@ -232,6 +236,8 @@ class Style:
         """Render the ANSI codes to implement the style."""
         attrs: List[str] = []
         append = attrs.append
+
+        print(current_style)
 
         if current_style is None:
             current = RESET_STYLE
