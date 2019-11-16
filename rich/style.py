@@ -175,9 +175,7 @@ class Style:
                         f"unknown word {original_word!r} in style {style_definition!r}"
                     )
                 color = word
-        print(attributes)
         style = Style(name, color=color, back=back, **attributes)
-        print("--", style)
         return style
 
     @classmethod
