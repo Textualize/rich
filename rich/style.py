@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace, InitVar
-from functools import lru_cache
 import sys
 from operator import truth
 from typing import Dict, Iterable, List, Mapping, Optional, Type
@@ -18,7 +16,7 @@ class _Bit:
 
     def __get__(self, obj: Style, objtype: Type[Style]) -> Optional[bool]:
         if obj._set_attributes & self.bit:
-            return bool(obj._attributes & self.bit)
+            return truth(obj._attributes & self.bit)
         return None
 
     def __set__(self, obj: Style, val: Optional[bool]) -> None:
@@ -52,21 +50,31 @@ class Style:
         reverse: bool = None,
         strike: bool = None,
     ):
-        self._set_attributes = 0
-        self._attributes = 0
+
         self.name = name
-        self.color = color
-        self._color = Color.parse(color) if color else None
-        self.back = back
-        self._back = Color.parse(back) if back else None
-        self.bold = bold
-        self.dim = dim
-        self.italic = italic
-        self.underline = underline
-        self.blink = blink
-        self.blink2 = blink2
-        self.reverse = reverse
-        self.strike = strike
+        self._color = None if color is None else Color.parse(color)
+        self._back = None if back is None else Color.parse(back)
+
+        self._attributes = (
+            truth(bold)
+            | truth(dim) << 1
+            | truth(italic) << 2
+            | truth(underline) << 3
+            | truth(blink) << 4
+            | truth(blink2) << 5
+            | truth(reverse) << 6
+            | truth(strike) << 7
+        )
+        self._set_attributes = (
+            truth(bold is not None)
+            | truth(dim is not None) << 1
+            | truth(italic is not None) << 2
+            | truth(underline is not None) << 3
+            | truth(blink is not None) << 4
+            | truth(blink2 is not None) << 5
+            | truth(reverse is not None) << 6
+            | truth(strike is not None) << 7
+        )
 
     bold = _Bit(0)
     dim = _Bit(1)
@@ -110,6 +118,22 @@ class Style:
             return f'<style "{self}">'
         else:
             return f'<style {self.name} "{self}">'
+
+    @property
+    def color(self) -> Optional[str]:
+        return self._color.name if self._color is not None else None
+
+    @color.setter
+    def color(self, new_color: Optional[str]) -> None:
+        self._color = None if new_color is None else Color.parse(new_color)
+
+    @property
+    def back(self) -> Optional[str]:
+        return self._back.name if self._beck is not None else None
+
+    @back.setter
+    def back(self, new_color: Optional[str]) -> None:
+        self._back = None if new_color is None else Color.parse(new_color)
 
     @classmethod
     def reset(cls) -> Style:
@@ -277,20 +301,8 @@ class Style:
             return self
 
         new_style = style.__new__(Style)
-        if style.color is None:
-            new_style.color = self.color
-            new_style._color = self._color
-        else:
-            new_style.color = style.color
-            new_style._color = style._color
-
-        if style.back is None:
-            new_style.back = self.back
-            new_style._back = self._back
-        else:
-            new_style.back = style.back
-            new_style._back = style._back
-
+        new_style._color = self._color if style._color is None else style._color
+        new_style._back = self._back if style._back is None else style._back
         new_style._attributes = (style._attributes & ~self._set_attributes) | (
             self._attributes & self._set_attributes
         )
