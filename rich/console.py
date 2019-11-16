@@ -53,7 +53,7 @@ class ConsoleRenderable(Protocol):
         ...
 
 
-RenderableType = Union[ConsoleRenderable, SupportsStr]
+RenderableType = Union[ConsoleRenderable, StyledText, SupportsStr]
 RenderResult = Iterable[Union[ConsoleRenderable, StyledText]]
 
 
@@ -162,6 +162,10 @@ class Console:
             max_width=self.width, encoding=self.encoding, is_terminal=self.is_terminal
         )
 
+    def line(self, count: int = 1) -> None:
+        self.buffer.append(StyledText("\n" * count))
+        self._check_buffer()
+
     def render(
         self, renderable: RenderableType, options: ConsoleOptions
     ) -> Iterable[StyledText]:
@@ -179,8 +183,10 @@ class Console:
         Returns:
             Iterable[StyledText]: An iterable of styled text that may be rendered.
         """
-
-        if isinstance(renderable, ConsoleRenderable):
+        render_iterable: Iterable[RenderableType]
+        if isinstance(renderable, StyledText):
+            yield renderable
+        elif isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__console__(self, options)
         else:
             render_iterable = self.render_str(str(renderable), options)
@@ -191,7 +197,9 @@ class Console:
             else:
                 yield from self.render(render_output, options)
 
-    def render_str(self, text: str, options: ConsoleOptions) -> Iterable[StyledText]:
+    def render_str(
+        self, text: str, options: ConsoleOptions
+    ) -> Iterable[RenderableType]:
         """Render a string."""
         if self._markup == "markdown":
             from .markdown import Markdown
@@ -289,18 +297,15 @@ class Console:
         self.buffer.append(StyledText(text, write_style))
         self._check_buffer()
 
-    def print(self, *objects: RenderableType, sep: str = " ", end="\n") -> None:
+    def print(self, *objects: RenderableType) -> None:
+        if not objects:
+            self.line()
+            return
         options = self.options
-        buffer_append = self.buffer.append
         buffer_extend = self.buffer.extend
-        separator = StyledText(sep)
         with self:
-            last_index = len(objects) - 1
-            for index, console_object in enumerate(objects):
+            for console_object in objects:
                 buffer_extend(self.render(console_object, options))
-                if sep and index != last_index:
-                    buffer_append(separator)
-            buffer_append(StyledText(end))
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered."""
@@ -349,32 +354,6 @@ class Console:
         width, _ = self.size
         return width
 
-    # def write(self, console_object: Any) -> Console:
-    #     if isinstance(console_object, SupportsConsole):
-    #         return self.write_object(console_object)
-    #     else:
-    #         text = str(console_object)
-    #         return self.write_text(text)
-
-    # def write_object(self, console_object: SupportsConsole) -> Console:
-    #     console_object.__console__(self)
-    #     return self
-
-    # def write_text(
-    #     self, text: str, style: Union[str, Style] = None, *, end="\n"
-    # ) -> Console:
-    #     if isinstance(style, str):
-    #         render_style = Style.parse(style)
-    #     elif isinstance(style, Style):
-    #         render_style = style
-
-    #     prefix = render_style.render(Style())
-    #     self.file.write(f"{prefix}{text}\x1b[0m{end}")
-    #     return self
-
-    # def new_line(self) -> Console:
-    #     return self
-
 
 if __name__ == "__main__":
     console = Console(width=80)
@@ -390,7 +369,10 @@ if __name__ == "__main__":
     #         console.write("in style")
     # console.write("!")
 
+    console.print("Hello")
     with console.style("dim on black"):
         console.print("**Hello**, *World*!")
         console.print("Hello, *World*!")
+
+    # console.print("foo")
 

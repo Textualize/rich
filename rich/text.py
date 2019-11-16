@@ -291,7 +291,7 @@ class Text:
         text_length = len(text)
         divide_offsets = [0, *offsets, text_length]
         line_ranges = list(zip(divide_offsets, divide_offsets[1:]))
-        average_line_length = text_length // (len(divide_offsets) - 1)
+        average_line_length = -(-text_length // len(line_ranges))
 
         new_lines = Lines(
             Text(text[start:end].rstrip(), style=self._style)
@@ -364,12 +364,9 @@ class Lines(List[Text]):
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         """Console render method to insert line-breaks."""
-        length = len(self)
-        last_index = length - 1
-        for index, line in enumerate(self):
+        for line in self:
             yield line
-            if index != last_index:
-                yield StyledText("\n")
+            yield StyledText("\n")
 
     def justify(
         self, width: int, align: Literal["left", "center", "right"] = "left"

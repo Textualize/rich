@@ -55,9 +55,8 @@ class Markdown:
             elif node_type == "paragraph":
                 if entering:
                     if paragraph_count:
-                        yield StyledText("\n\n")
+                        yield StyledText("\n")
                     paragraph_count += 1
-
                     push_style("markdown.paragraph")
                     stack.push(Text())
                 else:
@@ -75,12 +74,12 @@ class Markdown:
                     pop_style()
                     text = stack.pop()
                     yield text.wrap(options.max_width, justify="center")
-                    yield StyledText("\n\n")
+                    yield StyledText("\n")
             elif node_type == "code_block":
                 style = push_style("markdown.code_block")
                 text = Text(current.literal.rstrip(), style=style)
                 wrapped_text = text.wrap(options.max_width, justify="left")
-                yield StyledText("\n\n")
+                yield StyledText("\n")
                 yield wrapped_text
                 pop_style()
 
