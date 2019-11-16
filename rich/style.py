@@ -3,30 +3,79 @@ from __future__ import annotations
 from dataclasses import dataclass, field, replace, InitVar
 from functools import lru_cache
 import sys
-from typing import Dict, Iterable, List, Mapping, Optional
+from operator import truth
+from typing import Dict, Iterable, List, Mapping, Optional, Type
 
 from . import errors
 from .color import Color
 
 
-@dataclass
+class _Bit:
+    """A descriptor to get/set a style attribute bit."""
+
+    def __init__(self, bit_no: int) -> None:
+        self.bit = 1 << bit_no
+
+    def __get__(self, obj: Style, objtype: Type[Style]) -> Optional[bool]:
+        if obj._set_attributes & self.bit:
+            return bool(obj._attributes & self.bit)
+        return None
+
+    def __set__(self, obj: Style, val: Optional[bool]) -> None:
+        bit = self.bit
+        if val is None:
+            obj._set_attributes &= ~bit
+            obj._attributes &= ~bit
+        else:
+            obj._set_attributes |= bit
+            if val:
+                obj._attributes |= bit
+            else:
+                obj._attributes &= ~bit
+
+
 class Style:
     """A terminal style."""
 
-    name: Optional[str] = None
-    color: Optional[str] = None
-    back: Optional[str] = None
-    bold: Optional[bool] = None
-    dim: Optional[bool] = None
-    italic: Optional[bool] = None
-    underline: Optional[bool] = None
-    blink: Optional[bool] = None
-    blink2: Optional[bool] = None
-    reverse: Optional[bool] = None
-    strike: Optional[bool] = None
+    def __init__(
+        self,
+        name: str = None,
+        *,
+        color: str = None,
+        back: str = None,
+        bold: bool = None,
+        dim: bool = None,
+        italic: bool = None,
+        underline: bool = None,
+        blink: bool = None,
+        blink2: bool = None,
+        reverse: bool = None,
+        strike: bool = None,
+    ):
+        self._set_attributes = 0
+        self._attributes = 0
+        self.name = name
+        self.color = color
+        self._color = Color.parse(color) if color else None
+        self.back = back
+        self._back = Color.parse(back) if back else None
+        self.bold = bold
+        self.dim = dim
+        self.italic = italic
+        self.underline = underline
+        self.blink = blink
+        self.blink2 = blink2
+        self.reverse = reverse
+        self.strike = strike
 
-    _color: Optional[Color] = field(init=False, default=None, repr=False)
-    _back: Optional[Color] = field(init=False, default=None, repr=False)
+    bold = _Bit(0)
+    dim = _Bit(1)
+    italic = _Bit(2)
+    underline = _Bit(3)
+    blink = _Bit(4)
+    blink2 = _Bit(5)
+    reverse = _Bit(6)
+    strike = _Bit(7)
 
     def __str__(self) -> str:
         """Re-generate style definition from attributes."""
@@ -61,13 +110,6 @@ class Style:
             return f'<style "{self}">'
         else:
             return f'<style {self.name} "{self}">'
-
-    def __post_init__(self) -> None:
-        """Post process colors."""
-        if self.color:
-            self._color = Color.parse(self.color)
-        if self.back:
-            self._back = Color.parse(self.back)
 
     @classmethod
     def reset(cls) -> Style:
@@ -133,7 +175,9 @@ class Style:
                         f"unknown word {original_word!r} in style {style_definition!r}"
                     )
                 color = word
+        print(attributes)
         style = Style(name, color=color, back=back, **attributes)
+        print("--", style)
         return style
 
     @classmethod
@@ -233,18 +277,27 @@ class Style:
         """
         if style is None:
             return self
-        style = Style(
-            color=self.color if style.color is None else style.color,
-            back=self.back if style.back is None else style.back,
-            dim=self.dim if style.dim is None else style.dim,
-            bold=self.bold if style.bold is None else style.bold,
-            italic=self.italic if style.italic is None else style.italic,
-            underline=self.underline if style.underline is None else style.underline,
-            blink=self.blink if style.blink is None else style.blink,
-            blink2=self.blink2 if style.blink2 is None else style.blink2,
-            reverse=self.reverse if style.reverse is None else style.reverse,
+
+        new_style = style.__new__(Style)
+        if style.color is None:
+            new_style.color = self.color
+            new_style._color = self._color
+        else:
+            new_style.color = style.color
+            new_style._color = style._color
+
+        if style.back is None:
+            new_style.back = self.back
+            new_style._back = self._back
+        else:
+            new_style.back = style.back
+            new_style._back = style._back
+
+        new_style._attributes = (style._attributes & ~self._set_attributes) | (
+            self._attributes & self._set_attributes
         )
-        return style
+        new_style._set_attributes = self._set_attributes | style._set_attributes
+        return new_style
 
 
 RESET_STYLE = Style.reset()
@@ -254,13 +307,21 @@ if __name__ == "__main__":
 
     # style = Style(color="blue", bold=True, italic=True, reverse=False, dim=True)
 
-    style = Style.parse("bold")
-    print(style)
-    print(repr(style))
+    style = Style(italic=True)
+    print(style._attributes, style._set_attributes)
+    # style.italic = True
+    # print(style._attributes, style._set_attributes)
+    # print(style.italic)
+    # print(style.bold)
 
-    style.test()
+    # # style = Style.parse("bold")
+    # # print(style)
+    # # print(repr(style))
 
-    style = Style.parse("bold on black", name="markdown.header")
-    print(style)
-    print(repr(style))
+    # # style.test()
+
+    # style = Style.parse("bold on black", name="markdown.header")
+    # print(style.bold)
+    # print(style)
+    # print(repr(style))
 
