@@ -230,9 +230,7 @@ class Style:
         style._set_attributes = self._attributes
         return style
 
-    def render(
-        self, text: str = "", *, current_style: Style = None, reset=False
-    ) -> str:
+    def render(self, text: str = "", *, reset=False) -> str:
         """Render the ANSI codes to implement the style."""
         attrs: List[str] = []
         append = attrs.append
