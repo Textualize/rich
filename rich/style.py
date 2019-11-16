@@ -237,42 +237,18 @@ class Style:
         attrs: List[str] = []
         append = attrs.append
 
-        print(current_style)
-
-        if current_style is None:
-            current = RESET_STYLE
-        else:
-            current = current_style
-
-        if self._color is not None and current._color != self._color:
+        if self._color is not None:
             attrs.extend(self._color.get_ansi_codes())
 
-        if self._back is not None and current._back != self._back:
+        if self._back is not None:
             attrs.extend(self._back.get_ansi_codes(foreground=False))
 
-        if self.bold is not None and current.bold != self.bold:
-            append("1" if self.bold else "21")
-
-        if self.dim is not None and current.dim != self.dim:
-            append("2" if self.dim else "22")
-
-        if self.italic is not None and current.italic != self.italic:
-            append("3" if self.italic else "23")
-
-        if self.underline is not None and current.underline != self.underline:
-            append("4" if self.underline else "24")
-
-        if self.blink is not None and current.blink != self.blink:
-            append("5" if self.blink else "25")
-
-        if self.blink2 is not None and current.blink2 != self.blink2:
-            append("6" if self.blink2 else "26")
-
-        if self.reverse is not None and current.reverse != self.reverse:
-            append("7" if self.reverse else "27")
-
-        if self.strike is not None and current.strike != self.strike:
-            append("9" if self.strike else "29")
+        set_bits = self._set_attributes
+        bits = self._attributes
+        for bit_no in range(0, 9):
+            bit = 1 << bit_no
+            if set_bits & bit:
+                append(str(1 + bit_no if bits & bit else 20 + bit_no))
 
         reset = "\x1b[0m" if reset else ""
         if attrs:
@@ -323,8 +299,11 @@ if __name__ == "__main__":
 
     # style = Style(color="blue", bold=True, italic=True, reverse=False, dim=True)
 
-    style = Style(italic=True)
+    style = Style.parse("bold red on black")
     print(style._attributes, style._set_attributes)
+
+    print(style.render("hello"))
+
     # style.italic = True
     # print(style._attributes, style._set_attributes)
     # print(style.italic)
