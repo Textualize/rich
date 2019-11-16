@@ -63,6 +63,7 @@ class Style:
             return f'<style {self.name} "{self}">'
 
     def __post_init__(self) -> None:
+        """Post process colors."""
         if self.color:
             self._color = Color.parse(self.color)
         if self.back:
