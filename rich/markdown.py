@@ -43,7 +43,7 @@ class TextElement(MarkdownElement):
     def __init__(self) -> None:
         self.text = Text()
 
-    def on_enter(self, context: MarkdownContext, node) -> None:
+    def on_enter(self, context: MarkdownContext, node: Any) -> None:
         context.enter_style(f"markdown.h{node.level}")
 
     def on_text(self, context: MarkdownContext, text: str):
@@ -53,12 +53,17 @@ class TextElement(MarkdownElement):
         context.leave_style()
         yield self.text
 
-    def on_child_close(self, context: MarkdownContext, child: MarkdownElement):
+    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> None:
         pass
 
 
 class Paragraph(TextElement):
-    pass
+    style_name = "markdown.paragraph"
+
+    def on_leave(self, context: MarkdownContext) -> Iterable[Text]:
+        context.leave_style()
+        lines = self.text.wrap(context.options.max_width)
+        yield lines
 
 
 class Heading(TextElement):
@@ -94,6 +99,7 @@ class MarkdownContext:
 class Markdown:
 
     elements = {"paragraph": Paragraph, "heading": Heading}
+    inlines = {"emph", "strong"}
 
     def __init__(self, markup: str) -> None:
         self.markup = markup
@@ -104,15 +110,17 @@ class Markdown:
 
         context = MarkdownContext(console, options)
 
-        inline_styles = {"emph"}
-
         nodes = self.parsed.walker()
+
         for current, entering in nodes:
             print(current, entering)
             node_type = current.t
             if node_type == "text":
                 context.on_text(current.literal)
-            elif node_type in inline_styles:
+            elif node_type == "softbreak":
+                if entering:
+                    context.on_text("\n")
+            elif node_type in self.inlines:
                 if entering:
                     context.enter_style(f"markdown.{node_type}")
                 else:
@@ -126,7 +134,10 @@ class Markdown:
                     element.on_enter(context, current)
                 else:
                     element = context.stack.pop()
+                    if context.stack:
+                        yield StyledText("\n")
                     yield from element.on_leave(context)
+
                     if context.stack:
                         context.stack.top.on_child_close(context, element)
 
@@ -278,7 +289,8 @@ The main area where I think Django's models are missing out is the lack of type 
 markup = """\
 # Heading
 
-Hello, *World*!
+Hello, *World*! 
+**Bold**
 
 """
 
