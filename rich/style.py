@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Dict, Iterable, List, Mapping, Optional, Type
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Type
 
 from . import errors
 from .color import Color
@@ -288,6 +288,27 @@ class Style:
         )
         new_style._set_attributes = self._set_attributes | style._set_attributes
         return new_style
+
+
+class StyleStack:
+    """A stack of styles that maintains a current style."""
+
+    def __init__(self, default_style: Style) -> None:
+        self._stack: List[Style] = []
+        self._stack.append(default_style)
+        self.current = default_style
+
+    def __repr__(self) -> str:
+        return f"<stylestack {self._stack!r}>"
+
+    def push(self, style: Style) -> None:
+        self.current = self.current.apply(style)
+        self._stack.append(self.current)
+
+    def pop(self) -> Style:
+        self._stack.pop()
+        self.current = self._stack[-1]
+        return self.current
 
 
 RESET_STYLE = Style.reset()
