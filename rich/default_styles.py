@@ -47,6 +47,7 @@ MARKDOWN_STYLES = {
     "markdown.list": Style("markdown.list", color="cyan"),
     "markdown.item": Style("markdown.item", underline=True),
     "markdown.hr": Style("markdown.hr", dim=True),
+    "markdown.h1.border": Style("markdown.h1.border", color="cyan"),
     "markdown.h1": Style("markdown.h1", bold=True),
     "markdown.h2": Style("markdown.h2", bold=True, underline=True),
     "markdown.h3": Style("markdown.h3", bold=True),

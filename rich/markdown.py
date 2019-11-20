@@ -10,9 +10,9 @@ from .console import (
     ConsoleOptions,
     ConsoleRenderable,
     RenderResult,
-    StyledText,
+    Styled,
 )
-from .panel import Panel
+from .panel import DOUBLE_BORDER, Panel
 from .style import Style, StyleStack
 from .text import Lines, Text
 from ._stack import Stack
@@ -65,8 +65,9 @@ class Paragraph(TextElement):
 
     def on_leave(self, context: MarkdownContext) -> Iterable[Lines]:
         context.leave_style()
-        lines = self.text.wrap(context.options.max_width)
-        yield from lines
+        yield self.text
+        # lines = self.text.wrap(context.width)
+        # yield from lines
 
 
 class Heading(TextElement):
@@ -76,7 +77,7 @@ class Heading(TextElement):
         return heading
 
     def on_enter(self, context: MarkdownContext) -> None:
-        self.text = Text(style=context.current_style, end="")
+        self.text = Text(style=context.current_style)
         context.enter_style(self.style_name)
 
     def __init__(self, level: int) -> None:
@@ -84,16 +85,16 @@ class Heading(TextElement):
         self.style_name = f"markdown.h{level}"
         super().__init__()
 
-    def on_leave(self, context: MarkdownContext) -> Iterable[Lines]:
+    def on_leave(self, context: MarkdownContext) -> RenderResult:
         context.leave_style()
         self.text.justify = "center"
+
         if self.level == 1:
-            yield Panel(self.text)
+            yield Panel(
+                self.text, border=DOUBLE_BORDER, style="markdown.h1.border",
+            )
         else:
             yield self.text
-            yield StyledText("\n")
-        # lines = self.text.wrap(context.options.max_width, justify="center")
-        # yield lines
 
 
 class CodeBlock(TextElement):
@@ -101,15 +102,14 @@ class CodeBlock(TextElement):
 
     def on_leave(self, context: MarkdownContext) -> Iterable[Lines]:
         context.leave_style()
-        lines = self.text.wrap(context.options.max_width, justify="left")
-        yield lines
+        yield self.text
 
 
 class BlockQuote(TextElement):
     style_name = "markdown.block_quote"
 
     def __init__(self) -> None:
-        self.elements = []
+        self.elements: List[MarkdownElement] = []
 
     def on_enter(self, context: MarkdownContext) -> None:
         context.enter_style(self.style_name)
@@ -118,7 +118,7 @@ class BlockQuote(TextElement):
         self.elements.append(child)
         return False
 
-    def on_leave(self, context: MarkdownContext) -> Iterable[Lines]:
+    def on_leave(self, context: MarkdownContext) -> RenderResult:
         context.leave_style()
         for element in self.elements:
             yield from element.on_leave(context)
@@ -127,9 +127,9 @@ class BlockQuote(TextElement):
 class HorizontalRule(MarkdownElement):
     new_line = False
 
-    def on_leave(self, context: MarkdownContext) -> Iterable[StyledText]:
+    def on_leave(self, context: MarkdownContext) -> Iterable[Styled]:
         style = context.console.get_style("markdown.hr")
-        yield StyledText("─" * context.options.max_width, style)
+        yield Styled("─" * context.options.max_width, style)
 
 
 class MarkdownContext:
@@ -145,6 +145,10 @@ class MarkdownContext:
     def current_style(self) -> Style:
         """Current style which is the product of all styles on the stack."""
         return self.style_stack.current
+
+    @property
+    def width(self) -> int:
+        return self.options.max_width
 
     def on_text(self, text: str) -> None:
         """Called when the parser visits text."""
@@ -185,8 +189,8 @@ class Markdown:
         inlines = self.inlines
         for current, entering in nodes:
             # print(dir(current))
-            print(current, entering)
-            print(current.is_container())
+            # print(current, entering)
+            # print(current.is_container())
             node_type = current.t
             if node_type == "text":
                 context.on_text(current.literal)
@@ -217,7 +221,7 @@ class Markdown:
                         if context.stack:
                             if context.stack.top.on_child_close(context, element):
                                 if element.new_line:
-                                    yield StyledText("\n")
+                                    yield Styled("\n")
                                 yield from element.on_leave(context)
                         else:
                             yield from element.on_leave(context)
@@ -229,128 +233,12 @@ class Markdown:
                         element.on_text(context, current.literal.rstrip())
                     context.stack.pop()
                     if context.stack and element.new_line:
-                        yield StyledText("\n")
+                        yield Styled("\n")
                     yield from element.on_leave(context)
 
 
-# class Markdown:
-#     """Render markdown to the console."""
-
-#     def __init__(self, markup):
-#         self.markup = markup
-
-#     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-
-#         parser = Parser()
-
-#         nodes = parser.parse(self.markup).walker()
-
-#         rendered: List[StyledText] = []
-#         style_stack: Stack[Style] = Stack()
-#         style_stack.push(Style())
-#         stack = Stack()
-
-#         text = Text()
-
-#         null_style = Style()
-
-#         def push_style(name: str) -> Style:
-#             """Enter in to a new style context."""
-#             style = console.get_style(name) or null_style
-#             style = style_stack.top.apply(style)
-#             style_stack.push(style)
-#             return style
-
-#         def pop_style() -> Style:
-#             """Leave a style context."""
-#             return style_stack.pop()
-
-#         deferred_space = False
-
-#         def new_content(
-#             *objects: Union[ConsoleRenderable, StyledText, str], line=True
-#         ) -> RenderResult:
-#             nonlocal deferred_space
-#             if deferred_space and line:
-#                 yield StyledText("\n")
-#             for render_object in objects:
-#                 if isinstance(render_object, str):
-#                     yield StyledText(render_object)
-#                 elif isinstance(render_object, StyledText):
-#                     yield render_object
-#                 else:
-#                     yield render_object
-#             deferred_space = True
-
-#         element_stack: Stack[MarkdownElement] = Stack()
-#         for current, entering in nodes:
-#             node_type = current.t
-#             if node_type == "text":
-#                 element_stack.top.on_text(current.literal)
-#             elif node_type == "emph":
-#                 if entering:
-#                     push_s
-
-#         # for current, entering in nodes:
-#         #     print(current, entering)
-#         #     node_type = current.t
-#         #     if node_type == "text":
-#         #         style = push_style("markdown.text")
-#         #         text.append(current.literal, style)
-#         #         pop_style()
-#         #     elif node_type == "paragraph":
-#         #         if entering:
-#         #             push_style("markdown.paragraph")
-#         #         else:
-#         #             pop_style()
-#         #             yield from new_content(text.wrap(options.max_width))
-#         #             text = Text()
-#         #     elif node_type == "heading":
-#         #         if entering:
-#         #             push_style(f"markdown.h{current.level}")
-#         #         else:
-#         #             pop_style()
-#         #             yield from new_content(
-#         #                 text.wrap(options.max_width, justify="center")
-#         #             )
-#         #             text = Text()
-#         #     elif node_type == "code_block":
-#         #         style = push_style("markdown.code_block")
-#         #         code_text = Text(current.literal.rstrip(), style=style)
-#         #         wrapped_text = code_text.wrap(options.max_width, justify="left")
-#         #         yield from new_content(wrapped_text)
-#         #         pop_style()
-#         #     elif node_type == "code":
-#         #         style = push_style("markdown.code")
-#         #         text.append(current.literal, style)
-#         #         pop_style()
-#         #     elif node_type == "softbreak":
-#         #         text.append("\n")
-#         #     elif node_type == "thematic_break":
-#         #         style = push_style("markdown.hr")
-#         #         yield from new_content(StyledText(f"{'—' * options.max_width}", style))
-#         #         pop_style()
-#         #     elif node_type == "block_quote":
-#         #         if entering:
-#         #             push_style("markdown.block_quote")
-#         #         else:
-#         #             style = pop_style()
-#         #     elif node_type == "list":
-#         #         if entering:
-#         #             push_style("markdown.list")
-#         #         else:
-#         #             pop_style()
-#         #     elif node_type == "item":
-#         #         if entering:
-#         #             push_style("markdown.item")
-#         #         else:
-#         #             pop_style()
-
-#         yield from rendered
-
-
 markup = """
-# This is a header
+# This is a header which is very long and should be wrapped accross several lines, it should render within a cyan panel
 
 ## This is a header L2
 

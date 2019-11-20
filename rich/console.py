@@ -25,7 +25,7 @@ from typing import (
 from .default_styles import DEFAULT_STYLES
 from . import errors
 from .style import Style
-from .styled_text import StyledText
+from .styled import Styled
 
 
 @dataclass
@@ -52,12 +52,12 @@ class ConsoleRenderable(Protocol):
 
     def __console__(
         self, console: Console, options: ConsoleOptions
-    ) -> Iterable[Union[ConsoleRenderable, StyledText]]:
+    ) -> Iterable[Union[ConsoleRenderable, Styled]]:
         ...
 
 
-RenderableType = Union[ConsoleRenderable, StyledText, SupportsStr]
-RenderResult = Iterable[Union[ConsoleRenderable, StyledText]]
+RenderableType = Union[ConsoleRenderable, Styled, SupportsStr]
+RenderResult = Iterable[Union[ConsoleRenderable, Styled]]
 
 
 class ConsoleDimensions(NamedTuple):
@@ -103,7 +103,7 @@ class Console:
         self._height = height
         self._markup = markup
 
-        self.buffer: List[StyledText] = []
+        self.buffer: List[Styled] = []
         self._buffer_index = 0
 
         default_style = Style()
@@ -166,12 +166,12 @@ class Console:
         )
 
     def line(self, count: int = 1) -> None:
-        self.buffer.append(StyledText("\n" * count))
+        self.buffer.append(Styled("\n" * count))
         self._check_buffer()
 
     def render(
         self, renderable: RenderableType, options: Optional[ConsoleOptions]
-    ) -> Iterable[StyledText]:
+    ) -> Iterable[Styled]:
         """Render an object in to an iterable of `StyledText` instances.
 
         This method contains the logic for rendering objects with the console protocol. 
@@ -188,7 +188,7 @@ class Console:
         """
         render_iterable: Iterable[RenderableType]
         render_options = options or self.options
-        if isinstance(renderable, StyledText):
+        if isinstance(renderable, Styled):
             yield renderable
         elif isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__console__(self, render_options)
@@ -196,32 +196,35 @@ class Console:
             render_iterable = self.render_str(str(renderable), render_options)
 
         for render_output in render_iterable:
-            if isinstance(render_output, StyledText):
+            if isinstance(render_output, Styled):
                 yield render_output
             else:
                 yield from self.render(render_output, render_options)
 
     def render_all(
         self, renderables: Iterable[RenderableType], options: Optional[ConsoleOptions]
-    ) -> Iterable[StyledText]:
+    ) -> Iterable[Styled]:
         render_options = options or self.options
         for renderable in renderables:
             yield from self.render(renderable, render_options)
 
     def render_lines(
         self, renderables: Iterable[RenderableType], options: Optional[ConsoleOptions]
-    ) -> List[List[StyledText]]:
+    ) -> List[List[Styled]]:
         from .text import Text
 
-        contents: List[StyledText] = []
+        contents: List[Styled] = []
         render_options = options or self.options
         for renderable in renderables:
-            contents.extend(self.render(renderable, render_options))
+            rendered = list(self.render(renderable, render_options))
+            contents.extend(rendered)
 
-        new_text = Text.from_styled_text(contents)
+        print("!", contents)
+        new_text = Text.from_styled(contents)
+        print("*", new_text)
 
         split_text = new_text.split()
-        lines: List[List[StyledText]] = []
+        lines: List[List[Styled]] = []
         for line in split_text:
             line.end = ""
             line.set_length(render_options.max_width)
@@ -237,7 +240,7 @@ class Console:
 
             yield Markdown(text)
         else:
-            yield StyledText(text, self.current_style)
+            yield Styled(text, self.current_style)
 
     def get_style(self, name: str) -> Optional[Style]:
         """Get a named style, or `None` if it doesn't exist.
@@ -325,7 +328,7 @@ class Console:
             None: 
         """
         write_style = self.current_style or self.get_style(style or "none")
-        self.buffer.append(StyledText(text, write_style))
+        self.buffer.append(Styled(text, write_style))
         self._check_buffer()
 
     def print(self, *objects: RenderableType, sep=" ", end="\n") -> None:
@@ -351,7 +354,7 @@ class Console:
 
         with self:
             for console_object in objects:
-                if isinstance(console_object, (ConsoleRenderable, StyledText)):
+                if isinstance(console_object, (ConsoleRenderable, Styled)):
                     check_strings()
                     buffer_extend(self.render(console_object, options))
                 else:

@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 from .console import Console, ConsoleOptions, RenderResult, RenderableType
 from .style import Style
-from .styled_text import StyledText
+from .styled import Styled
 
 JustifyValues = Optional[Literal["left", "center", "right"]]
 
@@ -122,7 +122,7 @@ class Text:
         return f"<text {self.text!r} {self._spans!r}>"
 
     @classmethod
-    def from_styled_text(cls, styled_text: Iterable[StyledText]) -> Text:
+    def from_styled(cls, styled_text: Iterable[Styled]) -> Text:
         text = Text(justify=None)
         append_span = text._spans.append
         append_text = text._text.append
@@ -178,14 +178,14 @@ class Text:
 
     def __console__(
         self, console: Console, options: ConsoleOptions
-    ) -> Iterable[StyledText]:
+    ) -> Iterable[Styled]:
         lines = self.wrap(options.max_width, justify=self.justify)
         for line in lines:
             yield from self._render_line(line, console, options)
 
     def _render_line(
         self, line: Text, console: Console, options: ConsoleOptions
-    ) -> Iterable[StyledText]:
+    ) -> Iterable[Styled]:
         """Render the rich text to the console.
         
         Args:
@@ -241,13 +241,13 @@ class Text:
                 current_style = Style.combine(stack)
             if next_offset > offset:
                 span_text = text[offset:next_offset]
-                yield StyledText(span_text, current_style)
+                yield Styled(span_text, current_style)
 
         # while stack:
         #     style = stack.pop()
         #     yield StyledText("", style)
         if self.end:
-            yield StyledText(self.end)
+            yield Styled(self.end)
 
     @classmethod
     def join(cls, lines: Iterable[Text]) -> Text:
@@ -359,7 +359,7 @@ class Text:
         average_line_length = -(-text_length // len(line_ranges))
 
         new_lines = Lines(
-            Text(text[start:end].rstrip(), style=self.style)
+            Text(text[start:end].rstrip(), style=self.style, justify=self.justify)
             for start, end in line_ranges
         )
 
@@ -400,7 +400,6 @@ class Text:
         Returns:
             Lines: Number of lines.
         """
-
         lines: Lines = Lines()
         for line in self.split():
             text = line.text
@@ -429,6 +428,7 @@ class Lines(List[Text]):
         """Console render method to insert line-breaks."""
         for line in self:
             yield line
+            yield Styled("\n")
 
     def justify(
         self, width: int, align: Literal["left", "center", "right"] = "left"
@@ -456,7 +456,7 @@ if __name__ == "__main__":
 The main area where I think Django's models are missing out is the lack of type hinting (hardly surprising since Django pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code. It may only save you minutes each time, but multiply that by the number of code + run iterations you do each day, and it can save hours of development time. Multiply that by the lifetime of your project, and it could save weeks or months. A clear win.
 """.rstrip()
     console = Console(width=50, markup=None)
-    rtext = Text(text, style=Style.parse("on black"))
+    rtext = Text(text, style=Style.parse("on black"), justify="center")
     rtext.stylize(20, 60, "bold yellow")
     rtext.stylize(28, 36, "underline")
     rtext.stylize(259, 357, "yellow on blue")
