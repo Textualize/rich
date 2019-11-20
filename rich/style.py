@@ -117,6 +117,14 @@ class Style:
         else:
             return f'<style {self.name} "{self}">'
 
+    def __eq__(self, other) -> bool:
+        return (
+            self._color == other._color
+            and self._back == self._back
+            and self._set_attributes == other._set_attributes
+            and self._attributes == other._attributes,
+        )
+
     @property
     def color(self) -> Optional[str]:
         return self._color.name if self._color is not None else None
@@ -281,6 +289,7 @@ class Style:
             return self
 
         new_style = style.__new__(Style)
+        new_style.name = self.name
         new_style._color = self._color if style._color is None else style._color
         new_style._back = self._back if style._back is None else style._back
         new_style._attributes = (style._attributes & ~self._set_attributes) | (

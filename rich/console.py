@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections import ChainMap
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 import re
 import shutil
@@ -36,6 +36,9 @@ class ConsoleOptions:
     is_terminal: bool
     encoding: str
     min_width: int = 1
+
+    def copy(self) -> ConsoleOptions:
+        return replace(self)
 
 
 class SupportsStr(Protocol):
@@ -92,7 +95,7 @@ class Console:
         file: IO = None,
         width: int = None,
         height: int = None,
-        markup: str = "markdown",
+        markup: Optional[str] = "markdown",
     ):
         self._styles = ChainMap(styles)
         self.file = file or sys.stdout
@@ -167,7 +170,7 @@ class Console:
         self._check_buffer()
 
     def render(
-        self, renderable: RenderableType, options: ConsoleOptions
+        self, renderable: RenderableType, options: Optional[ConsoleOptions]
     ) -> Iterable[StyledText]:
         """Render an object in to an iterable of `StyledText` instances.
 
@@ -184,18 +187,46 @@ class Console:
             Iterable[StyledText]: An iterable of styled text that may be rendered.
         """
         render_iterable: Iterable[RenderableType]
+        render_options = options or self.options
         if isinstance(renderable, StyledText):
             yield renderable
         elif isinstance(renderable, ConsoleRenderable):
-            render_iterable = renderable.__console__(self, options)
+            render_iterable = renderable.__console__(self, render_options)
         else:
-            render_iterable = self.render_str(str(renderable), options)
+            render_iterable = self.render_str(str(renderable), render_options)
 
         for render_output in render_iterable:
             if isinstance(render_output, StyledText):
                 yield render_output
             else:
-                yield from self.render(render_output, options)
+                yield from self.render(render_output, render_options)
+
+    def render_all(
+        self, renderables: Iterable[RenderableType], options: Optional[ConsoleOptions]
+    ) -> Iterable[StyledText]:
+        render_options = options or self.options
+        for renderable in renderables:
+            yield from self.render(renderable, render_options)
+
+    def render_lines(
+        self, renderables: Iterable[RenderableType], options: Optional[ConsoleOptions]
+    ) -> List[List[StyledText]]:
+        from .text import Text
+
+        contents: List[StyledText] = []
+        render_options = options or self.options
+        for renderable in renderables:
+            contents.extend(self.render(renderable, render_options))
+
+        new_text = Text.from_styled_text(contents)
+
+        split_text = new_text.split()
+        lines: List[List[StyledText]] = []
+        for line in split_text:
+            line.end = ""
+            line.set_length(render_options.max_width)
+            lines.append(list(line.__console__(self, render_options)))
+        return lines
 
     def render_str(
         self, text: str, options: ConsoleOptions

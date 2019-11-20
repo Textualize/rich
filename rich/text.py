@@ -8,6 +8,8 @@ from .console import Console, ConsoleOptions, RenderResult, RenderableType
 from .style import Style
 from .styled_text import StyledText
 
+JustifyValues = Optional[Literal["left", "center", "right"]]
+
 
 class TextSpan(NamedTuple):
     """A marked up region in some text."""
@@ -19,7 +21,7 @@ class TextSpan(NamedTuple):
     def __repr__(self) -> str:
         return f'<textspan {self.start}:{self.end} "{self.style}">'
 
-    def split(self, offset: int) -> Tuple[Optional[TextSpan], Optional[TextSpan]]:
+    def split(self, offset: int) -> Tuple[TextSpan, Optional[TextSpan]]:
         """Split a span in to 2 from a given offset."""
 
         if offset < self.start:
@@ -87,19 +89,25 @@ class TextSpan(NamedTuple):
 
     def right_crop(self, offset: int) -> TextSpan:
         start, end, style = self
-        if offset > end:
+        if offset >= end:
             return self
-        return TextSpan(start, max(offset, end), style)
+        return TextSpan(start, min(offset, end), style)
 
 
 class Text:
     """Text with colored spans."""
 
     def __init__(
-        self, text: str = "", style: Union[str, Style] = None, end: str = "",
+        self,
+        text: str = "",
+        style: Union[str, Style] = None,
+        justify: JustifyValues = "left",
+        end: str = "\n",
     ) -> None:
-        self._text: List[str] = [text]
-        self._style = style
+        self._text: List[str] = [text] if text else []
+        self.style = style
+        self.justify = justify
+        self.end = end
         self._text_str: Optional[str] = text
         self._spans: List[TextSpan] = []
         self._length: int = len(text)
@@ -113,9 +121,24 @@ class Text:
     def __repr__(self) -> str:
         return f"<text {self.text!r} {self._spans!r}>"
 
+    @classmethod
+    def from_styled_text(cls, styled_text: Iterable[StyledText]) -> Text:
+        text = Text(justify=None)
+        append_span = text._spans.append
+        append_text = text._text.append
+        offset = 0
+        for text_str, style in styled_text:
+            span_length = len(text_str)
+            append_span(TextSpan(offset, offset + span_length, style or "none"))
+            append_text(text_str)
+            offset += span_length
+            text._length += span_length
+        text._text_str = None
+        return text
+
     def copy(self) -> Text:
         """Return a copy of this instance."""
-        copy_self = Text(self.text, style=self._style)
+        copy_self = Text(self.text, style=self.style)
         copy_self._spans = self._spans[:]
         return copy_self
 
@@ -136,8 +159,32 @@ class Text:
             return
         self._spans.append(TextSpan(max(0, start), min(length, end), style))
 
+    def set_length(self, new_length: int) -> None:
+        """Set new length of the text, clipping or padding is required."""
+        length = len(self)
+        if length == new_length:
+            return
+        if length < new_length:
+            self.pad_right(new_length - length)
+        else:
+            text = self.text[:new_length]
+            self.text = text
+            new_spans = []
+            for span in self._spans:
+                if span.start >= new_length:
+                    break
+                new_spans.append(span.right_crop(new_length))
+            self._spans[:] = new_spans
+
     def __console__(
         self, console: Console, options: ConsoleOptions
+    ) -> Iterable[StyledText]:
+        lines = self.wrap(options.max_width, justify=self.justify)
+        for line in lines:
+            yield from self._render_line(line, console, options)
+
+    def _render_line(
+        self, line: Text, console: Console, options: ConsoleOptions
     ) -> Iterable[StyledText]:
         """Render the rich text to the console.
         
@@ -149,26 +196,26 @@ class Text:
             Iterable[StyledText]: An iterable of styled text.
         """
 
-        text = self.text
+        text = line.text
         stack: List[Style] = []
 
         null_style = Style()
 
         def get_style(style: Union[str, Style]) -> Style:
-
             if isinstance(style, str):
                 return console.parse_style(style)
             return style
 
-        stack.append(get_style(self._style) if self._style is not None else Style())
+        stack.append(get_style(line.style) if line.style is not None else Style())
 
         start_spans = (
             (span.start, True, get_style(span.style) or null_style)
-            for span in self._spans
+            for span in line._spans
         )
+
         end_spans = (
             (span.end, False, get_style(span.style) or null_style)
-            for span in self._spans
+            for span in line._spans
         )
 
         spans = [
@@ -177,11 +224,13 @@ class Text:
             *end_spans,
             (len(text), False, null_style),
         ]
-        spans.sort(key=itemgetter(0))
+        spans.sort(key=itemgetter(0, 1))
 
         current_style = stack[-1]
+
         for (offset, entering, _style), (next_offset, _, _) in zip(spans, spans[1:]):
             style = get_style(_style)
+
             if entering:
                 stack.append(style)
                 current_style = current_style.apply(style)
@@ -190,12 +239,26 @@ class Text:
                 stack.remove(style)
                 stack.reverse()
                 current_style = Style.combine(stack)
-            span_text = text[offset:next_offset]
-            yield StyledText(span_text, current_style)
+            if next_offset > offset:
+                span_text = text[offset:next_offset]
+                yield StyledText(span_text, current_style)
 
-        while stack:
-            style = stack.pop()
-            yield StyledText("", style)
+        # while stack:
+        #     style = stack.pop()
+        #     yield StyledText("", style)
+        if self.end:
+            yield StyledText(self.end)
+
+    @classmethod
+    def join(cls, lines: Iterable[Text]) -> Text:
+        """Join lines in to a new text instance."""
+        new_text = Text()
+        new_text.text = "\n".join(line.text for line in lines)
+        offset = 0
+        for line in lines:
+            new_text._spans.extend(span.move(offset) for span in line._spans)
+            offset += len(line.text)
+        return new_text
 
     @property
     def text(self) -> str:
@@ -209,6 +272,7 @@ class Text:
         """Set the text to a new value."""
         self._text[:] = [new_text]
         self._text_str = new_text
+        self._length = len(new_text)
         return self
 
     def pad_left(self, count: int, character: str = " ") -> None:
@@ -260,7 +324,7 @@ class Text:
         """
         assert separator, "separator must not be empty"
 
-        text = self.text
+        text = self.text.rstrip("\n")
         if separator not in text:
             return [self.copy()]
         offsets: List[int] = []
@@ -285,7 +349,8 @@ class Text:
         """
 
         if not offsets:
-            return Lines([self.copy()])
+            line = self.copy()
+            return Lines([line])
 
         text = self.text
         text_length = len(text)
@@ -294,7 +359,7 @@ class Text:
         average_line_length = -(-text_length // len(line_ranges))
 
         new_lines = Lines(
-            Text(text[start:end].rstrip(), style=self._style)
+            Text(text[start:end].rstrip(), style=self.style)
             for start, end in line_ranges
         )
 
@@ -325,9 +390,7 @@ class Text:
 
         return new_lines
 
-    def wrap(
-        self, width: int, justify: Literal["left", "center", "right"] = "left"
-    ) -> Lines:
+    def wrap(self, width: int, justify: JustifyValues = "left") -> Lines:
         """Word wrap the text.
         
         Args:
@@ -366,7 +429,6 @@ class Lines(List[Text]):
         """Console render method to insert line-breaks."""
         for line in self:
             yield line
-            yield StyledText("\n")
 
     def justify(
         self, width: int, align: Literal["left", "center", "right"] = "left"
@@ -393,26 +455,31 @@ if __name__ == "__main__":
     text = """\
 The main area where I think Django's models are missing out is the lack of type hinting (hardly surprising since Django pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code. It may only save you minutes each time, but multiply that by the number of code + run iterations you do each day, and it can save hours of development time. Multiply that by the lifetime of your project, and it could save weeks or months. A clear win.
 """.rstrip()
-    console = Console()
+    console = Console(width=50, markup=None)
     rtext = Text(text, style=Style.parse("on black"))
     rtext.stylize(20, 60, "bold yellow")
     rtext.stylize(28, 36, "underline")
     rtext.stylize(259, 357, "yellow on blue")
-    print("\n")
+
     console.print(rtext)
-    print("\n")
-    print(repr(rtext))
-    print("\n")
 
-    # console.print(rtext)
+    # lines = rtext.wrap(console.width, justify="left")
+    # for line in lines:
+    #     print(repr(line))
+    # print("-" * 50)
 
-    lines = rtext.wrap(50, justify="left")
-    for line in lines:
-        print(repr(line))
-    print("-" * 50)
+    # with console.style(Style()):
+    #     console.print(lines)
 
-    with console.style(Style()):
-        console.print(lines)
+    from .panel import Panel
+
+    print("--")
+    panel = Panel(rtext)
+    console.print(panel)
+
+    p = Text("hello")
+    console.print(Panel(p))
+
     # console.wrap(50)
 
 # if __name__ == "__main__":

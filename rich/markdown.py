@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, ClassVar, Dict, Iterable, List, Optional, Union
 
 from commonmark.blocks import Parser
 
@@ -12,12 +12,16 @@ from .console import (
     RenderResult,
     StyledText,
 )
+from .panel import Panel
 from .style import Style, StyleStack
 from .text import Lines, Text
 from ._stack import Stack
 
 
 class MarkdownElement:
+
+    new_line: ClassVar[bool] = True
+
     @classmethod
     def create(cls, node: Any) -> MarkdownElement:
         return cls()
@@ -32,8 +36,8 @@ class MarkdownElement:
         return
         yield
 
-    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> None:
-        pass
+    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
+        return True
 
 
 class UnknownElement(MarkdownElement):
@@ -44,21 +48,16 @@ class TextElement(MarkdownElement):
 
     style_name = "none"
 
-    def __init__(self) -> None:
-        self.text = Text()
-
     def on_enter(self, context: MarkdownContext) -> None:
         context.enter_style(self.style_name)
+        self.text = Text(style=context.current_style)
 
     def on_text(self, context: MarkdownContext, text: str) -> None:
         self.text.append(text, context.current_style)
 
-    def on_leave(self, context: MarkdownContext) -> Iterable[Lines]:
+    def on_leave(self, context: MarkdownContext) -> RenderResult:
         context.leave_style()
         yield self.text
-
-    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> None:
-        pass
 
 
 class Paragraph(TextElement):
@@ -67,7 +66,7 @@ class Paragraph(TextElement):
     def on_leave(self, context: MarkdownContext) -> Iterable[Lines]:
         context.leave_style()
         lines = self.text.wrap(context.options.max_width)
-        yield lines
+        yield from lines
 
 
 class Heading(TextElement):
@@ -76,14 +75,61 @@ class Heading(TextElement):
         heading = Heading(node.level)
         return heading
 
+    def on_enter(self, context: MarkdownContext) -> None:
+        self.text = Text(style=context.current_style, end="")
+        context.enter_style(self.style_name)
+
     def __init__(self, level: int) -> None:
+        self.level = level
         self.style_name = f"markdown.h{level}"
         super().__init__()
 
     def on_leave(self, context: MarkdownContext) -> Iterable[Lines]:
         context.leave_style()
-        lines = self.text.wrap(context.options.max_width, justify="center")
+        self.text.justify = "center"
+        if self.level == 1:
+            yield Panel(self.text)
+        else:
+            yield self.text
+            yield StyledText("\n")
+        # lines = self.text.wrap(context.options.max_width, justify="center")
+        # yield lines
+
+
+class CodeBlock(TextElement):
+    style_name = "markdown.code_block"
+
+    def on_leave(self, context: MarkdownContext) -> Iterable[Lines]:
+        context.leave_style()
+        lines = self.text.wrap(context.options.max_width, justify="left")
         yield lines
+
+
+class BlockQuote(TextElement):
+    style_name = "markdown.block_quote"
+
+    def __init__(self) -> None:
+        self.elements = []
+
+    def on_enter(self, context: MarkdownContext) -> None:
+        context.enter_style(self.style_name)
+
+    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
+        self.elements.append(child)
+        return False
+
+    def on_leave(self, context: MarkdownContext) -> Iterable[Lines]:
+        context.leave_style()
+        for element in self.elements:
+            yield from element.on_leave(context)
+
+
+class HorizontalRule(MarkdownElement):
+    new_line = False
+
+    def on_leave(self, context: MarkdownContext) -> Iterable[StyledText]:
+        style = context.console.get_style("markdown.hr")
+        yield StyledText("─" * context.options.max_width, style)
 
 
 class MarkdownContext:
@@ -97,24 +143,34 @@ class MarkdownContext:
 
     @property
     def current_style(self) -> Style:
+        """Current style which is the product of all styles on the stack."""
         return self.style_stack.current
 
     def on_text(self, text: str) -> None:
+        """Called when the parser visits text."""
         self.stack.top.on_text(self, text)
 
     def enter_style(self, style_name: str) -> None:
-        style = console.get_style(style_name) or console.get_style("none")
+        """Enter a style context."""
+        style = self.console.get_style(style_name) or self.console.get_style("none")
         self.style_stack.push(style)
 
     def leave_style(self) -> Style:
+        """Leave a style context."""
         style = self.style_stack.pop()
         return style
 
 
 class Markdown:
 
-    elements = {"paragraph": Paragraph, "heading": Heading}
-    inlines = {"emph", "strong"}
+    elements: ClassVar[Dict[str, MarkdownElement]] = {
+        "paragraph": Paragraph,
+        "heading": Heading,
+        "code_block": CodeBlock,
+        "block_quote": BlockQuote,
+        "thematic_break": HorizontalRule,
+    }
+    inlines = {"emph", "strong", "code"}
 
     def __init__(self, markup: str) -> None:
         """Parses the markup."""
@@ -126,35 +182,55 @@ class Markdown:
         """Render markdown to the console."""
         context = MarkdownContext(console, options)
         nodes = self.parsed.walker()
-
+        inlines = self.inlines
         for current, entering in nodes:
+            # print(dir(current))
             print(current, entering)
+            print(current.is_container())
             node_type = current.t
             if node_type == "text":
                 context.on_text(current.literal)
             elif node_type == "softbreak":
                 if entering:
                     context.on_text("\n")
-            elif node_type in self.inlines:
-                if entering:
-                    context.enter_style(f"markdown.{node_type}")
+            elif node_type in inlines:
+                if current.is_container():
+                    if entering:
+                        context.enter_style(f"markdown.{node_type}")
+                    else:
+                        context.leave_style()
                 else:
+                    context.enter_style(f"markdown.{node_type}")
+                    if current.literal:
+                        context.on_text(current.literal)
                     context.leave_style()
             else:
                 element_class = self.elements.get(node_type) or UnknownElement
+                if current.is_container():
+                    if entering:
+                        element = element_class.create(current)
+                        context.stack.push(element)
+                        element.on_enter(context)
+                    else:
+                        element = context.stack.pop()
 
-                if entering:
+                        if context.stack:
+                            if context.stack.top.on_child_close(context, element):
+                                if element.new_line:
+                                    yield StyledText("\n")
+                                yield from element.on_leave(context)
+                        else:
+                            yield from element.on_leave(context)
+                else:
                     element = element_class.create(current)
                     context.stack.push(element)
                     element.on_enter(context)
-                else:
-                    element = context.stack.pop()
-                    if context.stack:
+                    if current.literal:
+                        element.on_text(context, current.literal.rstrip())
+                    context.stack.pop()
+                    if context.stack and element.new_line:
                         yield StyledText("\n")
                     yield from element.on_leave(context)
-
-                    if context.stack:
-                        context.stack.top.on_child_close(context, element)
 
 
 # class Markdown:
@@ -276,6 +352,16 @@ class Markdown:
 markup = """
 # This is a header
 
+## This is a header L2
+
+### This is a header L3
+
+#### This is a header L4
+
+##### This is a header L5
+
+###### This is a header L6
+
 The main area where I think *Django's models* are `missing` out is the lack of type hinting (hardly surprising since **Django** pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code. It may only save you minutes each time, but multiply that by the number of code + run iterations you do each day, and it can save hours of development time. Multiply that by the lifetime of your project, and it could save weeks or months. A clear win.
 
 ```
@@ -301,13 +387,14 @@ The main area where I think Django's models are missing out is the lack of type 
  * baz
 """
 
-markup = """\
-# Heading
+# markup = """\
+# # Heading
 
-Hello, *World*! 
-**Bold**
+# This is `code`!
+# Hello, *World*!
+# **Bold**
 
-"""
+# """
 
 if __name__ == "__main__":
     from .console import Console
