@@ -240,7 +240,10 @@ class Console:
 
             yield Markdown(text)
         else:
-            yield Styled(text, self.current_style)
+            from .text import Text
+
+            yield Text(text, self.current_style)
+            # yield Styled(text, self.current_style)
 
     def get_style(self, name: str) -> Optional[Style]:
         """Get a named style, or `None` if it doesn't exist.
