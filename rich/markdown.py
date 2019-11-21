@@ -32,12 +32,15 @@ class MarkdownElement:
     def on_text(self, context: MarkdownContext, text: str) -> None:
         pass
 
-    def on_leave(self, context: MarkdownContext) -> RenderResult:
-        return
-        yield
+    def on_leave(self, context: MarkdownContext) -> None:
+        pass
 
     def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
         return True
+
+    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+        return
+        yield
 
 
 class UnknownElement(MarkdownElement):
@@ -49,25 +52,24 @@ class TextElement(MarkdownElement):
     style_name = "none"
 
     def on_enter(self, context: MarkdownContext) -> None:
-        context.enter_style(self.style_name)
+        self.style = context.enter_style(self.style_name)
         self.text = Text(style=context.current_style)
 
     def on_text(self, context: MarkdownContext, text: str) -> None:
         self.text.append(text, context.current_style)
 
-    def on_leave(self, context: MarkdownContext) -> RenderResult:
+    def on_leave(self, context: MarkdownContext) -> None:
         context.leave_style()
+
+    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         yield self.text
 
 
 class Paragraph(TextElement):
     style_name = "markdown.paragraph"
 
-    def on_leave(self, context: MarkdownContext) -> Iterable[Lines]:
-        context.leave_style()
+    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         yield self.text
-        # lines = self.text.wrap(context.width)
-        # yield from lines
 
 
 class Heading(TextElement):
@@ -85,24 +87,19 @@ class Heading(TextElement):
         self.style_name = f"markdown.h{level}"
         super().__init__()
 
-    def on_leave(self, context: MarkdownContext) -> RenderResult:
-        context.leave_style()
-        self.text.justify = "center"
-
+    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+        text = self.text
+        text.justify = "center"
         if self.level == 1:
             yield Panel(
-                self.text, border=DOUBLE_BORDER, style="markdown.h1.border",
+                text, border=DOUBLE_BORDER, style="markdown.h1.border",
             )
         else:
-            yield self.text
+            yield text
 
 
 class CodeBlock(TextElement):
     style_name = "markdown.code_block"
-
-    def on_leave(self, context: MarkdownContext) -> Iterable[Lines]:
-        context.leave_style()
-        yield self.text
 
 
 class BlockQuote(TextElement):
@@ -115,21 +112,62 @@ class BlockQuote(TextElement):
         context.enter_style(self.style_name)
 
     def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
+
         self.elements.append(child)
         return False
 
-    def on_leave(self, context: MarkdownContext) -> RenderResult:
-        context.leave_style()
+    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         for element in self.elements:
-            yield from element.on_leave(context)
+            yield from element.__console__(console, options)
 
 
 class HorizontalRule(MarkdownElement):
     new_line = False
 
-    def on_leave(self, context: MarkdownContext) -> Iterable[Styled]:
-        style = context.console.get_style("markdown.hr")
-        yield Styled("─" * context.options.max_width, style)
+    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+        style = console.get_style("markdown.hr")
+        yield Styled("─" * options.max_width, style)
+
+
+class ListElement(MarkdownElement):
+    def __init__(self) -> None:
+        self.items: List[ListItem] = []
+
+    @classmethod
+    def create(cls, node: Any) -> ListElement:
+        print(node.list_data)
+        print(dir(node))
+        return cls()
+
+    def on_child_close(self, context: MarkdownContext, child: ListItem) -> bool:
+        self.items.append(child)
+        return False
+
+    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+        for item in self.items:
+            yield from item.render_bullet(console, options)
+
+
+class ListItem(TextElement):
+    style_name = "markdown.item"
+
+    def __init__(self) -> None:
+        self.elements: List[MarkdownElement] = []
+
+    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
+        self.elements.append(child)
+        return False
+
+    def render_bullet(self, console: Console, options: ConsoleOptions) -> RenderResult:
+        render_options = options.with_width(options.max_width - 3)
+        lines = console.render_lines(self.elements, render_options, style=self.style)
+        for index, line in enumerate(lines):
+            if index:
+                yield Styled(" " * 3)
+            else:
+                yield Styled(" • ")
+            yield from line
+            yield Styled("\n")
 
 
 class MarkdownContext:
@@ -154,10 +192,11 @@ class MarkdownContext:
         """Called when the parser visits text."""
         self.stack.top.on_text(self, text)
 
-    def enter_style(self, style_name: str) -> None:
+    def enter_style(self, style_name: str) -> Style:
         """Enter a style context."""
         style = self.console.get_style(style_name) or self.console.get_style("none")
         self.style_stack.push(style)
+        return self.current_style
 
     def leave_style(self) -> Style:
         """Leave a style context."""
@@ -173,6 +212,8 @@ class Markdown:
         "code_block": CodeBlock,
         "block_quote": BlockQuote,
         "thematic_break": HorizontalRule,
+        "list": ListElement,
+        "item": ListItem,
     }
     inlines = {"emph", "strong", "code"}
 
@@ -187,9 +228,10 @@ class Markdown:
         context = MarkdownContext(console, options)
         nodes = self.parsed.walker()
         inlines = self.inlines
+        top = True
         for current, entering in nodes:
             # print(dir(current))
-            # print(current, entering)
+            print(current, current.is_container(), entering)
             # print(current.is_container())
             node_type = current.t
             if node_type == "text":
@@ -217,14 +259,22 @@ class Markdown:
                         element.on_enter(context)
                     else:
                         element = context.stack.pop()
-
                         if context.stack:
                             if context.stack.top.on_child_close(context, element):
-                                if element.new_line:
+                                if element.new_line and not top:
                                     yield Styled("\n")
-                                yield from element.on_leave(context)
+                                yield from element.__console__(
+                                    context.console, console.options
+                                )
+                                element.on_leave(context)
+                            else:
+                                element.on_leave(context)
                         else:
-                            yield from element.on_leave(context)
+                            element.on_leave(context)
+                            yield from element.__console__(
+                                context.console, console.options
+                            )
+                        top = False
                 else:
                     element = element_class.create(current)
                     context.stack.push(element)
@@ -234,7 +284,8 @@ class Markdown:
                     context.stack.pop()
                     if context.stack and element.new_line:
                         yield Styled("\n")
-                    yield from element.on_leave(context)
+                    yield from element.__console__(context.console, console.options)
+                    element.on_leave(context)
 
 
 markup = """
@@ -270,9 +321,12 @@ The main area where I think Django's models are missing out is the lack of type 
 > This is a *block* quote
 > With another line
 
- * foo
+
+ * Hello, *World*!
+   Another line
  * bar
  * baz
+
 """
 
 # markup = """\

@@ -5,6 +5,7 @@ from collections import ChainMap
 from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from enum import Enum
+from itertools import chain
 import re
 import shutil
 import sys
@@ -39,6 +40,9 @@ class ConsoleOptions:
 
     def copy(self) -> ConsoleOptions:
         return replace(self)
+
+    def with_width(self, width: int) -> ConsoleOptions:
+        return replace(self, min_width=width, max_width=width)
 
 
 class SupportsStr(Protocol):
@@ -209,7 +213,10 @@ class Console:
             yield from self.render(renderable, render_options)
 
     def render_lines(
-        self, renderables: Iterable[RenderableType], options: Optional[ConsoleOptions]
+        self,
+        renderables: Iterable[RenderableType],
+        options: Optional[ConsoleOptions],
+        style: Optional[Style] = None,
     ) -> List[List[Styled]]:
         """Render objects in to a list of lines.
 
@@ -223,13 +230,20 @@ class Console:
         Returns:
             List[List[Styled]]: A list of lines, where a line is a list of Styled text objects.
         """
-
-        contents: List[Styled] = []
+        style = style or self.current_style
         render_options = options or self.options
-        for renderable in renderables:
-            contents.extend(self.render(renderable, render_options))
-        lines = Styled.get_lines(contents, length=render_options.max_width)
-        return lines
+
+        lines = Styled.split_lines(
+            Styled.apply(
+                chain.from_iterable(
+                    self.render(renderable, render_options)
+                    for renderable in renderables
+                ),
+                style,
+            ),
+            render_options.max_width,
+        )
+        return list(lines)
 
     def render_str(
         self, text: str, options: ConsoleOptions
@@ -243,7 +257,6 @@ class Console:
             from .text import Text
 
             yield Text(text, self.current_style)
-            # yield Styled(text, self.current_style)
 
     def get_style(self, name: str) -> Optional[Style]:
         """Get a named style, or `None` if it doesn't exist.
@@ -374,14 +387,16 @@ class Console:
         """Render buffered output, and clear buffer."""
         output: List[str] = []
         append = output.append
-        for text, style in self.buffer:
-            if style:
-                style = self.current_style.apply(style)
-                append(style.render(text, reset=True))
-            else:
-                append(text)
+        current_style = self.current_style
+        for line in Styled.split_lines(self.buffer, self.width):
+            for text, style in line:
+                if style:
+                    style = current_style.apply(style)
+                    append(style.render(text, reset=True))
+                else:
+                    append(text)
+            append("\n")
         rendered = "".join(output)
-
         del self.buffer[:]
         return rendered
 
@@ -426,8 +441,6 @@ if __name__ == "__main__":
     #         console.write("in style")
     # console.write("!")
 
-    console.print("Hello", "*World*")
-    console.print()
     with console.style("dim on black"):
         console.print("**Hello**, *World*!")
         console.print("Hello, *World*!")

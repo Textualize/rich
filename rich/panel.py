@@ -86,13 +86,21 @@ class Panel:
         border: Border = SQUARE_BORDER,
         style: str = "none",
     ) -> None:
+        """A console renderable that draws a border around its contents.
+        
+        Args:
+            *contents (ConsoleRenderable): One or more console renderable objects.
+            border (Border, optional): A Border instance that defines the look of the border.
+                Defaults to SQUARE_BORDER.
+            style (str, optional): The style of the border. Defaults to "none".
+        """
         self.contents: Tuple[ConsoleRenderable, ...] = contents
         self.border = border
         self.style = style
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
 
-        style = console.get_style(self.style)
+        style = console.parse_style(self.style)
         width = options.max_width
         child_options = options.copy()
         child_options.max_width = width - 2
@@ -104,6 +112,6 @@ class Panel:
         yield Styled(border.get_top(width), style)
         for line in lines:
             yield line_start
-            yield line
+            yield from line
             yield line_end
         yield Styled(border.get_bottom(width), style)

@@ -480,7 +480,7 @@ The main area where I think Django's models are missing out is the lack of type 
     console.print(panel)
 
     p = Text("hello")
-    console.print(Panel(p))
+    console.print(Panel(p, style="yellow on blue"))
 
     # console.wrap(50)
 
