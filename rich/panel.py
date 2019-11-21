@@ -94,18 +94,16 @@ class Panel:
 
         style = console.get_style(self.style)
         width = options.max_width
-        contents_width = width - 2
         child_options = options.copy()
-        child_options.max_width = contents_width
+        child_options.max_width = width - 2
 
         lines = console.render_lines(self.contents, child_options)
-
         border = self.border
         line_start = Styled(border.left, style)
         line_end = Styled(f"{border.right}\n", style)
         yield Styled(border.get_top(width), style)
         for line in lines:
             yield line_start
-            yield from line
+            yield line
             yield line_end
         yield Styled(border.get_bottom(width), style)

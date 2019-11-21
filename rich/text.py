@@ -386,6 +386,8 @@ class Text:
                     break
                 span = new_span
                 line_index += 1
+                if line_index >= len(line_ranges):
+                    break
                 line_start, line_end = line_ranges[line_index]
 
         return new_lines
@@ -412,7 +414,7 @@ class Text:
                 if break_offset != -1:
                     line_end = break_offset + 1
                 line_start = line_end
-                line_end = line_start + width + 1
+                line_end = line_start + width
                 offsets.append(line_start)
             new_lines = line.divide(offsets)
             if justify:
@@ -456,7 +458,7 @@ if __name__ == "__main__":
 The main area where I think Django's models are missing out is the lack of type hinting (hardly surprising since Django pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code. It may only save you minutes each time, but multiply that by the number of code + run iterations you do each day, and it can save hours of development time. Multiply that by the lifetime of your project, and it could save weeks or months. A clear win.
 """.rstrip()
     console = Console(width=50, markup=None)
-    rtext = Text(text, style=Style.parse("on black"), justify="center")
+    rtext = Text(text, style=Style.parse("on black"), justify=None)
     rtext.stylize(20, 60, "bold yellow")
     rtext.stylize(28, 36, "underline")
     rtext.stylize(259, 357, "yellow on blue")

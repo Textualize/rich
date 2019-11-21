@@ -211,24 +211,24 @@ class Console:
     def render_lines(
         self, renderables: Iterable[RenderableType], options: Optional[ConsoleOptions]
     ) -> List[List[Styled]]:
-        from .text import Text
+        """Render objects in to a list of lines.
+
+        The output of render_lines is useful when further formatting of rendered console text
+        is required, such as the Panel class which draws a border around any renderable object.
+        
+        Args:
+            renderables (Iterable[RenderableType]): Any object or objects renderable in the console.
+            options (Optional[ConsoleOptions]): Console options used to render with.
+        
+        Returns:
+            List[List[Styled]]: A list of lines, where a line is a list of Styled text objects.
+        """
 
         contents: List[Styled] = []
         render_options = options or self.options
         for renderable in renderables:
-            rendered = list(self.render(renderable, render_options))
-            contents.extend(rendered)
-
-        print("!", contents)
-        new_text = Text.from_styled(contents)
-        print("*", new_text)
-
-        split_text = new_text.split()
-        lines: List[List[Styled]] = []
-        for line in split_text:
-            line.end = ""
-            line.set_length(render_options.max_width)
-            lines.append(list(line.__console__(self, render_options)))
+            contents.extend(self.render(renderable, render_options))
+        lines = Styled.get_lines(contents, length=render_options.max_width)
         return lines
 
     def render_str(
