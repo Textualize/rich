@@ -373,7 +373,10 @@ class Text:
         )
 
         for span in self._spans:
+            if span.start >= text_length:
+                continue
             line_index = span.start // average_line_length
+
             line_start, line_end = line_ranges[line_index]
             if span.start < line_start:
                 while True:

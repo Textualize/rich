@@ -69,6 +69,7 @@ class Paragraph(TextElement):
     style_name = "markdown.paragraph"
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+        print(repr(self.text))
         yield self.text
 
 
@@ -108,8 +109,8 @@ class BlockQuote(TextElement):
     def __init__(self) -> None:
         self.elements: List[MarkdownElement] = []
 
-    def on_enter(self, context: MarkdownContext) -> None:
-        context.enter_style(self.style_name)
+    # def on_enter(self, context: MarkdownContext) -> None:
+    #     context.enter_style(self.style_name)
 
     def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
 
@@ -117,8 +118,17 @@ class BlockQuote(TextElement):
         return False
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        for element in self.elements:
-            yield from element.__console__(console, options)
+        render_options = options.with_width(options.max_width - 4)
+        lines = console.render_lines(self.elements, render_options, style=self.style)
+        last_index = len(lines) - 1
+        left_quote = "“ "
+        right_quote = " ”"
+
+        for index, line in enumerate(lines):
+            yield Segment(left_quote if index == 0 else "  ", self.style)
+            yield from line
+            yield Segment(right_quote if index == last_index else "  ", self.style)
+            yield Segment("\n")
 
 
 class HorizontalRule(MarkdownElement):
@@ -130,22 +140,30 @@ class HorizontalRule(MarkdownElement):
 
 
 class ListElement(MarkdownElement):
-    def __init__(self) -> None:
-        self.items: List[ListItem] = []
-
     @classmethod
     def create(cls, node: Any) -> ListElement:
-        print(node.list_data)
-        print(dir(node))
-        return cls()
+        list_data = node.list_data
+        return cls(list_data["type"], list_data["start"])
+
+    def __init__(self, list_type: str, list_start: int) -> None:
+        self.items: List[ListItem] = []
+        self.list_type = list_type
+        self.list_start = list_start
 
     def on_child_close(self, context: MarkdownContext, child: ListItem) -> bool:
         self.items.append(child)
         return False
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        for item in self.items:
-            yield from item.render_bullet(console, options)
+        if self.list_type == "bullet":
+            for item in self.items:
+                yield from item.render_bullet(console, options)
+        else:
+            number = 1 if self.list_start is None else self.list_start
+            last_number = number + len(self.items)
+            for item in self.items:
+                yield from item.render_number(console, options, number, last_number)
+                number += 1
 
 
 class ListItem(TextElement):
@@ -161,11 +179,28 @@ class ListItem(TextElement):
     def render_bullet(self, console: Console, options: ConsoleOptions) -> RenderResult:
         render_options = options.with_width(options.max_width - 3)
         lines = console.render_lines(self.elements, render_options, style=self.style)
+        bullet_style = console.parse_style("markdown.item.bullet")
         for index, line in enumerate(lines):
             if index:
-                yield Segment(" " * 3)
+                yield Segment(" " * 2, bullet_style)
             else:
-                yield Segment(" • ")
+                yield Segment("• ", bullet_style)
+            yield from line
+            yield Segment("\n")
+
+    def render_number(
+        self, console: Console, options: ConsoleOptions, number: int, last_number: int
+    ) -> RenderResult:
+        number_width = len(str(last_number)) + 2
+        render_options = options.with_width(options.max_width - number_width)
+        lines = console.render_lines(self.elements, render_options, style=self.style)
+        number_style = console.parse_style("markdown.item.number")
+        for index, line in enumerate(lines):
+            if index:
+                yield Segment(" " * number_width, number_style)
+            else:
+                number_str = f"{number}.".rjust(number_width - 1) + " "
+                yield Segment(number_str, number_style)
             yield from line
             yield Segment("\n")
 
@@ -215,7 +250,7 @@ class Markdown:
         "list": ListElement,
         "item": ListItem,
     }
-    inlines = {"emph", "strong", "code"}
+    inlines = {"emph", "strong", "code", "link"}
 
     def __init__(self, markup: str) -> None:
         """Parses the markup."""
@@ -231,7 +266,7 @@ class Markdown:
         new_line = False
         for current, entering in nodes:
             # print(dir(current))
-            print(current, current.is_container(), entering)
+            print(current, current.is_container(), entering, current.destination)
             # print(current.is_container())
             node_type = current.t
             if node_type == "text":
@@ -250,6 +285,12 @@ class Markdown:
                     if current.literal:
                         context.on_text(current.literal)
                     context.leave_style()
+                if current.destination and not entering:
+                    context.on_text(" (")
+                    context.enter_style("markdown.link_url")
+                    context.on_text(current.destination)
+                    context.leave_style()
+                    context.on_text(") ")
             else:
                 element_class = self.elements.get(node_type) or UnknownElement
                 if current.is_container():
@@ -319,14 +360,23 @@ The main area where I think Django's models are missing out is the lack of type 
 # Another header
 qqweo qlkwje lqkwej 
 
-> This is a *block* quote
-> With another line
+> The main area where I think Django's models are missing out is the lack of type hinting (hardly surprising since Django pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code. It may only save you minutes each time, but multiply that by the number of code + run iterations you do each day, and it can save hours of development time. Multiply that by the lifetime of your project, and it could save weeks or months. A clear win.
 
 
  * Hello, *World*!
    Another line
  * bar
  * baz
+
+1. First *Item* **in bold!**
+   Foo bar baz etc
+2. Second Item
+3. The main area where I think Django's models are missing out is the lack of type hinting (hardly surprising since Django pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code.
+
+- sdfsdf
+- wewerwer
+
+This is a [link](https://www.willmcgugan.com)
 
 """
 

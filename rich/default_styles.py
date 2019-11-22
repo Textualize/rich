@@ -45,7 +45,9 @@ MARKDOWN_STYLES = {
     ),
     "markdown.block_quote": Style("markdown.code_block", color="magenta"),
     "markdown.list": Style("markdown.list", color="cyan"),
-    "markdown.item": Style("markdown.item", back="blue"),
+    "markdown.item": Style("markdown.item"),
+    "markdown.item.bullet": Style("markdown.item", color="yellow"),
+    "markdown.item.number": Style("markdown.item", bold=True, dim=True),
     "markdown.hr": Style("markdown.hr", dim=True),
     "markdown.h1.border": Style("markdown.h1.border", color="cyan"),
     "markdown.h1": Style("markdown.h1", bold=True),
@@ -55,5 +57,7 @@ MARKDOWN_STYLES = {
     "markdown.h5": Style("markdown.h5", underline=True),
     "markdown.h6": Style("markdown.h6", italic=True),
     "markdown.h7": Style("markdown.h7", italic=True, dim=True),
+    "markdown.link": Style(bold=True),
+    "markdown.link_url": Style(underline=True),
 }
 DEFAULT_STYLES.update(MARKDOWN_STYLES)
