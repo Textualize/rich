@@ -18,12 +18,22 @@ class Styled(NamedTuple):
         return f"Styled({self.text!r}, {self.style!r})"
 
     @classmethod
-    def apply(
+    def apply_style(
         cls, styled_text: Iterable[Styled], style: Style = None
     ) -> Iterable[Styled]:
+        """Apply a style to an iterable of styled text.
+        
+        Args:
+            styled_text (Iterable[Styled]): Styled text.
+            style (Style, optional): A style to apply. Defaults to None.
+        
+        Returns:
+            Iterable[Styled]: A new iterable of styles (possibly the same iterable).
+        """
         if style is None:
             return styled_text
-        return (cls(text, style.apply(_style)) for text, _style in styled_text)
+        apply = style.apply
+        return (cls(text, apply(style)) for text, style in styled_text)
 
     @classmethod
     def split_lines(

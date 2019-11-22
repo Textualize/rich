@@ -126,7 +126,7 @@ class HorizontalRule(MarkdownElement):
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         style = console.get_style("markdown.hr")
-        yield Styled("─" * options.max_width, style)
+        yield Styled(f'{"─" * options.max_width}\n', style)
 
 
 class ListElement(MarkdownElement):
@@ -228,7 +228,7 @@ class Markdown:
         context = MarkdownContext(console, options)
         nodes = self.parsed.walker()
         inlines = self.inlines
-        top = True
+        new_line = False
         for current, entering in nodes:
             # print(dir(current))
             print(current, current.is_container(), entering)
@@ -261,31 +261,29 @@ class Markdown:
                         element = context.stack.pop()
                         if context.stack:
                             if context.stack.top.on_child_close(context, element):
-                                if element.new_line and not top:
+                                if new_line:
                                     yield Styled("\n")
-                                yield from element.__console__(
-                                    context.console, console.options
-                                )
+                                yield from console.render(element, context.options)
                                 element.on_leave(context)
                             else:
                                 element.on_leave(context)
                         else:
                             element.on_leave(context)
-                            yield from element.__console__(
-                                context.console, console.options
-                            )
-                        top = False
+                            yield from console.render(element, context.options)
+                        new_line = element.new_line
                 else:
                     element = element_class.create(current)
+
                     context.stack.push(element)
                     element.on_enter(context)
                     if current.literal:
                         element.on_text(context, current.literal.rstrip())
                     context.stack.pop()
-                    if context.stack and element.new_line:
+                    if new_line:
                         yield Styled("\n")
-                    yield from element.__console__(context.console, console.options)
+                    yield from console.render(element, context.options)
                     element.on_leave(context)
+                    new_line = element.new_line
 
 
 markup = """
@@ -318,6 +316,9 @@ The main area where I think *Django's models* are `missing` out is the lack of t
 The main area where I think Django's models are missing out is the lack of type hinting (hardly surprising since Django pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code. It may only save you minutes each time, but multiply that by the number of code + run iterations you do each day, and it can save hours of development time. Multiply that by the lifetime of your project, and it could save weeks or months. A clear win.
 
 ---
+# Another header
+qqweo qlkwje lqkwej 
+
 > This is a *block* quote
 > With another line
 

@@ -234,7 +234,7 @@ class Console:
         render_options = options or self.options
 
         lines = Styled.split_lines(
-            Styled.apply(
+            Styled.apply_style(
                 chain.from_iterable(
                     self.render(renderable, render_options)
                     for renderable in renderables
