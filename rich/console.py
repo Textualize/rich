@@ -26,7 +26,7 @@ from typing import (
 from .default_styles import DEFAULT_STYLES
 from . import errors
 from .style import Style
-from .styled import Styled
+from .segment import Segment
 
 
 @dataclass
@@ -56,12 +56,12 @@ class ConsoleRenderable(Protocol):
 
     def __console__(
         self, console: Console, options: ConsoleOptions
-    ) -> Iterable[Union[ConsoleRenderable, Styled]]:
+    ) -> Iterable[Union[ConsoleRenderable, Segment]]:
         ...
 
 
-RenderableType = Union[ConsoleRenderable, Styled, SupportsStr]
-RenderResult = Iterable[Union[ConsoleRenderable, Styled]]
+RenderableType = Union[ConsoleRenderable, Segment, SupportsStr]
+RenderResult = Iterable[Union[ConsoleRenderable, Segment]]
 
 
 class ConsoleDimensions(NamedTuple):
@@ -107,7 +107,7 @@ class Console:
         self._height = height
         self._markup = markup
 
-        self.buffer: List[Styled] = []
+        self.buffer: List[Segment] = []
         self._buffer_index = 0
 
         default_style = Style()
@@ -170,13 +170,13 @@ class Console:
         )
 
     def line(self, count: int = 1) -> None:
-        self.buffer.append(Styled("\n" * count))
+        self.buffer.append(Segment("\n" * count))
         self._check_buffer()
 
     def render(
         self, renderable: RenderableType, options: Optional[ConsoleOptions]
-    ) -> Iterable[Styled]:
-        """Render an object in to an iterable of `StyledText` instances.
+    ) -> Iterable[Segment]:
+        """Render an object in to an iterable of `Segment` instances.
 
         This method contains the logic for rendering objects with the console protocol. 
         You are unlikely to need to use it directly, unless you are extending the library.
@@ -188,11 +188,11 @@ class Console:
             options (ConsoleOptions, optional): An options objects. Defaults to None.
         
         Returns:
-            Iterable[StyledText]: An iterable of styled text that may be rendered.
+            Iterable[Segment]: An iterable of segments that may be rendered.
         """
         render_iterable: Iterable[RenderableType]
         render_options = options or self.options
-        if isinstance(renderable, Styled):
+        if isinstance(renderable, Segment):
             yield renderable
         elif isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__console__(self, render_options)
@@ -200,14 +200,14 @@ class Console:
             render_iterable = self.render_str(str(renderable), render_options)
 
         for render_output in render_iterable:
-            if isinstance(render_output, Styled):
+            if isinstance(render_output, Segment):
                 yield render_output
             else:
                 yield from self.render(render_output, render_options)
 
     def render_all(
         self, renderables: Iterable[RenderableType], options: Optional[ConsoleOptions]
-    ) -> Iterable[Styled]:
+    ) -> Iterable[Segment]:
         render_options = options or self.options
         for renderable in renderables:
             yield from self.render(renderable, render_options)
@@ -217,7 +217,7 @@ class Console:
         renderables: Iterable[RenderableType],
         options: Optional[ConsoleOptions],
         style: Optional[Style] = None,
-    ) -> List[List[Styled]]:
+    ) -> List[List[Segment]]:
         """Render objects in to a list of lines.
 
         The output of render_lines is useful when further formatting of rendered console text
@@ -228,13 +228,13 @@ class Console:
             options (Optional[ConsoleOptions]): Console options used to render with.
         
         Returns:
-            List[List[Styled]]: A list of lines, where a line is a list of Styled text objects.
+            List[List[Segment]]: A list of lines, where a line is a list of Segment objects.
         """
         style = style or self.current_style
         render_options = options or self.options
 
-        lines = Styled.split_lines(
-            Styled.apply_style(
+        lines = Segment.split_lines(
+            Segment.apply_style(
                 chain.from_iterable(
                     self.render(renderable, render_options)
                     for renderable in renderables
@@ -344,7 +344,7 @@ class Console:
             None: 
         """
         write_style = self.current_style or self.get_style(style or "none")
-        self.buffer.append(Styled(text, write_style))
+        self.buffer.append(Segment(text, write_style))
         self._check_buffer()
 
     def print(self, *objects: RenderableType, sep=" ", end="\n") -> None:
@@ -370,7 +370,7 @@ class Console:
 
         with self:
             for console_object in objects:
-                if isinstance(console_object, (ConsoleRenderable, Styled)):
+                if isinstance(console_object, (ConsoleRenderable, Segment)):
                     check_strings()
                     buffer_extend(self.render(console_object, options))
                 else:
@@ -388,7 +388,7 @@ class Console:
         output: List[str] = []
         append = output.append
         current_style = self.current_style
-        for line in Styled.split_lines(self.buffer, self.width):
+        for line in Segment.split_lines(self.buffer, self.width):
             for text, style in line:
                 if style:
                     style = current_style.apply(style)

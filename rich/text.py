@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 from .console import Console, ConsoleOptions, RenderResult, RenderableType
 from .style import Style
-from .styled import Styled
+from .segment import Segment
 
 JustifyValues = Optional[Literal["left", "center", "right"]]
 
@@ -122,12 +122,12 @@ class Text:
         return f"<text {self.text!r} {self._spans!r}>"
 
     @classmethod
-    def from_styled(cls, styled_text: Iterable[Styled]) -> Text:
+    def from_segments(cls, segments: Iterable[Segment]) -> Text:
         text = Text(justify=None)
         append_span = text._spans.append
         append_text = text._text.append
         offset = 0
-        for text_str, style in styled_text:
+        for text_str, style in segments:
             span_length = len(text_str)
             append_span(TextSpan(offset, offset + span_length, style or "none"))
             append_text(text_str)
@@ -178,14 +178,14 @@ class Text:
 
     def __console__(
         self, console: Console, options: ConsoleOptions
-    ) -> Iterable[Styled]:
+    ) -> Iterable[Segment]:
         lines = self.wrap(options.max_width, justify=self.justify)
         for line in lines:
             yield from self._render_line(line, console, options)
 
     def _render_line(
         self, line: Text, console: Console, options: ConsoleOptions
-    ) -> Iterable[Styled]:
+    ) -> Iterable[Segment]:
         """Render the rich text to the console.
         
         Args:
@@ -193,7 +193,7 @@ class Text:
             options (ConsoleOptions): Console options.
         
         Returns:
-            Iterable[StyledText]: An iterable of styled text.
+            Iterable[Segment]: An iterable of segments.
         """
 
         text = line.text
@@ -241,13 +241,13 @@ class Text:
                 current_style = Style.combine(stack)
             if next_offset > offset:
                 span_text = text[offset:next_offset]
-                yield Styled(span_text, current_style)
+                yield Segment(span_text, current_style)
 
         # while stack:
         #     style = stack.pop()
-        #     yield StyledText("", style)
+        #     yield Segment("", style)
         if self.end:
-            yield Styled(self.end)
+            yield Segment(self.end)
 
     @classmethod
     def join(cls, lines: Iterable[Text]) -> Text:
@@ -430,7 +430,7 @@ class Lines(List[Text]):
         """Console render method to insert line-breaks."""
         for line in self:
             yield line
-            yield Styled("\n")
+            yield Segment("\n")
 
     def justify(
         self, width: int, align: Literal["left", "center", "right"] = "left"

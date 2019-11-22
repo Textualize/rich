@@ -4,7 +4,7 @@ from typing import Tuple
 
 from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult
 from .text import Text
-from .styled import Styled
+from .segment import Segment
 
 
 class Border:
@@ -107,11 +107,11 @@ class Panel:
 
         lines = console.render_lines(self.contents, child_options)
         border = self.border
-        line_start = Styled(border.left, style)
-        line_end = Styled(f"{border.right}\n", style)
-        yield Styled(border.get_top(width), style)
+        line_start = Segment(border.left, style)
+        line_end = Segment(f"{border.right}\n", style)
+        yield Segment(border.get_top(width), style)
         for line in lines:
             yield line_start
             yield from line
             yield line_end
-        yield Styled(border.get_bottom(width), style)
+        yield Segment(border.get_bottom(width), style)

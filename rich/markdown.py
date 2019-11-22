@@ -10,7 +10,7 @@ from .console import (
     ConsoleOptions,
     ConsoleRenderable,
     RenderResult,
-    Styled,
+    Segment,
 )
 from .panel import DOUBLE_BORDER, Panel
 from .style import Style, StyleStack
@@ -126,7 +126,7 @@ class HorizontalRule(MarkdownElement):
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         style = console.get_style("markdown.hr")
-        yield Styled(f'{"─" * options.max_width}\n', style)
+        yield Segment(f'{"─" * options.max_width}\n', style)
 
 
 class ListElement(MarkdownElement):
@@ -163,11 +163,11 @@ class ListItem(TextElement):
         lines = console.render_lines(self.elements, render_options, style=self.style)
         for index, line in enumerate(lines):
             if index:
-                yield Styled(" " * 3)
+                yield Segment(" " * 3)
             else:
-                yield Styled(" • ")
+                yield Segment(" • ")
             yield from line
-            yield Styled("\n")
+            yield Segment("\n")
 
 
 class MarkdownContext:
@@ -262,7 +262,7 @@ class Markdown:
                         if context.stack:
                             if context.stack.top.on_child_close(context, element):
                                 if new_line:
-                                    yield Styled("\n")
+                                    yield Segment("\n")
                                 yield from console.render(element, context.options)
                                 element.on_leave(context)
                             else:
@@ -280,7 +280,7 @@ class Markdown:
                         element.on_text(context, current.literal.rstrip())
                     context.stack.pop()
                     if new_line:
-                        yield Styled("\n")
+                        yield Segment("\n")
                     yield from console.render(element, context.options)
                     element.on_leave(context)
                     new_line = element.new_line
