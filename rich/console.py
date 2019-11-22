@@ -349,8 +349,12 @@ class Console:
             StyleContext: A style context manager.
         """
         if isinstance(style, str):
-            style = Style.parse(style)
-        return StyleContext(self, style)
+            _style = self.parse_style(style) or Style()
+        else:
+            if not isinstance(style, Style):
+                raise TypeError(f"style must be a str or Style instance, not {style!r}")
+            _style = style
+        return StyleContext(self, _style)
 
     def write(self, text: str, style: str = None) -> None:
         """Write text in the current style.
