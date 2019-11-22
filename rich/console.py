@@ -114,32 +114,22 @@ class Console:
         self.style_stack: List[Style] = [default_style]
         self.current_style = default_style
 
-    # def push_styles(self, styles: Dict[str, Style]) -> None:
-    #     """Push a new set of styles on to the style stack.
-
-    #     Args:
-    #         styles (Dict[str, Style]): A mapping of styles.
-
-    #     """
-    #     self._styles.maps.insert(0, styles)
-
-    # def pop_styles(self) -> None:
-    #     if len(self._styles.maps) == 1:
-    #         raise StyleError("Can't pop default styles")
-    #     self._styles.maps.pop(0)
-
     def _enter_buffer(self) -> None:
+        """Enter in to a buffer context, and buffer all output."""
         self._buffer_index += 1
 
     def _exit_buffer(self) -> None:
+        """Leave buffer context, and render content if required."""
         self._buffer_index -= 1
         self._check_buffer()
 
     def __enter__(self) -> Console:
+        """Own context manager to enter buffer context."""
         self._enter_buffer()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
+        """Exit buffer context."""
         self._exit_buffer()
 
     @property
@@ -170,6 +160,15 @@ class Console:
         )
 
     def line(self, count: int = 1) -> None:
+        """Write new line(s).
+        
+        Args:
+            count (int, optional): Number of new lines. Defaults to 1.
+        """
+
+        assert count >= 0, "count must be >= 0"
+        if not count:
+            return
         self.buffer.append(Segment("\n" * count))
         self._check_buffer()
 
@@ -208,6 +207,16 @@ class Console:
     def render_all(
         self, renderables: Iterable[RenderableType], options: Optional[ConsoleOptions]
     ) -> Iterable[Segment]:
+        """Render a number of console objects.
+        
+        Args:
+            renderables (Iterable[RenderableType]): Console objects.
+            options (Optional[ConsoleOptions]): Options for render.
+        
+        Returns:
+            Iterable[Segment]: Segments to be written to the console.
+        
+        """
         render_options = options or self.options
         for renderable in renderables:
             yield from self.render(renderable, render_options)
@@ -248,7 +257,16 @@ class Console:
     def render_str(
         self, text: str, options: ConsoleOptions
     ) -> Iterable[RenderableType]:
-        """Render a string."""
+        """Convert a string to something renderable.
+        
+        Args:
+            text (str): Text to render.
+            options (ConsoleOptions): Options for render.
+        
+        Returns:
+            Iterable[RenderableType]: Renderable objects.
+        
+        """
         if self._markup == "markdown":
             from .markdown import Markdown
 

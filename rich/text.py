@@ -123,6 +123,15 @@ class Text:
 
     @classmethod
     def from_segments(cls, segments: Iterable[Segment]) -> Text:
+        """Convert segments in to a Text object for further processing.
+        
+        Args:
+            segments (Iterable[Segment]): Segments from a rendered console object.
+        
+        Returns:
+            Text: A new text instance.
+        """
+
         text = Text(justify=None)
         append_span = text._spans.append
         append_text = text._text.append
@@ -193,7 +202,7 @@ class Text:
             options (ConsoleOptions): Console options.
         
         Returns:
-            Iterable[Segment]: An iterable of segments.
+            Iterable[Segment]: Result of render that may be written to the console.
         """
 
         text = line.text
@@ -203,7 +212,7 @@ class Text:
 
         def get_style(style: Union[str, Style]) -> Style:
             if isinstance(style, str):
-                return console.parse_style(style)
+                return console.parse_style(style) or Style()
             return style
 
         stack.append(get_style(line.style) if line.style is not None else Style())
