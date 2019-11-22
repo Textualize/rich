@@ -109,11 +109,7 @@ class BlockQuote(TextElement):
     def __init__(self) -> None:
         self.elements: List[MarkdownElement] = []
 
-    # def on_enter(self, context: MarkdownContext) -> None:
-    #     context.enter_style(self.style_name)
-
     def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
-
         self.elements.append(child)
         return False
 
@@ -145,7 +141,7 @@ class ListElement(MarkdownElement):
         list_data = node.list_data
         return cls(list_data["type"], list_data["start"])
 
-    def __init__(self, list_type: str, list_start: int) -> None:
+    def __init__(self, list_type: str, list_start: Optional[int]) -> None:
         self.items: List[ListItem] = []
         self.list_type = list_type
         self.list_start = list_start
@@ -203,6 +199,7 @@ class ListItem(TextElement):
                 yield Segment(number_str, number_style)
             yield from line
             yield Segment("\n")
+        yield Segment("\n")
 
 
 class MarkdownContext:
