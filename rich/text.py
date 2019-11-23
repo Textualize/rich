@@ -216,8 +216,6 @@ class Text:
         """
 
         text = line.text
-        print("*", len(text), repr(text))
-
         style_map: Dict[int, Style] = {}
         null_style = Style()
 
@@ -235,30 +233,20 @@ class Text:
         }
 
         spans = [
-            (0, True, 0),
+            (0, False, 0),
             *((span.start, False, index + 1) for index, span in enumerate(line._spans)),
             *((span.end, True, index + 1) for index, span in enumerate(line._spans)),
-            (len(text), False, 0),
+            (len(text), True, 0),
         ]
         spans.sort(key=itemgetter(0, 1))
-        print(spans)
 
         stack: List[int] = [0]
         current_style = style_map[0]
 
         for (offset, leaving, style_id), (next_offset, _, _) in zip(spans, spans[1:]):
-            print(offset, leaving, style_id)
-
             style = style_map[style_id]
-
             if leaving:
-                stack.reverse()
-                try:
-                    stack.remove(style_id)
-                except ValueError:
-                    print(stack, style_id)
-                    raise
-                stack.reverse()
+                stack.remove(style_id)
                 current_style = Style.combine(
                     style_map[_style_id] for _style_id in stack
                 )
@@ -269,10 +257,6 @@ class Text:
             if next_offset > offset:
                 span_text = text[offset:next_offset]
                 yield Segment(span_text, current_style)
-
-        # while stack:
-        #     style = stack.pop()
-        #     yield Segment("", style)
         if self.end:
             yield Segment(self.end)
 

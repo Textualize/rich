@@ -179,9 +179,9 @@ class ListItem(TextElement):
         bullet_style = console.parse_style("markdown.item.bullet")
         for index, line in enumerate(lines):
             if index:
-                yield Segment(" " * 2, bullet_style)
+                yield Segment(" " * 3, bullet_style)
             else:
-                yield Segment("• ", bullet_style)
+                yield Segment(" • ", bullet_style)
             yield from line
             yield Segment("\n")
 
@@ -200,7 +200,6 @@ class ListItem(TextElement):
                 yield Segment(number_str, number_style)
             yield from line
             yield Segment("\n")
-        yield Segment("\n")
 
 
 class MarkdownContext:
@@ -264,7 +263,7 @@ class Markdown:
         new_line = False
         for current, entering in nodes:
             # print(dir(current))
-            print(current, current.is_container(), entering, current.destination)
+            # print(current, current.is_container(), entering, current.destination)
             # print(current.is_container())
             node_type = current.t
             if node_type == "text":
@@ -391,7 +390,7 @@ if __name__ == "__main__":
     from .console import Console
 
     console = Console(width=79)
-    print(console.size)
+    # print(console.size)
     md = Markdown(markup)
 
     console.print(md)
