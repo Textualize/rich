@@ -33,8 +33,9 @@ class Span(NamedTuple):
         if offset >= self.end:
             return self, None
 
-        span1 = Span(self.start, min(self.end, offset), self.style)
-        span2 = Span(span1.end, self.end, self.style)
+        start, end, style = self
+        span1 = Span(start, min(end, offset), style)
+        span2 = Span(span1.end, end, style)
         return span1, span2
 
     def overlaps(self, start: int, end: int) -> bool:
@@ -77,6 +78,14 @@ class Span(NamedTuple):
         return text[self.start : self.end]
 
     def right_crop(self, offset: int) -> Span:
+        """Crop the span at the given offset.
+        
+        Args:
+            offset (int): A value between start and end.
+        
+        Returns:
+            Span: A new (possibly smaller) span.
+        """
         start, end, style = self
         if offset >= end:
             return self
@@ -89,7 +98,7 @@ class Text:
     def __init__(
         self,
         text: str = "",
-        style: Union[str, Style] = None,
+        style: Union[str, Style] = "none",
         justify: JustifyValues = "left",
         end: str = "\n",
     ) -> None:
@@ -224,18 +233,14 @@ class Text:
                 style = console.parse_style(style) or null_style
             return style
 
-        style_map = {
-            0: get_style(self.style or "none"),
-            **{
-                index + 1: get_style(span.style)
-                for index, span in enumerate(line._spans)
-            },
-        }
+        enumerated_spans = list(enumerate(line._spans, 1))
+        style_map = {index: get_style(span.style) for index, span in enumerated_spans}
+        style_map[0] = get_style(self.style)
 
         spans = [
             (0, False, 0),
-            *((span.start, False, index + 1) for index, span in enumerate(line._spans)),
-            *((span.end, True, index + 1) for index, span in enumerate(line._spans)),
+            *((span.start, False, index) for index, span in enumerated_spans),
+            *((span.end, True, index) for index, span in enumerated_spans),
             (len(text), True, 0),
         ]
         spans.sort(key=itemgetter(0, 1))
@@ -244,7 +249,6 @@ class Text:
         current_style = style_map[0]
 
         for (offset, leaving, style_id), (next_offset, _, _) in zip(spans, spans[1:]):
-            style = style_map[style_id]
             if leaving:
                 stack.remove(style_id)
                 current_style = Style.combine(
@@ -252,26 +256,11 @@ class Text:
                 )
             else:
                 stack.append(style_id)
-                current_style = current_style.apply(style)
-
+                current_style = current_style.apply(style_map[style_id])
             if next_offset > offset:
-                span_text = text[offset:next_offset]
-                yield Segment(span_text, current_style)
+                yield Segment(text[offset:next_offset], current_style)
         if self.end:
             yield Segment(self.end)
-
-    @classmethod
-    def join(cls, lines: Iterable[Text], join_str: str = "\n") -> Text:
-        """Join lines in to a new text instance."""
-        new_text = Text()
-        new_text.text = join_str.join(text.text for text in lines)
-        offset = 0
-        join_length = len(join_str)
-        extend = new_text._spans.extend
-        for text in lines:
-            extend(span.move(offset) for span in text._spans)
-            offset += len(text) + join_length
-        return new_text
 
     def join(self, lines: Iterable[Text]) -> Text:
         """Join text together."""
@@ -292,8 +281,8 @@ class Text:
             if span.end < new_length:
                 append(span)
                 continue
-            if span.start > new_length:
-                continue
+            if span.start >= new_length:
+                break
             append(span.right_crop(new_length))
         self._spans[:] = spans
 
@@ -375,8 +364,8 @@ class Text:
         lines = self.divide(offsets)
         if not include_separator:
             separator_length = len(separator)
-            for line in lines:
-                if line.text.endswith(separator):
+            for last, line in iter_last(lines):
+                if not last:
                     line.right_crop(separator_length)
         return lines
 
@@ -509,7 +498,6 @@ class Lines(List[Text]):
                 if line_index == len(self) - 1:
                     break
                 words = line.split(" ")
-
                 words_size = sum(len(word) for word in words)
                 num_spaces = len(words) - 1
                 spaces = [1 for _ in range(num_spaces)]
@@ -518,7 +506,7 @@ class Lines(List[Text]):
                     spaces[len(spaces) - index - 1] += 1
                     num_spaces += 1
                     index = (index + 1) % len(spaces)
-                tokens = []
+                tokens: List[Text] = []
                 index = 0
                 for index, word in enumerate(words):
                     tokens.append(word)

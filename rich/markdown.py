@@ -16,6 +16,7 @@ from .panel import DOUBLE_BORDER, Panel
 from .style import Style, StyleStack
 from .text import Lines, Text
 from ._stack import Stack
+from ._tools import iter_first, iter_first_last
 
 
 class MarkdownElement:
@@ -116,15 +117,18 @@ class BlockQuote(TextElement):
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         render_options = options.with_width(options.max_width - 4)
         lines = console.render_lines(self.elements, render_options, style=self.style)
-        last_index = len(lines) - 1
-        left_quote = "“ "
-        right_quote = " ”"
 
-        for index, line in enumerate(lines):
-            yield Segment(left_quote if index == 0 else "  ", self.style)
+        style = self.style
+        new_line = Segment("\n")
+        left_quote = Segment("“ ", style)
+        right_quote = Segment(" ”", style)
+        padding = Segment("  ", style)
+
+        for first, last, line in iter_first_last(lines):
+            yield left_quote if first else padding
             yield from line
-            yield Segment(right_quote if index == last_index else "  ", self.style)
-            yield Segment("\n")
+            yield right_quote if last else padding
+            yield new_line
 
 
 class HorizontalRule(MarkdownElement):
@@ -177,13 +181,14 @@ class ListItem(TextElement):
         render_options = options.with_width(options.max_width - 3)
         lines = console.render_lines(self.elements, render_options, style=self.style)
         bullet_style = console.parse_style("markdown.item.bullet")
-        for index, line in enumerate(lines):
-            if index:
-                yield Segment(" " * 3, bullet_style)
-            else:
-                yield Segment(" • ", bullet_style)
+
+        bullet = Segment(" • ", bullet_style)
+        padding = Segment(" " * 3, bullet_style)
+        new_line = Segment("\n")
+        for first, line in iter_first(lines):
+            yield bullet if first else padding
             yield from line
-            yield Segment("\n")
+            yield new_line
 
     def render_number(
         self, console: Console, options: ConsoleOptions, number: int, last_number: int
@@ -192,14 +197,14 @@ class ListItem(TextElement):
         render_options = options.with_width(options.max_width - number_width)
         lines = console.render_lines(self.elements, render_options, style=self.style)
         number_style = console.parse_style("markdown.item.number")
-        for index, line in enumerate(lines):
-            if index:
-                yield Segment(" " * number_width, number_style)
-            else:
-                number_str = f"{number}.".rjust(number_width - 1) + " "
-                yield Segment(number_str, number_style)
+
+        new_line = Segment("\n")
+        padding = Segment(" " * number_width, number_style)
+        numeral = Segment(f"{number}".rjust(number_width - 1) + " ", number_style)
+        for first, line in iter_first(lines):
+            yield numeral if first else padding
             yield from line
-            yield Segment("\n")
+            yield new_line
 
 
 class MarkdownContext:
@@ -391,6 +396,7 @@ if __name__ == "__main__":
 
     console = Console(width=79)
     # print(console.size)
+
     md = Markdown(markup)
 
     console.print(md)
