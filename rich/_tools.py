@@ -5,7 +5,6 @@ T = TypeVar("T")
 
 def iter_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
     """Iterate and generate a tuple with a flag for last value."""
-
     iter_values = iter(values)
     try:
         previous_value = next(iter_values)
@@ -19,7 +18,6 @@ def iter_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
 
 def iter_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
     """Iterate and generate a tuple with a flag for first and last value."""
-
     iter_values = iter(values)
     try:
         previous_value = next(iter_values)

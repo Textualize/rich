@@ -22,6 +22,9 @@ class Span(NamedTuple):
     def __repr__(self) -> str:
         return f'<span {self.start}:{self.end} "{self.style}">'
 
+    def __bool__(self) -> bool:
+        return self.end > self.start
+
     def split(self, offset: int) -> Tuple[Span, Optional[Span]]:
         """Split a span in to 2 from a given offset."""
 
@@ -100,6 +103,9 @@ class Text:
 
     def __len__(self) -> int:
         return self._length
+
+    def __bool__(self) -> bool:
+        return bool(self._length)
 
     def __str__(self) -> str:
         return self.text
@@ -219,6 +225,7 @@ class Text:
             *end_spans,
             (len(text), False, null_style),
         ]
+        print(spans)
         spans.sort(key=itemgetter(0, 1))
 
         current_style = stack[-1]
@@ -511,8 +518,6 @@ class Lines(List[Text]):
                 if line_index == len(self) - 1:
                     break
                 words = line.split(" ")
-                print(repr(words))
-                # self[line_index] = Text.join(words, " ")
 
                 words_size = sum(len(word) for word in words)
                 num_spaces = len(words) - 1
@@ -520,7 +525,7 @@ class Lines(List[Text]):
                 index = 0
                 while words_size + num_spaces < width:
                     spaces[
-                        index // 2 if index % 2 else len(spaces) - index // 2 - 1
+                        (index // 2) if index % 2 else (len(spaces) - index // 2 - 1)
                     ] += 1
                     num_spaces += 1
                     index = (index + 1) % len(spaces)
@@ -535,12 +540,17 @@ class Lines(List[Text]):
 
 
 if __name__ == "__main__":
+    console = Console()
     text = Text("Hello, World! 1 2 3")
     text.stylize(1, 10, "bold")
-    words = text.split(" ")
-    print(repr(words))
+    text.stylize(7, 17, "underline")
+    console.print(text)
 
-    console = Console()
+    words = text.split(" ")
+    # for word in words:
+    #     console.print(word)
+    # print(repr(words))
+
     console.print(text)
 
     j = Text(" ").join(words)
