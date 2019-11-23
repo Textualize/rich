@@ -69,7 +69,7 @@ class Paragraph(TextElement):
     style_name = "markdown.paragraph"
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        print(repr(self.text))
+        self.text.justify = "full"
         yield self.text
 
 
@@ -146,7 +146,8 @@ class ListElement(MarkdownElement):
         self.list_type = list_type
         self.list_start = list_start
 
-    def on_child_close(self, context: MarkdownContext, child: ListItem) -> bool:
+    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
+        assert isinstance(child, ListItem)
         self.items.append(child)
         return False
 
@@ -226,7 +227,7 @@ class MarkdownContext:
 
     def enter_style(self, style_name: str) -> Style:
         """Enter a style context."""
-        style = self.console.get_style(style_name) or self.console.get_style("none")
+        style = self.console.get_style(style_name) or Style()
         self.style_stack.push(style)
         return self.current_style
 
