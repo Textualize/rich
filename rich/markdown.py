@@ -223,6 +223,7 @@ class MarkdownContext:
 
     @property
     def width(self) -> int:
+        """The width of the console."""
         return self.options.max_width
 
     def on_text(self, text: str) -> None:
