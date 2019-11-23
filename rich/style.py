@@ -118,9 +118,12 @@ class Style:
             return f'<style {self.name} "{self}">'
 
     def __eq__(self, other) -> bool:
+        if not isinstance(other, Style):
+            return NotImplemented
         return (
-            self._color == other._color
-            and self._back == self._back
+            self.name == other.name
+            and self._color == other._color
+            and self._back == other._back
             and self._set_attributes == other._set_attributes
             and self._attributes == other._attributes,
         )

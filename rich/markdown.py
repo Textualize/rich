@@ -53,7 +53,7 @@ class TextElement(MarkdownElement):
 
     def on_enter(self, context: MarkdownContext) -> None:
         self.style = context.enter_style(self.style_name)
-        self.text = Text(style=context.current_style)
+        self.text = Text(style=context.current_style, justify="left")
 
     def on_text(self, context: MarkdownContext, text: str) -> None:
         self.text.append(text, context.current_style)

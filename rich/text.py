@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from operator import itemgetter
-from typing import Iterable, NamedTuple, Optional, List, Tuple, Union
+from typing import Dict, Iterable, NamedTuple, Optional, List, Tuple, Union
 from typing_extensions import Literal
 
 from .console import Console, ConsoleOptions, RenderResult, RenderableType
@@ -113,6 +113,24 @@ class Text:
     def __repr__(self) -> str:
         return f"<text {self.text!r} {self._spans!r}>"
 
+    @property
+    def text(self) -> str:
+        """Get the text as a single string."""
+        if self._text_str is None:
+            self._text_str = "".join(self._text)
+        return self._text_str
+
+    @text.setter
+    def text(self, new_text: str) -> Text:
+        """Set the text to a new value."""
+        self._text[:] = [new_text]
+        self._text_str = new_text
+        new_length = len(new_text)
+        if new_length < self._length:
+            self._trim_spans()
+        self._length = new_length
+        return self
+
     @classmethod
     def from_segments(cls, segments: Iterable[Segment]) -> Text:
         """Convert segments in to a Text object for further processing.
@@ -198,49 +216,56 @@ class Text:
         """
 
         text = line.text
-        stack: List[Style] = []
+        print("*", len(text), repr(text))
 
+        style_map: Dict[int, Style] = {}
         null_style = Style()
 
         def get_style(style: Union[str, Style]) -> Style:
             if isinstance(style, str):
-                return console.parse_style(style) or Style()
+                style = console.parse_style(style) or null_style
             return style
 
-        stack.append(get_style(line.style) if line.style is not None else Style())
-
-        start_spans = (
-            (span.start, True, get_style(span.style) or null_style)
-            for span in line._spans
-        )
-
-        end_spans = (
-            (span.end, False, get_style(span.style) or null_style)
-            for span in line._spans
-        )
+        style_map = {
+            0: get_style(self.style or "none"),
+            **{
+                index + 1: get_style(span.style)
+                for index, span in enumerate(line._spans)
+            },
+        }
 
         spans = [
-            (0, True, null_style),
-            *start_spans,
-            *end_spans,
-            (len(text), False, null_style),
+            (0, True, 0),
+            *((span.start, False, index + 1) for index, span in enumerate(line._spans)),
+            *((span.end, True, index + 1) for index, span in enumerate(line._spans)),
+            (len(text), False, 0),
         ]
-        print(spans)
         spans.sort(key=itemgetter(0, 1))
+        print(spans)
 
-        current_style = stack[-1]
+        stack: List[int] = [0]
+        current_style = style_map[0]
 
-        for (offset, entering, _style), (next_offset, _, _) in zip(spans, spans[1:]):
-            style = get_style(_style)
+        for (offset, leaving, style_id), (next_offset, _, _) in zip(spans, spans[1:]):
+            print(offset, leaving, style_id)
 
-            if entering:
-                stack.append(style)
-                current_style = current_style.apply(style)
+            style = style_map[style_id]
+
+            if leaving:
+                stack.reverse()
+                try:
+                    stack.remove(style_id)
+                except ValueError:
+                    print(stack, style_id)
+                    raise
+                stack.reverse()
+                current_style = Style.combine(
+                    style_map[_style_id] for _style_id in stack
+                )
             else:
-                stack.reverse()
-                stack.remove(style)
-                stack.reverse()
-                current_style = Style.combine(stack)
+                stack.append(style_id)
+                current_style = current_style.apply(style)
+
             if next_offset > offset:
                 span_text = text[offset:next_offset]
                 yield Segment(span_text, current_style)
@@ -263,24 +288,6 @@ class Text:
             extend(span.move(offset) for span in text._spans)
             offset += len(text) + join_length
         return new_text
-
-    @property
-    def text(self) -> str:
-        """Get the text as a single string."""
-        if self._text_str is None:
-            self._text_str = "".join(self._text)
-        return self._text_str
-
-    @text.setter
-    def text(self, new_text: str) -> Text:
-        """Set the text to a new value."""
-        self._text[:] = [new_text]
-        self._text_str = new_text
-        new_length = len(new_text)
-        if new_length < self._length:
-            self._trim_spans()
-        self._length = new_length
-        return self
 
     def join(self, lines: Iterable[Text]) -> Text:
         """Join text together."""
@@ -524,9 +531,7 @@ class Lines(List[Text]):
                 spaces = [1 for _ in range(num_spaces)]
                 index = 0
                 while words_size + num_spaces < width:
-                    spaces[
-                        (index // 2) if index % 2 else (len(spaces) - index // 2 - 1)
-                    ] += 1
+                    spaces[len(spaces) - index - 1] += 1
                     num_spaces += 1
                     index = (index + 1) % len(spaces)
                 tokens = []
@@ -540,10 +545,11 @@ class Lines(List[Text]):
 
 
 if __name__ == "__main__":
-    console = Console()
-    text = Text("Hello, World! 1 2 3")
+    console = Console(markup=None)
+    text = Text("Hello, World! 1 2 3", justify=None)
     text.stylize(1, 10, "bold")
     text.stylize(7, 17, "underline")
+    print(repr(text))
     console.print(text)
 
     words = text.split(" ")
