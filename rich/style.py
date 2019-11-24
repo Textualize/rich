@@ -38,7 +38,7 @@ class Style:
         self,
         *,
         color: str = None,
-        back: str = None,
+        bgcolor: str = None,
         bold: bool = None,
         dim: bool = None,
         italic: bool = None,
@@ -50,7 +50,7 @@ class Style:
         strike: bool = None,
     ):
         self._color = None if color is None else Color.parse(color)
-        self._back = None if back is None else Color.parse(back)
+        self._bgcolor = None if bgcolor is None else Color.parse(bgcolor)
         _bool = bool
         self._attributes = (
             (bold or 0)
@@ -109,9 +109,9 @@ class Style:
             append("strike" if self.strike else "not strike")
         if self._color is not None:
             append(self._color.name)
-        if self._back is not None:
+        if self._bgcolor is not None:
             append("on")
-            append(self._back.name)
+            append(self._bgcolor.name)
         return " ".join(attributes) or "none"
 
     def __repr__(self):
@@ -123,7 +123,7 @@ class Style:
             return NotImplemented
         return (
             self._color == other._color
-            and self._back == other._back
+            and self._bgcolor == other._bgcolor
             and self._set_attributes == other._set_attributes
             and self._attributes == other._attributes,
         )
@@ -137,19 +137,19 @@ class Style:
         self._color = None if new_color is None else Color.parse(new_color)
 
     @property
-    def back(self) -> Optional[str]:
-        return self._back.name if self._back is not None else None
+    def bgcolor(self) -> Optional[str]:
+        return self._bgcolor.name if self._bgcolor is not None else None
 
-    @back.setter
-    def back(self, new_color: Optional[str]) -> None:
-        self._back = None if new_color is None else Color.parse(new_color)
+    @bgcolor.setter
+    def bgcolor(self, new_color: Optional[str]) -> None:
+        self._bgcolor = None if new_color is None else Color.parse(new_color)
 
     @classmethod
     def reset(cls) -> Style:
         """Get a style to reset all attributes."""
         return Style(
             color="default",
-            back="default",
+            bgcolor="default",
             dim=False,
             bold=False,
             italic=False,
@@ -176,7 +176,7 @@ class Style:
             "strike",
         }
         color: Optional[str] = None
-        back: Optional[str] = None
+        bgcolor: Optional[str] = None
         attributes: Dict[str, Optional[bool]] = {}
 
         words = iter(style_definition.split())
@@ -190,7 +190,7 @@ class Style:
                     raise errors.StyleSyntaxError(
                         f"color expected after 'on', found {original_word!r}"
                     )
-                back = word
+                bgcolor = word
 
             elif word == "not":
                 word = next(words, "")
@@ -209,7 +209,7 @@ class Style:
                         f"unknown word {original_word!r} in style {style_definition!r}"
                     )
                 color = word
-        style = Style(color=color, back=back, **attributes)
+        style = Style(color=color, bgcolor=bgcolor, **attributes)
         return style
 
     @classmethod
@@ -236,7 +236,7 @@ class Style:
         """
         style = self.__new__(Style)
         style._color = self.color
-        style._back = self.back
+        style._bgcolor = self._bgcolor
         style._attributes = self._attributes
         style._set_attributes = self._attributes
         return style
@@ -249,8 +249,8 @@ class Style:
         if self._color is not None:
             attrs.extend(self._color.get_ansi_codes())
 
-        if self._back is not None:
-            attrs.extend(self._back.get_ansi_codes(foreground=False))
+        if self._bgcolor is not None:
+            attrs.extend(self._bgcolor.get_ansi_codes(foreground=False))
 
         set_bits = self._set_attributes
         bits = self._attributes
@@ -293,7 +293,7 @@ class Style:
 
         new_style = style.__new__(Style)
         new_style._color = self._color if style._color is None else style._color
-        new_style._back = self._back if style._back is None else style._back
+        new_style._bgcolor = self._bgcolor if style._bgcolor is None else style._bgcolor
         new_style._attributes = (style._attributes & ~self._set_attributes) | (
             self._attributes & self._set_attributes
         )

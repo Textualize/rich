@@ -25,13 +25,6 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "magenta": Style(color="magenta"),
     "cyan": Style(color="cyan"),
     "white": Style(color="white"),
-    "on_black": Style(back="black"),
-    "on_red": Style(back="red"),
-    "on_green": Style(back="green"),
-    "on_yellow": Style(back="yellow"),
-    "on_magenta": Style(back="magenta"),
-    "on_cyan": Style(back="cyan"),
-    "on_white": Style(back="white"),
 }
 
 MARKDOWN_STYLES = {
@@ -40,7 +33,7 @@ MARKDOWN_STYLES = {
     "markdown.emph": Style(italic=True),
     "markdown.strong": Style(bold=True),
     "markdown.code": Style(dim=True, bold=True),
-    "markdown.code_block": Style(dim=True, color="cyan", back="black"),
+    "markdown.code_block": Style(dim=True, color="cyan", bgcolor="black"),
     "markdown.block_quote": Style(color="magenta"),
     "markdown.list": Style(color="cyan"),
     "markdown.item": Style(),

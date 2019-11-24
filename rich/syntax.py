@@ -29,7 +29,7 @@ def highlight(
     style_cache: Dict[Any, Style] = {}
 
     lexer = get_lexer_by_name(lexer_name)
-    background_style = Style(back=pygments_style_class.background_color)
+    background_style = Style(bgcolor=pygments_style_class.background_color)
     text = Text(style=background_style)
     for token_type, token in lexer.get_tokens(code):
         if token_type in style_cache:
@@ -37,10 +37,10 @@ def highlight(
         else:
             pygments_style = pygments_style_class.style_for_token(token_type)
             color = pygments_style["color"]
-            back = pygments_style["bgcolor"]
+            bgcolor = pygments_style["bgcolor"]
             style = Style(
                 color="#" + color if color else None,
-                back="#" + back if back else None,
+                bgcolor="#" + bgcolor if bgcolor else None,
                 bold=pygments_style["bold"],
                 italic=pygments_style["italic"],
                 underline=pygments_style["underline"],
