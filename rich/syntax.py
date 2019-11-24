@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import textwrap
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from pygments.lexers import get_lexer_by_name
 from pygments.styles import get_style_by_name
@@ -21,6 +21,7 @@ class Syntax:
         code: str,
         lexer_name: str,
         *,
+        style: Union[str, Style] = None,
         theme: str = "monokai",
         dedent: bool = True,
         line_numbers: bool = True,
@@ -30,6 +31,7 @@ class Syntax:
             code = textwrap.dedent(code)
         self.code = code
         self.lexer_name = lexer_name
+        self.style = style
         self.theme = theme
         self.dedent = dedent
         self.line_numbers = line_numbers
@@ -75,6 +77,7 @@ class Syntax:
         foreground_color = self._get_theme_style(Token.Text)._color
         if foreground_color is None:
             return Color.default()
+        # TODO: Handle no full colors here
         new_color = blend_rgb(background_color, foreground_color.triplet)
         return Color.from_triplet(new_color)
 
@@ -91,20 +94,27 @@ class Syntax:
         numbers_column_width = len(str(len(lines))) + 1
         render_options = options.with_width(options.max_width - numbers_column_width)
 
-        background_style = text.style
-        assert isinstance(background_style, Style)
+        if self.style is None:
+            background_style = Style(
+                bgcolor=self._pygments_style_class.background_color
+            )
+        else:
+            if isinstance(self.style, str):
+                background_style = console.parse_style(self.style) or Style()
+            else:
+
+                background_style = self.style
 
         number_style = background_style.apply(self._get_theme_style(Token.Text))
         number_style._color = self._get_line_numbers_color()
         padding = Segment(" " * numbers_column_width, background_style)
         new_line = Segment("\n")
         for line_no, line in enumerate(lines, self.start_line):
-
             wrapped_lines = console.render_lines([line], render_options)
             for first, wrapped_line in iter_first(wrapped_lines):
                 if first:
                     yield Segment(
-                        f"{line_no}".rjust(numbers_column_width - 1) + " ", number_style
+                        str(line_no).rjust(numbers_column_width - 1) + " ", number_style
                     )
                 else:
                     yield padding

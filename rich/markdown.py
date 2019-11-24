@@ -380,6 +380,9 @@ qqweo qlkwje lqkwej
 
 1. First *Item* **in bold!**
    Foo bar baz etc
+   * Secondary list with lots of text that will wrap on to another line, Secondary list with lots of text that will wrap on to another line, Secondary list with lots of text that will wrap on to another line,
+   * Foo 
+   * Bar baz
 2. Second Item
 3. The main area where I think Django's models are missing out is the lack of type hinting (hardly surprising since Django pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code.
 

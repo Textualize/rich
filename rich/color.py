@@ -379,7 +379,7 @@ class Color(NamedTuple):
         Returns:
             Color: Default color,.
         """
-        return cls(color, type=ColorType.DEFAULT)
+        return cls(name="default", type=ColorType.DEFAULT)
 
     @classmethod
     @lru_cache(maxsize=1000)
