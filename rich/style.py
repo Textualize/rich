@@ -36,7 +36,6 @@ class Style:
 
     def __init__(
         self,
-        name: str = None,
         *,
         color: str = None,
         back: str = None,
@@ -49,7 +48,6 @@ class Style:
         reverse: bool = None,
         strike: bool = None,
     ):
-        self.name = name
         self._color = None if color is None else Color.parse(color)
         self._back = None if back is None else Color.parse(back)
         _bool = bool
@@ -112,17 +110,13 @@ class Style:
 
     def __repr__(self):
         """Render a named style differently from an anonymous style."""
-        if self.name is None:
-            return f'<style "{self}">'
-        else:
-            return f'<style {self.name} "{self}">'
+        return f'<style "{self}">'
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, Style):
             return NotImplemented
         return (
-            self.name == other.name
-            and self._color == other._color
+            self._color == other._color
             and self._back == other._back
             and self._set_attributes == other._set_attributes
             and self._attributes == other._attributes,
@@ -148,7 +142,6 @@ class Style:
     def reset(cls) -> Style:
         """Get a style to reset all attributes."""
         return Style(
-            "reset",
             color="default",
             back="default",
             dim=False,
@@ -234,7 +227,6 @@ class Style:
             Style: A new Style instance with identical attributes.
         """
         style = self.__new__(Style)
-        style.name = self.name
         style._color = self.color
         style._back = self.back
         style._attributes = self._attributes
@@ -292,7 +284,6 @@ class Style:
             return self
 
         new_style = style.__new__(Style)
-        new_style.name = self.name
         new_style._color = self._color if style._color is None else style._color
         new_style._back = self._back if style._back is None else style._back
         new_style._attributes = (style._attributes & ~self._set_attributes) | (
