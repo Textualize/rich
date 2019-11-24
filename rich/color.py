@@ -314,6 +314,12 @@ class ColorTriplet(NamedTuple):
     green: int
     blue: int
 
+    @property
+    def hex(self) -> str:
+        """get the color triplet as 6 chars of hex."""
+        red, green, blue = self
+        return f"{red:02X}{green:02X}{blue:02X}"
+
 
 class ColorParseError(Exception):
     """The color could not be parsed."""
@@ -353,6 +359,27 @@ class Color(NamedTuple):
         if self.type == ColorType.DEFAULT:
             return ColorSystem.STANDARD
         return ColorSystem(int(self.type))
+
+    @classmethod
+    def from_triplet(cls, triplet: ColorTriplet) -> Color:
+        """Create a full RGB color from a triplet of values.
+        
+        Args:
+            triplet (ColorTriplet): A color triplet containing red, green and blue components.
+        
+        Returns:
+            Color: A new color object.
+        """
+        return cls(name=f"#{triplet.hex}", type=ColorType.FULL, triplet=triplet)
+
+    @classmethod
+    def default(cls) -> Color:
+        """Get a Color instance representing the default color.
+        
+        Returns:
+            Color: Default color,.
+        """
+        return cls(color, type=ColorType.DEFAULT)
 
     @classmethod
     @lru_cache(maxsize=1000)
@@ -472,6 +499,28 @@ class Color(NamedTuple):
             return Color(self.name, ColorType.STANDARD, number=color_number)
 
         return self
+
+
+def parse_rgb_hex(hex_color: str) -> ColorTriplet:
+    """Parse six hex characters in to RGB triplet."""
+    color = ColorTriplet(
+        int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+    )
+    return color
+
+
+def blend_rgb(
+    color1: ColorTriplet, color2: ColorTriplet, cross_fade: float = 0.5
+) -> ColorTriplet:
+    """Blend one RGB color in to another."""
+    r1, g1, b1 = color1
+    r2, g2, b2 = color2
+    new_color = ColorTriplet(
+        int(r1 + (r2 - r1) * cross_fade),
+        int(g1 + (g2 - g1) * cross_fade),
+        int(b1 + (b2 - b1) * cross_fade),
+    )
+    return new_color
 
 
 if __name__ == "__main__":
