@@ -39,9 +39,22 @@ class ConsoleOptions:
     min_width: int = 1
 
     def copy(self) -> ConsoleOptions:
+        """Get a copy of this object.
+        
+        Returns:
+            ConsoleOptions: New instance with same settings.
+        """
         return replace(self)
 
     def with_width(self, width: int) -> ConsoleOptions:
+        """Get a new console options with a changed width.
+        
+        Args:
+            width (int): New min and max_width.
+        
+        Returns:
+            ConsoleOptions: new ConsoleOptions instance.
+        """
         return replace(self, min_width=width, max_width=width)
 
 

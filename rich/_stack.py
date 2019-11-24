@@ -12,4 +12,5 @@ class Stack(List[T]):
         return self[-1]
 
     def push(self, item: T) -> None:
+        """Push an item on to the stack (append in stack nomenclature)."""
         self.append(item)

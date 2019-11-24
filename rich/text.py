@@ -99,11 +99,13 @@ class Text:
         self,
         text: str = "",
         style: Union[str, Style] = "none",
+        word_wrap: bool = True,
         justify: JustifyValues = "left",
         end: str = "\n",
     ) -> None:
         self._text: List[str] = [text] if text else []
         self.style = style
+        self.word_wrap = word_wrap
         self.justify = justify
         self.end = end
         self._text_str: Optional[str] = text
@@ -207,7 +209,11 @@ class Text:
     def __console__(
         self, console: Console, options: ConsoleOptions
     ) -> Iterable[Segment]:
-        lines = self.wrap(options.max_width, justify=self.justify)
+        if self.word_wrap:
+            lines = self.wrap(options.max_width, justify=self.justify)
+        else:
+            lines = self.fit(options.max_width)
+
         for line in lines:
             yield from self._render_line(line, console, options)
 
@@ -364,8 +370,8 @@ class Text:
         lines = self.divide(offsets)
         if not include_separator:
             separator_length = len(separator)
-            for last, line in iter_last(lines):
-                if not last:
+            for line in lines:
+                if line.text.endswith(separator):
                     line.right_crop(separator_length)
         return lines
 
@@ -462,6 +468,22 @@ class Text:
             if justify:
                 new_lines.justify(width, align=justify)
             lines.extend(new_lines)
+        return lines
+
+    def fit(self, width: int) -> Lines:
+        """Fit the text in to given width by chopping in to lines.
+        
+        Args:
+            width (int): Maximum characters in a line.
+        
+        Returns:
+            Lines: List of lines.
+        """
+        lines: Lines = Lines()
+        append = lines.append
+        for line in self.split():
+            line.set_length(width)
+            append(line)
         return lines
 
 

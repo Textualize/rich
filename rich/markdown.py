@@ -14,6 +14,7 @@ from .console import (
 )
 from .panel import DOUBLE_BORDER, Panel
 from .style import Style, StyleStack
+from .syntax import highlight
 from .text import Lines, Text
 from ._stack import Stack
 from ._tools import iter_first, iter_first_last
@@ -102,6 +103,12 @@ class Heading(TextElement):
 
 class CodeBlock(TextElement):
     style_name = "markdown.code_block"
+
+    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+        code = str(self.text).rstrip()
+        text = highlight("python", code)
+        text.justify = "left"
+        yield text
 
 
 class BlockQuote(TextElement):

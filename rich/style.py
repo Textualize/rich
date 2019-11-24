@@ -46,30 +46,33 @@ class Style:
         blink: bool = None,
         blink2: bool = None,
         reverse: bool = None,
+        conceal: bool = None,
         strike: bool = None,
     ):
         self._color = None if color is None else Color.parse(color)
         self._back = None if back is None else Color.parse(back)
         _bool = bool
         self._attributes = (
-            _bool(bold)
-            | _bool(dim) << 1
-            | _bool(italic) << 2
-            | _bool(underline) << 3
-            | _bool(blink) << 4
-            | _bool(blink2) << 5
-            | _bool(reverse) << 6
-            | _bool(strike) << 7
+            (bold or 0)
+            | (dim or 0) << 1
+            | (italic or 0) << 2
+            | (underline or 0) << 3
+            | (blink or 0) << 4
+            | (blink2 or 0) << 5
+            | (reverse or 0) << 6
+            | (conceal or 0) << 7
+            | (strike or 0) << 8
         )
         self._set_attributes = (
-            _bool(bold is not None)
-            | _bool(dim is not None) << 1
-            | _bool(italic is not None) << 2
-            | _bool(underline is not None) << 3
-            | _bool(blink is not None) << 4
-            | _bool(blink2 is not None) << 5
-            | _bool(reverse is not None) << 6
-            | _bool(strike is not None) << 7
+            (bold is not None)
+            | (dim is not None) << 1
+            | (italic is not None) << 2
+            | (underline is not None) << 3
+            | (blink is not None) << 4
+            | (blink2 is not None) << 5
+            | (reverse is not None) << 6
+            | (conceal is not None) << 7
+            | (strike is not None) << 8
         )
 
     bold = _Bit(0)
@@ -79,7 +82,8 @@ class Style:
     blink = _Bit(4)
     blink2 = _Bit(5)
     reverse = _Bit(6)
-    strike = _Bit(7)
+    conceal = _Bit(7)
+    strike = _Bit(8)
 
     def __str__(self) -> str:
         """Re-generate style definition from attributes."""
@@ -99,6 +103,8 @@ class Style:
             append("blink2" if self.blink2 else "not blink2")
         if self.reverse is not None:
             append("reverse" if self.reverse else "not reverse")
+        if self.conceal is not None:
+            append("conceal" if self.conceal else "not conceal")
         if self.strike is not None:
             append("strike" if self.strike else "not strike")
         if self._color is not None:
@@ -151,11 +157,12 @@ class Style:
             blink=False,
             blink2=False,
             reverse=False,
+            conceal=False,
             strike=False,
         )
 
     @classmethod
-    def parse(cls, style_definition: str, name: str = None) -> Style:
+    def parse(cls, style_definition: str) -> Style:
         """Parse style name(s) in to style object."""
         style_attributes = {
             "dim",
@@ -165,6 +172,7 @@ class Style:
             "blink",
             "blink2",
             "reverse",
+            "conceal",
             "strike",
         }
         color: Optional[str] = None
@@ -201,7 +209,7 @@ class Style:
                         f"unknown word {original_word!r} in style {style_definition!r}"
                     )
                 color = word
-        style = Style(name, color=color, back=back, **attributes)
+        style = Style(color=color, back=back, **attributes)
         return style
 
     @classmethod
@@ -246,10 +254,10 @@ class Style:
 
         set_bits = self._set_attributes
         bits = self._attributes
-        for bit_no in range(0, 9):
+        for bit_no in range(0, 10):
             bit = 1 << bit_no
             if set_bits & bit:
-                append(str(1 + bit_no if bits & bit else 20 + bit_no))
+                append(str(1 + bit_no) if bits & bit else str(21 + bit_no))
 
         reset = "\x1b[0m" if reset else ""
         if attrs:
@@ -321,10 +329,12 @@ if __name__ == "__main__":
 
     # style = Style(color="blue", bold=True, italic=True, reverse=False, dim=True)
 
-    style = Style.parse("bold red on black")
-    print(style._attributes, style._set_attributes)
+    style = Style.parse("bold  not italic  #6ab825")
+    print(bin(style._attributes), bin(style._set_attributes))
 
-    print(style.render("hello"))
+    print(repr(style.bold))
+    print(repr(style.italic))
+    print(style.render("hello", reset=True))
 
     # style.italic = True
     # print(style._attributes, style._set_attributes)
@@ -337,7 +347,7 @@ if __name__ == "__main__":
 
     # # style.test()
 
-    # style = Style.parse("bold on black", name="markdown.header")
+    # style = Style.parse("bold on black")
     # print(style.bold)
     # print(style)
     # print(repr(style))
