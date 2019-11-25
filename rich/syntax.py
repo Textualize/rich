@@ -24,7 +24,7 @@ class Syntax:
         style: Union[str, Style] = None,
         theme: str = "monokai",
         dedent: bool = True,
-        line_numbers: bool = True,
+        line_numbers: bool = False,
         start_line: int = 1,
     ) -> None:
         if dedent:
@@ -78,6 +78,7 @@ class Syntax:
         if foreground_color is None:
             return Color.default()
         # TODO: Handle no full colors here
+        assert foreground_color.triplet is not None
         new_color = blend_rgb(background_color, foreground_color.triplet)
         return Color.from_triplet(new_color)
 
@@ -102,7 +103,6 @@ class Syntax:
             if isinstance(self.style, str):
                 background_style = console.parse_style(self.style) or Style()
             else:
-
                 background_style = self.style
 
         number_style = background_style.apply(self._get_theme_style(Token.Text))

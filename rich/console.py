@@ -147,7 +147,9 @@ class Console:
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
 
-    def _detect_color_system(self) -> str:
+    def _detect_color_system(
+        self,
+    ) -> Literal["auto", "none", "standard", "256", "truecolor"]:
         """Detect color system from env vars."""
         if not self.is_terminal:
             return "none"

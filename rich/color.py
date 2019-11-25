@@ -291,11 +291,13 @@ EIGHT_BIT_COLORS = [
 
 
 class Palette:
+    """A palette of available colors."""
+
     def __init__(self, colors: Sequence[Tuple[int, int, int]]):
         self._colors = colors
 
     def __getitem__(self, number: int) -> Tuple[int, int, int]:
-        return self._color[number]
+        return self._colors[number]
 
     @lru_cache(maxsize=1000)
     def match(self, color: ColorTriplet) -> int:
@@ -474,8 +476,9 @@ class Color(NamedTuple):
             return ["39" if foreground else "49"]
 
         elif _type == ColorType.STANDARD:
-            assert self.number is not None
-            return [str(30 + self.number if foreground else 40 + self.number)]
+            number = self.number
+            assert number is not None
+            return [str(30 + number if foreground else 40 + number)]
 
         elif _type == ColorType.EIGHT_BIT:
             assert self.number is not None
@@ -493,25 +496,8 @@ class Color(NamedTuple):
 
         # Convert to 8-bit color from truecolor color
         if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:
-
             color_number = EIGHT_BIT_PALETTE.match(self.triplet)
             return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
-
-            # assert self.triplet is not None
-            # red, green, blue = self.triplet
-            # if red == green and green == blue:
-            #     if red < 8:
-            #         color_number = 16
-            #     elif red > 248:
-            #         color_number = 231
-            #     else:
-            #         color_number = round(((red - 8) / 247.0) * 24) + 232
-            #     return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
-            # ansi_red = 36 * round(red / 255.0 * 5.0)
-            # ansi_green = 6 * round(green / 255.0 * 5.0)
-            # ansi_blue = round(blue / 255.0 * 5.0)
-            # color_number = 16 + ansi_red + ansi_green + ansi_blue
-            # return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
 
         # Convert to standard from truecolor or 8-bit
         elif system == ColorSystem.STANDARD:
@@ -551,17 +537,21 @@ def blend_rgb(
 
 
 if __name__ == "__main__":
-    print(Color.parse("default"))
-    print(Color.parse("red"))
-    print(Color.parse("#ff0000"))
-    print(Color.parse("0"))
-    print(Color.parse("100"))
-    print(Color.parse("rgb(  12, 130, 200)"))
 
-    color = Color.parse("#339a2e")
-    print(color)
-    print(color.downgrade(ColorSystem.EIGHT_BIT))
-    print(color.downgrade(ColorSystem.STANDARD))
-    import sys
+    c = Color.parse("#ff0000")
+    print(c.downgrade(ColorSystem.STANDARD))
+
+    # print(Color.parse("default"))
+    # print(Color.parse("red"))
+    # print(Color.parse("#ff0000"))
+    # print(Color.parse("0"))
+    # print(Color.parse("100"))
+    # print(Color.parse("rgb(  12, 130, 200)"))
+
+    # color = Color.parse("#339a2e")
+    # print(color)
+    # print(color.downgrade(ColorSystem.EIGHT_BIT))
+    # print(color.downgrade(ColorSystem.STANDARD))
+    # import sys
 
     # sys.stdout.write(Color.parse("#00ffff").foreground_sequence + "Hello")
