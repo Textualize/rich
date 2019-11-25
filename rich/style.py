@@ -162,8 +162,8 @@ class Style:
             strike=False,
         )
 
-    @lru_cache
     @classmethod
+    @lru_cache(maxsize=1000)
     def parse(cls, style_definition: str) -> Style:
         """Parse style name(s) in to style object."""
         style_attributes = {

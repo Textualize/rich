@@ -433,3 +433,14 @@ if __name__ == "__main__":
     console.print(md)
     print(console)
     # print(console.render_spans())
+
+    from .color import Color
+    from .style import Style
+
+    print(Color.downgrade.cache_info())
+    print(Color.parse.cache_info())
+    print(Color.get_ansi_codes.cache_info())
+
+    Style.parse("on red")
+
+    print(Style.parse.cache_info())

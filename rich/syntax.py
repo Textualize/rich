@@ -211,3 +211,5 @@ if __name__ == "__main__":
     print(Color.downgrade.cache_info())
     print(Color.parse.cache_info())
     print(Color.get_ansi_codes.cache_info())
+
+    print(Style.parse.cache_info())
