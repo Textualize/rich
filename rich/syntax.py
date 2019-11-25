@@ -122,8 +122,9 @@ class Syntax:
                 yield new_line
 
 
-CODE = r"""
+CODE = r'''
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+        """This is a docstring."""
         code = self.code
         if self.dedent:
             code = textwrap.dedent(code)
@@ -132,6 +133,7 @@ CODE = r"""
             yield text
             return
 
+        # This is a comment
         lines = text.split("\n")
         numbers_column_width = len(str(len(lines))) + 1
         render_options = options.with_width(options.max_width - numbers_column_width)
@@ -148,7 +150,7 @@ CODE = r"""
                     yield padding
                 yield from wrapped_line
                 yield new_line
-"""
+'''
 
 if __name__ == "__main__":
 

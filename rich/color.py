@@ -180,8 +180,6 @@ class Color(NamedTuple):
 
         # Convert to 8-bit color from truecolor color
         if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:
-            # color_number = EIGHT_BIT_PALETTE.match(self.triplet)
-            # return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
             assert self.triplet is not None
             red, green, blue = self.triplet
             _h, l, s = rgb_to_hls(red / 255, green / 255, blue / 255)
@@ -220,6 +218,7 @@ class Color(NamedTuple):
 
 def parse_rgb_hex(hex_color: str) -> ColorTriplet:
     """Parse six hex characters in to RGB triplet."""
+    assert len(hex_color) == 6, "must be 6 characters"
     color = ColorTriplet(
         int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
     )
