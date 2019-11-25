@@ -153,5 +153,5 @@ CODE = r"""
 if __name__ == "__main__":
 
     syntax = Syntax(CODE, "python", dedent=True)
-    console = Console(width=90)
+    console = Console()
     console.print(syntax)
