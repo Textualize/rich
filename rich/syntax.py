@@ -22,11 +22,12 @@ class Syntax:
         lexer_name: str,
         *,
         style: Union[str, Style] = None,
-        theme: str = "monokai",
+        theme: str = "emacs",
         dedent: bool = True,
         line_numbers: bool = False,
         start_line: int = 1,
     ) -> None:
+
         if dedent:
             code = textwrap.dedent(code)
         self.code = code
@@ -44,27 +45,42 @@ class Syntax:
         except ClassNotFound:
             self._pygments_style_class = get_style_by_name("default")
 
+        self._background_color = self._pygments_style_class.background_color[1:]
+
     def _get_theme_style(self, token_type) -> Style:
         if token_type in self._style_cache:
             style = self._style_cache[token_type]
         else:
             pygments_style = self._pygments_style_class.style_for_token(token_type)
+
             color = pygments_style["color"]
             bgcolor = pygments_style["bgcolor"]
             style = Style(
-                color="#" + color if color else None,
-                bgcolor="#" + bgcolor if bgcolor else None,
+                color="#" + color if color else "#000000",
+                bgcolor="#" + bgcolor if bgcolor else self._background_color,
                 bold=pygments_style["bold"],
                 italic=pygments_style["italic"],
                 underline=pygments_style["underline"],
             )
             self._style_cache[token_type] = style
+
+        return style.copy()
+
+    def _get_default_style(self) -> Style:
+
+        style = self._get_theme_style(Token.Text)
+        style = style.apply(Style(bgcolor=self._pygments_style_class.background_color))
+
         return style
 
     def _highlight(self, lexer_name: str) -> Text:
-        lexer = get_lexer_by_name(lexer_name)
-        background_style = Style(bgcolor=self._pygments_style_class.background_color)
-        text = Text(style=background_style)
+        default_style = self._get_default_style()
+
+        try:
+            lexer = get_lexer_by_name(lexer_name)
+        except ClassNotFound:
+            return Text(self.code, style=default_style)
+        text = Text(style=default_style)
         for token_type, token in lexer.get_tokens(self.code):
             style = self._get_theme_style(token_type)
             text.append(token, style)

@@ -25,7 +25,7 @@ class MarkdownElement:
     new_line: ClassVar[bool] = True
 
     @classmethod
-    def create(cls, node: Any) -> MarkdownElement:
+    def create(cls, markdown: Markdown, node: Any) -> MarkdownElement:
         return cls()
 
     def on_enter(self, context: MarkdownContext):
@@ -70,14 +70,21 @@ class TextElement(MarkdownElement):
 class Paragraph(TextElement):
     style_name = "markdown.paragraph"
 
+    @classmethod
+    def create(cls, markdown: Markdown, node) -> None:
+        return cls(justify=markdown.justify)
+
+    def __init__(self, justify: str) -> None:
+        self.justify = justify
+
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        self.text.justify = "full"
+        self.text.justify = self.justify
         yield self.text
 
 
 class Heading(TextElement):
     @classmethod
-    def create(cls, node: Any) -> Heading:
+    def create(cls, markdown: Markdown, node: Any) -> Heading:
         heading = Heading(node.level)
         return heading
 
@@ -104,10 +111,19 @@ class Heading(TextElement):
 class CodeBlock(TextElement):
     style_name = "markdown.code_block"
 
+    @classmethod
+    def create(cls, markdown: Markdown, node: Any) -> ListElement:
+        lexer_name, _, _ = node.info.partition(" ")
+        return cls(lexer_name, markdown.code_theme)
+
+    def __init__(self, lexer_name: str, theme: str) -> None:
+        self.lexer_name = lexer_name
+        self.theme = theme
+
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
 
         code = str(self.text).rstrip()
-        syntax = Syntax(code, "python")
+        syntax = Syntax(code, self.lexer_name, theme=self.theme, line_numbers=False)
         yield syntax
 
 
@@ -148,7 +164,7 @@ class HorizontalRule(MarkdownElement):
 
 class ListElement(MarkdownElement):
     @classmethod
-    def create(cls, node: Any) -> ListElement:
+    def create(cls, markdown: Markdown, node: Any) -> ListElement:
         list_data = node.list_data
         return cls(list_data["type"], list_data["start"])
 
@@ -262,11 +278,15 @@ class Markdown:
     }
     inlines = {"emph", "strong", "code", "link"}
 
-    def __init__(self, markup: str) -> None:
+    def __init__(
+        self, markup: str, code_theme: str = "monokai", justify: str = "left"
+    ) -> None:
         """Parses the markup."""
         self.markup = markup
         parser = Parser()
         self.parsed = parser.parse(markup)
+        self.code_theme = code_theme
+        self.justify = justify
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         """Render markdown to the console."""
@@ -305,7 +325,7 @@ class Markdown:
                 element_class = self.elements.get(node_type) or UnknownElement
                 if current.is_container():
                     if entering:
-                        element = element_class.create(current)
+                        element = element_class.create(self, current)
                         context.stack.push(element)
                         element.on_enter(context)
                     else:
@@ -323,7 +343,7 @@ class Markdown:
                             yield from console.render(element, context.options)
                         new_line = element.new_line
                 else:
-                    element = element_class.create(current)
+                    element = element_class.create(self, current)
 
                     context.stack.push(element)
                     element.on_enter(context)
@@ -352,7 +372,7 @@ markup = """
 
 The main area where I think *Django's models* are `missing` out is the lack of type hinting (hardly surprising since **Django** pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code. It may only save you minutes each time, but multiply that by the number of code + run iterations you do each day, and it can save hours of development time. Multiply that by the lifetime of your project, and it could save weeks or months. A clear win.
 
-```
+```python
     @property
     def width(self) -> int:
         \"\"\"Get the width of the console.

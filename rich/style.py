@@ -235,7 +235,7 @@ class Style:
             Style: A new Style instance with identical attributes.
         """
         style = self.__new__(Style)
-        style._color = self.color
+        style._color = self._color
         style._bgcolor = self._bgcolor
         style._attributes = self._attributes
         style._set_attributes = self._attributes
