@@ -3,7 +3,7 @@ from __future__ import annotations
 import textwrap
 from typing import Any, Dict, Union
 
-from pygments.lexers import get_lexer_by_name
+from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
 from pygments.styles import get_style_by_name
 from pygments.token import Token
 from pygments.util import ClassNotFound
@@ -47,6 +47,34 @@ class Syntax:
 
         self._background_color = self._pygments_style_class.background_color[1:]
 
+    @classmethod
+    def from_path(
+        cls,
+        path: str,
+        style: Union[str, Style] = None,
+        theme: str = "emacs",
+        dedent: bool = True,
+        line_numbers: bool = False,
+        start_line: int = 1,
+    ) -> Syntax:
+        """Get a Syntax object for given path."""
+        with open(path, "rt") as code_file:
+            code = code_file.read()
+        try:
+            lexer = guess_lexer_for_filename(path, code)
+            lexer_name = lexer.name
+        except ClassNotFound:
+            lexer_name = "default"
+        return cls(
+            code,
+            lexer_name,
+            style=style,
+            theme=theme,
+            dedent=dedent,
+            line_numbers=line_numbers,
+            start_line=start_line,
+        )
+
     def _get_theme_style(self, token_type) -> Style:
         if token_type in self._style_cache:
             style = self._style_cache[token_type]
@@ -67,15 +95,12 @@ class Syntax:
         return style.copy()
 
     def _get_default_style(self) -> Style:
-
         style = self._get_theme_style(Token.Text)
         style = style.apply(Style(bgcolor=self._pygments_style_class.background_color))
-
         return style
 
     def _highlight(self, lexer_name: str) -> Text:
         default_style = self._get_default_style()
-
         try:
             lexer = get_lexer_by_name(lexer_name)
         except ClassNotFound:
@@ -172,5 +197,12 @@ CODE = r'''
 if __name__ == "__main__":
 
     syntax = Syntax(CODE, "python", dedent=True, line_numbers=True, start_line=990)
+
+    from time import time
+
+    syntax = Syntax.from_path("./rich/syntax.py", theme="monokai", line_numbers=True)
     console = Console()
+    start = time()
     console.print(syntax)
+    elapsed = int((time() - start) * 1000)
+    print(f"{elapsed}ms")
