@@ -106,9 +106,10 @@ class Syntax:
         except ClassNotFound:
             return Text(self.code, style=default_style)
         text = Text(style=default_style)
+        append = text.append
+        _get_theme_style = self._get_theme_style
         for token_type, token in lexer.get_tokens(self.code):
-            style = self._get_theme_style(token_type)
-            text.append(token, style)
+            append(token, _get_theme_style(token_type))
         return text
 
     def _get_line_numbers_color(self) -> Color:

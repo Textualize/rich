@@ -71,7 +71,7 @@ class Paragraph(TextElement):
     style_name = "markdown.paragraph"
 
     @classmethod
-    def create(cls, markdown: Markdown, node) -> None:
+    def create(cls, markdown: Markdown, node) -> Paragraph:
         return cls(justify=markdown.justify)
 
     def __init__(self, justify: str) -> None:
