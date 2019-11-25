@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 import sys
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Type
 
@@ -161,6 +162,7 @@ class Style:
             strike=False,
         )
 
+    @lru_cache
     @classmethod
     def parse(cls, style_definition: str) -> Style:
         """Parse style name(s) in to style object."""
