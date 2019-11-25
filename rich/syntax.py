@@ -207,3 +207,7 @@ if __name__ == "__main__":
     console.print(syntax)
     elapsed = int((time() - start) * 1000)
     print(f"{elapsed}ms")
+
+    print(Color.downgrade.cache_info())
+    print(Color.parse.cache_info())
+    print(Color.get_ansi_codes.cache_info())
