@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from enum import Enum
 from itertools import chain
+import os
 import re
 import shutil
 import sys
@@ -22,9 +23,11 @@ from typing import (
     runtime_checkable,
     Union,
 )
+from typing_extensions import Literal
 
 from .default_styles import DEFAULT_STYLES
 from . import errors
+from .color import ColorSystem
 from .style import Style
 from .segment import Segment
 
@@ -101,6 +104,14 @@ class StyleContext:
         self.console.pop_style()
 
 
+COLOR_SYSTEMS = {
+    "none": ColorSystem.NONE,
+    "standard": ColorSystem.STANDARD,
+    "256": ColorSystem.EIGHT_BIT,
+    "truecolor": ColorSystem.TRUECOLOR,
+}
+
+
 class Console:
     """A high level console interface."""
 
@@ -108,17 +119,23 @@ class Console:
 
     def __init__(
         self,
+        color_system: Literal["auto", "none", "standard", "256", "truecolor"] = "auto",
         styles: Dict[str, Style] = DEFAULT_STYLES,
         file: IO = None,
         width: int = None,
         height: int = None,
         markup: Optional[str] = "markdown",
     ):
+
         self._styles = ChainMap(styles)
         self.file = file or sys.stdout
         self._width = width
         self._height = height
         self._markup = markup
+
+        if color_system == "auto":
+            color_system = self._detect_color_system()
+        self._color_system = COLOR_SYSTEMS[color_system]
 
         self.buffer: List[Segment] = []
         self._buffer_index = 0
@@ -126,6 +143,18 @@ class Console:
         default_style = Style()
         self.style_stack: List[Style] = [default_style]
         self.current_style = default_style
+
+    def __repr__(self) -> str:
+        return f"<console width={self.width} {str(self._color_system)}>"
+
+    def _detect_color_system(self) -> str:
+        """Detect color system from env vars."""
+        if not self.is_terminal:
+            return "none"
+        if os.environ.get("COLORTERM", "").strip().lower() == "truecolor":
+            return "truecolor"
+        # 256 can be considered standard nowadays
+        return "256"
 
     def _enter_buffer(self) -> None:
         """Enter in to a buffer context, and buffer all output."""
@@ -423,11 +452,12 @@ class Console:
         output: List[str] = []
         append = output.append
         current_style = self.current_style
+        color_system = self._color_system
         for line in Segment.split_lines(self.buffer, self.width):
             for text, style in line:
                 if style:
                     style = current_style.apply(style)
-                    append(style.render(text, reset=True))
+                    append(style.render(text, reset=True, color_system=color_system))
                 else:
                     append(text)
             append("\n")

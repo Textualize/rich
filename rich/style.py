@@ -4,7 +4,7 @@ import sys
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Type
 
 from . import errors
-from .color import Color
+from .color import Color, ColorSystem
 
 
 class _Bit:
@@ -241,16 +241,24 @@ class Style:
         style._set_attributes = self._attributes
         return style
 
-    def render(self, text: str = "", *, reset=False) -> str:
+    def render(
+        self,
+        text: str = "",
+        *,
+        color_system: ColorSystem = ColorSystem.TRUECOLOR,
+        reset=False,
+    ) -> str:
         """Render the ANSI codes to implement the style."""
         attrs: List[str] = []
         append = attrs.append
 
         if self._color is not None:
-            attrs.extend(self._color.get_ansi_codes())
+            attrs.extend(self._color.downgrade(color_system).get_ansi_codes())
 
         if self._bgcolor is not None:
-            attrs.extend(self._bgcolor.get_ansi_codes(foreground=False))
+            attrs.extend(
+                self._bgcolor.downgrade(color_system).get_ansi_codes(foreground=False)
+            )
 
         set_bits = self._set_attributes
         bits = self._attributes

@@ -411,4 +411,5 @@ if __name__ == "__main__":
     md = Markdown(markup)
 
     console.print(md)
+    print(console)
     # print(console.render_spans())

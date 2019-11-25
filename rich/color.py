@@ -293,9 +293,10 @@ EIGHT_BIT_COLORS = {
 class ColorSystem(IntEnum):
     """One of the 3 color system supported by terminals."""
 
+    NONE = 0
     STANDARD = 1
     EIGHT_BIT = 2
-    FULL = 3
+    TRUECOLOR = 3
 
 
 class ColorType(IntEnum):
@@ -304,7 +305,7 @@ class ColorType(IntEnum):
     DEFAULT = 0
     STANDARD = 1
     EIGHT_BIT = 2
-    FULL = 3
+    TRUECOLOR = 3
 
 
 class ColorTriplet(NamedTuple):
@@ -362,7 +363,7 @@ class Color(NamedTuple):
 
     @classmethod
     def from_triplet(cls, triplet: ColorTriplet) -> Color:
-        """Create a full RGB color from a triplet of values.
+        """Create a truecolor RGB color from a triplet of values.
         
         Args:
             triplet (ColorTriplet): A color triplet containing red, green and blue components.
@@ -370,7 +371,7 @@ class Color(NamedTuple):
         Returns:
             Color: A new color object.
         """
-        return cls(name=f"#{triplet.hex}", type=ColorType.FULL, triplet=triplet)
+        return cls(name=f"#{triplet.hex}", type=ColorType.TRUECOLOR, triplet=triplet)
 
     @classmethod
     def default(cls) -> Color:
@@ -408,7 +409,7 @@ class Color(NamedTuple):
             )
             if not all(component <= 255 for component in triplet):
                 raise ColorParseError(f"color components must be <= 255 in {color!r}")
-            return cls(color, ColorType.FULL, triplet=triplet)
+            return cls(color, ColorType.TRUECOLOR, triplet=triplet)
 
         else:  #  color_rgb:
             components = color_rgb.split(",")
@@ -418,7 +419,7 @@ class Color(NamedTuple):
             triplet = ColorTriplet(int(red), int(green), int(blue))
             if not all(component <= 255 for component in triplet):
                 raise ColorParseError(f"color components must be <= 255 in {color!r}")
-            return cls(color, ColorType.FULL, triplet=triplet)
+            return cls(color, ColorType.TRUECOLOR, triplet=triplet)
 
     @classmethod
     def _match_color(
@@ -458,7 +459,7 @@ class Color(NamedTuple):
             assert self.number is not None
             return ["38" if foreground else "48", "5", str(self.number)]
 
-        else:  # self.standard == ColorStandard.FULL:
+        else:  # self.standard == ColorStandard.TRUECOLOR:
             assert self.triplet is not None
             red, green, blue = self.triplet
             return ["38" if foreground else "48", "2", str(red), str(green), str(blue)]
@@ -468,8 +469,8 @@ class Color(NamedTuple):
         if system >= self.system:
             return self
 
-        # Convert to 8-bit color from full color
-        if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.FULL:
+        # Convert to 8-bit color from truecolor color
+        if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:
 
             assert self.triplet is not None
             red, green, blue = self.triplet
@@ -487,9 +488,9 @@ class Color(NamedTuple):
             color_number = 16 + ansi_red + ansi_green + ansi_blue
             return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
 
-        # Convert to standard from full color or 8-bit
+        # Convert to standard from truecolor or 8-bit
         elif system == ColorSystem.STANDARD:
-            if self.system == ColorSystem.FULL:
+            if self.system == ColorSystem.TRUECOLOR:
                 assert self.triplet is not None
                 triplet = self.triplet
             else:  # self.system == ColorSystem.EIGHT_BUT
