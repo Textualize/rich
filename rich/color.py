@@ -140,7 +140,9 @@ class Color(NamedTuple):
                 int(color_24[0:2], 16), int(color_24[2:4], 16), int(color_24[4:6], 16)
             )
             if not all(component <= 255 for component in triplet):
-                raise ColorParseError(f"color components must be <= 255 in {color!r}")
+                raise ColorParseError(
+                    f"color components must be <= 0xff (255) in {color!r}"
+                )
             return cls(color, ColorType.TRUECOLOR, triplet=triplet)
 
         else:  #  color_rgb:
@@ -173,6 +175,7 @@ class Color(NamedTuple):
             red, green, blue = self.triplet
             return ["38" if foreground else "48", "2", str(red), str(green), str(blue)]
 
+    @lru_cache(maxsize=None)
     def downgrade(self, system: ColorSystem) -> Color:
         """Downgrade a color system to a system with fewer colors."""
         if system >= self.system:
@@ -180,6 +183,9 @@ class Color(NamedTuple):
 
         # Convert to 8-bit color from truecolor color
         if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:
+            # color_number = EIGHT_BIT_PALETTE.match(self.triplet)
+            # return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
+
             assert self.triplet is not None
             red, green, blue = self.triplet
             _h, l, s = rgb_to_hls(red / 255, green / 255, blue / 255)

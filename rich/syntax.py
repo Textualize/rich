@@ -92,7 +92,7 @@ class Syntax:
             return
 
         lines = text.split("\n")
-        numbers_column_width = len(str(len(lines))) + 1
+        numbers_column_width = len(str(self.start_line + len(lines))) + 2
         render_options = options.with_width(options.max_width - numbers_column_width)
 
         if self.style is None:
@@ -114,7 +114,8 @@ class Syntax:
             for first, wrapped_line in iter_first(wrapped_lines):
                 if first:
                     yield Segment(
-                        str(line_no).rjust(numbers_column_width - 1) + " ", number_style
+                        f" {str(line_no).rjust(numbers_column_width - 2)} ",
+                        number_style,
                     )
                 else:
                     yield padding
@@ -154,6 +155,6 @@ CODE = r'''
 
 if __name__ == "__main__":
 
-    syntax = Syntax(CODE, "python", dedent=True)
+    syntax = Syntax(CODE, "python", dedent=True, line_numbers=True, start_line=990)
     console = Console()
     console.print(syntax)
