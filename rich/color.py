@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import re
+from colorsys import rgb_to_hls
 from dataclasses import dataclass
 from enum import IntEnum
 from functools import lru_cache
 from math import sqrt
-from typing import Iterable, List, NamedTuple, Sequence, Tuple, Optional
-
+from typing import Iterable, List, NamedTuple, Optional, Sequence, Tuple
 
 STANDARD_COLORS_NAMES = {
     "black": 0,
@@ -346,6 +346,10 @@ class ColorSystem(IntEnum):
     EIGHT_BIT = 2
     TRUECOLOR = 3
 
+    @property
+    def name(self) -> str:
+        return "foo"
+
 
 class ColorType(IntEnum):
     """Type of color stored in Color class."""
@@ -496,7 +500,27 @@ class Color(NamedTuple):
 
         # Convert to 8-bit color from truecolor color
         if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:
-            color_number = EIGHT_BIT_PALETTE.match(self.triplet)
+            # color_number = EIGHT_BIT_PALETTE.match(self.triplet)
+            # return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
+            assert self.triplet is not None
+            red, green, blue = self.triplet
+            _h, l, s = rgb_to_hls(red / 255, green / 255, blue / 255)
+
+            # If saturation is under 10% assume it is grayscale
+            if s < 0.1:
+                gray = int(round(l * 25))
+                if gray == 0:
+                    color_number = 0
+                elif gray == 25:
+                    color_number = 15
+                else:
+                    color_number = 231 + gray
+                return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
+
+            ansi_red = 36 * round(red / 255.0 * 5.0)
+            ansi_green = 6 * round(green / 255.0 * 5.0)
+            ansi_blue = round(blue / 255.0 * 5.0)
+            color_number = 16 + ansi_red + ansi_green + ansi_blue
             return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
 
         # Convert to standard from truecolor or 8-bit
@@ -540,6 +564,8 @@ if __name__ == "__main__":
 
     c = Color.parse("#ff0000")
     print(c.downgrade(ColorSystem.STANDARD))
+
+    print(ColorSystem.NONE.name)
 
     # print(Color.parse("default"))
     # print(Color.parse("red"))
