@@ -19,18 +19,6 @@ class _Bit:
             return obj._attributes & self.bit != 0
         return None
 
-    def __set__(self, obj: Style, val: Optional[bool]) -> None:
-        bit = self.bit
-        if val is None:
-            obj._set_attributes &= ~bit
-            obj._attributes &= ~bit
-        else:
-            obj._set_attributes |= bit
-            if val:
-                obj._attributes |= bit
-            else:
-                obj._attributes &= ~bit
-
 
 class Style:
     """A terminal style."""
@@ -126,24 +114,18 @@ class Style:
             self._color == other._color
             and self._bgcolor == other._bgcolor
             and self._set_attributes == other._set_attributes
-            and self._attributes == other._attributes,
+            and self._attributes == other._attributes
         )
 
     @property
-    def color(self) -> Optional[str]:
-        return self._color.name if self._color is not None else None
-
-    @color.setter
-    def color(self, new_color: Optional[str]) -> None:
-        self._color = None if new_color is None else Color.parse(new_color)
+    def color(self) -> Optional[Color]:
+        """Get the style foreground color or None if it is not set."""
+        return self._color
 
     @property
-    def bgcolor(self) -> Optional[str]:
-        return self._bgcolor.name if self._bgcolor is not None else None
-
-    @bgcolor.setter
-    def bgcolor(self, new_color: Optional[str]) -> None:
-        self._bgcolor = None if new_color is None else Color.parse(new_color)
+    def bgcolor(self) -> Optional[Color]:
+        """Get the style background color or None if it is not set."""
+        return self._bgcolor
 
     @classmethod
     def reset(cls) -> Style:
@@ -252,8 +234,6 @@ class Style:
     ) -> str:
         """Render the ANSI codes to implement the style."""
         attrs: List[str] = []
-        append = attrs.append
-
         if self._color is not None:
             attrs.extend(self._color.downgrade(color_system).get_ansi_codes())
 
@@ -263,11 +243,13 @@ class Style:
             )
 
         set_bits = self._set_attributes
-        bits = self._attributes
-        for bit_no in range(0, 10):
-            bit = 1 << bit_no
-            if set_bits & bit:
-                append(str(1 + bit_no) if bits & bit else str(21 + bit_no))
+        if set_bits:
+            append = attrs.append
+            bits = self._attributes
+            for bit_no in range(0, 9):
+                bit = 1 << bit_no
+                if set_bits & bit:
+                    append(str(1 + bit_no) if bits & bit else str(21 + bit_no))
 
         reset = "\x1b[0m" if reset else ""
         if attrs:
@@ -301,13 +283,17 @@ class Style:
         if style is None:
             return self
 
-        new_style = style.__new__(Style)
-        new_style._color = self._color if style._color is None else style._color
-        new_style._bgcolor = self._bgcolor if style._bgcolor is None else style._bgcolor
-        new_style._attributes = (style._attributes & ~self._set_attributes) | (
-            self._attributes & self._set_attributes
-        )
-        new_style._set_attributes = self._set_attributes | style._set_attributes
+        new_style = self.__new__(Style)
+
+        new_style.__dict__ = {
+            "_color": style._color or self._color,
+            "_bgcolor": style._bgcolor or self._bgcolor,
+            "_attributes": (
+                (style._attributes & ~self._set_attributes)
+                | (self._attributes & self._set_attributes)
+            ),
+            "_set_attributes": self._set_attributes | style._set_attributes,
+        }
         return new_style
 
 
@@ -315,18 +301,27 @@ class StyleStack:
     """A stack of styles that maintains a current style."""
 
     def __init__(self, default_style: Style) -> None:
-        self._stack: List[Style] = []
-        self._stack.append(default_style)
+        self._stack: List[Style] = [default_style]
         self.current = default_style
 
     def __repr__(self) -> str:
         return f"<stylestack {self._stack!r}>"
 
     def push(self, style: Style) -> None:
+        """Push a new style on to the stack.
+        
+        Args:
+            style (Style): New style to combine with current style.
+        """
         self.current = self.current.apply(style)
         self._stack.append(self.current)
 
     def pop(self) -> Style:
+        """Pop last style and discard.
+        
+        Returns:
+            Style: New current style (also available as stack.current)
+        """
         self._stack.pop()
         self.current = self._stack[-1]
         return self.current
