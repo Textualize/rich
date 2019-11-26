@@ -236,7 +236,7 @@ class Text:
 
         def get_style(style: Union[str, Style]) -> Style:
             if isinstance(style, str):
-                style = console.parse_style(style) or null_style
+                style = console.get_style(style) or null_style
             return style
 
         enumerated_spans = list(enumerate(line._spans, 1))

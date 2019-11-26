@@ -100,7 +100,7 @@ class Panel:
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
 
-        style = console.parse_style(self.style)
+        style = console.get_style(self.style)
         width = options.max_width
         child_options = options.copy()
         child_options.max_width = width - 2

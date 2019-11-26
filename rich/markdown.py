@@ -26,18 +26,50 @@ class MarkdownElement:
 
     @classmethod
     def create(cls, markdown: Markdown, node: Any) -> MarkdownElement:
+        """Factory to create markdown element,
+        
+        Args:
+            markdown (Markdown): THe parent Markdown object.
+            node (Any): A node from Pygments.
+        
+        Returns:
+            MarkdownElement: A new markdown element
+        """
         return cls()
 
     def on_enter(self, context: MarkdownContext):
-        pass
+        """Called when the node is entered.
+        
+        Args:
+            context (MarkdownContext): The markdown context.
+        """
 
     def on_text(self, context: MarkdownContext, text: str) -> None:
-        pass
+        """Called when text is parsed.
+        
+        Args:
+            context (MarkdownContext): The markdown context.
+        """
 
     def on_leave(self, context: MarkdownContext) -> None:
-        pass
+        """Called when the parser leaves the element.
+        
+        Args:
+            context (MarkdownContext): [description]
+        """
 
     def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
+        """Called when a child element is closed.
+
+        This method allows a parent element to take over rendering of its children.
+        
+        Args:
+            context (MarkdownContext): The markdown context.
+            child (MarkdownElement): The child markdown element.
+        
+        Returns:
+            bool: Return True to render the element, or False to not render the element.
+        """
         return True
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
@@ -46,10 +78,16 @@ class MarkdownElement:
 
 
 class UnknownElement(MarkdownElement):
-    pass
+    """An unknown element.
+    
+    Hopefully there will be no unknown elements, and we will have a MarkdownElement for
+    everything in the document.
+    
+    """
 
 
 class TextElement(MarkdownElement):
+    """Base class for elements that render text."""
 
     style_name = "none"
 
@@ -68,6 +106,8 @@ class TextElement(MarkdownElement):
 
 
 class Paragraph(TextElement):
+    """A Paragraph."""
+
     style_name = "markdown.paragraph"
 
     @classmethod
@@ -83,6 +123,8 @@ class Paragraph(TextElement):
 
 
 class Heading(TextElement):
+    """A heading."""
+
     @classmethod
     def create(cls, markdown: Markdown, node: Any) -> Heading:
         heading = Heading(node.level)
@@ -101,14 +143,18 @@ class Heading(TextElement):
         text = self.text
         text.justify = "center"
         if self.level == 1:
+            # Draw a border around h1s
             yield Panel(
                 text, border=DOUBLE_BORDER, style="markdown.h1.border",
             )
         else:
+            # Styled text for h2 and beyond
             yield text
 
 
 class CodeBlock(TextElement):
+    """A code block with syntax highlighting."""
+
     style_name = "markdown.code_block"
 
     @classmethod
@@ -121,13 +167,14 @@ class CodeBlock(TextElement):
         self.theme = theme
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-
         code = str(self.text).rstrip()
-        syntax = Syntax(code, self.lexer_name, theme=self.theme, line_numbers=False)
+        syntax = Syntax(code, self.lexer_name, theme=self.theme)
         yield syntax
 
 
 class BlockQuote(TextElement):
+    """A block quote."""
+
     style_name = "markdown.block_quote"
 
     def __init__(self) -> None:
@@ -138,6 +185,7 @@ class BlockQuote(TextElement):
         return False
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+        # Render surrounded by qoutes.
         render_options = options.with_width(options.max_width - 4)
         lines = console.render_lines(self.elements, render_options, style=self.style)
 
@@ -155,6 +203,8 @@ class BlockQuote(TextElement):
 
 
 class HorizontalRule(MarkdownElement):
+    """A horizontal rule to divide secions."""
+
     new_line = False
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
@@ -163,6 +213,8 @@ class HorizontalRule(MarkdownElement):
 
 
 class ListElement(MarkdownElement):
+    """A list element."""
+
     @classmethod
     def create(cls, markdown: Markdown, node: Any) -> ListElement:
         list_data = node.list_data
@@ -191,6 +243,8 @@ class ListElement(MarkdownElement):
 
 
 class ListItem(TextElement):
+    """An item in a list."""
+
     style_name = "markdown.item"
 
     def __init__(self) -> None:
@@ -203,7 +257,7 @@ class ListItem(TextElement):
     def render_bullet(self, console: Console, options: ConsoleOptions) -> RenderResult:
         render_options = options.with_width(options.max_width - 3)
         lines = console.render_lines(self.elements, render_options, style=self.style)
-        bullet_style = console.parse_style("markdown.item.bullet")
+        bullet_style = console.get_style("markdown.item.bullet")
 
         bullet = Segment(" • ", bullet_style)
         padding = Segment(" " * 3, bullet_style)
@@ -219,7 +273,7 @@ class ListItem(TextElement):
         number_width = len(str(last_number)) + 2
         render_options = options.with_width(options.max_width - number_width)
         lines = console.render_lines(self.elements, render_options, style=self.style)
-        number_style = console.parse_style("markdown.item.number")
+        number_style = console.get_style("markdown.item.number")
 
         new_line = Segment("\n")
         padding = Segment(" " * number_width, number_style)
@@ -253,9 +307,9 @@ class MarkdownContext:
         """Called when the parser visits text."""
         self.stack.top.on_text(self, text)
 
-    def enter_style(self, style_name: str) -> Style:
+    def enter_style(self, style_name: Union[str, Style]) -> Style:
         """Enter a style context."""
-        style = self.console.get_style(style_name) or Style()
+        style = self.console.get_style(style_name)
         self.style_stack.push(style)
         return self.current_style
 
@@ -279,7 +333,7 @@ class Markdown:
     inlines = {"emph", "strong", "code", "link"}
 
     def __init__(
-        self, markup: str, code_theme: str = "monokai", justify: str = "left"
+        self, markup: str, code_theme: str = "monokai", justify: str = None
     ) -> None:
         """Parses the markup."""
         self.markup = markup

@@ -25,6 +25,7 @@ from typing import (
 )
 from typing_extensions import Literal
 
+from ._emoji_replace import _emoji_replace
 from .default_styles import DEFAULT_STYLES
 from . import errors
 from .color import ColorSystem
@@ -311,6 +312,7 @@ class Console:
             Iterable[RenderableType]: Renderable objects.
         
         """
+
         if self._markup == "markdown":
             from .markdown import Markdown
 
@@ -320,7 +322,7 @@ class Console:
 
             yield Text(text, self.current_style)
 
-    def get_style(self, name: str) -> Optional[Style]:
+    def _get_style(self, name: str) -> Optional[Style]:
         """Get a named style, or `None` if it doesn't exist.
         
         Args:
@@ -331,8 +333,8 @@ class Console:
         """
         return self._styles.get(name, None)
 
-    def parse_style(self, name: str) -> Optional[Style]:
-        """Get a named style, or parse a style definition.
+    def get_style(self, name: Union[str, Style]) -> Optional[Style]:
+        """Get a style.
 
         Args:
             name (str): The name of a style.
@@ -341,6 +343,8 @@ class Console:
             Optional[Style]: A Style object or `None` if it couldn't be found / parsed.
 
         """
+        if isinstance(name, Style):
+            return name
         try:
             return self._styles.get(name, None) or Style.parse(name)
         except errors.StyleSyntaxError:
@@ -393,7 +397,7 @@ class Console:
             StyleContext: A style context manager.
         """
         if isinstance(style, str):
-            _style = self.parse_style(style) or Style()
+            _style = self.get_style(style) or Style()
         else:
             if not isinstance(style, Style):
                 raise TypeError(f"style must be a str or Style instance, not {style!r}")
@@ -409,17 +413,18 @@ class Console:
         Returns:
             None: 
         """
-        write_style = self.current_style or self.get_style(style or "none")
+        write_style = self.current_style or self._get_style(style or "none")
         self.buffer.append(Segment(text, write_style))
         self._check_buffer()
 
-    def print(self, *objects: RenderableType, sep=" ", end="\n") -> None:
+    def print(self, *objects: RenderableType, sep=" ", end="\n", emoji=True) -> None:
         """Print to the console.
         
         Args:
             *objects: Arbitrary objects to print to the console.
             sep (str, optional): Separator to print between objects. Defaults to " ".
             end (str, optional): Character to end print with. Defaults to "\n".
+            emoji (bool): If True, emoji codes will be replaced, otherwise emoji codes will be left in.
         """
         if not objects:
             self.line()
@@ -432,6 +437,8 @@ class Console:
             """Check strings buffer."""
             if strings:
                 text = f"{sep.join(strings)}{end}"
+                if emoji:
+                    text = _emoji_replace(text)
                 buffer_extend(self.render(text, options))
 
         with self:
@@ -455,6 +462,7 @@ class Console:
         append = output.append
         current_style = self.current_style
         color_system = self._color_system
+
         for line in Segment.split_lines(self.buffer, self.width):
             for text, style in line:
                 if style:

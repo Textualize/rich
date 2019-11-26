@@ -284,7 +284,6 @@ class Style:
             return self
 
         new_style = self.__new__(Style)
-
         new_style.__dict__ = {
             "_color": style._color or self._color,
             "_bgcolor": style._bgcolor or self._bgcolor,

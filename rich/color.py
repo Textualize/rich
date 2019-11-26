@@ -89,6 +89,7 @@ class Color(NamedTuple):
 
     @property
     def system(self) -> ColorSystem:
+        """Get the native color system for this color."""
         if self.type == ColorType.DEFAULT:
             return ColorSystem.STANDARD
         return ColorSystem(int(self.type))

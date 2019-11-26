@@ -143,7 +143,7 @@ class Syntax:
             )
         else:
             if isinstance(self.style, str):
-                background_style = console.parse_style(self.style) or Style()
+                background_style = console.get_style(self.style) or Style()
             else:
                 background_style = self.style
 
