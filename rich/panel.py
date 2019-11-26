@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Tuple
 
-from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult
+from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .text import Text
 from .segment import Segment
 
@@ -82,7 +82,7 @@ DOUBLE_BORDER = Border(
 class Panel:
     def __init__(
         self,
-        *contents: ConsoleRenderable,
+        *contents: RenderableType,
         border: Border = SQUARE_BORDER,
         style: str = "none",
     ) -> None:
@@ -94,7 +94,7 @@ class Panel:
                 Defaults to SQUARE_BORDER.
             style (str, optional): The style of the border. Defaults to "none".
         """
-        self.contents: Tuple[ConsoleRenderable, ...] = contents
+        self.contents: Tuple[RenderableType, ...] = contents
         self.border = border
         self.style = style
 
