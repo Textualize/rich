@@ -70,5 +70,5 @@ if __name__ == "__main__":
 
     c.print(Panel(Emoji.replace("Hello, :smiley: ! :thumbs_up: :sfwdfwer:")))
 
-    c.print("Here is a :smiley:")
+    c.print("Here is a :smiley: woman_student_dark_skin_tone")
 
