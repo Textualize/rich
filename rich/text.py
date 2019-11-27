@@ -4,12 +4,16 @@ from operator import itemgetter
 from typing import Dict, Iterable, NamedTuple, Optional, List, Tuple, Union
 from typing_extensions import Literal
 
-from .console import Console, ConsoleOptions, RenderResult, RenderableType
+from .console import (
+    Console,
+    ConsoleOptions,
+    JustifyValues,
+    RenderResult,
+    RenderableType,
+)
 from .style import Style
 from .segment import Segment
 from ._tools import iter_last, iter_first_last
-
-JustifyValues = Optional[Literal["left", "center", "right", "full"]]
 
 
 class Span(NamedTuple):
@@ -210,7 +214,9 @@ class Text:
         self, console: Console, options: ConsoleOptions
     ) -> Iterable[Segment]:
         if self.word_wrap:
-            lines = self.wrap(options.max_width, justify=self.justify)
+            lines = self.wrap(
+                options.max_width, justify=options.justify or self.justify
+            )
         else:
             lines = self.fit(options.max_width)
 

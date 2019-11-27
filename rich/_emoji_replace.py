@@ -12,7 +12,6 @@ def _emoji_replace(text: str, _emoji_sub=re.compile("(:(.*?):)").sub) -> str:
     def do_replace(match: Match[str]) -> str:
         """Called by re.sub to do the replacement."""
         emoji_code, emoji_name = match.groups()
-        return get_emoji(emoji_name, emoji_code)
+        return get_emoji(emoji_name.lower(), emoji_code)
 
-    new_text = _emoji_sub(do_replace, text)
-    return new_text
+    return _emoji_sub(do_replace, text)

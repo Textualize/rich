@@ -33,6 +33,9 @@ from .style import Style
 from .segment import Segment
 
 
+JustifyValues = Optional[Literal["left", "center", "right", "full"]]
+
+
 @dataclass
 class ConsoleOptions:
     """Options for __console__ method."""
@@ -41,6 +44,7 @@ class ConsoleOptions:
     is_terminal: bool
     encoding: str
     min_width: int = 1
+    justify: Optional[JustifyValues] = None
 
     def copy(self) -> ConsoleOptions:
         """Get a copy of this object.
@@ -467,7 +471,7 @@ class Console:
             for text, style in line:
                 if style:
                     style = current_style.apply(style)
-                    append(style.render(text, reset=True, color_system=color_system))
+                    append(style.render(text, color_system=color_system, reset=True))
                 else:
                     append(text)
             append("\n")

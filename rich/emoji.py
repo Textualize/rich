@@ -15,6 +15,8 @@ class NoEmoji(Exception):
 
 
 class Emoji:
+    __slots__ = ["name", "style", "_char"]
+
     def __init__(self, name: str, style: Union[str, Style] = None) -> None:
         """A single emoji character.
         

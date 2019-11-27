@@ -5,6 +5,7 @@ from typing import Any, ClassVar, Dict, Iterable, List, Optional, Union
 
 from commonmark.blocks import Parser
 
+from . import box
 from .console import (
     Console,
     ConsoleOptions,
@@ -12,7 +13,7 @@ from .console import (
     RenderResult,
     Segment,
 )
-from .panel import DOUBLE_BORDER, Panel
+from .panel import Panel
 from .style import Style, StyleStack
 from .syntax import Syntax
 from .text import Lines, Text
@@ -145,7 +146,7 @@ class Heading(TextElement):
         if self.level == 1:
             # Draw a border around h1s
             yield Panel(
-                text, border=DOUBLE_BORDER, style="markdown.h1.border",
+                text, box=box.DOUBLE, style="markdown.h1.border",
             )
         else:
             # Styled text for h2 and beyond
