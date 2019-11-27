@@ -2,26 +2,51 @@ from __future__ import annotations
 
 
 class Box:
-    """Defines characters to render boxes."""
+    """Defines characters to render boxes.
+    
+    ┌─┬┐ top
+    │ ││ head
+    ├─┴┤ head_row
+    │ ││ mid
+    ├─┼┤ row
+    ├─┬┤ foot_row
+    │ ││ foot
+    └─┴┘ bottom
+
+    
+    """
 
     def __init__(self, box: str) -> None:
-        line1, line2, line3, line4, line5, line6 = box.strip().splitlines()
-        self.top_left, self.top, self.top_divider, self.top_right = line1
-
-        self.left, _, self.vertical, self.right = line2
-
         (
-            self.left_row,
-            self.horizontal,
-            self.horizontal_top_divider,
-            self.right_row,
+            line1,
+            line2,
+            line3,
+            line4,
+            line5,
+            line6,
+            line7,
+            line8,
+        ) = box.strip().splitlines()
+        self.top_left, self.top, self.top_divider, self.top_right = line1
+        self.head_left, _, self.head_vertical, self.head_right = line2
+        (
+            self.head_row_left_row,
+            self.head_row_horizontal,
+            self.head_row_divider,
+            self.head_row_right,
         ) = line3
 
-        _, _, self.cross, _ = line4
+        self.mid_left, _, self.mid_vertical, self.mid_right = line4
+        self.row_left, self.row_horizontal, self.row_cross, self.row_right = line5
 
-        _, _, self.horizontal_bottom_divider, self.right_row = line5
-
-        self.bottom_left, self.bottom, self.bottom_divider, self.bottom_right = line6
+        (
+            self.foot_row_left,
+            self.foot_row_horizontal,
+            self.foot_row_divider,
+            self.foot_row_right,
+        ) = line6
+        self.foot_left, _, self.foot_vertical, self.foot_right = line7
+        self.bottom_left, self.bottom, self.bottom_divider, self.bottom_right = line8
 
     def __repr__(self) -> str:
         border_str = str(self).replace("\n", r"\n")
@@ -30,9 +55,9 @@ class Box:
     def __str__(self) -> str:
         return (
             f"{self.top_left}{self.top}{self.top_divider}{self.top}{self.top_right}\n"
-            f"{self.left} {self.vertical} {self.right}\n"
-            f"{self.left_row}{self.horizontal}{self.cross}{self.horizontal}{self.right_row}\n"
-            f"{self.left} {self.vertical} {self.right}\n"
+            f"{self.head_left} {self.head_vertical} {self.head_right}\n"
+            f"{self.row_left}{self.row_horizontal}{self.row_cross}{self.row_horizontal}{self.row_right}\n"
+            f"{self.foot_left} {self.foot_vertical} {self.foot_right}\n"
             f"{self.bottom_left}{self.bottom}{self.bottom_divider}{self.bottom}{self.bottom_right}"
         )
 
@@ -70,6 +95,8 @@ ASCII = Box(
 |-+|
 |-+|
 |-+|
+|-+|
+| ||
 +--+
 """
 )
@@ -79,8 +106,10 @@ SQUARE = Box(
 ┌─┬┐
 │ ││
 ├─┴┤
+│ ││
 ├─┼┤
 ├─┬┤
+│ ││
 └─┴┘
 """
 )
@@ -90,8 +119,10 @@ ROUNDED = Box(
 ╭─┬╮
 │ ││
 ├─┴┤
+│ ││
 ├─┼┤
 ├─┬┤
+│ ││
 ╰─┴╯
 """
 )
@@ -101,9 +132,24 @@ HEAVY = Box(
 ┏━┳┓
 ┃ ┃┃
 ┣━┻┫
+┃ ┃┃
 ┣━╋┫
 ┣━┳┫
+┃ ┃┃
 ┗━┻┛
+"""
+)
+
+HEAVY_HEADER = Box(
+    """
+┏━┳┓
+┃ ┃┃
+┡━┻┩
+│ ││
+┡━╇┩
+├─┬┤
+│ ││
+└─┴┘
 """
 )
 
@@ -112,8 +158,10 @@ HEAVY_EDGE = Box(
 ┏━┯┓
 ┃ │┃
 ┠─┴┨
+┃ │┃
 ┠─┼┨
 ┠─┬┨
+┃ │┃
 ┗━┷┛
 """
 )
@@ -123,8 +171,10 @@ DOUBLE = Box(
 ╔═╦╗
 ║ ║║
 ╠═╩╣
+║ ║║
 ╠═╬╣
 ╠═╦╣
+║ ║║
 ╚═╩╝
 """
 )
@@ -134,8 +184,10 @@ DOUBLE_EDGE = Box(
 ╔═╤╗
 ║ │║
 ╟─┴╢
+║ │║
 ╟─┼╢
 ╟─┬╢
+║ │║
 ╚═╧╝
 """
 )
@@ -156,6 +208,9 @@ if __name__ == "__main__":
 
     print("HEAVY_EDGE")
     print(HEAVY_EDGE)
+
+    print("HEAVY_HEADER")
+    print(HEAVY_HEADER)
 
     print("DOUBLE")
     print(DOUBLE)
