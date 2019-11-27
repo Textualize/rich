@@ -13,10 +13,10 @@ class Box:
             self.top_right,
             self.left,
             _,
-            _,
+            self.mid_vertical,
             self.right,
             self.mid_left,
-            self.mid,
+            self.mid_horizontal,
             self.cross,
             self.mid_right,
             self.bottom_left,
@@ -31,9 +31,11 @@ class Box:
 
     def __str__(self) -> str:
         return (
-            f"{self.top_left}{self.top}{self.top_right}\n"
-            f"{self.left} {self.right}\n"
-            f"{self.bottom_left}{self.bottom}{self.bottom_right}"
+            f"{self.top_left}{self.top}{self.top_cross}{self.top}{self.top_right}\n"
+            f"{self.left} {self.mid_vertical} {self.right}\n"
+            f"{self.mid_left}{self.mid_horizontal}{self.cross}{self.mid_horizontal}{self.mid_right}\n"
+            f"{self.left} {self.mid_vertical} {self.right}\n"
+            f"{self.bottom_left}{self.bottom}{self.bottom_cross}{self.bottom}{self.bottom_right}"
         )
 
     def get_top(self, width: int) -> str:
@@ -99,6 +101,15 @@ HEAVY = Box(
 """
 )
 
+HEAVY_EDGE = Box(
+    """
+┏━┯┓
+┃ │┃
+┠─┼┨
+┗━┷┛
+"""
+)
+
 DOUBLE = Box(
     """
 ╔═╦╗
@@ -108,9 +119,21 @@ DOUBLE = Box(
 """
 )
 
+
+DOUBLE_EDGE = Box(
+    """
+╔═╤╗
+║ │║
+╟─┼╢
+╚═╧╝
+"""
+)
+
 if __name__ == "__main__":
     print(ASCII)
     print(SQUARE)
     print(ROUNDED)
     print(HEAVY)
+    print(HEAVY_EDGE)
     print(DOUBLE)
+    print(DOUBLE_EDGE)
