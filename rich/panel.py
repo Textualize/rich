@@ -33,8 +33,8 @@ class Panel:
 
         lines = console.render_lines(self.contents, child_options)
         box = self.box
-        line_start = Segment(box.left, style)
-        line_end = Segment(f"{box.right}\n", style)
+        line_start = Segment(box.mid_left, style)
+        line_end = Segment(f"{box.mid_right}\n", style)
         yield Segment(box.get_top(width), style)
         for line in lines:
             yield line_start
