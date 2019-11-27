@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Tuple
 
-from . import box
+from .box import Box, SQUARE
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .text import Text
 from .segment import Segment
@@ -10,13 +10,13 @@ from .segment import Segment
 
 class Panel:
     def __init__(
-        self, *contents: RenderableType, box: Box = box.SQUARE, style: str = "none",
+        self, *contents: RenderableType, box: Box = SQUARE, style: str = "none",
     ) -> None:
         """A console renderable that draws a border around its contents.
         
         Args:
             *contents (ConsoleRenderable): One or more console renderable objects.
-            box (box, optional): A Box instance that defines the look of the border.
+            box (Box, optional): A Box instance that defines the look of the border.
                 Defaults to box.SQUARE.
             style (str, optional): The style of the border. Defaults to "none".
         """

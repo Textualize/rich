@@ -186,7 +186,7 @@ class BlockQuote(TextElement):
         return False
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        # Render surrounded by qoutes.
+        # Render surrounded by quotes.
         render_options = options.with_width(options.max_width - 4)
         lines = console.render_lines(self.elements, render_options, style=self.style)
 
