@@ -80,8 +80,8 @@ class Color(NamedTuple):
         """Render the color to the terminal."""
         attrs = self.get_ansi_codes(foreground=True)
         return (
+            f"\x1b[{';'.join(attrs)}m⬤  \x1b[0m"
             f"<color {self.name!r} ({self.type.name.lower()})>"
-            f"\x1b[{';'.join(attrs)}m ⬤ \x1b[0m"
         )
 
     def __repr__(self) -> str:
@@ -124,9 +124,17 @@ class Color(NamedTuple):
         if color == "default":
             return cls(color, type=ColorType.DEFAULT)
 
-        standard_color_number = STANDARD_COLORS_NAMES.get(color)
-        if standard_color_number is not None:
-            return cls(color, type=ColorType.STANDARD, number=standard_color_number)
+        if color.endswith("+"):
+            standard_color_number = STANDARD_COLORS_NAMES.get(color[:-1])
+            if standard_color_number is not None:
+                return cls(
+                    color, type=ColorType.EIGHT_BIT, number=standard_color_number + 8
+                )
+            return cls()
+        else:
+            standard_color_number = STANDARD_COLORS_NAMES.get(color)
+            if standard_color_number is not None:
+                return cls(color, type=ColorType.STANDARD, number=standard_color_number)
 
         color_match = RE_COLOR.match(color)
         if color_match is None:
@@ -251,6 +259,10 @@ if __name__ == "__main__":
 
     c = Color.parse("#ff0000")
     print(c.downgrade(ColorSystem.STANDARD))
+
+    print(Color.parse("yellow"))
+    print(Color.parse("3"))
+    print(Color.parse("11"))
 
     # print(Color.parse("default"))
     # print(Color.parse("red"))

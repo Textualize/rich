@@ -114,6 +114,19 @@ SQUARE = Box(
 """
 )
 
+HORIZONTALS = Box(
+    """
+────
+    
+────
+    
+────
+────
+    
+────
+"""
+)
+
 ROUNDED = Box(
     """
 ╭─┬╮
@@ -137,19 +150,6 @@ HEAVY = Box(
 ┣━┳┫
 ┃ ┃┃
 ┗━┻┛
-"""
-)
-
-HEAVY_HEADER = Box(
-    """
-┏━┳┓
-┃ ┃┃
-┡━┻┩
-│ ││
-┡━╇┩
-├─┬┤
-│ ││
-└─┴┘
 """
 )
 
@@ -200,6 +200,9 @@ if __name__ == "__main__":
     print("SQUARE")
     print(SQUARE)
 
+    print("HORIZONTALS")
+    print(HORIZONTALS)
+
     print("ROUNDED")
     print(ROUNDED)
 
@@ -208,9 +211,6 @@ if __name__ == "__main__":
 
     print("HEAVY_EDGE")
     print(HEAVY_EDGE)
-
-    print("HEAVY_HEADER")
-    print(HEAVY_HEADER)
 
     print("DOUBLE")
     print(DOUBLE)

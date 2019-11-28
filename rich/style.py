@@ -333,13 +333,23 @@ if __name__ == "__main__":
 
     # style = Style(color="blue", bold=True, italic=True, reverse=False, dim=True)
 
-    style = Style.parse("bold  not italic  #6ab825")
+    from .console import Console
+
+    c = Console()
+    style = Style.parse("bold not italic  #6ab825")
     print(bin(style._attributes), bin(style._set_attributes))
 
     print(repr(style.bold))
     print(repr(style.italic))
     print(style.render("hello", reset=True))
 
+    c.print("hello", style=style)
+
+    print(Style.parse("dim cyan").render("COLOR", reset=True))
+    print(Style.parse("dim cyan+").render("COLOR", reset=True))
+
+    print(Style.parse("cyan").render("COLOR", reset=True))
+    print(Style.parse("cyan+").render("COLOR", reset=True))
     # style.italic = True
     # print(style._attributes, style._set_attributes)
     # print(style.italic)

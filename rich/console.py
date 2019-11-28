@@ -421,13 +421,21 @@ class Console:
         self.buffer.append(Segment(text, write_style))
         self._check_buffer()
 
-    def print(self, *objects: RenderableType, sep=" ", end="\n", emoji=True) -> None:
+    def print(
+        self,
+        *objects: RenderableType,
+        sep=" ",
+        end="\n",
+        style: Union[str, Style] = None,
+        emoji=True,
+    ) -> None:
         """Print to the console.
         
         Args:
             *objects: Arbitrary objects to print to the console.
             sep (str, optional): Separator to print between objects. Defaults to " ".
             end (str, optional): Character to end print with. Defaults to "\n".
+            style (Union[str, Style], optional): 
             emoji (bool): If True, emoji codes will be replaced, otherwise emoji codes will be left in.
         """
         if not objects:
@@ -445,14 +453,20 @@ class Console:
                     text = _emoji_replace(text)
                 buffer_extend(self.render(text, options))
 
+        if style is not None:
+            self.push_style(style)
         with self:
-            for console_object in objects:
-                if isinstance(console_object, (ConsoleRenderable, Segment)):
-                    check_strings()
-                    buffer_extend(self.render(console_object, options))
-                else:
-                    strings.append(str(console_object))
-            check_strings()
+            try:
+                for console_object in objects:
+                    if isinstance(console_object, (ConsoleRenderable, Segment)):
+                        check_strings()
+                        buffer_extend(self.render(console_object, options))
+                    else:
+                        strings.append(str(console_object))
+                check_strings()
+            finally:
+                if style is not None:
+                    self.pop_style()
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered."""
