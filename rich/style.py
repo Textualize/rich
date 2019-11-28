@@ -5,7 +5,7 @@ import sys
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Type
 
 from . import errors
-from .color import Color, ColorSystem
+from .color import Color, ColorParseError, ColorSystem
 
 
 class _Bit:
@@ -170,9 +170,11 @@ class Style:
                 word = next(words, "")
                 if not word:
                     raise errors.StyleSyntaxError("color expected after 'on'")
-                if Color.parse(word) is None:
+                try:
+                    Color.parse(word) is None
+                except ColorParseError as error:
                     raise errors.StyleSyntaxError(
-                        f"color expected after 'on', found {original_word!r}"
+                        f"unable to parse background color {word} in style {style_definition!r}; {error}"
                     )
                 bgcolor = word
 
@@ -188,9 +190,11 @@ class Style:
                 attributes[word] = True
 
             else:
-                if Color.parse(word) is None:
+                try:
+                    Color.parse(word)
+                except ColorParseError as error:
                     raise errors.StyleSyntaxError(
-                        f"unknown word {original_word!r} in style {style_definition!r}"
+                        f"unable to parse color {word} in style {style_definition!r}; {error}"
                     )
                 color = word
         style = Style(color=color, bgcolor=bgcolor, **attributes)
@@ -350,6 +354,9 @@ if __name__ == "__main__":
 
     print(Style.parse("cyan").render("COLOR", reset=True))
     print(Style.parse("cyan+").render("COLOR", reset=True))
+
+    print(Style.parse("bold blue on magenta+ red").render("COLOR", reset=True))
+
     # style.italic = True
     # print(style._attributes, style._set_attributes)
     # print(style.italic)

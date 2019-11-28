@@ -117,7 +117,7 @@ class Color(NamedTuple):
 
     @classmethod
     @lru_cache(maxsize=1000)
-    def parse(cls, color: str) -> Optional[Color]:
+    def parse(cls, color: str) -> Color:
         """Parse a color definition."""
         color = color.lower().strip()
 
@@ -130,7 +130,6 @@ class Color(NamedTuple):
                 return cls(
                     color, type=ColorType.EIGHT_BIT, number=standard_color_number + 8
                 )
-            return cls()
         else:
             standard_color_number = STANDARD_COLORS_NAMES.get(color)
             if standard_color_number is not None:
@@ -138,11 +137,14 @@ class Color(NamedTuple):
 
         color_match = RE_COLOR.match(color)
         if color_match is None:
-            return None
+            raise ColorParseError(f"{color!r} is not a valid color")
 
         color_24, color_8, color_rgb = color_match.groups()
         if color_8:
-            return cls(color, ColorType.EIGHT_BIT, number=int(color_8))
+            number = int(color_8)
+            if number > 255:
+                raise ColorParseError(f"8bit colors must be <= 255 in {color!r}")
+            return cls(color, ColorType.EIGHT_BIT, number=number)
 
         elif color_24:
             triplet = ColorTriplet(
@@ -260,6 +262,7 @@ if __name__ == "__main__":
     c = Color.parse("#ff0000")
     print(c.downgrade(ColorSystem.STANDARD))
 
+    print(Color.parse("9992"))
     print(Color.parse("yellow"))
     print(Color.parse("3"))
     print(Color.parse("11"))
