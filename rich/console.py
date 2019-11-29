@@ -118,18 +118,19 @@ COLOR_SYSTEMS = {
 }
 
 
-def get_render_width(renderable: Union[str, ConsoleRenderable], max_width: int) -> int:
-    """Get expected width once rendered, or None if unknown."""
-    if isinstance(renderable, str):
-        width = max(len(line) for line in renderable.splitlines())
-        return min(width, max_width)
+def get_render_width(renderable: RenderableType, max_width: int) -> int:
+    """Get desired width for a renderable."""
     console_size = getattr(renderable, "__console_width__", None)
-    if console_size is None:
-        return max_width
-    desired_width = console_size(max_width)
-    assert desired_width >= 0, f"{console_size} should return an integer >= 0"
-    width = max(0, min(max_width, desired_width))
-    return width
+    if console_size is not None:
+        desired_width = console_size(max_width)
+        assert desired_width >= 0, f"{console_size} should return an integer >= 0"
+        width = max(0, min(max_width, desired_width))
+        return width
+    elif isinstance(renderable, Segment):
+        return min(len(renderable.text), max_width)
+    else:
+        width = max(len(line) for line in str(renderable).splitlines())
+        return min(width, max_width)
 
 
 class Console:
