@@ -127,7 +127,7 @@ def get_render_width(renderable: Union[str, ConsoleRenderable], max_width: int) 
     if console_size is None:
         return max_width
     desired_width = console_size(max_width)
-    assert desired_width < 0, f"{console_size} should return an integer >= 0"
+    assert desired_width >= 0, f"{console_size} should return an integer >= 0"
     width = max(0, min(max_width, desired_width))
     return width
 
