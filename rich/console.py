@@ -20,6 +20,7 @@ from typing import (
     NamedTuple,
     overload,
     Protocol,
+    Tuple,
     runtime_checkable,
     Union,
 )
@@ -115,6 +116,18 @@ COLOR_SYSTEMS = {
     "256": ColorSystem.EIGHT_BIT,
     "truecolor": ColorSystem.TRUECOLOR,
 }
+
+
+def get_render_width(renderable: Union[str, ConsoleRenderable], max_width: int) -> int:
+    """Get expected width once rendered, or None if unknown."""
+    if isinstance(renderable, str):
+        width = max(len(line) for line in renderable.splitlines())
+        return min(width, max_width)
+    console_size = getattr(renderable, "__console_width__", None)
+    if console_size is None:
+        return max_width
+    width = max(0, min(max_width, console_size(max_width)))
+    return width
 
 
 class Console:
@@ -272,7 +285,7 @@ class Console:
 
     def render_lines(
         self,
-        renderables: Iterable[RenderableType],
+        renderable: RenderableType,
         options: Optional[ConsoleOptions],
         style: Optional[Style] = None,
     ) -> List[List[Segment]]:
@@ -292,13 +305,7 @@ class Console:
         render_options = options or self.options
 
         lines = Segment.split_lines(
-            Segment.apply_style(
-                chain.from_iterable(
-                    self.render(renderable, render_options)
-                    for renderable in renderables
-                ),
-                style,
-            ),
+            Segment.apply_style(self.render(renderable, render_options), style),
             render_options.max_width,
         )
         return list(lines)

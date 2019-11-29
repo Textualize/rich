@@ -11,6 +11,7 @@ from .console import (
     RenderResult,
     RenderableType,
 )
+from .containers import Lines
 from .style import Style
 from .segment import Segment
 from ._tools import iter_last, iter_first_last
@@ -222,6 +223,11 @@ class Text:
 
         for line in lines:
             yield from self._render_line(line, console, options)
+
+    def __console_width__(self, max_width: int) -> int:
+        text = self.text
+        width = min(max_width, len(text))
+        return width
 
     def _render_line(
         self, line: Text, console: Console, options: ConsoleOptions
@@ -491,57 +497,6 @@ class Text:
             line.set_length(width)
             append(line)
         return lines
-
-
-class Lines(List[Text]):
-    """A list subclass which can render to the console."""
-
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        """Console render method to insert line-breaks."""
-        for line in self:
-            yield line
-            yield Segment("\n")
-
-    def justify(
-        self, width: int, align: Literal["left", "center", "right", "full"] = "left"
-    ) -> None:
-        """Pad each line with spaces to a given width.
-        
-        Args:
-            width (int): Number of characters per line.
-            
-        """
-        if align == "left":
-            for line in self:
-                line.pad_right(width - len(line.text))
-        elif align == "center":
-            for line in self:
-                line.pad_left((width - len(line.text)) // 2)
-                line.pad_right(width - len(line.text))
-        elif align == "right":
-            for line in self:
-                line.pad_left(width - len(line.text))
-        elif align == "full":
-            for line_index, line in enumerate(self):
-                if line_index == len(self) - 1:
-                    break
-                words = line.split(" ")
-                words_size = sum(len(word) for word in words)
-                num_spaces = len(words) - 1
-                spaces = [1 for _ in range(num_spaces)]
-                index = 0
-                while words_size + num_spaces < width:
-                    spaces[len(spaces) - index - 1] += 1
-                    num_spaces += 1
-                    index = (index + 1) % len(spaces)
-                tokens: List[Text] = []
-                index = 0
-                for index, word in enumerate(words):
-                    tokens.append(word)
-                    if index < len(spaces):
-                        tokens.append(Text(" " * spaces[index]))
-                    index += 1
-                self[line_index] = Text("").join(tokens)
 
 
 if __name__ == "__main__":

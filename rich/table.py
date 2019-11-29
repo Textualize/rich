@@ -8,6 +8,7 @@ from .console import (
     Console,
     ConsoleOptions,
     ConsoleRenderable,
+    get_render_width,
     RenderableType,
     RenderResult,
 )
@@ -20,12 +21,12 @@ class Column:
 
     label: Optional[RenderableType] = None
     width: Optional[int] = None
-    ratio: int = 1
+    ratio: Optional[int] = 1
+    renderables: List[ConsoleRenderable] = []
 
 
 class Table:
     columns: List[Column]
-    _rows: List[Sequence[Optional[RenderableType]]]
 
     def __init__(
         self, *headers: Union[Column, str], box: Optional[Box] = SQUARE
@@ -35,51 +36,42 @@ class Table:
             (Column(header) if isinstance(header, str) else header)
             for header in headers
         ]
-        self._rows = []
 
     def add_row(self, *renderables: Optional[RenderableType]) -> None:
-
         row: List[Optional[ConsoleRenderable]] = []
         for index, renderable in enumerate(renderables):
             if index == len(self.columns):
                 self.columns.append(Column(ratio=1))
+            column = self.columns[index]
             if isinstance(renderable, ConsoleRenderable):
-                row.append(renderable)
+                column.renderables.append(renderable)
             elif renderable is None:
-                row.append(Text(""))
+                column.renderables.append(Text(""))
             else:
-                row.append(Text(str(renderable)))
-        self._rows.append(row)
+                column.renderables.append(Text(str(renderable)))
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        width = options.max_width
-        has_border = self.box is not None
-        fixed_width = sum(
-            column.width for column in self.columns if column.width is not None
-        )
+        remaining_width = options.max_width
         if self.box:
-            fixed_width += len(self.columns) + 1
+            remaining_width -= len(self.columns) + 2
 
-        variable_width = width - fixed_width
-        variable_ratio = sum(
-            column.ratio for column in self.columns if column.width is None
-        )
+        widths = []
 
-        ratio_width = (width - fixed_width) / variable_ratio_total
-
-        remaining_width = width
-        remaining_variable = width - fixed_width
-        if has_border:
-            remaining_width -= len(self.columns) + 1
-
-        for last, column in iter_last(self.columns):
-
-            if column.width is None:
-                cell_width = (column.ratio / variable_ratio) * remaining_variable
-                variable_ratio = column.ratio
+        for index, column in enumerate(self.columns):
+            if column.width is not None:
+                widths.append((column.width, column.width))
+            elif column.ratio is not None:
+                widths.append((1, options.max_width))
             else:
-                cell_width = column.width
-            remaining_width -= cell_width
+                min_widths: List[int] = []
+                max_widths: List[int] = []
+                for renderable in column.renderables:
+                    _min_width, _max_width = get_render_width(options, renderable)
+
+                    min_widths.append(_min_width)
+                    max_widths.append(_max_width)
+                min_width = max(min_widths)
+                max_width = max(max_widths)
 
 
 if __name__ == "__main_":

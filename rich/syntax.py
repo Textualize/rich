@@ -45,7 +45,7 @@ class Syntax:
         except ClassNotFound:
             self._pygments_style_class = get_style_by_name("default")
 
-        self._background_color = self._pygments_style_class.background_color[1:]
+        self._background_color = self._pygments_style_class.background_color
 
     @classmethod
     def from_path(
@@ -152,7 +152,7 @@ class Syntax:
         padding = Segment(" " * numbers_column_width, background_style)
         new_line = Segment("\n")
         for line_no, line in enumerate(lines, self.start_line):
-            wrapped_lines = console.render_lines([line], render_options)
+            wrapped_lines = console.render_lines(line, render_options)
             for first, wrapped_line in iter_first(wrapped_lines):
                 if first:
                     yield Segment(

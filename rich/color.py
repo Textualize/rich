@@ -262,8 +262,9 @@ if __name__ == "__main__":
     c = Color.parse("#ff0000")
     print(c.downgrade(ColorSystem.STANDARD))
 
-    print(Color.parse("2"))
     print(Color.parse("yellow"))
+    print(Color.parse("yellow+"))
+
     print(Color.parse("3"))
     print(Color.parse("11"))
 

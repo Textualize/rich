@@ -4,7 +4,8 @@ from typing import NamedTuple, Optional
 
 from .style import Style
 
-from typing import Iterable, List
+from itertools import zip_longest
+from typing import Iterable, List, Tuple
 
 
 class Segment(NamedTuple):
@@ -84,7 +85,7 @@ class Segment(NamedTuple):
         """
         if style is None:
             style = Style()
-        length = sum(len(text) for text, style in line)
+        length = sum(len(text) for text, _style in line)
         if length < width:
             return line[:] + [Segment(" " * (width - length), style)]
         elif length > width:
@@ -100,3 +101,62 @@ class Segment(NamedTuple):
                     break
             return new_line
         return line[:]
+
+    @classmethod
+    def get_line_length(cls, line: List[Segment]) -> int:
+        """Get the length of list of segments.
+        
+        Args:
+            line (List[Segment]): A line encoded as a list of Segments (assumes no '\n' characters),
+        
+        Returns:
+            int: The length of the line.
+        """
+        return sum(len(text) for text, _ in line)
+
+    @classmethod
+    def get_shape(cls, lines: List[List[Segment]]) -> Tuple[int, int]:
+        """Get the shape (enclosing rectangle) of a list of lines
+        
+        Args:
+            lines (List[List[Segment]]): A list of lines (no '\n' characters)
+        
+        Returns:
+            Tuple[int, int]: Width and height in characters
+        """
+        get_line_length = cls.get_line_length
+        max_width = max(get_line_length(line) for line in lines)
+        return (max_width, len(lines))
+
+    @classmethod
+    def set_shape(
+        cls,
+        lines: List[List[Segment]],
+        width: int,
+        height: int = None,
+        style: Style = None,
+    ):
+        """Set the shape of a list of lines (enclosing rectangle)
+        
+        Args:
+            lines (List[List[Segment]]): A list of lines.
+            width (int): Desired width.
+            height (int, optional): Desired height or None for no change..
+            style (Style, optional): Style of any padding added. Defaults to None.
+        
+        Returns:
+            [type]: New list of lines that fits width x height.
+        """
+        if height is None:
+            height = len(lines)
+        new_lines: List[List[Segment]] = []
+        pad_line = [Segment(" " * width, style)]
+        append = new_lines.append
+        adjust_line_length = cls.adjust_line_length
+        for line, _ in zip_longest(lines, range(height)):
+            if line is None:
+                append(pad_line)
+            else:
+                append(adjust_line_length(line, width, style=style))
+        return new_lines
+

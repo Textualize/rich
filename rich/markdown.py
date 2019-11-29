@@ -13,6 +13,7 @@ from .console import (
     RenderResult,
     Segment,
 )
+from .containers import Renderables
 from .panel import Panel
 from .style import Style, StyleStack
 from .syntax import Syntax
@@ -179,7 +180,7 @@ class BlockQuote(TextElement):
     style_name = "markdown.block_quote"
 
     def __init__(self) -> None:
-        self.elements: List[MarkdownElement] = []
+        self.elements: Renderables[MarkdownElement] = Renderables()
 
     def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
         self.elements.append(child)
@@ -249,7 +250,7 @@ class ListItem(TextElement):
     style_name = "markdown.item"
 
     def __init__(self) -> None:
-        self.elements: List[MarkdownElement] = []
+        self.elements: Renderables[MarkdownElement] = Renderables()
 
     def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
         self.elements.append(child)
