@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import List, Optional, Sequence, Union
+from dataclasses import dataclass, field
+from typing import List, Optional, Sequence, Tuple, Union
 
 from .box import Box, SQUARE
 from .console import (
     Console,
     ConsoleOptions,
     ConsoleRenderable,
-    get_render_width,
     RenderableType,
     RenderResult,
+    RenderWidth,
 )
 from .text import Text
 from ._tools import iter_last
@@ -19,10 +19,9 @@ from ._tools import iter_last
 @dataclass
 class Column:
 
-    label: Optional[RenderableType] = None
+    title: Optional[RenderableType] = None
     width: Optional[int] = None
-    ratio: Optional[int] = 1
-    renderables: List[ConsoleRenderable] = []
+    renderables: List[ConsoleRenderable] = field(default_factory=list)
 
 
 class Table:
@@ -55,26 +54,26 @@ class Table:
         if self.box:
             remaining_width -= len(self.columns) + 2
 
-        widths = []
+        max_width = options.max_width
+        width_ranges: List[Tuple[int, int]] = []
 
-        for index, column in enumerate(self.columns):
+        for column in self.columns:
+
             if column.width is not None:
-                widths.append((column.width, column.width))
-            elif column.ratio is not None:
-                widths.append((1, options.max_width))
+                width_ranges.append((column.width, column.width))
             else:
                 min_widths: List[int] = []
                 max_widths: List[int] = []
+                append_min = min_widths.append
+                append_max = max_widths.append
                 for renderable in column.renderables:
-                    _min_width, _max_width = get_render_width(options, renderable)
-
-                    min_widths.append(_min_width)
-                    max_widths.append(_max_width)
-                min_width = max(min_widths)
-                max_width = max(max_widths)
+                    _min_width, _max_width = RenderWidth.get(renderable, max_width)
+                    append_min(_min_width)
+                    append_max(_max_width)
+                width_ranges.append((max(min_widths), max(max_widths)))
 
 
-if __name__ == "__main_":
+if __name__ == "__main__":
     c = Console()
     table = Table("Column1", "Column2", "Column3")
 

@@ -7,9 +7,9 @@ from .console import (
     Console,
     ConsoleOptions,
     ConsoleRenderable,
-    get_render_width,
     RenderableType,
     RenderResult,
+    RenderWidth,
 )
 from .style import Style
 from .text import Text
@@ -47,7 +47,7 @@ class Panel:
         width = options.max_width
 
         if self.fit:
-            child_width = get_render_width(self.renderable, width - 2)
+            child_width = RenderWidth.get(self.renderable, width - 2).maximum
         else:
             child_width = width - 2
 

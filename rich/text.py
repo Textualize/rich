@@ -10,6 +10,7 @@ from .console import (
     JustifyValues,
     RenderResult,
     RenderableType,
+    RenderWidth,
 )
 from .containers import Lines
 from .style import Style
@@ -224,10 +225,11 @@ class Text:
         for line in lines:
             yield from self._render_line(line, console, options)
 
-    def __console_width__(self, max_width: int) -> int:
+    def __console_width__(self, max_width: int) -> RenderWidth:
         text = self.text
-        width = min(max_width, len(text))
-        return width
+        max_text_width = max(len(line.rstrip()) for line in text.splitlines())
+        min_text_width = max(len(word) for word in text.split())
+        return RenderWidth(min_text_width, max_text_width)
 
     def _render_line(
         self, line: Text, console: Console, options: ConsoleOptions

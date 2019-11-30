@@ -93,6 +93,41 @@ class ConsoleDimensions(NamedTuple):
     height: int
 
 
+class RenderWidth(NamedTuple):
+    """Range of widths for a renderable object."""
+
+    minimum: int
+    maximum: int
+
+    def with_maximum(self, width: int) -> RenderWidth:
+        """Get a RenderableWith where the widths are <= width.
+        
+        Args:
+            width (int): Maximum desred width.
+        
+        Returns:
+            RenderableWidth: new RenderableWidth object.
+        """
+        minimum, maximum = self
+        return RenderWidth(min(minimum, width), min(maximum, width))
+
+    def get(renderable: RenderableType, max_width: int) -> RenderWidth:
+        """Get desired width for a renderable."""
+        get_console_width = getattr(renderable, "__console_width__", None)
+        if get_console_width is not None:
+            render_width = get_console_width(max_width).with_maximum(max_width)
+            return render_width
+        elif isinstance(renderable, Segment):
+            text, _style = renderable
+            width = min(max_width, len(text))
+            return RenderWidth(width, width)
+        elif isinstance(renderable, str):
+            text = renderable.rstrip()
+            return RenderWidth(len(text), len(text))
+        else:
+            return RenderWidth(1, max_width)
+
+
 class StyleContext:
     """A context manager to manage a style."""
 
@@ -116,21 +151,6 @@ COLOR_SYSTEMS = {
     "256": ColorSystem.EIGHT_BIT,
     "truecolor": ColorSystem.TRUECOLOR,
 }
-
-
-def get_render_width(renderable: RenderableType, max_width: int) -> int:
-    """Get desired width for a renderable."""
-    console_size = getattr(renderable, "__console_width__", None)
-    if console_size is not None:
-        desired_width = console_size(max_width)
-        assert desired_width >= 0, f"{console_size} should return an integer >= 0"
-        width = max(0, min(max_width, desired_width))
-        return width
-    elif isinstance(renderable, Segment):
-        return min(len(renderable.text), max_width)
-    else:
-        width = max(len(line) for line in str(renderable).splitlines())
-        return min(width, max_width)
 
 
 class Console:
