@@ -111,7 +111,8 @@ class RenderWidth(NamedTuple):
         minimum, maximum = self
         return RenderWidth(min(minimum, width), min(maximum, width))
 
-    def get(renderable: RenderableType, max_width: int) -> RenderWidth:
+    @classmethod
+    def get(cls, renderable: RenderableType, max_width: int) -> RenderWidth:
         """Get desired width for a renderable."""
         get_console_width = getattr(renderable, "__console_width__", None)
         if get_console_width is not None:
