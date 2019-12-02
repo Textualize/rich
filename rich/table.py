@@ -100,7 +100,6 @@ class Table:
             flex_minimum = [
                 column.width or 1 for column in self.columns if column.ratio is not None
             ]
-
             flex_widths = ratio_divide(flexible_width, ratios, flex_minimum)
             iter_flex_widths = iter(flex_widths)
             for index, (column, width) in enumerate(zip(columns, widths)):
@@ -131,7 +130,12 @@ if __name__ == "__main__":
 
     for w in range(10, 110):
         c = Console(width=w)
-        table = Table(Column("Column1", ratio=2), Column("Column2", ratio=1), "Column3")
+        table = Table(
+            Column("Column1", ratio=2),
+            Column("Column2", ratio=1, width=4),
+            "Column3",
+            fit=False,
+        )
 
         table.add_row(
             Text("Hello"), Text("world" * 2), "Hello",
