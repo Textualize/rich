@@ -19,6 +19,11 @@ class Segment(NamedTuple):
         return f"Segment({self.text!r}, {self.style!r})"
 
     @classmethod
+    def new_line(self) -> Segment:
+        """Make a new line segment."""
+        return Segment("\n")
+
+    @classmethod
     def apply_style(
         cls, segments: Iterable[Segment], style: Style = None
     ) -> Iterable[Segment]:
@@ -91,13 +96,15 @@ class Segment(NamedTuple):
         elif length > width:
             line_length = 0
             new_line: List[Segment] = []
+            append = new_line.append
             for segment in line:
-                if line_length + len(segment.text) < width:
-                    new_line.append(segment)
-                    line_length += len(segment.text)
+                segment_length = len(segment.text)
+                if line_length + segment_length < width:
+                    append(segment)
+                    line_length += segment_length
                 else:
                     text, style = segment
-                    new_line.append(Segment(text[width - line_length :], style))
+                    append(Segment(text[: width - line_length + segment_length], style))
                     break
             return new_line
         return line[:]

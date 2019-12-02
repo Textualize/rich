@@ -511,8 +511,10 @@ class Console:
         append = output.append
         current_style = self.current_style
         color_system = self._color_system
-
-        for line in Segment.split_lines(self.buffer, self.width):
+        print(self.buffer)
+        buffer = self.buffer[:]
+        del self.buffer[:]
+        for line in Segment.split_lines(buffer, self.width):
             for text, style in line:
                 if style:
                     style = current_style.apply(style)
@@ -521,7 +523,6 @@ class Console:
                     append(text)
             append("\n")
         rendered = "".join(output)
-        del self.buffer[:]
         return rendered
 
     @property

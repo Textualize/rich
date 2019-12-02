@@ -14,7 +14,7 @@ from .console import (
 )
 from .segment import Segment
 from .text import Text
-from ._tools import iter_last
+from ._tools import iter_last, ratio_divide
 
 
 @dataclass
@@ -22,14 +22,27 @@ class Column:
 
     title: Optional[RenderableType] = None
     width: Optional[int] = None
+    ratio: Optional[int] = None
     renderables: List[RenderableType] = field(default_factory=list)
+
+    def measure(self, max_width: int) -> Tuple[int, int]:
+        column_min_widths: List[int] = []
+        column_max_widths: List[int] = []
+        append_min = column_min_widths.append
+        append_max = column_max_widths.append
+        get_render_width = RenderWidth.get
+        for renderable in self.renderables:
+            _min_width, _max_width = get_render_width(renderable, max_width)
+            append_min(_min_width)
+            append_max(_max_width)
+        return max(column_min_widths), max(column_max_widths)
 
 
 class Table:
     columns: List[Column]
 
     def __init__(
-        self, *headers: Union[Column, str], box: Optional[Box] = None, fit: bool = False
+        self, *headers: Union[Column, str], box: Optional[Box] = None, fit: bool = True
     ) -> None:
         self.box = box
         self.columns = [
@@ -52,66 +65,45 @@ class Table:
                 column.renderables.append(str(renderable))
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        remaining_width = options.max_width
+        max_width = options.max_width
         if self.box:
-            remaining_width -= len(self.columns) + 2
+            max_width -= len(self.columns) + 2
 
-        min_widths: List[int] = []
-        max_widths: List[int] = []
+        columns = self.columns
+        # Fixed width
+        render_widths: List[Optional[Tuple[int, int]]] = [
+            (column.width, column.width) if column.width else None for column in columns
+        ]
 
-        for column in self.columns:
-            if column.width is None:
-                column_min_widths: List[int] = []
-                column_max_widths: List[int] = []
-                append_min = column_min_widths.append
-                append_max = column_max_widths.append
-                for renderable in column.renderables:
-                    _min_width, _max_width = RenderWidth.get(
-                        renderable, options.max_width
-                    )
-                    append_min(_min_width)
-                    append_max(_max_width)
-                min_widths.append(max(column_min_widths))
-                max_widths.append(max(column_max_widths))
-            else:
-                min_widths.append(column.width)
-                max_widths.append(column.width)
+        for index, (width, column) in enumerate(zip(render_widths, columns)):
+            if width is None:
+                render_widths[index] = column.measure(max_width)
 
-        print(min_widths, max_widths)
+        table_width = sum(_max for _min, _max in render_widths)
 
-        widths = max_widths[:]
-        table_width = sum(widths)
-        if not self.fit:
-            if table_width > options.max_width:
-                flexible_widths = [
-                    _max - _min for _min, _max in zip(min_widths, max_widths)
-                ]
-                total_flexible = sum(flexible_widths)
-            elif table_width < options.max_width:
-                column_count = len(widths)
-                for index in range(options.max_width - table_width):
-                    widths[index % column_count] += 1
+        if self.fit:
+            widths = [_max for _min, _max in render_widths]
 
-        yield Segment("-" * options.max_width)
-        yield Segment("\n")
+        yield Segment("-" * max_width)
+        yield Segment.new_line()
+        print(widths)
         for index, width in enumerate(widths):
             yield Segment(str(index) * width)
-        yield "\n"
+        yield Segment.new_line()
 
 
 if __name__ == "__main__":
 
-    for w in range(10, 20):
-        c = Console(width=w)
-        table = Table("Column1", "Column2", "Column3")
+    c = Console(width=60)
+    table = Table("Column1", "Column2", "Column3")
 
-        table.add_row(
-            Text("This column contains text with" * 2),
-            Text("This column contains text with" * 3),
-            "Hello",
-        )
-        from .markdown import Markdown
+    table.add_row(
+        Text("This column contains text with" * 2),
+        Text("This column contains text with" * 3),
+        "Hello",
+    )
+    from .markdown import Markdown
 
-        table.add_row(Markdown("Hello *World*!"), "More text", "Hello WOrld")
+    table.add_row(Markdown("Hello *World*!"), "More text", "Hello WOrld")
 
-        c.print(table)
+    c.print(table)
