@@ -36,10 +36,10 @@ class ColorTriplet(NamedTuple):
     blue: int
 
     @property
-    def hex(self) -> str:
-        """get the color triplet as 6 chars of hex."""
+    def css(self) -> str:
+        """get the color triplet in CSS style."""
         red, green, blue = self
-        return f"{red:02x}{green:02x}{blue:02x}"
+        return f"#{red:02x}{green:02x}{blue:02x}"
 
     def normalize(self) -> Tuple[float, float, float]:
         """Covert components in to floats between 0 and 1."""
@@ -109,7 +109,7 @@ class Color(NamedTuple):
         Returns:
             Color: A new color object.
         """
-        return cls(name=f"#{triplet.hex}", type=ColorType.TRUECOLOR, triplet=triplet)
+        return cls(name=triplet.css, type=ColorType.TRUECOLOR, triplet=triplet)
 
     @classmethod
     def default(cls) -> Color:
@@ -218,10 +218,9 @@ class Color(NamedTuple):
                     color_number = 231 + gray
                 return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
 
-            ansi_red = 36 * round(red * 5.0)
-            ansi_green = 6 * round(green * 5.0)
-            ansi_blue = round(blue * 5.0)
-            color_number = 16 + ansi_red + ansi_green + ansi_blue
+            color_number = (
+                16 + 36 * round(red * 5.0) + 6 * round(green * 5.0) + round(blue * 5.0)
+            )
             return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
 
         # Convert to standard from truecolor or 8-bit
