@@ -86,6 +86,7 @@ class Table:
                 flexible_widths = [
                     _max - _min for _min, _max in zip(min_widths, max_widths)
                 ]
+                total_flexible = sum(flexible_widths)
             elif table_width < options.max_width:
                 column_count = len(widths)
                 for index in range(options.max_width - table_width):

@@ -41,6 +41,11 @@ class ColorTriplet(NamedTuple):
         red, green, blue = self
         return f"{red:02x}{green:02x}{blue:02x}"
 
+    def normalize(self) -> Tuple[float, float, float]:
+        """Covert components in to floats between 0 and 1."""
+        red, green, blue = self
+        return red / 255.0, green / 255.0, blue / 255.0
+
 
 STANDARD_COLORS_NAMES = {
     "black": 0,
@@ -199,12 +204,12 @@ class Color(NamedTuple):
             # return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
 
             assert self.triplet is not None
-            red, green, blue = self.triplet
-            _h, l, s = rgb_to_hls(red / 255, green / 255, blue / 255)
+            red, green, blue = self.triplet.normalize()
+            _h, l, s = rgb_to_hls(red, green, blue)
 
             # If saturation is under 10% assume it is grayscale
             if s < 0.1:
-                gray = int(round(l * 25))
+                gray = round(l * 25.0)
                 if gray == 0:
                     color_number = 0
                 elif gray == 25:
@@ -213,9 +218,9 @@ class Color(NamedTuple):
                     color_number = 231 + gray
                 return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
 
-            ansi_red = 36 * round(red / 255.0 * 5.0)
-            ansi_green = 6 * round(green / 255.0 * 5.0)
-            ansi_blue = round(blue / 255.0 * 5.0)
+            ansi_red = 36 * round(red * 5.0)
+            ansi_green = 6 * round(green * 5.0)
+            ansi_blue = round(blue * 5.0)
             color_number = 16 + ansi_red + ansi_green + ansi_blue
             return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
 
