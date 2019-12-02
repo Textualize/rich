@@ -43,7 +43,7 @@ def iter_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
     yield first, True, previous_value
 
 
-def ratio_divide(total: int, ratios: List[int]) -> List[int]:
+def ratio_divide(total: int, ratios: List[int], minimum: List[int] = None) -> List[int]:
     """Divide an integer total in to parts based on ratios.
     
     Args:
@@ -53,19 +53,23 @@ def ratio_divide(total: int, ratios: List[int]) -> List[int]:
     Returns:
         List[int]: A list of integers garanteed to sum to total.
     """
+    if minimum is None:
+        minimum = [0] * len(ratios)
     total_ratio = sum(ratios)
     assert total_ratio > 0, "Sum of ratios must be > 0"
 
     total_remaining = total
     distributed_total: List[int] = []
     append = distributed_total.append
-    for ratio in ratios[::-1]:
-        distributed = ratio * total_remaining // total_ratio
+    for ratio, minimum in zip(ratios, minimum):
+        if total_ratio:
+            distributed = max(minimum, round(ratio * total_remaining / total_ratio))
+        else:
+            distributed = 0
         append(distributed)
         total_ratio -= ratio
         total_remaining -= distributed
-    assert sum(distributed_total) == total, "sanity check failed in ratio_divide"
-    return distributed_total[::-1]
+    return distributed_total
 
 
 if __name__ == "__main__":
@@ -78,3 +82,4 @@ if __name__ == "__main__":
     print(ratio_divide(10, [1, 2, 1]))
     print(ratio_divide(3, [1, 2, 1]))
     print(ratio_divide(20, [1, 2]))
+    print(ratio_divide(7, [1, 0, 0]))

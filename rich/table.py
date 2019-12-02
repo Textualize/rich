@@ -42,8 +42,13 @@ class Table:
     columns: List[Column]
 
     def __init__(
-        self, *headers: Union[Column, str], box: Optional[Box] = None, fit: bool = True
+        self,
+        *headers: Union[Column, str],
+        width: int = None,
+        box: Optional[Box] = None,
+        fit: bool = True
     ) -> None:
+        self.width = width
         self.box = box
         self.columns = [
             (Column(header) if isinstance(header, str) else header)
@@ -66,44 +71,73 @@ class Table:
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         max_width = options.max_width
+        if self.width is not None:
+            max_width = min(self.width, max_width)
         if self.box:
             max_width -= len(self.columns) + 2
 
         columns = self.columns
+
         # Fixed width
-        render_widths: List[Optional[Tuple[int, int]]] = [
-            (column.width, column.width) if column.width else None for column in columns
+        width_ranges: List[Tuple[int, int]] = [
+            (
+                (column.width, column.width)
+                if column.width
+                else column.measure(max_width)
+            )
+            for column in columns
         ]
 
-        for index, (width, column) in enumerate(zip(render_widths, columns)):
-            if width is None:
-                render_widths[index] = column.measure(max_width)
-
-        table_width = sum(_max for _min, _max in render_widths)
-
         if self.fit:
-            widths = [_max for _min, _max in render_widths]
+            widths = [_max for _min, _max in width_ranges]
+        else:
+            widths = [_max for _min, _max in width_ranges]
+            fixed_widths = [_min for _min, _max in width_ranges]
+            flexible_width = max_width - sum(fixed_widths)
+            ratios = [
+                column.ratio for column in self.columns if column.ratio is not None
+            ]
+            flex_minimum = [
+                column.width or 1 for column in self.columns if column.ratio is not None
+            ]
+
+            flex_widths = ratio_divide(flexible_width, ratios, flex_minimum)
+            iter_flex_widths = iter(flex_widths)
+            for index, (column, width) in enumerate(zip(columns, widths)):
+                if column.ratio is not None:
+                    widths[index] = next(iter_flex_widths)
+
+        table_width = sum(widths)
+        if table_width > max_width:
+            flex_widths = [_max - _min for _min, _max in width_ranges]
+            if not any(flex_widths):
+                flex_widths = [1] * len(flex_widths)
+            excess_width = table_width - max_width
+            shrink_widths = ratio_divide(excess_width, flex_widths)
+            widths = [_width - shrink for _width, shrink in zip(widths, shrink_widths)]
+        elif table_width < max_width and not self.fit:
+            pad_widths = ratio_divide(max_width - table_width, widths)
+            widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
 
         yield Segment("-" * max_width)
-        yield Segment.new_line()
-        print(widths)
+        yield Segment.line()
+
         for index, width in enumerate(widths):
             yield Segment(str(index) * width)
-        yield Segment.new_line()
+        yield Segment.line()
 
 
 if __name__ == "__main__":
 
-    c = Console(width=60)
-    table = Table("Column1", "Column2", "Column3")
+    for w in range(10, 110):
+        c = Console(width=w)
+        table = Table(Column("Column1", ratio=2), Column("Column2", ratio=1), "Column3")
 
-    table.add_row(
-        Text("This column contains text with" * 2),
-        Text("This column contains text with" * 3),
-        "Hello",
-    )
-    from .markdown import Markdown
+        table.add_row(
+            Text("Hello"), Text("world" * 2), "Hello",
+        )
+        from .markdown import Markdown
 
-    table.add_row(Markdown("Hello *World*!"), "More text", "Hello WOrld")
+        # table.add_row(Markdown("Hello *World*!"), "More text", "Hello WOrld")
 
-    c.print(table)
+        c.print(table)

@@ -19,7 +19,7 @@ class Segment(NamedTuple):
         return f"Segment({self.text!r}, {self.style!r})"
 
     @classmethod
-    def new_line(self) -> Segment:
+    def line(self) -> Segment:
         """Make a new line segment."""
         return Segment("\n")
 

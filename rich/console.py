@@ -511,7 +511,6 @@ class Console:
         append = output.append
         current_style = self.current_style
         color_system = self._color_system
-        print(self.buffer)
         buffer = self.buffer[:]
         del self.buffer[:]
         for line in Segment.split_lines(buffer, self.width):
