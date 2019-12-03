@@ -20,6 +20,7 @@ from ._tools import iter_last, ratio_divide
 
 @dataclass
 class Column:
+    """Defines a column in a table."""
 
     title: RenderableType = ""
     width: Optional[int] = None
@@ -38,6 +39,10 @@ class Column:
 
     def measure(self, max_width: int) -> RenderWidth:
         """Get the minimum and maximum width of the column."""
+        if self.width is not None:
+            # Fixed width column
+            return RenderWidth(self.width, self.width)
+        # Flexible column, we need to measure contents
         column_min_widths: List[int] = []
         column_max_widths: List[int] = []
         append_min = column_min_widths.append
@@ -58,7 +63,7 @@ class Table:
         *headers: Union[Column, str],
         width: int = None,
         box: Optional[Box] = None,
-        fit: bool = True
+        expand: bool = False
     ) -> None:
         self.width = width
         self.box = box
@@ -66,7 +71,7 @@ class Table:
             (Column(header) if isinstance(header, str) else header)
             for header in headers
         ]
-        self.fit = fit
+        self.expand = expand
 
     def add_row(self, *renderables: Optional[RenderableType]) -> None:
 
@@ -82,27 +87,18 @@ class Table:
                 column._cells.append(str(renderable))
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+        columns = self.columns
         max_width = options.max_width
         if self.width is not None:
             max_width = min(self.width, max_width)
         if self.box:
             max_width -= len(self.columns) + 2
 
-        columns = self.columns
-
         # Fixed width
-        width_ranges = [
-            (
-                RenderWidth(column.width, column.width)
-                if column.width
-                else column.measure(max_width)
-            )
-            for column in columns
-        ]
+        width_ranges = [column.measure(max_width) for column in columns]
+        widths = [_range.maximum for _range in width_ranges]
 
-        if self.fit:
-            widths = [_range.maximum for _range in width_ranges]
-        else:
+        if self.expand:
             widths = [_range.maximum for _range in width_ranges]
             fixed_widths = [_range.minimum for _range in width_ranges]
             flexible_width = max_width - sum(fixed_widths)
@@ -122,7 +118,7 @@ class Table:
             excess_width = table_width - max_width
             shrink_widths = ratio_divide(excess_width, flex_widths)
             widths = [_width - shrink for _width, shrink in zip(widths, shrink_widths)]
-        elif table_width < max_width and not self.fit:
+        elif table_width < max_width and self.expand:
             pad_widths = ratio_divide(max_width - table_width, widths)
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
 
@@ -145,7 +141,7 @@ if __name__ == "__main__":
             Column("Column1", ratio=2),
             Column("Column2", ratio=1, width=4),
             "Column3",
-            fit=False,
+            expand=True,
         )
 
         table.add_row(

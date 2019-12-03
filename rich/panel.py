@@ -21,7 +21,7 @@ class Panel:
         self,
         renderable: Union[str, ConsoleRenderable],
         box: Box = SQUARE,
-        fit: bool = False,
+        expand: bool = True,
         style: Union[str, Style] = "none",
     ) -> None:
         """A console renderable that draws a border around its contents.
@@ -30,15 +30,15 @@ class Panel:
             renderable (ConsoleRenderable): A console renderable objects.
             box (Box, optional): A Box instance that defines the look of the border.
                 Defaults to box.SQUARE.
-            fit (bool, optional): If True the panel will attempt to fit its contents,
-                otherwise it will expand to the available width. Defaults to False.
+            expand (bool, optional): If True the panel will stretch to fill the console 
+                width, otherwise it will be sized to fit the contents. Defaults to False.
             style (str, optional): The style of the border. Defaults to "none".
         """
         self.renderable = (
             Text(renderable) if isinstance(renderable, str) else renderable
         )
         self.box = box
-        self.fit = fit
+        self.expand = expand
         self.style = style
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
@@ -46,10 +46,10 @@ class Panel:
         style = console.get_style(self.style)
         width = options.max_width
 
-        if self.fit:
-            child_width = RenderWidth.get(self.renderable, width - 2).maximum
-        else:
+        if self.expand:
             child_width = width - 2
+        else:
+            child_width = RenderWidth.get(self.renderable, width - 2).maximum
 
         width = child_width + 2
         child_options = options.with_width(child_width)
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     from .padding import Padding
     from .box import ROUNDED
 
-    p = Panel(Panel(Padding("Hello World! ", 2), box=ROUNDED, fit=True))
+    p = Panel(Panel(Padding("Hello World! ", 2), box=ROUNDED, expand=False))
 
     print(p)
     c.print(p)

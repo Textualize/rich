@@ -5,10 +5,9 @@ from typing import Union
 from .console import (
     Console,
     ConsoleOptions,
-    get_render_width,
     RenderableType,
     RenderResult,
-    RenderableWidth,
+    RenderWidth,
 )
 from .style import Style
 from .text import Text
@@ -67,8 +66,11 @@ class Padding:
         for _ in range(self.bottom):
             yield row
 
-    def __console_width__(self, max_width: int) -> RenderableWidth:
+    def __console_width__(self, max_width: int) -> RenderWidth:
         extra_width = self.left + self.right
-        width = get_render_width(self.renderable, max_width - extra_width) + extra_width
-        return RenderableWidth(width, width)
+        width = (
+            RenderWidth.get(self.renderable, max_width - extra_width).maximum
+            + extra_width
+        )
+        return RenderWidth(width, width)
 
