@@ -16,3 +16,7 @@ class MissingStyle(StyleError):
 
 class StyleStackError(ConsoleError):
     """Style stack is invalid."""
+
+
+class NotRenderableError(ConsoleError):
+    """Object is not renderable."""

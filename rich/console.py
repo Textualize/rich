@@ -82,7 +82,7 @@ class ConsoleRenderable(Protocol):
         ...
 
 
-RenderableType = Union[ConsoleRenderable, Segment, SupportsStr]
+RenderableType = Union[ConsoleRenderable, Segment, str]
 RenderResult = Iterable[Union[ConsoleRenderable, Segment]]
 
 
@@ -131,7 +131,10 @@ class RenderWidth(NamedTuple):
             text = renderable.rstrip()
             return RenderWidth(len(text), len(text))
         else:
-            return RenderWidth(1, max_width)
+            raise errors.NotRenderableError(
+                f"Unable to render {renderable!r}; "
+                "a str, Segment, or object with __console__ method is required"
+            )
 
 
 class StyleContext:
