@@ -99,6 +99,11 @@ class RenderWidth(NamedTuple):
     minimum: int
     maximum: int
 
+    @property
+    def span(self) -> int:
+        """Get difference between maximum and minimum."""
+        return self.maximum - self.minimum
+
     def with_maximum(self, width: int) -> RenderWidth:
         """Get a RenderableWith where the widths are <= width.
         

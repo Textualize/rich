@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Sequence, Tuple, Union
+from itertools import chain
+from typing import Iterable, List, Optional, Sequence, Tuple, Union
 
 from .box import Box, SQUARE
 from .console import (
@@ -20,22 +21,33 @@ from ._tools import iter_last, ratio_divide
 @dataclass
 class Column:
 
-    title: Optional[RenderableType] = None
+    title: RenderableType = ""
     width: Optional[int] = None
     ratio: Optional[int] = None
-    renderables: List[RenderableType] = field(default_factory=list)
+    _cells: List[RenderableType] = field(default_factory=list)
 
-    def measure(self, max_width: int) -> Tuple[int, int]:
+    @property
+    def cells(self) -> Iterable[RenderableType]:
+        """Get all cells in the column, including header."""
+        return chain([self.title], self._cells)
+
+    @property
+    def flexible(self) -> bool:
+        """Check if this column is flexible."""
+        return self.ratio is not None
+
+    def measure(self, max_width: int) -> RenderWidth:
+        """Get the minimum and maximum width of the column."""
         column_min_widths: List[int] = []
         column_max_widths: List[int] = []
         append_min = column_min_widths.append
         append_max = column_max_widths.append
         get_render_width = RenderWidth.get
-        for renderable in self.renderables:
+        for renderable in self.cells:
             _min_width, _max_width = get_render_width(renderable, max_width)
             append_min(_min_width)
             append_max(_max_width)
-        return max(column_min_widths), max(column_max_widths)
+        return RenderWidth(max(column_min_widths), max(column_max_widths))
 
 
 class Table:
@@ -63,11 +75,11 @@ class Table:
                 self.columns.append(Column())
             column = self.columns[index]
             if isinstance(renderable, ConsoleRenderable):
-                column.renderables.append(renderable)
+                column._cells.append(renderable)
             elif renderable is None:
-                column.renderables.append("")
+                column._cells.append("")
             else:
-                column.renderables.append(str(renderable))
+                column._cells.append(str(renderable))
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         max_width = options.max_width
@@ -79,9 +91,9 @@ class Table:
         columns = self.columns
 
         # Fixed width
-        width_ranges: List[Tuple[int, int]] = [
+        width_ranges = [
             (
-                (column.width, column.width)
+                RenderWidth(column.width, column.width)
                 if column.width
                 else column.measure(max_width)
             )
@@ -89,26 +101,22 @@ class Table:
         ]
 
         if self.fit:
-            widths = [_max for _min, _max in width_ranges]
+            widths = [_range.maximum for _range in width_ranges]
         else:
-            widths = [_max for _min, _max in width_ranges]
-            fixed_widths = [_min for _min, _max in width_ranges]
+            widths = [_range.maximum for _range in width_ranges]
+            fixed_widths = [_range.minimum for _range in width_ranges]
             flexible_width = max_width - sum(fixed_widths)
-            ratios = [
-                column.ratio for column in self.columns if column.ratio is not None
-            ]
-            flex_minimum = [
-                column.width or 1 for column in self.columns if column.ratio is not None
-            ]
+            ratios = [col.ratio or 0 for col in columns if col.flexible]
+            flex_minimum = [column.width or 1 for column in columns if column.flexible]
             flex_widths = ratio_divide(flexible_width, ratios, flex_minimum)
             iter_flex_widths = iter(flex_widths)
             for index, (column, width) in enumerate(zip(columns, widths)):
-                if column.ratio is not None:
+                if column.flexible:
                     widths[index] = next(iter_flex_widths)
 
         table_width = sum(widths)
         if table_width > max_width:
-            flex_widths = [_max - _min for _min, _max in width_ranges]
+            flex_widths = [_range.span for _range in width_ranges]
             if not any(flex_widths):
                 flex_widths = [1] * len(flex_widths)
             excess_width = table_width - max_width
@@ -124,6 +132,9 @@ class Table:
         for index, width in enumerate(widths):
             yield Segment(str(index) * width)
         yield Segment.line()
+
+    def _render(self, widths: List[int]) -> RenderResult:
+        pass
 
 
 if __name__ == "__main__":
