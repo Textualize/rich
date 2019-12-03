@@ -30,7 +30,8 @@ class Column:
     @property
     def cells(self) -> Iterable[RenderableType]:
         """Get all cells in the column, including header."""
-        return chain([self.title], self._cells)
+        yield self.title
+        yield from self._cells
 
     @property
     def flexible(self) -> bool:
@@ -43,16 +44,16 @@ class Column:
             # Fixed width column
             return RenderWidth(self.width, self.width)
         # Flexible column, we need to measure contents
-        column_min_widths: List[int] = []
-        column_max_widths: List[int] = []
-        append_min = column_min_widths.append
-        append_max = column_max_widths.append
+        min_widths: List[int] = []
+        max_widths: List[int] = []
+        append_min = min_widths.append
+        append_max = max_widths.append
         get_render_width = RenderWidth.get
         for renderable in self.cells:
-            _min_width, _max_width = get_render_width(renderable, max_width)
-            append_min(_min_width)
-            append_max(_max_width)
-        return RenderWidth(max(column_min_widths), max(column_max_widths))
+            _min, _max = get_render_width(renderable, max_width)
+            append_min(_min)
+            append_max(_max)
+        return RenderWidth(max(min_widths), max(max_widths))
 
 
 class Table:
@@ -87,30 +88,41 @@ class Table:
                 column._cells.append(str(renderable))
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        columns = self.columns
+
         max_width = options.max_width
         if self.width is not None:
             max_width = min(self.width, max_width)
         if self.box:
             max_width -= len(self.columns) + 2
+        widths = self._calculate_column_widths(max_width)
 
-        # Fixed width
+        yield Segment("-" * max_width)
+        yield Segment.line()
+
+        for index, width in enumerate(widths):
+            yield Segment(str(index) * width)
+        yield Segment.line()
+
+    def _calculate_column_widths(self, max_width: int) -> List[int]:
+        """Calculate the widths of each column."""
+        columns = self.columns
         width_ranges = [column.measure(max_width) for column in columns]
         widths = [_range.maximum for _range in width_ranges]
 
         if self.expand:
             widths = [_range.maximum for _range in width_ranges]
             fixed_widths = [_range.minimum for _range in width_ranges]
-            flexible_width = max_width - sum(fixed_widths)
             ratios = [col.ratio or 0 for col in columns if col.flexible]
             flex_minimum = [column.width or 1 for column in columns if column.flexible]
+            flexible_width = max_width - sum(fixed_widths)
             flex_widths = ratio_divide(flexible_width, ratios, flex_minimum)
             iter_flex_widths = iter(flex_widths)
-            for index, (column, width) in enumerate(zip(columns, widths)):
+            for index, column in enumerate(columns):
                 if column.flexible:
                     widths[index] = next(iter_flex_widths)
 
         table_width = sum(widths)
+
         if table_width > max_width:
             flex_widths = [_range.span for _range in width_ranges]
             if not any(flex_widths):
@@ -121,13 +133,7 @@ class Table:
         elif table_width < max_width and self.expand:
             pad_widths = ratio_divide(max_width - table_width, widths)
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
-
-        yield Segment("-" * max_width)
-        yield Segment.line()
-
-        for index, width in enumerate(widths):
-            yield Segment(str(index) * width)
-        yield Segment.line()
+        return widths
 
     def _render(self, widths: List[int]) -> RenderResult:
         pass

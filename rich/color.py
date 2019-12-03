@@ -6,8 +6,13 @@ from dataclasses import dataclass
 from enum import IntEnum
 from functools import lru_cache
 from math import sqrt
-from typing import Iterable, List, NamedTuple, Optional, Sequence, Tuple
-from ._palette import STANDARD_PALETTE, EIGHT_BIT_PALETTE
+from typing import Iterable, List, NamedTuple, Optional, Sequence, Tuple, TYPE_CHECKING
+
+from ._palettes import STANDARD_PALETTE, EIGHT_BIT_PALETTE
+from .color_triplet import ColorTriplet
+
+if TYPE_CHECKING:
+    from .theme import Theme
 
 
 class ColorSystem(IntEnum):
@@ -26,25 +31,6 @@ class ColorType(IntEnum):
     STANDARD = 1
     EIGHT_BIT = 2
     TRUECOLOR = 3
-
-
-class ColorTriplet(NamedTuple):
-    """The red, green, and blue components of a color."""
-
-    red: int
-    green: int
-    blue: int
-
-    @property
-    def css(self) -> str:
-        """get the color triplet in CSS style."""
-        red, green, blue = self
-        return f"#{red:02x}{green:02x}{blue:02x}"
-
-    def normalize(self) -> Tuple[float, float, float]:
-        """Covert components in to floats between 0 and 1."""
-        red, green, blue = self
-        return red / 255.0, green / 255.0, blue / 255.0
 
 
 STANDARD_COLORS_NAMES = {
@@ -98,6 +84,24 @@ class Color(NamedTuple):
         if self.type == ColorType.DEFAULT:
             return ColorSystem.STANDARD
         return ColorSystem(int(self.type))
+
+    def get_truecolor(self, theme: Theme, foreground=True) -> ColorTriplet:
+        """Get a color triplet for this color."""
+        if self.type == ColorType.TRUECOLOR:
+            assert self.triplet is not None
+            return self.triplet
+        elif self.type == ColorType.EIGHT_BIT:
+            assert self.number is not None
+            if self.number <= 16:
+                return theme.ansi_colors[self.number]
+            else:
+                return EIGHT_BIT_PALETTE[self.number]
+        elif self.type == ColorType.STANDARD:
+            assert self.number is not None
+            return theme.ansi_colors[self.number]
+        else:  # self.type == ColorType.DEFAULT:
+            assert self.number is not None
+            return theme.foreground_color if foreground else theme.background_color
 
     @classmethod
     def from_triplet(cls, triplet: ColorTriplet) -> Color:
@@ -200,9 +204,6 @@ class Color(NamedTuple):
 
         # Convert to 8-bit color from truecolor color
         if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:
-            # color_number = EIGHT_BIT_PALETTE.match(self.triplet)
-            # return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
-
             assert self.triplet is not None
             red, green, blue = self.triplet.normalize()
             _h, l, s = rgb_to_hls(red, green, blue)
@@ -271,6 +272,8 @@ if __name__ == "__main__":
 
     print(Color.parse("3"))
     print(Color.parse("11"))
+
+    print(Color.parse("default"))
 
     # print(Color.parse("default"))
     # print(Color.parse("red"))

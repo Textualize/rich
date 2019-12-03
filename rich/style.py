@@ -6,6 +6,8 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Type
 
 from . import errors
 from .color import Color, ColorParseError, ColorSystem
+from . import themes
+from .theme import Theme
 
 
 class _Bit:
@@ -200,6 +202,29 @@ class Style:
         style = Style(color=color, bgcolor=bgcolor, **attributes)
         return style
 
+    def get_html_style(self, theme: Theme = None) -> str:
+        """Get a CSS style rule."""
+        theme = theme or themes.DEFAULT
+        css: List[str] = []
+        append = css.append
+        if self.bold:
+            append("font-weight: bold")
+        if self.italic:
+            append("font-style: italic")
+        if self.underline:
+            append("text-decoration: underline")
+        color = self.color
+        bgcolor = self.bgcolor
+        if self.reverse:
+            color, bgcolor = bgcolor, color
+        if color is not None:
+            theme_color = color.get_truecolor(theme)
+            append(f"color: {theme_color.css}")
+        if bgcolor is not None:
+            theme_color = bgcolor.get_truecolor(theme, foreground=False)
+            append(f"background-color: {theme_color.css}")
+        return "; ".join(css)
+
     @classmethod
     def combine(self, styles: Iterable[Style]) -> Style:
         """Combine styles and get result.
@@ -356,6 +381,8 @@ if __name__ == "__main__":
     print(Style.parse("cyan+").render("COLOR", reset=True))
 
     print(Style.parse("bold blue on magenta+ red").render("COLOR", reset=True))
+
+    print(Style.parse("bold blue on magenta+ red").get_html_style())
 
     # style.italic = True
     # print(style._attributes, style._set_attributes)

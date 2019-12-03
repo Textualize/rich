@@ -119,10 +119,13 @@ class RenderWidth(NamedTuple):
     @classmethod
     def get(cls, renderable: RenderableType, max_width: int) -> RenderWidth:
         """Get desired width for a renderable."""
-        get_console_width = getattr(renderable, "__console_width__", None)
-        if get_console_width is not None:
-            render_width = get_console_width(max_width).with_maximum(max_width)
-            return render_width
+        if hasattr(renderable, "__console__"):
+            get_console_width = getattr(renderable, "__console_width__", None)
+            if get_console_width is not None:
+                render_width = get_console_width(max_width).with_maximum(max_width)
+                return render_width
+            else:
+                return RenderWidth(1, max_width)
         elif isinstance(renderable, Segment):
             text, _style = renderable
             width = min(max_width, len(text))
@@ -132,7 +135,7 @@ class RenderWidth(NamedTuple):
             return RenderWidth(len(text), len(text))
         else:
             raise errors.NotRenderableError(
-                f"Unable to render {renderable!r}; "
+                f"Unable to get render width for {renderable!r}; "
                 "a str, Segment, or object with __console__ method is required"
             )
 
@@ -174,6 +177,7 @@ class Console:
         file: IO = None,
         width: int = None,
         height: int = None,
+        record: bool = False,
         markup: Optional[str] = "markdown",
     ):
 
@@ -181,6 +185,7 @@ class Console:
         self.file = file or sys.stdout
         self._width = width
         self._height = height
+        self._record = record
         self._markup = markup
 
         if color_system == "auto":
@@ -189,6 +194,7 @@ class Console:
 
         self.buffer: List[Segment] = []
         self._buffer_index = 0
+        self._record_buffer: List[Segment] = []
 
         default_style = Style()
         self.style_stack: List[Style] = [default_style]
@@ -289,8 +295,13 @@ class Console:
             yield renderable
         elif isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__console__(self, render_options)
+        elif isinstance(renderable, str):
+            render_iterable = self.render_str(renderable, render_options)
         else:
-            render_iterable = self.render_str(str(renderable), render_options)
+            raise errors.NotRenderableError(
+                f"Unable to render {renderable!r}; "
+                "A str, Segment or object with __console__ method is required"
+            )
 
         for render_output in render_iterable:
             if isinstance(render_output, Segment):
@@ -520,6 +531,8 @@ class Console:
         current_style = self.current_style
         color_system = self._color_system
         buffer = self.buffer[:]
+        if self._record:
+            self._record_buffer.extend(buffer)
         del self.buffer[:]
         for line in Segment.split_lines(buffer, self.width):
             for text, style in line:
