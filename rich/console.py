@@ -642,10 +642,10 @@ class Console:
                     append(text)
             stylesheet_rules: List[str] = []
             stylesheet_append = stylesheet_rules.append
-            for style_number, style_rule in sorted((v, k) for k, v in styles.items()):
+            for style_rule, style_number in styles.items():
                 if style_rule:
-                    stylesheet_append(f".r{style_number} {{ {style_rule} }}\n")
-            stylesheet = "".join(stylesheet_rules)
+                    stylesheet_append(f".r{style_number} {{{style_rule}}}")
+            stylesheet = "\n".join(stylesheet_rules)
 
         rendered_code = code_format.format(
             code="".join(fragments),
