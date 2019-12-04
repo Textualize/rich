@@ -7,6 +7,7 @@ from dataclasses import dataclass, replace
 from enum import Enum
 from itertools import chain
 import os
+from operator import itemgetter
 import re
 import shutil
 import sys
@@ -41,8 +42,17 @@ JustifyValues = Optional[Literal["left", "center", "right", "full"]]
 
 CONSOLE_HTML_FORMAT = """\
 <!DOCTYPE html>
+<head>
+<style>
+{stylesheet}
+body {{
+    color: {foreground};
+    background-color: {background};
+}}
+</style>
+</head>
 <html>
-<body style="color: {foreground}; background-color: {background}">
+<body>
     <code>
         <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">{code}</pre>
     </code>
@@ -591,6 +601,7 @@ class Console:
         theme: Theme = None,
         clear: bool = True,
         code_format=CONSOLE_HTML_FORMAT,
+        inline_styles: bool = False,
     ) -> None:
         """Write console data to HTML file (required record=True argument in constructor).
         
@@ -600,20 +611,45 @@ class Console:
             clear (bool, optional): Set to True to clear the record buffer after saving HTML.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
+            inline_styes (bool, optional): If True styles will be inlined in to spans, which makes files
+                larger but easier to cut and paste markup. If False, styles will be embedded in a style tag.
+                Defaults to False.
         """
 
         fragments: List[str] = []
         append = fragments.append
-
         _theme = theme or themes.DEFAULT
-        for text, style in self._record_buffer:
-            if style:
-                append(f'<span style="{style.get_html_style(_theme)}">{text}</span>')
-            else:
-                append(text)
+        stylesheet = ""
+
+        if inline_styles:
+            for text, style in self._record_buffer:
+                if style:
+                    rule = style.get_html_style(_theme)
+                    append(f'<span style="{rule}">{text}</span>' if rule else text)
+                else:
+                    append(text)
+        else:
+            styles: Dict[str, int] = {}
+            for text, style in self._record_buffer:
+                if style:
+                    rule = style.get_html_style(_theme)
+                    if rule:
+                        style_number = styles.setdefault(rule, len(styles) + 1)
+                        append(f'<span class="rich{style_number}">{text}</span>')
+                    else:
+                        append(text)
+                else:
+                    append(text)
+            stylesheet_rules: List[str] = []
+            stylesheet_append = stylesheet_rules.append
+            for style_number, style_rule in sorted((v, k) for k, v in styles.items()):
+                if style_rule:
+                    stylesheet_append(f".rich{style_number} {{ {style_rule} }}\n")
+            stylesheet = "".join(stylesheet_rules)
 
         rendered_code = code_format.format(
             code="".join(fragments),
+            stylesheet=stylesheet,
             foreground=_theme.foreground_color.css,
             background=_theme.background_color.css,
         )

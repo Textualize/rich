@@ -501,4 +501,5 @@ if __name__ == "__main__":
 
     print(Style.parse.cache_info())
 
-    console.save_html("console.html")
+    console.save_html("console.html", clear=False)
+    console.save_html("console2.html", inline_styles=True)

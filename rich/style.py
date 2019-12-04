@@ -237,6 +237,8 @@ class Style:
             append("font-style: italic")
         if self.underline:
             append("text-decoration: underline")
+        if self.strike:
+            append("text-decoration: line-through")
         return "; ".join(css)
 
     @classmethod
