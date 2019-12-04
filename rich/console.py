@@ -622,7 +622,7 @@ class Console:
         stylesheet = ""
 
         if inline_styles:
-            for text, style in self._record_buffer:
+            for text, style in Segment.simplify(self._record_buffer):
                 if style:
                     rule = style.get_html_style(_theme)
                     append(f'<span style="{rule}">{text}</span>' if rule else text)
@@ -630,7 +630,7 @@ class Console:
                     append(text)
         else:
             styles: Dict[str, int] = {}
-            for text, style in self._record_buffer:
+            for text, style in Segment.simplify(self._record_buffer):
                 if style:
                     rule = style.get_html_style(_theme)
                     if rule:
