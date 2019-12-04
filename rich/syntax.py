@@ -202,7 +202,7 @@ if __name__ == "__main__":
     from time import time
 
     syntax = Syntax.from_path("./rich/syntax.py", theme="monokai", line_numbers=True)
-    console = Console()
+    console = Console(record=True)
     start = time()
     console.print(syntax)
     elapsed = int((time() - start) * 1000)
@@ -213,3 +213,4 @@ if __name__ == "__main__":
     print(Color.get_ansi_codes.cache_info())
 
     print(Style.parse.cache_info())
+    console.save_html("syntax.html")

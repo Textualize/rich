@@ -5,7 +5,7 @@ import sys
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Type
 
 from . import errors
-from .color import Color, ColorParseError, ColorSystem
+from .color import blend_rgb, Color, ColorParseError, ColorSystem
 from . import themes
 from .theme import Theme
 
@@ -119,6 +119,11 @@ class Style:
             and self._attributes == other._attributes
         )
 
+    def __hash__(self) -> int:
+        return hash(
+            (self._color, self._bgcolor, self._attributes, self._set_attributes)
+        )
+
     @property
     def color(self) -> Optional[Color]:
         """Get the style foreground color or None if it is not set."""
@@ -202,27 +207,36 @@ class Style:
         style = Style(color=color, bgcolor=bgcolor, **attributes)
         return style
 
+    @lru_cache(maxsize=1000)
     def get_html_style(self, theme: Theme = None) -> str:
         """Get a CSS style rule."""
         theme = theme or themes.DEFAULT
         css: List[str] = []
         append = css.append
-        if self.bold:
-            append("font-weight: bold")
-        if self.italic:
-            append("font-style: italic")
-        if self.underline:
-            append("text-decoration: underline")
+
         color = self.color
         bgcolor = self.bgcolor
         if self.reverse:
             color, bgcolor = bgcolor, color
+        if self.dim:
+            foreground_color = (
+                theme.foreground_color if color is None else color.get_truecolor(theme)
+            )
+            color = Color.from_triplet(
+                blend_rgb(foreground_color, theme.background_color, 0.5)
+            )
         if color is not None:
             theme_color = color.get_truecolor(theme)
             append(f"color: {theme_color.css}")
         if bgcolor is not None:
             theme_color = bgcolor.get_truecolor(theme, foreground=False)
             append(f"background-color: {theme_color.css}")
+        if self.bold:
+            append("font-weight: bold")
+        if self.italic:
+            append("font-style: italic")
+        if self.underline:
+            append("text-decoration: underline")
         return "; ".join(css)
 
     @classmethod

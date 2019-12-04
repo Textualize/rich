@@ -481,7 +481,7 @@ This is a [link](https://www.willmcgugan.com)
 if __name__ == "__main__":
     from .console import Console
 
-    console = Console(width=79)
+    console = Console(width=79, record=True)
     # print(console.size)
 
     md = Markdown(markup)
@@ -500,3 +500,5 @@ if __name__ == "__main__":
     Style.parse("on red")
 
     print(Style.parse.cache_info())
+
+    console.save_html("console.html")

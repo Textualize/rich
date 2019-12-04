@@ -31,10 +31,24 @@ from .default_styles import DEFAULT_STYLES
 from . import errors
 from .color import ColorSystem
 from .style import Style
+from . import themes
+from .theme import Theme
 from .segment import Segment
 
 
 JustifyValues = Optional[Literal["left", "center", "right", "full"]]
+
+
+CONSOLE_HTML_FORMAT = """\
+<!DOCTYPE html>
+<html>
+<body style="color: {foreground}; background-color: {background}">
+    <code>
+        <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">{code}</pre>
+    </code>
+</body>
+</html>
+"""
 
 
 @dataclass
@@ -258,6 +272,32 @@ class Console:
         return ConsoleOptions(
             max_width=self.width, encoding=self.encoding, is_terminal=self.is_terminal
         )
+
+    @property
+    def size(self) -> ConsoleDimensions:
+        """Get the size of the console.
+        
+        Returns:
+            ConsoleDimensions: A named tuple containing the dimensions.
+        """
+        if self._width is not None and self._height is not None:
+            return ConsoleDimensions(self._width, self._height)
+
+        width, height = shutil.get_terminal_size()
+        return ConsoleDimensions(
+            width if self._width is None else self._width,
+            height if self._height is None else self._height,
+        )
+
+    @property
+    def width(self) -> int:
+        """Get the width of the console.
+        
+        Returns:
+            int: The width (in characters) of the console.
+        """
+        width, _ = self.size
+        return width
 
     def line(self, count: int = 1) -> None:
         """Write new line(s).
@@ -545,31 +585,42 @@ class Console:
         rendered = "".join(output)
         return rendered
 
-    @property
-    def size(self) -> ConsoleDimensions:
-        """Get the size of the console.
+    def save_html(
+        self,
+        path: str,
+        theme: Theme = None,
+        clear: bool = True,
+        code_format=CONSOLE_HTML_FORMAT,
+    ) -> None:
+        """Write console data to HTML file (required record=True argument in constructor).
         
-        Returns:
-            ConsoleDimensions: A named tuple containing the dimensions.
+        Args:
+            path (str): A path to html file to write.            
+            theme (Theme, optional): Theme object containing console colors.
+            clear (bool, optional): Set to True to clear the record buffer after saving HTML.
+            code_format (str, optional): Format string to render HTML, should contain {foreground}
+                {background} and {code}.
         """
-        if self._width is not None and self._height is not None:
-            return ConsoleDimensions(self._width, self._height)
 
-        width, height = shutil.get_terminal_size()
-        return ConsoleDimensions(
-            width if self._width is None else self._width,
-            height if self._height is None else self._height,
+        fragments: List[str] = []
+        append = fragments.append
+
+        _theme = theme or themes.DEFAULT
+        for text, style in self._record_buffer:
+            if style:
+                append(f'<span style="{style.get_html_style(_theme)}">{text}</span>')
+            else:
+                append(text)
+
+        rendered_code = code_format.format(
+            code="".join(fragments),
+            foreground=_theme.foreground_color.css,
+            background=_theme.background_color.css,
         )
-
-    @property
-    def width(self) -> int:
-        """Get the width of the console.
-        
-        Returns:
-            int: The width (in characters) of the console.
-        """
-        width, _ = self.size
-        return width
+        with open(path, "wt") as write_file:
+            write_file.write(rendered_code)
+        if clear:
+            del self._record_buffer[:]
 
 
 if __name__ == "__main__":
