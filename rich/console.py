@@ -603,7 +603,7 @@ class Console:
         code_format=CONSOLE_HTML_FORMAT,
         inline_styles: bool = False,
     ) -> None:
-        """Write console data to HTML file (required record=True argument in constructor).
+        """Write console data to HTML file (requires record=True argument in constructor).
         
         Args:
             path (str): A path to html file to write.            

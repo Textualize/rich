@@ -142,7 +142,7 @@ class Segment(NamedTuple):
         width: int,
         height: int = None,
         style: Style = None,
-    ):
+    ) -> List[List[Segment]]:
         """Set the shape of a list of lines (enclosing rectangle)
         
         Args:

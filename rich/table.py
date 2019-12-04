@@ -13,9 +13,11 @@ from .console import (
     RenderResult,
     RenderWidth,
 )
+from . import errors
 from .segment import Segment
+from .style import Style
 from .text import Text
-from ._tools import iter_last, ratio_divide
+from ._tools import iter_first, iter_last, ratio_divide
 
 
 @dataclass
@@ -25,12 +27,12 @@ class Column:
     title: RenderableType = ""
     width: Optional[int] = None
     ratio: Optional[int] = None
-    _cells: List[RenderableType] = field(default_factory=list)
+    _cells: List[ConsoleRenderable] = field(default_factory=list)
 
     @property
     def cells(self) -> Iterable[RenderableType]:
         """Get all cells in the column, including header."""
-        yield self.title
+        yield Text(self.title) if isinstance(self.title, str) else self.title
         yield from self._cells
 
     @property
@@ -64,7 +66,9 @@ class Table:
         *headers: Union[Column, str],
         width: int = None,
         box: Optional[Box] = None,
-        expand: bool = False
+        expand: bool = False,
+        style: Union[str, Style] = "none",
+        header_style: Union[str, Style] = "bold",
     ) -> None:
         self.width = width
         self.box = box
@@ -72,9 +76,11 @@ class Table:
             (Column(header) if isinstance(header, str) else header)
             for header in headers
         ]
+        self.style = style
+        self.header_style = header_style
         self.expand = expand
 
-    def add_row(self, *renderables: Optional[RenderableType]) -> None:
+    def add_row(self, *renderables: Optional[Union[str, ConsoleRenderable]]) -> None:
 
         for index, renderable in enumerate(renderables):
             if index == len(self.columns):
@@ -83,9 +89,13 @@ class Table:
             if isinstance(renderable, ConsoleRenderable):
                 column._cells.append(renderable)
             elif renderable is None:
-                column._cells.append("")
+                column._cells.append(Text(""))
+            elif isinstance(renderable, str):
+                column._cells.append(Text(renderable))
             else:
-                column._cells.append(str(renderable))
+                raise errors.NotRenderableError(
+                    f"unable to render {renderable!r}; str or object with a __console__ method is required"
+                )
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
 
@@ -96,12 +106,7 @@ class Table:
             max_width -= len(self.columns) + 2
         widths = self._calculate_column_widths(max_width)
 
-        yield Segment("-" * max_width)
-        yield Segment.line()
-
-        for index, width in enumerate(widths):
-            yield Segment(str(index) * width)
-        yield Segment.line()
+        yield from self._render(console, options, widths)
 
     def _calculate_column_widths(self, max_width: int) -> List[int]:
         """Calculate the widths of each column."""
@@ -110,16 +115,18 @@ class Table:
         widths = [_range.maximum for _range in width_ranges]
 
         if self.expand:
-            widths = [_range.maximum for _range in width_ranges]
-            fixed_widths = [_range.minimum for _range in width_ranges]
             ratios = [col.ratio or 0 for col in columns if col.flexible]
-            flex_minimum = [column.width or 1 for column in columns if column.flexible]
-            flexible_width = max_width - sum(fixed_widths)
-            flex_widths = ratio_divide(flexible_width, ratios, flex_minimum)
-            iter_flex_widths = iter(flex_widths)
-            for index, column in enumerate(columns):
-                if column.flexible:
-                    widths[index] = next(iter_flex_widths)
+            if any(ratios):
+                fixed_widths = [_range.minimum for _range in width_ranges]
+                flex_minimum = [
+                    column.width or 1 for column in columns if column.flexible
+                ]
+                flexible_width = max_width - sum(fixed_widths)
+                flex_widths = ratio_divide(flexible_width, ratios, flex_minimum)
+                iter_flex_widths = iter(flex_widths)
+                for index, column in enumerate(columns):
+                    if column.flexible:
+                        widths[index] = next(iter_flex_widths)
 
         table_width = sum(widths)
 
@@ -135,26 +142,44 @@ class Table:
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
         return widths
 
-    def _render(self, widths: List[int]) -> RenderResult:
-        pass
+    def _render(
+        self, console: Console, options: ConsoleOptions, widths: List[int]
+    ) -> RenderResult:
+
+        style = console.get_style(self.style)
+        header_style = console.get_style(self.header_style)
+        rows = zip(*(column.cells for column in self.columns))
+
+        for first, row in iter_first(rows):
+            max_height = 1
+            cells: List[List[List[Segment]]] = []
+            for width, cell in zip(widths, row):
+                lines = console.render_lines(
+                    cell, options.with_width(width), header_style if first else style
+                )
+                max_height = max(max_height, len(lines))
+                cells.append(lines)
+
+            cells[:] = [
+                Segment.set_shape(cell, width, max_height, style=style)
+                for width, cell in zip(widths, cells)
+            ]
+
+            for line_no in range(max_height):
+                for cell in cells:
+                    yield from cell[line_no]
+                yield Segment.line()
 
 
 if __name__ == "__main__":
 
-    for w in range(10, 110):
-        c = Console(width=w)
-        table = Table(
-            Column("Column1", ratio=2),
-            Column("Column2", ratio=1, width=4),
-            "Column3",
-            expand=True,
-        )
+    c = Console(width=79)
+    table = Table("Foo", "Bar", expand=True, style="on blue")
+    table.columns[0].width = 10
 
-        table.add_row(
-            Text("Hello"), Text("world" * 2), "Hello",
-        )
-        from .markdown import Markdown
+    table.add_row("Hello, World! " * 8, "cake" * 10)
+    from .markdown import Markdown
 
-        # table.add_row(Markdown("Hello *World*!"), "More text", "Hello WOrld")
+    # table.add_row(Markdown("Hello *World*!"), "More text", "Hello WOrld")
 
-        c.print(table)
+    c.print(table)
