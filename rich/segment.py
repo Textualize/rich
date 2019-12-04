@@ -169,7 +169,7 @@ class Segment(NamedTuple):
         return new_lines
 
     @classmethod
-    def simplify(cls, segments: List[Segment]) -> List[Segment]:
+    def simplify(cls, segments: Iterable[Segment]) -> List[Segment]:
         """Simplify a list of segments by combining contiguous segments with the same style.
         
         Args:
