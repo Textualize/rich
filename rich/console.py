@@ -635,7 +635,7 @@ class Console:
                     rule = style.get_html_style(_theme)
                     if rule:
                         style_number = styles.setdefault(rule, len(styles) + 1)
-                        append(f'<span class="rich{style_number}">{text}</span>')
+                        append(f'<span class="r{style_number}">{text}</span>')
                     else:
                         append(text)
                 else:
@@ -644,7 +644,7 @@ class Console:
             stylesheet_append = stylesheet_rules.append
             for style_number, style_rule in sorted((v, k) for k, v in styles.items()):
                 if style_rule:
-                    stylesheet_append(f".rich{style_number} {{ {style_rule} }}\n")
+                    stylesheet_append(f".r{style_number} {{ {style_rule} }}\n")
             stylesheet = "".join(stylesheet_rules)
 
         rendered_code = code_format.format(

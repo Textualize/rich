@@ -5,7 +5,6 @@ from typing import NamedTuple, Optional
 from .style import Style
 
 from itertools import zip_longest
-from operator import itemgetter
 from typing import Iterable, List, Tuple
 
 
@@ -169,26 +168,28 @@ class Segment(NamedTuple):
         return new_lines
 
     @classmethod
-    def simplify(cls, segments: Iterable[Segment]) -> List[Segment]:
-        """Simplify a list of segments by combining contiguous segments with the same style.
+    def simplify(cls, segments: Iterable[Segment]) -> Iterable[Segment]:
+        """Simplify an iterable of segments by combining contiguous segments with the same style.
         
         Args:
-            segments (List[Segment]): A list of segments.
+            segments (Iterable[Segment]): An iterable segments.
         
         Returns:
-            List[Segment]: A possibly smaller list of segments that will render the same.
+            Iterable[Segment]: A possibly smaller iterable of segments that will render the same way.
         """
-        if not segments:
-            return []
         iter_segments = iter(segments)
-        simplified: List[Segment] = [next(iter_segments)]
-        append = simplified.append
+        try:
+            last_segment = next(iter_segments)
+        except StopIteration:
+            return
+
         _Segment = Segment
-        get_last = itemgetter(-1)
         for segment in iter_segments:
-            if get_last(simplified).style == segment.style:
-                text, style = segment
-                simplified[-1] = _Segment(get_last(simplified).text + text, style)
+            if last_segment.style == segment.style:
+                last_segment = _Segment(
+                    last_segment.text + segment.text, last_segment.style
+                )
             else:
-                append(segment)
-        return simplified
+                yield last_segment
+                last_segment = segment
+        yield last_segment
