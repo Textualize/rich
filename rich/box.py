@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from typing import List
+
+from ._tools import iter_last
+
 
 class Box:
     """Defines characters to render boxes.
@@ -30,7 +34,7 @@ class Box:
         self.top_left, self.top, self.top_divider, self.top_right = line1
         self.head_left, _, self.head_vertical, self.head_right = line2
         (
-            self.head_row_left_row,
+            self.head_row_left,
             self.head_row_horizontal,
             self.head_row_divider,
             self.head_row_right,
@@ -61,31 +65,68 @@ class Box:
             f"{self.bottom_left}{self.bottom}{self.bottom_divider}{self.bottom}{self.bottom_right}"
         )
 
-    def get_top(self, width: int) -> str:
+    def get_top(self, *widths: int) -> str:
         """Get the top of a simple box.
         
         Args:
-            width (int): The width of the box (including corners)
+            *width (int): Widths of columns.
         
         Returns:
             str: A string of box characters.
         """
-        non_corner_width = width - 2
-        return f"{self.top_left}{self.top * non_corner_width}{self.top_right}\n"
 
-    def get_bottom(self, width: int) -> str:
-        """Get the bottom of a simple box.
+        parts: List[str] = []
+        append = parts.append
+        append(self.top_left)
+        for last, width in iter_last(widths):
+            append(self.top * width)
+            if not last:
+                append(self.top_divider)
+        append(self.top_right)
+        append("\n")
+        return "".join(parts)
+
+    def get_row(self, *widths: int) -> str:
+        """Get the top of a simple box.
         
         Args:
-            width (int): The width of the box (including corners)
+            *width (int): Widths of columns.
         
         Returns:
             str: A string of box characters.
         """
-        non_corner_width = width - 2
-        return (
-            f"{self.bottom_left}{self.bottom * non_corner_width}{self.bottom_right}\n"
-        )
+
+        parts: List[str] = []
+        append = parts.append
+        append(self.head_row_left)
+        for last, width in iter_last(widths):
+            append(self.head_row_horizontal * width)
+            if not last:
+                append(self.row_cross)
+        append(self.head_row_right)
+        append("\n")
+        return "".join(parts)
+
+    def get_bottom(self, *widths: int) -> str:
+        """Get the top of a simple box.
+        
+        Args:
+            *width (int): Widths of columns.
+        
+        Returns:
+            str: A string of box characters.
+        """
+
+        parts: List[str] = []
+        append = parts.append
+        append(self.bottom_left)
+        for last, width in iter_last(widths):
+            append(self.bottom * width)
+            if not last:
+                append(self.bottom_divider)
+        append(self.bottom_right)
+        append("\n")
+        return "".join(parts)
 
 
 ASCII = Box(
@@ -93,7 +134,7 @@ ASCII = Box(
 +--+
 | ||
 |-+|
-|-+|
+| ||
 |-+|
 |-+|
 | ||

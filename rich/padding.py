@@ -27,6 +27,14 @@ class Padding:
         left: int = None,
         style: Union[str, Style] = "none",
     ):
+        if (
+            all_sides is None
+            and top is None
+            and right is None
+            and bottom is None
+            and left is None
+        ):
+            all_sides = 1
         self.renderable = renderable
         self.top = self.right = self.bottom = self.left = 0
         if all_sides is not None:

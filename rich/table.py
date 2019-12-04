@@ -4,7 +4,8 @@ from dataclasses import dataclass, field
 from itertools import chain
 from typing import Iterable, List, Optional, Sequence, Tuple, Union
 
-from .box import Box, SQUARE
+from . import box
+
 from .console import (
     Console,
     ConsoleOptions,
@@ -65,10 +66,11 @@ class Table:
         self,
         *headers: Union[Column, str],
         width: int = None,
-        box: Optional[Box] = None,
+        box: Optional[box.Box] = box.HEAVY_EDGE,
         expand: bool = False,
         style: Union[str, Style] = "none",
         header_style: Union[str, Style] = "bold",
+        border_style: Union[str, Style] = "dim",
     ) -> None:
         self.width = width
         self.box = box
@@ -76,16 +78,22 @@ class Table:
             (Column(header) if isinstance(header, str) else header)
             for header in headers
         ]
+        self.expand = expand
         self.style = style
         self.header_style = header_style
-        self.expand = expand
+        self.border_style = border_style
+        self._row_count = 0
 
     def add_row(self, *renderables: Optional[Union[str, ConsoleRenderable]]) -> None:
 
         for index, renderable in enumerate(renderables):
             if index == len(self.columns):
-                self.columns.append(Column())
-            column = self.columns[index]
+                column = Column()
+                for _ in range(self._row_count):
+                    column._cells.append(Text(""))
+                self.columns.append(column)
+            else:
+                column = self.columns[index]
             if isinstance(renderable, ConsoleRenderable):
                 column._cells.append(renderable)
             elif renderable is None:
@@ -96,6 +104,7 @@ class Table:
                 raise errors.NotRenderableError(
                     f"unable to render {renderable!r}; str or object with a __console__ method is required"
                 )
+        self._row_count += 1
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
 
@@ -148,8 +157,12 @@ class Table:
 
         style = console.get_style(self.style)
         header_style = console.get_style(self.header_style)
-        rows = zip(*(column.cells for column in self.columns))
+        border_style = console.get_style(self.border_style)
+        rows = list(zip(*(column.cells for column in self.columns)))
+        box = self.box
 
+        if box:
+            yield Segment(box.get_top(*widths), border_style)
         for first, row in iter_first(rows):
             max_height = 1
             cells: List[List[List[Segment]]] = []
@@ -165,21 +178,40 @@ class Table:
                 for width, cell in zip(widths, cells)
             ]
 
+            if box is not None:
+                if first:
+                    left = Segment(box.head_left, border_style)
+                    right = Segment(box.head_right, border_style)
+                    divider = Segment(box.head_vertical, border_style)
+                else:
+                    left = Segment(box.mid_left, border_style)
+                    right = Segment(box.mid_right, border_style)
+                    divider = Segment(box.mid_vertical, border_style)
             for line_no in range(max_height):
-                for cell in cells:
+                if box:
+                    yield left
+                for last, cell in iter_last(cells):
                     yield from cell[line_no]
+                    if box and not last:
+                        yield divider
+                if box:
+                    yield right
                 yield Segment.line()
+                if box and first:
+                    yield Segment(box.get_row(*widths), border_style)
+        if box:
+            yield Segment(box.get_bottom(*widths), border_style)
 
 
 if __name__ == "__main__":
 
     c = Console(width=79)
-    table = Table("Foo", "Bar", expand=True, style="on blue")
-    table.columns[0].width = 10
+    table = Table("Foo", "Bar", expand=True, border_style="", box=box.HEAVY_EDGE)
+    table.columns[0].width = 12
 
     table.add_row("Hello, World! " * 8, "cake" * 10)
     from .markdown import Markdown
 
-    # table.add_row(Markdown("Hello *World*!"), "More text", "Hello WOrld")
+    table.add_row(Markdown("# This is *Markdown*!"), "More text", "Hello WOrld")
 
     c.print(table)
