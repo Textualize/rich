@@ -65,6 +65,7 @@ class Padding:
         row = Segment(" " * width + "\n", style)
         left = Segment(" " * self.left, style)
         right = Segment(" " * self.right, style)
+        new_line = Segment.line()
         for _ in range(self.top):
             yield row
         for line in lines:
@@ -73,18 +74,15 @@ class Padding:
             yield from line
             if self.right:
                 yield right
-            yield Segment.line()
+            yield new_line
         for _ in range(self.bottom):
             yield row
 
     def __console_width__(self, max_width: int) -> RenderWidth:
         extra_width = self.left + self.right
-        width = max(
-            max_width,
-            (
-                RenderWidth.get(self.renderable, max_width - extra_width).maximum
-                + extra_width
-            ),
-        )
-        return RenderWidth(width, width)
+        render_width = max(1, max_width - extra_width)
+        min_width, max_width = RenderWidth.get(self.renderable, render_width)
+        render_width = RenderWidth(min_width + extra_width, max_width + extra_width)
+        print(self.renderable, render_width)
+        return render_width
 

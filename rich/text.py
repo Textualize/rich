@@ -229,7 +229,7 @@ class Text:
         text = self.text
         if not text.strip():
             return RenderWidth(0, 0)
-        max_text_width = max(len(line.rstrip()) for line in text.splitlines())
+        max_text_width = max(len(line) for line in text.splitlines())
         min_text_width = max(len(word) for word in text.split())
         return RenderWidth(min_text_width, max_text_width)
 

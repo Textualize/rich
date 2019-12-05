@@ -59,20 +59,20 @@ class Table:
         *headers: Union[Column, str],
         width: int = None,
         box: Optional[box.Box] = box.HEAVY_EDGE,
-        pad: PaddingDimensions = (1, 0),
+        pad: PaddingDimensions = (0, 1),
         expand: bool = False,
         show_header: bool = True,
         style: Union[str, Style] = "none",
         header_style: Union[str, Style] = "bold",
         border_style: Union[str, Style] = "dim",
     ) -> None:
-        self.width = width
-        self.box = box
-        self.padding = Padding.unpack(pad)
         self.columns = [
             (Column(header) if isinstance(header, str) else header)
             for header in headers
         ]
+        self.width = width
+        self.box = box
+        self.padding = Padding.unpack(pad)
         self.expand = expand
         self.show_header = show_header
         self.style = style
@@ -164,9 +164,9 @@ class Table:
 
     def _measure_column(self, column: Column, max_width: int) -> RenderWidth:
         """Get the minimum and maximum width of the column."""
-        if self.width is not None:
+        if column.width is not None:
             # Fixed width column
-            return RenderWidth(self.width, self.width)
+            return RenderWidth(column.width, column.width)
         # Flexible column, we need to measure contents
         min_widths: List[int] = []
         max_widths: List[int] = []
@@ -182,7 +182,7 @@ class Table:
     def _render(
         self, console: Console, options: ConsoleOptions, widths: List[int]
     ) -> RenderResult:
-
+        print(widths)
         style = console.get_style(self.style)
         header_style = console.get_style(self.header_style)
         border_style = console.get_style(self.border_style)
@@ -239,8 +239,10 @@ class Table:
 if __name__ == "__main__":
 
     c = Console()
-    table = Table("Foo", "Bar", expand=True, border_style="", box=box.HEAVY_EDGE)
-    table.columns[0].width = 12
+    table = Table("Foo", "Bar", expand=False, border_style="", box=box.HEAVY_EDGE)
+    table.columns[0].width = 50
+    # table.columns[1].ratio = 1
+    # table.columns[2].ratio = 1
 
     table.add_row("Hello, World! " * 8, "cake" * 10)
     from .markdown import Markdown
