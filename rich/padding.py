@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union
+from typing import Tuple, Union
 
 from .console import (
     Console,
@@ -14,40 +14,42 @@ from .text import Text
 from .segment import Segment
 
 
+PaddingType = Union[int, Tuple[int], Tuple[int, int], Tuple[int, int, int, int]]
+
+
 class Padding:
     """Draw space around a console renderable."""
 
     def __init__(
         self,
         renderable: RenderableType,
-        all_sides: int = None,
-        top: int = None,
-        right: int = None,
-        bottom: int = None,
-        left: int = None,
+        pad: PaddingType,
+        *,
         style: Union[str, Style] = "none",
     ):
-        if (
-            all_sides is None
-            and top is None
-            and right is None
-            and bottom is None
-            and left is None
-        ):
-            all_sides = 1
         self.renderable = renderable
-        self.top = self.right = self.bottom = self.left = 0
-        if all_sides is not None:
-            self.top = self.right = self.bottom = self.left = all_sides
-        if top is not None:
-            self.top = top
-        if right is not None:
-            self.right = right
-        if bottom is not None:
-            self.bottom = bottom
-        if left is not None:
-            self.left = left
+        self.top, self.right, self.bottom, self.left = self.unpack(pad)
         self.style = style
+
+    @classmethod
+    def unpack(cls, pad: Union[int, Tuple[int, ...]]) -> Tuple[int, int, int, int]:
+        """Unpack padding specified in CSS style."""
+        if isinstance(pad, int):
+            return (pad, pad, pad, pad)
+        if len(pad) == 1:
+            _pad = pad[0]
+            return (_pad, _pad, _pad, _pad)
+        if len(pad) == 2:
+            pad_top, pad_right = pad
+            return (pad_top, pad_right, pad_top, pad_right)
+        if len(pad) == 3:
+            raise ValueError(
+                f"1, 2 or 4 integers required for padding; {len(pad)} given"
+            )
+        if len(pad) == 4:
+            top, right, bottom, left = pad
+            return (top, right, bottom, left)
+        raise ValueError(f"1, 2 or 4 integers required for padding; {len(pad)} given")
 
     def __repr__(self) -> str:
         return f"<padding {self.renderable!r} {self.top} {self.right} {self.bottom} {self.left}>"

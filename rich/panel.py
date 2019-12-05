@@ -74,7 +74,7 @@ if __name__ == "__main__":
     from .padding import Padding
     from .box import ROUNDED
 
-    p = Panel(Panel(Padding("Hello World! ", 2), box=ROUNDED, expand=False))
+    p = Panel(Panel(Padding("Hello World! ", (1, 8)), box=ROUNDED, expand=False))
 
     print(p)
     c.print(p)

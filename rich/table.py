@@ -205,7 +205,7 @@ class Table:
 
 if __name__ == "__main__":
 
-    c = Console(width=79)
+    c = Console()
     table = Table("Foo", "Bar", expand=True, border_style="", box=box.HEAVY_EDGE)
     table.columns[0].width = 12
 
