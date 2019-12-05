@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Tuple, Union
+from typing import cast, Tuple, Union
 
 from .console import (
     Console,
@@ -14,7 +14,7 @@ from .text import Text
 from .segment import Segment
 
 
-PaddingType = Union[int, Tuple[int], Tuple[int, int], Tuple[int, int, int, int]]
+PaddingDimensions = Union[int, Tuple[int], Tuple[int, int], Tuple[int, int, int, int]]
 
 
 class Padding:
@@ -23,7 +23,7 @@ class Padding:
     def __init__(
         self,
         renderable: RenderableType,
-        pad: PaddingType,
+        pad: PaddingDimensions,
         *,
         style: Union[str, Style] = "none",
     ):
@@ -31,8 +31,8 @@ class Padding:
         self.top, self.right, self.bottom, self.left = self.unpack(pad)
         self.style = style
 
-    @classmethod
-    def unpack(cls, pad: Union[int, Tuple[int, ...]]) -> Tuple[int, int, int, int]:
+    @staticmethod
+    def unpack(pad: PaddingDimensions) -> Tuple[int, int, int, int]:
         """Unpack padding specified in CSS style."""
         if isinstance(pad, int):
             return (pad, pad, pad, pad)
@@ -40,19 +40,19 @@ class Padding:
             _pad = pad[0]
             return (_pad, _pad, _pad, _pad)
         if len(pad) == 2:
-            pad_top, pad_right = pad
+            pad_top, pad_right = cast(Tuple[int, int], pad)
             return (pad_top, pad_right, pad_top, pad_right)
         if len(pad) == 3:
             raise ValueError(
                 f"1, 2 or 4 integers required for padding; {len(pad)} given"
             )
         if len(pad) == 4:
-            top, right, bottom, left = pad
+            top, right, bottom, left = cast(Tuple[int, int, int, int], pad)
             return (top, right, bottom, left)
         raise ValueError(f"1, 2 or 4 integers required for padding; {len(pad)} given")
 
     def __repr__(self) -> str:
-        return f"<padding {self.renderable!r} {self.top} {self.right} {self.bottom} {self.left}>"
+        return f"Padding({self.renderable!r}, ({self.top},{self.right},{self.bottom},{self.left}))"
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
 
@@ -64,7 +64,7 @@ class Padding:
 
         row = Segment(" " * width + "\n", style)
         left = Segment(" " * self.left, style)
-        right = Segment(" " * self.right + "\n", style)
+        right = Segment(" " * self.right, style)
         for _ in range(self.top):
             yield row
         for line in lines:
@@ -73,14 +73,18 @@ class Padding:
             yield from line
             if self.right:
                 yield right
+            yield Segment.line()
         for _ in range(self.bottom):
             yield row
 
     def __console_width__(self, max_width: int) -> RenderWidth:
         extra_width = self.left + self.right
-        width = (
-            RenderWidth.get(self.renderable, max_width - extra_width).maximum
-            + extra_width
+        width = max(
+            max_width,
+            (
+                RenderWidth.get(self.renderable, max_width - extra_width).maximum
+                + extra_width
+            ),
         )
         return RenderWidth(width, width)
 

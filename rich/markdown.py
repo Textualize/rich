@@ -351,9 +351,6 @@ class Markdown:
         inlines = self.inlines
         new_line = False
         for current, entering in nodes:
-            # print(dir(current))
-            # print(current, current.is_container(), entering, current.destination)
-            # print(current.is_container())
             node_type = current.t
             if node_type == "text":
                 context.on_text(current.literal)

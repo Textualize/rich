@@ -397,11 +397,13 @@ class Console:
         style = style or self.current_style
         render_options = options or self.options
 
-        lines = Segment.split_lines(
-            Segment.apply_style(self.render(renderable, render_options), style),
-            render_options.max_width,
+        _rendered = self.render(renderable, render_options)
+        lines = list(
+            Segment.split_lines(
+                Segment.apply_style(_rendered, style), render_options.max_width,
+            )
         )
-        return list(lines)
+        return lines
 
     def render_str(
         self, text: str, options: ConsoleOptions

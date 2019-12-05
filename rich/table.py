@@ -15,6 +15,7 @@ from .console import (
     RenderWidth,
 )
 from . import errors
+from .padding import Padding, PaddingDimensions
 from .segment import Segment
 from .style import Style
 from .text import Text
@@ -25,15 +26,15 @@ from ._tools import iter_first, iter_last, ratio_divide
 class Column:
     """Defines a column in a table."""
 
-    title: RenderableType = ""
+    title: Union[str, ConsoleRenderable] = ""
+    style: Union[str, Style] = "none"
     width: Optional[int] = None
     ratio: Optional[int] = None
     _cells: List[ConsoleRenderable] = field(default_factory=list)
 
     @property
-    def cells(self) -> Iterable[RenderableType]:
-        """Get all cells in the column, including header."""
-        yield Text(self.title) if isinstance(self.title, str) else self.title
+    def cells(self) -> Iterable[ConsoleRenderable]:
+        """Get all cells in the column, not including header."""
         yield from self._cells
 
     @property
@@ -41,22 +42,13 @@ class Column:
         """Check if this column is flexible."""
         return self.ratio is not None
 
-    def measure(self, max_width: int) -> RenderWidth:
-        """Get the minimum and maximum width of the column."""
-        if self.width is not None:
-            # Fixed width column
-            return RenderWidth(self.width, self.width)
-        # Flexible column, we need to measure contents
-        min_widths: List[int] = []
-        max_widths: List[int] = []
-        append_min = min_widths.append
-        append_max = max_widths.append
-        get_render_width = RenderWidth.get
-        for renderable in self.cells:
-            _min, _max = get_render_width(renderable, max_width)
-            append_min(_min)
-            append_max(_max)
-        return RenderWidth(max(min_widths), max(max_widths))
+    @property
+    def header(self) -> ConsoleRenderable:
+        return (
+            Text(self.title, style=self.style)
+            if isinstance(self.title, str)
+            else self.title
+        )
 
 
 class Table:
@@ -67,39 +59,45 @@ class Table:
         *headers: Union[Column, str],
         width: int = None,
         box: Optional[box.Box] = box.HEAVY_EDGE,
+        pad: PaddingDimensions = (1, 0),
         expand: bool = False,
+        show_header: bool = True,
         style: Union[str, Style] = "none",
         header_style: Union[str, Style] = "bold",
         border_style: Union[str, Style] = "dim",
     ) -> None:
         self.width = width
         self.box = box
+        self.padding = Padding.unpack(pad)
         self.columns = [
             (Column(header) if isinstance(header, str) else header)
             for header in headers
         ]
         self.expand = expand
+        self.show_header = show_header
         self.style = style
         self.header_style = header_style
         self.border_style = border_style
         self._row_count = 0
 
     def add_row(self, *renderables: Optional[Union[str, ConsoleRenderable]]) -> None:
+        def add_cell(column: Column, renderable: ConsoleRenderable):
+            column._cells.append(renderable)
 
         for index, renderable in enumerate(renderables):
             if index == len(self.columns):
                 column = Column()
                 for _ in range(self._row_count):
-                    column._cells.append(Text(""))
+                    add_cell(column, Text(""))
                 self.columns.append(column)
             else:
                 column = self.columns[index]
             if isinstance(renderable, ConsoleRenderable):
-                column._cells.append(renderable)
+                add_cell(column, renderable)
             elif renderable is None:
-                column._cells.append(Text(""))
+                add_cell(column, Text(""))
             elif isinstance(renderable, str):
-                column._cells.append(Text(renderable))
+                add_cell(column, Text(renderable))
             else:
                 raise errors.NotRenderableError(
                     f"unable to render {renderable!r}; str or object with a __console__ method is required"
@@ -114,13 +112,12 @@ class Table:
         if self.box:
             max_width -= len(self.columns) + 2
         widths = self._calculate_column_widths(max_width)
-
         yield from self._render(console, options, widths)
 
     def _calculate_column_widths(self, max_width: int) -> List[int]:
         """Calculate the widths of each column."""
         columns = self.columns
-        width_ranges = [column.measure(max_width) for column in columns]
+        width_ranges = [self._measure_column(column, max_width) for column in columns]
         widths = [_range.maximum for _range in width_ranges]
 
         if self.expand:
@@ -151,6 +148,37 @@ class Table:
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
         return widths
 
+    def _get_cells(self, column: Column) -> Iterable[ConsoleRenderable]:
+        """Get all the cells with padding and optional header."""
+
+        padding = self.padding
+        if any(padding):
+            if self.show_header:
+                yield Padding(column.header, padding, style=self.header_style)
+            for cell in column.cells:
+                yield Padding(cell, padding, style=self.style)
+        else:
+            if self.show_header:
+                yield column.header
+            yield from column.cells
+
+    def _measure_column(self, column: Column, max_width: int) -> RenderWidth:
+        """Get the minimum and maximum width of the column."""
+        if self.width is not None:
+            # Fixed width column
+            return RenderWidth(self.width, self.width)
+        # Flexible column, we need to measure contents
+        min_widths: List[int] = []
+        max_widths: List[int] = []
+        append_min = min_widths.append
+        append_max = max_widths.append
+        get_render_width = RenderWidth.get
+        for renderable in self._get_cells(column):
+            _min, _max = get_render_width(renderable, max_width)
+            append_min(_min)
+            append_max(_max)
+        return RenderWidth(max(min_widths), max(max_widths))
+
     def _render(
         self, console: Console, options: ConsoleOptions, widths: List[int]
     ) -> RenderResult:
@@ -158,8 +186,9 @@ class Table:
         style = console.get_style(self.style)
         header_style = console.get_style(self.header_style)
         border_style = console.get_style(self.border_style)
-        rows = list(zip(*(column.cells for column in self.columns)))
+        rows = zip(*(self._get_cells(column) for column in self.columns))
         box = self.box
+        new_line = Segment.line()
 
         if box:
             yield Segment(box.get_top(*widths), border_style)
@@ -178,7 +207,7 @@ class Table:
                 for width, cell in zip(widths, cells)
             ]
 
-            if box is not None:
+            if box:
                 if first:
                     left = Segment(box.head_left, border_style)
                     right = Segment(box.head_right, border_style)
@@ -187,18 +216,22 @@ class Table:
                     left = Segment(box.mid_left, border_style)
                     right = Segment(box.mid_right, border_style)
                     divider = Segment(box.mid_vertical, border_style)
-            for line_no in range(max_height):
-                if box:
+                for line_no in range(max_height):
                     yield left
-                for last, cell in iter_last(cells):
-                    yield from cell[line_no]
-                    if box and not last:
-                        yield divider
-                if box:
+                    for last, cell in iter_last(cells):
+                        yield from cell[line_no]
+                        if not last:
+                            yield divider
                     yield right
-                yield Segment.line()
-                if box and first:
-                    yield Segment(box.get_row(*widths), border_style)
+                    yield new_line
+            else:
+                for line_no in range(max_height):
+                    for last, cell in iter_last(cells):
+                        yield from cell[line_no]
+                    yield new_line
+            if box and first:
+                yield Segment(box.get_row(*widths), border_style)
+
         if box:
             yield Segment(box.get_bottom(*widths), border_style)
 
