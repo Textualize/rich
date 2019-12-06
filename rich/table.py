@@ -58,13 +58,13 @@ class Table:
         self,
         *headers: Union[Column, str],
         width: int = None,
-        box: box.Box = box.GRID,
+        box: box.Box = box.MINIMAL_DOUBLE_HEAD,
         pad: PaddingDimensions = (0, 1),
         expand: bool = False,
         show_header: bool = True,
         style: Union[str, Style] = "none",
         header_style: Union[str, Style] = "bold",
-        border_style: Union[str, Style] = "dim",
+        border_style: Union[str, Style] = "",
     ) -> None:
         self.columns = [
             (Column(header) if isinstance(header, str) else header)
@@ -187,7 +187,6 @@ class Table:
         border_style = console.get_style(self.border_style)
         rows = zip(*(self._get_cells(column) for column in self.columns))
         box = self.box
-        print()
         new_line = Segment.line()
 
         if box:
@@ -239,7 +238,7 @@ class Table:
 if __name__ == "__main__":
 
     c = Console()
-    table = Table("Foo", "Bar", expand=False, border_style="")
+    table = Table("Foo", "Bar", expand=False)
     table.columns[0].width = 50
     # table.columns[1].ratio = 1
     # table.columns[2].ratio = 1

@@ -597,25 +597,48 @@ class Console:
         rendered = "".join(output)
         return rendered
 
-    def save_html(
+    def export_text(self, clear: bool = True, styles: bool = False) -> str:
+        """Generate text from console contents (requires record=True argument in constructor).
+        
+        Args:                       
+            clear (bool, optional): Set to True to clear the record buffer after exporting.
+            styles (bool, optional): If True, ansi style codes will be included. False for plain text.
+                Defaults to False.
+                   
+        Returns:
+            str: String containing console contents.
+
+        """
+        if styles:
+            text = "".join(
+                style.render(text, reset=True) for text, style in self._render_buffer
+            )
+        else:
+            text = "".join(text for text, _ in self._record_buffer)
+        if clear:
+            del self._record_buffer[:]
+        return text
+
+    def export_html(
         self,
-        path: str,
         theme: Theme = None,
         clear: bool = True,
         code_format=CONSOLE_HTML_FORMAT,
         inline_styles: bool = False,
-    ) -> None:
-        """Write console data to HTML file (requires record=True argument in constructor).
+    ) -> str:
+        """Generate HTML from console contents (requires record=True argument in constructor).
         
-        Args:
-            path (str): A path to html file to write.            
+        Args:            
             theme (Theme, optional): Theme object containing console colors.
-            clear (bool, optional): Set to True to clear the record buffer after saving HTML.
+            clear (bool, optional): Set to True to clear the record buffer after generating the HTML.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
             inline_styes (bool, optional): If True styles will be inlined in to spans, which makes files
                 larger but easier to cut and paste markup. If False, styles will be embedded in a style tag.
                 Defaults to False.
+        
+        Returns:
+            str: String containing console contents.
         """
 
         fragments: List[str] = []
@@ -655,10 +678,9 @@ class Console:
             foreground=_theme.foreground_color.css,
             background=_theme.background_color.css,
         )
-        with open(path, "wt") as write_file:
-            write_file.write(rendered_code)
         if clear:
             del self._record_buffer[:]
+        return rendered_code
 
 
 if __name__ == "__main__":

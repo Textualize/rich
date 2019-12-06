@@ -176,7 +176,21 @@ SQUARE = Box(
 )
 
 
-GRID = Box(
+MINIMAL = Box(
+    """\
+  ╷ 
+  │ 
+╶─┼╴
+  │ 
+╶─┼╴
+╶─┼╴
+  │ 
+  ╵ 
+"""
+)
+
+
+MINIMAL_HEAVY_HEAD = Box(
     """\
   ╷ 
   │ 
@@ -188,6 +202,20 @@ GRID = Box(
   ╵ 
 """
 )
+
+MINIMAL_DOUBLE_HEAD = Box(
+    """\
+  ╷ 
+  │ 
+══╪═
+  │ 
+╶─┼╴
+╶─┼╴
+  │ 
+  ╵ 
+"""
+)
+
 
 HORIZONTALS = Box(
     """\
