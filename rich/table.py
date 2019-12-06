@@ -244,11 +244,12 @@ if __name__ == "__main__":
     table = Table("Foo", "Bar", expand=False)
     table.columns[0].width = 50
     # table.columns[1].ratio = 1
-    # table.columns[2].ratio = 1
 
     table.add_row("Hello, World! " * 8, "cake" * 10)
     from .markdown import Markdown
 
     table.add_row(Markdown("# This is *Markdown*!"), "More text", "Hello WOrld")
+    table.columns[0].justify = "center"
+    table.columns[1].justify = "right"
 
     c.print(table)

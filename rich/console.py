@@ -135,7 +135,7 @@ class RenderWidth(NamedTuple):
         """Get a RenderableWith where the widths are <= width.
         
         Args:
-            width (int): Maximum desred width.
+            width (int): Maximum desired width.
         
         Returns:
             RenderableWidth: new RenderableWidth object.

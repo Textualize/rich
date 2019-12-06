@@ -46,6 +46,8 @@ class Lines(List["Text"]):
             width (int): Number of characters per line.
             
         """
+        from .text import Text
+
         if align == "left":
             for line in self:
                 line.pad_right(width - len(line.text))
