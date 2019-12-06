@@ -135,7 +135,7 @@ class Syntax:
 
         lines = text.split("\n")
         numbers_column_width = len(str(self.start_line + len(lines))) + 2
-        render_options = options.with_width(options.max_width - numbers_column_width)
+        render_options = options.update(width=options.max_width - numbers_column_width)
 
         if self.style is None:
             background_style = Style(
@@ -179,7 +179,7 @@ CODE = r'''
         # This is a comment
         lines = text.split("\n")
         numbers_column_width = len(str(len(lines))) + 1
-        render_options = options.with_width(options.max_width - numbers_column_width)
+        render_options = options.update(width=options.max_width - numbers_column_width)
 
         padding = Segment(" " * numbers_column_width)
         new_line = Segment("\n")

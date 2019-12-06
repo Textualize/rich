@@ -52,7 +52,7 @@ class Panel:
             child_width = RenderWidth.get(self.renderable, width - 2).maximum
 
         width = child_width + 2
-        child_options = options.with_width(child_width)
+        child_options = options.update(width=child_width)
         lines = console.render_lines(self.renderable, child_options)
 
         box = self.box

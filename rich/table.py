@@ -10,6 +10,7 @@ from .console import (
     Console,
     ConsoleOptions,
     ConsoleRenderable,
+    JustifyValues,
     RenderableType,
     RenderResult,
     RenderWidth,
@@ -28,6 +29,7 @@ class Column:
 
     title: Union[str, ConsoleRenderable] = ""
     style: Union[str, Style] = "none"
+    justify: JustifyValues = "left"
     width: Optional[int] = None
     ratio: Optional[int] = None
     _cells: List[ConsoleRenderable] = field(default_factory=list)
@@ -194,9 +196,10 @@ class Table:
         for first, row in iter_first(rows):
             max_height = 1
             cells: List[List[List[Segment]]] = []
-            for width, cell in zip(widths, row):
+            for width, cell, column in zip(widths, row, self.columns):
+                render_options = options.update(width=width, justify=column.justify)
                 lines = console.render_lines(
-                    cell, options.with_width(width), header_style if first else style
+                    cell, render_options, header_style if first else style
                 )
                 max_height = max(max_height, len(lines))
                 cells.append(lines)

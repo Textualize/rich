@@ -37,7 +37,7 @@ from .theme import Theme
 from .segment import Segment
 
 
-JustifyValues = Optional[Literal["left", "center", "right", "full"]]
+JustifyValues = Literal["none", "left", "center", "right", "full"]
 
 
 CONSOLE_HTML_FORMAT = """\
@@ -65,11 +65,11 @@ body {{
 class ConsoleOptions:
     """Options for __console__ method."""
 
+    min_width: int
     max_width: int
     is_terminal: bool
     encoding: str
-    min_width: int = 1
-    justify: Optional[JustifyValues] = None
+    justify: Optional[JustifyValues] = "none"
 
     def copy(self) -> ConsoleOptions:
         """Get a copy of this object.
@@ -79,21 +79,24 @@ class ConsoleOptions:
         """
         return replace(self)
 
-    def with_width(self, width: int) -> ConsoleOptions:
-        """Get a new console options with a changed width.
-        
-        Args:
-            width (int): New min and max_width.
-        
-        Returns:
-            ConsoleOptions: new ConsoleOptions instance.
-        """
-        return replace(self, min_width=width, max_width=width)
-
-
-class SupportsStr(Protocol):
-    def __str__(self) -> str:
-        ...
+    def update(
+        self,
+        width: int = None,
+        min_width: int = None,
+        max_width: int = None,
+        justify: JustifyValues = None,
+    ):
+        """Update values, return a copy."""
+        options = replace(self)
+        if width is not None:
+            options.min_width = options.max_width = width
+        if min_width is not None:
+            options.min_width = min_width
+        if max_width is not None:
+            options.max_width = max_width
+        if justify is not None:
+            options.justify = justify
+        return options
 
 
 @runtime_checkable
@@ -280,7 +283,10 @@ class Console:
     def options(self) -> ConsoleOptions:
         """Get default console options."""
         return ConsoleOptions(
-            max_width=self.width, encoding=self.encoding, is_terminal=self.is_terminal
+            min_width=0,
+            max_width=self.width,
+            encoding=self.encoding,
+            is_terminal=self.is_terminal,
         )
 
     @property

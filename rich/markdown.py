@@ -188,7 +188,7 @@ class BlockQuote(TextElement):
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         # Render surrounded by quotes.
-        render_options = options.with_width(options.max_width - 4)
+        render_options = options.update(width=options.max_width - 4)
         lines = console.render_lines(self.elements, render_options, style=self.style)
 
         style = self.style
@@ -257,7 +257,7 @@ class ListItem(TextElement):
         return False
 
     def render_bullet(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        render_options = options.with_width(options.max_width - 3)
+        render_options = options.update(width=options.max_width - 3)
         lines = console.render_lines(self.elements, render_options, style=self.style)
         bullet_style = console.get_style("markdown.item.bullet")
 
@@ -273,7 +273,7 @@ class ListItem(TextElement):
         self, console: Console, options: ConsoleOptions, number: int, last_number: int
     ) -> RenderResult:
         number_width = len(str(last_number)) + 2
-        render_options = options.with_width(options.max_width - number_width)
+        render_options = options.update(width=options.max_width - number_width)
         lines = console.render_lines(self.elements, render_options, style=self.style)
         number_style = console.get_style("markdown.item.number")
 
