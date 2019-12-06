@@ -17,7 +17,7 @@ class NoEmoji(Exception):
 class Emoji:
     __slots__ = ["name", "style", "_char"]
 
-    def __init__(self, name: str, style: Union[str, Style] = None) -> None:
+    def __init__(self, name: str, style: Union[str, Style] = "none") -> None:
         """A single emoji character.
         
         Args:
@@ -28,11 +28,11 @@ class Emoji:
             NoEmoji: If the emoji doesn't exist.
         """
         self.name = name
-        self.style = style or Style()
+        self.style = style
         try:
             self._char = EMOJI[name]
         except KeyError:
-            raise NoEmoji("No emoji called {name!r}")
+            raise NoEmoji(f"No emoji called {name!r}")
 
     @classmethod
     def replace(cls, text: str) -> str:

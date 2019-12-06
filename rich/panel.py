@@ -58,12 +58,12 @@ class Panel:
         box = self.box
         line_start = Segment(box.mid_left, style)
         line_end = Segment(f"{box.mid_right}\n", style)
-        yield Segment(box.get_top(width - 2), style)
+        yield Segment(box.get_top([width - 2]), style)
         for line in lines:
             yield line_start
             yield from line
             yield line_end
-        yield Segment(box.get_bottom(width - 2), style)
+        yield Segment(box.get_bottom([width - 2]), style)
 
 
 if __name__ == "__main__":

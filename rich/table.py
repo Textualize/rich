@@ -58,7 +58,7 @@ class Table:
         self,
         *headers: Union[Column, str],
         width: int = None,
-        box: Optional[box.Box] = box.HEAVY_EDGE,
+        box: box.Box = box.GRID,
         pad: PaddingDimensions = (0, 1),
         expand: bool = False,
         show_header: bool = True,
@@ -182,16 +182,16 @@ class Table:
     def _render(
         self, console: Console, options: ConsoleOptions, widths: List[int]
     ) -> RenderResult:
-        print(widths)
         style = console.get_style(self.style)
         header_style = console.get_style(self.header_style)
         border_style = console.get_style(self.border_style)
         rows = zip(*(self._get_cells(column) for column in self.columns))
         box = self.box
+        print()
         new_line = Segment.line()
 
         if box:
-            yield Segment(box.get_top(*widths), border_style)
+            yield Segment(box.get_top(widths), border_style)
         for first, row in iter_first(rows):
             max_height = 1
             cells: List[List[List[Segment]]] = []
@@ -230,16 +230,16 @@ class Table:
                         yield from cell[line_no]
                     yield new_line
             if box and first:
-                yield Segment(box.get_row(*widths), border_style)
+                yield Segment(box.get_row(widths, "head"), border_style)
 
         if box:
-            yield Segment(box.get_bottom(*widths), border_style)
+            yield Segment(box.get_bottom(widths), border_style)
 
 
 if __name__ == "__main__":
 
     c = Console()
-    table = Table("Foo", "Bar", expand=False, border_style="", box=box.HEAVY_EDGE)
+    table = Table("Foo", "Bar", expand=False, border_style="")
     table.columns[0].width = 50
     # table.columns[1].ratio = 1
     # table.columns[2].ratio = 1
