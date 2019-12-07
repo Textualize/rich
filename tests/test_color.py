@@ -23,6 +23,7 @@ def test_repr() -> None:
 
 
 def test_system() -> None:
+    assert Color.parse("default").system == ColorSystem.STANDARD
     assert Color.parse("red").system == ColorSystem.STANDARD
     assert Color.parse("#ff0000").system == ColorSystem.TRUECOLOR
 
@@ -59,7 +60,13 @@ def test_from_triplet() -> None:
     )
 
 
+def test_default() -> None:
+    assert Color.default() == Color("default", ColorType.DEFAULT, None, None)
+
+
 def test_parse_error() -> None:
+    with pytest.raises(ColorParseError):
+        Color.parse("256")
     with pytest.raises(ColorParseError):
         Color.parse("rgb(999,0,0)")
     with pytest.raises(ColorParseError):
@@ -72,7 +79,46 @@ def test_parse_error() -> None:
         Color.parse("#xxyyzz")
 
 
-def test_parse_rb_hex() -> None:
+def test_get_ansi_codes() -> None:
+    assert Color.parse("default").get_ansi_codes() == ["39"]
+    assert Color.parse("default").get_ansi_codes(False) == ["49"]
+    assert Color.parse("red").get_ansi_codes() == ["31"]
+    assert Color.parse("red").get_ansi_codes(False) == ["41"]
+    assert Color.parse("1").get_ansi_codes() == ["38", "5", "1"]
+    assert Color.parse("1").get_ansi_codes(False) == ["48", "5", "1"]
+    assert Color.parse("#ff0000").get_ansi_codes() == ["38", "2", "255", "0", "0"]
+    assert Color.parse("#ff0000").get_ansi_codes(False) == ["48", "2", "255", "0", "0"]
+
+
+def test_downgrade() -> None:
+
+    assert Color.parse("9").downgrade(0) == Color("9", ColorType.EIGHT_BIT, 9, None)
+
+    assert Color.parse("#000000").downgrade(ColorSystem.EIGHT_BIT) == Color(
+        "#000000", ColorType.EIGHT_BIT, 0, None
+    )
+
+    assert Color.parse("#ffffff").downgrade(ColorSystem.EIGHT_BIT) == Color(
+        "#ffffff", ColorType.EIGHT_BIT, 15, None
+    )
+
+    assert Color.parse("#404142").downgrade(ColorSystem.EIGHT_BIT) == Color(
+        "#404142", ColorType.EIGHT_BIT, 237, None
+    )
+
+    assert Color.parse("#ff0000").downgrade(ColorSystem.EIGHT_BIT) == Color(
+        "#ff0000", ColorType.EIGHT_BIT, 196, None
+    )
+    assert Color.parse("#ff0000").downgrade(ColorSystem.STANDARD) == Color(
+        "#ff0000", ColorType.STANDARD, 1, None
+    )
+
+    assert Color.parse("9").downgrade(ColorSystem.STANDARD) == Color(
+        "9", ColorType.STANDARD, 1, None
+    )
+
+
+def test_parse_rgb_hex() -> None:
     assert parse_rgb_hex("aabbcc") == ColorTriplet(0xAA, 0xBB, 0xCC)
 
 

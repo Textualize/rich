@@ -11,14 +11,13 @@ from typing import Iterable, List, NamedTuple, Optional, Sequence, Tuple, TYPE_C
 from ._palettes import STANDARD_PALETTE, EIGHT_BIT_PALETTE
 from .color_triplet import ColorTriplet
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from .theme import Theme
 
 
 class ColorSystem(IntEnum):
     """One of the 3 color system supported by terminals."""
 
-    NONE = 0
     STANDARD = 1
     EIGHT_BIT = 2
     TRUECOLOR = 3
@@ -195,8 +194,6 @@ class Color(NamedTuple):
     @lru_cache(maxsize=1000)
     def downgrade(self, system: ColorSystem) -> Color:
         """Downgrade a color system to a system with fewer colors."""
-        if system >= self.system:
-            return self
 
         # Convert to 8-bit color from truecolor color
         if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:
@@ -225,7 +222,7 @@ class Color(NamedTuple):
             if self.system == ColorSystem.TRUECOLOR:
                 assert self.triplet is not None
                 triplet = self.triplet
-            else:  # self.system == ColorSystem.EIGHT_BUT
+            else:  # self.system == ColorSystem.EIGHT_BIT
                 assert self.number is not None
                 triplet = ColorTriplet(*EIGHT_BIT_PALETTE[self.number])
 
