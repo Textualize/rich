@@ -100,7 +100,7 @@ class Color(NamedTuple):
             assert self.number is not None
             return theme.ansi_colors[self.number]
         else:  # self.type == ColorType.DEFAULT:
-            assert self.number is not None
+            assert self.number is None
             return theme.foreground_color if foreground else theme.background_color
 
     @classmethod
@@ -159,10 +159,6 @@ class Color(NamedTuple):
             triplet = ColorTriplet(
                 int(color_24[0:2], 16), int(color_24[2:4], 16), int(color_24[4:6], 16)
             )
-            if not all(component <= 255 for component in triplet):
-                raise ColorParseError(
-                    f"color components must be <= 0xff (255) in {color!r}"
-                )
             return cls(color, ColorType.TRUECOLOR, triplet=triplet)
 
         else:  #  color_rgb:
@@ -262,7 +258,7 @@ def blend_rgb(
     return new_color
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
 
     c = Color.parse("#ff0000")
     print(c.downgrade(ColorSystem.STANDARD))
