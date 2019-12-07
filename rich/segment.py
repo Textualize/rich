@@ -105,7 +105,7 @@ class Segment(NamedTuple):
                     append(Segment(text[: length - line_length], style))
                     break
             return new_line
-        return line[:]
+        return line
 
     @classmethod
     def get_line_length(cls, line: List[Segment]) -> int:
