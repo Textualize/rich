@@ -98,7 +98,7 @@ class TextElement(MarkdownElement):
         self.text = Text(justify="left")
 
     def on_text(self, context: MarkdownContext, text: str) -> None:
-        self.text.append(text)
+        self.text.append(text, context.current_style)
 
     def on_leave(self, context: MarkdownContext) -> None:
         context.leave_style()
@@ -481,10 +481,11 @@ This is a [link](https://www.willmcgugan.com)
 
 # """
 
+
 if __name__ == "__main__":
     from .console import Console
 
-    console = Console(width=79, record=True)
+    console = Console(record=True)
     # print(console.size)
 
     md = Markdown(markup)

@@ -159,7 +159,7 @@ class Text:
             Text: A new text instance.
         """
 
-        text = Text(justify=None)
+        text = Text(justify="none")
         append_span = text._spans.append
         append_text = text._text.append
         offset = 0

@@ -425,7 +425,9 @@ class Console:
 
         with self.style(style or "none"):
             _rendered = self.render(renderable, render_options)
-            lines = list(Segment.split_lines(_rendered, render_options.max_width))
+            lines = list(
+                Segment.split_and_crop_lines(_rendered, render_options.max_width)
+            )
         return lines
 
     def render_str(
@@ -611,13 +613,12 @@ class Console:
         """Render buffered output, and clear buffer."""
         output: List[str] = []
         append = output.append
-        current_style = self.current_style
         color_system = self._color_system
         buffer = self.buffer[:]
         if self._record:
             self._record_buffer.extend(buffer)
         del self.buffer[:]
-        for line in Segment.split_lines(buffer):
+        for line in Segment.split_and_crop_lines(buffer, self.width, wrap=False):
             for text, style in line:
                 if style:
                     append(style.render(text, color_system=color_system, reset=True))

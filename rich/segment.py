@@ -42,21 +42,22 @@ class Segment(NamedTuple):
         return (cls(text, apply(style)) for text, style in segments)
 
     @classmethod
-    def split_lines(
-        cls, segments: Iterable[Segment], length: int = None
+    def split_and_crop_lines(
+        cls, segments: Iterable[Segment], length: int, wrap=False
     ) -> Iterable[List[Segment]]:
-        """Split segments in to lines.
+        """Split segments in to lines, and crop lines greater than a given length.
         
         Args:
             segments (Iterable[Segment]): An iterable of segments, probably 
                 generated from console.render.
-            length (Optional[int]): Length of line, or None for no change.
+            length (Optional[int]): Desired line length.           
         
         Returns:
             Iterable[List[Segment]]: An iterable of lines of segments.
         """
         lines: List[List[Segment]] = [[]]
         append = lines[-1].append
+
         for segment in segments:
             if "\n" in segment.text:
                 text, style = segment
@@ -65,52 +66,43 @@ class Segment(NamedTuple):
                     if _text:
                         append(cls(_text, style))
                     if new_line:
-                        if length is not None:
-                            yield cls.adjust_line_length(lines[-1], length)
-                        else:
-                            yield lines[-1]
+                        yield cls.adjust_line_length(lines[-1], length)
                         lines.append([])
                         append = lines[-1].append
             else:
                 append(segment)
         if lines[-1]:
-            if length is not None:
-                yield cls.adjust_line_length(lines[-1], length)
-            else:
-                yield lines[-1]
-        return lines
+            yield cls.adjust_line_length(lines[-1], length)
 
     @classmethod
     def adjust_line_length(
-        cls, line: List[Segment], width: int, style: Style = None
+        cls, line: List[Segment], length: int, style: Style = None
     ) -> List[Segment]:
         """Adjust a line to a given width (cropping or padding as required.
         
         Args:
             segments (Iterable[Segment]): A list of segments in a single line.
-            width (int): The desired width of the line.
+            length (int): The desired width of the line.
             style (Style, optional): The style of padding if used (space on the end). Defaults to None.
         
         Returns:
             List[Segment]: A line of segments with the desired length.
         """
-        if style is None:
-            style = Style()
-        length = sum(len(text) for text, _style in line)
-        if length < width:
-            return line[:] + [Segment(" " * (width - length), style)]
-        elif length > width:
+        line_length = sum(len(text) for text, _style in line)
+        if length < length:
+            return line[:] + [Segment(" " * (length - line_length), style)]
+        elif line_length > length:
             line_length = 0
             new_line: List[Segment] = []
             append = new_line.append
             for segment in line:
                 segment_length = len(segment.text)
-                if line_length + segment_length < width:
+                if line_length + segment_length < length:
                     append(segment)
                     line_length += segment_length
                 else:
                     text, style = segment
-                    append(Segment(text[: width - line_length + segment_length], style))
+                    append(Segment(text[: length - line_length], style))
                     break
             return new_line
         return line[:]
