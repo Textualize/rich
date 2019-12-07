@@ -217,7 +217,7 @@ class Text:
     ) -> Iterable[Segment]:
         if self.word_wrap:
             lines = self.wrap(
-                options.max_width, justify=options.justify or self.justify
+                options.max_width, justify=self.justify or options.justify
             )
         else:
             lines = self.fit(options.max_width)
@@ -278,7 +278,7 @@ class Text:
                 )
             else:
                 stack.append(style_id)
-                current_style = current_style.apply(style_map[style_id])
+                current_style = current_style + style_map[style_id]
             if next_offset > offset:
                 yield Segment(text[offset:next_offset], current_style)
         if self.end:
@@ -466,6 +466,7 @@ class Text:
         Returns:
             Lines: Number of lines.
         """
+        assert width > 0, "width must be an integer >0"
         lines: Lines = Lines()
         for line in self.split():
             text = line.text

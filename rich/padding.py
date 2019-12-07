@@ -59,8 +59,8 @@ class Padding:
         style = console.get_style(self.style)
         width = options.max_width
         child_options = options.update(width=width - self.left - self.right)
-        lines = console.render_lines(self.renderable, child_options)
-        lines = Segment.set_shape(lines, child_options.max_width)
+        lines = console.render_lines(self.renderable, child_options, style=style)
+        lines = Segment.set_shape(lines, child_options.max_width, style=style)
 
         blank_line = Segment(" " * width + "\n", style)
         top = [blank_line] * self.top

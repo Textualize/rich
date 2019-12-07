@@ -254,7 +254,7 @@ class Style:
 
         style = Style()
         for _style in styles:
-            style = style.apply(_style)
+            style = style + _style
         return style
 
     def copy(self) -> Style:
@@ -314,7 +314,7 @@ class Style:
         text = text or str(self)
         sys.stdout.write(f"{self.render(text)}\x1b[0m\n")
 
-    def apply(self, style: Optional[Style]) -> Style:
+    def _apply(self, style: Style) -> Style:
         """Merge this style with another.
         
         Args:
@@ -325,9 +325,6 @@ class Style:
             (Style): A new style with combined attributes.
 
         """
-        if style is None:
-            return self
-
         new_style = self.__new__(Style)
         new_style.__dict__ = {
             "_color": style._color or self._color,
@@ -339,6 +336,13 @@ class Style:
             "_set_attributes": self._set_attributes | style._set_attributes,
         }
         return new_style
+
+    def __add__(self, style: Optional[Style]) -> Style:
+        if style is None:
+            return self
+        if not isinstance(style, Style):
+            return NotImplemented  # type: ignore
+        return self._apply(style)
 
 
 class StyleStack:
@@ -357,7 +361,7 @@ class StyleStack:
         Args:
             style (Style): New style to combine with current style.
         """
-        self.current = self.current.apply(style)
+        self.current = self.current + style
         self._stack.append(self.current)
 
     def pop(self) -> Style:

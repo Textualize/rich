@@ -96,7 +96,7 @@ class Syntax:
 
     def _get_default_style(self) -> Style:
         style = self._get_theme_style(Token.Text)
-        style = style.apply(Style(bgcolor=self._pygments_style_class.background_color))
+        style = style + Style(bgcolor=self._pygments_style_class.background_color)
         return style
 
     def _highlight(self, lexer_name: str) -> Text:
@@ -143,11 +143,11 @@ class Syntax:
             )
         else:
             if isinstance(self.style, str):
-                background_style = console.get_style(self.style) or Style()
+                background_style = console.get_style(self.style)
             else:
                 background_style = self.style
 
-        number_style = background_style.apply(self._get_theme_style(Token.Text))
+        number_style = background_style + self._get_theme_style(Token.Text)
         number_style._color = self._get_line_numbers_color()
         padding = Segment(" " * numbers_column_width, background_style)
         new_line = Segment("\n")
@@ -213,4 +213,4 @@ if __name__ == "__main__":
     print(Color.get_ansi_codes.cache_info())
 
     print(Style.parse.cache_info())
-    console.save_html("syntax.html")
+

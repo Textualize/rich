@@ -95,10 +95,10 @@ class TextElement(MarkdownElement):
 
     def on_enter(self, context: MarkdownContext) -> None:
         self.style = context.enter_style(self.style_name)
-        self.text = Text(style=context.current_style, justify="left")
+        self.text = Text(justify="left")
 
     def on_text(self, context: MarkdownContext, text: str) -> None:
-        self.text.append(text, context.current_style)
+        self.text.append(text)
 
     def on_leave(self, context: MarkdownContext) -> None:
         context.leave_style()
@@ -133,7 +133,7 @@ class Heading(TextElement):
         return heading
 
     def on_enter(self, context: MarkdownContext) -> None:
-        self.text = Text(style=context.current_style)
+        self.text = Text()
         context.enter_style(self.style_name)
 
     def __init__(self, level: int) -> None:
@@ -289,10 +289,10 @@ class ListItem(TextElement):
 class MarkdownContext:
     """Manages the console render state."""
 
-    def __init__(self, console: Console, options: ConsoleOptions) -> None:
+    def __init__(self, console: Console, options: ConsoleOptions, style: Style) -> None:
         self.console = console
         self.options = options
-        self.style_stack: StyleStack = StyleStack(console.current_style)
+        self.style_stack: StyleStack = StyleStack(style)
         self.stack: Stack[MarkdownElement] = Stack()
 
     @property
@@ -335,7 +335,11 @@ class Markdown:
     inlines = {"emph", "strong", "code", "link"}
 
     def __init__(
-        self, markup: str, code_theme: str = "monokai", justify: str = None
+        self,
+        markup: str,
+        code_theme: str = "monokai",
+        justify: str = None,
+        style: Union[str, Style] = "none",
     ) -> None:
         """Parses the markup."""
         self.markup = markup
@@ -343,10 +347,12 @@ class Markdown:
         self.parsed = parser.parse(markup)
         self.code_theme = code_theme
         self.justify = justify
+        self.style = style
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         """Render markdown to the console."""
-        context = MarkdownContext(console, options)
+        style = console.get_style(self.style)
+        context = MarkdownContext(console, options, style)
         nodes = self.parsed.walker()
         inlines = self.inlines
         new_line = False
@@ -497,6 +503,3 @@ if __name__ == "__main__":
     Style.parse("on red")
 
     print(Style.parse.cache_info())
-
-    console.save_html("console.html", clear=False)
-    console.save_html("console2.html", inline_styles=True)

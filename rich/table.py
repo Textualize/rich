@@ -121,7 +121,6 @@ class Table:
         columns = self.columns
         width_ranges = [self._measure_column(column, max_width) for column in columns]
         widths = [_range.maximum for _range in width_ranges]
-
         if self.expand:
             ratios = [col.ratio or 0 for col in columns if col.flexible]
             if any(ratios):
@@ -135,7 +134,6 @@ class Table:
                 for index, column in enumerate(columns):
                     if column.flexible:
                         widths[index] = next(iter_flex_widths)
-
         table_width = sum(widths)
 
         if table_width > max_width:
@@ -143,8 +141,9 @@ class Table:
             if not any(flex_widths):
                 flex_widths = [1] * len(flex_widths)
             excess_width = table_width - max_width
-            shrink_widths = ratio_divide(excess_width, flex_widths)
-            widths = [_width - shrink for _width, shrink in zip(widths, shrink_widths)]
+            widths = ratio_divide(
+                excess_width, flex_widths, [_range.minimum for _range in width_ranges],
+            )
         elif table_width < max_width and self.expand:
             pad_widths = ratio_divide(max_width - table_width, widths)
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
@@ -156,9 +155,9 @@ class Table:
         padding = self.padding
         if any(padding):
             if self.show_header:
-                yield Padding(column.header, padding, style=self.header_style)
+                yield Padding(column.header, padding)
             for cell in column.cells:
-                yield Padding(cell, padding, style=self.style)
+                yield Padding(cell, padding)
         else:
             if self.show_header:
                 yield column.header
@@ -185,8 +184,8 @@ class Table:
         self, console: Console, options: ConsoleOptions, widths: List[int]
     ) -> RenderResult:
         style = console.get_style(self.style)
-        header_style = console.get_style(self.header_style)
-        border_style = console.get_style(self.border_style)
+        header_style = style + console.get_style(self.header_style)
+        border_style = style + console.get_style(self.border_style)
         rows = zip(*(self._get_cells(column) for column in self.columns))
         box = self.box
         new_line = Segment.line()
@@ -199,7 +198,7 @@ class Table:
             for width, cell, column in zip(widths, row, self.columns):
                 render_options = options.update(width=width, justify=column.justify)
                 lines = console.render_lines(
-                    cell, render_options, header_style if first else style
+                    cell, render_options, style=header_style if first else style
                 )
                 max_height = max(max_height, len(lines))
                 cells.append(lines)
@@ -241,7 +240,7 @@ class Table:
 if __name__ == "__main__":
 
     c = Console()
-    table = Table("Foo", "Bar", expand=False)
+    table = Table("Foo", "Bar", expand=False, style="on blue")
     table.columns[0].width = 50
     # table.columns[1].ratio = 1
 
@@ -252,4 +251,5 @@ if __name__ == "__main__":
     table.columns[0].justify = "center"
     table.columns[1].justify = "right"
 
-    c.print(table)
+    with c.style("on red"):
+        c.print(table)

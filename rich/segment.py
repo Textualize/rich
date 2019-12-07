@@ -38,12 +38,12 @@ class Segment(NamedTuple):
         """
         if style is None:
             return segments
-        apply = style.apply
+        apply = style.__add__
         return (cls(text, apply(style)) for text, style in segments)
 
     @classmethod
     def split_lines(
-        cls, segments: Iterable[Segment], length: int
+        cls, segments: Iterable[Segment], length: int = None
     ) -> Iterable[List[Segment]]:
         """Split segments in to lines.
         
@@ -65,13 +65,19 @@ class Segment(NamedTuple):
                     if _text:
                         append(cls(_text, style))
                     if new_line:
-                        yield cls.adjust_line_length(lines[-1], length)
+                        if length is not None:
+                            yield cls.adjust_line_length(lines[-1], length)
+                        else:
+                            yield lines[-1]
                         lines.append([])
                         append = lines[-1].append
             else:
                 append(segment)
         if lines[-1]:
-            yield cls.adjust_line_length(lines[-1], length)
+            if length is not None:
+                yield cls.adjust_line_length(lines[-1], length)
+            else:
+                yield lines[-1]
         return lines
 
     @classmethod
@@ -193,3 +199,12 @@ class Segment(NamedTuple):
                 yield last_segment
                 last_segment = segment
         yield last_segment
+
+
+if __name__ == "__main__":
+    lines = [[Segment("Hello")]]
+    lines = Segment.set_shape(lines, 50, 4, style=Style.parse("on blue"))
+    for line in lines:
+        print(line)
+
+    print(Style.parse("on blue") + Style.parse("on red"))

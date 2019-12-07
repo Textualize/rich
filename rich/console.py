@@ -328,7 +328,7 @@ class Console:
         self.buffer.append(Segment("\n" * count))
         self._check_buffer()
 
-    def render(
+    def _render(
         self, renderable: RenderableType, options: Optional[ConsoleOptions]
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
@@ -365,6 +365,27 @@ class Console:
             else:
                 yield from self.render(render_output, render_options)
 
+    def render(
+        self, renderable: RenderableType, options: Optional[ConsoleOptions]
+    ) -> Iterable[Segment]:
+        """Render an object in to an iterable of `Segment` instances.
+
+        This method contains the logic for rendering objects with the console protocol. 
+        You are unlikely to need to use it directly, unless you are extending the library.
+
+        
+        Args:
+            renderable (RenderableType): An object supporting the console protocol, or
+                an object that may be converted to a string.
+            options (ConsoleOptions, optional): An options objects. Defaults to None.
+        
+        Returns:
+            Iterable[Segment]: An iterable of segments that may be rendered.
+        """
+        yield from Segment.apply_style(
+            self._render(renderable, options), self.current_style
+        )
+
     def render_all(
         self, renderables: Iterable[RenderableType], options: Optional[ConsoleOptions]
     ) -> Iterable[Segment]:
@@ -400,15 +421,11 @@ class Console:
         Returns:
             List[List[Segment]]: A list of lines, where a line is a list of Segment objects.
         """
-        style = style or self.current_style
         render_options = options or self.options
 
-        _rendered = self.render(renderable, render_options)
-        lines = list(
-            Segment.split_lines(
-                Segment.apply_style(_rendered, style), render_options.max_width,
-            )
-        )
+        with self.style(style or "none"):
+            _rendered = self.render(renderable, render_options)
+            lines = list(Segment.split_lines(_rendered, render_options.max_width))
         return lines
 
     def render_str(
@@ -445,22 +462,30 @@ class Console:
         """
         return self._styles.get(name, None)
 
-    def get_style(self, name: Union[str, Style]) -> Optional[Style]:
-        """Get a style.
+    def get_style(self, name: Union[str, Style], *, default: str = None) -> Style:
+        """Get a style merged with the current style.
 
         Args:
-            name (str): The name of a style.
+            name (str): The name of a style or a style definition.
         
         Returns:
-            Optional[Style]: A Style object or `None` if it couldn't be found / parsed.
+            Style: A Style object.
+
+        Raises:
+            MissingStyle: If no style could be parsed from name.
 
         """
         if isinstance(name, Style):
             return name
+
         try:
-            return self._styles.get(name, None) or Style.parse(name)
-        except errors.StyleSyntaxError:
-            return None
+            return self._styles.get(name) or Style.parse(name)
+        except errors.StyleSyntaxError as error:
+            if default is not None:
+                return self.get_style(default)
+            if " " in name:
+                raise
+            raise errors.MissingStyle(f"No style named {name!r} found; {error}")
 
     def push_style(self, style: Union[str, Style]) -> None:
         """Push a style on to the stack.
@@ -475,8 +500,8 @@ class Console:
             None: [description]
         """
         if isinstance(style, str):
-            style = Style.parse(style)
-        self.current_style = self.current_style.apply(style)
+            style = self.get_style(style)
+        self.current_style = self.current_style + style
         self.style_stack.append(self.current_style)
 
     def pop_style(self) -> Style:
@@ -509,7 +534,7 @@ class Console:
             StyleContext: A style context manager.
         """
         if isinstance(style, str):
-            _style = self.get_style(style) or Style()
+            _style = self.get_style(style)
         else:
             if not isinstance(style, Style):
                 raise TypeError(f"style must be a str or Style instance, not {style!r}")
@@ -592,10 +617,9 @@ class Console:
         if self._record:
             self._record_buffer.extend(buffer)
         del self.buffer[:]
-        for line in Segment.split_lines(buffer, self.width):
+        for line in Segment.split_lines(buffer):
             for text, style in line:
                 if style:
-                    style = current_style.apply(style)
                     append(style.render(text, color_system=color_system, reset=True))
                 else:
                     append(text)

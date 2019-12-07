@@ -63,7 +63,7 @@ def ratio_divide(
     distributed_total: List[int] = []
     append = distributed_total.append
     if minimums is None:
-        _minimums = [0] * len(ratios)
+        _minimums = [1] * len(ratios)
     else:
         _minimums = minimums
     for ratio, minimum in zip(ratios, _minimums):

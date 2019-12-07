@@ -38,7 +38,9 @@ class Lines(List["Text"]):
             yield Segment("\n")
 
     def justify(
-        self, width: int, align: Literal["left", "center", "right", "full"] = "left"
+        self,
+        width: int,
+        align: Literal["none", "left", "center", "right", "full"] = "left",
     ) -> None:
         """Pad each line with spaces to a given width.
         
