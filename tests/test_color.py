@@ -14,7 +14,6 @@ import pytest
 
 
 def test_str() -> None:
-    print(repr(str(Color.parse("red"))))
     assert str(Color.parse("red")) == "\x1b[31m⬤  \x1b[0m<color 'red' (standard)>"
 
 
