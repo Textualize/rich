@@ -28,6 +28,7 @@ class Column:
     """Defines a column in a table."""
 
     title: Union[str, ConsoleRenderable] = ""
+    header_style: Union[str, Style] = "none"
     style: Union[str, Style] = "none"
     justify: JustifyValues = "left"
     width: Optional[int] = None
@@ -47,7 +48,7 @@ class Column:
     @property
     def header(self) -> ConsoleRenderable:
         return (
-            Text(self.title, style=self.style)
+            Text(self.title, style=self.header_style)
             if isinstance(self.title, str)
             else self.title
         )
@@ -81,6 +82,36 @@ class Table:
         self.header_style = header_style
         self.border_style = border_style
         self._row_count = 0
+
+    def add_column(
+        self,
+        title: Union[str, ConsoleRenderable] = "",
+        header_style: Union[str, Style] = "none",
+        style: Union[str, Style] = "none",
+        justify: JustifyValues = "left",
+        width: int = None,
+        ratio: int = None,
+    ):
+        """Add a column to the table.
+        
+        Args:
+            title (Union[str, ConsoleRenderable], optional): Text or renderable for the header.
+                Defaults to "".
+            header_style (Union[str, Style], optional): Style for the header. Defaults to "none".
+            style (Union[str, Style], optional): Style for the column cells. Defaults to "none".
+            justify (JustifyValues, optional): Alignment for cells. Defaults to "left".
+            width (int, optional): A minimum width in characters. Defaults to None.
+            ratio (int, optional): Flexible ratio for the column. Defaults to None.
+        """
+        column = Column(
+            title=title,
+            header_style=header_style,
+            style=style,
+            justify=justify,
+            width=width,
+            ratio=ratio,
+        )
+        self.columns.append(column)
 
     def add_row(self, *renderables: Optional[Union[str, ConsoleRenderable]]) -> None:
         def add_cell(column: Column, renderable: ConsoleRenderable):
@@ -161,8 +192,6 @@ class Table:
             pad_widths = ratio_divide(max_width - table_width, widths)
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
 
-        # print(widths)
-        # 1 / 0
         return widths
 
     def _get_cells(self, column: Column) -> Iterable[ConsoleRenderable]:
@@ -202,9 +231,9 @@ class Table:
     def _render(
         self, console: Console, options: ConsoleOptions, widths: List[int]
     ) -> RenderResult:
-        style = console.get_style(self.style)
-        header_style = style + console.get_style(self.header_style)
-        border_style = style + console.get_style(self.border_style)
+        table_style = console.get_style(self.style)
+        header_style = table_style + console.get_style(self.header_style)
+        border_style = table_style + console.get_style(self.border_style)
         rows = zip(*(self._get_cells(column) for column in self.columns))
         box = self.box
         new_line = Segment.line()
@@ -212,18 +241,19 @@ class Table:
         if box:
             yield Segment(box.get_top(widths), border_style)
         for first, row in iter_first(rows):
+            is_header = first and self.show_header
             max_height = 1
             cells: List[List[List[Segment]]] = []
             for width, cell, column in zip(widths, row, self.columns):
                 render_options = options.update(width=width, justify=column.justify)
-                lines = console.render_lines(
-                    cell, render_options, style=header_style if first else style
-                )
+                column_style = console.get_style(column.style)
+                cell_style = header_style if is_header else (table_style + column_style)
+                lines = console.render_lines(cell, render_options, style=cell_style)
                 max_height = max(max_height, len(lines))
                 cells.append(lines)
 
             cells[:] = [
-                Segment.set_shape(cell, width, max_height, style=style)
+                Segment.set_shape(cell, width, max_height, style=table_style)
                 for width, cell in zip(widths, cells)
             ]
 
@@ -258,8 +288,12 @@ class Table:
 
 if __name__ == "__main__":
 
+    from .box import SIMPLE
+
     c = Console()
-    table = Table("Foo", "Bar", expand=False, style="on blue")
+    table = Table(
+        "Foo", Column("Bar", style="red"), box=SIMPLE, expand=False, style="on blue"
+    )
     table.columns[0].width = 50
     # table.columns[1].ratio = 1
 

@@ -217,6 +217,20 @@ MINIMAL_DOUBLE_HEAD = Box(
 )
 
 
+SIMPLE = Box(
+    """\
+    
+    
+╺━━╸
+    
+    
+    
+    
+    
+"""
+)
+
+
 HORIZONTALS = Box(
     """\
 ────

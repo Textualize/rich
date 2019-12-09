@@ -459,29 +459,22 @@ if __name__ == "__main__":  # pragma: no cover
 
     console = Console()
 
-    color_table = Table(
-        Column("Color", width=10),
-        Column("Number", justify="right"),
-        "Name",
-        "Hex",
-        "RGB",
-        border_style="yellow",
-    )
+    table = Table()
+    table.add_column("Color", width=10)
+    table.add_column("Number", justify="right", style="yellow")
+    table.add_column("Name", style="green")
+    table.add_column("Hex", style="blue")
+    table.add_column("RGB", style="magenta")
+
     colors = sorted((v, k) for k, v in ANSI_COLOR_NAMES.items())
     for color_number, name in colors:
         color_cell = Text(" " * 10, style=f"on {name}")
-        name_cell = Text(f'"{name}"', style="green")
-
         if color_number < 16:
-            color_table.add_row(color_cell, f"{color_number}", name_cell)
+            table.add_row(color_cell, f"{color_number}", f'"{name}"')
         else:
             color = EIGHT_BIT_PALETTE[color_number]
-            color_table.add_row(
-                color_cell,
-                str(color_number),
-                name_cell,
-                Text(color.hex, style="dim"),
-                Text(color.rgb, style="dim"),
+            table.add_row(
+                color_cell, str(color_number), f'"{name}"', color.hex, color.rgb
             )
 
-    console.print(color_table)
+    console.print(table)
