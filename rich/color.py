@@ -401,9 +401,9 @@ class Color(NamedTuple):
             if s < 0.1:
                 gray = round(l * 25.0)
                 if gray == 0:
-                    color_number = 0
+                    color_number = 16
                 elif gray == 25:
-                    color_number = 15
+                    color_number = 231
                 else:
                     color_number = 231 + gray
                 return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
@@ -453,12 +453,35 @@ def blend_rgb(
 
 if __name__ == "__main__":  # pragma: no cover
 
-    c = Color.parse("red")
-    print(c)
+    from .console import Console
+    from .table import Column, Table
+    from .text import Text
 
-    c = Color.parse("bright_red")
-    print(c)
+    console = Console()
 
-    c = Color.parse("dark_sea_green")
-    print(c)
+    color_table = Table(
+        Column("Color", width=10),
+        Column("Number", justify="right"),
+        "Name",
+        "Hex",
+        "RGB",
+        border_style="yellow",
+    )
+    colors = sorted((v, k) for k, v in ANSI_COLOR_NAMES.items())
+    for color_number, name in colors:
+        color_cell = Text(" " * 10, style=f"on {name}")
+        name_cell = Text(f'"{name}"', style="green")
 
+        if color_number < 16:
+            color_table.add_row(color_cell, f"{color_number}", name_cell)
+        else:
+            color = EIGHT_BIT_PALETTE[color_number]
+            color_table.add_row(
+                color_cell,
+                str(color_number),
+                name_cell,
+                Text(color.hex, style="dim"),
+                Text(color.rgb, style="dim"),
+            )
+
+    console.print(color_table)

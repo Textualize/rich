@@ -11,10 +11,15 @@ class ColorTriplet(NamedTuple):
     blue: int
 
     @property
-    def css(self) -> str:
+    def hex(self) -> str:
         """get the color triplet in CSS style."""
         red, green, blue = self
         return f"#{red:02x}{green:02x}{blue:02x}"
+
+    @property
+    def rgb(self) -> str:
+        red, green, blue = self
+        return f"rgb({red},{green},{blue})"
 
     @property
     def normalized(self) -> Tuple[float, float, float]:

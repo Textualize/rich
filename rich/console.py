@@ -37,7 +37,7 @@ from .theme import Theme
 from .segment import Segment
 
 
-JustifyValues = Literal["none", "left", "center", "right", "full"]
+JustifyValues = Optional[Literal["left", "center", "right", "full"]]
 
 
 CONSOLE_HTML_FORMAT = """\
@@ -131,6 +131,11 @@ class RenderWidth(NamedTuple):
         """Get difference between maximum and minimum."""
         return self.maximum - self.minimum
 
+    def normalize(self) -> RenderWidth:
+        minimum, maximum = self
+        minimum = max(0, minimum)
+        return RenderWidth(minimum, max(minimum, maximum))
+
     def with_maximum(self, width: int) -> RenderWidth:
         """Get a RenderableWith where the widths are <= width.
         
@@ -150,7 +155,7 @@ class RenderWidth(NamedTuple):
             get_console_width = getattr(renderable, "__console_width__", None)
             if get_console_width is not None:
                 render_width = get_console_width(max_width).with_maximum(max_width)
-                return render_width
+                return render_width.normalize()
             else:
                 return RenderWidth(1, max_width)
         elif isinstance(renderable, Segment):
@@ -185,7 +190,6 @@ class StyleContext:
 
 
 COLOR_SYSTEMS = {
-    "none": ColorSystem.NONE,
     "standard": ColorSystem.STANDARD,
     "256": ColorSystem.EIGHT_BIT,
     "truecolor": ColorSystem.TRUECOLOR,
@@ -199,7 +203,9 @@ class Console:
 
     def __init__(
         self,
-        color_system: Literal["auto", "none", "standard", "256", "truecolor"] = "auto",
+        color_system: Optional[
+            Literal["auto", "standard", "256", "truecolor"]
+        ] = "auto",
         styles: Dict[str, Style] = DEFAULT_STYLES,
         file: IO = None,
         width: int = None,
@@ -215,9 +221,12 @@ class Console:
         self._record = record
         self._markup = markup
 
-        if color_system == "auto":
-            color_system = self._detect_color_system()
-        self._color_system = COLOR_SYSTEMS[color_system]
+        if color_system is None:
+            self._color_system = None
+        elif color_system == "auto":
+            self._color_system = self._detect_color_system()
+        else:
+            self._color_system = COLOR_SYSTEMS[color_system]
 
         self.buffer: List[Segment] = []
         self._buffer_index = 0
@@ -230,16 +239,14 @@ class Console:
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
 
-    def _detect_color_system(
-        self,
-    ) -> Literal["auto", "none", "standard", "256", "truecolor"]:
+    def _detect_color_system(self,) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
         if not self.is_terminal:
-            return "none"
+            return None
         if os.environ.get("COLORTERM", "").strip().lower() == "truecolor":
-            return "truecolor"
+            return ColorSystem.TRUECOLOR
         # 256 can be considered standard nowadays
-        return "256"
+        return ColorSystem.EIGHT_BIT
 
     def _enter_buffer(self) -> None:
         """Enter in to a buffer context, and buffer all output."""
@@ -487,7 +494,7 @@ class Console:
                 return self.get_style(default)
             if " " in name:
                 raise
-            raise errors.MissingStyle(f"No style named {name!r} found; {error}")
+            raise errors.MissingStyle(f"No style named {name!r}; {error}")
 
     def push_style(self, style: Union[str, Style]) -> None:
         """Push a style on to the stack.
@@ -706,8 +713,8 @@ class Console:
         rendered_code = code_format.format(
             code="".join(fragments),
             stylesheet=stylesheet,
-            foreground=_theme.foreground_color.css,
-            background=_theme.background_color.css,
+            foreground=_theme.foreground_color.hex,
+            background=_theme.background_color.hex,
         )
         if clear:
             del self._record_buffer[:]

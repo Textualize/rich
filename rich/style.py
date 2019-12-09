@@ -181,7 +181,7 @@ class Style:
                     Color.parse(word) is None
                 except ColorParseError as error:
                     raise errors.StyleSyntaxError(
-                        f"unable to parse background color {word} in style {style_definition!r}; {error}"
+                        f"unable to parse {word} in {style_definition!r}; {error}"
                     )
                 bgcolor = word
 
@@ -201,7 +201,7 @@ class Style:
                     Color.parse(word)
                 except ColorParseError as error:
                     raise errors.StyleSyntaxError(
-                        f"unable to parse color {word} in style {style_definition!r}; {error}"
+                        f"unable to parse {word!r} in style {style_definition!r}; {error}"
                     )
                 color = word
         style = Style(color=color, bgcolor=bgcolor, **attributes)
@@ -227,10 +227,10 @@ class Style:
             )
         if color is not None:
             theme_color = color.get_truecolor(theme)
-            append(f"color: {theme_color.css}")
+            append(f"color: {theme_color.hex}")
         if bgcolor is not None:
             theme_color = bgcolor.get_truecolor(theme, foreground=False)
-            append(f"background-color: {theme_color.css}")
+            append(f"background-color: {theme_color.hex}")
         if self.bold:
             append("font-weight: bold")
         if self.italic:
@@ -274,10 +274,12 @@ class Style:
         self,
         text: str = "",
         *,
-        color_system: ColorSystem = ColorSystem.TRUECOLOR,
+        color_system: Optional[ColorSystem] = ColorSystem.TRUECOLOR,
         reset=False,
     ) -> str:
         """Render the ANSI codes to implement the style."""
+        if color_system is None:
+            return text
         attrs: List[str] = []
         if self._color is not None:
             attrs.extend(self._color.downgrade(color_system).get_ansi_codes())

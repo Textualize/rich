@@ -106,7 +106,7 @@ class Text:
         text: str = "",
         style: Union[str, Style] = "none",
         word_wrap: bool = True,
-        justify: JustifyValues = "left",
+        justify: JustifyValues = None,
         end: str = "\n",
     ) -> None:
         self._text: List[str] = [text] if text else []
@@ -159,7 +159,7 @@ class Text:
             Text: A new text instance.
         """
 
-        text = Text(justify="none")
+        text = Text()
         append_span = text._spans.append
         append_text = text._text.append
         offset = 0
@@ -228,7 +228,7 @@ class Text:
     def __console_width__(self, max_width: int) -> RenderWidth:
         text = self.text
         if not text.strip():
-            return RenderWidth(0, 0)
+            return RenderWidth(len(text), len(text))
         max_text_width = max(len(line) for line in text.splitlines())
         min_text_width = max(len(word) for word in text.split())
         return RenderWidth(min_text_width, max_text_width)

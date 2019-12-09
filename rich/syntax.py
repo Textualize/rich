@@ -92,7 +92,7 @@ class Syntax:
             )
             self._style_cache[token_type] = style
 
-        return style.copy()
+        return style
 
     def _get_default_style(self) -> Style:
         style = self._get_theme_style(Token.Text)
