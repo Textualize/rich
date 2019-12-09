@@ -32,7 +32,7 @@ class ColorType(IntEnum):
     TRUECOLOR = 3
 
 
-STANDARD_COLORS_NAMES = {
+ANSI_COLOR_NAMES = {
     "black": 0,
     "red": 1,
     "green": 2,
@@ -41,6 +41,201 @@ STANDARD_COLORS_NAMES = {
     "magenta": 5,
     "cyan": 6,
     "white": 7,
+    "bright_black": 8,
+    "bright_red": 9,
+    "bright_green": 10,
+    "bright_yellow": 11,
+    "bright_blue": 12,
+    "bright_magenta": 13,
+    "bright_cyan": 14,
+    "bright_white": 15,
+    "grey0": 16,
+    "navy_blue": 17,
+    "dark_blue": 18,
+    "blue3": 20,
+    "blue1": 21,
+    "dark_green": 22,
+    "deep_sky_blue4": 25,
+    "dodger_blue3": 26,
+    "dodger_blue2": 27,
+    "green4": 28,
+    "spring_green4": 29,
+    "turquoise4": 30,
+    "deep_sky_blue3": 32,
+    "dodger_blue1": 33,
+    "green3": 40,
+    "spring_green3": 41,
+    "dark_cyan": 36,
+    "light_sea_green": 37,
+    "deep_sky_blue2": 38,
+    "deep_sky_blue1": 39,
+    "spring_green2": 47,
+    "cyan3": 43,
+    "dark_turquoise": 44,
+    "turquoise2": 45,
+    "green1": 46,
+    "spring_green1": 48,
+    "medium_spring_green": 49,
+    "cyan2": 50,
+    "cyan1": 51,
+    "dark_red": 88,
+    "deep_pink4": 125,
+    "purple4": 55,
+    "purple3": 56,
+    "blue_violet": 57,
+    "orange4": 94,
+    "grey37": 59,
+    "medium_purple4": 60,
+    "slate_blue3": 62,
+    "royal_blue1": 63,
+    "chartreuse4": 64,
+    "dark_sea_green4": 71,
+    "pale_turquoise4": 66,
+    "steel_blue": 67,
+    "steel_blue3": 68,
+    "cornflower_blue": 69,
+    "chartreuse3": 76,
+    "cadet_blue": 73,
+    "sky_blue3": 74,
+    "steel_blue1": 81,
+    "pale_green3": 114,
+    "sea_green3": 78,
+    "aquamarine3": 79,
+    "medium_turquoise": 80,
+    "chartreuse2": 112,
+    "sea_green2": 83,
+    "sea_green1": 85,
+    "aquamarine1": 122,
+    "dark_slate_gray2": 87,
+    "dark_magenta": 91,
+    "dark_violet": 128,
+    "purple": 129,
+    "light_pink4": 95,
+    "plum4": 96,
+    "medium_purple3": 98,
+    "slate_blue1": 99,
+    "yellow4": 106,
+    "wheat4": 101,
+    "grey53": 102,
+    "light_slate_grey": 103,
+    "medium_purple": 104,
+    "light_slate_blue": 105,
+    "dark_olive_green3": 149,
+    "dark_sea_green": 108,
+    "light_sky_blue3": 110,
+    "sky_blue2": 111,
+    "dark_sea_green3": 150,
+    "dark_slate_gray3": 116,
+    "sky_blue1": 117,
+    "chartreuse1": 118,
+    "light_green": 120,
+    "pale_green1": 156,
+    "dark_slate_gray1": 123,
+    "red3": 160,
+    "medium_violet_red": 126,
+    "magenta3": 164,
+    "dark_orange3": 166,
+    "indian_red": 167,
+    "hot_pink3": 168,
+    "medium_orchid3": 133,
+    "medium_orchid": 134,
+    "medium_purple2": 140,
+    "dark_goldenrod": 136,
+    "light_salmon3": 173,
+    "rosy_brown": 138,
+    "grey63": 139,
+    "medium_purple1": 141,
+    "gold3": 178,
+    "dark_khaki": 143,
+    "navajo_white3": 144,
+    "grey69": 145,
+    "light_steel_blue3": 146,
+    "light_steel_blue": 147,
+    "yellow3": 184,
+    "dark_sea_green2": 157,
+    "light_cyan3": 152,
+    "light_sky_blue1": 153,
+    "green_yellow": 154,
+    "dark_olive_green2": 155,
+    "dark_sea_green1": 193,
+    "pale_turquoise1": 159,
+    "deep_pink3": 162,
+    "magenta2": 200,
+    "hot_pink2": 169,
+    "orchid": 170,
+    "medium_orchid1": 207,
+    "orange3": 172,
+    "light_pink3": 174,
+    "pink3": 175,
+    "plum3": 176,
+    "violet": 177,
+    "light_goldenrod3": 179,
+    "tan": 180,
+    "misty_rose3": 181,
+    "thistle3": 182,
+    "plum2": 183,
+    "khaki3": 185,
+    "light_goldenrod2": 222,
+    "light_yellow3": 187,
+    "grey84": 188,
+    "light_steel_blue1": 189,
+    "yellow2": 190,
+    "dark_olive_green1": 192,
+    "honeydew2": 194,
+    "light_cyan1": 195,
+    "red1": 196,
+    "deep_pink2": 197,
+    "deep_pink1": 199,
+    "magenta1": 201,
+    "orange_red1": 202,
+    "indian_red1": 204,
+    "hot_pink": 206,
+    "dark_orange": 208,
+    "salmon1": 209,
+    "light_coral": 210,
+    "pale_violet_red1": 211,
+    "orchid2": 212,
+    "orchid1": 213,
+    "orange1": 214,
+    "sandy_brown": 215,
+    "light_salmon1": 216,
+    "light_pink1": 217,
+    "pink1": 218,
+    "plum1": 219,
+    "gold1": 220,
+    "navajo_white1": 223,
+    "misty_rose1": 224,
+    "thistle1": 225,
+    "yellow1": 226,
+    "light_goldenrod1": 227,
+    "khaki1": 228,
+    "wheat1": 229,
+    "cornsilk1": 230,
+    "grey100": 231,
+    "grey3": 232,
+    "grey7": 233,
+    "grey11": 234,
+    "grey15": 235,
+    "grey19": 236,
+    "grey23": 237,
+    "grey27": 238,
+    "grey30": 239,
+    "grey35": 240,
+    "grey39": 241,
+    "grey42": 242,
+    "grey46": 243,
+    "grey50": 244,
+    "grey54": 245,
+    "grey58": 246,
+    "grey62": 247,
+    "grey66": 248,
+    "grey70": 249,
+    "grey74": 250,
+    "grey78": 251,
+    "grey82": 252,
+    "grey85": 253,
+    "grey89": 254,
+    "grey93": 255,
 }
 
 
@@ -132,16 +327,17 @@ class Color(NamedTuple):
         if color == "default":
             return cls(color, type=ColorType.DEFAULT)
 
-        if color.endswith("+"):
-            standard_color_number = STANDARD_COLORS_NAMES.get(color[:-1])
-            if standard_color_number is not None:
-                return cls(
-                    color, type=ColorType.EIGHT_BIT, number=standard_color_number + 8
-                )
-        else:
-            standard_color_number = STANDARD_COLORS_NAMES.get(color)
-            if standard_color_number is not None:
-                return cls(color, type=ColorType.STANDARD, number=standard_color_number)
+        named_color_number = ANSI_COLOR_NAMES.get(color)
+        if named_color_number is not None:
+            return cls(
+                color,
+                type=(
+                    ColorType.STANDARD
+                    if named_color_number < 8
+                    else ColorType.EIGHT_BIT
+                ),
+                number=named_color_number,
+            )
 
         color_match = RE_COLOR.match(color)
         if color_match is None:
@@ -198,7 +394,7 @@ class Color(NamedTuple):
         # Convert to 8-bit color from truecolor color
         if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:
             assert self.triplet is not None
-            red, green, blue = self.triplet.normalize()
+            red, green, blue = self.triplet.normalized
             _h, l, s = rgb_to_hls(red, green, blue)
 
             # If saturation is under 10% assume it is grayscale
@@ -257,28 +453,12 @@ def blend_rgb(
 
 if __name__ == "__main__":  # pragma: no cover
 
-    c = Color.parse("#ff0000")
-    print(c.downgrade(ColorSystem.STANDARD))
+    c = Color.parse("red")
+    print(c)
 
-    print(Color.parse("yellow"))
-    print(Color.parse("yellow+"))
+    c = Color.parse("bright_red")
+    print(c)
 
-    print(Color.parse("3"))
-    print(Color.parse("11"))
+    c = Color.parse("dark_sea_green")
+    print(c)
 
-    print(Color.parse("default"))
-
-    # print(Color.parse("default"))
-    # print(Color.parse("red"))
-    # print(Color.parse("#ff0000"))
-    # print(Color.parse("0"))
-    # print(Color.parse("100"))
-    # print(Color.parse("rgb(  12, 130, 200)"))
-
-    # color = Color.parse("#339a2e")
-    # print(color)
-    # print(color.downgrade(ColorSystem.EIGHT_BIT))
-    # print(color.downgrade(ColorSystem.STANDARD))
-    # import sys
-
-    # sys.stdout.write(Color.parse("#00ffff").foreground_sequence + "Hello")
