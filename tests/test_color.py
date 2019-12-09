@@ -97,11 +97,11 @@ def test_downgrade() -> None:
     assert Color.parse("9").downgrade(0) == Color("9", ColorType.EIGHT_BIT, 9, None)
 
     assert Color.parse("#000000").downgrade(ColorSystem.EIGHT_BIT) == Color(
-        "#000000", ColorType.EIGHT_BIT, 0, None
+        "#000000", ColorType.EIGHT_BIT, 16, None
     )
 
     assert Color.parse("#ffffff").downgrade(ColorSystem.EIGHT_BIT) == Color(
-        "#ffffff", ColorType.EIGHT_BIT, 15, None
+        "#ffffff", ColorType.EIGHT_BIT, 231, None
     )
 
     assert Color.parse("#404142").downgrade(ColorSystem.EIGHT_BIT) == Color(

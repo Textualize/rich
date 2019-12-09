@@ -307,7 +307,7 @@ class Color(NamedTuple):
         Returns:
             Color: A new color object.
         """
-        return cls(name=triplet.css, type=ColorType.TRUECOLOR, triplet=triplet)
+        return cls(name=triplet.hex, type=ColorType.TRUECOLOR, triplet=triplet)
 
     @classmethod
     def default(cls) -> Color:
