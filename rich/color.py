@@ -456,10 +456,11 @@ if __name__ == "__main__":  # pragma: no cover
     from .console import Console
     from .table import Column, Table
     from .text import Text
+    from . import box
 
     console = Console()
 
-    table = Table()
+    table = Table(show_footer=False, show_edge=True)
     table.add_column("Color", width=10)
     table.add_column("Number", justify="right", style="yellow")
     table.add_column("Name", style="green")

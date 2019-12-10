@@ -58,13 +58,6 @@ class Box:
 
     def __str__(self) -> str:
         return self._box
-        return (
-            f"{self.top_left}{self.top}{self.top_divider}{self.top}{self.top_right}\n"
-            f"{self.head_left} {self.head_vertical} {self.head_right}\n"
-            f"{self.head_row_left}{self.head_row_horizontal}{self.head_row_cross}{self.head_row_horizontal}{self.head_row_right}\n"
-            f"{self.foot_left} {self.foot_vertical} {self.foot_right}\n"
-            f"{self.bottom_left}{self.bottom}{self.bottom_divider}{self.bottom}{self.bottom_right}"
-        )
 
     def get_top(self, widths: Iterable[int]) -> str:
         """Get the top of a simple box.
@@ -88,7 +81,10 @@ class Box:
         return "".join(parts)
 
     def get_row(
-        self, widths: Iterable[int], level: Literal["head", "row", "foot"] = "row"
+        self,
+        widths: Iterable[int],
+        level: Literal["head", "row", "foot"] = "row",
+        edge: bool = True,
     ) -> str:
         """Get the top of a simple box.
         
@@ -118,12 +114,14 @@ class Box:
 
         parts: List[str] = []
         append = parts.append
-        append(left)
+        if edge:
+            append(left)
         for last, width in iter_last(widths):
             append(horizontal * width)
             if not last:
                 append(cross)
-        append(right)
+        if edge:
+            append(right)
         append("\n")
         return "".join(parts)
 
@@ -178,41 +176,41 @@ SQUARE = Box(
 
 MINIMAL = Box(
     """\
-  ╷ 
+    
+  │ 
+ ─┼ 
   │ 
 ╶─┼╴
-  │ 
-╶─┼╴
 ╶─┼╴
   │ 
-  ╵ 
+    
 """
 )
 
 
 MINIMAL_HEAVY_HEAD = Box(
     """\
-  ╷ 
+    
   │ 
-╺━┿╸
+ ━┿ 
   │ 
-╶─┼╴
-╶─┼╴
+ ─┼ 
+ ─┼ 
   │ 
-  ╵ 
+    
 """
 )
 
 MINIMAL_DOUBLE_HEAD = Box(
     """\
-  ╷ 
+    
   │ 
-══╪═
+ ═╪ 
   │ 
-╶─┼╴
-╶─┼╴
+ ─┼ 
+ ─┼ 
   │ 
-  ╵ 
+    
 """
 )
 
@@ -221,10 +219,24 @@ SIMPLE = Box(
     """\
     
     
+────
+    
+    
+────
+    
+    
+"""
+)
+
+
+SIMPLE_HEAVY = Box(
+    """\
+    
+    
 ╺━━╸
     
     
-    
+╺━━╸
     
     
 """
