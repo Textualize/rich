@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from itertools import chain
-from typing import Iterable, List, Optional, Sequence, Tuple, Union
+from typing import Iterable, List, NamedTuple, Optional, Sequence, Tuple, Union
+from typing_extensions import Literal
 
 from . import box
 
@@ -20,15 +21,17 @@ from .padding import Padding, PaddingDimensions
 from .segment import Segment
 from .style import Style
 from .text import Text
-from ._tools import iter_first, iter_last, ratio_divide
+from ._tools import iter_first_last, iter_first, iter_last, ratio_divide
 
 
 @dataclass
 class Column:
     """Defines a column in a table."""
 
-    title: Union[str, ConsoleRenderable] = ""
+    header: Union[str, ConsoleRenderable] = ""
+    footer: Union[str, ConsoleRenderable] = ""
     header_style: Union[str, Style] = "none"
+    footer_style: Union[str, Style] = "none"
     style: Union[str, Style] = "none"
     justify: JustifyValues = "left"
     width: Optional[int] = None
@@ -46,12 +49,26 @@ class Column:
         return self.ratio is not None
 
     @property
-    def header(self) -> ConsoleRenderable:
+    def header_renderable(self) -> ConsoleRenderable:
         return (
-            Text(self.title, style=self.header_style)
-            if isinstance(self.title, str)
-            else self.title
+            Text(self.header, style=self.header_style)
+            if isinstance(self.header, str)
+            else self.header
         )
+
+    @property
+    def footer_renderable(self) -> ConsoleRenderable:
+        return (
+            Text(self.footer, style=self.footer_style)
+            if isinstance(self.footer, str)
+            else self.footer
+        )
+
+
+class _Cell(NamedTuple):
+
+    style: Union[str, Style]
+    renderable: ConsoleRenderable
 
 
 class Table:
@@ -65,6 +82,7 @@ class Table:
         pad: PaddingDimensions = (0, 1),
         expand: bool = False,
         show_header: bool = True,
+        show_footer: bool = True,
         style: Union[str, Style] = "none",
         header_style: Union[str, Style] = "bold",
         border_style: Union[str, Style] = "",
@@ -78,6 +96,7 @@ class Table:
         self.padding = Padding.unpack(pad)
         self.expand = expand
         self.show_header = show_header
+        self.show_footer = show_footer
         self.style = style
         self.header_style = header_style
         self.border_style = border_style
@@ -85,8 +104,10 @@ class Table:
 
     def add_column(
         self,
-        title: Union[str, ConsoleRenderable] = "",
+        header: Union[str, ConsoleRenderable] = "",
+        footer: Union[str, ConsoleRenderable] = "",
         header_style: Union[str, Style] = "none",
+        footer_style: Union[str, Style] = "none",
         style: Union[str, Style] = "none",
         justify: JustifyValues = "left",
         width: int = None,
@@ -95,17 +116,22 @@ class Table:
         """Add a column to the table.
         
         Args:
-            title (Union[str, ConsoleRenderable], optional): Text or renderable for the header.
+            header (Union[str, ConsoleRenderable], optional): Text or renderable for the header.
+                Defaults to "".
+            footer (Union[str, ConsoleRenderable], optional): Text or renderable for the footer.
                 Defaults to "".
             header_style (Union[str, Style], optional): Style for the header. Defaults to "none".
+            footer_style (Union[str, Style], optional): Style for the header. Defaults to "none".
             style (Union[str, Style], optional): Style for the column cells. Defaults to "none".
             justify (JustifyValues, optional): Alignment for cells. Defaults to "left".
             width (int, optional): A minimum width in characters. Defaults to None.
             ratio (int, optional): Flexible ratio for the column. Defaults to None.
         """
         column = Column(
-            title=title,
+            header=header,
+            footer=footer,
             header_style=header_style,
+            footer_style=footer_style,
             style=style,
             justify=justify,
             width=width,
@@ -194,19 +220,21 @@ class Table:
 
         return widths
 
-    def _get_cells(self, column: Column) -> Iterable[ConsoleRenderable]:
+    def _get_cells(self, column: Column) -> Iterable[_Cell]:
         """Get all the cells with padding and optional header."""
 
         padding = self.padding
-        if any(padding):
-            if self.show_header:
-                yield Padding(column.header, padding)
-            for cell in column.cells:
-                yield Padding(cell, padding)
-        else:
-            if self.show_header:
-                yield column.header
-            yield from column.cells
+        any_padding = any(padding)
+
+        def add_padding(renderable: ConsoleRenderable) -> ConsoleRenderable:
+            return Padding(renderable, padding) if any_padding else renderable
+
+        if self.show_header:
+            yield _Cell(column.header_style, add_padding(column.header_renderable))
+        for cell in column.cells:
+            yield _Cell(column.style, add_padding(cell))
+        if self.show_footer:
+            yield _Cell(column.footer_style, add_padding(column.footer_renderable))
 
     def _measure_column(self, column: Column, max_width: int) -> RenderWidth:
         """Get the minimum and maximum width of the column."""
@@ -222,8 +250,8 @@ class Table:
         append_min = min_widths.append
         append_max = max_widths.append
         get_render_width = RenderWidth.get
-        for renderable in self._get_cells(column):
-            _min, _max = get_render_width(renderable, max_width)
+        for cell in self._get_cells(column):
+            _min, _max = get_render_width(cell.renderable, max_width)
             append_min(_min)
             append_max(_max)
         return RenderWidth(max(min_widths), max(max_widths))
@@ -232,55 +260,65 @@ class Table:
         self, console: Console, options: ConsoleOptions, widths: List[int]
     ) -> RenderResult:
         table_style = console.get_style(self.style)
-        header_style = table_style + console.get_style(self.header_style)
+
         border_style = table_style + console.get_style(self.border_style)
-        rows = zip(*(self._get_cells(column) for column in self.columns))
+        rows: Iterable[Tuple[_Cell, ...]] = zip(
+            *(self._get_cells(column) for column in self.columns)
+        )
         box = self.box
         new_line = Segment.line()
 
         if box:
             yield Segment(box.get_top(widths), border_style)
-        for first, row in iter_first(rows):
-            is_header = first and self.show_header
+
+        for first, last, row in iter_first_last(rows):
             max_height = 1
             cells: List[List[List[Segment]]] = []
             for width, cell, column in zip(widths, row, self.columns):
                 render_options = options.update(width=width, justify=column.justify)
-                column_style = console.get_style(column.style)
-                cell_style = header_style if is_header else (table_style + column_style)
-                lines = console.render_lines(cell, render_options, style=cell_style)
+                cell_style = table_style + console.get_style(cell.style)
+                lines = console.render_lines(
+                    cell.renderable, render_options, style=cell_style
+                )
                 max_height = max(max_height, len(lines))
                 cells.append(lines)
 
             cells[:] = [
-                Segment.set_shape(cell, width, max_height, style=table_style)
-                for width, cell in zip(widths, cells)
+                Segment.set_shape(_cell, width, max_height, style=table_style)
+                for width, _cell in zip(widths, cells)
             ]
 
             if box:
+                if last and self.show_header:
+                    yield Segment(box.get_row(widths, "foot"), border_style)
                 if first:
                     left = Segment(box.head_left, border_style)
                     right = Segment(box.head_right, border_style)
                     divider = Segment(box.head_vertical, border_style)
+                elif last:
+                    left = Segment(box.foot_left, border_style)
+                    right = Segment(box.foot_right, border_style)
+                    divider = Segment(box.foot_vertical, border_style)
                 else:
                     left = Segment(box.mid_left, border_style)
                     right = Segment(box.mid_right, border_style)
                     divider = Segment(box.mid_vertical, border_style)
+
                 for line_no in range(max_height):
                     yield left
-                    for last, cell in iter_last(cells):
-                        yield from cell[line_no]
+                    for last, rendered_cell in iter_last(cells):
+                        yield from rendered_cell[line_no]
                         if not last:
                             yield divider
                     yield right
                     yield new_line
             else:
                 for line_no in range(max_height):
-                    for last, cell in iter_last(cells):
-                        yield from cell[line_no]
+                    for rendered_cell in cells:
+                        yield from rendered_cell[line_no]
                     yield new_line
             if box and first:
-                yield Segment(box.get_row(widths, "head"), border_style)
+                yield Segment(box.get_row(widths, "foot"), border_style)
 
         if box:
             yield Segment(box.get_bottom(widths), border_style)
@@ -288,11 +326,14 @@ class Table:
 
 if __name__ == "__main__":
 
-    from .box import SIMPLE
+    from .box import SQUARE
 
     c = Console()
     table = Table(
-        "Foo", Column("Bar", style="red"), box=SIMPLE, expand=False, style="on blue"
+        Column("Foo", footer=Text("Total", justify="right"), footer_style="bold"),
+        Column("Bar", style="red", footer="123"),
+        box=SQUARE,
+        expand=False,
     )
     table.columns[0].width = 50
     # table.columns[1].ratio = 1
@@ -304,5 +345,4 @@ if __name__ == "__main__":
     table.columns[0].justify = "center"
     table.columns[1].justify = "right"
 
-    with c.style("on red"):
-        c.print(table)
+    c.print(table)
