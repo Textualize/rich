@@ -218,7 +218,7 @@ class Console:
         self.file = file or sys.stdout
         self._width = width
         self._height = height
-        self._record = record
+        self.record = record
         self._markup = markup
 
         if color_system is None:
@@ -622,7 +622,7 @@ class Console:
         append = output.append
         color_system = self._color_system
         buffer = self.buffer[:]
-        if self._record:
+        if self.record:
             self._record_buffer.extend(buffer)
         del self.buffer[:]
         for line in Segment.split_and_crop_lines(buffer, self.width, wrap=False):
@@ -638,7 +638,7 @@ class Console:
     def export_text(self, clear: bool = True, styles: bool = False) -> str:
         """Generate text from console contents (requires record=True argument in constructor).
         
-        Args:                       
+        Args:         
             clear (bool, optional): Set to True to clear the record buffer after exporting.
             styles (bool, optional): If True, ansi style codes will be included. False for plain text.
                 Defaults to False.
@@ -647,6 +647,9 @@ class Console:
             str: String containing console contents.
 
         """
+        assert (
+            self.record
+        ), "To export console contents set record=True in the constructor or instance"
         if styles:
             text = "".join(
                 style.render(text, reset=True) for text, style in self._render_buffer
@@ -656,6 +659,20 @@ class Console:
         if clear:
             del self._record_buffer[:]
         return text
+
+    def save_text(self, path: str, clear: bool = True, styles: bool = False) -> None:
+        """Generate text from console and save to a given location (requires record=True argument in constructor).
+        
+        Args:   
+            path (str): Path to write text files.                    
+            clear (bool, optional): Set to True to clear the record buffer after exporting.
+            styles (bool, optional): If True, ansi style codes will be included. False for plain text.
+                Defaults to False.     
+
+        """
+        text = self.export_text(clear=clear, styles=styles)
+        with open(path, "wt") as write_file:
+            write_file.write(text)
 
     def export_html(
         self,
@@ -678,7 +695,9 @@ class Console:
         Returns:
             str: String containing console contents.
         """
-
+        assert (
+            self.record
+        ), "To export console contents set record=True in the constructor or instance"
         fragments: List[str] = []
         append = fragments.append
         _theme = theme or themes.DEFAULT
@@ -719,6 +738,36 @@ class Console:
         if clear:
             del self._record_buffer[:]
         return rendered_code
+
+    def save_html(
+        self,
+        path: str,
+        theme: Theme = None,
+        clear: bool = True,
+        code_format=CONSOLE_HTML_FORMAT,
+        inline_styles: bool = False,
+    ) -> None:
+        """Generate HTML from console contents and write to a file (requires record=True argument in constructor).
+        
+        Args:  
+            path (str): Path to write html file.        
+            theme (Theme, optional): Theme object containing console colors.
+            clear (bool, optional): Set to True to clear the record buffer after generating the HTML.
+            code_format (str, optional): Format string to render HTML, should contain {foreground}
+                {background} and {code}.
+            inline_styes (bool, optional): If True styles will be inlined in to spans, which makes files
+                larger but easier to cut and paste markup. If False, styles will be embedded in a style tag.
+                Defaults to False.
+        
+        """
+        html = self.export_html(
+            theme=theme,
+            clear=clear,
+            code_format=code_format,
+            inline_styles=inline_styles,
+        )
+        with open(path, "wt") as write_file:
+            write_file.write(html)
 
 
 if __name__ == "__main__":
