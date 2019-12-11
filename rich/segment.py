@@ -43,7 +43,7 @@ class Segment(NamedTuple):
 
     @classmethod
     def split_and_crop_lines(
-        cls, segments: Iterable[Segment], length: int, wrap=False
+        cls, segments: Iterable[Segment], length: int
     ) -> Iterable[List[Segment]]:
         """Split segments in to lines, and crop lines greater than a given length.
         
@@ -193,7 +193,7 @@ class Segment(NamedTuple):
         yield last_segment
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     lines = [[Segment("Hello")]]
     lines = Segment.set_shape(lines, 50, 4, style=Style.parse("on blue"))
     for line in lines:
