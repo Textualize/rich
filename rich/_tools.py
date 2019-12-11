@@ -63,21 +63,18 @@ def ratio_divide(
     distributed_total: List[int] = []
     append = distributed_total.append
     if minimums is None:
-        _minimums = [1] * len(ratios)
+        _minimums = [0] * len(ratios)
     else:
         _minimums = minimums
     for ratio, minimum in zip(ratios, _minimums):
-        if total_ratio:
-            distributed = max(minimum, round(ratio * total_remaining / total_ratio))
-        else:
-            distributed = 0
+        distributed = max(minimum, round(ratio * total_remaining / total_ratio))
         append(distributed)
         total_ratio -= ratio
         total_remaining -= distributed
     return distributed_total
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no coverage
 
     n = ["foo", "bar", "egg", "baz"]
     for first, last, t in iter_first_last(n):
