@@ -109,7 +109,7 @@ class Segment(NamedTuple):
 
     @classmethod
     def get_line_length(cls, line: List[Segment]) -> int:
-        """Get the length of list of segments.
+        r"""Get the length of list of segments.
         
         Args:
             line (List[Segment]): A line encoded as a list of Segments (assumes no '\n' characters),

@@ -4,7 +4,19 @@ from .style import Style
 
 DEFAULT_STYLES: Dict[str, Style] = {
     "none": Style(),
-    "reset": Style.reset(),
+    "reset": Style(
+        color="default",
+        bgcolor="default",
+        dim=False,
+        bold=False,
+        italic=False,
+        underline=False,
+        blink=False,
+        blink2=False,
+        reverse=False,
+        conceal=False,
+        strike=False,
+    ),
     "dim": Style(dim=True),
     "bright": Style(dim=False),
     "bold": Style(bold=True),

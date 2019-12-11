@@ -199,8 +199,6 @@ COLOR_SYSTEMS = {
 class Console:
     """A high level console interface."""
 
-    default_style = Style.reset()
-
     def __init__(
         self,
         color_system: Optional[

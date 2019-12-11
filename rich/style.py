@@ -135,23 +135,6 @@ class Style:
         return self._bgcolor
 
     @classmethod
-    def reset(cls) -> Style:
-        """Get a style to reset all attributes."""
-        return Style(
-            color="default",
-            bgcolor="default",
-            dim=False,
-            bold=False,
-            italic=False,
-            underline=False,
-            blink=False,
-            blink2=False,
-            reverse=False,
-            conceal=False,
-            strike=False,
-        )
-
-    @classmethod
     @lru_cache(maxsize=1000)
     def parse(cls, style_definition: str) -> Style:
         """Parse style name(s) in to style object."""
@@ -377,9 +360,7 @@ class StyleStack:
         return self.current
 
 
-RESET_STYLE = Style.reset()
-
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     import sys
 
     # style = Style(color="blue", bold=True, italic=True, reverse=False, dim=True)

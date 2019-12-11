@@ -1,2 +1,2 @@
 test:
-	pytest --cov=rich tests/ -v
+	pytest --cov-report term-missing --cov=rich tests/ -v
