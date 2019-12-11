@@ -482,7 +482,7 @@ This is a [link](https://www.willmcgugan.com)
 # """
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
     console = Console(record=True)

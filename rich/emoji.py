@@ -56,7 +56,7 @@ class Emoji:
         yield Segment(self._char, console.get_style(self.style))
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
     c = Console(markup=None)
