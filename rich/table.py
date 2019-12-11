@@ -229,9 +229,12 @@ class Table:
             if not any(flex_widths):
                 flex_widths = [1] * len(flex_widths)
             excess_width = table_width - max_width
-            widths = ratio_divide(
-                excess_width, flex_widths, [_range.minimum for _range in width_ranges],
-            )
+            widths = [
+                width - excess_width
+                for width, excess_width in zip(
+                    widths, ratio_divide(excess_width, flex_widths)
+                )
+            ]
         elif table_width < max_width and self.expand:
             pad_widths = ratio_divide(max_width - table_width, widths)
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
@@ -380,7 +383,7 @@ if __name__ == "__main__":
         show_footer=True,
         show_edge=True,
     )
-    table.columns[0].width = 50
+    # table.columns[0].width = 50
     # table.columns[1].ratio = 1
 
     table.add_row("Hello, World! " * 8, "cake" * 10)
