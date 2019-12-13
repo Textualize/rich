@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from typing import List, Literal, TypeVar, TYPE_CHECKING
+from typing import List, Literal, TypeVar, TYPE_CHECKING, Union
 
 
 from .console import (
     Console,
     ConsoleOptions,
+    ConsoleRenderable,
     RenderResult,
     RenderableType,
+    RenderWidth,
 )
 
 from .segment import Segment
@@ -19,13 +21,20 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 
-class Renderables(List[T]):
+class Renderables(List[Union[ConsoleRenderable, Segment]]):
     """A list subclass which renders its contents to the console."""
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         """Console render method to insert line-breaks."""
         for renderable in self:
             yield renderable
+
+    def __console_width__(self, max_width: int) -> RenderWidth:
+
+        dimensions = [RenderWidth.get(renderable, max_width) for renderable in self]
+        _min = max(dimension.minimum for dimension in dimensions)
+        _max = max(dimension.maximum for dimension in dimensions)
+        return RenderWidth(_min, _max)
 
 
 class Lines(List["Text"]):

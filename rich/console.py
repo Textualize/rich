@@ -69,7 +69,7 @@ class ConsoleOptions:
     max_width: int
     is_terminal: bool
     encoding: str
-    justify: Optional[JustifyValues] = "none"
+    justify: Optional[JustifyValues] = None
 
     def copy(self) -> ConsoleOptions:
         """Get a copy of this object.
@@ -623,7 +623,7 @@ class Console:
         if self.record:
             self._record_buffer.extend(buffer)
         del self.buffer[:]
-        for line in Segment.split_and_crop_lines(buffer, self.width, wrap=False):
+        for line in Segment.split_and_crop_lines(buffer, self.width):
             for text, style in line:
                 if style:
                     append(style.render(text, color_system=color_system, reset=True))
@@ -650,7 +650,8 @@ class Console:
         ), "To export console contents set record=True in the constructor or instance"
         if styles:
             text = "".join(
-                style.render(text, reset=True) for text, style in self._render_buffer
+                (style.render(text, reset=True) if style else text)
+                for text, style in self._record_buffer
             )
         else:
             text = "".join(text for text, _ in self._record_buffer)

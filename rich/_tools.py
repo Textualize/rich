@@ -67,7 +67,10 @@ def ratio_divide(
     else:
         _minimums = minimums
     for ratio, minimum in zip(ratios, _minimums):
-        distributed = max(minimum, round(ratio * total_remaining / total_ratio))
+        if total_ratio > 0:
+            distributed = max(minimum, round(ratio * total_remaining / total_ratio))
+        else:
+            distributed = total_remaining
         append(distributed)
         total_ratio -= ratio
         total_remaining -= distributed

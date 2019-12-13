@@ -37,6 +37,9 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "magenta": Style(color="magenta"),
     "cyan": Style(color="cyan"),
     "white": Style(color="white"),
+    "log.time": Style(color="yellow", bold=True),
+    "log.message": Style(),
+    "log.path": Style(dim=True, color="blue"),
 }
 
 MARKDOWN_STYLES = {

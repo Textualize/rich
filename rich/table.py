@@ -78,7 +78,7 @@ class Table:
         self,
         *headers: Union[Column, str],
         width: int = None,
-        box: box.Box = box.MINIMAL_DOUBLE_HEAD,
+        box: Optional[box.Box] = box.MINIMAL_DOUBLE_HEAD,
         padding: PaddingDimensions = (0, 1),
         pad_edge: bool = True,
         expand: bool = False,
@@ -205,23 +205,29 @@ class Table:
             self._measure_column(column_index, column, max_width)
             for column_index, column in enumerate(columns)
         ]
+
         widths = [_range.maximum for _range in width_ranges]
         padding_width = self.padding[1] + self.padding[3]
         if self.expand:
             ratios = [col.ratio or 0 for col in columns if col.flexible]
             if any(ratios):
-                fixed_widths = [_range.minimum for _range in width_ranges]
+                fixed_widths = [_range.maximum for _range in width_ranges]
+                fixed_widths = [
+                    _range.minimum if column.flexible else _range.maximum
+                    for _range, column in zip(width_ranges, columns)
+                ]
                 flex_minimum = [
-                    (column.width or 1) + padding_width
+                    (column.width or 0) + padding_width
                     for column in columns
                     if column.flexible
                 ]
                 flexible_width = max_width - sum(fixed_widths)
+
                 flex_widths = ratio_divide(flexible_width, ratios, flex_minimum)
                 iter_flex_widths = iter(flex_widths)
                 for index, column in enumerate(columns):
                     if column.flexible:
-                        widths[index] = next(iter_flex_widths)
+                        widths[index] = fixed_widths[index] + next(iter_flex_widths)
         table_width = sum(widths)
 
         if table_width > max_width:
@@ -288,7 +294,10 @@ class Table:
             _min, _max = get_render_width(cell.renderable, max_width)
             append_min(_min)
             append_max(_max)
-        return RenderWidth(max(min_widths), max(max_widths))
+        return RenderWidth(
+            max(min_widths) if min_widths else 1,
+            max(max_widths) if max_widths else max_width,
+        )
 
     def _render(
         self, console: Console, options: ConsoleOptions, widths: List[int]
@@ -376,10 +385,12 @@ if __name__ == "__main__":
 
     c = Console()
     table = Table(
-        Column("Foo", footer=Text("Total", justify="right"), footer_style="bold"),
-        Column("Bar", style="red", footer="123"),
+        Column(
+            "Foo", footer=Text("Total", justify="right"), footer_style="bold", ratio=1
+        ),
+        Column("Bar", style="red", footer="123", ratio=1),
         box=box.SIMPLE,
-        expand=False,
+        expand=True,
         show_footer=True,
         show_edge=True,
     )
