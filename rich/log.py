@@ -55,4 +55,38 @@ if __name__ == "__main__":
     print(console)
     logger = Logger(console)
 
-    logger("Hello", path="foo.py", line_no=20)
+    from .markdown import Markdown
+    from .syntax import Syntax
+
+    s = Syntax(
+        '''\
+@classmethod
+def get(cls, renderable: RenderableType, max_width: int) -> RenderWidth:
+    """Get desired width for a renderable."""
+    if hasattr(renderable, "__console__"):
+        get_console_width = getattr(renderable, "__console_width__", None)
+        if get_console_width is not None:
+            render_width = get_console_width(max_width).with_maximum(max_width)
+            return render_width.normalize()
+        else:
+            return RenderWidth(1, max_width)
+    elif isinstance(renderable, Segment):
+        text, _style = renderable
+        width = min(max_width, len(text))
+        return RenderWidth(width, width)
+    elif isinstance(renderable, str):
+        text = renderable.rstrip()
+        return RenderWidth(len(text), len(text))
+    else:
+        raise errors.NotRenderableError(
+            f"Unable to get render width for {renderable!r}; "
+            "a str, Segment, or object with __console__ method is required"
+        )
+        ''',
+        "python",
+        theme="monokai",
+    )
+
+    logger(
+        s, path="foo.py", line_no=20,
+    )
