@@ -813,5 +813,7 @@ if __name__ == "__main__":
         console.print("**Hello**, *World*!")
         console.print("Hello, *World*!")
 
+    console.log("Hello, World!")
+
     # console.print("foo")
 
