@@ -357,8 +357,9 @@ class Markdown:
         inlines = self.inlines
         new_line = False
         for current, entering in nodes:
+            print(current, current.literal)
             node_type = current.t
-            if node_type == "text":
+            if node_type in ("html_inline", "html_block", "text"):
                 context.on_text(current.literal)
             elif node_type == "softbreak":
                 if entering:
@@ -488,6 +489,7 @@ if __name__ == "__main__":  # pragma: no cover
     console = Console(record=True)
     # print(console.size)
 
+    markup = "<foo>"
     md = Markdown(markup)
 
     console.print(md)

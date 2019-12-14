@@ -544,7 +544,7 @@ class Console:
         self._check_buffer()
 
     def _collect_renderables(
-        self, objects: Iterable[Any], sep: Text, end: Text, emoji=True,
+        self, objects: Iterable[Any], sep: str, end: str, emoji=True,
     ) -> List[ConsoleRenderable]:
         """Combined a number of renderables and text in to one renderable.
         
@@ -559,20 +559,17 @@ class Console:
 
         renderables: List[ConsoleRenderable] = []
         append = renderables.append
-        strings: List[Text] = []
+        strings: List[str] = []
         append_string = strings.append
 
         def check_strings() -> None:
             if strings:
                 if end:
-                    append(end)
-                append(sep.join(strings))
+                    append_string(end)
+                append(self.render_str(sep.join(strings)))
                 del strings[:]
 
         for renderable in objects:
-            if isinstance(renderable, Text):
-                append_string(renderable)
-                continue
             if isinstance(renderable, ConsoleRenderable):
                 check_strings()
                 append(renderable)
@@ -584,7 +581,7 @@ class Console:
             render_str = str(renderable)
             if emoji:
                 render_str = _emoji_replace(render_str)
-            append(self.render_str(render_str))
+            append_string(render_str)
 
         check_strings()
         return renderables
@@ -610,11 +607,7 @@ class Console:
             self.line()
             return
 
-        from .text import Text
-
-        renderables = self._collect_renderables(
-            objects, sep=Text(sep), end=Text(end), emoji=emoji
-        )
+        renderables = self._collect_renderables(objects, sep=sep, end=end, emoji=emoji)
 
         render_options = self.options
         extend = self.buffer.extend
@@ -630,10 +623,10 @@ class Console:
 
         from .text import Text
 
-        renderables = self._collect_renderables(objects, sep=Text(" "), end=Text("\n"))
+        renderables = self._collect_renderables(objects, sep=" ", end="\n")
 
         caller = inspect.stack()[1]
-        path = caller.filename.rpartition("/")[-1]
+        path = caller.filename.rpartition(os.sep)[-1]
         line_no = caller.lineno
 
         with self:
@@ -823,8 +816,9 @@ if __name__ == "__main__":
         console.print("**Hello**, *World*!")
         console.print("Hello, *World*!")
 
-    console.log("Hello, World!")
-    console.log("Hello, World!")
+    console.log("<foo>")
+    console.log("Hello", "World", 5, "`import this`", console)
+    console.log("Hello, **World**!")
     console.log("Hello, World!")
     console.log("Hello, World!")
     console.log("Hello, World!")

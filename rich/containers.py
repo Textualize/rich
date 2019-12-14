@@ -42,7 +42,7 @@ class Renderables:
         return RenderWidth(_min, _max)
 
     def append(self, renderable: ConsoleRenderable) -> None:
-        self.renderables.append(renderable)
+        self._renderables.append(renderable)
 
     def __iter__(self) -> Iterable[ConsoleRenderable]:
         return iter(self._renderables)
