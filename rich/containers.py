@@ -54,8 +54,15 @@ class Lines:
     def __init__(self, lines: Iterable[Text] = ()) -> None:
         self._lines: List[Text] = list(lines)
 
-    def __iter__(self) -> Iter[Text]:
+    def __iter__(self) -> Iterable[Text]:
         yield from self._lines
+
+    def __getitem__(self, index: int) -> Text:
+        return self._lines[index]
+
+    def __setitem__(self, index: int, value: Text) -> Lines:
+        self._lines[index] = value
+        return self
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         """Console render method to insert line-breaks."""

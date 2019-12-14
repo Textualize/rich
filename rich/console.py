@@ -5,6 +5,7 @@ from collections import ChainMap
 from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from enum import Enum
+import inspect
 from itertools import chain
 import os
 from operator import itemgetter
@@ -631,8 +632,17 @@ class Console:
 
         renderables = self._collect_renderables(objects, sep=Text(" "), end=Text("\n"))
 
+        caller = inspect.stack()[1]
+        path = caller.filename.rpartition("/")[-1]
+        line_no = caller.lineno
+
         with self:
-            self.buffer.append(self._log_renderer(self, renderables, "foo", "20"))
+            self.buffer.extend(
+                self.render(
+                    self._log_render(self, renderables, path=path, line_no=line_no),
+                    self.options,
+                )
+            )
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered."""
@@ -796,7 +806,7 @@ class Console:
 
 
 if __name__ == "__main__":
-    console = Console(width=80)
+    console = Console()
     # console.write_text("Hello", style="bold magenta on white", end="").write_text(
     #     " World!", "italic blue"
     # )
@@ -813,6 +823,10 @@ if __name__ == "__main__":
         console.print("**Hello**, *World*!")
         console.print("Hello, *World*!")
 
+    console.log("Hello, World!")
+    console.log("Hello, World!")
+    console.log("Hello, World!")
+    console.log("Hello, World!")
     console.log("Hello, World!")
 
     # console.print("foo")
