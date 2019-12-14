@@ -30,10 +30,11 @@ from typing_extensions import Literal
 
 from ._emoji_replace import _emoji_replace
 from ._render_width import RenderWidth
+from ._log_render import LogRender
 from .default_styles import DEFAULT_STYLES
 from . import errors
 from .color import ColorSystem
-from .log import Logger
+
 from .style import Style
 from . import themes
 from .theme import Theme
@@ -182,6 +183,9 @@ class Console:
         height: int = None,
         record: bool = False,
         markup: Optional[str] = "markdown",
+        log_time: bool = True,
+        log_path: bool = True,
+        log_time_format: str = "[%x %X] ",
     ):
 
         self._styles = ChainMap(styles)
@@ -205,6 +209,10 @@ class Console:
         default_style = Style()
         self.style_stack: List[Style] = [default_style]
         self.current_style = default_style
+
+        self._log_render = LogRender(
+            show_time=log_time, show_path=log_path, time_format=log_time_format
+        )
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
@@ -599,6 +607,7 @@ class Console:
         """
         if not objects:
             self.line()
+            return
 
         from .text import Text
 
@@ -612,6 +621,18 @@ class Console:
         with self.style(style):
             for renderable in renderables:
                 extend(render(renderable, render_options))
+
+    def log(self, *objects: Any) -> None:
+        if not objects:
+            self.line()
+            return
+
+        from .text import Text
+
+        renderables = self._collect_renderables(objects, sep=Text(" "), end=Text("\n"))
+
+        with self:
+            self.buffer.append(self._log_renderer(self, renderables, "foo", "20"))
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered."""
