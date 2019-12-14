@@ -2,25 +2,35 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from itertools import chain
-from typing import Iterable, List, NamedTuple, Optional, Sequence, Tuple, Union
+from typing import (
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Tuple,
+    TYPE_CHECKING,
+    Union,
+)
 from typing_extensions import Literal
 
 from . import box
 
-from .console import (
-    Console,
-    ConsoleOptions,
-    ConsoleRenderable,
-    JustifyValues,
-    RenderableType,
-    RenderResult,
-    RenderWidth,
-)
+if TYPE_CHECKING:
+    from .console import (
+        Console,
+        ConsoleOptions,
+        ConsoleRenderable,
+        JustifyValues,
+        RenderableType,
+        RenderResult,
+    )
 from . import errors
 from .padding import Padding, PaddingDimensions
 from .segment import Segment
 from .style import Style
 from .text import Text
+from ._render_width import RenderWidth
 from ._tools import iter_first_last, iter_first, iter_last, ratio_divide
 
 
@@ -174,7 +184,7 @@ class Table:
                 self.columns.append(column)
             else:
                 column = columns[index]
-            if isinstance(renderable, ConsoleRenderable):
+            if hasattr(renderable, "__console__"):
                 add_cell(column, renderable)
             elif renderable is None:
                 add_cell(column, Text(""))
@@ -206,7 +216,7 @@ class Table:
             for column_index, column in enumerate(columns)
         ]
 
-        widths = [_range.maximum for _range in width_ranges]
+        widths = [_range.maximum or 1 for _range in width_ranges]
         padding_width = self.padding[1] + self.padding[3]
         if self.expand:
             ratios = [col.ratio or 0 for col in columns if col.flexible]
@@ -381,6 +391,7 @@ class Table:
 
 if __name__ == "__main__":
 
+    from .console import Console
     from . import box
 
     c = Console()

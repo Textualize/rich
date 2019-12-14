@@ -1,10 +1,12 @@
-from datetime import datetime
-from typing import Any, List, Optional
+from __future__ import annotations
 
-from .console import Console, ConsoleRenderable, RenderableType
-from .containers import Renderables
-from .table import Table
+from datetime import datetime
+from typing import Any, List, Optional, TYPE_CHECKING
+
 from .text import Text
+
+if TYPE_CHECKING:
+    from .console import Console, ConsoleRenderable, RenderableType
 
 
 class Logger:
@@ -19,7 +21,7 @@ class Logger:
         self.show_time = show_time
         self.show_path = show_path
         self.time_format = time_format
-        self._last_time: Optional[datetime] = None
+        self._last_time: Optional[str] = None
 
     def __call__(
         self,
@@ -28,6 +30,9 @@ class Logger:
         path: str = None,
         line_no: int = None,
     ) -> None:
+        from .containers import Renderables
+        from .table import Table
+
         output = Table(show_header=False, expand=True, box=None, padding=0)
         if self.show_time:
             output.add_column(style="log.time")
@@ -38,7 +43,12 @@ class Logger:
         if self.show_time:
             if log_time is None:
                 log_time = datetime.now()
-            row.append(Text(log_time.strftime(self.time_format)))
+            log_time_display = log_time.strftime(self.time_format)
+            if log_time_display == self._last_time:
+                row.append(Text(" " * len(log_time_display)))
+            else:
+                row.append(log_time_display)
+                self._last_time = log_time_display
         row.append(Renderables(objects))
         if self.show_path and path:
             if line_no is None:
@@ -51,6 +61,8 @@ class Logger:
 
 
 if __name__ == "__main__":
+    from .console import Console
+
     console = Console()
     print(console)
     logger = Logger(console)
@@ -88,5 +100,8 @@ def get(cls, renderable: RenderableType, max_width: int) -> RenderWidth:
     )
 
     logger(
-        s, path="foo.py", line_no=20,
+        "Hello", path="foo.py", line_no=20,
+    )
+    logger(
+        "World!", path="foo.py", line_no=20,
     )

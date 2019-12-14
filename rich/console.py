@@ -22,19 +22,25 @@ from typing import (
     overload,
     Protocol,
     Tuple,
+    TYPE_CHECKING,
     runtime_checkable,
     Union,
 )
 from typing_extensions import Literal
 
 from ._emoji_replace import _emoji_replace
+from ._render_width import RenderWidth
 from .default_styles import DEFAULT_STYLES
 from . import errors
 from .color import ColorSystem
+from .log import Logger
 from .style import Style
 from . import themes
 from .theme import Theme
 from .segment import Segment
+
+if TYPE_CHECKING:
+    from .text import Text
 
 
 JustifyValues = Optional[Literal["left", "center", "right", "full"]]
@@ -59,6 +65,22 @@ body {{
 </body>
 </html>
 """
+
+
+def console_str(render_object: Any) -> Text:
+    console_str_callable = getattr(render_object, "__console_str__")
+    if console_str_callable:
+        return console_str_callable()
+    else:
+        return Text(str(render_object))
+
+
+def console_repr(render_object: Any) -> Text:
+    console_str_callable = getattr(render_object, "__console_repr__")
+    if console_str_callable:
+        return console_str_callable()
+    else:
+        return Text(str(render_object))
 
 
 @dataclass
@@ -120,73 +142,23 @@ class ConsoleDimensions(NamedTuple):
     height: int
 
 
-class RenderWidth(NamedTuple):
-    """Range of widths for a renderable object."""
-
-    minimum: int
-    maximum: int
-
-    @property
-    def span(self) -> int:
-        """Get difference between maximum and minimum."""
-        return self.maximum - self.minimum
-
-    def normalize(self) -> RenderWidth:
-        minimum, maximum = self
-        minimum = max(0, minimum)
-        return RenderWidth(minimum, max(minimum, maximum))
-
-    def with_maximum(self, width: int) -> RenderWidth:
-        """Get a RenderableWith where the widths are <= width.
-        
-        Args:
-            width (int): Maximum desired width.
-        
-        Returns:
-            RenderableWidth: new RenderableWidth object.
-        """
-        minimum, maximum = self
-        return RenderWidth(min(minimum, width), min(maximum, width))
-
-    @classmethod
-    def get(cls, renderable: RenderableType, max_width: int) -> RenderWidth:
-        """Get desired width for a renderable."""
-        if hasattr(renderable, "__console__"):
-            get_console_width = getattr(renderable, "__console_width__", None)
-            if get_console_width is not None:
-                render_width = get_console_width(max_width).with_maximum(max_width)
-                return render_width.normalize()
-            else:
-                return RenderWidth(1, max_width)
-        elif isinstance(renderable, Segment):
-            text, _style = renderable
-            width = min(max_width, len(text))
-            return RenderWidth(width, width)
-        elif isinstance(renderable, str):
-            text = renderable.rstrip()
-            return RenderWidth(len(text), len(text))
-        else:
-            raise errors.NotRenderableError(
-                f"Unable to get render width for {renderable!r}; "
-                "a str, Segment, or object with __console__ method is required"
-            )
-
-
 class StyleContext:
     """A context manager to manage a style."""
 
-    def __init__(self, console: Console, style: Style):
+    def __init__(self, console: Console, style: Optional[Style]):
         self.console = console
         self.style = style
 
     def __enter__(self) -> Console:
-        self.console.push_style(self.style)
+        if self.style is not None:
+            self.console.push_style(self.style)
         self.console._enter_buffer()
         return self.console
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         self.console._exit_buffer()
-        self.console.pop_style()
+        if self.style is not None:
+            self.console.pop_style()
 
 
 COLOR_SYSTEMS = {
@@ -354,10 +326,12 @@ class Console:
         render_options = options or self.options
         if isinstance(renderable, Segment):
             yield renderable
+            return
         elif isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__console__(self, render_options)
         elif isinstance(renderable, str):
-            render_iterable = self.render_str(renderable, render_options)
+            yield from self._render(self.render_str(renderable), render_options)
+            return
         else:
             raise errors.NotRenderableError(
                 f"Unable to render {renderable!r}; "
@@ -435,28 +409,25 @@ class Console:
             )
         return lines
 
-    def render_str(
-        self, text: str, options: ConsoleOptions
-    ) -> Iterable[RenderableType]:
+    def render_str(self, text: str) -> ConsoleRenderable:
         """Convert a string to something renderable.
         
         Args:
-            text (str): Text to render.
-            options (ConsoleOptions): Options for render.
+            text (str): Text to render.            
         
         Returns:
-            Iterable[RenderableType]: Renderable objects.
+            ConsoleRenderable: Renderable object.
         
         """
 
         if self._markup == "markdown":
             from .markdown import Markdown
 
-            yield Markdown(text)
+            return Markdown(text)
         else:
             from .text import Text
 
-            yield Text(text, self.current_style)
+            return Text(text, self.current_style)
 
     def _get_style(self, name: str) -> Optional[Style]:
         """Get a named style, or `None` if it doesn't exist.
@@ -527,7 +498,7 @@ class Console:
         self.current_style = self.style_stack[-1]
         return style
 
-    def style(self, style: Union[str, Style]) -> StyleContext:
+    def style(self, style: Optional[Union[str, Style]]) -> StyleContext:
         """A context manager to apply a new style.
 
         Example:
@@ -540,6 +511,8 @@ class Console:
         Returns:
             StyleContext: A style context manager.
         """
+        if style is None:
+            return StyleContext(self, None)
         if isinstance(style, str):
             _style = self.get_style(style)
         else:
@@ -561,52 +534,84 @@ class Console:
         self.buffer.append(Segment(text, write_style))
         self._check_buffer()
 
+    def _collect_renderables(
+        self, objects: Iterable[Any], sep: Text, end: Text, emoji=True,
+    ) -> List[ConsoleRenderable]:
+        """Combined a number of renderables and text in to one renderable.
+        
+        Args:
+            renderables (Iterable[Union[str, ConsoleRenderable]]): [description]
+            sep (str, optional): [description]. Defaults to " ".
+        
+        Returns:
+            Renderables: [description]
+        """
+        from .text import Text
+
+        renderables: List[ConsoleRenderable] = []
+        append = renderables.append
+        strings: List[Text] = []
+        append_string = strings.append
+
+        def check_strings() -> None:
+            if strings:
+                if end:
+                    append(end)
+                append(sep.join(strings))
+                del strings[:]
+
+        for renderable in objects:
+            if isinstance(renderable, Text):
+                append_string(renderable)
+                continue
+            if isinstance(renderable, ConsoleRenderable):
+                check_strings()
+                append(renderable)
+                continue
+            console_str_callable = getattr(renderable, "__console_str__", None)
+            if console_str_callable is not None:
+                append(console_str_callable())
+                continue
+            render_str = str(renderable)
+            if emoji:
+                render_str = _emoji_replace(render_str)
+            append(self.render_str(render_str))
+
+        check_strings()
+        return renderables
+
     def print(
         self,
-        *objects: RenderableType,
+        *objects: Any,
         sep=" ",
         end="\n",
         style: Union[str, Style] = None,
         emoji=True,
     ) -> None:
         """Print to the console.
-        
+
         Args:
             *objects: Arbitrary objects to print to the console.
             sep (str, optional): Separator to print between objects. Defaults to " ".
             end (str, optional): Character to end print with. Defaults to "\n".
-            style (Union[str, Style], optional): 
+            style (Union[str, Style], optional):
             emoji (bool): If True, emoji codes will be replaced, otherwise emoji codes will be left in.
         """
         if not objects:
             self.line()
-            return
-        options = self.options
-        buffer_extend = self.buffer.extend
-        strings: List[str] = []
 
-        def check_strings() -> None:
-            """Check strings buffer."""
-            if strings:
-                text = f"{sep.join(strings)}{end}"
-                if emoji:
-                    text = _emoji_replace(text)
-                buffer_extend(self.render(text, options))
+        from .text import Text
 
-        if style is not None:
-            self.push_style(style)
-        with self:
-            try:
-                for console_object in objects:
-                    if isinstance(console_object, (ConsoleRenderable, Segment)):
-                        check_strings()
-                        buffer_extend(self.render(console_object, options))
-                    else:
-                        strings.append(str(console_object))
-                check_strings()
-            finally:
-                if style is not None:
-                    self.pop_style()
+        renderables = self._collect_renderables(
+            objects, sep=Text(sep), end=Text(end), emoji=emoji
+        )
+
+        render_options = self.options
+        extend = self.buffer.extend
+        render = self.render
+        with self.style(style):
+            for renderable in renderables:
+                extend(render(renderable, render_options))
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered."""

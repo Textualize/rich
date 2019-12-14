@@ -1,50 +1,73 @@
 from __future__ import annotations
 
-from typing import List, Literal, TypeVar, TYPE_CHECKING, Union
+from typing import Iterable, List, Literal, TypeVar, TYPE_CHECKING, Union
 
-
-from .console import (
-    Console,
-    ConsoleOptions,
-    ConsoleRenderable,
-    RenderResult,
-    RenderableType,
-    RenderWidth,
-)
 
 from .segment import Segment
 
+
 if TYPE_CHECKING:
+    from .console import (
+        Console,
+        ConsoleOptions,
+        ConsoleRenderable,
+        RenderResult,
+        RenderableType,
+    )
     from .text import Text
 
+from ._render_width import RenderWidth
 
 T = TypeVar("T")
 
 
-class Renderables(List[Union[ConsoleRenderable, Segment]]):
+class Renderables:
     """A list subclass which renders its contents to the console."""
+
+    def __init__(self, renderables: Iterable[ConsoleRenderable] = None) -> None:
+        self._renderables: List[ConsoleRenderable] = (
+            list(renderables) if renderables is not None else []
+        )
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         """Console render method to insert line-breaks."""
-        for renderable in self:
-            yield renderable
+        yield from self._renderables
 
     def __console_width__(self, max_width: int) -> RenderWidth:
-
-        dimensions = [RenderWidth.get(renderable, max_width) for renderable in self]
+        dimensions = [
+            RenderWidth.get(renderable, max_width) for renderable in self._renderables
+        ]
         _min = max(dimension.minimum for dimension in dimensions)
         _max = max(dimension.maximum for dimension in dimensions)
         return RenderWidth(_min, _max)
 
+    def append(self, renderable: ConsoleRenderable) -> None:
+        self.renderables.append(renderable)
 
-class Lines(List["Text"]):
+    def __iter__(self) -> Iterable[ConsoleRenderable]:
+        return iter(self._renderables)
+
+
+class Lines:
     """A list subclass which can render to the console."""
+
+    def __init__(self, lines: Iterable[Text] = ()) -> None:
+        self._lines: List[Text] = list(lines)
+
+    def __iter__(self) -> Iter[Text]:
+        yield from self._lines
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         """Console render method to insert line-breaks."""
-        for line in self:
+        for line in self._lines:
             yield line
             yield Segment("\n")
+
+    def append(self, line: Text) -> None:
+        self._lines.append(line)
+
+    def extend(self, lines: Iterable[Text]) -> None:
+        self._lines.extend(lines)
 
     def justify(
         self,
@@ -60,18 +83,18 @@ class Lines(List["Text"]):
         from .text import Text
 
         if align == "left":
-            for line in self:
+            for line in self._lines:
                 line.pad_right(width - len(line.text))
         elif align == "center":
-            for line in self:
+            for line in self._lines:
                 line.pad_left((width - len(line.text)) // 2)
                 line.pad_right(width - len(line.text))
         elif align == "right":
-            for line in self:
+            for line in self._lines:
                 line.pad_left(width - len(line.text))
         elif align == "full":
-            for line_index, line in enumerate(self):
-                if line_index == len(self) - 1:
+            for line_index, line in enumerate(self._lines):
+                if line_index == len(self._lines) - 1:
                     break
                 words = line.split(" ")
                 words_size = sum(len(word) for word in words)

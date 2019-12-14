@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from typing import cast, Tuple, Union
+from typing import cast, Tuple, TYPE_CHECKING, Union
 
-from .console import (
-    Console,
-    ConsoleOptions,
-    RenderableType,
-    RenderResult,
-    RenderWidth,
-)
+if TYPE_CHECKING:
+    from .console import (
+        Console,
+        ConsoleOptions,
+        RenderableType,
+        RenderResult,
+    )
+from ._render_width import RenderWidth
 from .style import Style
 from .text import Text
 from .segment import Segment

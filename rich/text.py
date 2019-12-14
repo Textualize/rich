@@ -1,20 +1,30 @@
 from __future__ import annotations
 
 from operator import itemgetter
-from typing import Dict, Iterable, NamedTuple, Optional, List, Tuple, Union
+from typing import (
+    Dict,
+    Iterable,
+    NamedTuple,
+    Optional,
+    List,
+    Tuple,
+    TYPE_CHECKING,
+    Union,
+)
 from typing_extensions import Literal
 
-from .console import (
-    Console,
-    ConsoleOptions,
-    JustifyValues,
-    RenderResult,
-    RenderableType,
-    RenderWidth,
-)
+if TYPE_CHECKING:
+    from .console import (
+        Console,
+        ConsoleOptions,
+        JustifyValues,
+        RenderResult,
+        RenderableType,
+    )
 from .containers import Lines
 from .style import Style
 from .segment import Segment
+from ._render_width import RenderWidth
 from ._tools import iter_last, iter_first_last
 
 
