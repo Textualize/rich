@@ -40,6 +40,15 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "log.time": Style(color="cyan"),
     "log.message": Style(),
     "log.path": Style(dim=True),
+    "repr.str": Style(color="bright_yellow"),
+    "repr.int": Style(color="cyan"),
+    "repr.float": Style(color="cyan"),
+    "repr.bool": Style(color="magenta", italic=True),
+    "repr.NoneType": Style(color="green", italic=True),
+    "repr.mapping": Style(),
+    "repr.sequence": Style(),
+    "inspect.key": Style(italic=True),
+    "inspect.value": Style(),
 }
 
 MARKDOWN_STYLES = {

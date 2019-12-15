@@ -77,14 +77,6 @@ def console_str(render_object: Any) -> Text:
         return Text(str(render_object))
 
 
-def console_repr(render_object: Any) -> Text:
-    console_str_callable = getattr(render_object, "__console_repr__")
-    if console_str_callable:
-        return console_str_callable()
-    else:
-        return Text(str(render_object))
-
-
 @dataclass
 class ConsoleOptions:
     """Options for __console__ method."""
@@ -436,7 +428,7 @@ class Console:
         else:
             from .text import Text
 
-            return Text(text, self.current_style)
+            return Text(text)
 
     def _get_style(self, name: str) -> Optional[Style]:
         """Get a named style, or `None` if it doesn't exist.
@@ -530,18 +522,18 @@ class Console:
             _style = style
         return StyleContext(self, _style)
 
-    def write(self, text: str, style: str = None) -> None:
-        """Write text in the current style.
-        
-        Args:
-            text (str): Text to write
-        
-        Returns:
-            None: 
-        """
-        write_style = self.current_style or self._get_style(style or "none")
-        self.buffer.append(Segment(text, write_style))
-        self._check_buffer()
+    # def write(self, text: str, style: str = None) -> None:
+    #     """Write text in the current style.
+
+    #     Args:
+    #         text (str): Text to write
+
+    #     Returns:
+    #         None:
+    #     """
+    #     write_style = self.current_style or self._get_style(style or "none")
+    #     self.buffer.append(Segment(text, write_style))
+    #     self._check_buffer()
 
     def _collect_renderables(
         self, objects: Iterable[Any], sep: str, end: str, emoji=True,

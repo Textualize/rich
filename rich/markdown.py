@@ -357,7 +357,7 @@ class Markdown:
         inlines = self.inlines
         new_line = False
         for current, entering in nodes:
-            print(current, current.literal)
+            # print(current, current.literal)
             node_type = current.t
             if node_type in ("html_inline", "html_block", "text"):
                 context.on_text(current.literal)

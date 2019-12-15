@@ -64,6 +64,9 @@ class Lines:
         self._lines[index] = value
         return self
 
+    def __len__(self) -> int:
+        return self._lines.__len__()
+
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         """Console render method to insert line-breaks."""
         for line in self._lines:

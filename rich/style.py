@@ -311,12 +311,13 @@ class Style:
 
         """
         new_style = self.__new__(Style)
+
         new_style.__dict__ = {
             "_color": style._color or self._color,
             "_bgcolor": style._bgcolor or self._bgcolor,
             "_attributes": (
-                (style._attributes & ~self._set_attributes)
-                | (self._attributes & self._set_attributes)
+                (self._attributes & ~style._set_attributes)
+                | (style._attributes & style._set_attributes)
             ),
             "_set_attributes": self._set_attributes | style._set_attributes,
         }

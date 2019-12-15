@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from operator import itemgetter
 from typing import (
+    Any,
     Dict,
     Iterable,
     NamedTuple,
@@ -140,6 +141,13 @@ class Text:
     def __repr__(self) -> str:
         return f"<text {self.text!r} {self._spans!r}>"
 
+    def __add__(self, other: Any) -> Text:
+        if isinstance(other, (str, Text)):
+            result = self.copy()
+            result.append(other)
+            return result
+        return NotImplemented
+
     @property
     def text(self) -> str:
         """Get the text as a single string."""
@@ -184,8 +192,14 @@ class Text:
 
     def copy(self) -> Text:
         """Return a copy of this instance."""
-        copy_self = Text(self.text, style=self.style)
-        copy_self._spans = self._spans[:]
+        copy_self = Text(
+            self.text,
+            style=self.style,
+            word_wrap=self.word_wrap,
+            justify=self.justify,
+            end=self.end,
+        )
+        copy_self._spans[:] = self._spans[:]
         return copy_self
 
     def stylize(self, start: int, end: int, style: Union[str, Style]) -> None:
@@ -358,8 +372,12 @@ class Text:
             self._text_str = None
         else:
             if style is not None:
-                raise ValueError("style must not be set if appending Text instance")
+                raise ValueError("style must not be set when appending Text instance")
             text_length = self._length
+            if text.style is not None:
+                self._spans.append(
+                    Span(text_length, text_length + len(text), text.style),
+                )
             self._text.append(text.text)
             self._spans.extend(
                 Span(start + text_length, end + text_length, style)

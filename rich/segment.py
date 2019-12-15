@@ -89,7 +89,7 @@ class Segment(NamedTuple):
             List[Segment]: A line of segments with the desired length.
         """
         line_length = sum(len(text) for text, _style in line)
-        if length < length:
+        if line_length < length:
             return line[:] + [Segment(" " * (length - line_length), style)]
         elif line_length > length:
             line_length = 0
