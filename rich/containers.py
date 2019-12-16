@@ -55,7 +55,7 @@ class Lines:
         self._lines: List[Text] = list(lines)
 
     def __iter__(self) -> Iterable[Text]:
-        yield from self._lines
+        return iter(self._lines)
 
     def __getitem__(self, index: int) -> Text:
         return self._lines[index]

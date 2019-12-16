@@ -275,9 +275,7 @@ class Text:
         null_style = Style()
 
         def get_style(style: Union[str, Style]) -> Style:
-            if isinstance(style, str):
-                style = console.get_style(style) or null_style
-            return style
+            return console.get_style(style, default=null_style)
 
         enumerated_spans = list(enumerate(line._spans, 1))
         style_map = {index: get_style(span.style) for index, span in enumerated_spans}
@@ -292,21 +290,25 @@ class Text:
         spans.sort(key=itemgetter(0, 1))
 
         stack: List[int] = [0]
+        stack_append = stack.append
+        stack_pop = stack.remove
         current_style = style_map[0]
+
+        _Segment = Segment
 
         for (offset, leaving, style_id), (next_offset, _, _) in zip(spans, spans[1:]):
             if leaving:
-                stack.remove(style_id)
+                stack_pop(style_id)
                 current_style = Style.combine(
                     style_map[_style_id] for _style_id in stack
                 )
             else:
-                stack.append(style_id)
+                stack_append(style_id)
                 current_style = current_style + style_map[style_id]
             if next_offset > offset:
-                yield Segment(text[offset:next_offset], current_style)
+                yield _Segment(text[offset:next_offset], current_style)
         if self.end:
-            yield Segment(self.end)
+            yield _Segment(self.end)
 
     def join(self, lines: Iterable[Text]) -> Text:
         """Join text together."""
@@ -370,7 +372,7 @@ class Text:
                 self._spans.append(Span(offset, offset + text_length, style))
             self._length += text_length
             self._text_str = None
-        else:
+        elif isinstance(text, Text):
             if style is not None:
                 raise ValueError("style must not be set when appending Text instance")
             text_length = self._length
@@ -385,6 +387,8 @@ class Text:
             )
             self._length += len(text)
             self._text_str = None
+        else:
+            raise TypeError("Only str or Text can be appended to Text")
 
     def split(self, separator="\n", include_separator: bool = False) -> List[Text]:
         """Split rich text in to lines, preserving styles.

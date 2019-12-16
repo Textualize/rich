@@ -29,15 +29,19 @@ from typing import (
 )
 from typing_extensions import Literal
 
+
 from ._emoji_replace import _emoji_replace
 from ._render_width import RenderWidth
 from ._log_render import LogRender
 from .default_styles import DEFAULT_STYLES
 from . import errors
 from .color import ColorSystem
-
+from .highlighter import ReprHighlighter
+from .pretty import Pretty
 from .style import Style
+from . import highlighter
 from . import themes
+from .pretty import Pretty
 from .theme import Theme
 from .segment import Segment
 
@@ -75,6 +79,9 @@ def console_str(render_object: Any) -> Text:
         return console_str_callable()
     else:
         return Text(str(render_object))
+
+
+_repr_highlight = ReprHighlighter()
 
 
 @dataclass
@@ -522,19 +529,6 @@ class Console:
             _style = style
         return StyleContext(self, _style)
 
-    # def write(self, text: str, style: str = None) -> None:
-    #     """Write text in the current style.
-
-    #     Args:
-    #         text (str): Text to write
-
-    #     Returns:
-    #         None:
-    #     """
-    #     write_style = self.current_style or self._get_style(style or "none")
-    #     self.buffer.append(Segment(text, write_style))
-    #     self._check_buffer()
-
     def _collect_renderables(
         self, objects: Iterable[Any], sep: str, end: str, emoji=True,
     ) -> List[ConsoleRenderable]:
@@ -549,33 +543,43 @@ class Console:
         """
         from .text import Text
 
+        sep_text = Text(sep)
+        end_text = Text(end)
         renderables: List[ConsoleRenderable] = []
         append = renderables.append
-        strings: List[str] = []
-        append_string = strings.append
+        text: List[Text] = []
+        append_text = text.append
 
-        def check_strings() -> None:
-            if strings:
+        def check_text() -> None:
+            if text:
                 if end:
-                    append_string(end)
-                append(self.render_str(sep.join(strings)))
-                del strings[:]
+                    append_text(end_text)
+                append(sep_text.join(text))
+                del text[:]
 
         for renderable in objects:
             if isinstance(renderable, ConsoleRenderable):
-                check_strings()
+                check_text()
                 append(renderable)
                 continue
             console_str_callable = getattr(renderable, "__console_str__", None)
             if console_str_callable is not None:
-                append(console_str_callable())
+                append_text(console_str_callable())
                 continue
-            render_str = str(renderable)
-            if emoji:
-                render_str = _emoji_replace(render_str)
-            append_string(render_str)
+            if isinstance(renderable, str):
+                render_str = renderable
+                if emoji:
+                    render_str = _emoji_replace(render_str)
+                append_text(_repr_highlight(render_str))
+            elif isinstance(renderable, Text):
+                append_text(renderable)
+            elif isinstance(renderable, (int, float, bool, bytes, type(None))):
+                append_text(_repr_highlight(repr(renderable)))
+            else:
+                check_text()
+                append(Pretty(renderable))
 
-        check_strings()
+        check_text()
         return renderables
 
     def print(
@@ -608,14 +612,14 @@ class Console:
             for renderable in renderables:
                 extend(render(renderable, render_options))
 
-    def log(self, *objects: Any) -> None:
-        if not objects:
+    def log(self, *objects: Any, debug=Ellipsis) -> None:
+        if not objects and not debug:
             self.line()
             return
-
-        from .text import Text
-
         renderables = self._collect_renderables(objects, sep=" ", end="\n")
+
+        if debug != Ellipsis:
+            renderables.append(Pretty(debug))
 
         caller = inspect.stack()[1]
         path = caller.filename.rpartition(os.sep)[-1]
@@ -792,28 +796,61 @@ class Console:
 
 if __name__ == "__main__":
     console = Console()
-    # console.write_text("Hello", style="bold magenta on white", end="").write_text(
-    #     " World!", "italic blue"
-    # )
-    # "[b]This is bold [style not bold]This is not[/style] this is[/b]"
-
-    # console.write("Hello ")
-    # with console.style("bold blue"):
-    #     console.write("World ")
-    #     with console.style("italic"):
-    #         console.write("in style")
-    # console.write("!")
 
     with console.style("dim on black"):
         console.print("**Hello**, *World*!")
         console.print("Hello, *World*!")
 
-    console.log("<foo>")
-    console.log("Hello", "World", 5, "`import this`", console)
-    console.log("Hello, **World**!")
-    console.log("Hello, World!")
-    console.log("Hello, World!")
+    console.log(
+        "JSONRPC *request*",
+        5,
+        1.3,
+        True,
+        False,
+        None,
+        {
+            "jsonrpc": "2.0",
+            "method": "subtract",
+            "params": {"minuend": 42, "subtrahend": 23},
+            "id": 3,
+        },
+    )
+
+    console.log("# Hello, **World**!")
     console.log("Hello, World!")
 
-    # console.print("foo")
+    console.log(
+        {
+            "name": None,
+            "quiz": {
+                "sport": {
+                    "answered": True,
+                    "q1": {
+                        "question": "Which one is correct team name in NBA?",
+                        "options": [
+                            "New York Bulls",
+                            "Los Angeles Kings",
+                            "Golden State Warriros",
+                            "Huston Rocket",
+                        ],
+                        "answer": "Huston Rocket",
+                    },
+                },
+                "maths": {
+                    "answered": False,
+                    "q1": {
+                        "question": "5 + 7 = ?",
+                        "options": [10, 11, 12, 13],
+                        "answer": 12,
+                    },
+                    "q2": {
+                        "question": "12 - 8 = ?",
+                        "options": [1, 2, 3, 4],
+                        "answer": 4,
+                    },
+                },
+            },
+        }
+    )
+# console.print("foo")
 

@@ -1,7 +1,17 @@
-package = []
+[[package]]
+category = "main"
+description = "A drop-in replacement for pprint that's actually pretty"
+name = "pprintpp"
+optional = false
+python-versions = "*"
+version = "0.4.0"
 
 [metadata]
-content-hash = "fafb334cb038533f851c23d0b63254223abf72ce4f02987e7064b0c95566699a"
+content-hash = "61699e45af0f6a57783fa07c17d80ae01c3615cfc78027541a9b58948ef913d8"
 python-versions = "^3.8"
 
-[metadata.hashes]
+[metadata.files]
+pprintpp = [
+    {file = "pprintpp-0.4.0-py2.py3-none-any.whl", hash = "sha256:b6b4dcdd0c0c0d75e4d7b2f21a9e933e5b2ce62b26e1a54537f9651ae5a5c01d"},
+    {file = "pprintpp-0.4.0.tar.gz", hash = "sha256:ea826108e2c7f49dc6d66c752973c3fc9749142a798d6b254e1e301cfdbc6403"},
+]

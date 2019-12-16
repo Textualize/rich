@@ -30,6 +30,7 @@ class Style:
         *,
         color: str = None,
         bgcolor: str = None,
+        merge: bool = True,
         bold: bool = None,
         dim: bool = None,
         italic: bool = None,
@@ -65,6 +66,7 @@ class Style:
             | (conceal is not None) << 7
             | (strike is not None) << 8
         )
+        self._merge = merge
 
     bold = _Bit(0)
     dim = _Bit(1)
@@ -117,6 +119,7 @@ class Style:
             and self._bgcolor == other._bgcolor
             and self._set_attributes == other._set_attributes
             and self._attributes == other._attributes
+            and self._merge == other._merge
         )
 
     def __hash__(self) -> int:
@@ -152,6 +155,7 @@ class Style:
         color: Optional[str] = None
         bgcolor: Optional[str] = None
         attributes: Dict[str, Optional[bool]] = {}
+        merge: bool = True
 
         words = iter(style_definition.split())
         for original_word in words:
@@ -179,6 +183,8 @@ class Style:
             elif word in style_attributes:
                 attributes[word] = True
 
+            elif word == "nomerge":
+                merge = False
             else:
                 try:
                     Color.parse(word)
@@ -187,7 +193,7 @@ class Style:
                         f"unable to parse {word!r} in style {style_definition!r}; {error}"
                     )
                 color = word
-        style = Style(color=color, bgcolor=bgcolor, **attributes)
+        style = Style(color=color, bgcolor=bgcolor, merge=merge, **attributes)
         return style
 
     @lru_cache(maxsize=1000)
@@ -251,6 +257,7 @@ class Style:
         style._bgcolor = self._bgcolor
         style._attributes = self._attributes
         style._set_attributes = self._attributes
+        style._merge = self._merge
         return style
 
     def render(
@@ -320,11 +327,12 @@ class Style:
                 | (style._attributes & style._set_attributes)
             ),
             "_set_attributes": self._set_attributes | style._set_attributes,
+            "_merge": style._merge,
         }
         return new_style
 
     def __add__(self, style: Optional[Style]) -> Style:
-        if style is None:
+        if style is None or not self._merge:
             return self
         if not isinstance(style, Style):
             return NotImplemented  # type: ignore
