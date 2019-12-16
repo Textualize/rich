@@ -822,6 +822,7 @@ if __name__ == "__main__":
     console.log(
         {
             "name": None,
+            "empty": [],
             "quiz": {
                 "sport": {
                     "answered": True,

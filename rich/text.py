@@ -535,21 +535,3 @@ class Text:
             append(line)
         return lines
 
-
-if __name__ == "__main__":
-    console = Console(markup=None)
-    text = Text("Hello, World! 1 2 3", justify=None)
-    text.stylize(1, 10, "bold")
-    text.stylize(7, 17, "underline")
-    print(repr(text))
-    console.print(text)
-
-    words = text.split(" ")
-    # for word in words:
-    #     console.print(word)
-    # print(repr(words))
-
-    console.print(text)
-
-    j = Text(" ").join(words)
-    console.print(j)

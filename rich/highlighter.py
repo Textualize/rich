@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import re
+from re import finditer
 from typing import List, Union
 
 
@@ -30,8 +30,8 @@ class RegexHighlighter(Highlighter):
         base_style = self.base_style
         stylize = text.stylize
         for highlight in self.highlights:
-            for match in re.finditer(highlight, str_text):
-                for name, _value in match.groupdict().items():
+            for match in finditer(highlight, str_text):
+                for name, _ in match.groupdict().items():
                     start, end = match.span(name)
                     if start != -1:
                         stylize(start, end, f"{base_style}{name}")
@@ -46,8 +46,7 @@ class ReprHighlighter(RegexHighlighter):
         r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?\w+\"?)",
         r"(?P<bool_true>True)|(?P<bool_false>False)|(?P<none>None)",
         r"(?P<number>\-?[0-9]+\.?[0-9]*)",
-        r"(?P<double_str>b?\"\"\".*?\"\"\"|b?\".*?\")",
-        r"(?P<single_str>b?\'\'\'.*?\'\'\'|b?\'.*?\')",
+        r"(?P<str>b?\'\'\'.*?\'\'\'|b?\'.*?\'|b?\"\"\".*?\"\"\"|b?\".*?\")",
     ]
 
 
