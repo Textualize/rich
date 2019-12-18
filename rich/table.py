@@ -99,7 +99,7 @@ class Table:
         style: Union[str, Style] = "none",
         header_style: Union[str, Style] = "bold",
         border_style: Union[str, Style] = "",
-        title_style: Union[str, Style] = "bold",
+        title_style: Union[str, Style] = "italic blue",
     ) -> None:
         self.columns = [
             (Column(header) if isinstance(header, str) else header)

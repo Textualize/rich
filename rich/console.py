@@ -185,7 +185,7 @@ class Console:
         markup: Optional[str] = "markdown",
         log_time: bool = True,
         log_path: bool = True,
-        log_time_format: str = "[%x %X] ",
+        log_time_format: str = "[%X] ",
     ):
 
         self._styles = ChainMap(styles)

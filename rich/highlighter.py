@@ -91,6 +91,6 @@ if __name__ == "__main__":
 
     t.stylize(9, 13, "bold")
 
-    t.stylize(0, 16, "red not bold nomerge")
+    t.stylize(0, 16, "red not bold important")
 
     console.print(t)

@@ -30,7 +30,7 @@ class Style:
         *,
         color: str = None,
         bgcolor: str = None,
-        merge: bool = True,
+        important: bool = False,
         bold: bool = None,
         dim: bool = None,
         italic: bool = None,
@@ -66,7 +66,7 @@ class Style:
             | (conceal is not None) << 7
             | (strike is not None) << 8
         )
-        self._merge = merge
+        self._important = important
 
     bold = _Bit(0)
     dim = _Bit(1)
@@ -105,6 +105,8 @@ class Style:
         if self._bgcolor is not None:
             append("on")
             append(self._bgcolor.name)
+        if self._important:
+            append("important")
         return " ".join(attributes) or "none"
 
     def __repr__(self):
@@ -119,12 +121,18 @@ class Style:
             and self._bgcolor == other._bgcolor
             and self._set_attributes == other._set_attributes
             and self._attributes == other._attributes
-            and self._merge == other._merge
+            and self._important == other._important
         )
 
     def __hash__(self) -> int:
         return hash(
-            (self._color, self._bgcolor, self._attributes, self._set_attributes)
+            (
+                self._color,
+                self._bgcolor,
+                self._attributes,
+                self._set_attributes,
+                self._important,
+            )
         )
 
     @property
@@ -155,7 +163,7 @@ class Style:
         color: Optional[str] = None
         bgcolor: Optional[str] = None
         attributes: Dict[str, Optional[bool]] = {}
-        merge: bool = True
+        important: bool = False
 
         words = iter(style_definition.split())
         for original_word in words:
@@ -183,8 +191,8 @@ class Style:
             elif word in style_attributes:
                 attributes[word] = True
 
-            elif word == "nomerge":
-                merge = False
+            elif word == "important":
+                important = True
 
             else:
                 try:
@@ -194,7 +202,7 @@ class Style:
                         f"unable to parse {word!r} in style {style_definition!r}; {error}"
                     )
                 color = word
-        style = Style(color=color, bgcolor=bgcolor, merge=merge, **attributes)
+        style = Style(color=color, bgcolor=bgcolor, important=important, **attributes)
         return style
 
     @lru_cache(maxsize=1000)
@@ -258,7 +266,7 @@ class Style:
         style._bgcolor = self._bgcolor
         style._attributes = self._attributes
         style._set_attributes = self._attributes
-        style._merge = self._merge
+        style._important = self._important
         return style
 
     def render(
@@ -328,12 +336,12 @@ class Style:
                 | (style._attributes & style._set_attributes)
             ),
             "_set_attributes": self._set_attributes | style._set_attributes,
-            "_merge": style._merge,
+            "_important": style._important,
         }
         return new_style
 
     def __add__(self, style: Optional[Style]) -> Style:
-        if style is None or not self._merge:
+        if style is None or self._important:
             return self
         if not isinstance(style, Style):
             return NotImplemented  # type: ignore
