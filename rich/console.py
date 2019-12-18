@@ -14,6 +14,7 @@ import shutil
 import sys
 from typing import (
     Any,
+    Callable,
     Dict,
     IO,
     Iterable,
@@ -39,6 +40,7 @@ from .color import ColorSystem
 from .highlighter import ReprHighlighter
 from .pretty import Pretty
 from .style import Style
+from .tabulate import tabulate_mapping
 from . import highlighter
 from . import themes
 from .pretty import Pretty
@@ -48,6 +50,7 @@ from .segment import Segment
 if TYPE_CHECKING:
     from .text import Text
 
+    HighlighterType = Callable[[Union[str, Text]], Text]
 
 JustifyValues = Optional[Literal["left", "center", "right", "full"]]
 
@@ -79,9 +82,6 @@ def console_str(render_object: Any) -> Text:
         return console_str_callable()
     else:
         return Text(str(render_object))
-
-
-_repr_highlight = ReprHighlighter()
 
 
 @dataclass
@@ -243,6 +243,9 @@ class Console:
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         """Exit buffer context."""
         self._exit_buffer()
+
+    def push_styles(self, styles: Dict[str, Style]) -> None:
+        self._styles.maps.append(styles)
 
     @property
     def encoding(self) -> str:
@@ -530,7 +533,12 @@ class Console:
         return StyleContext(self, _style)
 
     def _collect_renderables(
-        self, objects: Iterable[Any], sep: str, end: str, emoji=True,
+        self,
+        objects: Iterable[Any],
+        sep: str,
+        end: str,
+        emoji=True,
+        highlight: HighlighterType = None,
     ) -> List[ConsoleRenderable]:
         """Combined a number of renderables and text in to one renderable.
         
@@ -570,11 +578,11 @@ class Console:
                 render_str = renderable
                 if emoji:
                     render_str = _emoji_replace(render_str)
-                append_text(_repr_highlight(render_str))
+                append_text(highlight(render_str) if highlight else render_str)
             elif isinstance(renderable, Text):
                 append_text(renderable)
             elif isinstance(renderable, (int, float, bool, bytes, type(None))):
-                append_text(_repr_highlight(repr(renderable)))
+                append_text(highlight(repr(renderable)) if highlight else renderable)
             else:
                 check_text()
                 append(Pretty(renderable))
@@ -589,6 +597,7 @@ class Console:
         end="\n",
         style: Union[str, Style] = None,
         emoji=True,
+        highlight: HighlighterType = None,
     ) -> None:
         """Print to the console.
 
@@ -603,7 +612,9 @@ class Console:
             self.line()
             return
 
-        renderables = self._collect_renderables(objects, sep=sep, end=end, emoji=emoji)
+        renderables = self._collect_renderables(
+            objects, sep=sep, end=end, emoji=emoji, highlight=highlighter
+        )
 
         render_options = self.options
         extend = self.buffer.extend
@@ -612,11 +623,20 @@ class Console:
             for renderable in renderables:
                 extend(render(renderable, render_options))
 
-    def log(self, *objects: Any, debug=Ellipsis) -> None:
+    def log(
+        self,
+        *objects: Any,
+        debug=Ellipsis,
+        highlight: HighlighterType = None,
+        log_locals: bool = False,
+    ) -> None:
         if not objects and not debug:
             self.line()
             return
-        renderables = self._collect_renderables(objects, sep=" ", end="\n")
+        highlighter = highlight or ReprHighlighter()
+        renderables = self._collect_renderables(
+            objects, sep=" ", end="\n", highlight=highlighter
+        )
 
         if debug != Ellipsis:
             renderables.append(Pretty(debug))
@@ -624,6 +644,13 @@ class Console:
         caller = inspect.stack()[1]
         path = caller.filename.rpartition(os.sep)[-1]
         line_no = caller.lineno
+        if log_locals:
+            locals_map = {
+                key: value
+                for key, value in caller.frame.f_locals.items()
+                if not key.startswith("__")
+            }
+            renderables.append(tabulate_mapping(locals_map, title="Locals"))
 
         with self:
             self.buffer.extend(
@@ -817,7 +844,7 @@ if __name__ == "__main__":
     )
 
     console.log("# Hello, **World**!")
-    console.log("Hello, World!")
+    console.log("Hello, World!", "{'a': 1}", repr(console))
 
     console.log(
         {

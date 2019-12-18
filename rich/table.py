@@ -87,6 +87,7 @@ class Table:
     def __init__(
         self,
         *headers: Union[Column, str],
+        title: str = None,
         width: int = None,
         box: Optional[box.Box] = box.MINIMAL_DOUBLE_HEAD,
         padding: PaddingDimensions = (0, 1),
@@ -98,22 +99,25 @@ class Table:
         style: Union[str, Style] = "none",
         header_style: Union[str, Style] = "bold",
         border_style: Union[str, Style] = "",
+        title_style: Union[str, Style] = "bold",
     ) -> None:
         self.columns = [
             (Column(header) if isinstance(header, str) else header)
             for header in headers
         ]
+        self.title = title
         self.width = width
         self.box = box
         self._padding = Padding.unpack(padding)
         self.pad_edge = pad_edge
         self.expand = expand
-        self.show_header = show_header
+        self.show_header = show_header and headers
         self.show_footer = show_footer
         self.show_edge = show_edge
         self.style = style
         self.header_style = header_style
         self.border_style = border_style
+        self.title_style = title_style
         self._row_count = 0
 
     @property
@@ -163,6 +167,8 @@ class Table:
         self.columns.append(column)
 
     def add_row(self, *renderables: Optional[Union[str, ConsoleRenderable]]) -> None:
+        from .console import ConsoleRenderable
+
         def add_cell(column: Column, renderable: ConsoleRenderable):
             column._cells.append(renderable)
 
@@ -184,7 +190,7 @@ class Table:
                 self.columns.append(column)
             else:
                 column = columns[index]
-            if hasattr(renderable, "__console__"):
+            if isinstance(renderable, ConsoleRenderable):
                 add_cell(column, renderable)
             elif renderable is None:
                 add_cell(column, Text(""))
@@ -201,11 +207,17 @@ class Table:
         max_width = options.max_width
         if self.width is not None:
             max_width = min(self.width, max_width)
+
         if self.box:
             max_width -= len(self.columns)
             if self.show_edge:
                 max_width -= 2
         widths = self._calculate_column_widths(max_width)
+        table_width = sum(widths) + len(self.columns) + (2 if self.box else 0)
+        if self.title:
+            title_text = Text(self.title, self.title_style)
+            wrapped_title = title_text.wrap(table_width, "center")
+            yield wrapped_title
         yield from self._render(console, options, widths)
 
     def _calculate_column_widths(self, max_width: int) -> List[int]:

@@ -71,7 +71,6 @@ class Lines:
         """Console render method to insert line-breaks."""
         for line in self._lines:
             yield line
-            yield Segment("\n")
 
     def append(self, line: Text) -> None:
         self._lines.append(line)

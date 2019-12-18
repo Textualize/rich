@@ -185,6 +185,7 @@ class Style:
 
             elif word == "nomerge":
                 merge = False
+
             else:
                 try:
                     Color.parse(word)

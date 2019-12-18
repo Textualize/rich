@@ -486,10 +486,10 @@ This is a [link](https://www.willmcgugan.com)
 if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
-    console = Console(record=True)
+    console = Console(record=True, width=60)
     # print(console.size)
 
-    markup = "<foo>"
+    # markup = "<foo>"
     md = Markdown(markup)
 
     console.print(md)

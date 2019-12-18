@@ -7,6 +7,7 @@ from .text import Text
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleRenderable, RenderableType
+    from table import Table
 
 
 class LogRender:
@@ -56,8 +57,6 @@ class LogRender:
                 row.append(Text(f"{path}:{line_no}"))
         output.add_row(*row)
         return output
-
-        self.console.print(output)
 
 
 if __name__ == "__main__":
