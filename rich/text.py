@@ -246,8 +246,8 @@ class Text:
         else:
             lines = self.fit(options.max_width)
 
-        for line in lines:
-            yield from self._render_line(line, console, options)
+        all_lines = Text("\n").join(lines)
+        yield from self._render_line(all_lines, console, options)
 
     def __console_width__(self, max_width: int) -> RenderWidth:
         text = self.text
@@ -292,33 +292,29 @@ class Text:
         stack: List[int] = []
         stack_append = stack.append
         stack_pop = stack.remove
-        current_style = style_map[0]
 
         _Segment = Segment
 
         style_cache: Dict[Tuple[int, ...], Style] = {}
+        combine = Style.combine
 
         def get_current_style() -> Style:
+            """Construct current style from stack."""
             style_ids = tuple(sorted(stack))
             cached_style = style_cache.get(style_ids)
             if cached_style is not None:
                 return cached_style
-            current_style = Style.combine(
-                style_map[_style_id] for _style_id in style_ids
-            )
+            current_style = combine(style_map[_style_id] for _style_id in style_ids)
             style_cache[style_ids] = current_style
             return current_style
 
         for (offset, leaving, style_id), (next_offset, _, _) in zip(spans, spans[1:]):
             if leaving:
                 stack_pop(style_id)
-                current_style = get_current_style()
             else:
                 stack_append(style_id)
-                current_style = get_current_style()
-
             if next_offset > offset:
-                yield _Segment(text[offset:next_offset], current_style)
+                yield _Segment(text[offset:next_offset], get_current_style())
         if self.end:
             yield _Segment(self.end)
 

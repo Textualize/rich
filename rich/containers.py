@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, List, Literal, TypeVar, TYPE_CHECKING, Union
+from typing import Iterator, Iterable, List, Literal, TypeVar, TYPE_CHECKING, Union
 
 
 from .segment import Segment
@@ -54,7 +54,7 @@ class Lines:
     def __init__(self, lines: Iterable[Text] = ()) -> None:
         self._lines: List[Text] = list(lines)
 
-    def __iter__(self) -> Iterable[Text]:
+    def __iter__(self) -> Iterator[Text]:
         return iter(self._lines)
 
     def __getitem__(self, index: int) -> Text:
