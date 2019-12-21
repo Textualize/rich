@@ -49,7 +49,7 @@ def test_locals():
     console = Console()
 
     console.log(
-        "JSON RPC batch",
+        "[b]JSON[/b] RPC [i]batch[/i]",
         [
             {"jsonrpc": "2.0", "method": "sum", "params": [1, 2, 4], "id": "1"},
             {"jsonrpc": "2.0", "method": "notify_hello", "params": [7]},

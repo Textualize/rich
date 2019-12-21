@@ -32,6 +32,8 @@ from typing_extensions import Literal
 
 
 from ._emoji_replace import _emoji_replace
+
+from . import markup
 from ._render_width import RenderWidth
 from ._log_render import LogRender
 from .default_styles import DEFAULT_STYLES
@@ -182,7 +184,7 @@ class Console:
         width: int = None,
         height: int = None,
         record: bool = False,
-        markup: Optional[str] = "markdown",
+        markup: bool = True,
         log_time: bool = True,
         log_path: bool = True,
         log_time_format: str = "[%X] ",
@@ -341,7 +343,9 @@ class Console:
         elif isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__console__(self, render_options)
         elif isinstance(renderable, str):
-            yield from self._render(self.render_str(renderable), render_options)
+            from .text import Text
+
+            yield from self._render(Text(renderable), render_options)
             return
         else:
             raise errors.NotRenderableError(
@@ -420,8 +424,8 @@ class Console:
             )
         return lines
 
-    def render_str(self, text: str) -> ConsoleRenderable:
-        """Convert a string to something renderable.
+    def render_str(self, text: str) -> Text:
+        """Convert a string to a Text instance.
         
         Args:
             text (str): Text to render.            
@@ -430,15 +434,9 @@ class Console:
             ConsoleRenderable: Renderable object.
         
         """
-
-        if self._markup == "markdown":
-            from .markdown import Markdown
-
-            return Markdown(text)
-        else:
-            from .text import Text
-
-            return Text(text)
+        if self._markup:
+            return markup.render(text)
+        return Text(text)
 
     def _get_style(self, name: str) -> Optional[Style]:
         """Get a named style, or `None` if it doesn't exist.
@@ -580,11 +578,14 @@ class Console:
                 render_str = renderable
                 if emoji:
                     render_str = _emoji_replace(render_str)
+                render_str = self.render_str(render_str)
                 append_text(highlight(render_str) if highlight else render_str)
             elif isinstance(renderable, Text):
                 append_text(renderable)
             elif isinstance(renderable, (int, float, bool, bytes, type(None))):
-                append_text(highlight(repr(renderable)) if highlight else renderable)
+                append_text(
+                    highlight(repr(renderable)) if highlight else repr(renderable)
+                )
             else:
                 check_text()
                 append(Pretty(renderable))
@@ -615,7 +616,7 @@ class Console:
             return
 
         renderables = self._collect_renderables(
-            objects, sep=sep, end=end, emoji=emoji, highlight=highlighter
+            objects, sep=sep, end=end, emoji=emoji, highlight=highlight
         )
 
         render_options = self.options
@@ -827,7 +828,7 @@ if __name__ == "__main__":
     console = Console()
 
     with console.style("dim on black"):
-        console.print("**Hello**, *World*!")
+        console.print("[b]Hello[/b], [i]World[/i]!")
         console.print("Hello, *World*!")
 
     console.log(

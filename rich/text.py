@@ -22,6 +22,7 @@ if TYPE_CHECKING:
         RenderResult,
         RenderableType,
     )
+
 from .containers import Lines
 from .style import Style
 from .segment import Segment
@@ -147,6 +148,20 @@ class Text:
             result.append(other)
             return result
         return NotImplemented
+
+    @classmethod
+    def from_markup(cls, text: str) -> Text:
+        """Create Text instance from markup.
+        
+        Args:
+            text (str): A string containing console markup.
+        
+        Returns:
+            Text: A Text instance with markup rendered.
+        """
+        from .markup import render
+
+        return render(text)
 
     @property
     def text(self) -> str:
@@ -565,3 +580,10 @@ if __name__ == "__main__":
     print(text._spans)
 
     c.print(text)
+
+    c.print("[bold red]Danger Will Robinson[/bold red]")
+
+    t = Text.from_markup("[magenta]wat")
+    print(len(t))
+    print(RenderWidth.get(t, 100))
+

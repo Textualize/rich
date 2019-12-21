@@ -35,7 +35,7 @@ class Panel:
             style (str, optional): The style of the border. Defaults to "none".
         """
         self.renderable = (
-            Text(renderable) if isinstance(renderable, str) else renderable
+            Text.from_markup(renderable) if isinstance(renderable, str) else renderable
         )
         self.box = box
         self.expand = expand
@@ -49,7 +49,9 @@ class Panel:
         if self.expand:
             child_width = width - 2
         else:
+            print(self.renderable)
             child_width = RenderWidth.get(self.renderable, width - 2).maximum
+            print(child_width)
 
         width = child_width + 2
         child_options = options.update(width=child_width)
@@ -65,6 +67,12 @@ class Panel:
             yield line_end
         yield Segment(box.get_bottom([width - 2]), style)
 
+    def __console_width__(self, max_width: int) -> RenderWidth:
+        if self.expand:
+            return RenderWidth(max_width, max_width)
+        width = RenderWidth.get(self.renderable, max_width - 2).maximum + 2
+        return RenderWidth.get(width, width)
+
 
 if __name__ == "__main__":
     from .console import Console
@@ -74,8 +82,13 @@ if __name__ == "__main__":
     from .padding import Padding
     from .box import ROUNDED
 
-    p = Panel(Panel(Padding("Hello World! ", (1, 8)), box=ROUNDED, expand=False))
+    p = Panel(
+        Panel(
+            Padding(Text.from_markup("[bold magenta]Hello World!"), (1, 8)),
+            box=ROUNDED,
+            expand=False,
+        )
+    )
 
     print(p)
     c.print(p)
-
