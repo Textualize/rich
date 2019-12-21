@@ -20,3 +20,7 @@ class StyleStackError(ConsoleError):
 
 class NotRenderableError(ConsoleError):
     """Object is not renderable."""
+
+
+class MarkupError(ConsoleError):
+    """Markup was badly formatted."""

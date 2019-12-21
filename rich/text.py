@@ -215,7 +215,7 @@ class Text:
         """
         length = len(self)
         if end < 0 or start > length:
-            # span in range
+            # span not in range
             return
         self._spans.append(Span(max(0, start), min(length, end), style))
 
@@ -319,7 +319,15 @@ class Text:
             yield _Segment(self.end)
 
     def join(self, lines: Iterable[Text]) -> Text:
-        """Join text together."""
+        """Join text together with this instance as the separator.
+        
+        Args:
+            lines (Iterable[Text]): An iterable of Text instances to join.
+        
+        Returns:
+            Text: A new text instance containing join text.
+        """
+
         new_text = Text()
         append = new_text.append
         for last, line in iter_last(lines):
