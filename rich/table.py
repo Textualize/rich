@@ -88,6 +88,7 @@ class Table:
         self,
         *headers: Union[Column, str],
         title: str = None,
+        footer: str = None,
         width: int = None,
         box: Optional[box.Box] = box.MINIMAL_DOUBLE_HEAD,
         padding: PaddingDimensions = (0, 1),

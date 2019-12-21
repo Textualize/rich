@@ -161,6 +161,8 @@ class CodeBlock(TextElement):
 
     @classmethod
     def create(cls, markdown: Markdown, node: Any) -> ListElement:
+        if node.info is None:
+            return cls("default", markdown.code_theme)
         lexer_name, _, _ = node.info.partition(" ")
         return cls(lexer_name, markdown.code_theme)
 
@@ -418,58 +420,56 @@ class Markdown:
 
 
 markup = """
-# This is a header which is very long and should be wrapped accross several lines, it should render within a cyan panel
+An h1 header
+============
 
-## This is a header L2
+Paragraphs are separated by a blank line.
 
-### This is a header L3
+2nd paragraph. *Italic*, **bold**, and `monospace`. Itemized lists look like:
 
-#### This is a header L4
+  * this one
+  * that one
+  * the other one
 
-##### This is a header L5
+Note that --- not considering the asterisk --- the actual text content starts at 4-columns in.
 
-###### This is a header L6
+> Block quotes are
+> written like so.
+>
+> They can span multiple paragraphs,
+> if you like.
 
-The main area where I think *Django's models* are `missing` out is the lack of type hinting (hardly surprising since **Django** pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code. It may only save you minutes each time, but multiply that by the number of code + run iterations you do each day, and it can save hours of development time. Multiply that by the lifetime of your project, and it could save weeks or months. A clear win.
+Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., "it's all in chapters 12--14"). Three dots ... will be converted to an ellipsis. Unicode is supported. ☺
+
+
+An h2 header
+------------
 
 ```python
-    @property
-    def width(self) -> int:
-        \"\"\"Get the width of the console.
-        
-        Returns:
-            int: The width (in characters) of the console.
-        \"\"\"
-        width, _ = self.size
-        return width
+    @classmethod
+    def adjust_line_length(
+        cls, line: List[Segment], length: int, style: Style = None
+    ) -> List[Segment]:        
+        line_length = sum(len(text) for text, _style in line)
+        if line_length < length:
+            return line[:] + [Segment(" " * (length - line_length), style)]
+        elif line_length > length:
+            line_length = 0
+            new_line: List[Segment] = []
+            append = new_line.append
+            for segment in line:
+                segment_length = len(segment.text)
+                if line_length + segment_length < length:
+                    append(segment)
+                    line_length += segment_length
+                else:
+                    text, style = segment
+                    append(Segment(text[: length - line_length], style))
+                    break
+            return new_line
+        return line
 ```
 
-The main area where I think Django's models are missing out is the lack of type hinting (hardly surprising since Django pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code. It may only save you minutes each time, but multiply that by the number of code + run iterations you do each day, and it can save hours of development time. Multiply that by the lifetime of your project, and it could save weeks or months. A clear win.
-
----
-# Another header
-qqweo qlkwje lqkwej 
-
-> The main area where I think Django's models are missing out is the lack of type hinting (hardly surprising since Django pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code. It may only save you minutes each time, but multiply that by the number of code + run iterations you do each day, and it can save hours of development time. Multiply that by the lifetime of your project, and it could save weeks or months. A clear win.
-
-
- * Hello, *World*!
-   Another line
- * bar
- * baz
-
-1. First *Item* **in bold!**
-   Foo bar baz etc
-   * Secondary list with lots of text that will wrap on to another line, Secondary list with lots of text that will wrap on to another line, Secondary list with lots of text that will wrap on to another line,
-   * Foo 
-   * Bar baz
-2. Second Item
-3. The main area where I think Django's models are missing out is the lack of type hinting (hardly surprising since Django pre-dates type hints). Adding type hints allows Mypy to detect bugs before you even run your code.
-
-- sdfsdf
-- wewerwer
-
-This is a [link](https://www.willmcgugan.com)
 
 """
 
@@ -486,7 +486,7 @@ This is a [link](https://www.willmcgugan.com)
 if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
-    console = Console(record=True, width=60)
+    console = Console(record=True, width=90)
     # print(console.size)
 
     # markup = "<foo>"
@@ -496,13 +496,13 @@ if __name__ == "__main__":  # pragma: no cover
     print(console)
     # print(console.render_spans())
 
-    from .color import Color
-    from .style import Style
+    # from .color import Color
+    # from .style import Style
 
-    print(Color.downgrade.cache_info())
-    print(Color.parse.cache_info())
-    print(Color.get_ansi_codes.cache_info())
+    # print(Color.downgrade.cache_info())
+    # print(Color.parse.cache_info())
+    # print(Color.get_ansi_codes.cache_info())
 
-    Style.parse("on red")
+    # Style.parse("on red")
 
-    print(Style.parse.cache_info())
+    # print(Style.parse.cache_info())

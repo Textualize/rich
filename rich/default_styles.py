@@ -40,7 +40,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "log.time": Style(color="cyan", dim=True),
     "log.message": Style(),
     "log.path": Style(dim=True),
-    "repr.str": Style(color="green", important=True),
+    "repr.str": Style(color="green"),
     "repr.brace": Style(bold=True),
     "repr.tag_start": Style(bold=True),
     "repr.tag_name": Style(color="bright_magenta"),
@@ -53,7 +53,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.bool_true": Style(color="bright_green", italic=True),
     "repr.bool_false": Style(color="bright_red", italic=True),
     "repr.none": Style(color="magenta", italic=True),
-    "repr.url": Style(underline=True, color="default", important=True),
+    "repr.url": Style(underline=True, color="default"),
     "inspect.key": Style(italic=True),
     "inspect.value": Style(),
 }

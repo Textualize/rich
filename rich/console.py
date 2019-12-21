@@ -451,7 +451,9 @@ class Console:
         """
         return self._styles.get(name, None)
 
-    def get_style(self, name: Union[str, Style], *, default: str = None) -> Style:
+    def get_style(
+        self, name: Union[str, Style], *, default: Union[Style, str] = None
+    ) -> Style:
         """Get a style merged with the current style.
 
         Args:

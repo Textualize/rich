@@ -30,7 +30,6 @@ class Style:
         *,
         color: str = None,
         bgcolor: str = None,
-        important: bool = False,
         bold: bool = None,
         dim: bool = None,
         italic: bool = None,
@@ -43,7 +42,6 @@ class Style:
     ):
         self._color = None if color is None else Color.parse(color)
         self._bgcolor = None if bgcolor is None else Color.parse(bgcolor)
-        _bool = bool
         self._attributes = (
             (bold or 0)
             | (dim or 0) << 1
@@ -66,7 +64,6 @@ class Style:
             | (conceal is not None) << 7
             | (strike is not None) << 8
         )
-        self._important = important
 
     bold = _Bit(0)
     dim = _Bit(1)
@@ -105,8 +102,6 @@ class Style:
         if self._bgcolor is not None:
             append("on")
             append(self._bgcolor.name)
-        if self._important:
-            append("important")
         return " ".join(attributes) or "none"
 
     def __repr__(self):
@@ -121,18 +116,11 @@ class Style:
             and self._bgcolor == other._bgcolor
             and self._set_attributes == other._set_attributes
             and self._attributes == other._attributes
-            and self._important == other._important
         )
 
     def __hash__(self) -> int:
         return hash(
-            (
-                self._color,
-                self._bgcolor,
-                self._attributes,
-                self._set_attributes,
-                self._important,
-            )
+            (self._color, self._bgcolor, self._attributes, self._set_attributes,)
         )
 
     @property
@@ -163,7 +151,6 @@ class Style:
         color: Optional[str] = None
         bgcolor: Optional[str] = None
         attributes: Dict[str, Optional[bool]] = {}
-        important: bool = False
 
         words = iter(style_definition.split())
         for original_word in words:
@@ -191,9 +178,6 @@ class Style:
             elif word in style_attributes:
                 attributes[word] = True
 
-            elif word == "important":
-                important = True
-
             else:
                 try:
                     Color.parse(word)
@@ -202,7 +186,7 @@ class Style:
                         f"unable to parse {word!r} in style {style_definition!r}; {error}"
                     )
                 color = word
-        style = Style(color=color, bgcolor=bgcolor, important=important, **attributes)
+        style = Style(color=color, bgcolor=bgcolor, **attributes)
         return style
 
     @lru_cache(maxsize=1000)
@@ -251,8 +235,9 @@ class Style:
         """
 
         style = Style()
+        update = style._update
         for _style in styles:
-            style = style + _style
+            update(_style)
         return style
 
     def copy(self) -> Style:
@@ -262,11 +247,7 @@ class Style:
             Style: A new Style instance with identical attributes.
         """
         style = self.__new__(Style)
-        style._color = self._color
-        style._bgcolor = self._bgcolor
-        style._attributes = self._attributes
-        style._set_attributes = self._attributes
-        style._important = self._important
+        style.__dict__ = self.__dict__.copy()
         return style
 
     def render(
@@ -327,7 +308,6 @@ class Style:
 
         """
         new_style = self.__new__(Style)
-
         new_style.__dict__ = {
             "_color": style._color or self._color,
             "_bgcolor": style._bgcolor or self._bgcolor,
@@ -336,16 +316,36 @@ class Style:
                 | (style._attributes & style._set_attributes)
             ),
             "_set_attributes": self._set_attributes | style._set_attributes,
-            "_important": style._important,
         }
         return new_style
 
+    def _update(self, style: Style) -> None:
+        """Update this style with another.
+        
+        Args:
+            style (Style): Style to combine to this instance.
+        """
+        self._color = style._color or self._color
+        self._bgcolor = style._bgcolor or self._bgcolor
+        self._attributes = (self._attributes & ~style._set_attributes) | (
+            style._attributes & style._set_attributes
+        )
+        self._set_attributes = self._set_attributes | style._set_attributes
+
     def __add__(self, style: Optional[Style]) -> Style:
-        if style is None or self._important:
+        if style is None:
             return self
         if not isinstance(style, Style):
             return NotImplemented  # type: ignore
         return self._apply(style)
+
+    def __iadd__(self, style: Optional[Style]) -> Style:
+        if style is None:
+            return self
+        if not isinstance(style, Style):
+            return NotImplemented  # type: ignore
+        self._update(style)
+        return self
 
 
 class StyleStack:

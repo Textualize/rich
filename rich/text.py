@@ -289,22 +289,34 @@ class Text:
         ]
         spans.sort(key=itemgetter(0, 1))
 
-        stack: List[int] = [0]
+        stack: List[int] = []
         stack_append = stack.append
         stack_pop = stack.remove
         current_style = style_map[0]
 
         _Segment = Segment
 
+        style_cache: Dict[Tuple[int, ...], Style] = {}
+
+        def get_current_style() -> Style:
+            style_ids = tuple(sorted(stack))
+            cached_style = style_cache.get(style_ids)
+            if cached_style is not None:
+                return cached_style
+            current_style = Style.combine(
+                style_map[_style_id] for _style_id in style_ids
+            )
+            style_cache[style_ids] = current_style
+            return current_style
+
         for (offset, leaving, style_id), (next_offset, _, _) in zip(spans, spans[1:]):
             if leaving:
                 stack_pop(style_id)
-                current_style = Style.combine(
-                    style_map[_style_id] for _style_id in stack
-                )
+                current_style = get_current_style()
             else:
                 stack_append(style_id)
-                current_style = current_style + style_map[style_id]
+                current_style = get_current_style()
+
             if next_offset > offset:
                 yield _Segment(text[offset:next_offset], current_style)
         if self.end:
@@ -535,3 +547,17 @@ class Text:
             append(line)
         return lines
 
+
+if __name__ == "__main__":
+    text = Text("Hello, World!")
+    from .console import Console
+
+    c = Console()
+    c.print(text)
+
+    text.stylize(0, 12, "bold red")
+    text.stylize(0, 6, "not bold default")
+
+    print(text._spans)
+
+    c.print(text)
