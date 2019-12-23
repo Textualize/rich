@@ -68,6 +68,6 @@ console.print(":smiley: :vampire: :pile_of_poo: :thumbs_up: :raccoon:")
 <code>
         <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">😃 🧛 💩 👍 🦝 
 </pre>
-    </code>
+</code>
 
 Please use this feature wisely.
