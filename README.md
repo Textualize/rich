@@ -40,6 +40,8 @@ console.print("Hello", "World!", style="bold red")
 
 The output will be something like the following:
 
+![Hello World](./imgs/hello_world.png)
+
 <code>
         <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #800000; font-weight: bold">Hello World! 
 </span></pre>
