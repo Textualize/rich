@@ -2,6 +2,7 @@ from __future__ import annotations
 
 
 from collections import ChainMap
+from collections.abc import Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from enum import Enum
@@ -588,9 +589,13 @@ class Console:
                 append_text(
                     highlight(repr(renderable)) if highlight else repr(renderable)
                 )
-            else:
+            elif isinstance(renderable, (Mapping, Sequence)):
                 check_text()
                 append(Pretty(renderable))
+            else:
+                append_text(
+                    highlight(repr(renderable)) if highlight else repr(renderable)
+                )
 
         check_text()
         return renderables

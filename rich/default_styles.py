@@ -56,6 +56,9 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.url": Style(underline=True, color="default"),
     "inspect.key": Style(italic=True),
     "inspect.value": Style(),
+    "table.header": Style(bold=True),
+    "table.footer": Style(bold=True),
+    "table.cell": Style(),
 }
 
 MARKDOWN_STYLES = {

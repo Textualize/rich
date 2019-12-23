@@ -3,9 +3,10 @@ from __future__ import annotations
 from collections import defaultdict
 from operator import itemgetter
 import re
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 from .errors import MarkupError
+from .style import Style
 from .text import Span, Text
 
 
@@ -36,7 +37,7 @@ def _parse(markup: str) -> Iterable[Tuple[Optional[str], Optional[str]]]:
         yield markup[position:], None
 
 
-def render(markup: str) -> Text:
+def render(markup: str, style: Union[str, Style] = "") -> Text:
     """Render console markup in to a Text instance.
 
     Args:
@@ -48,7 +49,7 @@ def render(markup: str) -> Text:
     Returns:
         Text: A test instance.
     """
-    text = Text()
+    text = Text(style=style)
     stylize = text.stylize
 
     styles: Dict[str, List[int]] = defaultdict(list)

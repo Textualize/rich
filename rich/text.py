@@ -150,7 +150,7 @@ class Text:
         return NotImplemented
 
     @classmethod
-    def from_markup(cls, text: str) -> Text:
+    def from_markup(cls, text: str, style: Union[str, Style] = "") -> Text:
         """Create Text instance from markup.
         
         Args:
@@ -161,7 +161,7 @@ class Text:
         """
         from .markup import render
 
-        return render(text)
+        return render(text, style)
 
     @property
     def text(self) -> str:

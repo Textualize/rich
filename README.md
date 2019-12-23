@@ -1,3 +1,5 @@
+**Note:** This library is currently work in progress. Documentation and tests are in progress...
+
 # Rich
 
 Rich is a Python library for _rich_ text and high level formatting in the terminal.
@@ -81,7 +83,38 @@ Style attributes and colors may appear in any order, i.e. `"bold magenta on yell
 
 ## Console Logging
 
-TODO
+The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default, Rich will do syntax highlighting for Python structures and for repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
+
+```python
+from rich.console import Console
+console = Console()
+
+test_data = [
+    {"jsonrpc": "2.0", "method": "sum", "params": [None, 1, 2, 4, False, True], "id": "1",},
+    {"jsonrpc": "2.0", "method": "notify_hello", "params": [7]},
+    {"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": "2"},
+]
+
+def test_log():
+    enabled = False
+    context = {
+        "foo": "bar",
+    }
+    movies = ["Deadpool", "Rise of the Skywalker"]
+    console.log("Hello from", console, "!")
+    console.log(test_data, log_locals=True)
+
+
+test_log()
+```
+
+The above produces the following output:
+
+![Log](./imgs/log.png)
+
+Note the `log_locals` argument, which outputs a table containing the local variables where the log method was called.
+
+The log method could be used for logging to the terminal for long running applications such as servers, but is also a very nice debugging aid.
 
 ## Emoji
 
@@ -93,6 +126,50 @@ To insert an emoji in to console output place the name between two colons. Here'
 ```
 
 Please use this feature wisely.
+
+## Tables
+
+Rich can render flexible tables with unicode box characters. There is a large variety of formatting options for borders, styles, cell alignment etc. Here's a simple example:
+
+```python
+from rich.console import Console
+from rich.table import Column, Table
+
+console = Console()
+
+table = Table(show_header=True, header_style="bold magenta")
+table.add_column("Date", style="dim", width=12)
+table.add_column("Title")
+table.add_column("Production Budget", justify="right")
+table.add_column("Box Office", justify="right")
+table.add_row(
+    "Dev 20, 2019", "Star Wars: The Rise of Skywalker", "$275,000,0000", "$375,126,118"
+)
+table.add_row(
+    "May 25, 2018",
+    "[red]Solo[/red]: A Star Wars Story",
+    "$275,000,0000",
+    "$393,151,347",
+)
+table.add_row(
+    "Dec 15, 2017",
+    "Star Wars Ep. VIII: The Last Jedi",
+    "$262,000,000",
+    "[bold]$1,332,539,889[/bold]",
+)
+
+console.print(table)
+```
+
+This produces the following output:
+
+![table](./imgs/table.png)
+
+Note that console markup is rendered in the same was as `print()` and `log()`. In fact, anything that is renderable by Rich may be included in the headers / rows (even other tables).
+
+The `Table` class is smart enough to resize columns to fit the available width of the terminal, wrapping text as required. Here's the same example, with the terminal made smaller than the table above:
+
+![table2](./imgs/table2.png)
 
 ## Markdown
 

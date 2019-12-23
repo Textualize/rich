@@ -9,6 +9,7 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    TypeVar,
     TYPE_CHECKING,
     Union,
 )
@@ -34,14 +35,25 @@ from ._render_width import RenderWidth
 from ._tools import iter_first_last, iter_first, iter_last, ratio_divide
 
 
+T = TypeVar("T")
+
+
+def _pick_first(values: Iterable[Optional[T]], final: T) -> T:
+    """Pick first non-None value."""
+    for value in values:
+        if value is not None:
+            return value
+    return final
+
+
 @dataclass
 class Column:
     """Defines a column in a table."""
 
     header: Union[str, ConsoleRenderable] = ""
     footer: Union[str, ConsoleRenderable] = ""
-    header_style: Union[str, Style] = "none"
-    footer_style: Union[str, Style] = "none"
+    header_style: Union[str, Style] = "table.header"
+    footer_style: Union[str, Style] = "table.footer"
     style: Union[str, Style] = "none"
     justify: JustifyValues = "left"
     width: Optional[int] = None
@@ -61,7 +73,7 @@ class Column:
     @property
     def header_renderable(self) -> ConsoleRenderable:
         return (
-            Text(self.header, style=self.header_style)
+            Text.from_markup(self.header, style=self.header_style or "")
             if isinstance(self.header, str)
             else self.header
         )
@@ -69,7 +81,7 @@ class Column:
     @property
     def footer_renderable(self) -> ConsoleRenderable:
         return (
-            Text(self.footer, style=self.footer_style)
+            Text.from_markup(self.footer, style=self.footer_style or "")
             if isinstance(self.footer, str)
             else self.footer
         )
@@ -90,7 +102,7 @@ class Table:
         title: str = None,
         footer: str = None,
         width: int = None,
-        box: Optional[box.Box] = box.MINIMAL_DOUBLE_HEAD,
+        box: Optional[box.Box] = box.DOUBLE_EDGE,
         padding: PaddingDimensions = (0, 1),
         pad_edge: bool = True,
         expand: bool = False,
@@ -98,9 +110,10 @@ class Table:
         show_footer: bool = False,
         show_edge: bool = True,
         style: Union[str, Style] = "none",
-        header_style: Union[str, Style] = "bold",
-        border_style: Union[str, Style] = "",
-        title_style: Union[str, Style] = "italic blue",
+        header_style: Union[str, Style] = None,
+        footer_style: Union[str, Style] = None,
+        border_style: Union[str, Style] = None,
+        title_style: Union[str, Style] = None,
     ) -> None:
         self.columns = [
             (Column(header) if isinstance(header, str) else header)
@@ -112,11 +125,12 @@ class Table:
         self._padding = Padding.unpack(padding)
         self.pad_edge = pad_edge
         self.expand = expand
-        self.show_header = show_header and headers
+        self.show_header = show_header
         self.show_footer = show_footer
         self.show_edge = show_edge
         self.style = style
         self.header_style = header_style
+        self.footer_style = footer_style
         self.border_style = border_style
         self.title_style = title_style
         self._row_count = 0
@@ -134,9 +148,9 @@ class Table:
         self,
         header: Union[str, ConsoleRenderable] = "",
         footer: Union[str, ConsoleRenderable] = "",
-        header_style: Union[str, Style] = "none",
-        footer_style: Union[str, Style] = "none",
-        style: Union[str, Style] = "none",
+        header_style: Union[str, Style] = None,
+        footer_style: Union[str, Style] = None,
+        style: Union[str, Style] = None,
         justify: JustifyValues = "left",
         width: int = None,
         ratio: int = None,
@@ -158,9 +172,9 @@ class Table:
         column = Column(
             header=header,
             footer=footer,
-            header_style=header_style,
-            footer_style=footer_style,
-            style=style,
+            header_style=_pick_first((header_style, self.header_style), "table.header"),
+            footer_style=_pick_first((footer_style, self.footer_style), "table.footer"),
+            style=_pick_first((style, self.style), "table.cell"),
             justify=justify,
             width=width,
             ratio=ratio,
@@ -196,7 +210,7 @@ class Table:
             elif renderable is None:
                 add_cell(column, Text(""))
             elif isinstance(renderable, str):
-                add_cell(column, Text(renderable))
+                add_cell(column, Text.from_markup(renderable))
             else:
                 raise errors.NotRenderableError(
                     f"unable to render {renderable!r}; str or object with a __console__ method is required"
@@ -216,7 +230,7 @@ class Table:
         widths = self._calculate_column_widths(max_width)
         table_width = sum(widths) + len(self.columns) + (2 if self.box else 0)
         if self.title:
-            title_text = Text(self.title, self.title_style)
+            title_text = Text.from_markup(self.title, style=self.title_style or "")
             wrapped_title = title_text.wrap(table_width, "center")
             yield wrapped_title
         yield from self._render(console, options, widths)
@@ -325,9 +339,9 @@ class Table:
     def _render(
         self, console: Console, options: ConsoleOptions, widths: List[int]
     ) -> RenderResult:
-        table_style = console.get_style(self.style)
+        table_style = console.get_style(self.style or "")
 
-        border_style = table_style + console.get_style(self.border_style)
+        border_style = table_style + console.get_style(self.border_style or "")
         rows: Iterable[Tuple[_Cell, ...]] = zip(
             *(
                 self._get_cells(column_index, column)
