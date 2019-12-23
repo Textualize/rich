@@ -43,7 +43,7 @@ class Segment(NamedTuple):
 
     @classmethod
     def split_and_crop_lines(
-        cls, segments: Iterable[Segment], length: int
+        cls, segments: Iterable[Segment], length: int, style: Style = None
     ) -> Iterable[List[Segment]]:
         """Split segments in to lines, and crop lines greater than a given length.
         
@@ -66,13 +66,13 @@ class Segment(NamedTuple):
                     if _text:
                         append(cls(_text, style))
                     if new_line:
-                        yield cls.adjust_line_length(lines[-1], length)
+                        yield cls.adjust_line_length(lines[-1], length, style=style)
                         lines.append([])
                         append = lines[-1].append
             else:
                 append(segment)
         if lines[-1]:
-            yield cls.adjust_line_length(lines[-1], length)
+            yield cls.adjust_line_length(lines[-1], length, style=style)
 
     @classmethod
     def adjust_line_length(

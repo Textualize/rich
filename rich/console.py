@@ -420,7 +420,9 @@ class Console:
         with self.style(style or "none"):
             _rendered = self.render(renderable, render_options)
             lines = list(
-                Segment.split_and_crop_lines(_rendered, render_options.max_width)
+                Segment.split_and_crop_lines(
+                    _rendered, render_options.max_width, style=style
+                )
             )
         return lines
 

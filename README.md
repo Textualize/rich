@@ -12,7 +12,7 @@ Rich may be installed with pip or your favorite PyPi package manager.
 pip install rich
 ```
 
-## Basic Usage
+## Console Printing
 
 The first step to using the rich console is to import and construct the `Console` object.
 
@@ -65,6 +65,8 @@ There are a few ways of specifying colors:
 
 By itself, a color will set the _foreground_ color. To set a _background_ color, precede the color with the word `"on"`. For example `"red on white"`.
 
+Not that the CSS hex and RGB style of color lets you chose one of 16.7 million colors, but some terminals (notably OSX terminal) only support 256 colors. If Rich detects that only 256 colors are supported it will pick the closest color available.
+
 To set a style or attribute add one or more of the following words:
 
 - `"bold"` for bold text.
@@ -76,7 +78,9 @@ To set a style or attribute add one or more of the following words:
 - `"conceal"` for concealed text (not supported on most terminals).
 - `"strike"` for text with a line through it (bit supported on all terminals).
 
-Style attributes and colors may appear in any order, so `"bold underline magenta on yellow"` has the same effect as `"on yellow magenta underline bold"`
+Style attributes and colors may appear in any order, so `"bold underline magenta on yellow"` has the same effect as `"on yellow magenta underline bold"`.
+
+## Console Logging
 
 ## Emoji
 
@@ -88,3 +92,55 @@ Rich supports a simple way of inserting emoji in to terminal output, by using th
 ```
 
 Please use this feature wisely.
+
+## Markdown
+
+Rich can render markdown, and does a reasonable job of translating the formatting to the terminal.
+
+To render markdown import the `Markdown` class and construct it with a string containing markdown. Then print it to the console.
+
+```python
+from rich.console import Console
+from rich.markdown import Markdown
+
+console = Console()
+with open("README.md") as readme:
+    markdown = Markdown(readme.read())
+console.print(markdown)
+```
+
+This will produce output something like the following:
+
+![markdown](./imgs/markdown.png)
+
+## Syntax Highlighting
+
+Rich uses the [pygments](https://pygments.org/) library to implement syntax highlighting. Usage is similar to rendering markdown; construct a `Syntax` object and print it to the console. Here's an example:
+
+```python
+from rich.console import Console
+from rich.syntax import Syntax
+
+my_code = '''
+def iter_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
+    """Iterate and generate a tuple with a flag for first and last value."""
+    iter_values = iter(values)
+    try:
+        previous_value = next(iter_values)
+    except StopIteration:
+        return
+    first = True
+    for value in iter_values:
+        yield first, False, previous_value
+        first = False
+        previous_value = value
+    yield first, True, previous_value
+'''
+syntax = Syntax(my_code, "python", theme="monokai", line_numbers=True)
+console = Console()
+console.print(syntax)
+```
+
+This will produce the following output:
+
+![syntax](./imgs/syntax.png)

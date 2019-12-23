@@ -152,7 +152,9 @@ class Syntax:
         padding = Segment(" " * numbers_column_width, background_style)
         new_line = Segment("\n")
         for line_no, line in enumerate(lines, self.start_line):
-            wrapped_lines = console.render_lines(line, render_options)
+            wrapped_lines = console.render_lines(
+                line, render_options, style=background_style
+            )
             for first, wrapped_line in iter_first(wrapped_lines):
                 if first:
                     yield Segment(
