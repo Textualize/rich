@@ -30,7 +30,7 @@ The Console object has a `print` method which has an intentionally similar inter
 console.print("Hello", "World!")
 ```
 
-As you might expect, this will print `"Hello World!"` to the terminal. The only difference from the `print` function is that the output is word-wrapped by default (Rich auto-detects the width of the terminal).
+As you might expect, this will print `"Hello World!"` to the terminal. Not that unlike the `print` function, Rich will word-wrap your test to fit within the terminal width.
 
 There are a few ways of adding color and style to your output. You can set a style for the entire output by adding a `style` keyword argument. Here's an example:
 
@@ -77,7 +77,7 @@ To set a style or attribute add one or more of the following words:
 - `"conceal"` for concealed text (not supported on most terminals).
 - `"strike"` for text with a line through it (not supported on all terminals).
 
-Style attributes and colors may appear in any order, so `"bold magenta on yellow"` has the same effect as `"on yellow magenta bold"`.
+Style attributes and colors may appear in any order, i.e. `"bold magenta on yellow"` has the same effect as `"on yellow magenta bold"`. The latter may be preferred by Yoda.
 
 ## Console Logging
 
@@ -96,7 +96,7 @@ Please use this feature wisely.
 
 ## Markdown
 
-Rich can render markdown, and does a reasonable job of translating the formatting to the terminal.
+Rich can render markdown and does a reasonable job of translating the formatting to the terminal.
 
 To render markdown import the `Markdown` class and construct it with a string containing markdown code. Then print it to the console. Here's an example:
 
