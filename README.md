@@ -42,16 +42,9 @@ The output will be something like the following:
 
 ![Hello World](./imgs/hello_world.png)
 
-<code>
-        <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #800000; font-weight: bold">Hello World! 
-</span></pre>
-    </code>
-
 That's fine for styling a line of text at a time. For more finely grained styling, Rich renders a special markup which is similar in syntax to [bbcode](https://en.wikipedia.org/wiki/BBCode). Here's an example:
 
-```python
-console.print("Where there is a [b]Will[/b] there is a [i]way[/i].")
-```
+![Console Markup](./imgs/where_there_is_a_will.png)
 
 <code>
         <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
@@ -59,17 +52,39 @@ Where there is a <span style="font-weight: bold">Will</span> there is a <span st
 </pre>
     </code>
 
+### Style definitions
+
+Rich expects styles to be specified with a _style definition_ string, which is a intuitive syntax that reads almost like English.
+
+There are a few ways of specifying colors:
+
+- The name of the color (one of 256 possible constants) e.g. `"magenta"`. To see the full range of colors run `python -m rich.color` from the console.
+- A number between 0 and 255 (inclusive) which corresponds to one of the 256 possible constants above.
+- A CSS hex style color, e.g. `#ff0000` or `#d75faf`
+- A CSS rbg style color, e.g. `rgb(215,95,175)`
+
+By itself, a color will set the _foreground_ color. To set a _background_ color, precede the color with the word `"on"`. For example `"red on white"`.
+
+To set a style or attribute add one or more of the following words:
+
+- `"bold"` for bold text.
+- `"dim"` for dim text.
+- `"italic"` for italic text.
+- `"underline"` for underlined text.
+- `"blink"` for text that blinks.
+- `"reverse"` to swap foreground and background text.
+- `"conceal"` for concealed text (not supported on most terminals).
+- `"strike"` for text with a line through it (bit supported on all terminals).
+
+Style attributes and colors may appear in any order, so `"bold underline magenta on yellow"` has the same effect as `"on yellow magenta underline bold"`
+
 ## Emoji
 
 Rich supports a simple way of inserting emoji in to terminal output, by using the name of the emoji between two colons. Here's an example:
 
 ```python
-console.print(":smiley: :vampire: :pile_of_poo: :thumbs_up: :raccoon:")
+>>> console.print(":smiley: :vampire: :pile_of_poo: :thumbs_up: :raccoon:")
+😃 🧛 💩 👍 🦝
 ```
-
-<code>
-        <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">😃 🧛 💩 👍 🦝 
-</pre>
-</code>
 
 Please use this feature wisely.
