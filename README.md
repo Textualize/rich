@@ -1,4 +1,4 @@
-**Note:** This library is currently work in progress. Documentation and tests are in progress...
+**Note:** This library is currently work in progress. Documentation and tests are coming.
 
 # Rich
 
