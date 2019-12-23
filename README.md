@@ -4,15 +4,11 @@
 
 Rich is a Python library for _rich_ text and high level formatting in the terminal.
 
-The Rich API make it extremely easy to add colored text (up to 16.7million colors) and styles (bold, italic, underline etc.) to your script or application. Rich can also render pretty tables, markdown and source code with syntax highlighting.
+The Rich API make it easy to add colored text (up to 16.7million colors) and styles (bold, italic, underline etc.) to your script or application. Rich can also render pretty tables, markdown and source code with syntax highlighting.
 
 ## Installing
 
-Rich may be installed with pip or your favorite PyPi package manager.
-
-```
-pip install rich
-```
+Not yet released. Please checkout and install.
 
 ## Console Printing
 
@@ -32,7 +28,7 @@ The Console object has a `print` method which has an intentionally similar inter
 console.print("Hello", "World!")
 ```
 
-As you might expect, this will print `"Hello World!"` to the terminal. Not that unlike the `print` function, Rich will word-wrap your test to fit within the terminal width.
+As you might expect, this will print `"Hello World!"` to the terminal. Note that unlike the `print` function, Rich will word-wrap your test to fit within the terminal width.
 
 There are a few ways of adding color and style to your output. You can set a style for the entire output by adding a `style` keyword argument. Here's an example:
 
