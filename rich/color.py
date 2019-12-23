@@ -261,7 +261,7 @@ class Color(NamedTuple):
     number: Optional[int] = None
     triplet: Optional[ColorTriplet] = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Render the color to the terminal."""
         attrs = self.get_ansi_codes(foreground=True)
         return (

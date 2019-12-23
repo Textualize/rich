@@ -104,11 +104,11 @@ class Style:
             append(self._bgcolor.name)
         return " ".join(attributes) or "none"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Render a named style differently from an anonymous style."""
         return f'<style "{self}">'
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Style):
             return NotImplemented
         return (

@@ -578,8 +578,8 @@ class Console:
                 render_str = renderable
                 if emoji:
                     render_str = _emoji_replace(render_str)
-                render_str = self.render_str(render_str)
-                append_text(highlight(render_str) if highlight else render_str)
+                render_text = self.render_str(render_str)
+                append_text(highlight(render_text) if highlight else render_text)
             elif isinstance(renderable, Text):
                 append_text(renderable)
             elif isinstance(renderable, (int, float, bool, bytes, type(None))):

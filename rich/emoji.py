@@ -59,7 +59,7 @@ class Emoji:
 if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
-    c = Console(markup=None)
+    c = Console(markup=False)
 
     e = Emoji("thumbs_up")
     print(repr(e))
