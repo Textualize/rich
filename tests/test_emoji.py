@@ -15,3 +15,4 @@ def test_str_repr():
 
 def test_replace():
     assert Emoji.replace("my code is :pile_of_poo:") == "my code is 💩"
+

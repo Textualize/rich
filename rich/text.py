@@ -14,7 +14,7 @@ from typing import (
 )
 from typing_extensions import Literal
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from .console import (
         Console,
         ConsoleOptions,
@@ -56,22 +56,6 @@ class Span(NamedTuple):
         span2 = Span(span1.end, end, style)
         return span1, span2
 
-    def overlaps(self, start: int, end: int) -> bool:
-        """Check if a range overlaps this span.
-        
-        Args:
-            start (int): Start offset.
-            end (int): End offset.
-        
-        Returns:
-            bool: True if stat and end overlaps this span, otherwise False.
-        """
-        return (
-            (self.start <= end < self.end)
-            or (self.start <= start < self.end)
-            or (start <= self.start and end > self.end)
-        )
-
     def move(self, offset: int) -> Span:
         """Move start and end by a given offset.
         
@@ -83,17 +67,6 @@ class Span(NamedTuple):
         """
         start, end, style = self
         return Span(start + offset, end + offset, style)
-
-    def slice_text(self, text: str) -> str:
-        """Slice the text according to the start and end offsets.
-        
-        Args:
-            text (str): A string to slice.
-        
-        Returns:
-            str: A slice of the original string.
-        """
-        return text[self.start : self.end]
 
     def right_crop(self, offset: int) -> Span:
         """Crop the span at the given offset.
@@ -126,7 +99,6 @@ class Text:
         self.word_wrap = word_wrap
         self.justify = justify
         self.end = end
-        self._text_str: Optional[str] = text
         self._spans: List[Span] = []
         self._length: int = len(text)
 
@@ -149,6 +121,11 @@ class Text:
             return result
         return NotImplemented
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Text):
+            return NotImplemented
+        return self.text == other.text and self._spans == other._spans
+
     @classmethod
     def from_markup(cls, text: str, style: Union[str, Style] = "") -> Text:
         """Create Text instance from markup.
@@ -166,47 +143,24 @@ class Text:
     @property
     def text(self) -> str:
         """Get the text as a single string."""
-        if self._text_str is None:
-            self._text_str = "".join(self._text)
-        return self._text_str
+        if len(self._text) not in (0, 1):
+            text = "".join(self._text)
+            self._text[:] = [text]
+        return self._text[0]
 
     @text.setter
     def text(self, new_text: str) -> Text:
         """Set the text to a new value."""
         self._text[:] = [new_text]
-        self._text_str = new_text
-        new_length = len(new_text)
-        if new_length < self._length:
+        old_length = self._length
+        self._length = len(new_text)
+        if old_length > self._length:
             self._trim_spans()
-        self._length = new_length
         return self
-
-    @classmethod
-    def from_segments(cls, segments: Iterable[Segment]) -> Text:
-        """Convert segments in to a Text object for further processing.
-        
-        Args:
-            segments (Iterable[Segment]): Segments from a rendered console object.
-        
-        Returns:
-            Text: A new text instance.
-        """
-
-        text = Text()
-        append_span = text._spans.append
-        append_text = text._text.append
-        offset = 0
-        for text_str, style in segments:
-            span_length = len(text_str)
-            append_span(Span(offset, offset + span_length, style or "none"))
-            append_text(text_str)
-            offset += span_length
-            text._length += span_length
-        text._text_str = None
-        return text
 
     def copy(self) -> Text:
         """Return a copy of this instance."""
+        self.text
         copy_self = Text(
             self.text,
             style=self.style,
@@ -402,7 +356,6 @@ class Text:
             if style is not None:
                 self._spans.append(Span(offset, offset + text_length, style))
             self._length += text_length
-            self._text_str = None
         elif isinstance(text, Text):
             if style is not None:
                 raise ValueError("style must not be set when appending Text instance")
@@ -417,7 +370,6 @@ class Text:
                 for start, end, style in text._spans
             )
             self._length += len(text)
-            self._text_str = None
         else:
             raise TypeError("Only str or Text can be appended to Text")
 
@@ -567,7 +519,7 @@ class Text:
         return lines
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     text = Text("Hello, World!")
     from .console import Console
 
