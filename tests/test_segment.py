@@ -25,5 +25,49 @@ def test_split_and_crop_lines():
     ) == [[Segment("Hell")], [Segment("Worl")], [Segment("foo"), Segment(" ")]]
 
 
+def test_adjust_line_length():
+    line = [Segment("Hello", "foo")]
+    assert Segment.adjust_line_length(line, 10, style="bar") == [
+        Segment("Hello", "foo"),
+        Segment("     ", "bar"),
+    ]
+
+    line = [Segment("H"), Segment("ello, World!")]
+    assert Segment.adjust_line_length(line, 5) == [Segment("H"), Segment("ello")]
+
+    line = [Segment("Hello")]
+    assert Segment.adjust_line_length(line, 5) == line
+
+
 def test_get_line_length():
     assert Segment.get_line_length([Segment("foo"), Segment("bar")]) == 6
+
+
+def test_get_shape():
+    assert Segment.get_shape([[Segment("Hello")]]) == (5, 1)
+    assert Segment.get_shape([[Segment("Hello")], [Segment("World!")]]) == (6, 2)
+
+
+def test_set_shape():
+    assert Segment.set_shape([[Segment("Hello")]], 10) == [
+        [Segment("Hello"), Segment("     ")]
+    ]
+
+    assert Segment.set_shape([[Segment("Hello")]], 10, 2) == [
+        [Segment("Hello"), Segment("     ")],
+        [Segment(" " * 10)],
+    ]
+
+
+def test_simplify():
+    assert list(
+        Segment.simplify([Segment("Hello"), Segment(" "), Segment("World!")])
+    ) == [Segment("Hello World!")]
+
+    assert list(
+        Segment.simplify(
+            [Segment("Hello", "red"), Segment(" ", "red"), Segment("World!", "blue")]
+        )
+    ) == [Segment("Hello ", "red"), Segment("World!", "blue")]
+
+    assert list(Segment.simplify([])) == []
