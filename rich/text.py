@@ -146,7 +146,7 @@ class Text:
         if len(self._text) not in (0, 1):
             text = "".join(self._text)
             self._text[:] = [text]
-        return self._text[0]
+        return self._text[0] if self._text else ""
 
     @text.setter
     def text(self, new_text: str) -> Text:
@@ -200,9 +200,8 @@ class Text:
             self.text = text
             new_spans = []
             for span in self._spans:
-                if span.start >= new_length:
-                    break
-                new_spans.append(span.right_crop(new_length))
+                if span.start < new_length:
+                    new_spans.append(span.right_crop(new_length))
             self._spans[:] = new_spans
 
     def __console__(
