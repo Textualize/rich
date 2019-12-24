@@ -67,7 +67,7 @@ class ReprHighlighter(RegexHighlighter):
     ]
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
     console = Console()

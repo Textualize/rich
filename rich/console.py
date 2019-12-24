@@ -831,7 +831,7 @@ class Console:
             write_file.write(html)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     console = Console()
 
     with console.style("dim on black"):
