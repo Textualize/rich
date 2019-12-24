@@ -34,3 +34,4 @@ def test_ratio_divide():
     assert ratio_divide(12, [1, 3]) == [3, 9]
     assert ratio_divide(0, [1, 3]) == [0, 0]
     assert ratio_divide(0, [1, 3], [1, 1]) == [1, 1]
+    assert ratio_divide(10, [1, 0]) == [10, 0]

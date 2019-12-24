@@ -114,6 +114,15 @@ def test_add():
     assert Style().__add__("foo") == NotImplemented
 
 
+def test_iadd():
+    style = Style(color="red")
+    style += Style(bold=True)
+    assert style == Style(color="red", bold=True)
+    style += None
+    assert style == Style(color="red", bold=True)
+    assert style.__iadd__("foo") == NotImplemented
+
+
 def test_style_stack():
     stack = StyleStack(Style(color="red"))
     repr(stack)
