@@ -463,8 +463,8 @@ class Text:
                     break
                 span = new_span
                 line_index += 1
-                if line_index >= len(line_ranges):
-                    break
+                # if line_index >= len(line_ranges):
+                #     break
                 line_start, line_end = line_ranges[line_index]
 
         return new_lines
