@@ -89,6 +89,12 @@ def test_copy():
     assert test is not test_copy
 
 
+def test_rstrip():
+    test = Text("Hello, World!    ")
+    test.rstrip()
+    assert str(test) == "Hello, World!"
+
+
 def test_stylize():
     test = Text("Hello, World!")
     test.stylize(7, 11, "bold")
