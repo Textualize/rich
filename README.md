@@ -52,35 +52,6 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![Console Markup](./imgs/where_there_is_a_will.png)
 
-### Defining Styles
-
-Rich expects styles to be specified with a _style definition_ string, which is a intuitive syntax that reads almost like English.
-
-There are a few ways of specifying colors:
-
-- The word `"default"` to select the default foreground or background color.
-- The name of the color (one of 256 possible constants) e.g. `"magenta"`. To see the full range of colors run `python -m rich.color` from the console.
-- A number between 0 and 255 (inclusive) which corresponds to one of the 256 possible constants above.
-- A CSS hex style color, e.g. `#ff0000` or `#d75faf`
-- A CSS rbg style color, e.g. `rgb(215,95,175)`
-
-By itself, a color will set the _foreground_ color. To set a _background_ color, precede the color with the word `"on"`. For example `"red on white"`.
-
-Note that the CSS hex and RGB style of color lets you chose one of 16.7 million colors, but some terminals (notably OSX terminal) only support 256 colors. If Rich detects that only 256 colors are supported it will pick the closest color available. In practice this means that you may not get exactly the color you ask for, but it is generally _close enough_.
-
-To set a style or attribute add one or more of the following words:
-
-- `"bold"` for bold text.
-- `"dim"` for dim text.
-- `"italic"` for italic text.
-- `"underline"` for underlined text.
-- `"blink"` for text that blinks.
-- `"reverse"` to swap foreground and background text.
-- `"conceal"` for concealed text (not supported on most terminals).
-- `"strike"` for text with a line through it (not supported on all terminals).
-
-Style attributes and colors may appear in any order, i.e. `"bold magenta on yellow"` has the same effect as `"on yellow magenta bold"`. The latter may be preferred by Yoda.
-
 ## Console Logging
 
 The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default, Rich will do syntax highlighting for Python structures and for repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
