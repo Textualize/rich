@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "rich"
-version = "0.1.0"
+version = "0.2.0"
 description = "Rich Console"
 authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.6"
 pprintpp = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
