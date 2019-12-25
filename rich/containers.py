@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from typing import Iterator, Iterable, List, Literal, TypeVar, TYPE_CHECKING, Union
-
+from typing import Iterator, Iterable, List, TypeVar, TYPE_CHECKING, Union
+from typing_extensions import Literal
 
 from .segment import Segment
 

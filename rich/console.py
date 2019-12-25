@@ -23,13 +23,12 @@ from typing import (
     Optional,
     NamedTuple,
     overload,
-    Protocol,
     Tuple,
     TYPE_CHECKING,
     runtime_checkable,
     Union,
 )
-from typing_extensions import Literal
+from typing_extensions import Protocol, Literal
 
 
 from ._emoji_replace import _emoji_replace

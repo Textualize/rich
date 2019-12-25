@@ -6,8 +6,9 @@ authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.5"
+python = "^3.6"
 pprintpp = "^0.4.0"
+typing-extensions = "^3.7.4"
 
 [tool.poetry.dev-dependencies]
 
