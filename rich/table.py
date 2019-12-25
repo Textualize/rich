@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 from itertools import chain
 from typing import (
@@ -50,18 +48,18 @@ def _pick_first(values: Iterable[Optional[T]], final: T) -> T:
 class Column:
     """Defines a column in a table."""
 
-    header: Union[str, ConsoleRenderable] = ""
-    footer: Union[str, ConsoleRenderable] = ""
+    header: Union[str, "ConsoleRenderable"] = ""
+    footer: Union[str, "ConsoleRenderable"] = ""
     header_style: Union[str, Style] = "table.header"
     footer_style: Union[str, Style] = "table.footer"
     style: Union[str, Style] = "none"
-    justify: JustifyValues = "left"
+    justify: "JustifyValues" = "left"
     width: Optional[int] = None
     ratio: Optional[int] = None
-    _cells: List[ConsoleRenderable] = field(default_factory=list)
+    _cells: List["ConsoleRenderable"] = field(default_factory=list)
 
     @property
-    def cells(self) -> Iterable[ConsoleRenderable]:
+    def cells(self) -> Iterable["ConsoleRenderable"]:
         """Get all cells in the column, not including header."""
         yield from self._cells
 
@@ -71,7 +69,7 @@ class Column:
         return self.ratio is not None
 
     @property
-    def header_renderable(self) -> ConsoleRenderable:
+    def header_renderable(self) -> "ConsoleRenderable":
         return (
             Text.from_markup(self.header, style=self.header_style or "")
             if isinstance(self.header, str)
@@ -79,7 +77,7 @@ class Column:
         )
 
     @property
-    def footer_renderable(self) -> ConsoleRenderable:
+    def footer_renderable(self) -> "ConsoleRenderable":
         return (
             Text.from_markup(self.footer, style=self.footer_style or "")
             if isinstance(self.footer, str)
@@ -90,7 +88,7 @@ class Column:
 class _Cell(NamedTuple):
 
     style: Union[str, Style]
-    renderable: ConsoleRenderable
+    renderable: "ConsoleRenderable"
 
 
 class Table:
@@ -140,18 +138,18 @@ class Table:
         return self._padding
 
     @padding.setter
-    def padding(self, padding: PaddingDimensions) -> Table:
+    def padding(self, padding: PaddingDimensions) -> "Table":
         self._padding = Padding.unpack(padding)
         return self
 
     def add_column(
         self,
-        header: Union[str, ConsoleRenderable] = "",
-        footer: Union[str, ConsoleRenderable] = "",
+        header: Union[str, "ConsoleRenderable"] = "",
+        footer: Union[str, "ConsoleRenderable"] = "",
         header_style: Union[str, Style] = None,
         footer_style: Union[str, Style] = None,
         style: Union[str, Style] = None,
-        justify: JustifyValues = "left",
+        justify: "JustifyValues" = "left",
         width: int = None,
         ratio: int = None,
     ):
@@ -181,7 +179,7 @@ class Table:
         )
         self.columns.append(column)
 
-    def add_row(self, *renderables: Optional[Union[str, ConsoleRenderable]]) -> None:
+    def add_row(self, *renderables: Optional[Union[str, "ConsoleRenderable"]]) -> None:
         from .console import ConsoleRenderable
 
         def add_cell(column: Column, renderable: ConsoleRenderable):
@@ -217,7 +215,9 @@ class Table:
                 )
         self._row_count += 1
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
 
         max_width = options.max_width
         if self.width is not None:
@@ -293,7 +293,7 @@ class Table:
         first = column_index == 0
         last = column_index == len(self.columns) - 1
 
-        def add_padding(renderable: ConsoleRenderable) -> ConsoleRenderable:
+        def add_padding(renderable: "ConsoleRenderable") -> "ConsoleRenderable":
             if not any_padding:
                 return renderable
             top, right, bottom, left = padding
@@ -337,8 +337,8 @@ class Table:
         )
 
     def _render(
-        self, console: Console, options: ConsoleOptions, widths: List[int]
-    ) -> RenderResult:
+        self, console: "Console", options: "ConsoleOptions", widths: List[int]
+    ) -> "RenderResult":
         table_style = console.get_style(self.style or "")
 
         border_style = table_style + console.get_style(self.border_style or "")
@@ -416,7 +416,7 @@ class Table:
             yield Segment(box.get_bottom(widths), border_style)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
 
     from .console import Console
     from . import box

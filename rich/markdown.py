@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
 from typing import Any, ClassVar, Dict, Iterable, List, Optional, Union
 
@@ -27,7 +25,7 @@ class MarkdownElement:
     new_line: ClassVar[bool] = True
 
     @classmethod
-    def create(cls, markdown: Markdown, node: Any) -> MarkdownElement:
+    def create(cls, markdown: "Markdown", node: Any) -> "MarkdownElement":
         """Factory to create markdown element,
         
         Args:
@@ -39,28 +37,30 @@ class MarkdownElement:
         """
         return cls()
 
-    def on_enter(self, context: MarkdownContext):
+    def on_enter(self, context: "MarkdownContext"):
         """Called when the node is entered.
         
         Args:
             context (MarkdownContext): The markdown context.
         """
 
-    def on_text(self, context: MarkdownContext, text: str) -> None:
+    def on_text(self, context: "MarkdownContext", text: str) -> None:
         """Called when text is parsed.
         
         Args:
             context (MarkdownContext): The markdown context.
         """
 
-    def on_leave(self, context: MarkdownContext) -> None:
+    def on_leave(self, context: "MarkdownContext") -> None:
         """Called when the parser leaves the element.
         
         Args:
             context (MarkdownContext): [description]
         """
 
-    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
+    def on_child_close(
+        self, context: "MarkdownContext", child: "MarkdownElement"
+    ) -> bool:
         """Called when a child element is closed.
 
         This method allows a parent element to take over rendering of its children.
@@ -74,7 +74,9 @@ class MarkdownElement:
         """
         return True
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
         return
         yield
 
@@ -93,14 +95,14 @@ class TextElement(MarkdownElement):
 
     style_name = "none"
 
-    def on_enter(self, context: MarkdownContext) -> None:
+    def on_enter(self, context: "MarkdownContext") -> None:
         self.style = context.enter_style(self.style_name)
         self.text = Text(justify="left")
 
-    def on_text(self, context: MarkdownContext, text: str) -> None:
+    def on_text(self, context: "MarkdownContext", text: str) -> None:
         self.text.append(text, context.current_style)
 
-    def on_leave(self, context: MarkdownContext) -> None:
+    def on_leave(self, context: "MarkdownContext") -> None:
         context.leave_style()
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
@@ -113,7 +115,7 @@ class Paragraph(TextElement):
     style_name = "markdown.paragraph"
 
     @classmethod
-    def create(cls, markdown: Markdown, node) -> Paragraph:
+    def create(cls, markdown: "Markdown", node) -> "Paragraph":
         return cls(justify=markdown.justify)
 
     def __init__(self, justify: str) -> None:
@@ -128,11 +130,11 @@ class Heading(TextElement):
     """A heading."""
 
     @classmethod
-    def create(cls, markdown: Markdown, node: Any) -> Heading:
+    def create(cls, markdown: "Markdown", node: Any) -> "Heading":
         heading = Heading(node.level)
         return heading
 
-    def on_enter(self, context: MarkdownContext) -> None:
+    def on_enter(self, context: "MarkdownContext") -> None:
         self.text = Text()
         context.enter_style(self.style_name)
 
@@ -160,7 +162,7 @@ class CodeBlock(TextElement):
     style_name = "markdown.code_block"
 
     @classmethod
-    def create(cls, markdown: Markdown, node: Any) -> ListElement:
+    def create(cls, markdown: "Markdown", node: Any) -> "ListElement":
         if node.info is None:
             return cls("default", markdown.code_theme)
         lexer_name, _, _ = node.info.partition(" ")
@@ -182,9 +184,11 @@ class BlockQuote(TextElement):
     style_name = "markdown.block_quote"
 
     def __init__(self) -> None:
-        self.elements: Renderables[MarkdownElement] = Renderables()
+        self.elements: Renderables = Renderables()
 
-    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
+    def on_child_close(
+        self, context: "MarkdownContext", child: "MarkdownElement"
+    ) -> bool:
         self.elements.append(child)
         return False
 
@@ -220,7 +224,7 @@ class ListElement(MarkdownElement):
     """A list element."""
 
     @classmethod
-    def create(cls, markdown: Markdown, node: Any) -> ListElement:
+    def create(cls, markdown: "Markdown", node: Any) -> "ListElement":
         list_data = node.list_data
         return cls(list_data["type"], list_data["start"])
 
@@ -229,7 +233,9 @@ class ListElement(MarkdownElement):
         self.list_type = list_type
         self.list_start = list_start
 
-    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
+    def on_child_close(
+        self, context: "MarkdownContext", child: "MarkdownElement"
+    ) -> bool:
         assert isinstance(child, ListItem)
         self.items.append(child)
         return False
@@ -252,9 +258,11 @@ class ListItem(TextElement):
     style_name = "markdown.item"
 
     def __init__(self) -> None:
-        self.elements: Renderables[MarkdownElement] = Renderables()
+        self.elements: Renderables = Renderables()
 
-    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
+    def on_child_close(
+        self, context: "MarkdownContext", child: "MarkdownElement"
+    ) -> bool:
         self.elements.append(child)
         return False
 

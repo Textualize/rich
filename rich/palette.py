@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from math import sqrt
 from functools import lru_cache
 from typing import List, Sequence, Tuple

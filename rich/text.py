@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from operator import itemgetter
 from typing import (
     Any,
@@ -43,7 +41,7 @@ class Span(NamedTuple):
     def __bool__(self) -> bool:
         return self.end > self.start
 
-    def split(self, offset: int) -> Tuple[Span, Optional[Span]]:
+    def split(self, offset: int) -> Tuple["Span", Optional["Span"]]:
         """Split a span in to 2 from a given offset."""
 
         if offset < self.start:
@@ -56,7 +54,7 @@ class Span(NamedTuple):
         span2 = Span(span1.end, end, style)
         return span1, span2
 
-    def move(self, offset: int) -> Span:
+    def move(self, offset: int) -> "Span":
         """Move start and end by a given offset.
         
         Args:
@@ -68,7 +66,7 @@ class Span(NamedTuple):
         start, end, style = self
         return Span(start + offset, end + offset, style)
 
-    def right_crop(self, offset: int) -> Span:
+    def right_crop(self, offset: int) -> "Span":
         """Crop the span at the given offset.
         
         Args:
@@ -91,7 +89,7 @@ class Text:
         text: str = "",
         style: Union[str, Style] = "none",
         word_wrap: bool = True,
-        justify: JustifyValues = None,
+        justify: "JustifyValues" = None,
         end: str = "\n",
     ) -> None:
         self._text: List[str] = [text] if text else []
@@ -114,7 +112,7 @@ class Text:
     def __repr__(self) -> str:
         return f"<text {self.text!r} {self._spans!r}>"
 
-    def __add__(self, other: Any) -> Text:
+    def __add__(self, other: Any) -> "Text":
         if isinstance(other, (str, Text)):
             result = self.copy()
             result.append(other)
@@ -127,7 +125,7 @@ class Text:
         return self.text == other.text and self._spans == other._spans
 
     @classmethod
-    def from_markup(cls, text: str, style: Union[str, Style] = "") -> Text:
+    def from_markup(cls, text: str, style: Union[str, Style] = "") -> "Text":
         """Create Text instance from markup.
         
         Args:
@@ -149,7 +147,7 @@ class Text:
         return self._text[0] if self._text else ""
 
     @text.setter
-    def text(self, new_text: str) -> Text:
+    def text(self, new_text: str) -> "Text":
         """Set the text to a new value."""
         self._text[:] = [new_text]
         old_length = self._length
@@ -158,7 +156,7 @@ class Text:
             self._trim_spans()
         return self
 
-    def copy(self) -> Text:
+    def copy(self) -> "Text":
         """Return a copy of this instance."""
         self.text
         copy_self = Text(
@@ -205,7 +203,7 @@ class Text:
             self._spans[:] = new_spans
 
     def __console__(
-        self, console: Console, options: ConsoleOptions
+        self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
         if self.word_wrap:
             lines = self.wrap(
@@ -226,8 +224,8 @@ class Text:
         return RenderWidth(min_text_width, max_text_width)
 
     def _render_line(
-        self, line: Text, console: Console, options: ConsoleOptions
-    ) -> Iterable[Segment]:
+        self, line: "Text", console: "Console", options: "ConsoleOptions"
+    ) -> Iterable["Segment"]:
         """Render the rich text to the console.
         
         Args:
@@ -286,7 +284,7 @@ class Text:
         if self.end:
             yield _Segment(self.end)
 
-    def join(self, lines: Iterable[Text]) -> Text:
+    def join(self, lines: Iterable["Text"]) -> "Text":
         """Join text together with this instance as the separator.
         
         Args:
@@ -341,7 +339,9 @@ class Text:
         if count:
             self.text = f"{self.text}{character * count}"
 
-    def append(self, text: Union[Text, str], style: Union[str, Style] = None) -> None:
+    def append(
+        self, text: Union["Text", str], style: Union[str, "Style"] = None
+    ) -> None:
         """Add text with an optional style.
         
         Args:
@@ -372,7 +372,7 @@ class Text:
         else:
             raise TypeError("Only str or Text can be appended to Text")
 
-    def split(self, separator="\n", include_separator: bool = False) -> List[Text]:
+    def split(self, separator="\n", include_separator: bool = False) -> List["Text"]:
         """Split rich text in to lines, preserving styles.
         
         Args:
@@ -470,7 +470,7 @@ class Text:
         """Remove a number of characters from the end of the text."""
         self.text = self.text[:-amount]
 
-    def wrap(self, width: int, justify: JustifyValues = "left") -> Lines:
+    def wrap(self, width: int, justify: "JustifyValues" = "left") -> Lines:
         """Word wrap the text.
         
         Args:

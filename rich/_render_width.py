@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import NamedTuple
 
 from .segment import Segment
@@ -16,12 +14,12 @@ class RenderWidth(NamedTuple):
         """Get difference between maximum and minimum."""
         return self.maximum - self.minimum
 
-    def normalize(self) -> RenderWidth:
+    def normalize(self) -> "RenderWidth":
         minimum, maximum = self
         minimum = max(0, minimum)
         return RenderWidth(minimum, max(minimum, maximum))
 
-    def with_maximum(self, width: int) -> RenderWidth:
+    def with_maximum(self, width: int) -> "RenderWidth":
         """Get a RenderableWith where the widths are <= width.
         
         Args:
@@ -34,7 +32,7 @@ class RenderWidth(NamedTuple):
         return RenderWidth(min(minimum, width), min(maximum, width))
 
     @classmethod
-    def get(cls, renderable: RenderableType, max_width: int) -> RenderWidth:
+    def get(cls, renderable: "RenderableType", max_width: int) -> "RenderWidth":
         """Get desired width for a renderable."""
         if hasattr(renderable, "__console__"):
             get_console_width = getattr(renderable, "__console_width__", None)

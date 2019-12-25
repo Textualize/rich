@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import cast, Tuple, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
@@ -23,8 +21,8 @@ class Padding:
 
     def __init__(
         self,
-        renderable: RenderableType,
-        pad: PaddingDimensions,
+        renderable: "RenderableType",
+        pad: "PaddingDimensions",
         *,
         style: Union[str, Style] = "none",
     ):
@@ -33,7 +31,7 @@ class Padding:
         self.style = style
 
     @staticmethod
-    def unpack(pad: PaddingDimensions) -> Tuple[int, int, int, int]:
+    def unpack(pad: "PaddingDimensions") -> Tuple[int, int, int, int]:
         """Unpack padding specified in CSS style."""
         if isinstance(pad, int):
             return (pad, pad, pad, pad)
@@ -55,7 +53,9 @@ class Padding:
     def __repr__(self) -> str:
         return f"Padding({self.renderable!r}, ({self.top},{self.right},{self.bottom},{self.left}))"
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
 
         style = console.get_style(self.style)
         width = options.max_width
@@ -79,7 +79,7 @@ class Padding:
             yield new_line
         yield from bottom
 
-    def __console_width__(self, max_width: int) -> RenderWidth:
+    def __console_width__(self, max_width: int) -> "RenderWidth":
         extra_width = self.left + self.right
         min_width, max_width = RenderWidth.get(
             self.renderable, max(1, max_width - extra_width)

@@ -8,7 +8,11 @@ The Rich API make it easy to add colored text (up to 16.7million colors) and sty
 
 ## Installing
 
-Not yet released. Please checkout and install.
+Install with `pip` or your favorite PyPi package manager.
+
+```
+pip install rich
+```
 
 ## Console Printing
 

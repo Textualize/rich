@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from functools import lru_cache
 import sys
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Type
@@ -16,7 +14,7 @@ class _Bit:
     def __init__(self, bit_no: int) -> None:
         self.bit = 1 << bit_no
 
-    def __get__(self, obj: Style, objtype: Type[Style]) -> Optional[bool]:
+    def __get__(self, obj: "Style", objtype: Type["Style"]) -> Optional[bool]:
         if obj._set_attributes & self.bit:
             return obj._attributes & self.bit != 0
         return None
@@ -135,7 +133,7 @@ class Style:
 
     @classmethod
     @lru_cache(maxsize=1000)
-    def parse(cls, style_definition: str) -> Style:
+    def parse(cls, style_definition: str) -> "Style":
         """Parse style name(s) in to style object."""
         style_attributes = {
             "dim",
@@ -224,7 +222,7 @@ class Style:
         return "; ".join(css)
 
     @classmethod
-    def combine(self, styles: Iterable[Style]) -> Style:
+    def combine(self, styles: Iterable["Style"]) -> "Style":
         """Combine styles and get result.
         
         Args:
@@ -240,7 +238,7 @@ class Style:
             update(_style)
         return style
 
-    def copy(self) -> Style:
+    def copy(self) -> "Style":
         """Get a copy of this style.
         
         Returns:
@@ -296,7 +294,7 @@ class Style:
         text = text or str(self)
         sys.stdout.write(f"{self.render(text)}\x1b[0m\n")
 
-    def _apply(self, style: Style) -> Style:
+    def _apply(self, style: "Style") -> "Style":
         """Merge this style with another.
         
         Args:
@@ -319,7 +317,7 @@ class Style:
         }
         return new_style
 
-    def _update(self, style: Style) -> None:
+    def _update(self, style: "Style") -> None:
         """Update this style with another.
         
         Args:
@@ -332,14 +330,14 @@ class Style:
         )
         self._set_attributes = self._set_attributes | style._set_attributes
 
-    def __add__(self, style: Optional[Style]) -> Style:
+    def __add__(self, style: Optional["Style"]) -> "Style":
         if style is None:
             return self
         if not isinstance(style, Style):
             return NotImplemented  # type: ignore
         return self._apply(style)
 
-    def __iadd__(self, style: Optional[Style]) -> Style:
+    def __iadd__(self, style: Optional["Style"]) -> "Style":
         if style is None:
             return self
         if not isinstance(style, Style):
@@ -351,7 +349,7 @@ class Style:
 class StyleStack:
     """A stack of styles that maintains a current style."""
 
-    def __init__(self, default_style: Style) -> None:
+    def __init__(self, default_style: "Style") -> None:
         self._stack: List[Style] = [default_style]
         self.current = default_style
 

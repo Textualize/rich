@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import textwrap
 from typing import Any, Dict, Union
 
@@ -56,7 +54,7 @@ class Syntax:
         dedent: bool = True,
         line_numbers: bool = False,
         start_line: int = 1,
-    ) -> Syntax:
+    ) -> "Syntax":
         """Get a Syntax object for given path."""
         with open(path, "rt") as code_file:
             code = code_file.read()

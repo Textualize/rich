@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import NamedTuple, Optional
 
 from .style import Style
@@ -19,14 +17,14 @@ class Segment(NamedTuple):
         return f"Segment({self.text!r}, {self.style!r})"
 
     @classmethod
-    def line(self) -> Segment:
+    def line(self) -> "Segment":
         """Make a new line segment."""
         return Segment("\n")
 
     @classmethod
     def apply_style(
-        cls, segments: Iterable[Segment], style: Style = None
-    ) -> Iterable[Segment]:
+        cls, segments: Iterable["Segment"], style: Style = None
+    ) -> Iterable["Segment"]:
         """Apply a style to an iterable of segments.
         
         Args:
@@ -43,8 +41,8 @@ class Segment(NamedTuple):
 
     @classmethod
     def split_and_crop_lines(
-        cls, segments: Iterable[Segment], length: int, style: Style = None
-    ) -> Iterable[List[Segment]]:
+        cls, segments: Iterable["Segment"], length: int, style: Style = None
+    ) -> Iterable[List["Segment"]]:
         """Split segments in to lines, and crop lines greater than a given length.
         
         Args:
@@ -76,8 +74,8 @@ class Segment(NamedTuple):
 
     @classmethod
     def adjust_line_length(
-        cls, line: List[Segment], length: int, style: Style = None
-    ) -> List[Segment]:
+        cls, line: List["Segment"], length: int, style: Style = None
+    ) -> List["Segment"]:
         """Adjust a line to a given width (cropping or padding as required.
         
         Args:
@@ -108,7 +106,7 @@ class Segment(NamedTuple):
         return line
 
     @classmethod
-    def get_line_length(cls, line: List[Segment]) -> int:
+    def get_line_length(cls, line: List["Segment"]) -> int:
         r"""Get the length of list of segments.
         
         Args:
@@ -120,7 +118,7 @@ class Segment(NamedTuple):
         return sum(len(text) for text, _ in line)
 
     @classmethod
-    def get_shape(cls, lines: List[List[Segment]]) -> Tuple[int, int]:
+    def get_shape(cls, lines: List[List["Segment"]]) -> Tuple[int, int]:
         """Get the shape (enclosing rectangle) of a list of lines
         
         Args:
@@ -136,11 +134,11 @@ class Segment(NamedTuple):
     @classmethod
     def set_shape(
         cls,
-        lines: List[List[Segment]],
+        lines: List[List["Segment"]],
         width: int,
         height: int = None,
         style: Style = None,
-    ) -> List[List[Segment]]:
+    ) -> List[List["Segment"]]:
         """Set the shape of a list of lines (enclosing rectangle)
         
         Args:
@@ -166,7 +164,7 @@ class Segment(NamedTuple):
         return new_lines
 
     @classmethod
-    def simplify(cls, segments: Iterable[Segment]) -> Iterable[Segment]:
+    def simplify(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
         """Simplify an iterable of segments by combining contiguous segments with the same style.
         
         Args:

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 from colorsys import rgb_to_hls
 from dataclasses import dataclass
@@ -279,7 +277,7 @@ class Color(NamedTuple):
             return ColorSystem.STANDARD
         return ColorSystem(int(self.type))
 
-    def get_truecolor(self, theme: Theme, foreground=True) -> ColorTriplet:
+    def get_truecolor(self, theme: "Theme", foreground=True) -> ColorTriplet:
         """Get a color triplet for this color."""
         if self.type == ColorType.TRUECOLOR:
             assert self.triplet is not None
@@ -298,7 +296,7 @@ class Color(NamedTuple):
             return theme.foreground_color if foreground else theme.background_color
 
     @classmethod
-    def from_triplet(cls, triplet: ColorTriplet) -> Color:
+    def from_triplet(cls, triplet: "ColorTriplet") -> "Color":
         """Create a truecolor RGB color from a triplet of values.
         
         Args:
@@ -310,7 +308,7 @@ class Color(NamedTuple):
         return cls(name=triplet.hex, type=ColorType.TRUECOLOR, triplet=triplet)
 
     @classmethod
-    def default(cls) -> Color:
+    def default(cls) -> "Color":
         """Get a Color instance representing the default color.
         
         Returns:
@@ -320,7 +318,7 @@ class Color(NamedTuple):
 
     @classmethod
     @lru_cache(maxsize=1000)
-    def parse(cls, color: str) -> Color:
+    def parse(cls, color: str) -> "Color":
         """Parse a color definition."""
         color = color.lower().strip()
 
@@ -388,7 +386,7 @@ class Color(NamedTuple):
             return ["38" if foreground else "48", "2", str(red), str(green), str(blue)]
 
     @lru_cache(maxsize=1000)
-    def downgrade(self, system: ColorSystem) -> Color:
+    def downgrade(self, system: ColorSystem) -> "Color":
         """Downgrade a color system to a system with fewer colors."""
 
         # Convert to 8-bit color from truecolor color

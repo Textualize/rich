@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Sequence, Mapping
 from typing import Any, TYPE_CHECKING
 

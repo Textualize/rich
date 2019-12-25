@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from typing import Any, Iterable, List, Optional, TYPE_CHECKING
 
@@ -24,12 +22,12 @@ class LogRender:
 
     def __call__(
         self,
-        console: Console,
-        renderables: Iterable[ConsoleRenderable],
+        console: "Console",
+        renderables: Iterable["ConsoleRenderable"],
         log_time: datetime = None,
         path: str = None,
         line_no: int = None,
-    ) -> Table:
+    ) -> "Table":
         from .containers import Renderables
         from .table import Table
 
@@ -39,7 +37,7 @@ class LogRender:
         output.add_column(ratio=1, style="log.message")
         if self.show_path and path:
             output.add_column(style="log.path")
-        row: List[RenderableType] = []
+        row: List["RenderableType"] = []
         if self.show_time:
             if log_time is None:
                 log_time = datetime.now()
@@ -59,7 +57,7 @@ class LogRender:
         return output
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
     console = Console()

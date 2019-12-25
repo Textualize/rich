@@ -1,6 +1,3 @@
-from __future__ import annotations
-
-
 from collections import ChainMap
 from collections.abc import Mapping, Sequence
 from contextlib import contextmanager
@@ -77,7 +74,7 @@ body {{
 """
 
 
-def console_str(render_object: Any) -> Text:
+def console_str(render_object: Any) -> "Text":
     console_str_callable = getattr(render_object, "__console_str__")
     if console_str_callable:
         return console_str_callable()
@@ -95,7 +92,7 @@ class ConsoleOptions:
     encoding: str
     justify: Optional[JustifyValues] = None
 
-    def copy(self) -> ConsoleOptions:
+    def copy(self) -> "ConsoleOptions":
         """Get a copy of this object.
         
         Returns:
@@ -128,8 +125,8 @@ class ConsoleRenderable(Protocol):
     """An object that supports the console protocol."""
 
     def __console__(
-        self, console: Console, options: ConsoleOptions
-    ) -> Iterable[Union[ConsoleRenderable, Segment]]:
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> Iterable[Union["ConsoleRenderable", Segment]]:
         ...
 
 
@@ -147,11 +144,11 @@ class ConsoleDimensions(NamedTuple):
 class StyleContext:
     """A context manager to manage a style."""
 
-    def __init__(self, console: Console, style: Optional[Style]):
+    def __init__(self, console: "Console", style: Optional[Style]):
         self.console = console
         self.style = style
 
-    def __enter__(self) -> Console:
+    def __enter__(self) -> "Console":
         if self.style is not None:
             self.console.push_style(self.style)
         self.console._enter_buffer()
@@ -236,7 +233,7 @@ class Console:
         self._buffer_index -= 1
         self._check_buffer()
 
-    def __enter__(self) -> Console:
+    def __enter__(self) -> "Console":
         """Own context manager to enter buffer context."""
         self._enter_buffer()
         return self
@@ -425,7 +422,7 @@ class Console:
             )
         return lines
 
-    def render_str(self, text: str) -> Text:
+    def render_str(self, text: str) -> "Text":
         """Convert a string to a Text instance.
         
         Args:
@@ -539,7 +536,7 @@ class Console:
         sep: str,
         end: str,
         emoji=True,
-        highlight: HighlighterType = None,
+        highlight: "HighlighterType" = None,
     ) -> List[ConsoleRenderable]:
         """Combined a number of renderables and text in to one renderable.
         
@@ -605,7 +602,7 @@ class Console:
         end="\n",
         style: Union[str, Style] = None,
         emoji=True,
-        highlight: HighlighterType = None,
+        highlight: "HighlighterType" = None,
     ) -> None:
         """Print to the console.
 
@@ -635,7 +632,7 @@ class Console:
         self,
         *objects: Any,
         debug=Ellipsis,
-        highlight: HighlighterType = None,
+        highlight: "HighlighterType" = None,
         log_locals: bool = False,
     ) -> None:
         if not objects and not debug:
