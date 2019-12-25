@@ -26,5 +26,5 @@ jobs:
           # make typecheck
       - name: Test with pytest
         run: |
-          pip install pytest
+          pip install pytest pytest-cov
           make test
