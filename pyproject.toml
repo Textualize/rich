@@ -9,6 +9,7 @@ license = "MIT"
 python = "^3.6"
 pprintpp = "^0.4.0"
 typing-extensions = "^3.7.4"
+dataclasses = {version="^0.7", python = "~3.6"} 
 
 [tool.poetry.dev-dependencies]
 

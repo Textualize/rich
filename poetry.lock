@@ -1,5 +1,14 @@
 [[package]]
 category = "main"
+description = "A backport of the dataclasses module for Python 3.6"
+marker = "python_version >= \"3.6\" and python_version < \"3.7\""
+name = "dataclasses"
+optional = false
+python-versions = ">=3.6, <3.7"
+version = "0.7"
+
+[[package]]
+category = "main"
 description = "A drop-in replacement for pprint that's actually pretty"
 name = "pprintpp"
 optional = false
@@ -15,10 +24,14 @@ python-versions = "*"
 version = "3.7.4.1"
 
 [metadata]
-content-hash = "8fa4cd872a42acf90353195a40be3bde2086e7c307b963f7a0bb062fda40ba39"
+content-hash = "6a6b430b4c6eaf83bf8955c546cc6bbb4f21d8a8e873248c88212cf5a78e2d1e"
 python-versions = "^3.6"
 
 [metadata.files]
+dataclasses = [
+    {file = "dataclasses-0.7-py3-none-any.whl", hash = "sha256:3459118f7ede7c8bea0fe795bff7c6c2ce287d01dd226202f7c9ebc0610a7836"},
+    {file = "dataclasses-0.7.tar.gz", hash = "sha256:494a6dcae3b8bcf80848eea2ef64c0cc5cd307ffc263e17cdf42f3e5420808e6"},
+]
 pprintpp = [
     {file = "pprintpp-0.4.0-py2.py3-none-any.whl", hash = "sha256:b6b4dcdd0c0c0d75e4d7b2f21a9e933e5b2ce62b26e1a54537f9651ae5a5c01d"},
     {file = "pprintpp-0.4.0.tar.gz", hash = "sha256:ea826108e2c7f49dc6d66c752973c3fc9749142a798d6b254e1e301cfdbc6403"},
