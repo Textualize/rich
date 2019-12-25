@@ -1,4 +1,7 @@
+import pytest
+
 from rich.text import Span, Text
+from rich._render_width import RenderWidth
 
 
 def test_span():
@@ -111,3 +114,116 @@ def test_set_length():
     expected = Text()
     expected.append("Hel", "bold")
     assert test == expected
+
+
+def test_console_width():
+    test = Text("Hello World!\nfoobarbaz")
+    assert test.__console_width__(80) == RenderWidth(9, 12)
+    assert Text(" " * 4).__console_width__(80) == RenderWidth(4, 4)
+
+
+def test_join():
+    test = Text("bar").join([Text("foo", "red"), Text("baz", "blue")])
+    assert str(test) == "foobarbaz"
+    assert test._spans == [Span(0, 3, "red"), Span(3, 6, ""), Span(6, 9, "blue")]
+
+
+def test_trim_spans():
+    test = Text("Hello")
+    test._spans[:] = [Span(0, 3, "red"), Span(3, 6, "green"), Span(6, 9, "blue")]
+    test._trim_spans()
+    assert test._spans == [Span(0, 3, "red"), Span(3, 5, "green")]
+
+
+def test_pad_left():
+    test = Text("foo")
+    test.pad_left(3, "X")
+    assert str(test) == "XXXfoo"
+
+
+def test_pad_right():
+    test = Text("foo")
+    test.pad_right(3, "X")
+    assert str(test) == "fooXXX"
+
+
+def test_append():
+    test = Text("foo")
+    test.append("bar")
+    assert str(test) == "foobar"
+    test.append(Text("baz", "bold"))
+    assert str(test) == "foobarbaz"
+    assert test._spans == [Span(6, 9, "bold")]
+
+    with pytest.raises(ValueError):
+        test.append(Text("foo"), "bar")
+
+    with pytest.raises(TypeError):
+        test.append(1)
+
+
+def test_split():
+    test = Text()
+    test.append("foo", "red")
+    test.append("\n")
+    test.append("bar", "green")
+    test.append("\n")
+
+    line1 = Text()
+    line1.append("foo", "red")
+    line2 = Text()
+    line2.append("bar", "green")
+    split = test.split("\n")
+    assert len(split) == 2
+    assert split[0] == line1
+    assert split[1] == line2
+
+    assert Text("foo").split("\n") == [Text("foo")]
+
+
+def test_divide():
+    lines = Text("foo").divide([])
+    assert len(lines) == 1
+    assert lines[0] == Text("foo")
+
+    text = Text()
+    text.append("foo", "bold")
+    lines = text.divide([1, 2])
+    assert len(lines) == 3
+    assert str(lines[0]) == "f"
+    assert str(lines[1]) == "o"
+    assert str(lines[2]) == "o"
+    assert lines[0]._spans == [Span(0, 1, "bold")]
+    assert lines[1]._spans == [Span(0, 1, "bold")]
+    assert lines[2]._spans == [Span(0, 1, "bold")]
+
+
+def test_right_crop():
+    test = Text()
+    test.append("foobar", "red")
+    test.right_crop(3)
+    assert str(test) == "foo"
+    assert test._spans == [Span(0, 3, "red")]
+
+
+def test_wrap():
+    test = Text("foo bar baz")
+    lines = test.wrap(4)
+    assert len(lines) == 3
+    assert lines[0] == Text("foo ")
+    assert lines[1] == Text("bar ")
+    assert lines[2] == Text("baz ")
+
+    lines = test.wrap(3)
+    print(list(lines))
+    assert len(lines) == 3
+    assert lines[0] == Text("foo")
+    assert lines[1] == Text("bar")
+    assert lines[2] == Text("baz")
+
+
+def test_fit():
+    test = Text("Hello\nWorld")
+    lines = test.fit(3)
+    assert str(lines[0]) == "Hel"
+    assert str(lines[1]) == "Wor"

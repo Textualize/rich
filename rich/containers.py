@@ -95,9 +95,10 @@ class Lines:
 
         if align == "left":
             for line in self._lines:
-                line.pad_right(width - len(line.text))
+                line.set_length(width)
         elif align == "center":
             for line in self._lines:
+                line.rstrip()
                 line.pad_left((width - len(line.text)) // 2)
                 line.pad_right(width - len(line.text))
         elif align == "right":

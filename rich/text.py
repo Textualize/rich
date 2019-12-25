@@ -87,7 +87,7 @@ class Text:
     def __init__(
         self,
         text: str = "",
-        style: Union[str, Style] = "none",
+        style: Union[str, Style] = "",
         word_wrap: bool = True,
         justify: "JustifyValues" = None,
         end: str = "\n",
@@ -185,6 +185,11 @@ class Text:
             # span not in range
             return
         self._spans.append(Span(max(0, start), min(length, end), style))
+
+    def rstrip(self) -> None:
+        """Trip whitespace from end of text
+        """
+        self.text = self.text.rstrip()
 
     def set_length(self, new_length: int) -> None:
         """Set new length of the text, clipping or padding is required."""
@@ -435,8 +440,6 @@ class Text:
         ]
 
         for span in self._spans:
-            if span.start >= text_length:
-                continue
             line_index = span.start // average_line_length
 
             line_start, line_end = line_ranges[line_index]
@@ -486,15 +489,18 @@ class Text:
             text = line.text
             text_length = len(text)
             line_start = 0
-            line_end = width
+            line_end = min(text_length, width)
             offsets: List[int] = []
             while line_end < text_length:
                 break_offset = text.rfind(" ", line_start, line_end)
-                if break_offset != -1:
+                if break_offset == -1:
+                    line_end += 1
+                else:
                     line_end = break_offset + 1
                 line_start = line_end
                 line_end = line_start + width
                 offsets.append(line_start)
+
             new_lines = line.divide(offsets)
             if justify:
                 new_lines.justify(width, align=justify)
