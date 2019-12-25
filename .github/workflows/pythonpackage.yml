@@ -28,4 +28,5 @@ jobs:
         run: |
           pip install poetry pytest
           poetry install
+          pip install .
           pytest tests/ -v
