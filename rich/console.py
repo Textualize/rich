@@ -25,10 +25,9 @@ from typing import (
     overload,
     Tuple,
     TYPE_CHECKING,
-    runtime_checkable,
     Union,
 )
-from typing_extensions import Protocol, Literal
+from typing_extensions import Protocol, runtime_checkable, Literal
 
 
 from ._emoji_replace import _emoji_replace
