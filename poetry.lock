@@ -7,8 +7,8 @@ python-versions = "*"
 version = "0.4.0"
 
 [metadata]
-content-hash = "61699e45af0f6a57783fa07c17d80ae01c3615cfc78027541a9b58948ef913d8"
-python-versions = "^3.8"
+content-hash = "be7c062dae9395437a3e2a3173527457308b9dba029bbee067ceb6cc1b62424d"
+python-versions = "^3.5"
 
 [metadata.files]
 pprintpp = [
