@@ -26,6 +26,6 @@ jobs:
           # make typecheck
       - name: Test with pytest
         run: |
-          pip install poetry pytest pytest-cov
+          pip install poetry pytest
           poetry install
-          make test
+          pytest tests/ -v
