@@ -1,6 +1,7 @@
 .DS_Store
 .vscode
 mypy_report
+docs/build
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

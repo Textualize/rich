@@ -159,7 +159,7 @@ class Console:
         color_system: Optional[
             Literal["auto", "standard", "256", "truecolor"]
         ] = "auto",
-        styles: Dict[str, Style] = DEFAULT_STYLES,
+        styles: Dict[str, Style] = None,
         file: IO = None,
         width: int = None,
         height: int = None,
@@ -170,7 +170,7 @@ class Console:
         log_time_format: str = "[%X] ",
     ):
 
-        self._styles = ChainMap(styles)
+        self._styles = ChainMap(DEFAULT_STYLES if styles is None else styles)
         self.file = file or sys.stdout
         self._width = width
         self._height = height
@@ -249,7 +249,7 @@ class Console:
         
         Returns:
             bool: True if the console writting to a device capable of
-                understanding terminal codes, otherwise False.
+            understanding terminal codes, otherwise False.
         """
         isatty = getattr(self.file, "isatty", None)
         return False if isatty is None else isatty()
@@ -722,7 +722,7 @@ class Console:
         self,
         theme: Theme = None,
         clear: bool = True,
-        code_format=CONSOLE_HTML_FORMAT,
+        code_format: str = None,
         inline_styles: bool = False,
     ) -> str:
         """Generate HTML from console contents (requires record=True argument in constructor).
@@ -746,6 +746,8 @@ class Console:
         append = fragments.append
         _theme = theme or themes.DEFAULT
         stylesheet = ""
+
+        render_code_format = CONSOLE_HTML_FORMAT if code_format is None else code_format
 
         if inline_styles:
             for text, style in Segment.simplify(self._record_buffer):
@@ -773,7 +775,7 @@ class Console:
                     stylesheet_append(f".r{style_number} {{{style_rule}}}")
             stylesheet = "\n".join(stylesheet_rules)
 
-        rendered_code = code_format.format(
+        rendered_code = render_code_format.format(
             code="".join(fragments),
             stylesheet=stylesheet,
             foreground=_theme.foreground_color.hex,
