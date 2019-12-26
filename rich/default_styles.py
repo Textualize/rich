@@ -54,8 +54,6 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.bool_false": Style(color="bright_red", italic=True),
     "repr.none": Style(color="magenta", italic=True),
     "repr.url": Style(underline=True, color="default"),
-    "inspect.key": Style(italic=True),
-    "inspect.value": Style(),
     "table.header": Style(bold=True),
     "table.footer": Style(bold=True),
     "table.cell": Style(),
