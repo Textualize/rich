@@ -53,6 +53,7 @@ class LogRender:
                 row.append(Text(path))
             else:
                 row.append(Text(f"{path}:{line_no}"))
+
         output.add_row(*row)
         return output
 

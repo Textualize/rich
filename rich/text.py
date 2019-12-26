@@ -26,6 +26,7 @@ from .style import Style
 from .segment import Segment
 from ._render_width import RenderWidth
 from ._tools import iter_last, iter_first_last
+from ._wrap import divide_line
 
 
 class Span(NamedTuple):
@@ -483,24 +484,10 @@ class Text:
         Returns:
             Lines: Number of lines.
         """
-        assert width > 0, "width must be an integer >0"
+
         lines: Lines = Lines()
         for line in self.split():
-            text = line.text
-            text_length = len(text)
-            line_start = 0
-            line_end = min(text_length, width)
-            offsets: List[int] = []
-            while line_end < text_length:
-                break_offset = text.rfind(" ", line_start, line_end)
-                if break_offset == -1:
-                    line_end += 1
-                else:
-                    line_end = break_offset + 1
-                line_start = line_end
-                line_end = line_start + width
-                offsets.append(line_start)
-
+            offsets = divide_line(str(line), width)
             new_lines = line.divide(offsets)
             if justify:
                 new_lines.justify(width, align=justify)
@@ -525,22 +512,10 @@ class Text:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    text = Text("Hello, World!")
     from .console import Console
 
-    c = Console()
-    c.print(text)
-
-    text.stylize(0, 12, "bold red")
-    text.stylize(0, 6, "not bold default")
-
-    print(text._spans)
-
-    c.print(text)
-
-    c.print("[bold red]Danger Will Robinson[/bold red]")
-
-    t = Text.from_markup("[magenta]wat")
-    print(len(t))
-    print(RenderWidth.get(t, 100))
+    console = Console()
+    text = Text("[12:42:33] ")
+    lines = text.wrap(10)
+    console.print(lines)
 

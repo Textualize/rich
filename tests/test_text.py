@@ -241,6 +241,7 @@ def test_right_crop():
 def test_wrap():
     test = Text("foo bar baz")
     lines = test.wrap(4)
+    print(list(lines))
     assert len(lines) == 3
     assert lines[0] == Text("foo ")
     assert lines[1] == Text("bar ")

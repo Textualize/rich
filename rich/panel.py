@@ -44,12 +44,14 @@ class Panel:
         style = console.get_style(self.style)
         width = options.max_width
 
+        if width <= 3:
+            yield self.renderable
+            return
+
         if self.expand:
             child_width = width - 2
         else:
-            print(self.renderable)
             child_width = RenderWidth.get(self.renderable, width - 2).maximum
-            print(child_width)
 
         width = child_width + 2
         child_options = options.update(width=child_width)
@@ -75,7 +77,7 @@ class Panel:
 if __name__ == "__main__":
     from .console import Console
 
-    c = Console()
+    c = Console(width=22)
 
     from .padding import Padding
     from .box import ROUNDED
