@@ -1,5 +1,6 @@
 import pytest
 
+from rich.console import Console
 from rich.text import Span, Text
 from rich._render_width import RenderWidth
 
@@ -260,3 +261,14 @@ def test_fit():
     lines = test.fit(3)
     assert str(lines[0]) == "Hel"
     assert str(lines[1]) == "Wor"
+
+
+def test_render():
+    console = Console(width=15, record=True)
+    test = Text.from_markup(
+        "[u][b]Where[/b] there is a [i]Will[/i], there is a Way.[/u]"
+    )
+    console.print(test)
+    output = console.export_text(styles=True)
+    expected = "\x1b[1;4mWhere\x1b[0m\x1b[4m there is \x1b[0m\n\x1b[0m\x1b[4ma \x1b[0m\x1b[3;4mWill\x1b[0m\x1b[4m, there \x1b[0m\n\x1b[0m\x1b[4mis a Way.\x1b[0m\n\x1b[0m"
+    assert output == expected

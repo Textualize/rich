@@ -89,13 +89,11 @@ class Text:
         self,
         text: str = "",
         style: Union[str, Style] = "",
-        word_wrap: bool = True,
         justify: "JustifyValues" = None,
         end: str = "\n",
     ) -> None:
         self._text: List[str] = [text] if text else []
         self.style = style
-        self.word_wrap = word_wrap
         self.justify = justify
         self.end = end
         self._spans: List[Span] = []
@@ -161,11 +159,7 @@ class Text:
         """Return a copy of this instance."""
         self.text
         copy_self = Text(
-            self.text,
-            style=self.style,
-            word_wrap=self.word_wrap,
-            justify=self.justify,
-            end=self.end,
+            self.text, style=self.style, justify=self.justify, end=self.end,
         )
         copy_self._spans[:] = self._spans[:]
         return copy_self
@@ -211,13 +205,7 @@ class Text:
     def __console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
-        if self.word_wrap:
-            lines = self.wrap(
-                options.max_width, justify=self.justify or options.justify
-            )
-        else:
-            lines = self.fit(options.max_width)
-
+        lines = self.wrap(options.max_width, justify=self.justify or options.justify)
         all_lines = Text("\n").join(lines)
         yield from self._render_line(all_lines, console, options)
 
