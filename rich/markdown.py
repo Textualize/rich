@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, ClassVar, Dict, Iterable, List, Optional, Union
+from typing import Any, ClassVar, Dict, Iterable, List, Optional, Type, Union
 
 from commonmark.blocks import Parser
 
@@ -162,7 +162,7 @@ class CodeBlock(TextElement):
     style_name = "markdown.code_block"
 
     @classmethod
-    def create(cls, markdown: "Markdown", node: Any) -> "ListElement":
+    def create(cls, markdown: "Markdown", node: Any) -> "CodeBlock":
         if node.info is None:
             return cls("default", markdown.code_theme)
         lexer_name, _, _ = node.info.partition(" ")
@@ -333,7 +333,7 @@ class MarkdownContext:
 
 class Markdown:
 
-    elements: ClassVar[Dict[str, MarkdownElement]] = {
+    elements: ClassVar[Dict[str, Type[MarkdownElement]]] = {
         "paragraph": Paragraph,
         "heading": Heading,
         "code_block": CodeBlock,

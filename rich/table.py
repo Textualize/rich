@@ -33,17 +33,6 @@ from ._render_width import RenderWidth
 from ._tools import iter_first_last, iter_first, iter_last, ratio_divide
 
 
-T = TypeVar("T")
-
-
-def _pick_first(values: Iterable[Optional[T]], final: T) -> T:
-    """Pick first non-None value."""
-    for value in values:
-        if value is not None:
-            return value
-    return final
-
-
 @dataclass
 class Column:
     """Defines a column in a table."""
@@ -167,12 +156,26 @@ class Table:
             width (int, optional): A minimum width in characters. Defaults to None.
             ratio (int, optional): Flexible ratio for the column. Defaults to None.
         """
+
+        def _pick_first_style(
+            *values: Optional[Union[Style, str]]
+        ) -> Union[Style, str]:
+            """Pick first non-None style."""
+            for value in values:
+                if value is not None:
+                    return value
+            raise ValueError("expected at least one non-None style")
+
         column = Column(
             header=header,
             footer=footer,
-            header_style=_pick_first((header_style, self.header_style), "table.header"),
-            footer_style=_pick_first((footer_style, self.footer_style), "table.footer"),
-            style=_pick_first((style, self.style), "table.cell"),
+            header_style=_pick_first_style(
+                header_style, self.header_style, "table.header"
+            ),
+            footer_style=_pick_first_style(
+                footer_style, self.footer_style, "table.footer"
+            ),
+            style=_pick_first_style(style, self.style, "table.cell"),
             justify=justify,
             width=width,
             ratio=ratio,

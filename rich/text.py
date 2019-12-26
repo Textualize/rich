@@ -366,7 +366,7 @@ class Text:
         else:
             raise TypeError("Only str or Text can be appended to Text")
 
-    def split(self, separator="\n", include_separator: bool = False) -> List["Text"]:
+    def split(self, separator="\n", include_separator: bool = False) -> Lines:
         """Split rich text in to lines, preserving styles.
         
         Args:
@@ -379,7 +379,7 @@ class Text:
 
         text = self.text
         if separator not in text:
-            return [self.copy()]
+            return Lines([self.copy()])
         if text.endswith(separator):
             text = text[: -len(separator)]
         offsets: List[int] = []

@@ -25,14 +25,3 @@ def divide_line(text: str, width: int) -> List[int]:
             line_size = 0
         line_size += len(word)
     return divides
-
-
-if __name__ == "__main__":  # pragma: no cover
-    test = "      Where there is a Will there is a way. Hello World. There   can be only one."
-
-    boundaries = [0, *wrap(test, 10), len(test)]
-    print(boundaries)
-    for start, end in zip(boundaries, boundaries[1:]):
-        line = test[start:end]
-        print(f"{len(line)}\t", repr(line))
-
