@@ -885,5 +885,5 @@ if __name__ == "__main__":  # pragma: no cover
             },
         }
     )
-# console.print("foo")
+    console.log("foo")
 

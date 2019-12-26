@@ -45,7 +45,7 @@ class LogRender:
             if log_time_display == self._last_time:
                 row.append(Text(" " * len(log_time_display)))
             else:
-                row.append(log_time_display)
+                row.append(Text(log_time_display))
                 self._last_time = log_time_display
         row.append(Renderables(renderables))
         if self.show_path and path:
