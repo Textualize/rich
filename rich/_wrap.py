@@ -27,7 +27,7 @@ def divide_line(text: str, width: int) -> List[int]:
     return divides
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     test = "      Where there is a Will there is a way. Hello World. There   can be only one."
 
     boundaries = [0, *wrap(test, 10), len(test)]

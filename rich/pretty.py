@@ -6,7 +6,7 @@ from ._render_width import RenderWidth
 from .highlighter import ReprHighlighter
 from .text import Text
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from .console import Console, ConsoleOptions, RenderResult
 
 

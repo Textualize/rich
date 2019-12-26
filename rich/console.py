@@ -45,7 +45,7 @@ from .pretty import Pretty
 from .theme import Theme
 from .segment import Segment
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from .text import Text
 
     HighlighterType = Callable[[Union[str, Text]], Text]
@@ -74,14 +74,6 @@ body {{
 """
 
 
-def console_str(render_object: Any) -> "Text":
-    console_str_callable = getattr(render_object, "__console_str__")
-    if console_str_callable:
-        return console_str_callable()
-    else:
-        return Text(str(render_object))
-
-
 @dataclass
 class ConsoleOptions:
     """Options for __console__ method."""
@@ -91,14 +83,6 @@ class ConsoleOptions:
     is_terminal: bool
     encoding: str
     justify: Optional[JustifyValues] = None
-
-    def copy(self) -> "ConsoleOptions":
-        """Get a copy of this object.
-        
-        Returns:
-            ConsoleOptions: New instance with same settings.
-        """
-        return replace(self)
 
     def update(
         self,
@@ -126,7 +110,7 @@ class ConsoleRenderable(Protocol):
 
     def __console__(
         self, console: "Console", options: "ConsoleOptions"
-    ) -> Iterable[Union["ConsoleRenderable", Segment]]:
+    ) -> Iterable[Union["ConsoleRenderable", Segment]]:  # pragma: no cover
         ...
 
 
@@ -243,6 +227,11 @@ class Console:
         self._exit_buffer()
 
     def push_styles(self, styles: Dict[str, Style]) -> None:
+        """Merge set of styles with currently active styles.
+        
+        Args:
+            styles (Dict[str, Style]): A mapping of style name to Style instance.
+        """
         self._styles.maps.append(styles)
 
     @property
@@ -269,7 +258,7 @@ class Console:
     def options(self) -> ConsoleOptions:
         """Get default console options."""
         return ConsoleOptions(
-            min_width=0,
+            min_width=1,
             max_width=self.width,
             encoding=self.encoding,
             is_terminal=self.is_terminal,
@@ -309,10 +298,9 @@ class Console:
         """
 
         assert count >= 0, "count must be >= 0"
-        if not count:
-            return
-        self.buffer.append(Segment("\n" * count))
-        self._check_buffer()
+        if count:
+            self.buffer.append(Segment("\n" * count))
+            self._check_buffer()
 
     def _render(
         self, renderable: RenderableType, options: Optional[ConsoleOptions]
