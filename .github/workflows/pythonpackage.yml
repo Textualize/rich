@@ -23,7 +23,7 @@ jobs:
       - name: Typecheck with mypy
         run: |
           pip install mypy
-          # make typecheck
+          make typecheck
       - name: Test with pytest
         run: |
           pip install poetry pytest
