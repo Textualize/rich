@@ -8,6 +8,7 @@ from .console import (
     Console,
     ConsoleOptions,
     ConsoleRenderable,
+    JustifyValues,
     RenderResult,
     Segment,
 )
@@ -77,8 +78,7 @@ class MarkdownElement:
     def __console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-        return
-        yield
+        return ()
 
 
 class UnknownElement(MarkdownElement):
@@ -113,12 +113,13 @@ class Paragraph(TextElement):
     """A Paragraph."""
 
     style_name = "markdown.paragraph"
+    justify: JustifyValues
 
     @classmethod
     def create(cls, markdown: "Markdown", node) -> "Paragraph":
-        return cls(justify=markdown.justify)
+        return cls(justify=markdown.justify or "left")
 
-    def __init__(self, justify: str) -> None:
+    def __init__(self, justify: JustifyValues) -> None:
         self.justify = justify
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
@@ -348,7 +349,7 @@ class Markdown:
         self,
         markup: str,
         code_theme: str = "monokai",
-        justify: str = None,
+        justify: JustifyValues = None,
         style: Union[str, Style] = "none",
     ) -> None:
         """Parses the markup."""

@@ -23,6 +23,11 @@ class _Bit:
 class Style:
     """A terminal style."""
 
+    _color: Optional[Color]
+    _bgcolor: Optional[Color]
+    _attributes: int
+    _set_attributes: int
+
     def __init__(
         self,
         *,

@@ -1,6 +1,10 @@
-from typing import NamedTuple
+from typing import NamedTuple, TYPE_CHECKING
 
+from . import errors
 from .segment import Segment
+
+if TYPE_CHECKING:
+    from .console import RenderableType
 
 
 class RenderWidth(NamedTuple):

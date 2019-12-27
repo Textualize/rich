@@ -195,7 +195,7 @@ CODE = r'''
                 yield new_line
 '''
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
 
     syntax = Syntax(CODE, "python", dedent=True, line_numbers=True, start_line=990)
 
@@ -208,9 +208,9 @@ if __name__ == "__main__":
     elapsed = int((time() - start) * 1000)
     print(f"{elapsed}ms")
 
-    print(Color.downgrade.cache_info())
-    print(Color.parse.cache_info())
-    print(Color.get_ansi_codes.cache_info())
+    # print(Color.downgrade.cache_info())
+    # print(Color.parse.cache_info())
+    # print(Color.get_ansi_codes.cache_info())
 
-    print(Style.parse.cache_info())
+    # print(Style.parse.cache_info())
 

@@ -48,7 +48,7 @@ from .segment import Segment
 if TYPE_CHECKING:  # pragma: no cover
     from .text import Text
 
-    HighlighterType = Callable[[Union[str, Text]], Text]
+HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 
 JustifyValues = Optional[Literal["left", "center", "right", "full"]]
 
@@ -570,14 +570,14 @@ class Console:
                 append_text(renderable)
             elif isinstance(renderable, (int, float, bool, bytes, type(None))):
                 append_text(
-                    highlight(repr(renderable)) if highlight else repr(renderable)
+                    highlight(repr(renderable)) if highlight else Text(repr(renderable))
                 )
             elif isinstance(renderable, (Mapping, Sequence)):
                 check_text()
                 append(Pretty(renderable))
             else:
                 append_text(
-                    highlight(repr(renderable)) if highlight else repr(renderable)
+                    highlight(repr(renderable)) if highlight else Text(repr(renderable))
                 )
 
         check_text()

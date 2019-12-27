@@ -71,7 +71,7 @@ class Panel:
         if self.expand:
             return RenderWidth(max_width, max_width)
         width = RenderWidth.get(self.renderable, max_width - 2).maximum + 2
-        return RenderWidth.get(width, width)
+        return RenderWidth(width, width)
 
 
 if __name__ == "__main__":
