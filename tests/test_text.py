@@ -185,7 +185,7 @@ def test_split():
     assert split[0] == line1
     assert split[1] == line2
 
-    assert Text("foo").split("\n") == [Text("foo")]
+    assert list(Text("foo").split("\n")) == [Text("foo")]
 
 
 def test_divide():

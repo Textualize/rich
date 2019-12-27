@@ -1,4 +1,4 @@
-name: Python package
+name: Test Rich module
 
 on: [push]
 
