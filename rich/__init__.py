@@ -1,4 +1,4 @@
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, IO, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .console import Console
@@ -7,16 +7,25 @@ if TYPE_CHECKING:
 _console: Optional["Console"] = None
 
 
-def print(*objects: Any, sep=" ", end="\n", log_locals: bool = False):
+def print(
+    *objects: Any,
+    sep=" ",
+    end="\n",
+    file: IO[str] = None,
+    flush: bool = False,
+    log_locals: bool = False
+):
     global _console
     if _console is None:
         from .console import Console
 
         _console = Console()
-    return _console.log(
+
+    write_console = _console if file is None else Console(file=file)
+    return write_console.log(
         *objects, sep=sep, end=end, log_locals=log_locals, _stack_offset=2
     )
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     print("Hello, **World**", log_locals=True)
