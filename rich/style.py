@@ -107,6 +107,23 @@ class Style:
             append(self._bgcolor.name)
         return " ".join(attributes) or "none"
 
+    @classmethod
+    @lru_cache(maxsize=1000)
+    def normalize(cls, style: str) -> str:
+        """Normalize a style definition so that styles with the same effect have the same string
+        representation.
+        
+        Args:
+            style (str): A style definition.
+        
+        Returns:
+            str: Normal form of style definition.
+        """
+        try:
+            return str(cls.parse(style))
+        except errors.StyleSyntaxError:
+            return style.strip().lower()
+
     def __repr__(self) -> str:
         """Render a named style differently from an anonymous style."""
         return f'<style "{self}">'
