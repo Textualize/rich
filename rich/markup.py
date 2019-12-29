@@ -112,7 +112,7 @@ def render(markup: str, style: Union[str, Style] = "") -> Text:
     return text
 
 
-if __name__ == "__main__":  # pragma: np cover
+if __name__ == "__main__":  # pragma: no cover
     text = """*Hello* **World**! [bold blue]~~strike~~[/blue bold] `code`"""
 
     from .console import Console
