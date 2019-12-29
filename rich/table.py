@@ -233,7 +233,12 @@ class Table:
         widths = self._calculate_column_widths(max_width)
         table_width = sum(widths) + len(self.columns) + (2 if self.box else 0)
         if self.title:
-            title_text = Text.from_markup(self.title, style=self.title_style or "")
+            title_text = Text.from_markup(
+                self.title,
+                style=self.title_style
+                if self.title_style is not None
+                else "table.title",
+            )
             wrapped_title = title_text.wrap(table_width, "center")
             yield wrapped_title
         yield from self._render(console, options, widths)

@@ -60,6 +60,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "table.header": Style(bold=True),
     "table.footer": Style(bold=True),
     "table.cell": Style(),
+    "table.title": Style(italic=True),
 }
 
 MARKDOWN_STYLES = {

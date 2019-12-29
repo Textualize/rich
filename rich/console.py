@@ -619,22 +619,25 @@ class Console:
     def log(
         self,
         *objects: Any,
+        sep=" ",
+        end="\n",
         debug=Ellipsis,
         highlight: "HighlighterType" = None,
         log_locals: bool = False,
+        _stack_offset=1,
     ) -> None:
         if not objects and not debug:
             self.line()
             return
         highlighter = highlight or ReprHighlighter()
         renderables = self._collect_renderables(
-            objects, sep=" ", end="\n", highlight=highlighter
+            objects, sep=sep, end=end, highlight=highlighter
         )
 
         if debug != Ellipsis:
             renderables.append(Pretty(debug))
 
-        caller = inspect.stack()[1]
+        caller = inspect.stack()[_stack_offset]
         path = caller.filename.rpartition(os.sep)[-1]
         line_no = caller.lineno
         if log_locals:

@@ -17,7 +17,9 @@ def tabulate_mapping(mapping: Mapping, title: str = None) -> Table:
     Returns:
         Table: A table instance which may be rendered by the Console.
     """
-    table = Table(title=title, box=box.ROUNDED, border_style="blue", padding=0)
+    table = Table(
+        show_header=False, title=title, box=box.ROUNDED, border_style="blue", padding=0
+    )
     for key, value in mapping.items():
         table.add_row(Pretty(key), Pretty(value))
     return table
