@@ -11,7 +11,7 @@ class Highlighter(ABC):
         """Highlight a str or Text instance.
         
         Args:
-            text (Union[str, Text]): Text to highlight.
+            text (Union[str, ~Text]): Text to highlight.
         
         Raises:
             TypeError: If not called with text or str.
@@ -22,14 +22,19 @@ class Highlighter(ABC):
         if isinstance(text, str):
             highlight_text = Text(text)
         elif isinstance(text, Text):
-            highlight_text = text
+            highlight_text = text.copy()
         else:
             raise TypeError(f"str or Text instance required, not {text!r}")
-        return self.highlight(highlight_text)
+        self.highlight(highlight_text)
+        return highlight_text
 
     @abstractmethod
-    def highlight(self, text: Text) -> Text:
-        ...
+    def highlight(self, text: Text) -> None:
+        """Apply highlighting in place to text.
+        
+        Args:
+            text (~Text): A text object highlight.
+        """
 
 
 class RegexHighlighter(Highlighter):
@@ -38,7 +43,13 @@ class RegexHighlighter(Highlighter):
     highlights: List[str] = []
     base_style: str = ""
 
-    def highlight(self, text: Text) -> Text:
+    def highlight(self, text: Text) -> None:
+        """Highlight a :ref:`rich.text.Text` using regular expressions.
+        
+        Args:
+            text (Text): Text to highlighted.
+        
+        """
         str_text = str(text)
         base_style = self.base_style
         stylize = text.stylize
@@ -49,10 +60,11 @@ class RegexHighlighter(Highlighter):
                     start, end = _span(name)
                     if start != -1:
                         stylize(start, end, f"{base_style}{name}")
-        return text
 
 
 class ReprHighlighter(RegexHighlighter):
+    """Highlights the text typically produces from ``__repr__`` methods."""
+
     base_style = "repr."
     highlights = [
         r"(?P<brace>[\{\[\(\)\]\}])",

@@ -10,6 +10,9 @@ Welcome to Rich's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   introduction.rst
+   markup.rst
+
    reference.rst
 
 Indices and tables
