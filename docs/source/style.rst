@@ -20,14 +20,14 @@ You may also use the color's number (an integer between 0 and 255). The followin
 
     console.print("Hello", style="5")
 
-Alteratively, you can use the CSS-like hex form of a color with a "#" followed by three pairs of hex characters, or in rgb form with three decimal integers. The following two lines, both print "Hello" in the same color (purple)::
+Alteratively you can use a CSS-like syntax to specify a color with a "#" followed by three pairs of hex characters for the red, green, and blue components, or in RGB form with three decimal integers. The following two lines both print "Hello" in the same color (purple)::
 
     console.print("Hello", style="#af00ff")
     console.print("Hello", style="rgb(175,0,255)")
 
-The hex and rgb forms, both give you access to the full truecolor set of colors, giving you a choice of 16.7 million colors.
+The hex and rgb forms, both allow you to select from the truecolor set of colors, giving you a choice of 16.7 million colors.
 
-By itself, a color, will change the *foreground* color. To specify a *background* color precede the color with the word "on". For example, the following prints text in red on a white background::
+By itself, a color will change the *foreground* color. To specify a *background* color precede the color with the word "on". For example, the following prints text in red on a white background::
 
     console.print("DANGER!", style="white on red")
 
@@ -43,13 +43,13 @@ You can set a style attribute by adding one or more of the following words:
 
 Style attributes and colors may be used in combination with each other. For example::
 
-    console.print("Danger, Will Robinson!", style="blink bold red")
+    console.print("Danger, Will Robinson!", style="blink bold red underline on white")
 
 
 Style Class
 -----------
 
-Ultimately the style definition is parsed and an instance of a :class:`~rich.style.Style` class is generated. If you prefer, you can use the Style class in place of the style definition. Here's an example::
+Ultimately the style definition is parsed and an instance of a :class:`~rich.style.Style` class. If you prefer, you can use the Style class in place of the style definition. Here's an example::
 
     from rich.style import Style
     console.print("Danger, Will Robinson!", style=Style(color="red", blink=True, bold=True)
