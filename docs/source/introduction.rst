@@ -1,34 +1,55 @@
 Introduction
 ============
 
-Rich is a Python library for rendering *rich* text and formatting to the terminal. Use Rich to create slick command line applications and as a handy debugging aid.
+Rich is a Python library for writing *rich* text (with color and formatting) to the terminal, and for rendering tables, markdown, and code with syntax highlighting. 
+
+Use Rich to make command line applications more visually appealing and present data in a more readable way. Rich can also be a useful debugging aid by pretty printing and syntax highlighting data structures.
 
 
 Installation
 ------------
 
-You may install Rich with your favorite PyPi package manager::
+You can install Rich with your favorite PyPi package manager::
 
     pip install rich
 
-Add the ``-U`` switch to update to the current version, if rich is already installed.
+Add the ``-U`` switch to update to the current version, if Rich is already installed.
 
 
 Quick Start
 -----------
 
-The quickest way to get up and running with Rich is to use the alternative ``print`` function, which can be used as a drop-in replacement for Python's built in function. Here's how you would do that::
+The quickest way to get up and running with Rich is to import the alternative ``print`` function, which can be used as a drop-in replacement for Python's built in function. Here's how you would do that::
 
     from rich import print
 
-You can then print content to the terminal in the same way as usual. Rich will add the time and file/line number where print was called. It will also format and syntax highlight any Python objects you print. 
+You can then print content to the terminal in the usual way. Rich will pretty print and syntax highlight any Python objects you print, and display the file/line where the print function was called.
 
-If you would rather not shadow Python's builtin print, you can import rich.print as ``rprint`` (for example)::
+Strings may contain :ref:`console_markup` which can be used to easily insert color and styles in to the output.
+
+The following demonstrates both console markup and pretty formatting of Python objects::
+
+    >>> print("[red]*Hello*[/red] World!", locals())
+
+This writes the following output to the terminal (including all the colors and styles):
+
+.. raw:: html
+
+    <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #800000; font-style: italic">Hello</span> World!                                                 <span style="color: #7f7f7f">&lt;stdin&gt;:1</span>
+    <span style="font-weight: bold">{</span>                                                                                                      
+        <span style="color: #008000">'__annotations__'</span>: <span style="font-weight: bold">{}</span>,                                                                             
+        <span style="color: #008000">'__builtins__'</span>: <span style="font-weight: bold"><</span><span style="color: #ff00ff">module</span><span style="color: #000000"> </span><span style="color: #008000">'builtins'</span><span style="color: #000000"> </span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">built-in</span><span style="color: #000000; font-weight: bold">)</span><span style="font-weight: bold">></span>,                                                    
+        <span style="color: #008000">'__doc__'</span>: <span style="color: #800080; font-style: italic">None</span>,                                                                                   
+        <span style="color: #008000">'__loader__'</span>: <span style="font-weight: bold"><</span><span style="color: #ff00ff">class</span><span style="color: #000000"> </span><span style="color: #008000">'_frozen_importlib.BuiltinImporter'</span><span style="font-weight: bold">></span>,                                         
+        <span style="color: #008000">'__name__'</span>: <span style="color: #008000">'__main__'</span>,                                                                            
+        <span style="color: #008000">'__package__'</span>: <span style="color: #800080; font-style: italic">None</span>,                                                                               
+        <span style="color: #008000">'__spec__'</span>: <span style="color: #800080; font-style: italic">None</span>,                                                                                  
+        <span style="color: #008000">'print'</span>: <span style="font-weight: bold"><</span><span style="color: #ff00ff">function</span><span style="color: #000000"> print at </span><span style="color: #000080; font-weight: bold">0x1027fd4c0</span><span style="font-weight: bold">></span>,                                                          
+    <span style="font-weight: bold">}</span> </pre>
+
+
+If you would rather not shadow Python's builtin print, you can import ``rich.print`` as ``rprint`` (for example)::
 
     from rich import print as rprint
 
-For more control over formatting, create a :ref:`rich.console.Console` object::
-
-    from rich.console import Console
-    console = Console()
-    console.print("Hello, **World**! :smiley:")
+Continue reading to learn about the more advanced features of Rich.

@@ -1,3 +1,5 @@
+.. _console_markup:
+
 Console Markup
 ==============
 

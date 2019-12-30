@@ -152,7 +152,22 @@ COLOR_SYSTEMS = {
 
 
 class Console:
-    """A high level console interface."""
+    """A high level console interface.
+    
+    Args:
+        color_system (str, optional): The color system supported by your terminal,
+            either ``"standard"``, ``"256"`` or ``"truecolor"``. Leave as ``"auto"`` to autodetect.
+        styles (Dict[str, Style], optional): An optional mapping of style name strings to :class:`~rich.style.Style` objects.
+        file (IO, optional): A file object where the console shoudl write to. Defaults to stdoutput.
+        width (int, optional): The width of the terminal. Leave as default to auto-detect width.
+        height (int, optional): The height of the terminal. Leave as default to auto-detect height.
+        record (bool, optional): Boolean to enable recording of terminal output,
+            required to call :meth:`export_html` and :meth:`export_text`. Defaults to False.
+        markup (bool, optional): Boolean to enable :ref:`console_markup`. Defaults to True.
+        log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
+        log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
+        log_time_format (str, optional): Log time format if ``log_time`` is enabled. Defaults to "[%X] ".
+    """
 
     def __init__(
         self,
@@ -169,6 +184,20 @@ class Console:
         log_path: bool = True,
         log_time_format: str = "[%X] ",
     ):
+        """[summary]
+        
+        Args:
+            color_system (Optional[Literal[, optional): [description]. Defaults to "auto".
+            styles (Dict[str, Style], optional): [description]. Defaults to None.
+            file (IO, optional): [description]. Defaults to None.
+            width (int, optional): [description]. Defaults to None.
+            height (int, optional): [description]. Defaults to None.
+            record (bool, optional): [description]. Defaults to False.
+            markup (bool, optional): [description]. Defaults to True.
+            log_time (bool, optional): [description]. Defaults to True.
+            log_path (bool, optional): [description]. Defaults to True.
+            log_time_format (str, optional): [description]. Defaults to "[%X] ".
+        """
 
         self._styles = ChainMap(DEFAULT_STYLES if styles is None else styles)
         self.file = file or sys.stdout
@@ -236,7 +265,7 @@ class Console:
 
     @property
     def encoding(self) -> str:
-        """Get the encoding of the console file.
+        """Get the encoding of the console file, e.g. ``"utf-8"``.
         
         Returns:
             str: A standard encoding string.
@@ -309,7 +338,6 @@ class Console:
 
         This method contains the logic for rendering objects with the console protocol. 
         You are unlikely to need to use it directly, unless you are extending the library.
-
         
         Args:
             renderable (RenderableType): An object supporting the console protocol, or
@@ -422,7 +450,8 @@ class Console:
         """
         if self._markup:
             return markup.render(text)
-        return Text(text)
+
+        return markup.render_text(text)
 
     def _get_style(self, name: str) -> Optional[Style]:
         """Get a named style, or `None` if it doesn't exist.
@@ -592,14 +621,17 @@ class Console:
         emoji=True,
         highlight: "HighlighterType" = None,
     ) -> None:
-        """Print to the console.
+        r"""Print to the console.
 
         Args:
-            *objects: Arbitrary objects to print to the console.
-            sep (str, optional): Separator to print between objects. Defaults to " ".
-            end (str, optional): Character to end print with. Defaults to "\n".
-            style (Union[str, Style], optional):
+            
+            objects (positional args): Objects to log to the terminal.
+            sep (str, optional): String to write between print data. Defaults to " ".
+            end (str, optional): String to write at end of print data. Defaults to "\n".
+            style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             emoji (bool): If True, emoji codes will be replaced, otherwise emoji codes will be left in.
+            highlight ([type], optional): A callable that accepts a :class:`~rich.text.Text` instance
+                and returns a Text instance, used to add highlighting. Defaults to None.
         """
         if not objects:
             self.line()
@@ -621,21 +653,29 @@ class Console:
         *objects: Any,
         sep=" ",
         end="\n",
-        debug=Ellipsis,
         highlight: "HighlighterType" = None,
         log_locals: bool = False,
         _stack_offset=1,
     ) -> None:
-        if not objects and not debug:
+        r"""Log rich content to the terminal.
+        
+        Args:
+            objects (positional args): Objects to log to the terminal.
+            sep (str, optional): String to write between print data. Defaults to " ".
+            end (str, optional): String to write at end of print data. Defaults to "\n".
+            highlight ([type], optional): A callable that accepts a :class:`~rich.text.Text` instance
+                and returns a Text instance, used to add highlighting. Defaults to None.
+            log_locals (bool, optional): Boolean to enable logging of locals where ``log()``
+                was called. Defaults to False.
+            _stack_offset (int, optional): Offset of caller from end of call stack. Defaults to 1.
+        """
+        if not objects:
             self.line()
             return
         highlighter = highlight or ReprHighlighter()
         renderables = self._collect_renderables(
             objects, sep=sep, end=end, highlight=highlighter
         )
-
-        if debug != Ellipsis:
-            renderables.append(Pretty(debug))
 
         caller = inspect.stack()[_stack_offset]
         path = caller.filename.rpartition(os.sep)[-1]
@@ -685,9 +725,9 @@ class Console:
         """Generate text from console contents (requires record=True argument in constructor).
         
         Args:         
-            clear (bool, optional): Set to True to clear the record buffer after exporting.
-            styles (bool, optional): If True, ansi style codes will be included. False for plain text.
-                Defaults to False.
+            clear (bool, optional): Set to ``True`` to clear the record buffer after exporting.
+            styles (bool, optional): If ``True``, ansi style codes will be included. ``False`` for plain text.
+                Defaults to ``False``.
                    
         Returns:
             str: String containing console contents.
@@ -712,9 +752,9 @@ class Console:
         
         Args:   
             path (str): Path to write text files.                    
-            clear (bool, optional): Set to True to clear the record buffer after exporting.
-            styles (bool, optional): If True, ansi style codes will be included. False for plain text.
-                Defaults to False.     
+            clear (bool, optional): Set to ``True`` to clear the record buffer after exporting.
+            styles (bool, optional): If ``True``, ansi style codes will be included. ``False`` for plain text.
+                Defaults to ``False``.     
 
         """
         text = self.export_text(clear=clear, styles=styles)
@@ -732,15 +772,15 @@ class Console:
         
         Args:            
             theme (Theme, optional): Theme object containing console colors.
-            clear (bool, optional): Set to True to clear the record buffer after generating the HTML.
+            clear (bool, optional): Set to ``True`` to clear the record buffer after generating the HTML.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
-            inline_styes (bool, optional): If True styles will be inlined in to spans, which makes files
-                larger but easier to cut and paste markup. If False, styles will be embedded in a style tag.
+            inline_styes (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
+                larger but easier to cut and paste markup. If ``False``, styles will be embedded in a style tag.
                 Defaults to False.
         
         Returns:
-            str: String containing console contents.
+            str: String containing console contents as HTML.
         """
         assert (
             self.record
@@ -750,10 +790,15 @@ class Console:
         _theme = theme or themes.DEFAULT
         stylesheet = ""
 
+        def escape(text: str) -> str:
+            """Escape html."""
+            return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
         render_code_format = CONSOLE_HTML_FORMAT if code_format is None else code_format
 
         if inline_styles:
             for text, style in Segment.simplify(self._record_buffer):
+                text = escape(text)
                 if style:
                     rule = style.get_html_style(_theme)
                     append(f'<span style="{rule}">{text}</span>' if rule else text)
@@ -762,6 +807,7 @@ class Console:
         else:
             styles: Dict[str, int] = {}
             for text, style in Segment.simplify(self._record_buffer):
+                text = escape(text)
                 if style:
                     rule = style.get_html_style(_theme)
                     if rule:
@@ -804,8 +850,8 @@ class Console:
             clear (bool, optional): Set to True to clear the record buffer after generating the HTML.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
-            inline_styes (bool, optional): If True styles will be inlined in to spans, which makes files
-                larger but easier to cut and paste markup. If False, styles will be embedded in a style tag.
+            inline_styes (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
+                larger but easier to cut and paste markup. If ``False``, styles will be embedded in a style tag.
                 Defaults to False.
         
         """

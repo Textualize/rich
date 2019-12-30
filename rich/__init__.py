@@ -19,9 +19,9 @@ def print(
     if _console is None:
         from .console import Console
 
-        _console = Console()
+        _console = Console(log_time=False)
 
-    write_console = _console if file is None else Console(file=file)
+    write_console = _console if file is None else Console(log_time=False, file=file)
     return write_console.log(
         *objects, sep=sep, end=end, log_locals=log_locals, _stack_offset=2
     )

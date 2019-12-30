@@ -59,6 +59,11 @@ def _parse(markup: str) -> Iterable[Tuple[Optional[str], Optional[str]]]:
         yield markup[position:], None
 
 
+def render_text(markup: str, style: Union[str, Style] = "") -> Text:
+    """Convert markup to Text instance."""
+    return Text(markup, style=style)
+
+
 def render(markup: str, style: Union[str, Style] = "") -> Text:
     """Render console markup in to a Text instance.
 
