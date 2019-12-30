@@ -284,7 +284,7 @@ class Color(NamedTuple):
             return self.triplet
         elif self.type == ColorType.EIGHT_BIT:
             assert self.number is not None
-            if self.number <= 16:
+            if self.number <= 15:
                 return theme.ansi_colors[self.number]
             else:
                 return EIGHT_BIT_PALETTE[self.number]
@@ -456,7 +456,7 @@ if __name__ == "__main__":  # pragma: no cover
     from .text import Text
     from . import box
 
-    console = Console()
+    console = Console(record=True)
 
     table = Table(show_footer=False, show_edge=True)
     table.add_column("Color", width=10)
@@ -469,11 +469,12 @@ if __name__ == "__main__":  # pragma: no cover
     for color_number, name in colors:
         color_cell = Text(" " * 10, style=f"on {name}")
         if color_number < 16:
-            table.add_row(color_cell, f"{color_number}", f'"{name}"')
+            table.add_row(color_cell, f"{color_number}", Text(f'"{name}"'))
         else:
             color = EIGHT_BIT_PALETTE[color_number]
             table.add_row(
-                color_cell, str(color_number), f'"{name}"', color.hex, color.rgb
+                color_cell, str(color_number), Text(f'"{name}"'), color.hex, color.rgb
             )
 
     console.print(table)
+    console.save_html("color.html", inline_styles=True)

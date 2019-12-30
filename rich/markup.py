@@ -24,10 +24,12 @@ def _parse(markup: str) -> Iterable[Tuple[Optional[str], Optional[str]]]:
     """
 
     def repl_strong(match: Match[str]) -> str:
-        return f"[strong]{match.group(1)}[/strong]"
+        group = match.group
+        return f"[strong]{group(1) or group(2)}[/strong]"
 
     def repl_emphasize(match: Match[str]) -> str:
-        return f"[emphasize]{match.group(1)}[/emphasize]"
+        group = match.group
+        return f"[emphasize]{group(1) or group(2)}[/emphasize]"
 
     def repl_strike(match: Match[str]) -> str:
         return f"[strike]{match.group(1)}[/strike]"

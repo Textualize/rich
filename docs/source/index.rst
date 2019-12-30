@@ -12,8 +12,10 @@ Welcome to Rich's documentation!
 
    introduction.rst
    markup.rst
+   style.rst
 
    reference.rst
+   appendix.rst
 
 Indices and tables
 ==================
