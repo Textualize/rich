@@ -11,6 +11,7 @@ Welcome to Rich's documentation!
    :caption: Contents:
 
    introduction.rst
+   console.rst
    markup.rst
    style.rst
 

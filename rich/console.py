@@ -151,14 +151,17 @@ COLOR_SYSTEMS = {
 }
 
 
+_COLOR_SYSTEMS_NAMES = {system: name for name, system in COLOR_SYSTEMS.items()}
+
+
 class Console:
     """A high level console interface.
-    
+
     Args:
         color_system (str, optional): The color system supported by your terminal,
             either ``"standard"``, ``"256"`` or ``"truecolor"``. Leave as ``"auto"`` to autodetect.
         styles (Dict[str, Style], optional): An optional mapping of style name strings to :class:`~rich.style.Style` objects.
-        file (IO, optional): A file object where the console shoudl write to. Defaults to stdoutput.
+        file (IO, optional): A file object where the console should write to. Defaults to stdoutput.
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
         height (int, optional): The height of the terminal. Leave as default to auto-detect height.
         record (bool, optional): Boolean to enable recording of terminal output,
@@ -185,7 +188,7 @@ class Console:
         log_time_format: str = "[%X] ",
     ):
         """[summary]
-        
+
         Args:
             color_system (Optional[Literal[, optional): [description]. Defaults to "auto".
             styles (Dict[str, Style], optional): [description]. Defaults to None.
@@ -257,16 +260,29 @@ class Console:
 
     def push_styles(self, styles: Dict[str, Style]) -> None:
         """Merge set of styles with currently active styles.
-        
+
         Args:
             styles (Dict[str, Style]): A mapping of style name to Style instance.
         """
         self._styles.maps.append(styles)
 
     @property
+    def color_system(self) -> Optional[str]:
+        """Get color system string.
+
+        Returns:
+            Optional[str]: "standard", "256" or "truecolor".
+        """
+
+        if self._color_system is not None:
+            return _COLOR_SYSTEMS_NAMES[self._color_system]
+        else:
+            return None
+
+    @property
     def encoding(self) -> str:
         """Get the encoding of the console file, e.g. ``"utf-8"``.
-        
+
         Returns:
             str: A standard encoding string.
         """
@@ -275,7 +291,7 @@ class Console:
     @property
     def is_terminal(self) -> bool:
         """Check if the console is writing to a terminal.
-        
+
         Returns:
             bool: True if the console writting to a device capable of
             understanding terminal codes, otherwise False.
@@ -296,7 +312,7 @@ class Console:
     @property
     def size(self) -> ConsoleDimensions:
         """Get the size of the console.
-        
+
         Returns:
             ConsoleDimensions: A named tuple containing the dimensions.
         """
@@ -312,7 +328,7 @@ class Console:
     @property
     def width(self) -> int:
         """Get the width of the console.
-        
+
         Returns:
             int: The width (in characters) of the console.
         """
@@ -321,7 +337,7 @@ class Console:
 
     def line(self, count: int = 1) -> None:
         """Write new line(s).
-        
+
         Args:
             count (int, optional): Number of new lines. Defaults to 1.
         """
@@ -336,14 +352,14 @@ class Console:
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
 
-        This method contains the logic for rendering objects with the console protocol. 
+        This method contains the logic for rendering objects with the console protocol.
         You are unlikely to need to use it directly, unless you are extending the library.
-        
+
         Args:
             renderable (RenderableType): An object supporting the console protocol, or
                 an object that may be converted to a string.
             options (ConsoleOptions, optional): An options objects. Defaults to None.
-        
+
         Returns:
             Iterable[Segment]: An iterable of segments that may be rendered.
         """
@@ -376,15 +392,15 @@ class Console:
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
 
-        This method contains the logic for rendering objects with the console protocol. 
+        This method contains the logic for rendering objects with the console protocol.
         You are unlikely to need to use it directly, unless you are extending the library.
 
-        
+
         Args:
             renderable (RenderableType): An object supporting the console protocol, or
                 an object that may be converted to a string.
             options (ConsoleOptions, optional): An options objects. Defaults to None.
-        
+
         Returns:
             Iterable[Segment]: An iterable of segments that may be rendered.
         """
@@ -396,14 +412,14 @@ class Console:
         self, renderables: Iterable[RenderableType], options: Optional[ConsoleOptions]
     ) -> Iterable[Segment]:
         """Render a number of console objects.
-        
+
         Args:
             renderables (Iterable[RenderableType]): Console objects.
             options (Optional[ConsoleOptions]): Options for render.
-        
+
         Returns:
             Iterable[Segment]: Segments to be written to the console.
-        
+
         """
         render_options = options or self.options
         for renderable in renderables:
@@ -419,11 +435,11 @@ class Console:
 
         The output of render_lines is useful when further formatting of rendered console text
         is required, such as the Panel class which draws a border around any renderable object.
-        
+
         Args:
             renderables (Iterable[RenderableType]): Any object or objects renderable in the console.
             options (Optional[ConsoleOptions]): Console options used to render with.
-        
+
         Returns:
             List[List[Segment]]: A list of lines, where a line is a list of Segment objects.
         """
@@ -440,13 +456,13 @@ class Console:
 
     def render_str(self, text: str) -> "Text":
         """Convert a string to a Text instance.
-        
+
         Args:
-            text (str): Text to render.            
-        
+            text (str): Text to render.
+
         Returns:
             ConsoleRenderable: Renderable object.
-        
+
         """
         if self._markup:
             return markup.render(text)
@@ -455,10 +471,10 @@ class Console:
 
     def _get_style(self, name: str) -> Optional[Style]:
         """Get a named style, or `None` if it doesn't exist.
-        
+
         Args:
             name (str): The name of a style.
-        
+
         Returns:
             Optional[Style]: A Style object for the given name, or `None`.
         """
@@ -471,7 +487,7 @@ class Console:
 
         Args:
             name (str): The name of a style or a style definition.
-        
+
         Returns:
             Style: A Style object.
 
@@ -494,12 +510,12 @@ class Console:
     def push_style(self, style: Union[str, Style]) -> None:
         """Push a style on to the stack.
 
-        The new style will be applied to all `write` calls, until 
+        The new style will be applied to all `write` calls, until
         `pop_style` is called.
-        
+
         Args:
             style (Union[str, Style]): New style to merge with current style.
-        
+
         Returns:
             None: [description]
         """
@@ -512,7 +528,7 @@ class Console:
         """Pop a style from the stack.
 
         This will revert to the style applied prior to the corresponding `push_style`.
-        
+
         Returns:
             Style: The previously applied style.
         """
@@ -530,10 +546,10 @@ class Console:
         Example:
             with context.style("bold red"):
                 context.print("Danger Will Robinson!")
-        
+
         Args:
             style (Union[str, Style]): New style to apply.
-        
+
         Returns:
             StyleContext: A style context manager.
         """
@@ -556,11 +572,11 @@ class Console:
         highlight: "HighlighterType" = None,
     ) -> List[ConsoleRenderable]:
         """Combined a number of renderables and text in to one renderable.
-        
+
         Args:
             renderables (Iterable[Union[str, ConsoleRenderable]]): [description]
             sep (str, optional): [description]. Defaults to " ".
-        
+
         Returns:
             Renderables: [description]
         """
@@ -624,7 +640,7 @@ class Console:
         r"""Print to the console.
 
         Args:
-            
+
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".
@@ -658,7 +674,7 @@ class Console:
         _stack_offset=1,
     ) -> None:
         r"""Log rich content to the terminal.
-        
+
         Args:
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
@@ -723,12 +739,12 @@ class Console:
 
     def export_text(self, clear: bool = True, styles: bool = False) -> str:
         """Generate text from console contents (requires record=True argument in constructor).
-        
-        Args:         
+
+        Args:
             clear (bool, optional): Set to ``True`` to clear the record buffer after exporting.
             styles (bool, optional): If ``True``, ansi style codes will be included. ``False`` for plain text.
                 Defaults to ``False``.
-                   
+
         Returns:
             str: String containing console contents.
 
@@ -749,12 +765,12 @@ class Console:
 
     def save_text(self, path: str, clear: bool = True, styles: bool = False) -> None:
         """Generate text from console and save to a given location (requires record=True argument in constructor).
-        
-        Args:   
-            path (str): Path to write text files.                    
+
+        Args:
+            path (str): Path to write text files.
             clear (bool, optional): Set to ``True`` to clear the record buffer after exporting.
             styles (bool, optional): If ``True``, ansi style codes will be included. ``False`` for plain text.
-                Defaults to ``False``.     
+                Defaults to ``False``.
 
         """
         text = self.export_text(clear=clear, styles=styles)
@@ -769,8 +785,8 @@ class Console:
         inline_styles: bool = False,
     ) -> str:
         """Generate HTML from console contents (requires record=True argument in constructor).
-        
-        Args:            
+
+        Args:
             theme (Theme, optional): Theme object containing console colors.
             clear (bool, optional): Set to ``True`` to clear the record buffer after generating the HTML.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
@@ -778,7 +794,7 @@ class Console:
             inline_styes (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
                 larger but easier to cut and paste markup. If ``False``, styles will be embedded in a style tag.
                 Defaults to False.
-        
+
         Returns:
             str: String containing console contents as HTML.
         """
@@ -843,9 +859,9 @@ class Console:
         inline_styles: bool = False,
     ) -> None:
         """Generate HTML from console contents and write to a file (requires record=True argument in constructor).
-        
-        Args:  
-            path (str): Path to write html file.        
+
+        Args:
+            path (str): Path to write html file.
             theme (Theme, optional): Theme object containing console colors.
             clear (bool, optional): Set to True to clear the record buffer after generating the HTML.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
@@ -853,7 +869,7 @@ class Console:
             inline_styes (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
                 larger but easier to cut and paste markup. If ``False``, styles will be embedded in a style tag.
                 Defaults to False.
-        
+
         """
         html = self.export_html(
             theme=theme,

@@ -23,7 +23,7 @@ For code, wrap the text in backticks. e.g. ```import this```
 Styles
 ------
 
-For other styles and color, you can use a syntax similar to bbcode. If you write the style (see :ref:`styles`) in square brackets, i.e. ``[bold red]``, that style will apply until it is *closed* with a corrensponding ``[/bold red]``.
+For other styles and color, you can use a syntax similar to bbcode. If you write the style (see :ref:`styles`) in square brackets, i.e. ``[bold red]``, that style will apply until it is *closed* with a corresponding ``[/bold red]``.
 
 Here's a simple example::
 
