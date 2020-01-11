@@ -2,6 +2,7 @@ from collections.abc import Mapping
 
 
 from . import box
+from .highlighter import ReprHighlighter
 from .pretty import Pretty
 from .table import Table
 from .text import Text
@@ -20,6 +21,9 @@ def tabulate_mapping(mapping: Mapping, title: str = None) -> Table:
     table = Table(
         show_header=False, title=title, box=box.ROUNDED, border_style="blue", padding=0
     )
+    highlighter = ReprHighlighter()
     for key, value in mapping.items():
-        table.add_row(Pretty(key), Pretty(value))
+        table.add_row(
+            Pretty(key, highlighter=highlighter), Pretty(value, highlighter=highlighter)
+        )
     return table

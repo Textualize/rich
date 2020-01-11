@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     )
     from .text import Text
 
-from ._render_width import RenderWidth
+from .render_width import RenderWidth
 
 T = TypeVar("T")
 

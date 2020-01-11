@@ -2,7 +2,7 @@ import pytest
 
 from rich.console import Console
 from rich.text import Span, Text
-from rich._render_width import RenderWidth
+from rich.render_width import RenderWidth
 
 
 def test_span():

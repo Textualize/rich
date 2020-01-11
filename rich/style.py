@@ -1,6 +1,6 @@
 from functools import lru_cache
 import sys
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Type
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Type, Union
 
 from . import errors
 from .color import blend_rgb, Color, ColorParseError, ColorSystem
@@ -123,6 +123,14 @@ class Style:
             return str(cls.parse(style))
         except errors.StyleSyntaxError:
             return style.strip().lower()
+
+    @classmethod
+    def pick_first(cls, *values: Optional[Union["Style", str]]) -> Union["Style", str]:
+        """Pick first non-None style."""
+        for value in values:
+            if value is not None:
+                return value
+        raise ValueError("expected at least one non-None style")
 
     def __repr__(self) -> str:
         """Render a named style differently from an anonymous style."""

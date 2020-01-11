@@ -24,7 +24,7 @@ if TYPE_CHECKING:  # pragma: no cover
 from .containers import Lines
 from .style import Style
 from .segment import Segment
-from ._render_width import RenderWidth
+from .render_width import RenderWidth
 from ._tools import iter_last, iter_first_last
 from ._wrap import divide_line
 

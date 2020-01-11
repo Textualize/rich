@@ -26,11 +26,11 @@ class Segment(NamedTuple):
         cls, segments: Iterable["Segment"], style: Style = None
     ) -> Iterable["Segment"]:
         """Apply a style to an iterable of segments.
-        
+
         Args:
             segments (Iterable[Segment]): Segments to process.
             style (Style, optional): A style to apply. Defaults to None.
-        
+
         Returns:
             Iterable[Segments]: A new iterable of segments (possibly the same iterable).
         """
@@ -44,12 +44,12 @@ class Segment(NamedTuple):
         cls, segments: Iterable["Segment"], length: int, style: Style = None
     ) -> Iterable[List["Segment"]]:
         """Split segments in to lines, and crop lines greater than a given length.
-        
+
         Args:
-            segments (Iterable[Segment]): An iterable of segments, probably 
+            segments (Iterable[Segment]): An iterable of segments, probably
                 generated from console.render.
-            length (Optional[int]): Desired line length.           
-        
+            length (Optional[int]): Desired line length.
+
         Returns:
             Iterable[List[Segment]]: An iterable of lines of segments.
         """
@@ -77,12 +77,12 @@ class Segment(NamedTuple):
         cls, line: List["Segment"], length: int, style: Style = None
     ) -> List["Segment"]:
         """Adjust a line to a given width (cropping or padding as required.
-        
+
         Args:
             segments (Iterable[Segment]): A list of segments in a single line.
             length (int): The desired width of the line.
             style (Style, optional): The style of padding if used (space on the end). Defaults to None.
-        
+
         Returns:
             List[Segment]: A line of segments with the desired length.
         """
@@ -108,10 +108,10 @@ class Segment(NamedTuple):
     @classmethod
     def get_line_length(cls, line: List["Segment"]) -> int:
         r"""Get the length of list of segments.
-        
+
         Args:
             line (List[Segment]): A line encoded as a list of Segments (assumes no '\n' characters),
-        
+
         Returns:
             int: The length of the line.
         """
@@ -119,13 +119,13 @@ class Segment(NamedTuple):
 
     @classmethod
     def get_shape(cls, lines: List[List["Segment"]]) -> Tuple[int, int]:
-        """Get the shape (enclosing rectangle) of a list of lines
-        
+        """Get the shape (enclosing rectangle) of a list of lines.
+
         Args:
-            lines (List[List[Segment]]): A list of lines (no '\n' characters)
-        
+            lines (List[List[Segment]]): A list of lines (no '\n' characters).
+
         Returns:
-            Tuple[int, int]: Width and height in characters
+            Tuple[int, int]: Width and height in characters.
         """
         get_line_length = cls.get_line_length
         max_width = max(get_line_length(line) for line in lines)
@@ -140,13 +140,13 @@ class Segment(NamedTuple):
         style: Style = None,
     ) -> List[List["Segment"]]:
         """Set the shape of a list of lines (enclosing rectangle)
-        
+
         Args:
             lines (List[List[Segment]]): A list of lines.
             width (int): Desired width.
             height (int, optional): Desired height or None for no change..
             style (Style, optional): Style of any padding added. Defaults to None.
-        
+
         Returns:
             [type]: New list of lines that fits width x height.
         """
@@ -166,10 +166,10 @@ class Segment(NamedTuple):
     @classmethod
     def simplify(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
         """Simplify an iterable of segments by combining contiguous segments with the same style.
-        
+
         Args:
             segments (Iterable[Segment]): An iterable segments.
-        
+
         Returns:
             Iterable[Segment]: A possibly smaller iterable of segments that will render the same way.
         """

@@ -29,7 +29,7 @@ from .padding import Padding, PaddingDimensions
 from .segment import Segment
 from .style import Style
 from .text import Text
-from ._render_width import RenderWidth
+from .render_width import RenderWidth
 from ._tools import iter_first_last, iter_first, iter_last, ratio_divide
 
 
@@ -45,6 +45,7 @@ class Column:
     justify: "JustifyValues" = "left"
     width: Optional[int] = None
     ratio: Optional[int] = None
+    no_wrap: bool = False
     _cells: List["ConsoleRenderable"] = field(default_factory=list)
 
     @property
@@ -86,10 +87,10 @@ class Table:
     def __init__(
         self,
         *headers: Union[Column, str],
-        title: str = None,
-        footer: str = None,
+        title: Union[str, Text] = None,
+        caption: Union[str, Text] = None,
         width: int = None,
-        box: Optional[box.Box] = box.DOUBLE_EDGE,
+        box: Optional[box.Box] = box.HEAVY_HEAD,
         padding: PaddingDimensions = (0, 1),
         pad_edge: bool = True,
         expand: bool = False,
@@ -101,12 +102,14 @@ class Table:
         footer_style: Union[str, Style] = None,
         border_style: Union[str, Style] = None,
         title_style: Union[str, Style] = None,
+        caption_style: Union[str, Style] = None,
     ) -> None:
         self.columns = [
             (Column(header) if isinstance(header, str) else header)
             for header in headers
         ]
         self.title = title
+        self.caption = caption
         self.width = width
         self.box = box
         self._padding = Padding.unpack(padding)
@@ -120,6 +123,7 @@ class Table:
         self.footer_style = footer_style
         self.border_style = border_style
         self.title_style = title_style
+        self.caption_style = title_style
         self._row_count = 0
 
     @property
@@ -141,6 +145,7 @@ class Table:
         justify: "JustifyValues" = "left",
         width: int = None,
         ratio: int = None,
+        no_wrap: bool = False,
     ):
         """Add a column to the table.
         
@@ -155,30 +160,23 @@ class Table:
             justify (JustifyValues, optional): Alignment for cells. Defaults to "left".
             width (int, optional): A minimum width in characters. Defaults to None.
             ratio (int, optional): Flexible ratio for the column. Defaults to None.
+            no_wrap (bool, optional): Set to ``True`` to disable wrapping of this column.
         """
-
-        def _pick_first_style(
-            *values: Optional[Union[Style, str]]
-        ) -> Union[Style, str]:
-            """Pick first non-None style."""
-            for value in values:
-                if value is not None:
-                    return value
-            raise ValueError("expected at least one non-None style")
 
         column = Column(
             header=header,
             footer=footer,
-            header_style=_pick_first_style(
+            header_style=Style.pick_first(
                 header_style, self.header_style, "table.header"
             ),
-            footer_style=_pick_first_style(
+            footer_style=Style.pick_first(
                 footer_style, self.footer_style, "table.footer"
             ),
-            style=_pick_first_style(style, self.style, "table.cell"),
+            style=Style.pick_first(style, self.style, "table.cell"),
             justify=justify,
             width=width,
             ratio=ratio,
+            no_wrap=no_wrap,
         )
         self.columns.append(column)
 
@@ -232,16 +230,30 @@ class Table:
                 max_width -= 2
         widths = self._calculate_column_widths(max_width)
         table_width = sum(widths) + len(self.columns) + (2 if self.box else 0)
-        if self.title:
-            title_text = Text.from_markup(
-                self.title,
-                style=self.title_style
-                if self.title_style is not None
-                else "table.title",
-            )
-            wrapped_title = title_text.wrap(table_width, "center")
-            yield wrapped_title
+        yield from self.render_title(table_width)
         yield from self._render(console, options, widths)
+        yield from self.render_caption(table_width)
+
+    def render_title(self, table_width: int) -> "RenderResult":
+        if self.title:
+            if isinstance(self.title, str):
+                title_text = Text.from_markup(
+                    self.title, style=Style.pick_first(self.title_style, "table.title")
+                )
+            else:
+                title_text = self.title
+            yield title_text.wrap(table_width, "center")
+
+    def render_caption(self, table_width: int) -> "RenderResult":
+        if self.caption:
+            if isinstance(self.caption, str):
+                caption_text = Text.from_markup(
+                    self.caption,
+                    style=Style.pick_first(self.caption_style, "table.caption"),
+                )
+            else:
+                caption_text = self.caption
+            yield caption_text.wrap(table_width, "center")
 
     def _calculate_column_widths(self, max_width: int) -> List[int]:
         """Calculate the widths of each column."""
@@ -339,10 +351,14 @@ class Table:
             _min, _max = get_render_width(cell.renderable, max_width)
             append_min(_min)
             append_max(_max)
-        return RenderWidth(
-            max(min_widths) if min_widths else 1,
-            max(max_widths) if max_widths else max_width,
-        )
+        if column.no_wrap:
+            _width = max(max_widths) if max_widths else max_width
+            return RenderWidth(_width, _width)
+        else:
+            return RenderWidth(
+                max(min_widths) if min_widths else 1,
+                max(max_widths) if max_widths else max_width,
+            )
 
     def _render(
         self, console: "Console", options: "ConsoleOptions", widths: List[int]
@@ -366,6 +382,7 @@ class Table:
 
         if box and show_edge:
             yield Segment(box.get_top(widths), border_style)
+            yield new_line
 
         for first, last, row in iter_first_last(rows):
             max_height = 1
@@ -389,6 +406,7 @@ class Table:
                     yield Segment(
                         box.get_row(widths, "foot", edge=show_edge), border_style
                     )
+                    yield new_line
                 if first:
                     left = Segment(box.head_left, border_style)
                     right = Segment(box.head_right, border_style)
@@ -419,9 +437,11 @@ class Table:
                     yield new_line
             if box and first and show_header:
                 yield Segment(box.get_row(widths, "head", edge=show_edge), border_style)
+                yield new_line
 
         if box and show_edge:
             yield Segment(box.get_bottom(widths), border_style)
+            yield new_line
 
 
 if __name__ == "__main__":  # pragma: no cover

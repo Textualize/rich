@@ -14,6 +14,8 @@ Welcome to Rich's documentation!
    console.rst
    markup.rst
    style.rst
+   tables.rst
+   protocol.rst
 
    reference.rst
    appendix.rst

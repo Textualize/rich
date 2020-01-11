@@ -75,7 +75,6 @@ class Box:
             if not last:
                 append(self.top_divider)
         append(self.top_right)
-        append("\n")
         return "".join(parts)
 
     def get_row(
@@ -120,7 +119,6 @@ class Box:
                 append(cross)
         if edge:
             append(right)
-        append("\n")
         return "".join(parts)
 
     def get_bottom(self, widths: Iterable[int]) -> str:
@@ -141,7 +139,6 @@ class Box:
             if not last:
                 append(self.bottom_divider)
         append(self.bottom_right)
-        append("\n")
         return "".join(parts)
 
 
@@ -334,29 +331,43 @@ DOUBLE_EDGE = Box(
 
 
 if __name__ == "__main__":  # pragma: no cover
-    print("ASCII")
-    print(ASCII)
 
-    print("SQUARE")
-    print(SQUARE)
+    from .console import Console
+    from .panel import Panel
+    from .table import Table
+    from .text import Text
+    from . import box
 
-    print("HORIZONTALS")
-    print(HORIZONTALS)
+    import sys
 
-    print("ROUNDED")
-    print(ROUNDED)
+    console = Console(record=True)
 
-    print("HEAVY")
-    print(HEAVY)
+    table = Table(width=80, show_footer=True, style="dim", border_style="not dim")
+    spaces = " " * 10
+    table.add_column(spaces, spaces)
+    table.add_column(spaces, spaces)
+    table.add_row(spaces, spaces)
 
-    print("HEAVY_EDGE")
-    print(HEAVY_EDGE)
+    BOXES = [
+        "ASCII",
+        "SQUARE",
+        "MINIMAL",
+        "MINIMAL_HEAVY_HEAD",
+        "MINIMAL_DOUBLE_HEAD",
+        "SIMPLE",
+        "SIMPLE_HEAVY",
+        "HORIZONTALS",
+        "ROUNDED",
+        "HEAVY",
+        "HEAVY_EDGE",
+        "HEAVY_HEAD",
+        "DOUBLE",
+        "DOUBLE_EDGE",
+    ]
 
-    print("HEAVY_HEAD")
-    print(HEAVY_HEAD)
+    for box_name in BOXES:
+        table.box = getattr(box, box_name)
+        table.title = Text(f"box.{box_name}", style="magenta")
+        console.print(table)
 
-    print("DOUBLE")
-    print(DOUBLE)
-
-    print("DOUBLE_EDGE")
-    print(DOUBLE_EDGE)
+    console.save_html("box.html", inline_styles=True)

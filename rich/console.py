@@ -30,12 +30,12 @@ from typing_extensions import Protocol, runtime_checkable, Literal
 from ._emoji_replace import _emoji_replace
 
 from . import markup
-from ._render_width import RenderWidth
+from .render_width import RenderWidth
 from ._log_render import LogRender
 from .default_styles import DEFAULT_STYLES
 from . import errors
 from .color import ColorSystem
-from .highlighter import ReprHighlighter
+from .highlighter import NullHighlighter, ReprHighlighter
 from .pretty import Pretty
 from .style import Style
 from .tabulate import tabulate_mapping
@@ -170,6 +170,7 @@ class Console:
         log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
         log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
         log_time_format (str, optional): Log time format if ``log_time`` is enabled. Defaults to "[%X] ".
+        highlighter(HighlighterType, optional): Default highlighter.    
     """
 
     def __init__(
@@ -186,21 +187,8 @@ class Console:
         log_time: bool = True,
         log_path: bool = True,
         log_time_format: str = "[%X] ",
+        highlighter: "HighlighterType" = ReprHighlighter(),
     ):
-        """[summary]
-
-        Args:
-            color_system (Optional[Literal[, optional): [description]. Defaults to "auto".
-            styles (Dict[str, Style], optional): [description]. Defaults to None.
-            file (IO, optional): [description]. Defaults to None.
-            width (int, optional): [description]. Defaults to None.
-            height (int, optional): [description]. Defaults to None.
-            record (bool, optional): [description]. Defaults to False.
-            markup (bool, optional): [description]. Defaults to True.
-            log_time (bool, optional): [description]. Defaults to True.
-            log_path (bool, optional): [description]. Defaults to True.
-            log_time_format (str, optional): [description]. Defaults to "[%X] ".
-        """
 
         self._styles = ChainMap(DEFAULT_STYLES if styles is None else styles)
         self.file = file or sys.stdout
@@ -227,6 +215,7 @@ class Console:
         self._log_render = LogRender(
             show_time=log_time, show_path=log_path, time_format=log_time_format
         )
+        self.highlighter: HighlighterType = highlighter
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
@@ -569,7 +558,7 @@ class Console:
         sep: str,
         end: str,
         emoji=True,
-        highlight: "HighlighterType" = None,
+        highlighter: "HighlighterType" = None,
     ) -> List[ConsoleRenderable]:
         """Combined a number of renderables and text in to one renderable.
 
@@ -588,6 +577,8 @@ class Console:
         append = renderables.append
         text: List[Text] = []
         append_text = text.append
+
+        _highlighter = highlighter or self.highlighter
 
         def check_text() -> None:
             if text:
@@ -610,23 +601,48 @@ class Console:
                 if emoji:
                     render_str = _emoji_replace(render_str)
                 render_text = self.render_str(render_str)
-                append_text(highlight(render_text) if highlight else render_text)
+                append_text(_highlighter(render_text))
             elif isinstance(renderable, Text):
                 append_text(renderable)
             elif isinstance(renderable, (int, float, bool, bytes, type(None))):
-                append_text(
-                    highlight(repr(renderable)) if highlight else Text(repr(renderable))
-                )
+                append_text(_highlighter(repr(renderable)))
             elif isinstance(renderable, (Mapping, Sequence)):
                 check_text()
-                append(Pretty(renderable))
+                append(Pretty(renderable, highlighter=_highlighter))
             else:
-                append_text(
-                    highlight(repr(renderable)) if highlight else Text(repr(renderable))
-                )
+                append_text(_highlighter(repr(renderable)))
 
         check_text()
         return renderables
+
+    def rule(self, title: str = "", character: str = "─") -> None:
+        """Draw a line with optional centered title.
+        
+        Args:
+            title (str, optional): Text to render over the rule. Defaults to "".
+            character (str, optional): Character to form the line. Defaults to "─".
+        """
+
+        from .text import Text
+
+        width = self.width
+
+        if not title:
+            self.print(Text(character * width, "rule.line"))
+        else:
+            title_text = Text.from_markup(title, "rule.text")
+            if len(title_text) > width - 4:
+                title_text.set_length(width - 4)
+
+            rule_text = Text()
+
+            center = (width - len(title_text)) // 2
+            rule_text.append(character * (center - 1) + " ", "rule.line")
+            rule_text.append(title_text)
+            rule_text.append(
+                " " + character * (width - len(rule_text) - 1), "rule.line"
+            )
+            self.print(rule_text)
 
     def print(
         self,
@@ -635,7 +651,7 @@ class Console:
         end="\n",
         style: Union[str, Style] = None,
         emoji=True,
-        highlight: "HighlighterType" = None,
+        highlighter: "HighlighterType" = None,
     ) -> None:
         r"""Print to the console.
 
@@ -646,7 +662,7 @@ class Console:
             end (str, optional): String to write at end of print data. Defaults to "\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             emoji (bool): If True, emoji codes will be replaced, otherwise emoji codes will be left in.
-            highlight ([type], optional): A callable that accepts a :class:`~rich.text.Text` instance
+            highlighter ([type], optional): A callable that accepts a :class:`~rich.text.Text` instance
                 and returns a Text instance, used to add highlighting. Defaults to None.
         """
         if not objects:
@@ -654,7 +670,7 @@ class Console:
             return
 
         renderables = self._collect_renderables(
-            objects, sep=sep, end=end, emoji=emoji, highlight=highlight
+            objects, sep=sep, end=end, emoji=emoji, highlighter=highlighter,
         )
 
         render_options = self.options
@@ -669,7 +685,7 @@ class Console:
         *objects: Any,
         sep=" ",
         end="\n",
-        highlight: "HighlighterType" = None,
+        highlighter: "HighlighterType" = None,
         log_locals: bool = False,
         _stack_offset=1,
     ) -> None:
@@ -679,7 +695,7 @@ class Console:
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".
-            highlight ([type], optional): A callable that accepts a :class:`~rich.text.Text` instance
+            highlighter (HighlighterType, optional): A callable that accepts a :class:`~rich.text.Text` instance
                 and returns a Text instance, used to add highlighting. Defaults to None.
             log_locals (bool, optional): Boolean to enable logging of locals where ``log()``
                 was called. Defaults to False.
@@ -688,9 +704,8 @@ class Console:
         if not objects:
             self.line()
             return
-        highlighter = highlight or ReprHighlighter()
         renderables = self._collect_renderables(
-            objects, sep=sep, end=end, highlight=highlighter
+            objects, sep=sep, end=end, highlighter=highlighter
         )
 
         caller = inspect.stack()[_stack_offset]

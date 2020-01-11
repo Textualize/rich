@@ -2,24 +2,24 @@ from typing import Any, TYPE_CHECKING
 
 from pprintpp import pformat
 
-from ._render_width import RenderWidth
+from .render_width import RenderWidth
 from .highlighter import ReprHighlighter
 from .text import Text
 
 if TYPE_CHECKING:  # pragma: no cover
-    from .console import Console, ConsoleOptions, RenderResult
+    from .console import Console, ConsoleOptions, HighlighterType, RenderResult
 
 
 class Pretty:
-    def __init__(self, _object: Any) -> None:
+    def __init__(self, _object: Any, highlighter: "HighlighterType" = None) -> None:
         self._object = _object
+        self.highlighter = highlighter or Text
 
     def __console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-        highlighter = ReprHighlighter()
         pretty_str = pformat(self._object, width=options.max_width)
-        pretty_text = highlighter(pretty_str)
+        pretty_text = self.highlighter(pretty_str)
         yield pretty_text
 
     def __console_width__(self, max_width: int) -> "RenderWidth":

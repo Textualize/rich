@@ -37,6 +37,11 @@ class Highlighter(ABC):
         """
 
 
+class NullHighlighter(Highlighter):
+    def highlight(self, text: Text) -> None:
+        pass
+
+
 class RegexHighlighter(Highlighter):
     """Applies highlighting from a list of regular expressions."""
 

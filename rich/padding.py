@@ -7,7 +7,7 @@ if TYPE_CHECKING:
         RenderableType,
         RenderResult,
     )
-from ._render_width import RenderWidth
+from .render_width import RenderWidth
 from .style import Style
 from .text import Text
 from .segment import Segment
