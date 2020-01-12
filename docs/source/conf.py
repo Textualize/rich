@@ -27,7 +27,7 @@ html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 project = "Rich"
-copyright = "2019, Will McGugan"
+copyright = "2020, Will McGugan"
 author = "Will McGugan"
 
 # The full version, including alpha/beta/rc tags
