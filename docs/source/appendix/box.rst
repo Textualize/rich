@@ -1,8 +1,14 @@
-.. _appendix-box:
+.. _appendix_box:
 
 Box
 ===
 
+Rich defines a number of ways of drawing boxes and lines such as those used in tables. To select a box style import one of the constants below from rich.box. For example::
+
+    from rich import box
+    table = Table(box=box.SQUARE)
+
+The constants are as follows:
 
 .. raw:: html
 

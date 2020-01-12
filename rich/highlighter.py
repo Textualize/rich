@@ -49,10 +49,10 @@ class RegexHighlighter(Highlighter):
     base_style: str = ""
 
     def highlight(self, text: Text) -> None:
-        """Highlight a :ref:`rich.text.Text` using regular expressions.
+        """Highlight :class:`rich.text.Text` using regular expressions.
         
         Args:
-            text (Text): Text to highlighted.
+            text (~Text): Text to highlighted.
         
         """
         str_text = str(text)
@@ -68,7 +68,7 @@ class RegexHighlighter(Highlighter):
 
 
 class ReprHighlighter(RegexHighlighter):
-    """Highlights the text typically produces from ``__repr__`` methods."""
+    """Highlights the text typically produced from ``__repr__`` methods."""
 
     base_style = "repr."
     highlights = [

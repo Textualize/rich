@@ -82,6 +82,27 @@ class _Cell(NamedTuple):
 
 
 class Table:
+    """A console renderable to draw a table.
+    
+    Args:
+        title (Union[str, Text], optional): The title of the table rendered at the top. Defaults to None.
+        caption (Union[str, Text], optional): The table caption rendered below. Defaults to None.
+        width (int, optional): The width in characters of the table, or ``None`` to automatically fit. Defaults to None.
+        box (Optional[box.Box], optional): One of the constants in box.py used to draw the edges (See :ref:`appendix_box`). Defaults to box.HEAVY_HEAD.
+        padding (PaddingDimensions, optional): Padding for cells (top, right, bottom, left). Defaults to (0, 1).
+        pad_edge (bool, optional): Enable padding of edge cells. Defaults to True.
+        expand (bool, optional): Expand the table to fit the available space if ``True`` otherwise the table width will be auto-calculated. Defaults to False.
+        show_header (bool, optional): Show a header row. Defaults to True.
+        show_footer (bool, optional): Show a footer row. Defaults to False.
+        show_edge (bool, optional): Draw a box around the outside of the table. Defaults to True.
+        style (Union[str, Style], optional): Default style for the table. Defaults to "none".
+        header_style (Union[str, Style], optional): Style of the header. Defaults to None.
+        footer_style (Union[str, Style], optional): Style of the footer. Defaults to None.
+        border_style (Union[str, Style], optional): Style of the border. Defaults to None.
+        title_style (Union[str, Style], optional): Style of the title. Defaults to None.
+        caption_style (Union[str, Style], optional): Style of the caption. Defaults to None.
+    """
+
     columns: List[Column]
 
     def __init__(
@@ -104,6 +125,7 @@ class Table:
         title_style: Union[str, Style] = None,
         caption_style: Union[str, Style] = None,
     ) -> None:
+
         self.columns = [
             (Column(header) if isinstance(header, str) else header)
             for header in headers
@@ -181,6 +203,11 @@ class Table:
         self.columns.append(column)
 
     def add_row(self, *renderables: Optional[Union[str, "ConsoleRenderable"]]) -> None:
+        """Add a row of renderables.
+        
+        Raises:
+            errors.NotRenderableError: If you add something that can't be rendered.
+        """
         from .console import ConsoleRenderable
 
         def add_cell(column: Column, renderable: ConsoleRenderable):
@@ -235,6 +262,7 @@ class Table:
         yield from self.render_caption(table_width)
 
     def render_title(self, table_width: int) -> "RenderResult":
+        """Render the title. Override if you want to render the title differently."""
         if self.title:
             if isinstance(self.title, str):
                 title_text = Text.from_markup(
@@ -245,6 +273,7 @@ class Table:
             yield title_text.wrap(table_width, "center")
 
     def render_caption(self, table_width: int) -> "RenderResult":
+        """Render the caption. Override if you want to render the caption differently."""
         if self.caption:
             if isinstance(self.caption, str):
                 caption_text = Text.from_markup(

@@ -2,5 +2,4 @@ rich.table
 ==========
 
 .. automodule:: rich.table
-    :members: Table
-
+    :members:

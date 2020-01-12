@@ -83,7 +83,7 @@ class Span(NamedTuple):
 
 
 class Text:
-    """Text with color / style.
+    r"""Text with color / style.
         
         Args:
             text (str, optional): Default unstyled text. Defaults to "".
@@ -375,7 +375,7 @@ class Text:
             raise TypeError("Only str or Text can be appended to Text")
 
     def split(self, separator="\n", include_separator: bool = False) -> Lines:
-        """Split rich text in to lines, preserving styles.
+        r"""Split rich text in to lines, preserving styles.
         
         Args:
             separator (str, optional): String to split on. Defaults to "\n".

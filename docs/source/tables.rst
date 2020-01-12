@@ -22,7 +22,7 @@ Here's an example::
     table.add_row("Dec 16, 2016", "Rouge One: A Star Wars Story", "$1,332,439,889")
 
     console = Console()
-    console.print(table)    
+    console.print(table)
 
 This produces the following output:
 

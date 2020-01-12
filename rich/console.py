@@ -189,7 +189,6 @@ class Console:
         log_time_format: str = "[%X] ",
         highlighter: "HighlighterType" = ReprHighlighter(),
     ):
-
         self._styles = ChainMap(DEFAULT_STYLES if styles is None else styles)
         self.file = file or sys.stdout
         self._width = width

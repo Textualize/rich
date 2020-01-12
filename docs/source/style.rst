@@ -62,3 +62,21 @@ It is slightly quicker to construct a Style class like this, since a style defin
 
 You can parse a style definition explicitly with the :meth:`~rich.style.Style.parse` method.
 
+
+Custom Styles
+-------------
+
+While it is possible to explicitly specify styles each time you use them, it is discouraged. Rich allows you to predefine style names which you can use in place on an explicit style. For instance, you may want to define styles for info, warning, danger etc.
+
+You can define a mapping of names to styles in the :class:`~rich.console.Console` constructor. These styles will be merged in to the default styles, potentially overwriting them. Here's an example::
+
+    from rich.console import Console
+    styles = {
+        "info" : Style.parse("dim cyan"),
+        "warning": Style.parse("magenta"),
+        "danger": Style.parse("bold red")
+    }
+    console = Console(styles=styles)
+    console.print("This is information", style="info")
+    console.print("Something terrible happened!", style="danger")
+
