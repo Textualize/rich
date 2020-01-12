@@ -83,7 +83,14 @@ class Span(NamedTuple):
 
 
 class Text:
-    """Text with colored spans."""
+    """Text with color / style.
+        
+        Args:
+            text (str, optional): Default unstyled text. Defaults to "".
+            style (Union[str, Style], optional): Base style for text. Defaults to "".
+            justify (str, optional): Default alignment for text, "left", "center", "full" or "right". Defaults to None.
+            end (str, optional): Character to end text with. Defaults to "\n".
+    """
 
     def __init__(
         self,
@@ -92,6 +99,7 @@ class Text:
         justify: "JustifyValues" = None,
         end: str = "\n",
     ) -> None:
+
         self._text: List[str] = [text] if text else []
         self.style = style
         self.justify = justify

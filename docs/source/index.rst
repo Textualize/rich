@@ -15,6 +15,9 @@ Welcome to Rich's documentation!
    markup.rst
    style.rst
    tables.rst
+   markdown.rst
+   syntax.rst
+   text.rst
    protocol.rst
 
    reference.rst

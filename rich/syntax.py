@@ -14,12 +14,22 @@ from ._tools import iter_first
 
 
 class Syntax:
+    """Construct a Syntax object to render syntax highlighted code.
+    
+    Args:
+        code (str): Code to highlight.
+        lexer_name (str): Lexer to use (see https://pygments.org/docs/lexers/)
+        theme (str, optional): Color theme, aka Pygments style (see https://pygments.org/docs/styles/#getting-a-list-of-available-styles). Defaults to "emacs".
+        dedent (bool, optional): Enable stripping of initial whitespace. Defaults to True.
+        line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
+        start_line (int, optional): Starting number for line numbers. Defaults to 1.
+    """
+
     def __init__(
         self,
         code: str,
         lexer_name: str,
         *,
-        style: Union[str, Style] = None,
         theme: str = "emacs",
         dedent: bool = True,
         line_numbers: bool = False,
@@ -30,32 +40,40 @@ class Syntax:
             code = textwrap.dedent(code)
         self.code = code
         self.lexer_name = lexer_name
-        self.style = style
         self.theme = theme
         self.dedent = dedent
         self.line_numbers = line_numbers
         self.start_line = start_line
 
         self._style_cache: Dict[Any, Style] = {}
-
         try:
             self._pygments_style_class = get_style_by_name(theme)
         except ClassNotFound:
             self._pygments_style_class = get_style_by_name("default")
-
         self._background_color = self._pygments_style_class.background_color
 
     @classmethod
     def from_path(
         cls,
         path: str,
-        style: Union[str, Style] = None,
         theme: str = "emacs",
         dedent: bool = True,
         line_numbers: bool = False,
         start_line: int = 1,
     ) -> "Syntax":
-        """Get a Syntax object for given path."""
+        """Construct a Syntax object from a file.
+        
+        Args:
+            path (str): Path to file to highlight.
+            lexer_name (str): Lexer to use (see https://pygments.org/docs/lexers/)
+            theme (str, optional): Color theme, aka Pygments style (see https://pygments.org/docs/styles/#getting-a-list-of-available-styles). Defaults to "emacs".
+            dedent (bool, optional): Enable stripping of initial whitespace. Defaults to True.
+            line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
+            start_line (int, optional): Starting number for line numbers. Defaults to 1.
+
+        Returns:
+            [Syntax]: A Syntax object that may be printed to the console
+        """
         with open(path, "rt") as code_file:
             code = code_file.read()
         try:
@@ -66,7 +84,6 @@ class Syntax:
         return cls(
             code,
             lexer_name,
-            style=style,
             theme=theme,
             dedent=dedent,
             line_numbers=line_numbers,
@@ -134,17 +151,7 @@ class Syntax:
         lines = text.split("\n")
         numbers_column_width = len(str(self.start_line + len(lines))) + 2
         render_options = options.update(width=options.max_width - numbers_column_width)
-
-        if self.style is None:
-            background_style = Style(
-                bgcolor=self._pygments_style_class.background_color
-            )
-        else:
-            if isinstance(self.style, str):
-                background_style = console.get_style(self.style)
-            else:
-                background_style = self.style
-
+        background_style = Style(bgcolor=self._pygments_style_class.background_color)
         number_style = background_style + self._get_theme_style(Token.Text)
         number_style._color = self._get_line_numbers_color()
         padding = Segment(" " * numbers_column_width, background_style)
@@ -165,38 +172,36 @@ class Syntax:
                 yield new_line
 
 
-CODE = r'''
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        """This is a docstring."""
-        code = self.code
-        if self.dedent:
-            code = textwrap.dedent(code)
-        text = highlight(code, self.lexer_name, theme=self.theme)
-        if not self.line_numbers:
-            yield text
-            return
-
-        # This is a comment
-        lines = text.split("\n")
-        numbers_column_width = len(str(len(lines))) + 1
-        render_options = options.update(width=options.max_width - numbers_column_width)
-
-        padding = Segment(" " * numbers_column_width)
-        new_line = Segment("\n")
-        for line_no, line in enumerate(lines, self.start_line):
-
-            wrapped_lines = console.render_lines([line], render_options)
-            for first, wrapped_line in iter_first(wrapped_lines):
-                if first:
-                    yield Segment(f"{line_no}".ljust(numbers_column_width))
-                else:
-                    yield padding
-                yield from wrapped_line
-                yield new_line
-'''
-
 if __name__ == "__main__":  # pragma: no cover
+    CODE = r'''
+        def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+            """This is a docstring."""
+            code = self.code
+            if self.dedent:
+                code = textwrap.dedent(code)
+            text = highlight(code, self.lexer_name, theme=self.theme)
+            if not self.line_numbers:
+                yield text
+                return
 
+            # This is a comment
+            lines = text.split("\n")
+            numbers_column_width = len(str(len(lines))) + 1
+            render_options = options.update(width=options.max_width - numbers_column_width)
+
+            padding = Segment(" " * numbers_column_width)
+            new_line = Segment("\n")
+            for line_no, line in enumerate(lines, self.start_line):
+
+                wrapped_lines = console.render_lines([line], render_options)
+                for first, wrapped_line in iter_first(wrapped_lines):
+                    if first:
+                        yield Segment(f"{line_no}".ljust(numbers_column_width))
+                    else:
+                        yield padding
+                    yield from wrapped_line
+                    yield new_line
+    '''
     syntax = Syntax(CODE, "python", dedent=True, line_numbers=True, start_line=990)
 
     from time import time
