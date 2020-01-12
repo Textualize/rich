@@ -34,8 +34,6 @@ author = "Will McGugan"
 release = pkg_resources.get_distribution("rich").version
 
 
-master_doc = "contents"
-
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
