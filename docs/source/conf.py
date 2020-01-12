@@ -34,7 +34,7 @@ author = "Will McGugan"
 release = pkg_resources.get_distribution("rich").version
 
 
-master_doc = "index"
+master_doc = "contents"
 
 # -- General configuration ---------------------------------------------------
 
