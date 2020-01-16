@@ -1,3 +1,4 @@
+.pytype
 .DS_Store
 .vscode
 mypy_report

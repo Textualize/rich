@@ -1,6 +1,6 @@
 from typing import Tuple, Union
 
-from .box import Box, SQUARE
+from . import box
 from .console import (
     Console,
     ConsoleOptions,
@@ -32,7 +32,7 @@ class Panel:
     def __init__(
         self,
         renderable: Union[str, ConsoleRenderable],
-        box: Box = SQUARE,
+        box=box.SQUARE,
         expand: bool = True,
         style: Union[str, Style] = "none",
     ) -> None:
@@ -84,7 +84,7 @@ class Panel:
 if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
-    c = Console(width=22)
+    c = Console()
 
     from .padding import Padding
     from .box import ROUNDED

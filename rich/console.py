@@ -118,6 +118,9 @@ RenderableType = Union[ConsoleRenderable, Segment, str]
 RenderResult = Iterable[Union[ConsoleRenderable, Segment]]
 
 
+_null_highlighter = NullHighlighter()
+
+
 class ConsoleDimensions(NamedTuple):
     """Size of the terminal."""
 
@@ -187,7 +190,7 @@ class Console:
         log_time: bool = True,
         log_path: bool = True,
         log_time_format: str = "[%X] ",
-        highlighter: "HighlighterType" = ReprHighlighter(),
+        highlighter: Optional["HighlighterType"] = ReprHighlighter(),
     ):
         self._styles = ChainMap(DEFAULT_STYLES if styles is None else styles)
         self.file = file or sys.stdout
@@ -214,7 +217,7 @@ class Console:
         self._log_render = LogRender(
             show_time=log_time, show_path=log_path, time_format=log_time_format
         )
-        self.highlighter: HighlighterType = highlighter
+        self.highlighter: HighlighterType = highlighter or _null_highlighter
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
@@ -557,16 +560,19 @@ class Console:
         sep: str,
         end: str,
         emoji=True,
-        highlighter: "HighlighterType" = None,
+        highlight: bool = True,
     ) -> List[ConsoleRenderable]:
         """Combined a number of renderables and text in to one renderable.
 
         Args:
             renderables (Iterable[Union[str, ConsoleRenderable]]): [description]
-            sep (str, optional): [description]. Defaults to " ".
+            sep (str, optional): String to write between print data. Defaults to " ".
+            end (str, optional): String to write at end of print data. Defaults to "\n".            
+            emoji (bool): If True, emoji codes will be replaced, otherwise emoji codes will be left in.
+            highlight (bool, optional): Perform highlighting. Defaults to True.
 
         Returns:
-            Renderables: [description]
+            List[ConsoleRenderable]: A list of things to render.
         """
         from .text import Text
 
@@ -577,7 +583,11 @@ class Console:
         text: List[Text] = []
         append_text = text.append
 
-        _highlighter = highlighter or self.highlighter
+        _highlighter: HighlighterType
+        if highlight:
+            _highlighter = self.highlighter
+        else:
+            _highlighter = _null_highlighter
 
         def check_text() -> None:
             if text:
@@ -650,7 +660,7 @@ class Console:
         end="\n",
         style: Union[str, Style] = None,
         emoji=True,
-        highlighter: "HighlighterType" = None,
+        highlight: bool = True,
     ) -> None:
         r"""Print to the console.
 
@@ -661,15 +671,14 @@ class Console:
             end (str, optional): String to write at end of print data. Defaults to "\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             emoji (bool): If True, emoji codes will be replaced, otherwise emoji codes will be left in.
-            highlighter ([type], optional): A callable that accepts a :class:`~rich.text.Text` instance
-                and returns a Text instance, used to add highlighting. Defaults to None.
+            highlight (bool, optional): Perform highlighting. Defaults to True.
         """
         if not objects:
             self.line()
             return
 
         renderables = self._collect_renderables(
-            objects, sep=sep, end=end, emoji=emoji, highlighter=highlighter,
+            objects, sep=sep, end=end, emoji=emoji, highlight=highlight,
         )
 
         render_options = self.options
@@ -684,7 +693,7 @@ class Console:
         *objects: Any,
         sep=" ",
         end="\n",
-        highlighter: "HighlighterType" = None,
+        highlight: bool = True,
         log_locals: bool = False,
         _stack_offset=1,
     ) -> None:
@@ -694,8 +703,7 @@ class Console:
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".
-            highlighter (HighlighterType, optional): A callable that accepts a :class:`~rich.text.Text` instance
-                and returns a Text instance, used to add highlighting. Defaults to None.
+            highlight (bool, optional): Perform highlighting. Defaults to True.
             log_locals (bool, optional): Boolean to enable logging of locals where ``log()``
                 was called. Defaults to False.
             _stack_offset (int, optional): Offset of caller from end of call stack. Defaults to 1.
@@ -704,7 +712,7 @@ class Console:
             self.line()
             return
         renderables = self._collect_renderables(
-            objects, sep=sep, end=end, highlighter=highlighter
+            objects, sep=sep, end=end, highlight=highlight
         )
 
         caller = inspect.stack()[_stack_offset]
