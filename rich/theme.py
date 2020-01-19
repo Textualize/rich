@@ -7,7 +7,11 @@ _ColorTuple = Tuple[int, int, int]
 
 
 class Theme:
-    """A terminal theme."""
+    """A terminal theme.
+    
+    This object is used when exporting console contents as HTML.
+    
+    """
 
     def __init__(
         self, background: _ColorTuple, foreground: _ColorTuple, ansi: List[_ColorTuple]

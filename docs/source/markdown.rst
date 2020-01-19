@@ -19,4 +19,3 @@ Rich can render Markdown to the console. To render markdown, construct a :class:
     console.print(md)
 
 Note that code blocks are rendered with full syntax highlighting!
-    

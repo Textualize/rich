@@ -1,7 +1,8 @@
 [tool.poetry]
 name = "rich"
 homepage = "https://github.com/willmcgugan/rich"
-version = "0.2.3"
+documentation = "https://rich.readthedocs.io/en/latest/"
+version = "0.3.0"
 description = "Render rich text, tables, syntax highlighting, markdown and more to the terminal"
 authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"

@@ -9,7 +9,7 @@ Use Rich to make command line applications more visually appealing and present d
 Installation
 ------------
 
-You can install Rich with your favorite PyPi package manager::
+You can install Rich with from PyPi with `pip` or your favorite package manager::
 
     pip install rich
 

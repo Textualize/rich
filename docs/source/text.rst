@@ -10,9 +10,9 @@ One way to add a style to Text is the :meth:`~tich.text.Text.styleize` method wh
     text.styleize(0, 6, "bold magenta")
     console.print(text)
 
-This will print "Hello, World!" to the terminal, with the first word in bold.
+This will print "Hello, World!" to the terminal, with the first word in bold magenta.
 
-Alternatively, you can construct style text by calling :meth:`~rich.text.Text.append` to add a string and style to the end of the Text. Here's an example::
+Alternatively, you can construct styled text by calling :meth:`~rich.text.Text.append` to add a string and style to the end of the Text. Here's an example::
 
     text = Text()
     text.append("Hello", style="bold magenta")
