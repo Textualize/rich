@@ -1,6 +1,6 @@
 # Rich
 
-Rich is a Python library for _rich_ text and high level formatting in the terminal.
+Rich is a Python library for _rich_ text and beautiful formatting in the terminal.
 
 The [Rich API](https://rich.readthedocs.io/en/latest/) make it easy to add colored text (up to 16.7million colors) and styles (bold, italic, underline etc.) to your script or application. Rich can also render pretty tables, markdown and source code with syntax highlighting.
 
@@ -12,9 +12,19 @@ Install with `pip` or your favorite PyPi package manager.
 pip install rich
 ```
 
+## Rich print function
+
+To effortlessly add rich output to your application, you can import the [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) method, which has the same signature as the builtin Python function. Try this:
+
+```python
+from rich import print
+
+print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
+```
+
 ## Console Printing
 
-The first step to using the rich console is to import and construct the `Console` object.
+For more control over rich terminal content, import and construct a `Console` object.
 
 ```python
 from rich.console import Console
@@ -22,11 +32,11 @@ from rich.console import Console
 console = Console()
 ```
 
-Most applications will require one `Console` instance. The easiest way to manage your console instance would be to construct an instance at the module level and import it where needed.
+Most applications will require one `Console` instance. The easiest way to manage your console would be to construct an instance at the module level and import it where needed.
 
 The Console object has a `print` method which has an intentionally similar interface to the builtin `print` function. Here's an example of use:
 
-```
+```python
 console.print("Hello", "World!")
 ```
 
@@ -34,7 +44,7 @@ As you might expect, this will print `"Hello World!"` to the terminal. Note that
 
 There are a few ways of adding color and style to your output. You can set a style for the entire output by adding a `style` keyword argument. Here's an example:
 
-```
+```python
 console.print("Hello", "World!", style="bold red")
 ```
 
@@ -52,7 +62,7 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ## Console Logging
 
-The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default, Rich will do syntax highlighting for Python structures and for repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
+The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default Rich will do syntax highlighting for Python structures and for repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
 
 ```python
 from rich.console import Console
@@ -161,7 +171,7 @@ console = Console()
 table = Table(show_header=True, header_style="bold magenta")
 table.add_column("Date", style="dim", width=12)
 table.add_column("Title")
-table.add_column("Production Budget", justify="right")
+table.add_columngit ("Production Budget", justify="right")
 table.add_column("Box Office", justify="right")
 table.add_row(
     "Dev 20, 2019", "Star Wars: The Rise of Skywalker", "$275,000,0000", "$375,126,118"
