@@ -1,5 +1,13 @@
 [[package]]
 category = "main"
+description = "Cross-platform colored terminal text."
+name = "colorama"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+version = "0.4.3"
+
+[[package]]
+category = "main"
 description = "A backport of the dataclasses module for Python 3.6"
 marker = "python_version >= \"3.6\" and python_version < \"3.7\""
 name = "dataclasses"
@@ -24,10 +32,14 @@ python-versions = "*"
 version = "3.7.4.1"
 
 [metadata]
-content-hash = "6a6b430b4c6eaf83bf8955c546cc6bbb4f21d8a8e873248c88212cf5a78e2d1e"
+content-hash = "5e56b6e649bcc0c39c09eece2f491aae1ace26b7988eccc0686f04c767563494"
 python-versions = "^3.6"
 
 [metadata.files]
+colorama = [
+    {file = "colorama-0.4.3-py2.py3-none-any.whl", hash = "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff"},
+    {file = "colorama-0.4.3.tar.gz", hash = "sha256:e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"},
+]
 dataclasses = [
     {file = "dataclasses-0.7-py3-none-any.whl", hash = "sha256:3459118f7ede7c8bea0fe795bff7c6c2ce287d01dd226202f7c9ebc0610a7836"},
     {file = "dataclasses-0.7.tar.gz", hash = "sha256:494a6dcae3b8bcf80848eea2ef64c0cc5cd307ffc263e17cdf42f3e5420808e6"},

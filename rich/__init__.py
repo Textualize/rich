@@ -1,3 +1,5 @@
+from colorama import init
+
 from typing import Any, IO, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -26,6 +28,8 @@ def print(
         *objects, sep=sep, end=end, log_locals=log_locals, _stack_offset=2
     )
 
+
+init()
 
 if __name__ == "__main__":  # pragma: no cover
     print("Hello, **World**", log_locals=True)
