@@ -84,6 +84,8 @@ class ReprHighlighter(RegexHighlighter):
         r"(?P<bool_true>True)|(?P<bool_false>False)|(?P<none>None)",
         r"(?P<number>\-?[0-9]+\.?[0-9]*)",
         r"(?P<number>0x[0-9a-f]*)",
+        r"(?P<path>(\/\w+)+\/)",
+        r"(?P<filename>\/\w*\..{3,4})\s",
         r"(?P<str>b?\'\'\'.*?\'\'\'|b?\'.*?\'|b?\"\"\".*?\"\"\"|b?\".*?\")",
         r"(?P<url>https?:\/\/\S*)",
     ]

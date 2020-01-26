@@ -1,4 +1,5 @@
 from operator import itemgetter
+import re
 from typing import (
     Any,
     Dict,
@@ -189,9 +190,28 @@ class Text:
             return
         self._spans.append(Span(max(0, start), min(length, end), style))
 
-    def rstrip(self) -> None:
-        """Trip whitespace from end of text
+    def highlight_words(self, words: Iterable[str], style: Union[str, Style]) -> int:
+        """Highlight words with a style.
+        
+        Args:
+            words (Iterable[str]): Worlds to highlight.
+            style (Union[str, Style]): Style to apply.
+        
+        Returns:
+            int: Number of words highlighted.
         """
+        re_words = "|".join(re.escape(word) for word in words)
+        add_span = self._spans.append
+        count = 0
+        _Span = Span
+        for match in re.finditer(re_words, self.text):
+            start, end = match.span(0)
+            add_span(_Span(start, end, style))
+            count += 1
+        return count
+
+    def rstrip(self) -> None:
+        """Trip whitespace from end of text."""
         self.text = self.text.rstrip()
 
     def set_length(self, new_length: int) -> None:

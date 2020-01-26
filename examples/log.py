@@ -29,14 +29,16 @@ console.log("Serving on http://127.0.0.1:8000")
 
 time.sleep(1)
 
+request_highlighter = RequestHighlighter()
+
 console.log(
-    "HTTP GET /foo/bar/baz/egg.html 200 [0.57, 127.0.0.1:59076]",
-    highlighter=RequestHighlighter(),
+    request_highlighter("HTTP GET /foo/bar/baz/egg.html 200 [0.57, 127.0.0.1:59076]"),
 )
 
 console.log(
-    "HTTP GET /foo/bar/baz/background.jpg 200 [0.57, 127.0.0.1:59076]",
-    highlighter=RequestHighlighter(),
+    request_highlighter(
+        "HTTP GET /foo/bar/baz/background.jpg 200 [0.57, 127.0.0.1:59076]"
+    ),
 )
 
 
