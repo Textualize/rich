@@ -368,7 +368,7 @@ class Markdown:
         inlines = self.inlines
         new_line = False
         for current, entering in nodes:
-            # print(current, current.literal)
+            print(current, current.literal)
             node_type = current.t
             if node_type in ("html_inline", "html_block", "text"):
                 context.on_text(current.literal)
@@ -431,62 +431,23 @@ class Markdown:
 if __name__ == "__main__":  # pragma: no cover
 
     markup = """
-    An h1 header
-    ============
+An h1 header
+============
 
-    Paragraphs are separated by a blank line.
-
-    2nd paragraph. *Italic*, **bold**, and `monospace`. Itemized lists look like:
-
-    * this one
-    * that one
-    * the other one
-
-    Note that --- not considering the asterisk --- the actual text content starts at 4-columns in.
-
-    > Block quotes are
-    > written like so.
-    >
-    > They can span multiple paragraphs,
-    > if you like.
-
-    Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., "it's all in chapters 12--14"). Three dots ... will be converted to an ellipsis. Unicode is supported. ☺
-
-
-    An h2 header
-    ------------
-
-    ```python
-        @classmethod
-        def adjust_line_length(
-            cls, line: List[Segment], length: int, style: Style = None
-        ) -> List[Segment]:        
-            line_length = sum(len(text) for text, _style in line)
-            if line_length < length:
-                return line[:] + [Segment(" " * (length - line_length), style)]
-            elif line_length > length:
-                line_length = 0
-                new_line: List[Segment] = []
-                append = new_line.append
-                for segment in line:
-                    segment_length = len(segment.text)
-                    if line_length + segment_length < length:
-                        append(segment)
-                        line_length += segment_length
-                    else:
-                        text, style = segment
-                        append(Segment(text[: length - line_length], style))
-                        break
-                return new_line
-            return line
-    ```
-
+| Syntax | Description |
+| --- | ----------- |
+| Header | Title |
+| Paragraph | Text |
 
     """
 
+    import commonmark
+
+    print(commonmark.commonmark(markup))
+
     from .console import Console
 
-    console = Console(record=True, width=90)
+    console = Console(record=True)
     # print(console.size)
 
     # markup = "<foo>"

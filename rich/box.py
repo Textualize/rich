@@ -142,7 +142,7 @@ class Box:
         return "".join(parts)
 
 
-ASCII = Box(
+ASCII: Box = Box(
     """\
 +--+
 | ||
@@ -155,7 +155,7 @@ ASCII = Box(
 """
 )
 
-SQUARE = Box(
+SQUARE: Box = Box(
     """\
 ┌─┬┐
 │ ││
@@ -169,7 +169,7 @@ SQUARE = Box(
 )
 
 
-MINIMAL = Box(
+MINIMAL: Box = Box(
     """\
     
   │ 
@@ -183,7 +183,7 @@ MINIMAL = Box(
 )
 
 
-MINIMAL_HEAVY_HEAD = Box(
+MINIMAL_HEAVY_HEAD: Box = Box(
     """\
     
   │ 
@@ -196,7 +196,7 @@ MINIMAL_HEAVY_HEAD = Box(
 """
 )
 
-MINIMAL_DOUBLE_HEAD = Box(
+MINIMAL_DOUBLE_HEAD: Box = Box(
     """\
     
   │ 
@@ -210,7 +210,7 @@ MINIMAL_DOUBLE_HEAD = Box(
 )
 
 
-SIMPLE = Box(
+SIMPLE: Box = Box(
     """\
     
     
@@ -224,7 +224,7 @@ SIMPLE = Box(
 )
 
 
-SIMPLE_HEAVY = Box(
+SIMPLE_HEAVY: Box = Box(
     """\
     
     
@@ -238,7 +238,7 @@ SIMPLE_HEAVY = Box(
 )
 
 
-HORIZONTALS = Box(
+HORIZONTALS: Box = Box(
     """\
 ────
     
@@ -251,7 +251,7 @@ HORIZONTALS = Box(
 """
 )
 
-ROUNDED = Box(
+ROUNDED: Box = Box(
     """\
 ╭─┬╮
 │ ││
@@ -264,7 +264,7 @@ ROUNDED = Box(
 """
 )
 
-HEAVY = Box(
+HEAVY: Box = Box(
     """\
 ┏━┳┓
 ┃ ┃┃
@@ -277,7 +277,7 @@ HEAVY = Box(
 """
 )
 
-HEAVY_EDGE = Box(
+HEAVY_EDGE: Box = Box(
     """\
 ┏━┯┓
 ┃ │┃
@@ -290,7 +290,7 @@ HEAVY_EDGE = Box(
 """
 )
 
-HEAVY_HEAD = Box(
+HEAVY_HEAD: Box = Box(
     """\
 ┏━┳┓
 ┃ ┃┃
@@ -303,7 +303,7 @@ HEAVY_HEAD = Box(
 """
 )
 
-DOUBLE = Box(
+DOUBLE: Box = Box(
     """\
 ╔═╦╗
 ║ ║║
@@ -316,7 +316,7 @@ DOUBLE = Box(
 """
 )
 
-DOUBLE_EDGE = Box(
+DOUBLE_EDGE: Box = Box(
     """\
 ╔═╤╗
 ║ │║
