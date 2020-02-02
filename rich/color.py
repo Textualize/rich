@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from functools import lru_cache
 from math import sqrt
+import platform
 from typing import Iterable, List, NamedTuple, Optional, Sequence, Tuple, TYPE_CHECKING
 
 from ._palettes import STANDARD_PALETTE, EIGHT_BIT_PALETTE
@@ -13,12 +14,16 @@ if TYPE_CHECKING:  # pragma: no cover
     from .theme import Theme
 
 
+WINDOWS = platform.system() == "Windows"
+
+
 class ColorSystem(IntEnum):
     """One of the 3 color system supported by terminals."""
 
     STANDARD = 1
     EIGHT_BIT = 2
     TRUECOLOR = 3
+    WINDOWS = 4
 
 
 class ColorType(IntEnum):
@@ -28,6 +33,7 @@ class ColorType(IntEnum):
     STANDARD = 1
     EIGHT_BIT = 2
     TRUECOLOR = 3
+    WINDOWS = 4
 
 
 ANSI_COLOR_NAMES = {
@@ -291,6 +297,8 @@ class Color(NamedTuple):
         elif self.type == ColorType.STANDARD:
             assert self.number is not None
             return theme.ansi_colors[self.number]
+        elif self.type == ColorType.WINDOWS:
+            return STANDARD_PALETTE[self.number]
         else:  # self.type == ColorType.DEFAULT:
             assert self.number is None
             return theme.foreground_color if foreground else theme.background_color
@@ -371,7 +379,7 @@ class Color(NamedTuple):
         if _type == ColorType.DEFAULT:
             return ["39" if foreground else "49"]
 
-        elif _type == ColorType.STANDARD:
+        elif _type in (ColorType.STANDARD, ColorType.WINDOWS):
             number = self.number
             assert number is not None
             return [str(30 + number if foreground else 40 + number)]
@@ -422,6 +430,21 @@ class Color(NamedTuple):
 
             color_number = STANDARD_PALETTE.match(triplet)
             return Color(self.name, ColorType.STANDARD, number=color_number)
+
+        elif system == ColorSystem.WINDOWS:
+            if self.system == ColorSystem.TRUECOLOR:
+                assert self.triplet is not None
+                triplet = self.triplet
+            else:  # self.system == ColorSystem.EIGHT_BIT
+                assert self.number is not None
+                if self.number < 8:
+                    return Color(self.name, ColorType.WINDOWS, number=self.number)
+                elif self.number < 16:
+                    return Color(self.name, ColorType.WINDOWS, number=self.number - 8)
+                triplet = ColorTriplet(*EIGHT_BIT_PALETTE[self.number])
+
+            color_number = STANDARD_PALETTE.match(triplet)
+            return Color(self.name, ColorType.WINDOWS, number=color_number)
 
         return self
 

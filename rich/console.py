@@ -7,6 +7,7 @@ import inspect
 from itertools import chain
 import os
 from operator import itemgetter
+import platform
 import re
 import shutil
 import sys
@@ -48,8 +49,9 @@ from .segment import Segment
 if TYPE_CHECKING:  # pragma: no cover
     from .text import Text
 
-HighlighterType = Callable[[Union[str, "Text"]], "Text"]
+WINDOWS = platform.system() == "Windows"
 
+HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyValues = Optional[Literal["left", "center", "right", "full"]]
 
 
@@ -151,6 +153,7 @@ COLOR_SYSTEMS = {
     "standard": ColorSystem.STANDARD,
     "256": ColorSystem.EIGHT_BIT,
     "truecolor": ColorSystem.TRUECOLOR,
+    "windows": ColorSystem.WINDOWS,
 }
 
 
@@ -179,7 +182,7 @@ class Console:
     def __init__(
         self,
         color_system: Optional[
-            Literal["auto", "standard", "256", "truecolor"]
+            Literal["auto", "standard", "256", "truecolor", "windows"]
         ] = "auto",
         styles: Dict[str, Style] = None,
         file: IO = None,
@@ -226,6 +229,8 @@ class Console:
         """Detect color system from env vars."""
         if not self.is_terminal:
             return None
+        if WINDOWS:
+            return ColorSystem.WINDOWS
         if os.environ.get("COLORTERM", "").strip().lower() == "truecolor":
             return ColorSystem.TRUECOLOR
         # 256 can be considered standard nowadays
@@ -311,6 +316,8 @@ class Console:
             return ConsoleDimensions(self._width, self._height)
 
         width, height = shutil.get_terminal_size()
+        if WINDOWS:
+            width -= 1
         return ConsoleDimensions(
             width if self._width is None else self._width,
             height if self._height is None else self._height,
@@ -796,7 +803,7 @@ class Console:
 
         """
         text = self.export_text(clear=clear, styles=styles)
-        with open(path, "wt") as write_file:
+        with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(text)
 
     def export_html(
@@ -899,7 +906,7 @@ class Console:
             code_format=code_format,
             inline_styles=inline_styles,
         )
-        with open(path, "wt") as write_file:
+        with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(html)
 
 
