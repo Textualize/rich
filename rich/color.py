@@ -298,6 +298,7 @@ class Color(NamedTuple):
             assert self.number is not None
             return theme.ansi_colors[self.number]
         elif self.type == ColorType.WINDOWS:
+            assert self.number is not None
             return STANDARD_PALETTE[self.number]
         else:  # self.type == ColorType.DEFAULT:
             assert self.number is None
