@@ -19,6 +19,7 @@ class Pretty:
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         pretty_str = pformat(self._object, width=options.max_width)
+        pretty_str = pretty_str.replace("\r", "")
         pretty_text = self.highlighter(pretty_str)
         yield pretty_text
 

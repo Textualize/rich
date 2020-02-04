@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed Windows color support
+- Fixed line width on windows issue (https://github.com/willmcgugan/rich/issues/7)
+- Fixed Pretty print on Windows
 
 ## [0.3.2] - 2020-01-26
 

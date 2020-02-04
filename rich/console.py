@@ -316,8 +316,8 @@ class Console:
             return ConsoleDimensions(self._width, self._height)
 
         width, height = shutil.get_terminal_size()
-        if WINDOWS:
-            width -= 1
+        # Fixes Issue with Windows console (https://github.com/willmcgugan/rich/issues/7)
+        width -= 1
         return ConsoleDimensions(
             width if self._width is None else self._width,
             height if self._height is None else self._height,

@@ -88,7 +88,7 @@ class Segment(NamedTuple):
         """
         line_length = sum(len(text) for text, _style in line)
         if line_length < length:
-            return line[:] + [Segment(" " * (length - line_length), style)]
+            return line + [Segment(" " * (length - line_length), style)]
         elif line_length > length:
             line_length = 0
             new_line: List[Segment] = []
@@ -103,7 +103,7 @@ class Segment(NamedTuple):
                     append(Segment(text[: length - line_length], style))
                     break
             return new_line
-        return line
+        return line[:]
 
     @classmethod
     def get_line_length(cls, line: List["Segment"]) -> int:
