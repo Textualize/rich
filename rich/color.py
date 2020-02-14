@@ -9,9 +9,10 @@ from typing import Iterable, List, NamedTuple, Optional, Sequence, Tuple, TYPE_C
 
 from ._palettes import STANDARD_PALETTE, EIGHT_BIT_PALETTE
 from .color_triplet import ColorTriplet
+from .terminal_theme import DEFAULT_TERMINAL_THEME
 
 if TYPE_CHECKING:  # pragma: no cover
-    from .theme import Theme
+    from .terminal_theme import TerminalTheme
 
 
 WINDOWS = platform.system() == "Windows"
@@ -283,7 +284,11 @@ class Color(NamedTuple):
             return ColorSystem.STANDARD
         return ColorSystem(int(self.type))
 
-    def get_truecolor(self, theme: "Theme", foreground=True) -> ColorTriplet:
+    def get_truecolor(
+        self, theme: "TerminalTheme" = None, foreground=True
+    ) -> ColorTriplet:
+        if theme is None:
+            theme = DEFAULT_TERMINAL_THEME
         """Get a color triplet for this color."""
         if self.type == ColorType.TRUECOLOR:
             assert self.triplet is not None

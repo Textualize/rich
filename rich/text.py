@@ -190,7 +190,39 @@ class Text:
             return
         self._spans.append(Span(max(0, start), min(length, end), style))
 
-    def highlight_words(self, words: Iterable[str], style: Union[str, Style]) -> int:
+    def highlight_regex(
+        self, re_highlight: str, style: Union[str, Style] = None
+    ) -> int:
+        """Highlight text with a regular expression, where group names are 
+        translated to styles.
+        
+        Args:
+            re_highlight (str): A regular expression            
+        
+        Returns:
+            int: Number of regex matches
+        """
+        count = 0
+        append_span = self._spans.append
+        _Span = Span
+        for match in re.finditer(re_highlight, self.text):
+            _span = match.span
+            if style:
+                start, end = _span()
+                append_span(_Span(start, end, style))
+            count += 1
+            for name, _ in match.groupdict().items():
+                start, end = _span(name)
+                if start != -1:
+                    append_span(_Span(start, end, name))
+        return count
+
+    def highlight_words(
+        self,
+        words: Iterable[str],
+        style: Union[str, Style],
+        case_sensitive: bool = True,
+    ) -> int:
         """Highlight words with a style.
         
         Args:
@@ -204,7 +236,9 @@ class Text:
         add_span = self._spans.append
         count = 0
         _Span = Span
-        for match in re.finditer(re_words, self.text):
+        for match in re.finditer(
+            re_words, self.text, flags=0 if case_sensitive else re.IGNORECASE
+        ):
             start, end = match.span(0)
             add_span(_Span(start, end, style))
             count += 1
@@ -266,6 +300,7 @@ class Text:
             return console.get_style(style, default=null_style)
 
         enumerated_spans = list(enumerate(line._spans, 1))
+
         style_map = {index: get_style(span.style) for index, span in enumerated_spans}
         style_map[0] = get_style(self.style)
 
@@ -334,7 +369,7 @@ class Text:
                 append(span)
                 continue
             if span.start >= new_length:
-                break
+                continue
             append(span.right_crop(new_length))
         self._spans[:] = spans
 
@@ -529,7 +564,11 @@ if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
     console = Console()
-    text = Text("[12:42:33] ")
-    lines = text.wrap(10)
-    console.print(lines)
+    text = Text(
+        """Hello, self! hello World
+
+hello  worhello\n"""
+    )
+    text.highlight_regex("self", "reverse")
+    console.print(text)
 

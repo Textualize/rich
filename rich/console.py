@@ -43,8 +43,9 @@ from .tabulate import tabulate_mapping
 from . import highlighter
 from . import themes
 from .pretty import Pretty
-from .theme import Theme
+from .terminal_theme import TerminalTheme, DEFAULT_TERMINAL_THEME
 from .segment import Segment
+from .theme import Theme
 
 if TYPE_CHECKING:  # pragma: no cover
     from .text import Text
@@ -166,7 +167,7 @@ class Console:
     Args:
         color_system (str, optional): The color system supported by your terminal,
             either ``"standard"``, ``"256"`` or ``"truecolor"``. Leave as ``"auto"`` to autodetect.
-        styles (Dict[str, Style], optional): An optional mapping of style name strings to :class:`~rich.style.Style` objects.
+        theme (Theme, optional): An optional style theme object, or ``None`` for default theme.
         file (IO, optional): A file object where the console should write to. Defaults to stdoutput.
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
         height (int, optional): The height of the terminal. Leave as default to auto-detect height.
@@ -184,7 +185,7 @@ class Console:
         color_system: Optional[
             Literal["auto", "standard", "256", "truecolor", "windows"]
         ] = "auto",
-        styles: Dict[str, Style] = None,
+        theme: Theme = None,
         file: IO = None,
         width: int = None,
         height: int = None,
@@ -195,7 +196,9 @@ class Console:
         log_time_format: str = "[%X] ",
         highlighter: Optional["HighlighterType"] = ReprHighlighter(),
     ):
-        self._styles = ChainMap(DEFAULT_STYLES if styles is None else styles)
+        self._styles = ChainMap(
+            themes.DEFAULT.styles if theme is None else theme.styles
+        )
         self.file = file or sys.stdout
         self._width = width
         self._height = height
@@ -261,6 +264,10 @@ class Console:
             styles (Dict[str, Style]): A mapping of style name to Style instance.
         """
         self._styles.maps.append(styles)
+
+    def pop_styles(self) -> None:
+        """Restore styles to state before `push_styles`."""
+        self._styles.maps.pop()
 
     @property
     def color_system(self) -> Optional[str]:
@@ -379,7 +386,13 @@ class Console:
                 "A str, Segment or object with __console__ method is required"
             )
 
-        for render_output in render_iterable:
+        try:
+            iter_render = iter(render_iterable)
+        except TypeError:
+            raise errors.NotRenderableError(
+                f"object {render_iterable!r} is not renderable"
+            )
+        for render_output in iter_render:
             if isinstance(render_output, Segment):
                 yield render_output
             else:
@@ -808,7 +821,7 @@ class Console:
 
     def export_html(
         self,
-        theme: Theme = None,
+        theme: TerminalTheme = None,
         clear: bool = True,
         code_format: str = None,
         inline_styles: bool = False,
@@ -816,7 +829,7 @@ class Console:
         """Generate HTML from console contents (requires record=True argument in constructor).
 
         Args:
-            theme (Theme, optional): Theme object containing console colors.
+            theme (TerminalTheme, optional): TerminalTheme object containing console colors.
             clear (bool, optional): Set to ``True`` to clear the record buffer after generating the HTML.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
@@ -832,7 +845,7 @@ class Console:
         ), "To export console contents set record=True in the constructor or instance"
         fragments: List[str] = []
         append = fragments.append
-        _theme = theme or themes.DEFAULT
+        _theme = theme or DEFAULT_TERMINAL_THEME
         stylesheet = ""
 
         def escape(text: str) -> str:
@@ -882,7 +895,7 @@ class Console:
     def save_html(
         self,
         path: str,
-        theme: Theme = None,
+        theme: TerminalTheme = None,
         clear: bool = True,
         code_format=CONSOLE_HTML_FORMAT,
         inline_styles: bool = False,
@@ -891,7 +904,7 @@ class Console:
 
         Args:
             path (str): Path to write html file.
-            theme (Theme, optional): Theme object containing console colors.
+            theme (TerminalTheme, optional): TerminalTheme object containing console colors.
             clear (bool, optional): Set to True to clear the record buffer after generating the HTML.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.

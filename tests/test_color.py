@@ -8,7 +8,7 @@ from rich.color import (
     ColorTriplet,
 )
 
-from rich import themes
+from rich import terminal_theme
 
 import pytest
 
@@ -28,16 +28,14 @@ def test_system() -> None:
 
 
 def test_truecolor() -> None:
-    assert Color.parse("#ff0000").get_truecolor(themes.DEFAULT) == ColorTriplet(
-        255, 0, 0
+    assert Color.parse("#ff0000").get_truecolor() == ColorTriplet(255, 0, 0)
+    assert Color.parse("red").get_truecolor() == ColorTriplet(128, 0, 0)
+    assert Color.parse("1").get_truecolor() == ColorTriplet(128, 0, 0)
+    assert Color.parse("17").get_truecolor() == ColorTriplet(0, 0, 95)
+    assert Color.parse("default").get_truecolor() == ColorTriplet(0, 0, 0)
+    assert Color.parse("default").get_truecolor(foreground=False) == ColorTriplet(
+        255, 255, 255
     )
-    assert Color.parse("red").get_truecolor(themes.DEFAULT) == ColorTriplet(128, 0, 0)
-    assert Color.parse("1").get_truecolor(themes.DEFAULT) == ColorTriplet(128, 0, 0)
-    assert Color.parse("17").get_truecolor(themes.DEFAULT) == ColorTriplet(0, 0, 95)
-    assert Color.parse("default").get_truecolor(themes.DEFAULT) == ColorTriplet(0, 0, 0)
-    assert Color.parse("default").get_truecolor(
-        themes.DEFAULT, foreground=False
-    ) == ColorTriplet(255, 255, 255)
 
 
 def test_parse_success() -> None:

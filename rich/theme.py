@@ -1,21 +1,32 @@
-from typing import List, Tuple
+import configparser
+from typing import Dict, IO
 
-from .color_triplet import ColorTriplet
-from .palette import Palette
-
-_ColorTuple = Tuple[int, int, int]
+from .style import Style
 
 
 class Theme:
-    """A terminal theme.
-    
-    This object is used when exporting console contents as HTML.
-    
-    """
+    def __init__(self, styles: Dict[str, Style] = None):
+        self.styles = styles or {}
 
-    def __init__(
-        self, background: _ColorTuple, foreground: _ColorTuple, ansi: List[_ColorTuple]
-    ) -> None:
-        self.background_color = ColorTriplet(*background)
-        self.foreground_color = ColorTriplet(*foreground)
-        self.ansi_colors = Palette(ansi)
+    @property
+    def config(self) -> str:
+        """Get contents of a config file for this theme."""
+        config_lines = ["[styles]"]
+        append = config_lines.append
+        for name, style in sorted(self.styles.items()):
+            append(f"{name} = {style}")
+        config = "\n".join(config_lines)
+        return config
+
+    @classmethod
+    def from_file(cls, config_file: IO[str], source: str = None) -> "Theme":
+        config = configparser.ConfigParser()
+        config.read_file(config_file, source=source)
+        styles = {name: Style.parse(value) for name, value in config.items("styles")}
+        theme = Theme(styles)
+        return theme
+
+    @classmethod
+    def read(cls, path: str) -> "Theme":
+        with open(path, "rt") as config_file:
+            return cls.from_file(config_file, source=path)

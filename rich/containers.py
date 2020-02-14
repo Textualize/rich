@@ -1,4 +1,4 @@
-from typing import Iterator, Iterable, List, TypeVar, TYPE_CHECKING, Union
+from typing import Iterator, Iterable, List, overload, TypeVar, TYPE_CHECKING, Union
 from typing_extensions import Literal
 
 from .segment import Segment
@@ -57,7 +57,15 @@ class Lines:
     def __iter__(self) -> Iterator["Text"]:
         return iter(self._lines)
 
+    @overload
     def __getitem__(self, index: int) -> "Text":
+        ...
+
+    @overload
+    def __getitem__(self, index: slice) -> "Lines":
+        ...
+
+    def __getitem__(self, index):
         return self._lines[index]
 
     def __setitem__(self, index: int, value: "Text") -> "Lines":

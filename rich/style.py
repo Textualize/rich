@@ -4,8 +4,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Type, Union
 
 from . import errors
 from .color import blend_rgb, Color, ColorParseError, ColorSystem
-from . import themes
-from .theme import Theme
+from .terminal_theme import TerminalTheme, DEFAULT_TERMINAL_THEME
 
 
 class _Bit:
@@ -31,8 +30,8 @@ class Style:
     def __init__(
         self,
         *,
-        color: str = None,
-        bgcolor: str = None,
+        color: Union[Color, str] = None,
+        bgcolor: Union[Color, str] = None,
         bold: bool = None,
         dim: bool = None,
         italic: bool = None,
@@ -43,8 +42,11 @@ class Style:
         conceal: bool = None,
         strike: bool = None,
     ):
-        self._color = None if color is None else Color.parse(color)
-        self._bgcolor = None if bgcolor is None else Color.parse(bgcolor)
+        def _make_color(color: Union[Color, str]) -> Color:
+            return color if isinstance(color, Color) else Color.parse(color)
+
+        self._color = None if color is None else _make_color(color)
+        self._bgcolor = None if bgcolor is None else _make_color(bgcolor)
         self._attributes = (
             (bold or 0)
             | (dim or 0) << 1
@@ -218,9 +220,9 @@ class Style:
         return style
 
     @lru_cache(maxsize=1000)
-    def get_html_style(self, theme: Theme = None) -> str:
+    def get_html_style(self, theme: TerminalTheme = None) -> str:
         """Get a CSS style rule."""
-        theme = theme or themes.DEFAULT
+        theme = theme or DEFAULT_TERMINAL_THEME
         css: List[str] = []
         append = css.append
 
