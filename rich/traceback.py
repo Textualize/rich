@@ -2,9 +2,9 @@ from __future__ import absolute_import
 
 from dataclasses import dataclass, field
 from traceback import extract_tb
-from typing import Type, List
+from typing import Optional, Type, List
 
-from .console import Console, ConsoleOptions, RenderResult
+from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult
 from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
 from .padding import Padding
@@ -53,11 +53,11 @@ class Trace:
 
 
 class PathHighlighter(RegexHighlighter):
-    highlights = [r'"(?P<dim>.*/)(?P<b>.+)"']
+    highlights = [r'"(?P<dim>.*/)(?P<_>.+)"']
 
 
 class Traceback:
-    def __init__(self, trace: Trace = None, code_width: int = 88):
+    def __init__(self, trace: Trace = None, code_width: Optional[int] = 88):
         if trace is None:
             trace = self.extract(*sys.exc_info())
         self.trace = trace
@@ -94,7 +94,10 @@ class Traceback:
         highlighter = ReprHighlighter()
         for last, stack in iter_last(reversed(self.trace.stacks)):
             yield Text.from_markup("[b]Traceback[/b] [dim](most recent call last):")
-            yield Constrain(Panel(stack, style="blue"), width=self.code_width)
+            stack_renderable: ConsoleRenderable = Panel(stack, style="blue")
+            if self.code_width is not None:
+                stack_renderable = Constrain(stack_renderable, width=self.code_width)
+            yield stack_renderable
             yield Text.assemble((f"{stack.exc_type}: ", "traceback.exc_type"), end="")
             yield highlighter(stack.exc_value)
             if not last:
