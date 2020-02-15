@@ -32,7 +32,7 @@ class Panel:
     def __init__(
         self,
         renderable: Union[str, ConsoleRenderable],
-        box=box.SQUARE,
+        box=box.ROUNDED,
         expand: bool = True,
         style: Union[str, Style] = "none",
     ) -> None:

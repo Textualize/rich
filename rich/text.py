@@ -146,6 +146,14 @@ class Text:
 
         return render(text, style)
 
+    @classmethod
+    def assemble(cls, *parts: Tuple[str, Union[str, Style]]) -> "Text":
+        text = cls()
+        append = text.append
+        for part in parts:
+            append(*part)
+        return text
+
     @property
     def text(self) -> str:
         """Get the text as a single string."""

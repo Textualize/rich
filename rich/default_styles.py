@@ -65,7 +65,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.bool_false": Style(color="bright_red", italic=True),
     "repr.none": Style(color="magenta", italic=True),
     "repr.url": Style(underline=True, color="bright_blue", bold=False),
-    "rule.line": Style(color="green"),
+    "rule.line": Style(dim=True),
     "rule.text": Style(),
     "repr.path": Style(color="magenta"),
     "repr.filename": Style(color="bright_magenta", bold=True),
@@ -74,6 +74,12 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "table.cell": Style(),
     "table.title": Style(italic=True),
     "table.caption": Style(italic=True, dim=True),
+    "traceback.text": Style(),
+    "traceback.filename": Style(color="green"),
+    "traceback.lineno": Style(bold=True, color="cyan"),
+    "traceback.name": Style(color="yellow"),
+    "traceback.exc_type": Style(color="bright_red", bold=True),
+    "traceback.exc_value": Style(),
 }
 
 MARKDOWN_STYLES = {

@@ -30,6 +30,10 @@ class Padding:
         self.top, self.right, self.bottom, self.left = self.unpack(pad)
         self.style = style
 
+    @classmethod
+    def indent(cls, renderable: "RenderableType", pad_amount: int) -> "Padding":
+        return Padding(renderable, pad=(0, 0, 0, pad_amount))
+
     @staticmethod
     def unpack(pad: "PaddingDimensions") -> Tuple[int, int, int, int]:
         """Unpack padding specified in CSS style."""

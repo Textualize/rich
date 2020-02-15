@@ -113,12 +113,12 @@ class ConsoleRenderable(Protocol):
 
     def __console__(
         self, console: "Console", options: "ConsoleOptions"
-    ) -> Iterable[Union["ConsoleRenderable", Segment]]:  # pragma: no cover
+    ) -> Iterable[Union["ConsoleRenderable", Segment, str]]:  # pragma: no cover
         ...
 
 
 RenderableType = Union[ConsoleRenderable, Segment, str]
-RenderResult = Iterable[Union[ConsoleRenderable, Segment]]
+RenderResult = Iterable[RenderableType]
 
 
 _null_highlighter = NullHighlighter()

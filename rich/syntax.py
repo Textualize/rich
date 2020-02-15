@@ -140,7 +140,7 @@ class Syntax:
             append(token, _get_theme_style(token_type))
         return text
 
-    def _get_line_numbers_color(self, blend: float = 0.5) -> Color:
+    def _get_line_numbers_color(self, blend: float = 0.3) -> Color:
         background_color = parse_rgb_hex(
             self._pygments_style_class.background_color[1:]
         )
@@ -171,7 +171,7 @@ class Syntax:
             start_line = start_line - 1
             lines = lines[start_line:end_line]
 
-        numbers_column_width = len(str(self.start_line + len(lines))) + 2
+        numbers_column_width = len(str(self.start_line + start_line + len(lines))) + 2
         render_options = options.update(width=options.max_width - numbers_column_width)
         background_style = Style(bgcolor=self._pygments_style_class.background_color)
         number_styles = {
