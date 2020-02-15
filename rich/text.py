@@ -147,8 +147,14 @@ class Text:
         return render(text, style)
 
     @classmethod
-    def assemble(cls, *parts: Tuple[str, Union[str, Style]]) -> "Text":
-        text = cls()
+    def assemble(
+        cls,
+        *parts: Tuple[str, Union[str, Style]],
+        style: Union[str, Style] = "",
+        justify: "JustifyValues" = None,
+        end: str = "\n",
+    ) -> "Text":
+        text = cls(style=style, justify=justify, end=end)
         append = text.append
         for part in parts:
             append(*part)

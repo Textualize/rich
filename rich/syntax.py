@@ -174,18 +174,18 @@ class Syntax:
         numbers_column_width = len(str(self.start_line + start_line + len(lines))) + 2
         render_options = options.update(width=options.max_width - numbers_column_width)
         background_style = Style(bgcolor=self._pygments_style_class.background_color)
-        number_styles = {
-            False: (
-                background_style
-                + self._get_theme_style(Token.Text)
-                + Style(color=self._get_line_numbers_color())
-            ),
-            True: (
-                background_style
-                + self._get_theme_style(Token.Text)
-                + Style(bold=True, color=self._get_line_numbers_color(0.9))
-            ),
-        }
+
+        number_style = (
+            background_style
+            + self._get_theme_style(Token.Text)
+            + Style(color=self._get_line_numbers_color())
+        )
+        highlight_number_style = (
+            background_style
+            + self._get_theme_style(Token.Text)
+            + Style(bold=True, color=self._get_line_numbers_color(0.9))
+        )
+
         highlight_line = self.highlight_lines.__contains__
         padding = Segment(" " * numbers_column_width, background_style)
         new_line = Segment("\n")
@@ -195,10 +195,22 @@ class Syntax:
             )
             for first, wrapped_line in iter_first(wrapped_lines):
                 if first:
-                    yield Segment(
-                        f" {str(line_no).rjust(numbers_column_width - 2)} ",
-                        number_styles[highlight_line(line_no)],
-                    )
+                    if highlight_line(line_no):
+
+                        yield Segment("❱ ", number_style)
+                        yield Segment(
+                            str(line_no).rjust(numbers_column_width - 2),
+                            highlight_number_style,
+                        )
+                        #     f"⮕ {str(line_no).rjust(numbers_column_width - 2)}",
+                        #     highlight_number_style,
+                        # )
+                    else:
+                        yield Segment(
+                            f"  {str(line_no).rjust(numbers_column_width - 2)}",
+                            number_style,
+                        )
+
                 else:
                     yield padding
                 yield from wrapped_line

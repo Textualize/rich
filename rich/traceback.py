@@ -5,7 +5,8 @@ from traceback import extract_tb
 from typing import Type, List
 
 from .console import Console, ConsoleOptions, RenderResult
-from .highlighter import RegexHighlighter
+from .constrain import Constrain
+from .highlighter import RegexHighlighter, ReprHighlighter
 from .padding import Padding
 from .panel import Panel
 from .rule import Rule
@@ -33,8 +34,6 @@ class Stack:
             text = Text.assemble(
                 (" File ", "traceback.text"),
                 (f'"{frame.filename}"', "traceback.filename"),
-                (", line ", "traceback.text"),
-                (str(frame.lineno), "traceback.lineno"),
                 (", in ", "traceback.text"),
                 (frame.name, "traceback.name"),
             )
@@ -58,10 +57,11 @@ class PathHighlighter(RegexHighlighter):
 
 
 class Traceback:
-    def __init__(self, trace: Trace = None):
+    def __init__(self, trace: Trace = None, code_width: int = 88):
         if trace is None:
             trace = self.extract(*sys.exc_info())
         self.trace = trace
+        self.code_width = code_width
 
     @classmethod
     def extract(
@@ -91,13 +91,12 @@ class Traceback:
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         yield ""
+        highlighter = ReprHighlighter()
         for last, stack in iter_last(reversed(self.trace.stacks)):
             yield Text.from_markup("[b]Traceback[/b] [dim](most recent call last):")
-            yield Panel(stack, style="blue")
-            yield Text.assemble(
-                (f"{stack.exc_type}: ", "traceback.exc_type"),
-                (stack.exc_value, "traceback.exc_value"),
-            )
+            yield Constrain(Panel(stack, style="blue"), width=self.code_width)
+            yield Text.assemble((f"{stack.exc_type}: ", "traceback.exc_type"), end="")
+            yield highlighter(stack.exc_value)
             if not last:
                 yield Text.from_markup(
                     "\n[I]During handling of the above exception, another exception occurred:\n\n",
