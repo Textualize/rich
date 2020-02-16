@@ -165,13 +165,13 @@ class Syntax:
 
         lines = text.split("\n")
 
-        start_line = 0
+        line_offset = 0
         if self.line_range:
             start_line, end_line = self.line_range
-            start_line = start_line - 1
-            lines = lines[start_line:end_line]
+            line_offset = max(0, start_line - 1)
+            lines = lines[line_offset:end_line]
 
-        numbers_column_width = len(str(self.start_line + start_line + len(lines))) + 2
+        numbers_column_width = len(str(self.start_line + line_offset + len(lines))) + 2
         render_options = options.update(width=options.max_width - numbers_column_width)
         background_style = Style(bgcolor=self._pygments_style_class.background_color)
 
@@ -187,30 +187,26 @@ class Syntax:
         )
 
         highlight_line = self.highlight_lines.__contains__
-        padding = Segment(" " * numbers_column_width, background_style)
-        new_line = Segment("\n")
-        for line_no, line in enumerate(lines, self.start_line + start_line):
+        _Segment = Segment
+        padding = _Segment(" " * numbers_column_width, background_style)
+        new_line = _Segment("\n")
+        for line_no, line in enumerate(lines, self.start_line + line_offset):
             wrapped_lines = console.render_lines(
                 line, render_options, style=background_style
             )
             for first, wrapped_line in iter_first(wrapped_lines):
                 if first:
+                    line_column = str(line_no).rjust(numbers_column_width - 2) + " "
                     if highlight_line(line_no):
-
-                        yield Segment("❱ ", number_style)
-                        yield Segment(
-                            str(line_no).rjust(numbers_column_width - 2),
-                            highlight_number_style,
+                        yield _Segment("❱ ", number_style)
+                        yield _Segment(
+                            line_column, highlight_number_style,
                         )
-                        #     f"⮕ {str(line_no).rjust(numbers_column_width - 2)}",
-                        #     highlight_number_style,
-                        # )
                     else:
-                        yield Segment(
-                            f"  {str(line_no).rjust(numbers_column_width - 2)}",
-                            number_style,
+                        yield _Segment("  ", highlight_number_style)
+                        yield _Segment(
+                            line_column, number_style,
                         )
-
                 else:
                     yield padding
                 yield from wrapped_line
@@ -228,7 +224,13 @@ def __init__(self):
     from time import time
 
     syntax = Syntax(CODE, "python", line_numbers=False, theme="monokai")
-    syntax = Syntax.from_path("rich/segment.py", theme="monokai", line_numbers=True)
+    syntax = Syntax.from_path(
+        "rich/segment.py",
+        theme="monokai",
+        line_numbers=True,
+        line_range=(190, 300),
+        highlight_lines={194},
+    )
     console = Console(record=True)
     start = time()
     console.print(syntax)

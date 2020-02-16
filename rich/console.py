@@ -3,6 +3,7 @@ from collections.abc import Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from enum import Enum
+from functools import wraps
 import inspect
 from itertools import chain
 import os
@@ -122,6 +123,36 @@ RenderResult = Iterable[RenderableType]
 
 
 _null_highlighter = NullHighlighter()
+
+
+class RenderGroup:
+    def __init__(self, renderables: Iterable[RenderableType]) -> None:
+        """Takes a group of renderables and returns a renderable object,
+        that renders the group.
+        
+        Args:
+            renderables (Iterable[RenderableType]): An iterable of renderable objects.
+        """
+        self.renderables = renderables
+        self._render: Optional[List[RenderableType]] = None
+
+    def __console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> RenderResult:
+        if self._render is None:
+            self._render = list(self.renderables)
+        yield from self._render
+
+
+def render_group(method):
+    """Convert a method that returns an iterable of renderables in to a RenderGroup."""
+
+    @wraps(method)
+    def deco(*args, **kwargs):
+        renderables = method(*args, **kwargs)
+        return RenderGroup(renderables)
+
+    return deco
 
 
 class ConsoleDimensions(NamedTuple):
