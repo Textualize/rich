@@ -1,8 +1,12 @@
+from typing import Optional
+
 from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult
 
 
 class Constrain:
-    def __init__(self, renderable: ConsoleRenderable, width=80) -> None:
+    def __init__(
+        self, renderable: ConsoleRenderable, width: Optional[int] = 80
+    ) -> None:
         """Constrain the width of a renderable to a given number of characters.
         
         Args:
@@ -13,5 +17,8 @@ class Constrain:
         self.width = width
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        child_options = options.update(width=min(self.width, options.max_width))
-        yield from console.render(self.renderable, child_options)
+        if self.width is None:
+            yield self.renderable
+        else:
+            child_options = options.update(width=min(self.width, options.max_width))
+            yield from console.render(self.renderable, child_options)

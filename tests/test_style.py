@@ -84,8 +84,8 @@ def test_get_html_style():
     )
 
 
-def test_combine():
-    assert Style.combine([Style(color="red"), Style(bold=True)]) == Style(
+def test_chain():
+    assert Style.chain(Style(color="red"), Style(bold=True)) == Style(
         color="red", bold=True
     )
 

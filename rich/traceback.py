@@ -1,7 +1,9 @@
 from __future__ import absolute_import
 
 from dataclasses import dataclass, field
+import sys
 from traceback import extract_tb
+from types import TracebackType
 from typing import Optional, Type, List
 
 from .console import (
@@ -16,9 +18,34 @@ from .highlighter import RegexHighlighter, ReprHighlighter
 from .padding import Padding
 from .panel import Panel
 from .rule import Rule
+from .segment import Segment
 from .text import Text
 from ._tools import iter_last
 from .syntax import Syntax
+
+
+def install(width: Optional[int] = 100, extra_lines: int = 2) -> None:
+    """Install a rich traceback handler.
+
+    Once installed, any tracebacks will be printed with syntax highlighting and rich formatting.
+    
+    
+    Args:
+        width (Optional[int], optional): Width (in characters) of traceback. Defaults to 100.
+        extra_lines (int, optional): Extra lines of code. Defaults to 2.
+    """
+    console = Console(file=sys.stderr)
+
+    def excepthook(
+        type_: Type[BaseException], value: BaseException, traceback: TracebackType,
+    ) -> None:
+        console.print(
+            Traceback.from_exception(
+                type_, value, traceback, width=width, extra_lines=extra_lines
+            )
+        )
+
+    sys.excepthook = excepthook
 
 
 @dataclass
@@ -26,13 +53,23 @@ class Frame:
     filename: str
     lineno: int
     name: str
+    line: str = ""
+
+
+@dataclass
+class _SyntaxError:
+    offset: int
+    filename: str
     line: str
+    lineno: int
+    msg: str
 
 
 @dataclass
 class Stack:
     exc_type: str
     exc_value: str
+    syntax_error: Optional[_SyntaxError] = None
     frames: List[Frame] = field(default_factory=list)
 
 
@@ -47,21 +84,54 @@ class PathHighlighter(RegexHighlighter):
 
 class Traceback:
     def __init__(
-        self, trace: Trace = None, code_width: Optional[int] = 88, extra_lines: int = 3,
+        self, trace: Trace = None, width: Optional[int] = 88, extra_lines: int = 3,
     ):
+        """A Console renderable that renders a traceback.
+        
+        Args:
+            trace (Trace, optional): A `Trace` object produced from `extract`. Defaults to None, which uses
+                the last exception.
+            width (Optional[int], optional): Number of characters used to traceback. Defaults to 100.
+            extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
+        """
         if trace is None:
             trace = self.extract(*sys.exc_info())
         self.trace = trace
-        self.code_width = code_width
+        self.width = width
         self.extra_lines = extra_lines
 
     @classmethod
+    def from_exception(
+        cls,
+        exc_type: Type[BaseException],
+        exc_value: BaseException,
+        traceback: TracebackType,
+        width: Optional[int] = 100,
+        extra_lines: int = 2,
+    ):
+        rich_traceback = cls.extract(exc_type, exc_value, traceback)
+        return Traceback(rich_traceback, width=width, extra_lines=extra_lines)
+
+    @classmethod
     def extract(
-        cls, exc_type: Type[BaseException], exc_value: BaseException, traceback
+        cls,
+        exc_type: Type[BaseException],
+        exc_value: BaseException,
+        traceback: TracebackType,
     ) -> Trace:
         stacks: List[Stack] = []
         while True:
             stack = Stack(exc_type=str(exc_type.__name__), exc_value=str(exc_value))
+
+            if isinstance(exc_value, SyntaxError):
+                stack.syntax_error = _SyntaxError(
+                    offset=exc_value.offset or 0,
+                    filename=exc_value.filename,
+                    lineno=exc_value.lineno,
+                    line=exc_value.text or "",
+                    msg=exc_value.msg,
+                )
+
             stacks.append(stack)
             append = stack.frames.append
 
@@ -70,7 +140,6 @@ class Traceback:
                     filename=frame_summary.filename,
                     lineno=frame_summary.lineno,
                     name=frame_summary.name,
-                    line=frame_summary.line,
                 )
                 append(frame)
 
@@ -85,34 +154,69 @@ class Traceback:
         return trace
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        yield ""
         highlighter = ReprHighlighter()
         for last, stack in iter_last(reversed(self.trace.stacks)):
-            yield Text.from_markup("[b]Traceback[/b] [dim](most recent call last):")
-            stack_renderable: ConsoleRenderable = Panel(
-                self._render_stack(stack), style="blue"
-            )
-            if self.code_width is not None:
-                stack_renderable = Constrain(stack_renderable, width=self.code_width)
-            yield stack_renderable
-            yield Text.assemble((f"{stack.exc_type}: ", "traceback.exc_type"), end="")
-            yield highlighter(stack.exc_value)
+            if stack.frames:
+                yield Text.from_markup("[b]Traceback[/b] [dim](most recent call last):")
+                stack_renderable: ConsoleRenderable = Panel(
+                    self._render_stack(stack), style="blue", expand=False
+                )
+                stack_renderable = Constrain(stack_renderable, self.width)
+                yield stack_renderable
+            if stack.syntax_error is not None:
+                yield Constrain(
+                    Panel(
+                        self._render_syntax_error(stack.syntax_error),
+                        style="red",
+                        expand=False,
+                    ),
+                    self.width,
+                )
+                yield Text.assemble(
+                    (f"{stack.exc_type}: ", "traceback.exc_type"), end=""
+                )
+                yield highlighter(stack.syntax_error.msg)
+            else:
+                yield Text.assemble(
+                    (f"{stack.exc_type}: ", "traceback.exc_type"), end=""
+                )
+                yield highlighter(stack.exc_value)
             if not last:
                 yield Text.from_markup(
                     "\n[i]During handling of the above exception, another exception occurred:\n\n",
                 )
 
-    @render_group
+    @render_group()
+    def _render_syntax_error(self, syntax_error: _SyntaxError) -> RenderResult:
+        highlighter = ReprHighlighter()
+        path_highlighter = PathHighlighter()
+        text = Text.assemble(
+            (" File ", "traceback.text"),
+            (f'"{syntax_error.filename}"', "traceback.filename"),
+            (", line ", "traceback.text"),
+            (str(syntax_error.lineno), "traceback.lineno"),
+        )
+        yield path_highlighter(text)
+        yield highlighter("   " + syntax_error.line)
+        yield Text.from_markup(
+            "   " + " " * (syntax_error.offset - 1) + "[traceback.offset]▲[/]\n"
+        )
+
+    @render_group()
     def _render_stack(self, stack: Stack) -> RenderResult:
         path_highlighter = PathHighlighter()
         for frame in stack.frames:
             text = Text.assemble(
                 (" File ", "traceback.text"),
                 (f'"{frame.filename}"', "traceback.filename"),
+                (", line ", "traceback.text"),
+                (str(frame.lineno), "traceback.lineno"),
                 (", in ", "traceback.text"),
                 (frame.name, "traceback.name"),
             )
             yield path_highlighter(text)
+            if frame.filename.startswith("<"):
+                continue
             try:
                 syntax = Syntax.from_path(
                     frame.filename,
@@ -124,17 +228,12 @@ class Traceback:
                     highlight_lines={frame.lineno},
                 )
             except Exception:
-                syntax = Syntax(
-                    frame.line,
-                    "python",
-                    line_numbers=True,
-                    start_line=frame.lineno,
-                    highlight_lines={frame.lineno},
-                )
-            yield Padding.indent(syntax, 2)
+                pass
+            else:
+                yield Padding.indent(syntax, 2)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # type: ignore
 
     from .console import Console
 

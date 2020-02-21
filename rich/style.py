@@ -270,6 +270,22 @@ class Style:
             update(_style)
         return style
 
+    @classmethod
+    def chain(self, *styles: "Style") -> "Style":
+        """Combine styles from positiona argument in to a single style.
+        
+        Args:
+            styles (Iterable[Style]): Styles to combine.
+        
+        Returns:
+            Style: A new style instance.
+        """
+        style = Style()
+        update = style._update
+        for _style in styles:
+            update(_style)
+        return style
+
     def copy(self) -> "Style":
         """Get a copy of this style.
         

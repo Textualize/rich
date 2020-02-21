@@ -1,4 +1,5 @@
-from typing import NamedTuple, TYPE_CHECKING
+from operator import itemgetter
+from typing import Iterable, NamedTuple, TYPE_CHECKING
 
 from . import errors
 from .segment import Segment
@@ -57,3 +58,18 @@ class RenderWidth(NamedTuple):
                 f"Unable to get render width for {renderable!r}; "
                 "a str, Segment, or object with __console__ method is required"
             )
+
+    @classmethod
+    def measure(
+        cls, renderables: Iterable["RenderableType"], max_width: int
+    ) -> "RenderWidth":
+        """Measure a number of renderables."""
+
+        render_widths = [
+            RenderWidth.get(renderable, max_width) for renderable in renderables
+        ]
+        measured_width = RenderWidth(
+            max(render_widths, key=itemgetter(0)).minimum,
+            max(render_widths, key=itemgetter(1)).maximum,
+        )
+        return measured_width

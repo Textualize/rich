@@ -77,9 +77,10 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "traceback.text": Style(),
     "traceback.filename": Style(color="green"),
     "traceback.lineno": Style(bold=True, color="cyan"),
-    "traceback.name": Style(color="yellow", italic=True),
+    "traceback.name": Style(color="yellow"),
     "traceback.exc_type": Style(color="bright_red", bold=True),
     "traceback.exc_value": Style(),
+    "traceback.offset": Style(color="bright_red", bold=True),
 }
 
 MARKDOWN_STYLES = {

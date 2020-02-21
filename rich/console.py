@@ -126,33 +126,49 @@ _null_highlighter = NullHighlighter()
 
 
 class RenderGroup:
-    def __init__(self, renderables: Iterable[RenderableType]) -> None:
+    def __init__(
+        self, renderables: Iterable[RenderableType], fit: bool = False
+    ) -> None:
         """Takes a group of renderables and returns a renderable object,
         that renders the group.
         
         Args:
             renderables (Iterable[RenderableType]): An iterable of renderable objects.
         """
-        self.renderables = renderables
+        self._renderables = renderables
+        self.fit = fit
         self._render: Optional[List[RenderableType]] = None
+
+    @property
+    def renderables(self) -> List["RenderableType"]:
+        if self._render is None:
+            self._render = list(self._renderables)
+        return self._render
+
+    def __console_width__(self, max_width: int) -> "RenderWidth":
+        if self.fit:
+            return RenderWidth.measure(self.renderables, max_width)
+        else:
+            return RenderWidth(max_width, max_width)
 
     def __console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> RenderResult:
-        if self._render is None:
-            self._render = list(self.renderables)
-        yield from self._render
+        yield from self.renderables
 
 
-def render_group(method):
-    """Convert a method that returns an iterable of renderables in to a RenderGroup."""
+def render_group(fit: bool = False) -> Callable:
+    def decorator(method):
+        """Convert a method that returns an iterable of renderables in to a RenderGroup."""
 
-    @wraps(method)
-    def deco(*args, **kwargs):
-        renderables = method(*args, **kwargs)
-        return RenderGroup(renderables)
+        @wraps(method)
+        def _replace(*args, **kwargs):
+            renderables = method(*args, **kwargs)
+            return RenderGroup(renderables, fit=fit)
 
-    return deco
+        return _replace
+
+    return decorator
 
 
 class ConsoleDimensions(NamedTuple):
@@ -738,6 +754,20 @@ class Console:
         with self.style(style):
             for renderable in renderables:
                 extend(render(renderable, render_options))
+
+    def print_exception(
+        self, code_width: Optional[int] = 88, extra_lines: int = 2
+    ) -> None:
+        """Prints a rich render of the last exception and traceback.
+        
+        Args:
+            code_width (Optional[int], optional): Number of characters used to render code. Defaults to 88.
+            extra_lines (int, optional): Additional lines of code to render. Defaults to 2.
+        """
+        from .traceback import Traceback
+
+        traceback = Traceback(code_width=code_width, extra_lines=extra_lines)
+        self.print(traceback)
 
     def log(
         self,

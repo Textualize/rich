@@ -1,5 +1,5 @@
 import textwrap
-from typing import Any, Dict, Set, Tuple, Union
+from typing import Any, Dict, Optional, Set, Tuple, Union
 
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
 from pygments.styles import get_style_by_name
@@ -9,6 +9,7 @@ from pygments.util import ClassNotFound
 
 from .color import Color, parse_rgb_hex, blend_rgb
 from .console import Console, ConsoleOptions, RenderResult, Segment, ConsoleRenderable
+from .render_width import RenderWidth
 from .style import Style
 from .text import Text
 from ._tools import iter_first
@@ -41,6 +42,7 @@ class Syntax:
         start_line: int = 1,
         line_range: Tuple[int, int] = None,
         highlight_lines: Set[int] = None,
+        code_width: Optional[int] = None,
     ) -> None:
         self.code = code
         self.lexer_name = lexer_name
@@ -49,6 +51,7 @@ class Syntax:
         self.start_line = start_line
         self.line_range = line_range
         self.highlight_lines = highlight_lines or set()
+        self.code_width = code_width
 
         self._style_cache: Dict[Any, Style] = {}
         if not isinstance(theme, str) and issubclass(theme, PygmentsStyle):
@@ -70,6 +73,7 @@ class Syntax:
         line_range: Tuple[int, int] = None,
         start_line: int = 1,
         highlight_lines: Set[int] = None,
+        code_width: Optional[int] = None,
     ) -> "Syntax":
         """Construct a Syntax object from a file.
         
@@ -102,6 +106,7 @@ class Syntax:
             line_range=line_range,
             start_line=start_line,
             highlight_lines=highlight_lines,
+            code_width=code_width,
         )
 
     def _get_theme_style(self, token_type) -> Style:
@@ -154,13 +159,34 @@ class Syntax:
         )
         return Color.from_triplet(new_color)
 
+    @property
+    def _numbers_column_width(self) -> int:
+        """Get the number of characters used to render the numbers column."""
+        if self.line_numbers:
+            return len(str(self.start_line + self.code.count("\n"))) + 2
+        return 0
+
+    def __console_width__(self, max_width: int) -> "RenderWidth":
+        if self.code_width is not None:
+            width = self.code_width + self._numbers_column_width
+            return RenderWidth(width, width)
+        return RenderWidth(max_width, max_width)
+
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+
+        code_width = options.max_width if self.code_width is None else self.code_width
+
         code = self.code
         if self.dedent:
             code = textwrap.dedent(code)
         text = self._highlight(self.lexer_name)
         if not self.line_numbers:
-            yield text
+            if self.code_width is None:
+                yield text
+            else:
+                yield from console.render(
+                    text, options=options.update(width=code_width)
+                )
             return
 
         lines = text.split("\n")
@@ -171,19 +197,19 @@ class Syntax:
             line_offset = max(0, start_line - 1)
             lines = lines[line_offset:end_line]
 
-        numbers_column_width = len(str(self.start_line + line_offset + len(lines))) + 2
-        render_options = options.update(width=options.max_width - numbers_column_width)
+        numbers_column_width = self._numbers_column_width
+        render_options = options.update(width=code_width + numbers_column_width)
         background_style = Style(bgcolor=self._pygments_style_class.background_color)
 
-        number_style = (
-            background_style
-            + self._get_theme_style(Token.Text)
-            + Style(color=self._get_line_numbers_color())
+        number_style = Style.chain(
+            background_style,
+            self._get_theme_style(Token.Text),
+            Style(color=self._get_line_numbers_color()),
         )
-        highlight_number_style = (
-            background_style
-            + self._get_theme_style(Token.Text)
-            + Style(bold=True, color=self._get_line_numbers_color(0.9))
+        highlight_number_style = Style.chain(
+            background_style,
+            self._get_theme_style(Token.Text),
+            Style(bold=True, color=self._get_line_numbers_color(0.9)),
         )
 
         highlight_line = self.highlight_lines.__contains__
