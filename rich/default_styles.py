@@ -65,7 +65,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.bool_false": Style(color="bright_red", italic=True),
     "repr.none": Style(color="magenta", italic=True),
     "repr.url": Style(underline=True, color="bright_blue", bold=False),
-    "rule.line": Style(dim=True),
+    "rule.line": Style(dim=True, color="green"),
     "rule.text": Style(),
     "repr.path": Style(color="magenta"),
     "repr.filename": Style(color="bright_magenta", bold=True),

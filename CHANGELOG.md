@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Traceback rendering and handler
 - Added rich.constrain
+- Added rich.rule
 
 ### Fixed
 

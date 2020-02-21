@@ -14,6 +14,7 @@ from .console import (
 )
 from .containers import Renderables
 from .panel import Panel
+from .rule import Rule
 from .style import Style, StyleStack
 from .syntax import Syntax
 from .text import Lines, Text
@@ -218,7 +219,7 @@ class HorizontalRule(MarkdownElement):
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         style = console.get_style("markdown.hr")
-        yield Segment(f'{"─" * options.max_width}\n', style)
+        yield Rule(style=style)
 
 
 class ListElement(MarkdownElement):

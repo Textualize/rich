@@ -691,34 +691,22 @@ class Console:
         check_text()
         return renderables
 
-    def rule(self, title: str = "", character: str = "─") -> None:
+    def rule(
+        self,
+        title: str = "",
+        character: str = "─",
+        style: Union[str, Style] = "rule.line",
+    ) -> None:
         """Draw a line with optional centered title.
         
         Args:
             title (str, optional): Text to render over the rule. Defaults to "".
             character (str, optional): Character to form the line. Defaults to "─".
         """
+        from .rule import Rule
 
-        from .text import Text
-
-        width = self.width
-
-        if not title:
-            self.print(Text(character * width, "rule.line"))
-        else:
-            title_text = Text.from_markup(title, "rule.text")
-            if len(title_text) > width - 4:
-                title_text.set_length(width - 4)
-
-            rule_text = Text()
-
-            center = (width - len(title_text)) // 2
-            rule_text.append(character * (center - 1) + " ", "rule.line")
-            rule_text.append(title_text)
-            rule_text.append(
-                " " + character * (width - len(rule_text) - 1), "rule.line"
-            )
-            self.print(rule_text)
+        rule = Rule(title=title, character=character, style=style)
+        self.print(rule)
 
     def print(
         self,
