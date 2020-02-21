@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from dataclasses import dataclass, field
 import sys
+import platform
 from traceback import extract_tb
 from types import TracebackType
 from typing import Optional, Type, List
@@ -17,11 +18,15 @@ from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
 from .padding import Padding
 from .panel import Panel
+from .pygments_themes.base16_dark import base16_default_dark
 from .rule import Rule
 from .segment import Segment
 from .text import Text
 from ._tools import iter_last
 from .syntax import Syntax
+
+
+WINDOWS = platform.system() == "Windows"
 
 
 def install(width: Optional[int] = 100, extra_lines: int = 2) -> None:
@@ -205,6 +210,7 @@ class Traceback:
     @render_group()
     def _render_stack(self, stack: Stack) -> RenderResult:
         path_highlighter = PathHighlighter()
+        theme = "fruity" if WINDOWS else "monokai"
         for frame in stack.frames:
             text = Text.assemble(
                 (" File ", "traceback.text"),
@@ -220,6 +226,7 @@ class Traceback:
             try:
                 syntax = Syntax.from_path(
                     frame.filename,
+                    theme=theme,
                     line_numbers=True,
                     line_range=(
                         frame.lineno - self.extra_lines,

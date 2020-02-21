@@ -830,7 +830,7 @@ class Console:
         if self.record:
             self._record_buffer.extend(buffer)
         del self.buffer[:]
-        for line in Segment.split_and_crop_lines(buffer, self.width):
+        for line in Segment.split_and_crop_lines(buffer, self.width, pad=False):
             for text, style in line:
                 if style:
                     append(style.render(text, color_system=color_system, reset=True))

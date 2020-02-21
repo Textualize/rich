@@ -41,14 +41,20 @@ class Segment(NamedTuple):
 
     @classmethod
     def split_and_crop_lines(
-        cls, segments: Iterable["Segment"], length: int, style: Style = None
+        cls,
+        segments: Iterable["Segment"],
+        length: int,
+        style: Style = None,
+        pad: bool = True,
     ) -> Iterable[List["Segment"]]:
         """Split segments in to lines, and crop lines greater than a given length.
 
         Args:
             segments (Iterable[Segment]): An iterable of segments, probably
                 generated from console.render.
-            length (Optional[int]): Desired line length.
+            length (int): Desired line length.
+            style (Style, optional): Style to use for any padding.
+            pad (bool): Enable padding of lines that are less than `length`.
 
         Returns:
             Iterable[List[Segment]]: An iterable of lines of segments.
@@ -64,31 +70,37 @@ class Segment(NamedTuple):
                     if _text:
                         append(cls(_text, style))
                     if new_line:
-                        yield cls.adjust_line_length(lines[-1], length, style=style)
+                        yield cls.adjust_line_length(
+                            lines[-1], length, style=style, pad=pad
+                        )
                         lines.append([])
                         append = lines[-1].append
             else:
                 append(segment)
         if lines[-1]:
-            yield cls.adjust_line_length(lines[-1], length, style=style)
+            yield cls.adjust_line_length(lines[-1], length, style=style, pad=pad)
 
     @classmethod
     def adjust_line_length(
-        cls, line: List["Segment"], length: int, style: Style = None
+        cls, line: List["Segment"], length: int, style: Style = None, pad: bool = True
     ) -> List["Segment"]:
-        """Adjust a line to a given width (cropping or padding as required.
+        """Adjust a line to a given width (cropping or padding as required).
 
         Args:
             segments (Iterable[Segment]): A list of segments in a single line.
             length (int): The desired width of the line.
             style (Style, optional): The style of padding if used (space on the end). Defaults to None.
+            pad (bool, optional): Pad lines with spaces if they are shorter than `length`. Defaults to True. 
 
         Returns:
             List[Segment]: A line of segments with the desired length.
         """
         line_length = sum(len(text) for text, _style in line)
         if line_length < length:
-            return line + [Segment(" " * (length - line_length), style)]
+            if pad:
+                return line + [cls(" " * (length - line_length), style)]
+            else:
+                return line[:]
         elif line_length > length:
             line_length = 0
             new_line: List[Segment] = []
@@ -100,7 +112,7 @@ class Segment(NamedTuple):
                     line_length += segment_length
                 else:
                     text, style = segment
-                    append(Segment(text[: length - line_length], style))
+                    append(cls(text[: length - line_length], style))
                     break
             return new_line
         return line[:]

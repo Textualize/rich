@@ -488,11 +488,13 @@ if __name__ == "__main__":  # pragma: no cover
         expand=True,
         show_footer=True,
         show_edge=True,
+        width=100,
+        style="on blue",
     )
     # table.columns[0].width = 50
     # table.columns[1].ratio = 1
 
-    table.add_row("Hello, World! " * 8, "cake" * 10)
+    table.add_row("Hello, World! " * 3, "cake" * 10)
     from .markdown import Markdown
 
     table.add_row(Markdown("# This is *Markdown*!"), "More text", "Hello WOrld")

@@ -1,3 +1,4 @@
+import platform
 import textwrap
 from typing import Any, Dict, Optional, Set, Tuple, Union
 
@@ -14,7 +15,8 @@ from .style import Style
 from .text import Text
 from ._tools import iter_first
 
-DEFAULT_THEME = "monokai"
+WINDOWS = platform.system() == "Windows"
+DEFAULT_THEME = "dark"
 
 
 class Syntax:
@@ -166,6 +168,24 @@ class Syntax:
             return len(str(self.start_line + self.code.count("\n"))) + 2
         return 0
 
+    def _get_number_styles(self, console: Console) -> Tuple[Style, Style, Style]:
+        """Get background, number, and highlight styles for line numbers."""
+        background_style = Style(bgcolor=self._pygments_style_class.background_color)
+        if console.color_system in ("256", "truecolor"):
+            number_style = Style.chain(
+                background_style,
+                self._get_theme_style(Token.Text),
+                Style(color=self._get_line_numbers_color()),
+            )
+            highlight_number_style = Style.chain(
+                background_style,
+                self._get_theme_style(Token.Text),
+                Style(bold=True, color=self._get_line_numbers_color(0.9)),
+            )
+        else:
+            number_style = highlight_number_style = Style()
+        return background_style, number_style, highlight_number_style
+
     def __console_width__(self, max_width: int) -> "RenderWidth":
         if self.code_width is not None:
             width = self.code_width + self._numbers_column_width
@@ -199,23 +219,20 @@ class Syntax:
 
         numbers_column_width = self._numbers_column_width
         render_options = options.update(width=code_width + numbers_column_width)
-        background_style = Style(bgcolor=self._pygments_style_class.background_color)
 
-        number_style = Style.chain(
+        (
             background_style,
-            self._get_theme_style(Token.Text),
-            Style(color=self._get_line_numbers_color()),
-        )
-        highlight_number_style = Style.chain(
-            background_style,
-            self._get_theme_style(Token.Text),
-            Style(bold=True, color=self._get_line_numbers_color(0.9)),
-        )
+            number_style,
+            highlight_number_style,
+        ) = self._get_number_styles(console)
 
         highlight_line = self.highlight_lines.__contains__
         _Segment = Segment
         padding = _Segment(" " * numbers_column_width, background_style)
         new_line = _Segment("\n")
+
+        line_pointer = "->" if WINDOWS else "❱ "
+
         for line_no, line in enumerate(lines, self.start_line + line_offset):
             wrapped_lines = console.render_lines(
                 line, render_options, style=background_style
@@ -224,7 +241,7 @@ class Syntax:
                 if first:
                     line_column = str(line_no).rjust(numbers_column_width - 2) + " "
                     if highlight_line(line_no):
-                        yield _Segment("❱ ", number_style)
+                        yield _Segment(line_pointer, number_style)
                         yield _Segment(
                             line_column, highlight_number_style,
                         )
@@ -252,9 +269,9 @@ def __init__(self):
     syntax = Syntax(CODE, "python", line_numbers=False, theme="monokai")
     syntax = Syntax.from_path(
         "rich/segment.py",
-        theme="monokai",
+        theme="fruity",
         line_numbers=True,
-        line_range=(190, 300),
+        # line_range=(190, 300),
         highlight_lines={194},
     )
     console = Console(record=True)
