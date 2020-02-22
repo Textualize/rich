@@ -7,7 +7,7 @@ Rich can render Python tracebacks with syntax highlighting and formatting. Rich 
 Printing tracebacks
 -------------------
 
-The :meth:`~rich.console.Console.print_exception` method will print a traceback for the current exception being handled.
+The :meth:`~rich.console.Console.print_exception` method will print a traceback for the current exception being handled. Here's an example::
 
     try:
         do_something()

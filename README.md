@@ -210,8 +210,8 @@ Here's what it looks like on OSX (similar on Linux):
 
 ![traceback](./imgs/traceback.png)
 
-Here's what it looks like on Linux.
+Here's what it looks like on Windows:
 
 ![traceback_windows](./imgs/traceback_windows.png)
 
-See the [rich traceback](https://rich.readthedocs.io/en/latest/traceback) documentation for the details.
+See the [rich traceback](https://rich.readthedocs.io/en/latest/traceback.htmls) documentation for the details.
