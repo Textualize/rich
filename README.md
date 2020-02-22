@@ -22,7 +22,7 @@ from rich import print
 print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 ```
 
-![Hello World](./imgs/print.png)
+![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/print.png)
 
 ## Console Printing
 
@@ -50,7 +50,7 @@ console.print("Hello", "World!", style="bold red")
 
 The output will be something like the following:
 
-![Hello World](./imgs/hello_world.png)
+![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/hello_world.png)
 
 That's fine for styling a line of text at a time. For more finely grained styling, Rich renders a special markup which is similar in syntax to [bbcode](https://en.wikipedia.org/wiki/BBCode). Here's an example:
 
@@ -58,7 +58,7 @@ That's fine for styling a line of text at a time. For more finely grained stylin
 console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i]way[/i].")
 ```
 
-![Console Markup](./imgs/where_there_is_a_will.png)
+![Console Markup](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
 
 ## Console Logging
 
@@ -89,7 +89,7 @@ test_log()
 
 The above produces the following output:
 
-![Log](./imgs/log.png)
+![Log](https://github.com/willmcgugan/rich/raw/master/imgs/log.png)
 
 Note the `log_locals` argument, which outputs a table containing the local variables where the log method was called.
 
@@ -124,7 +124,7 @@ console.print(markdown)
 
 This will produce output something like the following:
 
-![markdown](./imgs/markdown.png)
+![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
 
 ## Syntax Highlighting
 
@@ -156,7 +156,7 @@ console.print(syntax)
 
 This will produce the following output:
 
-![syntax](./imgs/syntax.png)
+![syntax](https://github.com/willmcgugan/rich/raw/master/imgs/syntax.png)
 
 ## Tables
 
@@ -194,13 +194,13 @@ console.print(table)
 
 This produces the following output:
 
-![table](./imgs/table.png)
+![table](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
 
 Note that console markup is rendered in the same was as `print()` and `log()`. In fact, anything that is renderable by Rich may be included in the headers / rows (even other tables).
 
 The `Table` class is smart enough to resize columns to fit the available width of the terminal, wrapping text as required. Here's the same example, with the terminal made smaller than the table above:
 
-![table2](./imgs/table2.png)
+![table2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
 
 ## Tracebacks
 
@@ -208,10 +208,10 @@ Rich can render beautiful tracebacks which are easier to read and show more code
 
 Here's what it looks like on OSX (similar on Linux):
 
-![traceback](./imgs/traceback.png)
+![traceback](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
 
 Here's what it looks like on Windows:
 
-![traceback_windows](./imgs/traceback_windows.png)
+![traceback_windows](https://github.com/willmcgugan/rich/raw/master/imgs/traceback_windows.png)
 
 See the [rich traceback](https://rich.readthedocs.io/en/latest/traceback.html) documentation for the details.
