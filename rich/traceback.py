@@ -18,7 +18,6 @@ from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
 from .padding import Padding
 from .panel import Panel
-from .pygments_themes.base16_dark import base16_default_dark
 from .rule import Rule
 from .segment import Segment
 from .text import Text
@@ -183,7 +182,7 @@ class Traceback:
                 append(frame)
 
             cause = exc_value.__context__
-            if cause:
+            if cause and cause.__traceback__:
                 exc_type = cause.__class__
                 exc_value = cause
                 traceback = cause.__traceback__
@@ -274,7 +273,7 @@ class Traceback:
                 yield Padding.indent(syntax, 2)
 
 
-if __name__ == "__main__":  # type: ignore
+if __name__ == "__main__":  # pragma: no cover
 
     from .console import Console
 
@@ -291,7 +290,7 @@ if __name__ == "__main__":  # type: ignore
         try:
             foo(0)
         except:
-            slfkjsldkfj
+            slfkjsldkfj  # type: ignore
     except:
         tb = Traceback()
         # print(fooads)

@@ -11,6 +11,7 @@ Reference
    reference/markdown.rst
    reference/render_width.rst
    reference/panel.rst
+   reference/rule.rst
    reference/segment.rst
    reference/style.rst
    reference/syntax.rst

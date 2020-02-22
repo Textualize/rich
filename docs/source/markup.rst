@@ -11,7 +11,7 @@ Formatting
 
 for bold, italic, and strikethrough, Rich uses the same convention as Markdown::
 
-For italics, wrap text in asterisks or underscores. e.g. ``*this is italics*`` or ``_this is also italics_``.
+For italics, wrap text in asterisks or underscores, e.g. ``*this is italics*`` or ``_this is also italics_``.
 
 For bold, wrap the text in *two* asterisks or underscores. e.g. ``**this is bold**`` or ``__this is also bold__``.
 

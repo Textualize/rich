@@ -151,16 +151,16 @@ class Segment(NamedTuple):
         height: int = None,
         style: Style = None,
     ) -> List[List["Segment"]]:
-        """Set the shape of a list of lines (enclosing rectangle)
+        """Set the shape of a list of lines (enclosing rectangle).
 
         Args:
             lines (List[List[Segment]]): A list of lines.
             width (int): Desired width.
-            height (int, optional): Desired height or None for no change..
+            height (int, optional): Desired height or None for no change.
             style (Style, optional): Style of any padding added. Defaults to None.
 
         Returns:
-            [type]: New list of lines that fits width x height.
+            List[List[Segment]]: New list of lines that fits width x height.
         """
         if height is None:
             height = len(lines)

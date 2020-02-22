@@ -40,10 +40,10 @@ class Rule:
 
             rule_text = Text()
             center = (width - len(title_text)) // 2
-            rule_text.append(self.character * (center - 1) + " ", self.rule_style)
+            rule_text.append(self.character * (center - 1) + " ", self.style)
             rule_text.append(title_text)
             rule_text.append(
-                " " + self.character * (width - len(rule_text) - 1), self.rule_style
+                " " + self.character * (width - len(rule_text) - 1), self.style
             )
             yield rule_text
 
