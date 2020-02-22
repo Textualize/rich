@@ -744,17 +744,21 @@ class Console:
                 extend(render(renderable, render_options))
 
     def print_exception(
-        self, code_width: Optional[int] = 88, extra_lines: int = 2
+        self,
+        width: Optional[int] = 88,
+        extra_lines: int = 3,
+        theme: Optional[str] = None,
     ) -> None:
         """Prints a rich render of the last exception and traceback.
         
         Args:
             code_width (Optional[int], optional): Number of characters used to render code. Defaults to 88.
-            extra_lines (int, optional): Additional lines of code to render. Defaults to 2.
+            extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
+            theme (str, optional): Override pygments theme used in traceback
         """
         from .traceback import Traceback
 
-        traceback = Traceback(code_width=code_width, extra_lines=extra_lines)
+        traceback = Traceback(width=width, extra_lines=extra_lines, theme=theme)
         self.print(traceback)
 
     def log(

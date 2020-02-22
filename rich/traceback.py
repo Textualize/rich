@@ -29,7 +29,9 @@ from .syntax import Syntax
 WINDOWS = platform.system() == "Windows"
 
 
-def install(width: Optional[int] = 100, extra_lines: int = 2) -> None:
+def install(
+    width: Optional[int] = 100, extra_lines: int = 3, theme: Optional[str] = None
+) -> None:
     """Install a rich traceback handler.
 
     Once installed, any tracebacks will be printed with syntax highlighting and rich formatting.
@@ -37,7 +39,10 @@ def install(width: Optional[int] = 100, extra_lines: int = 2) -> None:
     
     Args:
         width (Optional[int], optional): Width (in characters) of traceback. Defaults to 100.
-        extra_lines (int, optional): Extra lines of code. Defaults to 2.
+        extra_lines (int, optional): Extra lines of code. Defaults to 3.
+        theme (str, optional) Pygments theme to use in traceback. Defaults to ``None`` which will pick
+            a theme appropriate for the platform. 
+
     """
     console = Console(file=sys.stderr)
 
@@ -46,7 +51,12 @@ def install(width: Optional[int] = 100, extra_lines: int = 2) -> None:
     ) -> None:
         console.print(
             Traceback.from_exception(
-                type_, value, traceback, width=width, extra_lines=extra_lines
+                type_,
+                value,
+                traceback,
+                width=width,
+                extra_lines=extra_lines,
+                theme=theme,
             )
         )
 
@@ -89,7 +99,11 @@ class PathHighlighter(RegexHighlighter):
 
 class Traceback:
     def __init__(
-        self, trace: Trace = None, width: Optional[int] = 88, extra_lines: int = 3,
+        self,
+        trace: Trace = None,
+        width: Optional[int] = 88,
+        extra_lines: int = 3,
+        theme: Optional[str] = None,
     ):
         """A Console renderable that renders a traceback.
         
@@ -98,12 +112,19 @@ class Traceback:
                 the last exception.
             width (Optional[int], optional): Number of characters used to traceback. Defaults to 100.
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
+            theme (str, optional): Override pygments theme used in traceback.
         """
         if trace is None:
-            trace = self.extract(*sys.exc_info())
+            exc_type, exc_value, traceback = sys.exc_info()
+            if exc_type is None or exc_value is None or traceback is None:
+                raise ValueError(
+                    "Value for 'trace' required if not called in except: block"
+                )
+            trace = self.extract(exc_type, exc_value, traceback)
         self.trace = trace
         self.width = width
         self.extra_lines = extra_lines
+        self.theme = theme
 
     @classmethod
     def from_exception(
@@ -112,10 +133,13 @@ class Traceback:
         exc_value: BaseException,
         traceback: TracebackType,
         width: Optional[int] = 100,
-        extra_lines: int = 2,
+        extra_lines: int = 3,
+        theme: Optional[str] = None,
     ):
         rich_traceback = cls.extract(exc_type, exc_value, traceback)
-        return Traceback(rich_traceback, width=width, extra_lines=extra_lines)
+        return Traceback(
+            rich_traceback, width=width, extra_lines=extra_lines, theme=theme
+        )
 
     @classmethod
     def extract(
@@ -124,6 +148,16 @@ class Traceback:
         exc_value: BaseException,
         traceback: TracebackType,
     ) -> Trace:
+        """Extrace traceback information.
+        
+        Args:
+            exc_type (Type[BaseException]): Exception type.
+            exc_value (BaseException): Exception value.
+            traceback (TracebackType): Python Traceback object.
+        
+        Returns:
+            Trace: A Trace instance which you can use to construct a `Traceback`.
+        """
         stacks: List[Stack] = []
         while True:
             stack = Stack(exc_type=str(exc_type.__name__), exc_value=str(exc_value))
@@ -210,7 +244,7 @@ class Traceback:
     @render_group()
     def _render_stack(self, stack: Stack) -> RenderResult:
         path_highlighter = PathHighlighter()
-        theme = "fruity" if WINDOWS else "monokai"
+        theme = self.theme or ("fruity" if WINDOWS else "monokai")
         for frame in stack.frames:
             text = Text.assemble(
                 (" File ", "traceback.text"),

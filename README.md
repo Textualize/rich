@@ -22,6 +22,8 @@ from rich import print
 print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 ```
 
+![Hello World](./imgs/print.png)
+
 ## Console Printing
 
 For more control over rich terminal content, import and construct a `Console` object.
@@ -32,15 +34,13 @@ from rich.console import Console
 console = Console()
 ```
 
-Most applications will require one `Console` instance. The easiest way to manage your console would be to construct an instance at the module level and import it where needed.
-
 The Console object has a `print` method which has an intentionally similar interface to the builtin `print` function. Here's an example of use:
 
 ```python
 console.print("Hello", "World!")
 ```
 
-As you might expect, this will print `"Hello World!"` to the terminal. Note that unlike the `print` function, Rich will word-wrap your text to fit within the terminal width.
+As you might expect, this will print `"Hello World!"` to the terminal. Note that unlike the builtin `print` function, Rich will word-wrap your text to fit within the terminal width.
 
 There are a few ways of adding color and style to your output. You can set a style for the entire output by adding a `style` keyword argument. Here's an example:
 
@@ -201,3 +201,11 @@ Note that console markup is rendered in the same was as `print()` and `log()`. I
 The `Table` class is smart enough to resize columns to fit the available width of the terminal, wrapping text as required. Here's the same example, with the terminal made smaller than the table above:
 
 ![table2](./imgs/table2.png)
+
+## Tracebacks
+
+Rich can render beautiful tracebacks which are easier to read and show more code than standard Python tracebacks.
+
+![traceback](./imgs/traceback.png)
+
+![traceback_windows](./imgs/traceback_windows.png)

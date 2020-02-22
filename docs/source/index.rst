@@ -18,6 +18,7 @@ Welcome to Rich's documentation!
    markdown.rst
    syntax.rst
    text.rst
+   traceback
    protocol.rst
 
    reference.rst
