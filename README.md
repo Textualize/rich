@@ -204,8 +204,14 @@ The `Table` class is smart enough to resize columns to fit the available width o
 
 ## Tracebacks
 
-Rich can render beautiful tracebacks which are easier to read and show more code than standard Python tracebacks.
+Rich can render beautiful tracebacks which are easier to read and show more code than standard Python tracebacks. You can set Rich as the default traceback handler so all uncaught exceptions will be rendered by Rich.
+
+Here's what it looks like on OSX (similar on Linux):
 
 ![traceback](./imgs/traceback.png)
 
+Here's what it looks like on Linux.
+
 ![traceback_windows](./imgs/traceback_windows.png)
+
+See the [rich traceback](https://rich.readthedocs.io/en/latest/traceback) documentation for the details.
