@@ -97,6 +97,16 @@ class PathHighlighter(RegexHighlighter):
 
 
 class Traceback:
+    """A Console renderable that renders a traceback.
+    
+    Args:
+        trace (Trace, optional): A `Trace` object produced from `extract`. Defaults to None, which uses
+            the last exception.
+        width (Optional[int], optional): Number of characters used to traceback. Defaults to 100.
+        extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
+        theme (str, optional): Override pygments theme used in traceback.
+    """
+
     def __init__(
         self,
         trace: Trace = None,
@@ -104,15 +114,6 @@ class Traceback:
         extra_lines: int = 3,
         theme: Optional[str] = None,
     ):
-        """A Console renderable that renders a traceback.
-        
-        Args:
-            trace (Trace, optional): A `Trace` object produced from `extract`. Defaults to None, which uses
-                the last exception.
-            width (Optional[int], optional): Number of characters used to traceback. Defaults to 100.
-            extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
-            theme (str, optional): Override pygments theme used in traceback.
-        """
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
             if exc_type is None or exc_value is None or traceback is None:

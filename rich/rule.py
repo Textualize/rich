@@ -6,18 +6,19 @@ from .text import Text
 
 
 class Rule:
+    """A console renderable to draw a horizontal rule (line).
+    
+    Args:
+        title (str, optional): Text to render in the rule. Defaults to "".
+        character (str, optional): Character used to draw the line. Defaults to "─".
+    """
+
     def __init__(
         self,
         title: Union[str, Text] = "",
         character: str = "─",
         style: Union[str, Style] = "rule.line",
     ) -> None:
-        """A console renderable to draw a horizontal rule (line).
-        
-        Args:
-            title (str, optional): Text to render in the rule. Defaults to "".
-            character (str, optional): Character used to draw the line. Defaults to "─".
-        """
         self.title = title
         self.character = character
         self.style = style
