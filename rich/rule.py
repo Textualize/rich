@@ -19,6 +19,10 @@ class Rule:
         character: str = "─",
         style: Union[str, Style] = "rule.line",
     ) -> None:
+        if len(character) != 1:
+            raise ValueError(
+                "Rule requires character argument to be a string of length 1"
+            )
         self.title = title
         self.character = character
         self.style = style
@@ -49,7 +53,7 @@ class Rule:
             yield rule_text
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
     c = Console()

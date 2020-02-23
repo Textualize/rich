@@ -680,8 +680,7 @@ class Console:
             if isinstance(renderable, ConsoleRenderable):
                 check_text()
                 append(renderable)
-                continue
-            if isinstance(renderable, str):
+            elif isinstance(renderable, str):
                 render_str = renderable
                 if emoji:
                     render_str = _emoji_replace(render_str)
