@@ -125,6 +125,16 @@ RenderResult = Iterable[RenderableType]
 _null_highlighter = NullHighlighter()
 
 
+class RichRenderable:
+    def __init__(self, rich_cast: Callable[[], ConsoleRenderable]) -> None:
+        self.rich_cast = rich_cast
+
+    def __console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> RenderResult:
+        yield self.rich_cast()
+
+
 class RenderGroup:
     def __init__(
         self, renderables: Iterable[RenderableType], fit: bool = False
@@ -664,13 +674,12 @@ class Console:
                 del text[:]
 
         for renderable in objects:
+            rich_cast = getattr(renderable, "__rich__", None)
+            if rich_cast:
+                renderable = rich_cast()
             if isinstance(renderable, ConsoleRenderable):
                 check_text()
                 append(renderable)
-                continue
-            console_str_callable = getattr(renderable, "__console_str__", None)
-            if console_str_callable is not None:
-                append_text(console_str_callable())
                 continue
             if isinstance(renderable, str):
                 render_str = renderable
@@ -680,8 +689,6 @@ class Console:
                 append_text(_highlighter(render_text))
             elif isinstance(renderable, Text):
                 append_text(renderable)
-            elif isinstance(renderable, (int, float, bool, bytes, type(None))):
-                append_text(_highlighter(repr(renderable)))
             elif isinstance(renderable, (Mapping, Sequence)):
                 check_text()
                 append(Pretty(renderable, highlighter=_highlighter))

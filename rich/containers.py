@@ -22,8 +22,8 @@ T = TypeVar("T")
 class Renderables:
     """A list subclass which renders its contents to the console."""
 
-    def __init__(self, renderables: Iterable["ConsoleRenderable"] = None) -> None:
-        self._renderables: List["ConsoleRenderable"] = (
+    def __init__(self, renderables: Iterable["RenderableType"] = None) -> None:
+        self._renderables: List["RenderableType"] = (
             list(renderables) if renderables is not None else []
         )
 
@@ -41,10 +41,10 @@ class Renderables:
         _max = max(dimension.maximum for dimension in dimensions)
         return RenderWidth(_min, _max)
 
-    def append(self, renderable: "ConsoleRenderable") -> None:
+    def append(self, renderable: "RenderableType") -> None:
         self._renderables.append(renderable)
 
-    def __iter__(self) -> Iterable["ConsoleRenderable"]:
+    def __iter__(self) -> Iterable["RenderableType"]:
         return iter(self._renderables)
 
 

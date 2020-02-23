@@ -7,7 +7,12 @@ from typing import Iterable, List, Tuple
 
 
 class Segment(NamedTuple):
-    """A piece of text with associated style."""
+    """A piece of text with associated style.
+    
+    Args:
+        text (str): A piece of text.
+        style (:class:`rich.style.Style`, optional): An optional style to apply to the text.
+    """
 
     text: str
     style: Optional[Style] = None
@@ -131,7 +136,7 @@ class Segment(NamedTuple):
 
     @classmethod
     def get_shape(cls, lines: List[List["Segment"]]) -> Tuple[int, int]:
-        """Get the shape (enclosing rectangle) of a list of lines.
+        r"""Get the shape (enclosing rectangle) of a list of lines.
 
         Args:
             lines (List[List[Segment]]): A list of lines (no '\n' characters).
