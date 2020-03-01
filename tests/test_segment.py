@@ -22,7 +22,11 @@ def test_apply_style():
 def test_split_and_crop_lines():
     assert list(
         Segment.split_and_crop_lines([Segment("Hello\nWorld!\n"), Segment("foo")], 4)
-    ) == [[Segment("Hell")], [Segment("Worl")], [Segment("foo"), Segment(" ")]]
+    ) == [
+        [Segment("Hell"), Segment("\n", None)],
+        [Segment("Worl"), Segment("\n", None)],
+        [Segment("foo"), Segment(" ")],
+    ]
 
 
 def test_adjust_line_length():

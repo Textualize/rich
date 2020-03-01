@@ -202,9 +202,7 @@ class Syntax:
         return RenderWidth(max_width, max_width)
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-
         code_width = options.max_width if self.code_width is None else self.code_width
-
         code = self.code
         if self.dedent:
             code = textwrap.dedent(code)
@@ -272,5 +270,5 @@ if __name__ == "__main__":  # pragma: no cover
 
     console = Console()
 
-    syntax = Syntax.from_path(sys.argv[1])
+    syntax = Syntax.from_path(sys.argv[1], line_numbers=False)
     console.print(syntax)

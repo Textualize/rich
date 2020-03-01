@@ -461,11 +461,9 @@ if __name__ == "__main__":  # pragma: no cover
             "Foo", footer=Text("Total", justify="right"), footer_style="bold", ratio=1
         ),
         Column("Bar", style="red", footer="123", ratio=1),
-        box=box.SIMPLE,
         expand=True,
         show_footer=True,
         show_edge=True,
-        width=100,
         style="on blue",
     )
     # table.columns[0].width = 50

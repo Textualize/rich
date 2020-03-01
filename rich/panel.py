@@ -31,15 +31,12 @@ class Panel:
 
     def __init__(
         self,
-        renderable: Union[str, ConsoleRenderable],
+        renderable: RenderableType,
         box=box.ROUNDED,
         expand: bool = True,
         style: Union[str, Style] = "none",
     ) -> None:
-
-        self.renderable = (
-            Text.from_markup(renderable) if isinstance(renderable, str) else renderable
-        )
+        self.renderable = renderable
         self.box = box
         self.expand = expand
         self.style = style

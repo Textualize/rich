@@ -476,7 +476,7 @@ An h2 header
 
     import commonmark
 
-    print(commonmark.commonmark(markup))
+    # print(commonmark.commonmark(markup))
 
     from .console import Console
 

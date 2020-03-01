@@ -530,7 +530,10 @@ class Console:
             _rendered = self.render(renderable, render_options)
             lines = list(
                 Segment.split_and_crop_lines(
-                    _rendered, render_options.max_width, style=style
+                    _rendered,
+                    render_options.max_width,
+                    style=style,
+                    include_new_lines=False,
                 )
             )
         return lines
@@ -668,8 +671,7 @@ class Console:
         """
         from .text import Text
 
-        sep_text = Text(sep)
-        end_text = Text(end)
+        sep_text = Text(sep, end=end)
         renderables: List[ConsoleRenderable] = []
         append = renderables.append
         text: List[Text] = []
@@ -683,9 +685,7 @@ class Console:
 
         def check_text() -> None:
             if text:
-                all_text = sep_text.join(text)
-                all_text.end = end
-                append(all_text)
+                append(sep_text.join(text))
                 del text[:]
 
         for renderable in objects:
@@ -756,7 +756,6 @@ class Console:
         renderables = self._collect_renderables(
             objects, sep=sep, end=end, emoji=emoji, highlight=highlight,
         )
-        print(repr(renderables))
 
         render_options = self.options
         extend = self.buffer.extend
@@ -850,7 +849,6 @@ class Console:
                     append(style.render(text, color_system=color_system, reset=True))
                 else:
                     append(text)
-            append("\n")
         rendered = "".join(output)
         return rendered
 
@@ -869,6 +867,7 @@ class Console:
         assert (
             self.record
         ), "To export console contents set record=True in the constructor or instance"
+
         if styles:
             text = "".join(
                 (style.render(text, reset=True) if style else text)

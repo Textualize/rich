@@ -23,10 +23,8 @@ def print(
 
         _console = Console(log_time=False)
 
-    write_console = _console if file is None else Console(log_time=False, file=file)
-    return write_console.log(
-        *objects, sep=sep, end=end, log_locals=log_locals, _stack_offset=2
-    )
+    write_console = _console if file is None else Console(file=file)
+    return write_console.print(*objects, sep=sep, end=end)
 
 
 init()

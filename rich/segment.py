@@ -51,6 +51,7 @@ class Segment(NamedTuple):
         length: int,
         style: Style = None,
         pad: bool = True,
+        include_new_lines: bool = True,
     ) -> Iterable[List["Segment"]]:
         """Split segments in to lines, and crop lines greater than a given length.
 
@@ -75,9 +76,12 @@ class Segment(NamedTuple):
                     if _text:
                         append(cls(_text, style))
                     if new_line:
-                        yield cls.adjust_line_length(
-                            lines[-1], length, style=style, pad=pad
+                        line = cls.adjust_line_length(
+                            lines[-1], length, style=style, pad=pad,
                         )
+                        if include_new_lines:
+                            line.append(cls("\n"))
+                        yield line
                         lines.append([])
                         append = lines[-1].append
             else:
@@ -101,15 +105,17 @@ class Segment(NamedTuple):
             List[Segment]: A line of segments with the desired length.
         """
         line_length = sum(len(text) for text, _style in line)
+        new_line: List[Segment]
+
         if line_length < length:
             if pad:
-                return line + [cls(" " * (length - line_length), style)]
+                new_line = line + [cls(" " * (length - line_length), style)]
             else:
-                return line[:]
+                new_line = line[:]
         elif line_length > length:
-            line_length = 0
-            new_line: List[Segment] = []
+            new_line = []
             append = new_line.append
+            line_length = 0
             for segment in line:
                 segment_length = len(segment.text)
                 if line_length + segment_length < length:
@@ -119,8 +125,9 @@ class Segment(NamedTuple):
                     text, style = segment
                     append(cls(text[: length - line_length], style))
                     break
-            return new_line
-        return line[:]
+        else:
+            new_line = line[:]
+        return new_line
 
     @classmethod
     def get_line_length(cls, line: List["Segment"]) -> int:

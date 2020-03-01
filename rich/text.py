@@ -39,7 +39,7 @@ class Span(NamedTuple):
     style: Union[str, Style]
 
     def __repr__(self) -> str:
-        return f'<span {self.start}:{self.end} "{self.style}">'
+        return f"Span({self.start}, {self.end}, {self.style!r})"
 
     def __bool__(self) -> bool:
         return self.end > self.start
@@ -163,7 +163,7 @@ class Text:
         style: Union[str, Style] = "",
         justify: "JustifyValues" = None,
         end: str = "\n",
-        tab_size: Optional[int] = None,
+        tab_size: int = 8,
     ) -> "Text":
         text = cls(style=style, justify=justify, end=end, tab_size=tab_size)
         append = text.append
@@ -189,9 +189,18 @@ class Text:
             self._trim_spans()
         return self
 
+    def blank_copy(self) -> "Text":
+        """Return a new Text instance with copied meta data (but not the string or spans)."""
+        copy_self = Text(
+            style=self.style,
+            justify=self.justify,
+            end=self.end,
+            tab_size=self.tab_size,
+        )
+        return copy_self
+
     def copy(self) -> "Text":
         """Return a copy of this instance."""
-        self.text
         copy_self = Text(
             self.text,
             style=self.style,
@@ -389,7 +398,7 @@ class Text:
             Text: A new text instance containing join text.
         """
 
-        new_text = Text()
+        new_text = self.blank_copy()
         append = new_text.append
         for last, line in iter_last(lines):
             append(line)
