@@ -92,7 +92,7 @@ class Text:
             style (Union[str, Style], optional): Base style for text. Defaults to "".
             justify (str, optional): Default alignment for text, "left", "center", "full" or "right". Defaults to None.
             end (str, optional): Character to end text with. Defaults to "\n".
-            tab_size (int, optional): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to None.
+            tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
     """
 
     def __init__(
@@ -101,7 +101,7 @@ class Text:
         style: Union[str, Style] = "",
         justify: "JustifyValues" = None,
         end: str = "\n",
-        tab_size: int = None,
+        tab_size: int = 8,
     ) -> None:
         self._text: List[str] = [text] if text else []
         self.style = style
@@ -402,7 +402,7 @@ class Text:
                 append(self)
         return new_text
 
-    def tabs_to_spaces(self, tab_size: int = 8) -> "Text":
+    def tabs_to_spaces(self, tab_size: int = None) -> "Text":
         """Get a new string with tabs converted to spaces.
         
         Args:
@@ -415,6 +415,8 @@ class Text:
             return self.copy()
         parts = self.split("\t", include_separator=True)
         pos = 0
+        if tab_size is None:
+            tab_size = self.tab_size
         result = Text(
             style=self.style, justify=self.justify, end=self.end, tab_size=self.tab_size
         )
