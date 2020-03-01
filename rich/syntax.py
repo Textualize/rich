@@ -16,7 +16,7 @@ from .text import Text
 from ._tools import iter_first
 
 WINDOWS = platform.system() == "Windows"
-DEFAULT_THEME = "dark"
+DEFAULT_THEME = "monokai"
 
 
 class Syntax:
@@ -31,6 +31,8 @@ class Syntax:
         start_line (int, optional): Starting number for line numbers. Defaults to 1.
         line_range (Tuple[int, int], optional): If given should be a tuple of the start and end line to render.
         highlight_lines (Set[int]): A set of line numbers to highlight.
+        code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
+        tab_size (int, optional): Size of tabs. Defaults to 4.
     """
 
     def __init__(
@@ -45,6 +47,7 @@ class Syntax:
         line_range: Tuple[int, int] = None,
         highlight_lines: Set[int] = None,
         code_width: Optional[int] = None,
+        tab_size: int = 4,
     ) -> None:
         self.code = code
         self.lexer_name = lexer_name
@@ -54,6 +57,7 @@ class Syntax:
         self.line_range = line_range
         self.highlight_lines = highlight_lines or set()
         self.code_width = code_width
+        self.tab_size = tab_size
 
         self._style_cache: Dict[Any, Style] = {}
         if not isinstance(theme, str) and issubclass(theme, PygmentsStyle):
@@ -76,6 +80,7 @@ class Syntax:
         start_line: int = 1,
         highlight_lines: Set[int] = None,
         code_width: Optional[int] = None,
+        tab_size: int = 4,
     ) -> "Syntax":
         """Construct a Syntax object from a file.
         
@@ -88,6 +93,8 @@ class Syntax:
             start_line (int, optional): Starting number for line numbers. Defaults to 1.
             line_range (Tuple[int, int], optional): If given should be a tuple of the start and end line to render.
             highlight_lines (Set[int]): A set of line numbers to highlight.
+            code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
+            tab_size (int, optional): Size of tabs. Defaults to 4.
 
         Returns:
             [Syntax]: A Syntax object that may be printed to the console
@@ -139,8 +146,10 @@ class Syntax:
         try:
             lexer = get_lexer_by_name(lexer_name)
         except ClassNotFound:
-            return Text(self.code, style=default_style)
-        text = Text(style=default_style)
+            return Text(
+                self.code, justify="left", style=default_style, tab_size=self.tab_size
+            )
+        text = Text(justify="left", style=default_style, tab_size=self.tab_size)
         append = text.append
         _get_theme_style = self._get_theme_style
         for token_type, token in lexer.get_tokens(self.code):
@@ -257,32 +266,11 @@ class Syntax:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    CODE = r"""
-def __init__(self):
-    self.b = self.
 
-    """
-    # syntax = Syntax(CODE, "python", dedent=True, line_numbers=True, start_line=990)
+    import sys
+    from rich.console import Console
 
-    from time import time
+    console = Console()
 
-    syntax = Syntax(CODE, "python", line_numbers=False, theme="monokai")
-    syntax = Syntax.from_path(
-        "rich/segment.py",
-        theme="fruity",
-        line_numbers=True,
-        # line_range=(190, 300),
-        highlight_lines={194},
-    )
-    console = Console(record=True)
-    start = time()
+    syntax = Syntax.from_path(sys.argv[1])
     console.print(syntax)
-    elapsed = int((time() - start) * 1000)
-    print(f"{elapsed}ms")
-
-    # print(Color.downgrade.cache_info())
-    # print(Color.parse.cache_info())
-    # print(Color.get_ansi_codes.cache_info())
-
-    # print(Style.parse.cache_info())
-

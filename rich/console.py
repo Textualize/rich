@@ -109,17 +109,28 @@ class ConsoleOptions:
 
 
 @runtime_checkable
+class RichCast(Protocol):
+    """An object that may be 'cast' to a console renderable."""
+
+    def __rich__(self) -> Union["ConsoleRenderable", str]:  # pragma: no cover
+        ...
+
+
+@runtime_checkable
 class ConsoleRenderable(Protocol):
     """An object that supports the console protocol."""
 
     def __console__(
         self, console: "Console", options: "ConsoleOptions"
-    ) -> Iterable[Union["ConsoleRenderable", Segment, str]]:  # pragma: no cover
+    ) -> "RenderResult":  # pragma: no cover
         ...
 
 
-RenderableType = Union[ConsoleRenderable, Segment, str]
-RenderResult = Iterable[RenderableType]
+"""A type that may be rendered by Console."""
+RenderableType = Union[ConsoleRenderable, RichCast, str]
+
+"""The result of calling a __console__ method."""
+RenderResult = Iterable[Union[RenderableType, Segment]]
 
 
 _null_highlighter = NullHighlighter()
@@ -246,6 +257,7 @@ class Console:
         file: IO = None,
         width: int = None,
         height: int = None,
+        tab_size: int = 8,
         record: bool = False,
         markup: bool = True,
         log_time: bool = True,
@@ -259,6 +271,7 @@ class Console:
         self.file = file or sys.stdout
         self._width = width
         self._height = height
+        self.tab_size = tab_size
         self.record = record
         self._markup = markup
 
@@ -410,7 +423,9 @@ class Console:
             self._check_buffer()
 
     def _render(
-        self, renderable: RenderableType, options: Optional[ConsoleOptions]
+        self,
+        renderable: Union[RenderableType, Segment],
+        options: Optional[ConsoleOptions],
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
 
@@ -425,17 +440,15 @@ class Console:
         Returns:
             Iterable[Segment]: An iterable of segments that may be rendered.
         """
-        render_iterable: Iterable[RenderableType]
-        render_options = options or self.options
+        render_iterable: RenderResult
         if isinstance(renderable, Segment):
             yield renderable
             return
-        elif isinstance(renderable, ConsoleRenderable):
+        render_options = options or self.options
+        if isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__console__(self, render_options)
         elif isinstance(renderable, str):
-            from .text import Text
-
-            yield from self._render(Text(renderable), render_options)
+            yield from self.render(self.render_str(renderable), render_options)
             return
         else:
             raise errors.NotRenderableError(
@@ -522,20 +535,22 @@ class Console:
             )
         return lines
 
-    def render_str(self, text: str) -> "Text":
+    def render_str(self, text: str, style: Union[str, Style] = "") -> "Text":
         """Convert a string to a Text instance.
 
         Args:
             text (str): Text to render.
-
+            style (Union[str, Style], optional): Style to apply to rendered text.
         Returns:
             ConsoleRenderable: Renderable object.
 
         """
         if self._markup:
-            return markup.render(text)
+            return markup.render(text, style=style)
 
-        return markup.render_text(text)
+        from .text import Text
+
+        return Text(text, style=style)
 
     def _get_style(self, name: str) -> Optional[Style]:
         """Get a named style, or `None` if it doesn't exist.
@@ -681,10 +696,10 @@ class Console:
                 check_text()
                 append(renderable)
             elif isinstance(renderable, str):
-                render_str = renderable
+                renderable_str = renderable
                 if emoji:
-                    render_str = _emoji_replace(render_str)
-                render_text = self.render_str(render_str)
+                    renderable_str = _emoji_replace(renderable_str)
+                render_text = self.render_str(renderable_str)
                 append_text(_highlighter(render_text))
             elif isinstance(renderable, Text):
                 append_text(renderable)

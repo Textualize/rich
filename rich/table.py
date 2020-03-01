@@ -24,8 +24,11 @@ if TYPE_CHECKING:
         RenderableType,
         RenderResult,
     )
+    from .containers import Lines
+
 from . import errors
 from .padding import Padding, PaddingDimensions
+from .protocol import is_renderable
 from .segment import Segment
 from .style import Style
 from .text import Text
@@ -37,8 +40,8 @@ from ._tools import iter_first_last, iter_first, iter_last, ratio_divide
 class Column:
     """Defines a column in a table."""
 
-    header: Union[str, "ConsoleRenderable"] = ""
-    footer: Union[str, "ConsoleRenderable"] = ""
+    header: "RenderableType" = ""
+    footer: "RenderableType" = ""
     header_style: Union[str, Style] = "table.header"
     footer_style: Union[str, Style] = "table.footer"
     style: Union[str, Style] = "none"
@@ -46,10 +49,10 @@ class Column:
     width: Optional[int] = None
     ratio: Optional[int] = None
     no_wrap: bool = False
-    _cells: List["ConsoleRenderable"] = field(default_factory=list)
+    _cells: List["RenderableType"] = field(default_factory=list)
 
     @property
-    def cells(self) -> Iterable["ConsoleRenderable"]:
+    def cells(self) -> Iterable["RenderableType"]:
         """Get all cells in the column, not including header."""
         yield from self._cells
 
@@ -58,27 +61,11 @@ class Column:
         """Check if this column is flexible."""
         return self.ratio is not None
 
-    @property
-    def header_renderable(self) -> "ConsoleRenderable":
-        return (
-            Text.from_markup(self.header, style=self.header_style or "")
-            if isinstance(self.header, str)
-            else self.header
-        )
-
-    @property
-    def footer_renderable(self) -> "ConsoleRenderable":
-        return (
-            Text.from_markup(self.footer, style=self.footer_style or "")
-            if isinstance(self.footer, str)
-            else self.footer
-        )
-
 
 class _Cell(NamedTuple):
 
     style: Union[str, Style]
-    renderable: "ConsoleRenderable"
+    renderable: "RenderableType"
 
 
 class Table:
@@ -202,7 +189,7 @@ class Table:
         )
         self.columns.append(column)
 
-    def add_row(self, *renderables: Optional[Union[str, "ConsoleRenderable"]]) -> None:
+    def add_row(self, *renderables: Optional["RenderableType"]) -> None:
         """Add a row of renderables.
         
         Raises:
@@ -210,12 +197,10 @@ class Table:
         """
         from .console import ConsoleRenderable
 
-        def add_cell(column: Column, renderable: ConsoleRenderable):
+        def add_cell(column: Column, renderable: "RenderableType") -> None:
             column._cells.append(renderable)
 
-        cell_renderables: List[Optional[Union[str, ConsoleRenderable]]] = list(
-            renderables
-        )
+        cell_renderables: List[Optional["RenderableType"]] = list(renderables)
 
         columns = self.columns
         if len(cell_renderables) < len(columns):
@@ -231,12 +216,10 @@ class Table:
                 self.columns.append(column)
             else:
                 column = columns[index]
-            if isinstance(renderable, ConsoleRenderable):
+            if renderable is None:
+                add_cell(column, "")
+            elif is_renderable(renderable):
                 add_cell(column, renderable)
-            elif renderable is None:
-                add_cell(column, Text(""))
-            elif isinstance(renderable, str):
-                add_cell(column, Text.from_markup(renderable))
             else:
                 raise errors.NotRenderableError(
                     f"unable to render {renderable!r}; str or object with a __console__ method is required"
@@ -257,32 +240,24 @@ class Table:
                 max_width -= 2
         widths = self._calculate_column_widths(max_width)
         table_width = sum(widths) + len(self.columns) + (2 if self.box else 0)
-        yield from self.render_title(table_width)
+
+        def render_annotation(
+            text: Union[Text, str], style: Union[str, Style]
+        ) -> "Lines":
+            if isinstance(text, Text):
+                render_text = text
+            else:
+                render_text = console.render_str(text, style=style)
+            return render_text.wrap(table_width, "center")
+
+        yield render_annotation(
+            self.title or "", style=Style.pick_first(self.title_style, "table.title")
+        )
         yield from self._render(console, options, widths)
-        yield from self.render_caption(table_width)
-
-    def render_title(self, table_width: int) -> "RenderResult":
-        """Render the title. Override if you want to render the title differently."""
-        if self.title:
-            if isinstance(self.title, str):
-                title_text = Text.from_markup(
-                    self.title, style=Style.pick_first(self.title_style, "table.title")
-                )
-            else:
-                title_text = self.title
-            yield title_text.wrap(table_width, "center")
-
-    def render_caption(self, table_width: int) -> "RenderResult":
-        """Render the caption. Override if you want to render the caption differently."""
-        if self.caption:
-            if isinstance(self.caption, str):
-                caption_text = Text.from_markup(
-                    self.caption,
-                    style=Style.pick_first(self.caption_style, "table.caption"),
-                )
-            else:
-                caption_text = self.caption
-            yield caption_text.wrap(table_width, "center")
+        yield render_annotation(
+            self.caption or "",
+            style=Style.pick_first(self.caption_style, "table.caption"),
+        )
 
     def _calculate_column_widths(self, max_width: int) -> List[int]:
         """Calculate the widths of each column."""
@@ -342,7 +317,7 @@ class Table:
         first = column_index == 0
         last = column_index == len(self.columns) - 1
 
-        def add_padding(renderable: "ConsoleRenderable") -> "ConsoleRenderable":
+        def add_padding(renderable: "RenderableType") -> "RenderableType":
             if not any_padding:
                 return renderable
             top, right, bottom, left = padding
@@ -354,11 +329,11 @@ class Table:
             return Padding(renderable, (top, right, bottom, left))
 
         if self.show_header:
-            yield _Cell(column.header_style, add_padding(column.header_renderable))
+            yield _Cell(column.header_style, add_padding(column.header))
         for cell in column.cells:
             yield _Cell(column.style, add_padding(cell))
         if self.show_footer:
-            yield _Cell(column.footer_style, add_padding(column.footer_renderable))
+            yield _Cell(column.footer_style, add_padding(column.footer))
 
     def _measure_column(
         self, column_index: int, column: Column, max_width: int
@@ -478,7 +453,7 @@ if __name__ == "__main__":  # pragma: no cover
     from .console import Console
     from . import box
 
-    c = Console()
+    c = Console(markup=False)
     table = Table(
         Column(
             "Foo", footer=Text("Total", justify="right"), footer_style="bold", ratio=1
@@ -494,7 +469,7 @@ if __name__ == "__main__":  # pragma: no cover
     # table.columns[0].width = 50
     # table.columns[1].ratio = 1
 
-    table.add_row("Hello, World! " * 3, "cake" * 10)
+    table.add_row("Hello, [b]World[/b]! " * 3, "cake" * 10)
     from .markdown import Markdown
 
     table.add_row(Markdown("# This is *Markdown*!"), "More text", "Hello WOrld")

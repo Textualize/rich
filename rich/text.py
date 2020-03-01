@@ -2,6 +2,7 @@ from operator import itemgetter
 import re
 from typing import (
     Any,
+    cast,
     Dict,
     Iterable,
     NamedTuple,
@@ -91,6 +92,7 @@ class Text:
             style (Union[str, Style], optional): Base style for text. Defaults to "".
             justify (str, optional): Default alignment for text, "left", "center", "full" or "right". Defaults to None.
             end (str, optional): Character to end text with. Defaults to "\n".
+            tab_size (int, optional): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to None.
     """
 
     def __init__(
@@ -99,12 +101,13 @@ class Text:
         style: Union[str, Style] = "",
         justify: "JustifyValues" = None,
         end: str = "\n",
+        tab_size: int = None,
     ) -> None:
-
         self._text: List[str] = [text] if text else []
         self.style = style
         self.justify = justify
         self.end = end
+        self.tab_size = tab_size
         self._spans: List[Span] = []
         self._length: int = len(text)
 
@@ -132,6 +135,13 @@ class Text:
             return NotImplemented
         return self.text == other.text and self._spans == other._spans
 
+    def __contains__(self, other: object) -> bool:
+        if isinstance(other, str):
+            return other in self.text
+        elif isinstance(other, Text):
+            return other.text in self.text
+        return False
+
     @classmethod
     def from_markup(cls, text: str, style: Union[str, Style] = "") -> "Text":
         """Create Text instance from markup.
@@ -153,8 +163,9 @@ class Text:
         style: Union[str, Style] = "",
         justify: "JustifyValues" = None,
         end: str = "\n",
+        tab_size: Optional[int] = None,
     ) -> "Text":
-        text = cls(style=style, justify=justify, end=end)
+        text = cls(style=style, justify=justify, end=end, tab_size=tab_size)
         append = text.append
         for part in parts:
             append(*part)
@@ -182,7 +193,11 @@ class Text:
         """Return a copy of this instance."""
         self.text
         copy_self = Text(
-            self.text, style=self.style, justify=self.justify, end=self.end,
+            self.text,
+            style=self.style,
+            justify=self.justify,
+            end=self.end,
+            tab_size=self.tab_size,
         )
         copy_self._spans[:] = self._spans[:]
         return copy_self
@@ -281,7 +296,21 @@ class Text:
     def __console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
-        lines = self.wrap(options.max_width, justify=self.justify or options.justify)
+        # TODO: Why does mypy give "error: Cannot determine type of 'tab_size'"" ?
+        if self.tab_size is None:
+            tab_size = console.tab_size  # type: ignore
+        else:
+            tab_size = self.tab_size
+
+        # if self.tab_size is None:
+        #     tab_size = console.tab_size
+        # else:
+        #     tab_size = self.tab_size
+        lines = self.wrap(
+            options.max_width,
+            justify=self.justify or options.justify,
+            tab_size=tab_size,
+        )
         all_lines = Text("\n").join(lines)
         yield from self._render_line(all_lines, console, options)
 
@@ -372,6 +401,37 @@ class Text:
             if not last:
                 append(self)
         return new_text
+
+    def tabs_to_spaces(self, tab_size: int = 8) -> "Text":
+        """Get a new string with tabs converted to spaces.
+        
+        Args:
+            tab_size (int, optional): Size of tabs. Defaults to 8.
+
+        Returns:
+            Text: A new instance with tabs replaces by spaces.
+        """
+        if "\t" not in self.text:
+            return self.copy()
+        parts = self.split("\t", include_separator=True)
+        pos = 0
+        result = Text(
+            style=self.style, justify=self.justify, end=self.end, tab_size=self.tab_size
+        )
+        append = result.append
+
+        for part in parts:
+            if part.text.endswith("\t"):
+                part._text = [part.text[:-1] + " "]
+                append(part)
+                pos += len(part)
+                spaces = tab_size - ((pos - 1) % tab_size) - 1
+                if spaces:
+                    append(" " * spaces, self.style)
+                    pos += spaces
+            else:
+                append(part)
+        return result
 
     def _trim_spans(self) -> None:
         """Remove or modify any spans that are over the end of the text."""
@@ -537,7 +597,9 @@ class Text:
         """Remove a number of characters from the end of the text."""
         self.text = self.text[:-amount]
 
-    def wrap(self, width: int, justify: "JustifyValues" = "left") -> Lines:
+    def wrap(
+        self, width: int, justify: "JustifyValues" = "left", tab_size: int = 8
+    ) -> Lines:
         """Word wrap the text.
         
         Args:
@@ -550,6 +612,8 @@ class Text:
 
         lines: Lines = Lines()
         for line in self.split():
+            if "\t" in line:
+                line = line.tabs_to_spaces(tab_size)
             offsets = divide_line(str(line), width)
             new_lines = line.divide(offsets)
             if justify:

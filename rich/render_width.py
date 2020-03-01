@@ -1,5 +1,5 @@
 from operator import itemgetter
-from typing import Iterable, NamedTuple, TYPE_CHECKING
+from typing import Iterable, NamedTuple, TYPE_CHECKING, Union
 
 from . import errors
 from .segment import Segment
@@ -37,7 +37,9 @@ class RenderWidth(NamedTuple):
         return RenderWidth(min(minimum, width), min(maximum, width))
 
     @classmethod
-    def get(cls, renderable: "RenderableType", max_width: int) -> "RenderWidth":
+    def get(
+        cls, renderable: Union["RenderableType", "Segment"], max_width: int
+    ) -> "RenderWidth":
         """Get desired width for a renderable."""
         if hasattr(renderable, "__console__"):
             get_console_width = getattr(renderable, "__console_width__", None)

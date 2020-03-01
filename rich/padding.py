@@ -45,10 +45,6 @@ class Padding:
         if len(pad) == 2:
             pad_top, pad_right = cast(Tuple[int, int], pad)
             return (pad_top, pad_right, pad_top, pad_right)
-        if len(pad) == 3:
-            raise ValueError(
-                f"1, 2 or 4 integers required for padding; {len(pad)} given"
-            )
         if len(pad) == 4:
             top, right, bottom, left = cast(Tuple[int, int, int, int], pad)
             return (top, right, bottom, left)

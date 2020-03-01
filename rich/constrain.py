@@ -4,15 +4,16 @@ from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult
 
 
 class Constrain:
+    """Constrain the width of a renderable to a given number of characters.
+    
+    Args:
+        renderable (ConsoleRenderable): A renderable object.
+        width (int, optional): The maximum width (in characters) to render. Defaults to 80.
+    """
+
     def __init__(
         self, renderable: ConsoleRenderable, width: Optional[int] = 80
     ) -> None:
-        """Constrain the width of a renderable to a given number of characters.
-        
-        Args:
-            renderable (ConsoleRenderable): A renderable object.
-            width (int, optional): The maximum width (in characters) to render. Defaults to 80.
-        """
         self.renderable = renderable
         self.width = width
 
