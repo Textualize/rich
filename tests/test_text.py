@@ -1,3 +1,4 @@
+from io import StringIO
 import pytest
 
 from rich.console import Console
@@ -274,10 +275,36 @@ def test_render():
     assert output == expected
 
 
+@pytest.mark.parametrize(
+    "print_text,result",
+    [
+        (("."), ".\n"),
+        ((".", "."), ". .\n"),
+        (("Hello", "World", "!"), "Hello World !\n"),
+    ],
+)
+def test_print(print_text, result):
+    console = Console(record=True)
+    console.print(*print_text)
+    assert console.export_text(styles=False) == result
+
+
+@pytest.mark.parametrize(
+    "print_text,result",
+    [(("."), ".X"), ((".", "."), "..X"), (("Hello", "World", "!"), "HelloWorld!X"),],
+)
+def test_print_sep_end(print_text, result):
+    console = Console(record=True, file=StringIO())
+    console.print(*print_text, sep="", end="X")
+    assert console.file.getvalue() == result
+
+
 def test_tabs_to_spaces():
     test = Text("\tHello\tWorld", tab_size=8)
     assert test.tabs_to_spaces().text == "        Hello   World"
+
     test = Text("\tHello\tWorld", tab_size=4)
     assert test.tabs_to_spaces().text == "    Hello   World"
+
     test = Text(".\t..\t...\t....\t", tab_size=4)
     assert test.tabs_to_spaces().text == ".   ..  ... ....    "

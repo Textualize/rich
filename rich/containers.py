@@ -37,6 +37,8 @@ class Renderables:
         dimensions = [
             RenderWidth.get(renderable, max_width) for renderable in self._renderables
         ]
+        if not dimensions:
+            return RenderWidth(1, 1)
         _min = max(dimension.minimum for dimension in dimensions)
         _max = max(dimension.maximum for dimension in dimensions)
         return RenderWidth(_min, _max)

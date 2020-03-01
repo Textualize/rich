@@ -683,19 +683,16 @@ class Console:
 
         def check_text() -> None:
             if text:
-                if end:
-                    append_text(end_text)
-                append(sep_text.join(text))
+                all_text = sep_text.join(text)
+                all_text.end = end
+                append(all_text)
                 del text[:]
 
         for renderable in objects:
             rich_cast = getattr(renderable, "__rich__", None)
             if rich_cast:
                 renderable = rich_cast()
-            if isinstance(renderable, ConsoleRenderable):
-                check_text()
-                append(renderable)
-            elif isinstance(renderable, str):
+            if isinstance(renderable, str):
                 renderable_str = renderable
                 if emoji:
                     renderable_str = _emoji_replace(renderable_str)
@@ -703,6 +700,9 @@ class Console:
                 append_text(_highlighter(render_text))
             elif isinstance(renderable, Text):
                 append_text(renderable)
+            elif isinstance(renderable, ConsoleRenderable):
+                check_text()
+                append(renderable)
             elif isinstance(renderable, (Mapping, Sequence)):
                 check_text()
                 append(Pretty(renderable, highlighter=_highlighter))
@@ -756,6 +756,7 @@ class Console:
         renderables = self._collect_renderables(
             objects, sep=sep, end=end, emoji=emoji, highlight=highlight,
         )
+        print(repr(renderables))
 
         render_options = self.options
         extend = self.buffer.extend

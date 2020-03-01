@@ -301,11 +301,6 @@ class Text:
             tab_size = console.tab_size  # type: ignore
         else:
             tab_size = self.tab_size
-
-        # if self.tab_size is None:
-        #     tab_size = console.tab_size
-        # else:
-        #     tab_size = self.tab_size
         lines = self.wrap(
             options.max_width,
             justify=self.justify or options.justify,

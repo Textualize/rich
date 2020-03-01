@@ -250,14 +250,16 @@ class Table:
                 render_text = console.render_str(text, style=style)
             return render_text.wrap(table_width, "center")
 
-        yield render_annotation(
-            self.title or "", style=Style.pick_first(self.title_style, "table.title")
-        )
+        if self.title:
+            yield render_annotation(
+                self.title, style=Style.pick_first(self.title_style, "table.title")
+            )
         yield from self._render(console, options, widths)
-        yield render_annotation(
-            self.caption or "",
-            style=Style.pick_first(self.caption_style, "table.caption"),
-        )
+        if self.caption:
+            yield render_annotation(
+                self.caption,
+                style=Style.pick_first(self.caption_style, "table.caption"),
+            )
 
     def _calculate_column_widths(self, max_width: int) -> List[int]:
         """Calculate the widths of each column."""
