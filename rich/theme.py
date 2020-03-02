@@ -14,21 +14,16 @@ class Theme:
     """
 
     def __init__(self, styles: Dict[str, Style] = None, inherit: bool = True):
-        if inherit:
-            self.styles = DEFAULT_STYLES.copy()
-        else:
-            self.styles = {}
+        self.styles = DEFAULT_STYLES.copy() if inherit else {}
         if styles is not None:
             self.styles.update(styles)
 
     @property
     def config(self) -> str:
         """Get contents of a config file for this theme."""
-        config_lines = ["[styles]"]
-        append = config_lines.append
-        for name, style in sorted(self.styles.items()):
-            append(f"{name} = {style}")
-        config = "\n".join(config_lines)
+        config = "[styles]\n" + "\n".join(
+            f"{name} = {style}" for name, style in sorted(self.styles.items())
+        )
         return config
 
     @classmethod

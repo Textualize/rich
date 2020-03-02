@@ -3,11 +3,11 @@ Rich Text
 
 Rich has a :class:`~rich.text.Text` class for text that may be marked up with color and style attributes. You can consider this class to be like a mutable string with style information. The methods on the Text() instance are similar to a Python ``str`` but are designed to preserve any style information.
 
-One way to add a style to Text is the :meth:`~tich.text.Text.styleize` method which applies a style to a start and end offset. Here is an example::
+One way to add a style to Text is the :meth:`~tich.text.Text.stylize` method which applies a style to a start and end offset. Here is an example::
 
     from rich.text import Text
     text = Text("Hello, World!")
-    text.styleize(0, 6, "bold magenta")
+    text.stylize(0, 6, "bold magenta")
     console.print(text)
 
 This will print "Hello, World!" to the terminal, with the first word in bold magenta.

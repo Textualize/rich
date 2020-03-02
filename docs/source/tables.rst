@@ -3,7 +3,7 @@ Tables
 
 Rich's :class:`~rich.table.Table` class offers a variety ways of rendering tabular data to the terminal.
 
-To render a table, construct a :class:`~rich.table.Table` object, add data, then call :meth:`~rich.console.Console.print` or :meth:`~rich.console.Console.log` to write it to the console.
+To render a table, construct a :class:`~rich.table.Table` object, add columns with :meth:`~rich.table.Table.add_column`, and rows with :meth:`~rich.table.Table.add_row` -- then print it to the console.
 
 Here's an example::
 

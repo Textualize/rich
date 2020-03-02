@@ -719,8 +719,6 @@ class Console:
         Returns:
             List[ConsoleRenderable]: A list of things to render.
         """
-        from .text import Text
-
         sep_text = Text(sep, end=end)
         renderables: List[ConsoleRenderable] = []
         append = renderables.append
@@ -753,7 +751,7 @@ class Console:
                 check_text()
                 append(Pretty(renderable, highlighter=_highlighter))
             else:
-                append_text(_highlighter(repr(renderable)))
+                append_text(_highlighter(str(renderable)))
 
         check_text()
         return renderables
@@ -788,7 +786,6 @@ class Console:
         r"""Print to the console.
 
         Args:
-
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".

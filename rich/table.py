@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from .console import (
         Console,
         ConsoleOptions,
-        ConsoleRenderable,
         JustifyValues,
         RenderableType,
         RenderResult,
@@ -147,8 +146,8 @@ class Table:
 
     def add_column(
         self,
-        header: Union[str, "ConsoleRenderable"] = "",
-        footer: Union[str, "ConsoleRenderable"] = "",
+        header: "RenderableType" = "",
+        footer: "RenderableType" = "",
         header_style: Union[str, Style] = None,
         footer_style: Union[str, Style] = None,
         style: Union[str, Style] = None,
@@ -160,9 +159,9 @@ class Table:
         """Add a column to the table.
         
         Args:
-            header (Union[str, ConsoleRenderable], optional): Text or renderable for the header.
+            header (RenderableType, optional): Text or renderable for the header.
                 Defaults to "".
-            footer (Union[str, ConsoleRenderable], optional): Text or renderable for the footer.
+            footer (RenderableType, optional): Text or renderable for the footer.
                 Defaults to "".
             header_style (Union[str, Style], optional): Style for the header. Defaults to "none".
             footer_style (Union[str, Style], optional): Style for the header. Defaults to "none".
@@ -196,7 +195,6 @@ class Table:
         Raises:
             errors.NotRenderableError: If you add something that can't be rendered.
         """
-        from .console import ConsoleRenderable
 
         def add_cell(column: Column, renderable: "RenderableType") -> None:
             column._cells.append(renderable)
@@ -456,7 +454,7 @@ if __name__ == "__main__":  # pragma: no cover
     from .console import Console
     from . import box
 
-    c = Console(markup=False)
+    c = Console(markup=True)
     table = Table(
         Column(
             "Foo", footer=Text("Total", justify="right"), footer_style="bold", ratio=1
