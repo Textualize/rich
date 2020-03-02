@@ -15,7 +15,7 @@ class Theme:
 
     def __init__(self, styles: Dict[str, Style] = None, inherit: bool = True):
         if inherit:
-            self.styles = DEFAULT_STYLES
+            self.styles = DEFAULT_STYLES.copy()
         else:
             self.styles = {}
         if styles is not None:
