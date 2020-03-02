@@ -287,18 +287,18 @@ class Console:
         else:
             self._color_system = COLOR_SYSTEMS[color_system]
 
-        self._thread_locals = threading.local()
-        self._buffer_index = 0
-        self._record_buffer: List[Segment] = []
-
-        default_style = Style()
-        self.style_stack: List[Style] = [default_style]
-        self.current_style = default_style
-
         self._log_render = LogRender(
             show_time=log_time, show_path=log_path, time_format=log_time_format
         )
         self.highlighter: HighlighterType = highlighter or _null_highlighter
+
+        self._record_buffer_lock = threading.RLock()
+        self._thread_locals = threading.local()
+        self._record_buffer: List[Segment] = []
+
+        default_style = Style()
+        self._style_stack.append(default_style)
+        self._current_style = default_style
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
@@ -311,7 +311,33 @@ class Console:
             buffer = self._thread_locals.buffer = []
         return buffer
 
-    def _detect_color_system(self,) -> Optional[ColorSystem]:
+    @property
+    def _buffer_index(self) -> int:
+        """Get a thread local buffer."""
+        return getattr(self._thread_locals, "buffer_index", 0)
+
+    @_buffer_index.setter
+    def _buffer_index(self, value: int) -> None:
+        self._thread_locals.buffer_index = value
+
+    @property
+    def _style_stack(self) -> List[Style]:
+        """Get a thread local style stack."""
+        style_stack = getattr(self._thread_locals, "style_stack", None)
+        if style_stack is None:
+            style_stack = self._thread_locals.style_stack = []
+        return style_stack
+
+    @property
+    def _current_style(self) -> Style:
+        """Get a thread local buffer."""
+        return getattr(self._thread_locals, "current_style", 0)
+
+    @_current_style.setter
+    def _current_style(self, style: Style) -> None:
+        self._thread_locals.current_style = style
+
+    def _detect_color_system(self) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
         if not self.is_terminal:
             return None
@@ -499,7 +525,7 @@ class Console:
             Iterable[Segment]: An iterable of segments that may be rendered.
         """
         yield from Segment.apply_style(
-            self._render(renderable, options), self.current_style
+            self._render(renderable, options), self._current_style
         )
 
     def render_all(
@@ -629,8 +655,8 @@ class Console:
         """
         if isinstance(style, str):
             style = self.get_style(style)
-        self.current_style = self.current_style + style
-        self.style_stack.append(self.current_style)
+        self._current_style = self._current_style + style
+        self._style_stack.append(self._current_style)
 
     def pop_style(self) -> Style:
         """Pop a style from the stack.
@@ -640,12 +666,12 @@ class Console:
         Returns:
             Style: The previously applied style.
         """
-        if len(self.style_stack) == 1:
+        if len(self._style_stack) == 1:
             raise errors.StyleStackError(
                 "Can't pop the default style (check there is `push_style` for every `pop_style`)"
             )
-        style = self.style_stack.pop()
-        self.current_style = self.style_stack[-1]
+        style = self._style_stack.pop()
+        self._current_style = self._style_stack[-1]
         return style
 
     def style(self, style: Optional[Union[str, Style]]) -> StyleContext:
@@ -894,15 +920,16 @@ class Console:
             self.record
         ), "To export console contents set record=True in the constructor or instance"
 
-        if styles:
-            text = "".join(
-                (style.render(text, reset=True) if style else text)
-                for text, style in self._record_buffer
-            )
-        else:
-            text = "".join(text for text, _ in self._record_buffer)
-        if clear:
-            del self._record_buffer[:]
+        with self._record_buffer_lock:
+            if styles:
+                text = "".join(
+                    (style.render(text, reset=True) if style else text)
+                    for text, style in self._record_buffer
+                )
+            else:
+                text = "".join(text for text, _ in self._record_buffer)
+            if clear:
+                del self._record_buffer[:]
         return text
 
     def save_text(self, path: str, clear: bool = True, styles: bool = False) -> None:
@@ -954,42 +981,43 @@ class Console:
 
         render_code_format = CONSOLE_HTML_FORMAT if code_format is None else code_format
 
-        if inline_styles:
-            for text, style in Segment.simplify(self._record_buffer):
-                text = escape(text)
-                if style:
-                    rule = style.get_html_style(_theme)
-                    append(f'<span style="{rule}">{text}</span>' if rule else text)
-                else:
-                    append(text)
-        else:
-            styles: Dict[str, int] = {}
-            for text, style in Segment.simplify(self._record_buffer):
-                text = escape(text)
-                if style:
-                    rule = style.get_html_style(_theme)
-                    if rule:
-                        style_number = styles.setdefault(rule, len(styles) + 1)
-                        append(f'<span class="r{style_number}">{text}</span>')
+        with self._record_buffer_lock:
+            if inline_styles:
+                for text, style in Segment.simplify(self._record_buffer):
+                    text = escape(text)
+                    if style:
+                        rule = style.get_html_style(_theme)
+                        append(f'<span style="{rule}">{text}</span>' if rule else text)
                     else:
                         append(text)
-                else:
-                    append(text)
-            stylesheet_rules: List[str] = []
-            stylesheet_append = stylesheet_rules.append
-            for style_rule, style_number in styles.items():
-                if style_rule:
-                    stylesheet_append(f".r{style_number} {{{style_rule}}}")
-            stylesheet = "\n".join(stylesheet_rules)
+            else:
+                styles: Dict[str, int] = {}
+                for text, style in Segment.simplify(self._record_buffer):
+                    text = escape(text)
+                    if style:
+                        rule = style.get_html_style(_theme)
+                        if rule:
+                            style_number = styles.setdefault(rule, len(styles) + 1)
+                            append(f'<span class="r{style_number}">{text}</span>')
+                        else:
+                            append(text)
+                    else:
+                        append(text)
+                stylesheet_rules: List[str] = []
+                stylesheet_append = stylesheet_rules.append
+                for style_rule, style_number in styles.items():
+                    if style_rule:
+                        stylesheet_append(f".r{style_number} {{{style_rule}}}")
+                stylesheet = "\n".join(stylesheet_rules)
 
-        rendered_code = render_code_format.format(
-            code="".join(fragments),
-            stylesheet=stylesheet,
-            foreground=_theme.foreground_color.hex,
-            background=_theme.background_color.hex,
-        )
-        if clear:
-            del self._record_buffer[:]
+            rendered_code = render_code_format.format(
+                code="".join(fragments),
+                stylesheet=stylesheet,
+                foreground=_theme.foreground_color.hex,
+                background=_theme.background_color.hex,
+            )
+            if clear:
+                del self._record_buffer[:]
         return rendered_code
 
     def save_html(

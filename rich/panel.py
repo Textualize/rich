@@ -21,7 +21,7 @@ class Panel:
         >>> console.print(Panel("Hello, World!))
 
     Args:
-        renderable (ConsoleRenderable): A console renderable objects.
+        renderable (RenderableType): A console renderable object.
         box (Box, optional): A Box instance that defines the look of the border.
             Defaults to box.SQUARE.
         expand (bool, optional): If True the panel will stretch to fill the console 

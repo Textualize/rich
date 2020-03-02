@@ -17,4 +17,5 @@ Reference
    reference/syntax.rst
    reference/table.rst
    reference/text.rst
+   reference/theme.rst
    reference/traceback.rst

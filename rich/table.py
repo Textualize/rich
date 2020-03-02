@@ -63,6 +63,7 @@ class Column:
 
 
 class _Cell(NamedTuple):
+    """A single cell in a table."""
 
     style: Union[str, Style]
     renderable: "RenderableType"
