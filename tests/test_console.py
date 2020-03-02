@@ -25,14 +25,14 @@ def test_style_context():
     console = Console()
 
     with StyleContext(console, None):
-        assert console.current_style == Style()
+        assert console._current_style == Style()
 
     with StyleContext(console, "bold"):
-        assert console.current_style == Style.parse("bold")
+        assert console._current_style == Style.parse("bold")
         with StyleContext(console, "red"):
-            assert console.current_style == Style.parse("bold red")
-        assert console.current_style == Style.parse("bold")
-    assert console.current_style == Style()
+            assert console._current_style == Style.parse("bold red")
+        assert console._current_style == Style.parse("bold")
+    assert console._current_style == Style()
 
 
 def test_init():
