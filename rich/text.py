@@ -217,7 +217,7 @@ class Text:
         Args:
             start (int): Start offset.
             end (int): End offset.
-            style (str): Style name to apply.
+            style (Union[str, Style]): Style instance or style definition to apply.
         
         Returns:
             None: 
@@ -235,7 +235,8 @@ class Text:
         translated to styles.
         
         Args:
-            re_highlight (str): A regular expression            
+            re_highlight (str): A regular expression.
+            style (Union[str, Style]): Optional style to apply to whole match.
         
         Returns:
             int: Number of regex matches
