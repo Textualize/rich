@@ -10,12 +10,7 @@ _console: Optional["Console"] = None
 
 
 def print(
-    *objects: Any,
-    sep=" ",
-    end="\n",
-    file: IO[str] = None,
-    flush: bool = False,
-    log_locals: bool = False
+    *objects: Any, sep=" ", end="\n", file: IO[str] = None, flush: bool = False,
 ):
     global _console
     if _console is None:
@@ -30,4 +25,4 @@ def print(
 init()
 
 if __name__ == "__main__":  # pragma: no cover
-    print("Hello, **World**", log_locals=True)
+    print("Hello, **World**")

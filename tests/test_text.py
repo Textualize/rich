@@ -308,3 +308,24 @@ def test_tabs_to_spaces():
 
     test = Text(".\t..\t...\t....\t", tab_size=4)
     assert test.tabs_to_spaces().text == ".   ..  ... ....    "
+
+
+def test_markup_switch():
+    """Test markup can be disabled."""
+    console = Console(file=StringIO(), markup=False)
+    console.print("[bold]foo[/bold]")
+    assert console.file.getvalue() == "[bold]foo[/bold]\n"
+
+
+def test_emoji():
+    """Test printing emoji codes."""
+    console = Console(file=StringIO())
+    console.print(":+1:")
+    assert console.file.getvalue() == "👍\n"
+
+
+def test_emoji_switch():
+    """Test emoji can be disabled."""
+    console = Console(file=StringIO(), emoji=False)
+    console.print(":+1:")
+    assert console.file.getvalue() == ":+1:\n"

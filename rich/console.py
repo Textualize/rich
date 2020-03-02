@@ -31,7 +31,7 @@ from typing_extensions import Protocol, runtime_checkable, Literal
 
 from ._emoji_replace import _emoji_replace
 
-from . import markup
+from .markup import render as render_markup
 from .render_width import RenderWidth
 from ._log_render import LogRender
 from .default_styles import DEFAULT_STYLES
@@ -46,6 +46,7 @@ from . import themes
 from .pretty import Pretty
 from .terminal_theme import TerminalTheme, DEFAULT_TERMINAL_THEME
 from .segment import Segment
+from .text import Text
 from .theme import Theme
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -241,6 +242,7 @@ class Console:
         height (int, optional): The height of the terminal. Leave as default to auto-detect height.
         record (bool, optional): Boolean to enable recording of terminal output,
             required to call :meth:`export_html` and :meth:`export_text`. Defaults to False.
+        emoji (Optional[bool], optional): Enable emoji code. Defaults to True.
         markup (bool, optional): Boolean to enable :ref:`console_markup`. Defaults to True.
         log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
         log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
@@ -260,6 +262,7 @@ class Console:
         tab_size: int = 8,
         record: bool = False,
         markup: bool = True,
+        emoji: bool = True,
         log_time: bool = True,
         log_path: bool = True,
         log_time_format: str = "[%X] ",
@@ -274,6 +277,7 @@ class Console:
         self.tab_size = tab_size
         self.record = record
         self._markup = markup
+        self._emoji = emoji
 
         if color_system is None:
             self._color_system = None
@@ -538,20 +542,29 @@ class Console:
             )
         return lines
 
-    def render_str(self, text: str, style: Union[str, Style] = "") -> "Text":
+    def render_str(
+        self,
+        text: str,
+        style: Union[str, Style] = "",
+        emoji: bool = None,
+        markup: bool = None,
+    ) -> "Text":
         """Convert a string to a Text instance.
 
         Args:
             text (str): Text to render.
             style (Union[str, Style], optional): Style to apply to rendered text.
+            emoji (Optional[bool], optional): Enable emoji, or ``None`` to use Console default.
+            markup (Optional[bool], optional): Enable markup, or ``None`` to use Console default.
         Returns:
             ConsoleRenderable: Renderable object.
 
         """
-        if self._markup:
-            return markup.render(text, style=style)
+        if emoji or (emoji is None and self._emoji):
+            text = _emoji_replace(text)
 
-        from .text import Text
+        if markup or (markup is None and self._markup):
+            return render_markup(text, style=style)
 
         return Text(text, style=style)
 
@@ -654,7 +667,8 @@ class Console:
         objects: Iterable[Any],
         sep: str,
         end: str,
-        emoji=True,
+        emoji: bool = None,
+        markup: bool = None,
         highlight: bool = True,
     ) -> List[ConsoleRenderable]:
         """Combined a number of renderables and text in to one renderable.
@@ -663,7 +677,8 @@ class Console:
             renderables (Iterable[Union[str, ConsoleRenderable]]): [description]
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".            
-            emoji (bool): If True, emoji codes will be replaced, otherwise emoji codes will be left in.
+            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default.
+            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default.
             highlight (bool, optional): Perform highlighting. Defaults to True.
 
         Returns:
@@ -693,11 +708,7 @@ class Console:
             if rich_cast:
                 renderable = rich_cast()
             if isinstance(renderable, str):
-                renderable_str = renderable
-                if emoji:
-                    renderable_str = _emoji_replace(renderable_str)
-                render_text = self.render_str(renderable_str)
-                append_text(_highlighter(render_text))
+                append_text(_highlighter(self.render_str(renderable)))
             elif isinstance(renderable, Text):
                 append_text(renderable)
             elif isinstance(renderable, ConsoleRenderable):
@@ -735,7 +746,8 @@ class Console:
         sep=" ",
         end="\n",
         style: Union[str, Style] = None,
-        emoji=True,
+        emoji: bool = None,
+        markup: bool = None,
         highlight: bool = True,
     ) -> None:
         r"""Print to the console.
@@ -746,7 +758,8 @@ class Console:
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
-            emoji (bool): If True, emoji codes will be replaced, otherwise emoji codes will be left in.
+            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default.
+            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default.
             highlight (bool, optional): Perform highlighting. Defaults to True.
         """
         if not objects:
@@ -754,7 +767,7 @@ class Console:
             return
 
         renderables = self._collect_renderables(
-            objects, sep=sep, end=end, emoji=emoji, highlight=highlight,
+            objects, sep, end, emoji=emoji, markup=markup, highlight=highlight
         )
 
         render_options = self.options
@@ -787,6 +800,8 @@ class Console:
         *objects: Any,
         sep=" ",
         end="\n",
+        emoji: bool = None,
+        markup: bool = None,
         highlight: bool = True,
         log_locals: bool = False,
         _stack_offset=1,
@@ -797,6 +812,8 @@ class Console:
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".
+            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default.
+            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default.
             highlight (bool, optional): Perform highlighting. Defaults to True.
             log_locals (bool, optional): Boolean to enable logging of locals where ``log()``
                 was called. Defaults to False.
@@ -806,7 +823,7 @@ class Console:
             self.line()
             return
         renderables = self._collect_renderables(
-            objects, sep=sep, end=end, highlight=highlight
+            objects, sep, end, emoji=emoji, markup=markup, highlight=highlight
         )
 
         caller = inspect.stack()[_stack_offset]
