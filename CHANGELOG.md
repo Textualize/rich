@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added tab_size to Console and Text
 - Added protocol.is_renderable for runtime check
+- Added emoji switch to Console
+- Added inherit boolean to Theme
+- Made Console thread safe, with a thread local buffer
 
 ### Changed
 

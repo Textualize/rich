@@ -63,20 +63,35 @@ It is slightly quicker to construct a Style class like this, since a style defin
 You can parse a style definition explicitly with the :meth:`~rich.style.Style.parse` method.
 
 
-Custom Styles
--------------
+Style Themes
+------------
 
-While it is possible to explicitly specify styles each time you use them, it is discouraged. Rich allows you to predefine style names which you can use in place on an explicit style. For instance, you may want to define styles for info, warning, danger etc.
+If you re-use styles it can be a maintenance headache if you ever want to modify an attribute or color -- you would have to change every line where the style is used. Rich provides a :class:`rich.theme.Theme` class which you can use to pre-define styles, so if you ever need to modify a style you only need change one file.
 
-You can define a mapping of names to styles in the :class:`~rich.console.Console` constructor. These styles will be merged in to the default styles, potentially overwriting them. Here's an example::
+Style themes can also make your code more semantic, for instance a style called ``"warning"`` better expresses intent that ``"italic magenta underline"``.
+
+To use a style theme, construct a :class:`rich.theme.Theme` instance and pass it to the :class:`~rich.console.Console` constructor. Here's an example::
 
     from rich.console import Console
-    styles = {
+    from rich.theme import Theme
+    custom_theme = Theme({
         "info" : Style.parse("dim cyan"),
         "warning": Style.parse("magenta"),
         "danger": Style.parse("bold red")
-    }
-    console = Console(styles=styles)
+    })
+    console = Console(theme=custom_theme)
     console.print("This is information", style="info")
     console.print("Something terrible happened!", style="danger")
 
+You can also use these custom styles via markup. For example::
+
+    console.print("[warning]The pod bay doors are locked[/warning]")
+
+If you prefer you can write your styles in an external config file rather than in Python. Here's an example of the format::
+
+    [styles]
+    info = dim cyan
+    warning = magenta
+    danger bold red
+
+You can read these files with the :method:`~rich.theme.Theme.read` method.

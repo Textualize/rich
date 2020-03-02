@@ -12,6 +12,7 @@ import platform
 import re
 import shutil
 import sys
+import threading
 from typing import (
     Any,
     Callable,
@@ -286,7 +287,7 @@ class Console:
         else:
             self._color_system = COLOR_SYSTEMS[color_system]
 
-        self.buffer: List[Segment] = []
+        self._thread_locals = threading.local()
         self._buffer_index = 0
         self._record_buffer: List[Segment] = []
 
@@ -301,6 +302,14 @@ class Console:
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
+
+    @property
+    def _buffer(self) -> List[Segment]:
+        """Get a thread local buffer."""
+        buffer = getattr(self._thread_locals, "buffer", None)
+        if buffer is None:
+            buffer = self._thread_locals.buffer = []
+        return buffer
 
     def _detect_color_system(self,) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
@@ -423,7 +432,7 @@ class Console:
 
         assert count >= 0, "count must be >= 0"
         if count:
-            self.buffer.append(Segment("\n" * count))
+            self._buffer.append(Segment("\n" * count))
             self._check_buffer()
 
     def _render(
@@ -771,7 +780,7 @@ class Console:
         )
 
         render_options = self.options
-        extend = self.buffer.extend
+        extend = self._buffer.extend
         render = self.render
         with self.style(style):
             for renderable in renderables:
@@ -838,7 +847,7 @@ class Console:
             renderables.append(tabulate_mapping(locals_map, title="Locals"))
 
         with self:
-            self.buffer.extend(
+            self._buffer.extend(
                 self.render(
                     self._log_render(self, renderables, path=path, line_no=line_no),
                     self.options,
@@ -856,10 +865,10 @@ class Console:
         output: List[str] = []
         append = output.append
         color_system = self._color_system
-        buffer = self.buffer[:]
+        buffer = self._buffer[:]
         if self.record:
             self._record_buffer.extend(buffer)
-        del self.buffer[:]
+        del self._buffer[:]
         for line in Segment.split_and_crop_lines(buffer, self.width, pad=False):
             for text, style in line:
                 if style:
