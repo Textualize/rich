@@ -26,7 +26,7 @@ if TYPE_CHECKING:  # pragma: no cover
 from .containers import Lines
 from .style import Style
 from .segment import Segment
-from .render_width import RenderWidth
+from .measure import Measurement
 from ._tools import iter_last, iter_first_last
 from ._wrap import divide_line
 
@@ -319,13 +319,13 @@ class Text:
         all_lines = Text("\n").join(lines)
         yield from self._render_line(all_lines, console, options)
 
-    def __console_width__(self, console: "Console", max_width: int) -> RenderWidth:
+    def __measure__(self, console: "Console", max_width: int) -> Measurement:
         text = self.text
         if not text.strip():
-            return RenderWidth(len(text), len(text))
+            return Measurement(len(text), len(text))
         max_text_width = max(len(line) for line in text.splitlines())
         min_text_width = max(len(word) for word in text.split())
-        return RenderWidth(min_text_width, max_text_width)
+        return Measurement(min_text_width, max_text_width)
 
     def _render_line(
         self, line: "Text", console: "Console", options: "ConsoleOptions"

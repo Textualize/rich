@@ -59,13 +59,13 @@ For complete control over how a custom object is rendered to the terminal, you c
             yield Segment("()", "cyan")
 
 
-Console Width
-~~~~~~~~~~~~~
+Measuring Renderables
+~~~~~~~~~~~~~~~~~~~~~
 
-Sometimes Rich needs to know how many characters an object will take up when rendering. The :class:`~rich.table.Table` class, for instance, will use this information to calculate the optimal dimensions for the columns. If you aren't using one of the standard classes, you will need to supply a ``__console_width__`` method which accepts the maximum width as an integer and returns a :class:`~rich.render_width.RenderWidth` object. The RenderWidth object should contain the *minimum* and *maximum* number of characters required to render.
+Sometimes Rich needs to know how many characters an object will take up when rendering. The :class:`~rich.table.Table` class, for instance, will use this information to calculate the optimal dimensions for the columns. If you aren't using one of the renderable objects in the Rich module, you will need to supply a ``__measure__`` method which accepts a Console object and the maximum width and returns a :class:`~rich.measure.Measurement` object. The Measurement object should contain the *minimum* and *maximum* number of characters required to render.
 
 For example, if we are rendering a chess board, it would require a minimum of 8 characters to render. The maximum can be left as the maximum available width (assuming a centered board)::
 
     class ChessBoard:
-        def __console_width__(self, max_width: int) -> RenderWidth:
-            return RenderWidth(8, max_width)
+        def __measure__(self, console: Console, max_width: int) -> Measurement:
+            return Measurement(8, max_width)

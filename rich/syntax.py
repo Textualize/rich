@@ -10,7 +10,7 @@ from pygments.util import ClassNotFound
 
 from .color import Color, parse_rgb_hex, blend_rgb
 from .console import Console, ConsoleOptions, RenderResult, Segment, ConsoleRenderable
-from .render_width import RenderWidth
+from .measure import Measurement
 from .style import Style
 from .text import Text
 from ._tools import iter_first
@@ -195,11 +195,11 @@ class Syntax:
             number_style = highlight_number_style = Style()
         return background_style, number_style, highlight_number_style
 
-    def __console_width__(self, console: "Console", max_width: int) -> "RenderWidth":
+    def __measure__(self, console: "Console", max_width: int) -> "Measurement":
         if self.code_width is not None:
             width = self.code_width + self._numbers_column_width
-            return RenderWidth(width, width)
-        return RenderWidth(max_width, max_width)
+            return Measurement(width, width)
+        return Measurement(max_width, max_width)
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         code_width = options.max_width if self.code_width is None else self.code_width

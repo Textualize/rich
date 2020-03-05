@@ -3,7 +3,7 @@ import pytest
 
 from rich.console import Console
 from rich.text import Span, Text
-from rich.render_width import RenderWidth
+from rich.measure import Measurement
 
 
 def test_span():
@@ -127,8 +127,8 @@ def test_set_length():
 def test_console_width():
     console = Console()
     test = Text("Hello World!\nfoobarbaz")
-    assert test.__console_width__(console, 80) == RenderWidth(9, 12)
-    assert Text(" " * 4).__console_width__(console, 80) == RenderWidth(4, 4)
+    assert test.__measure__(console, 80) == Measurement(9, 12)
+    assert Text(" " * 4).__measure__(console, 80) == Measurement(4, 4)
 
 
 def test_join():

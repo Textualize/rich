@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     )
     from .text import Text
 
-from .render_width import RenderWidth
+from .measure import Measurement
 
 T = TypeVar("T")
 
@@ -33,16 +33,16 @@ class Renderables:
         """Console render method to insert line-breaks."""
         yield from self._renderables
 
-    def __console_width__(self, console: "Console", max_width: int) -> "RenderWidth":
+    def __measure__(self, console: "Console", max_width: int) -> "Measurement":
         dimensions = [
-            RenderWidth.get(console, renderable, max_width)
+            Measurement.get(console, renderable, max_width)
             for renderable in self._renderables
         ]
         if not dimensions:
-            return RenderWidth(1, 1)
+            return Measurement(1, 1)
         _min = max(dimension.minimum for dimension in dimensions)
         _max = max(dimension.maximum for dimension in dimensions)
-        return RenderWidth(_min, _max)
+        return Measurement(_min, _max)
 
     def append(self, renderable: "RenderableType") -> None:
         self._renderables.append(renderable)

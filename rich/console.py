@@ -33,7 +33,7 @@ from typing_extensions import Protocol, runtime_checkable, Literal
 from ._emoji_replace import _emoji_replace
 
 from .markup import render as render_markup
-from .render_width import RenderWidth
+from .measure import measure_renderables, Measurement
 from ._log_render import LogRender
 from .default_styles import DEFAULT_STYLES
 from . import errors
@@ -168,11 +168,11 @@ class RenderGroup:
             self._render = list(self._renderables)
         return self._render
 
-    def __console_width__(self, console: "Console", max_width: int) -> "RenderWidth":
+    def __measure__(self, console: "Console", max_width: int) -> "Measurement":
         if self.fit:
-            return RenderWidth.measure(console, self.renderables, max_width)
+            return measure_renderables(console, self.renderables, max_width)
         else:
-            return RenderWidth(max_width, max_width)
+            return Measurement(max_width, max_width)
 
     def __console__(
         self, console: "Console", options: "ConsoleOptions"

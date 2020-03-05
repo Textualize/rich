@@ -31,7 +31,7 @@ from .protocol import is_renderable
 from .segment import Segment
 from .style import Style
 from .text import Text
-from .render_width import RenderWidth
+from .measure import Measurement
 from ._tools import iter_first_last, iter_first, iter_last, ratio_divide
 
 
@@ -338,12 +338,12 @@ class Table:
 
     def _measure_column(
         self, console: "Console", column_index: int, column: Column, max_width: int
-    ) -> RenderWidth:
+    ) -> Measurement:
         """Get the minimum and maximum width of the column."""
         padding_width = self.padding[1] + self.padding[3]
         if column.width is not None:
             # Fixed width column
-            return RenderWidth(
+            return Measurement(
                 column.width + padding_width, column.width + padding_width
             )
         # Flexible column, we need to measure contents
@@ -351,16 +351,16 @@ class Table:
         max_widths: List[int] = []
         append_min = min_widths.append
         append_max = max_widths.append
-        get_render_width = RenderWidth.get
+        get_render_width = Measurement.get
         for cell in self._get_cells(column_index, column):
             _min, _max = get_render_width(console, cell.renderable, max_width)
             append_min(_min)
             append_max(_max)
         if column.no_wrap:
             _width = max(max_widths) if max_widths else max_width
-            return RenderWidth(_width, _width)
+            return Measurement(_width, _width)
         else:
-            return RenderWidth(
+            return Measurement(
                 max(min_widths) if min_widths else 1,
                 max(max_widths) if max_widths else max_width,
             )

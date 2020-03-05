@@ -7,7 +7,7 @@ from .console import (
     ConsoleRenderable,
     RenderableType,
     RenderResult,
-    RenderWidth,
+    Measurement,
 )
 from .style import Style
 from .text import Text
@@ -54,7 +54,7 @@ class Panel:
         child_width = (
             width - 2
             if self.expand
-            else RenderWidth.get(console, self.renderable, width - 2).maximum
+            else Measurement.get(console, self.renderable, width - 2).maximum
         )
         width = child_width + 2
         child_options = options.update(width=child_width)
@@ -72,11 +72,11 @@ class Panel:
         yield Segment(box.get_bottom([width - 2]), style)
         yield Segment.line()
 
-    def __console_width__(self, console: "Console", max_width: int) -> RenderWidth:
+    def __measure__(self, console: "Console", max_width: int) -> Measurement:
         if self.expand:
-            return RenderWidth(max_width, max_width)
-        width = RenderWidth.get(console, self.renderable, max_width - 2).maximum + 2
-        return RenderWidth(width, width)
+            return Measurement(max_width, max_width)
+        width = Measurement.get(console, self.renderable, max_width - 2).maximum + 2
+        return Measurement(width, width)
 
 
 if __name__ == "__main__":  # pragma: no cover

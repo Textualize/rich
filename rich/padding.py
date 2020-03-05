@@ -7,7 +7,7 @@ if TYPE_CHECKING:
         RenderableType,
         RenderResult,
     )
-from .render_width import RenderWidth
+from .measure import Measurement
 from .style import Style
 from .text import Text
 from .segment import Segment
@@ -79,11 +79,11 @@ class Padding:
             yield new_line
         yield from bottom
 
-    def __console_width__(self, console: "Console", max_width: int) -> "RenderWidth":
+    def __measure__(self, console: "Console", max_width: int) -> "Measurement":
         extra_width = self.left + self.right
-        min_width, max_width = RenderWidth.get(
+        min_width, max_width = Measurement.get(
             console, self.renderable, max(1, max_width - extra_width)
         )
-        render_width = RenderWidth(min_width + extra_width, max_width + extra_width)
+        render_width = Measurement(min_width + extra_width, max_width + extra_width)
         return render_width
 

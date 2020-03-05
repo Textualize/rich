@@ -2,7 +2,7 @@ from typing import Any, TYPE_CHECKING
 
 from pprintpp import pformat
 
-from .render_width import RenderWidth
+from .measure import Measurement
 from .highlighter import ReprHighlighter
 from .text import Text
 
@@ -23,6 +23,6 @@ class Pretty:
         pretty_text = self.highlighter(pretty_str)
         yield pretty_text
 
-    def __console_width__(self, console: "Console", max_width: int) -> "RenderWidth":
+    def __measure__(self, console: "Console", max_width: int) -> "Measurement":
         text = Text(pformat(self._object, width=max_width))
-        return text.__console_width__(console, max_width)
+        return text.__measure__(console, max_width)
