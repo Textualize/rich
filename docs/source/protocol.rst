@@ -62,7 +62,7 @@ For complete control over how a custom object is rendered to the terminal, you c
 Measuring Renderables
 ~~~~~~~~~~~~~~~~~~~~~
 
-Sometimes Rich needs to know how many characters an object will take up when rendering. The :class:`~rich.table.Table` class, for instance, will use this information to calculate the optimal dimensions for the columns. If you aren't using one of the renderable objects in the Rich module, you will need to supply a ``__measure__`` method which accepts a Console object and the maximum width and returns a :class:`~rich.measure.Measurement` object. The Measurement object should contain the *minimum* and *maximum* number of characters required to render.
+Sometimes Rich needs to know how many characters an object will take up when rendering. The :class:`~rich.table.Table` class, for instance, will use this information to calculate the optimal dimensions for the columns. If you aren't using one of the renderable objects in the Rich module, you will need to supply a ``__measure__`` method which accepts a :class:`~rich.console.Console` and the maximum width and returns a :class:`~rich.measure.Measurement` object. The Measurement object should contain the *minimum* and *maximum* number of characters required to render.
 
 For example, if we are rendering a chess board, it would require a minimum of 8 characters to render. The maximum can be left as the maximum available width (assuming a centered board)::
 
