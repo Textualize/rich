@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 
 from . import box
 from .console import (
@@ -27,6 +27,7 @@ class Panel:
         expand (bool, optional): If True the panel will stretch to fill the console 
             width, otherwise it will be sized to fit the contents. Defaults to False.
         style (str, optional): The style of the border. Defaults to "none".
+        width (Optional[int], optional): Optional width of panel. Defaults to None to auto-detect.
     """
 
     def __init__(
@@ -35,26 +36,26 @@ class Panel:
         box=box.ROUNDED,
         expand: bool = True,
         style: Union[str, Style] = "none",
+        width: Optional[int] = None,
     ) -> None:
         self.renderable = renderable
         self.box = box
         self.expand = expand
         self.style = style
+        self.width = width
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-
         style = console.get_style(self.style)
-        width = options.max_width
-
-        if width <= 3:
-            yield self.renderable
-            return
-
-        if self.expand:
-            child_width = width - 2
-        else:
-            child_width = RenderWidth.get(self.renderable, width - 2).maximum
-
+        width = (
+            options.max_width
+            if self.width is None
+            else min(self.width, options.max_width)
+        )
+        child_width = (
+            width - 2
+            if self.expand
+            else RenderWidth.get(self.renderable, width - 2).maximum
+        )
         width = child_width + 2
         child_options = options.update(width=child_width)
         lines = console.render_lines(self.renderable, child_options)
