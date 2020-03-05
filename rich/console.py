@@ -168,9 +168,9 @@ class RenderGroup:
             self._render = list(self._renderables)
         return self._render
 
-    def __console_width__(self, max_width: int) -> "RenderWidth":
+    def __console_width__(self, console: "Console", max_width: int) -> "RenderWidth":
         if self.fit:
-            return RenderWidth.measure(self.renderables, max_width)
+            return RenderWidth.measure(console, self.renderables, max_width)
         else:
             return RenderWidth(max_width, max_width)
 

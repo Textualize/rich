@@ -319,7 +319,7 @@ class Text:
         all_lines = Text("\n").join(lines)
         yield from self._render_line(all_lines, console, options)
 
-    def __console_width__(self, max_width: int) -> RenderWidth:
+    def __console_width__(self, console: "Console", max_width: int) -> RenderWidth:
         text = self.text
         if not text.strip():
             return RenderWidth(len(text), len(text))

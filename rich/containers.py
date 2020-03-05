@@ -33,9 +33,10 @@ class Renderables:
         """Console render method to insert line-breaks."""
         yield from self._renderables
 
-    def __console_width__(self, max_width: int) -> "RenderWidth":
+    def __console_width__(self, console: "Console", max_width: int) -> "RenderWidth":
         dimensions = [
-            RenderWidth.get(renderable, max_width) for renderable in self._renderables
+            RenderWidth.get(console, renderable, max_width)
+            for renderable in self._renderables
         ]
         if not dimensions:
             return RenderWidth(1, 1)

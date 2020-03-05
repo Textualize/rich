@@ -2,10 +2,11 @@ from operator import itemgetter
 from typing import Iterable, NamedTuple, TYPE_CHECKING, Union
 
 from . import errors
+from .protocol import is_renderable
 from .segment import Segment
 
 if TYPE_CHECKING:
-    from .console import RenderableType
+    from .console import Console, RenderableType
 
 
 class RenderWidth(NamedTuple):
@@ -38,23 +39,20 @@ class RenderWidth(NamedTuple):
 
     @classmethod
     def get(
-        cls, renderable: Union["RenderableType", "Segment"], max_width: int
+        cls, console: "Console", renderable: "RenderableType", max_width: int
     ) -> "RenderWidth":
         """Get desired width for a renderable."""
-        if hasattr(renderable, "__console__"):
+        if isinstance(renderable, str):
+            renderable = console.render_str(renderable)
+        if is_renderable(renderable):
             get_console_width = getattr(renderable, "__console_width__", None)
             if get_console_width is not None:
-                render_width = get_console_width(max_width).with_maximum(max_width)
+                render_width = get_console_width(console, max_width).with_maximum(
+                    max_width
+                )
                 return render_width.normalize()
             else:
                 return RenderWidth(1, max_width)
-        elif isinstance(renderable, Segment):
-            text, _style = renderable
-            width = min(max_width, len(text))
-            return RenderWidth(width, width)
-        elif isinstance(renderable, str):
-            text = renderable.rstrip()
-            return RenderWidth(len(text), len(text))
         else:
             raise errors.NotRenderableError(
                 f"Unable to get render width for {renderable!r}; "
@@ -63,12 +61,13 @@ class RenderWidth(NamedTuple):
 
     @classmethod
     def measure(
-        cls, renderables: Iterable["RenderableType"], max_width: int
+        cls, console: "Console", renderables: Iterable["RenderableType"], max_width: int
     ) -> "RenderWidth":
         """Measure a number of renderables."""
 
         render_widths = [
-            RenderWidth.get(renderable, max_width) for renderable in renderables
+            RenderWidth.get(console, renderable, max_width)
+            for renderable in renderables
         ]
         measured_width = RenderWidth(
             max(render_widths, key=itemgetter(0)).minimum,

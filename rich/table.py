@@ -237,7 +237,7 @@ class Table:
             max_width -= len(self.columns)
             if self.show_edge:
                 max_width -= 2
-        widths = self._calculate_column_widths(max_width)
+        widths = self._calculate_column_widths(console, max_width)
         table_width = sum(widths) + len(self.columns) + (2 if self.box else 0)
 
         def render_annotation(
@@ -260,11 +260,11 @@ class Table:
                 style=Style.pick_first(self.caption_style, "table.caption"),
             )
 
-    def _calculate_column_widths(self, max_width: int) -> List[int]:
+    def _calculate_column_widths(self, console: "Console", max_width: int) -> List[int]:
         """Calculate the widths of each column."""
         columns = self.columns
         width_ranges = [
-            self._measure_column(column_index, column, max_width)
+            self._measure_column(console, column_index, column, max_width)
             for column_index, column in enumerate(columns)
         ]
 
@@ -337,7 +337,7 @@ class Table:
             yield _Cell(column.footer_style, add_padding(column.footer))
 
     def _measure_column(
-        self, column_index: int, column: Column, max_width: int
+        self, console: "Console", column_index: int, column: Column, max_width: int
     ) -> RenderWidth:
         """Get the minimum and maximum width of the column."""
         padding_width = self.padding[1] + self.padding[3]
@@ -353,7 +353,7 @@ class Table:
         append_max = max_widths.append
         get_render_width = RenderWidth.get
         for cell in self._get_cells(column_index, column):
-            _min, _max = get_render_width(cell.renderable, max_width)
+            _min, _max = get_render_width(console, cell.renderable, max_width)
             append_min(_min)
             append_max(_max)
         if column.no_wrap:

@@ -125,9 +125,10 @@ def test_set_length():
 
 
 def test_console_width():
+    console = Console()
     test = Text("Hello World!\nfoobarbaz")
-    assert test.__console_width__(80) == RenderWidth(9, 12)
-    assert Text(" " * 4).__console_width__(80) == RenderWidth(4, 4)
+    assert test.__console_width__(console, 80) == RenderWidth(9, 12)
+    assert Text(" " * 4).__console_width__(console, 80) == RenderWidth(4, 4)
 
 
 def test_join():

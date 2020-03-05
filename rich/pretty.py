@@ -23,6 +23,6 @@ class Pretty:
         pretty_text = self.highlighter(pretty_str)
         yield pretty_text
 
-    def __console_width__(self, max_width: int) -> "RenderWidth":
+    def __console_width__(self, console: "Console", max_width: int) -> "RenderWidth":
         text = Text(pformat(self._object, width=max_width))
-        return text.__console_width__(max_width)
+        return text.__console_width__(console, max_width)

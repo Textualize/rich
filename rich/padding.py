@@ -79,10 +79,10 @@ class Padding:
             yield new_line
         yield from bottom
 
-    def __console_width__(self, max_width: int) -> "RenderWidth":
+    def __console_width__(self, console: "Console", max_width: int) -> "RenderWidth":
         extra_width = self.left + self.right
         min_width, max_width = RenderWidth.get(
-            self.renderable, max(1, max_width - extra_width)
+            console, self.renderable, max(1, max_width - extra_width)
         )
         render_width = RenderWidth(min_width + extra_width, max_width + extra_width)
         return render_width

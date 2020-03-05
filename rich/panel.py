@@ -54,7 +54,7 @@ class Panel:
         child_width = (
             width - 2
             if self.expand
-            else RenderWidth.get(self.renderable, width - 2).maximum
+            else RenderWidth.get(console, self.renderable, width - 2).maximum
         )
         width = child_width + 2
         child_options = options.update(width=child_width)
@@ -72,10 +72,10 @@ class Panel:
         yield Segment(box.get_bottom([width - 2]), style)
         yield Segment.line()
 
-    def __console_width__(self, max_width: int) -> RenderWidth:
+    def __console_width__(self, console: "Console", max_width: int) -> RenderWidth:
         if self.expand:
             return RenderWidth(max_width, max_width)
-        width = RenderWidth.get(self.renderable, max_width - 2).maximum + 2
+        width = RenderWidth.get(console, self.renderable, max_width - 2).maximum + 2
         return RenderWidth(width, width)
 
 

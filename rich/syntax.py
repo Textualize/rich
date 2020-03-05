@@ -195,7 +195,7 @@ class Syntax:
             number_style = highlight_number_style = Style()
         return background_style, number_style, highlight_number_style
 
-    def __console_width__(self, max_width: int) -> "RenderWidth":
+    def __console_width__(self, console: "Console", max_width: int) -> "RenderWidth":
         if self.code_width is not None:
             width = self.code_width + self._numbers_column_width
             return RenderWidth(width, width)
