@@ -61,7 +61,7 @@ class Measurement(NamedTuple):
 
 
 def measure_renderables(
-    cls, console: "Console", renderables: Iterable["RenderableType"], max_width: int
+    console: "Console", renderables: Iterable["RenderableType"], max_width: int
 ) -> "Measurement":
     """Measure a number of renderables."""
 
@@ -69,7 +69,7 @@ def measure_renderables(
         Measurement.get(console, renderable, max_width) for renderable in renderables
     ]
     measured_width = Measurement(
-        max(measurments, key=itemgetter(0)).minimum,
-        max(measurments, key=itemgetter(1)).maximum,
+        max(measurements, key=itemgetter(0)).minimum,
+        max(measurements, key=itemgetter(1)).maximum,
     )
     return measured_width
