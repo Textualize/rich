@@ -22,6 +22,7 @@ class MissingWidget(ProgressError):
 
 @dataclass
 class Task:
+    name: str
     total: int
     completed: int
     fields: Dict[str, str] = field(default_factory=dict)
@@ -67,7 +68,7 @@ class Progress:
         console: Console = None,
         refresh_per_second: int = 10
     ) -> None:
-        self.columns = columns or ("$bar", "{percentage:2.0f}%")
+        self.columns = columns or ("{task.name}", bar_widget, "{task.percentage:.0f}%")
         self.console = console or Console()
         self.refresh_per_second = refresh_per_second
         self._tasks: Dict[int, Task] = {}
@@ -129,8 +130,10 @@ class Progress:
             table.add_row(*row)
         return table
 
-    def add_task(self, total: int = 100, completed: int = 0, *fields: str) -> Task:
-        task = Task(total, completed)
+    def add_task(
+        self, name: str, total: int = 100, completed: int = 0, **fields: str
+    ) -> Task:
+        task = Task(name, total, completed, fields=fields)
         self._tasks[self._task_index] = task
         try:
             return task
@@ -141,8 +144,8 @@ class Progress:
 if __name__ == "__main__":
     import time
 
-    with Progress(bar_widget, "{task.percentage:.0f}%") as progress:
-        task = progress.add_task()
+    with Progress() as progress:
+        task = progress.add_task("Processing...")
         progress.refresh()
         for _ in range(100):
             task.completed += 1
