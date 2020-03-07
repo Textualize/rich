@@ -20,7 +20,7 @@ class Palette:
         return [f"{red:02x}{green:02x}{blue:02x}" for red, green, blue in self._colors]
 
     # This is somewhat inefficient and needs caching
-    @lru_cache(maxsize=1000)
+    @lru_cache(maxsize=1024)
     def match(self, color: Tuple[int, int, int]) -> int:
         """Find a color from a palette that most closely matches a given color"""
         red1, green1, blue1 = color

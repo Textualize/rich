@@ -65,8 +65,9 @@ def measure_renderables(
 ) -> "Measurement":
     """Measure a number of renderables."""
 
+    get_measurement = Measurement.get
     measurements = [
-        Measurement.get(console, renderable, max_width) for renderable in renderables
+        get_measurement(console, renderable, max_width) for renderable in renderables
     ]
     measured_width = Measurement(
         max(measurements, key=itemgetter(0)).minimum,

@@ -98,7 +98,7 @@ class Table:
         title: Union[str, Text] = None,
         caption: Union[str, Text] = None,
         width: int = None,
-        box: Optional[box.Box] = box.HEAVY_HEAD,
+        box: Optional[box.Box] = box.SQUARE,
         padding: PaddingDimensions = (0, 1),
         pad_edge: bool = True,
         expand: bool = False,
@@ -134,6 +134,13 @@ class Table:
         self.title_style = title_style
         self.caption_style = title_style
         self._row_count = 0
+
+    @classmethod
+    def grid(cls) -> "Table":
+        """Get a table with lines, headers, or footer."""
+        return cls(
+            box=None, padding=0, show_header=False, show_footer=False, show_edge=False
+        )
 
     @property
     def padding(self) -> Tuple[int, int, int, int]:

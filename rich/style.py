@@ -6,6 +6,9 @@ from . import errors
 from .color import blend_rgb, Color, ColorParseError, ColorSystem
 from .terminal_theme import TerminalTheme, DEFAULT_TERMINAL_THEME
 
+# Style instances and style definitions are often interchangable
+StyleType = Union[str, "Style"]
+
 
 class _Bit:
     """A descriptor to get/set a style attribute bit."""
@@ -26,6 +29,8 @@ class Style:
     _bgcolor: Optional[Color]
     _attributes: int
     _set_attributes: int
+
+    __slots__ = ["_color", "_bgcolor", "_attributes", "_set_attributes"]
 
     def __init__(
         self,
@@ -110,7 +115,7 @@ class Style:
         return " ".join(attributes) or "none"
 
     @classmethod
-    @lru_cache(maxsize=1000)
+    @lru_cache(maxsize=1024)
     def normalize(cls, style: str) -> str:
         """Normalize a style definition so that styles with the same effect have the same string
         representation.
@@ -127,7 +132,7 @@ class Style:
             return style.strip().lower()
 
     @classmethod
-    def pick_first(cls, *values: Optional[Union["Style", str]]) -> Union["Style", str]:
+    def pick_first(cls, *values: Optional[StyleType]) -> StyleType:
         """Pick first non-None style."""
         for value in values:
             if value is not None:
@@ -164,7 +169,7 @@ class Style:
         return self._bgcolor
 
     @classmethod
-    @lru_cache(maxsize=1000)
+    @lru_cache(maxsize=1024)
     def parse(cls, style_definition: str) -> "Style":
         """Parse style name(s) in to style object."""
         style_attributes = {
@@ -219,7 +224,7 @@ class Style:
         style = Style(color=color, bgcolor=bgcolor, **attributes)
         return style
 
-    @lru_cache(maxsize=1000)
+    @lru_cache(maxsize=1024)
     def get_html_style(self, theme: TerminalTheme = None) -> str:
         """Get a CSS style rule."""
         theme = theme or DEFAULT_TERMINAL_THEME
@@ -293,7 +298,10 @@ class Style:
             Style: A new Style instance with identical attributes.
         """
         style = self.__new__(Style)
-        style.__dict__ = self.__dict__.copy()
+        style._color = self._color
+        style._bgcolor = self._bgcolor
+        style._attributes = self._attributes
+        style._set_attributes = self._set_attributes
         return style
 
     def render(
@@ -301,10 +309,9 @@ class Style:
         text: str = "",
         *,
         color_system: Optional[ColorSystem] = ColorSystem.TRUECOLOR,
-        reset=False,
     ) -> str:
         """Render the ANSI codes to implement the style."""
-        if color_system is None:
+        if color_system is None or not text:
             return text
         attrs: List[str] = []
         if self._color is not None:
@@ -324,11 +331,10 @@ class Style:
                 if set_bits & bit:
                     append(str(1 + bit_no) if bits & bit else str(21 + bit_no))
 
-        reset = "\x1b[0m" if reset else ""
         if attrs:
-            return f"\x1b[{';'.join(attrs)}m{text or ''}{reset}"
+            return f"\x1b[{';'.join(attrs)}m{text or ''}\x1b[0m"
         else:
-            return f"{text or ''}{reset}"
+            return text
 
     def test(self, text: Optional[str] = None) -> None:
         """Write test text with style to terminal.
@@ -354,15 +360,12 @@ class Style:
 
         """
         new_style = self.__new__(Style)
-        new_style.__dict__ = {
-            "_color": style._color or self._color,
-            "_bgcolor": style._bgcolor or self._bgcolor,
-            "_attributes": (
-                (self._attributes & ~style._set_attributes)
-                | (style._attributes & style._set_attributes)
-            ),
-            "_set_attributes": self._set_attributes | style._set_attributes,
-        }
+        new_style._color = style._color or self._color
+        new_style._bgcolor = style._bgcolor or self._bgcolor
+        new_style._attributes = (self._attributes & ~style._set_attributes) | (
+            style._attributes & style._set_attributes
+        )
+        new_style._set_attributes = self._set_attributes | style._set_attributes
         return new_style
 
     def _update(self, style: "Style") -> None:
@@ -422,48 +425,3 @@ class StyleStack:
         self._stack.pop()
         self.current = self._stack[-1]
         return self.current
-
-
-if __name__ == "__main__":  # pragma: no cover
-    import sys
-
-    # style = Style(color="blue", bold=True, italic=True, reverse=False, dim=True)
-
-    from .console import Console
-
-    c = Console()
-    style = Style.parse("bold not italic  #6ab825")
-    print(bin(style._attributes), bin(style._set_attributes))
-
-    print(repr(style.bold))
-    print(repr(style.italic))
-    print(style.render("hello", reset=True))
-
-    c.print("hello", style=style)
-
-    print(Style.parse("dim cyan").render("COLOR", reset=True))
-    print(Style.parse("dim cyan+").render("COLOR", reset=True))
-
-    print(Style.parse("cyan").render("COLOR", reset=True))
-    print(Style.parse("cyan+").render("COLOR", reset=True))
-
-    print(Style.parse("bold blue on magenta+ red").render("COLOR", reset=True))
-
-    print(Style.parse("bold blue on magenta+ red").get_html_style())
-
-    # style.italic = True
-    # print(style._attributes, style._set_attributes)
-    # print(style.italic)
-    # print(style.bold)
-
-    # # style = Style.parse("bold")
-    # # print(style)
-    # # print(repr(style))
-
-    # # style.test()
-
-    # style = Style.parse("bold on black")
-    # print(style.bold)
-    # print(style)
-    # print(repr(style))
-

@@ -325,13 +325,13 @@ class Console:
         """Get a thread local style stack."""
         style_stack = getattr(self._thread_locals, "style_stack", None)
         if style_stack is None:
-            style_stack = self._thread_locals.style_stack = []
+            style_stack = self._thread_locals.style_stack = [Style()]
         return style_stack
 
     @property
     def _current_style(self) -> Style:
-        """Get a thread local buffer."""
-        return getattr(self._thread_locals, "current_style", 0)
+        """Get a thread local style."""
+        return getattr(self._thread_locals, "current_style", Style())
 
     @_current_style.setter
     def _current_style(self, style: Style) -> None:
@@ -461,6 +461,17 @@ class Console:
             self._buffer.append(Segment("\n" * count))
             self._check_buffer()
 
+    def show_cursor(self, show: bool = True) -> None:
+        """Show or hide the cursor.
+        
+        Args:
+            show (bool, optional): Set visibility of the cursor.
+        """
+        if WINDOWS:
+            return
+        self._buffer.append(Segment("\033[?25h" if show else "\033[?25l"))
+        self._check_buffer()
+
     def _render(
         self,
         renderable: Union[RenderableType, Segment],
@@ -550,6 +561,7 @@ class Console:
         renderable: RenderableType,
         options: Optional[ConsoleOptions],
         style: Optional[Style] = None,
+        pad: bool = True,
     ) -> List[List[Segment]]:
         """Render objects in to a list of lines.
 
@@ -573,6 +585,7 @@ class Console:
                     render_options.max_width,
                     style=style,
                     include_new_lines=False,
+                    pad=pad,
                 )
             )
         return lines
@@ -895,7 +908,7 @@ class Console:
         for line in Segment.split_and_crop_lines(buffer, self.width, pad=False):
             for text, style in line:
                 if style:
-                    append(style.render(text, color_system=color_system, reset=True))
+                    append(style.render(text, color_system=color_system))
                 else:
                     append(text)
         rendered = "".join(output)
@@ -920,7 +933,7 @@ class Console:
         with self._record_buffer_lock:
             if styles:
                 text = "".join(
-                    (style.render(text, reset=True) if style else text)
+                    (style.render(text) if style else text)
                     for text, style in self._record_buffer
                 )
             else:

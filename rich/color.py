@@ -331,7 +331,7 @@ class Color(NamedTuple):
         return cls(name="default", type=ColorType.DEFAULT)
 
     @classmethod
-    @lru_cache(maxsize=1000)
+    @lru_cache(maxsize=1024)
     def parse(cls, color: str) -> "Color":
         """Parse a color definition."""
         color = color.lower().strip()
@@ -378,7 +378,7 @@ class Color(NamedTuple):
                 raise ColorParseError(f"color components must be <= 255 in {color!r}")
             return cls(color, ColorType.TRUECOLOR, triplet=triplet)
 
-    @lru_cache(maxsize=1000)
+    @lru_cache(maxsize=1024)
     def get_ansi_codes(self, foreground: bool = True) -> List[str]:
         """Get the ANSI escape codes for this color."""
         _type = self.type
@@ -399,7 +399,7 @@ class Color(NamedTuple):
             red, green, blue = self.triplet
             return ["38" if foreground else "48", "2", str(red), str(green), str(blue)]
 
-    @lru_cache(maxsize=1000)
+    @lru_cache(maxsize=1024)
     def downgrade(self, system: ColorSystem) -> "Color":
         """Downgrade a color system to a system with fewer colors."""
 
