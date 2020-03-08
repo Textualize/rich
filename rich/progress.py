@@ -123,9 +123,9 @@ class Progress:
     def update(
         self,
         task_id: TaskID,
-        total: int = None,
-        completed: int = None,
-        advance: int = None,
+        total: float = None,
+        completed: float = None,
+        advance: float = None,
         visible: bool = None,
         **fields: RenderableType
     ) -> None:
