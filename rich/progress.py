@@ -26,10 +26,14 @@ class MissingWidget(ProgressError):
 @dataclass
 class Task:
     name: str
-    total: int
-    completed: int
+    total: float
+    completed: float
     visible: bool = True
     fields: Dict[str, str] = field(default_factory=dict)
+
+    @property
+    def finished(self) -> bool:
+        return self.completed >= self.total
 
     @property
     def percentage(self) -> float:
@@ -74,7 +78,11 @@ class Progress:
         refresh_per_second: int = 15,
         auto_refresh: bool = True
     ) -> None:
-        self.columns = columns or ("{task.name}", bar_widget, "{task.percentage:.0f}%")
+        self.columns = columns or (
+            "{task.name}",
+            bar_widget,
+            "{task.percentage:>3.0f}%",
+        )
         self.console = console or Console(file=sys.stderr)
         self.refresh_per_second = refresh_per_second
         self.auto_refresh = auto_refresh
@@ -84,6 +92,16 @@ class Progress:
         self._lock = RLock()
         self._refresh_thread: Optional[RefreshThread] = None
         self._refresh_count = 0
+
+    @property
+    def tasks(self) -> List[TaskID]:
+        return list(self._tasks.keys())
+
+    @property
+    def finished(self) -> bool:
+        if not self._tasks:
+            return True
+        return all(task.finished for task in self._tasks.values())
 
     def __enter__(self) -> "Progress":
         self.console.show_cursor(False)
@@ -168,15 +186,21 @@ class Progress:
             task_id (TaskID): A task ID.
         
         """
-        self._tasks.pop(task_id)
+        self.tasks.pop(task_id)
 
 
 if __name__ == "__main__":
+    import random
     import time
 
     with Progress() as progress:
-        task_id = progress.add_task("Processing...")
 
-        for i in range(100):
-            progress.update(task_id, completed=i)
+        task1 = progress.add_task("[red]Downloading")
+        task2 = progress.add_task("[green]Processing")
+        task3 = progress.add_task("[cyan]Cooking...")
+
+        while not progress.finished:
+            progress.update(task1, advance=1.0)
+            progress.update(task2, advance=0.6)
+            progress.update(task3, advance=1.7)
             time.sleep(0.05)

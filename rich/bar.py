@@ -9,17 +9,19 @@ from .style import StyleType
 class Bar:
     def __init__(
         self,
-        total: int = 100,
-        completed: int = 0,
+        total: float = 100,
+        completed: float = 0,
         width: int = None,
-        style: StyleType = "progress.bar",
-        complete_style: StyleType = "progress.complete",
+        style: StyleType = "bar.back",
+        complete_style: StyleType = "bar.complete",
+        done_style: StyleType = "bar.done",
     ):
         self.total = total
         self.completed = completed
         self.width = width
         self.style = style
         self.complete_style = complete_style
+        self.done_style = done_style
 
     def __repr__(self) -> str:
         return f"<Bar {self.completed!r} of {self.total!r}>"
@@ -30,7 +32,7 @@ class Bar:
         completed = min(100, max(0.0, completed))
         return completed
 
-    def update_progress(self, completed: int, total: int = None) -> None:
+    def update_progress(self, completed: float, total: float = None) -> None:
         self.completed = completed
         self.total = total if total is not None else self.total
 
@@ -44,7 +46,9 @@ class Bar:
         bar_count = complete_halves // 2
         half_bar_count = complete_halves % 2
         style = console.get_style(self.style)
-        complete_style = console.get_style(self.complete_style)
+        complete_style = console.get_style(
+            self.complete_style if self.completed < self.total else self.done_style
+        )
         if bar_count:
             yield Segment(bar * bar_count, complete_style)
         if half_bar_count:
