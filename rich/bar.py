@@ -22,7 +22,7 @@ class Bar:
         self.complete_style = complete_style
 
     def __repr__(self) -> str:
-        return f"<Bar {self.total!r} of {self.completed!r}>"
+        return f"<Bar {self.completed!r} of {self.total!r}>"
 
     @property
     def percentage_completed(self) -> float:

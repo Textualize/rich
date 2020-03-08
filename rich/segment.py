@@ -152,7 +152,7 @@ class Segment(NamedTuple):
             Tuple[int, int]: Width and height in characters.
         """
         get_line_length = cls.get_line_length
-        max_width = max(get_line_length(line) for line in lines)
+        max_width = max(get_line_length(line) for line in lines) if lines else 0
         return (max_width, len(lines))
 
     @classmethod

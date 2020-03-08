@@ -137,7 +137,7 @@ class Table:
 
     @classmethod
     def grid(cls) -> "Table":
-        """Get a table with lines, headers, or footer."""
+        """Get a table with no lines, headers, or footer."""
         return cls(
             box=None, padding=0, show_header=False, show_footer=False, show_edge=False
         )

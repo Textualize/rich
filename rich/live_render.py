@@ -12,6 +12,9 @@ class LiveRender:
         self.style = style
         self._shape: Optional[Tuple[int, int]] = None
 
+    def set_renderable(self, renderable: RenderableType) -> None:
+        self.renderable = renderable
+
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
 
         if self._shape is not None:
@@ -40,8 +43,6 @@ class LiveRender:
             yield from line
             if not last:
                 yield Segment.line()
-
-        # yield Segment(f"\x1b[{height}F")
 
 
 if __name__ == "__main__":

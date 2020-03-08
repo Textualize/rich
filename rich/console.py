@@ -895,6 +895,7 @@ class Console:
         if self._buffer_index == 0:
             text = self._render_buffer()
             self.file.write(text)
+            self.file.flush()
 
     def _render_buffer(self) -> str:
         """Render buffered output, and clear buffer."""
