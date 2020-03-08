@@ -15,10 +15,11 @@ Welcome to Rich's documentation!
    style.rst
    markup.rst
    tables.rst
+   panel.rst
    markdown.rst
    syntax.rst
    text.rst
-   traceback
+   traceback.rst
    protocol.rst
 
    reference.rst

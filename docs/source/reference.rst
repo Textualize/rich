@@ -9,7 +9,7 @@ Reference
    reference/emoji.rst
    reference/highlighter.rst
    reference/markdown.rst
-   reference/render_width.rst
+   reference/measure.rst
    reference/panel.rst
    reference/rule.rst
    reference/segment.rst

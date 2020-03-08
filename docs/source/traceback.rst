@@ -22,3 +22,5 @@ Rich can be installed as the default traceback handler so that all uncaught exce
 
     from rich.traceback import install
     install()
+
+There are a few options to configure the traceback handler, see :func:`~rich.traceback.install` for details.

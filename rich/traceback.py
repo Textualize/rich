@@ -39,7 +39,7 @@ def install(
     Args:
         width (Optional[int], optional): Width (in characters) of traceback. Defaults to 100.
         extra_lines (int, optional): Extra lines of code. Defaults to 3.
-        theme (Optional[str], optional) Pygments theme to use in traceback. Defaults to ``None`` which will pick
+        theme (Optional[str], optional): Pygments theme to use in traceback. Defaults to ``None`` which will pick
             a theme appropriate for the platform. 
 
     """

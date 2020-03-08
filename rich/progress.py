@@ -95,13 +95,15 @@ class Progress:
 
     @property
     def tasks(self) -> List[TaskID]:
-        return list(self._tasks.keys())
+        with self._lock:
+            return list(self._tasks.keys())
 
     @property
     def finished(self) -> bool:
-        if not self._tasks:
-            return True
-        return all(task.finished for task in self._tasks.values())
+        with self._lock:
+            if not self._tasks:
+                return True
+            return all(task.finished for task in self._tasks.values())
 
     def __enter__(self) -> "Progress":
         self.console.show_cursor(False)
