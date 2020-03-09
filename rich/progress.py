@@ -68,12 +68,21 @@ def bar_widget(task: Task) -> Bar:
 
 
 class Progress:
+    """Renders an auto-updating progress bar(s).
+    
+    Args:
+        console (Console, optional): Optional Console instance. Default will create own internal Console instance.
+        auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
+        refresh_per_second (int, optional): Number of times per second to refresh the progress information. Defaults to 15.
+        
+    """
+
     def __init__(
         self,
         *columns: Union[str, WidgetCallable],
         console: Console = None,
-        refresh_per_second: int = 15,
-        auto_refresh: bool = True
+        auto_refresh: bool = True,
+        refresh_per_second: int = 15
     ) -> None:
         self.columns = columns or (
             "{task.name}",
@@ -131,6 +140,15 @@ class Progress:
         visible: bool = None,
         **fields: Any
     ) -> None:
+        """Update information associated with a task.
+        
+        Args:
+            task_id (TaskID): Task id (return by add_task).
+            total (float, optional): Updates task.total if not None.
+            completed (float, optional): Updates task.completed if not None.
+            advance (float, optional): Add a value to task.completed if not None.
+            visible (bool, optional): Set visible flag if not None.
+        """
         with self._lock:
             task = self._tasks[task_id]
             if total is not None:
