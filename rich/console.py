@@ -754,7 +754,11 @@ class Console:
             if rich_cast:
                 renderable = rich_cast()
             if isinstance(renderable, str):
-                append_text(_highlighter(self.render_str(renderable)))
+                append_text(
+                    _highlighter(
+                        self.render_str(renderable, emoji=emoji, markup=markup)
+                    )
+                )
             elif isinstance(renderable, Text):
                 append_text(renderable)
             elif isinstance(renderable, ConsoleRenderable):
