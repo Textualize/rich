@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Console.show_cursor method
 
+### Fixed
+
+- Fixed wrapping when a single word was too large to fit in a line
+
 ## [0.6.0] - 2020-03-03
 
 ### Added

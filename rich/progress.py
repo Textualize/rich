@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 import sys
 from time import monotonic
 from threading import Event, RLock, Thread
-from typing import Callable, Dict, List, Optional, NewType, Union
+from typing import Any, Callable, Dict, List, Optional, NewType, Union
 
 from .bar import Bar
 from .console import Console, RenderableType
@@ -29,7 +29,7 @@ class Task:
     total: float
     completed: float
     visible: bool = True
-    fields: Dict[str, str] = field(default_factory=dict)
+    fields: Dict[str, Any] = field(default_factory=dict)
 
     @property
     def finished(self) -> bool:
@@ -45,7 +45,7 @@ class Task:
 
 
 class RefreshThread(Thread):
-    """A thread that calls refresh on the Process object at regular intervals."""
+    """A thread that calls refresh() on the Process object at regular intervals."""
 
     def __init__(self, progress: "Progress", refresh_per_second: int = 10) -> None:
         self.progress = progress
@@ -59,10 +59,7 @@ class RefreshThread(Thread):
 
     def run(self) -> None:
         while not self.done.wait(1.0 / self.refresh_per_second):
-            try:
-                self.progress.refresh()
-            except Exception as error:
-                raise
+            self.progress.refresh()
 
 
 def bar_widget(task: Task) -> Bar:
@@ -95,11 +92,13 @@ class Progress:
 
     @property
     def tasks(self) -> List[TaskID]:
+        """Get a list of task IDs."""
         with self._lock:
             return list(self._tasks.keys())
 
     @property
     def finished(self) -> bool:
+        """Check if all tasks have been completed."""
         with self._lock:
             if not self._tasks:
                 return True
@@ -125,11 +124,12 @@ class Progress:
     def update(
         self,
         task_id: TaskID,
+        *,
         total: float = None,
         completed: float = None,
         advance: float = None,
         visible: bool = None,
-        **fields: RenderableType
+        **fields: Any
     ) -> None:
         with self._lock:
             task = self._tasks[task_id]
@@ -143,6 +143,7 @@ class Progress:
                 task.visible = True
 
     def refresh(self) -> None:
+        """Refresh (render) the progress information."""
         with self._lock:
             self._live_render.set_renderable(self._table)
             self.console.print(self._live_render)
@@ -192,14 +193,14 @@ class Progress:
 
 
 if __name__ == "__main__":
-    import random
+
     import time
 
     with Progress() as progress:
 
         task1 = progress.add_task("[red]Downloading")
         task2 = progress.add_task("[green]Processing")
-        task3 = progress.add_task("[cyan]Cooking...")
+        task3 = progress.add_task("[cyan]Cooking")
 
         while not progress.finished:
             progress.update(task1, advance=1.0)

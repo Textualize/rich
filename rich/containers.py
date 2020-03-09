@@ -57,6 +57,9 @@ class Lines:
     def __init__(self, lines: Iterable["Text"] = ()) -> None:
         self._lines: List["Text"] = list(lines)
 
+    def __repr__(self) -> str:
+        return f"Lines({self._lines!r})"
+
     def __iter__(self) -> Iterator["Text"]:
         return iter(self._lines)
 

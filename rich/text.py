@@ -644,16 +644,3 @@ class Text:
             append(line)
         return lines
 
-
-if __name__ == "__main__":  # pragma: no cover
-    from .console import Console
-
-    console = Console()
-    text = Text(
-        """Hello, self! hello World
-
-hello  worhello\n"""
-    )
-    text.highlight_regex("self", "reverse")
-    console.print(text)
-

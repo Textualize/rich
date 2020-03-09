@@ -303,6 +303,7 @@ class Table:
             flex_widths = [_range.span for _range in width_ranges]
             if not any(flex_widths):
                 flex_widths = [1] * len(flex_widths)
+                flex_widths = [0 if column.no_wrap else 1 for column in columns]
             excess_width = table_width - max_width
             widths = [
                 width - excess_width
@@ -457,29 +458,15 @@ class Table:
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     from .console import Console
-    from . import box
 
-    c = Console(markup=True)
-    table = Table(
-        Column(
-            "Foo", footer=Text("Total", justify="right"), footer_style="bold", ratio=1
-        ),
-        Column("Bar", style="red", footer="123", ratio=1),
-        expand=True,
-        show_footer=True,
-        show_edge=True,
-        style="on blue",
+    c = Console(width=80)
+    table = Table()
+    table.add_column(no_wrap=True)
+    table.add_column()
+    table.add_row(
+        "Magnet",
+        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
     )
-    # table.columns[0].width = 50
-    # table.columns[1].ratio = 1
-
-    table.add_row("Hello, [b]World[/b]! " * 3, "cake" * 10)
-    from .markdown import Markdown
-
-    table.add_row(Markdown("# This is *Markdown*!"), "More text", "Hello WOrld")
-    table.columns[0].justify = "center"
-    table.columns[1].justify = "right"
-
     c.print(table)
+
