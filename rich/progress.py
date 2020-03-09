@@ -141,6 +141,7 @@ class Progress:
                 task.completed = completed
             if visible is not None:
                 task.visible = True
+            task.fields.update(fields)
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""

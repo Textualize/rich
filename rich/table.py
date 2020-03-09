@@ -457,7 +457,7 @@ class Table:
             yield new_line
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     from .console import Console
 
     c = Console(width=80)

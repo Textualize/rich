@@ -8,7 +8,7 @@ from urllib.request import urlopen
 from rich.progress import bar_widget, Progress, TaskID
 
 
-progress = Progress(bar_widget, "{task.percentage:0.1f}%", "{task.fields[filename]}")
+progress = Progress(bar_widget, "{task.percentage:>3.0f}%", "{task.fields[filename]}")
 
 
 def copy_url(task_id: TaskID, url: str, path: str) -> None:
