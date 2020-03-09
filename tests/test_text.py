@@ -241,17 +241,18 @@ def test_right_crop():
     assert test._spans == [Span(0, 3, "red")]
 
 
-def test_wrap():
+def test_wrap_4():
     test = Text("foo bar baz")
     lines = test.wrap(4)
-    print(list(lines))
     assert len(lines) == 3
     assert lines[0] == Text("foo ")
     assert lines[1] == Text("bar ")
     assert lines[2] == Text("baz ")
 
+
+def test_wrap_3():
+    test = Text("foo bar baz")
     lines = test.wrap(3)
-    print(list(lines))
     assert len(lines) == 3
     assert lines[0] == Text("foo")
     assert lines[1] == Text("bar")

@@ -98,7 +98,7 @@ class Table:
         title: Union[str, Text] = None,
         caption: Union[str, Text] = None,
         width: int = None,
-        box: Optional[box.Box] = box.SQUARE,
+        box: Optional[box.Box] = box.HEAVY_HEAD,
         padding: PaddingDimensions = (0, 1),
         pad_edge: bool = True,
         expand: bool = False,
