@@ -329,7 +329,15 @@ class Style:
         *,
         color_system: Optional[ColorSystem] = ColorSystem.TRUECOLOR,
     ) -> str:
-        """Render the ANSI codes to implement the style."""
+        """Render the ANSI codes for the style.
+        
+        Args:
+            text (str, optional): A string to style. Defaults to "".
+            color_system (Optional[ColorSystem], optional): Color system to render to. Defaults to ColorSystem.TRUECOLOR.
+        
+        Returns:
+            str: A string containing ANSI style codes.
+        """
         if color_system is None or not text:
             return text
         attrs: List[str] = []
@@ -345,13 +353,6 @@ class Style:
         if set_bits:
             append = attrs.append
             bits = self._attributes
-
-            # for bit_no in range(0, 9):
-            #     bit = 1 << bit_no
-            #     if set_bits & bit:
-            #         append(str(1 + bit_no) if bits & bit else str(21 + bit_no))
-
-            # An exercise in loop unrolling - never thought I'd do this in Python!
             if set_bits & 1:
                 append("1" if bits & 1 else "21")
             if set_bits & 2:
@@ -360,16 +361,18 @@ class Style:
                 append("3" if bits & 4 else "23")
             if set_bits & 8:
                 append("4" if bits & 8 else "24")
-            if set_bits & 16:
-                append("5" if bits & 16 else "25")
-            if set_bits & 32:
-                append("6" if bits & 32 else "26")
-            if set_bits & 64:
-                append("7" if bits & 64 else "27")
-            if set_bits & 128:
-                append("8" if bits & 128 else "28")
-            if set_bits & 256:
-                append("9" if bits & 256 else "29")
+            # Early out for less common attributes
+            if set_bits & 0b111110000:
+                if set_bits & 16:
+                    append("5" if bits & 16 else "25")
+                if set_bits & 32:
+                    append("6" if bits & 32 else "26")
+                if set_bits & 64:
+                    append("7" if bits & 64 else "27")
+                if set_bits & 128:
+                    append("8" if bits & 128 else "28")
+                if set_bits & 256:
+                    append("9" if bits & 256 else "29")
 
         if attrs:
             return f"\x1b[{';'.join(attrs)}m{text or ''}\x1b[0m"
