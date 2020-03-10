@@ -11,6 +11,7 @@ Reference
    reference/markdown.rst
    reference/measure.rst
    reference/panel.rst
+   reference/progress.rst
    reference/rule.rst
    reference/segment.rst
    reference/style.rst

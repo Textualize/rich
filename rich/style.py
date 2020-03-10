@@ -23,26 +23,26 @@ class _Bit:
 
 
 class Style:
-        """A terminal style.
+    """A terminal style.
 
-        A terminal style consists of a color (`color`), a backround color (`bgcolor`), and a number of attributes, such
-        as bold, italic etc. The attributes have 3 states: they can either be on
-        (``True``), off (``False``), or not set (``None``).
-        
-        Args:
-            color (Union[Color, str], optional): Color of terminal text. Defaults to None.
-            bgcolor (Union[Color, str], optional): Color of terminal background. Defaults to None.
-            bold (bool, optional): Enable bold text. Defaults to None.
-            dim (bool, optional): Enable dim text. Defaults to None.
-            italic (bool, optional): Enable italic text. Defaults to None.
-            underline (bool, optional): Enable underlined text. Defaults to None.
-            blink (bool, optional): Enabled blinking text. Defaults to None.
-            blink2 (bool, optional): Enable fast blinking text. Defaults to None.
-            reverse (bool, optional): Enabled reverse text. Defaults to None.
-            conceal (bool, optional): Enable concealed text. Defaults to None.
-            strike (bool, optional): Enable strikethrough text. Defaults to None.
-        
-        """
+    A terminal style consists of a color (`color`), a backround color (`bgcolor`), and a number of attributes, such
+    as bold, italic etc. The attributes have 3 states: they can either be on
+    (``True``), off (``False``), or not set (``None``).
+    
+    Args:
+        color (Union[Color, str], optional): Color of terminal text. Defaults to None.
+        bgcolor (Union[Color, str], optional): Color of terminal background. Defaults to None.
+        bold (bool, optional): Enable bold text. Defaults to None.
+        dim (bool, optional): Enable dim text. Defaults to None.
+        italic (bool, optional): Enable italic text. Defaults to None.
+        underline (bool, optional): Enable underlined text. Defaults to None.
+        blink (bool, optional): Enabled blinking text. Defaults to None.
+        blink2 (bool, optional): Enable fast blinking text. Defaults to None.
+        reverse (bool, optional): Enabled reverse text. Defaults to None.
+        conceal (bool, optional): Enable concealed text. Defaults to None.
+        strike (bool, optional): Enable strikethrough text. Defaults to None.
+    
+    """
 
     _color: Optional[Color]
     _bgcolor: Optional[Color]
