@@ -24,3 +24,18 @@ There is a shorthand for closing a style. If you omit the style name from the cl
 
     print("[bold red]Bold and red[/] not bold or red")
 
+
+Rendering Markup
+----------------
+
+By default, Rich will render console markup when you explicitly pass a string to :meth:`~rich.console.Print.print` or implicitly when you embed a string in another renderable object such as :class:`~rich.table.Table` or :class:`~rich.panel.Panel`.
+
+Console markup is convenient, but you may wish to disable it if the syntax clashes with the string you want to print. You can do this by setting ``markup=False`` on the :meth:`~rich.console.Print.print` method or on the :class:`~rich.console.Console` constructor.
+
+
+Markup API
+----------
+
+You can convert a string to styled text by calling :meth:`~rich.text.Text.from_markup`, which returns a :class:`~rich.text.Text` instance you can print or add more styles to.
+
+

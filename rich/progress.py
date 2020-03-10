@@ -116,7 +116,7 @@ class TransferSpeedColumn(ProgressColumn):
         return Text(f"{data_speed}/s", style="progress.data.speed")
 
 
-class _ProgressSample(NamedTuple):
+class ProgressSample(NamedTuple):
     """Sample of progress for a given time."""
 
     timestamp: float
@@ -133,10 +133,12 @@ class Task:
     completed: float
     visible: bool = True
     fields: Dict[str, Any] = field(default_factory=dict)
-    start_time: Optional[float] = None
-    stop_time: Optional[float] = None
+    start_time: Optional[float] = field(default=None, init=False, repr=False)
+    stop_time: Optional[float] = field(default=None, init=False, repr=False)
 
-    _progress: Deque[_ProgressSample] = field(default_factory=deque)
+    _progress: Deque[ProgressSample] = field(
+        default_factory=deque, init=False, repr=False
+    )
 
     @property
     def remaining(self) -> float:
@@ -193,7 +195,7 @@ class Task:
         return estimate
 
 
-class RefreshThread(Thread):
+class _RefreshThread(Thread):
     """A thread that calls refresh() on the Process object at regular intervals."""
 
     def __init__(self, progress: "Progress", refresh_per_second: int = 10) -> None:
@@ -217,7 +219,7 @@ class Progress:
     Args:
         console (Console, optional): Optional Console instance. Default will create own internal Console instance.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
-        refresh_per_second (int, optional): Number of times per second to refresh the progress information. Defaults to 15.
+        refresh_per_second (int, optional): Number of times per second to refresh the progress information. Defaults to 10.
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
     """
 
@@ -226,7 +228,7 @@ class Progress:
         *columns: Union[str, ProgressColumn],
         console: Console = None,
         auto_refresh: bool = True,
-        refresh_per_second: int = 15,
+        refresh_per_second: int = 10,
         speed_estimate_period: float = 30.0,
     ) -> None:
         self.columns = columns or (
@@ -243,7 +245,7 @@ class Progress:
         self._live_render = LiveRender(self._table)
         self._task_index: TaskID = TaskID(0)
         self._lock = RLock()
-        self._refresh_thread: Optional[RefreshThread] = None
+        self._refresh_thread: Optional[_RefreshThread] = None
         self._refresh_count = 0
 
     @property
@@ -263,7 +265,7 @@ class Progress:
     def __enter__(self) -> "Progress":
         self.console.show_cursor(False)
         if self.auto_refresh:
-            self._refresh_thread = RefreshThread(self, self.refresh_per_second)
+            self._refresh_thread = _RefreshThread(self, self.refresh_per_second)
             self._refresh_thread.start()
         return self
 
@@ -345,7 +347,7 @@ class Progress:
 
             while _progress and _progress[0].timestamp < old_sample_time:
                 _progress.popleft()
-            task._progress.append(_ProgressSample(current_time, update_completed))
+            task._progress.append(ProgressSample(current_time, update_completed))
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
