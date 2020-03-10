@@ -34,7 +34,6 @@ def _to_str(size: int, suffixes: Iterable[str], base: int) -> int:
 
 
 def traditional(size: int) -> str:
-    # type: (SupportsInt) -> Text
     """Convert a filesize in to a string (powers of 1024, JDEC prefixes).
 
     In this convention, ``1024 B = 1 KB``.
