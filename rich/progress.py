@@ -325,6 +325,7 @@ class Progress:
             completed (float, optional): Updates task.completed if not None.
             advance (float, optional): Add a value to task.completed if not None.
             visible (bool, optional): Set visible flag if not None.
+            **fields (Any): Additional data fields required for rendering.
         """
         current_time = monotonic()
         with self._lock:
@@ -361,6 +362,8 @@ class Progress:
         """Get a table to render the Progress display."""
         table = Table.grid()
         table.padding = (0, 1, 0, 0)
+        for _ in self.columns:
+            table.add_column()
         for _, task in self._tasks.items():
             if task.visible:
                 row: List[RenderableType] = []
@@ -383,7 +386,7 @@ class Progress:
         total: int = 100,
         completed: int = 0,
         visible: bool = True,
-        **fields: str,
+        **fields: Any,
     ) -> TaskID:
         """Add a new 'task' to the Progress display.
         
@@ -394,6 +397,7 @@ class Progress:
             total (int, optional): Number of total steps in the progress if know. Defaults to 100.
             completed (int, optional): Number of steps completed so far.. Defaults to 0.
             visible (bool, optional): Enable display of the task. Defaults to True.
+            **fields (str): Additional data fields required for rendering.
         
         Returns:
             TaskID: An ID you can use when calling `update`.
