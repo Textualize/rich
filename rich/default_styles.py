@@ -84,6 +84,10 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "bar.back": Style(color="grey50"),
     "bar.complete": Style(color="bright_magenta"),
     "bar.done": Style(color="bright_green"),
+    "progress.data": Style(color="green"),
+    "progress.percentage": Style(color="magenta"),
+    "progress.remaining": Style(color="cyan"),
+    "progress.data.speed": Style(color="red"),
 }
 
 MARKDOWN_STYLES = {

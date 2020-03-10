@@ -5,10 +5,27 @@ import sys
 from typing import Iterable
 from urllib.request import urlopen
 
-from rich.progress import bar_widget, Progress, TaskID
+from rich.progress import (
+    bar_widget,
+    data_speed_widget,
+    file_size_widget,
+    remaining_widget,
+    Progress,
+    TaskID,
+)
 
 
-progress = Progress(bar_widget, "{task.percentage:>3.0f}%", "{task.fields[filename]}")
+progress = Progress(
+    "[bold blue]{task.fields[filename]}",
+    bar_widget,
+    "[progress.percentage]{task.percentage:>3.0f}%",
+    "•",
+    file_size_widget,
+    "•",
+    data_speed_widget,
+    "•",
+    remaining_widget,
+)
 
 
 def copy_url(task_id: TaskID, url: str, path: str) -> None:
@@ -37,4 +54,4 @@ if __name__ == "__main__":
     if sys.argv[1:]:
         download(sys.argv[1:], "./")
     else:
-        print("Usage:\npython downloader.py URL1 URL2 URL3 (etc)")
+        print("Usage:\n\tpython downloader.py URL1 URL2 URL3 (etc)")

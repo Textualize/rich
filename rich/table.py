@@ -302,8 +302,9 @@ class Table:
         if table_width > max_width:
             flex_widths = [_range.span for _range in width_ranges]
             if not any(flex_widths):
-                flex_widths = [1] * len(flex_widths)
                 flex_widths = [0 if column.no_wrap else 1 for column in columns]
+                if not any(flex_widths):
+                    return widths
             excess_width = table_width - max_width
             widths = [
                 width - excess_width
