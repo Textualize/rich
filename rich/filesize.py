@@ -16,7 +16,7 @@ __all__ = ["traditional", "decimal", "binary"]
 from typing import Iterable
 
 
-def _to_str(size: int, suffixes: Iterable[str], base: int) -> int:
+def _to_str(size: int, suffixes: Iterable[str], base: int) -> str:
     try:
         size = int(size)
     except ValueError:

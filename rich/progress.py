@@ -86,7 +86,7 @@ class TimeRemainingColumn(ProgressColumn):
     # Only refresh twice a second to prevent jitter
     max_refresh = 0.5
 
-    def render(self, task: "Task") -> str:
+    def render(self, task: "Task") -> Text:
         """Show time remaining."""
         remaining = task.time_remaining
         if remaining is None:
@@ -98,16 +98,16 @@ class TimeRemainingColumn(ProgressColumn):
 class FileSizeColumn(ProgressColumn):
     """Renders human readable filesize."""
 
-    def render(self, task: "Task") -> str:
+    def render(self, task: "Task") -> Text:
         """Show data completed."""
-        data_size = filesize.decimal(task.completed)
+        data_size = filesize.decimal(int(task.completed))
         return Text(data_size, style="progress.data")
 
 
 class TransferSpeedColumn(ProgressColumn):
     """Renders human readable transfer speed."""
 
-    def render(self, task: "Task") -> str:
+    def render(self, task: "Task") -> Text:
         """Show data transfer speed."""
         speed = task.speed
         if speed is None:
