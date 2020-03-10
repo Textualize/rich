@@ -361,8 +361,6 @@ class Progress:
         """Get a table to render the Progress display."""
         table = Table.grid()
         table.padding = (0, 1, 0, 0)
-        for column in self.columns:
-            table.add_column()
         for _, task in self._tasks.items():
             if task.visible:
                 row: List[RenderableType] = []

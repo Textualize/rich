@@ -480,14 +480,14 @@ def blend_rgb(
     return new_color
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
 
     from .console import Console
     from .table import Column, Table
     from .text import Text
     from . import box
 
-    console = Console(record=True)
+    console = Console()
 
     table = Table(show_footer=False, show_edge=True)
     table.add_column("Color", width=10)
@@ -508,4 +508,4 @@ if __name__ == "__main__":  # pragma: no cover
             )
 
     console.print(table)
-    console.save_html("color.html", inline_styles=True)
+

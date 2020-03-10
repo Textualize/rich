@@ -51,8 +51,7 @@ class Box:
         self.bottom_left, self.bottom, self.bottom_divider, self.bottom_right = line8
 
     def __repr__(self) -> str:
-        border_str = str(self).replace("\n", r"\n")
-        return f'Border("{border_str}")'
+        return "Box(...)"
 
     def __str__(self) -> str:
         return self._box

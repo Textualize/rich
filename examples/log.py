@@ -1,3 +1,9 @@
+"""
+
+A simulation of Rich console logging.
+
+"""
+
 import time
 from rich.console import Console
 from rich.style import Style
