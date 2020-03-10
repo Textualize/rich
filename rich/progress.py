@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from collections import deque
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -14,6 +15,7 @@ from typing import (
     List,
     Optional,
     NamedTuple,
+    Tuple,
     NewType,
     Union,
 )
@@ -27,44 +29,91 @@ from .text import Text
 
 
 TaskID = NewType("TaskID", int)
-WidgetCallable = Callable[["Task"], RenderableType]
 
 
-class ProgressError(Exception):
-    pass
+class ProgressColumn(ABC):
+    """Base class for a widget to use in progress display."""
+
+    max_refresh: Optional[float] = None
+
+    def __init__(self) -> None:
+        self._renderable_cache: Dict[TaskID, Tuple[float, RenderableType]] = {}
+        self._update_time: Optional[float] = None
+
+    def __call__(self, task: "Task") -> RenderableType:
+        """Called by the Progress object to return a renderable for the given task.
+        
+        Args:
+            task (Task): An object containing information regarding the task.
+        
+        Returns:
+            RenderableType: Anything renderable (including str).
+        """
+        current_time = monotonic()
+        if self.max_refresh is not None:
+            try:
+                timestamp, renderable = self._renderable_cache[task.id]
+            except KeyError:
+                pass
+            else:
+                if timestamp + self.max_refresh > current_time:
+                    return renderable
+
+        renderable = self.render(task)
+        self._renderable_cache[task.id] = (current_time, renderable)
+        return renderable
+
+    @abstractmethod
+    def render(self, task: "Task") -> RenderableType:
+        """Should return a renderable object."""
 
 
-class MissingWidget(ProgressError):
-    pass
+class BarColumn(ProgressColumn):
+    """Renders a progress bar."""
+
+    def __init__(self, bar_width: Optional[int] = 40) -> None:
+        self.bar_width = bar_width
+        super().__init__()
+
+    def render(self, task: "Task") -> Bar:
+        """Gets a progress bar widget for a task."""
+        return Bar(total=task.total, completed=task.completed, width=self.bar_width)
 
 
-def bar_widget(task: "Task") -> Bar:
-    """Gets a progress bar widget for a task."""
-    return Bar(total=task.total, completed=task.completed, width=40)
+class TimeRemainingColumn(ProgressColumn):
+    """Renders estimated time remaining."""
+
+    # Only refresh twice a second to prevent jitter
+    max_refresh = 0.5
+
+    def render(self, task: "Task") -> str:
+        """Show time remaining."""
+        remaining = task.time_remaining
+        if remaining is None:
+            return Text("?", style="progress.remaining")
+        remaining_delta = timedelta(seconds=floor(remaining))
+        return Text(str(remaining_delta), style="progress.remaining")
 
 
-def remaining_widget(task: "Task") -> str:
-    """Show time remaining."""
-    remaining = task.time_remaining
-    if remaining is None:
-        return Text("?", style="progress.remaining")
-    remaining_delta = timedelta(seconds=floor(remaining))
-    return Text(str(remaining_delta), style="progress.remaining")
+class FileSizeColumn(ProgressColumn):
+    """Renders human readable filesize."""
+
+    def render(self, task: "Task") -> str:
+        """Show data completed."""
+        data_size = filesize.decimal(task.completed)
+        return Text(data_size, style="progress.data")
 
 
-def file_size_widget(task: "Task") -> str:
-    """Show data completed."""
-    data_size = filesize.decimal(task.completed)
-    return Text(data_size, style="progress.data")
+class TransferSpeedColumn(ProgressColumn):
+    """Renders human readable transfer speed."""
 
-
-def data_speed_widget(task: "Task") -> str:
-    """Show data transfer speed."""
-    speed = task.speed
-    if speed is None:
-        return Text("?", style="progress.data.speed")
-    data_speed = filesize.decimal(int(speed))
-    return Text(f"{data_speed}/s", style="progress.data.speed")
+    def render(self, task: "Task") -> str:
+        """Show data transfer speed."""
+        speed = task.speed
+        if speed is None:
+            return Text("?", style="progress.data.speed")
+        data_speed = filesize.decimal(int(speed))
+        return Text(f"{data_speed}/s", style="progress.data.speed")
 
 
 class _ProgressSample(NamedTuple):
@@ -78,6 +127,7 @@ class _ProgressSample(NamedTuple):
 class Task:
     """Stores information regarding a progress task."""
 
+    id: TaskID
     name: str
     total: float
     completed: float
@@ -173,7 +223,7 @@ class Progress:
 
     def __init__(
         self,
-        *columns: Union[str, WidgetCallable],
+        *columns: Union[str, ProgressColumn],
         console: Console = None,
         auto_refresh: bool = True,
         refresh_per_second: int = 15,
@@ -181,9 +231,9 @@ class Progress:
     ) -> None:
         self.columns = columns or (
             "{task.name}",
-            bar_widget,
+            BarColumn(),
             "[progress.percentage]{task.percentage:>3.0f}%",
-            remaining_widget,
+            TimeRemainingColumn(),
         )
         self.console = console or Console(file=sys.stderr)
         self.auto_refresh = auto_refresh
@@ -349,7 +399,9 @@ class Progress:
             TaskID: An ID you can use when calling `update`.
         """
         with self._lock:
-            task = Task(name, total, completed, visible=visible, fields=fields)
+            task = Task(
+                self._task_index, name, total, completed, visible=visible, fields=fields
+            )
             self._tasks[self._task_index] = task
             if start:
                 self.start(self._task_index)

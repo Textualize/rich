@@ -81,7 +81,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "traceback.exc_type": Style(color="bright_red", bold=True),
     "traceback.exc_value": Style(),
     "traceback.offset": Style(color="bright_red", bold=True),
-    "bar.back": Style(color="grey50"),
+    "bar.back": Style(color="grey23"),
     "bar.complete": Style(color="bright_magenta"),
     "bar.done": Style(color="bright_green"),
     "progress.data": Style(color="green"),

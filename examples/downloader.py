@@ -6,10 +6,10 @@ from typing import Iterable
 from urllib.request import urlopen
 
 from rich.progress import (
-    bar_widget,
-    data_speed_widget,
-    file_size_widget,
-    remaining_widget,
+    BarColumn,
+    TransferSpeedColumn,
+    FileSizeColumn,
+    TimeRemainingColumn,
     Progress,
     TaskID,
 )
@@ -17,14 +17,14 @@ from rich.progress import (
 
 progress = Progress(
     "[bold blue]{task.fields[filename]}",
-    bar_widget,
+    BarColumn(),
     "[progress.percentage]{task.percentage:>3.0f}%",
     "•",
-    file_size_widget,
+    FileSizeColumn(),
     "•",
-    data_speed_widget,
+    TransferSpeedColumn(),
     "•",
-    remaining_widget,
+    TimeRemainingColumn(),
 )
 
 
