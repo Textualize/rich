@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import deque
 from contextlib import contextmanager
-from dataclasses import dataclass, field
+from dataclasses import dataclass, replace, field
 from datetime import timedelta
 from math import floor
 import sys

@@ -11,10 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added width option to Panel
 - Change special method `__render_width__` to `__measure__`
+- Dropped the "markdown style" syntax in console markup
 
 ### Added
 
 - Added Console.show_cursor method
+- Added Progress bars
 
 ### Fixed
 

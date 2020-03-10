@@ -9,10 +9,6 @@ from .text import Span, Text
 
 
 re_tags = re.compile(r"(\[\".*?\"\])|(\[.*?\])")
-re_emphasize_sub = re.compile(r"\*(.+?)\*|_(.+?)_").sub
-re_strong_sub = re.compile(r"\*\*(.+?)\*\*|__(.+?)__").sub
-re_strike_sub = re.compile(r"\~(.+?)\~").sub
-re_code_sub = re.compile(r"`(.+?)`").sub
 
 
 def _parse(markup: str) -> Iterable[Tuple[Optional[str], Optional[str]]]:
@@ -22,26 +18,6 @@ def _parse(markup: str) -> Iterable[Tuple[Optional[str], Optional[str]]]:
         markup (str): A string containing console markup
     
     """
-
-    def repl_strong(match: Match[str]) -> str:
-        group = match.group
-        return f"[strong]{group(1) or group(2)}[/strong]"
-
-    def repl_emphasize(match: Match[str]) -> str:
-        group = match.group
-        return f"[emphasize]{group(1) or group(2)}[/emphasize]"
-
-    def repl_strike(match: Match[str]) -> str:
-        return f"[strike]{match.group(1)}[/strike]"
-
-    def repl_code(match: Match[str]) -> str:
-        return f"[code]{match.group(1)}[/code]"
-
-    markup = re_strong_sub(repl_strong, markup)
-    markup = re_emphasize_sub(repl_emphasize, markup)
-    markup = re_strike_sub(repl_strike, markup)
-    markup = re_code_sub(repl_code, markup)
-
     position = 0
     for match in re_tags.finditer(markup):
         escaped_text, tag_text = match.groups()
@@ -113,11 +89,3 @@ def render(markup: str, style: Union[str, Style] = "") -> Text:
 
     return text
 
-
-if __name__ == "__main__":  # pragma: no cover
-    text = """*Hello* **World**! [bold blue]~~strike~~[/blue bold] `code`"""
-
-    from .console import Console
-
-    console = Console()
-    console.print(render(text))
