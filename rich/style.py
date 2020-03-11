@@ -350,7 +350,7 @@ class Style:
         if color_system is None or not text:
             return text
         _attributes = self._attributes & self._set_attributes
-        attrs: List[str] = [__STYLE_TABLE[_attributes]] if _attributes else []
+        attrs = [__STYLE_TABLE[_attributes]] if _attributes else []
         if self._color is not None:
             attrs.extend(self._color.downgrade(color_system).get_ansi_codes())
         if self._bgcolor is not None:
