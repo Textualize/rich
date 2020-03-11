@@ -4,6 +4,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Type, Union
 
 from . import errors
 from .color import blend_rgb, Color, ColorParseError, ColorSystem
+from ._style_table import STYLE_TABLE
 from .terminal_theme import TerminalTheme, DEFAULT_TERMINAL_THEME
 
 # Style instances and style definitions are often interchangable
@@ -340,40 +341,14 @@ class Style:
         """
         if color_system is None or not text:
             return text
-        attrs: List[str] = []
+        _attributes = self._attributes & self._set_attributes
+        attrs: List[str] = [STYLE_TABLE[_attributes]] if _attributes else []
         if self._color is not None:
             attrs.extend(self._color.downgrade(color_system).get_ansi_codes())
-
         if self._bgcolor is not None:
             attrs.extend(
                 self._bgcolor.downgrade(color_system).get_ansi_codes(foreground=False)
             )
-
-        set_bits = self._set_attributes
-        if set_bits:
-            append = attrs.append
-            bits = self._attributes
-            if set_bits & 1:
-                append("1" if bits & 1 else "21")
-            if set_bits & 2:
-                append("2" if bits & 2 else "22")
-            if set_bits & 4:
-                append("3" if bits & 4 else "23")
-            if set_bits & 8:
-                append("4" if bits & 8 else "24")
-            # Early out for less common attributes
-            if set_bits & 0b111110000:
-                if set_bits & 16:
-                    append("5" if bits & 16 else "25")
-                if set_bits & 32:
-                    append("6" if bits & 32 else "26")
-                if set_bits & 64:
-                    append("7" if bits & 64 else "27")
-                if set_bits & 128:
-                    append("8" if bits & 128 else "28")
-                if set_bits & 256:
-                    append("9" if bits & 256 else "29")
-
         if attrs:
             return f"\x1b[{';'.join(attrs)}m{text or ''}\x1b[0m"
         else:

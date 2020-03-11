@@ -100,7 +100,7 @@ def test_render():
     assert Style(color="red").render("foo", color_system=None) == "foo"
     assert (
         Style(color="red", bgcolor="black", bold=True).render("foo")
-        == "\x1b[31;40;1mfoo\x1b[0m"
+        == "\x1b[1;31;40mfoo\x1b[0m"
     )
     assert Style().render("foo") == "foo"
 

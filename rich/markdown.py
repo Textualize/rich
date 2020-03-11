@@ -476,27 +476,13 @@ An h2 header
 
     import commonmark
 
-    # print(commonmark.commonmark(markup))
-
     from .console import Console
 
     console = Console(record=True)
-    # print(console.size)
 
-    # markup = "<foo>"
     md = Markdown(markup)
 
+    from time import time
+
     console.print(md)
-    print(console)
-    # print(console.render_spans())
 
-    # from .color import Color
-    # from .style import Style
-
-    # print(Color.downgrade.cache_info())
-    # print(Color.parse.cache_info())
-    # print(Color.get_ansi_codes.cache_info())
-
-    # Style.parse("on red")
-
-    # print(Style.parse.cache_info())
