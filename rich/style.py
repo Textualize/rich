@@ -191,7 +191,14 @@ class Style:
     @classmethod
     @lru_cache(maxsize=1024)
     def parse(cls, style_definition: str) -> "Style":
-        """Parse style name(s) in to style object."""
+        """Parse a style definition.
+        
+        Raises:
+            errors.StyleSyntaxError: If the style definition syntax is invalid.            
+        
+        Returns:
+            `Style`: A Style instance.
+        """
         style_attributes = {
             "dim",
             "bold",
@@ -297,7 +304,7 @@ class Style:
 
     @classmethod
     def chain(self, *styles: "Style") -> "Style":
-        """Combine styles from positiona argument in to a single style.
+        """Combine styles from positional argument in to a single style.
         
         Args:
             styles (Iterable[Style]): Styles to combine.
@@ -329,6 +336,7 @@ class Style:
         text: str = "",
         *,
         color_system: Optional[ColorSystem] = ColorSystem.TRUECOLOR,
+        __STYLE_TABLE=STYLE_TABLE,
     ) -> str:
         """Render the ANSI codes for the style.
         
@@ -342,7 +350,7 @@ class Style:
         if color_system is None or not text:
             return text
         _attributes = self._attributes & self._set_attributes
-        attrs: List[str] = [STYLE_TABLE[_attributes]] if _attributes else []
+        attrs: List[str] = [__STYLE_TABLE[_attributes]] if _attributes else []
         if self._color is not None:
             attrs.extend(self._color.downgrade(color_system).get_ansi_codes())
         if self._bgcolor is not None:
@@ -350,12 +358,14 @@ class Style:
                 self._bgcolor.downgrade(color_system).get_ansi_codes(foreground=False)
             )
         if attrs:
-            return f"\x1b[{';'.join(attrs)}m{text or ''}\x1b[0m"
+            return f"\x1b[{';'.join(attrs)}m{text}\x1b[0m"
         else:
             return text
 
     def test(self, text: Optional[str] = None) -> None:
-        """Write test text with style to terminal.
+        """Write text with style directly to terminal.
+
+        This method is for testing purposes only.
         
         Args:
             text (Optional[str], optional): Text to style or None for style name.
@@ -364,7 +374,7 @@ class Style:
             None:
         """
         text = text or str(self)
-        sys.stdout.write(f"{self.render(text)}\x1b[0m\n")
+        sys.stdout.write(f"{self.render(text)}\n")
 
     def _apply(self, style: "Style") -> "Style":
         """Merge this style with another.

@@ -367,13 +367,14 @@ class Progress:
         for _, task in self._tasks.items():
             if task.visible:
                 row: List[RenderableType] = []
+                append = row.append
                 for index, column in enumerate(self.columns):
                     if isinstance(column, str):
-                        row.append(column.format(task=task))
+                        append(column.format(task=task))
                         table.columns[index].no_wrap = True
                     else:
                         widget = column(task)
-                        row.append(widget)
+                        append(widget)
                         if isinstance(widget, (str, Text)):
                             table.columns[index].no_wrap = True
                 table.add_row(*row)
