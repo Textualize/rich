@@ -1,3 +1,7 @@
+[![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
+[![PyPI](https://img.shields.io/pypi/pyversions/rich.svg)](https://pypi.org/project/rich/)
+[![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich/month)
+
 # Rich
 
 Rich is a Python library for rendering _rich_ text and beautiful formatting to the terminal.
