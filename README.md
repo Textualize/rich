@@ -2,7 +2,7 @@
 
 Rich is a Python library for rendering _rich_ text and beautiful formatting to the terminal.
 
-The [Rich API](https://rich.readthedocs.io/en/latest/) makes it easy to add colorful text (up to 16.7 million colors) with styles (bold, italic, underline etc.) to your script or application. Rich can also render pretty tables, markdown, syntax highlighted source code, and tracebacks -- out of the box.
+The [Rich API](https://rich.readthedocs.io/en/latest/) makes it easy to add colorful text (up to 16.7 million colors) with styles (bold, italic, underline etc.) to your script or application. Rich can also render pretty tables, progress bars, markdown, syntax highlighted source code, and tracebacks -- out of the box.
 
 ## Installing
 
@@ -105,6 +105,23 @@ To insert an emoji in to console output place the name between two colons. Here'
 ```
 
 Please use this feature wisely.
+
+## Progress Bars
+
+Rich can render multiple flicker-free progress bars to track long-running tasks.
+
+For basic usage, wrap any sequence in the `track` method and iterate over the result. Here's an example:
+
+```python
+from rich.progress import track
+
+for step in track(range(100)):
+    do_step(step)
+```
+
+It's not much harder to add multiple progress bars. Here's an example taken from the docs:
+
+![progress](./imgs/progress.png)
 
 ## Markdown
 

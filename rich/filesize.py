@@ -1,5 +1,5 @@
 # coding: utf-8
-"""Functions for reporting filesizes.
+"""Functions for reporting filesizes. Borrowed from https://github.com/PyFilesystem/pyfilesystem2
 
 The functions declared in this module should cover the different
 usecases needed to generate a string representation of a file size

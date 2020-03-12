@@ -4,6 +4,7 @@ Reference
 .. toctree::
    :maxdepth: 3
 
+   reference/bar.rst
    reference/color.rst
    reference/console.rst
    reference/emoji.rst

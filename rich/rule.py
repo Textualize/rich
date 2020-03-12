@@ -9,14 +9,14 @@ class Rule:
     """A console renderable to draw a horizontal rule (line).
     
     Args:
-        title (str, optional): Text to render in the rule. Defaults to "".
+        title (Union[str, Text], optional): Text to render in the rule. Defaults to "".
         character (str, optional): Character used to draw the line. Defaults to "─".
     """
 
     def __init__(
         self,
         title: Union[str, Text] = "",
-        character: str = "─",
+        character: str = "━",
         style: Union[str, Style] = "rule.line",
     ) -> None:
         if len(character) != 1:
@@ -39,7 +39,7 @@ class Rule:
             if isinstance(self.title, Text):
                 title_text = self.title
             else:
-                title_text = Text.from_markup(self.title, "rule.text")
+                title_text = console.render_str(self.title, style="rule.text")
             if len(title_text) > width - 4:
                 title_text.set_length(width - 4)
 
@@ -53,12 +53,8 @@ class Rule:
             yield rule_text
 
 
-if __name__ == "__main__":  # pragma: no cover
-    from .console import Console
+if __name__ == "__main__":
+    from rich.console import Console
 
-    c = Console()
-
-    c.print(Rule())
-    c.print(Rule("*Hello, World*"))
-    c.print(Rule(Text("Hello, World", "bold red reverse")))
-    c.print(Rule("*Hello, World*", character="."))
+    console = Console()
+    console.print(Rule("Hello, World"))

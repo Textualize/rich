@@ -357,10 +357,7 @@ class Style:
             attrs.extend(
                 self._bgcolor.downgrade(color_system).get_ansi_codes(foreground=False)
             )
-        if attrs:
-            return f"\x1b[{';'.join(attrs)}m{text}\x1b[0m"
-        else:
-            return text
+        return f"\x1b[{';'.join(attrs)}m{text}\x1b[0m" if attrs else text
 
     def test(self, text: Optional[str] = None) -> None:
         """Write text with style directly to terminal.

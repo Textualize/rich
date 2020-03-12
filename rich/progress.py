@@ -3,7 +3,7 @@ from collections import deque
 from contextlib import contextmanager
 from dataclasses import dataclass, replace, field
 from datetime import timedelta
-from math import floor
+from math import ceil, floor
 import sys
 from time import monotonic
 from threading import Event, RLock, Thread
@@ -12,10 +12,13 @@ from typing import (
     Callable,
     Deque,
     Dict,
+    Iterable,
     List,
     Optional,
     NamedTuple,
+    Sequence,
     Tuple,
+    TypeVar,
     NewType,
     Union,
 )
@@ -29,6 +32,30 @@ from .text import Text
 
 
 TaskID = NewType("TaskID", int)
+
+ProgressType = TypeVar("ProgressType")
+
+
+def track(
+    sequence: Sequence[ProgressType], description="Working..."
+) -> Iterable[ProgressType]:
+    """Track progress of processing a sequence.
+    
+    Args:
+        sequence (Sequence[ProgressType]): A sequence (must support "len") you wish to iterate over.
+        description (str, optional): [description]. Defaults to "Working".
+    
+    Returns:
+        Iterable[ProgressType]: An iterable of the values in the sequence.
+    
+    """
+    progress = Progress(auto_refresh=False)
+    task_id = progress.add_task(description, total=len(sequence))
+    with progress:
+        for completed, value in enumerate(sequence, 1):
+            yield value
+            progress.update(task_id, completed=completed)
+            progress.refresh()
 
 
 class ProgressColumn(ABC):
@@ -50,7 +77,7 @@ class ProgressColumn(ABC):
             RenderableType: Anything renderable (including str).
         """
         current_time = monotonic()
-        if self.max_refresh is not None:
+        if self.max_refresh is not None and not task.completed:
             try:
                 timestamp, renderable = self._renderable_cache[task.id]
             except KeyError:
@@ -91,7 +118,7 @@ class TimeRemainingColumn(ProgressColumn):
         remaining = task.time_remaining
         if remaining is None:
             return Text("?", style="progress.remaining")
-        remaining_delta = timedelta(seconds=floor(remaining))
+        remaining_delta = timedelta(seconds=int(remaining))
         return Text(str(remaining_delta), style="progress.remaining")
 
 
@@ -125,10 +152,14 @@ class ProgressSample(NamedTuple):
 
 @dataclass
 class Task:
-    """Stores information regarding a progress task."""
+    """Information regarding a progress task.
+    
+    Note, that this object should be considered read-only outside of the `Progress` class.
+
+    """
 
     id: TaskID
-    name: str
+    description: str
     total: float
     completed: float
     visible: bool = True
@@ -165,7 +196,7 @@ class Task:
         if not self.total:
             return 0.0
         completed = (self.completed / self.total) * 100.0
-        completed = min(100, max(0.0, completed))
+        completed = min(100.0, max(0.0, completed))
         return completed
 
     @property
@@ -191,7 +222,7 @@ class Task:
         speed = self.speed
         if speed is None:
             return None
-        estimate = round(self.remaining / int(speed))
+        estimate = ceil(self.remaining / speed)
         return estimate
 
 
@@ -232,7 +263,7 @@ class Progress:
         speed_estimate_period: float = 30.0,
     ) -> None:
         self.columns = columns or (
-            "{task.name}",
+            "[progress.description]{task.description}",
             BarColumn(),
             "[progress.percentage]{task.percentage:>3.0f}%",
             TimeRemainingColumn(),
@@ -250,7 +281,7 @@ class Progress:
 
     @property
     def tasks_ids(self) -> List[TaskID]:
-        """Get a list of task IDs."""
+        """A list of task IDs."""
         with self._lock:
             return list(self._tasks.keys())
 
@@ -262,16 +293,18 @@ class Progress:
                 return True
             return all(task.finished for task in self._tasks.values())
 
-    def __enter__(self) -> "Progress":
+    def start(self) -> None:
+        """Start the progress display."""
         self.console.show_cursor(False)
+        self.refresh()
         if self.auto_refresh:
             self._refresh_thread = _RefreshThread(self, self.refresh_per_second)
             self._refresh_thread.start()
-        return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def stop(self) -> None:
+        """Stop the progress display."""
         try:
-            if self.auto_refresh:
+            if self.auto_refresh and self._refresh_thread is not None:
                 self._refresh_thread.stop()
                 self._refresh_thread = None
             self.refresh()
@@ -279,7 +312,32 @@ class Progress:
         finally:
             self.console.show_cursor(True)
 
-    def start(self, task_id: TaskID) -> None:
+    def __enter__(self) -> "Progress":
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        self.stop()
+
+    def track(
+        self, sequence: Sequence[ProgressType], description="Working..."
+    ) -> Iterable[ProgressType]:
+        """[summary]
+        
+        Args:
+            sequence (Sequence[ProgressType]): [description]
+        
+        Returns:
+            Iterable[ProgressType]: [description]
+        """
+        task_id = self.add_task(description, total=len(sequence))
+        with self:
+            for completed, value in enumerate(sequence, 1):
+                yield value
+                self.update(task_id, completed=completed)
+                self.refresh()
+
+    def start_task(self, task_id: TaskID) -> None:
         """Start a task.
 
         Starts a task (used when calculating elapsed time). You may need to call this manually,
@@ -292,7 +350,7 @@ class Progress:
             task = self._tasks[task_id]
             task.start_time = monotonic()
 
-    def stop(self, task_id: TaskID) -> None:
+    def stop_task(self, task_id: TaskID) -> None:
         """Stop a task.
 
         This will freeze the elapsed time on the task.
@@ -300,8 +358,8 @@ class Progress:
         Args:
             task_id (TaskID): ID of task.
         """
-        task = self._tasks[task_id]
         with self._lock:
+            task = self._tasks[task_id]
             current_time = monotonic()
             if task.start_time is None:
                 task.start_time = current_time
@@ -310,6 +368,7 @@ class Progress:
     def update(
         self,
         task_id: TaskID,
+        refresh=False,
         *,
         total: float = None,
         completed: float = None,
@@ -321,6 +380,7 @@ class Progress:
         
         Args:
             task_id (TaskID): Task id (return by add_task).
+            refresh (bool): Also refresh the progress information.
             total (float, optional): Updates task.total if not None.
             completed (float, optional): Updates task.completed if not None.
             advance (float, optional): Add a value to task.completed if not None.
@@ -349,6 +409,8 @@ class Progress:
             while _progress and _progress[0].timestamp < old_sample_time:
                 _progress.popleft()
             task._progress.append(ProgressSample(current_time, update_completed))
+            if refresh:
+                self.refresh()
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
@@ -382,7 +444,7 @@ class Progress:
 
     def add_task(
         self,
-        name: str,
+        description: str,
         start: bool = True,
         total: int = 100,
         completed: int = 0,
@@ -392,7 +454,7 @@ class Progress:
         """Add a new 'task' to the Progress display.
         
         Args:
-            name (str): The name of the task.
+            description (str): A description of the task.
             start (bool, optional): Start the task immediately (to calculate elapsed time). If set to False,
                 you will need to call `start` manually. Defaults to True.
             total (int, optional): Number of total steps in the progress if know. Defaults to 100.
@@ -405,11 +467,16 @@ class Progress:
         """
         with self._lock:
             task = Task(
-                self._task_index, name, total, completed, visible=visible, fields=fields
+                self._task_index,
+                description,
+                total,
+                completed,
+                visible=visible,
+                fields=fields,
             )
             self._tasks[self._task_index] = task
             if start:
-                self.start(self._task_index)
+                self.start_task(self._task_index)
             self.refresh()
             try:
                 return self._task_index
@@ -433,9 +500,9 @@ if __name__ == "__main__":
 
     with Progress() as progress:
 
-        task1 = progress.add_task("[red]Downloading", total=1000)
-        task2 = progress.add_task("[green]Processing", total=1000)
-        task3 = progress.add_task("[cyan]Cooking", total=1000)
+        task1 = progress.add_task("[red]Downloading...", total=1000)
+        task2 = progress.add_task("[green]Processing...", total=1000)
+        task3 = progress.add_task("[cyan]Cooking...", total=1000)
 
         while not progress.finished:
             progress.update(task1, advance=0.5)
