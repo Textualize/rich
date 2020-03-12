@@ -121,7 +121,7 @@ for step in track(range(100)):
 
 It's not much harder to add multiple progress bars. Here's an example taken from the docs:
 
-![progress](./imgs/progress.png)
+![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.png)
 
 ## Markdown
 
