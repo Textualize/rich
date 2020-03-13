@@ -202,25 +202,6 @@ class ConsoleDimensions(NamedTuple):
     height: int
 
 
-class StyleContext:
-    """A context manager to manage a style."""
-
-    def __init__(self, console: "Console", style: Optional[Style]):
-        self.console = console
-        self.style = style
-
-    def __enter__(self) -> "Console":
-        if self.style is not None:
-            self.console.push_style(self.style)
-        self.console._enter_buffer()
-        return self.console
-
-    def __exit__(self, exc_type, exc_value, traceback) -> None:
-        self.console._exit_buffer()
-        if self.style is not None:
-            self.console.pop_style()
-
-
 COLOR_SYSTEMS = {
     "standard": ColorSystem.STANDARD,
     "256": ColorSystem.EIGHT_BIT,
@@ -239,7 +220,6 @@ class ConsoleThreadLocals(threading.local):
     buffer: List[Segment] = field(default_factory=list)
     buffer_index: int = 0
     style_stack: List[Style] = field(default_factory=lambda: [Style()])
-    current_style: Style = field(default_factory=Style)
     control: List[str] = field(default_factory=list)
 
 
@@ -307,7 +287,6 @@ class Console:
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals()
         self._record_buffer: List[Segment] = []
-        self._current_style = self._style_stack[0]
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
@@ -332,16 +311,8 @@ class Console:
         return self._thread_locals.style_stack
 
     @property
-    def _current_style(self) -> Style:
-        """Get a thread local style."""
-        return self._thread_locals.current_style
-
-    @_current_style.setter
-    def _current_style(self, style: Style) -> None:
-        self._thread_locals.current_style = style
-
-    @property
     def _control(self) -> List[str]:
+        """Get control codes buffer."""
         return self._thread_locals.control
 
     def _detect_color_system(self) -> Optional[ColorSystem]:
@@ -545,9 +516,8 @@ class Console:
         Returns:
             Iterable[Segment]: An iterable of segments that may be rendered.
         """
-        yield from Segment.apply_style(
-            self._render(renderable, options), self._current_style
-        )
+
+        yield from self._render(renderable, options)
 
     def render_all(
         self, renderables: Iterable[RenderableType], options: Optional[ConsoleOptions]
@@ -586,9 +556,10 @@ class Console:
             List[List[Segment]]: A list of lines, where a line is a list of Segment objects.
         """
         render_options = options or self.options
-
-        with self.style(style or "none"):
+        with self:
             _rendered = self.render(renderable, render_options)
+            if style is not None:
+                _rendered = Segment.apply_style(_rendered, style)
             lines = list(
                 Segment.split_and_crop_lines(
                     _rendered,
@@ -663,62 +634,6 @@ class Console:
             if " " in name:
                 raise
             raise errors.MissingStyle(f"No style named {name!r}; {error}")
-
-    def push_style(self, style: Union[str, Style]) -> None:
-        """Push a style on to the stack.
-
-        The new style will be applied to all `write` calls, until
-        `pop_style` is called.
-
-        Args:
-            style (Union[str, Style]): New style to merge with current style.
-
-        Returns:
-            None: [description]
-        """
-        if isinstance(style, str):
-            style = self.get_style(style)
-        self._current_style = self._current_style + style
-        self._style_stack.append(self._current_style)
-
-    def pop_style(self) -> Style:
-        """Pop a style from the stack.
-
-        This will revert to the style applied prior to the corresponding `push_style`.
-
-        Returns:
-            Style: The previously applied style.
-        """
-        if len(self._style_stack) == 1:
-            raise errors.StyleStackError(
-                "Can't pop the default style (check there is `push_style` for every `pop_style`)"
-            )
-        style = self._style_stack.pop()
-        self._current_style = self._style_stack[-1]
-        return style
-
-    def style(self, style: Optional[Union[str, Style]]) -> StyleContext:
-        """A context manager to apply a new style.
-
-        Example:
-            with context.style("bold red"):
-                context.print("Danger Will Robinson!")
-
-        Args:
-            style (Union[str, Style]): New style to apply.
-
-        Returns:
-            StyleContext: A style context manager.
-        """
-        if style is None:
-            return StyleContext(self, None)
-        if isinstance(style, str):
-            _style = self.get_style(style)
-        else:
-            if not isinstance(style, Style):
-                raise TypeError(f"style must be a str or Style instance, not {style!r}")
-            _style = style
-        return StyleContext(self, _style)
 
     def _collect_renderables(
         self,
@@ -825,16 +740,23 @@ class Console:
             self.line()
             return
 
-        renderables = self._collect_renderables(
-            objects, sep, end, emoji=emoji, markup=markup, highlight=highlight
-        )
-
-        render_options = self.options
-        extend = self._buffer.extend
-        render = self.render
-        with self.style(style):
-            for renderable in renderables:
-                extend(render(renderable, render_options))
+        with self:
+            renderables = self._collect_renderables(
+                objects, sep, end, emoji=emoji, markup=markup, highlight=highlight
+            )
+            render_options = self.options
+            extend = self._buffer.extend
+            render = self.render
+            if style is None:
+                for renderable in renderables:
+                    extend(render(renderable, render_options))
+            else:
+                for renderable in renderables:
+                    extend(
+                        Segment.apply_style(
+                            render(renderable, render_options), self.get_style(style)
+                        )
+                    )
 
     def print_exception(
         self,

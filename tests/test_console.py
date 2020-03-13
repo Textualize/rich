@@ -1,5 +1,5 @@
 from rich.color import ColorSystem
-from rich.console import Console, ConsoleOptions, StyleContext
+from rich.console import Console, ConsoleOptions
 from rich.style import Style
 
 
@@ -19,20 +19,6 @@ def test_console_options_update():
 
     options_copy = options.update()
     assert options_copy == options and options_copy is not options
-
-
-def test_style_context():
-    console = Console()
-
-    with StyleContext(console, None):
-        assert console._current_style == Style()
-
-    with StyleContext(console, "bold"):
-        assert console._current_style == Style.parse("bold")
-        with StyleContext(console, "red"):
-            assert console._current_style == Style.parse("bold red")
-        assert console._current_style == Style.parse("bold")
-    assert console._current_style == Style()
 
 
 def test_init():

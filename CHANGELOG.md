@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Issue with control codes being used in length calculation
 
+### Changed
+
+- Remove current_style concept, which wasn't really used and was problematic for concurrency
+
 ## [0.7.0] - 2020-03-12
 
 ### Changed
