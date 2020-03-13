@@ -1002,13 +1002,8 @@ class Console:
 
 if __name__ == "__main__":  # pragma: no cover
     console = Console()
-
-    with console.style("dim on black"):
-        console.print("[b]Hello[/b], [i]World[/i]!")
-        console.print("Hello, *World*!")
-
     console.log(
-        "JSONRPC *request*",
+        "JSONRPC [i]request[/i]",
         5,
         1.3,
         True,
@@ -1022,7 +1017,6 @@ if __name__ == "__main__":  # pragma: no cover
         },
     )
 
-    console.log("# Hello, **World**!")
     console.log("Hello, World!", "{'a': 1}", repr(console))
 
     console.log(
