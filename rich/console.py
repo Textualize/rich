@@ -840,7 +840,8 @@ class Console:
         color_system = self._color_system
         buffer = self._buffer[:]
         if self.record:
-            self._record_buffer.extend(buffer)
+            with self._record_buffer_lock:
+                self._record_buffer.extend(buffer)
         del self._buffer[:]
         for line in Segment.split_and_crop_lines(buffer, self.width, pad=False):
             for text, style in line:
