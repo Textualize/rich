@@ -1,7 +1,7 @@
 from collections import ChainMap
 from collections.abc import Mapping, Sequence
 from contextlib import contextmanager
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from functools import wraps
 import inspect
@@ -38,6 +38,7 @@ from ._log_render import LogRender
 from .default_styles import DEFAULT_STYLES
 from . import errors
 from .color import ColorSystem
+from .control import Control
 from .highlighter import NullHighlighter, ReprHighlighter
 from .pretty import Pretty
 from .style import Style
@@ -129,10 +130,10 @@ class ConsoleRenderable(Protocol):
 
 
 """A type that may be rendered by Console."""
-RenderableType = Union[ConsoleRenderable, RichCast, str]
+RenderableType = Union[ConsoleRenderable, RichCast, Control, str]
 
 """The result of calling a __console__ method."""
-RenderResult = Iterable[Union[RenderableType, Segment]]
+RenderResult = Iterable[Union[RenderableType, Segment, Control]]
 
 
 _null_highlighter = NullHighlighter()
@@ -231,6 +232,17 @@ COLOR_SYSTEMS = {
 _COLOR_SYSTEMS_NAMES = {system: name for name, system in COLOR_SYSTEMS.items()}
 
 
+@dataclass
+class ConsoleThreadLocals(threading.local):
+    """Thread local values for Console context."""
+
+    buffer: List[Segment] = field(default_factory=list)
+    buffer_index: int = 0
+    style_stack: List[Style] = field(default_factory=lambda: [Style()])
+    current_style: Style = field(default_factory=Style)
+    control: List[str] = field(default_factory=list)
+
+
 class Console:
     """A high level console interface.
 
@@ -293,12 +305,9 @@ class Console:
         self.highlighter: HighlighterType = highlighter or _null_highlighter
 
         self._record_buffer_lock = threading.RLock()
-        self._thread_locals = threading.local()
+        self._thread_locals = ConsoleThreadLocals()
         self._record_buffer: List[Segment] = []
-
-        default_style = Style()
-        self._style_stack.append(default_style)
-        self._current_style = default_style
+        self._current_style = self._style_stack[0]
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
@@ -306,15 +315,12 @@ class Console:
     @property
     def _buffer(self) -> List[Segment]:
         """Get a thread local buffer."""
-        buffer = getattr(self._thread_locals, "buffer", None)
-        if buffer is None:
-            buffer = self._thread_locals.buffer = []
-        return buffer
+        return self._thread_locals.buffer
 
     @property
     def _buffer_index(self) -> int:
         """Get a thread local buffer."""
-        return getattr(self._thread_locals, "buffer_index", 0)
+        return self._thread_locals.buffer_index
 
     @_buffer_index.setter
     def _buffer_index(self, value: int) -> None:
@@ -323,19 +329,20 @@ class Console:
     @property
     def _style_stack(self) -> List[Style]:
         """Get a thread local style stack."""
-        style_stack = getattr(self._thread_locals, "style_stack", None)
-        if style_stack is None:
-            style_stack = self._thread_locals.style_stack = [Style()]
-        return style_stack
+        return self._thread_locals.style_stack
 
     @property
     def _current_style(self) -> Style:
         """Get a thread local style."""
-        return getattr(self._thread_locals, "current_style", Style())
+        return self._thread_locals.current_style
 
     @_current_style.setter
     def _current_style(self, style: Style) -> None:
         self._thread_locals.current_style = style
+
+    @property
+    def _control(self) -> List[str]:
+        return self._thread_locals.control
 
     def _detect_color_system(self) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
@@ -474,7 +481,7 @@ class Console:
 
     def _render(
         self,
-        renderable: Union[RenderableType, Segment],
+        renderable: Union[RenderableType, Segment, Control],
         options: Optional[ConsoleOptions],
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
@@ -493,6 +500,9 @@ class Console:
         render_iterable: RenderResult
         if isinstance(renderable, Segment):
             yield renderable
+            return
+        if isinstance(renderable, Control):
+            self._control.append(renderable.codes)
             return
         render_options = options or self.options
         if isinstance(renderable, ConsoleRenderable):
@@ -916,7 +926,9 @@ class Console:
                     append(style.render(text, color_system=color_system))
                 else:
                     append(text)
-        rendered = "".join(output)
+
+        rendered = "".join(self._control) + "".join(output)
+        del self._control[:]
         return rendered
 
     def export_text(self, clear: bool = True, styles: bool = False) -> str:

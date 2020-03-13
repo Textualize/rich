@@ -1,6 +1,7 @@
 from typing import Optional, Tuple
 
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
+from .control import Control
 from .segment import Segment
 from .style import StyleType
 from ._tools import iter_last
@@ -20,9 +21,9 @@ class LiveRender:
         if self._shape is not None:
             width, height = self._shape
             if height > 1:
-                yield Segment(f"\r\x1b[{height - 1}A")
+                yield Control(f"\r\x1b[{height - 1}A")
             else:
-                yield Segment("\r")
+                yield Control("\r")
         style = console.get_style(self.style)
         lines = console.render_lines(self.renderable, options, style, pad=False)
 

@@ -14,7 +14,7 @@ class Segment(NamedTuple):
         style (:class:`rich.style.Style`, optional): An optional style to apply to the text.
     """
 
-    text: str
+    text: str = ""
     style: Optional[Style] = None
 
     def __repr__(self) -> str:
