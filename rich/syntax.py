@@ -122,16 +122,20 @@ class Syntax:
         if token_type in self._style_cache:
             style = self._style_cache[token_type]
         else:
-            pygments_style = self._pygments_style_class.style_for_token(token_type)
-            color = pygments_style["color"]
-            bgcolor = pygments_style["bgcolor"]
-            style = Style(
-                color="#" + color if color else "#000000",
-                bgcolor="#" + bgcolor if bgcolor else self._background_color,
-                bold=pygments_style["bold"],
-                italic=pygments_style["italic"],
-                underline=pygments_style["underline"],
-            )
+            try:
+                pygments_style = self._pygments_style_class.style_for_token(token_type)
+            except KeyError:
+                style = Style()
+            else:
+                color = pygments_style["color"]
+                bgcolor = pygments_style["bgcolor"]
+                style = Style(
+                    color="#" + color if color else "#000000",
+                    bgcolor="#" + bgcolor if bgcolor else self._background_color,
+                    bold=pygments_style["bold"],
+                    italic=pygments_style["italic"],
+                    underline=pygments_style["underline"],
+                )
             self._style_cache[token_type] = style
 
         return style
