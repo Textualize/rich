@@ -412,6 +412,15 @@ class Progress:
             if refresh:
                 self.refresh()
 
+    def advance(self, task_id: TaskID, advance: float = 1) -> None:
+        """Advance task by a number of steps.
+        
+        Args:
+            task_id (TaskID): ID of task.
+            advance (float): Number of steps to advance. Default is 1.
+        """
+        self.update(task_id, advance=advance)
+
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
         with self._lock:

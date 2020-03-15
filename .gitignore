@@ -4,6 +4,7 @@
 mypy_report
 docs/build
 docs/source/_build
+tools/*.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
