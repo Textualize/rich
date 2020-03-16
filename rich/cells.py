@@ -28,10 +28,8 @@ def get_character_cell_size(character: str) -> int:
     Returns:
         int: Number of cells (0, 1 or 2) occupied by that character.
     """
-    assert len(character) == 1, "'character' should have a length of 1"
 
     codepoint = ord(character)
-
     if 127 > codepoint > 31:
         # Shortcut for ascii
         return 1
@@ -82,16 +80,18 @@ def chop_cells(text: str, max_size: int) -> List[str]:
     ][::-1]
     total_size = 0
     lines: List[List[str]] = [[]]
+    append = lines[-1].append
 
     pop = characters.pop
     while characters:
         character, size = pop()
         if total_size + size > max_size:
             lines.append([character])
+            append = lines[-1].append
             total_size = size
         else:
             total_size += size
-            lines[-1].append(character)
+            append(character)
     return ["".join(line) for line in lines]
 
 
