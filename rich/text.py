@@ -23,6 +23,7 @@ if TYPE_CHECKING:  # pragma: no cover
         RenderableType,
     )
 
+from .cells import cell_len
 from .containers import Lines
 from .style import Style
 from .segment import Segment
@@ -322,9 +323,9 @@ class Text:
     def __measure__(self, console: "Console", max_width: int) -> Measurement:
         text = self.text
         if not text.strip():
-            return Measurement(len(text), len(text))
-        max_text_width = max(len(line) for line in text.splitlines())
-        min_text_width = max(len(word) for word in text.split())
+            return Measurement(cell_len(text), cell_len(text))
+        max_text_width = max(cell_len(line) for line in text.splitlines())
+        min_text_width = max(cell_len(word) for word in text.split())
         return Measurement(min_text_width, max_text_width)
 
     def _render_line(
