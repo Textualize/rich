@@ -31,6 +31,11 @@ def get_character_cell_size(character: str, _table=CELL_WIDTHS) -> int:
     assert len(character) == 1, "'character' should have a length of 1"
 
     codepoint = ord(character)
+
+    if 127 > codepoint > 31:
+        # Shortcut for ascii
+        return 1
+
     lower_bound = 0
     upper_bound = len(_table) - 1
     index = (lower_bound + upper_bound) // 2
