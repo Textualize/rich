@@ -75,6 +75,7 @@ def set_cell_size(text: str, total: int) -> str:
 
 
 def chop_cells(text: str, max_size: int) -> List[str]:
+    """Break text in to equal (cell) length strings."""
     _get_character_cell_size = get_character_cell_size
     characters = [
         (character, _get_character_cell_size(character)) for character in text
@@ -84,7 +85,7 @@ def chop_cells(text: str, max_size: int) -> List[str]:
 
     pop = characters.pop
     while characters:
-        character, size = characters.pop()
+        character, size = pop()
         if total_size + size > max_size:
             lines.append([character])
             total_size = size
