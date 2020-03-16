@@ -19,7 +19,7 @@ def cell_len(text: str) -> int:
 
 
 @lru_cache(maxsize=5000)
-def get_character_cell_size(character: str, _table=CELL_WIDTHS) -> int:
+def get_character_cell_size(character: str) -> int:
     """Get the cell size of a character.
     
     Args:
@@ -36,6 +36,7 @@ def get_character_cell_size(character: str, _table=CELL_WIDTHS) -> int:
         # Shortcut for ascii
         return 1
 
+    _table = CELL_WIDTHS
     lower_bound = 0
     upper_bound = len(_table) - 1
     index = (lower_bound + upper_bound) // 2
