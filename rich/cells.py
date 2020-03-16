@@ -93,7 +93,7 @@ if __name__ == "__main__":
     print(get_character_cell_size("😽"))
     for line in chop_cells("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", 8):
         print(line)
-    # for n in range(80, 1, -1):
-    #     print(set_cell_size("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", n) + "|")
-    #     print("x" * n)
+    for n in range(80, 1, -1):
+        print(set_cell_size("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", n) + "|")
+        print("x" * n)
 
