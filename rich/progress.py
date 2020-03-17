@@ -135,7 +135,7 @@ class TimeRemainingColumn(ProgressColumn):
         """Show time remaining."""
         remaining = task.time_remaining
         if remaining is None:
-            return Text("?", style="progress.remaining")
+            return Text("-:--:--", style="progress.remaining")
         remaining_delta = timedelta(seconds=int(remaining))
         return Text(str(remaining_delta), style="progress.remaining")
 

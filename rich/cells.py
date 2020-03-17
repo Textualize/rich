@@ -3,9 +3,10 @@ from itertools import takewhile
 from typing import List, Tuple
 
 from ._cell_widths import CELL_WIDTHS
+from ._lru_cache import LRUCache
 
 
-def cell_len(text: str) -> int:
+def cell_len(text: str, _cache: LRUCache[str, int] = LRUCache(1024)) -> int:
     """Get the number of cells required to display text.
     
     Args:
@@ -14,8 +15,14 @@ def cell_len(text: str) -> int:
     Returns:
         int: Number of cells required to display the text.
     """
+    cached_result = _cache.get(text, None)
+    if cached_result is not None:
+        return cached_result
     _get_size = get_character_cell_size
-    return sum(_get_size(character) for character in text)
+    total_size = sum(_get_size(character) for character in text)
+    if len(text) < 256:
+        _cache[text] = total_size
+    return total_size
 
 
 @lru_cache(maxsize=5000)

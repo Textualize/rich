@@ -234,9 +234,10 @@ class Console:
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
         height (int, optional): The height of the terminal. Leave as default to auto-detect height.
         record (bool, optional): Boolean to enable recording of terminal output,
-            required to call :meth:`export_html` and :meth:`export_text`. Defaults to False.
-        emoji (Optional[bool], optional): Enable emoji code. Defaults to True.
+            required to call :meth:`export_html` and :meth:`export_text`. Defaults to False.        
         markup (bool, optional): Boolean to enable :ref:`console_markup`. Defaults to True.
+        emoji (bool, optional): Enable emoji code. Defaults to True.
+        highlight (bool, optional): Enable automatic highlighting. Defaults to True.
         log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
         log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
         log_time_format (str, optional): Log time format if ``log_time`` is enabled. Defaults to "[%X] ".
@@ -256,6 +257,7 @@ class Console:
         record: bool = False,
         markup: bool = True,
         emoji: bool = True,
+        highlight: bool = True,
         log_time: bool = True,
         log_path: bool = True,
         log_time_format: str = "[%X] ",
@@ -271,6 +273,7 @@ class Console:
         self.record = record
         self._markup = markup
         self._emoji = emoji
+        self._highlight = highlight
 
         if color_system is None:
             self._color_system = None
@@ -443,10 +446,8 @@ class Console:
         Args:
             show (bool, optional): Set visibility of the cursor.
         """
-        if WINDOWS:
-            return
-        self._buffer.append(Segment("\033[?25h" if show else "\033[?25l"))
         self._check_buffer()
+        self.file.write("\033[?25h" if show else "\033[?25l")
 
     def _render(
         self,
@@ -640,17 +641,17 @@ class Console:
         end: str,
         emoji: bool = None,
         markup: bool = None,
-        highlight: bool = True,
+        highlight: bool = None,
     ) -> List[ConsoleRenderable]:
         """Combined a number of renderables and text in to one renderable.
 
         Args:
-            renderables (Iterable[Union[str, ConsoleRenderable]]): [description]
+            renderables (Iterable[Union[str, ConsoleRenderable]]): Anyting that Rich can render.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".            
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default.
-            highlight (bool, optional): Perform highlighting. Defaults to True.
+            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default.
 
         Returns:
             List[ConsoleRenderable]: A list of things to render.
@@ -662,7 +663,7 @@ class Console:
         append_text = text.append
 
         _highlighter: HighlighterType
-        if highlight:
+        if highlight or (highlight is None and self._highlight):
             _highlighter = self.highlighter
         else:
             _highlighter = _null_highlighter
@@ -721,7 +722,7 @@ class Console:
         style: Union[str, Style] = None,
         emoji: bool = None,
         markup: bool = None,
-        highlight: bool = True,
+        highlight: bool = None,
     ) -> None:
         r"""Print to the console.
 
@@ -730,9 +731,9 @@ class Console:
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
-            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default.
-            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default.
-            highlight (bool, optional): Perform highlighting. Defaults to True.
+            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to None.
+            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to None
+            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to None.
         """
         if not objects:
             self.line()
@@ -781,7 +782,7 @@ class Console:
         end="\n",
         emoji: bool = None,
         markup: bool = None,
-        highlight: bool = True,
+        highlight: bool = None,
         log_locals: bool = False,
         _stack_offset=1,
     ) -> None:
@@ -791,9 +792,9 @@ class Console:
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".
-            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default.
-            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default.
-            highlight (bool, optional): Perform highlighting. Defaults to True.
+            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to None.
+            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to None.
+            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to None.
             log_locals (bool, optional): Boolean to enable logging of locals where ``log()``
                 was called. Defaults to False.
             _stack_offset (int, optional): Offset of caller from end of call stack. Defaults to 1.
