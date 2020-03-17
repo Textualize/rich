@@ -11,9 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - CJK support
 - Console level highlight flag
+- Added encoding argument to Syntax.from_path
 
 ### Changed
 
+- Dropped support for Windows command prompt (try https://www.microsoft.com/en-gb/p/windows-terminal-preview/)
 - Added task_id to Progress.track
 
 ## [0.7.2] - 2020-03-15

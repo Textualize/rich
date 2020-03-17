@@ -322,9 +322,7 @@ class Console:
         """Detect color system from env vars."""
         if not self.is_terminal:
             return None
-        if WINDOWS:
-            return ColorSystem.WINDOWS
-        if os.environ.get("COLORTERM", "").strip().lower() == "truecolor":
+        if os.environ.get("COLORTERM", "").strip().lower() in ("truecolor", "24bit"):
             return ColorSystem.TRUECOLOR
         # 256 can be considered standard nowadays
         return ColorSystem.EIGHT_BIT
