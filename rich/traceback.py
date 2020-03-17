@@ -281,7 +281,7 @@ if __name__ == "__main__":  # pragma: no cover
     console = Console()
     import sys
 
-    def bar(a):
+    def bar(a):  # 这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑
         print(1 / a)
 
     def foo(a):

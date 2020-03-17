@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import deque
+from collections.abc import Sized
 from contextlib import contextmanager
 from dataclasses import dataclass, replace, field
 from datetime import timedelta
@@ -37,25 +38,42 @@ ProgressType = TypeVar("ProgressType")
 
 
 def track(
-    sequence: Sequence[ProgressType], description="Working..."
+    sequence: Union[Sequence[ProgressType], Iterable[ProgressType]],
+    description="Working...",
+    total: int = None,
+    auto_refresh=True,
 ) -> Iterable[ProgressType]:
     """Track progress of processing a sequence.
     
     Args:
-        sequence (Sequence[ProgressType]): A sequence (must support "len") you wish to iterate over.
-        description (str, optional): [description]. Defaults to "Working".
+        sequence (Iterable[ProgressType]): A sequence (must support "len") you wish to iterate over.
+        description (str, optional): Description of task show next to progress bar. Defaults to "Working".
+        total: (int, optional): Total number of steps. Default is len(sequence).
+        auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
     
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
     
     """
-    progress = Progress(auto_refresh=False)
-    task_id = progress.add_task(description, total=len(sequence))
+    progress = Progress(auto_refresh=auto_refresh)
+
+    if total is None:
+        if isinstance(sequence, Sized):
+            task_total = len(sequence)
+        else:
+            raise ValueError(
+                f"unable to get size of {sequence!r}, please specify 'total'"
+            )
+    else:
+        task_total = total
+
+    task_id = progress.add_task(description, total=task_total)
     with progress:
         for completed, value in enumerate(sequence, 1):
             yield value
             progress.update(task_id, completed=completed)
-            progress.refresh()
+            if not auto_refresh:
+                progress.refresh()
 
 
 class ProgressColumn(ABC):
@@ -117,7 +135,7 @@ class TimeRemainingColumn(ProgressColumn):
         """Show time remaining."""
         remaining = task.time_remaining
         if remaining is None:
-            return Text("?", style="progress.remaining")
+            return Text("-:--:--", style="progress.remaining")
         remaining_delta = timedelta(seconds=int(remaining))
         return Text(str(remaining_delta), style="progress.remaining")
 
@@ -278,6 +296,7 @@ class Progress:
         self._lock = RLock()
         self._refresh_thread: Optional[_RefreshThread] = None
         self._refresh_count = 0
+        self._enter_count = 0
 
     @property
     def tasks_ids(self) -> List[TaskID]:
@@ -313,29 +332,56 @@ class Progress:
             self.console.show_cursor(True)
 
     def __enter__(self) -> "Progress":
-        self.start()
-        return self
+        with self._lock:
+            if self._enter_count:
+                self._enter_count += 1
+                return self
+            self.start()
+            self._enter_count += 1
+            return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        self.stop()
+        with self._lock:
+            self._enter_count -= 1
+            if not self._enter_count:
+                self.stop()
 
     def track(
-        self, sequence: Sequence[ProgressType], description="Working..."
+        self,
+        sequence: Sequence[ProgressType],
+        total: int = None,
+        task_id: Optional[TaskID] = None,
+        description="Working...",
     ) -> Iterable[ProgressType]:
         """[summary]
         
         Args:
             sequence (Sequence[ProgressType]): [description]
+            total: (int, optional): Total number of steps. Default is len(sequence).
+            task_id: (TaskID): Task to track. Default is new task.
+            description: (str, optional): Description of task, if new task is created.
         
         Returns:
             Iterable[ProgressType]: [description]
         """
-        task_id = self.add_task(description, total=len(sequence))
+        if total is None:
+            if isinstance(sequence, Sized):
+                task_total = len(sequence)
+            else:
+                raise ValueError(
+                    f"unable to get size of {sequence!r}, please specify 'total'"
+                )
+        else:
+            task_total = total
+
+        if task_id is None:
+            task_id = self.add_task(description, total=task_total)
+        else:
+            self.update(task_id, total=task_total)
         with self:
             for completed, value in enumerate(sequence, 1):
                 yield value
                 self.update(task_id, completed=completed)
-                self.refresh()
 
     def start_task(self, task_id: TaskID) -> None:
         """Start a task.
@@ -411,6 +457,15 @@ class Progress:
             task._progress.append(ProgressSample(current_time, update_completed))
             if refresh:
                 self.refresh()
+
+    def advance(self, task_id: TaskID, advance: float = 1) -> None:
+        """Advance task by a number of steps.
+        
+        Args:
+            task_id (TaskID): ID of task.
+            advance (float): Number of steps to advance. Default is 1.
+        """
+        self.update(task_id, advance=advance)
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""

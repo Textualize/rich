@@ -1,5 +1,3 @@
-from colorama import init
-
 from typing import Any, IO, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -21,8 +19,6 @@ def print(
     write_console = _console if file is None else Console(file=file)
     return write_console.print(*objects, sep=sep, end=end)
 
-
-init()
 
 if __name__ == "__main__":  # pragma: no cover
     print("Hello, **World**")

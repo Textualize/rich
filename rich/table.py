@@ -461,8 +461,8 @@ class Table:
 if __name__ == "__main__":
     from .console import Console
 
-    c = Console(width=80)
-    table = Table()
+    c = Console()
+    table = Table(expand=True)
     table.add_column(no_wrap=True)
     table.add_column()
     table.add_row(

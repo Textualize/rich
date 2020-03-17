@@ -73,6 +73,7 @@ class Syntax:
     def from_path(
         cls,
         path: str,
+        encoding: str = "utf-8",
         theme: Union[str, PygmentsStyle] = DEFAULT_THEME,
         dedent: bool = True,
         line_numbers: bool = False,
@@ -86,6 +87,7 @@ class Syntax:
         
         Args:
             path (str): Path to file to highlight.
+            encoding (str): Encoding of file.
             lexer_name (str): Lexer to use (see https://pygments.org/docs/lexers/)
             theme (str, optional): Color theme, aka Pygments style (see https://pygments.org/docs/styles/#getting-a-list-of-available-styles). Defaults to "emacs".
             dedent (bool, optional): Enable stripping of initial whitespace. Defaults to True.
@@ -99,7 +101,7 @@ class Syntax:
         Returns:
             [Syntax]: A Syntax object that may be printed to the console
         """
-        with open(path, "rt") as code_file:
+        with open(path, "rt", encoding=encoding) as code_file:
             code = code_file.read()
         try:
             lexer = guess_lexer_for_filename(path, code)
@@ -242,7 +244,7 @@ class Syntax:
         padding = _Segment(" " * numbers_column_width, background_style)
         new_line = _Segment("\n")
 
-        line_pointer = "->" if WINDOWS else "❱ "
+        line_pointer = "❱ "
 
         for line_no, line in enumerate(lines, self.start_line + line_offset):
             wrapped_lines = console.render_lines(

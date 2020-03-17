@@ -1,5 +1,6 @@
 from typing import NamedTuple, Optional
 
+from .cells import cell_len, set_cell_size
 from .style import Style
 
 from itertools import zip_longest
@@ -104,7 +105,7 @@ class Segment(NamedTuple):
         Returns:
             List[Segment]: A line of segments with the desired length.
         """
-        line_length = sum(len(text) for text, _style in line)
+        line_length = sum(cell_len(text) for text, _style in line)
         new_line: List[Segment]
 
         if line_length < length:
@@ -117,13 +118,14 @@ class Segment(NamedTuple):
             append = new_line.append
             line_length = 0
             for segment in line:
-                segment_length = len(segment.text)
+                segment_length = cell_len(segment.text)
                 if line_length + segment_length < length:
                     append(segment)
                     line_length += segment_length
                 else:
                     text, style = segment
-                    append(cls(text[: length - line_length], style))
+                    text = set_cell_size(text, length - line_length)
+                    append(cls(text, style))
                     break
         else:
             new_line = line[:]
@@ -139,7 +141,7 @@ class Segment(NamedTuple):
         Returns:
             int: The length of the line.
         """
-        return sum(len(text) for text, _ in line)
+        return sum(cell_len(text) for text, _ in line)
 
     @classmethod
     def get_shape(cls, lines: List[List["Segment"]]) -> Tuple[int, int]:
