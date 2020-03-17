@@ -122,12 +122,7 @@ class BarColumn(ProgressColumn):
 
     def render(self, task: "Task") -> Bar:
         """Gets a progress bar widget for a task."""
-        return Bar(
-            total=task.total,
-            completed=task.completed,
-            width=self.bar_width,
-            carriage_return=False,
-        )
+        return Bar(total=task.total, completed=task.completed, width=self.bar_width)
 
 
 class TimeRemainingColumn(ProgressColumn):

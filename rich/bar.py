@@ -26,7 +26,6 @@ class Bar:
         style: StyleType = "bar.back",
         complete_style: StyleType = "bar.complete",
         finished_style: StyleType = "bar.finished",
-        carriage_return: bool = True,
     ):
         self.total = total
         self.completed = completed
@@ -34,7 +33,6 @@ class Bar:
         self.style = style
         self.complete_style = complete_style
         self.finished_style = finished_style
-        self.carriage_return = carriage_return
 
     def __repr__(self) -> str:
         return f"<Bar {self.completed!r} of {self.total!r}>"
@@ -81,8 +79,6 @@ class Bar:
                 remaining_bars -= 1
             if remaining_bars:
                 yield Segment(bar * remaining_bars, style)
-        if self.carriage_return:
-            yield Segment("\r")
 
     def __measure__(self, console: Console, max_width: int) -> Measurement:
         if self.width is not None:
@@ -100,6 +96,7 @@ if __name__ == "__main__":
     for n in range(0, 101, 1):
         bar.update_progress(n)
         console.print(bar)
+        console.file.write("\r")
         time.sleep(0.05)
     console.show_cursor(True)
     console.print()
