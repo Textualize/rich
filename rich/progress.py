@@ -141,12 +141,39 @@ class TimeRemainingColumn(ProgressColumn):
 
 
 class FileSizeColumn(ProgressColumn):
-    """Renders human readable filesize."""
+    """Renders completed filesize."""
 
     def render(self, task: "Task") -> Text:
         """Show data completed."""
         data_size = filesize.decimal(int(task.completed))
-        return Text(data_size, style="progress.data")
+        return Text(data_size, style="progress.filesize")
+
+
+class TotalFileSizeColumn(ProgressColumn):
+    """Renders total filesize."""
+
+    def render(self, task: "Task") -> Text:
+        """Show data completed."""
+        data_size = filesize.decimal(int(task.total))
+        return Text(data_size, style="progress.filesize.total")
+
+
+class DownloadColumn(ProgressColumn):
+    """Renders file size downloaded and total, e.g. '0.5/2.3 GB'."""
+
+    def render(self, task: "Task") -> Text:
+        """Calculate common unit for completed and total."""
+        completed = int(task.completed)
+        total = int(task.total)
+        unit, suffix = filesize.pick_unit_and_suffix(
+            total, ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], 1024
+        )
+        completed_str = f"{1024 * completed / unit:,.1f}"
+        total_str = f"{1024 * total / unit:,.1f}"
+        download_text = Text(
+            f"{completed_str}/{total_str} {suffix}", style="progress.download"
+        )
+        return download_text
 
 
 class TransferSpeedColumn(ProgressColumn):
@@ -280,6 +307,7 @@ class Progress:
         refresh_per_second: int = 10,
         speed_estimate_period: float = 30.0,
     ) -> None:
+        assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self.columns = columns or (
             "[progress.description]{task.description}",
             BarColumn(),
@@ -348,7 +376,7 @@ class Progress:
 
     def track(
         self,
-        sequence: Sequence[ProgressType],
+        sequence: Union[Iterable[ProgressType], Sequence[ProgressType]],
         total: int = None,
         task_id: Optional[TaskID] = None,
         description="Working...",

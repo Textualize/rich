@@ -77,6 +77,8 @@ The following column objects are available:
 - :class:`~rich.progress.BarColumn` Displays the bar.
 - :class:`~rich.progress.TimeRemainingColumn` Displays the estimated time remaining.
 - :class:`~rich.progress.FileSizeColumn` Displays progress as file size (assumes the steps are bytes).
+- :class:`~rich.progress.FileSizeCompletedColumn` Displays total file size (assumes the steps are bytes).
+- :class:`~rich.progress.DownloadColumn` Displays download progress (assumes the steps are bytes).
 - :class:`~rich.progress.TransferSpeedColumn` Displays transfer speed (assumes the steps are bytes.
 
 

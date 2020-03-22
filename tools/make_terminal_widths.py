@@ -10,7 +10,7 @@ from wcwidth import wcwidth
 progress = Progress()
 
 
-def make_widths_table():
+def make_widths_table() -> List[Tuple[int, int, int]]:
     table: List[Tuple[int, int, int]] = []
     append = table.append
 
@@ -21,13 +21,13 @@ def make_widths_table():
         for codepoint in range(0, sys.maxunicode + 1)
     )
 
-    widths = [(codepoint, width) for codepoint, width in widths if width != 1]
-    iter_widths = iter(widths)
+    _widths = [(codepoint, width) for codepoint, width in widths if width != 1]
+    iter_widths = iter(_widths)
 
     endpoint, group_cell_size = next(iter_widths)
     start_codepoint = end_codepoint = endpoint
     for codepoint, cell_size in progress.track(
-        iter_widths, task_id=make_table_task, total=len(widths) - 1
+        iter_widths, task_id=make_table_task, total=len(_widths) - 1
     ):
         if cell_size != group_cell_size or codepoint != end_codepoint + 1:
             append((start_codepoint, end_codepoint, group_cell_size))
@@ -88,4 +88,3 @@ CELL_WIDTHS = {widths_table!r}
 
 if __name__ == "__main__":
     run()
-

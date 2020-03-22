@@ -6,7 +6,7 @@ from ._cell_widths import CELL_WIDTHS
 from ._lru_cache import LRUCache
 
 
-def cell_len(text: str, _cache: LRUCache[str, int] = LRUCache(1024)) -> int:
+def cell_len(text: str, _cache: LRUCache[str, int] = LRUCache(1024 * 4)) -> int:
     """Get the number of cells required to display text.
     
     Args:
@@ -20,7 +20,7 @@ def cell_len(text: str, _cache: LRUCache[str, int] = LRUCache(1024)) -> int:
         return cached_result
     _get_size = get_character_cell_size
     total_size = sum(_get_size(character) for character in text)
-    if len(text) < 256:
+    if len(text) < 64:
         _cache[text] = total_size
     return total_size
 

@@ -13,8 +13,8 @@ from urllib.request import urlopen
 
 from rich.progress import (
     BarColumn,
+    DownloadColumn,
     TransferSpeedColumn,
-    FileSizeColumn,
     TimeRemainingColumn,
     Progress,
     TaskID,
@@ -23,10 +23,10 @@ from rich.progress import (
 
 progress = Progress(
     "[bold blue]{task.fields[filename]}",
-    BarColumn(),
+    BarColumn(bar_width=None),
     "[progress.percentage]{task.percentage:>3.0f}%",
     "•",
-    FileSizeColumn(),
+    DownloadColumn(),
     "•",
     TransferSpeedColumn(),
     "•",

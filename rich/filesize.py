@@ -13,14 +13,10 @@ See Also:
 
 __all__ = ["traditional", "decimal", "binary"]
 
-from typing import Iterable
+from typing import Iterable, List, Tuple
 
 
 def _to_str(size: int, suffixes: Iterable[str], base: int) -> str:
-    try:
-        size = int(size)
-    except ValueError:
-        raise TypeError("filesize requires a numeric value, not {!r}".format(size))
     if size == 1:
         return "1 byte"
     elif size < base:
@@ -31,6 +27,19 @@ def _to_str(size: int, suffixes: Iterable[str], base: int) -> str:
         if size < unit:
             break
     return "{:,.1f} {}".format((base * size / unit), suffix)
+
+
+def pick_unit_and_suffix(size: int, suffixes: List[str], base: int) -> Tuple[int, str]:
+    """Pick a suffix and base for the given size."""
+    unit = 1
+    suffix = "bytes"
+    if size < base:
+        return 1, suffix
+    for i, suffix in enumerate(suffixes, 2):
+        unit = base ** i
+        if size < unit:
+            break
+    return unit, suffix
 
 
 def traditional(size: int) -> str:
