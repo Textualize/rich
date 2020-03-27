@@ -9,7 +9,7 @@ Rich supports a simple markup which you can use to insert color and styles virtu
 Syntax
 ------
 
-Console markup uses a syntax inspired by [bbcode](https://en.wikipedia.org/wiki/BBCode). If you write the style (see :ref:`styles`) in square brackets, i.e. ``[bold red]``, that style will apply until it is *closed* with a corresponding ``[/bold red]``.
+Console markup uses a syntax inspired by `bbcode <https://en.wikipedia.org/wiki/BBCode>`_. If you write the style (see :ref:`styles`) in square brackets, i.e. ``[bold red]``, that style will apply until it is *closed* with a corresponding ``[/bold red]``.
 
 Here's a simple example::
 
