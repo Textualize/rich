@@ -16,7 +16,7 @@ class RichHandler(Handler):
     """A logging handler that renders output with Rich. The time / level / message and file are displayed in columns. The 
     level is color coded, and the message is syntax highlighted.
 
-    Example:
+    Example::
 
         import logging
         from rich.logging import RichHandler
