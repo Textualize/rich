@@ -1,3 +1,5 @@
+.. _logging:
+
 rich.logging
 ============
 

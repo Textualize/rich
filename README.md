@@ -99,6 +99,10 @@ Note the `log_locals` argument, which outputs a table containing the local varia
 
 The log method could be used for logging to the terminal for long running applications such as servers, but is also a very nice debugging aid.
 
+You can also use the builtin logging Handler class, to format and colorize output form Python's logging module. Here's an example of the output:
+
+![Log](./imgs/logging.png)
+
 ## Emoji
 
 To insert an emoji in to console output place the name between two colons. Here's an example:

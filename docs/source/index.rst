@@ -16,6 +16,7 @@ Welcome to Rich's documentation!
    markup.rst
    tables.rst
    panel.rst
+   logging.rst
    progress.rst
    markdown.rst
    syntax.rst
