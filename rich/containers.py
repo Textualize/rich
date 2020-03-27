@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     )
     from .text import Text
 
+from .cells import cell_len
 from .measure import Measurement
 
 T = TypeVar("T")
@@ -113,17 +114,17 @@ class Lines:
         elif align == "center":
             for line in self._lines:
                 line.rstrip()
-                line.pad_left((width - len(line.text)) // 2)
-                line.pad_right(width - len(line.text))
+                line.pad_left((width - cell_len(line.text)) // 2)
+                line.pad_right(width - cell_len(line.text))
         elif align == "right":
             for line in self._lines:
-                line.pad_left(width - len(line.text))
+                line.pad_left(width - cell_len(line.text))
         elif align == "full":
             for line_index, line in enumerate(self._lines):
                 if line_index == len(self._lines) - 1:
                     break
                 words = line.split(" ")
-                words_size = sum(len(word) for word in words)
+                words_size = sum(cell_len(word.text) for word in words)
                 num_spaces = len(words) - 1
                 spaces = [1 for _ in range(num_spaces)]
                 index = 0

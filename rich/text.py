@@ -644,4 +644,3 @@ class Text:
             line.set_length(width)
             append(line)
         return lines
-
