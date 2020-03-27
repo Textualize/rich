@@ -55,6 +55,11 @@ class Rule:
 
 if __name__ == "__main__":
     from rich.console import Console
+    import sys
 
+    try:
+        text = sys.argv[1]
+    except IndexError:
+        text = "Hello, World"
     console = Console()
-    console.print(Rule("Hello, World"))
+    console.print(Rule(text))

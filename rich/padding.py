@@ -65,7 +65,7 @@ class Padding:
 
         blank_line = Segment(" " * width + "\n", style)
         top = [blank_line] * self.top
-        bottom = [blank_line] * self.top
+        bottom = [blank_line] * self.bottom
         left = Segment(" " * self.left, style) if self.left else None
         right = Segment(" " * self.right, style) if self.right else None
         new_line = Segment.line()
@@ -86,4 +86,3 @@ class Padding:
         )
         render_width = Measurement(min_width + extra_width, max_width + extra_width)
         return render_width
-

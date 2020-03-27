@@ -128,10 +128,11 @@ class Lines:
                 num_spaces = len(words) - 1
                 spaces = [1 for _ in range(num_spaces)]
                 index = 0
-                while words_size + num_spaces < width:
-                    spaces[len(spaces) - index - 1] += 1
-                    num_spaces += 1
-                    index = (index + 1) % len(spaces)
+                if spaces:
+                    while words_size + num_spaces < width:
+                        spaces[len(spaces) - index - 1] += 1
+                        num_spaces += 1
+                        index = (index + 1) % len(spaces)
                 tokens: List[Text] = []
                 index = 0
                 for index, word in enumerate(words):

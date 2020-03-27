@@ -150,9 +150,7 @@ class RichRenderable:
 
 
 class RenderGroup:
-    def __init__(
-        self, renderables: Iterable[RenderableType], fit: bool = False
-    ) -> None:
+    def __init__(self, *renderables: RenderableType, fit: bool = True) -> None:
         """Takes a group of renderables and returns a renderable object,
         that renders the group.
         
@@ -188,7 +186,7 @@ def render_group(fit: bool = False) -> Callable:
         @wraps(method)
         def _replace(*args, **kwargs):
             renderables = method(*args, **kwargs)
-            return RenderGroup(renderables, fit=fit)
+            return RenderGroup(*renderables, fit=fit)
 
         return _replace
 
@@ -586,11 +584,17 @@ class Console:
             ConsoleRenderable: Renderable object.
 
         """
-        if emoji or (emoji is None and self._emoji):
-            text = _emoji_replace(text)
+        emoji_enabled = emoji or (emoji is None and self._emoji)
+        markup_enabled = markup or (markup is None and self._markup)
 
-        if markup or (markup is None and self._markup):
-            return render_markup(text, style=style)
+        if emoji_enabled:
+            if markup_enabled:
+                return render_markup(text, style=style)
+            else:
+                text = _emoji_replace(text)
+        else:
+            if markup_enabled:
+                return render_markup(text, style=style, emoji=False)
 
         return Text(text, style=style)
 
@@ -1052,4 +1056,3 @@ if __name__ == "__main__":  # pragma: no cover
         }
     )
     console.log("foo")
-

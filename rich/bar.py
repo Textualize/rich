@@ -86,7 +86,7 @@ class Bar:
         return Measurement(4, max_width)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     console = Console()
     bar = Bar(width=50, total=100)
 

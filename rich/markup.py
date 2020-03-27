@@ -6,6 +6,7 @@ from typing import Dict, Iterable, List, Match, Optional, Tuple, Union
 from .errors import MarkupError
 from .style import Style
 from .text import Span, Text
+from ._emoji_replace import _emoji_replace
 
 
 re_tags = re.compile(r"(\[\".*?\"\])|(\[.*?\])")
@@ -35,11 +36,12 @@ def _parse(markup: str) -> Iterable[Tuple[Optional[str], Optional[str]]]:
         yield markup[position:], None
 
 
-def render(markup: str, style: Union[str, Style] = "") -> Text:
+def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Text:
     """Render console markup in to a Text instance.
 
     Args:
         markup (str): A string containing console markup.
+        emoji (bool, optional): Also render emoji code. Defaults to True.
     
     Raises:
         MarkupError: If there is a syntax error in the markup.
@@ -48,19 +50,22 @@ def render(markup: str, style: Union[str, Style] = "") -> Text:
         Text: A test instance.
     """
     text = Text(style=style)
+    append = text.append
     stylize = text.stylize
 
     styles: Dict[str, List[int]] = defaultdict(list)
     style_stack: List[str] = []
+    normalize = Style.normalize
+    emoji_replace = _emoji_replace
 
     for plain_text, tag in _parse(markup):
         if plain_text is not None:
-            text.append(plain_text)
+            append(emoji_replace(plain_text) if emoji else plain_text)
         if tag is not None:
             if tag.startswith("[/"):
                 style_name = tag[2:-1].strip()
                 if style_name:
-                    style_name = Style.normalize(style_name)
+                    style_name = normalize(style_name)
                 else:
                     try:
                         style_name = style_stack[-1]
@@ -77,7 +82,7 @@ def render(markup: str, style: Union[str, Style] = "") -> Text:
                 style_stack.remove(style_name)
                 stylize(style_position, len(text), style_name)
             else:
-                style_name = Style.normalize(tag[1:-1].strip())
+                style_name = normalize(tag[1:-1].strip())
                 styles[style_name].append(len(text))
                 style_stack.append(style_name)
 
@@ -88,4 +93,3 @@ def render(markup: str, style: Union[str, Style] = "") -> Text:
         text.stylize(style_position, text_length, style_name)
 
     return text
-

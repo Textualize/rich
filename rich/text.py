@@ -28,6 +28,7 @@ from .containers import Lines
 from .style import Style
 from .segment import Segment
 from .measure import Measurement
+from ._emoji_replace import _emoji_replace
 from ._tools import iter_last, iter_first_last
 from ._wrap import divide_line
 
@@ -144,18 +145,28 @@ class Text:
         return False
 
     @classmethod
-    def from_markup(cls, text: str, style: Union[str, Style] = "") -> "Text":
+    def from_markup(
+        cls,
+        text: str,
+        style: Union[str, Style] = "",
+        emoji: bool = True,
+        justify: "JustifyValues" = None,
+    ) -> "Text":
         """Create Text instance from markup.
         
         Args:
             text (str): A string containing console markup.
+            emoji (bool, optional): Also render emoji code. Defaults to True.
+            justify (str, optional): Default alignment for text, "left", "center", "full" or "right". Defaults to None.
         
         Returns:
             Text: A Text instance with markup rendered.
         """
         from .markup import render
 
-        return render(text, style)
+        text = render(text, style, emoji=emoji)
+        text.justify = justify
+        return text
 
     @classmethod
     def assemble(

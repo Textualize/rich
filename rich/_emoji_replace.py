@@ -5,7 +5,7 @@ import re
 from ._emoji_codes import EMOJI
 
 
-def _emoji_replace(text: str, _emoji_sub=re.compile("(:(.*?):)").sub) -> str:
+def _emoji_replace(text: str, _emoji_sub=re.compile(r"(:(\S*?):)").sub) -> str:
     """Replace emoji code in text."""
     get_emoji = EMOJI.get
 

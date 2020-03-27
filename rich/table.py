@@ -143,6 +143,37 @@ class Table:
         )
 
     @property
+    def _extra_width(self) -> int:
+        width = 0
+        if self.box and self.show_edge:
+            width += 2
+        if self.box:
+            width += len(self.columns)
+            if self.pad_edge:
+                width += 2
+        return width
+
+    def __measure__(self, console: "Console", max_width: int) -> Measurement:
+        if self.width is not None:
+            max_width = min(self.width, max_width)
+
+        if self.box:
+            max_width -= len(self.columns)
+            if self.show_edge:
+                max_width -= 2
+
+        extra_width = self._extra_width
+        table_width = (
+            sum(self._calculate_column_widths(console, max_width)) + extra_width
+        )
+        min_table_width = (
+            sum(self._calculate_column_widths(console, max_width, minimums=True))
+            + extra_width
+        )
+
+        return Measurement(min_table_width, table_width)
+
+    @property
     def padding(self) -> Tuple[int, int, int, int]:
         return self._padding
 
@@ -245,7 +276,7 @@ class Table:
             if self.show_edge:
                 max_width -= 2
         widths = self._calculate_column_widths(console, max_width)
-        table_width = sum(widths) + len(self.columns) + (2 if self.box else 0)
+        table_width = sum(widths) + self._extra_width
 
         def render_annotation(
             text: Union[Text, str], style: Union[str, Style]
@@ -267,22 +298,25 @@ class Table:
                 style=Style.pick_first(self.caption_style, "table.caption"),
             )
 
-    def _calculate_column_widths(self, console: "Console", max_width: int) -> List[int]:
+    def _calculate_column_widths(
+        self, console: "Console", max_width: int, minimums: bool = False
+    ) -> List[int]:
         """Calculate the widths of each column."""
         columns = self.columns
         width_ranges = [
             self._measure_column(console, column_index, column, max_width)
             for column_index, column in enumerate(columns)
         ]
-
-        widths = [_range.maximum or 1 for _range in width_ranges]
+        if minimums:
+            widths = [_range.minimum or 1 for _range in width_ranges]
+        else:
+            widths = [_range.maximum or 1 for _range in width_ranges]
         padding_width = self.padding[1] + self.padding[3]
         if self.expand:
             ratios = [col.ratio or 0 for col in columns if col.flexible]
             if any(ratios):
-                fixed_widths = [_range.maximum for _range in width_ranges]
                 fixed_widths = [
-                    _range.minimum if column.flexible else _range.maximum
+                    0 if column.flexible else _range.maximum
                     for _range, column in zip(width_ranges, columns)
                 ]
                 flex_minimum = [
@@ -470,4 +504,3 @@ if __name__ == "__main__":
         "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
     )
     c.print(table)
-
