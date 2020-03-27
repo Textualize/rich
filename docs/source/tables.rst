@@ -1,7 +1,7 @@
 Tables
 ======
 
-Rich's :class:`~rich.table.Table` class offers a variety ways of rendering tabular data to the terminal.
+Rich's :class:`~rich.table.Table` class offers a variety of ways to render tabular data to the terminal.
 
 To render a table, construct a :class:`~rich.table.Table` object, add columns with :meth:`~rich.table.Table.add_column`, and rows with :meth:`~rich.table.Table.add_row` -- then print it to the console.
 
@@ -40,6 +40,6 @@ This produces the following output:
     </pre>
 
 
-Rich is quite smart about rendering the table. It will adjust the columns widths to fit the contents and will wrap text if it doesn't fit. You can also add anything that Rich knows how to render as a title or row cell (even another table)!
+Rich is quite smart about rendering the table. It will adjust the column widths to fit the contents and will wrap text if it doesn't fit. You can also add anything that Rich knows how to render as a title or row cell (even another table)!
 
-The :class:`~rich.table.Table` class offers a number of configuration options to set the look and feel of the table, including how the borders are rendered, and the style and alignment of the columns.
+The :class:`~rich.table.Table` class offers a number of configuration options to set the look and feel of the table, including how borders are rendered and the style and alignment of the columns.
