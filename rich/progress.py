@@ -467,7 +467,7 @@ class Progress:
             completed (float, optional): Updates task.completed if not None.
             advance (float, optional): Add a value to task.completed if not None.
             visible (bool, optional): Set visible flag if not None.
-            refresh (bool): For a refresh of progress information.
+            refresh (bool): Force a refresh of progress information. Default is False.
             **fields (Any): Additional data fields required for rendering.
         """
         current_time = monotonic()
