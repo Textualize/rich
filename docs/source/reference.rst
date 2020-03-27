@@ -9,6 +9,7 @@ Reference
    reference/console.rst
    reference/emoji.rst
    reference/highlighter.rst
+   reference/logging.rst
    reference/markdown.rst
    reference/measure.rst
    reference/panel.rst

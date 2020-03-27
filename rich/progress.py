@@ -248,7 +248,7 @@ class Task:
     def speed(self) -> Optional[float]:
         """Get the estimated speed in steps per second."""
         if self.start_time is None:
-            return 0.0
+            return None
         progress = list(self._progress)
         if not progress:
             return None
@@ -265,7 +265,7 @@ class Task:
         if self.finished:
             return 0.0
         speed = self.speed
-        if speed is None:
+        if not speed:
             return None
         estimate = ceil(self.remaining / speed)
         return estimate
@@ -325,6 +325,7 @@ class Progress:
         self._refresh_thread: Optional[_RefreshThread] = None
         self._refresh_count = 0
         self._enter_count = 0
+        self._started = False
 
     @property
     def tasks_ids(self) -> List[TaskID]:
@@ -342,22 +343,30 @@ class Progress:
 
     def start(self) -> None:
         """Start the progress display."""
-        self.console.show_cursor(False)
-        self.refresh()
-        if self.auto_refresh:
-            self._refresh_thread = _RefreshThread(self, self.refresh_per_second)
-            self._refresh_thread.start()
+        with self._lock:
+            if self._started:
+                return
+            self._started = True
+            self.console.show_cursor(False)
+            self.refresh()
+            if self.auto_refresh:
+                self._refresh_thread = _RefreshThread(self, self.refresh_per_second)
+                self._refresh_thread.start()
 
     def stop(self) -> None:
         """Stop the progress display."""
-        try:
-            if self.auto_refresh and self._refresh_thread is not None:
-                self._refresh_thread.stop()
-                self._refresh_thread = None
-            self.refresh()
-            self.console.line()
-        finally:
-            self.console.show_cursor(True)
+        with self._lock:
+            if not self._started:
+                return
+            self._started = False
+            try:
+                if self.auto_refresh and self._refresh_thread is not None:
+                    self._refresh_thread.stop()
+                    self._refresh_thread = None
+                self.refresh()
+                self.console.line()
+            finally:
+                self.console.show_cursor(True)
 
     def __enter__(self) -> "Progress":
         with self._lock:
@@ -442,23 +451,23 @@ class Progress:
     def update(
         self,
         task_id: TaskID,
-        refresh=False,
         *,
         total: float = None,
         completed: float = None,
         advance: float = None,
         visible: bool = None,
+        refresh: bool = False,
         **fields: Any,
     ) -> None:
         """Update information associated with a task.
         
         Args:
-            task_id (TaskID): Task id (return by add_task).
-            refresh (bool): Also refresh the progress information.
+            task_id (TaskID): Task id (return by add_task).            
             total (float, optional): Updates task.total if not None.
             completed (float, optional): Updates task.completed if not None.
             advance (float, optional): Add a value to task.completed if not None.
             visible (bool, optional): Set visible flag if not None.
+            refresh (bool): For a refresh of progress information.
             **fields (Any): Additional data fields required for rendering.
         """
         current_time = monotonic()
