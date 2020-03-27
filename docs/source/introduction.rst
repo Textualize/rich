@@ -29,7 +29,7 @@ Strings may contain :ref:`console_markup` which can be used to easily insert col
 
 The following demonstrates both console markup and pretty formatting of Python objects::
 
-    >>> print("[red]*Hello*[/red] World!", locals())
+    >>> print("[italic red]Hello[/italic red] World!", locals())
 
 This writes the following output to the terminal (including all the colors and styles):
 
