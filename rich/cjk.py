@@ -14,7 +14,7 @@ print("x" * 15)
 
 console = Console()
 table = Table()
-table.add_column("这是对亚洲语言支持的测试。", justify="right")
+table.add_column("这是对亚洲语言支持的测试。", justify="center")
 console.print(table)
 table.add_column("拒绝猜测的诱惑。")
 console.print(table)

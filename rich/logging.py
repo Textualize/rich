@@ -13,21 +13,12 @@ from rich.text import Text
 
 
 class RichHandler(Handler):
-    """A logging handler that renders output with Rich. The time / level / message and file are displayed in columns. The 
-    level is color coded, and the message is syntax highlighted.
-
-    Example:
-        import logging
-        from rich.logging import RichHandler
-        FORMAT = "%(message)s"
-        logging.basicConfig(
-            level="NOTSET", format=FORMAT, datefmt="[%X] ", handlers=[RichHandler()]
-        )
-        log = logging.getLogger("rich")
-        log.info("Hello, World!")
+    """A logging handler that renders output with Rich. The time / level / message and file are displayed in columns.
+    The level is color coded, and the message is syntax highlighted.
         
     Args:
         level (int, optional): Log level. Defaults to logging.NOTSET.
+  
     """
 
     KEYWORDS = ["GET", "POST", "HEAD", "PUT", "DELETE", "OPTIONS", "TRACE", "PATCH"]

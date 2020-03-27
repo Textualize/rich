@@ -20,7 +20,7 @@ def cell_len(text: str, _cache: LRUCache[str, int] = LRUCache(1024 * 4)) -> int:
         return cached_result
     _get_size = get_character_cell_size
     total_size = sum(_get_size(character) for character in text)
-    if len(text) < 64:
+    if len(text) <= 64:
         _cache[text] = total_size
     return total_size
 
@@ -102,7 +102,7 @@ def chop_cells(text: str, max_size: int) -> List[str]:
     return ["".join(line) for line in lines]
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
 
     print(get_character_cell_size("😽"))
     for line in chop_cells("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", 8):
@@ -110,4 +110,3 @@ if __name__ == "__main__":
     for n in range(80, 1, -1):
         print(set_cell_size("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", n) + "|")
         print("x" * n)
-
