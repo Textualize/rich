@@ -28,7 +28,7 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/print.png)
 
-## Console Printing
+## Console logging
 
 For more control over rich terminal content, import and construct a `Console` object.
 
@@ -64,7 +64,7 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![Console Markup](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
 
-## Console Logging
+### logging handler
 
 The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default Rich will do syntax highlighting for Python structures and for repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
 
@@ -98,6 +98,8 @@ The above produces the following output:
 Note the `log_locals` argument, which outputs a table containing the local variables where the log method was called.
 
 The log method could be used for logging to the terminal for long running applications such as servers, but is also a very nice debugging aid.
+
+### Logging Handler
 
 You can also use the builtin Handler class to format and colorize output form Python's logging module. Here's an example of the output:
 
