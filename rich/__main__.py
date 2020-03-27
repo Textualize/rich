@@ -66,7 +66,7 @@ table.add_row(
 
 lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque in metus sed sapien ultricies pretium a at justo. Maecenas luctus velit et auctor maximus. Donec faucibus vel arcu id pretium. Phasellus sit amet semper turpis."
 lorem_table = Table.grid()
-lorem_table.padding = (0, 1)
+lorem_table.padding = (0, 1, 0, 1)
 lorem_table.pad_edge = False
 lorem_table.add_row(
     Text(lorem, justify="left", style="green"),

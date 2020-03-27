@@ -164,9 +164,9 @@ class Text:
         """
         from .markup import render
 
-        text = render(text, style, emoji=emoji)
-        text.justify = justify
-        return text
+        rendered_text = render(text, style, emoji=emoji)
+        rendered_text.justify = justify
+        return rendered_text
 
     @classmethod
     def assemble(
