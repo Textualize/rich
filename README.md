@@ -10,6 +10,10 @@ The [Rich API](https://rich.readthedocs.io/en/latest/) makes it easy to add colo
 
 ![Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
 
+## Compatibility
+
+Rich works with Linux, OSX, and Windows. True color / emoji works with new Windows Terminal, classic terminal is limited to 8 colors.
+
 ## Installing
 
 Install with `pip` or your favorite PyPi package manager.

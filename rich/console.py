@@ -279,7 +279,7 @@ class Console:
         self._markup = markup
         self._emoji = emoji
         self._highlight = highlight
-        self.legacy_windows = "WINDIR" in os.environ and not "WT_SESSION" in os.environ
+        self.legacy_windows: bool = "WINDIR" in os.environ and not "WT_SESSION" in os.environ
 
         self._color_system: Optional[ColorSystem]
         if self.legacy_windows:
