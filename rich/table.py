@@ -158,7 +158,7 @@ class Table:
             max_width = min(self.width, max_width)
 
         if self.box:
-            max_width -= len(self.columns)
+            max_width -= len(self.columns) - 1
             if self.show_edge:
                 max_width -= 2
 
@@ -170,7 +170,6 @@ class Table:
             sum(self._calculate_column_widths(console, max_width, minimums=True))
             + extra_width
         )
-
         return Measurement(min_table_width, table_width)
 
     @property
@@ -272,7 +271,7 @@ class Table:
             max_width = min(self.width, max_width)
 
         if self.box:
-            max_width -= len(self.columns)
+            max_width -= len(self.columns) - 1
             if self.show_edge:
                 max_width -= 2
         widths = self._calculate_column_widths(console, max_width)
@@ -320,7 +319,7 @@ class Table:
                     for _range, column in zip(width_ranges, columns)
                 ]
                 flex_minimum = [
-                    (column.width or 0) + padding_width
+                    (column.width or 1) + padding_width
                     for column in columns
                     if column.flexible
                 ]
@@ -341,9 +340,9 @@ class Table:
                     return widths
             excess_width = table_width - max_width
             widths = [
-                width - excess_width
+                max(1 + padding_width, width - excess_width)
                 for width, excess_width in zip(
-                    widths, ratio_divide(excess_width, flex_widths)
+                    widths, ratio_divide(excess_width, flex_widths),
                 )
             ]
         elif table_width < max_width and self.expand:

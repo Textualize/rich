@@ -64,7 +64,7 @@ table.add_row(
     "All ansi styles: [bold]bold[/], [dim]dim[/], [italic]italic[/italic], [underline]underline[/], [strike]strikethrough[/], [reverse]reverse[/], and even [blink]blink[/].",
 )
 
-lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque in metus sed sapien ultricies pretium a at justo. Maecenas luctus velit et auctor maximus. Donec faucibus vel arcu id pretium. Phasellus sit amet semper turpis."
+lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque in metus sed sapien ultricies pretium a at justo. Maecenas luctus velit et auctor maximus. Donec faucibus vel arcu id pretium."
 lorem_table = Table.grid()
 lorem_table.padding = (0, 1, 0, 1)
 lorem_table.pad_edge = False

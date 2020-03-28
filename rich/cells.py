@@ -71,7 +71,7 @@ def set_cell_size(text: str, total: int) -> str:
     character_sizes = [_get_character_cell_size(character) for character in text]
     excess = cell_size - total
     pop = character_sizes.pop
-    while excess > 0:
+    while excess > 0 and character_sizes:
         excess -= pop()
     text = text[: len(character_sizes)]
     if excess == -1:
