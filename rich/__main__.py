@@ -129,29 +129,30 @@ def make_test_card() -> Table:
     table.add_row("Tables", example_table)
 
     code = '''\
-    def iter_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
-        """Iterate and generate a tuple with a flag for last value."""
-        iter_values = iter(values)
-        try:
-            previous_value = next(iter_values)
-        except StopIteration:
-            return
-        for value in iter_values:
-            yield False, previous_value
-            previous_value = value
-        yield True, previous_value'''
+def iter_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
+    """Iterate and generate a tuple with a flag for last value."""
+    iter_values = iter(values)
+    try:
+        previous_value = next(iter_values)
+    except StopIteration:
+        return
+    for value in iter_values:
+        yield False, previous_value
+        previous_value = value
+    yield True, previous_value'''
 
     table.add_row("Syntax highlighting", Syntax(code, "python3", line_numbers=True))
 
     markdown_example = """\
-    # Markdown
-    
-    Supports much of the *markdown*, __syntax__!
+# Markdown
 
-    - Headers
-    - Basic formatting: bold, italic, code etc
-    - Block quotes
-    - Lists, and more... """
+Supports much of the *markdown*, __syntax__!
+
+- Headers
+- Basic formatting: bold, italic, code etc
+- Block quotes
+- Lists, and more...
+    """
     table.add_row("Markdown", comparison(markdown_example, Markdown(markdown_example)))
 
     table.add_row(
