@@ -221,6 +221,13 @@ class ConsoleThreadLocals(threading.local):
     control: List[str] = field(default_factory=list)
 
 
+def _enable_legacy_windows_support() -> None:
+    """Initialize Windows legacy support."""
+    from colorama import init
+
+    init()
+
+
 class Console:
     """A high level console interface.
 
@@ -264,7 +271,7 @@ class Console:
         self._styles = ChainMap(
             themes.DEFAULT.styles if theme is None else theme.styles
         )
-        self.file = file or sys.stdout
+
         self._width = width
         self._height = height
         self.tab_size = tab_size
@@ -272,13 +279,21 @@ class Console:
         self._markup = markup
         self._emoji = emoji
         self._highlight = highlight
+        self.legacy_windows = "WINDIR" in os.environ and not "WT_SESSION" in os.environ
 
-        if color_system is None:
-            self._color_system = None
-        elif color_system == "auto":
-            self._color_system = self._detect_color_system()
+        self._color_system: Optional[ColorSystem]
+        if self.legacy_windows:
+            _enable_legacy_windows_support()
+            self.file = file or sys.stdout
+            self._color_system = COLOR_SYSTEMS["windows"]
         else:
-            self._color_system = COLOR_SYSTEMS[color_system]
+            self.file = file or sys.stdout
+            if color_system is None:
+                self._color_system = None
+            elif color_system == "auto":
+                self._color_system = self._detect_color_system()
+            else:
+                self._color_system = COLOR_SYSTEMS[color_system]
 
         self._log_render = LogRender(
             show_time=log_time, show_path=log_path, time_format=log_time_format
@@ -409,6 +424,8 @@ class Console:
             return ConsoleDimensions(self._width, self._height)
 
         width, height = shutil.get_terminal_size()
+        if self.legacy_windows:
+            width -= 1
         return ConsoleDimensions(
             width if self._width is None else self._width,
             height if self._height is None else self._height,

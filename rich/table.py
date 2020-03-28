@@ -419,7 +419,7 @@ class Table:
                 for column_index, column in enumerate(self.columns)
             )
         )
-        box = self.box
+        _box = box.SQUARE if (console.legacy_windows and self.box) else self.box
         new_line = Segment.line()
 
         columns = self.columns
@@ -427,8 +427,8 @@ class Table:
         show_footer = self.show_footer
         show_edge = self.show_edge
 
-        if box and show_edge:
-            yield Segment(box.get_top(widths), border_style)
+        if _box and show_edge:
+            yield Segment(_box.get_top(widths), border_style)
             yield new_line
 
         for first, last, row in loop_first_last(rows):
@@ -448,24 +448,24 @@ class Table:
                 for width, _cell in zip(widths, cells)
             ]
 
-            if box:
+            if _box:
                 if last and show_footer:
                     yield Segment(
-                        box.get_row(widths, "foot", edge=show_edge), border_style
+                        _box.get_row(widths, "foot", edge=show_edge), border_style
                     )
                     yield new_line
                 if first:
-                    left = Segment(box.head_left, border_style)
-                    right = Segment(box.head_right, border_style)
-                    divider = Segment(box.head_vertical, border_style)
+                    left = Segment(_box.head_left, border_style)
+                    right = Segment(_box.head_right, border_style)
+                    divider = Segment(_box.head_vertical, border_style)
                 elif last:
-                    left = Segment(box.foot_left, border_style)
-                    right = Segment(box.foot_right, border_style)
-                    divider = Segment(box.foot_vertical, border_style)
+                    left = Segment(_box.foot_left, border_style)
+                    right = Segment(_box.foot_right, border_style)
+                    divider = Segment(_box.foot_vertical, border_style)
                 else:
-                    left = Segment(box.mid_left, border_style)
-                    right = Segment(box.mid_right, border_style)
-                    divider = Segment(box.mid_vertical, border_style)
+                    left = Segment(_box.mid_left, border_style)
+                    right = Segment(_box.mid_right, border_style)
+                    divider = Segment(_box.mid_vertical, border_style)
 
                 for line_no in range(max_height):
                     if show_edge:
@@ -482,12 +482,14 @@ class Table:
                     for rendered_cell in cells:
                         yield from rendered_cell[line_no]
                     yield new_line
-            if box and first and show_header:
-                yield Segment(box.get_row(widths, "head", edge=show_edge), border_style)
+            if _box and first and show_header:
+                yield Segment(
+                    _box.get_row(widths, "head", edge=show_edge), border_style
+                )
                 yield new_line
 
-        if box and show_edge:
-            yield Segment(box.get_bottom(widths), border_style)
+        if _box and show_edge:
+            yield Segment(_box.get_bottom(widths), border_style)
             yield new_line
 
 

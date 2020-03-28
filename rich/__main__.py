@@ -149,7 +149,7 @@ def iter_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
 Supports much of the *markdown*, __syntax__!
 
 - Headers
-- Basic formatting: bold, italic, code etc
+- Basic formatting: **bold**, *italic*, `code`
 - Block quotes
 - Lists, and more...
     """
