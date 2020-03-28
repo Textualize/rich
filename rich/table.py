@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from itertools import chain
 from typing import (
+    TYPE_CHECKING,
     Iterable,
     List,
     NamedTuple,
@@ -8,12 +9,20 @@ from typing import (
     Sequence,
     Tuple,
     TypeVar,
-    TYPE_CHECKING,
     Union,
 )
+
 from typing_extensions import Literal
 
-from . import box
+from . import box, errors
+from ._loop import loop_first, loop_first_last, loop_last
+from ._ratio import ratio_divide
+from .measure import Measurement
+from .padding import Padding, PaddingDimensions
+from .protocol import is_renderable
+from .segment import Segment
+from .style import Style
+from .text import Text
 
 if TYPE_CHECKING:
     from .console import (
@@ -24,15 +33,6 @@ if TYPE_CHECKING:
         RenderResult,
     )
     from .containers import Lines
-
-from . import errors
-from .padding import Padding, PaddingDimensions
-from .protocol import is_renderable
-from .segment import Segment
-from .style import Style
-from .text import Text
-from .measure import Measurement
-from ._tools import iter_first_last, iter_first, iter_last, ratio_divide
 
 
 @dataclass
@@ -431,7 +431,7 @@ class Table:
             yield Segment(box.get_top(widths), border_style)
             yield new_line
 
-        for first, last, row in iter_first_last(rows):
+        for first, last, row in loop_first_last(rows):
             max_height = 1
             cells: List[List[List[Segment]]] = []
             for width, cell, column in zip(widths, row, columns):
@@ -470,7 +470,7 @@ class Table:
                 for line_no in range(max_height):
                     if show_edge:
                         yield left
-                    for last, rendered_cell in iter_last(cells):
+                    for last, rendered_cell in loop_last(cells):
                         yield from rendered_cell[line_no]
                         if not last:
                             yield divider

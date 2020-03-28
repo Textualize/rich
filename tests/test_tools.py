@@ -1,9 +1,10 @@
-from rich._tools import iter_first, iter_last, iter_first_last, ratio_divide
+from rich._loop import loop_first, loop_last, loop_first_last
+from rich._ratio import ratio_divide
 
 
 def test_iter_first():
-    assert list(iter_first([])) == []
-    iterable = iter_first(["apples", "oranges", "pears", "lemons"])
+    assert list(loop_first([])) == []
+    iterable = loop_first(["apples", "oranges", "pears", "lemons"])
     assert next(iterable) == (True, "apples")
     assert next(iterable) == (False, "oranges")
     assert next(iterable) == (False, "pears")
@@ -11,8 +12,8 @@ def test_iter_first():
 
 
 def test_iter_last():
-    assert list(iter_last([])) == []
-    iterable = iter_last(["apples", "oranges", "pears", "lemons"])
+    assert list(loop_last([])) == []
+    iterable = loop_last(["apples", "oranges", "pears", "lemons"])
     assert next(iterable) == (False, "apples")
     assert next(iterable) == (False, "oranges")
     assert next(iterable) == (False, "pears")
@@ -20,8 +21,8 @@ def test_iter_last():
 
 
 def test_iter_first_last():
-    assert list(iter_first_last([])) == []
-    iterable = iter_first_last(["apples", "oranges", "pears", "lemons"])
+    assert list(loop_first_last([])) == []
+    iterable = loop_first_last(["apples", "oranges", "pears", "lemons"])
     assert next(iterable) == (True, False, "apples")
     assert next(iterable) == (False, False, "oranges")
     assert next(iterable) == (False, False, "pears")

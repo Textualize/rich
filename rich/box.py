@@ -1,7 +1,7 @@
 from typing import Iterable, List
 from typing_extensions import Literal
 
-from ._tools import iter_last
+from ._loop import loop_last
 
 
 class Box:
@@ -69,7 +69,7 @@ class Box:
         parts: List[str] = []
         append = parts.append
         append(self.top_left)
-        for last, width in iter_last(widths):
+        for last, width in loop_last(widths):
             append(self.top * width)
             if not last:
                 append(self.top_divider)
@@ -112,7 +112,7 @@ class Box:
         append = parts.append
         if edge:
             append(left)
-        for last, width in iter_last(widths):
+        for last, width in loop_last(widths):
             append(horizontal * width)
             if not last:
                 append(cross)
@@ -133,7 +133,7 @@ class Box:
         parts: List[str] = []
         append = parts.append
         append(self.bottom_left)
-        for last, width in iter_last(widths):
+        for last, width in loop_last(widths):
             append(self.bottom * width)
             if not last:
                 append(self.bottom_divider)

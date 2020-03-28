@@ -26,144 +26,142 @@ class ColorBox:
         return Measurement(12, 12)
 
 
-console = Console()
+def make_test_card() -> Table:
+    table = Table.grid()
+    table.title = "Rich features"
+    table.expand = False
+    table.padding = (1, 1, 0, 0)
+    table.add_column("Feature", no_wrap=True, justify="right", style="bold red")
+    table.add_column("Demonstration")
 
-table = Table.grid()
-table.title = "Rich features"
-table.expand = False
-table.padding = (1, 1, 0, 0)
-table.add_column("Feature", no_wrap=True, justify="right", style="bold red")
-table.add_column("Demonstration")
+    color_table = Table(
+        box=None,
+        expand=False,
+        show_header=False,
+        show_edge=False,
+        pad_edge=False,
+        padding=0,
+    )
 
-color_table = Table(
-    box=None,
-    expand=False,
-    show_header=False,
-    show_edge=False,
-    pad_edge=False,
-    padding=0,
-)
+    color_table.add_row(*(ColorBox(16 + color * 36) for color in range(6)))
 
-
-color_table.add_row(*(ColorBox(16 + color * 36) for color in range(6)))
-
-from rich.measure import Measurement
-
-m = Measurement.get(console, color_table, console.size.width)
-
-table.add_row(
-    "Colors",
-    RenderGroup(
-        "[bold yellow]256[/] colors or [bold green]16.7 million[/] colors [blue](if supported by your terminal)[/].",
-        Padding(color_table, (1, 0, 0, 0)),
-    ),
-)
-
-table.add_row(
-    "Styles",
-    "All ansi styles: [bold]bold[/], [dim]dim[/], [italic]italic[/italic], [underline]underline[/], [strike]strikethrough[/], [reverse]reverse[/], and even [blink]blink[/].",
-)
-
-lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque in metus sed sapien ultricies pretium a at justo. Maecenas luctus velit et auctor maximus. Donec faucibus vel arcu id pretium."
-lorem_table = Table.grid()
-lorem_table.padding = (0, 1, 0, 1)
-lorem_table.pad_edge = False
-lorem_table.add_row(
-    Text(lorem, justify="left", style="green"),
-    Text(lorem, justify="center", style="yellow"),
-    Text(lorem, justify="right", style="blue"),
-    Text(lorem, justify="full", style="red"),
-)
-table.add_row(
-    "Text",
-    RenderGroup(
-        Text.from_markup(
-            """Word wrap text. Justify [green]left[/], [yellow]center[/], [blue]right[/] or [red]full[/].\n\n"""
+    table.add_row(
+        "Colors",
+        RenderGroup(
+            "[bold yellow]256[/] colors or [bold green]16.7 million[/] colors [blue](if supported by your terminal)[/].",
+            Padding(color_table, (1, 0, 0, 0)),
         ),
-        lorem_table,
-    ),
-)
+    )
 
+    table.add_row(
+        "Styles",
+        "All ansi styles: [bold]bold[/], [dim]dim[/], [italic]italic[/italic], [underline]underline[/], [strike]strikethrough[/], [reverse]reverse[/], and even [blink]blink[/].",
+    )
 
-def comparison(renderable1, renderable2) -> Table:
-    table = Table(show_header=False, box=None, expand=True)
-    table.add_column("1", ratio=1)
-    table.add_column("2", ratio=1)
-    table.add_row(renderable1, renderable2)
+    lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque in metus sed sapien ultricies pretium a at justo. Maecenas luctus velit et auctor maximus. Donec faucibus vel arcu id pretium."
+    lorem_table = Table.grid()
+    lorem_table.padding = (0, 1, 0, 1)
+    lorem_table.pad_edge = False
+    lorem_table.add_row(
+        Text(lorem, justify="left", style="green"),
+        Text(lorem, justify="center", style="yellow"),
+        Text(lorem, justify="right", style="blue"),
+        Text(lorem, justify="full", style="red"),
+    )
+    table.add_row(
+        "Text",
+        RenderGroup(
+            Text.from_markup(
+                """Word wrap text. Justify [green]left[/], [yellow]center[/], [blue]right[/] or [red]full[/].\n\n"""
+            ),
+            lorem_table,
+        ),
+    )
+
+    def comparison(renderable1, renderable2) -> Table:
+        table = Table(show_header=False, box=None, expand=True)
+        table.add_column("1", ratio=1)
+        table.add_column("2", ratio=1)
+        table.add_row(renderable1, renderable2)
+        return table
+
+    table.add_row(
+        "Chinese Japanese & Korean support",
+        Panel("该库支持中文，日文和韩文文本！", expand=False, style="red", box=box.DOUBLE_EDGE,),
+    )
+
+    emoji_example = (
+        "Render emoji code: :+1: :apple: :ant: :bear: :baguette_bread: :bus: "
+    )
+    table.add_row("Emoji", comparison(Text(emoji_example), emoji_example))
+
+    markup_example = "[bold magenta]Rich[/] supports a simple [i]bbcode[/i] like [b]markup[/b], you can use to insert [yellow]color[/] and [underline]style[/]."
+    table.add_row(
+        "Console markup", comparison(Text(markup_example), markup_example),
+    )
+
+    example_table = Table(
+        title="Star Wars box office", show_header=True, header_style="bold magenta"
+    )
+    example_table.add_column("Date", style="dim", width=12)
+    example_table.add_column("Title")
+    example_table.add_column("Production Budget", justify="right")
+    example_table.add_column("Box Office", justify="right")
+    example_table.add_row(
+        "Dev 20, 2019",
+        "Star Wars: The Rise of Skywalker",
+        "$275,000,0000",
+        "$375,126,118",
+    )
+    example_table.add_row(
+        "May 25, 2018",
+        "[red]Solo[/red]: A Star Wars Story",
+        "$275,000,0000",
+        "$393,151,347",
+    )
+    example_table.add_row(
+        "Dec 15, 2017",
+        "Star Wars Ep. VIII: The Last Jedi",
+        "$262,000,000",
+        "[bold]$1,332,539,889[/bold]",
+    )
+
+    table.add_row("Tables", example_table)
+
+    code = '''\
+    def iter_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
+        """Iterate and generate a tuple with a flag for last value."""
+        iter_values = iter(values)
+        try:
+            previous_value = next(iter_values)
+        except StopIteration:
+            return
+        for value in iter_values:
+            yield False, previous_value
+            previous_value = value
+        yield True, previous_value'''
+
+    table.add_row("Syntax highlighting", Syntax(code, "python3", line_numbers=True))
+
+    markdown_example = """\
+    # Markdown
+    
+    Supports much of the *markdown*, __syntax__!
+
+    - Headers
+    - Basic formatting: bold, italic, code etc
+    - Block quotes
+    - Lists, and more... """
+    table.add_row("Markdown", comparison(markdown_example, Markdown(markdown_example)))
+
+    table.add_row(
+        "And more", """Progress bars, styled logging handler, tracebacks, etc..."""
+    )
     return table
 
 
-table.add_row(
-    "Chinese Japanese & Korean support",
-    Panel("该库支持中文，日文和韩文文本！", expand=False, style="red", box=box.DOUBLE_EDGE,),
-)
-
-emoji_example = "Render emoji code: :+1: :apple: :ant: :bear: :baguette_bread: :bus: "
-table.add_row("Emoji", comparison(Text(emoji_example), emoji_example))
-
-markup_example = "[bold magenta]Rich[/] supports a simple [i]bbcode[/i] like [b]markup[/b], you can use to insert [yellow]color[/] and [underline]style[/]."
-table.add_row(
-    "Console markup", comparison(Text(markup_example), markup_example),
-)
-
-example_table = Table(
-    title="Star Wars box office", show_header=True, header_style="bold magenta"
-)
-example_table.add_column("Date", style="dim", width=12)
-example_table.add_column("Title")
-example_table.add_column("Production Budget", justify="right")
-example_table.add_column("Box Office", justify="right")
-example_table.add_row(
-    "Dev 20, 2019", "Star Wars: The Rise of Skywalker", "$275,000,0000", "$375,126,118"
-)
-example_table.add_row(
-    "May 25, 2018",
-    "[red]Solo[/red]: A Star Wars Story",
-    "$275,000,0000",
-    "$393,151,347",
-)
-example_table.add_row(
-    "Dec 15, 2017",
-    "Star Wars Ep. VIII: The Last Jedi",
-    "$262,000,000",
-    "[bold]$1,332,539,889[/bold]",
-)
-
-table.add_row("Tables", example_table)
-
-
-code = '''\
-def iter_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
-    """Iterate and generate a tuple with a flag for last value."""
-    iter_values = iter(values)
-    try:
-        previous_value = next(iter_values)
-    except StopIteration:
-        return
-    for value in iter_values:
-        yield False, previous_value
-        previous_value = value
-    yield True, previous_value'''
-
-table.add_row("Syntax highlighting", Syntax(code, "python3", line_numbers=True))
-
-markdown_example = """\
-# Markdown
- 
-Supports much of the *markdown*, __syntax__!
-
- - Headers
- - Basic formatting: bold, italic, code etc
- - Block quotes
- - Lists, and more...
- 
-"""
-table.add_row("Markdown", comparison(markdown_example, Markdown(markdown_example)))
-
-
-table.add_row(
-    "And more", """Progress bars, styled logging handler, tracebacks, etc..."""
-)
-
-console.print(table)
-console.print()
+if __name__ == "__main__":
+    console = Console()
+    test_card = make_test_card()
+    console.print(test_card)
+    console.print()

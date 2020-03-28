@@ -1,18 +1,28 @@
-from operator import itemgetter
 import re
+from operator import itemgetter
 from typing import (
+    TYPE_CHECKING,
     Any,
-    cast,
     Dict,
     Iterable,
+    List,
     NamedTuple,
     Optional,
-    List,
     Tuple,
-    TYPE_CHECKING,
     Union,
+    cast,
 )
+
 from typing_extensions import Literal
+
+from ._emoji_replace import _emoji_replace
+from ._loop import loop_first_last, loop_last
+from ._wrap import divide_line
+from .cells import cell_len
+from .containers import Lines
+from .measure import Measurement
+from .segment import Segment
+from .style import Style
 
 if TYPE_CHECKING:  # pragma: no cover
     from .console import (
@@ -22,15 +32,6 @@ if TYPE_CHECKING:  # pragma: no cover
         RenderResult,
         RenderableType,
     )
-
-from .cells import cell_len
-from .containers import Lines
-from .style import Style
-from .segment import Segment
-from .measure import Measurement
-from ._emoji_replace import _emoji_replace
-from ._tools import iter_last, iter_first_last
-from ._wrap import divide_line
 
 
 class Span(NamedTuple):
@@ -413,7 +414,7 @@ class Text:
 
         new_text = self.blank_copy()
         append = new_text.append
-        for last, line in iter_last(lines):
+        for last, line in loop_last(lines):
             append(line)
             if not last:
                 append(self)

@@ -4,7 +4,7 @@ from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .control import Control
 from .segment import Segment
 from .style import StyleType
-from ._tools import iter_last
+from ._loop import loop_last
 
 
 class LiveRender:
@@ -40,7 +40,7 @@ class LiveRender:
 
         width, height = self._shape
         lines = Segment.set_shape(lines, width, height)
-        for last, line in iter_last(lines):
+        for last, line in loop_last(lines):
             yield from line
             if not last:
                 yield Segment.line()
@@ -72,4 +72,3 @@ if __name__ == "__main__":
 
     finally:
         console.show_cursor(True)
-

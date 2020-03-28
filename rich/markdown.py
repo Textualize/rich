@@ -4,6 +4,8 @@ from typing import Any, ClassVar, Dict, Iterable, List, Optional, Type, Union
 from commonmark.blocks import Parser
 
 from . import box
+from ._loop import loop_first, loop_first_last
+from ._stack import Stack
 from .console import (
     Console,
     ConsoleOptions,
@@ -18,8 +20,6 @@ from .rule import Rule
 from .style import Style, StyleStack
 from .syntax import Syntax
 from .text import Lines, Text
-from ._stack import Stack
-from ._tools import iter_first, iter_first_last
 
 
 class MarkdownElement:
@@ -205,7 +205,7 @@ class BlockQuote(TextElement):
         right_quote = Segment(" ”", style)
         padding = Segment("  ", style)
 
-        for first, last, line in iter_first_last(lines):
+        for first, last, line in loop_first_last(lines):
             yield left_quote if first else padding
             yield from line
             yield right_quote if last else padding
@@ -276,7 +276,7 @@ class ListItem(TextElement):
         bullet = Segment(" • ", bullet_style)
         padding = Segment(" " * 3, bullet_style)
         new_line = Segment("\n")
-        for first, line in iter_first(lines):
+        for first, line in loop_first(lines):
             yield bullet if first else padding
             yield from line
             yield new_line
@@ -292,7 +292,7 @@ class ListItem(TextElement):
         new_line = Segment("\n")
         padding = Segment(" " * number_width, number_style)
         numeral = Segment(f"{number}".rjust(number_width - 1) + " ", number_style)
-        for first, line in iter_first(lines):
+        for first, line in loop_first(lines):
             yield numeral if first else padding
             yield from line
             yield new_line
@@ -485,4 +485,3 @@ An h2 header
     from time import time
 
     console.print(md)
-

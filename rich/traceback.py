@@ -1,18 +1,19 @@
 from __future__ import absolute_import
 
-from dataclasses import dataclass, field
-import sys
 import platform
+import sys
+from dataclasses import dataclass, field
 from traceback import extract_tb
 from types import TracebackType
-from typing import Optional, Type, List
+from typing import List, Optional, Type
 
+from ._loop import loop_last
 from .console import (
     Console,
     ConsoleOptions,
     ConsoleRenderable,
-    render_group,
     RenderResult,
+    render_group,
 )
 from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
@@ -20,10 +21,8 @@ from .padding import Padding
 from .panel import Panel
 from .rule import Rule
 from .segment import Segment
-from .text import Text
-from ._tools import iter_last
 from .syntax import Syntax
-
+from .text import Text
 
 WINDOWS = platform.system() == "Windows"
 
@@ -194,7 +193,7 @@ class Traceback:
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         highlighter = ReprHighlighter()
-        for last, stack in iter_last(reversed(self.trace.stacks)):
+        for last, stack in loop_last(reversed(self.trace.stacks)):
             if stack.frames:
                 yield Text.from_markup("[b]Traceback[/b] [dim](most recent call last):")
                 stack_renderable: ConsoleRenderable = Panel(
@@ -296,4 +295,3 @@ if __name__ == "__main__":  # pragma: no cover
         tb = Traceback()
         # print(fooads)
         console.print(tb)
-

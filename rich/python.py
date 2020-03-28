@@ -8,13 +8,13 @@ In theory, this can give better results than Pygments
 
 """
 
-from io import StringIO
 import textwrap
 import tokenize
+from io import StringIO
 from typing import Iterable, Optional, Set, Tuple
 
-from ._tools import iter_first_last
-from .console import Console, ConsoleOptions, RenderResult, Segment, ConsoleRenderable
+from ._loop import loop_first_last
+from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, Segment
 from .style import Style
 from .text import Text
 
@@ -83,7 +83,7 @@ class Python:
                 add_style(start_line, start_col, end_col, styles)
             else:
                 line_range = range(start_line, end_line + 1)
-                for first, last, line_no in iter_first_last(line_range):
+                for first, last, line_no in loop_first_last(line_range):
                     if first:
                         add_style(line_no, start_col, line_count, styles)
                     elif last:
@@ -107,4 +107,3 @@ if __name__ == "__main__":
     console.print(py)
 
     import tokenize
-

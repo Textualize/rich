@@ -3,17 +3,17 @@ import textwrap
 from typing import Any, Dict, Optional, Set, Tuple, Union
 
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
-from pygments.styles import get_style_by_name
 from pygments.style import Style as PygmentsStyle
+from pygments.styles import get_style_by_name
 from pygments.token import Token
 from pygments.util import ClassNotFound
 
-from .color import Color, parse_rgb_hex, blend_rgb
-from .console import Console, ConsoleOptions, RenderResult, Segment, ConsoleRenderable
+from ._loop import loop_first
+from .color import Color, blend_rgb, parse_rgb_hex
+from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, Segment
 from .measure import Measurement
 from .style import Style
 from .text import Text
-from ._tools import iter_first
 
 WINDOWS = platform.system() == "Windows"
 DEFAULT_THEME = "monokai"
@@ -250,7 +250,7 @@ class Syntax:
             wrapped_lines = console.render_lines(
                 line, render_options, style=background_style
             )
-            for first, wrapped_line in iter_first(wrapped_lines):
+            for first, wrapped_line in loop_first(wrapped_lines):
                 if first:
                     line_column = str(line_no).rjust(numbers_column_width - 2) + " "
                     if highlight_line(line_no):
