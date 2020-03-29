@@ -82,12 +82,13 @@ class ReprHighlighter(RegexHighlighter):
         r"(?P<tag_start>\<)(?P<tag_name>\w*)(?P<tag_contents>.*?)(?P<tag_end>\>)",
         r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?\w+\"?)",
         r"(?P<bool_true>True)|(?P<bool_false>False)|(?P<none>None)",
-        r"(?P<number>\-?[0-9]+\.?[0-9]*)",
+        r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*\b)",
         r"(?P<number>0x[0-9a-f]*)",
         r"(?P<path>(\/\w+)+\/)",
         r"(?P<filename>\/\w*\..{3,4})\s",
-        r"(?P<str>b?\'\'\'.*?\'\'\'|b?\'.*?\'|b?\"\"\".*?\"\"\"|b?\".*?\")",
+        r"(?<!\\)(?P<str>b?\'\'\'.*?(?<!\\)\'\'\'|b?\'.*?(?<!\\)\'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
         r"(?P<url>https?:\/\/\S*)",
+        r"(?P<uuid>[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12})",
     ]
 
 
@@ -103,6 +104,17 @@ if __name__ == "__main__":  # pragma: no cover
             '''"""hello True""" print("foo", egg=5) <div class=foo bar=4>  <div class="foo"> [1, 2, 3,4] a=None qwewe True False'''
         )
     )
+
+    console.print(highlighter(r'"Hello \"World!\"!"'))
+    console.print(highlighter("b34a234-c3d42ef-3241"))
+    console.print(highlighter("234234"))
+    console.print(highlighter("0x234234"))
+    console.print(highlighter("234234"))
+    console.print(highlighter("234234 + 234234+-123"))
+
+    from uuid import uuid4
+
+    console.print(highlighter(str(uuid4())))
 
     from .default_styles import MARKDOWN_STYLES
     from pprint import PrettyPrinter

@@ -65,6 +65,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.bool_false": Style(color="bright_red", italic=True),
     "repr.none": Style(color="magenta", italic=True),
     "repr.url": Style(underline=True, color="bright_blue", bold=False),
+    "repr.uuid": Style(color="bright_yellow", bold=False),
     "rule.line": Style(color="bright_green"),
     "rule.text": Style(),
     "repr.path": Style(color="magenta"),
