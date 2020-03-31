@@ -104,7 +104,7 @@ class Text:
         style: Union[str, Style] = "",
         justify: "JustifyValues" = None,
         end: str = "\n",
-        tab_size: int = 8,
+        tab_size: Optional[int] = 8,
     ) -> None:
         self._text: List[str] = [text] if text else []
         self.style = style
@@ -319,7 +319,6 @@ class Text:
     def __console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
-        # TODO: Why does mypy give "error: Cannot determine type of 'tab_size'"" ?
         if self.tab_size is None:
             tab_size = console.tab_size  # type: ignore
         else:
@@ -330,7 +329,7 @@ class Text:
             tab_size=tab_size,
         )
         all_lines = Text("\n").join(lines)
-        yield from self._render_line(all_lines, console, options)
+        yield from all_lines.render(console, options, end=self.end)
 
     def __measure__(self, console: "Console", max_width: int) -> Measurement:
         text = self.text
@@ -340,8 +339,8 @@ class Text:
         min_text_width = max(cell_len(word) for word in text.split())
         return Measurement(min_text_width, max_text_width)
 
-    def _render_line(
-        self, line: "Text", console: "Console", options: "ConsoleOptions"
+    def render(
+        self, console: "Console", options: "ConsoleOptions", end: str = None
     ) -> Iterable["Segment"]:
         """Render the rich text to the console.
         
@@ -353,14 +352,14 @@ class Text:
             Iterable[Segment]: Result of render that may be written to the console.
         """
 
-        text = line.text
+        text = self.text
         style_map: Dict[int, Style] = {}
         null_style = Style()
 
         def get_style(style: Union[str, Style]) -> Style:
             return console.get_style(style, default=null_style)
 
-        enumerated_spans = list(enumerate(line._spans, 1))
+        enumerated_spans = list(enumerate(self._spans, 1))
 
         style_map = {index: get_style(span.style) for index, span in enumerated_spans}
         style_map[0] = get_style(self.style)
@@ -399,8 +398,10 @@ class Text:
                 stack_append(style_id)
             if next_offset > offset:
                 yield _Segment(text[offset:next_offset], get_current_style())
-        if self.end:
-            yield _Segment(self.end)
+        if end is None:
+            end = self.end
+        if end:
+            yield _Segment(end)
 
     def join(self, lines: Iterable["Text"]) -> "Text":
         """Join text together with this instance as the separator.
@@ -435,6 +436,7 @@ class Text:
         pos = 0
         if tab_size is None:
             tab_size = self.tab_size
+        assert tab_size is not None
         result = Text(
             style=self.style, justify=self.justify, end=self.end, tab_size=self.tab_size
         )

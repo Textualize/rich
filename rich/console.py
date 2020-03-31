@@ -139,16 +139,6 @@ RenderResult = Iterable[Union[RenderableType, Segment, Control]]
 _null_highlighter = NullHighlighter()
 
 
-class RichRenderable:
-    def __init__(self, rich_cast: Callable[[], ConsoleRenderable]) -> None:
-        self.rich_cast = rich_cast
-
-    def __console__(
-        self, console: "Console", options: "ConsoleOptions"
-    ) -> RenderResult:
-        yield self.rich_cast()
-
-
 class RenderGroup:
     def __init__(self, *renderables: RenderableType, fit: bool = True) -> None:
         """Takes a group of renderables and returns a renderable object,
@@ -781,6 +771,7 @@ class Console:
         width: Optional[int] = 88,
         extra_lines: int = 3,
         theme: Optional[str] = None,
+        word_wrap: bool = False,
     ) -> None:
         """Prints a rich render of the last exception and traceback.
         
@@ -788,10 +779,13 @@ class Console:
             code_width (Optional[int], optional): Number of characters used to render code. Defaults to 88.
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
             theme (str, optional): Override pygments theme used in traceback
+            word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         """
         from .traceback import Traceback
 
-        traceback = Traceback(width=width, extra_lines=extra_lines, theme=theme)
+        traceback = Traceback(
+            width=width, extra_lines=extra_lines, theme=theme, word_wrap=word_wrap
+        )
         self.print(traceback)
 
     def log(

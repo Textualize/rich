@@ -268,6 +268,16 @@ def test_wrap_long():
     assert lines[2] == Text("bra ")
 
 
+def test_wrap_long_words():
+    test = Text("X 123456789")
+    lines = test.wrap(4)
+    print(lines)
+    assert len(lines) == 3
+    assert lines[0] == Text("X 12")
+    assert lines[1] == Text("3456")
+    assert lines[2] == Text("789 ")
+
+
 def test_fit():
     test = Text("Hello\nWorld")
     lines = test.fit(3)

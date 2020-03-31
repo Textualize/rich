@@ -25,7 +25,6 @@ def cell_len(text: str, _cache: LRUCache[str, int] = LRUCache(1024 * 4)) -> int:
     return total_size
 
 
-@lru_cache(maxsize=5000)
 def get_character_cell_size(character: str) -> int:
     """Get the cell size of a character.
     
@@ -40,6 +39,19 @@ def get_character_cell_size(character: str) -> int:
     if 127 > codepoint > 31:
         # Shortcut for ascii
         return 1
+    return _get_codepoint_cell_size(codepoint)
+
+
+@lru_cache(maxsize=5000)
+def _get_codepoint_cell_size(codepoint: int) -> int:
+    """Get the cell size of a character.
+    
+    Args:
+        character (str): A single character.
+    
+    Returns:
+        int: Number of cells (0, 1 or 2) occupied by that character.
+    """
 
     _table = CELL_WIDTHS
     lower_bound = 0
@@ -79,13 +91,13 @@ def set_cell_size(text: str, total: int) -> str:
     return text
 
 
-def chop_cells(text: str, max_size: int) -> List[str]:
+def chop_cells(text: str, max_size: int, position: int = 0) -> List[str]:
     """Break text in to equal (cell) length strings."""
     _get_character_cell_size = get_character_cell_size
     characters = [
         (character, _get_character_cell_size(character)) for character in text
     ][::-1]
-    total_size = 0
+    total_size = position
     lines: List[List[str]] = [[]]
     append = lines[-1].append
 

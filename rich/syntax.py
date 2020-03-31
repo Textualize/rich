@@ -33,6 +33,7 @@ class Syntax:
         highlight_lines (Set[int]): A set of line numbers to highlight.
         code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
         tab_size (int, optional): Size of tabs. Defaults to 4.
+        word_wrap (bool, optional): Enable word wrapping.
     """
 
     def __init__(
@@ -48,6 +49,7 @@ class Syntax:
         highlight_lines: Set[int] = None,
         code_width: Optional[int] = None,
         tab_size: int = 4,
+        word_wrap: bool = False
     ) -> None:
         self.code = code
         self.lexer_name = lexer_name
@@ -58,6 +60,7 @@ class Syntax:
         self.highlight_lines = highlight_lines or set()
         self.code_width = code_width
         self.tab_size = tab_size
+        self.word_wrap = word_wrap
 
         self._style_cache: Dict[Any, Style] = {}
         if not isinstance(theme, str) and issubclass(theme, PygmentsStyle):
@@ -82,6 +85,7 @@ class Syntax:
         highlight_lines: Set[int] = None,
         code_width: Optional[int] = None,
         tab_size: int = 4,
+        word_wrap: bool = False,
     ) -> "Syntax":
         """Construct a Syntax object from a file.
         
@@ -97,6 +101,7 @@ class Syntax:
             highlight_lines (Set[int]): A set of line numbers to highlight.
             code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
             tab_size (int, optional): Size of tabs. Defaults to 4.
+            word_wrap (bool, optional): Enable word wrapping of code.
 
         Returns:
             [Syntax]: A Syntax object that may be printed to the console
@@ -118,6 +123,7 @@ class Syntax:
             start_line=start_line,
             highlight_lines=highlight_lines,
             code_width=code_width,
+            word_wrap=word_wrap,
         )
 
     def _get_theme_style(self, token_type) -> Style:
@@ -208,7 +214,11 @@ class Syntax:
         return Measurement(max_width, max_width)
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        code_width = options.max_width if self.code_width is None else self.code_width
+        code_width = (
+            (options.max_width - self._numbers_column_width - 1)
+            if self.code_width is None
+            else self.code_width
+        )
         code = self.code
         if self.dedent:
             code = textwrap.dedent(code)
@@ -231,7 +241,7 @@ class Syntax:
             lines = lines[line_offset:end_line]
 
         numbers_column_width = self._numbers_column_width
-        render_options = options.update(width=code_width + numbers_column_width)
+        render_options = options.update(width=code_width)
 
         (
             background_style,
@@ -241,15 +251,18 @@ class Syntax:
 
         highlight_line = self.highlight_lines.__contains__
         _Segment = Segment
-        padding = _Segment(" " * numbers_column_width, background_style)
+        padding = _Segment(" " * numbers_column_width + " ", background_style)
         new_line = _Segment("\n")
 
         line_pointer = "❱ "
 
         for line_no, line in enumerate(lines, self.start_line + line_offset):
-            wrapped_lines = console.render_lines(
-                line, render_options, style=background_style
-            )
+            if self.word_wrap:
+                wrapped_lines = console.render_lines(
+                    line, render_options, style=background_style
+                )
+            else:
+                wrapped_lines = [list(line.render(console, render_options, end=""))]
             for first, wrapped_line in loop_first(wrapped_lines):
                 if first:
                     line_column = str(line_no).rjust(numbers_column_width - 2) + " "
@@ -276,5 +289,5 @@ if __name__ == "__main__":  # pragma: no cover
 
     console = Console()
 
-    syntax = Syntax.from_path(sys.argv[1], line_numbers=False)
+    syntax = Syntax.from_path(sys.argv[1], line_numbers=True, word_wrap=True)
     console.print(syntax)

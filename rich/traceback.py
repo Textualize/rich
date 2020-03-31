@@ -28,7 +28,10 @@ WINDOWS = platform.system() == "Windows"
 
 
 def install(
-    width: Optional[int] = 100, extra_lines: int = 3, theme: Optional[str] = None
+    width: Optional[int] = 100,
+    extra_lines: int = 3,
+    theme: Optional[str] = None,
+    word_wrap: bool = False,
 ) -> None:
     """Install a rich traceback handler.
 
@@ -40,6 +43,7 @@ def install(
         extra_lines (int, optional): Extra lines of code. Defaults to 3.
         theme (Optional[str], optional): Pygments theme to use in traceback. Defaults to ``None`` which will pick
             a theme appropriate for the platform. 
+        word_wrap(bool, optional): Enable word wrapping of long lines. Defaults to False.
 
     """
     console = Console(file=sys.stderr)
@@ -55,6 +59,7 @@ def install(
                 width=width,
                 extra_lines=extra_lines,
                 theme=theme,
+                word_wrap=word_wrap,
             )
         )
 
@@ -104,6 +109,7 @@ class Traceback:
         width (Optional[int], optional): Number of characters used to traceback. Defaults to 100.
         extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
         theme (str, optional): Override pygments theme used in traceback.
+        word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
     """
 
     def __init__(
@@ -112,6 +118,7 @@ class Traceback:
         width: Optional[int] = 88,
         extra_lines: int = 3,
         theme: Optional[str] = None,
+        word_wrap: bool = False,
     ):
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
@@ -124,6 +131,7 @@ class Traceback:
         self.width = width
         self.extra_lines = extra_lines
         self.theme = theme
+        self.word_wrap = word_wrap
 
     @classmethod
     def from_exception(
@@ -134,10 +142,15 @@ class Traceback:
         width: Optional[int] = 100,
         extra_lines: int = 3,
         theme: Optional[str] = None,
+        word_wrap: bool = False,
     ):
         rich_traceback = cls.extract(exc_type, exc_value, traceback)
         return Traceback(
-            rich_traceback, width=width, extra_lines=extra_lines, theme=theme
+            rich_traceback,
+            width=width,
+            extra_lines=extra_lines,
+            theme=theme,
+            word_wrap=word_wrap,
         )
 
     @classmethod
@@ -266,6 +279,7 @@ class Traceback:
                         frame.lineno + self.extra_lines,
                     ),
                     highlight_lines={frame.lineno},
+                    word_wrap=self.word_wrap,
                 )
             except Exception:
                 pass
