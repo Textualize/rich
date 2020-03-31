@@ -329,7 +329,7 @@ class Text:
             tab_size=tab_size,
         )
         all_lines = Text("\n").join(lines)
-        yield from all_lines.render(console, options, end=self.end)
+        yield from all_lines.render(console, end=self.end)
 
     def __measure__(self, console: "Console", max_width: int) -> Measurement:
         text = self.text
@@ -339,14 +339,12 @@ class Text:
         min_text_width = max(cell_len(word) for word in text.split())
         return Measurement(min_text_width, max_text_width)
 
-    def render(
-        self, console: "Console", options: "ConsoleOptions", end: str = None
-    ) -> Iterable["Segment"]:
-        """Render the rich text to the console.
+    def render(self, console: "Console", end: str = None) -> Iterable["Segment"]:
+        """Render the text as Segments.
         
         Args:
-            console (Console): Console instance.
-            options (ConsoleOptions): Console options.
+            console (Console): Console instance.  
+            end (Optional[str], optional): Optional end character.          
         
         Returns:
             Iterable[Segment]: Result of render that may be written to the console.

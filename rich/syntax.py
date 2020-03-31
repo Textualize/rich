@@ -262,7 +262,12 @@ class Syntax:
                     line, render_options, style=background_style
                 )
             else:
-                wrapped_lines = [list(line.render(console, render_options, end=""))]
+                segments = list(line.render(console, end=""))
+                wrapped_lines = [
+                    Segment.adjust_line_length(
+                        segments, render_options.max_width, style=background_style
+                    )
+                ]
             for first, wrapped_line in loop_first(wrapped_lines):
                 if first:
                     line_column = str(line_no).rjust(numbers_column_width - 2) + " "
@@ -289,5 +294,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     console = Console()
 
-    syntax = Syntax.from_path(sys.argv[1], line_numbers=True, word_wrap=True)
+    syntax = Syntax.from_path(
+        sys.argv[1], line_numbers=True, word_wrap=False, theme="default"
+    )
     console.print(syntax)
