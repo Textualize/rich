@@ -42,7 +42,7 @@ def install(
     
     
     Args:
-        console (Optiona[Console], optional): Console to write exception to. Default uses internal Console instance.
+        console (Optional[Console], optional): Console to write exception to. Default uses internal Console instance.
         width (Optional[int], optional): Width (in characters) of traceback. Defaults to 100.
         line_numbers (bool, optional): Enable line numbers.
         extra_lines (int, optional): Extra lines of code. Defaults to 3.

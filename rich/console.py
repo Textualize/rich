@@ -243,6 +243,7 @@ class Console:
         color_system: Optional[
             Literal["auto", "standard", "256", "truecolor", "windows"]
         ] = "auto",
+        force_terminal: bool = False,
         theme: Theme = None,
         file: IO = None,
         width: int = None,
@@ -271,6 +272,7 @@ class Console:
         self.legacy_windows: bool = "WINDIR" in os.environ and not "WT_SESSION" in os.environ
 
         self._color_system: Optional[ColorSystem]
+        self._force_terminal = force_terminal
         if self.legacy_windows:
             _enable_legacy_windows_support()
             self.file = file or sys.stdout
@@ -384,6 +386,8 @@ class Console:
             bool: True if the console writting to a device capable of
             understanding terminal codes, otherwise False.
         """
+        if self._force_terminal:
+            return True
         isatty = getattr(self.file, "isatty", None)
         return False if isatty is None else isatty()
 

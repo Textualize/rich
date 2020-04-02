@@ -1,3 +1,6 @@
+import io
+from time import time
+
 from rich.console import Console, ConsoleOptions, RenderGroup, RenderResult
 from rich.markdown import Markdown
 from rich.measure import Measurement
@@ -27,6 +30,7 @@ class ColorBox:
 
 
 def make_test_card() -> Table:
+    """Get a renderable that demonstrates a number of features."""
     table = Table.grid()
     table.title = "Rich features"
     table.expand = False
@@ -162,7 +166,11 @@ Supports much of the *markdown*, __syntax__!
 
 
 if __name__ == "__main__":
-    console = Console()
+    console = Console(file=io.StringIO(), force_terminal=True)
     test_card = make_test_card()
+    start = time()
     console.print(test_card)
-    console.print()
+    taken = int((time() - start) * 1000.0)
+    print(console.file.getvalue())
+    print()
+    print(f"rendered in {taken}ms")

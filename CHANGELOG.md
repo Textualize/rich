@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Added force_terminal option to Console.**init**
+
 ## [0.8.8] - 2020-03-31
 
 ### Fixed
