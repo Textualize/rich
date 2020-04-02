@@ -171,6 +171,6 @@ if __name__ == "__main__":
     start = time()
     console.print(test_card)
     taken = int((time() - start) * 1000.0)
-    print(console.file.getvalue())
+    print(console.file.getvalue())  # type: ignore
     print()
     print(f"rendered in {taken}ms")
