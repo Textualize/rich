@@ -2,7 +2,7 @@ from rich._loop import loop_first, loop_last, loop_first_last
 from rich._ratio import ratio_divide
 
 
-def test_iter_first():
+def test_loop_first():
     assert list(loop_first([])) == []
     iterable = loop_first(["apples", "oranges", "pears", "lemons"])
     assert next(iterable) == (True, "apples")
@@ -11,7 +11,7 @@ def test_iter_first():
     assert next(iterable) == (False, "lemons")
 
 
-def test_iter_last():
+def test_loop_last():
     assert list(loop_last([])) == []
     iterable = loop_last(["apples", "oranges", "pears", "lemons"])
     assert next(iterable) == (False, "apples")
@@ -20,7 +20,7 @@ def test_iter_last():
     assert next(iterable) == (True, "lemons")
 
 
-def test_iter_first_last():
+def test_loop_first_last():
     assert list(loop_first_last([])) == []
     iterable = loop_first_last(["apples", "oranges", "pears", "lemons"])
     assert next(iterable) == (True, False, "apples")

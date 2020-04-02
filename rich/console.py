@@ -207,7 +207,6 @@ class ConsoleThreadLocals(threading.local):
 
     buffer: List[Segment] = field(default_factory=list)
     buffer_index: int = 0
-    style_stack: List[Style] = field(default_factory=lambda: [Style()])
     control: List[str] = field(default_factory=list)
 
 
@@ -310,11 +309,6 @@ class Console:
     @_buffer_index.setter
     def _buffer_index(self, value: int) -> None:
         self._thread_locals.buffer_index = value
-
-    @property
-    def _style_stack(self) -> List[Style]:
-        """Get a thread local style stack."""
-        return self._thread_locals.style_stack
 
     @property
     def _control(self) -> List[str]:

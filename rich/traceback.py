@@ -5,7 +5,7 @@ import sys
 from dataclasses import dataclass, field
 from traceback import extract_tb
 from types import TracebackType
-from typing import List, Optional, Type
+from typing import Callable, List, Optional, Type
 
 from ._loop import loop_last
 from .console import (
@@ -28,30 +28,38 @@ WINDOWS = platform.system() == "Windows"
 
 
 def install(
+    *,
+    console: Console = None,
     width: Optional[int] = 100,
+    line_numbers: bool = True,
     extra_lines: int = 3,
     theme: Optional[str] = None,
     word_wrap: bool = False,
-) -> None:
+) -> Callable:
     """Install a rich traceback handler.
 
     Once installed, any tracebacks will be printed with syntax highlighting and rich formatting.
     
     
     Args:
+        console (Optiona[Console], optional): Console to write exception to. Default uses internal Console instance.
         width (Optional[int], optional): Width (in characters) of traceback. Defaults to 100.
+        line_numbers (bool, optional): Enable line numbers.
         extra_lines (int, optional): Extra lines of code. Defaults to 3.
         theme (Optional[str], optional): Pygments theme to use in traceback. Defaults to ``None`` which will pick
             a theme appropriate for the platform. 
         word_wrap(bool, optional): Enable word wrapping of long lines. Defaults to False.
 
+    Returns:
+        Callable: The previous exception handler that was replaced
+
     """
-    console = Console(file=sys.stderr)
+    traceback_console = Console(file=sys.stderr) if console is None else console
 
     def excepthook(
         type_: Type[BaseException], value: BaseException, traceback: TracebackType,
     ) -> None:
-        console.print(
+        traceback_console.print(
             Traceback.from_exception(
                 type_,
                 value,
@@ -63,7 +71,9 @@ def install(
             )
         )
 
+    old_excepthook = sys.excepthook
     sys.excepthook = excepthook
+    return old_excepthook
 
 
 @dataclass

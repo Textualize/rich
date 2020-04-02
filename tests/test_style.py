@@ -131,3 +131,8 @@ def test_style_stack():
     assert stack.current == Style(color="red", bold=True)
     stack.pop()
     assert stack.current == Style(color="red")
+
+
+def test_pick_first():
+    with pytest.raises(ValueError):
+        Style.pick_first()

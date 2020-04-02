@@ -37,3 +37,9 @@ def test_size():
     console = Console(width=99, height=101)
     w, h = console.size
     assert w == 99 and h == 101
+
+
+def test_repr():
+    console = Console()
+    repr(console)
+    str(console)

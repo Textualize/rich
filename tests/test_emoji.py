@@ -2,6 +2,8 @@ import pytest
 
 from rich.emoji import Emoji, NoEmoji
 
+from render import render
+
 
 def test_no_emoji():
     with pytest.raises(NoEmoji):
@@ -16,3 +18,7 @@ def test_str_repr():
 def test_replace():
     assert Emoji.replace("my code is :pile_of_poo:") == "my code is 💩"
 
+
+def test_render():
+    render_result = render(Emoji("pile_of_poo"))
+    assert render_result == "💩"
