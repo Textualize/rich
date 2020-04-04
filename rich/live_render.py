@@ -46,7 +46,7 @@ class LiveRender:
                 yield Segment.line()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     from .bar import Bar
     from .table import Table
 
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     try:
         for n in range(5000):
             bar = bars[randint(0, len(bars) - 1)]
-            bar.update_progress(bar.completed + 1)
+            bar.update(bar.completed + 1)
             sleep(0.01)
             console.print(refresh)
 

@@ -44,7 +44,7 @@ class Bar:
         completed = min(100, max(0.0, completed))
         return completed
 
-    def update_progress(self, completed: float, total: float = None) -> None:
+    def update(self, completed: float, total: float = None) -> None:
         """Update progress with new values.
         
         Args:
@@ -69,6 +69,7 @@ class Bar:
         )
         if bar_count:
             yield Segment(bar * bar_count, complete_style)
+        print(completed, bar_count, half_bar_count)
         if half_bar_count:
             yield Segment(half_bar_right * half_bar_count, complete_style)
 
@@ -81,9 +82,11 @@ class Bar:
                 yield Segment(bar * remaining_bars, style)
 
     def __measure__(self, console: Console, max_width: int) -> Measurement:
-        if self.width is not None:
-            return Measurement(self.width, self.width)
-        return Measurement(4, max_width)
+        return (
+            Measurement(self.width, self.width)
+            if self.width is not None
+            else Measurement(4, max_width)
+        )
 
 
 if __name__ == "__main__":  # pragma: no cover
@@ -94,7 +97,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     console.show_cursor(False)
     for n in range(0, 101, 1):
-        bar.update_progress(n)
+        bar.update(n)
         console.print(bar)
         console.file.write("\r")
         time.sleep(0.05)

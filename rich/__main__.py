@@ -165,7 +165,7 @@ Supports much of the *markdown*, __syntax__!
     return table
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     console = Console(file=io.StringIO(), force_terminal=True)
     test_card = make_test_card()
     start = time()
