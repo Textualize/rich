@@ -29,7 +29,8 @@ def test_handler():
             sys.excepthook(exc_type, exc_value, traceback)
             rendered_exception = console.file.getvalue()
             print(repr(rendered_exception))
-            assert rendered_exception == CAPTURED_EXCEPTION
+            assert "Traceback" in rendered_exception
+            assert "ZeroDivisionError" in rendered_exception
     finally:
         sys.excepthook = old_handler
         assert old_handler == expected_old_handler
