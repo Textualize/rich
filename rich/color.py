@@ -480,7 +480,7 @@ def blend_rgb(
     return new_color
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
 
     from .console import Console
     from .table import Column, Table
@@ -508,4 +508,3 @@ if __name__ == "__main__":
             )
 
     console.print(table)
-

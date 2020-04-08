@@ -112,15 +112,15 @@ def make_test_card() -> Table:
     example_table.add_column("Production Budget", justify="right")
     example_table.add_column("Box Office", justify="right")
     example_table.add_row(
-        "Dev 20, 2019",
+        "Dec 20, 2019",
         "Star Wars: The Rise of Skywalker",
-        "$275,000,0000",
+        "$275,000,000",
         "$375,126,118",
     )
     example_table.add_row(
         "May 25, 2018",
         "[red]Solo[/red]: A Star Wars Story",
-        "$275,000,0000",
+        "$275,000,000",
         "$393,151,347",
     )
     example_table.add_row(
