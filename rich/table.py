@@ -453,7 +453,12 @@ class Table:
         for index, (first, last, row) in enumerate(loop_first_last(rows)):
             max_height = 1
             cells: List[List[List[Segment]]] = []
-            row_style = get_style(get_row_style(index))
+            if show_header and first:
+                row_style = Style()
+            else:
+                row_style = get_style(
+                    get_row_style(index - 1 if show_header else index)
+                )
             for width, cell, column in zip(widths, row, columns):
                 render_options = options.update(width=width, justify=column.justify)
                 cell_style = table_style + row_style + get_style(cell.style)
@@ -517,8 +522,8 @@ if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
     c = Console()
-    table = Table(row_styles=["grey44", "white"], expand=True)
-    table.add_column(no_wrap=True)
+    table = Table(row_styles=["red", "green"], expand=True)
+    table.add_column("foo", no_wrap=True)
     table.add_column()
     table.add_row(
         "Magnet",
