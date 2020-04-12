@@ -453,13 +453,10 @@ class Table:
         for index, (first, last, row) in enumerate(loop_first_last(rows)):
             max_height = 1
             cells: List[List[List[Segment]]] = []
+            row_style = get_style(get_row_style(index))
             for width, cell, column in zip(widths, row, columns):
                 render_options = options.update(width=width, justify=column.justify)
-                cell_style = (
-                    table_style
-                    + get_style(get_row_style(index))
-                    + get_style(cell.style)
-                )
+                cell_style = table_style + row_style + get_style(cell.style)
                 lines = console.render_lines(
                     cell.renderable, render_options, style=cell_style
                 )
