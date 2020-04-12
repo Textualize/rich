@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Added force_terminal option to Console.**init**
+- Added force_terminal option to `Console.__init__`
 
 ### Added
 

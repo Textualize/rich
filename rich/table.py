@@ -517,7 +517,7 @@ if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
     c = Console()
-    table = Table(row_styles=["red", "yellow"], expand=True)
+    table = Table(row_styles=["grey44", "white"], expand=True)
     table.add_column(no_wrap=True)
     table.add_column()
     table.add_row(

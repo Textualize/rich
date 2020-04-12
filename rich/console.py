@@ -639,7 +639,7 @@ class Console:
                 return self.get_style(default)
             if " " in name:
                 raise
-            raise errors.MissingStyle(f"No style named {name!r}; {error}")
+            raise errors.MissingStyle(f"Failed to get style; {error}")
 
     def _collect_renderables(
         self,
