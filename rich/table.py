@@ -21,7 +21,7 @@ from .measure import Measurement
 from .padding import Padding, PaddingDimensions
 from .protocol import is_renderable
 from .segment import Segment
-from .style import Style
+from .style import Style, StyleType
 from .text import Text
 
 if TYPE_CHECKING:
@@ -41,9 +41,9 @@ class Column:
 
     header: "RenderableType" = ""
     footer: "RenderableType" = ""
-    header_style: Union[str, Style] = "table.header"
-    footer_style: Union[str, Style] = "table.footer"
-    style: Union[str, Style] = "none"
+    header_style: StyleType = "table.header"
+    footer_style: StyleType = "table.footer"
+    style: StyleType = "none"
     justify: "JustifyValues" = "left"
     width: Optional[int] = None
     ratio: Optional[int] = None
@@ -64,7 +64,7 @@ class Column:
 class _Cell(NamedTuple):
     """A single cell in a table."""
 
-    style: Union[str, Style]
+    style: StyleType
     renderable: "RenderableType"
 
 
@@ -83,6 +83,7 @@ class Table:
         show_footer (bool, optional): Show a footer row. Defaults to False.
         show_edge (bool, optional): Draw a box around the outside of the table. Defaults to True.
         style (Union[str, Style], optional): Default style for the table. Defaults to "none".
+        row_styles (List[Union, str], optional): Optional list of row styles, if more that one style is give then the styles will alternate. Defaults to None.
         header_style (Union[str, Style], optional): Style of the header. Defaults to None.
         footer_style (Union[str, Style], optional): Style of the footer. Defaults to None.
         border_style (Union[str, Style], optional): Style of the border. Defaults to None.
@@ -105,12 +106,13 @@ class Table:
         show_header: bool = True,
         show_footer: bool = False,
         show_edge: bool = True,
-        style: Union[str, Style] = "none",
-        header_style: Union[str, Style] = None,
-        footer_style: Union[str, Style] = None,
-        border_style: Union[str, Style] = None,
-        title_style: Union[str, Style] = None,
-        caption_style: Union[str, Style] = None,
+        style: StyleType = "none",
+        row_styles: Iterable[StyleType] = None,
+        header_style: StyleType = None,
+        footer_style: StyleType = None,
+        border_style: StyleType = None,
+        title_style: StyleType = None,
+        caption_style: StyleType = None,
     ) -> None:
 
         self.columns = [
@@ -134,6 +136,7 @@ class Table:
         self.title_style = title_style
         self.caption_style = title_style
         self._row_count = 0
+        self.row_styles = list(row_styles or [])
 
     @classmethod
     def grid(cls) -> "Table":
@@ -144,6 +147,7 @@ class Table:
 
     @property
     def _extra_width(self) -> int:
+        """Get extra width to add to cell content."""
         width = 0
         if self.box and self.show_edge:
             width += 2
@@ -152,6 +156,17 @@ class Table:
             if self.pad_edge:
                 width += 2
         return width
+
+    @property
+    def row_count(self) -> int:
+        """Get the current number of rows."""
+        return self._row_count
+
+    def get_row_style(self, index: int) -> StyleType:
+        """Get the current row style."""
+        if self.row_styles:
+            return self.row_styles[index % len(self.row_styles)]
+        return Style()
 
     def __measure__(self, console: "Console", max_width: int) -> Measurement:
         if self.width is not None:
@@ -174,10 +189,12 @@ class Table:
 
     @property
     def padding(self) -> Tuple[int, int, int, int]:
+        """Get cell padding."""
         return self._padding
 
     @padding.setter
     def padding(self, padding: PaddingDimensions) -> "Table":
+        """Set cell padding."""
         self._padding = Padding.unpack(padding)
         return self
 
@@ -185,9 +202,9 @@ class Table:
         self,
         header: "RenderableType" = "",
         footer: "RenderableType" = "",
-        header_style: Union[str, Style] = None,
-        footer_style: Union[str, Style] = None,
-        style: Union[str, Style] = None,
+        header_style: StyleType = None,
+        footer_style: StyleType = None,
+        style: StyleType = None,
         justify: "JustifyValues" = "left",
         width: int = None,
         ratio: int = None,
@@ -431,12 +448,18 @@ class Table:
             yield Segment(_box.get_top(widths), border_style)
             yield new_line
 
-        for first, last, row in loop_first_last(rows):
+        get_row_style = self.get_row_style
+        get_style = console.get_style
+        for index, (first, last, row) in enumerate(loop_first_last(rows)):
             max_height = 1
             cells: List[List[List[Segment]]] = []
             for width, cell, column in zip(widths, row, columns):
                 render_options = options.update(width=width, justify=column.justify)
-                cell_style = table_style + console.get_style(cell.style)
+                cell_style = (
+                    table_style
+                    + get_style(get_row_style(index))
+                    + get_style(cell.style)
+                )
                 lines = console.render_lines(
                     cell.renderable, render_options, style=cell_style
                 )
@@ -493,13 +516,26 @@ class Table:
             yield new_line
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
     c = Console()
-    table = Table(expand=True)
+    table = Table(row_styles=["red", "yellow"], expand=True)
     table.add_column(no_wrap=True)
     table.add_column()
+    table.add_row(
+        "Magnet",
+        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
+    )
+    table.add_row(
+        "Magnet",
+        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
+        "foo",
+    )
+    table.add_row(
+        "Magnet",
+        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
+    )
     table.add_row(
         "Magnet",
         "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
