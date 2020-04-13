@@ -202,6 +202,11 @@ class Text:
             self._trim_spans()
         return self
 
+    @property
+    def spans(self) -> List[Span]:
+        """Get a copy of the list of spans."""
+        return self._spans[:]
+
     def blank_copy(self) -> "Text":
         """Return a new Text instance with copied meta data (but not the string or spans)."""
         copy_self = Text(

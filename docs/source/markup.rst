@@ -1,5 +1,5 @@
 .. _console_markup:
-
+py
 Console Markup
 ==============
 
@@ -23,6 +23,14 @@ If you don't close a style, it will apply until the end of the string. Which is 
 There is a shorthand for closing a style. If you omit the style name from the closing tag, Rich will close the last style. For example::
 
     print("[bold red]Bold and red[/] not bold or red")
+
+
+Escaping
+~~~~~~~~
+
+Occasionally you may want to print something that Rich would interpret as markup. You can *escape* square brackets by doubling them up. Here's an example::
+
+    print("foo[[bar]]")
 
 
 Rendering Markup

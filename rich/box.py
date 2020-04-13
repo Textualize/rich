@@ -121,7 +121,7 @@ class Box:
         return "".join(parts)
 
     def get_bottom(self, widths: Iterable[int]) -> str:
-        """Get the top of a simple box.
+        """Get the bottom of a simple box.
         
         Args:
             widths (List[int]): Widths of columns.

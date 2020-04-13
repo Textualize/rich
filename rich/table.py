@@ -82,6 +82,7 @@ class Table:
         show_header (bool, optional): Show a header row. Defaults to True.
         show_footer (bool, optional): Show a footer row. Defaults to False.
         show_edge (bool, optional): Draw a box around the outside of the table. Defaults to True.
+        show_lines (bool, optional): Draw lines between every row. Defaults to False.
         style (Union[str, Style], optional): Default style for the table. Defaults to "none".
         row_styles (List[Union, str], optional): Optional list of row styles, if more that one style is give then the styles will alternate. Defaults to None.
         header_style (Union[str, Style], optional): Style of the header. Defaults to None.
@@ -106,6 +107,7 @@ class Table:
         show_header: bool = True,
         show_footer: bool = False,
         show_edge: bool = True,
+        show_lines: bool = False,
         style: StyleType = "none",
         row_styles: Iterable[StyleType] = None,
         header_style: StyleType = None,
@@ -129,6 +131,7 @@ class Table:
         self.show_header = show_header
         self.show_footer = show_footer
         self.show_edge = show_edge
+        self.show_lines = show_lines
         self.style = style
         self.header_style = header_style
         self.footer_style = footer_style
@@ -139,10 +142,21 @@ class Table:
         self.row_styles = list(row_styles or [])
 
     @classmethod
-    def grid(cls) -> "Table":
-        """Get a table with no lines, headers, or footer."""
+    def grid(cls, padding: PaddingDimensions = 0) -> "Table":
+        """Get a table with no lines, headers, or footer.
+
+        Args:
+            padding (PaddingDimensions, optional): Get padding arround cells. Defaults to 0.
+        
+        Returns:
+            Table: A table instance.
+        """
         return cls(
-            box=None, padding=0, show_header=False, show_footer=False, show_edge=False
+            box=None,
+            padding=padding,
+            show_header=False,
+            show_footer=False,
+            show_edge=False,
         )
 
     @property
@@ -430,10 +444,12 @@ class Table:
         table_style = console.get_style(self.style or "")
 
         border_style = table_style + console.get_style(self.border_style or "")
-        rows: Iterable[Tuple[_Cell, ...]] = zip(
-            *(
-                self._get_cells(column_index, column)
-                for column_index, column in enumerate(self.columns)
+        rows: List[Tuple[_Cell, ...]] = list(
+            zip(
+                *(
+                    self._get_cells(column_index, column)
+                    for column_index, column in enumerate(self.columns)
+                )
             )
         )
         _box = box.SQUARE if (console.legacy_windows and self.box) else self.box
@@ -443,17 +459,21 @@ class Table:
         show_header = self.show_header
         show_footer = self.show_footer
         show_edge = self.show_edge
+        show_lines = self.show_lines
 
         if _box and show_edge:
             yield Segment(_box.get_top(widths), border_style)
             yield new_line
 
+        _Segment = Segment
         get_row_style = self.get_row_style
         get_style = console.get_style
         for index, (first, last, row) in enumerate(loop_first_last(rows)):
+            header_row = first and show_header
+            footer_row = last and show_footer
             max_height = 1
             cells: List[List[List[Segment]]] = []
-            if show_header and first:
+            if header_row or footer_row:
                 row_style = Style()
             else:
                 row_style = get_style(
@@ -480,24 +500,24 @@ class Table:
                     )
                     yield new_line
                 if first:
-                    left = Segment(_box.head_left, border_style)
-                    right = Segment(_box.head_right, border_style)
-                    divider = Segment(_box.head_vertical, border_style)
+                    left = _Segment(_box.head_left, border_style)
+                    right = _Segment(_box.head_right, border_style)
+                    divider = _Segment(_box.head_vertical, border_style)
                 elif last:
-                    left = Segment(_box.foot_left, border_style)
-                    right = Segment(_box.foot_right, border_style)
-                    divider = Segment(_box.foot_vertical, border_style)
+                    left = _Segment(_box.foot_left, border_style)
+                    right = _Segment(_box.foot_right, border_style)
+                    divider = _Segment(_box.foot_vertical, border_style)
                 else:
-                    left = Segment(_box.mid_left, border_style)
-                    right = Segment(_box.mid_right, border_style)
-                    divider = Segment(_box.mid_vertical, border_style)
+                    left = _Segment(_box.mid_left, border_style)
+                    right = _Segment(_box.mid_right, border_style)
+                    divider = _Segment(_box.mid_vertical, border_style)
 
                 for line_no in range(max_height):
                     if show_edge:
                         yield left
-                    for last, rendered_cell in loop_last(cells):
+                    for last_cell, rendered_cell in loop_last(cells):
                         yield from rendered_cell[line_no]
-                        if not last:
+                        if not last_cell:
                             yield divider
                     if show_edge:
                         yield right
@@ -512,9 +532,19 @@ class Table:
                     _box.get_row(widths, "head", edge=show_edge), border_style
                 )
                 yield new_line
+            if _box and show_lines:
+                if (
+                    not last
+                    and not (show_footer and index >= len(rows) - 2)
+                    and not (show_header and header_row)
+                ):
+                    yield _Segment(
+                        _box.get_row(widths, "row", edge=show_edge), border_style
+                    )
+                    yield new_line
 
         if _box and show_edge:
-            yield Segment(_box.get_bottom(widths), border_style)
+            yield _Segment(_box.get_bottom(widths), border_style)
             yield new_line
 
 
@@ -522,8 +552,16 @@ if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
     c = Console()
-    table = Table(row_styles=["red", "green"], expand=True)
-    table.add_column("foo", no_wrap=True)
+    table = Table(
+        show_lines=False,
+        row_styles=["red", "green"],
+        expand=True,
+        show_header=True,
+        show_footer=False,
+        box=box.MINIMAL_DOUBLE_HEAD,
+        show_edge=True,
+    )
+    table.add_column("foo", no_wrap=True, footer="BAR")
     table.add_column()
     table.add_row(
         "Magnet",

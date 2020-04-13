@@ -9,7 +9,7 @@ from .text import Span, Text
 from ._emoji_replace import _emoji_replace
 
 
-re_tags = re.compile(r"(\[\".*?\"\])|(\[.*?\])")
+re_tags = re.compile(r"(\[\[)|(\]\])|(\[.*?\])")
 
 
 def _parse(markup: str) -> Iterable[Tuple[Optional[str], Optional[str]]]:
@@ -21,16 +21,14 @@ def _parse(markup: str) -> Iterable[Tuple[Optional[str], Optional[str]]]:
     """
     position = 0
     for match in re_tags.finditer(markup):
-        escaped_text, tag_text = match.groups()
-
+        escape_open, escape_close, tag_text = match.groups()
         start, end = match.span()
         if start > position:
             yield markup[position:start], None
         if tag_text is not None:
             yield None, tag_text
         else:
-            yield escaped_text[2:-2], None  # type: ignore
-
+            yield (escape_open and "[") or (escape_close and "]"), None  # type: ignore
         position = end
     if position < len(markup):
         yield markup[position:], None
