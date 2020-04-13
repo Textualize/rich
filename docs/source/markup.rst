@@ -1,5 +1,4 @@
 .. _console_markup:
-py
 Console Markup
 ==============
 

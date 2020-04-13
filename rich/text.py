@@ -178,6 +178,19 @@ class Text:
         end: str = "\n",
         tab_size: int = 8,
     ) -> "Text":
+        """Construct a text instance by combining a sequence of strings with optional styles.
+
+        The positional arguments should be either strings, or a tuple of string + style.        
+
+        Args:            
+            style (Union[str, Style], optional): Base style for text. Defaults to "".
+            justify (str, optional): Default alignment for text, "left", "center", "full" or "right". Defaults to None.
+            end (str, optional): Character to end text with. Defaults to "\n".
+            tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
+
+        Returns:
+            Text: A new text instance.
+        """
         text = cls(style=style, justify=justify, end=end, tab_size=tab_size)
         append = text.append
         for part in parts:
