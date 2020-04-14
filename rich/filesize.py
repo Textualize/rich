@@ -42,56 +42,6 @@ def pick_unit_and_suffix(size: int, suffixes: List[str], base: int) -> Tuple[int
     return unit, suffix
 
 
-def traditional(size: int) -> str:
-    """Convert a filesize in to a string (powers of 1024, JDEC prefixes).
-
-    In this convention, ``1024 B = 1 KB``.
-
-    This is the format that was used to display the size of DVDs
-    (*700 MB* meaning actually about *734 003 200 bytes*) before
-    standardisation of IEC units among manufacturers, and still
-    used by **Windows** to report the storage capacity of hard
-    drives (*279.4 GB* meaning *279.4 × 1024³ bytes*).
-
-    Arguments:
-        size (int): A file size.
-
-    Returns:
-        `str`: A string containing an abbreviated file size and units.
-
-    Example:
-        >>> filesize.traditional(30000)
-        '29.3 KB'
-
-    """
-    return _to_str(size, ("KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"), 1024)
-
-
-def binary(size: int) -> str:
-    """Convert a filesize in to a string (powers of 1024, IEC prefixes).
-
-    In this convention, ``1024 B = 1 KiB``.
-
-    This is the format that has gained adoption among manufacturers
-    to avoid ambiguity regarding size units, since it explicitly states
-    using a binary base (*KiB = kibi bytes = kilo binary bytes*).
-    This format is notably being used by the **Linux** kernel (see
-    ``man 7 units``).
-
-    Arguments:
-        int (size): A file size.
-
-    Returns:
-        `str`: A string containing a abbreviated file size and units.
-
-    Example:
-        >>> filesize.binary(30000)
-        '29.3 KiB'
-
-    """
-    return _to_str(size, ("KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"), 1024)
-
-
 def decimal(size: int) -> str:
     """Convert a filesize in to a string (powers of 1000, SI prefixes).
 
