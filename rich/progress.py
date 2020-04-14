@@ -586,7 +586,7 @@ class Progress:
             del self._tasks[task_id]
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no coverage
 
     import time
 
