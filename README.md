@@ -1,7 +1,7 @@
 [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
 [![PyPI](https://img.shields.io/pypi/pyversions/rich.svg)](https://pypi.org/project/rich/)
 [![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich/month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)  
+[![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
 # Rich
 
@@ -35,9 +35,9 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/print.png)
 
-## Console logging
+## Using the Console
 
-For more control over rich terminal content, import and construct a `Console` object.
+For more control over rich terminal content, import and construct a [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console) object.
 
 ```python
 from rich.console import Console

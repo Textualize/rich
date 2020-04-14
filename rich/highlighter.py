@@ -7,6 +7,8 @@ from .text import Text
 
 
 class Highlighter(ABC):
+    """Abstract base class for highlighters."""
+
     def __call__(self, text: Union[str, Text]) -> Text:
         """Highlight a str or Text instance.
         
