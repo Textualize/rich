@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Generic, TypeVar
+from typing import Dict, Generic, Mapping, TypeVar
 
 
 CacheKey = TypeVar("CacheKey")
@@ -26,7 +26,7 @@ class LRUCache(Generic[CacheKey, CacheValue], OrderedDict):
                 self.popitem(last=False)
         OrderedDict.__setitem__(self, key, value)
 
-    def __getitem__(self, key: CacheKey) -> CacheValue:
+    def __getitem__(self: Dict[CacheKey, CacheValue], key: CacheKey) -> CacheValue:
         """Gets the item, but also makes it most recent."""
         value: CacheValue = OrderedDict.__getitem__(self, key)
         OrderedDict.__delitem__(self, key)

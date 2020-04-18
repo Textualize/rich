@@ -5,7 +5,7 @@ from .text import Text
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleRenderable, RenderableType
-    from table import Table
+    from .table import Table
 
 
 class LogRender:

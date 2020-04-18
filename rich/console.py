@@ -97,7 +97,7 @@ class ConsoleOptions:
         min_width: int = None,
         max_width: int = None,
         justify: JustifyValues = None,
-    ):
+    ) -> "ConsoleOptions":
         """Update values, return a copy."""
         options = replace(self)
         if width is not None:
@@ -245,7 +245,7 @@ class Console:
         ] = "auto",
         force_terminal: bool = False,
         theme: Theme = None,
-        file: IO = None,
+        file: IO[str] = None,
         width: int = None,
         height: int = None,
         tab_size: int = 8,

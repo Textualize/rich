@@ -153,7 +153,7 @@ class Traceback:
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
-    ):
+    ) -> "Traceback":
         rich_traceback = cls.extract(exc_type, exc_value, traceback)
         return Traceback(
             rich_traceback,

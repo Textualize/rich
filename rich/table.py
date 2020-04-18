@@ -223,7 +223,7 @@ class Table:
         width: int = None,
         ratio: int = None,
         no_wrap: bool = False,
-    ):
+    ) -> None:
         """Add a column to the table.
         
         Args:
