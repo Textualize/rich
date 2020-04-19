@@ -33,7 +33,7 @@ class Panel:
     def __init__(
         self,
         renderable: RenderableType,
-        box=box.ROUNDED,
+        box: box.Box = box.ROUNDED,
         expand: bool = True,
         style: Union[str, Style] = "none",
         width: Optional[int] = None,

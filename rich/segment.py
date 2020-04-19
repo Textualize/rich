@@ -182,6 +182,7 @@ class Segment(NamedTuple):
         pad_line = [Segment(" " * width, style)]
         append = new_lines.append
         adjust_line_length = cls.adjust_line_length
+        line: Optional[List[Segment]]
         for line, _ in zip_longest(lines, range(height)):
             if line is None:
                 append(pad_line)
