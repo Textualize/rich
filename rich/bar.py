@@ -69,7 +69,6 @@ class Bar:
         )
         if bar_count:
             yield Segment(bar * bar_count, complete_style)
-        print(completed, bar_count, half_bar_count)
         if half_bar_count:
             yield Segment(half_bar_right * half_bar_count, complete_style)
 
