@@ -1,5 +1,5 @@
 [run]
-omit = rich/python.py
+omit = rich/jupyter.py
 
 [report]
 exclude_lines =

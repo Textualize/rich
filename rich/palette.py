@@ -14,11 +14,6 @@ class Palette:
     def __getitem__(self, number: int) -> ColorTriplet:
         return ColorTriplet(*self._colors[number])
 
-    @property
-    def hex(self) -> List[str]:
-        """Get a list of hex encoded colors."""
-        return [f"{red:02x}{green:02x}{blue:02x}" for red, green, blue in self._colors]
-
     # This is somewhat inefficient and needs caching
     @lru_cache(maxsize=1024)
     def match(self, color: Tuple[int, int, int]) -> int:
@@ -43,4 +38,3 @@ class Palette:
             enumerate(self._colors), key=lambda _color: get_color_distance(_color[1]),
         )
         return min_index
-
