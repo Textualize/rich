@@ -5,6 +5,12 @@ Rich is a Python library for writing *rich* text (with color and formatting) to 
 
 Use Rich to make command line applications more visually appealing and present data in a more readable way. Rich can also be a useful debugging aid by pretty printing and syntax highlighting data structures.
 
+Requirements
+------------
+
+Rich works with OSX, Linux and Windows.
+
+Rich requires Python 3.6.1 and above. Note that Python 3.6.0 is *not* supported due to lack of support for methods on NamedTuples.
 
 Installation
 ------------

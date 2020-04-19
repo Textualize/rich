@@ -1,12 +1,12 @@
 from functools import lru_cache
 from itertools import takewhile
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 from ._cell_widths import CELL_WIDTHS
 from ._lru_cache import LRUCache
 
 
-def cell_len(text: str, _cache: LRUCache[str, int] = LRUCache(1024 * 4)) -> int:
+def cell_len(text: str, _cache: Dict[str, int] = LRUCache(1024 * 4)) -> int:
     """Get the number of cells required to display text.
     
     Args:
