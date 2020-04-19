@@ -140,13 +140,14 @@ _null_highlighter = NullHighlighter()
 
 
 class RenderGroup:
-    def __init__(self, *renderables: RenderableType, fit: bool = True) -> None:
-        """Takes a group of renderables and returns a renderable object,
-        that renders the group.
+    """Takes a group of renderables and returns a renderable object that renders the group.
+                
+    Args:
+        renderables (Iterable[RenderableType]): An iterable of renderable objects.
         
-        Args:
-            renderables (Iterable[RenderableType]): An iterable of renderable objects.
-        """
+    """
+
+    def __init__(self, *renderables: RenderableType, fit: bool = True) -> None:
         self._renderables = renderables
         self.fit = fit
         self._render: Optional[List[RenderableType]] = None
