@@ -175,7 +175,7 @@ class Style:
 
     def __hash__(self) -> int:
         return hash(
-            (self._color, self._bgcolor, self._attributes, self._set_attributes,)
+            (self._color, self._bgcolor, self._attributes, self._set_attributes)
         )
 
     @property
