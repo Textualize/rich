@@ -11,10 +11,13 @@ class Constrain:
         width (int, optional): The maximum width (in characters) to render. Defaults to 80.
     """
 
-    def __init__(self, renderable: RenderableType, width: int = 80) -> None:
+    def __init__(self, renderable: RenderableType, width: Optional[int] = 80) -> None:
         self.renderable = renderable
         self.width = width
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        child_options = options.update(width=min(self.width, options.max_width))
-        yield from console.render(self.renderable, child_options)
+        if self.width is None:
+            yield self.renderable
+        else:
+            child_options = options.update(width=min(self.width, options.max_width))
+            yield from console.render(self.renderable, child_options)
