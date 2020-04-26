@@ -47,7 +47,7 @@ class NullHighlighter(Highlighter):
     """
 
     def highlight(self, text: Text) -> None:
-        pass
+        """Nothing to do"""
 
 
 class RegexHighlighter(Highlighter):
