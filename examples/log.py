@@ -7,6 +7,7 @@ A simulation of Rich console logging.
 import time
 from rich.console import Console
 from rich.style import Style
+from rich.theme import Theme
 from rich.highlighter import RegexHighlighter
 
 
@@ -18,8 +19,7 @@ class RequestHighlighter(RegexHighlighter):
     ]
 
 
-console = Console()
-console.push_styles(
+theme = Theme(
     {
         "req.protocol": Style.parse("dim bold green"),
         "req.method": Style.parse("bold cyan"),
@@ -29,6 +29,7 @@ console.push_styles(
         "req.stats": Style.parse("dim"),
     }
 )
+console = Console(theme=theme)
 
 console.log("Server starting...")
 console.log("Serving on http://127.0.0.1:8000")

@@ -1,4 +1,3 @@
-from collections import ChainMap
 from collections.abc import Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass, field, replace
@@ -259,10 +258,7 @@ class Console:
         log_time_format: str = "[%X] ",
         highlighter: Optional["HighlighterType"] = ReprHighlighter(),
     ):
-        self._styles = ChainMap(
-            themes.DEFAULT.styles if theme is None else theme.styles
-        )
-
+        self._styles = themes.DEFAULT.styles if theme is None else theme.styles
         self._width = width
         self._height = height
         self.tab_size = tab_size
@@ -322,10 +318,12 @@ class Console:
         """Detect color system from env vars."""
         if not self.is_terminal:
             return None
-        if os.environ.get("COLORTERM", "").strip().lower() in ("truecolor", "24bit"):
-            return ColorSystem.TRUECOLOR
-        # 256 can be considered standard nowadays
-        return ColorSystem.EIGHT_BIT
+        color_term = os.environ.get("COLORTERM", "").strip().lower()
+        return (
+            ColorSystem.TRUECOLOR
+            if color_term in ("truecolor", "24bit")
+            else ColorSystem.EIGHT_BIT
+        )
 
     def _enter_buffer(self) -> None:
         """Enter in to a buffer context, and buffer all output."""
@@ -344,18 +342,6 @@ class Console:
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         """Exit buffer context."""
         self._exit_buffer()
-
-    def push_styles(self, styles: Dict[str, Style]) -> None:
-        """Merge set of styles with currently active styles.
-
-        Args:
-            styles (Dict[str, Style]): A mapping of style name to Style instance.
-        """
-        self._styles.maps.append(styles)
-
-    def pop_styles(self) -> None:
-        """Restore styles to state before `push_styles`."""
-        self._styles.maps.pop()
 
     @property
     def color_system(self) -> Optional[str]:
@@ -453,7 +439,7 @@ class Console:
 
     def _render(
         self,
-        renderable: Union[RenderableType, Segment, Control],
+        renderable: Union[RenderableType, Control],
         options: Optional[ConsoleOptions],
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
@@ -470,9 +456,6 @@ class Console:
             Iterable[Segment]: An iterable of segments that may be rendered.
         """
         render_iterable: RenderResult
-        if isinstance(renderable, Segment):
-            yield renderable
-            return
         if isinstance(renderable, Control):
             self._control.append(renderable.codes)
             return
@@ -519,23 +502,6 @@ class Console:
         """
 
         yield from self._render(renderable, options)
-
-    def render_all(
-        self, renderables: Iterable[RenderableType], options: Optional[ConsoleOptions]
-    ) -> Iterable[Segment]:
-        """Render a number of console objects.
-
-        Args:
-            renderables (Iterable[RenderableType]): Console objects.
-            options (Optional[ConsoleOptions]): Options for render.
-
-        Returns:
-            Iterable[Segment]: Segments to be written to the console.
-
-        """
-        render_options = options or self.options
-        for renderable in renderables:
-            yield from self.render(renderable, render_options)
 
     def render_lines(
         self,
@@ -604,17 +570,6 @@ class Console:
 
         return Text(text, style=style)
 
-    def _get_style(self, name: str) -> Optional[Style]:
-        """Get a named style, or `None` if it doesn't exist.
-
-        Args:
-            name (str): The name of a style.
-
-        Returns:
-            Optional[Style]: A Style object for the given name, or `None`.
-        """
-        return self._styles.get(name, None)
-
     def get_style(
         self, name: Union[str, Style], *, default: Union[Style, str] = None
     ) -> Style:
@@ -638,9 +593,7 @@ class Console:
         except errors.StyleSyntaxError as error:
             if default is not None:
                 return self.get_style(default)
-            if " " in name:
-                raise
-            raise errors.MissingStyle(f"Failed to get style; {error}")
+            raise errors.MissingStyle(f"Failed to get style {name!r}; {error}")
 
     def _collect_renderables(
         self,
@@ -670,11 +623,9 @@ class Console:
         text: List[Text] = []
         append_text = text.append
 
-        _highlighter: HighlighterType
+        _highlighter: HighlighterType = _null_highlighter
         if highlight or (highlight is None and self._highlight):
             _highlighter = self.highlighter
-        else:
-            _highlighter = _null_highlighter
 
         def check_text() -> None:
             if text:

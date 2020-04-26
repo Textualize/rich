@@ -1,6 +1,13 @@
+import io
+
+import pytest
+
 from rich.color import ColorSystem
 from rich.console import Console, ConsoleOptions
+from rich import errors
+from rich.segment import Segment
 from rich.style import Style
+from rich.theme import Theme
 
 
 def test_console_options_update():
@@ -41,5 +48,38 @@ def test_size():
 
 def test_repr():
     console = Console()
-    repr(console)
-    str(console)
+    assert isinstance(repr(console), str)
+    assert isinstance(str(console), str)
+
+
+def test_print():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print("foo")
+    assert console.file.getvalue() == "foo\n"
+
+
+def test_print_style():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print("foo", style="bold")
+    assert console.file.getvalue() == "\x1b[1mfoo\x1b[0m\n"
+
+
+def test_show_cursor():
+    console = Console(file=io.StringIO())
+    console.show_cursor(False)
+    console.print("foo")
+    console.show_cursor(True)
+    assert console.file.getvalue() == "\x1b[?25lfoo\n\x1b[?25h"
+
+
+def test_get_style():
+    console = Console()
+    console.get_style("repr.brace") == Style(bold=True)
+
+
+def test_get_style_error():
+    console = Console()
+    with pytest.raises(errors.MissingStyle):
+        console.get_style("nosuchstyle")
+    with pytest.raises(errors.MissingStyle):
+        console.get_style("foo bar")
