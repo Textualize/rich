@@ -42,7 +42,7 @@ def get_character_cell_size(character: str) -> int:
     return _get_codepoint_cell_size(codepoint)
 
 
-@lru_cache(maxsize=5000)
+@lru_cache(maxsize=4096)
 def _get_codepoint_cell_size(codepoint: int) -> int:
     """Get the cell size of a character.
     

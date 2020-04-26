@@ -328,7 +328,7 @@ class Progress:
         self._started = False
 
     @property
-    def tasks_ids(self) -> List[TaskID]:
+    def task_ids(self) -> List[TaskID]:
         """A list of task IDs."""
         with self._lock:
             return list(self._tasks.keys())
@@ -462,7 +462,7 @@ class Progress:
         """Update information associated with a task.
         
         Args:
-            task_id (TaskID): Task id (return by add_task).            
+            task_id (TaskID): Task id (returned by add_task).            
             total (float, optional): Updates task.total if not None.
             completed (float, optional): Updates task.completed if not None.
             advance (float, optional): Add a value to task.completed if not None.
