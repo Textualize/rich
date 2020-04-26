@@ -9,8 +9,6 @@ from rich.highlighter import ReprHighlighter
 from rich.markup import render
 from rich.text import Text
 
-# LOG_LEVELS = ["NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-
 
 class RichHandler(Handler):
     """A logging handler that renders output with Rich. The time / level / message and file are displayed in columns.
@@ -23,9 +21,9 @@ class RichHandler(Handler):
 
     KEYWORDS = ["GET", "POST", "HEAD", "PUT", "DELETE", "OPTIONS", "TRACE", "PATCH"]
 
-    def __init__(self, level: int = logging.NOTSET) -> None:
+    def __init__(self, level: int = logging.NOTSET, console: Console = None) -> None:
         super().__init__(level=level)
-        self.console = Console()
+        self.console = Console() if console is None else console
         self.highlighter = ReprHighlighter()
         self._log_render = LogRender(show_level=True)
 

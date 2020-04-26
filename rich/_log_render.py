@@ -57,10 +57,7 @@ class LogRender:
             row.append(level)
         row.append(Renderables(renderables))
         if self.show_path and path:
-            if line_no is None:
-                row.append(Text(path))
-            else:
-                row.append(Text(f"{path}:{line_no}"))
+            row.append(Text(f"{path}:{line_no}" if line_no else path))
 
         output.add_row(*row)
         return output
