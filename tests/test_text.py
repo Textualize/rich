@@ -57,6 +57,14 @@ def test_eq():
     assert Text("foo").__eq__(1) == NotImplemented
 
 
+def test_contain():
+    test = Text("foobar")
+    assert "foo" in test
+    assert "foo " not in test
+    assert Text("bar") in test
+    assert None not in test
+
+
 def test_text_property():
     text = Text("foo")
     text.append("bar")
@@ -103,6 +111,69 @@ def test_stylize():
     assert test._spans == [Span(7, 11, "bold")]
     test.stylize(20, 25, "bold")
     assert test._spans == [Span(7, 11, "bold")]
+
+
+def test_highlight_regex():
+    test = Text("peek-a-boo")
+
+    count = test.highlight_regex(r"NEVER_MATCH", "red")
+    assert count == 0
+    assert len(test._spans) == 0
+
+    # text: peek-a-boo
+    # indx: 0123456789
+    count = test.highlight_regex(r"[a|e|o]+", "red")
+    assert count == 3
+    assert sorted(test._spans) == [
+        Span(1, 3, "red"),
+        Span(5, 6, "red"),
+        Span(8, 10, "red"),
+    ]
+
+    test = Text("Ada Lovelace, Alan Turing")
+    count = test.highlight_regex(
+        r"(?P<yellow>[A-Za-z]+)[ ]+(?P<red>[A-Za-z]+)(?P<NEVER_MATCH>NEVER_MATCH)*"
+    )
+
+    # The number of matched name should be 2
+    assert count == 2
+    assert sorted(test._spans) == [
+        Span(0, 3, "yellow"),  # Ada
+        Span(4, 12, "red"),  # Lovelace
+        Span(14, 18, "yellow"),  # Alan
+        Span(19, 25, "red"),  # Turing
+    ]
+
+
+def test_highlight_words():
+    test = Text("Do NOT! touch anything!")
+    words = ["NOT", "!"]
+    count = test.highlight_words(words, "red")
+    assert count == 3
+    assert sorted(test._spans) == [
+        Span(3, 6, "red"),  # NOT
+        Span(6, 7, "red"),  # !
+        Span(22, 23, "red"),  # !
+    ]
+
+    # regex escape test
+    test = Text("[o|u]aeiou")
+    words = ["[a|e|i]", "[o|u]"]
+    count = test.highlight_words(words, "red")
+    assert count == 1
+    assert test._spans == [Span(0, 5, "red")]
+
+    # case sensitive
+    test = Text("AB Ab aB ab")
+    words = ["AB"]
+
+    count = test.highlight_words(words, "red")
+    assert count == 1
+    assert test._spans == [Span(0, 2, "red")]
+
+    test = Text("AB Ab aB ab")
+    count = test.highlight_words(words, "red", False)
+    assert count == 4
 
 
 def test_set_length():
@@ -330,6 +401,9 @@ def test_tabs_to_spaces():
 
     test = Text(".\t..\t...\t....\t", tab_size=4)
     assert test.tabs_to_spaces().text == ".   ..  ... ....    "
+
+    test = Text("No Tabs")
+    assert test.tabs_to_spaces().text == "No Tabs"
 
 
 def test_markup_switch():
