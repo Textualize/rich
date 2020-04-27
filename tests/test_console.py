@@ -58,6 +58,12 @@ def test_print():
     assert console.file.getvalue() == "foo\n"
 
 
+def test_print_empty():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print()
+    assert console.file.getvalue() == "\n"
+
+
 def test_print_style():
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print("foo", style="bold")
@@ -83,3 +89,45 @@ def test_get_style_error():
         console.get_style("nosuchstyle")
     with pytest.raises(errors.MissingStyle):
         console.get_style("foo bar")
+
+
+def test_render_error():
+    console = Console()
+    with pytest.raises(errors.NotRenderableError):
+        list(console.render([], console.options))
+
+
+class BrokenRenderable:
+    def __console__(self, console, options):
+        pass
+
+
+def test_render_broken_renderable():
+    console = Console()
+    broken = BrokenRenderable()
+    with pytest.raises(errors.NotRenderableError):
+        list(console.render(broken, console.options))
+
+
+def test_export_text():
+    console = Console(record=True, width=100)
+    console.print("[b]foo")
+    text = console.export_text()
+    expected = "foo\n"
+    assert text == expected
+
+
+def test_export_html():
+    console = Console(record=True, width=100)
+    console.print("[b]foo")
+    html = console.export_html()
+    expected = "<!DOCTYPE html>\n<head>\n<style>\n.r1 {font-weight: bold}\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style=\"font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span class=\"r1\">foo</span>\n</pre>\n    </code>\n</body>\n</html>\n"
+    assert html == expected
+
+
+def test_export_html_inline():
+    console = Console(record=True, width=100)
+    console.print("[b]foo")
+    html = console.export_html(inline_styles=True)
+    expected = "<!DOCTYPE html>\n<head>\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style=\"font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span style=\"font-weight: bold\">foo</span>\n</pre>\n    </code>\n</body>\n</html>\n"
+    assert html == expected

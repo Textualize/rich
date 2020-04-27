@@ -71,7 +71,17 @@ def get_exception() -> Traceback:
         return tb
 
 
-if __name__ == "__main__":
+def test_print_exception():
+    console = Console(width=100, file=io.StringIO())
+    try:
+        1 / 0
+    except Exception:
+        console.print_exception()
+    exception_text = console.file.getvalue()
+    assert "ZeroDivisionError" in exception_text
+
+
+if __name__ == "__main__":  # pragma: no cover
 
     expected = render(get_exception())
 
