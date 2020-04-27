@@ -356,6 +356,14 @@ def test_fit():
     assert str(lines[1]) == "Wor"
 
 
+def test_wrap_tabs():
+    test = Text("foo\tbar")
+    lines = test.wrap(4)
+    assert len(lines) == 2
+    assert str(lines[0]) == "foo "
+    assert str(lines[1]) == "bar "
+
+
 def test_render():
     console = Console(width=15, record=True)
     test = Text.from_markup(
@@ -363,7 +371,6 @@ def test_render():
     )
     console.print(test)
     output = console.export_text(styles=True)
-    print(repr(output))
     expected = "\x1b[1;4mWhere\x1b[0m\x1b[4m there is \x1b[0m\n\x1b[4ma \x1b[0m\x1b[3;4mWill\x1b[0m\x1b[4m, there \x1b[0m\n\x1b[4mis a Way.\x1b[0m\n"
     assert output == expected
 

@@ -337,14 +337,11 @@ class Text:
     def __console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
-        if self.tab_size is None:
-            tab_size = console.tab_size  # type: ignore
-        else:
-            tab_size = self.tab_size
+        tab_size: int = console.tab_size or self.tab_size or 8  # type: ignore
         lines = self.wrap(
             options.max_width,
             justify=self.justify or options.justify,
-            tab_size=tab_size,
+            tab_size=tab_size or 8,
         )
         all_lines = Text("\n").join(lines)
         yield from all_lines.render(console, end=self.end)
@@ -357,7 +354,7 @@ class Text:
         min_text_width = max(cell_len(word) for word in text.split())
         return Measurement(min_text_width, max_text_width)
 
-    def render(self, console: "Console", end: str = None) -> Iterable["Segment"]:
+    def render(self, console: "Console", end: str = "") -> Iterable["Segment"]:
         """Render the text as Segments.
         
         Args:
@@ -414,8 +411,6 @@ class Text:
                 stack_append(style_id)
             if next_offset > offset:
                 yield _Segment(text[offset:next_offset], get_current_style())
-        if end is None:
-            end = self.end
         if end:
             yield _Segment(end)
 
