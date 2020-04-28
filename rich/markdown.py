@@ -101,13 +101,11 @@ class TextElement(MarkdownElement):
         self.text = Text(justify="left")
 
     def on_text(self, context: "MarkdownContext", text: str) -> None:
+        text = text.replace("---", "—").replace("--", "–").replace("...", "…")
         self.text.append(text, context.current_style)
 
     def on_leave(self, context: "MarkdownContext") -> None:
         context.leave_style()
-
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        yield self.text
 
 
 class Paragraph(TextElement):
@@ -165,10 +163,9 @@ class CodeBlock(TextElement):
 
     @classmethod
     def create(cls, markdown: "Markdown", node: Any) -> "CodeBlock":
-        if node.info is None:
-            return cls("default", markdown.code_theme)
-        lexer_name, _, _ = node.info.partition(" ")
-        return cls(lexer_name, markdown.code_theme)
+        node_info = node.info or ""
+        lexer_name = node_info.partition(" ")[0]
+        return cls(lexer_name or "default", markdown.code_theme)
 
     def __init__(self, lexer_name: str, theme: str) -> None:
         self.lexer_name = lexer_name
@@ -195,20 +192,14 @@ class BlockQuote(TextElement):
         return False
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        # Render surrounded by quotes.
         render_options = options.update(width=options.max_width - 4)
         lines = console.render_lines(self.elements, render_options, style=self.style)
-
         style = self.style
         new_line = Segment("\n")
-        left_quote = Segment("“ ", style)
-        right_quote = Segment(" ”", style)
-        padding = Segment("  ", style)
-
-        for first, last, line in loop_first_last(lines):
-            yield left_quote if first else padding
+        padding = Segment("▌ ", style)
+        for line in lines:
+            yield padding
             yield from line
-            yield right_quote if last else padding
             yield new_line
 
 
@@ -312,11 +303,6 @@ class MarkdownContext:
         """Current style which is the product of all styles on the stack."""
         return self.style_stack.current
 
-    @property
-    def width(self) -> int:
-        """The width of the console."""
-        return self.options.max_width
-
     def on_text(self, text: str) -> None:
         """Called when the parser visits text."""
         self.stack.top.on_text(self, text)
@@ -344,7 +330,7 @@ class Markdown:
         "list": ListElement,
         "item": ListItem,
     }
-    inlines = {"emph", "strong", "code", "link"}
+    inlines = {"emph", "strong", "code", "link", "strike"}
 
     def __init__(
         self,
@@ -372,10 +358,13 @@ class Markdown:
             # print(current, current.literal)
             node_type = current.t
             if node_type in ("html_inline", "html_block", "text"):
-                context.on_text(current.literal)
-            elif node_type == "softbreak":
+                context.on_text(current.literal.replace("\n", " "))
+            elif node_type == "linebreak":
                 if entering:
                     context.on_text("\n")
+            elif node_type == "softbreak":
+                if entering:
+                    context.on_text(" ")
             elif node_type in inlines:
                 if current.is_container():
                     if entering:
