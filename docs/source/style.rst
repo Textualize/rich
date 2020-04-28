@@ -33,7 +33,7 @@ The hex and rgb forms allow you to select from the full *truecolor* set of 16.7 
 
 By itself, a color will change the *foreground* color. To specify a *background* color precede the color with the word "on". For example, the following prints text in red on a white background::
 
-    console.print("DANGER!", style="white on red")
+    console.print("DANGER!", style="red on white")
 
 You can set a style attribute by adding one or more of the following words:
 
