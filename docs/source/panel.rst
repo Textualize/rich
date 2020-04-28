@@ -1,7 +1,7 @@
 Panel
 =====
 
-To draw a border around any content construct a :class:`~rich.panel.Panel` object with any *renderable* as the first positional argument. Here's an example::
+To draw a border around any content, construct a :class:`~rich.panel.Panel` with any *renderable* as the first positional argument. Here's an example::
 
     from rich import print
     from rich.panel import Panel
