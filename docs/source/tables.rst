@@ -47,6 +47,6 @@ You can set the border style by importing one of the preset :class:`~rich.box.Bo
     from rich import box
     table = Table(title="Star Wars Movies", box=box.MINIMAL_DOUBLE_HEAD)
 
-See :ref:`appendix-box` for other box styles.
+See :ref:`appendix_box` for other box styles.
 
 The :class:`~rich.table.Table` class offers a number of configuration options to set the look and feel of the table, including how borders are rendered and the style and alignment of the columns.
