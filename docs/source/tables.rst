@@ -42,4 +42,11 @@ This produces the following output:
 
 Rich is quite smart about rendering the table. It will adjust the column widths to fit the contents and will wrap text if it doesn't fit. You can also add anything that Rich knows how to render as a title or row cell (even another table)!
 
+You can set the border style by importing one of the preset :class:`~rich.box.Box` objects and setting the ``box`` argument in the table constructor. Here's an example that modifies the look of the Star Wars table::
+
+    from rich import box
+    table = Table(title="Star Wars Movies", box=box.MINIMAL_DOUBLE_HEAD)
+
+See :ref:`appendix-box` for other box styles.
+
 The :class:`~rich.table.Table` class offers a number of configuration options to set the look and feel of the table, including how borders are rendered and the style and alignment of the columns.

@@ -18,7 +18,7 @@ class Panel:
     """A console renderable that draws a border around its contents.
     
     Example::
-        >>> console.print(Panel("Hello, World!))
+        >>> console.print(Panel("Hello, World!"))
 
     Args:
         renderable (RenderableType): A console renderable object.

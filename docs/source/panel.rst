@@ -7,4 +7,4 @@ To draw a border around any content construct a :class:`~rich.panel.Panel` objec
     from rich.panel import Panel
     print(Panel("Hello, [red]World!"))
 
-You can draw a panel around anything that Rich knows how to render.
+You can change the style of the panel by setting the ``box`` argument to the Panel constructor. See :ref:`appendix-box` for a list of available box styles.
