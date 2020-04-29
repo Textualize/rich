@@ -1,4 +1,5 @@
 .. _console_markup:
+
 Console Markup
 ==============
 
@@ -44,5 +45,3 @@ Markup API
 ----------
 
 You can convert a string to styled text by calling :meth:`~rich.text.Text.from_markup`, which returns a :class:`~rich.text.Text` instance you can print or add more styles to.
-
-
