@@ -63,16 +63,9 @@ class RegexHighlighter(Highlighter):
             text (~Text): Text to highlighted.
         
         """
-        str_text = str(text)
-        base_style = self.base_style
-        stylize = text.stylize
-        for highlight in self.highlights:
-            for match in finditer(highlight, str_text):
-                _span = match.span
-                for name, _ in match.groupdict().items():
-                    start, end = _span(name)
-                    if start != -1:
-                        stylize(start, end, f"{base_style}{name}")
+        highlight_regex = text.highlight_regex
+        for re_highlight in self.highlights:
+            highlight_regex(re_highlight, style_prefix=self.base_style)
 
 
 class ReprHighlighter(RegexHighlighter):
@@ -87,48 +80,8 @@ class ReprHighlighter(RegexHighlighter):
         r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*\b)",
         r"(?P<number>0x[0-9a-f]*)",
         r"(?P<path>(\/\w+)+\/)",
-        r"(?P<filename>\/\w*\..{3,4})\s",
+        r"(?P<filename>\/\w*\.\w{3,4})\s",
         r"(?<!\\)(?P<str>b?\'\'\'.*?(?<!\\)\'\'\'|b?\'.*?(?<!\\)\'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
-        r"(?P<url>https?:\/\/\S*)",
+        r"(?P<url>https?:\/\/[0-9a-zA-Z\$\-\_\+\!`\(\)\,\.\?\/\;\:\&\=\%]*)",
         r"(?P<uuid>[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12})",
     ]
-
-
-if __name__ == "__main__":  # pragma: no cover
-    from .console import Console
-
-    console = Console()
-
-    highlighter = ReprHighlighter()
-
-    console.print(
-        highlighter(
-            '''"""hello True""" print("foo", egg=5) <div class=foo bar=4>  <div class="foo"> [1, 2, 3,4] a=None qwewe True False'''
-        )
-    )
-
-    console.print(highlighter(r'"Hello \"World!\"!"'))
-    console.print(highlighter("b34a234-c3d42ef-3241"))
-    console.print(highlighter("234234"))
-    console.print(highlighter("0x234234"))
-    console.print(highlighter("234234"))
-    console.print(highlighter("234234 + 234234+-123"))
-
-    from uuid import uuid4
-
-    console.print(highlighter(str(uuid4())))
-
-    from .default_styles import MARKDOWN_STYLES
-    from pprint import PrettyPrinter
-
-    pp = PrettyPrinter(indent=4, compact=False)
-
-    # console.print(highlighter(pp.pformat(MARKDOWN_STYLES)))
-
-    t = Text('''"""hello True""" <div class=foo>''')
-
-    t.stylize(9, 13, "bold")
-
-    t.stylize(0, 16, "red not bold important")
-
-    console.print(t)

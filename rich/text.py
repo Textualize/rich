@@ -260,7 +260,7 @@ class Text:
         self._spans.append(Span(max(0, start), min(length, end), style))
 
     def highlight_regex(
-        self, re_highlight: str, style: Union[str, Style] = None
+        self, re_highlight: str, style: Union[str, Style] = None, style_prefix: str = ""
     ) -> int:
         """Highlight text with a regular expression, where group names are 
         translated to styles.
@@ -268,6 +268,7 @@ class Text:
         Args:
             re_highlight (str): A regular expression.
             style (Union[str, Style]): Optional style to apply to whole match.
+            style_prefix (str, optional): Optional prefix to add to style group names.
         
         Returns:
             int: Number of regex matches
@@ -284,7 +285,7 @@ class Text:
             for name, _ in match.groupdict().items():
                 start, end = _span(name)
                 if start != -1:
-                    append_span(_Span(start, end, name))
+                    append_span(_Span(start, end, f"{style_prefix}{name}"))
         return count
 
     def highlight_words(

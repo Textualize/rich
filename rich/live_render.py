@@ -44,31 +44,3 @@ class LiveRender:
             yield from line
             if not last:
                 yield Segment.line()
-
-
-if __name__ == "__main__":  # pragma: no cover
-    from .bar import Bar
-    from .table import Table
-
-    bars = [Bar(total=1000) for _ in range(3)]
-    table = Table(show_header=False, show_edge=False, box=None, padding=0, width=50)
-    for bar in bars:
-        table.add_row(bar)
-
-    refresh = LiveRender(table)
-
-    from time import sleep
-    from random import randint
-
-    console = Console()
-
-    console.show_cursor(False)
-    try:
-        for n in range(5000):
-            bar = bars[randint(0, len(bars) - 1)]
-            bar.update(bar.completed + 1)
-            sleep(0.01)
-            console.print(refresh)
-
-    finally:
-        console.show_cursor(True)

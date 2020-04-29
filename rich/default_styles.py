@@ -64,7 +64,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.bool_true": Style(color="bright_green", italic=True),
     "repr.bool_false": Style(color="bright_red", italic=True),
     "repr.none": Style(color="magenta", italic=True),
-    "repr.url": Style(underline=True, color="bright_blue", bold=False),
+    "repr.url": Style(underline=True, color="bright_blue", italic=False, bold=False),
     "repr.uuid": Style(color="bright_yellow", bold=False),
     "rule.line": Style(color="bright_green"),
     "rule.text": Style(),
@@ -121,9 +121,3 @@ MARKDOWN_STYLES = {
 
 
 DEFAULT_STYLES.update(MARKDOWN_STYLES)
-
-if __name__ == "__main__":  # pragma: no cover
-    import token
-
-    for name in token.tok_name.values():
-        print(f'"python.{name.lower()}" : Style(),')

@@ -17,7 +17,17 @@ PaddingDimensions = Union[int, Tuple[int], Tuple[int, int], Tuple[int, int, int,
 
 
 class Padding:
-    """Draw space around a console renderable."""
+    """Draw space around content.
+
+    Example:        
+        >>> print(Padding("Hello", (2, 4), style="on blue"))
+
+    Args:
+        renderable (RenderableType): String or other renderable.
+        pad (Union[int, Tuple[int]]): Padding for top, right, bottom, and left borders.
+            May be specified with 1, 2, or 4 integers (CSS style).
+        style (Union[str, Style], optional): Style for padding characters. Defaults to "none".
+    """
 
     def __init__(
         self,
@@ -31,8 +41,18 @@ class Padding:
         self.style = style
 
     @classmethod
-    def indent(cls, renderable: "RenderableType", pad_amount: int) -> "Padding":
-        return Padding(renderable, pad=(0, 0, 0, pad_amount))
+    def indent(cls, renderable: "RenderableType", level: int) -> "Padding":
+        """Make padding instance to render an indent.
+
+        Args:
+            renderable (RenderableType): String or other renderable.
+            level (int): Number of characters to indent.
+
+        Returns:
+            Padding: A Padding instance.
+        """
+
+        return Padding(renderable, pad=(0, 0, 0, level))
 
     @staticmethod
     def unpack(pad: "PaddingDimensions") -> Tuple[int, int, int, int]:

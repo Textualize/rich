@@ -12,6 +12,7 @@ Reference
    reference/logging.rst
    reference/markdown.rst
    reference/measure.rst
+   reference/padding.rst
    reference/panel.rst
    reference/progress.rst
    reference/rule.rst
