@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class Measurement(NamedTuple):
-    """Range of widths for a renderable object."""
+    """Stores the minimum and maximum widths (in characters) required to render an object."""
 
     minimum: int
     maximum: int
@@ -41,7 +41,20 @@ class Measurement(NamedTuple):
     def get(
         cls, console: "Console", renderable: "RenderableType", max_width: int
     ) -> "Measurement":
-        """Get desired width for a renderable."""
+        """Get a measurement for a renderable.
+
+        Args:
+            console (~rich.console.Console): Console instance.
+            renderable (RenderableType): An object that may be rendered with Rich.
+            max_width (int): The maximum width available.
+
+        Raises:
+            errors.NotRenderableError: If the object is not renderable.
+
+        Returns:
+            Measurement: Measurement object containing range of character widths required to render the object.
+        """
+
         if isinstance(renderable, str):
             renderable = console.render_str(renderable)
         if is_renderable(renderable):
@@ -63,7 +76,17 @@ class Measurement(NamedTuple):
 def measure_renderables(
     console: "Console", renderables: Iterable["RenderableType"], max_width: int
 ) -> "Measurement":
-    """Measure a number of renderables."""
+    """Get a measurement that would fit a number of renderables.
+
+    Args:
+        console (~rich.console.Console): Console instance.
+        renderables (Iterable[RenderableType]): One or more renderable objects.
+        max_width (int): The maximum width available.
+
+    Returns:
+        Measurement: Measurement object containing range of character widths required to
+        contain all given renderables.
+    """
 
     get_measurement = Measurement.get
     measurements = [
