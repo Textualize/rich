@@ -25,9 +25,11 @@ from typing import (
 )
 
 from .bar import Bar
-from .console import Console, RenderableType
+from .console import Console, JustifyValues, RenderableType
+from .highlighter import Highlighter
 from . import filesize
 from .live_render import LiveRender
+from .style import StyleType
 from .table import Table
 from .text import Text
 
@@ -111,6 +113,35 @@ class ProgressColumn(ABC):
     @abstractmethod
     def render(self, task: "Task") -> RenderableType:
         """Should return a renderable object."""
+
+
+class TextColumn(ProgressColumn):
+    """A column containing text."""
+
+    def __init__(
+        self,
+        text_format: str,
+        style: StyleType = "none",
+        justify: JustifyValues = "left",
+        markup: bool = True,
+        highlighter: Highlighter = None,
+    ) -> None:
+        self.text_format = text_format
+        self.justify = justify
+        self.style = style
+        self.markup = markup
+        self.highlighter = highlighter
+        super().__init__()
+
+    def render(self, task: "Task"):
+        _text = self.text_format.format(task=task)
+        if self.markup:
+            text = Text.from_markup(_text, style=self.style, justify=self.justify)
+        else:
+            text = Text(_text, style=self.style, justify=self.justify)
+        if self.highlighter:
+            self.highlighter.highlight(text)
+        return text
 
 
 class BarColumn(ProgressColumn):
@@ -309,9 +340,10 @@ class Progress:
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self.columns = columns or (
-            "[progress.description]{task.description}",
+            TextColumn("[progress.description]{task.description}", justify="right"),
             BarColumn(),
             "[progress.percentage]{task.percentage:>3.0f}%",
+            "•",
             TimeRemainingColumn(),
         )
         self.console = console or Console(file=sys.stderr)
@@ -515,6 +547,7 @@ class Progress:
     def _table(self) -> Table:
         """Get a table to render the Progress display."""
         table = Table.grid()
+        table.pad_edge = True
         table.padding = (0, 1, 0, 0)
         for _ in self.columns:
             table.add_column()
@@ -592,12 +625,12 @@ if __name__ == "__main__":  # pragma: no coverage
 
     with Progress() as progress:
 
-        task1 = progress.add_task("[red]Downloading...", total=1000)
-        task2 = progress.add_task("[green]Processing...", total=1000)
-        task3 = progress.add_task("[cyan]Cooking...", total=1000)
+        task1 = progress.add_task(" [red]Downloading", total=1000)
+        task2 = progress.add_task(" [green]Processing", total=1000)
+        task3 = progress.add_task(" [cyan]Cooking", total=1000)
 
         while not progress.finished:
             progress.update(task1, advance=0.5)
             progress.update(task2, advance=0.3)
             progress.update(task3, advance=0.9)
-            time.sleep(0.02)
+            time.sleep(0.01)

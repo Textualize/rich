@@ -14,6 +14,7 @@ from urllib.request import urlopen
 from rich.progress import (
     BarColumn,
     DownloadColumn,
+    TextColumn,
     TransferSpeedColumn,
     TimeRemainingColumn,
     Progress,
@@ -22,9 +23,9 @@ from rich.progress import (
 
 
 progress = Progress(
-    "[bold blue]{task.fields[filename]}",
+    TextColumn("[bold blue]{task.fields[filename]}", justify="right"),
     BarColumn(bar_width=None),
-    "[progress.percentage]{task.percentage:>3.0f}%",
+    "[progress.percentage]{task.percentage:>3.1f}%",
     "•",
     DownloadColumn(),
     "•",
@@ -57,6 +58,7 @@ def download(urls: Iterable[str], dest_dir: str):
 
 
 if __name__ == "__main__":
+    # Try with https://releases.ubuntu.com/20.04/ubuntu-20.04-desktop-amd64.iso
     if sys.argv[1:]:
         download(sys.argv[1:], "./")
     else:

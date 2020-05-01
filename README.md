@@ -125,9 +125,9 @@ Please use this feature wisely.
 
 ## Progress Bars
 
-Rich can render multiple flicker-free progress bars to track long-running tasks.
+Rich can render multiple flicker-free [progress](https://rich.readthedocs.io/en/latest/progress.html) bars to track long-running tasks.
 
-For basic usage, wrap any sequence in the `track` method and iterate over the result. Here's an example:
+For basic usage, wrap any sequence in the `track` function and iterate over the result. Here's an example:
 
 ```python
 from rich.progress import track
@@ -138,7 +138,13 @@ for step in track(range(100)):
 
 It's not much harder to add multiple progress bars. Here's an example taken from the docs:
 
-![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.png)
+![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
+
+The columns may be configured to show any details you want. Built-in columns include percentage complete, file size, file speed, and time remaining. Here's another example showing a download in progress::
+
+![progress](https://github.com/willmcgugan/rich/raw/master/imgs/downloader.gif)
+
+To try this out yourself, see [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) which can download multiple URLs simultaneously while displaying progress.
 
 ## Markdown
 
