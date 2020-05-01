@@ -1,6 +1,7 @@
 [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
 [![PyPI](https://img.shields.io/pypi/pyversions/rich.svg)](https://pypi.org/project/rich/)
 [![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich/month)
+[![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://awesome-python.com/#command-line-interface-development)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
 # Rich
