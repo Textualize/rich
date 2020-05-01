@@ -340,10 +340,9 @@ class Progress:
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self.columns = columns or (
-            TextColumn("[progress.description]{task.description}", justify="right"),
+            "[progress.description]{task.description}",
             BarColumn(),
             "[progress.percentage]{task.percentage:>3.0f}%",
-            "•",
             TimeRemainingColumn(),
         )
         self.console = console or Console(file=sys.stderr)
