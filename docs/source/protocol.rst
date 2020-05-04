@@ -31,6 +31,7 @@ The ``__console__`` method should accept a :class:`~rich.console.Console` and a 
 Here's an example of a ``__console__`` method::
 
     from rich.console import Console, ConsoleOptions, RenderResult
+    from rich.table import Table
 
     @dataclass
     class Student:
