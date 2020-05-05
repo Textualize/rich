@@ -55,7 +55,7 @@ For complete control over how a custom object is rendered to the terminal, you c
     class MyObject:
         def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
             yield Segment("My", "magenta")
-            yield Segment("Object", green")
+            yield Segment("Object", "green")
             yield Segment("()", "cyan")
 
 
