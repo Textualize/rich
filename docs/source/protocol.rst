@@ -31,6 +31,7 @@ The ``__console__`` method should accept a :class:`~rich.console.Console` and a 
 Here's an example of a ``__console__`` method::
 
     from rich.console import Console, ConsoleOptions, RenderResult
+    from rich.table import Table
 
     @dataclass
     class Student:
@@ -39,7 +40,7 @@ Here's an example of a ``__console__`` method::
         age: int
         def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
             yield f"[b]Student:[/b] #{self.id}"
-            my_table = Table("Attribute, "Value")
+            my_table = Table("Attribute", "Value")
             my_table.add_row("name", self.name)
             my_table.add_row("age", str(self.age))
             yield my_table
