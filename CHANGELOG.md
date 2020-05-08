@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.1] - 2020-05-08
 
+### Fixed
+
+- Issue with Windows legacy support https://github.com/willmcgugan/rich/issues/59
+
+## [1.0.1] - 2020-05-08
+
 ### Changed
 
 - Applied console markup after highlighting

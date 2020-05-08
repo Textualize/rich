@@ -210,8 +210,12 @@ class ConsoleThreadLocals(threading.local):
     control: List[str] = field(default_factory=list)
 
 
-def _enable_legacy_windows_support() -> None:
-    """Initialize Windows legacy support."""
+def detect_legacy_windows() -> bool:
+    """Detect legacy Windows."""
+    return "WINDIR" in os.environ and "WT_SESSION" not in os.environ
+
+
+if detect_legacy_windows():
     from colorama import init
 
     init()
@@ -266,12 +270,11 @@ class Console:
         self._markup = markup
         self._emoji = emoji
         self._highlight = highlight
-        self.legacy_windows: bool = "WINDIR" in os.environ and not "WT_SESSION" in os.environ
+        self.legacy_windows: bool = detect_legacy_windows()
 
         self._color_system: Optional[ColorSystem]
         self._force_terminal = force_terminal
         if self.legacy_windows:
-            _enable_legacy_windows_support()
             self.file = file or sys.stdout
             self._color_system = COLOR_SYSTEMS["windows"]
         else:
