@@ -19,3 +19,11 @@ Rich can render Markdown to the console. To render markdown, construct a :class:
     console.print(md)
 
 Note that code blocks are rendered with full syntax highlighting!
+
+You can also use the Markdown class from the command line. The following example displays a readme in the terminal::
+
+    python -m rich.markdown README.md
+
+Run the following to see the full list of arguments for the markdown command::
+
+    python -m rich.markdown -h
