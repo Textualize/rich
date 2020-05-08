@@ -23,9 +23,9 @@ class Panel:
     Args:
         renderable (RenderableType): A console renderable object.
         box (Box, optional): A Box instance that defines the look of the border.
-            Defaults to box.SQUARE.
+            Defaults to box.ROUNDED.
         expand (bool, optional): If True the panel will stretch to fill the console 
-            width, otherwise it will be sized to fit the contents. Defaults to False.
+            width, otherwise it will be sized to fit the contents. Defaults to True.
         style (str, optional): The style of the border. Defaults to "none".
         width (Optional[int], optional): Optional width of panel. Defaults to None to auto-detect.
     """
