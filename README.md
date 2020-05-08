@@ -149,7 +149,7 @@ To try this out yourself, see [examples/downloader.py](https://github.com/willmc
 
 ## Markdown
 
-Rich can render markdown and does a reasonable job of translating the formatting to the terminal.
+Rich can render [markdown](https://rich.readthedocs.io/en/latest/markdown.html) and does a reasonable job of translating the formatting to the terminal.
 
 To render markdown import the `Markdown` class and construct it with a string containing markdown code. Then print it to the console. Here's an example:
 
@@ -169,7 +169,7 @@ This will produce output something like the following:
 
 ## Syntax Highlighting
 
-Rich uses the [pygments](https://pygments.org/) library to implement syntax highlighting. Usage is similar to rendering markdown; construct a `Syntax` object and print it to the console. Here's an example:
+Rich uses the [pygments](https://pygments.org/) library to implement [syntax highlighting](https://rich.readthedocs.io/en/latest/syntax.html). Usage is similar to rendering markdown; construct a `Syntax` object and print it to the console. Here's an example:
 
 ```python
 from rich.console import Console
