@@ -141,7 +141,7 @@ It's not much harder to add multiple progress bars. Here's an example taken from
 
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
 
-The columns may be configured to show any details you want. Built-in columns include percentage complete, file size, file speed, and time remaining. Here's another example showing a download in progress::
+The columns may be configured to show any details you want. Built-in columns include percentage complete, file size, file speed, and time remaining. Here's another example showing a download in progress:
 
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/downloader.gif)
 
