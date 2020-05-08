@@ -289,12 +289,55 @@ class Syntax:
 
 if __name__ == "__main__":  # pragma: no cover
 
-    import sys
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Render Markdown to the console with Rich"
+    )
+    parser.add_argument("path", metavar="PATH", help="path to file")
+    parser.add_argument(
+        "-c",
+        "--force-color",
+        dest="force_color",
+        action="store_true",
+        help="force color for non-terminals",
+    )
+    parser.add_argument(
+        "-l",
+        "--line-numbers",
+        dest="line_numbers",
+        action="store_true",
+        help="render line numbers",
+    )
+    parser.add_argument(
+        "-w",
+        "--width",
+        type=int,
+        dest="width",
+        default=None,
+        help="width of output (default will auto-detect)",
+    )
+    parser.add_argument(
+        "-r",
+        "--wrap",
+        dest="word_wrap",
+        action="store_true",
+        default=False,
+        help="word wrap long lines",
+    )
+    parser.add_argument(
+        "-t", "--theme", dest="theme", default="monokai", help="pygments theme"
+    )
+    args = parser.parse_args()
+
     from rich.console import Console
 
-    console = Console()
+    console = Console(force_terminal=args.force_color, width=args.width)
 
     syntax = Syntax.from_path(
-        sys.argv[1], line_numbers=True, word_wrap=False, theme="default"
+        args.path,
+        line_numbers=args.line_numbers,
+        word_wrap=args.word_wrap,
+        theme=args.theme,
     )
     console.print(syntax)
