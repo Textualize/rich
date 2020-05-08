@@ -462,7 +462,7 @@ if __name__ == "__main__":  # pragma: no cover
     parser = argparse.ArgumentParser(
         description="Render Markdown to the console with Rich"
     )
-    parser.add_argument("path", metavar="PATH", help="Path to markdown file")
+    parser.add_argument("path", metavar="PATH", help="path to markdown file")
     parser.add_argument(
         "-c",
         "--force-color",
