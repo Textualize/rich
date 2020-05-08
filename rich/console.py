@@ -544,6 +544,7 @@ class Console:
         style: Union[str, Style] = "",
         emoji: bool = None,
         markup: bool = None,
+        highlighter: HighlighterType = None,
     ) -> "Text":
         """Convert a string to a Text instance.
 
@@ -552,6 +553,7 @@ class Console:
             style (Union[str, Style], optional): Style to apply to rendered text.
             emoji (Optional[bool], optional): Enable emoji, or ``None`` to use Console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use Console default.
+            highlighter (HighlighterType, optional): Optional highlighter to apply.
         Returns:
             ConsoleRenderable: Renderable object.
 
@@ -559,16 +561,19 @@ class Console:
         emoji_enabled = emoji or (emoji is None and self._emoji)
         markup_enabled = markup or (markup is None and self._markup)
 
-        if emoji_enabled:
-            if markup_enabled:
-                return render_markup(text, style=style)
-            else:
-                text = _emoji_replace(text)
+        if markup_enabled:
+            rich_text = render_markup(text, style=style, emoji=emoji_enabled)
         else:
-            if markup_enabled:
-                return render_markup(text, style=style, emoji=False)
+            rich_text = Text(
+                _emoji_replace(text) if emoji_enabled else text, style=style
+            )
 
-        return Text(text, style=style)
+        if highlighter is not None:
+            highlight_text = highlighter(str(rich_text))
+            highlight_text.copy_styles(rich_text)
+            return highlight_text
+
+        return rich_text
 
     def get_style(
         self, name: Union[str, Style], *, default: Union[Style, str] = None
@@ -638,8 +643,8 @@ class Console:
                 renderable = rich_cast()
             if isinstance(renderable, str):
                 append_text(
-                    _highlighter(
-                        self.render_str(renderable, emoji=emoji, markup=markup)
+                    self.render_str(
+                        renderable, emoji=emoji, markup=markup, highlighter=_highlighter
                     )
                 )
             elif isinstance(renderable, Text):

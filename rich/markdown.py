@@ -174,7 +174,7 @@ class CodeBlock(TextElement):
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         code = str(self.text).rstrip()
         syntax = Syntax(code, self.lexer_name, theme=self.theme)
-        yield syntax
+        yield Panel(syntax, style="dim")
 
 
 class BlockQuote(TextElement):
@@ -289,6 +289,35 @@ class ListItem(TextElement):
             yield new_line
 
 
+class ImageItem(MarkdownElement):
+    """Renders a placeholder for an image."""
+
+    new_line = False
+
+    @classmethod
+    def create(cls, markdown: "Markdown", node: Any) -> "MarkdownElement":
+        """Factory to create markdown element,
+        
+        Args:
+            markdown (Markdown): THe parent Markdown object.
+            node (Any): A node from Pygments.
+        
+        Returns:
+            MarkdownElement: A new markdown element
+        """
+        return cls(node.title, node.destination)
+
+    def __init__(self, title: Optional[str], destination: str) -> None:
+        self.title = title
+        self.destination = destination
+        super().__init__()
+
+    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+        yield Text.assemble(
+            (self.title or "🌆", "italic"), " ", f"({self.destination}) ", end=""
+        )
+
+
 class MarkdownContext:
     """Manages the console render state."""
 
@@ -320,6 +349,14 @@ class MarkdownContext:
 
 
 class Markdown:
+    """A Markdown renderable.
+
+    Args:
+        markup (str): A string containing markdown.
+        code_theme (str, optional): Pygments theme for code blocks. Defaults to "monokai".
+        justify (JustifyValues, optional): Justify value for paragraphs. Defaults to None.
+        style (Union[str, Style], optional): Optional style to apply to markdown.
+    """
 
     elements: ClassVar[Dict[str, Type[MarkdownElement]]] = {
         "paragraph": Paragraph,
@@ -329,6 +366,7 @@ class Markdown:
         "thematic_break": HorizontalRule,
         "list": ListElement,
         "item": ListItem,
+        "image": ImageItem,
     }
     inlines = {"emph", "strong", "code", "link", "strike"}
 
@@ -339,7 +377,6 @@ class Markdown:
         justify: JustifyValues = None,
         style: Union[str, Style] = "none",
     ) -> None:
-        """Parses the markup."""
         self.markup = markup
         parser = Parser()
         self.parsed = parser.parse(markup)
@@ -420,57 +457,32 @@ class Markdown:
 
 if __name__ == "__main__":  # pragma: no cover
 
-    markup = """
-An h1 header
-============
-Paragraphs are separated by a blank line.
-2nd paragraph. *Italic*, **bold**, and `monospace`. Itemized lists look like:
-* this one
-* that one
-* the other one
-Note that --- not considering the asterisk --- the actual text content starts at 4-columns in.
-> Block quotes are
-> written like so.
->
-> They can span multiple paragraphs,
-> if you like.
-Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., "it's all in chapters 12--14"). Three dots ... will be converted to an ellipsis. Unicode is supported. ☺
-An h2 header
-------------
-```python
-    @classmethod
-    def adjust_line_length(
-        cls, line: List[Segment], length: int, style: Style = None
-    ) -> List[Segment]:        
-        line_length = sum(len(text) for text, _style in line)
-        if line_length < length:
-            return line[:] + [Segment(" " * (length - line_length), style)]
-        elif line_length > length:
-            line_length = 0
-            new_line: List[Segment] = []
-            append = new_line.append
-            for segment in line:
-                segment_length = len(segment.text)
-                if line_length + segment_length < length:
-                    append(segment)
-                    line_length += segment_length
-                else:
-                    text, style = segment
-                    append(Segment(text[: length - line_length], style))
-                    break
-            return new_line
-        return line
-```
-    """
+    import argparse
 
-    import commonmark
+    parser = argparse.ArgumentParser(
+        description="Render Markdown to the console with Rich"
+    )
+    parser.add_argument("path", metavar="PATH", help="Path to markdown file")
+    parser.add_argument(
+        "-c",
+        "--force-color",
+        dest="force_color",
+        action="store_true",
+        help="force color for non-terminals",
+    )
+    parser.add_argument(
+        "-w",
+        "--width",
+        type=int,
+        dest="width",
+        default=None,
+        help="width of output (default will auto-detect)",
+    )
+    args = parser.parse_args()
 
-    from .console import Console
+    from rich.console import Console
 
-    console = Console(record=True)
-
-    md = Markdown(markup)
-
-    from time import time
-
-    console.print(md)
+    console = Console(force_terminal=args.force_color, width=args.width)
+    with open(args.path, "rt") as markdown_file:
+        markdown = Markdown(markdown_file.read())
+    console.print(markdown)

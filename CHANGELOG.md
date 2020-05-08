@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2020-05-08
+
+### Changed
+
+- Applied console markup after highlighting
+- Documented highlighting
+- Changed Markup parser to handle overlapping styles
+- Relaxed dependency on colorama
+- Allowed Theme to accept values as style definitions (str) as well as Style instances
+- Added a panel to emphasize code in Markdown
+
+### Added
+
+- Added markup.escape
+- Added `python -m rich.theme` command
+- Added `python -m rich.markdown` command
+- Added rendering of images in Readme (links only)
+
+### Fixed
+
+- Fixed Text.assemble not working with strings https://github.com/willmcgugan/rich/issues/57
+- Fixed table when column widths must be compressed to fit
+
 ## [1.0.0] - 2020-05-03
 
 ### Changed

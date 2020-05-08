@@ -13,14 +13,15 @@ Welcome to Rich's documentation!
    introduction.rst
    console.rst
    style.rst
+   text.rst
+   highlighting.rst
    markup.rst
    tables.rst
    panel.rst
    logging.rst
    progress.rst
    markdown.rst
-   syntax.rst
-   text.rst
+   syntax.rst   
    traceback.rst
    protocol.rst
 

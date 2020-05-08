@@ -64,6 +64,15 @@ def test_print_empty():
     assert console.file.getvalue() == "\n"
 
 
+def test_markup_highlight():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print("'[bold]foo[/bold]'")
+    assert (
+        console.file.getvalue()
+        == "\x1b[32m'\x1b[0m\x1b[1;32mfoo\x1b[0m\x1b[32m'\x1b[0m\n"
+    )
+
+
 def test_print_style():
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print("foo", style="bold")

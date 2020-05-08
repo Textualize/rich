@@ -44,6 +44,8 @@ An [example](http://example.com).
 >
 > Lorem ipsum
 
+![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
+
 
 ```
 a=1

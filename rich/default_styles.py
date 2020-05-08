@@ -108,7 +108,7 @@ MARKDOWN_STYLES = {
     "markdown.item.number": Style(color="yellow", bold=True),
     "markdown.hr": Style(dim=True),
     "markdown.h1.border": Style(),
-    "markdown.h1": Style(bold=True),
+    "markdown.h1": Style(bold=True,),
     "markdown.h2": Style(bold=True, underline=True),
     "markdown.h3": Style(bold=True),
     "markdown.h4": Style(bold=True, dim=True),

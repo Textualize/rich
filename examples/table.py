@@ -9,7 +9,7 @@ from rich.table import Table
 
 table = Table(title="Star Wars Movies")
 
-table.add_column("Released", justify="right", style="cyan", no_wrap=True)
+table.add_column("Released", style="cyan", no_wrap=True)
 table.add_column("Title", style="magenta")
 table.add_column("Box Office", justify="right", style="green")
 
@@ -20,4 +20,3 @@ table.add_row("Dec 16, 2016", "Rouge One: A Star Wars Story", "$1,332,439,889")
 
 console = Console()
 console.print(table)
-

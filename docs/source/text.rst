@@ -3,7 +3,7 @@
 Rich Text
 =========
 
-Rich has a :class:`~rich.text.Text` class for text that may be marked up with color and style attributes. You can consider this class to be like a mutable string with additional style information. The methods on the Text() instance are similar to a Python ``str`` but are designed to preserve the styles.
+Rich has a :class:`~rich.text.Text` class which you can use to mark up strings with color and style attributes. You can consider this class to be like a mutable string with additional style information.
 
 One way to add a style to Text is the :meth:`~rich.text.Text.stylize` method which applies a style to a start and end offset. Here is an example::
 

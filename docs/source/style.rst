@@ -49,6 +49,12 @@ Style attributes and colors may be used in combination with each other. For exam
 
     console.print("Danger, Will Robinson!", style="blink bold red underline on white")
 
+Styles may be negated by prefixing the attribute with the word "not". This can be used to turn off styles if they overlap. For example::
+
+    console.print("foo [not bold]bar[/not bold] baz", style="bold")
+
+This will print "foo" and "baz" in bold, but "bar" will be in normal text.
+
 
 Style Class
 -----------
@@ -63,6 +69,9 @@ It is slightly quicker to construct a Style class like this, since a style defin
 You can parse a style definition explicitly with the :meth:`~rich.style.Style.parse` method.
 
 
+.. _themes:
+
+
 Style Themes
 ------------
 
@@ -75,9 +84,9 @@ To use a style theme, construct a :class:`rich.theme.Theme` instance and pass it
     from rich.console import Console
     from rich.theme import Theme
     custom_theme = Theme({
-        "info" : Style.parse("dim cyan"),
-        "warning": Style.parse("magenta"),
-        "danger": Style.parse("bold red")
+        "info" : "dim cyan",
+        "warning": "magenta",
+        "danger": "bold red"
     })
     console = Console(theme=custom_theme)
     console.print("This is information", style="info")
@@ -95,3 +104,7 @@ If you prefer you can write your styles in an external config file rather than i
     danger = bold red
 
 You can read these files with the :meth:`~rich.theme.Theme.read` method.
+
+To see the default theme, run the following command::
+
+    python -m rich.theme

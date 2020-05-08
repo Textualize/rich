@@ -146,7 +146,7 @@ class Table:
         """Get a table with no lines, headers, or footer.
 
         Args:
-            padding (PaddingDimensions, optional): Get padding arround cells. Defaults to 0.
+            padding (PaddingDimensions, optional): Get padding around cells. Defaults to 0.
         
         Returns:
             Table: A table instance.
@@ -366,9 +366,13 @@ class Table:
         if table_width > max_width:
             flex_widths = [_range.span for _range in width_ranges]
             if not any(flex_widths):
-                flex_widths = [0 if column.no_wrap else 1 for column in columns]
+                flex_widths = [
+                    0 if column.no_wrap else width
+                    for column, width in zip(columns, widths)
+                ]
                 if not any(flex_widths):
                     return widths
+
             excess_width = table_width - max_width
             widths = [
                 max(1 + padding_width, width - excess_width)
@@ -379,7 +383,6 @@ class Table:
         elif table_width < max_width and self.expand:
             pad_widths = ratio_divide(max_width - table_width, widths)
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
-
         return widths
 
     def _get_cells(self, column_index: int, column: Column) -> Iterable[_Cell]:
@@ -558,7 +561,6 @@ if __name__ == "__main__":  # pragma: no cover
         expand=True,
         show_header=True,
         show_footer=False,
-        box=box.MINIMAL_DOUBLE_HEAD,
         show_edge=True,
     )
     table.add_column("foo", no_wrap=True, footer="BAR")

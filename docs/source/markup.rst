@@ -14,7 +14,7 @@ Console markup uses a syntax inspired by `bbcode <https://en.wikipedia.org/wiki/
 Here's a simple example::
 
     from rich import print
-    print("[bold red]alert![/bold red] *Something happened*")
+    print("[bold red]alert![/bold red] Something happened")
 
 If you don't close a style, it will apply until the end of the string. Which is sometimes convenient if you want to style a single line. For example::
 
@@ -30,7 +30,9 @@ Escaping
 
 Occasionally you may want to print something that Rich would interpret as markup. You can *escape* square brackets by doubling them up. Here's an example::
 
-    print("foo[[bar]]")
+    >>> from rich import print
+    >>> print("foo[[bar]]")
+    foo[bar]
 
 
 Rendering Markup

@@ -22,7 +22,7 @@ from .cells import cell_len
 from .containers import Lines
 from .measure import Measurement
 from .segment import Segment
-from .style import Style
+from .style import Style, StyleType
 
 if TYPE_CHECKING:  # pragma: no cover
     from .console import (
@@ -105,13 +105,14 @@ class Text:
         justify: "JustifyValues" = None,
         end: str = "\n",
         tab_size: Optional[int] = 8,
+        spans: List[Span] = None,
     ) -> None:
         self._text: List[str] = [text] if text else []
         self.style = style
         self.justify = justify
         self.end = end
         self.tab_size = tab_size
-        self._spans: List[Span] = []
+        self._spans: List[Span] = spans if spans is not None else []
         self._length: int = len(text)
 
     def __len__(self) -> int:
@@ -172,7 +173,7 @@ class Text:
     @classmethod
     def assemble(
         cls,
-        *parts: Tuple[str, Union[str, Style]],
+        *parts: Union[str, Tuple[str, StyleType]],
         style: Union[str, Style] = "",
         justify: "JustifyValues" = None,
         end: str = "\n",
@@ -193,7 +194,10 @@ class Text:
         text = cls(style=style, justify=justify, end=end, tab_size=tab_size)
         append = text.append
         for part in parts:
-            append(*part)
+            if isinstance(part, str):
+                append(part)
+            else:
+                append(*part)
         return text
 
     @property
@@ -205,19 +209,23 @@ class Text:
         return self._text[0] if self._text else ""
 
     @text.setter
-    def text(self, new_text: str) -> "Text":
+    def text(self, new_text: str) -> None:
         """Set the text to a new value."""
         self._text[:] = [new_text]
         old_length = self._length
         self._length = len(new_text)
         if old_length > self._length:
             self._trim_spans()
-        return self
 
     @property
     def spans(self) -> List[Span]:
         """Get a copy of the list of spans."""
         return self._spans[:]
+
+    @spans.setter
+    def spans(self, spans: List[Span]) -> None:
+        """Set spans."""
+        self._spans = spans[:]
 
     def blank_copy(self) -> "Text":
         """Return a new Text instance with copied meta data (but not the string or spans)."""
@@ -248,9 +256,7 @@ class Text:
             start (int): Start offset.
             end (int): End offset.
             style (Union[str, Style]): Style instance or style definition to apply.
-        
-        Returns:
-            None: 
+
         """
         length = len(self)
         if end < 0 or start > length:
@@ -512,6 +518,8 @@ class Text:
             text (Union[Text, str]): A str or Text to append.
             style (str, optional): A style name. Defaults to None.
         """
+        if not len(text):
+            return
         if isinstance(text, str):
             self._text.append(text)
             offset = len(self)
@@ -535,6 +543,14 @@ class Text:
             self._length += len(text)
         else:
             raise TypeError("Only str or Text can be appended to Text")
+
+    def copy_styles(self, text: "Text") -> None:
+        """Copy styles from another Text instance.
+
+        Args:
+            text (Text): A Text instance to copy styles from, must be the same length.
+        """
+        self._spans.extend(text._spans)
 
     def split(self, separator="\n", include_separator: bool = False) -> Lines:
         r"""Split rich text in to lines, preserving styles.

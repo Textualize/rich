@@ -1,22 +1,27 @@
 import configparser
-from typing import Dict, IO
+from typing import IO, Mapping
 
 from .default_styles import DEFAULT_STYLES
-from .style import Style
+from .style import Style, StyleType
 
 
 class Theme:
-    """An container for style information, used by :class:`~rich.console.Console`.
+    """A container for style information, used by :class:`~rich.console.Console`.
     
     Args:
         styles (Dict[str, Style], optional): A mapping of style names on to styles. Defaults to None for empty styles.
         inherit (bool, optional): Switch to inherit default styles. Defaults to True.
     """
 
-    def __init__(self, styles: Dict[str, Style] = None, inherit: bool = True):
+    def __init__(self, styles: Mapping[str, StyleType] = None, inherit: bool = True):
         self.styles = DEFAULT_STYLES.copy() if inherit else {}
         if styles is not None:
-            self.styles.update(styles)
+            self.styles.update(
+                {
+                    name: style if isinstance(style, Style) else Style.parse(style)
+                    for name, style in styles.items()
+                }
+            )
 
     @property
     def config(self) -> str:
@@ -59,3 +64,12 @@ class Theme:
         """
         with open(path, "rt") as config_file:
             return cls.from_file(config_file, source=path, inherit=inherit)
+
+
+if __name__ == "__main__":  # pragma: no cover
+    from .console import Console
+    from .markup import escape
+
+    console = Console()
+    theme = Theme()
+    console.print(escape(theme.config))

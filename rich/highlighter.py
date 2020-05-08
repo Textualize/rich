@@ -85,3 +85,11 @@ class ReprHighlighter(RegexHighlighter):
         r"(?P<url>https?:\/\/[0-9a-zA-Z\$\-\_\+\!`\(\)\,\.\?\/\;\:\&\=\%]*)",
         r"(?P<uuid>[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12})",
     ]
+
+
+if __name__ == "__main__":  # pragma: no cover
+    from .console import Console
+
+    console = Console()
+    console.print("[bold green]hello world![/bold green]")
+    console.print("'[bold green]hello world![/bold green]'")

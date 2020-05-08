@@ -432,3 +432,10 @@ def test_emoji_switch():
     console = Console(file=StringIO(), emoji=False)
     console.print(":+1:")
     assert console.file.getvalue() == ":+1:\n"
+
+
+def test_assemble():
+    text = Text.assemble("foo", ("bar", "bold"))
+    assert str(text) == "foobar"
+    assert text._spans == [Span(3, 6, "bold")]
+

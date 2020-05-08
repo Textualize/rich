@@ -12,3 +12,5 @@ To syntax highlight code, construct a :class:`~rich.syntax.Syntax` object and pr
     console = Console()
     syntax = Syntax.from_path("syntax.py", line_numbers=True)
     console.print(syntax)
+
+The Syntax constructor (and :meth:`~rich.syntax.Syntax.from_path`) accept a ``theme`` attribute which should be the name of a `Pygments theme <https://pygments.org/demo/>`_.
