@@ -215,12 +215,12 @@ table.add_column("Title")
 table.add_column("Production Budget", justify="right")
 table.add_column("Box Office", justify="right")
 table.add_row(
-    "Dev 20, 2019", "Star Wars: The Rise of Skywalker", "$275,000,0000", "$375,126,118"
+    "Dev 20, 2019", "Star Wars: The Rise of Skywalker", "$275,000,000", "$375,126,118"
 )
 table.add_row(
     "May 25, 2018",
     "[red]Solo[/red]: A Star Wars Story",
-    "$275,000,0000",
+    "$275,000,000",
     "$393,151,347",
 )
 table.add_row(
