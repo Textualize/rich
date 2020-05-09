@@ -1,6 +1,6 @@
 from rich.__main__ import make_test_card
 
-from render import render
+from .render import render
 
 try:
     from _card_render import expected

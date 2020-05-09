@@ -2,7 +2,7 @@ import pytest
 
 from rich.bar import Bar
 
-from render import render
+from .render import render
 
 
 def test_init():

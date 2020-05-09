@@ -16,17 +16,16 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      - name: Install dependencies and build the package
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          make build
       - name: Typecheck with mypy
         run: |
-          pip install mypy
           make typecheck
       - name: Test with pytest
         run: |
-          pip install poetry pytest
-          poetry install
-          pip install .
-          pytest tests/ -v
+          make test
+      - uses: codecov/codecov-action@v1
+        with:
+          file: ./cov.xml
+          flags: unittests

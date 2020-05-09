@@ -2,7 +2,7 @@ import io
 
 from rich.console import Console
 
-from render import render
+from .render import render
 
 
 test_data = [1, 2, 3]

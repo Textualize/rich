@@ -1,5 +1,8 @@
 [run]
-omit = rich/jupyter.py
+source = rich
+omit =
+    tests/*
+    rich/jupyter.py
 
 [report]
 exclude_lines =

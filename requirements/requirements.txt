@@ -1,0 +1,5 @@
+colorama==0.4.3
+commonmark==0.9.1
+Pygments==2.6.1
+pprintpp==0.4.0
+typing-extensions==3.7.4.1

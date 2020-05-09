@@ -6,7 +6,7 @@ import pytest
 from rich.console import Console
 from rich.traceback import install, Traceback
 
-from render import render
+from .render import render
 
 try:
     from _exception_render import expected
