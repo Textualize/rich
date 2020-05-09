@@ -1,8 +1,8 @@
 # coding=utf-8
 
-from _markdown import MARKDOWN
+from ._markdown import MARKDOWN
 
-from render import render
+from .render import render
 
 from rich.console import Console
 from rich.markdown import Markdown
