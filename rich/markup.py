@@ -1,7 +1,7 @@
 from collections import defaultdict
 from operator import itemgetter
 import re
-from typing import Dict, Iterable, List, Match, Optional, Tuple, Union
+from typing import Dict, Iterable, List, Match, NamedTuple, Optional, Tuple, Union
 
 from .errors import MarkupError
 from .style import Style
@@ -9,7 +9,24 @@ from .text import Span, Text
 from ._emoji_replace import _emoji_replace
 
 
-re_tags = re.compile(r"(\[\[)|(\]\])|(\[.*?\])")
+re_tags = re.compile(r"(\[\[)|(\]\])|\[(\w+?=\".*?\")\]|\[(.*?)\]")
+
+
+class Tag(NamedTuple):
+    name: str
+    parameters: Optional[str]
+
+    def __str__(self) -> str:
+        if self.parameters is None:
+            return self.name
+        else:
+            return f"{self.name} {self.parameters}"
+
+    def __repr__(self) -> str:
+        if self.parameters is None:
+            return f"[{self.name}]"
+        else:
+            return f"[{self.name} {self.parameters}]"
 
 
 def escape(markup: str) -> str:
@@ -24,26 +41,30 @@ def escape(markup: str) -> str:
     return markup.replace("[", "[[").replace("]", "]]")
 
 
-def _parse(markup: str) -> Iterable[Tuple[Optional[str], Optional[str]]]:
-    """Parse markup in to an iterable of pairs of text, tag.
+def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
+    """Parse markup in to an iterable of tuples of (position, text, tag).
     
     Args:
         markup (str): A string containing console markup
     
     """
     position = 0
+    normalize = Style.normalize
     for match in re_tags.finditer(markup):
-        escape_open, escape_close, tag_text = match.groups()
+        escape_open, escape_close, tag_parameters, tag_text = match.groups()
         start, end = match.span()
         if start > position:
-            yield markup[position:start], None
-        if tag_text is not None:
-            yield None, tag_text
+            yield start, markup[position:start], None
+        if tag_parameters:
+            text, _, parameters = tag_parameters.partition("=")
+            yield start, None, Tag(text, parameters.strip('"'))
+        elif tag_text:
+            yield start, None, Tag(normalize(tag_text.strip()), None)
         else:
-            yield (escape_open and "[") or (escape_close and "]"), None  # type: ignore
+            yield start, (escape_open and "[") or (escape_close and "]"), None  # type: ignore
         position = end
     if position < len(markup):
-        yield markup[position:], None
+        yield start, markup[position:], None
 
 
 def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Text:
@@ -62,9 +83,8 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
     text = Text(style=style)
     append = text.append
 
-    styles: Dict[str, List[int]] = defaultdict(list)
-    style_stack: List[str] = []
-    normalize = Style.normalize
+    style_stack: List[Tuple[int, Tag]] = []
+    pop = style_stack.pop
     emoji_replace = _emoji_replace
 
     spans: List[Span] = []
@@ -72,51 +92,59 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
 
     _Span = Span
 
-    for plain_text, tag in _parse(markup):
+    def pop_style(style_name: str) -> Tuple[int, Tag]:
+        """Pop tag matching given style name."""
+        for index, (_, tag) in enumerate(reversed(style_stack), 1):
+            if tag.name == style_name:
+                return pop(-index)
+        raise KeyError(style_name)
+
+    for position, plain_text, tag in _parse(markup):
         if plain_text is not None:
             append(emoji_replace(plain_text) if emoji else plain_text)
-        if tag is not None:
-            if tag.startswith("[/"):  # Closing tag
-                style_name = tag[2:-1].strip()
+        elif tag is not None:
+            if tag.name.startswith("/"):  # Closing tag
+                style_name = tag.name[1:].strip()
                 if style_name:  # explicit close
-                    style_name = normalize(style_name)
+                    try:
+                        start, open_tag = pop_style(style_name)
+                    except KeyError:
+                        raise MarkupError(
+                            f"closing tag '{tag!r}' at position {position} doesn't match any open tag"
+                        )
                 else:  # implicit close
                     try:
-                        style_name = style_stack[-1]
+                        start, open_tag = pop()
                     except IndexError:
                         raise MarkupError(
-                            f"closing tag '[/]' at position {len(text)} has nothing to close"
+                            f"closing tag '[/]' at position {position} has nothing to close"
                         )
-                try:
-                    style_position = styles[style_name].pop()
-                except (KeyError, IndexError):
-                    raise MarkupError(
-                        f"closing tag {tag!r} at position {len(text)} doesn't match open tag"
-                    )
-                style_stack.remove(style_name)
-                append_span(_Span(style_position, len(text), style_name))
+
+                append_span(_Span(start, len(text), str(open_tag)))
             else:  # Opening tag
-                style_name = normalize(tag[1:-1].strip())
-                styles[style_name].append(len(text))
-                style_stack.append(style_name)
+                style_stack.append((len(text), tag))
 
     text_length = len(text)
     while style_stack:
-        style_name = style_stack.pop()
-        style_position = styles[style_name].pop()
-        append_span(_Span(style_position, text_length, style_name))
+        start, tag = style_stack.pop()
+        append_span(_Span(start, text_length, str(tag)))
 
     text.spans = sorted(spans)
-
     return text
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from rich import print
+    # from rich import print
     from rich.console import Console
+    from rich.text import Text
 
     console = Console(highlight=False)
 
-    console.print("[bold]1 [not bold]2[/] 3[/]")
+    # t = Text.from_markup('Hello [link="https://www.willmcgugan.com"]W[b]o[/b]rld[/]!')
+    # print(repr(t._spans))
 
-    console.print("[green]XXX[blue]XXX[/]XXX[/]")
+    console.print('Hello [link="https://www.willmcgugan.com"]W[b]o[/b]rld[/]!')
+
+    # console.print("[bold]1 [not bold]2[/] 3[/]")
+
+    # console.print("[green]XXX[blue]XXX[/]XXX[/]")
