@@ -25,7 +25,7 @@ class Syntax:
     Args:
         code (str): Code to highlight.
         lexer_name (str): Lexer to use (see https://pygments.org/docs/lexers/)
-        theme (str, optional): Color theme, aka Pygments style (see https://pygments.org/docs/styles/#getting-a-list-of-available-styles). Defaults to "emacs".
+        theme (str, optional): Color theme, aka Pygments style (see https://pygments.org/docs/styles/#getting-a-list-of-available-styles). Defaults to "monokai".
         dedent (bool, optional): Enable stripping of initial whitespace. Defaults to True.
         line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
         start_line (int, optional): Starting number for line numbers. Defaults to 1.
