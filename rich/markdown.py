@@ -425,7 +425,10 @@ class Markdown:
                     context.leave_style()
                     if not self.hyperlinks:
                         context.on_text(" (")
-                        context.enter_style("markdown.link_url")
+                        style = Style(underline=True) + console.get_style(
+                            "markdown.link_url"
+                        )
+                        context.enter_style(style)
                         context.on_text(current.destination)
                         context.leave_style()
                         context.on_text(")")
