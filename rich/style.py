@@ -3,7 +3,6 @@ from binascii import crc32
 from functools import lru_cache
 import sys
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Type, Union
-from urllib.parse import quote
 
 from . import errors
 from .color import blend_rgb, Color, ColorParseError, ColorSystem
@@ -384,8 +383,7 @@ class Style:
             )
         rendered = f"\x1b[{';'.join(attrs)}m{text}\x1b[0m" if attrs else text
         if self.link:
-            link = quote(self.link, "/:")
-            rendered = f"\x1b]8;id={crc32(link.encode('utf-8'))};{link}\x1b\\{rendered}\x1b]8;;\x1b\\"
+            rendered = f"\x1b]8;id={crc32(self.link.encode('utf-8'))};{self.link}\x1b\\{rendered}\x1b]8;;\x1b\\"
         return rendered
 
     def test(self, text: Optional[str] = None) -> None:
