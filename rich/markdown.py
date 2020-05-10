@@ -369,7 +369,7 @@ class Markdown:
         code_theme (str, optional): Pygments theme for code blocks. Defaults to "monokai".
         justify (JustifyValues, optional): Justify value for paragraphs. Defaults to None.
         style (Union[str, Style], optional): Optional style to apply to markdown.
-        hyperlinks (bool, optional): Enable hyperlinks. Defaults to ``True``
+        hyperlinks (bool, optional): Enable hyperlinks. Defaults to ``True``.
     """
 
     elements: ClassVar[Dict[str, Type[MarkdownElement]]] = {

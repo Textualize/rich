@@ -146,7 +146,7 @@ if __name__ == "__main__":  # pragma: no cover
     # print(repr(t._spans))
 
     console.print("foo")
-    console.print('Hello [link="https://www.willmcgugan.com"]W[b]o[/b]rld[/]!')
+    console.print("Hello [link=https://www.willmcgugan.com]W[b]o[/b]rld[/]!")
 
     # console.print("[bold]1 [not bold]2[/] 3[/]")
 
