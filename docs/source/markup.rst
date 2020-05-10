@@ -25,6 +25,16 @@ There is a shorthand for closing a style. If you omit the style name from the cl
     print("[bold red]Bold and red[/] not bold or red")
 
 
+Links
+~~~~~
+
+Console markup can output hyperlinks with the following syntax: ``[link=URL]text[/link]``. Here's an example::
+
+    print("Visit my [link=https://www.willmcgugan.com]blog[/link]!")
+
+If your terminal software supports hyperlinks, you will be able to click the word "blog" which will typically open a browser. If your terminal doesn't support hyperlinks, you will see the text but it won't be clickable.
+
+
 Escaping
 ~~~~~~~~
 
@@ -34,6 +44,7 @@ Occasionally you may want to print something that Rich would interpret as markup
     >>> print("foo[[bar]]")
     foo[bar]
 
+The function :func:`~rich.markup.escape` will handle escape of text for you.
 
 Rendering Markup
 ----------------
