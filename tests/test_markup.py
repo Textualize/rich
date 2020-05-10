@@ -1,6 +1,6 @@
 import pytest
 
-from rich.markup import escape, MarkupError, _parse, render
+from rich.markup import escape, MarkupError, _parse, render, Tag
 from rich.text import Span
 
 
@@ -11,15 +11,25 @@ def test_escape():
 def test_parse():
     result = list(_parse("[foo]hello[/foo][bar]world[/][[escaped]]"))
     expected = [
-        (None, "[foo]"),
-        ("hello", None),
-        (None, "[/foo]"),
-        (None, "[bar]"),
-        ("world", None),
-        (None, "[/]"),
-        ("[", None),
-        ("escaped", None),
-        ("]", None),
+        (0, None, Tag(name="foo", parameters=None)),
+        (10, "hello", None),
+        (10, None, Tag(name="/foo", parameters=None)),
+        (16, None, Tag(name="bar", parameters=None)),
+        (26, "world", None),
+        (26, None, Tag(name="/", parameters=None)),
+        (29, "[", None),
+        (38, "escaped", None),
+        (38, "]", None),
+    ]
+    assert result == expected
+
+
+def test_parse_link():
+    result = list(_parse("[link=foo]bar[/link]"))
+    expected = [
+        (0, None, Tag(name="link", parameters="foo")),
+        (13, "bar", None),
+        (13, None, Tag(name="/link", parameters=None)),
     ]
     assert result == expected
 
@@ -28,6 +38,12 @@ def test_render():
     result = render("[bold]FOO[/bold]")
     assert str(result) == "FOO"
     assert result.spans == [Span(0, 3, "bold")]
+
+
+def test_render_link():
+    result = render("[link=foo]FOO[/link]")
+    assert str(result) == "FOO"
+    assert result.spans == [Span(0, 3, "link foo")]
 
 
 def test_render_combine():

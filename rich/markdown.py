@@ -153,6 +153,8 @@ class Heading(TextElement):
             )
         else:
             # Styled text for h2 and beyond
+            if self.level:
+                yield Text("\n")
             yield text
 
 
@@ -173,8 +175,10 @@ class CodeBlock(TextElement):
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         code = str(self.text).rstrip()
-        syntax = Syntax(code, self.lexer_name, theme=self.theme)
-        yield Panel(syntax, style="dim")
+        syntax = Panel(
+            Syntax(code, self.lexer_name, theme=self.theme), style="dim", box=box.SQUARE
+        )
+        yield syntax
 
 
 class BlockQuote(TextElement):
@@ -289,7 +293,7 @@ class ListItem(TextElement):
             yield new_line
 
 
-class ImageItem(MarkdownElement):
+class ImageItem(TextElement):
     """Renders a placeholder for an image."""
 
     new_line = False
@@ -305,17 +309,26 @@ class ImageItem(MarkdownElement):
         Returns:
             MarkdownElement: A new markdown element
         """
-        return cls(node.title, node.destination)
+        return cls(node.destination, markdown.hyperlinks)
 
-    def __init__(self, title: Optional[str], destination: str) -> None:
-        self.title = title
+    def __init__(self, destination: str, hyperlinks: bool) -> None:
         self.destination = destination
+        self.hyperlinks = hyperlinks
+        self.link: Optional[str] = None
         super().__init__()
 
+    def on_enter(self, context: "MarkdownContext") -> None:
+        self.link = context.current_style.link
+        self.text = Text(justify="left")
+        super().on_enter(context)
+
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        yield Text.assemble(
-            (self.title or "🌆", "italic"), " ", f"({self.destination}) ", end=""
-        )
+        link_style = Style(link=self.link or self.destination or None)
+        title = self.text or Text(self.destination.strip("/").rsplit("/", 1)[-1])
+
+        if self.hyperlinks:
+            title.stylize_all(link_style)
+        yield Text.assemble("🌆 ", title, " ", end="")
 
 
 class MarkdownContext:
@@ -356,6 +369,7 @@ class Markdown:
         code_theme (str, optional): Pygments theme for code blocks. Defaults to "monokai".
         justify (JustifyValues, optional): Justify value for paragraphs. Defaults to None.
         style (Union[str, Style], optional): Optional style to apply to markdown.
+        hyperlinks (bool, optional): Enable hyperlinks. Defaults to ``True``.
     """
 
     elements: ClassVar[Dict[str, Type[MarkdownElement]]] = {
@@ -368,7 +382,7 @@ class Markdown:
         "item": ListItem,
         "image": ImageItem,
     }
-    inlines = {"emph", "strong", "code", "link", "strike"}
+    inlines = {"emph", "strong", "code", "strike"}
 
     def __init__(
         self,
@@ -376,6 +390,7 @@ class Markdown:
         code_theme: str = "monokai",
         justify: JustifyValues = None,
         style: Union[str, Style] = "none",
+        hyperlinks: bool = True,
     ) -> None:
         self.markup = markup
         parser = Parser()
@@ -383,6 +398,7 @@ class Markdown:
         self.code_theme = code_theme
         self.justify = justify
         self.style = style
+        self.hyperlinks = hyperlinks
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         """Render markdown to the console."""
@@ -392,7 +408,6 @@ class Markdown:
         inlines = self.inlines
         new_line = False
         for current, entering in nodes:
-            # print(current, current.literal)
             node_type = current.t
             if node_type in ("html_inline", "html_block", "text"):
                 context.on_text(current.literal.replace("\n", " "))
@@ -402,6 +417,23 @@ class Markdown:
             elif node_type == "softbreak":
                 if entering:
                     context.on_text(" ")
+            elif node_type == "link":
+                if entering:
+                    link_style = console.get_style("markdown.link")
+                    if self.hyperlinks:
+                        link_style.link = current.destination
+                    context.enter_style(link_style)
+                else:
+                    context.leave_style()
+                    if not self.hyperlinks:
+                        context.on_text(" (")
+                        style = Style(underline=True) + console.get_style(
+                            "markdown.link_url"
+                        )
+                        context.enter_style(style)
+                        context.on_text(current.destination)
+                        context.leave_style()
+                        context.on_text(")")
             elif node_type in inlines:
                 if current.is_container():
                     if entering:
@@ -413,12 +445,6 @@ class Markdown:
                     if current.literal:
                         context.on_text(current.literal)
                     context.leave_style()
-                if current.destination and not entering:
-                    context.on_text(" (")
-                    context.enter_style("markdown.link_url")
-                    context.on_text(current.destination)
-                    context.leave_style()
-                    context.on_text(") ")
             else:
                 element_class = self.elements.get(node_type) or UnknownElement
                 if current.is_container():
@@ -471,6 +497,20 @@ if __name__ == "__main__":  # pragma: no cover
         help="force color for non-terminals",
     )
     parser.add_argument(
+        "-t",
+        "--code-theme",
+        dest="code_theme",
+        default="monokai",
+        help="pygments code theme",
+    )
+    parser.add_argument(
+        "-y",
+        "--hyperlinks",
+        dest="hyperlinks",
+        action="store_true",
+        help="enable hyperlinks",
+    )
+    parser.add_argument(
         "-w",
         "--width",
         type=int,
@@ -478,11 +518,23 @@ if __name__ == "__main__":  # pragma: no cover
         default=None,
         help="width of output (default will auto-detect)",
     )
+    parser.add_argument(
+        "-j",
+        "--justify",
+        dest="justify",
+        action="store_true",
+        help="enable full text justify",
+    )
     args = parser.parse_args()
 
     from rich.console import Console
 
     console = Console(force_terminal=args.force_color, width=args.width)
     with open(args.path, "rt") as markdown_file:
-        markdown = Markdown(markdown_file.read())
+        markdown = Markdown(
+            markdown_file.read(),
+            justify="full" if args.justify else "left",
+            code_theme=args.code_theme,
+            hyperlinks=args.hyperlinks,
+        )
     console.print(markdown)

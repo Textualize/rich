@@ -42,7 +42,7 @@ class Span(NamedTuple):
     style: Union[str, Style]
 
     def __repr__(self) -> str:
-        return f"Span({self.start}, {self.end}, {self.style!r})"
+        return f"Span({self.start}, {self.end}, {str(self.style)!r})"
 
     def __bool__(self) -> bool:
         return self.end > self.start
@@ -173,7 +173,7 @@ class Text:
     @classmethod
     def assemble(
         cls,
-        *parts: Union[str, Tuple[str, StyleType]],
+        *parts: Union[str, "Text", Tuple[str, StyleType]],
         style: Union[str, Style] = "",
         justify: "JustifyValues" = None,
         end: str = "\n",
@@ -194,7 +194,7 @@ class Text:
         text = cls(style=style, justify=justify, end=end, tab_size=tab_size)
         append = text.append
         for part in parts:
-            if isinstance(part, str):
+            if isinstance(part, (Text, str)):
                 append(part)
             else:
                 append(*part)
@@ -220,7 +220,7 @@ class Text:
     @property
     def spans(self) -> List[Span]:
         """Get a copy of the list of spans."""
-        return self._spans[:]
+        return self._spans
 
     @spans.setter
     def spans(self, spans: List[Span]) -> None:
@@ -241,12 +241,12 @@ class Text:
         """Return a copy of this instance."""
         copy_self = Text(
             self.text,
-            style=self.style,
+            style=self.style.copy() if isinstance(self.style, Style) else self.style,
             justify=self.justify,
             end=self.end,
             tab_size=self.tab_size,
         )
-        copy_self._spans[:] = self._spans[:]
+        copy_self._spans[:] = self._spans
         return copy_self
 
     def stylize(self, start: int, end: int, style: Union[str, Style]) -> None:
@@ -259,10 +259,41 @@ class Text:
 
         """
         length = len(self)
-        if end < 0 or start > length:
+        if end < 0 or start >= length:
             # span not in range
             return
-        self._spans.append(Span(max(0, start), min(length, end), style))
+        self._spans.append(Span(max(0, start), min(length + 1, end), style))
+
+    def stylize_all(self, style: Union[str, Style]) -> None:
+        """Apply a style to all the text.
+
+        Args:
+            start (int): Start offset.
+            end (int): End offset.
+            style (Union[str, Style]): Style instance or style definition to apply.
+
+        """
+        self._spans.append(Span(0, len(self), style))
+
+    def get_style_at_offset(self, console: "Console", offset: int) -> Style:
+        """Get the style of a character at give offset.
+
+        Args:
+            console (~Console): Console where text will be rendered.
+            offset (int): Offset in to text (negative indexing supported)
+
+        Returns:
+            Style: A Style instance.
+        """
+        if offset < 0:
+            offset = len(self) + offset
+
+        get_style = console.get_style
+        style = console.get_style(self.style).copy()
+        for start, end, span_style in self._spans:
+            if offset >= start and offset < end:
+                style += get_style(span_style)
+        return style
 
     def highlight_regex(
         self, re_highlight: str, style: Union[str, Style] = None, style_prefix: str = ""
@@ -345,6 +376,7 @@ class Text:
     ) -> Iterable[Segment]:
         tab_size: int = console.tab_size or self.tab_size or 8  # type: ignore
         lines = self.wrap(
+            console,
             options.max_width,
             justify=self.justify or options.justify,
             tab_size=tab_size or 8,
@@ -528,16 +560,18 @@ class Text:
                 self._spans.append(Span(offset, offset + text_length, style))
             self._length += text_length
         elif isinstance(text, Text):
+            _Span = Span
             if style is not None:
                 raise ValueError("style must not be set when appending Text instance")
+
             text_length = self._length
             if text.style is not None:
                 self._spans.append(
-                    Span(text_length, text_length + len(text), text.style),
+                    _Span(text_length, text_length + len(text), text.style)
                 )
             self._text.append(text.text)
             self._spans.extend(
-                Span(start + text_length, end + text_length, style)
+                _Span(start + text_length, end + text_length, style)
                 for start, end, style in text._spans
             )
             self._length += len(text)
@@ -615,7 +649,7 @@ class Text:
         ]
 
         for span in self._spans:
-            line_index = span.start // average_line_length
+            line_index = (span.start // average_line_length) % len(line_ranges)
 
             line_start, line_end = line_ranges[line_index]
             if span.start < line_start:
@@ -647,7 +681,11 @@ class Text:
         self.text = self.text[:-amount]
 
     def wrap(
-        self, width: int, justify: "JustifyValues" = "left", tab_size: int = 8
+        self,
+        console: "Console",
+        width: int,
+        justify: "JustifyValues" = "left",
+        tab_size: int = 8,
     ) -> Lines:
         """Word wrap the text.
         
@@ -666,7 +704,7 @@ class Text:
             offsets = divide_line(str(line), width)
             new_lines = line.divide(offsets)
             if justify:
-                new_lines.justify(width, align=justify)
+                new_lines.justify(console, width, align=justify)
             lines.extend(new_lines)
         return lines
 

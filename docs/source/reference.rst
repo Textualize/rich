@@ -11,6 +11,7 @@ Reference
    reference/highlighter.rst
    reference/logging.rst
    reference/markdown.rst
+   reference/markup.rst
    reference/measure.rst
    reference/padding.rst
    reference/panel.rst

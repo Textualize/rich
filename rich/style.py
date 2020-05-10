@@ -1,3 +1,5 @@
+
+from binascii import crc32
 from functools import lru_cache
 import sys
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Type, Union
@@ -42,6 +44,7 @@ class Style:
         reverse (bool, optional): Enabled reverse text. Defaults to None.
         conceal (bool, optional): Enable concealed text. Defaults to None.
         strike (bool, optional): Enable strikethrough text. Defaults to None.
+        link (str, link): Link URL. Defaults to None.
     
     """
 
@@ -50,7 +53,7 @@ class Style:
     _attributes: int
     _set_attributes: int
 
-    __slots__ = ["_color", "_bgcolor", "_attributes", "_set_attributes"]
+    __slots__ = ["_color", "_bgcolor", "_attributes", "_set_attributes", "link"]
 
     def __init__(
         self,
@@ -66,6 +69,7 @@ class Style:
         reverse: bool = None,
         conceal: bool = None,
         strike: bool = None,
+        link: str = None,
     ):
         def _make_color(color: Union[Color, str]) -> Color:
             return color if isinstance(color, Color) else Color.parse(color)
@@ -94,6 +98,7 @@ class Style:
             | (conceal is not None) << 7
             | (strike is not None) << 8
         )
+        self.link = link
 
     bold = _Bit(0)
     dim = _Bit(1)
@@ -132,6 +137,9 @@ class Style:
         if self._bgcolor is not None:
             append("on")
             append(self._bgcolor.name)
+        if self.link:
+            append("link")
+            append(self.link)
         return " ".join(attributes) or "none"
 
     @classmethod
@@ -171,11 +179,18 @@ class Style:
             and self._bgcolor == other._bgcolor
             and self._set_attributes == other._set_attributes
             and self._attributes == other._attributes
+            and self.link == other.link
         )
 
     def __hash__(self) -> int:
         return hash(
-            (self._color, self._bgcolor, self._attributes, self._set_attributes)
+            (
+                self._color,
+                self._bgcolor,
+                self._attributes,
+                self._set_attributes,
+                self.link,
+            )
         )
 
     @property
@@ -213,6 +228,7 @@ class Style:
         color: Optional[str] = None
         bgcolor: Optional[str] = None
         attributes: Dict[str, Optional[bool]] = {}
+        link: Optional[str] = None
 
         words = iter(style_definition.split())
         for original_word in words:
@@ -237,6 +253,12 @@ class Style:
                     )
                 attributes[word] = False
 
+            elif word == "link":
+                word = next(words, "")
+                if not word:
+                    raise errors.StyleSyntaxError("URL expected after 'link'")
+                link = word
+
             elif word in style_attributes:
                 attributes[word] = True
 
@@ -248,7 +270,7 @@ class Style:
                         f"unable to parse {word!r} in style {style_definition!r}; {error}"
                     )
                 color = word
-        style = Style(color=color, bgcolor=bgcolor, **attributes)
+        style = Style(color=color, bgcolor=bgcolor, link=link, **attributes)
         return style
 
     @lru_cache(maxsize=1024)
@@ -329,6 +351,7 @@ class Style:
         style._bgcolor = self._bgcolor
         style._attributes = self._attributes
         style._set_attributes = self._set_attributes
+        style.link = self.link
         return style
 
     def render(
@@ -347,7 +370,8 @@ class Style:
         Returns:
             str: A string containing ANSI style codes.
         """
-        if color_system is None or not text:
+        # Hyperlink spec: https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
+        if not text or color_system is None:
             return text
         _attributes = self._attributes & self._set_attributes
         attrs = [__STYLE_TABLE[_attributes]] if _attributes else []
@@ -357,7 +381,10 @@ class Style:
             attrs.extend(
                 self._bgcolor.downgrade(color_system).get_ansi_codes(foreground=False)
             )
-        return f"\x1b[{';'.join(attrs)}m{text}\x1b[0m" if attrs else text
+        rendered = f"\x1b[{';'.join(attrs)}m{text}\x1b[0m" if attrs else text
+        if self.link:
+            rendered = f"\x1b]8;id={crc32(self.link.encode('utf-8'))};{self.link}\x1b\\{rendered}\x1b]8;;\x1b\\"
+        return rendered
 
     def test(self, text: Optional[str] = None) -> None:
         """Write text with style directly to terminal.
@@ -391,6 +418,7 @@ class Style:
             style._attributes & style._set_attributes
         )
         new_style._set_attributes = self._set_attributes | style._set_attributes
+        new_style.link = style.link or self.link
         return new_style
 
     def _update(self, style: "Style") -> None:
@@ -405,6 +433,7 @@ class Style:
             style._attributes & style._set_attributes
         )
         self._set_attributes = self._set_attributes | style._set_attributes
+        self.link = style.link or self.link
 
     def __add__(self, style: Optional["Style"]) -> "Style":
         if style is None:

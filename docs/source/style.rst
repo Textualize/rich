@@ -55,6 +55,16 @@ Styles may be negated by prefixing the attribute with the word "not". This can b
 
 This will print "foo" and "baz" in bold, but "bar" will be in normal text.
 
+Styles may also have a ``"link"`` attribute, which will turn any styled text in to a *hyperlink* (if supported by your terminal software).
+
+To add a link to a style, the definition should contain the word ``"link"`` followed by a URL. The following example will make a clickable link::
+
+    console.print("Google", style="link https://google.com")
+
+.. note::
+    If you are familiar with HTML you may find applying links in this way a little odd, but the terminal considers a link to be another attribute just like bold, italic etc. 
+    
+
 
 Style Class
 -----------
