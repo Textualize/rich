@@ -649,7 +649,7 @@ class Text:
         ]
 
         for span in self._spans:
-            line_index = span.start // average_line_length
+            line_index = (span.start // average_line_length) % len(line_ranges)
 
             line_start, line_end = line_ranges[line_index]
             if span.start < line_start:

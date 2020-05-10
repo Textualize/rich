@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added hyperlinks to Style and markup
+- Added justify and code theme switches to markdown command
 
 ## [1.0.3] - 2020-05-08
 

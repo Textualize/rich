@@ -175,7 +175,9 @@ class CodeBlock(TextElement):
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         code = str(self.text).rstrip()
-        syntax = Syntax(code, self.lexer_name, theme=self.theme)
+        syntax = Panel(
+            Syntax(code, self.lexer_name, theme=self.theme), style="dim", box=box.SQUARE
+        )
         yield syntax
 
 
@@ -495,6 +497,13 @@ if __name__ == "__main__":  # pragma: no cover
         help="force color for non-terminals",
     )
     parser.add_argument(
+        "-t",
+        "--code-theme",
+        dest="code_theme",
+        default="monokai",
+        help="pygments code theme",
+    )
+    parser.add_argument(
         "-y",
         "--hyperlinks",
         dest="hyperlinks",
@@ -509,11 +518,23 @@ if __name__ == "__main__":  # pragma: no cover
         default=None,
         help="width of output (default will auto-detect)",
     )
+    parser.add_argument(
+        "-j",
+        "--justify",
+        dest="justify",
+        action="store_true",
+        help="enable full text justify",
+    )
     args = parser.parse_args()
 
     from rich.console import Console
 
     console = Console(force_terminal=args.force_color, width=args.width)
     with open(args.path, "rt") as markdown_file:
-        markdown = Markdown(markdown_file.read(), hyperlinks=args.hyperlinks)
+        markdown = Markdown(
+            markdown_file.read(),
+            justify="full" if args.justify else "left",
+            code_theme=args.code_theme,
+            hyperlinks=args.hyperlinks,
+        )
     console.print(markdown)
