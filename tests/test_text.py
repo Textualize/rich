@@ -314,7 +314,7 @@ def test_right_crop():
 
 def test_wrap_4():
     test = Text("foo bar baz")
-    lines = test.wrap(4)
+    lines = test.wrap(Console(), 4)
     assert len(lines) == 3
     assert lines[0] == Text("foo ")
     assert lines[1] == Text("bar ")
@@ -323,7 +323,7 @@ def test_wrap_4():
 
 def test_wrap_3():
     test = Text("foo bar baz")
-    lines = test.wrap(3)
+    lines = test.wrap(Console(), 3)
     assert len(lines) == 3
     assert lines[0] == Text("foo")
     assert lines[1] == Text("bar")
@@ -332,7 +332,7 @@ def test_wrap_3():
 
 def test_wrap_long():
     test = Text("abracadabra")
-    lines = test.wrap(4)
+    lines = test.wrap(Console(), 4)
     assert len(lines) == 3
     assert lines[0] == Text("abra")
     assert lines[1] == Text("cada")
@@ -341,8 +341,8 @@ def test_wrap_long():
 
 def test_wrap_long_words():
     test = Text("X 123456789")
-    lines = test.wrap(4)
-    print(lines)
+    lines = test.wrap(Console(), 4)
+
     assert len(lines) == 3
     assert lines[0] == Text("X 12")
     assert lines[1] == Text("3456")
@@ -358,7 +358,7 @@ def test_fit():
 
 def test_wrap_tabs():
     test = Text("foo\tbar")
-    lines = test.wrap(4)
+    lines = test.wrap(Console(), 4)
     assert len(lines) == 2
     assert str(lines[0]) == "foo "
     assert str(lines[1]) == "bar "
@@ -438,4 +438,3 @@ def test_assemble():
     text = Text.assemble("foo", ("bar", "bold"))
     assert str(text) == "foobar"
     assert text._spans == [Span(3, 6, "bold")]
-

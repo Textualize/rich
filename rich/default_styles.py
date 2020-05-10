@@ -115,8 +115,8 @@ MARKDOWN_STYLES = {
     "markdown.h5": Style(underline=True),
     "markdown.h6": Style(italic=True),
     "markdown.h7": Style(italic=True, dim=True),
-    "markdown.link": Style(bold=True),
-    "markdown.link_url": Style(underline=True),
+    "markdown.link": Style(color="bright_blue"),
+    "markdown.link_url": Style(color="blue"),
 }
 
 
