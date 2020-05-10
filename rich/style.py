@@ -1,6 +1,9 @@
+
+from binascii import crc32
 from functools import lru_cache
 import sys
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Type, Union
+from urllib.parse import quote
 
 from . import errors
 from .color import blend_rgb, Color, ColorParseError, ColorSystem
@@ -42,6 +45,7 @@ class Style:
         reverse (bool, optional): Enabled reverse text. Defaults to None.
         conceal (bool, optional): Enable concealed text. Defaults to None.
         strike (bool, optional): Enable strikethrough text. Defaults to None.
+        link (str, link): Link URL. Defaults to None.
     
     """
 
@@ -368,9 +372,7 @@ class Style:
             str: A string containing ANSI style codes.
         """
         # Hyperlink spec: https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
-        if not text:
-            return ""
-        if color_system is None and not self.link:
+        if not text or color_system is None:
             return text
         _attributes = self._attributes & self._set_attributes
         attrs = [__STYLE_TABLE[_attributes]] if _attributes else []
@@ -381,10 +383,8 @@ class Style:
                 self._bgcolor.downgrade(color_system).get_ansi_codes(foreground=False)
             )
         rendered = f"\x1b[{';'.join(attrs)}m{text}\x1b[0m" if attrs else text
-        if self.link is not None:
-            rendered = (
-                f"\x1b]8;id={self.link};{self.link}\x1b\\{rendered}\x1b]8;;\x1b\\"
-            )
+        if self.link:
+            rendered = f"\x1b]8;id={crc32(self.link.encode('utf-8'))};{quote(self.link)}\x1b\\{rendered}\x1b]8;;\x1b\\"
         return rendered
 
     def test(self, text: Optional[str] = None) -> None:

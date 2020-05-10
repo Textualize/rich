@@ -9,7 +9,7 @@ from .text import Span, Text
 from ._emoji_replace import _emoji_replace
 
 
-re_tags = re.compile(r"(\[\[)|(\]\])|\[(\w+?=\".*?\")\]|\[(.*?)\]")
+re_tags = re.compile(r"(\[\[)|(\]\])|\[(.*?)\]")
 
 
 class Tag(NamedTuple):
@@ -17,16 +17,17 @@ class Tag(NamedTuple):
     parameters: Optional[str]
 
     def __str__(self) -> str:
-        if self.parameters is None:
-            return self.name
-        else:
-            return f"{self.name} {self.parameters}"
+        return (
+            self.name if self.parameters is None else f"{self.name} {self.parameters}"
+        )
 
-    def __repr__(self) -> str:
-        if self.parameters is None:
-            return f"[{self.name}]"
-        else:
-            return f"[{self.name} {self.parameters}]"
+    @property
+    def markup(self) -> str:
+        return (
+            f"[{self.name}]"
+            if self.parameters is None
+            else f"[{self.name} {self.parameters}]"
+        )
 
 
 def escape(markup: str) -> str:
@@ -51,20 +52,21 @@ def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
     position = 0
     normalize = Style.normalize
     for match in re_tags.finditer(markup):
-        escape_open, escape_close, tag_parameters, tag_text = match.groups()
+        escape_open, escape_close, tag_text = match.groups()
         start, end = match.span()
         if start > position:
             yield start, markup[position:start], None
-        if tag_parameters:
-            text, _, parameters = tag_parameters.partition("=")
-            yield start, None, Tag(text, parameters.strip('"'))
-        elif tag_text:
-            yield start, None, Tag(normalize(tag_text.strip()), None)
+        if tag_text:
+            text, equals, parameters = tag_text.partition("=")
+            if equals:
+                yield start, None, Tag(text, parameters)
+            else:
+                yield start, None, Tag(normalize(tag_text.strip()), None)
         else:
             yield start, (escape_open and "[") or (escape_close and "]"), None  # type: ignore
         position = end
     if position < len(markup):
-        yield start, markup[position:], None
+        yield position, markup[position:], None
 
 
 def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Text:
@@ -110,7 +112,7 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
                         start, open_tag = pop_style(style_name)
                     except KeyError:
                         raise MarkupError(
-                            f"closing tag '{tag!r}' at position {position} doesn't match any open tag"
+                            f"closing tag '{tag.markup}' at position {position} doesn't match any open tag"
                         )
                 else:  # implicit close
                     try:
@@ -143,6 +145,7 @@ if __name__ == "__main__":  # pragma: no cover
     # t = Text.from_markup('Hello [link="https://www.willmcgugan.com"]W[b]o[/b]rld[/]!')
     # print(repr(t._spans))
 
+    console.print("foo")
     console.print('Hello [link="https://www.willmcgugan.com"]W[b]o[/b]rld[/]!')
 
     # console.print("[bold]1 [not bold]2[/] 3[/]")

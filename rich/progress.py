@@ -513,7 +513,7 @@ class Progress:
             if completed is not None:
                 task.completed = completed
             if visible is not None:
-                task.visible = True
+                task.visible = visible
             task.fields.update(fields)
 
             update_completed = task.completed - completed_start
