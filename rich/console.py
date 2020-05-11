@@ -881,7 +881,7 @@ class Console:
             clear (bool, optional): Set to ``True`` to clear the record buffer after generating the HTML.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
-            inline_styes (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
+            inline_styles (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
                 larger but easier to cut and paste markup. If ``False``, styles will be embedded in a style tag.
                 Defaults to False.
 
