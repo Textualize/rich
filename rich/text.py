@@ -554,7 +554,6 @@ class Text:
         if not len(text):
             return
         if isinstance(text, str):
-            text = strip_control_codes(text)
             self._text.append(text)
             offset = len(self)
             text_length = len(text)
