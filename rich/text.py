@@ -20,7 +20,6 @@ from ._loop import loop_first_last, loop_last
 from ._wrap import divide_line
 from .cells import cell_len
 from .containers import Lines
-from .control import strip_control_codes
 from .measure import Measurement
 from .segment import Segment
 from .style import Style, StyleType
@@ -108,7 +107,6 @@ class Text:
         tab_size: Optional[int] = 8,
         spans: List[Span] = None,
     ) -> None:
-        text = strip_control_codes(text)
         self._text: List[str] = [text] if text else []
         self.style = style
         self.justify = justify
@@ -213,7 +211,6 @@ class Text:
     @text.setter
     def text(self, new_text: str) -> None:
         """Set the text to a new value."""
-        new_text = strip_control_codes(new_text)
         self._text[:] = [new_text]
         old_length = self._length
         self._length = len(new_text)

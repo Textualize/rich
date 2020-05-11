@@ -21,6 +21,7 @@ def strip_control_codes(text: str, _translate_table=_CONTROL_TRANSLATE) -> str:
     Returns:
         str: String with control codes removed.
     """
+    return text
     return text.translate(_translate_table)
 
 
