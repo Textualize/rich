@@ -1,7 +1,12 @@
 from typing import NamedTuple
 
 
-STRIP_CONTROL_CODES = [8, 10, 11, 12, 13, 26]
+STRIP_CONTROL_CODES = [
+    8,  # Backspace
+    11,  # Vertical tab
+    12,  # Form feed
+    13,  # Carriage return
+]
 _CONTROL_TRANSLATE = {_codepoint: None for _codepoint in STRIP_CONTROL_CODES}
 
 

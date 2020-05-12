@@ -438,3 +438,10 @@ def test_assemble():
     text = Text.assemble("foo", ("bar", "bold"))
     assert str(text) == "foobar"
     assert text._spans == [Span(3, 6, "bold")]
+
+
+def test_strip_control_codes():
+    text = Text("foo\rbar")
+    assert str(text) == "foobar"
+    text.append("\x08")
+    assert str(text) == "foobar"
