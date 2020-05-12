@@ -153,7 +153,7 @@ class Heading(TextElement):
             )
         else:
             # Styled text for h2 and beyond
-            if self.level:
+            if self.level == 2:
                 yield Text("\n")
             yield text
 
@@ -525,11 +525,17 @@ if __name__ == "__main__":  # pragma: no cover
         action="store_true",
         help="enable full text justify",
     )
+    parser.add_argument(
+        "-p",
+        "--page",
+        dest="page",
+        action="store_true",
+        help="use pager to scroll output",
+    )
     args = parser.parse_args()
 
     from rich.console import Console
 
-    console = Console(force_terminal=args.force_color, width=args.width)
     with open(args.path, "rt") as markdown_file:
         markdown = Markdown(
             markdown_file.read(),
@@ -537,4 +543,16 @@ if __name__ == "__main__":  # pragma: no cover
             code_theme=args.code_theme,
             hyperlinks=args.hyperlinks,
         )
-    console.print(markdown)
+    if args.page:
+        import pydoc
+        import io
+
+        console = Console(
+            file=io.StringIO(), force_terminal=args.force_color, width=args.width
+        )
+        console.print(markdown)
+        pydoc.pager(console.file.getvalue())  # type: ignore
+
+    else:
+        console = Console(force_terminal=args.force_color, width=args.width)
+        console.print(markdown)

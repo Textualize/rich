@@ -521,6 +521,8 @@ class Console:
         Args:
             renderables (Iterable[RenderableType]): Any object or objects renderable in the console.
             options (Optional[ConsoleOptions]): Console options used to render with.
+            style (Style, optional): Optional style to apply to renderables. Defaults to ``None``.
+            pad (bool, optional): Pad lines shorter than render width. Defaults to ``True``.
 
         Returns:
             List[List[Segment]]: A list of lines, where a line is a list of Segment objects.
@@ -549,7 +551,8 @@ class Console:
         markup: bool = None,
         highlighter: HighlighterType = None,
     ) -> "Text":
-        """Convert a string to a Text instance.
+        """Convert a string to a Text instance. This is is called automatically if
+        you print or log a string.
 
         Args:
             text (str): Text to render.
@@ -581,7 +584,7 @@ class Console:
     def get_style(
         self, name: Union[str, Style], *, default: Union[Style, str] = None
     ) -> Style:
-        """Get a style merged with the current style.
+        """Get a Style instance by it's theme name or parse a definition.
 
         Args:
             name (str): The name of a style or a style definition.
@@ -598,7 +601,7 @@ class Console:
 
         try:
             style = self._styles.get(name)
-            return style.copy() if style is not None else Style.parse(name)            
+            return style.copy() if style is not None else Style.parse(name)
         except errors.StyleSyntaxError as error:
             if default is not None:
                 return self.get_style(default)
