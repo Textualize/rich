@@ -259,7 +259,7 @@ class Console:
         highlight: bool = True,
         log_time: bool = True,
         log_path: bool = True,
-        log_time_format: str = "[%X] ",
+        log_time_format: str = "[%X]",
         highlighter: Optional["HighlighterType"] = ReprHighlighter(),
     ):
         self._styles = themes.DEFAULT.styles if theme is None else theme.styles

@@ -62,7 +62,7 @@ if __name__ == "__main__":  # pragma: no cover
     FORMAT = "%(message)s"
     # FORMAT = "%(asctime)-15s - %(level) - %(message)s"
     logging.basicConfig(
-        level="NOTSET", format=FORMAT, datefmt="[%X] ", handlers=[RichHandler()]
+        level="NOTSET", format=FORMAT, datefmt="[%X]", handlers=[RichHandler()]
     )
     log = logging.getLogger("rich")
 

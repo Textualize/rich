@@ -14,7 +14,7 @@ class LogRender:
         show_time: bool = True,
         show_level: bool = False,
         show_path: bool = True,
-        time_format: str = "[%x %X] ",
+        time_format: str = "[%x %X]",
     ) -> None:
         self.show_time = show_time
         self.show_level = show_level
@@ -35,11 +35,11 @@ class LogRender:
         from .containers import Renderables
         from .table import Table
 
-        output = Table(show_header=False, expand=True, box=None, padding=0)
+        output = Table(show_header=False, expand=True, box=None, padding=(0, 1, 0, 0))
         if self.show_time:
             output.add_column(style="log.time")
         if self.show_level:
-            output.add_column(style="log.level", width=9)
+            output.add_column(style="log.level", width=8)
         output.add_column(ratio=1, style="log.message")
         if self.show_path and path:
             output.add_column(style="log.path")
@@ -57,7 +57,7 @@ class LogRender:
             row.append(level)
         row.append(Renderables(renderables))
         if self.show_path and path:
-            row.append(Text(f"{path}:{line_no}" if line_no else path))
+            row.append(Text(f" {path}:{line_no}" if line_no else path))
 
         output.add_row(*row)
         return output
