@@ -16,7 +16,7 @@ class RichHandler(Handler):
         
     Args:
         level (int, optional): Log level. Defaults to logging.NOTSET.
-        console (:class:`~rich.console.Console`, optional). Optional console instance to write logs.
+        console (:class:`~rich.console.Console`, optional): Optional console instance to write logs.
             Default will create a new console writing to stderr.
   
     """
