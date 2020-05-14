@@ -129,10 +129,10 @@ class ConsoleRenderable(Protocol):
 
 
 """A type that may be rendered by Console."""
-RenderableType = Union[ConsoleRenderable, RichCast, Control, str]
+RenderableType = Union[ConsoleRenderable, RichCast, str]
 
 """The result of calling a __console__ method."""
-RenderResult = Iterable[Union[RenderableType, Segment, Control]]
+RenderResult = Iterable[Union[RenderableType, Segment]]
 
 
 _null_highlighter = NullHighlighter()
@@ -207,7 +207,6 @@ class ConsoleThreadLocals(threading.local):
 
     buffer: List[Segment] = field(default_factory=list)
     buffer_index: int = 0
-    control: List[str] = field(default_factory=list)
 
 
 def detect_legacy_windows() -> bool:
@@ -215,7 +214,7 @@ def detect_legacy_windows() -> bool:
     return "WINDIR" in os.environ and "WT_SESSION" not in os.environ
 
 
-if detect_legacy_windows():
+if detect_legacy_windows():  # pragma: no cover
     from colorama import init
 
     init()
@@ -274,18 +273,16 @@ class Console:
 
         self._color_system: Optional[ColorSystem]
         self._force_terminal = force_terminal
-        if self.legacy_windows:
-            self.file = file or sys.stdout
-            self._color_system = COLOR_SYSTEMS["windows"]
-        else:
-            self.file = file or sys.stdout
-            if color_system is None:
-                self._color_system = None
-            elif color_system == "auto":
-                self._color_system = self._detect_color_system()
-            else:
-                self._color_system = COLOR_SYSTEMS[color_system]
+        self.file = file or sys.stdout
 
+        if color_system is None:
+            self._color_system = None
+        elif color_system == "auto":
+            self._color_system = self._detect_color_system()
+        else:
+            self._color_system = COLOR_SYSTEMS[color_system]
+
+        self._lock = threading.RLock()
         self._log_render = LogRender(
             show_time=log_time, show_path=log_path, time_format=log_time_format
         )
@@ -312,15 +309,12 @@ class Console:
     def _buffer_index(self, value: int) -> None:
         self._thread_locals.buffer_index = value
 
-    @property
-    def _control(self) -> List[str]:
-        """Get control codes buffer."""
-        return self._thread_locals.control
-
     def _detect_color_system(self) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
         if not self.is_terminal:
             return None
+        if self.legacy_windows:  # pragma: no cover
+            return ColorSystem.WINDOWS
         color_term = os.environ.get("COLORTERM", "").strip().lower()
         return (
             ColorSystem.TRUECOLOR
@@ -402,10 +396,8 @@ class Console:
             return ConsoleDimensions(self._width, self._height)
 
         width, height = shutil.get_terminal_size()
-        if self.legacy_windows:
-            width -= 1
         return ConsoleDimensions(
-            width if self._width is None else self._width,
+            (width - self.legacy_windows) if self._width is None else self._width,
             height if self._height is None else self._height,
         )
 
@@ -441,9 +433,7 @@ class Console:
         self.file.write("\033[?25h" if show else "\033[?25l")
 
     def _render(
-        self,
-        renderable: Union[RenderableType, Control],
-        options: Optional[ConsoleOptions],
+        self, renderable: RenderableType, options: Optional[ConsoleOptions],
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
 
@@ -459,9 +449,6 @@ class Console:
             Iterable[Segment]: An iterable of segments that may be rendered.
         """
         render_iterable: RenderResult
-        if isinstance(renderable, Control):
-            self._control.append(renderable.codes)
-            return
         render_options = options or self.options
         if isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__console__(self, render_options)
@@ -487,7 +474,7 @@ class Console:
                 yield from self.render(render_output, render_options)
 
     def render(
-        self, renderable: RenderableType, options: Optional[ConsoleOptions]
+        self, renderable: RenderableType, options: Optional[ConsoleOptions] = None
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
 
@@ -504,7 +491,7 @@ class Console:
             Iterable[Segment]: An iterable of segments that may be rendered.
         """
 
-        yield from self._render(renderable, options)
+        yield from self._render(renderable, options or self.options)
 
     def render_lines(
         self,
@@ -685,6 +672,16 @@ class Console:
         rule = Rule(title=title, character=character, style=style)
         self.print(rule)
 
+    def control(self, control_codes: Union["Control", str]) -> None:
+        """Insert non-printing control codes.
+
+        Args:
+            control_codes (str): Control codes, such as those that may move the cursor.
+        """
+
+        self._buffer.append(Segment.control(str(control_codes)))
+        self._check_buffer()
+
     def print(
         self,
         *objects: Any,
@@ -802,10 +799,11 @@ class Console:
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered."""
-        if self._buffer_index == 0:
-            text = self._render_buffer()
-            self.file.write(text)
-            self.file.flush()
+        with self._lock:
+            if self._buffer_index == 0:
+                text = self._render_buffer()
+                self.file.write(text)
+                self.file.flush()
 
     def _render_buffer(self) -> str:
         """Render buffered output, and clear buffer."""
@@ -818,14 +816,13 @@ class Console:
                 self._record_buffer.extend(buffer)
         del self._buffer[:]
         for line in Segment.split_and_crop_lines(buffer, self.width, pad=False):
-            for text, style in line:
-                if style:
+            for text, style, is_control in line:
+                if style and not is_control:
                     append(style.render(text, color_system=color_system))
                 else:
                     append(text)
 
-        rendered = "".join(self._control) + "".join(output)
-        del self._control[:]
+        rendered = "".join(output)
         return rendered
 
     def export_text(self, clear: bool = True, styles: bool = False) -> str:
@@ -848,10 +845,10 @@ class Console:
             if styles:
                 text = "".join(
                     (style.render(text) if style else text)
-                    for text, style in self._record_buffer
+                    for text, style, _ in self._record_buffer
                 )
             else:
-                text = "".join(text for text, _ in self._record_buffer)
+                text = "".join(text for text, _, _ in self._record_buffer)
             if clear:
                 del self._record_buffer[:]
         return text
@@ -907,7 +904,9 @@ class Console:
 
         with self._record_buffer_lock:
             if inline_styles:
-                for text, style in Segment.simplify(self._record_buffer):
+                for text, style, _ in Segment.filter_control(
+                    Segment.simplify(self._record_buffer)
+                ):
                     text = escape(text)
                     if style:
                         rule = style.get_html_style(_theme)
@@ -916,7 +915,9 @@ class Console:
                         append(text)
             else:
                 styles: Dict[str, int] = {}
-                for text, style in Segment.simplify(self._record_buffer):
+                for text, style, _ in Segment.filter_control(
+                    Segment.simplify(self._record_buffer)
+                ):
                     text = escape(text)
                     if style:
                         rule = style.get_html_style(_theme)

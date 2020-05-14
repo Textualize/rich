@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Iterable, Optional, Tuple
 
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .control import Control
@@ -16,14 +16,21 @@ class LiveRender:
     def set_renderable(self, renderable: RenderableType) -> None:
         self.renderable = renderable
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def position_cursor(self) -> Control:
+        """Get control codes to move cursor to beggining of live render.
 
+        Returns:
+            str: String containing control codes.
+        """
         if self._shape is not None:
-            width, height = self._shape
+            _, height = self._shape
             if height > 1:
-                yield Control(f"\r\x1b[{height - 1}A")
+                return Control(f"\r\x1b[{height - 1}A\x1b[2K")
             else:
-                yield Control("\r")
+                return Control("\r")
+        return Control("")
+
+    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         style = console.get_style(self.style)
         lines = console.render_lines(self.renderable, options, style, pad=False)
 

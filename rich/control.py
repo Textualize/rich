@@ -1,5 +1,9 @@
-from typing import NamedTuple
+from typing import NamedTuple, TYPE_CHECKING
 
+from .segment import Segment
+
+if TYPE_CHECKING:
+    from .console import Console, ConsoleOptions, RenderResult
 
 STRIP_CONTROL_CODES = [
     8,  # Backspace
@@ -10,11 +14,25 @@ STRIP_CONTROL_CODES = [
 _CONTROL_TRANSLATE = {_codepoint: None for _codepoint in STRIP_CONTROL_CODES}
 
 
-class Control(NamedTuple):
-    """Control codes that are not printable."""
+class Control:
+    """A renderable that inserts a control code (non printable but may move cursor).
 
-    # May define pre and post control codes eventually
-    codes: str
+    Args:
+        control_codes (str): A string containing control codes.
+    """
+
+    __slots__ = ["_control_codes"]
+
+    def __init__(self, control_codes: str) -> None:
+        self._control_codes = Segment.control(control_codes)
+
+    def __str__(self) -> str:
+        return self._control_codes.text
+
+    def __console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
+        yield self._control_codes
 
 
 def strip_control_codes(text: str, _translate_table=_CONTROL_TRANSLATE) -> str:

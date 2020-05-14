@@ -81,6 +81,24 @@ The following column objects are available:
 - :class:`~rich.progress.DownloadColumn` Displays download progress (assumes the steps are bytes).
 - :class:`~rich.progress.TransferSpeedColumn` Displays transfer speed (assumes the steps are bytes.
 
+Print / log
+~~~~~~~~~~~
+
+When a progress display is running, printing or logging anything directly to the console will break the visuals. To work around this, the Progress class provides :meth:`~rich.progress.Progress.print` and :meth:`~rich.progress.Progress.log` which work the same as their counterparts on :class:`~rich.console.Console` but will move the cursor and refresh automatically -- ensure that everything renders properly.
+
+
+Extending
+~~~~~~~~~
+
+If the progress API doesn't offer exactly what you need in terms of a progress display, you can extend the :class:`~rich.progress.Progress` class by overriding the :class:`~rich.progress.Progress.get_renderables` method. For example, the following class will render a :class:`~rich.panel.Panel` around the progress display::
+
+    from rich.panel import Panel
+    from rich.progress import Progress
+
+    class MyProgress(Progress):
+        def get_renderables(self):
+            yield Panel(self.make_tasks_table(self.tasks))            
+
 
 Example
 -------

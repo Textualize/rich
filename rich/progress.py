@@ -25,11 +25,11 @@ from typing import (
 )
 
 from .bar import Bar
-from .console import Console, JustifyValues, RenderableType
+from .console import Console, JustifyValues, RenderGroup, RenderableType
 from .highlighter import Highlighter
 from . import filesize
 from .live_render import LiveRender
-from .style import StyleType
+from .style import Style, StyleType
 from .table import Table
 from .text import Text
 
@@ -350,13 +350,18 @@ class Progress:
         self.refresh_per_second = refresh_per_second
         self.speed_estimate_period = speed_estimate_period
         self._tasks: Dict[TaskID, Task] = {}
-        self._live_render = LiveRender(self._table)
+        self._live_render = LiveRender(self.get_renderable())
         self._task_index: TaskID = TaskID(0)
         self._lock = RLock()
         self._refresh_thread: Optional[_RefreshThread] = None
         self._refresh_count = 0
         self._enter_count = 0
         self._started = False
+
+    @property
+    def tasks(self) -> List[Task]:
+        """Get a list of Task instances."""
+        return list(self._tasks.values())
 
     @property
     def task_ids(self) -> List[TaskID]:
@@ -538,19 +543,38 @@ class Progress:
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
         with self._lock:
-            self._live_render.set_renderable(self._table)
-            self.console.print(self._live_render)
+            self._live_render.set_renderable(self.get_renderable())
+            with self.console:
+                self.console.print(self._live_render.position_cursor())
+                self.console.print(self._live_render)
             self._refresh_count += 1
 
-    @property
-    def _table(self) -> Table:
-        """Get a table to render the Progress display."""
+    def get_renderable(self) -> RenderableType:
+        """Get a renderable for the progress display."""
+        renderable = RenderGroup(*self.get_renderables())
+        return renderable
+
+    def get_renderables(self) -> Iterable[RenderableType]:
+        """Get a number of renderables for the progress display."""
+        table = self.make_tasks_table(self.tasks)
+        yield table
+
+    def make_tasks_table(self, tasks: Iterable[Task]) -> Table:
+        """Get a table to render the Progress display.
+
+        Args:
+            tasks (Iterable[Task]): An iterable of Task instances, one per row of the table.
+
+        Returns:
+            Table: A table instance.
+        """
+
         table = Table.grid()
         table.pad_edge = True
         table.padding = (0, 1, 0, 0)
         for _ in self.columns:
             table.add_column()
-        for _, task in self._tasks.items():
+        for task in tasks:
             if task.visible:
                 row: List[RenderableType] = []
                 append = row.append
@@ -617,10 +641,101 @@ class Progress:
         with self._lock:
             del self._tasks[task_id]
 
+    def print(
+        self,
+        *objects: Any,
+        sep=" ",
+        end="\n",
+        style: Union[str, Style] = None,
+        emoji: bool = None,
+        markup: bool = None,
+        highlight: bool = None,
+    ) -> None:
+        """Print to the terminal and preserve progress display. Parameters identical to :class:`~rich.console.Console.print`."""
+        with self.console:
+            self.console.print(self._live_render.position_cursor())
+            self.console.print(
+                *objects,
+                sep=sep,
+                end=end,
+                style=style,
+                emoji=emoji,
+                markup=markup,
+                highlight=highlight,
+            )
+            self.console.print(self._live_render)
+
+    def log(
+        self,
+        *objects: Any,
+        sep=" ",
+        end="\n",
+        emoji: bool = None,
+        markup: bool = None,
+        highlight: bool = None,
+        log_locals: bool = False,
+        _stack_offset=1,
+    ) -> None:
+        """Log to the terminal and preserve progress display. Parameters identical to :class:`~rich.console.Console.log`."""
+        with self.console:
+            self.console.print(self._live_render.position_cursor())
+            self.console.log(
+                *objects,
+                sep=sep,
+                end=end,
+                emoji=emoji,
+                markup=markup,
+                highlight=highlight,
+                log_locals=log_locals,
+                _stack_offset=_stack_offset,
+            )
+            self.console.print(self._live_render)
+
 
 if __name__ == "__main__":  # pragma: no coverage
 
     import time
+    import random
+
+    from .panel import Panel
+    from .syntax import Syntax
+    from .table import Table
+    from .rule import Rule
+
+    syntax = Syntax(
+        '''def loop_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
+"""Iterate and generate a tup`le with a flag for last value."""
+iter_values = iter(values)
+try:
+    previous_value = next(iter_values)
+except StopIteration:
+    return
+for value in iter_values:
+    yield False, previous_value
+    previous_value = value
+yield True, previous_value''',
+        "python",
+        line_numbers=True,
+    )
+
+    table = Table("foo", "bar", "baz")
+    table.add_row("1", "2", "3")
+
+    progress_renderables = [
+        "Text may be printed while the progress bars are rendering.",
+        Panel("In fact, [i]any[/i] renderable will work"),
+        "Such as [magenta]tables[/]...",
+        table,
+        "Pretty printed structures...",
+        {"type": "example", "text": "Pretty printed"},
+        "Syntax...",
+        syntax,
+        Rule("Give it a try!"),
+    ]
+
+    from itertools import cycle
+
+    examples = cycle(progress_renderables)
 
     with Progress() as progress:
 
@@ -633,3 +748,5 @@ if __name__ == "__main__":  # pragma: no coverage
             progress.update(task2, advance=0.3)
             progress.update(task3, advance=0.9)
             time.sleep(0.01)
+            if random.randint(0, 100) < 1:
+                progress.log(next(examples))

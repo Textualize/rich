@@ -1,7 +1,7 @@
 from typing import NamedTuple, Optional
 
 from .cells import cell_len, set_cell_size
-from .style import Style
+from .style import Style, StyleType
 
 from itertools import zip_longest
 from typing import Iterable, List, Tuple
@@ -12,15 +12,34 @@ class Segment(NamedTuple):
     
     Args:
         text (str): A piece of text.
-        style (:class:`rich.style.Style`, optional): An optional style to apply to the text.
+        style (:class:`~rich.style.Style`, optional): An optional style to apply to the text.
+        is_control (bool, optional): Boolean that marks segment as containing non-printable control codes.
     """
 
     text: str = ""
     style: Optional[Style] = None
+    is_control: bool = False
 
     def __repr__(self) -> str:
         """Simplified repr."""
-        return f"Segment({self.text!r}, {self.style!r})"
+        return f"Segment({self.text!r}, {self.style!r}, {self.is_control!r})"
+
+    @property
+    def cell_length(self) -> int:
+        """Get cell length of segment."""
+        return 0 if self.is_control else cell_len(self.text)
+
+    @classmethod
+    def control(self, text: str) -> "Segment":
+        """Create a Segment with control codes.
+
+        Args:
+            text (str): Text containing non-printable control codes.
+
+        Returns:
+            Segment: A Segment instance with ``is_control=True``.
+        """
+        return Segment(text, is_control=True)
 
     @classmethod
     def line(self) -> "Segment":
@@ -43,7 +62,26 @@ class Segment(NamedTuple):
         if style is None:
             return segments
         apply = style.__add__
-        return (cls(text, apply(style)) for text, style in segments)
+        return (
+            cls(text, None if is_control else apply(style), is_control)
+            for text, style, is_control in segments
+        )
+
+    @classmethod
+    def filter_control(
+        self, segments: Iterable["Segment"], is_control=False
+    ) -> Iterable["Segment"]:
+        """Filter segments by ``is_control`` attribute.
+
+        Args:
+            segments (Iterable[Segment]): An iterable of Segment instances.
+            is_control (bool, optional): is_control flag to match in search.
+
+        Returns:
+            Iterable[Segment]: And iterable of Segment instances.
+        
+        """
+        return (segment for segment in segments if segment.is_control == is_control)
 
     @classmethod
     def split_and_crop_lines(
@@ -70,8 +108,8 @@ class Segment(NamedTuple):
         append = lines[-1].append
 
         for segment in segments:
-            if "\n" in segment.text:
-                text, style = segment
+            if "\n" in segment.text and not segment.is_control:
+                text, style, _ = segment
                 while text:
                     _text, new_line, text = text.partition("\n")
                     if _text:
@@ -105,7 +143,7 @@ class Segment(NamedTuple):
         Returns:
             List[Segment]: A line of segments with the desired length.
         """
-        line_length = sum(cell_len(text) for text, _style in line)
+        line_length = sum(segment.cell_length for segment in line)
         new_line: List[Segment]
 
         if line_length < length:
@@ -118,12 +156,12 @@ class Segment(NamedTuple):
             append = new_line.append
             line_length = 0
             for segment in line:
-                segment_length = cell_len(segment.text)
-                if line_length + segment_length < length:
+                segment_length = segment.cell_length
+                if line_length + segment_length < length or segment.is_control:
                     append(segment)
                     line_length += segment_length
                 else:
-                    text, style = segment
+                    text, style, _ = segment
                     text = set_cell_size(text, length - line_length)
                     append(cls(text, style))
                     break
@@ -141,7 +179,7 @@ class Segment(NamedTuple):
         Returns:
             int: The length of the line.
         """
-        return sum(cell_len(text) for text, _ in line)
+        return sum(segment.cell_length for segment in line)
 
     @classmethod
     def get_shape(cls, lines: List[List["Segment"]]) -> Tuple[int, int]:
@@ -208,7 +246,7 @@ class Segment(NamedTuple):
 
         _Segment = Segment
         for segment in iter_segments:
-            if last_segment.style == segment.style:
+            if last_segment.style == segment.style and not segment.is_control:
                 last_segment = _Segment(
                     last_segment.text + segment.text, last_segment.style
                 )

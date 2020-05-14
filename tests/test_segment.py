@@ -3,7 +3,7 @@ from rich.style import Style
 
 
 def test_repr():
-    assert repr(Segment("foo")) == "Segment('foo', None)"
+    assert repr(Segment("foo")) == "Segment('foo', None, False)"
 
 
 def test_line():
@@ -56,7 +56,6 @@ def test_set_shape():
     assert Segment.set_shape([[Segment("Hello")]], 10) == [
         [Segment("Hello"), Segment("     ")]
     ]
-
     assert Segment.set_shape([[Segment("Hello")]], 10, 2) == [
         [Segment("Hello"), Segment("     ")],
         [Segment(" " * 10)],
@@ -67,11 +66,17 @@ def test_simplify():
     assert list(
         Segment.simplify([Segment("Hello"), Segment(" "), Segment("World!")])
     ) == [Segment("Hello World!")]
-
     assert list(
         Segment.simplify(
             [Segment("Hello", "red"), Segment(" ", "red"), Segment("World!", "blue")]
         )
     ) == [Segment("Hello ", "red"), Segment("World!", "blue")]
-
     assert list(Segment.simplify([])) == []
+
+
+def test_filter_control():
+    segments = [Segment("foo"), Segment("bar", is_control=True)]
+    assert list(Segment.filter_control(segments)) == [Segment("foo")]
+    assert list(Segment.filter_control(segments, is_control=True)) == [
+        Segment("bar", is_control=True)
+    ]

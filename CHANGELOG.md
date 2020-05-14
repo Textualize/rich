@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added -p switch to python -m rich.markdown to page output
+- Added Console.control to output control codes
+
+### Changed
+
+- Changed Console log_time_format to no longer require a space at the end
+- Added print and log to Progress to render terminal output when progress is active
 
 ## [1.1.1] - 2020-05-12
 

@@ -27,6 +27,7 @@ def test_str():
         )
         == "bold dim italic underline blink blink2 reverse conceal strike red on black"
     )
+    assert str(Style(link="foo")) == "link foo"
 
 
 def test_repr():
@@ -58,6 +59,9 @@ def test_parse():
     assert Style.parse("bold red on black") == Style(
         color="red", bgcolor="black", bold=True
     )
+    assert Style.parse("bold link https://example.org") == Style(
+        bold=True, link="https://example.org"
+    )
     with pytest.raises(errors.StyleSyntaxError):
         Style.parse("on")
     with pytest.raises(errors.StyleSyntaxError):
@@ -66,6 +70,8 @@ def test_parse():
         Style.parse("rgb(999,999,999)")
     with pytest.raises(errors.StyleSyntaxError):
         Style.parse("not monkey")
+    with pytest.raises(errors.StyleSyntaxError):
+        Style.parse("link")
 
 
 def test_get_html_style():

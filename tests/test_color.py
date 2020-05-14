@@ -36,6 +36,9 @@ def test_truecolor() -> None:
     assert Color.parse("default").get_truecolor(foreground=False) == ColorTriplet(
         255, 255, 255
     )
+    assert Color("red", ColorType.WINDOWS, number=1).get_truecolor() == ColorTriplet(
+        255, 0, 0
+    )
 
 
 def test_parse_success() -> None:
@@ -109,12 +112,29 @@ def test_downgrade() -> None:
     assert Color.parse("#ff0000").downgrade(ColorSystem.EIGHT_BIT) == Color(
         "#ff0000", ColorType.EIGHT_BIT, 196, None
     )
+
     assert Color.parse("#ff0000").downgrade(ColorSystem.STANDARD) == Color(
         "#ff0000", ColorType.STANDARD, 1, None
     )
 
     assert Color.parse("9").downgrade(ColorSystem.STANDARD) == Color(
         "9", ColorType.STANDARD, 1, None
+    )
+
+    assert Color.parse("red").downgrade(ColorSystem.WINDOWS) == Color(
+        "red", ColorType.WINDOWS, 1, None
+    )
+
+    assert Color.parse("bright_red").downgrade(ColorSystem.WINDOWS) == Color(
+        "bright_red", ColorType.WINDOWS, 1, None
+    )
+
+    assert Color.parse("#ff0000").downgrade(ColorSystem.WINDOWS) == Color(
+        "#ff0000", ColorType.WINDOWS, 1, None
+    )
+
+    assert Color.parse("255").downgrade(ColorSystem.WINDOWS) == Color(
+        "255", ColorType.WINDOWS, 7, None
     )
 
 

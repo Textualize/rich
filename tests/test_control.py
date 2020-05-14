@@ -1,4 +1,9 @@
-from rich.control import strip_control_codes
+from rich.control import Control, strip_control_codes
+
+
+def test_control():
+    control = Control("FOO")
+    assert str(control) == "FOO"
 
 
 def test_strip_control_codes():

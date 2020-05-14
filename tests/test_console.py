@@ -1,4 +1,6 @@
 import io
+import os
+import tempfile
 
 import pytest
 
@@ -106,6 +108,13 @@ def test_render_error():
         list(console.render([], console.options))
 
 
+def test_control():
+    console = Console(file=io.StringIO())
+    console.control("FOO")
+    console.print("BAR")
+    assert console.file.getvalue() == "FOOBAR\n"
+
+
 class BrokenRenderable:
     def __console__(self, console, options):
         pass
@@ -140,3 +149,24 @@ def test_export_html_inline():
     html = console.export_html(inline_styles=True)
     expected = "<!DOCTYPE html>\n<head>\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style=\"font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span style=\"font-weight: bold\">foo</span>\n</pre>\n    </code>\n</body>\n</html>\n"
     assert html == expected
+
+
+def test_save_text():
+    console = Console(record=True, width=100)
+    console.print("foo")
+    with tempfile.TemporaryDirectory() as path:
+        export_path = os.path.join(path, "rich.txt")
+        console.save_text(export_path)
+        with open(export_path, "rt") as text_file:
+            assert text_file.read() == "foo\n"
+
+
+def test_save_html():
+    expected = "<!DOCTYPE html>\n<head>\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style=\"font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\">foo\n</pre>\n    </code>\n</body>\n</html>\n"
+    console = Console(record=True, width=100)
+    console.print("foo")
+    with tempfile.TemporaryDirectory() as path:
+        export_path = os.path.join(path, "example.html")
+        console.save_html(export_path)
+        with open(export_path, "rt") as html_file:
+            assert html_file.read() == expected
