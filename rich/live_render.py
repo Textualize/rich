@@ -27,7 +27,7 @@ class LiveRender:
             if height > 1:
                 return Control(f"\r\x1b[{height - 1}A\x1b[2K")
             else:
-                return Control("\r")
+                return Control("\r\x1b[2K")
         return Control("")
 
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
