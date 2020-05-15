@@ -13,9 +13,9 @@ If the default highlighting doesn't fit your needs, you can define a custom high
 
 Here's an example which highlights text that looks like an email address::
 
-
-    from rich.highlighter import RegexHighlighter
-
+    from rich.console import Console  
+    from rich.highlighter import RegexHighlighter      
+    from rich.theme import Theme
 
     class EmailHighlighter(RegexHighlighter):
         """Apply style to anything that looks like an email."""
@@ -24,13 +24,8 @@ Here's an example which highlights text that looks like an email address::
         highlights = [r"(?P<email>[\w-]+@([\w-]+\.)+[\w-]+)"]
 
 
-    from rich.console import Console
-    from rich.style import Style
-    from rich.theme import Theme
-
     theme = Theme({"example.email": "bold magenta"})
     console = Console(highlighter=EmailHighlighter(), theme=theme)
-
     console.print("Send funds to money@example.org")
 
 

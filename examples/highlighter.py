@@ -1,4 +1,6 @@
+from rich.console import Console
 from rich.highlighter import RegexHighlighter
+from rich.theme import Theme
 
 
 class EmailHighlighter(RegexHighlighter):
@@ -7,10 +9,6 @@ class EmailHighlighter(RegexHighlighter):
     base_style = "example."
     highlights = [r"(?P<email>[\w-]+@([\w-]+\.)+[\w-]+)"]
 
-
-from rich.console import Console
-from rich.style import Style
-from rich.theme import Theme
 
 theme = Theme({"example.email": "bold magenta"})
 console = Console(highlighter=EmailHighlighter(), theme=theme)
