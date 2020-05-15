@@ -324,7 +324,7 @@ class Progress:
     """Renders an auto-updating progress bar(s).
     
     Args:
-        console (Console, optional): Optional Console instance. Default will create own internal Console instance.
+        console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stderr.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
         refresh_per_second (int, optional): Number of times per second to refresh the progress information. Defaults to 10.
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
@@ -544,9 +544,10 @@ class Progress:
         """Refresh (render) the progress information."""
         with self._lock:
             self._live_render.set_renderable(self.get_renderable())
-            with self.console:
-                self.console.print(self._live_render.position_cursor())
-                self.console.print(self._live_render)
+            if self.console.is_terminal:
+                with self.console:
+                    self.console.print(self._live_render.position_cursor())
+                    self.console.print(self._live_render)
             self._refresh_count += 1
 
     def get_renderable(self) -> RenderableType:
@@ -652,9 +653,11 @@ class Progress:
         highlight: bool = None,
     ) -> None:
         """Print to the terminal and preserve progress display. Parameters identical to :class:`~rich.console.Console.print`."""
-        with self.console:
-            self.console.print(self._live_render.position_cursor())
-            self.console.print(
+        console = self.console
+        with console:
+            if console.is_terminal:
+                console.print(self._live_render.position_cursor())
+            console.print(
                 *objects,
                 sep=sep,
                 end=end,
@@ -663,7 +666,8 @@ class Progress:
                 markup=markup,
                 highlight=highlight,
             )
-            self.console.print(self._live_render)
+            if console.is_terminal:
+                console.print(self._live_render)
 
     def log(
         self,
@@ -677,9 +681,11 @@ class Progress:
         _stack_offset=1,
     ) -> None:
         """Log to the terminal and preserve progress display. Parameters identical to :class:`~rich.console.Console.log`."""
-        with self.console:
-            self.console.print(self._live_render.position_cursor())
-            self.console.log(
+        console = self.console
+        with console:
+            if console.is_terminal:
+                console.print(self._live_render.position_cursor())
+            console.log(
                 *objects,
                 sep=sep,
                 end=end,
@@ -687,9 +693,10 @@ class Progress:
                 markup=markup,
                 highlight=highlight,
                 log_locals=log_locals,
-                _stack_offset=_stack_offset,
+                _stack_offset=_stack_offset + 1,
             )
-            self.console.print(self._live_render)
+            if console.is_terminal:
+                console.print(self._live_render)
 
 
 if __name__ == "__main__":  # pragma: no coverage

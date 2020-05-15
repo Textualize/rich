@@ -16,10 +16,10 @@ class Rule:
     def __init__(
         self,
         title: Union[str, Text] = "",
-        character: str = "━",
+        character: str = None,
         style: Union[str, Style] = "rule.line",
     ) -> None:
-        if len(character) != 1:
+        if character and len(character) != 1:
             raise ValueError(
                 "Rule requires character argument to be a string of length 1"
             )
@@ -33,8 +33,10 @@ class Rule:
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         width = options.max_width
 
+        character = "-" if console.legacy_windows else (self.character or "━")
+
         if not self.title:
-            yield Text(self.character * width, self.style)
+            yield Text(character * width, self.style)
         else:
             if isinstance(self.title, Text):
                 title_text = self.title
@@ -45,11 +47,9 @@ class Rule:
 
             rule_text = Text()
             center = (width - len(title_text)) // 2
-            rule_text.append(self.character * (center - 1) + " ", self.style)
+            rule_text.append(character * (center - 1) + " ", self.style)
             rule_text.append(title_text)
-            rule_text.append(
-                " " + self.character * (width - len(rule_text) - 1), self.style
-            )
+            rule_text.append(" " + character * (width - len(rule_text) - 1), self.style)
             yield rule_text
 
 

@@ -82,7 +82,7 @@ def test_print_style():
 
 
 def test_show_cursor():
-    console = Console(file=io.StringIO())
+    console = Console(file=io.StringIO(), force_terminal=True)
     console.show_cursor(False)
     console.print("foo")
     console.show_cursor(True)
@@ -109,7 +109,7 @@ def test_render_error():
 
 
 def test_control():
-    console = Console(file=io.StringIO())
+    console = Console(file=io.StringIO(), force_terminal=True)
     console.control("FOO")
     console.print("BAR")
     assert console.file.getvalue() == "FOOBAR\n"

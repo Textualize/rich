@@ -57,9 +57,11 @@ class Bar:
     def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
         completed = min(self.total, max(0, self.completed))
         width = min(self.width or options.max_width, options.max_width)
-        bar = "━"
-        half_bar_right = "╸"
-        half_bar_left = "╺"
+
+        legacy_windows = console.legacy_windows
+        bar = "▓" if legacy_windows else "━"
+        half_bar_right = "░" if legacy_windows else "╸"
+        half_bar_left = " " if legacy_windows else "╺"
         complete_halves = int(width * 2 * completed / self.total)
         bar_count = complete_halves // 2
         half_bar_count = complete_halves % 2

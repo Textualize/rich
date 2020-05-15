@@ -1,6 +1,7 @@
 from typing import Optional, Tuple, Union
 
-from . import box
+from .box import Box, SQUARE, ROUNDED
+
 from .console import (
     Console,
     ConsoleOptions,
@@ -33,7 +34,7 @@ class Panel:
     def __init__(
         self,
         renderable: RenderableType,
-        box: box.Box = box.ROUNDED,
+        box: Box = None,
         expand: bool = True,
         style: Union[str, Style] = "none",
         width: Optional[int] = None,
@@ -59,8 +60,7 @@ class Panel:
         width = child_width + 2
         child_options = options.update(width=child_width)
         lines = console.render_lines(self.renderable, child_options)
-
-        box = self.box
+        box = SQUARE if console.legacy_windows else (self.box or ROUNDED)
         line_start = Segment(box.mid_left, style)
         line_end = Segment(f"{box.mid_right}\n", style)
         yield Segment(box.get_top([width - 2]), style)

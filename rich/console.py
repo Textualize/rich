@@ -429,8 +429,9 @@ class Console:
         Args:
             show (bool, optional): Set visibility of the cursor.
         """
-        self._check_buffer()
-        self.file.write("\033[?25h" if show else "\033[?25l")
+        if self.is_terminal and not self.legacy_windows:
+            self._check_buffer()
+            self.file.write("\033[?25h" if show else "\033[?25l")
 
     def _render(
         self, renderable: RenderableType, options: Optional[ConsoleOptions],
@@ -815,15 +816,34 @@ class Console:
             with self._record_buffer_lock:
                 self._record_buffer.extend(buffer)
         del self._buffer[:]
+        not_terminal = not self.is_terminal
         for line in Segment.split_and_crop_lines(buffer, self.width, pad=False):
             for text, style, is_control in line:
                 if style and not is_control:
                     append(style.render(text, color_system=color_system))
                 else:
-                    append(text)
+                    if not (not_terminal and is_control):
+                        append(text)
 
         rendered = "".join(output)
         return rendered
+
+    def input(
+        self, prompt: Union[str, Text] = "", *, markup: bool = True, emoji: bool = True
+    ) -> str:
+        """Displays a prompt and waits for input from the user. The prompt may contain color / style. 
+
+        Args:
+            prompt (Union[Str, Text]): Text to render in the prompt.
+            markup (bool, optional): Enable console markup (requires a str prompt). Defaults to True.
+            emoji (bool, optional): Enable emoji (requires a str prompt). Defaults to True.
+        
+        Returns:
+            str: Text read from stdin.
+        """
+        self.print(prompt, markup=markup, emoji=emoji, end="")
+        result = input()
+        return result
 
     def export_text(self, clear: bool = True, styles: bool = False) -> str:
         """Generate text from console contents (requires record=True argument in constructor).
