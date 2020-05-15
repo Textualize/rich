@@ -324,7 +324,7 @@ class Progress:
     """Renders an auto-updating progress bar(s).
     
     Args:
-        console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stderr.
+        console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
         refresh_per_second (int, optional): Number of times per second to refresh the progress information. Defaults to 10.
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
@@ -345,7 +345,7 @@ class Progress:
             "[progress.percentage]{task.percentage:>3.0f}%",
             TimeRemainingColumn(),
         )
-        self.console = console or Console(file=sys.stderr)
+        self.console = console or Console(file=sys.stdout)
         self.auto_refresh = auto_refresh
         self.refresh_per_second = refresh_per_second
         self.speed_estimate_period = speed_estimate_period
@@ -400,7 +400,8 @@ class Progress:
                     self._refresh_thread.stop()
                     self._refresh_thread = None
                 self.refresh()
-                self.console.line()
+                if self.console.is_terminal:
+                    self.console.line()
             finally:
                 self.console.show_cursor(True)
 
