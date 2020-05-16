@@ -115,6 +115,14 @@ def test_control():
     assert console.file.getvalue() == "FOOBAR\n"
 
 
+def test_input(monkeypatch, capsys):
+    monkeypatch.setattr('builtins.input', lambda: "bar")
+    console = Console()
+    user_input = console.input(prompt="foo:")
+    assert capsys.readouterr().out == "foo:"
+    assert user_input == "bar"
+
+
 class BrokenRenderable:
     def __console__(self, console, options):
         pass
