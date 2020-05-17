@@ -75,4 +75,4 @@ if __name__ == "__main__":  # pragma: no cover
     console = Console()
 
     for align in ["left", "center", "right"]:
-        console.print(Align("Hello\nWorld!\nWorld!!!", align))
+        console.print(Align("Hello\nWorld!\nWorld!!!", align))  # type: ignore
