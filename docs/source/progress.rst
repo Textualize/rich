@@ -24,7 +24,7 @@ For basic usage call the :func:`~rich.progress.track` function, which accepts a 
 Advanced usage
 --------------
 
-If you require multiple tasks in the display, or wish to configure the columns in the progress display, you can work directly with the :class:`~rich.progress.Progress` class. To use, add a task(s) with (:meth:`~rich.progress.Progress.add_task`) and update progress with :meth:`~rich.progress.Progress.update`.
+If you require multiple tasks in the display, or wish to configure the columns in the progress display, you can work directly with the :class:`~rich.progress.Progress` class. Once you have constructed a Progress object, add task(s) with (:meth:`~rich.progress.Progress.add_task`) and update progress with :meth:`~rich.progress.Progress.update`.
 
 The Progress class is designed to be used as a *context manager* which will start and stop the progress display automatically.
 
