@@ -28,6 +28,7 @@ To write rich content to the terminal use the :meth:`~rich.console.Console.print
     console.print([1, 2, 3])
     console.print("[blue underline]Looks like a link")
     console.print(locals())
+    console.print("FOO", style="white on blue")
 
 You can also use :meth:`~rich.console.Console.print` to render objects that support the :ref:`protocol`, which includes Rich's built in objects such as :class:`~rich.text.Text`, :class:`~rich.table.Table`, and :class:`~rich.syntax.Syntax` -- or other custom objects.
 
@@ -45,6 +46,34 @@ The :meth:`~rich.console.Console.log` methods offers the same capabilities as pr
     </pre>
 
 To help with debugging, the log() method has a ``log_locals`` parameter. If you set this to ``True``, Rich will display a table of local variables where the method was called.
+
+Justify / Alignment
+-------------------
+
+Both print and log support a ``justify`` argument which if set must be one of "left", "right", "center", or "full".  If "left", any text printed (or logged) will be left aligned, if "right" text will be aligned to the right of the terminal, if "center" the text will be centered, and if "full" the text will be lined up with both the left and right edges of the terminal (like printed text in a book). 
+
+The default for ``justify`` is ``None`` which will generally look the same as ``"left"`` but with a subtle different. Left justify will pad the right of the text with spaces, while a None justify will not. You will only notice the difference if you set a background color with the ``style`` argument. The following example demonstrates the difference::
+
+    from rich.console import Console
+
+    console = Console(width=20)
+
+    style = "bold white on blue"
+    console.print("Rich", style=style)
+    console.print("Rich", style=style, justify="left")
+    console.print("Rich", style=style, justify="center")
+    console.print("Rich", style=style, justify="right")
+
+
+This produces the following output:
+
+.. raw:: html
+
+    <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #c0c0c0; background-color: #000080; font-weight: bold">Rich
+    Rich               &nbsp;
+            Rich       &nbsp; 
+                    Rich
+    </span></pre>
 
 
 Exporting
