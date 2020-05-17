@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any, Iterable, List, Optional, TYPE_CHECKING, Union
 
+
 from .text import Text
 
 if TYPE_CHECKING:
@@ -40,7 +41,7 @@ class LogRender:
             output.add_column(style="log.time")
         if self.show_level:
             output.add_column(style="log.level", width=8)
-        output.add_column(ratio=1, style="log.message")
+        output.add_column(ratio=1, style="log.message", justify=None)
         if self.show_path and path:
             output.add_column(style="log.path")
         row: List["RenderableType"] = []
@@ -55,9 +56,10 @@ class LogRender:
                 self._last_time = log_time_display
         if self.show_level:
             row.append(level)
+
         row.append(Renderables(renderables))
         if self.show_path and path:
-            row.append(Text(f" {path}:{line_no}" if line_no else path))
+            row.append(Text(f"{path}:{line_no}" if line_no else path))
 
         output.add_row(*row)
         return output

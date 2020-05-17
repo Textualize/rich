@@ -84,6 +84,27 @@ class Segment(NamedTuple):
         return (segment for segment in segments if segment.is_control == is_control)
 
     @classmethod
+    def split_lines(cls, segments: Iterable["Segment"]) -> Iterable[List["Segment"]]:
+
+        line: List[Segment] = []
+        append = line.append
+
+        for segment in segments:
+            if "\n" in segment.text and not segment.is_control:
+                text, style, _ = segment
+                while text:
+                    _text, new_line, text = text.partition("\n")
+                    if _text:
+                        append(cls(_text, style))
+                    if new_line:
+                        yield line[:]
+                        del line[:]
+            else:
+                append(segment)
+        if line:
+            yield line
+
+    @classmethod
     def split_and_crop_lines(
         cls,
         segments: Iterable["Segment"],

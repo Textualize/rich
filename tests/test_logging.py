@@ -21,7 +21,7 @@ def make_log():
 
 def test_log():
     render = make_log()
-    expected = "\x1b[2;36m[DATE]\x1b[0m\x1b[2;36m \x1b[0m\x1b[32mDEBUG\x1b[0m    foo                                         \x1b[2m test_logging.py:17\x1b[0m\x1b[2m \x1b[0m\n"
+    expected = "\x1b[2;36m[DATE]\x1b[0m\x1b[2;36m \x1b[0m\x1b[32mDEBUG\x1b[0m    foo                                          \x1b[2mtest_logging.py:17\x1b[0m\x1b[2m \x1b[0m\n"
     assert render == expected
 
 

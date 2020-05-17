@@ -61,7 +61,7 @@ Columns
 
 You may customize the columns in the progress display with the positional arguments to the :class:`~rich.progress.Progress` constructor. The columns are specified as either a format string or a :class:`~rich.progress.ProgressColumn` object.
 
-Format strings will be rendered with a single value `"task"` which will be a :class:`~rich.progress.Task` instance. For example ``"{task.description}"`` would display the task description in the column.
+Format strings will be rendered with a single value `"task"` which will be a :class:`~rich.progress.Task` instance. For example ``"{task.description}"`` would display the task description in the column, and ``"{task.completed} of {task.total}"`` would display how many of the total steps have been completed.
 
 The defaults are roughly equivalent to the following::
 
@@ -75,9 +75,10 @@ The defaults are roughly equivalent to the following::
 The following column objects are available:
 
 - :class:`~rich.progress.BarColumn` Displays the bar.
+- :class:`~rich.progress.TextColumn` Displays text.
 - :class:`~rich.progress.TimeRemainingColumn` Displays the estimated time remaining.
 - :class:`~rich.progress.FileSizeColumn` Displays progress as file size (assumes the steps are bytes).
-- :class:`~rich.progress.FileSizeCompletedColumn` Displays total file size (assumes the steps are bytes).
+- :class:`~rich.progress.TotalFileSizeColumn` Displays total file size (assumes the steps are bytes).
 - :class:`~rich.progress.DownloadColumn` Displays download progress (assumes the steps are bytes).
 - :class:`~rich.progress.TransferSpeedColumn` Displays transfer speed (assumes the steps are bytes.
 

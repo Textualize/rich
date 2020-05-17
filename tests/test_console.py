@@ -7,6 +7,7 @@ import pytest
 from rich.color import ColorSystem
 from rich.console import Console, ConsoleOptions
 from rich import errors
+from rich.panel import Panel
 from rich.segment import Segment
 from rich.style import Style
 from rich.theme import Theme
@@ -116,11 +117,62 @@ def test_control():
 
 
 def test_input(monkeypatch, capsys):
-    monkeypatch.setattr('builtins.input', lambda: "bar")
+    monkeypatch.setattr("builtins.input", lambda: "bar")
     console = Console()
     user_input = console.input(prompt="foo:")
     assert capsys.readouterr().out == "foo:"
     assert user_input == "bar"
+
+
+def test_justify_none():
+    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    console.print("FOO", justify=None)
+    assert console.file.getvalue() == "FOO\n"
+
+
+def test_justify_left():
+    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    console.print("FOO", justify="left")
+    assert console.file.getvalue() == "FOO                 \n"
+
+
+def test_justify_center():
+    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    console.print("FOO", justify="center")
+    assert console.file.getvalue() == "        FOO         \n"
+
+
+def test_justify_right():
+    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    console.print("FOO", justify="right")
+    assert console.file.getvalue() == "                 FOO\n"
+
+
+def test_justify_renderable_none():
+    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    console.print(Panel("FOO", expand=False), justify=None)
+    assert console.file.getvalue() == "╭───╮\n│FOO│\n╰───╯\n"
+
+
+def test_justify_renderable_left():
+    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    console.print(Panel("FOO", expand=False), justify="left")
+    assert console.file.getvalue() == "╭───╮\n│FOO│\n╰───╯\n"
+
+
+def test_justify_renderable_center():
+    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    console.print(Panel("FOO", expand=False), justify="center")
+    assert console.file.getvalue() == "       ╭───╮\n       │FOO│\n       ╰───╯\n"
+
+
+def test_justify_renderable_right():
+    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    console.print(Panel("FOO", expand=False), justify="right")
+    assert (
+        console.file.getvalue()
+        == "               ╭───╮\n               │FOO│\n               ╰───╯\n"
+    )
 
 
 class BrokenRenderable:

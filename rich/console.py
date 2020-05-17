@@ -15,6 +15,7 @@ import threading
 from typing import (
     Any,
     Callable,
+    cast,
     Dict,
     IO,
     Iterable,
@@ -31,6 +32,7 @@ from typing_extensions import Protocol, runtime_checkable, Literal
 
 from ._emoji_replace import _emoji_replace
 
+from .align import Align, AlignValues
 from .markup import render as render_markup
 from .measure import measure_renderables, Measurement
 from ._log_render import LogRender
@@ -535,6 +537,7 @@ class Console:
         self,
         text: str,
         style: Union[str, Style] = "",
+        justify: JustifyValues = None,
         emoji: bool = None,
         markup: bool = None,
         highlighter: HighlighterType = None,
@@ -545,6 +548,7 @@ class Console:
         Args:
             text (str): Text to render.
             style (Union[str, Style], optional): Style to apply to rendered text.
+            justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
             emoji (Optional[bool], optional): Enable emoji, or ``None`` to use Console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use Console default.
             highlighter (HighlighterType, optional): Optional highlighter to apply.
@@ -559,7 +563,9 @@ class Console:
             rich_text = render_markup(text, style=style, emoji=emoji_enabled)
         else:
             rich_text = Text(
-                _emoji_replace(text) if emoji_enabled else text, style=style
+                _emoji_replace(text) if emoji_enabled else text,
+                justify=justify,
+                style=style,
             )
 
         if highlighter is not None:
@@ -600,6 +606,7 @@ class Console:
         objects: Iterable[Any],
         sep: str,
         end: str,
+        justify: JustifyValues = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
@@ -609,7 +616,8 @@ class Console:
         Args:
             renderables (Iterable[Union[str, ConsoleRenderable]]): Anyting that Rich can render.
             sep (str, optional): String to write between print data. Defaults to " ".
-            end (str, optional): String to write at end of print data. Defaults to "\n".            
+            end (str, optional): String to write at end of print data. Defaults to "\n". 
+            justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.       
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default.
@@ -617,11 +625,21 @@ class Console:
         Returns:
             List[ConsoleRenderable]: A list of things to render.
         """
-        sep_text = Text(sep, end=end)
         renderables: List[ConsoleRenderable] = []
-        append = renderables.append
+        _append = renderables.append
         text: List[Text] = []
         append_text = text.append
+
+        align = cast(
+            AlignValues, justify if justify in ("left", "center", "right") else "left"
+        )
+
+        if align == "left":
+            append = _append
+        else:
+
+            def append(renderable: RenderableType) -> None:
+                _append(Align(renderable, align))
 
         _highlighter: HighlighterType = _null_highlighter
         if highlight or (highlight is None and self._highlight):
@@ -629,6 +647,7 @@ class Console:
 
         def check_text() -> None:
             if text:
+                sep_text = Text(sep, justify=text[0].justify or justify, end=end)
                 append(sep_text.join(text))
                 del text[:]
 
@@ -639,7 +658,11 @@ class Console:
             if isinstance(renderable, str):
                 append_text(
                     self.render_str(
-                        renderable, emoji=emoji, markup=markup, highlighter=_highlighter
+                        renderable,
+                        justify=justify,
+                        emoji=emoji,
+                        markup=markup,
+                        highlighter=_highlighter,
                     )
                 )
             elif isinstance(renderable, Text):
@@ -689,6 +712,7 @@ class Console:
         sep=" ",
         end="\n",
         style: Union[str, Style] = None,
+        justify: JustifyValues = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
@@ -700,6 +724,7 @@ class Console:
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
+            justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to None.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to None
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to None.
@@ -710,7 +735,13 @@ class Console:
 
         with self:
             renderables = self._collect_renderables(
-                objects, sep, end, emoji=emoji, markup=markup, highlight=highlight
+                objects,
+                sep,
+                end,
+                justify=justify,
+                emoji=emoji,
+                markup=markup,
+                highlight=highlight,
             )
             render_options = self.options
             extend = self._buffer.extend
@@ -753,6 +784,7 @@ class Console:
         *objects: Any,
         sep=" ",
         end="\n",
+        justify: JustifyValues = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
@@ -765,6 +797,7 @@ class Console:
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".
+            justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to None.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to None.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to None.
@@ -776,7 +809,13 @@ class Console:
             self.line()
             return
         renderables = self._collect_renderables(
-            objects, sep, end, emoji=emoji, markup=markup, highlight=highlight
+            objects,
+            sep,
+            end,
+            justify=justify,
+            emoji=emoji,
+            markup=markup,
+            highlight=highlight,
         )
 
         caller = inspect.stack()[_stack_offset]

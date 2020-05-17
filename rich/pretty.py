@@ -25,4 +25,4 @@ class Pretty:
 
     def __measure__(self, console: "Console", max_width: int) -> "Measurement":
         text = Text(pformat(self._object, width=max_width))
-        return text.__measure__(console, max_width)
+        return Measurement.get(console, text, max_width)

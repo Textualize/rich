@@ -230,18 +230,33 @@ class ProgressSample(NamedTuple):
 class Task:
     """Information regarding a progress task.
     
-    Note, that this object should be considered read-only outside of the `Progress` class.
+    This object should be considered read-only outside of the :class:`~Progress` class.
 
     """
 
     id: TaskID
+    """Task ID associated with this task (used in Progress methods)."""
+
     description: str
+    """str: Description of the task."""
+
     total: float
+    """str: Total number of steps in this task."""
+
     completed: float
+    """float: Number of steps completed"""
+
     visible: bool = True
+    """bool: Indicates if this task is visible in the progress display."""
+
     fields: Dict[str, Any] = field(default_factory=dict)
+    """Arbitrary fields passed in via Progress.update."""
+
     start_time: Optional[float] = field(default=None, init=False, repr=False)
+    """Optional[float]: Time this task was started, or None if not started."""
+
     stop_time: Optional[float] = field(default=None, init=False, repr=False)
+    """Optional[float]: Time this task was stopped, or None if not stopped."""
 
     _progress: Deque[ProgressSample] = field(
         default_factory=deque, init=False, repr=False
@@ -249,12 +264,12 @@ class Task:
 
     @property
     def remaining(self) -> float:
-        """Get the number of steps remaining."""
+        """float: Get the number of steps remaining."""
         return self.total - self.completed
 
     @property
     def elapsed(self) -> Optional[float]:
-        """Time elapsed since task was started, or ``None`` if the task hasn't started."""
+        """Optional[float]: Time elapsed since task was started, or ``None`` if the task hasn't started."""
         if self.start_time is None:
             return None
         if self.stop_time is not None:
@@ -263,12 +278,12 @@ class Task:
 
     @property
     def finished(self) -> bool:
-        """Check if the task has completed."""
+        """bool: Check if the task has completed."""
         return self.completed >= self.total
 
     @property
     def percentage(self) -> float:
-        """Get progress of task as a percantage."""
+        """float: Get progress of task as a percantage."""
         if not self.total:
             return 0.0
         completed = (self.completed / self.total) * 100.0
@@ -277,7 +292,7 @@ class Task:
 
     @property
     def speed(self) -> Optional[float]:
-        """Get the estimated speed in steps per second."""
+        """Optional[float]: Get the estimated speed in steps per second."""
         if self.start_time is None:
             return None
         progress = list(self._progress)
@@ -292,7 +307,7 @@ class Task:
 
     @property
     def time_remaining(self) -> Optional[float]:
-        """Get estimated time to completion, or ``None`` if no data."""
+        """Optional[float]: Get estimated time to completion, or ``None`` if no data."""
         if self.finished:
             return 0.0
         speed = self.speed
@@ -649,6 +664,7 @@ class Progress:
         sep=" ",
         end="\n",
         style: Union[str, Style] = None,
+        justify: JustifyValues = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
@@ -663,6 +679,7 @@ class Progress:
                 sep=sep,
                 end=end,
                 style=style,
+                justify=justify,
                 emoji=emoji,
                 markup=markup,
                 highlight=highlight,
@@ -675,6 +692,7 @@ class Progress:
         *objects: Any,
         sep=" ",
         end="\n",
+        justify: JustifyValues = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
@@ -690,6 +708,7 @@ class Progress:
                 *objects,
                 sep=sep,
                 end=end,
+                justify=justify,
                 emoji=emoji,
                 markup=markup,
                 highlight=highlight,

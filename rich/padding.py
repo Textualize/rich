@@ -32,7 +32,7 @@ class Padding:
     def __init__(
         self,
         renderable: "RenderableType",
-        pad: "PaddingDimensions",
+        pad: "PaddingDimensions" = (0, 0, 0, 0),
         *,
         style: Union[str, Style] = "none",
     ):
