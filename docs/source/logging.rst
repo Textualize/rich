@@ -10,7 +10,7 @@ Here's an example of how to set up a rich logger::
 
     FORMAT = "%(message)s"
     logging.basicConfig(
-        level="NOTSET", format=FORMAT, datefmt="[%X] ", handlers=[RichHandler()]
+        level="NOTSET", format=FORMAT, datefmt="[%X]", handlers=[RichHandler()]
     )
 
     log = logging.getLogger("rich")

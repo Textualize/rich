@@ -62,7 +62,9 @@ class Bar:
         bar = "▓" if legacy_windows else "━"
         half_bar_right = "░" if legacy_windows else "╸"
         half_bar_left = " " if legacy_windows else "╺"
-        complete_halves = int(width * 2 * completed / self.total)
+        complete_halves = (
+            int(width * 2 * completed / self.total) if self.total else width * 2
+        )
         bar_count = complete_halves // 2
         half_bar_count = complete_halves % 2
         style = console.get_style(self.style)

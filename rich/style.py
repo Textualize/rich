@@ -215,15 +215,22 @@ class Style:
             `Style`: A Style instance.
         """
         style_attributes = {
-            "dim",
-            "bold",
-            "italic",
-            "underline",
-            "blink",
-            "blink2",
-            "reverse",
-            "conceal",
-            "strike",
+            "dim": "dim",
+            "d": "dim",
+            "bold": "bold",
+            "b": "bold",
+            "italic": "italic",
+            "i": "italic",
+            "underline": "underline",
+            "u": "underline",
+            "blink": "blink",
+            "blink2": "blink2",
+            "reverse": "reverse",
+            "r": "reverse",
+            "conceal": "conceal",
+            "c": "conceal",
+            "strike": "strike",
+            "s": "strike"
         }
         color: Optional[str] = None
         bgcolor: Optional[str] = None
@@ -247,11 +254,12 @@ class Style:
 
             elif word == "not":
                 word = next(words, "")
-                if word not in style_attributes:
+                attribute = style_attributes.get(word)
+                if attribute is None:
                     raise errors.StyleSyntaxError(
                         f"expected style attribute after 'not', found {original_word!r}"
-                    )
-                attributes[word] = False
+                    )                
+                attributes[attribute] = False
 
             elif word == "link":
                 word = next(words, "")
@@ -260,7 +268,7 @@ class Style:
                 link = word
 
             elif word in style_attributes:
-                attributes[word] = True
+                attributes[style_attributes[word]] = True
 
             else:
                 try:

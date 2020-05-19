@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.6] - Unreleased
+## [1.1.7] - 2020-05-19
+
+### Changed
+
+- Some style attributes may be abbreviated (b for bold, i for italic etc). Previously abbreviations worked in console markup but only one at a time, i.e. "[b]Hello[/]" but not "[b i]Hello[/]" -- now they work everywhere.
+
+### Fixed
+
+- Fixed zero division if total is 0 in progress bar
+
+## [1.1.6] - 2020-05-17
 
 ### Added
 

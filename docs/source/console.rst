@@ -52,7 +52,7 @@ Justify / Alignment
 
 Both print and log support a ``justify`` argument which if set must be one of "left", "right", "center", or "full".  If "left", any text printed (or logged) will be left aligned, if "right" text will be aligned to the right of the terminal, if "center" the text will be centered, and if "full" the text will be lined up with both the left and right edges of the terminal (like printed text in a book). 
 
-The default for ``justify`` is ``None`` which will generally look the same as ``"left"`` but with a subtle different. Left justify will pad the right of the text with spaces, while a None justify will not. You will only notice the difference if you set a background color with the ``style`` argument. The following example demonstrates the difference::
+The default for ``justify`` is ``None`` which will generally look the same as ``"left"`` but with a subtle difference. Left justify will pad the right of the text with spaces, while a None justify will not. You will only notice the difference if you set a background color with the ``style`` argument. The following example demonstrates the difference::
 
     from rich.console import Console
 
@@ -75,6 +75,15 @@ This produces the following output:
                     Rich
     </span></pre>
 
+
+Input
+-----
+
+The console class has an :meth:`~rich.console.Console.input` which works in the same way as Python's builtin ``input()`` method, but can use anything that Rich can print as a prompt. For example, here's a colorful prompt with an emoji::
+
+    from rich.console import Console
+    console = Console()
+    console.input("What is [i]your[/i] [bold red]name[/]? :smiley: ")
 
 Exporting
 ---------

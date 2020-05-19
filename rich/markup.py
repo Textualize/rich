@@ -26,7 +26,7 @@ class Tag(NamedTuple):
         return (
             f"[{self.name}]"
             if self.parameters is None
-            else f"[{self.name} {self.parameters}]"
+            else f"[{self.name}={self.parameters}]"
         )
 
 
@@ -61,7 +61,7 @@ def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
             if equals:
                 yield start, None, Tag(text, parameters)
             else:
-                yield start, None, Tag(normalize(tag_text.strip()), None)
+                yield start, None, Tag(tag_text.strip(), None)
         else:
             yield start, (escape_open and "[") or (escape_close and "]"), None  # type: ignore
         position = end
@@ -84,6 +84,7 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
     """
     text = Text(style=style)
     append = text.append
+    normalize = Style.normalize
 
     style_stack: List[Tuple[int, Tag]] = []
     pop = style_stack.pop
@@ -108,6 +109,7 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
             if tag.name.startswith("/"):  # Closing tag
                 style_name = tag.name[1:].strip()
                 if style_name:  # explicit close
+                    style_name = normalize(style_name)
                     try:
                         start, open_tag = pop_style(style_name)
                     except KeyError:
@@ -124,7 +126,8 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
 
                 append_span(_Span(start, len(text), str(open_tag)))
             else:  # Opening tag
-                style_stack.append((len(text), tag))
+                normalized_tag = Tag(normalize(tag.name), tag.parameters)
+                style_stack.append((len(text), normalized_tag))
 
     text_length = len(text)
     while style_stack:

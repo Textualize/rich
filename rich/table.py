@@ -260,6 +260,9 @@ class Table:
     def add_row(self, *renderables: Optional["RenderableType"]) -> None:
         """Add a row of renderables.
         
+        Args:
+            *renderables (None or renderable): Each cell in a row must be None (for a blank cell) or a renderable object (including str).
+
         Raises:
             errors.NotRenderableError: If you add something that can't be rendered.
         """
@@ -289,7 +292,7 @@ class Table:
                 add_cell(column, renderable)
             else:
                 raise errors.NotRenderableError(
-                    f"unable to render {renderable!r}; str or object with a __console__ method is required"
+                    f"unable to render {type(renderable).__name__}; a string or other renderable object is required"
                 )
         self._row_count += 1
 

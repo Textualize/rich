@@ -30,20 +30,21 @@ The hex and rgb forms allow you to select from the full *truecolor* set of 16.7 
 .. note::
     Some terminals only support 256 colors. Rich will attempt to pick the closest color it can if your color isn't available.
 
-
 By itself, a color will change the *foreground* color. To specify a *background* color precede the color with the word "on". For example, the following prints text in red on a white background::
 
     console.print("DANGER!", style="red on white")
 
+You can also set a color with the word ``"default"`` which will reset the color to a default managed by your terminal software. This works for back grounds as well, so the style of ``"default on default"`` is what your terminal starts with.
+
 You can set a style attribute by adding one or more of the following words:
 
-* ``"bold"`` For bold text.
-* ``"blink"`` For text that flashes (use this one sparingly).
-* ``"conceal"`` For *concealed* text (not supported by many terminals).
-* ``"italic"`` For italic text.
-* ``"reverse"`` For text with foreground and background colors reversed.
-* ``"strike"`` For text with a line through it.
-* ``"underline"`` For underlined text.
+* ``"bold"`` or ``"b"`` for bold text.
+* ``"blink"`` for text that flashes (use this one sparingly).
+* ``"conceal"`` for *concealed* text (not supported by many terminals).
+* ``"italic"`` or ``"i"`` for italic text.
+* ``"reverse"`` or ``"r"`` for text with foreground and background colors reversed.
+* ``"strike"`` or ``"s"`` for text with a line through it.
+* ``"underline"`` or ``"u"`` for underlined text.
 
 Style attributes and colors may be used in combination with each other. For example::
 
@@ -74,7 +75,7 @@ Ultimately the style definition is parsed and an instance of a :class:`~rich.sty
     from rich.style import Style
     console.print("Danger, Will Robinson!", style=Style(color="red", blink=True, bold=True)
 
-It is slightly quicker to construct a Style class like this, since a style definition takes a little time to parse -- but only on the first call, as Rich will cache any style definitions it parses.
+It is slightly quicker to construct a Style class like this, since a style definition takes a little time to parse -- but only on the first call, as Rich will cache parsed style definitions.
 
 You can parse a style definition explicitly with the :meth:`~rich.style.Style.parse` method.
 

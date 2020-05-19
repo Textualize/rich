@@ -21,4 +21,9 @@ Alternatively, you can construct styled text by calling :meth:`~rich.text.Text.a
     text.append(" World!")
     console.print(text)
 
-You can also apply a style to given words in the text with :meth:`~rich.text.Text.highlight_words` or for ultimate control call :meth:`~rich.text.Text.highlight_regex` to highlight text matching a *regular expression*.
+Since building Text instances from parts is a common requirement, Rich offers :meth:`~rich.text.Text.assemble` which will combine strings or pairs of string and Style, and return an Text instance. The follow example is equivalent to the code above::
+
+    text = Text.assemble(("Hello", "bold magenta"), " World!")
+    console.print(text)
+
+You can apply a style to given words in the text with :meth:`~rich.text.Text.highlight_words` or for ultimate control call :meth:`~rich.text.Text.highlight_regex` to highlight text matching a *regular expression*. 

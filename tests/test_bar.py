@@ -45,6 +45,12 @@ def test_measure():
     assert measurement.maximum == 120
 
 
+def test_zero_total():
+    # Shouldn't throw zero division error
+    bar = Bar(total=0)
+    render(bar)
+
+
 if __name__ == "__main__":
     bar = Bar(completed=11, width=50)
     bar_render = render(bar)
