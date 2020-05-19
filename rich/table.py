@@ -77,6 +77,7 @@ class Table:
         width (int, optional): The width in characters of the table, or ``None`` to automatically fit. Defaults to None.
         box (Optional[box.Box], optional): One of the constants in box.py used to draw the edges (See :ref:`appendix_box`). Defaults to box.HEAVY_HEAD.
         padding (PaddingDimensions, optional): Padding for cells (top, right, bottom, left). Defaults to (0, 1).
+        collapse_padding (bool, optional): Enable collapsing of padding around cells. Defaults to False.
         pad_edge (bool, optional): Enable padding of edge cells. Defaults to True.
         expand (bool, optional): Expand the table to fit the available space if ``True`` otherwise the table width will be auto-calculated. Defaults to False.
         show_header (bool, optional): Show a header row. Defaults to True.
@@ -102,13 +103,13 @@ class Table:
         width: int = None,
         box: Optional[box.Box] = box.HEAVY_HEAD,
         padding: PaddingDimensions = (0, 1),
+        collapse_padding: bool = False,
         pad_edge: bool = True,
         expand: bool = False,
         show_header: bool = True,
         show_footer: bool = False,
         show_edge: bool = True,
         show_lines: bool = False,
-        collapse_padding: bool = False,
         style: StyleType = "none",
         row_styles: Iterable[StyleType] = None,
         header_style: StyleType = None,
@@ -171,9 +172,7 @@ class Table:
         if self.box and self.show_edge:
             width += 2
         if self.box:
-            width += len(self.columns)
-            if self.pad_edge:
-                width += 2
+            width += len(self.columns) - 1
         return width
 
     @property
@@ -397,35 +396,47 @@ class Table:
         """Get all the cells with padding and optional header."""
 
         collapse_padding = self.collapse_padding
+        pad_edge = self.pad_edge
         padding = self.padding
         any_padding = any(padding)
 
-        first = column_index == 0
-        last = column_index == len(self.columns) - 1
+        first_column = column_index == 0
+        last_column = column_index == len(self.columns) - 1
 
-        def add_padding(renderable: "RenderableType") -> "RenderableType":
+        def add_padding(
+            renderable: "RenderableType", first_row: bool, last_row: bool
+        ) -> "RenderableType":
             if not any_padding:
                 return renderable
             top, right, bottom, left = padding
-            if collapse_padding:
-                if not first:
-                    left = max(right, left)
-                if column_index > 0:
-                    top = max(top, bottom)
 
-            if not self.pad_edge:
-                if first:
+            if collapse_padding:
+                if not first_column:
+                    left = max(0, left - right)
+                if not last_row:
+                    bottom = max(0, top - bottom)
+
+            if not pad_edge:
+                if first_column:
                     left = 0
-                if last:
+                if last_column:
                     right = 0
+                if first_row:
+                    top = 0
+                if last_row:
+                    bottom = 0
             return Padding(renderable, (top, right, bottom, left))
 
+        raw_cells: List[Tuple[StyleType, "RenderableType"]] = []
+        _append = raw_cells.append
         if self.show_header:
-            yield _Cell(column.header_style, add_padding(column.header))
+            _append((column.header_style, column.header))
         for cell in column.cells:
-            yield _Cell(column.style, add_padding(cell))
+            _append((column.style, cell))
         if self.show_footer:
-            yield _Cell(column.footer_style, add_padding(column.footer))
+            _append((column.footer_style, column.footer))
+        for first, last, (style, renderable) in loop_first_last(raw_cells):
+            yield _Cell(style, add_padding(renderable, first, last))
 
     def _measure_column(
         self, console: "Console", column_index: int, column: Column, max_width: int

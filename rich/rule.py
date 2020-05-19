@@ -1,6 +1,7 @@
 from typing import Union
 
 from .console import Console, ConsoleOptions, RenderResult
+from .segment import Segment
 from .style import Style
 from .text import Text
 

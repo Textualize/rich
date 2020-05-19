@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.7] - 2020-05-19
 
+### Added
+
+- Added collapse_padding option to Table.
+
 ### Changed
 
 - Some style attributes may be abbreviated (b for bold, i for italic etc). Previously abbreviations worked in console markup but only one at a time, i.e. "[b]Hello[/]" but not "[b i]Hello[/]" -- now they work everywhere.
