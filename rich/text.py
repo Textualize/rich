@@ -124,10 +124,10 @@ class Text:
         return bool(self._length)
 
     def __str__(self) -> str:
-        return self.text
+        return self.plain
 
     def __repr__(self) -> str:
-        return f"<text {self.text!r} {self._spans!r}>"
+        return f"<text {self.plain!r} {self._spans!r}>"
 
     def __add__(self, other: Any) -> "Text":
         if isinstance(other, (str, Text)):
@@ -139,13 +139,13 @@ class Text:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Text):
             return NotImplemented
-        return self.text == other.text and self._spans == other._spans
+        return self.plain == other.plain and self._spans == other._spans
 
     def __contains__(self, other: object) -> bool:
         if isinstance(other, str):
-            return other in self.text
+            return other in self.plain
         elif isinstance(other, Text):
-            return other.text in self.text
+            return other.plain in self.plain
         return False
 
     @classmethod
@@ -203,15 +203,15 @@ class Text:
         return text
 
     @property
-    def text(self) -> str:
+    def plain(self) -> str:
         """Get the text as a single string."""
         if len(self._text) not in (0, 1):
             text = "".join(self._text)
             self._text[:] = [text]
         return self._text[0] if self._text else ""
 
-    @text.setter
-    def text(self, new_text: str) -> None:
+    @plain.setter
+    def plain(self, new_text: str) -> None:
         """Set the text to a new value."""
         self._text[:] = [new_text]
         old_length = self._length
@@ -242,7 +242,7 @@ class Text:
     def copy(self) -> "Text":
         """Return a copy of this instance."""
         copy_self = Text(
-            self.text,
+            self.plain,
             style=self.style.copy() if isinstance(self.style, Style) else self.style,
             justify=self.justify,
             end=self.end,
@@ -314,7 +314,7 @@ class Text:
         count = 0
         append_span = self._spans.append
         _Span = Span
-        for match in re.finditer(re_highlight, self.text):
+        for match in re.finditer(re_highlight, self.plain):
             _span = match.span
             if style:
                 start, end = _span()
@@ -346,7 +346,7 @@ class Text:
         count = 0
         _Span = Span
         for match in re.finditer(
-            re_words, self.text, flags=0 if case_sensitive else re.IGNORECASE
+            re_words, self.plain, flags=0 if case_sensitive else re.IGNORECASE
         ):
             start, end = match.span(0)
             add_span(_Span(start, end, style))
@@ -355,7 +355,7 @@ class Text:
 
     def rstrip(self) -> None:
         """Trip whitespace from end of text."""
-        self.text = self.text.rstrip()
+        self.plain = self.plain.rstrip()
 
     def set_length(self, new_length: int) -> None:
         """Set new length of the text, clipping or padding is required."""
@@ -365,8 +365,8 @@ class Text:
         if length < new_length:
             self.pad_right(new_length - length)
         else:
-            text = self.text[:new_length]
-            self.text = text
+            text = self.plain[:new_length]
+            self.plain = text
             new_spans = []
             for span in self._spans:
                 if span.start < new_length:
@@ -387,7 +387,7 @@ class Text:
         yield from all_lines.render(console, end=self.end)
 
     def __measure__(self, console: "Console", max_width: int) -> Measurement:
-        text = self.text
+        text = self.plain
         if not text.strip():
             return Measurement(cell_len(text), cell_len(text))
         max_text_width = max(cell_len(line) for line in text.splitlines())
@@ -405,7 +405,7 @@ class Text:
             Iterable[Segment]: Result of render that may be written to the console.
         """
 
-        text = self.text
+        text = self.plain
         style_map: Dict[int, Style] = {}
         null_style = Style()
 
@@ -481,7 +481,7 @@ class Text:
         Returns:
             Text: A new instance with tabs replaces by spaces.
         """
-        if "\t" not in self.text:
+        if "\t" not in self.plain:
             return self.copy()
         parts = self.split("\t", include_separator=True)
         pos = 0
@@ -494,8 +494,8 @@ class Text:
         append = result.append
 
         for part in parts:
-            if part.text.endswith("\t"):
-                part._text = [part.text[:-1] + " "]
+            if part.plain.endswith("\t"):
+                part._text = [part.plain[:-1] + " "]
                 append(part)
                 pos += len(part)
                 spaces = tab_size - ((pos - 1) % tab_size) - 1
@@ -529,7 +529,7 @@ class Text:
         """
         assert len(character) == 1, "Character must be a string of length 1"
         if count:
-            self.text = f"{character * count}{self.text}"
+            self.plain = f"{character * count}{self.plain}"
             self._spans[:] = [span.move(count) for span in self._spans]
 
     def pad_right(self, count: int, character: str = " ") -> None:
@@ -541,7 +541,7 @@ class Text:
         """
         assert len(character) == 1, "Character must be a string of length 1"
         if count:
-            self.text = f"{self.text}{character * count}"
+            self.plain = f"{self.plain}{character * count}"
 
     def append(
         self, text: Union["Text", str], style: Union[str, "Style"] = None
@@ -573,7 +573,7 @@ class Text:
                 self._spans.append(
                     _Span(text_length, text_length + len(text), text.style)
                 )
-            self._text.append(text.text)
+            self._text.append(text.plain)
             self._spans.extend(
                 _Span(start + text_length, end + text_length, style)
                 for start, end, style in text._spans
@@ -601,7 +601,7 @@ class Text:
         """
         assert separator, "separator must not be empty"
 
-        text = self.text
+        text = self.plain
         if separator not in text:
             return Lines([self.copy()])
         if text.endswith(separator):
@@ -619,7 +619,7 @@ class Text:
         if not include_separator:
             separator_length = len(separator)
             for line in lines:
-                if line.text.endswith(separator):
+                if line.plain.endswith(separator):
                     line.right_crop(separator_length)
         return lines
 
@@ -637,7 +637,7 @@ class Text:
             line = self.copy()
             return Lines([line])
 
-        text = self.text
+        text = self.plain
         text_length = len(text)
         divide_offsets = [0, *offsets, text_length]
         line_ranges = list(zip(divide_offsets, divide_offsets[1:]))
@@ -682,7 +682,7 @@ class Text:
 
     def right_crop(self, amount: int = 1) -> None:
         """Remove a number of characters from the end of the text."""
-        self.text = self.text[:-amount]
+        self.plain = self.plain[:-amount]
 
     def wrap(
         self,

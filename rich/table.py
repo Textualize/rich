@@ -108,6 +108,7 @@ class Table:
         show_footer: bool = False,
         show_edge: bool = True,
         show_lines: bool = False,
+        collapse_padding: bool = False,
         style: StyleType = "none",
         row_styles: Iterable[StyleType] = None,
         header_style: StyleType = None,
@@ -132,6 +133,7 @@ class Table:
         self.show_footer = show_footer
         self.show_edge = show_edge
         self.show_lines = show_lines
+        self.collapse_padding = collapse_padding
         self.style = style
         self.header_style = header_style
         self.footer_style = footer_style
@@ -142,7 +144,9 @@ class Table:
         self.row_styles = list(row_styles or [])
 
     @classmethod
-    def grid(cls, padding: PaddingDimensions = 0) -> "Table":
+    def grid(
+        cls, padding: PaddingDimensions = 0, collapse_padding: bool = False
+    ) -> "Table":
         """Get a table with no lines, headers, or footer.
 
         Args:
@@ -154,6 +158,7 @@ class Table:
         return cls(
             box=None,
             padding=padding,
+            collapse_padding=collapse_padding,
             show_header=False,
             show_footer=False,
             show_edge=False,
@@ -391,6 +396,7 @@ class Table:
     def _get_cells(self, column_index: int, column: Column) -> Iterable[_Cell]:
         """Get all the cells with padding and optional header."""
 
+        collapse_padding = self.collapse_padding
         padding = self.padding
         any_padding = any(padding)
 
@@ -401,6 +407,12 @@ class Table:
             if not any_padding:
                 return renderable
             top, right, bottom, left = padding
+            if collapse_padding:
+                if not first:
+                    left = max(right, left)
+                if column_index > 0:
+                    top = max(top, bottom)
+
             if not self.pad_edge:
                 if first:
                     left = 0

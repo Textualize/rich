@@ -65,20 +65,20 @@ def test_contain():
     assert None not in test
 
 
-def test_text_property():
+def test_plain_property():
     text = Text("foo")
     text.append("bar")
     text.append("baz")
-    assert text.text == "foobarbaz"
+    assert text.plain == "foobarbaz"
 
 
-def test_text_property_setter():
+def test_plain_property_setter():
     test = Text("foo")
-    test.text = "bar"
+    test.plain = "bar"
     assert str(test) == "bar"
     test = Text()
     test.append("Hello, World", "bold")
-    test.text = "Hello"
+    test.plain = "Hello"
     assert str(test) == "Hello"
     assert test._spans == [Span(0, 5, "bold")]
 
@@ -401,16 +401,16 @@ def test_print_sep_end(print_text, result):
 
 def test_tabs_to_spaces():
     test = Text("\tHello\tWorld", tab_size=8)
-    assert test.tabs_to_spaces().text == "        Hello   World"
+    assert test.tabs_to_spaces().plain == "        Hello   World"
 
     test = Text("\tHello\tWorld", tab_size=4)
-    assert test.tabs_to_spaces().text == "    Hello   World"
+    assert test.tabs_to_spaces().plain == "    Hello   World"
 
     test = Text(".\t..\t...\t....\t", tab_size=4)
-    assert test.tabs_to_spaces().text == ".   ..  ... ....    "
+    assert test.tabs_to_spaces().plain == ".   ..  ... ....    "
 
     test = Text("No Tabs")
-    assert test.tabs_to_spaces().text == "No Tabs"
+    assert test.tabs_to_spaces().plain == "No Tabs"
 
 
 def test_markup_switch():
