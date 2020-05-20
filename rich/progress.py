@@ -156,7 +156,7 @@ class BarColumn(ProgressColumn):
         return Bar(
             total=max(0, task.total),
             completed=max(0, task.completed),
-            width=max(1, self.bar_width),
+            width=None if self.bar_width is None else max(1, self.bar_width),
         )
 
 
