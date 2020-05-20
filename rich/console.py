@@ -425,6 +425,16 @@ class Console:
             self._buffer.append(Segment("\n" * count))
             self._check_buffer()
 
+    def clear(self, home: bool = True) -> None:
+        """Clear the screen.
+
+        Args:
+            home (bool, optional): Also move the cursor to 'home' position. Defaults to True.
+        """
+        if self.is_terminal:
+            self._check_buffer()
+            self.file.write("\033[2J\033[H" if home else "\033[2J")
+
     def show_cursor(self, show: bool = True) -> None:
         """Show or hide the cursor.
         
@@ -436,7 +446,7 @@ class Console:
             self.file.write("\033[?25h" if show else "\033[?25l")
 
     def _render(
-        self, renderable: RenderableType, options: Optional[ConsoleOptions],
+        self, renderable: RenderableType, options: ConsoleOptions,
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
 
@@ -446,17 +456,16 @@ class Console:
         Args:
             renderable (RenderableType): An object supporting the console protocol, or
                 an object that may be converted to a string.
-            options (ConsoleOptions, optional): An options objects. Defaults to None.
+            options (ConsoleOptions): An options objects. Defaults to None.
 
         Returns:
             Iterable[Segment]: An iterable of segments that may be rendered.
         """
         render_iterable: RenderResult
-        render_options = options or self.options
         if isinstance(renderable, ConsoleRenderable):
-            render_iterable = renderable.__console__(self, render_options)
+            render_iterable = renderable.__console__(self, options)
         elif isinstance(renderable, str):
-            yield from self.render(self.render_str(renderable), render_options)
+            yield from self._render(self.render_str(renderable), options)
             return
         else:
             raise errors.NotRenderableError(
@@ -474,7 +483,7 @@ class Console:
             if isinstance(render_output, Segment):
                 yield render_output
             else:
-                yield from self.render(render_output, render_options)
+                yield from self._render(render_output, options)
 
     def render(
         self, renderable: RenderableType, options: Optional[ConsoleOptions] = None
@@ -969,9 +978,10 @@ class Console:
                     text = escape(text)
                     if style:
                         rule = style.get_html_style(_theme)
-                        append(f'<span style="{rule}">{text}</span>' if rule else text)
-                    else:
-                        append(text)
+                        text = f'<span style="{rule}">{text}</span>' if rule else text
+                        if style.link:
+                            text = f'<a href="{style.link}">{text}</a>'
+                    append(text)
             else:
                 styles: Dict[str, int] = {}
                 for text, style, _ in Segment.filter_control(
@@ -982,11 +992,10 @@ class Console:
                         rule = style.get_html_style(_theme)
                         if rule:
                             style_number = styles.setdefault(rule, len(styles) + 1)
-                            append(f'<span class="r{style_number}">{text}</span>')
-                        else:
-                            append(text)
-                    else:
-                        append(text)
+                            text = f'<span class="r{style_number}">{text}</span>'
+                        if style.link:
+                            text = f'<a href="{style.link}">{text}</a>'
+                    append(text)
                 stylesheet_rules: List[str] = []
                 stylesheet_append = stylesheet_rules.append
                 for style_rule, style_number in styles.items():

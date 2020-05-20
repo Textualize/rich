@@ -90,6 +90,20 @@ def test_show_cursor():
     assert console.file.getvalue() == "\x1b[?25lfoo\n\x1b[?25h"
 
 
+def test_clear():
+    console = Console(file=io.StringIO(), force_terminal=True)
+    console.clear()
+    console.clear(home=False)
+    assert console.file.getvalue() == "\033[2J\033[H" + "\033[2J"
+
+
+def test_clear_no_terminal():
+    console = Console(file=io.StringIO())
+    console.clear()
+    console.clear(home=False)
+    assert console.file.getvalue() == ""
+
+
 def test_get_style():
     console = Console()
     console.get_style("repr.brace") == Style(bold=True)
@@ -197,17 +211,17 @@ def test_export_text():
 
 def test_export_html():
     console = Console(record=True, width=100)
-    console.print("[b]foo")
+    console.print("[b]foo [link=https://example.org]Click[/link]")
     html = console.export_html()
-    expected = "<!DOCTYPE html>\n<head>\n<style>\n.r1 {font-weight: bold}\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style=\"font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span class=\"r1\">foo</span>\n</pre>\n    </code>\n</body>\n</html>\n"
+    expected = '<!DOCTYPE html>\n<head>\n<style>\n.r1 {font-weight: bold}\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><span class="r1">foo </span><a href="https://example.org"><span class="r1">Click</span></a>\n</pre>\n    </code>\n</body>\n</html>\n'
     assert html == expected
 
 
 def test_export_html_inline():
     console = Console(record=True, width=100)
-    console.print("[b]foo")
+    console.print("[b]foo [link=https://example.org]Click[/link]")
     html = console.export_html(inline_styles=True)
-    expected = "<!DOCTYPE html>\n<head>\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style=\"font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><span style=\"font-weight: bold\">foo</span>\n</pre>\n    </code>\n</body>\n</html>\n"
+    expected = '<!DOCTYPE html>\n<head>\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><span style="font-weight: bold">foo </span><a href="https://example.org"><span style="font-weight: bold">Click</span></a>\n</pre>\n    </code>\n</body>\n</html>\n'
     assert html == expected
 
 

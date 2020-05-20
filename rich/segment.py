@@ -3,7 +3,8 @@ from typing import NamedTuple, Optional
 from .cells import cell_len, set_cell_size
 from .style import Style, StyleType
 
-from itertools import zip_longest
+from itertools import filterfalse, zip_longest
+from operator import attrgetter
 from typing import Iterable, List, Tuple
 
 
@@ -81,7 +82,10 @@ class Segment(NamedTuple):
             Iterable[Segment]: And iterable of Segment instances.
         
         """
-        return (segment for segment in segments if segment.is_control == is_control)
+        if is_control:
+            return filter(attrgetter("is_control"), segments)
+        else:
+            return filterfalse(attrgetter("is_control"), segments)
 
     @classmethod
     def split_lines(cls, segments: Iterable["Segment"]) -> Iterable[List["Segment"]]:
@@ -104,8 +108,9 @@ class Segment(NamedTuple):
                     if _text:
                         append(cls(_text, style))
                     if new_line:
-                        yield line[:]
-                        del line[:]
+                        yield line
+                        line = []
+                        append = line.append
             else:
                 append(segment)
         if line:
@@ -132,8 +137,11 @@ class Segment(NamedTuple):
         Returns:
             Iterable[List[Segment]]: An iterable of lines of segments.
         """
-        lines: List[List[Segment]] = [[]]
-        append = lines[-1].append
+        line: List[Segment] = []
+        append = line.append
+
+        adjust_line_length = cls.adjust_line_length
+        new_line_segment = cls("\n")
 
         for segment in segments:
             if "\n" in segment.text and not segment.is_control:
@@ -143,18 +151,17 @@ class Segment(NamedTuple):
                     if _text:
                         append(cls(_text, style))
                     if new_line:
-                        line = cls.adjust_line_length(
-                            lines[-1], length, style=style, pad=pad,
+                        cropped_line = adjust_line_length(
+                            line, length, style=style, pad=pad
                         )
                         if include_new_lines:
-                            line.append(cls("\n"))
-                        yield line
-                        lines.append([])
-                        append = lines[-1].append
+                            cropped_line.append(new_line_segment)
+                        yield cropped_line
+                        del line[:]
             else:
                 append(segment)
-        if lines[-1]:
-            yield cls.adjust_line_length(lines[-1], length, style=style, pad=pad)
+        if line:
+            yield adjust_line_length(line, length, style=style, pad=pad)
 
     @classmethod
     def adjust_line_length(

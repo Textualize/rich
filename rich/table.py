@@ -490,11 +490,30 @@ class Table:
         show_edge = self.show_edge
         show_lines = self.show_lines
 
+        _Segment = Segment
         if _box and show_edge:
+            box_segments = [
+                (
+                    _Segment(_box.head_left, border_style),
+                    _Segment(_box.head_right, border_style),
+                    _Segment(_box.head_vertical, border_style),
+                ),
+                (
+                    Segment(_box.foot_left, border_style),
+                    _Segment(_box.foot_right, border_style),
+                    _Segment(_box.foot_vertical, border_style),
+                ),
+                (
+                    _Segment(_box.mid_left, border_style),
+                    _Segment(_box.mid_right, border_style),
+                    _Segment(_box.mid_vertical, border_style),
+                ),
+            ]
             yield Segment(_box.get_top(widths), border_style)
             yield new_line
+        else:
+            box_segments = []
 
-        _Segment = Segment
         get_row_style = self.get_row_style
         get_style = console.get_style
         for index, (first, last, row) in enumerate(loop_first_last(rows)):
@@ -529,17 +548,11 @@ class Table:
                     )
                     yield new_line
                 if first:
-                    left = _Segment(_box.head_left, border_style)
-                    right = _Segment(_box.head_right, border_style)
-                    divider = _Segment(_box.head_vertical, border_style)
+                    left, right, divider = box_segments[0]
                 elif last:
-                    left = _Segment(_box.foot_left, border_style)
-                    right = _Segment(_box.foot_right, border_style)
-                    divider = _Segment(_box.foot_vertical, border_style)
+                    left, right, divider = box_segments[2]
                 else:
-                    left = _Segment(_box.mid_left, border_style)
-                    right = _Segment(_box.mid_right, border_style)
-                    divider = _Segment(_box.mid_vertical, border_style)
+                    left, right, divider = box_segments[1]
 
                 for line_no in range(max_height):
                     if show_edge:

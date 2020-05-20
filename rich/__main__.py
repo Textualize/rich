@@ -63,8 +63,7 @@ def make_test_card() -> Table:
     )
 
     lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque in metus sed sapien ultricies pretium a at justo. Maecenas luctus velit et auctor maximus. Donec faucibus vel arcu id pretium."
-    lorem_table = Table.grid()
-    lorem_table.padding = (0, 1, 0, 1)
+    lorem_table = Table.grid(padding=1, collapse_padding=True)
     lorem_table.pad_edge = False
     lorem_table.add_row(
         Text(lorem, justify="left", style="green"),
@@ -83,7 +82,7 @@ def make_test_card() -> Table:
     )
 
     def comparison(renderable1, renderable2) -> Table:
-        table = Table(show_header=False, box=None, expand=True)
+        table = Table(show_header=False, pad_edge=False, box=None, expand=True)
         table.add_column("1", ratio=1)
         table.add_column("2", ratio=1)
         table.add_row(renderable1, renderable2)

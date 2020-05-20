@@ -19,6 +19,11 @@ def test_apply_style():
     ]
 
 
+def test_split_lines():
+    lines = [Segment("Hello\nWorld")]
+    assert list(Segment.split_lines(lines)) == [[Segment("Hello")], [Segment("World")]]
+
+
 def test_split_and_crop_lines():
     assert list(
         Segment.split_and_crop_lines([Segment("Hello\nWorld!\n"), Segment("foo")], 4)
