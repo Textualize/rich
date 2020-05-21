@@ -1,33 +1,60 @@
 import pytest
 
-from rich.color import Color, ColorType
+from rich.color import Color, ColorSystem, ColorType
 from rich import errors
 from rich.style import Style, StyleStack
 
 
 def test_str():
+    assert str(Style(bold=False)) == "not bold"
+    assert str(Style(color="red", bold=False)) == "not bold red"
+    assert str(Style(color="red", bold=False, italic=True)) == "not bold italic red"
     assert str(Style()) == "none"
     assert str(Style(bold=True)) == "bold"
     assert str(Style(color="red", bold=True)) == "bold red"
-    assert (
-        str(
-            Style(
-                color="red",
-                bgcolor="black",
-                bold=True,
-                dim=True,
-                italic=True,
-                underline=True,
-                blink=True,
-                blink2=True,
-                reverse=True,
-                conceal=True,
-                strike=True,
-            )
-        )
-        == "bold dim italic underline blink blink2 reverse conceal strike red on black"
+    assert str(Style(color="red", bgcolor="black", bold=True)) == "bold red on black"
+    all_styles = Style(
+        color="red",
+        bgcolor="black",
+        bold=True,
+        dim=True,
+        italic=True,
+        underline=True,
+        blink=True,
+        blink2=True,
+        reverse=True,
+        conceal=True,
+        strike=True,
+        underline2=True,
+        frame=True,
+        encircle=True,
+        overline=True,
     )
+    expected = "bold dim italic underline blink blink2 reverse conceal strike underline2 frame encircle overline red on black"
+    assert str(all_styles) == expected
     assert str(Style(link="foo")) == "link foo"
+
+
+def test_ansi_codes():
+    all_styles = Style(
+        color="red",
+        bgcolor="black",
+        bold=True,
+        dim=True,
+        italic=True,
+        underline=True,
+        blink=True,
+        blink2=True,
+        reverse=True,
+        conceal=True,
+        strike=True,
+        underline2=True,
+        frame=True,
+        encircle=True,
+        overline=True,
+    )
+    expected = "1;2;3;4;5;6;7;8;9;21;51;52;53;31;40"
+    assert all_styles._make_ansi_codes(ColorSystem.TRUECOLOR) == expected
 
 
 def test_repr():
@@ -75,6 +102,7 @@ def test_parse():
 
 
 def test_get_html_style():
+    expected = "color: #7f7fbf; background-color: #800000; font-weight: bold; font-style: italic; text-decoration: underline; text-decoration: line-through; text-decoration: overline"
     assert (
         Style(
             reverse=True,
@@ -85,8 +113,9 @@ def test_get_html_style():
             italic=True,
             underline=True,
             strike=True,
+            overline=True,
         ).get_html_style()
-        == "color: #7f7fbf; background-color: #800000; font-weight: bold; font-style: italic; text-decoration: underline; text-decoration: line-through"
+        == expected
     )
 
 
@@ -126,7 +155,6 @@ def test_iadd():
     assert style == Style(color="red", bold=True)
     style += None
     assert style == Style(color="red", bold=True)
-    assert style.__iadd__("foo") == NotImplemented
 
 
 def test_style_stack():

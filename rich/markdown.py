@@ -421,7 +421,7 @@ class Markdown:
                 if entering:
                     link_style = console.get_style("markdown.link")
                     if self.hyperlinks:
-                        link_style.link = current.destination
+                        link_style += Style(link=current.destination)
                     context.enter_style(link_style)
                 else:
                     context.leave_style()

@@ -1,5 +1,5 @@
 import io
-from time import time
+from time import process_time
 
 from rich.console import Console, ConsoleOptions, RenderGroup, RenderResult
 from rich.markdown import Markdown
@@ -167,9 +167,9 @@ Supports much of the *markdown*, __syntax__!
 if __name__ == "__main__":  # pragma: no cover
     console = Console(file=io.StringIO(), force_terminal=True)
     test_card = make_test_card()
-    start = time()
+    start = process_time()
     console.print(test_card)
-    taken = int((time() - start) * 1000.0)
+    taken = int((process_time() - start) * 1000.0)
     print(console.file.getvalue())  # type: ignore
     print()
     print(f"rendered in {taken}ms")

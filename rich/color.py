@@ -379,25 +379,25 @@ class Color(NamedTuple):
             return cls(color, ColorType.TRUECOLOR, triplet=triplet)
 
     @lru_cache(maxsize=1024)
-    def get_ansi_codes(self, foreground: bool = True) -> List[str]:
+    def get_ansi_codes(self, foreground: bool = True) -> Tuple[str, ...]:
         """Get the ANSI escape codes for this color."""
         _type = self.type
         if _type == ColorType.DEFAULT:
-            return ["39" if foreground else "49"]
+            return ("39" if foreground else "49",)
 
         elif _type in (ColorType.STANDARD, ColorType.WINDOWS):
             number = self.number
             assert number is not None
-            return [str(30 + number if foreground else 40 + number)]
+            return (str(30 + number if foreground else 40 + number),)
 
         elif _type == ColorType.EIGHT_BIT:
             assert self.number is not None
-            return ["38" if foreground else "48", "5", str(self.number)]
+            return ("38" if foreground else "48", "5", str(self.number))
 
         else:  # self.standard == ColorStandard.TRUECOLOR:
             assert self.triplet is not None
             red, green, blue = self.triplet
-            return ["38" if foreground else "48", "2", str(red), str(green), str(blue)]
+            return ("38" if foreground else "48", "2", str(red), str(green), str(blue))
 
     @lru_cache(maxsize=1024)
     def downgrade(self, system: ColorSystem) -> "Color":

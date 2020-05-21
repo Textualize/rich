@@ -40,11 +40,19 @@ You can set a style attribute by adding one or more of the following words:
 
 * ``"bold"`` or ``"b"`` for bold text.
 * ``"blink"`` for text that flashes (use this one sparingly).
-* ``"conceal"`` for *concealed* text (not supported by many terminals).
+* ``"blink2"`` for text that flashes rapidly (not supported by most terminals).
+* ``"conceal"`` for *concealed* text (not supported by most terminals).
 * ``"italic"`` or ``"i"`` for italic text.
 * ``"reverse"`` or ``"r"`` for text with foreground and background colors reversed.
 * ``"strike"`` or ``"s"`` for text with a line through it.
 * ``"underline"`` or ``"u"`` for underlined text.
+
+Rich also supports the following styles, which are not well supported and may not display in your terminal:
+
+* ``"underline2"`` or ``"uu"`` for doubly underlined text.
+* ``"frame"`` for framed text.
+* ``"encircle"`` for encircled text.
+* ``"overline"`` or ``"o"`` for overlined text.
 
 Style attributes and colors may be used in combination with each other. For example::
 
@@ -86,11 +94,11 @@ You can parse a style definition explicitly with the :meth:`~rich.style.Style.pa
 Style Themes
 ------------
 
-If you re-use styles it can be a maintenance headache if you ever want to modify an attribute or color -- you would have to change every line where the style is used. Rich provides a :class:`rich.theme.Theme` class which you can use to define custom styles that you can refer to by name. That way you only need update your styles in one place.
+If you re-use styles it can be a maintenance headache if you ever want to modify an attribute or color -- you would have to change every line where the style is used. Rich provides a :class:`~rich.theme.Theme` class which you can use to define custom styles that you can refer to by name. That way you only need update your styles in one place.
 
 Style themes can make your code more semantic, for instance a style called ``"warning"`` better expresses intent that ``"italic magenta underline"``.
 
-To use a style theme, construct a :class:`rich.theme.Theme` instance and pass it to the :class:`~rich.console.Console` constructor. Here's an example::
+To use a style theme, construct a :class:`~rich.theme.Theme` instance and pass it to the :class:`~rich.console.Console` constructor. Here's an example::
 
     from rich.console import Console
     from rich.theme import Theme

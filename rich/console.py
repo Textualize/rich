@@ -431,9 +431,7 @@ class Console:
         Args:
             home (bool, optional): Also move the cursor to 'home' position. Defaults to True.
         """
-        if self.is_terminal:
-            self._check_buffer()
-            self.file.write("\033[2J\033[H" if home else "\033[2J")
+        self.control("\033[2J\033[H" if home else "\033[2J")
 
     def show_cursor(self, show: bool = True) -> None:
         """Show or hide the cursor.
@@ -442,10 +440,9 @@ class Console:
             show (bool, optional): Set visibility of the cursor.
         """
         if self.is_terminal and not self.legacy_windows:
-            self._check_buffer()
-            self.file.write("\033[?25h" if show else "\033[?25l")
+            self.control("\033[?25h" if show else "\033[?25l")
 
-    def _render(
+    def render(
         self, renderable: RenderableType, options: ConsoleOptions,
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
@@ -465,7 +462,7 @@ class Console:
         if isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__console__(self, options)
         elif isinstance(renderable, str):
-            yield from self._render(self.render_str(renderable), options)
+            yield from self.render(self.render_str(renderable), options)
             return
         else:
             raise errors.NotRenderableError(
@@ -483,27 +480,7 @@ class Console:
             if isinstance(render_output, Segment):
                 yield render_output
             else:
-                yield from self._render(render_output, options)
-
-    def render(
-        self, renderable: RenderableType, options: Optional[ConsoleOptions] = None
-    ) -> Iterable[Segment]:
-        """Render an object in to an iterable of `Segment` instances.
-
-        This method contains the logic for rendering objects with the console protocol.
-        You are unlikely to need to use it directly, unless you are extending the library.
-
-
-        Args:
-            renderable (RenderableType): An object supporting the console protocol, or
-                an object that may be converted to a string.
-            options (ConsoleOptions, optional): An options objects. Defaults to None.
-
-        Returns:
-            Iterable[Segment]: An iterable of segments that may be rendered.
-        """
-
-        yield from self._render(renderable, options or self.options)
+                yield from self.render(render_output, options)
 
     def render_lines(
         self,
@@ -604,7 +581,7 @@ class Console:
 
         try:
             style = self._styles.get(name)
-            return style.copy() if style is not None else Style.parse(name)
+            return style if style is not None else Style.parse(name)
         except errors.StyleSyntaxError as error:
             if default is not None:
                 return self.get_style(default)
