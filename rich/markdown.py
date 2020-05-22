@@ -552,7 +552,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich.console import Console
 
-    with open(args.path, "rt") as markdown_file:
+    with open(args.path, "rt", encoding="utf-8") as markdown_file:
         markdown = Markdown(
             markdown_file.read(),
             justify="full" if args.justify else "left",
