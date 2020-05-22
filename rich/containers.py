@@ -120,6 +120,7 @@ class Lines:
                 line.pad_right(width - cell_len(line.plain))
         elif align == "right":
             for line in self._lines:
+                line.rstrip()
                 line.pad_left(width - cell_len(line.plain))
         elif align == "full":
             for line_index, line in enumerate(self._lines):
