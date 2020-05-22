@@ -373,7 +373,7 @@ class Text:
                     new_spans.append(span.right_crop(new_length))
             self._spans[:] = new_spans
 
-    def __console__(
+    def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
         tab_size: int = console.tab_size or self.tab_size or 8  # type: ignore
@@ -386,7 +386,7 @@ class Text:
         all_lines = Text("\n").join(lines)
         yield from all_lines.render(console, end=self.end)
 
-    def __measure__(self, console: "Console", max_width: int) -> Measurement:
+    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
         text = self.plain
         if not text.strip():
             return Measurement(cell_len(text), cell_len(text))
@@ -553,6 +553,9 @@ class Text:
             style (str, optional): A style name. Defaults to None.
         """
 
+        if not isinstance(text, (str, Text)):
+            raise TypeError("Only str or Text can be appended to Text")
+
         if not len(text):
             return
         if isinstance(text, str):
@@ -579,8 +582,6 @@ class Text:
                 for start, end, style in text._spans
             )
             self._length += len(text)
-        else:
-            raise TypeError("Only str or Text can be appended to Text")
 
     def copy_styles(self, text: "Text") -> None:
         """Copy styles from another Text instance.

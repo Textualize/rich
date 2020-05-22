@@ -15,7 +15,9 @@ class Constrain:
         self.renderable = renderable
         self.width = width
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         if self.width is None:
             yield self.renderable
         else:

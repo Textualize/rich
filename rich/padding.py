@@ -73,7 +73,7 @@ class Padding:
     def __repr__(self) -> str:
         return f"Padding({self.renderable!r}, ({self.top},{self.right},{self.bottom},{self.left}))"
 
-    def __console__(
+    def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
 
@@ -99,7 +99,7 @@ class Padding:
             yield new_line
         yield from bottom
 
-    def __measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         extra_width = self.left + self.right
         min_width, max_width = Measurement.get(
             console, self.renderable, max(1, max_width - extra_width)

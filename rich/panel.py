@@ -45,7 +45,9 @@ class Panel:
         self.style = style
         self.width = width
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         style = console.get_style(self.style)
         width = (
             options.max_width
@@ -72,7 +74,7 @@ class Panel:
         yield Segment(box.get_bottom([width - 2]), style)
         yield Segment.line()
 
-    def __measure__(self, console: "Console", max_width: int) -> Measurement:
+    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
         if self.expand:
             return Measurement(max_width, max_width)
         width = Measurement.get(console, self.renderable, max_width - 2).maximum + 2

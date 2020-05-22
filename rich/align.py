@@ -30,7 +30,7 @@ class Align:
         self.renderable = renderable
         self.align = align
 
-    def __console__(
+    def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
 

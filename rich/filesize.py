@@ -31,13 +31,9 @@ def _to_str(size: int, suffixes: Iterable[str], base: int) -> str:
 
 def pick_unit_and_suffix(size: int, suffixes: List[str], base: int) -> Tuple[int, str]:
     """Pick a suffix and base for the given size."""
-    unit = 1
-    suffix = "bytes"
-    if size < base:
-        return 1, suffix
-    for i, suffix in enumerate(suffixes, 2):
+    for i, suffix in enumerate(suffixes):
         unit = base ** i
-        if size < unit:
+        if size < unit * base:
             break
     return unit, suffix
 

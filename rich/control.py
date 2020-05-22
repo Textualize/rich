@@ -29,7 +29,7 @@ class Control:
     def __str__(self) -> str:
         return self._control_codes.text
 
-    def __console__(
+    def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         yield self._control_codes

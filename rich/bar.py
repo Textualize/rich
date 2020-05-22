@@ -54,7 +54,9 @@ class Bar:
         self.completed = completed
         self.total = total if total is not None else self.total
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         completed = min(self.total, max(0, self.completed))
         width = min(self.width or options.max_width, options.max_width)
 
@@ -84,7 +86,7 @@ class Bar:
             if remaining_bars:
                 yield Segment(bar * remaining_bars, style)
 
-    def __measure__(self, console: Console, max_width: int) -> Measurement:
+    def __rich_measure__(self, console: Console, max_width: int) -> Measurement:
         return (
             Measurement(self.width, self.width)
             if self.width is not None

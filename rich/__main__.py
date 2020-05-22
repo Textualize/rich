@@ -17,7 +17,9 @@ class ColorBox:
     def __init__(self, start: int = 16):
         self.start = start
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         start = self.start
         for color_start in range(start, start + 36, 6):
             text = Text()
@@ -25,7 +27,7 @@ class ColorBox:
                 text.append("  ", Style(bgcolor=str(color_no)))
             yield text
 
-    def __measure__(self, console: "Console", max_width: int) -> Measurement:
+    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
         return Measurement(12, 12)
 
 

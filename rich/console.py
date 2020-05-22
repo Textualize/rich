@@ -84,7 +84,7 @@ body {{
 
 @dataclass
 class ConsoleOptions:
-    """Options for __console__ method."""
+    """Options for __rich_console__ method."""
 
     min_width: int
     max_width: int
@@ -124,7 +124,7 @@ class RichCast(Protocol):
 class ConsoleRenderable(Protocol):
     """An object that supports the console protocol."""
 
-    def __console__(
+    def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":  # pragma: no cover
         ...
@@ -133,7 +133,7 @@ class ConsoleRenderable(Protocol):
 """A type that may be rendered by Console."""
 RenderableType = Union[ConsoleRenderable, RichCast, str]
 
-"""The result of calling a __console__ method."""
+"""The result of calling a __rich_console__ method."""
 RenderResult = Iterable[Union[RenderableType, Segment]]
 
 
@@ -159,13 +159,13 @@ class RenderGroup:
             self._render = list(self._renderables)
         return self._render
 
-    def __measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         if self.fit:
             return measure_renderables(console, self.renderables, max_width)
         else:
             return Measurement(max_width, max_width)
 
-    def __console__(
+    def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> RenderResult:
         yield from self.renderables
@@ -460,14 +460,14 @@ class Console:
         """
         render_iterable: RenderResult
         if isinstance(renderable, ConsoleRenderable):
-            render_iterable = renderable.__console__(self, options)
+            render_iterable = renderable.__rich_console__(self, options)
         elif isinstance(renderable, str):
             yield from self.render(self.render_str(renderable), options)
             return
         else:
             raise errors.NotRenderableError(
                 f"Unable to render {renderable!r}; "
-                "A str, Segment or object with __console__ method is required"
+                "A str, Segment or object with __rich_console__ method is required"
             )
 
         try:

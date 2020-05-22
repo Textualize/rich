@@ -31,7 +31,9 @@ class Rule:
     def __repr__(self) -> str:
         return f"Rule({self.title!r}, {self.character!r})"
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         width = options.max_width
 
         character = "-" if console.legacy_windows else (self.character or "━")

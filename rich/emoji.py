@@ -50,7 +50,9 @@ class Emoji:
     def __str__(self) -> str:
         return self._char
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         yield Segment(self._char, console.get_style(self.style))
 
 

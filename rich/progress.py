@@ -39,11 +39,15 @@ TaskID = NewType("TaskID", int)
 ProgressType = TypeVar("ProgressType")
 
 
+GetTimeCallable = Callable[[], float]
+
+
 def track(
     sequence: Union[Sequence[ProgressType], Iterable[ProgressType]],
     description="Working...",
     total: int = None,
     auto_refresh=True,
+    console: Optional[Console] = None,
 ) -> Iterable[ProgressType]:
     """Track progress of processing a sequence.
     
@@ -52,22 +56,22 @@ def track(
         description (str, optional): Description of task show next to progress bar. Defaults to "Working".
         total: (int, optional): Total number of steps. Default is len(sequence).
         auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
+        console (Console, optional): Console to write to. Default creates internal Console instance.
     
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
     
     """
-    progress = Progress(auto_refresh=auto_refresh)
+    progress = Progress(auto_refresh=auto_refresh, console=console)
 
-    if total is None:
+    task_total = total
+    if task_total is None:
         if isinstance(sequence, Sized):
             task_total = len(sequence)
         else:
             raise ValueError(
                 f"unable to get size of {sequence!r}, please specify 'total'"
             )
-    else:
-        task_total = total
 
     task_id = progress.add_task(description, total=task_total)
     with progress:
@@ -96,7 +100,7 @@ class ProgressColumn(ABC):
         Returns:
             RenderableType: Anything renderable (including str).
         """
-        current_time = monotonic()
+        current_time = task.get_time()
         if self.max_refresh is not None and not task.completed:
             try:
                 timestamp, renderable = self._renderable_cache[task.id]
@@ -201,13 +205,15 @@ class DownloadColumn(ProgressColumn):
         completed = int(task.completed)
         total = int(task.total)
         unit, suffix = filesize.pick_unit_and_suffix(
-            total, ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], 1024
+            total, ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], 1024
         )
-        completed_str = f"{1024 * completed / unit:,.1f}"
-        total_str = f"{1024 * total / unit:,.1f}"
-        download_text = Text(
-            f"{completed_str}/{total_str} {suffix}", style="progress.download"
-        )
+        completed_ratio = completed / unit
+        total_ratio = total / unit
+        precision = 0 if unit == 1 else 1
+        completed_str = f"{completed_ratio:,.{precision}f}"
+        total_str = f"{total_ratio:,.{precision}f}"
+        download_status = f"{completed_str}/{total_str} {suffix}"
+        download_text = Text(download_status, style="progress.download")
         return download_text
 
 
@@ -262,6 +268,9 @@ class Task:
     stop_time: Optional[float] = field(default=None, init=False, repr=False)
     """Optional[float]: Time this task was stopped, or None if not stopped."""
 
+    get_time: GetTimeCallable = monotonic
+    """Callable to get the current time."""
+
     _progress: Deque[ProgressSample] = field(
         default_factory=deque, init=False, repr=False
     )
@@ -278,7 +287,7 @@ class Task:
             return None
         if self.stop_time is not None:
             return self.stop_time - self.start_time
-        return monotonic() - self.start_time
+        return self.get_time() - self.start_time
 
     @property
     def finished(self) -> bool:
@@ -356,18 +365,20 @@ class Progress:
         auto_refresh: bool = True,
         refresh_per_second: int = 10,
         speed_estimate_period: float = 30.0,
+        get_time: GetTimeCallable = monotonic,
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self.columns = columns or (
-            "[progress.description]{task.description}",
+            TextColumn("[progress.description]{task.description}"),
             BarColumn(),
-            "[progress.percentage]{task.percentage:>3.0f}%",
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
             TimeRemainingColumn(),
         )
         self.console = console or Console(file=sys.stdout)
         self.auto_refresh = auto_refresh
         self.refresh_per_second = refresh_per_second
         self.speed_estimate_period = speed_estimate_period
+        self.get_time = get_time
         self._tasks: Dict[TaskID, Task] = {}
         self._live_render = LiveRender(self.get_renderable())
         self._task_index: TaskID = TaskID(0)
@@ -487,7 +498,7 @@ class Progress:
         """
         with self._lock:
             task = self._tasks[task_id]
-            task.start_time = monotonic()
+            task.start_time = self.get_time()
 
     def stop_task(self, task_id: TaskID) -> None:
         """Stop a task.
@@ -499,7 +510,7 @@ class Progress:
         """
         with self._lock:
             task = self._tasks[task_id]
-            current_time = monotonic()
+            current_time = self.get_time()
             if task.start_time is None:
                 task.start_time = current_time
             task.stop_time = current_time
@@ -526,7 +537,7 @@ class Progress:
             refresh (bool): Force a refresh of progress information. Default is False.
             **fields (Any): Additional data fields required for rendering.
         """
-        current_time = monotonic()
+        current_time = self.get_time()
         with self._lock:
             task = self._tasks[task_id]
             completed_start = task.completed
@@ -642,6 +653,7 @@ class Progress:
                 completed,
                 visible=visible,
                 fields=fields,
+                get_time=self.get_time,
             )
             self._tasks[self._task_index] = task
             if start:

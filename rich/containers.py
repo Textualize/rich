@@ -29,13 +29,13 @@ class Renderables:
             list(renderables) if renderables is not None else []
         )
 
-    def __console__(
+    def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         """Console render method to insert line-breaks."""
         yield from self._renderables
 
-    def __measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         dimensions = [
             Measurement.get(console, renderable, max_width)
             for renderable in self._renderables
@@ -83,7 +83,7 @@ class Lines:
     def __len__(self) -> int:
         return self._lines.__len__()
 
-    def __console__(
+    def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         """Console render method to insert line-breaks."""

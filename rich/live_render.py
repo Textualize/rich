@@ -30,7 +30,9 @@ class LiveRender:
                 return Control("\r\x1b[2K")
         return Control("")
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         style = console.get_style(self.style)
         lines = console.render_lines(self.renderable, options, style, pad=False)
 

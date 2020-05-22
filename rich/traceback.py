@@ -214,7 +214,9 @@ class Traceback:
         trace = Trace(stacks=stacks)
         return trace
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         highlighter = ReprHighlighter()
         for last, stack in loop_last(reversed(self.trace.stacks)):
             if stack.frames:

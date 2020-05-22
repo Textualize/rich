@@ -186,7 +186,7 @@ class Table:
             return self.row_styles[index % len(self.row_styles)]
         return Style()
 
-    def __measure__(self, console: "Console", max_width: int) -> Measurement:
+    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
         if self.width is not None:
             max_width = min(self.width, max_width)
 
@@ -300,7 +300,7 @@ class Table:
                 )
         self._row_count += 1
 
-    def __console__(
+    def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
 

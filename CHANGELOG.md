@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Optimized Style
+- Changed methods `__console__` to `__rich_console__`, and `__measure__` to `__rich_measure__`
 
 ## [1.1.9] - 2020-05-20
 

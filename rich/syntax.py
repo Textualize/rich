@@ -207,13 +207,15 @@ class Syntax:
             number_style = highlight_number_style = Style()
         return background_style, number_style, highlight_number_style
 
-    def __measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         if self.code_width is not None:
             width = self.code_width + self._numbers_column_width
             return Measurement(width, width)
         return Measurement(max_width, max_width)
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         code_width = (
             (options.max_width - self._numbers_column_width - 1)
             if self.code_width is None

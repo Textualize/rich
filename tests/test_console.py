@@ -190,7 +190,7 @@ def test_justify_renderable_right():
 
 
 class BrokenRenderable:
-    def __console__(self, console, options):
+    def __rich_console__(self, console, options):
         pass
 
 

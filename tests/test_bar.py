@@ -40,7 +40,7 @@ def test_render():
 
 def test_measure():
     bar = Bar()
-    measurement = bar.__measure__(None, 120)
+    measurement = bar.__rich_measure__(None, 120)
     assert measurement.minimum == 4
     assert measurement.maximum == 120
 

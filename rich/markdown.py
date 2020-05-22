@@ -76,7 +76,7 @@ class MarkdownElement:
         """
         return True
 
-    def __console__(
+    def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         return ()
@@ -121,7 +121,9 @@ class Paragraph(TextElement):
     def __init__(self, justify: JustifyValues) -> None:
         self.justify = justify
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         self.text.justify = self.justify
         yield self.text
 
@@ -143,7 +145,9 @@ class Heading(TextElement):
         self.style_name = f"markdown.h{level}"
         super().__init__()
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         text = self.text
         text.justify = "center"
         if self.level == 1:
@@ -173,7 +177,9 @@ class CodeBlock(TextElement):
         self.lexer_name = lexer_name
         self.theme = theme
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         code = str(self.text).rstrip()
         syntax = Panel(
             Syntax(code, self.lexer_name, theme=self.theme), style="dim", box=box.SQUARE
@@ -195,7 +201,9 @@ class BlockQuote(TextElement):
         self.elements.append(child)
         return False
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         render_options = options.update(width=options.max_width - 4)
         lines = console.render_lines(self.elements, render_options, style=self.style)
         style = self.style
@@ -212,7 +220,9 @@ class HorizontalRule(MarkdownElement):
 
     new_line = False
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         style = console.get_style("markdown.hr")
         yield Rule(style=style)
 
@@ -237,7 +247,9 @@ class ListElement(MarkdownElement):
         self.items.append(child)
         return False
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         if self.list_type == "bullet":
             for item in self.items:
                 yield from item.render_bullet(console, options)
@@ -322,7 +334,9 @@ class ImageItem(TextElement):
         self.text = Text(justify="left")
         super().on_enter(context)
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         link_style = Style(link=self.link or self.destination or None)
         title = self.text or Text(self.destination.strip("/").rsplit("/", 1)[-1])
 
@@ -400,7 +414,9 @@ class Markdown:
         self.style = style
         self.hyperlinks = hyperlinks
 
-    def __console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         """Render markdown to the console."""
         style = console.get_style(self.style)
         context = MarkdownContext(console, options, style)

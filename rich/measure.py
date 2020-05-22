@@ -60,7 +60,7 @@ class Measurement(NamedTuple):
 
         renderable = getattr(renderable, "__rich__", renderable)
         if is_renderable(renderable):
-            get_console_width = getattr(renderable, "__measure__", None)
+            get_console_width = getattr(renderable, "__rich_measure__", None)
             if get_console_width is not None:
                 render_width = get_console_width(console, max_width).with_maximum(
                     max_width
@@ -71,7 +71,7 @@ class Measurement(NamedTuple):
         else:
             raise errors.NotRenderableError(
                 f"Unable to get render width for {renderable!r}; "
-                "a str, Segment, or object with __console__ method is required"
+                "a str, Segment, or object with __rich_console__ method is required"
             )
 
 

@@ -4,6 +4,7 @@ import pytest
 from rich.console import Console
 from rich.text import Span, Text
 from rich.measure import Measurement
+from rich.style import Style
 
 
 def test_span():
@@ -198,8 +199,8 @@ def test_set_length():
 def test_console_width():
     console = Console()
     test = Text("Hello World!\nfoobarbaz")
-    assert test.__measure__(console, 80) == Measurement(9, 12)
-    assert Text(" " * 4).__measure__(console, 80) == Measurement(4, 4)
+    assert test.__rich_measure__(console, 80) == Measurement(9, 12)
+    assert Text(" " * 4).__rich_measure__(console, 80) == Measurement(4, 4)
 
 
 def test_join():
@@ -445,3 +446,10 @@ def test_strip_control_codes():
     assert str(text) == "foobar"
     text.append("\x08")
     assert str(text) == "foobar"
+
+
+def test_get_style_at_offset():
+    console = Console()
+    text = Text.from_markup("Hello [b]World[/b]")
+    assert text.get_style_at_offset(console, 0) == Style()
+    assert text.get_style_at_offset(console, 6) == Style(bold=True)

@@ -15,7 +15,7 @@ class Pretty:
         self._object = _object
         self.highlighter = highlighter or Text
 
-    def __console__(
+    def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         pretty_str = pformat(self._object, width=options.max_width)
@@ -23,6 +23,6 @@ class Pretty:
         pretty_text = self.highlighter(pretty_str)
         yield pretty_text
 
-    def __measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         text = Text(pformat(self._object, width=max_width))
         return Measurement.get(console, text, max_width)
