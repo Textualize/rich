@@ -22,7 +22,7 @@ jobs:
           pip install -r requirements.txt
       - name: Typecheck with mypy
         run: |
-          pip install mypy
+          pip install mypy==0.770
           make typecheck
       - name: Test with pytest
         run: |
