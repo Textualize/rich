@@ -441,7 +441,7 @@ class Style:
             Style: A new style instance.
         """
 
-        return sum(styles, start=Style())
+        return sum(styles, start=Style())  # type: ignore
 
     @classmethod
     def chain(self, *styles: "Style") -> "Style":
@@ -453,7 +453,7 @@ class Style:
         Returns:
             Style: A new style instance.
         """
-        return sum(styles, start=Style())
+        return sum(styles, start=Style())  # type: ignore
 
     def copy(self) -> "Style":
         """Get a copy of this style.
