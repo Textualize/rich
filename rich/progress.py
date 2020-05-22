@@ -100,7 +100,7 @@ class ProgressColumn(ABC):
         Returns:
             RenderableType: Anything renderable (including str).
         """
-        current_time = task.get_time()
+        current_time = task.get_time()  # type: ignore
         if self.max_refresh is not None and not task.completed:
             try:
                 timestamp, renderable = self._renderable_cache[task.id]
@@ -287,7 +287,7 @@ class Task:
             return None
         if self.stop_time is not None:
             return self.stop_time - self.start_time
-        return self.get_time() - self.start_time
+        return self.get_time() - self.start_time  # type: ignore
 
     @property
     def finished(self) -> bool:
