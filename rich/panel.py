@@ -10,6 +10,7 @@ from .console import (
     RenderResult,
     Measurement,
 )
+from .padding import Padding, PaddingDimensions
 from .style import Style
 from .text import Text
 from .segment import Segment
@@ -29,6 +30,7 @@ class Panel:
             width, otherwise it will be sized to fit the contents. Defaults to True.
         style (str, optional): The style of the border. Defaults to "none".
         width (Optional[int], optional): Optional width of panel. Defaults to None to auto-detect.
+        padding (Optional[PaddingDimensions]): Optional padding. Defaults to 0
     """
 
     def __init__(
@@ -38,16 +40,22 @@ class Panel:
         expand: bool = True,
         style: Union[str, Style] = "none",
         width: Optional[int] = None,
+        padding: PaddingDimensions = 0,
     ) -> None:
         self.renderable = renderable
         self.box = box
         self.expand = expand
         self.style = style
         self.width = width
+        self.padding = padding
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
+        _padding = Padding.unpack(self.padding)
+        renderable = (
+            Padding(self.renderable, _padding) if any(_padding) else self.renderable
+        )
         style = console.get_style(self.style)
         width = (
             options.max_width
@@ -57,11 +65,11 @@ class Panel:
         child_width = (
             width - 2
             if self.expand
-            else Measurement.get(console, self.renderable, width - 2).maximum
+            else Measurement.get(console, renderable, width - 2).maximum
         )
         width = child_width + 2
         child_options = options.update(width=child_width)
-        lines = console.render_lines(self.renderable, child_options)
+        lines = console.render_lines(renderable, child_options)
         box = SQUARE if console.legacy_windows else (self.box or ROUNDED)
         line_start = Segment(box.mid_left, style)
         line_end = Segment(f"{box.mid_right}\n", style)
