@@ -317,6 +317,9 @@ class Console:
             return None
         if self.legacy_windows:  # pragma: no cover
             return ColorSystem.WINDOWS
+        if "WT_SESSION" in os.environ:
+            # Exception for Windows terminal
+            return ColorSystem.TRUECOLOR
         color_term = os.environ.get("COLORTERM", "").strip().lower()
         return (
             ColorSystem.TRUECOLOR

@@ -36,7 +36,7 @@ class Rule:
     ) -> RenderResult:
         width = options.max_width
 
-        character = "-" if console.legacy_windows else (self.character or "━")
+        character = "-" if console.legacy_windows else (self.character or "─")
 
         if not self.title:
             yield Text(character * width, self.style)

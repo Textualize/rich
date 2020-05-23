@@ -1,9 +1,13 @@
-from typing import Union
+import math
+from time import monotonic
+from typing import Optional, List, Union
 
+from .color import Color, blend_rgb
+from .color_triplet import ColorTriplet
 from .console import Console, ConsoleOptions, RenderResult
 from .measure import Measurement
 from .segment import Segment
-from .style import StyleType
+from .style import Style, StyleType
 
 
 class Bar:
@@ -13,9 +17,11 @@ class Bar:
         total (float, optional): Number of steps in the bar. Defaults to 100.
         completed (float, optional): Number of steps completed. Defaults to 0.
         width (int, optional): Width of the bar, or ``None`` for maximum width. Defaults to None.
+        pulse (bool, optional): Enable pulse effect. Defaults to False.
         style (StyleType, optional): Style for the bar background. Defaults to "bar.back".
         complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
+        animation_time (Optional[float], optional): Time in seconds to use for animation, or None to use system time.
     """
 
     def __init__(
@@ -23,16 +29,24 @@ class Bar:
         total: float = 100,
         completed: float = 0,
         width: int = None,
+        pulse: bool = False,
         style: StyleType = "bar.back",
         complete_style: StyleType = "bar.complete",
         finished_style: StyleType = "bar.finished",
+        pulse_style: StyleType = "bar.pulse",
+        animation_time: float = None,
     ):
         self.total = total
         self.completed = completed
         self.width = width
+        self.pulse = pulse
         self.style = style
         self.complete_style = complete_style
         self.finished_style = finished_style
+        self.pulse_style = pulse_style
+        self.animation_time = animation_time
+
+        self._pulse_segments: Optional[List[Segment]] = None
 
     def __repr__(self) -> str:
         return f"<Bar {self.completed!r} of {self.total!r}>"
@@ -44,6 +58,54 @@ class Bar:
         completed = min(100, max(0.0, completed))
         return completed
 
+    def _get_pulse_segments(self, console: Console) -> List[Segment]:
+        """Get a list of segments to render a pulse animation.
+
+        Args:
+            console (Console): Console instance to get styles from.
+
+        Returns:
+            List[Segment]: A list of segments, one segment per character.
+        """
+        pulse_size = 20
+
+        fore_style = console.get_style(self.pulse_style, default="white")
+        back_style = console.get_style(self.style, default="black")
+        bar = "█" if console.legacy_windows else "━"
+
+        segments: List[Segment] = []
+
+        if console.color_system != "truecolor":
+            segments += [Segment(bar, fore_style)] * (pulse_size // 2)
+            segments += [Segment(bar, back_style)] * (pulse_size - (pulse_size // 2))
+            return segments
+
+        append = segments.append
+
+        fore_color = (
+            fore_style.color.get_truecolor()
+            if fore_style.color
+            else ColorTriplet(255, 0, 255)
+        )
+
+        back_color = (
+            back_style.color.get_truecolor()
+            if back_style.color
+            else ColorTriplet(0, 0, 0)
+        )
+        cos = math.cos
+        pi = math.pi
+        _Segment = Segment
+        _Style = Style
+        from_triplet = Color.from_triplet
+
+        for index in range(pulse_size):
+            position = index / pulse_size
+            fade = 0.5 + cos((position * pi * 2)) / 2.0
+            color = blend_rgb(fore_color, back_color, cross_fade=fade)
+            append(_Segment(bar, _Style(color=from_triplet(color))))
+        return segments
+
     def update(self, completed: float, total: float = None) -> None:
         """Update progress with new values.
         
@@ -54,12 +116,27 @@ class Bar:
         self.completed = completed
         self.total = total if total is not None else self.total
 
+    def _render_pulse(self, console: Console, width: int) -> RenderResult:
+        pulse_segments = self._get_pulse_segments(console)
+        segment_count = len(pulse_segments)
+        current_time = (
+            monotonic() if self.animation_time is None else self.animation_time
+        )
+        segments = pulse_segments * (int(width / segment_count) + 2)
+        offset = int(-current_time * 15) % segment_count
+        segments = segments[offset : offset + width]
+        yield from segments
+
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        completed = min(self.total, max(0, self.completed))
-        width = min(self.width or options.max_width, options.max_width)
 
+        width = min(self.width or options.max_width, options.max_width)
+        if self.pulse:
+            yield from self._render_pulse(console, width)
+            return
+
+        completed = min(self.total, max(0, self.completed))
         legacy_windows = console.legacy_windows
         bar = "▓" if legacy_windows else "━"
         half_bar_right = "░" if legacy_windows else "╸"
