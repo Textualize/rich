@@ -72,6 +72,7 @@ class Table:
     """A console renderable to draw a table.
     
     Args:
+        *headers (Union[Column, str]): Column headers, either as a string, or `~Column` instance.
         title (Union[str, Text], optional): The title of the table rendered at the top. Defaults to None.
         caption (Union[str, Text], optional): The table caption rendered below. Defaults to None.
         width (int, optional): The width in characters of the table, or ``None`` to automatically fit. Defaults to None.

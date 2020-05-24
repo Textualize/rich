@@ -50,3 +50,23 @@ You can set the border style by importing one of the preset :class:`~rich.box.Bo
 See :ref:`appendix_box` for other box styles.
 
 The :class:`~rich.table.Table` class offers a number of configuration options to set the look and feel of the table, including how borders are rendered and the style and alignment of the columns.
+
+
+Adding columns
+~~~~~~~~~~~~~~
+
+You may also add columns by specifying them in the positional arguments of the :class:`~rich.table.Table` constructor. For example, we could construct a table with three columns like this:: 
+
+    table = Table("Released", "Title", "Box Office", title="Star Wars Movies") 
+
+This allows you to specify the text of the column only. If you want to set other attributes, such as width, style, and alignment, you can add an :class:`~rich.table.Column` class. Here's an example::
+
+    from rich.table import Column
+    table = Table(
+        "Released",
+        "Title",
+        Column("Box Office", align="right"),
+        title="Star Wars Movies"
+    )
+
+
