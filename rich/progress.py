@@ -49,6 +49,7 @@ def track(
     total: int = None,
     auto_refresh=True,
     console: Optional[Console] = None,
+    get_time: Callable[[], float] = None,
 ) -> Iterable[ProgressType]:
     """Track progress of processing a sequence.
     
@@ -63,7 +64,7 @@ def track(
         Iterable[ProgressType]: An iterable of the values in the sequence.
     
     """
-    progress = Progress(auto_refresh=auto_refresh, console=console)
+    progress = Progress(auto_refresh=auto_refresh, console=console, get_time=get_time)
 
     task_total = total
     if task_total is None:

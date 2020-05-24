@@ -77,7 +77,6 @@ class Bar:
             List[Segment]: A list of segments, one segment per character.
         """
         bar = "█" if legacy_windows else "━"
-
         segments: List[Segment] = []
 
         if color_system != "truecolor":
