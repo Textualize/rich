@@ -1,6 +1,7 @@
+from functools import lru_cache
 import math
 from time import monotonic
-from typing import Optional, List, Union
+from typing import Iterable, Optional, List, Union
 
 from .color import Color, blend_rgb
 from .color_triplet import ColorTriplet
@@ -8,6 +9,10 @@ from .console import Console, ConsoleOptions, RenderResult
 from .measure import Measurement
 from .segment import Segment
 from .style import Style, StyleType
+
+
+# Number of characters before 'pulse' animation repeats
+PULSE_SIZE = 20
 
 
 class Bar:
@@ -58,26 +63,26 @@ class Bar:
         completed = min(100, max(0.0, completed))
         return completed
 
-    def _get_pulse_segments(self, console: Console) -> List[Segment]:
+    @lru_cache(maxsize=16)
+    def _get_pulse_segments(
+        self,
+        fore_style: Style,
+        back_style: Style,
+        color_system: str,
+        legacy_windows: bool,
+    ) -> List[Segment]:
         """Get a list of segments to render a pulse animation.
-
-        Args:
-            console (Console): Console instance to get styles from.
 
         Returns:
             List[Segment]: A list of segments, one segment per character.
         """
-        pulse_size = 20
-
-        fore_style = console.get_style(self.pulse_style, default="white")
-        back_style = console.get_style(self.style, default="black")
-        bar = "█" if console.legacy_windows else "━"
+        bar = "█" if legacy_windows else "━"
 
         segments: List[Segment] = []
 
-        if console.color_system != "truecolor":
-            segments += [Segment(bar, fore_style)] * (pulse_size // 2)
-            segments += [Segment(bar, back_style)] * (pulse_size - (pulse_size // 2))
+        if color_system != "truecolor":
+            segments += [Segment(bar, fore_style)] * (PULSE_SIZE // 2)
+            segments += [Segment(bar, back_style)] * (PULSE_SIZE - (PULSE_SIZE // 2))
             return segments
 
         append = segments.append
@@ -99,8 +104,8 @@ class Bar:
         _Style = Style
         from_triplet = Color.from_triplet
 
-        for index in range(pulse_size):
-            position = index / pulse_size
+        for index in range(PULSE_SIZE):
+            position = index / PULSE_SIZE
             fade = 0.5 + cos((position * pi * 2)) / 2.0
             color = blend_rgb(fore_color, back_color, cross_fade=fade)
             append(_Segment(bar, _Style(color=from_triplet(color))))
@@ -116,8 +121,25 @@ class Bar:
         self.completed = completed
         self.total = total if total is not None else self.total
 
-    def _render_pulse(self, console: Console, width: int) -> RenderResult:
-        pulse_segments = self._get_pulse_segments(console)
+    def _render_pulse(self, console: Console, width: int) -> Iterable[Segment]:
+        """Renders the pulse animation.
+
+        Args:
+            console (Console): Console instance.
+            width (int): Width in characters of pulse animation.
+
+        Returns:
+            RenderResult: [description]
+
+        Yields:
+            Iterator[Segment]: Segments to render pulse
+        """
+        fore_style = console.get_style(self.pulse_style, default="white")
+        back_style = console.get_style(self.style, default="black")
+
+        pulse_segments = self._get_pulse_segments(
+            fore_style, back_style, console.color_system, console.legacy_windows
+        )
         segment_count = len(pulse_segments)
         current_time = (
             monotonic() if self.animation_time is None else self.animation_time

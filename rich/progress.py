@@ -504,7 +504,8 @@ class Progress:
         """
         with self._lock:
             task = self._tasks[task_id]
-            task.start_time = self.get_time()
+            if task.start_time is None:
+                task.start_time = self.get_time()
 
     def stop_task(self, task_id: TaskID) -> None:
         """Stop a task.
