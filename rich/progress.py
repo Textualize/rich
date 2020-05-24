@@ -11,6 +11,7 @@ from threading import Event, RLock, Thread
 from typing import (
     Any,
     Callable,
+    cast,
     Deque,
     Dict,
     Iterable,
@@ -162,6 +163,7 @@ class BarColumn(ProgressColumn):
             completed=max(0, task.completed),
             width=None if self.bar_width is None else max(1, self.bar_width),
             pulse=not task.started,
+            animation_time=task.get_time(),
         )
 
 
@@ -269,12 +271,15 @@ class Task:
     stop_time: Optional[float] = field(default=None, init=False, repr=False)
     """Optional[float]: Time this task was stopped, or None if not stopped."""
 
-    get_time: GetTimeCallable = monotonic
+    _get_time: GetTimeCallable = monotonic
     """Callable to get the current time."""
 
     _progress: Deque[ProgressSample] = field(
         default_factory=deque, init=False, repr=False
     )
+
+    def get_time(self) -> float:
+        return self._get_time()  # type: ignore
 
     @property
     def started(self) -> bool:
@@ -660,7 +665,7 @@ class Progress:
                 completed,
                 visible=visible,
                 fields=fields,
-                get_time=self.get_time,
+                _get_time=self.get_time,
             )
             self._tasks[self._task_index] = task
             if start:
