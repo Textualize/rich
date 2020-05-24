@@ -431,20 +431,21 @@ class Progress:
 
     def stop(self) -> None:
         """Stop the progress display."""
-        assert self._refresh_thread is not None
         with self._lock:
             if not self._started:
                 return
             self._started = False
             try:
-                if self.auto_refresh:
+                if self.auto_refresh and self._refresh_thread is not None:
                     self._refresh_thread.stop()
                 self.refresh()
                 if self.console.is_terminal:
                     self.console.line()
             finally:
                 self.console.show_cursor(True)
-        self._refresh_thread.join()
+        if self._refresh_thread is not None:
+            self._refresh_thread.join()
+            self._refresh_thread = None
 
     def __enter__(self) -> "Progress":
         self.start()
