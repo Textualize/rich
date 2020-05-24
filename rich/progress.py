@@ -352,7 +352,6 @@ class _RefreshThread(Thread):
 
     def stop(self) -> None:
         self.done.set()
-        self.join()
 
     def run(self) -> None:
         while not self.done.wait(1.0 / self.refresh_per_second):
@@ -432,19 +431,20 @@ class Progress:
 
     def stop(self) -> None:
         """Stop the progress display."""
+        assert self._refresh_thread is not None
         with self._lock:
             if not self._started:
                 return
             self._started = False
             try:
-                if self.auto_refresh and self._refresh_thread is not None:
+                if self.auto_refresh:
                     self._refresh_thread.stop()
-                    self._refresh_thread = None
                 self.refresh()
                 if self.console.is_terminal:
                     self.console.line()
             finally:
                 self.console.show_cursor(True)
+        self._refresh_thread.join()
 
     def __enter__(self) -> "Progress":
         with self._lock:
@@ -456,10 +456,13 @@ class Progress:
             return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        stopping = False
         with self._lock:
             self._enter_count -= 1
             if not self._enter_count:
-                self.stop()
+                stopping = True
+        if stopping:
+            self.stop()
 
     def track(
         self,
