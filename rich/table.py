@@ -40,14 +40,32 @@ class Column:
     """Defines a column in a table."""
 
     header: "RenderableType" = ""
+    """Renderable for the header (typically a string)"""
+
     footer: "RenderableType" = ""
+    """Renderable for the footer (typically a string)"""
+
     header_style: StyleType = "table.header"
+    """The style of the header."""
+
     footer_style: StyleType = "table.footer"
+    """The style of the footer."""
+
     style: StyleType = "none"
+    """The style of the column."""
+
     justify: "JustifyValues" = "left"
+    """How to justify text within the column ("left", "center", "right", or "full")"""
+
     width: Optional[int] = None
+    """Width of the column, or ``None`` (default) to auto calculate width."""
+
     ratio: Optional[int] = None
+    """Ratio to use when calculating column width, or ``None`` (default) to adapt to column contents."""
+
     no_wrap: bool = False
+    """Prevent wrapping of text within the column. Defaults to ``False``."""
+
     _cells: List["RenderableType"] = field(default_factory=list)
 
     @property
