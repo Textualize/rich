@@ -374,6 +374,8 @@ class Progress:
             TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
             TimeRemainingColumn(),
         )
+        self._lock = RLock()
+        self._task_and_refresh_count_lock = RLock()
         self.console = console or Console(file=sys.stdout)
         self.auto_refresh = auto_refresh
         self.refresh_per_second = refresh_per_second
@@ -382,7 +384,6 @@ class Progress:
         self._tasks: Dict[TaskID, Task] = {}
         self._live_render = LiveRender(self.get_renderable())
         self._task_index: TaskID = TaskID(0)
-        self._lock = RLock()
         self._refresh_thread: Optional[_RefreshThread] = None
         self._refresh_count = 0
         self._enter_count = 0
@@ -391,18 +392,19 @@ class Progress:
     @property
     def tasks(self) -> List[Task]:
         """Get a list of Task instances."""
-        return list(self._tasks.values())
+        with self._task_and_refresh_count_lock:
+            return list(self._tasks.values())
 
     @property
     def task_ids(self) -> List[TaskID]:
         """A list of task IDs."""
-        with self._lock:
+        with self._task_and_refresh_count_lock:
             return list(self._tasks.keys())
 
     @property
     def finished(self) -> bool:
         """Check if all tasks have been completed."""
-        with self._lock:
+        with self._task_and_refresh_count_lock:
             if not self._tasks:
                 return True
             return all(task.finished for task in self._tasks.values())
@@ -496,7 +498,7 @@ class Progress:
         Args:
             task_id (TaskID): ID of task.
         """
-        with self._lock:
+        with self._task_and_refresh_count_lock:
             task = self._tasks[task_id]
             task.start_time = self.get_time()
 
@@ -508,7 +510,7 @@ class Progress:
         Args:
             task_id (TaskID): ID of task.
         """
-        with self._lock:
+        with self._task_and_refresh_count_lock:
             task = self._tasks[task_id]
             current_time = self.get_time()
             if task.start_time is None:
@@ -539,28 +541,29 @@ class Progress:
         """
         current_time = self.get_time()
         with self._lock:
-            task = self._tasks[task_id]
-            completed_start = task.completed
+            with self._task_and_refresh_count_lock:
+                task = self._tasks[task_id]
+                completed_start = task.completed
 
-            if total is not None:
-                task.total = total
-            if advance is not None:
-                task.completed += advance
-            if completed is not None:
-                task.completed = completed
-            if visible is not None:
-                task.visible = visible
-            task.fields.update(fields)
+                if total is not None:
+                    task.total = total
+                if advance is not None:
+                    task.completed += advance
+                if completed is not None:
+                    task.completed = completed
+                if visible is not None:
+                    task.visible = visible
+                task.fields.update(fields)
 
-            update_completed = task.completed - completed_start
-            old_sample_time = current_time - self.speed_estimate_period
-            _progress = task._progress
+                update_completed = task.completed - completed_start
+                old_sample_time = current_time - self.speed_estimate_period
+                _progress = task._progress
 
-            while _progress and _progress[0].timestamp < old_sample_time:
-                _progress.popleft()
-            task._progress.append(ProgressSample(current_time, update_completed))
-            if refresh:
-                self.refresh()
+                while _progress and _progress[0].timestamp < old_sample_time:
+                    _progress.popleft()
+                task._progress.append(ProgressSample(current_time, update_completed))
+                if refresh:
+                    self.refresh()
 
     def advance(self, task_id: TaskID, advance: float = 1) -> None:
         """Advance task by a number of steps.
@@ -573,7 +576,7 @@ class Progress:
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
-        with self._lock:
+        with self._task_and_refresh_count_lock:
             self._live_render.set_renderable(self.get_renderable())
             if self.console.is_terminal:
                 with self.console:
@@ -588,8 +591,9 @@ class Progress:
 
     def get_renderables(self) -> Iterable[RenderableType]:
         """Get a number of renderables for the progress display."""
-        table = self.make_tasks_table(self.tasks)
-        yield table
+        with self._task_and_refresh_count_lock:
+            table = self.make_tasks_table(self.tasks)
+            yield table
 
     def make_tasks_table(self, tasks: Iterable[Task]) -> Table:
         """Get a table to render the Progress display.
@@ -645,7 +649,7 @@ class Progress:
         Returns:
             TaskID: An ID you can use when calling `update`.
         """
-        with self._lock:
+        with self._task_and_refresh_count_lock:
             task = Task(
                 self._task_index,
                 description,
@@ -671,7 +675,7 @@ class Progress:
             task_id (TaskID): A task ID.
         
         """
-        with self._lock:
+        with self._task_and_refresh_count_lock:
             del self._tasks[task_id]
 
     def print(
