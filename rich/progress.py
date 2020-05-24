@@ -280,6 +280,7 @@ class Task:
     )
 
     def get_time(self) -> float:
+        """Get the current time, in seconds."""
         return self._get_time()  # type: ignore
 
     @property
@@ -299,7 +300,7 @@ class Task:
             return None
         if self.stop_time is not None:
             return self.stop_time - self.start_time
-        return self.get_time() - self.start_time  # type: ignore
+        return self.get_time() - self.start_time
 
     @property
     def finished(self) -> bool:
