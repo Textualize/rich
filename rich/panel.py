@@ -30,7 +30,7 @@ class Panel:
             width, otherwise it will be sized to fit the contents. Defaults to True.
         style (str, optional): The style of the border. Defaults to "none".
         width (Optional[int], optional): Optional width of panel. Defaults to None to auto-detect.
-        padding (Optional[PaddingDimensions]): Optional padding. Defaults to 0
+        padding (Optional[PaddingDimensions]): Optional padding around renderable. Defaults to 0.
     """
 
     def __init__(
