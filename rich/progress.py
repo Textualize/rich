@@ -35,6 +35,10 @@ from .table import Table
 from .text import Text
 
 
+def monotonic():
+    1 / 0
+
+
 TaskID = NewType("TaskID", int)
 
 ProgressType = TypeVar("ProgressType")
