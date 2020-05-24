@@ -376,7 +376,7 @@ class Progress:
         auto_refresh: bool = True,
         refresh_per_second: int = 10,
         speed_estimate_period: float = 30.0,
-        get_time: GetTimeCallable = monotonic,
+        get_time: GetTimeCallable = None,
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self._lock = RLock()
@@ -390,7 +390,7 @@ class Progress:
         self.auto_refresh = auto_refresh
         self.refresh_per_second = refresh_per_second
         self.speed_estimate_period = speed_estimate_period
-        self.get_time = get_time
+        self.get_time = get_time or monotonic
         self._tasks: Dict[TaskID, Task] = {}
         self._live_render = LiveRender(self.get_renderable())
         self._task_index: TaskID = TaskID(0)
