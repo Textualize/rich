@@ -260,6 +260,9 @@ class Task:
     completed: float
     """float: Number of steps completed"""
 
+    _get_time: GetTimeCallable
+    """Callable to get the current time."""
+
     visible: bool = True
     """bool: Indicates if this task is visible in the progress display."""
 
@@ -271,9 +274,6 @@ class Task:
 
     stop_time: Optional[float] = field(default=None, init=False, repr=False)
     """Optional[float]: Time this task was stopped, or None if not stopped."""
-
-    _get_time: GetTimeCallable = monotonic
-    """Callable to get the current time."""
 
     _progress: Deque[ProgressSample] = field(
         default_factory=deque, init=False, repr=False
