@@ -10,6 +10,8 @@ Requirements
 
 Rich works with OSX, Linux and Windows.
 
+On Windows both the (ancient) cmd.exe terminal is supported and the new `Windows Terminal <https://github.com/microsoft/terminal/releases>`_. The later has much improved support for color and style.
+
 Rich requires Python 3.6.1 and above. Note that Python 3.6.0 is *not* supported due to lack of support for methods on NamedTuples.
 
 Installation

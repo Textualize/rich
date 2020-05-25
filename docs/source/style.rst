@@ -42,7 +42,7 @@ You can set a style attribute by adding one or more of the following words:
 * ``"blink"`` for text that flashes (use this one sparingly).
 * ``"blink2"`` for text that flashes rapidly (not supported by most terminals).
 * ``"conceal"`` for *concealed* text (not supported by most terminals).
-* ``"italic"`` or ``"i"`` for italic text.
+* ``"italic"`` or ``"i"`` for italic text (not supported on Windows).
 * ``"reverse"`` or ``"r"`` for text with foreground and background colors reversed.
 * ``"strike"`` or ``"s"`` for text with a line through it.
 * ``"underline"`` or ``"u"`` for underlined text.
