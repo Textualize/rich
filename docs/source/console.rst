@@ -1,10 +1,14 @@
 Console API
 ===========
 
-For complete control over terminal formatting, Rich offers a :class:`~rich.console.Console` class. Most applications will require a single Console instance, so you may want to create one at the module level or as an attribute of your top-level object. For example::
+For complete control over terminal formatting, Rich offers a :class:`~rich.console.Console` class. Most applications will require a single Console instance, so you may want to create one at the module level or as an attribute of your top-level object. For example, you  could add a file called "console.py" to your project::
 
     from rich.console import Console
     console = Console()
+
+Then you can import the console from anywhere in your project like this::
+
+    from my_project.console import console
 
 The console object handles the mechanics of generating ANSI escape sequences for color and style. It will auto-detect the capabilities of the terminal and convert colors if necessary.
 
@@ -17,7 +21,42 @@ The console will auto-detect a number of properties required when rendering.
 * :obj:`~rich.console.Console.size` is the current dimensions of the terminal (which may change if you resize the window).
 * :obj:`~rich.console.Console.encoding` is the default encoding (typically "utf-8").
 * :obj:`~rich.console.Console.is_terminal` is a boolean that indicates if the Console instance is writing to a terminal or not.
-* :obj:`~rich.console.Console.color_system` is a string containing "standard", "256" or "truecolor", or ``None`` if not writing to a terminal.
+* :obj:`~rich.console.Console.color_system` is a string containing "standard", "256", "windows" or "truecolor", or ``None`` if not writing to a terminal.
+
+
+Color systems
+-------------
+
+There are several "standards" for writing color to the terminal which are not all universally supported. You can set the color system for a :class:`~rich.console.Console` by supplying the "color_system" argument. Generally you should leave this value as the default (``None``) which tells Rich to auto-detect the color system.
+
+You can also set ``color_system`` to one of the following values:
+
+* "standard" Can display 8 colors, with normal and bright variations, for 16 colors in total.
+* "256" Can display the 16 colors from "standard" plus a fixed palette of 240 colors.
+* "truecolor" Can display 16.7 million colors, which is likely all the colors your monitor can display.
+* "windows" Can display 8 colors in legacy Windows terminal. New Windows terminal can display "truecolor".
+
+.. warning::
+    Be careful when setting a color system, if you set a higher color system than your terminal supports, your text may be unreadable.
+
+
+File output
+-----------
+
+The Console object will write to standard output (i.e. the terminal). You can also tell the Console object to write to another file by setting the ``file`` argument on the constructor -- which should be a file-like object opened for writing text. One use of this capability is to create a Console for writing to standard error by setting file to ``sys.stderr``. Here's an example::
+
+    import sys
+    from rich.console import Console
+    error_console = Console(file=sys.stderr)
+    error_console.print("[bold red]This is an error!")
+
+
+Terminal detection
+------------------
+
+If Rich detects that it is not writing to a terminal it will strip control codes for color / style etc from the output. If you want to write control codes to a regular file then set ``force_terminal=True`` on the constructor.
+
+Letting Rich auto-detect terminals is useful as it will write plain text when you pipe output to a file or other application.
 
 
 Printing
