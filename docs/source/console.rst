@@ -27,9 +27,9 @@ The console will auto-detect a number of properties required when rendering.
 Color systems
 -------------
 
-There are several "standards" for writing color to the terminal which are not all universally supported. You can set the color system for a :class:`~rich.console.Console` by supplying the "color_system" argument. Generally you should leave this value as the default (``None``) which tells Rich to auto-detect the color system.
+There are several "standards" for writing color to the terminal which are not all universally supported. You can set the color system for a :class:`~rich.console.Console` by supplying the ``color_system`` argument. Rich will auto-detect the color system if you leave it as the default (``None``).
 
-You can also set ``color_system`` to one of the following values:
+You can set ``color_system`` to one of the following values:
 
 * "standard" Can display 8 colors, with normal and bright variations, for 16 colors in total.
 * "256" Can display the 16 colors from "standard" plus a fixed palette of 240 colors.
