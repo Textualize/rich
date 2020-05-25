@@ -31,10 +31,10 @@ There are several "standards" for writing color to the terminal which are not al
 
 You can set ``color_system`` to one of the following values:
 
-* "standard" Can display 8 colors, with normal and bright variations, for 16 colors in total.
-* "256" Can display the 16 colors from "standard" plus a fixed palette of 240 colors.
-* "truecolor" Can display 16.7 million colors, which is likely all the colors your monitor can display.
-* "windows" Can display 8 colors in legacy Windows terminal. New Windows terminal can display "truecolor".
+* ``"standard"`` Can display 8 colors, with normal and bright variations, for 16 colors in total.
+* ``"256"`` Can display the 16 colors from "standard" plus a fixed palette of 240 colors.
+* ``"truecolor"`` Can display 16.7 million colors, which is likely all the colors your monitor can display.
+* ``"windows"`` Can display 8 colors in legacy Windows terminal. New Windows terminal can display "truecolor".
 
 .. warning::
     Be careful when setting a color system, if you set a higher color system than your terminal supports, your text may be unreadable.
@@ -54,7 +54,7 @@ The Console object will write to standard output (i.e. the terminal). You can al
 Terminal detection
 ------------------
 
-If Rich detects that it is not writing to a terminal it will strip control codes for color / style etc from the output. If you want to write control codes to a regular file then set ``force_terminal=True`` on the constructor.
+If Rich detects that it is not writing to a terminal it will strip control codes from the output. If you want to write control codes to a regular file then set ``force_terminal=True`` on the constructor.
 
 Letting Rich auto-detect terminals is useful as it will write plain text when you pipe output to a file or other application.
 
