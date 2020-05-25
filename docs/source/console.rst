@@ -21,16 +21,18 @@ The console will auto-detect a number of properties required when rendering.
 * :obj:`~rich.console.Console.size` is the current dimensions of the terminal (which may change if you resize the window).
 * :obj:`~rich.console.Console.encoding` is the default encoding (typically "utf-8").
 * :obj:`~rich.console.Console.is_terminal` is a boolean that indicates if the Console instance is writing to a terminal or not.
-* :obj:`~rich.console.Console.color_system` is a string containing "standard", "256", "windows" or "truecolor", or ``None`` if not writing to a terminal.
+* :obj:`~rich.console.Console.color_system` is a string containing the Console color system (see below).
 
 
 Color systems
 -------------
 
-There are several "standards" for writing color to the terminal which are not all universally supported. You can set the color system for a :class:`~rich.console.Console` by supplying the ``color_system`` argument. Rich will auto-detect the color system if you leave it as the default (``None``).
+There are several "standards" for writing color to the terminal which are not all universally supported. Rich will auto-detect the appropriate color system, or you can set it manually by supplying a value for ``color_system`` to the :class:`~rich.console.Console` constructor.
 
 You can set ``color_system`` to one of the following values:
 
+* ``None`` Disables color entirely.
+* ``"auto"`` Will auto-detect the color system.
 * ``"standard"`` Can display 8 colors, with normal and bright variations, for 16 colors in total.
 * ``"256"`` Can display the 16 colors from "standard" plus a fixed palette of 240 colors.
 * ``"truecolor"`` Can display 16.7 million colors, which is likely all the colors your monitor can display.
