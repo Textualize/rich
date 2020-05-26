@@ -527,14 +527,20 @@ class Style:
 
 
 class StyleStack:
-    """A stack of styles that maintains a current style."""
+    """A stack of styles."""
+
+    __slots__ = ["_stack"]
 
     def __init__(self, default_style: "Style") -> None:
         self._stack: List[Style] = [default_style]
-        self.current = default_style
 
     def __repr__(self) -> str:
         return f"<stylestack {self._stack!r}>"
+
+    @property
+    def current(self) -> Style:
+        """Get the Style at the top of the stack."""
+        return self._stack[-1]
 
     def push(self, style: Style) -> None:
         """Push a new style on to the stack.
@@ -542,8 +548,7 @@ class StyleStack:
         Args:
             style (Style): New style to combine with current style.
         """
-        self.current = self.current + style
-        self._stack.append(self.current)
+        self._stack.append(self._stack[-1] + style)
 
     def pop(self) -> Style:
         """Pop last style and discard.
@@ -552,5 +557,4 @@ class StyleStack:
             Style: New current style (also available as stack.current)
         """
         self._stack.pop()
-        self.current = self._stack[-1]
-        return self.current
+        return self._stack[-1]

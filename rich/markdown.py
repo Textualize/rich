@@ -223,7 +223,7 @@ class HorizontalRule(MarkdownElement):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        style = console.get_style("markdown.hr")
+        style = console.get_style("markdown.hr", default="none")
         yield Rule(style=style)
 
 
@@ -278,7 +278,7 @@ class ListItem(TextElement):
     def render_bullet(self, console: Console, options: ConsoleOptions) -> RenderResult:
         render_options = options.update(width=options.max_width - 3)
         lines = console.render_lines(self.elements, render_options, style=self.style)
-        bullet_style = console.get_style("markdown.item.bullet")
+        bullet_style = console.get_style("markdown.item.bullet", default="none")
 
         bullet = Segment(" • ", bullet_style)
         padding = Segment(" " * 3, bullet_style)
@@ -294,7 +294,7 @@ class ListItem(TextElement):
         number_width = len(str(last_number)) + 2
         render_options = options.update(width=options.max_width - number_width)
         lines = console.render_lines(self.elements, render_options, style=self.style)
-        number_style = console.get_style("markdown.item.number")
+        number_style = console.get_style("markdown.item.number", default="none")
 
         new_line = Segment("\n")
         padding = Segment(" " * number_width, number_style)
@@ -365,7 +365,7 @@ class MarkdownContext:
 
     def enter_style(self, style_name: Union[str, Style]) -> Style:
         """Enter a style context."""
-        style = self.console.get_style(style_name)
+        style = self.console.get_style(style_name, default="none")
         self.style_stack.push(style)
         return self.current_style
 
@@ -418,7 +418,7 @@ class Markdown:
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         """Render markdown to the console."""
-        style = console.get_style(self.style)
+        style = console.get_style(self.style, default="none")
         context = MarkdownContext(console, options, style)
         nodes = self.parsed.walker()
         inlines = self.inlines
@@ -435,7 +435,7 @@ class Markdown:
                     context.on_text(" ")
             elif node_type == "link":
                 if entering:
-                    link_style = console.get_style("markdown.link")
+                    link_style = console.get_style("markdown.link", default="none")
                     if self.hyperlinks:
                         link_style += Style(link=current.destination)
                     context.enter_style(link_style)
@@ -444,7 +444,7 @@ class Markdown:
                     if not self.hyperlinks:
                         context.on_text(" (")
                         style = Style(underline=True) + console.get_style(
-                            "markdown.link_url"
+                            "markdown.link_url", default="none"
                         )
                         context.enter_style(style)
                         context.on_text(current.destination)
