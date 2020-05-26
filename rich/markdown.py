@@ -133,7 +133,7 @@ class Heading(TextElement):
 
     @classmethod
     def create(cls, markdown: "Markdown", node: Any) -> "Heading":
-        heading = Heading(node.level)
+        heading = cls(node.level)
         return heading
 
     def on_enter(self, context: "MarkdownContext") -> None:
