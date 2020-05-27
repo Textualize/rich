@@ -113,7 +113,7 @@ The log method could be used for logging to the terminal for long running applic
 
 You can also use the builtin [Handler class](https://rich.readthedocs.io/en/latest/logging.html) to format and colorize output from Python's logging module. Here's an example of the output:
 
-![Logging](https://github.com/willmcgugan/rich/blob/master/imgs/logging.png)
+![Logging](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
 
 ## Emoji
 
