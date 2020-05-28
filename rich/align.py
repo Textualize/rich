@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from typing_extensions import Literal
+from .jupyter import JupyterMixin
 from .measure import Measurement
 from .segment import Segment
 from .style import StyleType
@@ -11,7 +12,7 @@ if TYPE_CHECKING:
 AlignValues = Literal["left", "center", "right"]
 
 
-class Align:
+class Align(JupyterMixin):
     """Align a renderable by adding spaces if necessary.
 
     Args:

@@ -7,6 +7,7 @@ if TYPE_CHECKING:
         RenderableType,
         RenderResult,
     )
+from .jupyter import JupyterMixin
 from .measure import Measurement
 from .style import Style
 from .text import Text
@@ -16,7 +17,7 @@ from .segment import Segment
 PaddingDimensions = Union[int, Tuple[int], Tuple[int, int], Tuple[int, int, int, int]]
 
 
-class Padding:
+class Padding(JupyterMixin):
     """Draw space around content.
 
     Example:        

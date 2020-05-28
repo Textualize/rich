@@ -10,11 +10,13 @@ _console: Optional["Console"] = None
 def print(
     *objects: Any, sep=" ", end="\n", file: IO[str] = None, flush: bool = False,
 ):
+    from .console import Console
+
     global _console
     if _console is None:
-        from .console import Console
+        from ._global import console
 
-        _console = Console(log_time=False)
+        _console = console
 
     write_console = _console if file is None else Console(file=file)
     return write_console.print(*objects, sep=sep, end=end)

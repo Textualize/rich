@@ -1,12 +1,13 @@
 from typing import Union
 
 from .console import Console, ConsoleOptions, RenderResult
+from .jupyter import JupyterMixin
 from .segment import Segment
 from .style import Style
 from .text import Text
 
 
-class Rule:
+class Rule(JupyterMixin):
     """A console renderable to draw a horizontal rule (line).
     
     Args:

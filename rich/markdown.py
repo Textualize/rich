@@ -15,6 +15,7 @@ from .console import (
     Segment,
 )
 from .containers import Renderables
+from .jupyter import JupyterMixin
 from .panel import Panel
 from .rule import Rule
 from .style import Style, StyleStack
@@ -375,7 +376,7 @@ class MarkdownContext:
         return style
 
 
-class Markdown:
+class Markdown(JupyterMixin):
     """A Markdown renderable.
 
     Args:

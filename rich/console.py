@@ -44,6 +44,7 @@ from .highlighter import NullHighlighter, ReprHighlighter
 from .pretty import Pretty
 from .style import Style
 from .tabulate import tabulate_mapping
+from . import jupyter
 from . import highlighter
 from . import themes
 from .pretty import Pretty
@@ -397,6 +398,9 @@ class Console:
         Returns:
             ConsoleDimensions: A named tuple containing the dimensions.
         """
+        if jupyter.is_jupyter():
+            return ConsoleDimensions(93, 100)
+
         if self._width is not None and self._height is not None:
             return ConsoleDimensions(self._width, self._height)
 
@@ -507,19 +511,18 @@ class Console:
             List[List[Segment]]: A list of lines, where a line is a list of Segment objects.
         """
         render_options = options or self.options
-        with self:
-            _rendered = self.render(renderable, render_options)
-            if style is not None:
-                _rendered = Segment.apply_style(_rendered, style)
-            lines = list(
-                Segment.split_and_crop_lines(
-                    _rendered,
-                    render_options.max_width,
-                    style=style,
-                    include_new_lines=False,
-                    pad=pad,
-                )
+        _rendered = self.render(renderable, render_options)
+        if style is not None:
+            _rendered = Segment.apply_style(_rendered, style)
+        lines = list(
+            Segment.split_and_crop_lines(
+                _rendered,
+                render_options.max_width,
+                style=style,
+                include_new_lines=False,
+                pad=pad,
             )
+        )
         return lines
 
     def render_str(
@@ -830,9 +833,13 @@ class Console:
         """Check if the buffer may be rendered."""
         with self._lock:
             if self._buffer_index == 0:
-                text = self._render_buffer()
-                self.file.write(text)
-                self.file.flush()
+                if jupyter.is_jupyter():
+                    jupyter.display(self._buffer)
+                    del self._buffer[:]
+                else:
+                    text = self._render_buffer()
+                    self.file.write(text)
+                    self.file.flush()
 
     def _render_buffer(self) -> str:
         """Render buffered output, and clear buffer."""

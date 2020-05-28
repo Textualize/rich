@@ -21,6 +21,7 @@ from ._wrap import divide_line
 from .cells import cell_len
 from .containers import Lines
 from .control import strip_control_codes
+from .jupyter import JupyterMixin
 from .measure import Measurement
 from .segment import Segment
 from .style import Style, StyleType
@@ -88,7 +89,7 @@ class Span(NamedTuple):
         return Span(start, min(offset, end), style)
 
 
-class Text:
+class Text(JupyterMixin):
     r"""Text with color / style.
         
         Args:

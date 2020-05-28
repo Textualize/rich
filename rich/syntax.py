@@ -11,6 +11,7 @@ from pygments.util import ClassNotFound
 from ._loop import loop_first
 from .color import Color, blend_rgb, parse_rgb_hex
 from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, Segment
+from .jupyter import JupyterMixin
 from .measure import Measurement
 from .style import Style
 from .text import Text
@@ -19,7 +20,7 @@ WINDOWS = platform.system() == "Windows"
 DEFAULT_THEME = "monokai"
 
 
-class Syntax:
+class Syntax(JupyterMixin):
     """Construct a Syntax object to render syntax highlighted code.
     
     Args:
