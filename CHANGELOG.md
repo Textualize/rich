@@ -7,10 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.0] Unreleased
 
+### Added
+
+- Added rich.get_console() function to get global console instance.
+
 ### Changed
 
 - Updated `markdown.Heading.create()` to work with subclassing.
 - Console now transparently works with Jupyter
+
+### Fixed
+
+- Fixed issue with broken table with show_edge=False and a non-None box arg
 
 ## [1.2.3] - 2020-05-24
 
