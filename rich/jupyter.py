@@ -2,43 +2,17 @@ import io
 from typing import Any, Iterable, IO, List, Optional, TYPE_CHECKING, Union
 
 # from .console import Console as BaseConsole
+from .__init__ import get_console
 from .segment import Segment
 from .style import Style
 from .terminal_theme import DEFAULT_TERMINAL_THEME
 
 if TYPE_CHECKING:
-    from .console import Console
+    from .console import Console, RenderableType
 
 JUPYTER_HTML_FORMAT = """\
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">{code}</pre>
 """
-
-
-_console: Optional["Console"] = None
-
-
-def get_console() -> "Console":
-    from .console import Console
-
-    global _console
-    if _console is None:
-        _console = Console(width=100)
-    return _console
-
-
-def is_jupyter() -> bool:
-    """Check if we're running in a Jupyter notebook."""
-    try:
-        get_ipython  # type: ignore
-    except NameError:
-        return False
-    shell = get_ipython().__class__.__name__  # type: ignore
-    if shell == "ZMQInteractiveShell":
-        return True  # Jupyter notebook or qtconsole
-    elif shell == "TerminalInteractiveShell":
-        return False  # Terminal running IPython
-    else:
-        return False  # Other type (?)
 
 
 class JupyterRenderable:
@@ -48,7 +22,7 @@ class JupyterRenderable:
         self.html = html
 
     @classmethod
-    def render(self, rich_renderable) -> str:
+    def render(self, rich_renderable: "RenderableType") -> str:
         console = get_console()
         segments = console.render(rich_renderable, console.options)
         html = _render_segments(segments)
@@ -100,3 +74,9 @@ def display(segments: Iterable[Segment]) -> None:
     html = _render_segments(segments)
     jupyter_renderable = JupyterRenderable(html)
     ipython_display(jupyter_renderable)
+
+
+def print(*args, **kwargs) -> None:
+    """Proxy for Console print."""
+    console = get_console()
+    return console.print(*args, **kwargs)

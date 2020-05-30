@@ -44,7 +44,6 @@ from .highlighter import NullHighlighter, ReprHighlighter
 from .pretty import Pretty
 from .style import Style
 from .tabulate import tabulate_mapping
-from . import jupyter
 from . import highlighter
 from . import themes
 from .pretty import Pretty
@@ -193,6 +192,25 @@ class ConsoleDimensions(NamedTuple):
     height: int
 
 
+def _is_jupyter() -> bool:
+    """Check if we're running in a Jupyter notebook."""
+    try:
+        from IPython.display import display
+    except ImportError:
+        return False
+    try:
+        get_ipython  # type: ignore
+    except NameError:
+        return False
+    shell = get_ipython().__class__.__name__  # type: ignore
+    if shell == "ZMQInteractiveShell":
+        return True  # Jupyter notebook or qtconsole
+    elif shell == "TerminalInteractiveShell":
+        return False  # Terminal running IPython
+    else:
+        return False  # Other type (?)
+
+
 COLOR_SYSTEMS = {
     "standard": ColorSystem.STANDARD,
     "256": ColorSystem.EIGHT_BIT,
@@ -229,6 +247,8 @@ class Console:
     Args:
         color_system (str, optional): The color system supported by your terminal,
             either ``"standard"``, ``"256"`` or ``"truecolor"``. Leave as ``"auto"`` to autodetect.
+        force_terminal (bool, optional): Force the Console to write control codes even when a terminal is not detected. Defaults to False.
+        force_jupyter (bool, optional): Force the Console to write to Jupyter even when Jupyter is not detected. Defaults to False
         theme (Theme, optional): An optional style theme object, or ``None`` for default theme.
         file (IO, optional): A file object where the console should write to. Defaults to stdoutput.
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
@@ -246,10 +266,12 @@ class Console:
 
     def __init__(
         self,
+        *,
         color_system: Optional[
             Literal["auto", "standard", "256", "truecolor", "windows"]
         ] = "auto",
         force_terminal: bool = False,
+        force_jupyter: bool = False,
         theme: Theme = None,
         file: IO[str] = None,
         width: int = None,
@@ -264,6 +286,10 @@ class Console:
         log_time_format: str = "[%X]",
         highlighter: Optional["HighlighterType"] = ReprHighlighter(),
     ):
+        self.is_jupyter = force_jupyter or _is_jupyter()
+        if self.is_jupyter:
+            width = width or 93
+            height = height or 100
         self._styles = themes.DEFAULT.styles if theme is None else theme.styles
         self._width = width
         self._height = height
@@ -398,9 +424,6 @@ class Console:
         Returns:
             ConsoleDimensions: A named tuple containing the dimensions.
         """
-        if jupyter.is_jupyter():
-            return ConsoleDimensions(93, 100)
-
         if self._width is not None and self._height is not None:
             return ConsoleDimensions(self._width, self._height)
 
@@ -833,8 +856,10 @@ class Console:
         """Check if the buffer may be rendered."""
         with self._lock:
             if self._buffer_index == 0:
-                if jupyter.is_jupyter():
-                    jupyter.display(self._buffer)
+                if self.is_jupyter:
+                    from .jupyter import display
+
+                    display(self._buffer)
                     del self._buffer[:]
                 else:
                     text = self._render_buffer()

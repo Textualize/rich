@@ -25,6 +25,7 @@ from typing import (
     Union,
 )
 
+from . import get_console
 from .bar import Bar
 from .console import Console, JustifyValues, RenderGroup, RenderableType
 from .highlighter import Highlighter
@@ -387,7 +388,7 @@ class Progress:
             TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
             TimeRemainingColumn(),
         )
-        self.console = console or Console(file=sys.stdout)
+        self.console = console or get_console()
         self.auto_refresh = auto_refresh
         self.refresh_per_second = refresh_per_second
         self.speed_estimate_period = speed_estimate_period
