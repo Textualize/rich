@@ -166,7 +166,10 @@ class Table(JupyterMixin):
 
     @classmethod
     def grid(
-        cls, padding: PaddingDimensions = 0, collapse_padding: bool = False
+        cls,
+        padding: PaddingDimensions = 0,
+        collapse_padding: bool = False,
+        pad_edge: bool = True,
     ) -> "Table":
         """Get a table with no lines, headers, or footer.
 
@@ -183,6 +186,7 @@ class Table(JupyterMixin):
             show_header=False,
             show_footer=False,
             show_edge=False,
+            pad_edge=pad_edge,
         )
 
     @property
@@ -445,7 +449,8 @@ class Table(JupyterMixin):
                     top = 0
                 if last_row:
                     bottom = 0
-            return Padding(renderable, (top, right, bottom, left))
+            _padding = Padding(renderable, (top, right, bottom, left))
+            return _padding
 
         raw_cells: List[Tuple[StyleType, "RenderableType"]] = []
         _append = raw_cells.append

@@ -38,14 +38,6 @@ def test_console_width():
     assert max_width == 14
 
 
-def test_console_width_expand():
-    console = Console(file=io.StringIO(), width=50)
-    panel = Panel("Hello, World")
-    min_width, max_width = panel.__rich_measure__(console, 50)
-    assert min_width == 50
-    assert max_width == 50
-
-
 if __name__ == "__main__":
     expected = []
     for panel in tests:
