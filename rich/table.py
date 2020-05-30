@@ -17,6 +17,7 @@ from typing_extensions import Literal
 from . import box, errors
 from ._loop import loop_first, loop_first_last, loop_last
 from ._ratio import ratio_divide
+from .jupyter import JupyterMixin
 from .measure import Measurement
 from .padding import Padding, PaddingDimensions
 from .protocol import is_renderable
@@ -86,7 +87,7 @@ class _Cell(NamedTuple):
     renderable: "RenderableType"
 
 
-class Table:
+class Table(JupyterMixin):
     """A console renderable to draw a table.
     
     Args:
@@ -510,7 +511,7 @@ class Table:
         show_lines = self.show_lines
 
         _Segment = Segment
-        if _box and show_edge:
+        if _box:
             box_segments = [
                 (
                     _Segment(_box.head_left, border_style),
@@ -528,8 +529,9 @@ class Table:
                     _Segment(_box.mid_vertical, border_style),
                 ),
             ]
-            yield Segment(_box.get_top(widths), border_style)
-            yield new_line
+            if show_edge:
+                yield Segment(_box.get_top(widths), border_style)
+                yield new_line
         else:
             box_segments = []
 

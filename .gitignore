@@ -1,3 +1,4 @@
+*.ipynb
 .pytype
 .DS_Store
 .vscode

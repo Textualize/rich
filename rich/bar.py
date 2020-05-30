@@ -6,6 +6,7 @@ from typing import Iterable, Optional, List, Union
 from .color import Color, blend_rgb
 from .color_triplet import ColorTriplet
 from .console import Console, ConsoleOptions, RenderResult
+from .jupyter import JupyterMixin
 from .measure import Measurement
 from .segment import Segment
 from .style import Style, StyleType
@@ -15,7 +16,7 @@ from .style import Style, StyleType
 PULSE_SIZE = 20
 
 
-class Bar:
+class Bar(JupyterMixin):
     """Renders a (progress) bar.
         
     Args:

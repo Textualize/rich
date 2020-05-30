@@ -10,13 +10,14 @@ from .console import (
     RenderResult,
     Measurement,
 )
+from .jupyter import JupyterMixin
 from .padding import Padding, PaddingDimensions
 from .style import Style
 from .text import Text
 from .segment import Segment
 
 
-class Panel:
+class Panel(JupyterMixin):
     """A console renderable that draws a border around its contents.
     
     Example::

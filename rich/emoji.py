@@ -2,6 +2,7 @@ import re
 from typing import Match, Union
 
 from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult
+from .jupyter import JupyterMixin
 from .segment import Segment
 from .style import Style
 from ._emoji_codes import EMOJI
@@ -12,7 +13,7 @@ class NoEmoji(Exception):
     """No emoji by that name."""
 
 
-class Emoji:
+class Emoji(JupyterMixin):
     __slots__ = ["name", "style", "_char"]
 
     def __init__(self, name: str, style: Union[str, Style] = "none") -> None:

@@ -5,15 +5,18 @@ import rich
 from rich.console import Console
 
 
-def test_rich_print():
-    output = io.StringIO()
+def test_get_console():
+    console = rich.get_console()
+    assert isinstance(console, Console)
 
-    assert rich._console is None
-    backup_file = sys.stdout
+
+def test_rich_print():
+    console = rich.get_console()
+    output = io.StringIO()
+    backup_file = console.file
     try:
-        sys.stdout = output
+        console.file = output
         rich.print("foo")
-        assert isinstance(rich._console, Console)
         assert output.getvalue() == "foo\n"
     finally:
-        sys.stdout = backup_file
+        console.file = backup_file
