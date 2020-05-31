@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added rich.get_console() function to get global console instance.
+- Added Columns class
 
 ### Changed
 
