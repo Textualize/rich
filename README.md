@@ -126,6 +126,50 @@ To insert an emoji in to console output place the name between two colons. Here'
 
 Please use this feature wisely.
 
+## Tables
+
+Rich can render flexible tables with unicode box characters. There is a large variety of formatting options for borders, styles, cell alignment etc. Here's a simple example:
+
+```python
+from rich.console import Console
+from rich.table import Column, Table
+
+console = Console()
+
+table = Table(show_header=True, header_style="bold magenta")
+table.add_column("Date", style="dim", width=12)
+table.add_column("Title")
+table.add_column("Production Budget", justify="right")
+table.add_column("Box Office", justify="right")
+table.add_row(
+    "Dev 20, 2019", "Star Wars: The Rise of Skywalker", "$275,000,000", "$375,126,118"
+)
+table.add_row(
+    "May 25, 2018",
+    "[red]Solo[/red]: A Star Wars Story",
+    "$275,000,000",
+    "$393,151,347",
+)
+table.add_row(
+    "Dec 15, 2017",
+    "Star Wars Ep. VIII: The Last Jedi",
+    "$262,000,000",
+    "[bold]$1,332,539,889[/bold]",
+)
+
+console.print(table)
+```
+
+This produces the following output:
+
+![table](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
+
+Note that console markup is rendered in the same was as `print()` and `log()`. In fact, anything that is renderable by Rich may be included in the headers / rows (even other tables).
+
+The `Table` class is smart enough to resize columns to fit the available width of the terminal, wrapping text as required. Here's the same example, with the terminal made smaller than the table above:
+
+![table2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
+
 ## Progress Bars
 
 Rich can render multiple flicker-free [progress](https://rich.readthedocs.io/en/latest/progress.html) bars to track long-running tasks.
@@ -148,6 +192,26 @@ The columns may be configured to show any details you want. Built-in columns inc
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/downloader.gif)
 
 To try this out yourself, see [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) which can download multiple URLs simultaneously while displaying progress.
+
+## Columns
+
+Rich can render content in neat [columns](https://rich.readthedocs.io/en/latest/columns.html) with equal or optimal width. Here's a very basic clone of the `ls` command with Rich:
+
+```python
+import os
+
+from rich import print
+from rich.columns import Columns
+
+directory = os.listdir(sys.argv[1])
+print(Columns(directory))
+```
+
+This will displays the file names in the current directory arranged in to _optimal_ columns.
+
+Here's the output from the [columns example] which displays data pulled from an API in columns:
+
+![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
 
 ## Markdown
 
@@ -200,50 +264,6 @@ console.print(syntax)
 This will produce the following output:
 
 ![syntax](https://github.com/willmcgugan/rich/raw/master/imgs/syntax.png)
-
-## Tables
-
-Rich can render flexible tables with unicode box characters. There is a large variety of formatting options for borders, styles, cell alignment etc. Here's a simple example:
-
-```python
-from rich.console import Console
-from rich.table import Column, Table
-
-console = Console()
-
-table = Table(show_header=True, header_style="bold magenta")
-table.add_column("Date", style="dim", width=12)
-table.add_column("Title")
-table.add_column("Production Budget", justify="right")
-table.add_column("Box Office", justify="right")
-table.add_row(
-    "Dev 20, 2019", "Star Wars: The Rise of Skywalker", "$275,000,000", "$375,126,118"
-)
-table.add_row(
-    "May 25, 2018",
-    "[red]Solo[/red]: A Star Wars Story",
-    "$275,000,000",
-    "$393,151,347",
-)
-table.add_row(
-    "Dec 15, 2017",
-    "Star Wars Ep. VIII: The Last Jedi",
-    "$262,000,000",
-    "[bold]$1,332,539,889[/bold]",
-)
-
-console.print(table)
-```
-
-This produces the following output:
-
-![table](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
-
-Note that console markup is rendered in the same was as `print()` and `log()`. In fact, anything that is renderable by Rich may be included in the headers / rows (even other tables).
-
-The `Table` class is smart enough to resize columns to fit the available width of the terminal, wrapping text as required. Here's the same example, with the terminal made smaller than the table above:
-
-![table2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
 
 ## Tracebacks
 
