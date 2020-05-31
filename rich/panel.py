@@ -84,8 +84,6 @@ class Panel(JupyterMixin):
         yield Segment.line()
 
     def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
-        # if self.expand:
-        #     return Measurement(max_width, max_width)
         width = Measurement.get(console, self.renderable, max_width - 2).maximum + 2
         return Measurement(width, width)
 
