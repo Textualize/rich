@@ -195,7 +195,7 @@ To try this out yourself, see [examples/downloader.py](https://github.com/willmc
 
 ## Columns
 
-Rich can render content in neat [columns](https://rich.readthedocs.io/en/latest/columns.html) with equal or optimal width. Here's a very basic clone of the `ls` command with Rich:
+Rich can render content in neat [columns](https://rich.readthedocs.io/en/latest/columns.html) with equal or optimal width. Here's a very basic clone of the (MacOS / Linux) `ls` command with Rich:
 
 ```python
 import os
@@ -207,9 +207,9 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-This will displays the file names in the current directory arranged in to _optimal_ columns.
+This will display the file names in a given directory arranged in to _optimal_ columns.
 
-Here's the output from the [columns example] which displays data pulled from an API in columns:
+The following screenshot is the output from the [columns example](https://github.com/willmcgugan/rich/blob/master/examples/columns.py) which displays data pulled from an API in columns:
 
 ![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
 
