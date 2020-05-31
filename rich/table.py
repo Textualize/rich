@@ -168,13 +168,15 @@ class Table(JupyterMixin):
     def grid(
         cls,
         padding: PaddingDimensions = 0,
-        collapse_padding: bool = False,
-        pad_edge: bool = True,
+        collapse_padding: bool = True,
+        pad_edge: bool = False,
     ) -> "Table":
         """Get a table with no lines, headers, or footer.
 
         Args:
             padding (PaddingDimensions, optional): Get padding around cells. Defaults to 0.
+            collapse_padding (bool, optional): Enable collapsing of padding around cells. Defaults to True.
+            pad_edge (bool, optional): Enable padding around edges of table. Defaults to False.
         
         Returns:
             Table: A table instance.

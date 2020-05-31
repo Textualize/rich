@@ -33,10 +33,8 @@ class ColorBox:
 
 def make_test_card() -> Table:
     """Get a renderable that demonstrates a number of features."""
-    table = Table.grid()
+    table = Table.grid(padding=1, pad_edge=True)
     table.title = "Rich features"
-    table.expand = False
-    table.padding = (1, 1, 0, 0)
     table.add_column("Feature", no_wrap=True, justify="right", style="bold red")
     table.add_column("Demonstration")
 
@@ -173,5 +171,4 @@ if __name__ == "__main__":  # pragma: no cover
     console.print(test_card)
     taken = int((process_time() - start) * 1000.0)
     print(console.file.getvalue())  # type: ignore
-    print()
     print(f"rendered in {taken}ms")
