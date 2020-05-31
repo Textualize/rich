@@ -6,6 +6,7 @@ from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .measure import Measurement
 from .padding import Padding, PaddingDimensions
 from .table import Table
+from .text import Text
 from .jupyter import JupyterMixin
 
 
@@ -15,6 +16,9 @@ class Columns(JupyterMixin):
     Args:
         renderables (Iterable[RenderableType]): Any number of Rich renderables (including str),
         padding (PaddingDimensions, optional): Optional padding around cells. Defaults to (0, 1).
+        expand (bool, optional): Expand columns to full width. Defaults to False.
+        column_first (bool, optional): Align items from top to bottom (rather than left to right). Defaults to False.
+        right_to_left (bool, optional): Start column from right hand side. Defaults to False.
     """
 
     def __init__(
@@ -24,12 +28,14 @@ class Columns(JupyterMixin):
         expand: bool = False,
         equal: bool = False,
         column_first: bool = False,
+        right_to_left: bool = False,
     ) -> None:
         self.renderables = list(renderables)
         self.padding = padding
         self.expand = expand
         self.equal = equal
         self.column_first = column_first
+        self.right_to_left = right_to_left
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
@@ -42,9 +48,7 @@ class Columns(JupyterMixin):
 
         _top, right, _bottom, left = Padding.unpack(self.padding)
         width_padding = max(left, right)
-
         max_width = options.max_width
-
         widths: Dict[int, int] = defaultdict(int)
         column_count = len(renderables)
 
@@ -57,17 +61,28 @@ class Columns(JupyterMixin):
         def iter_renderables(
             column_count: int,
         ) -> Iterable[Tuple[int, Optional[RenderableType]]]:
+            item_count = len(renderables)
             if self.column_first:
                 width_renderables = list(zip(renderable_widths, renderables))
-                row_count = (len(renderables) + column_count - 1) // column_count
-                for index in range(row_count * column_count):
-                    _index = ((index % row_count) * column_count) + index // row_count
-                    try:
-                        yield width_renderables[_index]
-                    except IndexError:
-                        yield 0, None
+                column_lengths: List[int] = [item_count // column_count] * column_count
+                for col_no in range(item_count % column_count):
+                    column_lengths[col_no] += 1
+                row = 0
+                col = 0
+                for _ in width_renderables:
+                    yield width_renderables[row * column_count + col]
+                    column_lengths[col] -= 1
+                    if column_lengths[col]:
+                        row += 1
+                    else:
+                        col += 1
+                        row = 0
             else:
                 yield from zip(renderable_widths, renderables)
+            # Pad odd elements with spaces
+            if item_count % column_count:
+                for _ in range(column_count - (item_count % column_count)):
+                    yield 0, None
 
         table = Table.grid(padding=self.padding, collapse_padding=True, pad_edge=False)
         table.expand = self.expand
@@ -81,7 +96,7 @@ class Columns(JupyterMixin):
             while column_count > 1:
                 widths.clear()
                 column_no = 0
-                for renderable_width, renderable in iter_renderables(column_count):
+                for renderable_width, _ in iter_renderables(column_count):
                     widths[column_no] = max(widths[column_no], renderable_width)
                     total_width = sum(widths.values()) + width_padding * (
                         len(widths) - 1
@@ -101,8 +116,13 @@ class Columns(JupyterMixin):
             get_renderable(_renderable)
             for _renderable in iter_renderables(column_count)
         ]
+
+        right_to_left = self.right_to_left
         for start in range(0, len(_renderables), column_count):
-            add_row(*_renderables[start : start + column_count])
+            row = _renderables[start : start + column_count]
+            if right_to_left:
+                row = row[::-1]
+            add_row(*row)
         yield table
 
 
@@ -113,9 +133,13 @@ if __name__ == "__main__":
 
     from rich.panel import Panel
 
-    files = [s for s in sorted(os.listdir())]
-    columns = Columns(files, padding=(0, 1), expand=True, equal=True)
+    files = [f"{i} {s}" for i, s in enumerate(sorted(os.listdir()))]
+    columns = Columns(files, padding=(0, 1), expand=False, equal=False)
     console.print(columns)
     console.rule()
     columns.column_first = True
     console.print(columns)
+    columns.right_to_left = True
+    console.rule()
+    console.print(columns)
+    print(len(files))
