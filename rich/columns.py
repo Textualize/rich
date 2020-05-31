@@ -17,6 +17,7 @@ class Columns(JupyterMixin):
         renderables (Iterable[RenderableType]): Any number of Rich renderables (including str),
         padding (PaddingDimensions, optional): Optional padding around cells. Defaults to (0, 1).
         expand (bool, optional): Expand columns to full width. Defaults to False.
+        equal (bool, optional): Arrange in to equal sized columns. Defaults to False.
         column_first (bool, optional): Align items from top to bottom (rather than left to right). Defaults to False.
         right_to_left (bool, optional): Start column from right hand side. Defaults to False.
     """
