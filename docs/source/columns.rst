@@ -3,7 +3,7 @@ Columns
 
 Rich can render text or other Rich renderables in neat columns with the :class:`~rich.columns.Columns` class. To use, construct a Columns instance with an iterable of renderables and print it to the Console.
 
-The following example is a very basic clone of the `ls` command in OSX / Linux to list directory contents::
+The following example is a very basic clone of the ``ls`` command in OSX / Linux to list directory contents::
 
     import os
     import sys
