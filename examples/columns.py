@@ -1,3 +1,9 @@
+"""
+This example shows how to display content in columns.
+
+The data is pulled from https://randomuser.me
+"""
+
 import json
 from urllib.request import urlopen
 

@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Changed defaults of Table.grid
+- Polished listdir.py example
+
+### Added
+
+- Added width argument to Columns
+
+### Fixed
+
+- Fixed for `columns_first` argument in Columns
+- Fixed incorrect padding in columns with fixed width
 
 ## [1.3.0] - 2020-05-31
 

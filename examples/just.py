@@ -1,3 +1,7 @@
+"""
+This example demonstrates the justify argument to print.
+"""
+
 from rich.console import Console
 
 console = Console(width=20)

@@ -1,3 +1,9 @@
+"""
+
+This example demonstrates how to write a custom highlighter.
+
+"""
+
 from random import randint
 
 from rich import print

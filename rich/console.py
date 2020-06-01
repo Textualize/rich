@@ -195,10 +195,6 @@ class ConsoleDimensions(NamedTuple):
 def _is_jupyter() -> bool:
     """Check if we're running in a Jupyter notebook."""
     try:
-        from IPython.display import display
-    except ImportError:
-        return False
-    try:
         get_ipython  # type: ignore
     except NameError:
         return False

@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import chain
 from operator import itemgetter
 from typing import Dict, Iterable, List, Optional, Tuple
 
@@ -15,6 +16,7 @@ class Columns(JupyterMixin):
 
     Args:
         renderables (Iterable[RenderableType]): Any number of Rich renderables (including str),
+        width (int, optional): The desired width of the columns, or None to auto detect. Defaults to None.
         padding (PaddingDimensions, optional): Optional padding around cells. Defaults to (0, 1).
         expand (bool, optional): Expand columns to full width. Defaults to False.
         equal (bool, optional): Arrange in to equal sized columns. Defaults to False.
@@ -26,12 +28,14 @@ class Columns(JupyterMixin):
         self,
         renderables: Iterable[RenderableType],
         padding: PaddingDimensions = (0, 1),
+        width: int = None,
         expand: bool = False,
         equal: bool = False,
         column_first: bool = False,
         right_to_left: bool = False,
     ) -> None:
         self.renderables = list(renderables)
+        self.width = width
         self.padding = padding
         self.expand = expand
         self.equal = equal
@@ -46,7 +50,8 @@ class Columns(JupyterMixin):
             render_str(renderable) if isinstance(renderable, str) else renderable
             for renderable in self.renderables
         ]
-
+        if not renderables:
+            return
         _top, right, _bottom, left = Padding.unpack(self.padding)
         width_padding = max(left, right)
         max_width = options.max_width
@@ -58,6 +63,8 @@ class Columns(JupyterMixin):
             get_measurement(console, renderable, max_width).maximum
             for renderable in renderables
         ]
+        if self.equal:
+            renderable_widths = [max(renderable_widths)] * len(renderable_widths)
 
         def iter_renderables(
             column_count: int,
@@ -65,19 +72,26 @@ class Columns(JupyterMixin):
             item_count = len(renderables)
             if self.column_first:
                 width_renderables = list(zip(renderable_widths, renderables))
+
                 column_lengths: List[int] = [item_count // column_count] * column_count
                 for col_no in range(item_count % column_count):
                     column_lengths[col_no] += 1
-                row = 0
-                col = 0
-                for _ in width_renderables:
-                    yield width_renderables[row * column_count + col]
+
+                row_count = (item_count + column_count - 1) // column_count
+                cells = [[-1] * column_count for _ in range(row_count)]
+                row = col = 0
+                for index in range(item_count):
+                    cells[row][col] = index
                     column_lengths[col] -= 1
                     if column_lengths[col]:
                         row += 1
                     else:
                         col += 1
                         row = 0
+                for index in chain.from_iterable(cells):
+                    if index == -1:
+                        break
+                    yield width_renderables[index]
             else:
                 yield from zip(renderable_widths, renderables)
             # Pad odd elements with spaces
@@ -88,12 +102,16 @@ class Columns(JupyterMixin):
         table = Table.grid(padding=self.padding, collapse_padding=True, pad_edge=False)
         table.expand = self.expand
 
-        if self.equal:
-            maximum_column = max(renderable_widths)
-            column_count = max_width // maximum_column
+        if self.width is not None:
+            column_count = max_width // self.width
             for _ in range(column_count):
-                table.add_column(ratio=1)
+                table.add_column(width=self.width)
         else:
+            if self.equal:
+                table.expand = True
+                # for _ in range(column_count):
+                #     table.add_column(ratio=1)
+
             while column_count > 1:
                 widths.clear()
                 column_no = 0
@@ -102,6 +120,7 @@ class Columns(JupyterMixin):
                     total_width = sum(widths.values()) + width_padding * (
                         len(widths) - 1
                     )
+                    table.width = total_width
                     if total_width > max_width:
                         column_count = len(widths) - 1
                         break
@@ -109,6 +128,7 @@ class Columns(JupyterMixin):
                         column_no = (column_no + 1) % column_count
                 else:
                     break
+
             column_count = max(column_count, 1)
 
         add_row = table.add_row
@@ -143,4 +163,3 @@ if __name__ == "__main__":  # pragma: no cover
     columns.right_to_left = True
     console.rule()
     console.print(columns)
-    print(len(files))

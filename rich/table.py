@@ -374,8 +374,10 @@ class Table(JupyterMixin):
             widths = [_range.minimum or 1 for _range in width_ranges]
         else:
             widths = [_range.maximum or 1 for _range in width_ranges]
+
         padding_width = self.padding[1] + self.padding[3]
         if self.expand:
+
             ratios = [col.ratio or 0 for col in columns if col.flexible]
             if any(ratios):
                 fixed_widths = [
@@ -465,11 +467,21 @@ class Table(JupyterMixin):
         for first, last, (style, renderable) in loop_first_last(raw_cells):
             yield _Cell(style, add_padding(renderable, first, last))
 
+    def _get_padding_width(self, column_index) -> int:
+        """Get extra width from padding."""
+        _, pad_right, _, pad_left = self.padding
+        if self.collapse_padding:
+            if column_index != 0:
+                pad_left = max(0, pad_right - pad_left)
+        return pad_left + pad_right
+
     def _measure_column(
         self, console: "Console", column_index: int, column: Column, max_width: int
     ) -> Measurement:
         """Get the minimum and maximum width of the column."""
-        padding_width = self.padding[1] + self.padding[3]
+
+        padding_width = self._get_padding_width(column_index)
+
         if column.width is not None:
             # Fixed width column
             return Measurement(

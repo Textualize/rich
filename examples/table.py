@@ -1,7 +1,5 @@
 """
-
-Render a rich table.
-
+Demonstrates how to render a table.
 """
 
 from rich.console import Console
