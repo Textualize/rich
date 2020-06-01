@@ -31,5 +31,5 @@ else:
     ]
     filenames.sort(key=lambda filename: filename.lower())
     filename_text = [make_filename_text(filename) for filename in filenames]
-    columns = Columns(filename_text, equal=True, column_first=True, padding=(0, 1))
+    columns = Columns(filename_text, equal=True, column_first=True)
     print(columns)

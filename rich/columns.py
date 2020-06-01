@@ -4,6 +4,7 @@ from operator import itemgetter
 from typing import Dict, Iterable, List, Optional, Tuple
 
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
+from .constrain import Constrain
 from .measure import Measurement
 from .padding import Padding, PaddingDimensions
 from .table import Table
@@ -107,11 +108,6 @@ class Columns(JupyterMixin):
             for _ in range(column_count):
                 table.add_column(width=self.width)
         else:
-            if self.equal:
-                table.expand = True
-                # for _ in range(column_count):
-                #     table.add_column(ratio=1)
-
             while column_count > 1:
                 widths.clear()
                 column_no = 0
@@ -120,7 +116,6 @@ class Columns(JupyterMixin):
                     total_width = sum(widths.values()) + width_padding * (
                         len(widths) - 1
                     )
-                    table.width = total_width
                     if total_width > max_width:
                         column_count = len(widths) - 1
                         break
@@ -129,16 +124,21 @@ class Columns(JupyterMixin):
                 else:
                     break
 
-            column_count = max(column_count, 1)
-
-        add_row = table.add_row
         get_renderable = itemgetter(1)
         _renderables = [
             get_renderable(_renderable)
             for _renderable in iter_renderables(column_count)
         ]
+        if self.equal:
+            _renderables = [
+                None
+                if renderable is None
+                else Constrain(renderable, renderable_widths[0])
+                for renderable in _renderables
+            ]
 
         right_to_left = self.right_to_left
+        add_row = table.add_row
         for start in range(0, len(_renderables), column_count):
             row = _renderables[start : start + column_count]
             if right_to_left:

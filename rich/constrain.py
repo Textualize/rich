@@ -1,6 +1,7 @@
 from typing import Optional
 
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
+from .measure import Measurement
 
 
 class Constrain:
@@ -23,3 +24,10 @@ class Constrain:
         else:
             child_options = options.update(width=min(self.width, options.max_width))
             yield from console.render(self.renderable, child_options)
+
+    def __rich_measure__(self, console: Console, max_width: int) -> Measurement:
+        if self.width is None:
+            return Measurement.get(console, self.renderable, max_width)
+        else:
+            width = min(self.width, max_width)
+            return Measurement(width, width)

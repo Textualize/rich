@@ -21,5 +21,5 @@ def get_content(user):
 
 users = json.loads(urlopen("https://randomuser.me/api/?results=30").read())["results"]
 print(users)
-user_renderables = [Panel(get_content(user), expand=False) for user in users]
+user_renderables = [Panel(get_content(user), expand=True) for user in users]
 print(Columns(user_renderables))

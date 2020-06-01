@@ -333,7 +333,6 @@ class Table(JupyterMixin):
         max_width = options.max_width
         if self.width is not None:
             max_width = min(self.width, max_width)
-
         if self.box:
             max_width -= len(self.columns) - 1
             if self.show_edge:
@@ -377,7 +376,6 @@ class Table(JupyterMixin):
 
         padding_width = self.padding[1] + self.padding[3]
         if self.expand:
-
             ratios = [col.ratio or 0 for col in columns if col.flexible]
             if any(ratios):
                 fixed_widths = [
@@ -390,7 +388,6 @@ class Table(JupyterMixin):
                     if column.flexible
                 ]
                 flexible_width = max_width - sum(fixed_widths)
-
                 flex_widths = ratio_divide(flexible_width, ratios, flex_minimum)
                 iter_flex_widths = iter(flex_widths)
                 for index, column in enumerate(columns):
