@@ -1,5 +1,5 @@
-Higlighting
-===========
+Highlighting
+============
 
 Rich can apply styles to patterns in text which you :meth:`~rich.console.Console.print` or :meth:`~rich.console.Console.log`. With the default settings, Rich will highlight things such as numbers, strings, collections, booleans, None, and a few more exotic patterns such as URLs and UUIDs.
 
@@ -41,7 +41,7 @@ Setting the highlighter on the Console will apply highlighting to all text you p
 
 While :class:`~rich.highlighter.RegexHighlighter` is quite powerful, you can also extend its base class :class:`~rich.highlighter.Highlighter` which you can use to implement any scheme for highlighting. It contains a single method :class:`~rich.highlighter.Highlighter.highlight` which is passed the :class:`~rich.text.Text` to highlight.
 
-Here's an silly example that highlights every character with a different color::
+Here's a silly example that highlights every character with a different color::
 
     from random import randint
 

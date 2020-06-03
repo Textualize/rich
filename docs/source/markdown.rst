@@ -4,7 +4,7 @@ Markdown
 Rich can render Markdown to the console. To render markdown, construct a :class:`~rich.markdown.Markdown` object then print it to the console. Markdown is a great way of adding rich content to your command line applications. Here's an example of use::
 
     MARKDOWN = """
-    # This is a h1
+    # This is an h1
 
     Rich can do a pretty *decent* job of rendering markdown.
 
