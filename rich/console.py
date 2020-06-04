@@ -59,6 +59,7 @@ WINDOWS = platform.system() == "Windows"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyValues = Optional[Literal["left", "center", "right", "full"]]
+OverflowValues = Literal["crop", "fold", "ellipsis"]
 
 
 CONSOLE_HTML_FORMAT = """\
@@ -91,6 +92,8 @@ class ConsoleOptions:
     is_terminal: bool
     encoding: str
     justify: Optional[JustifyValues] = None
+    overflow: Optional[OverflowValues] = None
+    no_wrap: bool = False
 
     def update(
         self,
@@ -98,6 +101,8 @@ class ConsoleOptions:
         min_width: int = None,
         max_width: int = None,
         justify: JustifyValues = None,
+        overflow: OverflowValues = None,
+        no_wrap: bool = None,
     ) -> "ConsoleOptions":
         """Update values, return a copy."""
         options = replace(self)
@@ -109,6 +114,10 @@ class ConsoleOptions:
             options.max_width = max_width
         if justify is not None:
             options.justify = justify
+        if overflow is not None:
+            options.overflow = overflow
+        if no_wrap is not None:
+            options.no_wrap = no_wrap
         return options
 
 
@@ -676,8 +685,8 @@ class Console:
                         highlighter=_highlighter,
                     )
                 )
-            elif isinstance(renderable, Text):
-                append_text(renderable)
+            # elif isinstance(renderable, Text):
+            #     append_text(renderable)
             elif isinstance(renderable, ConsoleRenderable):
                 check_text()
                 append(renderable)

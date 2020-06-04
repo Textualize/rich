@@ -1,5 +1,14 @@
 from itertools import zip_longest
-from typing import Iterator, Iterable, List, overload, TypeVar, TYPE_CHECKING, Union
+from typing import (
+    Iterator,
+    Iterable,
+    List,
+    Optional,
+    overload,
+    TypeVar,
+    TYPE_CHECKING,
+    Union,
+)
 from typing_extensions import Literal
 
 from .segment import Segment
@@ -10,6 +19,7 @@ if TYPE_CHECKING:
         Console,
         ConsoleOptions,
         ConsoleRenderable,
+        OverflowValues,
         RenderResult,
         RenderableType,
     )
@@ -101,6 +111,7 @@ class Lines:
         console: "Console",
         width: int,
         align: Literal["none", "left", "center", "right", "full"] = "left",
+        overflow: Optional["OverflowValues"] = None,
     ) -> None:
         """Pad each line with spaces to a given width.
         
@@ -112,15 +123,17 @@ class Lines:
 
         if align == "left":
             for line in self._lines:
-                line.set_length(width)
+                line.truncate(width, overflow=overflow, pad=True)
         elif align == "center":
             for line in self._lines:
                 line.rstrip()
+                line.truncate(width, overflow=overflow)
                 line.pad_left((width - cell_len(line.plain)) // 2)
                 line.pad_right(width - cell_len(line.plain))
         elif align == "right":
             for line in self._lines:
                 line.rstrip()
+                line.truncate(width, overflow=overflow)
                 line.pad_left(width - cell_len(line.plain))
         elif align == "full":
             for line_index, line in enumerate(self._lines):

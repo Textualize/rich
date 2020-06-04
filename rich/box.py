@@ -21,34 +21,36 @@ class Box:
 
     def __init__(self, box: str) -> None:
         self._box = box
-        (line1, line2, line3, line4, line5, line6, line7, line8,) = box.splitlines()
+        line1, line2, line3, line4, line5, line6, line7, line8 = box.splitlines()
         # top
-        self.top_left, self.top, self.top_divider, self.top_right = line1
+        self.top_left, self.top, self.top_divider, self.top_right = iter(line1)
         # head
-        self.head_left, _, self.head_vertical, self.head_right = line2
+        self.head_left, _, self.head_vertical, self.head_right = iter(line2)
         # head_row
         (
             self.head_row_left,
             self.head_row_horizontal,
             self.head_row_cross,
             self.head_row_right,
-        ) = line3
+        ) = iter(line3)
 
         # mid
-        self.mid_left, _, self.mid_vertical, self.mid_right = line4
+        self.mid_left, _, self.mid_vertical, self.mid_right = iter(line4)
         # row
-        self.row_left, self.row_horizontal, self.row_cross, self.row_right = line5
+        self.row_left, self.row_horizontal, self.row_cross, self.row_right = iter(line5)
         # foot_row
         (
             self.foot_row_left,
             self.foot_row_horizontal,
             self.foot_row_cross,
             self.foot_row_right,
-        ) = line6
+        ) = iter(line6)
         # foot
-        self.foot_left, _, self.foot_vertical, self.foot_right = line7
+        self.foot_left, _, self.foot_vertical, self.foot_right = iter(line7)
         # bottom
-        self.bottom_left, self.bottom, self.bottom_divider, self.bottom_right = line8
+        self.bottom_left, self.bottom, self.bottom_divider, self.bottom_right = iter(
+            line8
+        )
 
     def __repr__(self) -> str:
         return "Box(...)"

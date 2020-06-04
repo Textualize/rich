@@ -126,6 +126,7 @@ class Table(JupyterMixin):
         collapse_padding: bool = False,
         pad_edge: bool = True,
         expand: bool = False,
+        compress: bool = True,
         show_header: bool = True,
         show_footer: bool = False,
         show_edge: bool = True,
@@ -150,6 +151,7 @@ class Table(JupyterMixin):
         self._padding = Padding.unpack(padding)
         self.pad_edge = pad_edge
         self.expand = expand
+        self.compress = compress
         self.show_header = show_header
         self.show_footer = show_footer
         self.show_edge = show_edge
@@ -369,6 +371,7 @@ class Table(JupyterMixin):
             self._measure_column(console, column_index, column, max_width)
             for column_index, column in enumerate(columns)
         ]
+
         if minimums:
             widths = [_range.minimum or 1 for _range in width_ranges]
         else:
@@ -395,26 +398,52 @@ class Table(JupyterMixin):
                         widths[index] = fixed_widths[index] + next(iter_flex_widths)
         table_width = sum(widths)
 
-        if table_width > max_width:
-            flex_widths = [_range.span for _range in width_ranges]
-            if not any(flex_widths):
-                flex_widths = [
-                    0 if column.no_wrap else width
-                    for column, width in zip(columns, widths)
-                ]
-                if not any(flex_widths):
-                    return widths
+        if self.compress:
 
-            excess_width = table_width - max_width
-            widths = [
-                max(1 + padding_width, width - excess_width)
-                for width, excess_width in zip(
-                    widths, ratio_divide(excess_width, flex_widths),
-                )
-            ]
+            if table_width > max_width:
+                excess_width = table_width - max_width
+                flex_widths = [
+                    0 if column.no_wrap else 1
+                    for width_range, column in zip(width_ranges, columns)
+                ]
+                if any(flex_widths):
+                    widths = [
+                        max(width_range.minimum, width - excess_width)
+                        for width_range, width, excess_width in zip(
+                            width_ranges,
+                            widths,
+                            ratio_divide(excess_width, flex_widths),
+                        )
+                    ]
+                table_width = sum(widths)
+            # if table_width > max_width:
+            #     excess_width = table_width - max_width
+            #     flex_widths = [0 if column.no_wrap else 1 for column in columns]
+
+            #     if any(flex_widths):
+            #         widths = [
+            #             max(width_range.minimum, width - excess_width)
+            #             for width_range, width, excess_width in zip(
+            #                 width_ranges,
+            #                 widths,
+            #                 ratio_divide(excess_width, flex_widths),
+            #             )
+            #         ]
+            #     table_width = sum(widths)
+            # if table_width > max_width:
+            #     flex_widths = [1 for column in columns]
+            #     excess_width = table_width - max_width
+            #     widths = [
+            #         width - excess_width
+            #         for width_range, width, excess_width in zip(
+            #             width_ranges, widths, ratio_divide(excess_width, flex_widths),
+            #         )
+            #     ]
+
         elif table_width < max_width and self.expand:
             pad_widths = ratio_divide(max_width - table_width, widths)
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
+
         return widths
 
     def _get_cells(self, column_index: int, column: Column) -> Iterable[_Cell]:
@@ -494,14 +523,11 @@ class Table(JupyterMixin):
             _min, _max = get_render_width(console, cell.renderable, max_width)
             append_min(_min)
             append_max(_max)
-        if column.no_wrap:
-            _width = max(max_widths) if max_widths else max_width
-            return Measurement(_width, _width)
-        else:
-            return Measurement(
-                max(min_widths) if min_widths else 1,
-                max(max_widths) if max_widths else max_width,
-            )
+
+        return Measurement(
+            max(min_widths) if min_widths else 1,
+            max(max_widths) if max_widths else max_width,
+        )
 
     def _render(
         self, console: "Console", options: "ConsoleOptions", widths: List[int]
@@ -517,7 +543,9 @@ class Table(JupyterMixin):
                 )
             )
         )
-        _box = box.SQUARE if (console.legacy_windows and self.box) else self.box
+        _box: Optional[box.Box] = (
+            box.SQUARE if (console.legacy_windows and self.box) else self.box
+        )
         new_line = Segment.line()
 
         columns = self.columns
@@ -565,7 +593,12 @@ class Table(JupyterMixin):
                     get_row_style(index - 1 if show_header else index)
                 )
             for width, cell, column in zip(widths, row, columns):
-                render_options = options.update(width=width, justify=column.justify)
+                render_options = options.update(
+                    width=width,
+                    justify=column.justify,
+                    no_wrap=column.no_wrap,
+                    overflow="ellipsis",
+                )
                 cell_style = table_style + row_style + get_style(cell.style)
                 lines = console.render_lines(
                     cell.renderable, render_options, style=cell_style

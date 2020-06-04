@@ -27,7 +27,7 @@ else:
         return text
 
     filenames = [
-        filename for filename in os.listdir(sys.argv[1]) if not filename.startswith(".")
+        filename for filename in os.listdir(root_path) if not filename.startswith(".")
     ]
     filenames.sort(key=lambda filename: filename.lower())
     filename_text = [make_filename_text(filename) for filename in filenames]

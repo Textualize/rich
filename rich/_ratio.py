@@ -8,7 +8,7 @@ def ratio_divide(
     
     Args:
         total (int): The total to divide.
-        ratios (List[int]): A list of integer rations.
+        ratios (List[int]): A list of integer ratios.
         minimums (List[int]): List of minimum values for each slot. 
     
     Returns:
