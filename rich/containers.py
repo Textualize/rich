@@ -128,8 +128,8 @@ class Lines:
             for line in self._lines:
                 line.rstrip()
                 line.truncate(width, overflow=overflow)
-                line.pad_left((width - cell_len(line.plain)) // 2)
-                line.pad_right(width - cell_len(line.plain))
+                line.pad_right((width - cell_len(line.plain)) // 2)
+                line.pad_left(width - cell_len(line.plain))
         elif align == "right":
             for line in self._lines:
                 line.rstrip()

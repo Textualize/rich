@@ -389,21 +389,37 @@ class Text(JupyterMixin):
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
         tab_size: int = console.tab_size or self.tab_size or 8  # type: ignore
-        overflow = self.overflow or options.overflow or DEFAULT_OVERFLOW
+        overflow = cast(
+            "OverflowValues", self.overflow or options.overflow or DEFAULT_OVERFLOW
+        )
+        justify = self.justify or options.justify
         if self.no_wrap or options.no_wrap:
             render_text = self
             if overflow in ("crop", "ellipsis"):
                 render_text = self.copy()
                 render_text.truncate(options.max_width, overflow)
+            if justify:
+                lines = Lines([render_text])
+                lines.justify(
+                    console, options.max_width, align=justify, overflow=overflow
+                )
+                render_text = lines[0]
             yield from render_text.render(console, end=self.end)
         else:
             lines = self.wrap(
                 console,
                 options.max_width,
-                justify=self.justify or options.justify,
+                justify=justify,
                 overflow=overflow,
                 tab_size=tab_size or 8,
             )
+            # new_line = Segment.line()
+            # for last, line in loop_last(lines):
+            #     yield from line.render(console)
+            #     if not last:
+            #         yield new_line
+            #     else:
+            #         yield Segment(self.end)
             all_lines = Text("\n").join(lines)
             yield from all_lines.render(console, end=self.end)
 
@@ -689,7 +705,12 @@ class Text(JupyterMixin):
         average_line_length = -(-text_length // len(line_ranges))
 
         new_lines = Lines(
-            Text(text[start:end], style=self.style, justify=self.justify)
+            Text(
+                text[start:end],
+                style=self.style,
+                justify=self.justify,
+                overflow=self.overflow,
+            )
             for start, end in line_ranges
         )
         line_ranges = [
@@ -756,7 +777,7 @@ class Text(JupyterMixin):
             offsets = divide_line(str(line), width, fold=wrap_overflow == "fold")
             new_lines = line.divide(offsets)
             if justify:
-                new_lines.justify(console, width, align=justify)
+                new_lines.justify(console, width, align=justify, overflow=overflow)
             lines.extend(new_lines)
 
         if wrap_overflow in ("crop", "ellipsis"):

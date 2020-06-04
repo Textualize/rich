@@ -490,7 +490,7 @@ if __name__ == "__main__":  # pragma: no cover
     console = Console()
 
     table = Table(show_footer=False, show_edge=True)
-    table.add_column("Color", width=10)
+    table.add_column("Color", width=10, overflow="ellipsis")
     table.add_column("Number", justify="right", style="yellow")
     table.add_column("Name", style="green")
     table.add_column("Hex", style="blue")
