@@ -123,7 +123,7 @@ Overflow is what happens when text you print is larger than the available space.
 
 You can specify how Rich should handle overflow with the ``overflow`` argument to  :meth:`~rich.console.Console.print` which should be one of the following strings: "fold", "crop", or "ellipsis". The default is "fold" which will put any excess characters on the following line, creating as many new lines as required to fit the text.
 
-The "crop" method simply truncates the text at the end of the line, discarding any characters that would overflow.
+The "crop" method truncates the text at the end of the line, discarding any characters that would overflow.
 
 The "ellipsis" method is similar to "crop", but will insert an ellipsis character ("…") at the end of any text that has been truncated.
 

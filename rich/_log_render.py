@@ -36,14 +36,8 @@ class LogRender:
         from .containers import Renderables
         from .table import Table
 
-        output = Table(
-            show_header=False,
-            expand=True,
-            box=None,
-            padding=(0, 1),
-            collapse_padding=True,
-            pad_edge=False,
-        )
+        output = Table.grid(padding=(0, 1))
+        output.expand = True
         if self.show_time:
             output.add_column(style="log.time")
         if self.show_level:
