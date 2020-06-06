@@ -609,9 +609,7 @@ class Progress:
             Table: A table instance.
         """
 
-        table = Table.grid()
-        table.pad_edge = True
-        table.padding = (0, 1, 0, 0)
+        table = Table.grid(padding=(0, 1))
         for _ in self.columns:
             table.add_column()
         for task in tasks:
