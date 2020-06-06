@@ -16,7 +16,7 @@ from typing_extensions import Literal
 
 from . import box, errors
 from ._loop import loop_first, loop_first_last, loop_last
-from ._ratio import ratio_divide, ratio_reduce
+from ._ratio import ratio_distribute, ratio_reduce
 from .jupyter import JupyterMixin
 from .measure import Measurement
 from .padding import Padding, PaddingDimensions
@@ -396,7 +396,7 @@ class Table(JupyterMixin):
                     if column.flexible
                 ]
                 flexible_width = max_width - sum(fixed_widths)
-                flex_widths = ratio_divide(flexible_width, ratios, flex_minimum)
+                flex_widths = ratio_distribute(flexible_width, ratios, flex_minimum)
                 iter_flex_widths = iter(flex_widths)
                 for index, column in enumerate(columns):
                     if column.flexible:
@@ -433,7 +433,7 @@ class Table(JupyterMixin):
             table_width = sum(widths)
 
         elif table_width < max_width and self.expand:
-            pad_widths = ratio_divide(max_width - table_width, widths)
+            pad_widths = ratio_distribute(max_width - table_width, widths)
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
 
         return widths

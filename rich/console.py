@@ -690,8 +690,6 @@ class Console:
                         highlighter=_highlighter,
                     )
                 )
-            # elif isinstance(renderable, Text):
-            #     append_text(renderable)
             elif isinstance(renderable, ConsoleRenderable):
                 check_text()
                 append(renderable)
@@ -739,6 +737,7 @@ class Console:
         style: Union[str, Style] = None,
         justify: JustifyMethod = None,
         overflow: OverflowMethod = None,
+        no_wrap: bool = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
@@ -753,6 +752,7 @@ class Console:
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             justify (str, optional): Overflowmethod: "left", "right", "center", or "full". Defaults to ``None``.
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipisis". Defaults to None.
+            no_wrap (Optional[bool], optional): Disable wrapping. Defaults to None
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to ``None``.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to ``None``.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
@@ -773,7 +773,7 @@ class Console:
                 highlight=highlight,
             )
             render_options = self.options.update(
-                justify=justify, overflow=overflow, width=width
+                justify=justify, overflow=overflow, width=width, no_wrap=no_wrap
             )
             extend = self._buffer.extend
             render = self.render

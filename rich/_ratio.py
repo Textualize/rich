@@ -3,7 +3,6 @@ from math import ceil
 from typing import List
 
 
-
 def ratio_reduce(
     total: int, ratios: List[int], maximums: List[int], values: List[int]
 ) -> List[int]:
@@ -34,10 +33,10 @@ def ratio_reduce(
     return result
 
 
-def ratio_divide(
+def ratio_distribute(
     total: int, ratios: List[int], minimums: List[int] = None
 ) -> List[int]:
-    """Divide an integer total in to parts based on ratios.
+    """Distribute an integer total in to parts based on ratios.
     
     Args:
         total (int): The total to divide.

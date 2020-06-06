@@ -244,3 +244,10 @@ def test_save_html():
         console.save_html(export_path)
         with open(export_path, "rt") as html_file:
             assert html_file.read() == expected
+
+
+def test_no_wrap():
+    console = Console(width=10, file=io.StringIO())
+    console.print("X" * 15)
+    console.print("Y" * 15, no_wrap=True)
+    assert console.file.getvalue() == "XXXXXXXXXX\nXXXXX\nYYYYYYYYYY\n"

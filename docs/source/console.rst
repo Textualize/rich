@@ -116,6 +116,48 @@ This produces the following output:
                     Rich
     </span></pre>
 
+Overflow
+--------
+
+Overflow is what happens when text you print is larger than the available space. Overflow may occur if you print long 'words' such as URLs for instance, or if you have text inside a panel or table cell with restricted space.
+
+You can specify how Rich should handle overflow with the ``overflow`` argument to  :meth:`~rich.console.Console.print` which should be one of the following strings: "fold", "crop", or "ellipsis". The default is "fold" which will put any excess characters on the following line, creating as many new lines as required to fit the text.
+
+The "crop" method simply truncates the text at the end of the line, discarding any characters that would overflow.
+
+The "ellipsis" method is similar to "crop", but will insert an ellipsis character ("…") at the end of any text that has been truncated.
+
+You can specify which overflow method to use with the ``overflow`` argument to :meth:`~rich.console.Console.print`. The following code demonstrates Rich's overflow methods::
+
+    from typing import List
+    from rich.console import Console, OverflowMethod
+
+    console = Console(width=14)
+    supercali = "supercalifragilisticexpialidocious"
+
+    overflow_methods: List[OverflowMethod] = ["fold", "crop", "ellipsis"]
+    for overflow in overflow_methods:
+        console.rule(overflow)
+        console.print(supercali, overflow=overflow, style="bold blue")
+        console.print()
+
+This produces the following output:
+
+.. raw:: html
+
+    <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #00ff00">──── </span>fold<span style="color: #00ff00"> ────</span>
+    <span style="color: #000080; font-weight: bold">supercalifragi
+    listicexpialid
+    ocious
+    </span>
+    <span style="color: #00ff00">──── </span>crop<span style="color: #00ff00"> ────</span>
+    <span style="color: #000080; font-weight: bold">supercalifragi
+    </span>
+    <span style="color: #00ff00">── </span>ellipsis<span style="color: #00ff00"> ──</span>
+    <span style="color: #000080; font-weight: bold">supercalifrag…
+    </span>
+    </pre>
+
 
 Input
 -----
