@@ -798,8 +798,8 @@ class Text(JupyterMixin):
         for line in self.split():
             if "\t" in line:
                 line = line.tabs_to_spaces(tab_size)
-            if no_wrap:                
-                new_lines = Lines([line])                
+            if no_wrap:
+                new_lines = Lines([line])
             else:
                 offsets = divide_line(str(line), width, fold=wrap_overflow == "fold")
                 new_lines = line.divide(offsets)

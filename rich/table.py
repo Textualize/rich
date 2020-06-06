@@ -357,7 +357,7 @@ class Table(JupyterMixin):
                 render_text = text
             else:
                 render_text = console.render_str(text, style=style)
-            return render_text.wrap(console, table_width, "center")
+            return render_text.wrap(console, table_width, justify="center")
 
         if self.title:
             yield render_annotation(
