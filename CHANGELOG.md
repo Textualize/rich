@@ -12,15 +12,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added overflow methods
 - Added no_wrap option to print()
 - Added width option to print
+- Improved handling of compressed tables
 
 ### Fixed
 
-- Improved handling of compressed tables
+- Fixed erroneous space at end of log
 
 ### Changed
 
 - Renamed \_ratio.ratio_divide to \_ratio.ratio_distribute
 - Renamed JustifyValues to JustifyMethod
+- Optimized \_trim_spans
 
 ## [1.3.1] - 2020-06-01
 

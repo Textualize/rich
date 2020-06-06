@@ -93,7 +93,7 @@ class ConsoleOptions:
     encoding: str
     justify: Optional[JustifyMethod] = None
     overflow: Optional[OverflowMethod] = None
-    no_wrap: bool = False
+    no_wrap: Optional[bool] = False
 
     def update(
         self,

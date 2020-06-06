@@ -248,6 +248,5 @@ def test_save_html():
 
 def test_no_wrap():
     console = Console(width=10, file=io.StringIO())
-    console.print("X" * 15)
-    console.print("Y" * 15, no_wrap=True)
-    assert console.file.getvalue() == "XXXXXXXXXX\nXXXXX\nYYYYYYYYYY\n"
+    console.print("foo bar baz egg", no_wrap=True)
+    assert console.file.getvalue() == "foo bar ba\n"

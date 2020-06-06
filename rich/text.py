@@ -23,6 +23,7 @@ from .containers import Lines
 from .control import strip_control_codes
 from .jupyter import JupyterMixin
 from .measure import Measurement
+from ._pick import pick_bool
 from .segment import Segment
 from .style import Style, StyleType
 
@@ -114,7 +115,7 @@ class Text(JupyterMixin):
         style: Union[str, Style] = "",
         justify: "JustifyMethod" = None,
         overflow: "OverflowMethod" = None,
-        no_wrap: bool = False,
+        no_wrap: bool = None,
         end: str = "\n",
         tab_size: Optional[int] = 8,
         spans: List[Span] = None,
@@ -423,28 +424,16 @@ class Text(JupyterMixin):
             "OverflowMethod", self.overflow or options.overflow or DEFAULT_OVERFLOW
         )
 
-        if self.no_wrap or options.no_wrap:
-            render_text = self
-            if overflow in ("crop", "ellipsis"):
-                render_text = self.copy()
-                render_text.truncate(options.max_width, overflow)
-            if justify:
-                lines = Lines([render_text])
-                lines.justify(
-                    console, options.max_width, justify=justify, overflow=overflow
-                )
-                render_text = lines[0]
-            yield from render_text.render(console, end=self.end)
-        else:
-            lines = self.wrap(
-                console,
-                options.max_width,
-                justify=justify,
-                overflow=overflow,
-                tab_size=tab_size or 8,
-            )
-            all_lines = Text("\n").join(lines)
-            yield from all_lines.render(console, end=self.end)
+        lines = self.wrap(
+            console,
+            options.max_width,
+            justify=justify,
+            overflow=overflow,
+            tab_size=tab_size or 8,
+            no_wrap=pick_bool(options.no_wrap, self.no_wrap, False),
+        )
+        all_lines = Text("\n").join(lines)
+        yield from all_lines.render(console, end=self.end)
 
     def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
         text = self.plain
@@ -574,7 +563,7 @@ class Text(JupyterMixin):
 
         Args:
             max_width (int): Maximum number of characters in text.
-            overflow (str, optional): Overflow method: "crop", "fold", or "ellipisis". Defaults to None, to use self.overflow.
+            overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None, to use self.overflow.
             pad (bool, optional): Pad with spaces if the length is less than max_width. Defaults to False.
         """
         length = cell_len(self.plain)
@@ -584,7 +573,6 @@ class Text(JupyterMixin):
                 self.plain = set_cell_size(self.plain, max_width - 1).rstrip() + "…"
             else:
                 self.plain = set_cell_size(self.plain, max_width)
-        length = cell_len(self.plain)
         if pad and length < max_width:
             spaces = max_width - length
             self.plain = f"{self.plain}{' ' * spaces}"
@@ -785,6 +773,7 @@ class Text(JupyterMixin):
         justify: "JustifyMethod" = None,
         overflow: "OverflowMethod" = None,
         tab_size: int = 8,
+        no_wrap: bool = None,
     ) -> Lines:
         """Word wrap the text.
         
@@ -792,9 +781,10 @@ class Text(JupyterMixin):
             console (Console): Console instance.
             width (int): Number of characters per line.
             emoji (bool, optional): Also render emoji code. Defaults to True.
-            justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to "left".
-            overflow (str, optional): Overflow method: "crop", "fold", or "ellipisis". Defaults to None.
+            justify (str, optional): Justify method: "default", "left", "center", "full", "right". Defaults to "default".
+            overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
             tab_size (int, optional): Default tab size. Defaults to 8.
+            no_wrap (bool, optional): Disable wrapping, Defaults to False.
         
         Returns:
             Lines: Number of lines.
@@ -803,22 +793,25 @@ class Text(JupyterMixin):
         wrap_overflow = cast(
             "OverflowMethod", overflow or self.overflow or DEFAULT_OVERFLOW
         )
+        no_wrap = pick_bool(no_wrap, self.no_wrap, False)
         lines: Lines = Lines()
         for line in self.split():
             if "\t" in line:
                 line = line.tabs_to_spaces(tab_size)
-            offsets = divide_line(str(line), width, fold=wrap_overflow == "fold")
-            new_lines = line.divide(offsets)
+            if no_wrap:                
+                new_lines = Lines([line])                
+            else:
+                offsets = divide_line(str(line), width, fold=wrap_overflow == "fold")
+                new_lines = line.divide(offsets)
             for line in new_lines:
                 line.rstrip_end(width)
             if wrap_justify:
                 new_lines.justify(
                     console, width, justify=wrap_justify, overflow=wrap_overflow
                 )
+            for line in new_lines:
+                line.truncate(width, wrap_overflow)
             lines.extend(new_lines)
-
-        for line in lines:
-            line.truncate(width, wrap_overflow)
 
         return lines
 
