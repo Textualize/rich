@@ -16,6 +16,7 @@ def ratio_reduce(
     Returns:
         List[int]: A list of integers garanteed to sum to total.
     """
+    ratios = [ratio if _max else 0 for ratio, _max in zip(ratios, maximums)]
     total_ratio = sum(ratios)
     if not total_ratio:
         return values[:]
@@ -24,7 +25,7 @@ def ratio_reduce(
     append = result.append
     for ratio, maximum, value in zip(ratios, maximums, values):
         if ratio and total_ratio > 0:
-            distributed = min(maximum, ceil(ratio * total_remaining / total_ratio))
+            distributed = min(maximum, round(ratio * total_remaining / total_ratio))
             append(value - distributed)
             total_remaining -= distributed
             total_ratio -= ratio
@@ -46,6 +47,8 @@ def ratio_distribute(
     Returns:
         List[int]: A list of integers garanteed to sum to total.
     """
+    if minimums:
+        ratios = [ratio if _min else 0 for ratio, _min in zip(ratios, minimums)]
     total_ratio = sum(ratios)
     assert total_ratio > 0, "Sum of ratios must be > 0"
 
@@ -58,7 +61,9 @@ def ratio_distribute(
         _minimums = minimums
     for ratio, minimum in zip(ratios, _minimums):
         if total_ratio > 0:
-            distributed = int(max(minimum, ceil(ratio * total_remaining / total_ratio)))
+            distributed = round(
+                max(minimum, int(ratio * total_remaining / total_ratio))
+            )
         else:
             distributed = total_remaining
         append(distributed)

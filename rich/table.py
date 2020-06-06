@@ -370,9 +370,7 @@ class Table(JupyterMixin):
                 style=Style.pick_first(self.caption_style, "table.caption"),
             )
 
-    def _calculate_column_widths(
-        self, console: "Console", max_width: int, minimums: bool = False
-    ) -> List[int]:
+    def _calculate_column_widths(self, console: "Console", max_width: int) -> List[int]:
         """Calculate the widths of each column, including padding, not including borders."""
         columns = self.columns
         width_ranges = [
@@ -380,7 +378,6 @@ class Table(JupyterMixin):
             for column_index, column in enumerate(columns)
         ]
         widths = [_range.maximum or 1 for _range in width_ranges]
-
         get_padding_width = self._get_padding_width
 
         if self.expand:
@@ -428,7 +425,10 @@ class Table(JupyterMixin):
         if table_width > max_width:
             excess_width = table_width - max_width
             widths = ratio_reduce(
-                excess_width, [1 for column in columns], widths, widths,
+                excess_width,
+                [width_range.minimum for width_range in width_ranges],
+                widths,
+                widths,
             )
             table_width = sum(widths)
 
