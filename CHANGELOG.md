@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renamed \_ratio.ratio_divide to \_ratio.ratio_distribute
 - Renamed JustifyValues to JustifyMethod
 - Optimized \_trim_spans
+- Enforced keyword args in Console / Text interfaces
+- Return self from text.append
 
 ## [1.3.1] - 2020-06-01
 

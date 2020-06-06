@@ -139,11 +139,11 @@ class ConsoleRenderable(Protocol):
         ...
 
 
-"""A type that may be rendered by Console."""
 RenderableType = Union[ConsoleRenderable, RichCast, str]
+"""A type that may be rendered by Console."""
 
-"""The result of calling a __rich_console__ method."""
 RenderResult = Iterable[Union[RenderableType, Segment]]
+"""The result of calling a __rich_console__ method."""
 
 
 _null_highlighter = NullHighlighter()
@@ -478,7 +478,7 @@ class Console:
             self.control("\033[?25h" if show else "\033[?25l")
 
     def render(
-        self, renderable: RenderableType, options: ConsoleOptions,
+        self, renderable: RenderableType, options: ConsoleOptions
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
 
@@ -521,6 +521,7 @@ class Console:
         self,
         renderable: RenderableType,
         options: Optional[ConsoleOptions],
+        *,
         style: Optional[Style] = None,
         pad: bool = True,
     ) -> List[List[Segment]]:
@@ -556,6 +557,7 @@ class Console:
     def render_str(
         self,
         text: str,
+        *,
         style: Union[str, Style] = "",
         justify: JustifyMethod = None,
         overflow: OverflowMethod = None,
@@ -631,6 +633,7 @@ class Console:
         objects: Iterable[Any],
         sep: str,
         end: str,
+        *,
         justify: JustifyMethod = None,
         emoji: bool = None,
         markup: bool = None,
@@ -704,6 +707,7 @@ class Console:
     def rule(
         self,
         title: str = "",
+        *,
         character: str = "─",
         style: Union[str, Style] = "rule.line",
     ) -> None:
@@ -789,6 +793,7 @@ class Console:
 
     def print_exception(
         self,
+        *,
         width: Optional[int] = 88,
         extra_lines: int = 3,
         theme: Optional[str] = None,
@@ -920,7 +925,7 @@ class Console:
         result = input()
         return result
 
-    def export_text(self, clear: bool = True, styles: bool = False) -> str:
+    def export_text(self, *, clear: bool = True, styles: bool = False) -> str:
         """Generate text from console contents (requires record=True argument in constructor).
 
         Args:
@@ -948,7 +953,7 @@ class Console:
                 del self._record_buffer[:]
         return text
 
-    def save_text(self, path: str, clear: bool = True, styles: bool = False) -> None:
+    def save_text(self, path: str, *, clear: bool = True, styles: bool = False) -> None:
         """Generate text from console and save to a given location (requires record=True argument in constructor).
 
         Args:
@@ -964,6 +969,7 @@ class Console:
 
     def export_html(
         self,
+        *,
         theme: TerminalTheme = None,
         clear: bool = True,
         code_format: str = None,
@@ -1043,6 +1049,7 @@ class Console:
     def save_html(
         self,
         path: str,
+        *,
         theme: TerminalTheme = None,
         clear: bool = True,
         code_format=CONSOLE_HTML_FORMAT,

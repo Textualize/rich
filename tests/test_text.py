@@ -173,7 +173,7 @@ def test_highlight_words():
     assert test._spans == [Span(0, 2, "red")]
 
     test = Text("AB Ab aB ab")
-    count = test.highlight_words(words, "red", False)
+    count = test.highlight_words(words, "red", case_sensitive=False)
     assert count == 4
 
 

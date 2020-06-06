@@ -113,6 +113,7 @@ class Text(JupyterMixin):
         self,
         text: str = "",
         style: Union[str, Style] = "",
+        *,
         justify: "JustifyMethod" = None,
         overflow: "OverflowMethod" = None,
         no_wrap: bool = None,
@@ -166,6 +167,7 @@ class Text(JupyterMixin):
     def from_markup(
         cls,
         text: str,
+        *,
         style: Union[str, Style] = "",
         emoji: bool = True,
         justify: "JustifyMethod" = None,
@@ -324,7 +326,11 @@ class Text(JupyterMixin):
         return style
 
     def highlight_regex(
-        self, re_highlight: str, style: Union[str, Style] = None, style_prefix: str = ""
+        self,
+        re_highlight: str,
+        style: Union[str, Style] = None,
+        *,
+        style_prefix: str = "",
     ) -> int:
         """Highlight text with a regular expression, where group names are 
         translated to styles.
@@ -356,6 +362,7 @@ class Text(JupyterMixin):
         self,
         words: Iterable[str],
         style: Union[str, Style],
+        *,
         case_sensitive: bool = True,
     ) -> int:
         """Highlight words with a style.
@@ -556,6 +563,7 @@ class Text(JupyterMixin):
     def truncate(
         self,
         max_width: int,
+        *,
         overflow: Optional["OverflowMethod"] = None,
         pad: bool = False,
     ) -> None:
@@ -621,19 +629,22 @@ class Text(JupyterMixin):
 
     def append(
         self, text: Union["Text", str], style: Union[str, "Style"] = None
-    ) -> None:
+    ) -> "Text":
         """Add text with an optional style.
         
         Args:
             text (Union[Text, str]): A str or Text to append.
             style (str, optional): A style name. Defaults to None.
+        
+        Returns:
+            text (Text): Returns self for chaining.
         """
 
         if not isinstance(text, (str, Text)):
             raise TypeError("Only str or Text can be appended to Text")
 
         if not len(text):
-            return
+            return self
         if isinstance(text, str):
             text = strip_control_codes(text)
             self._text.append(text)
@@ -658,6 +669,7 @@ class Text(JupyterMixin):
                 for start, end, style in text._spans
             )
             self._length += len(text)
+        return self
 
     def copy_styles(self, text: "Text") -> None:
         """Copy styles from another Text instance.
@@ -667,7 +679,7 @@ class Text(JupyterMixin):
         """
         self._spans.extend(text._spans)
 
-    def split(self, separator="\n", include_separator: bool = False) -> Lines:
+    def split(self, separator="\n", *, include_separator: bool = False) -> Lines:
         r"""Split rich text in to lines, preserving styles.
         
         Args:
@@ -770,6 +782,7 @@ class Text(JupyterMixin):
         self,
         console: "Console",
         width: int,
+        *,
         justify: "JustifyMethod" = None,
         overflow: "OverflowMethod" = None,
         tab_size: int = 8,
@@ -810,7 +823,7 @@ class Text(JupyterMixin):
                     console, width, justify=wrap_justify, overflow=wrap_overflow
                 )
             for line in new_lines:
-                line.truncate(width, wrap_overflow)
+                line.truncate(width, overflow=wrap_overflow)
             lines.extend(new_lines)
 
         return lines
