@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added overflow methods
 - Added no_wrap option to print()
+- Added width option to print
 
 ### Fixed
 
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Renamed \_ratio.ratio_divide to \_ratio.ratio_distribute
+- Renamed JustifyValues to JustifyMethod
 
 ## [1.3.1] - 2020-06-01
 

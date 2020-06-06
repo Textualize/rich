@@ -672,7 +672,7 @@ class Console:
 
         def check_text() -> None:
             if text:
-                sep_text = Text(sep, justify=text[0].justify or justify, end=end)
+                sep_text = Text(sep, end=end)
                 append(sep_text.join(text))
                 del text[:]
 
@@ -684,7 +684,6 @@ class Console:
                 append_text(
                     self.render_str(
                         renderable,
-                        justify=justify,
                         emoji=emoji,
                         markup=markup,
                         highlighter=_highlighter,
@@ -750,7 +749,7 @@ class Console:
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
-            justify (str, optional): Overflowmethod: "left", "right", "center", or "full". Defaults to ``None``.
+            justify (str, optional): Justify method: "left", "right", "center", or "full". Defaults to ``None``.
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipisis". Defaults to None.
             no_wrap (Optional[bool], optional): Disable wrapping. Defaults to None
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to ``None``.
