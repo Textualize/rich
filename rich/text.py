@@ -437,7 +437,7 @@ class Text(JupyterMixin):
             justify=justify,
             overflow=overflow,
             tab_size=tab_size or 8,
-            no_wrap=pick_bool(options.no_wrap, self.no_wrap, False),
+            no_wrap=pick_bool(self.no_wrap, options.no_wrap, False),
         )
         all_lines = Text("\n").join(lines)
         yield from all_lines.render(console, end=self.end)
