@@ -59,7 +59,7 @@ WINDOWS = platform.system() == "Windows"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
-OverflowMethod = Literal["crop", "fold", "ellipsis"]
+OverflowMethod = Literal["fold", "crop", "ellipsis"]
 
 
 CONSOLE_HTML_FORMAT = """\
@@ -569,7 +569,7 @@ class Console:
         Args:
             text (str): Text to render.
             style (Union[str, Style], optional): Style to apply to rendered text.
-            justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to ``None``.
+            justify (str, optional): Justify method: "default", "left", "center", "full", "right". Defaults to ``None``.
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to ``None``.
             emoji (Optional[bool], optional): Enable emoji, or ``None`` to use Console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use Console default.
@@ -751,7 +751,7 @@ class Console:
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             justify (str, optional): Justify method: "default", "left", "right", "center", or "full". Defaults to ``None``.
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipisis". Defaults to None.
-            no_wrap (Optional[bool], optional): Disable wrapping. Defaults to None
+            no_wrap (Optional[bool], optional): Disable word wrapping. Defaults to None.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to ``None``.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to ``None``.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
