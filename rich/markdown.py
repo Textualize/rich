@@ -10,7 +10,7 @@ from .console import (
     Console,
     ConsoleOptions,
     ConsoleRenderable,
-    JustifyValues,
+    JustifyMethod,
     RenderResult,
     Segment,
 )
@@ -113,13 +113,13 @@ class Paragraph(TextElement):
     """A Paragraph."""
 
     style_name = "markdown.paragraph"
-    justify: JustifyValues
+    justify: JustifyMethod
 
     @classmethod
     def create(cls, markdown: "Markdown", node) -> "Paragraph":
         return cls(justify=markdown.justify or "left")
 
-    def __init__(self, justify: JustifyValues) -> None:
+    def __init__(self, justify: JustifyMethod) -> None:
         self.justify = justify
 
     def __rich_console__(
@@ -382,7 +382,7 @@ class Markdown(JupyterMixin):
     Args:
         markup (str): A string containing markdown.
         code_theme (str, optional): Pygments theme for code blocks. Defaults to "monokai".
-        justify (JustifyValues, optional): Justify value for paragraphs. Defaults to None.
+        justify (JustifyMethod, optional): Justify value for paragraphs. Defaults to None.
         style (Union[str, Style], optional): Optional style to apply to markdown.
         hyperlinks (bool, optional): Enable hyperlinks. Defaults to ``True``.
     """
@@ -403,7 +403,7 @@ class Markdown(JupyterMixin):
         self,
         markup: str,
         code_theme: str = "monokai",
-        justify: JustifyValues = None,
+        justify: JustifyMethod = None,
         style: Union[str, Style] = "none",
         hyperlinks: bool = True,
     ) -> None:

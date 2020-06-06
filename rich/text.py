@@ -30,13 +30,17 @@ if TYPE_CHECKING:  # pragma: no cover
     from .console import (
         Console,
         ConsoleOptions,
-        JustifyValues,
-        OverflowValues,
+        JustifyMethod,
+        OverflowMethod,
         RenderResult,
         RenderableType,
     )
 
-DEFAULT_OVERFLOW = "fold"
+DEFAULT_JUSTIFY: "JustifyMethod" = "default"
+DEFAULT_OVERFLOW: "OverflowMethod" = "fold"
+
+
+_re_whitespace = re.compile(r"\s+$")
 
 
 class Span(NamedTuple):
@@ -98,7 +102,8 @@ class Text(JupyterMixin):
         Args:
             text (str, optional): Default unstyled text. Defaults to "".
             style (Union[str, Style], optional): Base style for text. Defaults to "".
-            justify (str, optional): Default alignment for text, "left", "center", "full" or "right". Defaults to None.
+            justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
+            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None. 
             end (str, optional): Character to end text with. Defaults to "\n".
             tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
     """
@@ -107,8 +112,8 @@ class Text(JupyterMixin):
         self,
         text: str = "",
         style: Union[str, Style] = "",
-        justify: "JustifyValues" = None,
-        overflow: "OverflowValues" = None,
+        justify: "JustifyMethod" = None,
+        overflow: "OverflowMethod" = None,
         no_wrap: bool = False,
         end: str = "\n",
         tab_size: Optional[int] = 8,
@@ -162,14 +167,16 @@ class Text(JupyterMixin):
         text: str,
         style: Union[str, Style] = "",
         emoji: bool = True,
-        justify: "JustifyValues" = None,
+        justify: "JustifyMethod" = None,
+        overflow: "OverflowMethod" = None,
     ) -> "Text":
         """Create Text instance from markup.
         
         Args:
             text (str): A string containing console markup.
             emoji (bool, optional): Also render emoji code. Defaults to True.
-            justify (str, optional): Default alignment for text, "left", "center", "full" or "right". Defaults to None.
+            justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
+            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None. 
         
         Returns:
             Text: A Text instance with markup rendered.
@@ -178,6 +185,7 @@ class Text(JupyterMixin):
 
         rendered_text = render(text, style, emoji=emoji)
         rendered_text.justify = justify
+        rendered_text.overflow = overflow
         return rendered_text
 
     @classmethod
@@ -185,7 +193,8 @@ class Text(JupyterMixin):
         cls,
         *parts: Union[str, "Text", Tuple[str, StyleType]],
         style: Union[str, Style] = "",
-        justify: "JustifyValues" = None,
+        justify: "JustifyMethod" = None,
+        overflow: "OverflowMethod" = None,
         end: str = "\n",
         tab_size: int = 8,
     ) -> "Text":
@@ -194,14 +203,17 @@ class Text(JupyterMixin):
 
         Args:            
             style (Union[str, Style], optional): Base style for text. Defaults to "".
-            justify (str, optional): Default alignment for text, "left", "center", "full" or "right". Defaults to None.
+            justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
+            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None. 
             end (str, optional): Character to end text with. Defaults to "\n".
             tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
 
         Returns:
             Text: A new text instance.
         """
-        text = cls(style=style, justify=justify, end=end, tab_size=tab_size)
+        text = cls(
+            style=style, justify=justify, overflow=overflow, end=end, tab_size=tab_size
+        )
         append = text.append
         for part in parts:
             if isinstance(part, (Text, str)):
@@ -221,11 +233,12 @@ class Text(JupyterMixin):
     @plain.setter
     def plain(self, new_text: str) -> None:
         """Set the text to a new value."""
-        self._text[:] = [new_text]
-        old_length = self._length
-        self._length = len(new_text)
-        if old_length > self._length:
-            self._trim_spans()
+        if new_text != self.plain:
+            self._text[:] = [new_text]
+            old_length = self._length
+            self._length = len(new_text)
+            if old_length > self._length:
+                self._trim_spans()
 
     @property
     def spans(self) -> List[Span]:
@@ -253,7 +266,7 @@ class Text(JupyterMixin):
         """Return a copy of this instance."""
         copy_self = Text(
             self.plain,
-            style=self.style.copy() if isinstance(self.style, Style) else self.style,
+            style=self.style,
             justify=self.justify,
             overflow=self.overflow,
             no_wrap=self.no_wrap,
@@ -369,6 +382,20 @@ class Text(JupyterMixin):
         """Trip whitespace from end of text."""
         self.plain = self.plain.rstrip()
 
+    def rstrip_end(self, size: int):
+        """Remove whitespace beyond a certain width at the end of the text.
+
+        Args:
+            size (int): The desired size of the text.
+        """
+        text_length = len(self)
+        if text_length > size:
+            excess = text_length - size
+            whitespace_match = _re_whitespace.search(self.plain)
+            if whitespace_match is not None:
+                whitespace_count = len(whitespace_match.group(0))
+                self.plain = self.plain[: -min(whitespace_count, excess)]
+
     def set_length(self, new_length: int) -> None:
         """Set new length of the text, clipping or padding is required."""
         length = len(self)
@@ -389,10 +416,13 @@ class Text(JupyterMixin):
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
         tab_size: int = console.tab_size or self.tab_size or 8  # type: ignore
-        overflow = cast(
-            "OverflowValues", self.overflow or options.overflow or DEFAULT_OVERFLOW
+        justify = cast(
+            "JustifyMethod", self.justify or options.justify or DEFAULT_OVERFLOW
         )
-        justify = self.justify or options.justify
+        overflow = cast(
+            "OverflowMethod", self.overflow or options.overflow or DEFAULT_OVERFLOW
+        )
+
         if self.no_wrap or options.no_wrap:
             render_text = self
             if overflow in ("crop", "ellipsis"):
@@ -401,7 +431,7 @@ class Text(JupyterMixin):
             if justify:
                 lines = Lines([render_text])
                 lines.justify(
-                    console, options.max_width, align=justify, overflow=overflow
+                    console, options.max_width, justify=justify, overflow=overflow
                 )
                 render_text = lines[0]
             yield from render_text.render(console, end=self.end)
@@ -413,13 +443,6 @@ class Text(JupyterMixin):
                 overflow=overflow,
                 tab_size=tab_size or 8,
             )
-            # new_line = Segment.line()
-            # for last, line in loop_last(lines):
-            #     yield from line.render(console)
-            #     if not last:
-            #         yield new_line
-            #     else:
-            #         yield Segment(self.end)
             all_lines = Text("\n").join(lines)
             yield from all_lines.render(console, end=self.end)
 
@@ -544,20 +567,20 @@ class Text(JupyterMixin):
     def truncate(
         self,
         max_width: int,
-        overflow: Optional["OverflowValues"] = None,
+        overflow: Optional["OverflowMethod"] = None,
         pad: bool = False,
     ) -> None:
         """Truncate text if it is longer that a given width.
 
         Args:
             max_width (int): Maximum number of characters in text.
-            ellipsis (bool): Replace last character with ellipsis if truncated.
+            overflow (str, optional): Overflow method: "crop", "fold", or "ellipisis". Defaults to None, to use self.overflow.
+            pad (bool, optional): Pad with spaces if the length is less than max_width. Defaults to False.
         """
-
         length = cell_len(self.plain)
+        _overflow = overflow or self.overflow or DEFAULT_OVERFLOW
         if length > max_width:
-            overflow = overflow or self.overflow or DEFAULT_OVERFLOW
-            if overflow == "ellipsis":
+            if _overflow == "ellipsis":
                 self.plain = set_cell_size(self.plain, max_width - 1).rstrip() + "…"
             else:
                 self.plain = set_cell_size(self.plain, max_width)
@@ -571,13 +594,18 @@ class Text(JupyterMixin):
         new_length = self._length
         spans: List[Span] = []
         append = spans.append
+        _Span = Span
         for span in self._spans:
             if span.end < new_length:
                 append(span)
                 continue
             if span.start >= new_length:
                 continue
-            append(span.right_crop(new_length))
+            if span.end > new_length:
+                start, end, style = span
+                append(_Span(start, min(new_length, end), style))
+            else:
+                append(span)
         self._spans[:] = spans
 
     def pad_left(self, count: int, character: str = " ") -> None:
@@ -741,7 +769,7 @@ class Text(JupyterMixin):
                 if new_span is None:
                     break
                 span = new_span
-                line_index += 1
+                line_index = (line_index + 1) % len(line_ranges)
                 line_start, line_end = line_ranges[line_index]
 
         return new_lines
@@ -754,21 +782,26 @@ class Text(JupyterMixin):
         self,
         console: "Console",
         width: int,
-        justify: Optional["JustifyValues"] = "left",
-        overflow: Optional["OverflowValues"] = None,
+        justify: "JustifyMethod" = None,
+        overflow: "OverflowMethod" = None,
         tab_size: int = 8,
     ) -> Lines:
         """Word wrap the text.
         
         Args:
+            console (Console): Console instance.
             width (int): Number of characters per line.
-            justify (bool, optional): True to pad lines with spaces. Defaults to False.
+            emoji (bool, optional): Also render emoji code. Defaults to True.
+            justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to "left".
+            overflow (str, optional): Overflow method: "crop", "fold", or "ellipisis". Defaults to None.
+            tab_size (int, optional): Default tab size. Defaults to 8.
         
         Returns:
             Lines: Number of lines.
         """
-        wrap_overflow: "OverflowValues" = cast(
-            "OverflowValues", overflow or self.overflow or DEFAULT_OVERFLOW
+        wrap_justify = cast("JustifyMethod", justify or self.justify or DEFAULT_JUSTIFY)
+        wrap_overflow = cast(
+            "OverflowMethod", overflow or self.overflow or DEFAULT_OVERFLOW
         )
         lines: Lines = Lines()
         for line in self.split():
@@ -776,13 +809,16 @@ class Text(JupyterMixin):
                 line = line.tabs_to_spaces(tab_size)
             offsets = divide_line(str(line), width, fold=wrap_overflow == "fold")
             new_lines = line.divide(offsets)
-            if justify:
-                new_lines.justify(console, width, align=justify, overflow=overflow)
+            for line in new_lines:
+                line.rstrip_end(width)
+            if wrap_justify:
+                new_lines.justify(
+                    console, width, justify=wrap_justify, overflow=wrap_overflow
+                )
             lines.extend(new_lines)
 
-        if wrap_overflow in ("crop", "ellipsis"):
-            for line in lines:
-                line.truncate(width, wrap_overflow)
+        for line in lines:
+            line.truncate(width, wrap_overflow)
 
         return lines
 
@@ -801,3 +837,11 @@ class Text(JupyterMixin):
             line.set_length(width)
             append(line)
         return lines
+
+
+if __name__ == "__main__":
+    from rich.console import Console
+
+    console = Console()
+    t = Text("foo bar", justify="left")
+    print(repr(t.wrap(console, 4)))

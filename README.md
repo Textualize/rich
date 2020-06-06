@@ -8,11 +8,13 @@
 
 # Rich
 
-Rich is a Python library for rendering _rich_ text and beautiful formatting to the terminal.
+Rich is a Python library for _rich_ text and beautiful formatting in the terminal.
 
 The [Rich API](https://rich.readthedocs.io/en/latest/) makes it easy to add colorful text (up to 16.7 million colors) with styles (bold, italic, underline etc.) to your script or application. Rich can also render pretty tables, progress bars, markdown, syntax highlighted source code, and tracebacks -- out of the box.
 
 ![Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
+
+For a video introduction to Rich see [calmcode.io](https://calmcode.io/rich/introduction.html).
 
 ## Compatibility
 

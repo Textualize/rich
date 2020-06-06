@@ -313,8 +313,18 @@ def test_right_crop():
     assert test._spans == [Span(0, 3, "red")]
 
 
-def test_wrap_4():
+def test_wrap_3():
     test = Text("foo bar baz")
+    lines = test.wrap(Console(), 3)
+    print(repr(lines))
+    assert len(lines) == 3
+    assert lines[0] == Text("foo")
+    assert lines[1] == Text("bar")
+    assert lines[2] == Text("baz")
+
+
+def test_wrap_4():
+    test = Text("foo bar baz", justify="left")
     lines = test.wrap(Console(), 4)
     assert len(lines) == 3
     assert lines[0] == Text("foo ")
@@ -322,17 +332,8 @@ def test_wrap_4():
     assert lines[2] == Text("baz ")
 
 
-def test_wrap_3():
-    test = Text("foo bar baz")
-    lines = test.wrap(Console(), 3)
-    assert len(lines) == 3
-    assert lines[0] == Text("foo")
-    assert lines[1] == Text("bar")
-    assert lines[2] == Text("baz")
-
-
 def test_wrap_long():
-    test = Text("abracadabra")
+    test = Text("abracadabra", justify="left")
     lines = test.wrap(Console(), 4)
     assert len(lines) == 3
     assert lines[0] == Text("abra")
@@ -341,7 +342,7 @@ def test_wrap_long():
 
 
 def test_wrap_long_words():
-    test = Text("X 123456789")
+    test = Text("X 123456789", justify="left")
     lines = test.wrap(Console(), 4)
 
     assert len(lines) == 3
@@ -358,7 +359,7 @@ def test_fit():
 
 
 def test_wrap_tabs():
-    test = Text("foo\tbar",)
+    test = Text("foo\tbar", justify="left")
     lines = test.wrap(Console(), 4)
     assert len(lines) == 2
     assert str(lines[0]) == "foo "

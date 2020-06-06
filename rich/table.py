@@ -29,7 +29,8 @@ if TYPE_CHECKING:
     from .console import (
         Console,
         ConsoleOptions,
-        JustifyValues,
+        JustifyMethod,
+        OverflowMethod,
         RenderableType,
         RenderResult,
     )
@@ -58,10 +59,10 @@ class Column:
     style: StyleType = "none"
     """StyleType: The style of the column."""
 
-    justify: "JustifyValues" = "left"
+    justify: "JustifyMethod" = "left"
     """str: How to justify text within the column ("left", "center", "right", or "full")"""
 
-    overflow: "OverflowValues" = "ellipsis"
+    overflow: "OverflowMethod" = "ellipsis"
 
     width: Optional[int] = None
     """Optional[int]: Width of the column, or ``None`` (default) to auto calculate width."""
@@ -230,8 +231,12 @@ class Table(JupyterMixin):
         table_width = (
             sum(self._calculate_column_widths(console, max_width)) + extra_width
         )
-
-        return Measurement(1, table_width)
+        _measure_column = self._measure_column
+        minimum_width = max(
+            _measure_column(console, column, max_width).minimum
+            for column in self.columns
+        )
+        return Measurement(minimum_width, table_width)
 
     @property
     def padding(self) -> Tuple[int, int, int, int]:
@@ -251,8 +256,8 @@ class Table(JupyterMixin):
         header_style: StyleType = None,
         footer_style: StyleType = None,
         style: StyleType = None,
-        justify: "JustifyValues" = "left",
-        overflow: "OverflowValues" = "ellipsis",
+        justify: "JustifyMethod" = "left",
+        overflow: "OverflowMethod" = "ellipsis",
         width: int = None,
         ratio: int = None,
         no_wrap: bool = False,
@@ -267,7 +272,7 @@ class Table(JupyterMixin):
             header_style (Union[str, Style], optional): Style for the header. Defaults to "none".
             footer_style (Union[str, Style], optional): Style for the header. Defaults to "none".
             style (Union[str, Style], optional): Style for the column cells. Defaults to "none".
-            justify (JustifyValues, optional): Alignment for cells. Defaults to "left".
+            justify (JustifyMethod, optional): Alignment for cells. Defaults to "left".
             width (int, optional): A minimum width in characters. Defaults to None.
             ratio (int, optional): Flexible ratio for the column. Defaults to None.
             no_wrap (bool, optional): Set to ``True`` to disable wrapping of this column.
@@ -398,6 +403,7 @@ class Table(JupyterMixin):
                         widths[index] = fixed_widths[index] + next(iter_flex_widths)
         table_width = sum(widths)
 
+        # Reduce rows that not no_wrap
         if table_width > max_width:
             excess_width = table_width - max_width
             widths = ratio_reduce(
@@ -408,6 +414,7 @@ class Table(JupyterMixin):
             )
             table_width = sum(widths)
 
+        # Reduce rows that are no_wrap
         if table_width > max_width:
             excess_width = table_width - max_width
             widths = ratio_reduce(
@@ -424,54 +431,6 @@ class Table(JupyterMixin):
                 excess_width, [1 for column in columns], widths, widths,
             )
             table_width = sum(widths)
-
-            # flex_widths = [_range.span for _range in width_ranges]
-            # excess_width = table_width - max_width
-
-            # widths = [
-            #     max(width_range.minimum + 2, width - excess_width)
-            #     for width_range, width, excess_width in zip(
-            #         width_ranges, widths, ratio_divide(excess_width, flex_widths)
-            #     )
-            # ]
-
-            # flex_widths = [
-            #     0 if column.no_wrap else 1
-            #     for width_range, column in zip(width_ranges, columns)
-            # ]
-            # if any(flex_widths):
-            #     widths = [
-            #         max(width_range.minimum, width - excess_width)
-            #         for width_range, width, excess_width in zip(
-            #             width_ranges,
-            #             widths,
-            #             ratio_divide(excess_width, flex_widths),
-            #         )
-            #     ]
-            table_width = sum(widths)
-        # if table_width > max_width:
-        #     excess_width = table_width - max_width
-        #     flex_widths = [0 if column.no_wrap else 1 for column in columns]
-
-        #     if any(flex_widths):
-        #         widths = [
-        #             max(width_range.minimum, width - excess_width)
-        #             for width_range, width, excess_width in zip(
-        #                 width_ranges,
-        #                 widths,
-        #                 ratio_divide(excess_width, flex_widths),
-        #             )
-        #         ]
-        #     table_width = sum(widths)
-        # if table_width > max_width:
-        #     flex_widths = [1 for column in columns]
-        #     excess_width = table_width - max_width
-        #     widths = [
-        #         width - excess_width
-        #         for width_range, width, excess_width in zip(
-        #             width_ranges, widths, ratio_divide(excess_width, flex_widths),
-        #         )
-        #     ]
 
         elif table_width < max_width and self.expand:
             pad_widths = ratio_divide(max_width - table_width, widths)

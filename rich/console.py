@@ -58,8 +58,8 @@ if TYPE_CHECKING:  # pragma: no cover
 WINDOWS = platform.system() == "Windows"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
-JustifyValues = Optional[Literal["left", "center", "right", "full"]]
-OverflowValues = Literal["crop", "fold", "ellipsis"]
+JustifyMethod = Literal["default", "left", "center", "right", "full"]
+OverflowMethod = Literal["crop", "fold", "ellipsis"]
 
 
 CONSOLE_HTML_FORMAT = """\
@@ -91,8 +91,8 @@ class ConsoleOptions:
     max_width: int
     is_terminal: bool
     encoding: str
-    justify: Optional[JustifyValues] = None
-    overflow: Optional[OverflowValues] = None
+    justify: Optional[JustifyMethod] = None
+    overflow: Optional[OverflowMethod] = None
     no_wrap: bool = False
 
     def update(
@@ -100,8 +100,8 @@ class ConsoleOptions:
         width: int = None,
         min_width: int = None,
         max_width: int = None,
-        justify: JustifyValues = None,
-        overflow: OverflowValues = None,
+        justify: JustifyMethod = None,
+        overflow: OverflowMethod = None,
         no_wrap: bool = None,
     ) -> "ConsoleOptions":
         """Update values, return a copy."""
@@ -557,7 +557,8 @@ class Console:
         self,
         text: str,
         style: Union[str, Style] = "",
-        justify: JustifyValues = None,
+        justify: JustifyMethod = None,
+        overflow: OverflowMethod = None,
         emoji: bool = None,
         markup: bool = None,
         highlighter: HighlighterType = None,
@@ -568,7 +569,8 @@ class Console:
         Args:
             text (str): Text to render.
             style (Union[str, Style], optional): Style to apply to rendered text.
-            justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
+            justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to ``None``.
+            overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to ``None``.
             emoji (Optional[bool], optional): Enable emoji, or ``None`` to use Console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use Console default.
             highlighter (HighlighterType, optional): Optional highlighter to apply.
@@ -581,10 +583,13 @@ class Console:
 
         if markup_enabled:
             rich_text = render_markup(text, style=style, emoji=emoji_enabled)
+            rich_text.justify = justify
+            rich_text.overflow = overflow
         else:
             rich_text = Text(
                 _emoji_replace(text) if emoji_enabled else text,
                 justify=justify,
+                overflow=overflow,
                 style=style,
             )
 
@@ -626,7 +631,7 @@ class Console:
         objects: Iterable[Any],
         sep: str,
         end: str,
-        justify: JustifyValues = None,
+        justify: JustifyMethod = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
@@ -732,10 +737,12 @@ class Console:
         sep=" ",
         end="\n",
         style: Union[str, Style] = None,
-        justify: JustifyValues = None,
+        justify: JustifyMethod = None,
+        overflow: OverflowMethod = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
+        width: int = None,
     ) -> None:
         r"""Print to the console.
 
@@ -744,10 +751,12 @@ class Console:
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
-            justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
-            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to None.
-            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to None
-            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to None.
+            justify (str, optional): Overflowmethod: "left", "right", "center", or "full". Defaults to ``None``.
+            overflow (str, optional): Overflow method: "crop", "fold", or "ellipisis". Defaults to None.
+            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to ``None``.
+            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to ``None``.
+            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
+            width (Optional[int], optional): Width of output, or ``None`` to auto-detect. Defaults to ``None``.
         """
         if not objects:
             self.line()
@@ -763,7 +772,9 @@ class Console:
                 markup=markup,
                 highlight=highlight,
             )
-            render_options = self.options
+            render_options = self.options.update(
+                justify=justify, overflow=overflow, width=width
+            )
             extend = self._buffer.extend
             render = self.render
             if style is None:
@@ -804,7 +815,7 @@ class Console:
         *objects: Any,
         sep=" ",
         end="\n",
-        justify: JustifyValues = None,
+        justify: JustifyMethod = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
