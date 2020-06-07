@@ -571,7 +571,7 @@ class Console:
         Args:
             text (str): Text to render.
             style (Union[str, Style], optional): Style to apply to rendered text.
-            justify (str, optional): Justify method: "default", "left", "center", "full", "right". Defaults to ``None``.
+            justify (str, optional): Justify method: "default", "left", "center", "full", or "right". Defaults to ``None``.
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to ``None``.
             emoji (Optional[bool], optional): Enable emoji, or ``None`` to use Console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use Console default.
