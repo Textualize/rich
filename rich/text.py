@@ -228,10 +228,10 @@ class Text(JupyterMixin):
     @property
     def plain(self) -> str:
         """Get the text as a single string."""
-        if len(self._text) not in (0, 1):
+        if len(self._text) != 1:
             text = "".join(self._text)
             self._text[:] = [text]
-        return self._text[0] if self._text else ""
+        return self._text[0]
 
     @plain.setter
     def plain(self, new_text: str) -> None:
