@@ -128,7 +128,7 @@ The "crop" method truncates the text at the end of the line, discarding any char
 
 The "ellipsis" method is similar to "crop", but will insert an ellipsis character ("…") at the end of any text that has been truncated.
 
-You can specify which overflow method to use with the ``overflow`` argument to :meth:`~rich.console.Console.print`. The following code demonstrates Rich's overflow methods::
+The following code demonstrates Rich's overflow methods::
 
     from typing import List
     from rich.console import Console, OverflowMethod

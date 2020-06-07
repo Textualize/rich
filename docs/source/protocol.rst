@@ -51,13 +51,13 @@ If you were to print a ``Student`` instance, it would render a simple table to t
 Low Level Render
 ~~~~~~~~~~~~~~~~
 
-For complete control over how a custom object is rendered to the terminal, you can yield :class:`~rich.segment.Segment` objects. A Segment consists of a piece of text and an optional Style. The following example, writes multi-colored text when rendering a ``MyObject`` instance::
+For complete control over how a custom object is rendered to the terminal, you can yield :class:`~rich.segment.Segment` objects. A Segment consists of a piece of text and an optional Style. The following example writes multi-colored text when rendering a ``MyObject`` instance::
 
     class MyObject:
         def __rich_console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-            yield Segment("My", "magenta")
-            yield Segment("Object", "green")
-            yield Segment("()", "cyan")
+            yield Segment("My", Style(color="magenta"))
+            yield Segment("Object", Style(color="green"))
+            yield Segment("()", Style(color="cyan"))
 
 
 Measuring Renderables
