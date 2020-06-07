@@ -14,7 +14,7 @@ The [Rich API](https://rich.readthedocs.io/en/latest/) makes it easy to add colo
 
 ![Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
 
-For a video introduction to Rich see [calmcode.io](https://calmcode.io/rich/introduction.html).
+For a video introduction to Rich see [calmcode.io](https://calmcode.io/rich/introduction.html) by [@fishnets88](https://twitter.com/fishnets88).
 
 ## Compatibility
 
