@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - Unreleased
+## [2.0.0] - 2020-07-07
 
 ### Added
 
@@ -22,9 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Renamed \_ratio.ratio_divide to \_ratio.ratio_distribute
-- Renamed JustifyValues to JustifyMethod
+- Renamed JustifyValues to JustifyMethod (backwards incompatible)
 - Optimized \_trim_spans
-- Enforced keyword args in Console / Text interfaces
+- Enforced keyword args in Console / Text interfaces (backwards incompatible)
 - Return self from text.append
 
 ## [1.3.1] - 2020-06-01
