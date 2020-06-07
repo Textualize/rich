@@ -88,6 +88,7 @@ The :meth:`~rich.console.Console.log` methods offers the same capabilities as pr
 
 To help with debugging, the log() method has a ``log_locals`` parameter. If you set this to ``True``, Rich will display a table of local variables where the method was called.
 
+
 Justify / Alignment
 -------------------
 
