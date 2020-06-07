@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - Unreleased
+
+### Added
+
+- Added overflow methods
+- Added no_wrap option to print()
+- Added width option to print
+- Improved handling of compressed tables
+
+### Fixed
+
+- Fixed erroneous space at end of log
+- Fixed erroneous space at end of progress bar
+
+### Changed
+
+- Renamed \_ratio.ratio_divide to \_ratio.ratio_distribute
+- Renamed JustifyValues to JustifyMethod
+- Optimized \_trim_spans
+- Enforced keyword args in Console / Text interfaces
+- Return self from text.append
+
 ## [1.3.1] - 2020-06-01
 
 ### Changed

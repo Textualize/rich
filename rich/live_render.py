@@ -34,7 +34,7 @@ class LiveRender:
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         style = console.get_style(self.style)
-        lines = console.render_lines(self.renderable, options, style, pad=False)
+        lines = console.render_lines(self.renderable, options, style=style, pad=False)
 
         shape = Segment.get_shape(lines)
         if self._shape is None:

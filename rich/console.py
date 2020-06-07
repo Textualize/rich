@@ -58,7 +58,8 @@ if TYPE_CHECKING:  # pragma: no cover
 WINDOWS = platform.system() == "Windows"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
-JustifyValues = Optional[Literal["left", "center", "right", "full"]]
+JustifyMethod = Literal["default", "left", "center", "right", "full"]
+OverflowMethod = Literal["fold", "crop", "ellipsis"]
 
 
 CONSOLE_HTML_FORMAT = """\
@@ -90,14 +91,18 @@ class ConsoleOptions:
     max_width: int
     is_terminal: bool
     encoding: str
-    justify: Optional[JustifyValues] = None
+    justify: Optional[JustifyMethod] = None
+    overflow: Optional[OverflowMethod] = None
+    no_wrap: Optional[bool] = False
 
     def update(
         self,
         width: int = None,
         min_width: int = None,
         max_width: int = None,
-        justify: JustifyValues = None,
+        justify: JustifyMethod = None,
+        overflow: OverflowMethod = None,
+        no_wrap: bool = None,
     ) -> "ConsoleOptions":
         """Update values, return a copy."""
         options = replace(self)
@@ -109,6 +114,10 @@ class ConsoleOptions:
             options.max_width = max_width
         if justify is not None:
             options.justify = justify
+        if overflow is not None:
+            options.overflow = overflow
+        if no_wrap is not None:
+            options.no_wrap = no_wrap
         return options
 
 
@@ -130,11 +139,11 @@ class ConsoleRenderable(Protocol):
         ...
 
 
-"""A type that may be rendered by Console."""
 RenderableType = Union[ConsoleRenderable, RichCast, str]
+"""A type that may be rendered by Console."""
 
-"""The result of calling a __rich_console__ method."""
 RenderResult = Iterable[Union[RenderableType, Segment]]
+"""The result of calling a __rich_console__ method."""
 
 
 _null_highlighter = NullHighlighter()
@@ -469,7 +478,7 @@ class Console:
             self.control("\033[?25h" if show else "\033[?25l")
 
     def render(
-        self, renderable: RenderableType, options: ConsoleOptions,
+        self, renderable: RenderableType, options: ConsoleOptions
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
 
@@ -512,6 +521,7 @@ class Console:
         self,
         renderable: RenderableType,
         options: Optional[ConsoleOptions],
+        *,
         style: Optional[Style] = None,
         pad: bool = True,
     ) -> List[List[Segment]]:
@@ -547,8 +557,10 @@ class Console:
     def render_str(
         self,
         text: str,
+        *,
         style: Union[str, Style] = "",
-        justify: JustifyValues = None,
+        justify: JustifyMethod = None,
+        overflow: OverflowMethod = None,
         emoji: bool = None,
         markup: bool = None,
         highlighter: HighlighterType = None,
@@ -559,7 +571,8 @@ class Console:
         Args:
             text (str): Text to render.
             style (Union[str, Style], optional): Style to apply to rendered text.
-            justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
+            justify (str, optional): Justify method: "default", "left", "center", "full", or "right". Defaults to ``None``.
+            overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to ``None``.
             emoji (Optional[bool], optional): Enable emoji, or ``None`` to use Console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use Console default.
             highlighter (HighlighterType, optional): Optional highlighter to apply.
@@ -572,10 +585,13 @@ class Console:
 
         if markup_enabled:
             rich_text = render_markup(text, style=style, emoji=emoji_enabled)
+            rich_text.justify = justify
+            rich_text.overflow = overflow
         else:
             rich_text = Text(
                 _emoji_replace(text) if emoji_enabled else text,
                 justify=justify,
+                overflow=overflow,
                 style=style,
             )
 
@@ -617,7 +633,8 @@ class Console:
         objects: Iterable[Any],
         sep: str,
         end: str,
-        justify: JustifyValues = None,
+        *,
+        justify: JustifyMethod = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
@@ -658,7 +675,7 @@ class Console:
 
         def check_text() -> None:
             if text:
-                sep_text = Text(sep, justify=text[0].justify or justify, end=end)
+                sep_text = Text(sep, end=end)
                 append(sep_text.join(text))
                 del text[:]
 
@@ -670,14 +687,11 @@ class Console:
                 append_text(
                     self.render_str(
                         renderable,
-                        justify=justify,
                         emoji=emoji,
                         markup=markup,
                         highlighter=_highlighter,
                     )
                 )
-            elif isinstance(renderable, Text):
-                append_text(renderable)
             elif isinstance(renderable, ConsoleRenderable):
                 check_text()
                 append(renderable)
@@ -693,6 +707,7 @@ class Console:
     def rule(
         self,
         title: str = "",
+        *,
         character: str = "─",
         style: Union[str, Style] = "rule.line",
     ) -> None:
@@ -723,10 +738,13 @@ class Console:
         sep=" ",
         end="\n",
         style: Union[str, Style] = None,
-        justify: JustifyValues = None,
+        justify: JustifyMethod = None,
+        overflow: OverflowMethod = None,
+        no_wrap: bool = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
+        width: int = None,
     ) -> None:
         r"""Print to the console.
 
@@ -735,10 +753,13 @@ class Console:
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
-            justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
-            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to None.
-            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to None
-            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to None.
+            justify (str, optional): Justify method: "default", "left", "right", "center", or "full". Defaults to ``None``.
+            overflow (str, optional): Overflow method: "crop", "fold", or "ellipisis". Defaults to None.
+            no_wrap (Optional[bool], optional): Disable word wrapping. Defaults to None.
+            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to ``None``.
+            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to ``None``.
+            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
+            width (Optional[int], optional): Width of output, or ``None`` to auto-detect. Defaults to ``None``.
         """
         if not objects:
             self.line()
@@ -754,7 +775,9 @@ class Console:
                 markup=markup,
                 highlight=highlight,
             )
-            render_options = self.options
+            render_options = self.options.update(
+                justify=justify, overflow=overflow, width=width, no_wrap=no_wrap
+            )
             extend = self._buffer.extend
             render = self.render
             if style is None:
@@ -770,6 +793,7 @@ class Console:
 
     def print_exception(
         self,
+        *,
         width: Optional[int] = 88,
         extra_lines: int = 3,
         theme: Optional[str] = None,
@@ -795,7 +819,7 @@ class Console:
         *objects: Any,
         sep=" ",
         end="\n",
-        justify: JustifyValues = None,
+        justify: JustifyMethod = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
@@ -901,7 +925,7 @@ class Console:
         result = input()
         return result
 
-    def export_text(self, clear: bool = True, styles: bool = False) -> str:
+    def export_text(self, *, clear: bool = True, styles: bool = False) -> str:
         """Generate text from console contents (requires record=True argument in constructor).
 
         Args:
@@ -929,7 +953,7 @@ class Console:
                 del self._record_buffer[:]
         return text
 
-    def save_text(self, path: str, clear: bool = True, styles: bool = False) -> None:
+    def save_text(self, path: str, *, clear: bool = True, styles: bool = False) -> None:
         """Generate text from console and save to a given location (requires record=True argument in constructor).
 
         Args:
@@ -945,6 +969,7 @@ class Console:
 
     def export_html(
         self,
+        *,
         theme: TerminalTheme = None,
         clear: bool = True,
         code_format: str = None,
@@ -1024,6 +1049,7 @@ class Console:
     def save_html(
         self,
         path: str,
+        *,
         theme: TerminalTheme = None,
         clear: bool = True,
         code_format=CONSOLE_HTML_FORMAT,

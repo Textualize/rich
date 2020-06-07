@@ -27,7 +27,7 @@ from typing import (
 
 from . import get_console
 from .bar import Bar
-from .console import Console, JustifyValues, RenderGroup, RenderableType
+from .console import Console, JustifyMethod, RenderGroup, RenderableType
 from .highlighter import Highlighter
 from . import filesize
 from .live_render import LiveRender
@@ -129,7 +129,7 @@ class TextColumn(ProgressColumn):
         self,
         text_format: str,
         style: StyleType = "none",
-        justify: JustifyValues = "left",
+        justify: JustifyMethod = "left",
         markup: bool = True,
         highlighter: Highlighter = None,
     ) -> None:
@@ -609,9 +609,7 @@ class Progress:
             Table: A table instance.
         """
 
-        table = Table.grid()
-        table.pad_edge = True
-        table.padding = (0, 1, 0, 0)
+        table = Table.grid(padding=(0, 1))
         for _ in self.columns:
             table.add_column()
         for task in tasks:
@@ -688,7 +686,7 @@ class Progress:
         sep=" ",
         end="\n",
         style: Union[str, Style] = None,
-        justify: JustifyValues = None,
+        justify: JustifyMethod = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
@@ -716,7 +714,7 @@ class Progress:
         *objects: Any,
         sep=" ",
         end="\n",
-        justify: JustifyValues = None,
+        justify: JustifyMethod = None,
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,

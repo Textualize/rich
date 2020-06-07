@@ -36,12 +36,13 @@ class LogRender:
         from .containers import Renderables
         from .table import Table
 
-        output = Table(show_header=False, expand=True, box=None, padding=(0, 1, 0, 0))
+        output = Table.grid(padding=(0, 1))
+        output.expand = True
         if self.show_time:
             output.add_column(style="log.time")
         if self.show_level:
             output.add_column(style="log.level", width=8)
-        output.add_column(ratio=1, style="log.message", justify=None)
+        output.add_column(ratio=1, style="log.message")
         if self.show_path and path:
             output.add_column(style="log.path")
         row: List["RenderableType"] = []

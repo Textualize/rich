@@ -1,5 +1,14 @@
 from itertools import zip_longest
-from typing import Iterator, Iterable, List, overload, TypeVar, TYPE_CHECKING, Union
+from typing import (
+    Iterator,
+    Iterable,
+    List,
+    Optional,
+    overload,
+    TypeVar,
+    TYPE_CHECKING,
+    Union,
+)
 from typing_extensions import Literal
 
 from .segment import Segment
@@ -10,6 +19,8 @@ if TYPE_CHECKING:
         Console,
         ConsoleOptions,
         ConsoleRenderable,
+        JustifyMethod,
+        OverflowMethod,
         RenderResult,
         RenderableType,
     )
@@ -100,29 +111,35 @@ class Lines:
         self,
         console: "Console",
         width: int,
-        align: Literal["none", "left", "center", "right", "full"] = "left",
+        justify: "JustifyMethod" = "left",
+        overflow: "OverflowMethod" = "fold",
     ) -> None:
-        """Pad each line with spaces to a given width.
+        """Justify and overflow text to a given width.
         
         Args:
+            console (Console): Console instance.
             width (int): Number of characters per line.
+            justify (str, optional): Default justify method for text: "left", "center", "full" or "right". Defaults to "left".
+            overflow (str, optional): Default overflow for text: "crop", "fold", or "ellipisis". Defaults to "fold".            
             
         """
         from .text import Text
 
-        if align == "left":
+        if justify == "left":
             for line in self._lines:
-                line.set_length(width)
-        elif align == "center":
+                line.truncate(width, overflow=overflow, pad=True)
+        elif justify == "center":
             for line in self._lines:
                 line.rstrip()
+                line.truncate(width, overflow=overflow)
                 line.pad_left((width - cell_len(line.plain)) // 2)
                 line.pad_right(width - cell_len(line.plain))
-        elif align == "right":
+        elif justify == "right":
             for line in self._lines:
                 line.rstrip()
+                line.truncate(width, overflow=overflow)
                 line.pad_left(width - cell_len(line.plain))
-        elif align == "full":
+        elif justify == "full":
             for line_index, line in enumerate(self._lines):
                 if line_index == len(self._lines) - 1:
                     break

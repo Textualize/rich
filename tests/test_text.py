@@ -173,7 +173,7 @@ def test_highlight_words():
     assert test._spans == [Span(0, 2, "red")]
 
     test = Text("AB Ab aB ab")
-    count = test.highlight_words(words, "red", False)
+    count = test.highlight_words(words, "red", case_sensitive=False)
     assert count == 4
 
 
@@ -313,8 +313,18 @@ def test_right_crop():
     assert test._spans == [Span(0, 3, "red")]
 
 
-def test_wrap_4():
+def test_wrap_3():
     test = Text("foo bar baz")
+    lines = test.wrap(Console(), 3)
+    print(repr(lines))
+    assert len(lines) == 3
+    assert lines[0] == Text("foo")
+    assert lines[1] == Text("bar")
+    assert lines[2] == Text("baz")
+
+
+def test_wrap_4():
+    test = Text("foo bar baz", justify="left")
     lines = test.wrap(Console(), 4)
     assert len(lines) == 3
     assert lines[0] == Text("foo ")
@@ -322,17 +332,8 @@ def test_wrap_4():
     assert lines[2] == Text("baz ")
 
 
-def test_wrap_3():
-    test = Text("foo bar baz")
-    lines = test.wrap(Console(), 3)
-    assert len(lines) == 3
-    assert lines[0] == Text("foo")
-    assert lines[1] == Text("bar")
-    assert lines[2] == Text("baz")
-
-
 def test_wrap_long():
-    test = Text("abracadabra")
+    test = Text("abracadabra", justify="left")
     lines = test.wrap(Console(), 4)
     assert len(lines) == 3
     assert lines[0] == Text("abra")
@@ -341,7 +342,7 @@ def test_wrap_long():
 
 
 def test_wrap_long_words():
-    test = Text("X 123456789")
+    test = Text("X 123456789", justify="left")
     lines = test.wrap(Console(), 4)
 
     assert len(lines) == 3
@@ -358,7 +359,7 @@ def test_fit():
 
 
 def test_wrap_tabs():
-    test = Text("foo\tbar")
+    test = Text("foo\tbar", justify="left")
     lines = test.wrap(Console(), 4)
     assert len(lines) == 2
     assert str(lines[0]) == "foo "
@@ -453,3 +454,30 @@ def test_get_style_at_offset():
     text = Text.from_markup("Hello [b]World[/b]")
     assert text.get_style_at_offset(console, 0) == Style()
     assert text.get_style_at_offset(console, 6) == Style(bold=True)
+
+
+@pytest.mark.parametrize(
+    "input, count, expected",
+    [
+        ("Hello", 10, "Hello"),
+        ("Hello", 5, "Hello"),
+        ("Hello", 4, "Hel…"),
+        ("Hello", 3, "He…"),
+        ("Hello", 2, "H…"),
+        ("Hello", 1, "…"),
+    ],
+)
+def test_truncate_ellipsis(input, count, expected):
+    text = Text(input)
+    text.truncate(count, overflow="ellipsis")
+    assert text.plain == expected
+
+
+@pytest.mark.parametrize(
+    "input, count, expected",
+    [("Hello", 5, "Hello"), ("Hello", 10, "Hello     "), ("Hello", 3, "He…"),],
+)
+def test_truncate_ellipsis_pad(input, count, expected):
+    text = Text(input)
+    text.truncate(count, overflow="ellipsis", pad=True)
+    assert text.plain == expected

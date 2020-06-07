@@ -1,5 +1,5 @@
 from rich._loop import loop_first, loop_last, loop_first_last
-from rich._ratio import ratio_divide
+from rich._ratio import ratio_distribute
 
 
 def test_loop_first():
@@ -29,10 +29,10 @@ def test_loop_first_last():
     assert next(iterable) == (False, True, "lemons")
 
 
-def test_ratio_divide():
-    assert ratio_divide(10, [1]) == [10]
-    assert ratio_divide(10, [1, 1]) == [5, 5]
-    assert ratio_divide(12, [1, 3]) == [3, 9]
-    assert ratio_divide(0, [1, 3]) == [0, 0]
-    assert ratio_divide(0, [1, 3], [1, 1]) == [1, 1]
-    assert ratio_divide(10, [1, 0]) == [10, 0]
+def test_ratio_distribute():
+    assert ratio_distribute(10, [1]) == [10]
+    assert ratio_distribute(10, [1, 1]) == [5, 5]
+    assert ratio_distribute(12, [1, 3]) == [3, 9]
+    assert ratio_distribute(0, [1, 3]) == [0, 0]
+    assert ratio_distribute(0, [1, 3], [1, 1]) == [1, 1]
+    assert ratio_distribute(10, [1, 0]) == [10, 0]

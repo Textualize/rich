@@ -187,8 +187,8 @@ class Traceback:
             if isinstance(exc_value, SyntaxError):
                 stack.syntax_error = _SyntaxError(
                     offset=exc_value.offset or 0,
-                    filename=exc_value.filename,
-                    lineno=exc_value.lineno,
+                    filename=exc_value.filename or "?",
+                    lineno=exc_value.lineno or 0,
                     line=exc_value.text or "",
                     msg=exc_value.msg,
                 )
