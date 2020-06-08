@@ -589,7 +589,7 @@ class Console:
             rich_text.overflow = overflow
         else:
             rich_text = Text(
-                _emoji_replace(text) if emoji_enabled else text,
+                self.emoji_replace(text, emoji_enabled),
                 justify=justify,
                 overflow=overflow,
                 style=style,
@@ -642,7 +642,7 @@ class Console:
         """Combined a number of renderables and text in to one renderable.
 
         Args:
-            renderables (Iterable[Union[str, ConsoleRenderable]]): Anyting that Rich can render.
+            renderables (Iterable[Union[str, ConsoleRenderable]]): Anything that Rich can render.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\n". 
             justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.       
@@ -731,6 +731,13 @@ class Console:
 
         self._buffer.append(Segment.control(str(control_codes)))
         self._check_buffer()
+
+    def emoji_replace(self, text: str, emoji=None):
+        emoji_enabled = emoji or (emoji is None and self._emoji)
+        if emoji_enabled:
+            return _emoji_replace(text)
+        else:
+            return text
 
     def print(
         self,

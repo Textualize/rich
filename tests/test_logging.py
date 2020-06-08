@@ -25,6 +25,13 @@ def test_log():
     assert render == expected
 
 
+def test_emoji():
+    from rich.emoji import Emoji
+
+    log.debug(":thumbs_up:")
+    assert Emoji.replace(":thumbs_up:") in handler.console.file.getvalue()
+
+
 if __name__ == "__main__":
     render = make_log()
     print(render)

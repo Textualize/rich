@@ -34,6 +34,7 @@ class RichHandler(Handler):
         path = Path(record.pathname).name
         log_style = f"logging.level.{record.levelname.lower()}"
         message = self.format(record)
+        message = self.console.emoji_replace(message)
         time_format = None if self.formatter is None else self.formatter.datefmt
         log_time = datetime.fromtimestamp(record.created)
 
