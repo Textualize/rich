@@ -39,7 +39,7 @@ Setting the highlighter on the Console will apply highlighting to all text you p
     console.print(highlight_emails("Send funds to money@example.org"))
 
 
-While :class:`~rich.highlighter.RegexHighlighter` is quite powerful, you can also extend its base class :class:`~rich.highlighter.Highlighter` which you can use to implement any scheme for highlighting. It contains a single method :class:`~rich.highlighter.Highlighter.highlight` which is passed the :class:`~rich.text.Text` to highlight.
+While :class:`~rich.highlighter.RegexHighlighter` is quite powerful, you can also extend its base class :class:`~rich.highlighter.Highlighter` to implement a custom scheme for highlighting. It contains a single method :class:`~rich.highlighter.Highlighter.highlight` which is passed the :class:`~rich.text.Text` to highlight.
 
 Here's a silly example that highlights every character with a different color::
 

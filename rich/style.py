@@ -15,6 +15,8 @@ StyleType = Union[str, "Style"]
 class _Bit:
     """A descriptor to get/set a style attribute bit."""
 
+    __slots__ = ["bit"]
+
     def __init__(self, bit_no: int) -> None:
         self.bit = 1 << bit_no
 

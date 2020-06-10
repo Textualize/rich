@@ -10,7 +10,7 @@ class Theme:
     
     Args:
         styles (Dict[str, Style], optional): A mapping of style names on to styles. Defaults to None for empty styles.
-        inherit (bool, optional): Switch to inherit default styles. Defaults to True.
+        inherit (bool, optional): Inherit default styles. Defaults to True.
     """
 
     def __init__(self, styles: Mapping[str, StyleType] = None, inherit: bool = True):
@@ -40,7 +40,7 @@ class Theme:
         Args:
             config_file (IO[str]): An open conf file.
             source (str, optional): The filename of the open file. Defaults to None.
-            inherit (bool, optional): Switch to inherit default styles. Defaults to True. 
+            inherit (bool, optional): Inherit default styles. Defaults to True. 
         
         Returns:
             Theme: A New theme instance.
@@ -57,7 +57,7 @@ class Theme:
 
         Args:
             path (str): Path to a config file readable by Python configparser module.            
-            inherit (bool, optional): Switch to inherit default styles. Defaults to True. 
+            inherit (bool, optional): Inherit default styles. Defaults to True. 
         
         Returns:
             Theme: A new theme instance.
@@ -67,9 +67,5 @@ class Theme:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from .console import Console
-    from .markup import escape
-
-    console = Console()
     theme = Theme()
-    console.print(escape(theme.config))
+    print(theme.config)

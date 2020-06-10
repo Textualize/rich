@@ -1,6 +1,6 @@
 from typing import Union
 
-from .cells import cell_len
+from .cells import cell_len, set_cell_size
 from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin
 from .segment import Segment
@@ -47,8 +47,10 @@ class Rule(JupyterMixin):
                 title_text = console.render_str(self.title, style="rule.text")
 
             if cell_len(title_text.plain) > width - 4:
-                title_text.set_length(width - 4)
+                title_text.truncate(width - 4, overflow="ellipsis")
 
+            title_text.plain = title_text.plain.replace("\n", " ")
+            title_text = title_text.tabs_to_spaces()
             rule_text = Text()
             center = (width - cell_len(title_text.plain)) // 2
             rule_text.append(character * (center - 1) + " ", self.style)

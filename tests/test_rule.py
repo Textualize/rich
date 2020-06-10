@@ -13,7 +13,7 @@ def test_rule():
     console.rule("foo")
     console.rule(Text("foo", style="bold"))
     console.rule("foobarbazeggfoobarbazegg")
-    expected = "\x1b[38;5;10m────────────────\x1b[0m\n\x1b[38;5;10m───── \x1b[0mfoo\x1b[38;5;10m ──────\x1b[0m\n\x1b[38;5;10m───── \x1b[0m\x1b[1mfoo\x1b[0m\x1b[38;5;10m ──────\x1b[0m\n\x1b[38;5;10m─ \x1b[0mfoobarbazegg\x1b[38;5;10m ─\x1b[0m\n"
+    expected = "\x1b[38;5;10m────────────────\x1b[0m\n\x1b[38;5;10m───── \x1b[0mfoo\x1b[38;5;10m ──────\x1b[0m\n\x1b[38;5;10m───── \x1b[0m\x1b[1mfoo\x1b[0m\x1b[38;5;10m ──────\x1b[0m\n\x1b[38;5;10m─ \x1b[0mfoobarbazeg…\x1b[38;5;10m ─\x1b[0m\n"
     assert console.file.getvalue() == expected
 
 

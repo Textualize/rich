@@ -81,7 +81,8 @@ Style Class
 Ultimately the style definition is parsed and an instance of a :class:`~rich.style.Style` class is created. If you prefer, you can use the Style class in place of the style definition. Here's an example::
 
     from rich.style import Style
-    console.print("Danger, Will Robinson!", style=Style(color="red", blink=True, bold=True)
+    danger_style = Style(color="red", blink=True, bold=True)
+    console.print("Danger, Will Robinson!", style=danger_style)
 
 It is slightly quicker to construct a Style class like this, since a style definition takes a little time to parse -- but only on the first call, as Rich will cache parsed style definitions.
 
