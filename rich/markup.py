@@ -82,13 +82,15 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
     Returns:
         Text: A test instance.
     """
+    emoji_replace = _emoji_replace
+    if "[" not in markup:
+        return Text(emoji_replace(markup) if emoji else markup, style=style)
     text = Text(style=style)
     append = text.append
     normalize = Style.normalize
 
     style_stack: List[Tuple[int, Tag]] = []
     pop = style_stack.pop
-    emoji_replace = _emoji_replace
 
     spans: List[Span] = []
     append_span = spans.append

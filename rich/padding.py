@@ -28,6 +28,7 @@ class Padding(JupyterMixin):
         pad (Union[int, Tuple[int]]): Padding for top, right, bottom, and left borders.
             May be specified with 1, 2, or 4 integers (CSS style).
         style (Union[str, Style], optional): Style for padding characters. Defaults to "none".
+        expand (bool, optional): Expand padding to fit available width. Defaults to True.
     """
 
     def __init__(
@@ -36,10 +37,12 @@ class Padding(JupyterMixin):
         pad: "PaddingDimensions" = (0, 0, 0, 0),
         *,
         style: Union[str, Style] = "none",
+        expand: bool = True,
     ):
         self.renderable = renderable
         self.top, self.right, self.bottom, self.left = self.unpack(pad)
         self.style = style
+        self.expand = expand
 
     @classmethod
     def indent(cls, renderable: "RenderableType", level: int) -> "Padding":
@@ -53,7 +56,7 @@ class Padding(JupyterMixin):
             Padding: A Padding instance.
         """
 
-        return Padding(renderable, pad=(0, 0, 0, level))
+        return Padding(renderable, pad=(0, 0, 0, level), expand=False)
 
     @staticmethod
     def unpack(pad: "PaddingDimensions") -> Tuple[int, int, int, int]:
@@ -79,7 +82,15 @@ class Padding(JupyterMixin):
     ) -> "RenderResult":
 
         style = console.get_style(self.style)
-        width = options.max_width
+        if self.expand:
+            width = options.max_width
+        else:
+            width = min(
+                Measurement.get(console, self.renderable, options.max_width).maximum
+                + self.left
+                + self.right,
+                options.max_width,
+            )
         child_options = options.update(width=width - self.left - self.right)
         lines = console.render_lines(self.renderable, child_options, style=style)
         lines = Segment.set_shape(lines, child_options.max_width, style=style)

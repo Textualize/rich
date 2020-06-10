@@ -17,6 +17,15 @@ def test_rule():
     assert console.file.getvalue() == expected
 
 
+def test_rule_cjk():
+    console = Console(
+        width=16, file=io.StringIO(), force_terminal=True, color_system=None
+    )
+    console.rule("欢迎！")
+    expected = "──── 欢迎！ ────\n"
+    assert console.file.getvalue() == expected
+
+
 def test_repr():
     rule = Rule("foo")
     assert isinstance(repr(rule), str)

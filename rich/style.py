@@ -1,5 +1,6 @@
 from binascii import crc32
-from functools import lru_cache
+from functools import lru_cache, reduce
+from operator import or_
 import sys
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Type, Union
 
@@ -110,35 +111,39 @@ class Style:
 
         self._color = None if color is None else _make_color(color)
         self._bgcolor = None if bgcolor is None else _make_color(bgcolor)
-        self._attributes = (
-            (bold or 0)
-            | (dim or 0) << 1
-            | (italic or 0) << 2
-            | (underline or 0) << 3
-            | (blink or 0) << 4
-            | (blink2 or 0) << 5
-            | (reverse or 0) << 6
-            | (conceal or 0) << 7
-            | (strike or 0) << 8
-            | (underline2 or 0) << 9
-            | (frame or 0) << 10
-            | (encircle or 0) << 11
-            | (overline or 0) << 12
+        self._attributes = sum(
+            (
+                bold and 1 or 0,
+                dim and 2 or 0,
+                italic and 4 or 0,
+                underline and 8 or 0,
+                blink and 16 or 0,
+                blink2 and 32 or 0,
+                reverse and 64 or 0,
+                conceal and 128 or 0,
+                strike and 256 or 0,
+                underline2 and 512 or 0,
+                frame and 1024 or 0,
+                encircle and 2048 or 0,
+                overline and 4096 or 0,
+            )
         )
-        self._set_attributes = (
-            (bold is not None)
-            | (dim is not None) << 1
-            | (italic is not None) << 2
-            | (underline is not None) << 3
-            | (blink is not None) << 4
-            | (blink2 is not None) << 5
-            | (reverse is not None) << 6
-            | (conceal is not None) << 7
-            | (strike is not None) << 8
-            | (underline2 is not None) << 9
-            | (frame is not None) << 10
-            | (encircle is not None) << 11
-            | (overline is not None) << 12
+        self._set_attributes = sum(
+            (
+                bold is not None,
+                dim is not None and 2,
+                italic is not None and 4,
+                underline is not None and 8,
+                blink is not None and 16,
+                blink2 is not None and 32,
+                reverse is not None and 64,
+                conceal is not None and 128,
+                strike is not None and 256,
+                underline2 is not None and 512,
+                frame is not None and 1024,
+                encircle is not None and 2048,
+                overline is not None and 4096,
+            )
         )
         self._link = link
 

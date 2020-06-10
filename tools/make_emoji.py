@@ -8,9 +8,7 @@ except ImportError:
 
 from emoji.unicode_codes import EMOJI_ALIAS_UNICODE
 
-emoji = {
-    k.lower().strip(":"): normalize("NFC", v) for k, v in EMOJI_ALIAS_UNICODE.items()
-}
+emoji = {k.lower().strip(":"): v for k, v in EMOJI_ALIAS_UNICODE.items()}
 
 with open("_emoji_codes.py", "wt") as f:
     f.write("EMOJI=" + str(emoji))

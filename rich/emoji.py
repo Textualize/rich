@@ -58,21 +58,18 @@ class Emoji(JupyterMixin):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from .console import Console
+    import sys
 
-    c = Console(markup=False)
+    from rich.columns import Columns
+    from rich.console import Console
 
-    e = Emoji("thumbs_up")
-    print(repr(e))
-    print(e)
+    console = Console(record=True)
 
-    c.print(Emoji("thumbs_up"))
-    # c.print("Hello")
-    c.print("Hello World")
-    from .panel import Panel
+    columns = Columns(
+        (f":{name}: {name}" for name in sorted(EMOJI.keys()) if "\u200D" not in name),
+        column_first=True,
+    )
 
-    c.print(Panel(Emoji.replace("Hello, :smiley: ! :thumbs_up: :sfwdfwer:")))
-
-    c.print("Here is a :smiley:  :link: Hello World")
-
-    c.print(":beer:")
+    console.print(columns)
+    if len(sys.argv) > 1:
+        console.save_html(sys.argv[1])

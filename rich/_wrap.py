@@ -21,9 +21,9 @@ def divide_line(text: str, width: int, fold: bool = True) -> List[int]:
     divides: List[int] = []
     append = divides.append
     line_position = 0
-
+    _cell_len = cell_len
     for start, _end, word in words(text):
-        word_length = cell_len(word.rstrip())
+        word_length = _cell_len(word.rstrip())
         if line_position + word_length > width:
             if word_length > width:
                 if fold:
@@ -31,17 +31,17 @@ def divide_line(text: str, width: int, fold: bool = True) -> List[int]:
                         chop_cells(word, width, position=line_position)
                     ):
                         if last:
-                            line_position = cell_len(line)
+                            line_position = _cell_len(line)
                         else:
                             start += len(line)
                             append(start)
                 else:
-                    line_position = cell_len(word)
+                    line_position = _cell_len(word)
             elif line_position and start:
                 append(start)
-                line_position = cell_len(word)
+                line_position = _cell_len(word)
         else:
-            line_position += cell_len(word)
+            line_position += _cell_len(word)
     return divides
 
 

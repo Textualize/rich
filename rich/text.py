@@ -109,6 +109,18 @@ class Text(JupyterMixin):
             tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
     """
 
+    __slots__ = [
+        "_text",
+        "style",
+        "justify",
+        "overflow",
+        "no_wrap",
+        "end",
+        "tab_size",
+        "_spans",
+        "_length",
+    ]
+
     def __init__(
         self,
         text: str = "",
@@ -121,15 +133,14 @@ class Text(JupyterMixin):
         tab_size: Optional[int] = 8,
         spans: List[Span] = None,
     ) -> None:
-        text = strip_control_codes(text)
-        self._text: List[str] = [text] if text else []
+        self._text = [strip_control_codes(text)]
         self.style = style
         self.justify = justify
         self.overflow = overflow
         self.no_wrap = no_wrap
         self.end = end
         self.tab_size = tab_size
-        self._spans: List[Span] = spans if spans is not None else []
+        self._spans: List[Span] = spans or []
         self._length: int = len(text)
 
     def __len__(self) -> int:
@@ -229,8 +240,7 @@ class Text(JupyterMixin):
     def plain(self) -> str:
         """Get the text as a single string."""
         if len(self._text) != 1:
-            text = "".join(self._text)
-            self._text[:] = [text]
+            self._text[:] = ["".join(self._text)]
         return self._text[0]
 
     @plain.setter
@@ -245,7 +255,7 @@ class Text(JupyterMixin):
 
     @property
     def spans(self) -> List[Span]:
-        """Get a copy of the list of spans."""
+        """Get a reference to the internal list of spans."""
         return self._spans
 
     @spans.setter
@@ -412,13 +422,7 @@ class Text(JupyterMixin):
         if length < new_length:
             self.pad_right(new_length - length)
         else:
-            text = self.plain[:new_length]
-            self.plain = text
-            new_spans = []
-            for span in self._spans:
-                if span.start < new_length:
-                    new_spans.append(span.right_crop(new_length))
-            self._spans[:] = new_spans
+            self.plain = self.plain[:new_length]
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"

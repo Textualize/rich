@@ -1,5 +1,6 @@
 from typing import Union
 
+from .cells import cell_len
 from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin
 from .segment import Segment
@@ -21,10 +22,8 @@ class Rule(JupyterMixin):
         character: str = None,
         style: Union[str, Style] = "rule.line",
     ) -> None:
-        if character and len(character) != 1:
-            raise ValueError(
-                "Rule requires character argument to be a string of length 1"
-            )
+        if character and cell_len(character) != 1:
+            raise ValueError("'character' argument must have a cell width of 1")
         self.title = title
         self.character = character
         self.style = style
@@ -46,14 +45,17 @@ class Rule(JupyterMixin):
                 title_text = self.title
             else:
                 title_text = console.render_str(self.title, style="rule.text")
-            if len(title_text) > width - 4:
+
+            if cell_len(title_text.plain) > width - 4:
                 title_text.set_length(width - 4)
 
             rule_text = Text()
-            center = (width - len(title_text)) // 2
+            center = (width - cell_len(title_text.plain)) // 2
             rule_text.append(character * (center - 1) + " ", self.style)
             rule_text.append(title_text)
-            rule_text.append(" " + character * (width - len(rule_text) - 1), self.style)
+            rule_text.append(
+                " " + character * (width - cell_len(rule_text.plain) - 1), self.style
+            )
             yield rule_text
 
 
