@@ -1,10 +1,11 @@
 from typing import Optional
 
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
+from .jupyter import JupyterMixin
 from .measure import Measurement
 
 
-class Constrain:
+class Constrain(JupyterMixin):
     """Constrain the width of a renderable to a given number of characters.
     
     Args:

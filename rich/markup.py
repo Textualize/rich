@@ -50,7 +50,6 @@ def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
     
     """
     position = 0
-    normalize = Style.normalize
     for match in re_tags.finditer(markup):
         escape_open, escape_close, tag_text = match.groups()
         start, end = match.span()

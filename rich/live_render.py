@@ -8,19 +8,31 @@ from ._loop import loop_last
 
 
 class LiveRender:
+    """Creates a renderable that may be updated.
+
+    Args:
+        renderable (RenderableType): Any renderable object.
+        style (StyleType, optional): An optional style to apply to the renderable. Defaults to "".
+    """
+
     def __init__(self, renderable: RenderableType, style: StyleType = "") -> None:
         self.renderable = renderable
         self.style = style
         self._shape: Optional[Tuple[int, int]] = None
 
     def set_renderable(self, renderable: RenderableType) -> None:
+        """Set a new renderable.
+
+        Args:
+            renderable (RenderableType): Any renderable object, including str.
+        """
         self.renderable = renderable
 
     def position_cursor(self) -> Control:
         """Get control codes to move cursor to beggining of live render.
 
         Returns:
-            str: String containing control codes.
+            Control: A control instance that may be printed.
         """
         if self._shape is not None:
             _, height = self._shape
@@ -28,6 +40,17 @@ class LiveRender:
                 return Control(f"\r\x1b[{height - 1}A\x1b[2K")
             else:
                 return Control("\r\x1b[2K")
+        return Control("")
+
+    def restore_cursor(self) -> Control:
+        """Get control codes to clear the render and restore the cursor to its previous position.
+
+        Returns:
+            Control: A Control instance that may be printed.
+        """
+        if self._shape is not None:
+            _, height = self._shape
+            return Control("\r" + "\x1b[1A\x1b[2K" * height)
         return Control("")
 
     def __rich_console__(

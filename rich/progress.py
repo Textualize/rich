@@ -50,6 +50,7 @@ def track(
     total: int = None,
     auto_refresh=True,
     console: Optional[Console] = None,
+    transient: bool = False,
     get_time: Callable[[], float] = None,
 ) -> Iterable[ProgressType]:
     """Track progress of processing a sequence.
@@ -59,13 +60,19 @@ def track(
         description (str, optional): Description of task show next to progress bar. Defaults to "Working".
         total: (int, optional): Total number of steps. Default is len(sequence).
         auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
+        transient: (bool, optional): Clear the progress on exit. Defaults to False.
         console (Console, optional): Console to write to. Default creates internal Console instance.
     
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
     
     """
-    progress = Progress(auto_refresh=auto_refresh, console=console, get_time=get_time)
+    progress = Progress(
+        auto_refresh=auto_refresh,
+        console=console,
+        transient=transient,
+        get_time=get_time,
+    )
 
     task_total = total
     if task_total is None:
@@ -369,6 +376,8 @@ class Progress:
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
         refresh_per_second (int, optional): Number of times per second to refresh the progress information. Defaults to 10.
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
+        transient: (bool, optional): Clear the progress on exit. Defaults to False.
+        get_time: (Callable, optional): A callable that gets the current time, or None to use time.monotonic. Defaults to None.
     """
 
     def __init__(
@@ -378,6 +387,7 @@ class Progress:
         auto_refresh: bool = True,
         refresh_per_second: int = 10,
         speed_estimate_period: float = 30.0,
+        transient: bool = False,
         get_time: GetTimeCallable = None,
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
@@ -392,6 +402,7 @@ class Progress:
         self.auto_refresh = auto_refresh
         self.refresh_per_second = refresh_per_second
         self.speed_estimate_period = speed_estimate_period
+        self.transient = transient
         self.get_time = get_time or monotonic
         self._tasks: Dict[TaskID, Task] = {}
         self._live_render = LiveRender(self.get_renderable())
@@ -449,6 +460,8 @@ class Progress:
         if self._refresh_thread is not None:
             self._refresh_thread.join()
             self._refresh_thread = None
+        if self.transient:
+            self.console.control(self._live_render.restore_cursor())
 
     def __enter__(self) -> "Progress":
         self.start()
@@ -467,13 +480,13 @@ class Progress:
         """[summary]
         
         Args:
-            sequence (Sequence[ProgressType]): [description]
+            sequence (Sequence[ProgressType]): A sequence of values you want to iterate over and track progress.
             total: (int, optional): Total number of steps. Default is len(sequence).
             task_id: (TaskID): Task to track. Default is new task.
             description: (str, optional): Description of task, if new task is created.
         
         Returns:
-            Iterable[ProgressType]: [description]
+            Iterable[ProgressType]: An iterable of values taken from the provided sequence.
         """
         if total is None:
             if isinstance(sequence, Sized):
@@ -786,7 +799,7 @@ yield True, previous_value''',
 
     examples = cycle(progress_renderables)
 
-    with Progress() as progress:
+    with Progress(transient=True) as progress:
 
         task1 = progress.add_task(" [red]Downloading", total=1000)
         task2 = progress.add_task(" [green]Processing", total=1000)

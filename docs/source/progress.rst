@@ -44,13 +44,24 @@ Here's a simple example::
             progress.update(task3, advance=0.9)
             time.sleep(0.02)
 
-Starting Tasks
+Transient progress
+~~~~~~~~~~~~~~~~~~
+
+Normally when you exit the progress context manager (or call :meth:`~rich.progress.Progress.stop`) the last refreshed display remains in the terminal with the cursor on the following line. You can also make the progress display disappear on exit by setting ``transient=False`` on the Progress constructor. Here's an example
+
+    with Progress(transient=False) as progress:
+        task = progress.add_task("Working", total=100)
+        do_work(task)
+
+Transient progress displays are useful if you want more minimal output in the terminal when tasks are complete.
+
+Starting tasks
 ~~~~~~~~~~~~~~
 
 When you add a task it is automatically *started* which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. Occasionally this may not work well if there is a long delay before you can start updating progress, you may need to wait for a response from a server, or count files in a directory (for example) before you can begin tracking progress. In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` which will display a pulsing animation that lets the user know something is working. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
 
 
-Updating Tasks
+Updating tasks
 ~~~~~~~~~~~~~~
 
 When you add a task you get back a `Task ID`. Use this ID to call :meth:`~rich.progress.Progress.update` whenever you have completed some work, or any information has changed.
@@ -58,7 +69,9 @@ When you add a task you get back a `Task ID`. Use this ID to call :meth:`~rich.p
 Auto refresh
 ~~~~~~~~~~~~
 
-By default, the progress information will auto refresh at 10 times a second. Refreshing in a predictable rate can make numbers more readable if they are updating very quickly. Auto refresh can also prevent excessive rendering to the terminal.
+By default, the progress information will refresh 10 times a second. Refreshing at a predictable rate can make numbers more readable if they are updating quickly. Auto refresh can also prevent excessive rendering to the terminal.
+
+You can set the refresh rate with the ``refresh_per_second`` argument on the :class:`~rich.progress.Progress` constructor. You could set this to something lower than 10 if you know your updates will not be that frequent.
 
 You can disable auto-refresh by setting ``auto_refresh=False`` on the constructor and call :meth:`~rich.progress.Progress.refresh` manually when there are updates to display.
 
@@ -93,7 +106,6 @@ Print / log
 
 When a progress display is running, printing or logging anything directly to the console will break the visuals. To work around this, the Progress class provides :meth:`~rich.progress.Progress.print` and :meth:`~rich.progress.Progress.log` which work the same as their counterparts on :class:`~rich.console.Console` but will move the cursor and refresh automatically -- ensure that everything renders properly.
 
-
 Extending
 ~~~~~~~~~
 
@@ -105,7 +117,6 @@ If the progress API doesn't offer exactly what you need in terms of a progress d
     class MyProgress(Progress):
         def get_renderables(self):
             yield Panel(self.make_tasks_table(self.tasks))            
-
 
 Example
 -------
