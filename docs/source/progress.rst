@@ -44,6 +44,22 @@ Here's a simple example::
             progress.update(task3, advance=0.9)
             time.sleep(0.02)
 
+The ``total`` value associated with a task is the number of steps that must be completed for the progress to reach 100%. A *step* in this context is whatever makes sense for your application; it could be number of bytes of a file read, or number of images processed, etc.
+
+
+Updating tasks
+~~~~~~~~~~~~~~
+
+When you call :meth:`~rich.progress.Progress.add_task` you get back a `Task ID`. Use this ID to call :meth:`~rich.progress.Progress.update` whenever you have completed some work, or any information has changed. Typically you will need to update ``completed`` every time you have completed a step. You can do this by updated ``completed`` directly or by setting ``advance`` which will add to the current ``completed`` value.
+
+The :meth:`~rich.progress.Progress.update` method collects keyword arguments which are also associated with the task. Use this to supply any additional information you would like to render in the progress display. The additional arguments are stored in ``task.fields`` and  may be referenced in :ref:`Column classes<Columns>`.
+
+Hiding tasks
+~~~~~~~~~~~~
+
+You can show or hide tasks by updating the tasks ``visible`` value. Tasks are visible by default, but you can also add a invisible task by calling :meth:`~rich.progress.Progress.add_task` with ``visible=False``.
+
+
 Transient progress
 ~~~~~~~~~~~~~~~~~~
 
@@ -58,13 +74,8 @@ Transient progress displays are useful if you want more minimal output in the te
 Starting tasks
 ~~~~~~~~~~~~~~
 
-When you add a task it is automatically *started* which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. Occasionally this may not work well if there is a long delay before you can start updating progress, you may need to wait for a response from a server, or count files in a directory (for example) before you can begin tracking progress. In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` which will display a pulsing animation that lets the user know something is working. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
+When you add a task it is automatically *started* which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. This may not work well if there is a long delay before you can start updating progress, you may need to wait for a response from a server, or count files in a directory (for example) before you can begin tracking progress. In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` which will display a pulsing animation that lets the user know something is working. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
 
-
-Updating tasks
-~~~~~~~~~~~~~~
-
-When you add a task you get back a `Task ID`. Use this ID to call :meth:`~rich.progress.Progress.update` whenever you have completed some work, or any information has changed.
 
 Auto refresh
 ~~~~~~~~~~~~
@@ -101,15 +112,18 @@ The following column objects are available:
 - :class:`~rich.progress.DownloadColumn` Displays download progress (assumes the steps are bytes).
 - :class:`~rich.progress.TransferSpeedColumn` Displays transfer speed (assumes the steps are bytes.
 
+To implement your own columns, extend the :class:`~rich.progress.Progress` and use it as you would the other columns.
+
+
 Print / log
 ~~~~~~~~~~~
 
 When a progress display is running, printing or logging anything directly to the console will break the visuals. To work around this, the Progress class provides :meth:`~rich.progress.Progress.print` and :meth:`~rich.progress.Progress.log` which work the same as their counterparts on :class:`~rich.console.Console` but will move the cursor and refresh automatically -- ensure that everything renders properly.
 
-Extending
-~~~~~~~~~
+Customizing
+~~~~~~~~~~~
 
-If the progress API doesn't offer exactly what you need in terms of a progress display, you can extend the :class:`~rich.progress.Progress` class by overriding the :class:`~rich.progress.Progress.get_renderables` method. For example, the following class will render a :class:`~rich.panel.Panel` around the progress display::
+If the :class:`~rich.progress.Progress` class doesn't offer exactly what you need in terms of a progress display, you can override the :class:`~rich.progress.Progress.get_renderables` method. For example, the following class will render a :class:`~rich.panel.Panel` around the progress display::
 
     from rich.panel import Panel
     from rich.progress import Progress
@@ -121,4 +135,4 @@ If the progress API doesn't offer exactly what you need in terms of a progress d
 Example
 -------
 
-See `downloader.py <https://github.com/willmcgugan/rich/blob/master/examples/downloader.py>`_ for a realistic application of a progress display. This script can download multiple concurrent files while displaying progress with transfer speed and file size.
+See `downloader.py <https://github.com/willmcgugan/rich/blob/master/examples/downloader.py>`_ for a realistic application of a progress display. This script can download multiple concurrent files with a progress bar, transfer speed and file size.
