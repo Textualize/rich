@@ -47,9 +47,9 @@ Here's a simple example::
 Transient progress
 ~~~~~~~~~~~~~~~~~~
 
-Normally when you exit the progress context manager (or call :meth:`~rich.progress.Progress.stop`) the last refreshed display remains in the terminal with the cursor on the following line. You can also make the progress display disappear on exit by setting ``transient=False`` on the Progress constructor. Here's an example
+Normally when you exit the progress context manager (or call :meth:`~rich.progress.Progress.stop`) the last refreshed display remains in the terminal with the cursor on the following line. You can also make the progress display disappear on exit by setting ``transient=True`` on the Progress constructor. Here's an example::
 
-    with Progress(transient=False) as progress:
+    with Progress(transient=True) as progress:
         task = progress.add_task("Working", total=100)
         do_work(task)
 
