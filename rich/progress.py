@@ -27,7 +27,15 @@ from typing import (
 
 from . import get_console
 from .bar import Bar
-from .console import Console, JustifyMethod, RenderGroup, RenderableType
+from .console import (
+    Console,
+    ConsoleRenderable,
+    JustifyMethod,
+    RenderGroup,
+    RenderHook,
+    RenderableType,
+)
+from .control import Control
 from .highlighter import Highlighter
 from . import filesize
 from .live_render import LiveRender
@@ -368,7 +376,7 @@ class _RefreshThread(Thread):
             self.progress.refresh()
 
 
-class Progress:
+class Progress(RenderHook):
     """Renders an auto-updating progress bar(s).
     
     Args:
@@ -410,6 +418,8 @@ class Progress:
         self._refresh_thread: Optional[_RefreshThread] = None
         self._refresh_count = 0
         self._started = False
+        self.print = self.console.print
+        self.log = self.console.log
 
     @property
     def tasks(self) -> List[Task]:
@@ -438,6 +448,7 @@ class Progress:
                 return
             self._started = True
             self.console.show_cursor(False)
+            self.console.push_render_hook(self)
             self.refresh()
             if self.auto_refresh:
                 self._refresh_thread = _RefreshThread(self, self.refresh_per_second)
@@ -457,6 +468,7 @@ class Progress:
                     self.console.line()
             finally:
                 self.console.show_cursor(True)
+                self.console.pop_render_hook()
         if self._refresh_thread is not None:
             self._refresh_thread.join()
             self._refresh_thread = None
@@ -598,8 +610,9 @@ class Progress:
             self._live_render.set_renderable(self.get_renderable())
             if self.console.is_terminal:
                 with self.console:
-                    self.console.print(self._live_render.position_cursor())
-                    self.console.print(self._live_render)
+                    # self.console.print(self._live_render.position_cursor())
+                    self.console.print(Control(""))
+                    # self.console.print(self._live_render)
             self._refresh_count += 1
 
     def get_renderable(self) -> RenderableType:
@@ -693,65 +706,17 @@ class Progress:
         with self._lock:
             del self._tasks[task_id]
 
-    def print(
-        self,
-        *objects: Any,
-        sep=" ",
-        end="\n",
-        style: Union[str, Style] = None,
-        justify: JustifyMethod = None,
-        emoji: bool = None,
-        markup: bool = None,
-        highlight: bool = None,
-    ) -> None:
-        """Print to the terminal and preserve progress display. Parameters identical to :class:`~rich.console.Console.print`."""
-        console = self.console
-        with console:
-            if console.is_terminal:
-                console.print(self._live_render.position_cursor())
-            console.print(
-                *objects,
-                sep=sep,
-                end=end,
-                style=style,
-                justify=justify,
-                emoji=emoji,
-                markup=markup,
-                highlight=highlight,
-            )
-            if console.is_terminal:
-                console.print(self._live_render)
-
-    def log(
-        self,
-        *objects: Any,
-        sep=" ",
-        end="\n",
-        justify: JustifyMethod = None,
-        emoji: bool = None,
-        markup: bool = None,
-        highlight: bool = None,
-        log_locals: bool = False,
-        _stack_offset=1,
-    ) -> None:
-        """Log to the terminal and preserve progress display. Parameters identical to :class:`~rich.console.Console.log`."""
-        console = self.console
-        with console:
-            if console.is_terminal:
-                console.print(self._live_render.position_cursor())
-            console.log(
-                *objects,
-                sep=sep,
-                end=end,
-                justify=justify,
-                emoji=emoji,
-                markup=markup,
-                highlight=highlight,
-                log_locals=log_locals,
-                _stack_offset=_stack_offset + 1,
-            )
-            if console.is_terminal:
-                console.print(self._live_render)
+    def process_renderables(
+        self, renderables: List[ConsoleRenderable]
+    ) -> List[ConsoleRenderable]:
+        """Process renderables to restore cursor and display progress."""
+        if self.console.is_terminal:
+            renderables = [
+                self._live_render.position_cursor(),
+                *renderables,
+                self._live_render,
+            ]
+        return renderables
 
 
 if __name__ == "__main__":  # pragma: no coverage
@@ -799,7 +764,8 @@ yield True, previous_value''',
 
     examples = cycle(progress_renderables)
 
-    with Progress(transient=True) as progress:
+    console = Console()
+    with Progress(console=console, transient=True) as progress:
 
         task1 = progress.add_task(" [red]Downloading", total=1000)
         task2 = progress.add_task(" [green]Processing", total=1000)

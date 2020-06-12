@@ -37,7 +37,7 @@ class LiveRender:
         if self._shape is not None:
             _, height = self._shape
             if height > 1:
-                return Control(f"\r\x1b[{height - 1}A\x1b[2K")
+                return Control("\r\x1b[2K" + "\x1b[1A\x1b[2K" * (height - 1))
             else:
                 return Control("\r\x1b[2K")
         return Control("")
