@@ -511,7 +511,7 @@ class Progress:
         """Start a task.
 
         Starts a task (used when calculating elapsed time). You may need to call this manually,
-        if you called `add_task` with ``start=False``.
+        if you called ``add_task`` with ``start=False``.
         
         Args:
             task_id (TaskID): ID of task.
