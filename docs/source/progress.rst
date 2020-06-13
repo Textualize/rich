@@ -139,7 +139,7 @@ If you have another Console object you want to use, pass it in to the :class:`~r
 Redirecting stdout / stderr
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To avoid breaking the progress display visuals, Rich will redirect ``stdout`` so that you can use the builtin ``print`` statement. This feature is enabled by default, but you can disable by setting ``redirect_stdout`` or ``redirect_stderr`` to ``False``
+To avoid breaking the progress display visuals, Rich will redirect ``stdout`` and ``stdout`` so that you can use the builtin ``print`` statement. This feature is enabled by default, but you can disable by setting ``redirect_stdout`` or ``redirect_stderr`` to ``False``
 
 
 Customizing
