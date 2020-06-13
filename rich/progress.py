@@ -379,6 +379,8 @@ class _RefreshThread(Thread):
 
 
 class _FileProxy(io.TextIOBase):
+    """Wraps a file (e.g. sys.stdout) and redirects writes to a console."""
+
     def __init__(self, console: Console, file: IO[str]) -> None:
         self.__console = console
         self.__file = file
