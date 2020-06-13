@@ -118,7 +118,29 @@ To implement your own columns, extend the :class:`~rich.progress.Progress` and u
 Print / log
 ~~~~~~~~~~~
 
-When a progress display is running, printing or logging anything directly to the console will break the visuals. To work around this, the Progress class provides :meth:`~rich.progress.Progress.print` and :meth:`~rich.progress.Progress.log` which work the same as their counterparts on :class:`~rich.console.Console` but will move the cursor and refresh automatically -- ensure that everything renders properly.
+The Progress class will create an internal Console object which you can access via ``progress.console``. If you print or log to this console, the output will be displayed *above* the progress display. Here's an example::
+
+    with Progress() as progress:
+        task = progress.add_task(total=10)
+        for job in range(10):
+            progress.console.print("Working on job #{job}")
+            run_job(job)
+            progress.advance(task)
+
+If you have another Console object you want to use, pass it in to the :class:`~rich.progress.Progress` constructor. Here's an example::
+
+    from my_project import my_console
+
+    with Progress(console=my_console) as progress:
+        my_console.print("[bold blue]Starting work!")
+        do_work(progress)
+        
+
+Redirecting stdout / stderr
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To avoid breaking the progress display visuals, Rich will redirect ``stdout`` so that you can use the builtin ``print`` statement. This feature is enabled by default, but you can disable by setting ``redirect_stdout`` or ``redirect_stderr`` to ``False``
+
 
 Customizing
 ~~~~~~~~~~~
