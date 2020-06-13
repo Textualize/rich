@@ -26,7 +26,7 @@ class RichHandler(Handler):
 
     def __init__(self, level: int = logging.NOTSET, console: Console = None) -> None:
         super().__init__(level=level)
-        self.console = get_console() if console is None else console
+        self.console = console or get_console()
         self.highlighter = ReprHighlighter()
         self._log_render = LogRender(show_level=True)
 
