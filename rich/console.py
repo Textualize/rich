@@ -901,7 +901,9 @@ class Console:
                 renderables.append(tabulate_mapping(locals_map, title="Locals"))
 
             renderables = [
-                self._log_render(self, renderables, path=path, line_no=line_no)
+                self._log_render(
+                    self, renderables, path=path, line_no=line_no, link_path=path
+                )
             ]
             for hook in self._render_hooks:
                 renderables = hook.process_renderables(renderables)

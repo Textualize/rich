@@ -53,6 +53,7 @@ class RichHandler(Handler):
                 level=level,
                 path=path,
                 line_no=record.lineno,
+                link_path=record.pathname,
             )
         )
 

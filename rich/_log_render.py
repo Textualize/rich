@@ -32,6 +32,7 @@ class LogRender:
         level: Union[str, Text] = "",
         path: str = None,
         line_no: int = None,
+        link_path: str = None,
     ) -> "Table":
         from .containers import Renderables
         from .table import Table
@@ -60,7 +61,13 @@ class LogRender:
 
         row.append(Renderables(renderables))
         if self.show_path and path:
-            row.append(Text(f"{path}:{line_no}" if line_no else path))
+            path_text = Text()
+            path_text.append(
+                path, style=f"link file://{link_path}" if link_path else ""
+            )
+            if line_no:
+                path_text.append(f":{line_no}")
+            row.append(path_text)
 
         output.add_row(*row)
         return output
