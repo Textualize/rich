@@ -235,6 +235,25 @@ class ConsoleThreadLocals(threading.local):
     buffer_index: int = 0
 
 
+class RenderHook:
+    """Provides hooks in to the render process."""
+
+    def process_renderables(
+        self, renderables: List[ConsoleRenderable]
+    ) -> List[ConsoleRenderable]:
+        """Called with a list of objects to render.
+
+        This method can return a new list of renderables, or modify and return the same list.
+
+        Args:
+            renderables (List[ConsoleRenderable]): A number of renderable objects.
+
+        Returns:
+            List[ConsoleRenderable]: A replacement list of renderables.
+        """
+        return renderables
+
+
 def detect_legacy_windows() -> bool:
     """Detect legacy Windows."""
     return "WINDIR" in os.environ and "WT_SESSION" not in os.environ
@@ -325,6 +344,7 @@ class Console:
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals()
         self._record_buffer: List[Segment] = []
+        self._render_hooks: List[RenderHook] = []
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
@@ -367,6 +387,19 @@ class Console:
         """Leave buffer context, and render content if required."""
         self._buffer_index -= 1
         self._check_buffer()
+
+    def push_render_hook(self, hook: RenderHook) -> None:
+        """Add a new render hook to the stack.
+
+        Args:
+            hook (RenderHook): Render hook instance.
+        """
+
+        self._render_hooks.append(hook)
+
+    def pop_render_hook(self) -> None:
+        """Pop the last renderhook from the stack."""
+        self._render_hooks.pop()
 
     def __enter__(self) -> "Console":
         """Own context manager to enter buffer context."""
@@ -754,7 +787,7 @@ class Console:
             end (str, optional): String to write at end of print data. Defaults to "\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             justify (str, optional): Justify method: "default", "left", "right", "center", or "full". Defaults to ``None``.
-            overflow (str, optional): Overflow method: "crop", "fold", or "ellipisis". Defaults to None.
+            overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
             no_wrap (Optional[bool], optional): Disable word wrapping. Defaults to None.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to ``None``.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to ``None``.
@@ -775,6 +808,8 @@ class Console:
                 markup=markup,
                 highlight=highlight,
             )
+            for hook in self._render_hooks:
+                renderables = hook.process_renderables(renderables)
             render_options = self.options.update(
                 justify=justify, overflow=overflow, width=width, no_wrap=no_wrap
             )
@@ -843,34 +878,38 @@ class Console:
         if not objects:
             self.line()
             return
-        renderables = self._collect_renderables(
-            objects,
-            sep,
-            end,
-            justify=justify,
-            emoji=emoji,
-            markup=markup,
-            highlight=highlight,
-        )
-
-        caller = inspect.stack()[_stack_offset]
-        path = caller.filename.rpartition(os.sep)[-1]
-        line_no = caller.lineno
-        if log_locals:
-            locals_map = {
-                key: value
-                for key, value in caller.frame.f_locals.items()
-                if not key.startswith("__")
-            }
-            renderables.append(tabulate_mapping(locals_map, title="Locals"))
-
         with self:
-            self._buffer.extend(
-                self.render(
-                    self._log_render(self, renderables, path=path, line_no=line_no),
-                    self.options,
-                )
+            renderables = self._collect_renderables(
+                objects,
+                sep,
+                end,
+                justify=justify,
+                emoji=emoji,
+                markup=markup,
+                highlight=highlight,
             )
+
+            caller = inspect.stack()[_stack_offset]
+            path = caller.filename.rpartition(os.sep)[-1]
+            line_no = caller.lineno
+            if log_locals:
+                locals_map = {
+                    key: value
+                    for key, value in caller.frame.f_locals.items()
+                    if not key.startswith("__")
+                }
+                renderables.append(tabulate_mapping(locals_map, title="Locals"))
+
+            renderables = [
+                self._log_render(self, renderables, path=path, line_no=line_no)
+            ]
+            for hook in self._render_hooks:
+                renderables = hook.process_renderables(renderables)
+            extend = self._buffer.extend
+            render = self.render
+            render_options = self.options
+            for renderable in renderables:
+                extend(render(renderable, render_options))
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered."""
@@ -883,7 +922,8 @@ class Console:
                     del self._buffer[:]
                 else:
                     text = self._render_buffer()
-                    self.file.write(text)
+                    if text:
+                        self.file.write(text)
                     self.file.flush()
 
     def _render_buffer(self) -> str:

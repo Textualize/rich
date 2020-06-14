@@ -4,6 +4,7 @@ from collections.abc import Sized
 from contextlib import contextmanager
 from dataclasses import dataclass, replace, field
 from datetime import timedelta
+import io
 from math import ceil, floor
 import sys
 from time import monotonic
@@ -15,6 +16,7 @@ from typing import (
     Deque,
     Dict,
     Iterable,
+    IO,
     List,
     Optional,
     NamedTuple,
@@ -27,7 +29,15 @@ from typing import (
 
 from . import get_console
 from .bar import Bar
-from .console import Console, JustifyMethod, RenderGroup, RenderableType
+from .console import (
+    Console,
+    ConsoleRenderable,
+    JustifyMethod,
+    RenderGroup,
+    RenderHook,
+    RenderableType,
+)
+from .control import Control
 from .highlighter import Highlighter
 from . import filesize
 from .live_render import LiveRender
@@ -368,7 +378,43 @@ class _RefreshThread(Thread):
             self.progress.refresh()
 
 
-class Progress:
+class _FileProxy(io.TextIOBase):
+    """Wraps a file (e.g. sys.stdout) and redirects writes to a console."""
+
+    def __init__(self, console: Console, file: IO[str]) -> None:
+        self.__console = console
+        self.__file = file
+        self.__buffer: List[str] = []
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.__file, name)
+
+    def write(self, text: str) -> int:
+        buffer = self.__buffer
+        lines: List[str] = []
+        while text:
+            line, new_line, text = text.partition("\n")
+            if new_line:
+                lines.append("".join(buffer) + line)
+                del buffer[:]
+            else:
+                buffer.append(line)
+                break
+        if lines:
+            console = self.__console
+            with console:
+                output = "\n".join(lines)
+                console.print(output, markup=False, emoji=False, highlight=False)
+        return len(text)
+
+    def flush(self) -> None:
+        buffer = self.__buffer
+        if buffer:
+            self.__console.print("".join(buffer))
+            del buffer[:]
+
+
+class Progress(RenderHook):
     """Renders an auto-updating progress bar(s).
     
     Args:
@@ -377,6 +423,8 @@ class Progress:
         refresh_per_second (int, optional): Number of times per second to refresh the progress information. Defaults to 10.
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
+        redirect_stout: (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
+        redirect_stout: (bool, optional): Enable redirection of stderr. Defaults to True.
         get_time: (Callable, optional): A callable that gets the current time, or None to use time.monotonic. Defaults to None.
     """
 
@@ -388,6 +436,8 @@ class Progress:
         refresh_per_second: int = 10,
         speed_estimate_period: float = 30.0,
         transient: bool = False,
+        redirect_stdout: bool = True,
+        redirect_stderr: bool = True,
         get_time: GetTimeCallable = None,
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
@@ -403,6 +453,8 @@ class Progress:
         self.refresh_per_second = refresh_per_second
         self.speed_estimate_period = speed_estimate_period
         self.transient = transient
+        self._redirect_stdout = redirect_stdout
+        self._redirect_stderr = redirect_stderr
         self.get_time = get_time or monotonic
         self._tasks: Dict[TaskID, Task] = {}
         self._live_render = LiveRender(self.get_renderable())
@@ -410,6 +462,10 @@ class Progress:
         self._refresh_thread: Optional[_RefreshThread] = None
         self._refresh_count = 0
         self._started = False
+        self.print = self.console.print
+        self.log = self.console.log
+        self._restore_stdout: Optional[IO[str]] = None
+        self._restore_stderr: Optional[IO[str]] = None
 
     @property
     def tasks(self) -> List[Task]:
@@ -431,6 +487,25 @@ class Progress:
                 return True
             return all(task.finished for task in self._tasks.values())
 
+    def _enable_redirect_io(self):
+        """Enable redirecting of stdout / stderr."""
+        if self.console.is_terminal:
+            if self._redirect_stdout:
+                self._restore_stdout = sys.stdout
+                sys.stdout = _FileProxy(self.console, sys.stdout)
+            if self._redirect_stderr:
+                self._restore_stderr = sys.stderr
+                sys.stdout = _FileProxy(self.console, sys.stdout)
+
+    def _disable_redirect_io(self):
+        """Disable redirecting of stdout / stderr."""
+        if self._restore_stdout:
+            sys.stdout = self._restore_stdout
+            self._restore_stdout = None
+        if self._restore_stderr:
+            sys.stderr = self._restore_stderr
+            self._restore_stderr = None
+
     def start(self) -> None:
         """Start the progress display."""
         with self._lock:
@@ -438,6 +513,8 @@ class Progress:
                 return
             self._started = True
             self.console.show_cursor(False)
+            self._enable_redirect_io()
+            self.console.push_render_hook(self)
             self.refresh()
             if self.auto_refresh:
                 self._refresh_thread = _RefreshThread(self, self.refresh_per_second)
@@ -457,6 +534,8 @@ class Progress:
                     self.console.line()
             finally:
                 self.console.show_cursor(True)
+                self._disable_redirect_io()
+                self.console.pop_render_hook()
         if self._refresh_thread is not None:
             self._refresh_thread.join()
             self._refresh_thread = None
@@ -598,8 +677,7 @@ class Progress:
             self._live_render.set_renderable(self.get_renderable())
             if self.console.is_terminal:
                 with self.console:
-                    self.console.print(self._live_render.position_cursor())
-                    self.console.print(self._live_render)
+                    self.console.print(Control(""))
             self._refresh_count += 1
 
     def get_renderable(self) -> RenderableType:
@@ -693,65 +771,17 @@ class Progress:
         with self._lock:
             del self._tasks[task_id]
 
-    def print(
-        self,
-        *objects: Any,
-        sep=" ",
-        end="\n",
-        style: Union[str, Style] = None,
-        justify: JustifyMethod = None,
-        emoji: bool = None,
-        markup: bool = None,
-        highlight: bool = None,
-    ) -> None:
-        """Print to the terminal and preserve progress display. Parameters identical to :class:`~rich.console.Console.print`."""
-        console = self.console
-        with console:
-            if console.is_terminal:
-                console.print(self._live_render.position_cursor())
-            console.print(
-                *objects,
-                sep=sep,
-                end=end,
-                style=style,
-                justify=justify,
-                emoji=emoji,
-                markup=markup,
-                highlight=highlight,
-            )
-            if console.is_terminal:
-                console.print(self._live_render)
-
-    def log(
-        self,
-        *objects: Any,
-        sep=" ",
-        end="\n",
-        justify: JustifyMethod = None,
-        emoji: bool = None,
-        markup: bool = None,
-        highlight: bool = None,
-        log_locals: bool = False,
-        _stack_offset=1,
-    ) -> None:
-        """Log to the terminal and preserve progress display. Parameters identical to :class:`~rich.console.Console.log`."""
-        console = self.console
-        with console:
-            if console.is_terminal:
-                console.print(self._live_render.position_cursor())
-            console.log(
-                *objects,
-                sep=sep,
-                end=end,
-                justify=justify,
-                emoji=emoji,
-                markup=markup,
-                highlight=highlight,
-                log_locals=log_locals,
-                _stack_offset=_stack_offset + 1,
-            )
-            if console.is_terminal:
-                console.print(self._live_render)
+    def process_renderables(
+        self, renderables: List[ConsoleRenderable]
+    ) -> List[ConsoleRenderable]:
+        """Process renderables to restore cursor and display progress."""
+        if self.console.is_terminal:
+            renderables = [
+                self._live_render.position_cursor(),
+                *renderables,
+                self._live_render,
+            ]
+        return renderables
 
 
 if __name__ == "__main__":  # pragma: no coverage
@@ -799,7 +829,8 @@ yield True, previous_value''',
 
     examples = cycle(progress_renderables)
 
-    with Progress(transient=True) as progress:
+    console = Console()
+    with Progress(console=console, transient=True) as progress:
 
         task1 = progress.add_task(" [red]Downloading", total=1000)
         task2 = progress.add_task(" [green]Processing", total=1000)
