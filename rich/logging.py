@@ -2,12 +2,12 @@ import logging
 from datetime import datetime
 from logging import Handler, LogRecord
 from pathlib import Path
-from typing import Optional
+from typing import ClassVar, List, Optional, Type
 
 from . import get_console
 from rich._log_render import LogRender
 from rich.console import Console
-from rich.highlighter import Highlighter, ReprHighlighter
+from rich.highlighter import Highlighter, RegexHighlighter, ReprHighlighter
 from rich.markup import render
 from rich.text import Text
 
@@ -20,11 +20,21 @@ class RichHandler(Handler):
         level (int, optional): Log level. Defaults to logging.NOTSET.
         console (:class:`~rich.console.Console`, optional): Optional console instance to write logs.
             Default will create a new console writing to stderr.
+        enable_link_path (bool, optional): Enable terminal link of path column to file. Defaults to True.
   
     """
 
-    KEYWORDS = ["GET", "POST", "HEAD", "PUT", "DELETE", "OPTIONS", "TRACE", "PATCH"]
-    HIGHLIGHTER_CLASS = ReprHighlighter
+    KEYWORDS: ClassVar[Optional[List[str]]] = [
+        "GET",
+        "POST",
+        "HEAD",
+        "PUT",
+        "DELETE",
+        "OPTIONS",
+        "TRACE",
+        "PATCH",
+    ]
+    HIGHLIGHTER_CLASS: ClassVar[Type[Highlighter]] = ReprHighlighter
 
     def __init__(
         self,
@@ -50,9 +60,10 @@ class RichHandler(Handler):
         level = Text()
         level.append(record.levelname, log_style)
         message_text = Text(message)
-        message_text.highlight_words(self.KEYWORDS, "logging.keyword")
         if self.highlighter:
             message_text = self.highlighter(message_text)
+        if self.KEYWORDS:
+            message_text.highlight_words(self.KEYWORDS, "logging.keyword")
 
         self.console.print(
             self._log_render(
