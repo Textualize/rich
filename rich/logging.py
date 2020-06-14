@@ -2,11 +2,12 @@ import logging
 from datetime import datetime
 from logging import Handler, LogRecord
 from pathlib import Path
+from typing import List
 
 from . import get_console
 from rich._log_render import LogRender
 from rich.console import Console
-from rich.highlighter import ReprHighlighter
+from rich.highlighter import Highlighter, ReprHighlighter
 from rich.markup import render
 from rich.text import Text
 
@@ -24,11 +25,18 @@ class RichHandler(Handler):
 
     KEYWORDS = ["GET", "POST", "HEAD", "PUT", "DELETE", "OPTIONS", "TRACE", "PATCH"]
 
-    def __init__(self, level: int = logging.NOTSET, console: Console = None) -> None:
+    def __init__(
+        self,
+        level: int = logging.NOTSET,
+        console: Console = None,
+        highlighter: Highlighter = None,
+        keywords: List[str] = None,
+    ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
-        self.highlighter = ReprHighlighter()
+        self.highlighter = highlighter or ReprHighlighter()
         self._log_render = LogRender(show_level=True)
+        self.keywords = self.KEYWORDS if keywords is None else keywords
 
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
@@ -41,7 +49,7 @@ class RichHandler(Handler):
         level = Text()
         level.append(record.levelname, log_style)
         message_text = Text(message)
-        message_text.highlight_words(self.KEYWORDS, "logging.keyword")
+        message_text.highlight_words(self.keywords, "logging.keyword")
         message_text = self.highlighter(message_text)
 
         self.console.print(
