@@ -677,9 +677,7 @@ class Progress(RenderHook):
             self._live_render.set_renderable(self.get_renderable())
             if self.console.is_terminal:
                 with self.console:
-                    # self.console.print(self._live_render.position_cursor())
                     self.console.print(Control(""))
-                    # self.console.print(self._live_render)
             self._refresh_count += 1
 
     def get_renderable(self) -> RenderableType:
