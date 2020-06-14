@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from logging import Handler, LogRecord
 from pathlib import Path
-from typing import List
+from typing import Optional
 
 from . import get_console
 from rich._log_render import LogRender
@@ -24,19 +24,20 @@ class RichHandler(Handler):
     """
 
     KEYWORDS = ["GET", "POST", "HEAD", "PUT", "DELETE", "OPTIONS", "TRACE", "PATCH"]
+    HIGHLIGHTER_CLASS = ReprHighlighter
 
     def __init__(
         self,
         level: int = logging.NOTSET,
         console: Console = None,
-        highlighter: Highlighter = None,
-        keywords: List[str] = None,
+        *,
+        enable_link_path: bool = True,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
-        self.highlighter = highlighter or ReprHighlighter()
+        self.highlighter = self.HIGHLIGHTER_CLASS()
         self._log_render = LogRender(show_level=True)
-        self.keywords = self.KEYWORDS if keywords is None else keywords
+        self.enable_link_path = enable_link_path
 
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
@@ -49,8 +50,9 @@ class RichHandler(Handler):
         level = Text()
         level.append(record.levelname, log_style)
         message_text = Text(message)
-        message_text.highlight_words(self.keywords, "logging.keyword")
-        message_text = self.highlighter(message_text)
+        message_text.highlight_words(self.KEYWORDS, "logging.keyword")
+        if self.highlighter:
+            message_text = self.highlighter(message_text)
 
         self.console.print(
             self._log_render(
@@ -61,7 +63,7 @@ class RichHandler(Handler):
                 level=level,
                 path=path,
                 line_no=record.lineno,
-                link_path=record.pathname,
+                link_path=record.pathname if self.enable_link_path else None,
             )
         )
 
