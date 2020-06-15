@@ -1,6 +1,6 @@
-from binascii import crc32
 from functools import lru_cache, reduce
 from operator import or_
+from random import randint
 import sys
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Type, Union
 
@@ -498,7 +498,7 @@ class Style:
         attrs = self._make_ansi_codes(color_system)
         rendered = f"\x1b[{attrs}m{text}\x1b[0m" if attrs else text
         if self._link:
-            rendered = f"\x1b]8;id={crc32(self._link.encode('utf-8'))};{self._link}\x1b\\{rendered}\x1b]8;;\x1b\\"
+            rendered = f"\x1b]8;id={randint(0, 10 ** 10)};{self._link}\x1b\\{rendered}\x1b]8;;\x1b\\"
         return rendered
 
     def test(self, text: Optional[str] = None) -> None:

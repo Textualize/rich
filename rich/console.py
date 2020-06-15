@@ -890,6 +890,11 @@ class Console:
             )
 
             caller = inspect.stack()[_stack_offset]
+            link_path = (
+                None
+                if caller.filename.startswith("<")
+                else os.path.abspath(caller.filename)
+            )
             path = caller.filename.rpartition(os.sep)[-1]
             line_no = caller.lineno
             if log_locals:
@@ -902,7 +907,7 @@ class Console:
 
             renderables = [
                 self._log_render(
-                    self, renderables, path=path, line_no=line_no, link_path=path
+                    self, renderables, path=path, line_no=line_no, link_path=link_path,
                 )
             ]
             for hook in self._render_hooks:
