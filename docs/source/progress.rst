@@ -71,10 +71,10 @@ Normally when you exit the progress context manager (or call :meth:`~rich.progre
 
 Transient progress displays are useful if you want more minimal output in the terminal when tasks are complete.
 
-Starting tasks
-~~~~~~~~~~~~~~
+Indeterminate progress
+~~~~~~~~~~~~~~~~~~~~~~
 
-When you add a task it is automatically *started* which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. This may not work well if there is a long delay before you can start updating progress, you may need to wait for a response from a server, or count files in a directory (for example) before you can begin tracking progress. In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` which will display a pulsing animation that lets the user know something is working. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
+When you add a task it is automatically *started*, which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. This may not work well if there is a long delay before you can start updating progress; you may need to wait for a response from a server or count files in a directory (for example). In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` which will display a pulsing animation that lets the user know something is working. This is know as an *indeterminate* progress bar. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
 
 
 Auto refresh
