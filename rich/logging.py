@@ -20,6 +20,7 @@ class RichHandler(Handler):
         level (int, optional): Log level. Defaults to logging.NOTSET.
         console (:class:`~rich.console.Console`, optional): Optional console instance to write logs.
             Default will create a new console writing to stderr.
+        show_path (bool, optional): Show the path to the original logging message. Defaults to True.
         enable_link_path (bool, optional): Enable terminal link of path column to file. Defaults to True.
   
     """
@@ -41,12 +42,13 @@ class RichHandler(Handler):
         level: int = logging.NOTSET,
         console: Console = None,
         *,
+        show_path: bool = True,
         enable_link_path: bool = True,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
         self.highlighter = self.HIGHLIGHTER_CLASS()
-        self._log_render = LogRender(show_level=True)
+        self._log_render = LogRender(show_level=True, show_path=show_path)
         self.enable_link_path = enable_link_path
 
     def emit(self, record: LogRecord) -> None:
