@@ -1,6 +1,6 @@
 from typing import Optional
 
-from .console import Console, ConsoleOptions, RenderableType, RenderResult
+from .console import Console, ConsoleOptions, RenderResult, RenderableType
 from .jupyter import JupyterMixin
 from .measure import Measurement
 

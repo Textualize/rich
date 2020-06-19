@@ -1,20 +1,12 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
-from .box import Box, SQUARE, ROUNDED
-
-from .console import (
-    Console,
-    ConsoleOptions,
-    ConsoleRenderable,
-    RenderableType,
-    RenderResult,
-    Measurement,
-)
+from .box import Box, SQUARE
+from .console import (Console, ConsoleOptions, Measurement, RenderResult, RenderableType)
 from .jupyter import JupyterMixin
-from .padding import Padding, PaddingDimensions
+from .padding import PaddingDimensions
+from .segment import Segment
 from .style import Style
 from .text import Text
-from .segment import Segment
 
 
 class Panel(JupyterMixin):

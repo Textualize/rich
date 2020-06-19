@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 import platform
-import sys
 from dataclasses import dataclass, field
 from traceback import extract_tb
 from types import TracebackType
@@ -19,8 +18,6 @@ from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
 from .padding import Padding
 from .panel import Panel
-from .rule import Rule
-from .segment import Segment
 from .syntax import Syntax
 from .text import Text
 

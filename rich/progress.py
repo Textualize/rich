@@ -1,33 +1,16 @@
+import io
+import sys
 from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Sized
-from contextlib import contextmanager
-from dataclasses import dataclass, replace, field
+from dataclasses import dataclass, field
 from datetime import timedelta
-import io
-from math import ceil, floor
-import sys
-from time import monotonic
+from math import ceil
 from threading import Event, RLock, Thread
-from typing import (
-    Any,
-    Callable,
-    cast,
-    Deque,
-    Dict,
-    Iterable,
-    IO,
-    List,
-    Optional,
-    NamedTuple,
-    Sequence,
-    Tuple,
-    TypeVar,
-    NewType,
-    Union,
-)
+from time import monotonic
+from typing import (Any, Callable, Deque, Dict, IO, Iterable, List, NamedTuple, NewType, Optional, Sequence, Tuple, TypeVar, Union)
 
-from . import get_console
+from . import filesize, get_console
 from .bar import Bar
 from .console import (
     Console,
@@ -39,12 +22,10 @@ from .console import (
 )
 from .control import Control
 from .highlighter import Highlighter
-from . import filesize
 from .live_render import LiveRender
-from .style import Style, StyleType
+from .style import StyleType
 from .table import Table
 from .text import Text
-
 
 TaskID = NewType("TaskID", int)
 

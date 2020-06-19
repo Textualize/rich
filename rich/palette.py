@@ -1,6 +1,6 @@
-from math import sqrt
 from functools import lru_cache
-from typing import List, Sequence, Tuple
+from math import sqrt
+from typing import Sequence, Tuple
 
 from .color_triplet import ColorTriplet
 

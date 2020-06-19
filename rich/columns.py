@@ -3,13 +3,12 @@ from itertools import chain
 from operator import itemgetter
 from typing import Dict, Iterable, List, Optional, Tuple
 
-from .console import Console, ConsoleOptions, RenderableType, RenderResult
+from .console import Console, ConsoleOptions, RenderResult, RenderableType
 from .constrain import Constrain
+from .jupyter import JupyterMixin
 from .measure import Measurement
 from .padding import Padding, PaddingDimensions
 from .table import Table
-from .text import Text
-from .jupyter import JupyterMixin
 
 
 class Columns(JupyterMixin):
@@ -151,8 +150,6 @@ if __name__ == "__main__":  # pragma: no cover
     import os
 
     console = Console()
-
-    from rich.panel import Panel
 
     files = [f"{i} {s}" for i, s in enumerate(sorted(os.listdir()))]
     columns = Columns(files, padding=(0, 1), expand=False, equal=False)

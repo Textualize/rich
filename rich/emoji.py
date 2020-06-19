@@ -1,12 +1,11 @@
-import re
-from typing import Match, Union
+from typing import Union
 
-from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult
+from ._emoji_codes import EMOJI
+from ._emoji_replace import _emoji_replace
+from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin
 from .segment import Segment
 from .style import Style
-from ._emoji_codes import EMOJI
-from ._emoji_replace import _emoji_replace
 
 
 class NoEmoji(Exception):

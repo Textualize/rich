@@ -1,4 +1,5 @@
 from typing import Iterable, List
+
 from typing_extensions import Literal
 
 from ._loop import loop_last
@@ -334,12 +335,9 @@ DOUBLE_EDGE: Box = Box(
 if __name__ == "__main__":  # pragma: no cover
 
     from .console import Console
-    from .panel import Panel
     from .table import Table
     from .text import Text
     from . import box
-
-    import sys
 
     console = Console(record=True)
 

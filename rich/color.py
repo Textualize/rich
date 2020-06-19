@@ -1,13 +1,11 @@
+import platform
 import re
 from colorsys import rgb_to_hls
-from dataclasses import dataclass
 from enum import IntEnum
 from functools import lru_cache
-from math import sqrt
-import platform
-from typing import Iterable, List, NamedTuple, Optional, Sequence, Tuple, TYPE_CHECKING
+from typing import NamedTuple, Optional, TYPE_CHECKING, Tuple
 
-from ._palettes import STANDARD_PALETTE, EIGHT_BIT_PALETTE
+from ._palettes import EIGHT_BIT_PALETTE, STANDARD_PALETTE
 from .color_triplet import ColorTriplet
 from .terminal_theme import DEFAULT_TERMINAL_THEME
 
@@ -483,9 +481,8 @@ def blend_rgb(
 if __name__ == "__main__":  # pragma: no cover
 
     from .console import Console
-    from .table import Column, Table
+    from .table import Table
     from .text import Text
-    from . import box
 
     console = Console()
 

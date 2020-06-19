@@ -1,4 +1,4 @@
-from typing import cast, Tuple, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Tuple, Union, cast
 
 if TYPE_CHECKING:
     from .console import (
@@ -10,7 +10,6 @@ if TYPE_CHECKING:
 from .jupyter import JupyterMixin
 from .measure import Measurement
 from .style import Style
-from .text import Text
 from .segment import Segment
 
 

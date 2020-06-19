@@ -1,13 +1,10 @@
-from collections import defaultdict
-from operator import itemgetter
 import re
-from typing import Dict, Iterable, List, Match, NamedTuple, Optional, Tuple, Union
+from typing import Iterable, List, NamedTuple, Optional, Tuple, Union
 
+from ._emoji_replace import _emoji_replace
 from .errors import MarkupError
 from .style import Style
 from .text import Span, Text
-from ._emoji_replace import _emoji_replace
-
 
 re_tags = re.compile(r"(\[\[)|(\]\])|\[(.*?)\]")
 

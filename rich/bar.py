@@ -1,7 +1,7 @@
-from functools import lru_cache
 import math
+from functools import lru_cache
 from time import monotonic
-from typing import Iterable, Optional, List, Union
+from typing import Iterable, List, Optional
 
 from .color import Color, blend_rgb
 from .color_triplet import ColorTriplet
@@ -10,7 +10,6 @@ from .jupyter import JupyterMixin
 from .measure import Measurement
 from .segment import Segment
 from .style import Style, StyleType
-
 
 # Number of characters before 'pulse' animation repeats
 PULSE_SIZE = 20

@@ -1,29 +1,15 @@
 import re
 from operator import itemgetter
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    Iterable,
-    List,
-    NamedTuple,
-    Optional,
-    Tuple,
-    Union,
-    cast,
-)
+from typing import (Any, Dict, Iterable, List, NamedTuple, Optional, TYPE_CHECKING, Tuple, Union, cast)
 
-from typing_extensions import Literal
-
-from ._emoji_replace import _emoji_replace
-from ._loop import loop_first_last, loop_last
+from ._loop import loop_last
+from ._pick import pick_bool
 from ._wrap import divide_line
 from .cells import cell_len, set_cell_size
 from .containers import Lines
 from .control import strip_control_codes
 from .jupyter import JupyterMixin
 from .measure import Measurement
-from ._pick import pick_bool
 from .segment import Segment
 from .style import Style, StyleType
 
@@ -33,8 +19,6 @@ if TYPE_CHECKING:  # pragma: no cover
         ConsoleOptions,
         JustifyMethod,
         OverflowMethod,
-        RenderResult,
-        RenderableType,
     )
 
 DEFAULT_JUSTIFY: "JustifyMethod" = "default"

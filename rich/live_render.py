@@ -1,10 +1,10 @@
-from typing import Iterable, Optional, Tuple
+from typing import Optional, Tuple
 
-from .console import Console, ConsoleOptions, RenderableType, RenderResult
+from ._loop import loop_last
+from .console import Console, ConsoleOptions, RenderResult, RenderableType
 from .control import Control
 from .segment import Segment
 from .style import StyleType
-from ._loop import loop_last
 
 
 class LiveRender:

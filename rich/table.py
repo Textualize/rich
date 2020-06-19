@@ -1,21 +1,8 @@
 from dataclasses import dataclass, field
-from itertools import chain
-from typing import (
-    TYPE_CHECKING,
-    Iterable,
-    List,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Tuple,
-    TypeVar,
-    Union,
-)
-
-from typing_extensions import Literal
+from typing import (Iterable, List, NamedTuple, Optional, TYPE_CHECKING, Tuple, Union)
 
 from . import box, errors
-from ._loop import loop_first, loop_first_last, loop_last
+from ._loop import loop_first_last, loop_last
 from ._ratio import ratio_distribute, ratio_reduce
 from .jupyter import JupyterMixin
 from .measure import Measurement

@@ -1,11 +1,9 @@
 from collections.abc import Mapping
 
-
 from . import box
 from .highlighter import ReprHighlighter
 from .pretty import Pretty
 from .table import Table
-from .text import Text
 
 
 def tabulate_mapping(mapping: Mapping, title: str = None) -> Table:

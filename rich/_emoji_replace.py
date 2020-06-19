@@ -1,6 +1,5 @@
-from typing import Match
-
 import re
+from typing import Match
 
 from ._emoji_codes import EMOJI
 

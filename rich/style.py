@@ -1,12 +1,11 @@
-from functools import lru_cache, reduce
-from operator import or_
-from random import randint
 import sys
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Type, Union
+from functools import lru_cache
+from random import randint
+from typing import Any, Dict, Iterable, List, Optional, Type, Union
 
 from . import errors
-from .color import blend_rgb, Color, ColorParseError, ColorSystem
-from .terminal_theme import TerminalTheme, DEFAULT_TERMINAL_THEME
+from .color import Color, ColorParseError, ColorSystem, blend_rgb
+from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
 
 # Style instances and style definitions are often interchangable
 StyleType = Union[str, "Style"]

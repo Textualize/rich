@@ -1,9 +1,8 @@
 from operator import itemgetter
-from typing import Iterable, NamedTuple, TYPE_CHECKING, Union
+from typing import Iterable, NamedTuple, TYPE_CHECKING
 
 from . import errors
 from .protocol import is_renderable
-from .segment import Segment
 
 if TYPE_CHECKING:
     from .console import Console, RenderableType

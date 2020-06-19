@@ -1,8 +1,8 @@
 import re
 from typing import Iterable, List, Tuple
 
-from .cells import cell_len, chop_cells
 from ._loop import loop_last
+from .cells import cell_len, chop_cells
 
 re_word = re.compile(r"\s*\S+\s*")
 

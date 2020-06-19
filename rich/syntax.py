@@ -10,7 +10,7 @@ from pygments.util import ClassNotFound
 
 from ._loop import loop_first
 from .color import Color, blend_rgb, parse_rgb_hex
-from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, Segment
+from .console import Console, ConsoleOptions, RenderResult, Segment
 from .jupyter import JupyterMixin
 from .measure import Measurement
 from .style import Style

@@ -1,11 +1,9 @@
-from typing import NamedTuple, Optional
-
-from .cells import cell_len, set_cell_size
-from .style import Style, StyleType
-
 from itertools import filterfalse, zip_longest
 from operator import attrgetter
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, NamedTuple, Optional, Tuple
+
+from .cells import cell_len, set_cell_size
+from .style import Style
 
 
 class Segment(NamedTuple):
