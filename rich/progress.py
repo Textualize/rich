@@ -8,7 +8,22 @@ from datetime import timedelta
 from math import ceil
 from threading import Event, RLock, Thread
 from time import monotonic
-from typing import (Any, Callable, Deque, Dict, IO, Iterable, List, NamedTuple, NewType, Optional, Sequence, Tuple, TypeVar, Union)
+from typing import (
+    Any,
+    Callable,
+    Deque,
+    Dict,
+    IO,
+    Iterable,
+    List,
+    NamedTuple,
+    NewType,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 from . import filesize, get_console
 from .bar import Bar

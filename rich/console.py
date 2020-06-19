@@ -7,7 +7,19 @@ import threading
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from functools import wraps
-from typing import (Any, Callable, Dict, IO, Iterable, List, NamedTuple, Optional, TYPE_CHECKING, Union, cast)
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    IO,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    TYPE_CHECKING,
+    Union,
+    cast,
+)
 
 from typing_extensions import Literal, Protocol, runtime_checkable
 

@@ -1,5 +1,5 @@
 from itertools import zip_longest
-from typing import (Iterable, Iterator, List, TYPE_CHECKING, TypeVar, overload)
+from typing import Iterable, Iterator, List, TYPE_CHECKING, TypeVar, overload
 
 from .style import Style
 

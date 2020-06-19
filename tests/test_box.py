@@ -24,7 +24,7 @@ def test_get_row():
     assert row == "|-+--+---|"
 
     foot_row = ROUNDED.get_row(widths=[2, 1, 3], level="foot")
-    assert foot_row == "├──┼─┼───┤" 
+    assert foot_row == "├──┼─┼───┤"
 
     with pytest.raises(ValueError):
         ROUNDED.get_row(widths=[1, 2, 3], level="FOO")

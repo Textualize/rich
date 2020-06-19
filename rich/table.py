@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import (Iterable, List, NamedTuple, Optional, TYPE_CHECKING, Tuple, Union)
+from typing import Iterable, List, NamedTuple, Optional, TYPE_CHECKING, Tuple, Union
 
 from . import box, errors
 from ._loop import loop_first_last, loop_last

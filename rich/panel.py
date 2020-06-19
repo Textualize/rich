@@ -1,7 +1,7 @@
 from typing import Optional, Union
 
 from .box import Box, SQUARE
-from .console import (Console, ConsoleOptions, Measurement, RenderResult, RenderableType)
+from .console import Console, ConsoleOptions, Measurement, RenderResult, RenderableType
 from .jupyter import JupyterMixin
 from .padding import PaddingDimensions
 from .segment import Segment

@@ -1,6 +1,17 @@
 import re
 from operator import itemgetter
-from typing import (Any, Dict, Iterable, List, NamedTuple, Optional, TYPE_CHECKING, Tuple, Union, cast)
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    TYPE_CHECKING,
+    Tuple,
+    Union,
+    cast,
+)
 
 from ._loop import loop_last
 from ._pick import pick_bool
