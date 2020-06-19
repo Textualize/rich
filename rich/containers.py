@@ -142,7 +142,6 @@ class Lines:
                         num_spaces += 1
                         index = (index + 1) % len(spaces)
                 tokens: List[Text] = []
-                index = 0
                 for index, (word, next_word) in enumerate(
                     zip_longest(words, words[1:])
                 ):
