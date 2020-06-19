@@ -32,6 +32,7 @@ colorama = "^0.4.0"
 
 
 [tool.poetry.dev-dependencies]
+black = "^19.10b0"
 
 [build-system]
 requires = ["poetry>=0.12"]
