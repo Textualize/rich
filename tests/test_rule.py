@@ -9,7 +9,7 @@ from rich.text import Text
 
 def test_rule():
     console = Console(
-        width=16, file=io.StringIO(), force_terminal=True, windows_legacy=False
+        width=16, file=io.StringIO(), force_terminal=True, legacy_windows=False
     )
     console.rule()
     console.rule("foo")
@@ -25,7 +25,7 @@ def test_rule_cjk():
         file=io.StringIO(),
         force_terminal=True,
         color_system=None,
-        windows_legacy=False,
+        legacy_windows=False,
     )
     console.rule("欢迎！")
     expected = "──── 欢迎！ ────\n"

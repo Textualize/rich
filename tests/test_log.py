@@ -18,7 +18,7 @@ def render_log():
         force_terminal=True,
         log_time_format="[TIME]",
         color_system="truecolor",
-        windows_legacy=False,
+        legacy_windows=False,
     )
     console.log()
     console.log("Hello from", console, "!")

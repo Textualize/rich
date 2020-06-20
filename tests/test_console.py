@@ -83,7 +83,7 @@ def test_print_style():
 
 
 def test_show_cursor():
-    console = Console(file=io.StringIO(), force_terminal=True, windows_legacy=False)
+    console = Console(file=io.StringIO(), force_terminal=True, legacy_windows=False)
     console.show_cursor(False)
     console.print("foo")
     console.show_cursor(True)
@@ -164,7 +164,7 @@ def test_justify_right():
 
 def test_justify_renderable_none():
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=20, windows_legacy=False
+        file=io.StringIO(), force_terminal=True, width=20, legacy_windows=False
     )
     console.print(Panel("FOO", expand=False), justify=None)
     assert console.file.getvalue() == "╭───╮\n│FOO│\n╰───╯\n"
@@ -172,7 +172,7 @@ def test_justify_renderable_none():
 
 def test_justify_renderable_left():
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=20, windows_legacy=False
+        file=io.StringIO(), force_terminal=True, width=20, legacy_windows=False
     )
     console.print(Panel("FOO", expand=False), justify="left")
     assert console.file.getvalue() == "╭───╮\n│FOO│\n╰───╯\n"
@@ -180,7 +180,7 @@ def test_justify_renderable_left():
 
 def test_justify_renderable_center():
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=20, windows_legacy=False
+        file=io.StringIO(), force_terminal=True, width=20, legacy_windows=False
     )
     console.print(Panel("FOO", expand=False), justify="center")
     assert console.file.getvalue() == "       ╭───╮\n       │FOO│\n       ╰───╯\n"
@@ -188,7 +188,7 @@ def test_justify_renderable_center():
 
 def test_justify_renderable_right():
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=20, windows_legacy=False
+        file=io.StringIO(), force_terminal=True, width=20, legacy_windows=False
     )
     console.print(Panel("FOO", expand=False), justify="right")
     assert (

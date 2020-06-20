@@ -134,7 +134,7 @@ def test_expand_bar() -> None:
         force_terminal=True,
         width=10,
         color_system="truecolor",
-        windows_legacy=False,
+        legacy_windows=False,
     )
     progress = Progress(
         BarColumn(bar_width=None),
