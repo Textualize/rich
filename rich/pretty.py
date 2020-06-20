@@ -3,7 +3,6 @@ from typing import Any, TYPE_CHECKING
 from pprintpp import pformat
 
 from .measure import Measurement
-from .highlighter import ReprHighlighter
 from .text import Text
 
 if TYPE_CHECKING:  # pragma: no cover

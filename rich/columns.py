@@ -8,7 +8,6 @@ from .constrain import Constrain
 from .measure import Measurement
 from .padding import Padding, PaddingDimensions
 from .table import Table
-from .text import Text
 from .jupyter import JupyterMixin
 
 

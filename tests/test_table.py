@@ -8,7 +8,7 @@ from rich.table import Table
 
 
 def render_tables():
-    console = Console(width=60, file=io.StringIO())
+    console = Console(width=60, file=io.StringIO(), legacy_windows=False)
 
     table = Table(title="test table", caption="table footer", expand=True)
     table.add_column("foo", no_wrap=True, overflow="ellipsis")

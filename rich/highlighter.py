@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
-from re import finditer
 from typing import List, Union
-
 
 from .text import Text
 

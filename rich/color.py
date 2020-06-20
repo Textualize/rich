@@ -1,11 +1,9 @@
 import re
 from colorsys import rgb_to_hls
-from dataclasses import dataclass
 from enum import IntEnum
 from functools import lru_cache
-from math import sqrt
 import platform
-from typing import Iterable, List, NamedTuple, Optional, Sequence, Tuple, TYPE_CHECKING
+from typing import NamedTuple, Optional, Tuple, TYPE_CHECKING
 
 from ._palettes import STANDARD_PALETTE, EIGHT_BIT_PALETTE
 from .color_triplet import ColorTriplet

@@ -20,7 +20,7 @@ expected = [
 
 
 def render(panel, width=50) -> str:
-    console = Console(file=io.StringIO(), width=50)
+    console = Console(file=io.StringIO(), width=50, legacy_windows=False)
     console.print(panel)
     return console.file.getvalue()
 
@@ -31,7 +31,7 @@ def test_render_panel(panel, expected):
 
 
 def test_console_width():
-    console = Console(file=io.StringIO(), width=50)
+    console = Console(file=io.StringIO(), width=50, legacy_windows=False)
     panel = Panel("Hello, World", expand=False)
     min_width, max_width = panel.__rich_measure__(console, 50)
     assert min_width == 14

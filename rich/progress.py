@@ -1,18 +1,16 @@
 from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Sized
-from contextlib import contextmanager
-from dataclasses import dataclass, replace, field
+from dataclasses import dataclass, field
 from datetime import timedelta
 import io
-from math import ceil, floor
+from math import ceil
 import sys
 from time import monotonic
 from threading import Event, RLock, Thread
 from typing import (
     Any,
     Callable,
-    cast,
     Deque,
     Dict,
     Iterable,
@@ -41,7 +39,7 @@ from .control import Control
 from .highlighter import Highlighter
 from . import filesize
 from .live_render import LiveRender
-from .style import Style, StyleType
+from .style import StyleType
 from .table import Table
 from .text import Text
 

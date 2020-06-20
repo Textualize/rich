@@ -1,11 +1,10 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 from .box import Box, SQUARE, ROUNDED
 
 from .console import (
     Console,
     ConsoleOptions,
-    ConsoleRenderable,
     RenderableType,
     RenderResult,
     Measurement,

@@ -1,7 +1,6 @@
-import re
 from typing import Match, Union
 
-from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult
+from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin
 from .segment import Segment
 from .style import Style

@@ -1,7 +1,7 @@
 from functools import lru_cache
 import math
 from time import monotonic
-from typing import Iterable, Optional, List, Union
+from typing import Iterable, Optional, List
 
 from .color import Color, blend_rgb
 from .color_triplet import ColorTriplet

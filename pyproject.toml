@@ -32,6 +32,9 @@ colorama = "^0.4.0"
 
 
 [tool.poetry.dev-dependencies]
+pytest = "^5.4.3"
+mypy = "^0.781"
+black = "^19.10b0"
 
 [build-system]
 requires = ["poetry>=0.12"]

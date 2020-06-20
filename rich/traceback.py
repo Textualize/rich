@@ -19,8 +19,6 @@ from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
 from .padding import Padding
 from .panel import Panel
-from .rule import Rule
-from .segment import Segment
 from .syntax import Syntax
 from .text import Text
 

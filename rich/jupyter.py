@@ -1,14 +1,12 @@
-import io
-from typing import Any, Iterable, IO, List, Optional, TYPE_CHECKING, Union
+from typing import Iterable, List, TYPE_CHECKING
 
 # from .console import Console as BaseConsole
 from .__init__ import get_console
 from .segment import Segment
-from .style import Style
 from .terminal_theme import DEFAULT_TERMINAL_THEME
 
 if TYPE_CHECKING:
-    from .console import Console, RenderableType
+    from .console import RenderableType
 
 JUPYTER_HTML_FORMAT = """\
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">{code}</pre>
