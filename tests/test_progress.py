@@ -130,7 +130,11 @@ def render_progress() -> str:
 
 def test_expand_bar() -> None:
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=10, color_system="truecolor"
+        file=io.StringIO(),
+        force_terminal=True,
+        width=10,
+        color_system="truecolor",
+        windows_legacy=False,
     )
     progress = Progress(
         BarColumn(bar_width=None),
