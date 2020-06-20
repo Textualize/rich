@@ -20,14 +20,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
+          pip install -r requirements-dev.txt
           poetry install
       - name: Typecheck with mypy
         run: |
-          pip install mypy
           make typecheck
       - name: Test with pytest
         run: |
-          pip install pytest
           pip install .
           python -m pytest tests/ -v

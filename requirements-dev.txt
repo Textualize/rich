@@ -1,0 +1,4 @@
+black==19.10b0
+mypy==0.781
+poetry==1.0.5
+pytest==5.4.3
