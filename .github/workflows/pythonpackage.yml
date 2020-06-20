@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: [ubuntu-latest]
+    runs-on: [ubuntu-latest, windows-latest, macos-latest]
     strategy:
       max-parallel: 4
       matrix:
@@ -23,9 +23,8 @@ jobs:
           poetry install
       - name: Typecheck with mypy
         run: |
-          pip install mypy==0.781
           make typecheck
       - name: Test with pytest
         run: |
           pip install .
-          pytest tests/ -v
+          python -m pytest tests/ -v
