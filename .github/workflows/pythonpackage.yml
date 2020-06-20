@@ -23,6 +23,7 @@ jobs:
           poetry install
       - name: Typecheck with mypy
         run: |
+          pip install mypy==0.781
           make typecheck
       - name: Test with pytest
         run: |
