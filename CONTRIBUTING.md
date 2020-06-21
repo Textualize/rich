@@ -16,7 +16,7 @@ poetry install
 Run tests with the following command:
 
 ```
-make tests
+make test
 ```
 
 Or if you don't have make, run the following:
