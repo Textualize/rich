@@ -10,7 +10,6 @@ if TYPE_CHECKING:
 from .jupyter import JupyterMixin
 from .measure import Measurement
 from .style import Style
-from .text import Text
 from .segment import Segment
 
 

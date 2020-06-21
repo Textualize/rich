@@ -1,4 +1,4 @@
-from typing import Iterable, Optional, Tuple
+from typing import Optional, Tuple
 
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .control import Control

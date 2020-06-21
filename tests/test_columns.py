@@ -30,7 +30,7 @@ COLUMN_DATA = [
 
 
 def render():
-    console = Console(file=io.StringIO(), width=100)
+    console = Console(file=io.StringIO(), width=100, legacy_windows=False)
 
     console.rule("empty")
     empty_columns = Columns([])

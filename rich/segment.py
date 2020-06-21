@@ -1,7 +1,7 @@
 from typing import NamedTuple, Optional
 
 from .cells import cell_len, set_cell_size
-from .style import Style, StyleType
+from .style import Style
 
 from itertools import filterfalse, zip_longest
 from operator import attrgetter

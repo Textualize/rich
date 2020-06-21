@@ -11,7 +11,7 @@ See Also:
 
 """
 
-__all__ = ["traditional", "decimal", "binary"]
+__all__ = ["decimal"]
 
 from typing import Iterable, List, Tuple
 

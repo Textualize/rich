@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Dict, Generic, Mapping, TypeVar
+from typing import Dict, Generic, TypeVar
 
 
 CacheKey = TypeVar("CacheKey")

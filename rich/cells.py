@@ -1,6 +1,5 @@
 from functools import lru_cache
-from itertools import takewhile
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 from ._cell_widths import CELL_WIDTHS
 from ._lru_cache import LRUCache

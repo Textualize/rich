@@ -1,9 +1,8 @@
 from typing import Union
 
-from .cells import cell_len, set_cell_size
+from .cells import cell_len
 from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin
-from .segment import Segment
 from .style import Style
 from .text import Text
 

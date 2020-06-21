@@ -1,7 +1,5 @@
-from collections import defaultdict
-from operator import itemgetter
 import re
-from typing import Dict, Iterable, List, Match, NamedTuple, Optional, Tuple, Union
+from typing import Iterable, List, NamedTuple, Optional, Tuple, Union
 
 from .errors import MarkupError
 from .style import Style

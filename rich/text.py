@@ -13,10 +13,7 @@ from typing import (
     cast,
 )
 
-from typing_extensions import Literal
-
-from ._emoji_replace import _emoji_replace
-from ._loop import loop_first_last, loop_last
+from ._loop import loop_last
 from ._wrap import divide_line
 from .cells import cell_len, set_cell_size
 from .containers import Lines
@@ -33,8 +30,6 @@ if TYPE_CHECKING:  # pragma: no cover
         ConsoleOptions,
         JustifyMethod,
         OverflowMethod,
-        RenderResult,
-        RenderableType,
     )
 
 DEFAULT_JUSTIFY: "JustifyMethod" = "default"

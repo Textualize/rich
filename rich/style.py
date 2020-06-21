@@ -1,8 +1,7 @@
-from functools import lru_cache, reduce
-from operator import or_
+from functools import lru_cache
 from random import randint
 import sys
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Type, Union
 
 from . import errors
 from .color import blend_rgb, Color, ColorParseError, ColorSystem

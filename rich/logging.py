@@ -7,8 +7,7 @@ from typing import ClassVar, List, Optional, Type
 from . import get_console
 from rich._log_render import LogRender
 from rich.console import Console
-from rich.highlighter import Highlighter, RegexHighlighter, ReprHighlighter
-from rich.markup import render
+from rich.highlighter import Highlighter, ReprHighlighter
 from rich.text import Text
 
 

@@ -18,6 +18,7 @@ def render_log():
         force_terminal=True,
         log_time_format="[TIME]",
         color_system="truecolor",
+        legacy_windows=False,
     )
     console.log()
     console.log("Hello from", console, "!")
@@ -26,7 +27,7 @@ def render_log():
 
 
 def test_log():
-    expected = "\n\x1b[2;36m[TIME]\x1b[0m\x1b[2;36m \x1b[0mHello from \x1b[1m<\x1b[0m\x1b[1;38;5;13mconsole\x1b[0m\x1b[39m \x1b[0m\x1b[3;33mwidth\x1b[0m\x1b[39m=\x1b[0m\x1b[1;34m80\x1b[0m\x1b[39m ColorSystem.TRUECOLOR\x1b[0m\x1b[1m>\x1b[0m !      \x1b]8;id=0;foo\x1b\\\x1b[2mtest_log.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:23\x1b[0m\n\x1b[2;36m      \x1b[0m\x1b[2;36m \x1b[0m\x1b[1m[\x1b[0m\x1b[1;34m1\x1b[0m, \x1b[1;34m2\x1b[0m, \x1b[1;34m3\x1b[0m\x1b[1m]\x1b[0m                                                  \x1b]8;id=0;foo\x1b\\\x1b[2mtest_log.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:24\x1b[0m\n       \x1b[3m                       Locals                             \x1b[0m               \n       \x1b[34m╭─────────┬────────────────────────────────────────╮\x1b[0m                     \n       \x1b[34m│\x1b[0m\x1b[32m'console'\x1b[0m\x1b[34m│\x1b[0m\x1b[1m<\x1b[0m\x1b[1;38;5;13mconsole\x1b[0m\x1b[39m \x1b[0m\x1b[3;33mwidth\x1b[0m\x1b[39m=\x1b[0m\x1b[1;34m80\x1b[0m\x1b[39m ColorSystem.TRUECOLOR\x1b[0m\x1b[1m>\x1b[0m\x1b[34m│\x1b[0m                     \n       \x1b[34m╰─────────┴────────────────────────────────────────╯\x1b[0m                     \n"
+    expected = "\n\x1b[2;36m[TIME]\x1b[0m\x1b[2;36m \x1b[0mHello from \x1b[1m<\x1b[0m\x1b[1;38;5;13mconsole\x1b[0m\x1b[39m \x1b[0m\x1b[3;33mwidth\x1b[0m\x1b[39m=\x1b[0m\x1b[1;34m80\x1b[0m\x1b[39m ColorSystem.TRUECOLOR\x1b[0m\x1b[1m>\x1b[0m !      \x1b]8;id=0;foo\x1b\\\x1b[2mtest_log.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:24\x1b[0m\n\x1b[2;36m      \x1b[0m\x1b[2;36m \x1b[0m\x1b[1m[\x1b[0m\x1b[1;34m1\x1b[0m, \x1b[1;34m2\x1b[0m, \x1b[1;34m3\x1b[0m\x1b[1m]\x1b[0m                                                  \x1b]8;id=0;foo\x1b\\\x1b[2mtest_log.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:25\x1b[0m\n       \x1b[3m                       Locals                             \x1b[0m               \n       \x1b[34m╭─────────┬────────────────────────────────────────╮\x1b[0m                     \n       \x1b[34m│\x1b[0m\x1b[32m'console'\x1b[0m\x1b[34m│\x1b[0m\x1b[1m<\x1b[0m\x1b[1;38;5;13mconsole\x1b[0m\x1b[39m \x1b[0m\x1b[3;33mwidth\x1b[0m\x1b[39m=\x1b[0m\x1b[1;34m80\x1b[0m\x1b[39m ColorSystem.TRUECOLOR\x1b[0m\x1b[1m>\x1b[0m\x1b[34m│\x1b[0m                     \n       \x1b[34m╰─────────┴────────────────────────────────────────╯\x1b[0m                     \n"
     assert render_log() == expected
 
 

@@ -3,22 +3,17 @@ from typing import (
     Iterator,
     Iterable,
     List,
-    Optional,
     overload,
     TypeVar,
     TYPE_CHECKING,
-    Union,
 )
-from typing_extensions import Literal
 
-from .segment import Segment
 from .style import Style
 
 if TYPE_CHECKING:
     from .console import (
         Console,
         ConsoleOptions,
-        ConsoleRenderable,
         JustifyMethod,
         OverflowMethod,
         RenderResult,

@@ -1,14 +1,14 @@
 from collections.abc import Mapping, Sequence
-from contextlib import contextmanager
+
 from dataclasses import dataclass, field, replace
-from enum import Enum
+
 from functools import wraps
 import inspect
-from itertools import chain
+
 import os
-from operator import itemgetter
+
 import platform
-import re
+
 import shutil
 import sys
 import threading
@@ -22,21 +22,15 @@ from typing import (
     List,
     Optional,
     NamedTuple,
-    overload,
-    Tuple,
-    TYPE_CHECKING,
     Union,
 )
 from typing_extensions import Protocol, runtime_checkable, Literal
 
-
 from ._emoji_replace import _emoji_replace
-
 from .align import Align, AlignValues
 from .markup import render as render_markup
 from .measure import measure_renderables, Measurement
 from ._log_render import LogRender
-from .default_styles import DEFAULT_STYLES
 from . import errors
 from .color import ColorSystem
 from .control import Control
@@ -44,16 +38,12 @@ from .highlighter import NullHighlighter, ReprHighlighter
 from .pretty import Pretty
 from .style import Style
 from .tabulate import tabulate_mapping
-from . import highlighter
 from . import themes
-from .pretty import Pretty
 from .terminal_theme import TerminalTheme, DEFAULT_TERMINAL_THEME
 from .segment import Segment
 from .text import Text
 from .theme import Theme
 
-if TYPE_CHECKING:  # pragma: no cover
-    from .text import Text
 
 WINDOWS = platform.system() == "Windows"
 
@@ -151,10 +141,10 @@ _null_highlighter = NullHighlighter()
 
 class RenderGroup:
     """Takes a group of renderables and returns a renderable object that renders the group.
-                
+
     Args:
         renderables (Iterable[RenderableType]): An iterable of renderable objects.
-        
+
     """
 
     def __init__(self, *renderables: RenderableType, fit: bool = True) -> None:
@@ -285,7 +275,8 @@ class Console:
         log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
         log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
         log_time_format (str, optional): Log time format if ``log_time`` is enabled. Defaults to "[%X] ".
-        highlighter(HighlighterType, optional): Default highlighter.    
+        highlighter (HighlighterType, optional): Default highlighter.
+        legacy_windows (bool, optional): Enable legacy Windows mode, or ``None`` to auto detect. Defaults to ``None``.
     """
 
     def __init__(
@@ -309,6 +300,7 @@ class Console:
         log_path: bool = True,
         log_time_format: str = "[%X]",
         highlighter: Optional["HighlighterType"] = ReprHighlighter(),
+        legacy_windows: bool = None,
     ):
         self.is_jupyter = force_jupyter or _is_jupyter()
         if self.is_jupyter:
@@ -322,7 +314,9 @@ class Console:
         self._markup = markup
         self._emoji = emoji
         self._highlight = highlight
-        self.legacy_windows: bool = detect_legacy_windows()
+        self.legacy_windows: bool = (
+            detect_legacy_windows() if legacy_windows is None else legacy_windows
+        )
 
         self._color_system: Optional[ColorSystem]
         self._force_terminal = force_terminal

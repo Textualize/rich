@@ -1,15 +1,13 @@
-from dataclasses import dataclass
-from typing import Any, ClassVar, Dict, Iterable, List, Optional, Type, Union
+from typing import Any, ClassVar, Dict, List, Optional, Type, Union
 
 from commonmark.blocks import Parser
 
 from . import box
-from ._loop import loop_first, loop_first_last
+from ._loop import loop_first
 from ._stack import Stack
 from .console import (
     Console,
     ConsoleOptions,
-    ConsoleRenderable,
     JustifyMethod,
     RenderResult,
     Segment,
@@ -20,7 +18,7 @@ from .panel import Panel
 from .rule import Rule
 from .style import Style, StyleStack
 from .syntax import Syntax
-from .text import Lines, Text
+from .text import Text
 
 
 class MarkdownElement:
