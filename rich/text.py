@@ -38,6 +38,8 @@ DEFAULT_OVERFLOW: "OverflowMethod" = "fold"
 
 _re_whitespace = re.compile(r"\s+$")
 
+TextType = Union[str, "Text"]
+
 
 class Span(NamedTuple):
     """A marked up region in some text."""

@@ -41,7 +41,7 @@ from .tabulate import tabulate_mapping
 from . import themes
 from .terminal_theme import TerminalTheme, DEFAULT_TERMINAL_THEME
 from .segment import Segment
-from .text import Text
+from .text import Text, TextType
 from .theme import Theme
 
 
@@ -950,12 +950,12 @@ class Console:
         return rendered
 
     def input(
-        self, prompt: Union[str, Text] = "", *, markup: bool = True, emoji: bool = True
+        self, prompt: TextType = "", *, markup: bool = True, emoji: bool = True
     ) -> str:
         """Displays a prompt and waits for input from the user. The prompt may contain color / style. 
 
         Args:
-            prompt (Union[Str, Text]): Text to render in the prompt.
+            prompt (Union[str, Text]): Text to render in the prompt.
             markup (bool, optional): Enable console markup (requires a str prompt). Defaults to True.
             emoji (bool, optional): Enable emoji (requires a str prompt). Defaults to True.
         

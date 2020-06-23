@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Iterable, List, Optional, TYPE_CHECKING, Union
 
 
-from .text import Text
+from .text import Text, TextType
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleRenderable, RenderableType
@@ -29,7 +29,7 @@ class LogRender:
         renderables: Iterable["ConsoleRenderable"],
         log_time: datetime = None,
         time_format: str = None,
-        level: Union[str, Text] = "",
+        level: TextType = "",
         path: str = None,
         line_no: int = None,
         link_path: str = None,

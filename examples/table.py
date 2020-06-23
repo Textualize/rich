@@ -18,4 +18,4 @@ table.add_row("Dec 15, 2017", "Star Wars Ep. V111: The Last Jedi", "$1,332,539,8
 table.add_row("Dec 16, 2016", "Rouge One: A Star Wars Story", "$1,332,439,889")
 
 console = Console()
-console.print(table)
+console.print(table, justify="center")
