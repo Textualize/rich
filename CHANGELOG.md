@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed justify of tables
+- Fixed justify of tables (https://github.com/willmcgugan/rich/issues/117)
 
 ## [2.2.4] - 2020-06-21
 
