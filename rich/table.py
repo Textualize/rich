@@ -19,7 +19,7 @@ from .padding import Padding, PaddingDimensions
 from .protocol import is_renderable
 from .segment import Segment
 from .style import Style, StyleType
-from .text import Text
+from .text import Text, TextType
 
 if TYPE_CHECKING:
     from .console import (
@@ -120,8 +120,8 @@ class Table(JupyterMixin):
     def __init__(
         self,
         *headers: Union[Column, str],
-        title: Union[str, Text] = None,
-        caption: Union[str, Text] = None,
+        title: TextType = None,
+        caption: TextType = None,
         width: int = None,
         box: Optional[box.Box] = box.HEAVY_HEAD,
         padding: PaddingDimensions = (0, 1),
@@ -346,22 +346,23 @@ class Table(JupyterMixin):
         widths = self._calculate_column_widths(console, max_width)
         table_width = sum(widths) + self._extra_width
 
-        def render_annotation(
-            text: Union[Text, str], style: Union[str, Style]
-        ) -> "Lines":
-            if isinstance(text, Text):
-                render_text = text
-            else:
-                render_text = console.render_str(text, style=style)
-            return render_text.wrap(console, table_width, justify="center")
+        render_options = options.update(width=table_width)
+
+        def render_annotation(text: TextType, style: StyleType) -> "RenderResult":
+            render_text = (
+                console.render_str(text, style=style) if isinstance(text, str) else text
+            )
+            return console.render(
+                render_text, options=render_options.update(justify="center")
+            )
 
         if self.title:
-            yield render_annotation(
+            yield from render_annotation(
                 self.title, style=Style.pick_first(self.title_style, "table.title")
             )
-        yield from self._render(console, options, widths)
+        yield from self._render(console, render_options, widths)
         if self.caption:
-            yield render_annotation(
+            yield from render_annotation(
                 self.caption,
                 style=Style.pick_first(self.caption_style, "table.caption"),
             )
