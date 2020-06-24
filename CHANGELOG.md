@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Store a "link id" on Style instance, so links containing different styles are highlighted together.
+- Store a "link id" on Style instance, so links containing different styles are highlighted together. (https://github.com/willmcgugan/rich/pull/123)
 
 ## [2.2.5] - 2020-06-23
 
