@@ -1,11 +1,12 @@
+import sys
 from functools import lru_cache
 from random import randint
-import sys
+from time import time
 from typing import Any, Dict, Iterable, List, Optional, Type, Union
 
 from . import errors
-from .color import blend_rgb, Color, ColorParseError, ColorSystem
-from .terminal_theme import TerminalTheme, DEFAULT_TERMINAL_THEME
+from .color import Color, ColorParseError, ColorSystem, blend_rgb
+from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
 
 # Style instances and style definitions are often interchangable
 StyleType = Union[str, "Style"]
@@ -63,6 +64,7 @@ class Style:
         "_attributes",
         "_set_attributes",
         "_link",
+        "_link_id",
         "_ansi",
         "_style_definition",
     ]
@@ -147,6 +149,7 @@ class Style:
             )
         )
         self._link = link
+        self._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
 
     bold = _Bit(0)
     dim = _Bit(1)
@@ -161,6 +164,11 @@ class Style:
     frame = _Bit(10)
     encircle = _Bit(11)
     overline = _Bit(12)
+
+    @property
+    def link_id(self) -> str:
+        """Get a link id, used in ansi code for links."""
+        return self._link_id
 
     def __str__(self) -> str:
         """Re-generate style definition from attributes."""
@@ -475,6 +483,7 @@ class Style:
         style._attributes = self._attributes
         style._set_attributes = self._set_attributes
         style._link = self._link
+        style._link_id = self._link_id
         return style
 
     def render(
@@ -497,7 +506,9 @@ class Style:
         attrs = self._make_ansi_codes(color_system)
         rendered = f"\x1b[{attrs}m{text}\x1b[0m" if attrs else text
         if self._link:
-            rendered = f"\x1b]8;id={randint(0, 10 ** 10)};{self._link}\x1b\\{rendered}\x1b]8;;\x1b\\"
+            rendered = (
+                f"\x1b]8;id={self._link_id};{self._link}\x1b\\{rendered}\x1b]8;;\x1b\\"
+            )
         return rendered
 
     def test(self, text: Optional[str] = None) -> None:
@@ -529,6 +540,7 @@ class Style:
         )
         new_style._set_attributes = self._set_attributes | style._set_attributes
         new_style._link = style._link or self._link
+        new_style._link_id = style._link_id or self._link_id
         return new_style
 
 
