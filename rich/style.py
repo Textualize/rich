@@ -483,7 +483,7 @@ class Style:
         style._attributes = self._attributes
         style._set_attributes = self._set_attributes
         style._link = self._link
-        style._link_id = self._link_id
+        style._link_id = f"{time()}-{randint(0, 999999)}" if self._link else ""
         return style
 
     def render(
@@ -509,6 +509,7 @@ class Style:
             rendered = (
                 f"\x1b]8;id={self._link_id};{self._link}\x1b\\{rendered}\x1b]8;;\x1b\\"
             )
+
         return rendered
 
     def test(self, text: Optional[str] = None) -> None:
