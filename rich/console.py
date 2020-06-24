@@ -649,7 +649,7 @@ class Console:
 
         try:
             style = self._styles.get(name)
-            return style if style is not None else Style.parse(name)
+            return style.copy() if style is not None else Style.parse(name).copy()
         except errors.StyleSyntaxError as error:
             if default is not None:
                 return self.get_style(default)
