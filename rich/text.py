@@ -363,7 +363,8 @@ class Text(JupyterMixin):
             if style:
                 start, end = get_span()
                 match_style = style(plain[start:end]) if callable(style) else style
-                append_span(_Span(start, end, match_style))
+                if match_style is not None:
+                    append_span(_Span(start, end, match_style))
 
             count += 1
             for name in match.groupdict().keys():
