@@ -3,6 +3,7 @@ from operator import itemgetter
 from typing import (
     TYPE_CHECKING,
     Any,
+    Callable,
     Dict,
     Iterable,
     List,
@@ -39,6 +40,8 @@ DEFAULT_OVERFLOW: "OverflowMethod" = "fold"
 _re_whitespace = re.compile(r"\s+$")
 
 TextType = Union[str, "Text"]
+
+GetStyleCallable = Callable[[str], Optional[StyleType]]
 
 
 class Span(NamedTuple):
@@ -335,32 +338,36 @@ class Text(JupyterMixin):
     def highlight_regex(
         self,
         re_highlight: str,
-        style: Union[str, Style] = None,
+        style: Union[GetStyleCallable, StyleType] = None,
         *,
         style_prefix: str = "",
     ) -> int:
-        """Highlight text with a regular expression, where group names are 
+        """Highlight text with a regular expression, where group names are
         translated to styles.
-        
+
         Args:
             re_highlight (str): A regular expression.
-            style (Union[str, Style]): Optional style to apply to whole match.
-            style_prefix (str, optional): Optional prefix to add to style group names.
-        
+            style (Union[GetStyleCallable, StyleType]): Optional style to apply to whole match, or a callable
+                which accepts the matched text and returns a style. Defaults to None.
+            style_prefix (str, optional): Optional prefix to add to style group names.            
+
         Returns:
             int: Number of regex matches
         """
         count = 0
         append_span = self._spans.append
         _Span = Span
-        for match in re.finditer(re_highlight, self.plain):
-            _span = match.span
+        plain = self.plain
+        for match in re.finditer(re_highlight, plain):
+            get_span = match.span
             if style:
-                start, end = _span()
-                append_span(_Span(start, end, style))
+                start, end = get_span()
+                match_style = style(plain[start:end]) if callable(style) else style
+                append_span(_Span(start, end, match_style))
+
             count += 1
-            for name, _ in match.groupdict().items():
-                start, end = _span(name)
+            for name in match.groupdict().keys():
+                start, end = get_span(name)
                 if start != -1:
                     append_span(_Span(start, end, f"{style_prefix}{name}"))
         return count
@@ -852,3 +859,11 @@ if __name__ == "__main__":
     console = Console()
     t = Text("foo bar", justify="left")
     print(repr(t.wrap(console, 4)))
+
+    test = Text("Vulnerability CVE-2018-6543 detected")
+
+    def get_style(text: str) -> str:
+        return f"bold link https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword={text}"
+
+    test.highlight_regex(r"CVE-\d{4}-\d+", get_style)
+    console.print(test)

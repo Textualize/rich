@@ -105,6 +105,7 @@ class Style:
         encircle: bool = None,
         overline: bool = None,
         link: str = None,
+        link_id: str = None,
     ):
         self._ansi: Optional[str] = None
         self._style_definition: Optional[str] = None
@@ -149,7 +150,7 @@ class Style:
             )
         )
         self._link = link
-        self._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
+        self._link_id = (link_id or f"{time()}-{randint(0, 999999)}") if link else ""
 
     bold = _Bit(0)
     dim = _Bit(1)

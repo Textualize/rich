@@ -65,7 +65,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "rule.line": Style(color="bright_green"),
     "rule.text": Style(),
     "repr.path": Style(color="magenta"),
-    "repr.filename": Style(color="bright_magenta", bold=True),
+    "repr.filename": Style(color="bright_magenta"),
     "table.header": Style(bold=True),
     "table.footer": Style(bold=True),
     "table.cell": Style(),
