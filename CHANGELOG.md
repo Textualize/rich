@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2020-06-26
+
+### Fixed
+
+- Fixed highlighting of paths / filenames
+- Corrected docs for RichHandler which erroneously said default console writes to stderr
+
+### Changed
+
+- Allowed `style` parameter for `highlight_regex` to be a callable that returns a style
+
+### Added
+
+- Added optional highlighter parameter to RichHandler
+
 ## [2.2.6] - 2020-06-24
 
 ### Changed

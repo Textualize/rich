@@ -146,6 +146,26 @@ def test_highlight_regex():
     ]
 
 
+def test_highlight_regex_callable():
+    test = Text("Vulnerability CVE-2018-6543 detected")
+    re_cve = r"CVE-\d{4}-\d+"
+
+    def get_style(text: str) -> Style:
+        return Style.parse(
+            f"bold yellow link https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword={text}"
+        )
+
+    count = test.highlight_regex(re_cve, get_style)
+    assert count == 1
+    assert len(test._spans) == 1
+    assert test._spans[0].start == 14
+    assert test._spans[0].end == 27
+    assert (
+        test._spans[0].style.link
+        == "https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=CVE-2018-6543"
+    )
+
+
 def test_highlight_words():
     test = Text("Do NOT! touch anything!")
     words = ["NOT", "!"]

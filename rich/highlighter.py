@@ -73,12 +73,11 @@ class ReprHighlighter(RegexHighlighter):
     highlights = [
         r"(?P<brace>[\{\[\(\)\]\}])",
         r"(?P<tag_start>\<)(?P<tag_name>\w*)(?P<tag_contents>.*?)(?P<tag_end>\>)",
-        r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?\w+\"?)",
+        r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?\S+\"?)",
         r"(?P<bool_true>True)|(?P<bool_false>False)|(?P<none>None)",
         r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*\b)",
         r"(?P<number>0x[0-9a-f]*)",
-        r"(?P<path>(\/\w+)+\/)",
-        r"(?P<filename>\/\w*\.\w{3,4})\s",
+        r"(?P<path>\B(\/[\w\.\-\_\+]+)*\/)(?P<filename>[\w\.\-\_\+]*)?",
         r"(?<!\\)(?P<str>b?\'\'\'.*?(?<!\\)\'\'\'|b?\'.*?(?<!\\)\'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
         r"(?P<url>https?:\/\/[0-9a-zA-Z\$\-\_\+\!`\(\)\,\.\?\/\;\:\&\=\%]*)",
         r"(?P<uuid>[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12})",
@@ -91,3 +90,18 @@ if __name__ == "__main__":  # pragma: no cover
     console = Console()
     console.print("[bold green]hello world![/bold green]")
     console.print("'[bold green]hello world![/bold green]'")
+
+    console.print(" /foo")
+    console.print("/foo/")
+    console.print("/foo/bar")
+    console.print("foo/bar/baz")
+
+    console.print("/foo/bar/baz?foo=bar+egg&egg=baz")
+    console.print("/foo/bar/baz/")
+    console.print("/foo/bar/baz/egg")
+    console.print("/foo/bar/baz/egg.py")
+    console.print("/foo/bar/baz/egg.py word")
+    console.print(" /foo/bar/baz/egg.py word")
+    console.print("foo /foo/bar/baz/egg.py word")
+    console.print("foo /foo/bar/ba._++z/egg+.py word")
+    console.print("https://example.org?foo=bar")
