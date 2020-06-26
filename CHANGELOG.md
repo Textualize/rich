@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Disabled legacy_windows if jupyter is detected
+- Disabled legacy_windows if jupyter is detected https://github.com/willmcgugan/rich/issues/125
 
 ## [2.3.0] - 2020-06-26
 
