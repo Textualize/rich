@@ -315,7 +315,9 @@ class Console:
         self._emoji = emoji
         self._highlight = highlight
         self.legacy_windows: bool = (
-            detect_legacy_windows() if legacy_windows is None else legacy_windows
+            (detect_legacy_windows() and not self.is_jupyter)
+            if legacy_windows is None
+            else legacy_windows
         )
 
         self._color_system: Optional[ColorSystem]
