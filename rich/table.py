@@ -552,7 +552,7 @@ class Table(JupyterMixin):
                     _Segment(_box.head_vertical, border_style),
                 ),
                 (
-                    Segment(_box.foot_left, border_style),
+                    _Segment(_box.foot_left, border_style),
                     _Segment(_box.foot_right, border_style),
                     _Segment(_box.foot_vertical, border_style),
                 ),
