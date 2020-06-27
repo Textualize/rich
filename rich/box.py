@@ -348,21 +348,26 @@ DOUBLE_EDGE: Box = Box(
 """
 )
 
+LEGACY_WINDOWS_SUBSTITUTIONS = {
+    ROUNDED: SQUARE,
+    MINIMAL_HEAVY_HEAD: MINIMAL,
+    SIMPLE_HEAVY: SIMPLE,
+    HEAVY: SQUARE,
+    HEAVY_EDGE: SQUARE,
+    HEAVY_HEAD: SQUARE,
+}
+
 
 if __name__ == "__main__":  # pragma: no cover
 
+    from rich.columns import Columns
+    from rich.panel import Panel
     from .console import Console
     from .table import Table
     from .text import Text
     from . import box
 
     console = Console(record=True)
-
-    table = Table(width=80, show_footer=True, style="dim", border_style="not dim")
-    spaces = " " * 10
-    table.add_column(spaces, spaces)
-    table.add_column(spaces, spaces)
-    table.add_row(spaces, spaces)
 
     BOXES = [
         "ASCII",
@@ -381,9 +386,21 @@ if __name__ == "__main__":  # pragma: no cover
         "DOUBLE_EDGE",
     ]
 
+    console.print(Panel("[bold green]Box Constants", style="green"), justify="center")
+    console.print()
+
+    columns = Columns(expand=False, padding=2)
     for box_name in BOXES:
+        table = Table(width=80, show_footer=True, style="dim", border_style="not dim")
+        spaces = " " * 10
+        table.add_column("Header 1", "Footer 1")
+        table.add_column("Header 2", "Footer 2")
+        table.add_row("Cell", "Cell")
+        table.add_row("Cell", "Cell")
         table.box = getattr(box, box_name)
         table.title = Text(f"box.{box_name}", style="magenta")
-        console.print(table)
+        columns.add_renderable(table)
+    console.print(columns)
 
-    console.save_html("box.html", inline_styles=True)
+    # console.save_html("box.html", inline_styles=True)
+

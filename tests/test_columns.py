@@ -25,7 +25,6 @@ COLUMN_DATA = [
     "Anteater, australian spiny",
     "Tachyglossus aculeatus",
     "Anteater, giant",
-    "Myrmecophaga tridactyla",
 ]
 
 
@@ -36,6 +35,7 @@ def render():
     empty_columns = Columns([])
     console.print(empty_columns)
     columns = Columns(COLUMN_DATA)
+    columns.add_renderable("Myrmecophaga tridactyla")
     console.rule("optimal")
     console.print(columns)
     console.rule("optimal, expand")

@@ -112,6 +112,7 @@ class Table(JupyterMixin):
         border_style (Union[str, Style], optional): Style of the border. Defaults to None.
         title_style (Union[str, Style], optional): Style of the title. Defaults to None.
         caption_style (Union[str, Style], optional): Style of the caption. Defaults to None.
+        safe_box (bool, optional): Disable box characters that don't display on windows legacy terminal with *raster* fonts. Defaults to True.
     """
 
     columns: List[Column]
@@ -138,6 +139,7 @@ class Table(JupyterMixin):
         border_style: StyleType = None,
         title_style: StyleType = None,
         caption_style: StyleType = None,
+        safe_box: bool = True,
     ) -> None:
 
         self.columns = [
@@ -162,6 +164,7 @@ class Table(JupyterMixin):
         self.border_style = border_style
         self.title_style = title_style
         self.caption_style = title_style
+        self.safe_box = safe_box
         self._row_count = 0
         self.row_styles = list(row_styles or [])
 
@@ -481,11 +484,11 @@ class Table(JupyterMixin):
         for first, last, (style, renderable) in loop_first_last(raw_cells):
             yield _Cell(style, add_padding(renderable, first, last))
 
-    def _get_padding_width(self, column_index) -> int:
+    def _get_padding_width(self, column_index: int) -> int:
         """Get extra width from padding."""
         _, pad_right, _, pad_left = self.padding
         if self.collapse_padding:
-            if column_index != 0:
+            if column_index > 0:
                 pad_left = max(0, pad_right - pad_left)
         return pad_left + pad_right
 
@@ -537,6 +540,9 @@ class Table(JupyterMixin):
             if isinstance(self.box, box.PlatformDefaultBox)
             else self.box
         )
+        if self.safe_box and _box is not None and console.legacy_windows:
+            _box = box.LEGACY_WINDOWS_SUBSTITUTIONS.get(_box, _box)
+
         # _box = self.box
         new_line = Segment.line()
 
