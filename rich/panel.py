@@ -72,7 +72,6 @@ class Panel(JupyterMixin):
         width = child_width + 2
         child_options = options.update(width=child_width)
         lines = console.render_lines(renderable, child_options)
-        print(repr(self.box))
         box = (
             get_safe_box(self.box, console.legacy_windows)
             if self.safe_box
