@@ -934,6 +934,7 @@ class Console:
         output: List[str] = []
         append = output.append
         color_system = self._color_system
+        legacy_windows = self.legacy_windows
         buffer = self._buffer[:]
         if self.record:
             with self._record_buffer_lock:
@@ -943,7 +944,13 @@ class Console:
         for line in Segment.split_and_crop_lines(buffer, self.width, pad=False):
             for text, style, is_control in line:
                 if style and not is_control:
-                    append(style.render(text, color_system=color_system))
+                    append(
+                        style.render(
+                            text,
+                            color_system=color_system,
+                            legacy_windows=legacy_windows,
+                        )
+                    )
                 else:
                     if not (not_terminal and is_control):
                         append(text)

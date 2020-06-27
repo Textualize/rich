@@ -143,6 +143,24 @@ class Box:
         return "".join(parts)
 
 
+class PlatformDefaultBox(Box):
+    """A sentinel to be replaced with an appropriate box for the platform."""
+
+
+PLATFORM_DEFAULT: Box = PlatformDefaultBox(
+    """\
++--+
+| ||
+|-+|
+| ||
+|-+|
+|-+|
+| ||
++--+
+"""
+)
+
+
 ASCII: Box = Box(
     """\
 +--+
@@ -334,12 +352,9 @@ DOUBLE_EDGE: Box = Box(
 if __name__ == "__main__":  # pragma: no cover
 
     from .console import Console
-    from .panel import Panel
     from .table import Table
     from .text import Text
     from . import box
-
-    import sys
 
     console = Console(record=True)
 

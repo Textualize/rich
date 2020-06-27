@@ -35,7 +35,7 @@ class Rule(JupyterMixin):
     ) -> RenderResult:
         width = options.max_width
 
-        character = "-" if console.legacy_windows else (self.character or "─")
+        character = self.character or "─"
 
         if not self.title:
             yield Text(character * width, self.style)

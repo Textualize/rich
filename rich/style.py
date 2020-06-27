@@ -491,6 +491,7 @@ class Style:
         text: str = "",
         *,
         color_system: Optional[ColorSystem] = ColorSystem.TRUECOLOR,
+        legacy_windows: bool = False,
     ) -> str:
         """Render the ANSI codes for the style.
         
@@ -505,7 +506,7 @@ class Style:
             return text
         attrs = self._make_ansi_codes(color_system)
         rendered = f"\x1b[{attrs}m{text}\x1b[0m" if attrs else text
-        if self._link:
+        if self._link and not legacy_windows:
             rendered = (
                 f"\x1b]8;id={self._link_id};{self._link}\x1b\\{rendered}\x1b]8;;\x1b\\"
             )

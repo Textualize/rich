@@ -30,7 +30,6 @@ if TYPE_CHECKING:
         RenderableType,
         RenderResult,
     )
-    from .containers import Lines
 
 
 @dataclass
@@ -123,7 +122,7 @@ class Table(JupyterMixin):
         title: TextType = None,
         caption: TextType = None,
         width: int = None,
-        box: Optional[box.Box] = box.HEAVY_HEAD,
+        box: Optional[box.Box] = box.PLATFORM_DEFAULT,
         padding: PaddingDimensions = (0, 1),
         collapse_padding: bool = False,
         pad_edge: bool = True,
@@ -532,9 +531,13 @@ class Table(JupyterMixin):
                 )
             )
         )
-        _box: Optional[box.Box] = (
-            box.SQUARE if (console.legacy_windows and self.box) else self.box
+
+        _box = (
+            (box.SQUARE if console.legacy_windows else box.HEAVY_HEAD)
+            if isinstance(self.box, box.PlatformDefaultBox)
+            else self.box
         )
+        # _box = self.box
         new_line = Segment.line()
 
         columns = self.columns
@@ -563,7 +566,7 @@ class Table(JupyterMixin):
                 ),
             ]
             if show_edge:
-                yield Segment(_box.get_top(widths), border_style)
+                yield _Segment(_box.get_top(widths), border_style)
                 yield new_line
         else:
             box_segments = []
