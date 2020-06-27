@@ -1,4 +1,4 @@
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 from typing_extensions import Literal
 
 from ._loop import loop_last
@@ -141,24 +141,6 @@ class Box:
                 append(self.bottom_divider)
         append(self.bottom_right)
         return "".join(parts)
-
-
-class PlatformDefaultBox(Box):
-    """A sentinel to be replaced with an appropriate box for the platform."""
-
-
-PLATFORM_DEFAULT: Box = PlatformDefaultBox(
-    """\
-+--+
-| ||
-|-+|
-| ||
-|-+|
-|-+|
-| ||
-+--+
-"""
-)
 
 
 ASCII: Box = Box(
@@ -358,6 +340,14 @@ LEGACY_WINDOWS_SUBSTITUTIONS = {
 }
 
 
+def get_safe_box(box: Optional[Box], legacy_windows: bool) -> Box:
+    """Substitute Box constants that don't render on windows legacy."""
+    if legacy_windows:
+        return LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box) if box else None
+    else:
+        return box
+
+
 if __name__ == "__main__":  # pragma: no cover
 
     from rich.columns import Columns
@@ -389,9 +379,11 @@ if __name__ == "__main__":  # pragma: no cover
     console.print(Panel("[bold green]Box Constants", style="green"), justify="center")
     console.print()
 
-    columns = Columns(expand=False, padding=2)
+    columns = Columns(expand=True, padding=2)
     for box_name in BOXES:
-        table = Table(width=80, show_footer=True, style="dim", border_style="not dim")
+        table = Table(
+            width=80, show_footer=True, style="dim", border_style="not dim", expand=True
+        )
         spaces = " " * 10
         table.add_column("Header 1", "Footer 1")
         table.add_column("Header 2", "Footer 2")
@@ -403,4 +395,3 @@ if __name__ == "__main__":  # pragma: no cover
     console.print(columns)
 
     # console.save_html("box.html", inline_styles=True)
-

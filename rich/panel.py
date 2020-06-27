@@ -1,6 +1,6 @@
 from typing import Optional, Union
 
-from .box import Box, SQUARE, ROUNDED
+from .box import get_safe_box, Box, SQUARE, ROUNDED
 
 from .console import (
     Console,
@@ -36,11 +36,12 @@ class Panel(JupyterMixin):
     def __init__(
         self,
         renderable: RenderableType,
-        box: Box = None,
+        box: Box = ROUNDED,
         expand: bool = True,
         style: Union[str, Style] = "none",
         width: Optional[int] = None,
         padding: PaddingDimensions = 0,
+        safe_box: bool = True,
     ) -> None:
         self.renderable = renderable
         self.box = box
@@ -48,6 +49,7 @@ class Panel(JupyterMixin):
         self.style = style
         self.width = width
         self.padding = padding
+        self.safe_box = safe_box
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
@@ -70,7 +72,12 @@ class Panel(JupyterMixin):
         width = child_width + 2
         child_options = options.update(width=child_width)
         lines = console.render_lines(renderable, child_options)
-        box = SQUARE if console.legacy_windows else (self.box or ROUNDED)
+        print(repr(self.box))
+        box = (
+            get_safe_box(self.box, console.legacy_windows)
+            if self.safe_box
+            else self.box
+        )
         line_start = Segment(box.mid_left, style)
         line_end = Segment(f"{box.mid_right}\n", style)
         yield Segment(box.get_top([width - 2]), style)
@@ -100,6 +107,7 @@ if __name__ == "__main__":  # pragma: no cover
             Padding(Text.from_markup("[bold magenta]Hello World!"), (1, 8)),
             box=ROUNDED,
             expand=False,
+            safe_box=True,
         )
     )
 

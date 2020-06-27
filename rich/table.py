@@ -96,7 +96,7 @@ class Table(JupyterMixin):
         title (Union[str, Text], optional): The title of the table rendered at the top. Defaults to None.
         caption (Union[str, Text], optional): The table caption rendered below. Defaults to None.
         width (int, optional): The width in characters of the table, or ``None`` to automatically fit. Defaults to None.
-        box (Optional[box.Box], optional): One of the constants in box.py used to draw the edges (See :ref:`appendix_box`). Defaults to box.HEAVY_HEAD.
+        box (box.Box, optional): One of the constants in box.py used to draw the edges (See :ref:`appendix_box`). Defaults to box.HEAVY_HEAD.
         padding (PaddingDimensions, optional): Padding for cells (top, right, bottom, left). Defaults to (0, 1).
         collapse_padding (bool, optional): Enable collapsing of padding around cells. Defaults to False.
         pad_edge (bool, optional): Enable padding of edge cells. Defaults to True.
@@ -123,7 +123,7 @@ class Table(JupyterMixin):
         title: TextType = None,
         caption: TextType = None,
         width: int = None,
-        box: Optional[box.Box] = box.PLATFORM_DEFAULT,
+        box: Optional[box.Box] = box.HEAVY_HEAD,
         padding: PaddingDimensions = (0, 1),
         collapse_padding: bool = False,
         pad_edge: bool = True,
@@ -226,15 +226,16 @@ class Table(JupyterMixin):
                 max_width -= 2
 
         extra_width = self._extra_width
-        table_width = (
-            sum(self._calculate_column_widths(console, max_width)) + extra_width
-        )
         _measure_column = self._measure_column
-        minimum_width = max(
+        minimum_width = sum(
             _measure_column(console, column, max_width).minimum
             for column in self.columns
         )
-        return Measurement(minimum_width, table_width)
+        maximum_width = sum(
+            _measure_column(console, column, max_width).maximum
+            for column in self.columns
+        )
+        return Measurement(minimum_width + extra_width, maximum_width + extra_width)
 
     @property
     def padding(self) -> Tuple[int, int, int, int]:
@@ -489,7 +490,7 @@ class Table(JupyterMixin):
         _, pad_right, _, pad_left = self.padding
         if self.collapse_padding:
             if column_index > 0:
-                pad_left = max(0, pad_right - pad_left)
+                pad_left = max(0, pad_left - pad_right)
         return pad_left + pad_right
 
     def _measure_column(
@@ -534,14 +535,11 @@ class Table(JupyterMixin):
                 )
             )
         )
-
         _box = (
-            (box.SQUARE if console.legacy_windows else box.HEAVY_HEAD)
-            if isinstance(self.box, box.PlatformDefaultBox)
+            box.get_safe_box(self.box, console.legacy_windows)
+            if self.safe_box
             else self.box
         )
-        if self.safe_box and _box is not None and console.legacy_windows:
-            _box = box.LEGACY_WINDOWS_SUBSTITUTIONS.get(_box, _box)
 
         # _box = self.box
         new_line = Segment.line()
