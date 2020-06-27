@@ -1,4 +1,4 @@
-from typing import Iterable, List, Optional
+from typing import Iterable, List, Optional, overload
 from typing_extensions import Literal
 
 from ._loop import loop_last
@@ -340,10 +340,20 @@ LEGACY_WINDOWS_SUBSTITUTIONS = {
 }
 
 
-def get_safe_box(box: Optional[Box], legacy_windows: bool) -> Box:
+@overload
+def get_safe_box(box: None, legacy_windows: bool) -> None:
+    ...
+
+
+@overload
+def get_safe_box(box: Box, legacy_windows: bool) -> Box:
+    ...
+
+
+def get_safe_box(box: Optional[Box], legacy_windows: bool) -> Optional[Box]:
     """Substitute Box constants that don't render on windows legacy."""
-    if legacy_windows:
-        return LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box) if box else None
+    if legacy_windows and box is not None:
+        return LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box)
     else:
         return box
 
