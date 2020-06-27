@@ -76,7 +76,7 @@ class Panel(JupyterMixin):
             get_safe_box(self.box, console.legacy_windows)
             if self.safe_box
             else self.box
-        )
+        ) or SQUARE
         line_start = Segment(box.mid_left, style)
         line_end = Segment(f"{box.mid_right}\n", style)
         yield Segment(box.get_top([width - 2]), style)
