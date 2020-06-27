@@ -3,11 +3,10 @@
 Box
 ===
 
-Rich defines a number of ways of drawing boxes and lines such as those used in tables. To select a box style import one of the constants below from rich.box. For example::
+Rich has a number of constants that set the box characters used to draw tables and panels. To select a box style import one of the constants below from ``rich.box``. For example::
 
     from rich import box
     table = Table(box=box.SQUARE)
-
 
 
 .. note::
