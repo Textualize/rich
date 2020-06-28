@@ -38,6 +38,7 @@ class Panel(JupyterMixin):
         self,
         renderable: RenderableType,
         box: Box = ROUNDED,
+        *,
         safe_box: bool = True,
         expand: bool = True,
         style: Union[str, Style] = "none",

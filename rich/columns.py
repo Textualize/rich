@@ -28,6 +28,7 @@ class Columns(JupyterMixin):
         self,
         renderables: Iterable[RenderableType] = None,
         padding: PaddingDimensions = (0, 1),
+        *,
         width: int = None,
         expand: bool = False,
         equal: bool = False,

@@ -18,6 +18,7 @@ class Rule(JupyterMixin):
     def __init__(
         self,
         title: Union[str, Text] = "",
+        *,
         character: str = None,
         style: Union[str, Style] = "rule.line",
     ) -> None:
