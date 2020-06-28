@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enabled supported box chars for legacy Windows, and introduce `safe_box` flag
 - Disable hyperlinks on legacy Windows
 - Constructors for Rule and Panel now have keyword only arguments (reason for major version bump)
+- Table.add_colum added keyword only arguments
 
 ### Fixed
 

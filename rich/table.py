@@ -150,6 +150,7 @@ class Table(JupyterMixin):
         self.caption = caption
         self.width = width
         self.box = box
+        self.safe_box = safe_box
         self._padding = Padding.unpack(padding)
         self.pad_edge = pad_edge
         self.expand = expand
@@ -164,7 +165,6 @@ class Table(JupyterMixin):
         self.border_style = border_style
         self.title_style = title_style
         self.caption_style = title_style
-        self.safe_box = safe_box
         self._row_count = 0
         self.row_styles = list(row_styles or [])
 
@@ -227,14 +227,12 @@ class Table(JupyterMixin):
 
         extra_width = self._extra_width
         _measure_column = self._measure_column
-        minimum_width = sum(
-            _measure_column(console, column, max_width).minimum
-            for column in self.columns
-        )
-        maximum_width = sum(
-            _measure_column(console, column, max_width).maximum
-            for column in self.columns
-        )
+
+        measurements = [
+            _measure_column(console, column, max_width) for column in self.columns
+        ]
+        minimum_width = sum(measurement.minimum for measurement in measurements)
+        maximum_width = sum(measurement.maximum for measurement in measurements)
         return Measurement(minimum_width + extra_width, maximum_width + extra_width)
 
     @property
@@ -252,6 +250,7 @@ class Table(JupyterMixin):
         self,
         header: "RenderableType" = "",
         footer: "RenderableType" = "",
+        *,
         header_style: StyleType = None,
         footer_style: StyleType = None,
         style: StyleType = None,

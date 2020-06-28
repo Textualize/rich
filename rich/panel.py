@@ -47,11 +47,11 @@ class Panel(JupyterMixin):
     ) -> None:
         self.renderable = renderable
         self.box = box
+        self.safe_box = safe_box
         self.expand = expand
         self.style = style
         self.width = width
         self.padding = padding
-        self.safe_box = safe_box
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
