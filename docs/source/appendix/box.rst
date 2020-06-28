@@ -19,7 +19,7 @@ The following table is generated with this command::
 
 .. raw:: html
 
-    <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #008000">╭──────────────────────────────────────────────────────────────────────────────╮</span>
+    <pre style="font-size:90%;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #008000">╭──────────────────────────────────────────────────────────────────────────────╮</span>
     <span style="color: #008000">│</span>                                <span style="color: #008000; font-weight: bold">Box Constants</span>                                 <span style="color: #008000">│
     ╰──────────────────────────────────────────────────────────────────────────────╯</span>
 
