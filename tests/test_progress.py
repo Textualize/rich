@@ -113,10 +113,12 @@ def make_progress() -> Progress:
     task4 = progress.add_task("egg")
     progress.remove_task(task4)
     task4 = progress.add_task("foo2", completed=50, start=False)
+    progress.stop_task(task4)
     progress.start_task(task4)
     progress.update(
         task4, total=200, advance=50, completed=200, visible=True, refresh=True
     )
+    progress.stop_task(task4)
     return progress
 
 

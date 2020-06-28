@@ -191,7 +191,7 @@ class ConsoleDimensions(NamedTuple):
     height: int
 
 
-def _is_jupyter() -> bool:
+def _is_jupyter() -> bool:  # pragma: no cover
     """Check if we're running in a Jupyter notebook."""
     try:
         get_ipython  # type: ignore
