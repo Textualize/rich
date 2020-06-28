@@ -77,7 +77,7 @@ class Bar(JupyterMixin):
         Returns:
             List[Segment]: A list of segments, one segment per character.
         """
-        bar = "█" if legacy_windows else "━"
+        bar = "─" if legacy_windows else "━"
         segments: List[Segment] = []
 
         if color_system != "truecolor":
@@ -86,13 +86,11 @@ class Bar(JupyterMixin):
             return segments
 
         append = segments.append
-
         fore_color = (
             fore_style.color.get_truecolor()
             if fore_style.color
             else ColorTriplet(255, 0, 255)
         )
-
         back_color = (
             back_style.color.get_truecolor()
             if back_style.color
@@ -160,8 +158,8 @@ class Bar(JupyterMixin):
 
         completed = min(self.total, max(0, self.completed))
         legacy_windows = console.legacy_windows
-        bar = "▓" if legacy_windows else "━"
-        half_bar_right = "░" if legacy_windows else "╸"
+        bar = "─" if legacy_windows else "━"
+        half_bar_right = " " if legacy_windows else "╸"
         half_bar_left = " " if legacy_windows else "╺"
         complete_halves = (
             int(width * 2 * completed / self.total) if self.total else width * 2

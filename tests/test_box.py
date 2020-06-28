@@ -1,6 +1,6 @@
 import pytest
 
-from rich.box import ASCII, DOUBLE, ROUNDED, HEAVY
+from rich.box import get_safe_box, ASCII, DOUBLE, ROUNDED, HEAVY, SQUARE
 
 
 def test_str():
@@ -24,7 +24,7 @@ def test_get_row():
     assert row == "|-+--+---|"
 
     foot_row = ROUNDED.get_row(widths=[2, 1, 3], level="foot")
-    assert foot_row == "├──┼─┼───┤" 
+    assert foot_row == "├──┼─┼───┤"
 
     with pytest.raises(ValueError):
         ROUNDED.get_row(widths=[1, 2, 3], level="FOO")
@@ -33,3 +33,10 @@ def test_get_row():
 def test_get_bottom():
     bottom = HEAVY.get_bottom(widths=[1, 2, 3])
     assert bottom == "┗━┻━━┻━━━┛"
+
+
+def test_get_safe_box():
+    assert get_safe_box(HEAVY, True) == SQUARE
+    assert get_safe_box(HEAVY, False) == HEAVY
+    assert get_safe_box(None, True) is None
+    assert get_safe_box(None, False) is None

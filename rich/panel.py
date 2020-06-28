@@ -1,6 +1,6 @@
 from typing import Optional, Union
 
-from .box import Box, SQUARE, ROUNDED
+from .box import get_safe_box, Box, SQUARE, ROUNDED
 
 from .console import (
     Console,
@@ -24,8 +24,9 @@ class Panel(JupyterMixin):
 
     Args:
         renderable (RenderableType): A console renderable object.
-        box (Box, optional): A Box instance that defines the look of the border.
+        box (Box, optional): A Box instance that defines the look of the border (see :ref:`appendix_box`.
             Defaults to box.ROUNDED.
+        safe_box (bool, optional): Disable box characters that don't display on windows legacy terminal with *raster* fonts. Defaults to True.
         expand (bool, optional): If True the panel will stretch to fill the console 
             width, otherwise it will be sized to fit the contents. Defaults to True.
         style (str, optional): The style of the border. Defaults to "none".
@@ -36,7 +37,9 @@ class Panel(JupyterMixin):
     def __init__(
         self,
         renderable: RenderableType,
-        box: Box = None,
+        box: Box = ROUNDED,
+        *,
+        safe_box: bool = True,
         expand: bool = True,
         style: Union[str, Style] = "none",
         width: Optional[int] = None,
@@ -44,6 +47,7 @@ class Panel(JupyterMixin):
     ) -> None:
         self.renderable = renderable
         self.box = box
+        self.safe_box = safe_box
         self.expand = expand
         self.style = style
         self.width = width
@@ -70,7 +74,11 @@ class Panel(JupyterMixin):
         width = child_width + 2
         child_options = options.update(width=child_width)
         lines = console.render_lines(renderable, child_options)
-        box = SQUARE if console.legacy_windows else (self.box or ROUNDED)
+        box = (
+            get_safe_box(self.box, console.legacy_windows)
+            if self.safe_box
+            else self.box
+        )
         line_start = Segment(box.mid_left, style)
         line_end = Segment(f"{box.mid_right}\n", style)
         yield Segment(box.get_top([width - 2]), style)
@@ -100,6 +108,7 @@ if __name__ == "__main__":  # pragma: no cover
             Padding(Text.from_markup("[bold magenta]Hello World!"), (1, 8)),
             box=ROUNDED,
             expand=False,
+            safe_box=True,
         )
     )
 

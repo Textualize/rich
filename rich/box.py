@@ -1,4 +1,4 @@
-from typing import Iterable, List
+from typing import Iterable, List, Optional, overload
 from typing_extensions import Literal
 
 from ._loop import loop_last
@@ -330,24 +330,52 @@ DOUBLE_EDGE: Box = Box(
 """
 )
 
+LEGACY_WINDOWS_SUBSTITUTIONS = {
+    ROUNDED: SQUARE,
+    MINIMAL_HEAVY_HEAD: MINIMAL,
+    SIMPLE_HEAVY: SIMPLE,
+    HEAVY: SQUARE,
+    HEAVY_EDGE: SQUARE,
+    HEAVY_HEAD: SQUARE,
+}
+
+
+@overload
+def get_safe_box(box: None, legacy_windows: bool) -> None:  # pragma: no cover
+    ...
+
+
+@overload
+def get_safe_box(box: Box, legacy_windows: bool) -> Box:  # pragma: no cover
+    ...
+
+
+def get_safe_box(box: Optional[Box], legacy_windows: bool) -> Optional[Box]:
+    """Substitute Box constants that don't render on windows legacy.
+
+    Args:
+        box (Optional[Box]): A Box instance.
+        legacy_windows (bool): Enable legacy Windows.
+
+    Returns:
+        Optional[Box]: A Box instance (potentially a new instance).
+    """
+    if legacy_windows and box is not None:
+        return LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box)
+    else:
+        return box
+
 
 if __name__ == "__main__":  # pragma: no cover
 
+    from rich.columns import Columns
+    from rich.panel import Panel
     from .console import Console
-    from .panel import Panel
     from .table import Table
     from .text import Text
     from . import box
 
-    import sys
-
     console = Console(record=True)
-
-    table = Table(width=80, show_footer=True, style="dim", border_style="not dim")
-    spaces = " " * 10
-    table.add_column(spaces, spaces)
-    table.add_column(spaces, spaces)
-    table.add_row(spaces, spaces)
 
     BOXES = [
         "ASCII",
@@ -366,9 +394,22 @@ if __name__ == "__main__":  # pragma: no cover
         "DOUBLE_EDGE",
     ]
 
+    console.print(Panel("[bold green]Box Constants", style="green"), justify="center")
+    console.print()
+
+    columns = Columns(expand=True, padding=2)
     for box_name in BOXES:
+        table = Table(
+            width=80, show_footer=True, style="dim", border_style="not dim", expand=True
+        )
+        spaces = " " * 10
+        table.add_column("Header 1", "Footer 1")
+        table.add_column("Header 2", "Footer 2")
+        table.add_row("Cell", "Cell")
+        table.add_row("Cell", "Cell")
         table.box = getattr(box, box_name)
         table.title = Text(f"box.{box_name}", style="magenta")
-        console.print(table)
+        columns.add_renderable(table)
+    console.print(columns)
 
-    console.save_html("box.html", inline_styles=True)
+    # console.save_html("box.html", inline_styles=True)
