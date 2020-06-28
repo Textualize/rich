@@ -1,5 +1,4 @@
 import io
-import sys
 
 import rich
 from rich.console import Console
