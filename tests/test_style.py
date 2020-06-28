@@ -58,7 +58,7 @@ def test_ansi_codes():
 
 
 def test_repr():
-    assert repr(Style(bold=True, color="red")) == '<style "bold red">'
+    assert repr(Style(bold=True, color="red")) == 'Style.parse("bold red")'
 
 
 def test_eq():

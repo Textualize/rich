@@ -96,7 +96,8 @@ class Table(JupyterMixin):
         title (Union[str, Text], optional): The title of the table rendered at the top. Defaults to None.
         caption (Union[str, Text], optional): The table caption rendered below. Defaults to None.
         width (int, optional): The width in characters of the table, or ``None`` to automatically fit. Defaults to None.
-        box (box.Box, optional): One of the constants in box.py used to draw the edges (See :ref:`appendix_box`). Defaults to box.HEAVY_HEAD.
+        box (box.Box, optional): One of the constants in box.py used to draw the edges (see :ref:`appendix_box`). Defaults to box.HEAVY_HEAD.
+        safe_box (bool, optional): Disable box characters that don't display on windows legacy terminal with *raster* fonts. Defaults to True.
         padding (PaddingDimensions, optional): Padding for cells (top, right, bottom, left). Defaults to (0, 1).
         collapse_padding (bool, optional): Enable collapsing of padding around cells. Defaults to False.
         pad_edge (bool, optional): Enable padding of edge cells. Defaults to True.
@@ -112,7 +113,6 @@ class Table(JupyterMixin):
         border_style (Union[str, Style], optional): Style of the border. Defaults to None.
         title_style (Union[str, Style], optional): Style of the title. Defaults to None.
         caption_style (Union[str, Style], optional): Style of the caption. Defaults to None.
-        safe_box (bool, optional): Disable box characters that don't display on windows legacy terminal with *raster* fonts. Defaults to True.
     """
 
     columns: List[Column]
@@ -124,6 +124,7 @@ class Table(JupyterMixin):
         caption: TextType = None,
         width: int = None,
         box: Optional[box.Box] = box.HEAVY_HEAD,
+        safe_box: bool = True,
         padding: PaddingDimensions = (0, 1),
         collapse_padding: bool = False,
         pad_edge: bool = True,
@@ -139,7 +140,6 @@ class Table(JupyterMixin):
         border_style: StyleType = None,
         title_style: StyleType = None,
         caption_style: StyleType = None,
-        safe_box: bool = True,
     ) -> None:
 
         self.columns = [

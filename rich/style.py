@@ -285,7 +285,7 @@ class Style:
 
     def __repr__(self) -> str:
         """Render a named style differently from an anonymous style."""
-        return f'<style "{self}">'
+        return f'Style.parse("{self}")'
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Style):

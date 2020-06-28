@@ -24,8 +24,9 @@ class Panel(JupyterMixin):
 
     Args:
         renderable (RenderableType): A console renderable object.
-        box (Box, optional): A Box instance that defines the look of the border.
+        box (Box, optional): A Box instance that defines the look of the border (see :ref:`appendix_box`.
             Defaults to box.ROUNDED.
+        safe_box (bool, optional): Disable box characters that don't display on windows legacy terminal with *raster* fonts. Defaults to True.
         expand (bool, optional): If True the panel will stretch to fill the console 
             width, otherwise it will be sized to fit the contents. Defaults to True.
         style (str, optional): The style of the border. Defaults to "none".
@@ -37,11 +38,11 @@ class Panel(JupyterMixin):
         self,
         renderable: RenderableType,
         box: Box = ROUNDED,
+        safe_box: bool = True,
         expand: bool = True,
         style: Union[str, Style] = "none",
         width: Optional[int] = None,
         padding: PaddingDimensions = 0,
-        safe_box: bool = True,
     ) -> None:
         self.renderable = renderable
         self.box = box

@@ -341,17 +341,25 @@ LEGACY_WINDOWS_SUBSTITUTIONS = {
 
 
 @overload
-def get_safe_box(box: None, legacy_windows: bool) -> None:
+def get_safe_box(box: None, legacy_windows: bool) -> None:  # pragma: no cover
     ...
 
 
 @overload
-def get_safe_box(box: Box, legacy_windows: bool) -> Box:
+def get_safe_box(box: Box, legacy_windows: bool) -> Box:  # pragma: no cover
     ...
 
 
 def get_safe_box(box: Optional[Box], legacy_windows: bool) -> Optional[Box]:
-    """Substitute Box constants that don't render on windows legacy."""
+    """Substitute Box constants that don't render on windows legacy.
+
+    Args:
+        box (Optional[Box]): A Box instance.
+        legacy_windows (bool): Enable legacy Windows.
+
+    Returns:
+        Optional[Box]: A Box instance (potentially a new instance).
+    """
     if legacy_windows and box is not None:
         return LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box)
     else:
