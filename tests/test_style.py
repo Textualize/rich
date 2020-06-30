@@ -101,6 +101,15 @@ def test_parse():
         Style.parse("link")
 
 
+def test_link_id():
+    assert Style().link_id == ""
+    assert Style.parse("").link_id == ""
+    assert Style.parse("red").link_id == ""
+    style = Style.parse("red link https://example.org")
+    assert isinstance(style.link_id, str)
+    assert len(style.link_id) > 1
+
+
 def test_get_html_style():
     expected = "color: #7f7fbf; background-color: #800000; font-weight: bold; font-style: italic; text-decoration: underline; text-decoration: line-through; text-decoration: overline"
     assert (

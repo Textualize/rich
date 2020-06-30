@@ -80,11 +80,9 @@ When you add a task it is automatically *started*, which means it will show a pr
 Auto refresh
 ~~~~~~~~~~~~
 
-By default, the progress information will refresh 10 times a second. Refreshing at a predictable rate can make numbers more readable if they are updating quickly. Auto refresh can also prevent excessive rendering to the terminal.
+By default, the progress information will refresh 10 times a second. You can set the refresh rate with the ``refresh_per_second`` argument on the :class:`~rich.progress.Progress` constructor. You should set this to something lower than 10 if you know your updates will not be that frequent.
 
-You can set the refresh rate with the ``refresh_per_second`` argument on the :class:`~rich.progress.Progress` constructor. You could set this to something lower than 10 if you know your updates will not be that frequent.
-
-You can disable auto-refresh by setting ``auto_refresh=False`` on the constructor and call :meth:`~rich.progress.Progress.refresh` manually when there are updates to display.
+You might want to disable auto-refresh entirely if your updates are not very frequent, which you can do by setting ``auto_refresh=False`` on the constructor. If you disable auto-refresh you will need to call :meth:`~rich.progress.Progress.refresh` manually after updating your task(s).
 
 Columns
 ~~~~~~~

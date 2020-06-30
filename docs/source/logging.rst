@@ -15,3 +15,9 @@ Here's an example of how to set up a rich logger::
 
     log = logging.getLogger("rich")
     log.info("Hello, World!")
+
+Rich logs won't process console markup by default, but you can enable markup per log statement with the ``extras`` argument as follows::
+
+    log.error("[bold red blink]Server is shutting down![/]", extras={"markup": True})
+
+There are a number of options you can use to configure logging output, see the :class:`~rich.logging.RichHandler` reference for details.

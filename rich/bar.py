@@ -170,18 +170,19 @@ class Bar(JupyterMixin):
         complete_style = console.get_style(
             self.complete_style if self.completed < self.total else self.finished_style
         )
+        _Segment = Segment
         if bar_count:
-            yield Segment(bar * bar_count, complete_style)
+            yield _Segment(bar * bar_count, complete_style)
         if half_bar_count:
-            yield Segment(half_bar_right * half_bar_count, complete_style)
+            yield _Segment(half_bar_right * half_bar_count, complete_style)
 
         remaining_bars = width - bar_count - half_bar_count
         if remaining_bars:
             if not half_bar_count and bar_count:
-                yield Segment(half_bar_left, style)
+                yield _Segment(half_bar_left, style)
                 remaining_bars -= 1
             if remaining_bars:
-                yield Segment(bar * remaining_bars, style)
+                yield _Segment(bar * remaining_bars, style)
 
     def __rich_measure__(self, console: Console, max_width: int) -> Measurement:
         return (

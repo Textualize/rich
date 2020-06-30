@@ -832,7 +832,7 @@ if __name__ == "__main__":  # pragma: no coverage
 
         task1 = progress.add_task(" [red]Downloading", total=1000)
         task2 = progress.add_task(" [green]Processing", total=1000)
-        task3 = progress.add_task(" [yellow]Thinking", total=1000, start=False)
+        # task3 = progress.add_task(" [yellow]Thinking", total=1000, start=False)
 
         while not progress.finished:
             progress.update(task1, advance=0.5)

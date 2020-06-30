@@ -61,7 +61,7 @@ def render_tables():
     console.print(table)
 
     table.width = 20
-    assert Measurement.get(console, table, 80) == Measurement(46, 52)
+    assert Measurement.get(console, table, 80) == Measurement(20, 20)
     console.print(table)
 
     return console.file.getvalue()

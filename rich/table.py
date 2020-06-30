@@ -101,7 +101,7 @@ class Table(JupyterMixin):
         padding (PaddingDimensions, optional): Padding for cells (top, right, bottom, left). Defaults to (0, 1).
         collapse_padding (bool, optional): Enable collapsing of padding around cells. Defaults to False.
         pad_edge (bool, optional): Enable padding of edge cells. Defaults to True.
-        expand (bool, optional): Expand the table to fit the available space if ``True`` otherwise the table width will be auto-calculated. Defaults to False.
+        expand (bool, optional): Expand the table to fit the available space if ``True``, otherwise the table width will be auto-calculated. Defaults to False.
         show_header (bool, optional): Show a header row. Defaults to True.
         show_footer (bool, optional): Show a footer row. Defaults to False.
         show_edge (bool, optional): Draw a box around the outside of the table. Defaults to True.
@@ -153,7 +153,7 @@ class Table(JupyterMixin):
         self.safe_box = safe_box
         self._padding = Padding.unpack(padding)
         self.pad_edge = pad_edge
-        self.expand = expand
+        self._expand = expand
         self.show_header = show_header
         self.show_footer = show_footer
         self.show_edge = show_edge
@@ -196,6 +196,16 @@ class Table(JupyterMixin):
         )
 
     @property
+    def expand(self) -> int:
+        """Setting a non-None self.width implies expand."""
+        return self._expand or self.width is not None
+
+    @expand.setter
+    def expand(self, expand: bool) -> None:
+        """Set expand."""
+        self._expand = expand
+
+    @property
     def _extra_width(self) -> int:
         """Get extra width to add to cell content."""
         width = 0
@@ -231,9 +241,15 @@ class Table(JupyterMixin):
         measurements = [
             _measure_column(console, column, max_width) for column in self.columns
         ]
-        minimum_width = sum(measurement.minimum for measurement in measurements)
-        maximum_width = sum(measurement.maximum for measurement in measurements)
-        return Measurement(minimum_width + extra_width, maximum_width + extra_width)
+        minimum_width = (
+            sum(measurement.minimum for measurement in measurements) + extra_width
+        )
+        maximum_width = (
+            sum(measurement.maximum for measurement in measurements) + extra_width
+            if (self.width is None)
+            else self.width
+        )
+        return Measurement(minimum_width, maximum_width)
 
     @property
     def padding(self) -> Tuple[int, int, int, int]:

@@ -156,6 +156,19 @@ ASCII: Box = Box(
 """
 )
 
+ASCII2: Box = Box(
+    """\
++-++
+| ||
++-++
+| ||
++-++
++-++
+| ||
++-++
+"""
+)
+
 SQUARE: Box = Box(
     """\
 ┌─┬┐
@@ -330,6 +343,7 @@ DOUBLE_EDGE: Box = Box(
 """
 )
 
+# Map Boxes that don't render with raster fonts on to equivalent that do
 LEGACY_WINDOWS_SUBSTITUTIONS = {
     ROUNDED: SQUARE,
     MINIMAL_HEAVY_HEAD: MINIMAL,
@@ -379,6 +393,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     BOXES = [
         "ASCII",
+        "ASCII2",
         "SQUARE",
         "MINIMAL",
         "MINIMAL_HEAVY_HEAD",
@@ -400,9 +415,8 @@ if __name__ == "__main__":  # pragma: no cover
     columns = Columns(expand=True, padding=2)
     for box_name in BOXES:
         table = Table(
-            width=80, show_footer=True, style="dim", border_style="not dim", expand=True
+            show_footer=True, style="dim", border_style="not dim", expand=True
         )
-        spaces = " " * 10
         table.add_column("Header 1", "Footer 1")
         table.add_column("Header 2", "Footer 2")
         table.add_row("Cell", "Cell")

@@ -21,7 +21,7 @@ class Measurement(NamedTuple):
 
     def normalize(self) -> "Measurement":
         minimum, maximum = self
-        minimum = max(0, minimum)
+        minimum = min(max(0, minimum), maximum)
         return Measurement(minimum, max(minimum, maximum))
 
     def with_maximum(self, width: int) -> "Measurement":
