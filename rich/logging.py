@@ -62,7 +62,12 @@ class RichHandler(Handler):
 
         level = Text()
         level.append(record.levelname, log_style)
-        message_text = Text(message)
+
+        if getattr(record, "markup", False):
+            message_text = Text.from_markup(message)
+        else:
+            message_text = Text(message)
+
         if self.highlighter:
             message_text = self.highlighter(message_text)
         if self.KEYWORDS:
@@ -123,3 +128,4 @@ if __name__ == "__main__":  # pragma: no cover
     sleep(1)
     log.critical("Out of memory!")
     log.info("Server exited with code=-1")
+    log.info("[bold]EXITING...[/bold]", extra=dict(markup=True))
