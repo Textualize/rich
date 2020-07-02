@@ -1,6 +1,6 @@
 import platform
 import textwrap
-from typing import Any, Dict, Optional, Set, Tuple, Union
+from typing import Any, Dict, Optional, Set, Tuple, Type, Union
 
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
 from pygments.style import Style as PygmentsStyle
@@ -37,12 +37,14 @@ class Syntax(JupyterMixin):
         word_wrap (bool, optional): Enable word wrapping.
     """
 
+    _pygments_style_class: Type[PygmentsStyle]
+
     def __init__(
         self,
         code: str,
         lexer_name: str,
         *,
-        theme: Union[str, PygmentsStyle] = DEFAULT_THEME,
+        theme: Union[str, Type[PygmentsStyle]] = DEFAULT_THEME,
         dedent: bool = False,
         line_numbers: bool = False,
         start_line: int = 1,
@@ -64,6 +66,7 @@ class Syntax(JupyterMixin):
         self.word_wrap = word_wrap
 
         self._style_cache: Dict[Any, Style] = {}
+
         if not isinstance(theme, str) and issubclass(theme, PygmentsStyle):
             self._pygments_style_class = theme
         else:
@@ -78,7 +81,7 @@ class Syntax(JupyterMixin):
         cls,
         path: str,
         encoding: str = "utf-8",
-        theme: Union[str, PygmentsStyle] = DEFAULT_THEME,
+        theme: Union[str, Type[PygmentsStyle]] = DEFAULT_THEME,
         dedent: bool = True,
         line_numbers: bool = False,
         line_range: Tuple[int, int] = None,

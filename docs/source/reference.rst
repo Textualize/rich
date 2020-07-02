@@ -21,6 +21,7 @@ Reference
    reference/rule.rst
    reference/segment.rst
    reference/style.rst
+   reference/styled.rst
    reference/syntax.rst
    reference/table.rst
    reference/text.rst

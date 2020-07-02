@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.2] - 2020-07-02
+
+### Added
+
+- Added rich.styled.Styled class to apply styles to renderable
+- Table.add_row now has an optional style parameter
+- Added table_movie.py to examples
+
+### Changed
+
+- Modified box options to use half line characters at edges
+- Non no_wrap columns will now shrink below minimum width if table is compressed
+
 ## [3.0.1] - 2020-06-30
 
 ### Added

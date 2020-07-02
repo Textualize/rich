@@ -1,4 +1,4 @@
-from typing import Match, Union
+from typing import Union
 
 from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin

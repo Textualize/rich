@@ -19,6 +19,7 @@ from .padding import Padding, PaddingDimensions
 from .protocol import is_renderable
 from .segment import Segment
 from .style import Style, StyleType
+from .styled import Styled
 from .text import Text, TextType
 
 if TYPE_CHECKING:
@@ -311,18 +312,24 @@ class Table(JupyterMixin):
         )
         self.columns.append(column)
 
-    def add_row(self, *renderables: Optional["RenderableType"]) -> None:
+    def add_row(
+        self, *renderables: Optional["RenderableType"], style: StyleType = None
+    ) -> None:
         """Add a row of renderables.
         
         Args:
-            *renderables (None or renderable): Each cell in a row must be None (for a blank cell) or a renderable object (including str).
+            *renderables (None or renderable): Each cell in a row must be a renderable object (including str),
+                or ``None`` for a blank cell.
+            style (StyleType, optional): An optional style to apply to the entire row. Defaults to None.
 
         Raises:
             errors.NotRenderableError: If you add something that can't be rendered.
         """
 
         def add_cell(column: Column, renderable: "RenderableType") -> None:
-            column._cells.append(renderable)
+            column._cells.append(
+                renderable if style is None else Styled(renderable, style)
+            )
 
         cell_renderables: List[Optional["RenderableType"]] = list(renderables)
 
@@ -437,6 +444,18 @@ class Table(JupyterMixin):
             )
             table_width = sum(widths)
 
+        # Reduce columns again
+        if table_width > max_width:
+            excess_width = table_width - max_width
+            widths = ratio_reduce(
+                excess_width,
+                [0 if column.no_wrap else 1 for column in columns],
+                [width_range.maximum for width_range in width_ranges],
+                widths,
+            )
+            table_width = sum(widths)
+
+        # last resort, reduce columns evenly
         if table_width > max_width:
             excess_width = table_width - max_width
             widths = ratio_reduce(
@@ -693,7 +712,6 @@ if __name__ == "__main__":  # pragma: no cover
     table.add_row(
         "Magnet",
         "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
-        "foo",
     )
     table.add_row(
         "Magnet",

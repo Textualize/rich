@@ -106,10 +106,10 @@ def make_test_card() -> Table:
     example_table = Table(
         title="Star Wars box office", show_header=True, header_style="bold magenta"
     )
-    example_table.add_column("Date", style="dim", width=12)
+    example_table.add_column("Date", style="dim", no_wrap=True)
     example_table.add_column("Title")
-    example_table.add_column("Production Budget", justify="right")
-    example_table.add_column("Box Office", justify="right")
+    example_table.add_column("Production Budget", justify="right", no_wrap=True)
+    example_table.add_column("Box Office", justify="right", no_wrap=True)
     example_table.add_row(
         "Dec 20, 2019",
         "Star Wars: The Rise of Skywalker",
