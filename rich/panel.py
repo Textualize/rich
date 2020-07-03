@@ -39,7 +39,7 @@ class Panel(JupyterMixin):
         renderable: RenderableType,
         box: Box = ROUNDED,
         *,
-        safe_box: bool = True,
+        safe_box: Optional[bool] = None,
         expand: bool = True,
         style: Union[str, Style] = "none",
         width: Optional[int] = None,
@@ -74,11 +74,8 @@ class Panel(JupyterMixin):
         width = child_width + 2
         child_options = options.update(width=child_width)
         lines = console.render_lines(renderable, child_options)
-        box = (
-            get_safe_box(self.box, console.legacy_windows)
-            if self.safe_box
-            else self.box
-        )
+        safe_box = self.safe_box if self.safe_box is not None else console.safe_box
+        box = get_safe_box(self.box, console.legacy_windows) if safe_box else self.box
         line_start = Segment(box.mid_left, style)
         line_end = Segment(f"{box.mid_right}\n", style)
         yield Segment(box.get_top([width - 2]), style)

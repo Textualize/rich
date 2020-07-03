@@ -228,10 +228,10 @@ SIMPLE: Box = Box(
     """\
     
     
-╶──╴
+ ── 
     
     
-╶──╴
+ ── 
     
     
 """
@@ -241,7 +241,7 @@ SIMPLE_HEAD: Box = Box(
     """\
     
     
-╶──╴
+ ── 
     
     
     
@@ -255,10 +255,10 @@ SIMPLE_HEAVY: Box = Box(
     """\
     
     
-╺━━╸
+ ━━ 
     
     
-╺━━╸
+ ━━ 
     
     
 """
@@ -267,14 +267,14 @@ SIMPLE_HEAVY: Box = Box(
 
 HORIZONTALS: Box = Box(
     """\
-╶──╴
+ ── 
     
-╶──╴
+ ── 
     
-╶──╴
-╶──╴
+ ── 
+ ── 
     
-╶──╴
+ ── 
 """
 )
 
@@ -412,7 +412,8 @@ if __name__ == "__main__":  # pragma: no cover
         "MINIMAL_HEAVY_HEAD",
         "MINIMAL_DOUBLE_HEAD",
         "SIMPLE",
-        "SIMPLE_HEAD" "SIMPLE_HEAVY",
+        "SIMPLE_HEAD",
+        "SIMPLE_HEAVY",
         "HORIZONTALS",
         "ROUNDED",
         "HEAVY",

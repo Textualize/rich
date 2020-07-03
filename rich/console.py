@@ -277,6 +277,7 @@ class Console:
         log_time_format (str, optional): Log time format if ``log_time`` is enabled. Defaults to "[%X] ".
         highlighter (HighlighterType, optional): Default highlighter.
         legacy_windows (bool, optional): Enable legacy Windows mode, or ``None`` to auto detect. Defaults to ``None``.
+        safe_box (bool, optional): Restrict box options that don't render on legacy Windows.
     """
 
     def __init__(
@@ -301,6 +302,7 @@ class Console:
         log_time_format: str = "[%X]",
         highlighter: Optional["HighlighterType"] = ReprHighlighter(),
         legacy_windows: bool = None,
+        safe_box: bool = True,
     ):
         self.is_jupyter = force_jupyter or _is_jupyter()
         if self.is_jupyter:
@@ -336,6 +338,7 @@ class Console:
             show_time=log_time, show_path=log_path, time_format=log_time_format
         )
         self.highlighter: HighlighterType = highlighter or _null_highlighter
+        self.safe_box = safe_box
 
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals()
