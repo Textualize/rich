@@ -31,7 +31,7 @@ pip install rich
 
 ## Rich 的打印功能
 
-想毫不费力地将 Rich 的输出功能添加到您的应用程序中，您只需导入[rich 打印]（https://rich.readthedocs.io/en/latest/introduction.html#quick-start）方法，该方法和其他Python的自带功能的参数类似。
+想毫不费力地将 Rich 的输出功能添加到您的应用程序中，您只需导入[rich 打印](https://rich.readthedocs.io/en/latest/introduction.html#quick-start)方法，该方法和其他 Python 的自带功能的参数类似。
 您可以试试：
 
 ```python
@@ -44,7 +44,7 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ## 使用控制台
 
-想要对 Rich 终端内容进行更多控制，请您导入并构造一个[控制台]（https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console）对象。
+想要对 Rich 终端内容进行更多控制，请您导入并构造一个[控制台](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console)对象。
 
 ```python
 from rich.console import Console
