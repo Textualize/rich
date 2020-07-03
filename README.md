@@ -135,6 +135,8 @@ Rich can render flexible [tables](https://rich.readthedocs.io/en/latest/tables.h
 
 ![table movie](https://github.com/willmcgugan/rich/raw/master/imgs/table_movie.gif)
 
+See [table_movie.py](https://github.com/willmcgugan/rich/raw/master/examples/table_movie.py) to run the above animation in your own terminal.
+
 Here's a simple example:
 
 ```python
