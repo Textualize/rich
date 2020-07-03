@@ -198,11 +198,11 @@ try:
         box.SIMPLE_HEAD,
     ]:
         table.box = box
-        with beat(20):
+        with beat(10):
             console.print(table, justify="center")
 
     table.pad_edge = False
-    with beat(20):
+    with beat(10):
         console.print(table, justify="center")
 
     original_width = Measurement.get(console, table).maximum

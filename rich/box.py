@@ -427,7 +427,7 @@ if __name__ == "__main__":  # pragma: no cover
     console.print()
 
     columns = Columns(expand=True, padding=2)
-    for box_name in BOXES:
+    for box_name in sorted(BOXES):
         table = Table(
             show_footer=True, style="dim", border_style="not dim", expand=True
         )

@@ -74,7 +74,7 @@ class Panel(JupyterMixin):
         width = child_width + 2
         child_options = options.update(width=child_width)
         lines = console.render_lines(renderable, child_options)
-        safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box  # type:ignore
+        safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box  # type: ignore
 
         box = get_safe_box(self.box, console.legacy_windows) if safe_box else self.box
         line_start = Segment(box.mid_left, style)
