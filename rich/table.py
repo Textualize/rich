@@ -424,36 +424,40 @@ class Table(JupyterMixin):
 
         # Reduce rows that not no_wrap
         if table_width > max_width:
+            ratios = [
+                (width_range.minimum, column.no_wrap)
+                for width_range, column in zip(width_ranges, columns)
+            ]
             excess_width = table_width - max_width
             widths = ratio_reduce(
                 excess_width,
-                [0 if column.no_wrap else 1 for column in columns],
+                [0 if no_wrap else ratio for ratio, no_wrap in ratios],
                 [width_range.span for width_range in width_ranges],
                 widths,
             )
             table_width = sum(widths)
 
-        # Reduce rows that are no_wrap
-        if table_width > max_width:
-            excess_width = table_width - max_width
-            widths = ratio_reduce(
-                excess_width,
-                [1 if column.no_wrap else 0 for column in columns],
-                [width_range.span for width_range in width_ranges],
-                widths,
-            )
-            table_width = sum(widths)
+            # Reduce rows that are no_wrap
+            if table_width > max_width:
+                excess_width = table_width - max_width
+                widths = ratio_reduce(
+                    excess_width,
+                    [ratio if no_wrap else 0 for ratio, no_wrap in ratios],
+                    [width_range.span for width_range in width_ranges],
+                    widths,
+                )
+                table_width = sum(widths)
 
-        # Reduce columns again
-        if table_width > max_width:
-            excess_width = table_width - max_width
-            widths = ratio_reduce(
-                excess_width,
-                [0 if column.no_wrap else 1 for column in columns],
-                [width_range.maximum for width_range in width_ranges],
-                widths,
-            )
-            table_width = sum(widths)
+            # Reduce columns again
+            if table_width > max_width:
+                excess_width = table_width - max_width
+                widths = ratio_reduce(
+                    excess_width,
+                    [0 if no_wrap else ratio for ratio, no_wrap in ratios],
+                    widths,
+                    widths,
+                )
+                table_width = sum(widths)
 
         # last resort, reduce columns evenly
         if table_width > max_width:
@@ -704,21 +708,28 @@ if __name__ == "__main__":  # pragma: no cover
         show_edge=True,
     )
     table.add_column("foo", no_wrap=True, footer="BAR")
-    table.add_column()
+    table.add_column("bar")
+    table.add_column("baz")
     table.add_row(
         "Magnet",
         "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
+        "some words",
+    )
+    table.add_row(
+        "Magnet",
+        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
+        "some more words",
+    )
+    table.add_row(
+        "Magnet",
+        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
+        "small words",
     )
     table.add_row(
         "Magnet",
         "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
     )
-    table.add_row(
-        "Magnet",
-        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
-    )
-    table.add_row(
-        "Magnet",
-        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
-    )
-    c.print(table)
+    for width in range(150, 20, -5):
+        c.print(table, width=width)
+
+    c.print("Some more words", width=4, overflow="ellipsis")
