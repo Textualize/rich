@@ -424,41 +424,11 @@ class Table(JupyterMixin):
 
         # Reduce rows that not no_wrap
         if table_width > max_width:
-            ratios = [
-                (width_range.minimum, column.no_wrap)
-                for width_range, column in zip(width_ranges, columns)
-            ]
-            excess_width = table_width - max_width
-            widths = ratio_reduce(
-                excess_width,
-                [0 if no_wrap else ratio for ratio, no_wrap in ratios],
-                [width_range.span for width_range in width_ranges],
-                widths,
+            widths = self._collapse_widths(
+                widths, [not column.no_wrap for column in columns], max_width
             )
-            table_width = sum(widths)
 
-            # Reduce rows that are no_wrap
-            if table_width > max_width:
-                excess_width = table_width - max_width
-                widths = ratio_reduce(
-                    excess_width,
-                    [ratio if no_wrap else 0 for ratio, no_wrap in ratios],
-                    [width_range.span for width_range in width_ranges],
-                    widths,
-                )
-                table_width = sum(widths)
-
-            # Reduce columns again
-            if table_width > max_width:
-                excess_width = table_width - max_width
-                widths = ratio_reduce(
-                    excess_width,
-                    [0 if no_wrap else ratio for ratio, no_wrap in ratios],
-                    widths,
-                    widths,
-                )
-                table_width = sum(widths)
-
+        table_width = sum(widths)
         # last resort, reduce columns evenly
         if table_width > max_width:
             excess_width = table_width - max_width
@@ -473,6 +443,43 @@ class Table(JupyterMixin):
         elif table_width < max_width and self.expand:
             pad_widths = ratio_distribute(max_width - table_width, widths)
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
+
+        return widths
+
+    @classmethod
+    def _collapse_widths(
+        cls, widths: List[int], wrapable: List[bool], max_width: int
+    ) -> List[int]:
+        widths = widths[:]
+        total_width = sum(widths)
+        excess_width = total_width - max_width
+        while excess_width > 0:
+            max_column = max(
+                width if allow_wrap else 0
+                for width, allow_wrap in zip(widths, wrapable)
+            )
+            if max_column == 0:
+                break
+            try:
+                second_max_column = max(
+                    width if allow_wrap and width != max_column else 0
+                    for width, allow_wrap in zip(widths, wrapable)
+                )
+            except ValueError:
+                second_max_column = 0
+            column_difference = max_column - second_max_column
+            ratios = [
+                (1 if (width == max_column and allow_wrap) else 0)
+                for width, allow_wrap in zip(widths, wrapable)
+            ]
+            if not any(ratios):
+                break
+
+            max_reduce = [min(excess_width, column_difference)] * len(widths)
+            widths = ratio_reduce(excess_width, ratios, max_reduce, widths)
+
+            total_width = sum(widths)
+            excess_width = total_width - max_width
 
         return widths
 
@@ -710,26 +717,27 @@ if __name__ == "__main__":  # pragma: no cover
     table.add_column("foo", no_wrap=True, footer="BAR")
     table.add_column("bar")
     table.add_column("baz")
-    table.add_row(
-        "Magnet",
-        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
-        "some words",
-    )
-    table.add_row(
-        "Magnet",
-        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
-        "some more words",
-    )
-    table.add_row(
-        "Magnet",
-        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
-        "small words",
-    )
-    table.add_row(
-        "Magnet",
-        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
-    )
-    for width in range(150, 20, -5):
+    table.add_row("Magnet", "foo" * 20, "bar" * 10, "egg" * 15)
+    # table.add_row(
+    #     "Magnet",
+    #     "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
+    #     "some words",
+    # )
+    # table.add_row(
+    #     "Magnet",
+    #     "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
+    #     "some more words",
+    # )m
+    # table.add_row(
+    #     "Magnet",
+    #     "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
+    #     "small words",
+    # )
+    # table.add_row(
+    #     "Magnet",
+    #     "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
+    # )
+    for width in range(180, 20, -5):
         c.print(table, width=width)
 
     c.print("Some more words", width=4, overflow="ellipsis")
