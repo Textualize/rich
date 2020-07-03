@@ -131,7 +131,11 @@ Please use this feature wisely.
 
 ## Tables
 
-Rich can render flexible [tables](https://rich.readthedocs.io/en/latest/tables.html) with unicode box characters. There is a large variety of formatting options for borders, styles, cell alignment etc. Here's a simple example:
+Rich can render flexible [tables](https://rich.readthedocs.io/en/latest/tables.html) with unicode box characters. There is a large variety of formatting options for borders, styles, cell alignment etc.
+
+[![asciicast](https://asciinema.org/a/rIihi2rm7KzrR3jdsZwBxUdFB.svg)](https://asciinema.org/a/rIihi2rm7KzrR3jdsZwBxUdFB)
+
+Here's a simple example:
 
 ```python
 from rich.console import Console
