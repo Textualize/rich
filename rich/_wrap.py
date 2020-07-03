@@ -36,6 +36,8 @@ def divide_line(text: str, width: int, fold: bool = True) -> List[int]:
                             start += len(line)
                             append(start)
                 else:
+                    if start:
+                        append(start)
                     line_position = _cell_len(word)
             elif line_position and start:
                 append(start)

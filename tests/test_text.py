@@ -361,6 +361,22 @@ def test_wrap_long():
     assert lines[2] == Text("bra ")
 
 
+def test_wrap_overflow():
+    test = Text("Some more words")
+    lines = test.wrap(Console(), 4, overflow="ellipsis")
+    assert (len(lines)) == 3
+    assert lines[0] == Text("Some")
+    assert lines[1] == Text("more")
+    assert lines[2] == Text("wor…")
+
+
+def test_wrap_overflow_long():
+    test = Text("bigword" * 10)
+    lines = test.wrap(Console(), 4, overflow="ellipsis")
+    assert len(lines) == 1
+    assert lines[0] == Text("big…")
+
+
 def test_wrap_long_words():
     test = Text("X 123456789", justify="left")
     lines = test.wrap(Console(), 4)

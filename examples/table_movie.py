@@ -54,7 +54,7 @@ TABLE_DATA = [
 
 console = Console()
 
-BEAT_TIME = 0.05
+BEAT_TIME = 0.04
 
 
 @contextmanager
@@ -110,7 +110,7 @@ try:
     with beat(10):
         console.print(table, justify="center")
 
-    table.caption = "Made with [b magenta]Rich[/]"
+    table.caption = "Made with [b magenta not dim]Rich[/]"
     with beat(10):
         console.print(table, justify="center")
 
@@ -187,31 +187,23 @@ try:
     with beat(10):
         console.print(table, justify="center")
 
-    for color in [
-        "deep_pink4",
-        "dark_khaki",
-        "medium_purple2",
-        "thistle3",
-        "orange1",
-    ]:
-        table.border_style = color
-        with beat(10):
-            console.print(table, justify="center")
+    table.border_style = "bright_yellow"
+    with beat(10):
+        console.print(table, justify="center")
 
     for box in [
-        box.ASCII,
-        box.ASCII2,
-        box.DOUBLE,
-        box.DOUBLE_EDGE,
-        box.HEAVY_EDGE,
-        box.MINIMAL_HEAVY_HEAD,
-        box.MINIMAL_DOUBLE_HEAD,
+        box.SQUARE,
+        box.MINIMAL,
         box.SIMPLE,
         box.SIMPLE_HEAD,
     ]:
         table.box = box
-        with beat(20):
+        with beat(10):
             console.print(table, justify="center")
+
+    table.pad_edge = False
+    with beat(10):
+        console.print(table, justify="center")
 
     original_width = Measurement.get(console, table).maximum
 

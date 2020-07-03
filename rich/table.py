@@ -98,7 +98,7 @@ class Table(JupyterMixin):
         caption (Union[str, Text], optional): The table caption rendered below. Defaults to None.
         width (int, optional): The width in characters of the table, or ``None`` to automatically fit. Defaults to None.
         box (box.Box, optional): One of the constants in box.py used to draw the edges (see :ref:`appendix_box`). Defaults to box.HEAVY_HEAD.
-        safe_box (bool, optional): Disable box characters that don't display on windows legacy terminal with *raster* fonts. Defaults to True.
+        safe_box (Optional[bool], optional): Disable box characters that don't display on windows legacy terminal with *raster* fonts. Defaults to True.
         padding (PaddingDimensions, optional): Padding for cells (top, right, bottom, left). Defaults to (0, 1).
         collapse_padding (bool, optional): Enable collapsing of padding around cells. Defaults to False.
         pad_edge (bool, optional): Enable padding of edge cells. Defaults to True.
@@ -125,7 +125,7 @@ class Table(JupyterMixin):
         caption: TextType = None,
         width: int = None,
         box: Optional[box.Box] = box.HEAVY_HEAD,
-        safe_box: bool = True,
+        safe_box: Optional[bool] = None,
         padding: PaddingDimensions = (0, 1),
         collapse_padding: bool = False,
         pad_edge: bool = True,
@@ -396,8 +396,7 @@ class Table(JupyterMixin):
         """Calculate the widths of each column, including padding, not including borders."""
         columns = self.columns
         width_ranges = [
-            self._measure_column(console, column, max_width)
-            for column_index, column in enumerate(columns)
+            self._measure_column(console, column, max_width) for column in columns
         ]
         widths = [_range.maximum or 1 for _range in width_ranges]
         get_padding_width = self._get_padding_width
@@ -422,54 +421,64 @@ class Table(JupyterMixin):
                         widths[index] = fixed_widths[index] + next(iter_flex_widths)
         table_width = sum(widths)
 
-        # Reduce rows that not no_wrap
         if table_width > max_width:
-            excess_width = table_width - max_width
-            widths = ratio_reduce(
-                excess_width,
-                [0 if column.no_wrap else 1 for column in columns],
-                [width_range.span for width_range in width_ranges],
-                widths,
+            widths = self._collapse_widths(
+                widths, [not column.no_wrap for column in columns], max_width
             )
             table_width = sum(widths)
 
-        # Reduce rows that are no_wrap
-        if table_width > max_width:
-            excess_width = table_width - max_width
-            widths = ratio_reduce(
-                excess_width,
-                [1 if column.no_wrap else 0 for column in columns],
-                [width_range.span for width_range in width_ranges],
-                widths,
-            )
-            table_width = sum(widths)
+            # last resort, reduce columns evenly
+            if table_width > max_width:
+                excess_width = table_width - max_width
+                widths = ratio_reduce(excess_width, [1] * len(widths), widths, widths)
+                table_width = sum(widths)
 
-        # Reduce columns again
-        if table_width > max_width:
-            excess_width = table_width - max_width
-            widths = ratio_reduce(
-                excess_width,
-                [0 if column.no_wrap else 1 for column in columns],
-                [width_range.maximum for width_range in width_ranges],
-                widths,
-            )
-            table_width = sum(widths)
-
-        # last resort, reduce columns evenly
-        if table_width > max_width:
-            excess_width = table_width - max_width
-            widths = ratio_reduce(
-                excess_width,
-                [width_range.minimum for width_range in width_ranges],
-                widths,
-                widths,
-            )
-            table_width = sum(widths)
-
-        elif table_width < max_width and self.expand:
+        if table_width < max_width and self.expand:
             pad_widths = ratio_distribute(max_width - table_width, widths)
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
 
+        return widths
+
+    @classmethod
+    def _collapse_widths(
+        cls, widths: List[int], wrapable: List[bool], max_width: int
+    ) -> List[int]:
+        """Reduce widths so that the total is under max_width.
+
+        Args:
+            widths (List[int]): List of widths.
+            wrapable (List[bool]): List of booleans that indicate if a column may shrink.
+            max_width (int): Maximum width to reduce to.
+
+        Returns:
+            List[int]: A new list of widths.
+        """
+        total_width = sum(widths)
+        excess_width = total_width - max_width
+        if any(wrapable):
+            while total_width and excess_width > 0:
+                max_column = max(
+                    width for width, allow_wrap in zip(widths, wrapable) if allow_wrap
+                )
+                try:
+                    second_max_column = max(
+                        width if allow_wrap and width != max_column else 0
+                        for width, allow_wrap in zip(widths, wrapable)
+                    )
+                except ValueError:
+                    second_max_column = 0
+                column_difference = max_column - second_max_column
+                ratios = [
+                    (1 if (width == max_column and allow_wrap) else 0)
+                    for width, allow_wrap in zip(widths, wrapable)
+                ]
+                if not any(ratios) or not column_difference:
+                    break
+                max_reduce = [min(excess_width, column_difference)] * len(widths)
+                widths = ratio_reduce(excess_width, ratios, max_reduce, widths)
+
+                total_width = sum(widths)
+                excess_width = total_width - max_width
         return widths
 
     def _get_cells(self, column_index: int, column: Column) -> Iterable[_Cell]:
@@ -569,10 +578,9 @@ class Table(JupyterMixin):
                 )
             )
         )
+        safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box  # type: ignore
         _box = (
-            box.get_safe_box(self.box, console.legacy_windows)
-            if self.safe_box
-            else self.box
+            box.get_safe_box(self.box, console.legacy_windows) if safe_box else self.box
         )
 
         # _box = self.box
@@ -698,27 +706,19 @@ if __name__ == "__main__":  # pragma: no cover
     table = Table(
         show_lines=False,
         row_styles=["red", "green"],
-        expand=True,
+        expand=False,
         show_header=True,
         show_footer=False,
         show_edge=True,
     )
     table.add_column("foo", no_wrap=True, footer="BAR")
-    table.add_column()
-    table.add_row(
-        "Magnet",
-        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
-    )
-    table.add_row(
-        "Magnet",
-        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
-    )
-    table.add_row(
-        "Magnet",
-        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
-    )
-    table.add_row(
-        "Magnet",
-        "pneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosispneumonoultramicroscopicsilicovolcanoconiosis",
-    )
-    c.print(table)
+    table.add_column("bar")
+    table.add_column("baz")
+    table.add_row("Magnet", "foo" * 20, "bar" * 10, "egg" * 15)
+
+    for width in range(170, 1, -1):
+        print(" " * width + "<|")
+        c = Console(width=width)
+        c.print(table)
+
+    c.print("Some more words", width=4, overflow="ellipsis")

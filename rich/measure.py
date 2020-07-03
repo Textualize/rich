@@ -22,7 +22,7 @@ class Measurement(NamedTuple):
     def normalize(self) -> "Measurement":
         minimum, maximum = self
         minimum = min(max(0, minimum), maximum)
-        return Measurement(minimum, max(minimum, maximum))
+        return Measurement(max(0, minimum), max(0, max(minimum, maximum)))
 
     def with_maximum(self, width: int) -> "Measurement":
         """Get a RenderableWith where the widths are <= width.
@@ -63,8 +63,10 @@ class Measurement(NamedTuple):
         if is_renderable(renderable):
             get_console_width = getattr(renderable, "__rich_measure__", None)
             if get_console_width is not None:
-                render_width = get_console_width(console, _max_width).with_maximum(
-                    _max_width
+                render_width = (
+                    get_console_width(console, _max_width)
+                    .normalize()
+                    .with_maximum(_max_width)
                 )
                 return render_width.normalize()
             else:
