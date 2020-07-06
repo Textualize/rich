@@ -298,7 +298,7 @@ if __name__ == "__main__":  # pragma: no cover
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Render Markdown to the console with Rich"
+        description="Render syntax to the console with Rich"
     )
     parser.add_argument("path", metavar="PATH", help="path to file")
     parser.add_argument(
