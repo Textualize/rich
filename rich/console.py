@@ -21,6 +21,7 @@ from typing import (
     Iterable,
     List,
     Optional,
+    TYPE_CHECKING,
     NamedTuple,
     Union,
 )
@@ -44,6 +45,8 @@ from .segment import Segment
 from .text import Text, TextType
 from .theme import Theme
 
+if TYPE_CHECKING:
+    from ._windows import WindowsConsoleFeatures
 
 WINDOWS = platform.system() == "Windows"
 
@@ -244,9 +247,22 @@ class RenderHook:
         return renderables
 
 
+_windows_console_features: Optional["WindowsConsoleFeatures"] = None
+
+
+def get_windows_console_features() -> "WindowsConsoleFeatures":
+    global _windows_console_features
+    if _windows_console_features is not None:
+        return _windows_console_features
+    from ._windows import get_windows_console_features
+
+    _windows_console_features = get_windows_console_features()
+    return _windows_console_features
+
+
 def detect_legacy_windows() -> bool:
     """Detect legacy Windows."""
-    return "WINDIR" in os.environ and "WT_SESSION" not in os.environ
+    return WINDOWS and not get_windows_console_features().vt
 
 
 if detect_legacy_windows():  # pragma: no cover
@@ -364,19 +380,26 @@ class Console:
 
     def _detect_color_system(self) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
-        if not self.is_terminal:
+        if not self.is_terminal or "NO_COLOR" in os.environ:
             return None
-        if self.legacy_windows:  # pragma: no cover
-            return ColorSystem.WINDOWS
-        if "WT_SESSION" in os.environ:
-            # Exception for Windows terminal
-            return ColorSystem.TRUECOLOR
-        color_term = os.environ.get("COLORTERM", "").strip().lower()
-        return (
-            ColorSystem.TRUECOLOR
-            if color_term in ("truecolor", "24bit")
-            else ColorSystem.EIGHT_BIT
-        )
+        if WINDOWS:  # pragma: no cover
+            if self.legacy_windows:  # pragma: no cover
+                return ColorSystem.WINDOWS
+            windows_console_features = get_windows_console_features()
+            return (
+                ColorSystem.TRUECOLOR
+                if windows_console_features.truecolor
+                else ColorSystem.EIGHT_BIT
+            )
+        else:
+            if self.is_jupyter:
+                return ColorSystem.TRUECOLOR
+            color_term = os.environ.get("COLORTERM", "").strip().lower()
+            return (
+                ColorSystem.TRUECOLOR
+                if color_term in ("truecolor", "24bit")
+                else ColorSystem.EIGHT_BIT
+            )
 
     def _enter_buffer(self) -> None:
         """Enter in to a buffer context, and buffer all output."""
