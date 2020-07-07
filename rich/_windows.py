@@ -40,7 +40,7 @@ else:
     _GetStdHandle.restype = wintypes.HANDLE
 
     def get_windows_console_features() -> WindowsConsoleFeatures:
-        """Get windows console fatures.
+        """Get windows console features.
 
         Returns:
             WindowsConsoleFeatures: An instance of WindowsConsoleFeatures.
