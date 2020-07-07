@@ -60,5 +60,8 @@ else:
 
 
 if __name__ == "__main__":
-    print(get_windows_console_features())
+    features = get_windows_console_features()
+    from rich import print
+
+    print(repr(features))
 
