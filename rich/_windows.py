@@ -7,8 +7,8 @@ from dataclasses import dataclass
 class WindowsConsoleFeatures:
     """Windows features available."""
 
-    vt: bool
-    truecolor: bool
+    vt: bool = False
+    truecolor: bool = False
 
 
 try:
@@ -16,7 +16,7 @@ try:
     from ctypes import wintypes
     from ctypes import LibraryLoader
 
-    windll = LibraryLoader(ctypes.WinDLL)
+    windll = LibraryLoader(ctypes.WinDLL)  # type: ignore
 except (AttributeError, ImportError):
 
     # Fallback if we can't load the Windows DLL
