@@ -1,5 +1,6 @@
 [run]
 omit = rich/jupyter.py
+    rich/_windows.py
 
 [report]
 exclude_lines =

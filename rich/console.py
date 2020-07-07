@@ -250,7 +250,7 @@ class RenderHook:
 _windows_console_features: Optional["WindowsConsoleFeatures"] = None
 
 
-def get_windows_console_features() -> "WindowsConsoleFeatures":
+def get_windows_console_features() -> "WindowsConsoleFeatures":  # pragma: no cover
     global _windows_console_features
     if _windows_console_features is not None:
         return _windows_console_features
@@ -380,6 +380,8 @@ class Console:
 
     def _detect_color_system(self) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
+        if self.is_jupyter:
+            return ColorSystem.TRUECOLOR
         if not self.is_terminal or "NO_COLOR" in os.environ:
             return None
         if WINDOWS:  # pragma: no cover
@@ -392,8 +394,6 @@ class Console:
                 else ColorSystem.EIGHT_BIT
             )
         else:
-            if self.is_jupyter:
-                return ColorSystem.TRUECOLOR
             color_term = os.environ.get("COLORTERM", "").strip().lower()
             return (
                 ColorSystem.TRUECOLOR
@@ -944,7 +944,7 @@ class Console:
         """Check if the buffer may be rendered."""
         with self._lock:
             if self._buffer_index == 0:
-                if self.is_jupyter:
+                if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
 
                     display(self._buffer)
