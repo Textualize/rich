@@ -73,7 +73,7 @@ class ReprHighlighter(RegexHighlighter):
     highlights = [
         r"(?P<brace>[\{\[\(\)\]\}])",
         r"(?P<tag_start>\<)(?P<tag_name>\w*)(?P<tag_contents>.*?)(?P<tag_end>\>)",
-        r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?\S+\"?)",
+        r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?[\w_]+\"?)",
         r"(?P<bool_true>True)|(?P<bool_false>False)|(?P<none>None)",
         r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*\b)",
         r"(?P<number>0x[0-9a-f]*)",
