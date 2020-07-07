@@ -17,7 +17,7 @@ try:
     from ctypes import LibraryLoader
 
     windll = LibraryLoader(ctypes.WinDLL)  # type: ignore
-except (AttributeError, ImportError):
+except (AttributeError, ImportError, ValueError):
 
     # Fallback if we can't load the Windows DLL
     def get_windows_console_features() -> WindowsConsoleFeatures:
@@ -60,8 +60,11 @@ else:
 
 
 if __name__ == "__main__":
+    import platform
+
     features = get_windows_console_features()
     from rich import print
 
+    print(f'platform="{platform.system()}"')
     print(repr(features))
 
