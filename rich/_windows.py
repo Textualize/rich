@@ -53,7 +53,7 @@ else:
         if vt:
             win_version = sys.getwindowsversion()
             truecolor = win_version.major > 10 or (
-                win_version.major == 10 and win_version.build > 15063
+                win_version.major == 10 and win_version.build >= 15063
             )
         features = WindowsConsoleFeatures(vt=vt, truecolor=truecolor)
         return features
