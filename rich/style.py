@@ -247,9 +247,9 @@ class Style:
                     for bit in range(9, 13):
                         if attributes & (1 << bit):
                             append(_style_map[bit])
-            if self._color is not None and color_system:
+            if self._color is not None:
                 sgr.extend(self._color.downgrade(color_system).get_ansi_codes())
-            if self._bgcolor is not None and color_system:
+            if self._bgcolor is not None:
                 sgr.extend(
                     self._bgcolor.downgrade(color_system).get_ansi_codes(
                         foreground=False
