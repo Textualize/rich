@@ -21,6 +21,7 @@ from typing import (
     Sequence,
     Tuple,
     TypeVar,
+    TYPE_CHECKING,
     NewType,
     Union,
 )
@@ -37,11 +38,15 @@ from .console import (
 )
 from .control import Control
 from .highlighter import Highlighter
+from .jupyter import JupyterMixin
 from . import filesize
 from .live_render import LiveRender
 from .style import StyleType
 from .table import Table
 from .text import Text
+
+if TYPE_CHECKING:
+    from ipywidgets import DOMWidget
 
 
 TaskID = NewType("TaskID", int)
@@ -412,7 +417,7 @@ class _FileProxy(io.TextIOBase):
             del buffer[:]
 
 
-class Progress(RenderHook):
+class Progress(JupyterMixin, RenderHook):
     """Renders an auto-updating progress bar(s).
     
     Args:
@@ -464,6 +469,7 @@ class Progress(RenderHook):
         self.log = self.console.log
         self._restore_stdout: Optional[IO[str]] = None
         self._restore_stderr: Optional[IO[str]] = None
+        self.ipy_widget: Optional["DomWidget"] = None
 
     @property
     def tasks(self) -> List[Task]:
@@ -539,6 +545,8 @@ class Progress(RenderHook):
             self._refresh_thread = None
         if self.transient:
             self.console.control(self._live_render.restore_cursor())
+        if self.ipy_widget is not None:
+            self.ipy_widget.close()
 
     def __enter__(self) -> "Progress":
         self.start()
@@ -671,12 +679,25 @@ class Progress(RenderHook):
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
-        with self._lock:
-            self._live_render.set_renderable(self.get_renderable())
-            if self.console.is_terminal:
+        if self.console.is_jupyter:
+            from ipywidgets import Output
+            from IPython.display import display
+
+            if self.ipy_widget is None:
+                self.ipy_widget = Output()
+                display(self.ipy_widget)
+
+            with self._lock:
+                with self.ipy_widget:
+                    self.ipy_widget.clear_output(wait=True)
+                    self.console.print(self.get_renderable())
+
+        elif self.console.is_terminal:
+            with self._lock:
+                self._live_render.set_renderable(self.get_renderable())
                 with self.console:
                     self.console.print(Control(""))
-            self._refresh_count += 1
+                self._refresh_count += 1
 
     def get_renderable(self) -> RenderableType:
         """Get a renderable for the progress display."""
