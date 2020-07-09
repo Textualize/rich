@@ -73,20 +73,22 @@ class Panel(JupyterMixin):
         )
         width = child_width + 2
         child_options = options.update(width=child_width)
-        lines = console.render_lines(renderable, child_options)
+        lines = console.render_lines(renderable, child_options, style=style)
         safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box  # type: ignore
 
         box = get_safe_box(self.box, console.legacy_windows) if safe_box else self.box
         line_start = Segment(box.mid_left, style)
-        line_end = Segment(f"{box.mid_right}\n", style)
+        line_end = Segment(f"{box.mid_right}", style)
+        new_line = Segment.line()
         yield Segment(box.get_top([width - 2]), style)
-        yield Segment.line()
+        yield new_line
         for line in lines:
             yield line_start
             yield from line
             yield line_end
+            yield new_line
         yield Segment(box.get_bottom([width - 2]), style)
-        yield Segment.line()
+        yield new_line
 
     def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
         width = Measurement.get(console, self.renderable, max_width - 2).maximum + 2
@@ -103,11 +105,13 @@ if __name__ == "__main__":  # pragma: no cover
 
     p = Panel(
         Panel(
-            Padding(Text.from_markup("[bold magenta]Hello World!"), (1, 8)),
+            Text.from_markup("[bold magenta]Hello World!"),
             box=ROUNDED,
             expand=False,
             safe_box=True,
-        )
+            style="on red",
+        ),
+        style="on blue",
     )
 
     print(p)
