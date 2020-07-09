@@ -45,10 +45,6 @@ from .style import StyleType
 from .table import Table
 from .text import Text
 
-if TYPE_CHECKING:
-    from ipywidgets import DOMWidget
-
-
 TaskID = NewType("TaskID", int)
 
 ProgressType = TypeVar("ProgressType")
@@ -65,6 +61,11 @@ def track(
     console: Optional[Console] = None,
     transient: bool = False,
     get_time: Callable[[], float] = None,
+    refresh_per_second: int = None,
+    style: StyleType = "bar.back",
+    complete_style: StyleType = "bar.complete",
+    finished_style: StyleType = "bar.finished",
+    pulse_style: StyleType = "bar.pulse",
 ) -> Iterable[ProgressType]:
     """Track progress of processing a sequence.
     
@@ -75,16 +76,38 @@ def track(
         auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         console (Console, optional): Console to write to. Default creates internal Console instance.
-    
+        refresh_per_second (Optional[int], optional): Number of times per second to refresh the progress information, or None to use default. Defaults to None.
+        style (StyleType, optional): Style for the bar background. Defaults to "bar.back".
+        complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
+        finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".   
+        pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".     
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
     
     """
+
+    columns: List["ProgressColumn"] = (
+        [TextColumn("[progress.description]{task.description}")] if description else []
+    )
+    columns.extend(
+        (
+            BarColumn(
+                style=style,
+                complete_style=complete_style,
+                finished_style=finished_style,
+                pulse_style=pulse_style,
+            ),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            TimeRemainingColumn(),
+        )
+    )
     progress = Progress(
+        *columns,
         auto_refresh=auto_refresh,
         console=console,
         transient=transient,
         get_time=get_time,
+        refresh_per_second=refresh_per_second,
     )
 
     task_total = total
@@ -101,7 +124,7 @@ def track(
         for completed, value in enumerate(sequence, 1):
             yield value
             progress.update(task_id, completed=completed)
-            if not auto_refresh:
+            if not progress.auto_refresh:
                 progress.refresh()
 
 
@@ -172,10 +195,29 @@ class TextColumn(ProgressColumn):
 
 
 class BarColumn(ProgressColumn):
-    """Renders a progress bar."""
+    """Renders a visual progress bar.
 
-    def __init__(self, bar_width: Optional[int] = 40) -> None:
+    Args:
+        bar_width (Optional[int], optional): Width of bar or None for full width. Defaults to 40.
+        style (StyleType, optional): Style for the bar background. Defaults to "bar.back".
+        complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
+        finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
+        pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
+    """
+
+    def __init__(
+        self,
+        bar_width: Optional[int] = 40,
+        style: StyleType = "bar.back",
+        complete_style: StyleType = "bar.complete",
+        finished_style: StyleType = "bar.finished",
+        pulse_style: StyleType = "bar.pulse",
+    ) -> None:
         self.bar_width = bar_width
+        self.style = style
+        self.complete_style = complete_style
+        self.finished_style = finished_style
+        self.pulse_style = pulse_style
         super().__init__()
 
     def render(self, task: "Task") -> Bar:
@@ -186,6 +228,10 @@ class BarColumn(ProgressColumn):
             width=None if self.bar_width is None else max(1, self.bar_width),
             pulse=not task.started,
             animation_time=task.get_time(),
+            style=self.style,
+            complete_style=self.complete_style,
+            finished_style=self.finished_style,
+            pulse_style=self.pulse_style,
         )
 
 
@@ -423,7 +469,7 @@ class Progress(JupyterMixin, RenderHook):
     Args:
         console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
-        refresh_per_second (int, optional): Number of times per second to refresh the progress information. Defaults to 10.
+        refresh_per_second (Optional[int], optional): Number of times per second to refresh the progress information or None to use default (10). Defaults to None.
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         redirect_stout: (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
@@ -436,14 +482,16 @@ class Progress(JupyterMixin, RenderHook):
         *columns: Union[str, ProgressColumn],
         console: Console = None,
         auto_refresh: bool = True,
-        refresh_per_second: int = 10,
+        refresh_per_second: int = None,
         speed_estimate_period: float = 30.0,
         transient: bool = False,
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
         get_time: GetTimeCallable = None,
     ) -> None:
-        assert refresh_per_second > 0, "refresh_per_second must be > 0"
+        assert (
+            refresh_per_second is None or refresh_per_second > 0
+        ), "refresh_per_second must be > 0"
         self._lock = RLock()
         self.columns = columns or (
             TextColumn("[progress.description]{task.description}"),
@@ -452,8 +500,8 @@ class Progress(JupyterMixin, RenderHook):
             TimeRemainingColumn(),
         )
         self.console = console or get_console()
-        self.auto_refresh = auto_refresh
-        self.refresh_per_second = refresh_per_second
+        self.auto_refresh = auto_refresh and not self.console.is_jupyter
+        self.refresh_per_second = refresh_per_second or 10
         self.speed_estimate_period = speed_estimate_period
         self.transient = transient
         self._redirect_stdout = redirect_stdout
@@ -469,7 +517,7 @@ class Progress(JupyterMixin, RenderHook):
         self.log = self.console.log
         self._restore_stdout: Optional[IO[str]] = None
         self._restore_stderr: Optional[IO[str]] = None
-        self.ipy_widget: Optional["DomWidget"] = None
+        self.ipy_widget: Optional[Any] = None
 
     @property
     def tasks(self) -> List[Task]:
@@ -545,7 +593,8 @@ class Progress(JupyterMixin, RenderHook):
             self._refresh_thread = None
         if self.transient:
             self.console.control(self._live_render.restore_cursor())
-        if self.ipy_widget is not None:
+        if self.ipy_widget is not None and self.transient:
+            self.ipy_widget.clear_output()
             self.ipy_widget.close()
 
     def __enter__(self) -> "Progress":
@@ -683,11 +732,11 @@ class Progress(JupyterMixin, RenderHook):
             from ipywidgets import Output
             from IPython.display import display
 
-            if self.ipy_widget is None:
-                self.ipy_widget = Output()
-                display(self.ipy_widget)
-
             with self._lock:
+                if self.ipy_widget is None:
+                    self.ipy_widget = Output()
+                    display(self.ipy_widget)
+
                 with self.ipy_widget:
                     self.ipy_widget.clear_output(wait=True)
                     self.console.print(self.get_renderable())
@@ -860,4 +909,4 @@ if __name__ == "__main__":  # pragma: no coverage
             progress.update(task2, advance=0.3)
             time.sleep(0.01)
             if random.randint(0, 100) < 1:
-                progress.log(next(examples))
+                progress.log(next(examples))                

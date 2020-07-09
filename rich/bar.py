@@ -27,6 +27,7 @@ class Bar(JupyterMixin):
         style (StyleType, optional): Style for the bar background. Defaults to "bar.back".
         complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
+        pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
         animation_time (Optional[float], optional): Time in seconds to use for animation, or None to use system time.
     """
 

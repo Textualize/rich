@@ -31,7 +31,7 @@ class Segment(NamedTuple):
         return 0 if self.is_control else cell_len(self.text)
 
     @classmethod
-    def control(self, text: str) -> "Segment":
+    def control(cls, text: str) -> "Segment":
         """Create a Segment with control codes.
 
         Args:
@@ -43,7 +43,7 @@ class Segment(NamedTuple):
         return Segment(text, is_control=True)
 
     @classmethod
-    def line(self) -> "Segment":
+    def line(cls) -> "Segment":
         """Make a new line segment."""
         return Segment("\n")
 

@@ -11,6 +11,11 @@ To see how the progress display looks, try this from the command line::
 
     python -m rich.progress
 
+
+.. note::
+
+    Progress works with Jupyter notebooks, with the caveat that auto-refresh is disabled. You will need to explicitly call :meth:`~rich.progress.Progress.refresh` or set ``refresh=True`` when calling :meth:`~rich.progress.Progress.update`. Or use the :func:`~rich.progress.track` function which does a refresh automatically on each loop.
+
 Basic Usage
 -----------
 
