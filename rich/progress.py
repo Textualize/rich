@@ -746,7 +746,7 @@ class Progress(JupyterMixin, RenderHook):
                 self._live_render.set_renderable(self.get_renderable())
                 with self.console:
                     self.console.print(Control(""))
-                self._refresh_count += 1
+        self._refresh_count += 1
 
     def get_renderable(self) -> RenderableType:
         """Get a renderable for the progress display."""
@@ -909,4 +909,5 @@ if __name__ == "__main__":  # pragma: no coverage
             progress.update(task2, advance=0.3)
             time.sleep(0.01)
             if random.randint(0, 100) < 1:
-                progress.log(next(examples))                
+                progress.log(next(examples))
+
