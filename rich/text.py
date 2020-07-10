@@ -222,7 +222,7 @@ class Text(JupyterMixin):
             style (Union[str, Style], optional): Base style for text. Defaults to "".
             justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
             overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None. 
-            end (str, optional): Character to end text with. Defaults to "\n".
+            end (str, optional): Character to end text with. Defaults to "\\n".
             tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
 
         Returns:
@@ -232,8 +232,9 @@ class Text(JupyterMixin):
             style=style, justify=justify, overflow=overflow, end=end, tab_size=tab_size
         )
         append = text.append
+        _Text = Text
         for part in parts:
-            if isinstance(part, (Text, str)):
+            if isinstance(part, (_Text, str)):
                 append(part)
             else:
                 append(*part)
