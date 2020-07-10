@@ -1,5 +1,8 @@
+# encoding=utf-8
+
 import io
 
+from rich import box
 from rich.columns import Columns
 from rich.console import Console
 from rich.panel import Panel
@@ -7,7 +10,7 @@ from rich.panel import Panel
 
 def render():
     console = Console(file=io.StringIO(), width=100, legacy_windows=False)
-    panel = Panel.fit("foo")
+    panel = Panel.fit("foo", box=box.SQUARE)
     columns = Columns([panel] * 4)
     columns.expand = True
     console.rule("no align")
@@ -30,7 +33,7 @@ def render():
 
 def test_align():
     result = render()
-    expected = "───────────────────────────────────────────── no align ─────────────────────────────────────────────\n╭───╮                      ╭───╮                     ╭───╮                     ╭───╮                \n│foo│                      │foo│                     │foo│                     │foo│                \n╰───╯                      ╰───╯                     ╰───╯                     ╰───╯                \n──────────────────────────────────────────── left align ────────────────────────────────────────────\n╭───╮                      ╭───╮                     ╭───╮                     ╭───╮                \n│foo│                      │foo│                     │foo│                     │foo│                \n╰───╯                      ╰───╯                     ╰───╯                     ╰───╯                \n─────────────────────────────────────────── center align ───────────────────────────────────────────\n          ╭───╮                      ╭───╮                     ╭───╮                   ╭───╮        \n          │foo│                      │foo│                     │foo│                   │foo│        \n          ╰───╯                      ╰───╯                     ╰───╯                   ╰───╯        \n─────────────────────────────────────────── right align ────────────────────────────────────────────\n                     ╭───╮                     ╭───╮                     ╭───╮                 ╭───╮\n                     │foo│                     │foo│                     │foo│                 │foo│\n                     ╰───╯                     ╰───╯                     ╰───╯                 ╰───╯\n"
+    expected = "───────────────────────────────────────────── no align ─────────────────────────────────────────────\n┌───┐                      ┌───┐                     ┌───┐                     ┌───┐                \n│foo│                      │foo│                     │foo│                     │foo│                \n└───┘                      └───┘                     └───┘                     └───┘                \n──────────────────────────────────────────── left align ────────────────────────────────────────────\n┌───┐                      ┌───┐                     ┌───┐                     ┌───┐                \n│foo│                      │foo│                     │foo│                     │foo│                \n└───┘                      └───┘                     └───┘                     └───┘                \n─────────────────────────────────────────── center align ───────────────────────────────────────────\n          ┌───┐                      ┌───┐                     ┌───┐                   ┌───┐        \n          │foo│                      │foo│                     │foo│                   │foo│        \n          └───┘                      └───┘                     └───┘                   └───┘        \n─────────────────────────────────────────── right align ────────────────────────────────────────────\n                     ┌───┐                     ┌───┐                     ┌───┐                 ┌───┐\n                     │foo│                     │foo│                     │foo│                 │foo│\n                     └───┘                     └───┘                     └───┘                 └───┘\n"
     assert result == expected
 
 
