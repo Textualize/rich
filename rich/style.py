@@ -216,6 +216,15 @@ class Style:
             self._style_definition = " ".join(attributes) or "none"
         return self._style_definition
 
+    def __bool__(self) -> bool:
+        """A Style is false if it has no attributes, colors, or links."""
+        return bool(
+            self._attributes & self._set_attributes
+            or self._color
+            or self._bgcolor
+            or self._link
+        )
+
     def _make_ansi_codes(self, color_system: ColorSystem) -> str:
         """Generate ANSI codes for this style.
 
