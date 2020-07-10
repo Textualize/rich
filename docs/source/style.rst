@@ -30,11 +30,11 @@ The hex and rgb forms allow you to select from the full *truecolor* set of 16.7 
 .. note::
     Some terminals only support 256 colors. Rich will attempt to pick the closest color it can if your color isn't available.
 
-By itself, a color will change the *foreground* color. To specify a *background* color precede the color with the word "on". For example, the following prints text in red on a white background::
+By itself, a color will change the *foreground* color. To specify a *background* color, precede the color with the word "on". For example, the following prints text in red on a white background::
 
     console.print("DANGER!", style="red on white")
 
-You can also set a color with the word ``"default"`` which will reset the color to a default managed by your terminal software. This works for back grounds as well, so the style of ``"default on default"`` is what your terminal starts with.
+You can also set a color with the word ``"default"`` which will reset the color to a default managed by your terminal software. This works for backgrounds as well, so the style of ``"default on default"`` is what your terminal starts with.
 
 You can set a style attribute by adding one or more of the following words:
 

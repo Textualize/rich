@@ -19,7 +19,7 @@ from .segment import Segment
 class Panel(JupyterMixin):
     """A console renderable that draws a border around its contents.
     
-    Example::
+    Example:
         >>> console.print(Panel("Hello, World!"))
 
     Args:
