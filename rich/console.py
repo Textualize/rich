@@ -600,11 +600,7 @@ class Console:
             _rendered = Segment.apply_style(_rendered, style)
         lines = list(
             Segment.split_and_crop_lines(
-                _rendered,
-                render_options.max_width,
-                style=style,
-                include_new_lines=False,
-                pad=pad,
+                _rendered, render_options.max_width, include_new_lines=False, pad=pad
             )
         )
         return lines
@@ -713,16 +709,13 @@ class Console:
         text: List[Text] = []
         append_text = text.append
 
-        align = cast(
-            AlignValues, justify if justify in ("left", "center", "right") else "left"
-        )
+        append = _append
+        if justify in ("left", "center", "right"):
 
-        if align == "left":
-            append = _append
-        else:
+            def align_append(renderable: RenderableType) -> None:
+                _append(Align(renderable, cast(AlignValues, justify)))
 
-            def append(renderable: RenderableType) -> None:
-                _append(Align(renderable, align))
+            append = align_append
 
         _highlighter: HighlighterType = _null_highlighter
         if highlight or (highlight is None and self._highlight):

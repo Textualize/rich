@@ -25,6 +25,10 @@ class Segment(NamedTuple):
         """Simplified repr."""
         return f"Segment({self.text!r}, {self.style!r}, {self.is_control!r})"
 
+    def __bool__(self) -> bool:
+        """Check if the segment contains text."""
+        return bool(self.text)
+
     @property
     def cell_length(self) -> int:
         """Get cell length of segment."""

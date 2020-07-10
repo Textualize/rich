@@ -511,7 +511,6 @@ class Progress(JupyterMixin, RenderHook):
         self._live_render = LiveRender(self.get_renderable())
         self._task_index: TaskID = TaskID(0)
         self._refresh_thread: Optional[_RefreshThread] = None
-        self._refresh_count = 0
         self._started = False
         self.print = self.console.print
         self.log = self.console.log
@@ -728,25 +727,29 @@ class Progress(JupyterMixin, RenderHook):
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
-        if self.console.is_jupyter:
-            from ipywidgets import Output
-            from IPython.display import display
+        if self.console.is_jupyter:  # pragma: no cover
+            try:
+                from ipywidgets import Output
+                from IPython.display import display
+            except ImportError:
+                import warnings
 
-            with self._lock:
-                if self.ipy_widget is None:
-                    self.ipy_widget = Output()
-                    display(self.ipy_widget)
+                warnings.warn('install "ipywidgets" for Jupyter support')
+            else:
+                with self._lock:
+                    if self.ipy_widget is None:
+                        self.ipy_widget = Output()
+                        display(self.ipy_widget)
 
-                with self.ipy_widget:
-                    self.ipy_widget.clear_output(wait=True)
-                    self.console.print(self.get_renderable())
+                    with self.ipy_widget:
+                        self.ipy_widget.clear_output(wait=True)
+                        self.console.print(self.get_renderable())
 
         elif self.console.is_terminal:
             with self._lock:
                 self._live_render.set_renderable(self.get_renderable())
                 with self.console:
                     self.console.print(Control(""))
-        self._refresh_count += 1
 
     def get_renderable(self) -> RenderableType:
         """Get a renderable for the progress display."""

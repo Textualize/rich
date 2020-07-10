@@ -56,7 +56,6 @@ def render():
     columns.width = 16
     console.print(columns)
     console.print()
-
     render_result = console.file.getvalue()
     return render_result
 

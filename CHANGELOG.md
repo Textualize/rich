@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2020-07-10
+
+### Added
+
+- Added Align.left Align.center Align.right shortcuts
+- Added Panel.fit shortcut
+- Added align parameter to Columns
+
+### Fixed
+
+- Align class now pads to the right, like Text
+- ipywidgets added as an optional dependency
+- Issue with Panel and background color
+- Fixed missing `__bool__` on Segment
+
+### Changed
+
+- Added `border_style` argument to Panel (note, `style` now applies to interior of the panel)
+
 ## [3.1.0] - 2020-07-09
 
 ### Changed
