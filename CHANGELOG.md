@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - Unreleased
+
+### Added
+
+- Added Align.left Align.center Align.right shortcuts
+
+### Fixed
+
+- Align class now pads to the right, like Text
+- ipywidgets added as an optional dependancy
+- Issue with Panel and background color
+- Fixed missing **bool** on Segment
+
 ## [3.1.0] - 2020-07-09
 
 ### Changed

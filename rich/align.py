@@ -38,17 +38,17 @@ class Align(JupyterMixin):
 
     @classmethod
     def left(cls, renderable: "RenderableType", style: StyleType = None) -> "Align":
-        """Align to the left."""
+        """Align a renderable to the left."""
         return cls(renderable, "left", style=style)
 
     @classmethod
     def center(cls, renderable: "RenderableType", style: StyleType = None) -> "Align":
-        """Align to the center."""
+        """Align arenderable to the center."""
         return cls(renderable, "center", style=style)
 
     @classmethod
     def right(cls, renderable: "RenderableType", style: StyleType = None) -> "Align":
-        """Align to the right."""
+        """Align a renderable to the right."""
         return cls(renderable, "right", style=style)
 
     def __rich_console__(

@@ -71,6 +71,13 @@ def test_hash():
     assert isinstance(hash(Style()), int)
 
 
+def test_bool():
+    assert bool(Style()) is False
+    assert bool(Style(bold=True)) is True
+    assert bool(Style(color="red")) is True
+    assert bool(Style.parse("")) is False
+
+
 def test_color_property():
     assert Style(color="red").color == Color("red", ColorType.STANDARD, 1, None)
 

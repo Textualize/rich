@@ -23,6 +23,10 @@ You can install Rich with from PyPi with `pip` or your favorite package manager:
 
 Add the ``-U`` switch to update to the current version, if Rich is already installed.
 
+If you intend to use Rich with Jupyter then there are some additional dependencies, which you can install with the following command::
+
+    pip install rich[jupyter]
+
 
 Quick Start
 -----------
