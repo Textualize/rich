@@ -91,7 +91,7 @@ def make_test_card() -> Table:
     table.add_row(
         "CJK support",
         Panel(
-            "[default]该库支持中文，日文和韩文文本！", expand=False, style="red", box=box.DOUBLE_EDGE,
+            "该库支持中文，日文和韩文文本！", expand=False, border_style="red", box=box.DOUBLE_EDGE,
         ),
     )
 
