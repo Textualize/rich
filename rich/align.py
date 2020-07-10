@@ -43,7 +43,7 @@ class Align(JupyterMixin):
 
     @classmethod
     def center(cls, renderable: "RenderableType", style: StyleType = None) -> "Align":
-        """Align arenderable to the center."""
+        """Align a renderable to the center."""
         return cls(renderable, "center", style=style)
 
     @classmethod

@@ -81,12 +81,19 @@ class ConsoleOptions:
     """Options for __rich_console__ method."""
 
     min_width: int
+    """Minimum width of renderable."""
     max_width: int
+    """Maximum width of renderable."""
     is_terminal: bool
+    """True if the target is a terminal, otherwise False."""
     encoding: str
+    """Encoding of terminal."""
     justify: Optional[JustifyMethod] = None
+    """Justify value override for renderable."""
     overflow: Optional[OverflowMethod] = None
+    """Overflow value override for renderable."""
     no_wrap: Optional[bool] = False
+    """"Disable wrapping for text."""
 
     def update(
         self,
