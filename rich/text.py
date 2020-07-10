@@ -215,7 +215,7 @@ class Text(JupyterMixin):
         end: str = "\n",
         tab_size: int = 8,
     ) -> "Text":
-        """Construct a text instance by combining a sequence of strings with optional styles.
+        r"""Construct a text instance by combining a sequence of strings with optional styles.
         The positional arguments should be either strings, or a tuple of string + style.        
 
         Args:            
