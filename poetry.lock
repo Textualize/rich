@@ -629,8 +629,11 @@ version = "3.1.0"
 docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
+[extras]
+jupyter = ["ipywidgets"]
+
 [metadata]
-content-hash = "56d015ef828f418bfd299170095d3a67ba6cf1b21848e4cb2506049bba89df81"
+content-hash = "e2c24649506040755aa391e68196f00a65ec8e7f7130feb9254a3b6d6352bb72"
 python-versions = "^3.6"
 
 [metadata.files]
