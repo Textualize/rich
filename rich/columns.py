@@ -3,6 +3,7 @@ from itertools import chain
 from operator import itemgetter
 from typing import Dict, Iterable, List, Optional, Tuple
 
+from .align import Align, AlignValues
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .constrain import Constrain
 from .measure import Measurement
@@ -22,6 +23,7 @@ class Columns(JupyterMixin):
         equal (bool, optional): Arrange in to equal sized columns. Defaults to False.
         column_first (bool, optional): Align items from top to bottom (rather than left to right). Defaults to False.
         right_to_left (bool, optional): Start column from right hand side. Defaults to False.
+        align (str, optional): Align value ("left", "right", or "center") or None for default. Defaults to None.
     """
 
     def __init__(
@@ -34,6 +36,7 @@ class Columns(JupyterMixin):
         equal: bool = False,
         column_first: bool = False,
         right_to_left: bool = False,
+        align: AlignValues = None,
     ) -> None:
         self.renderables = list(renderables or [])
         self.width = width
@@ -42,6 +45,7 @@ class Columns(JupyterMixin):
         self.equal = equal
         self.column_first = column_first
         self.right_to_left = right_to_left
+        self.align = align
 
     def add_renderable(self, renderable: RenderableType) -> None:
         """Add a renderable to the columns.
@@ -142,6 +146,13 @@ class Columns(JupyterMixin):
                 None
                 if renderable is None
                 else Constrain(renderable, renderable_widths[0])
+                for renderable in _renderables
+            ]
+        if self.align:
+            align = self.align
+            _Align = Align
+            _renderables = [
+                None if renderable is None else _Align(renderable, align)
                 for renderable in _renderables
             ]
 

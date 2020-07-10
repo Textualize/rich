@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Align.left Align.center Align.right shortcuts
 - Added Panel.fit shortcut
+- Added align parameter to Columns
 
 ### Fixed
 
