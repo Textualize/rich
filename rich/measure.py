@@ -12,7 +12,9 @@ class Measurement(NamedTuple):
     """Stores the minimum and maximum widths (in characters) required to render an object."""
 
     minimum: int
+    """Minimum number of cells required to render."""
     maximum: int
+    """Maximum number of cells required to render."""
 
     @property
     def span(self) -> int:

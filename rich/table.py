@@ -86,7 +86,9 @@ class _Cell(NamedTuple):
     """A single cell in a table."""
 
     style: StyleType
+    """Style to apply to cell."""
     renderable: "RenderableType"
+    """Cell renderable."""
 
 
 class Table(JupyterMixin):

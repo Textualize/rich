@@ -48,8 +48,11 @@ class Span(NamedTuple):
     """A marked up region in some text."""
 
     start: int
+    """Span start index."""
     end: int
+    """Span end index."""
     style: Union[str, Style]
+    """Style associated with the span."""
 
     def __repr__(self) -> str:
         return f"Span({self.start}, {self.end}, {str(self.style)!r})"

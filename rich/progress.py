@@ -304,7 +304,9 @@ class ProgressSample(NamedTuple):
     """Sample of progress for a given time."""
 
     timestamp: float
+    """Timestamp of sample."""
     completed: float
+    """Number of steps completed."""
 
 
 @dataclass

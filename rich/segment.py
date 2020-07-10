@@ -18,8 +18,11 @@ class Segment(NamedTuple):
     """
 
     text: str = ""
+    """Raw text."""
     style: Optional[Style] = None
+    """An optional style."""
     is_control: bool = False
+    """True if the segment contains control codes, otherwise False."""
 
     def __repr__(self) -> str:
         """Simplified repr."""

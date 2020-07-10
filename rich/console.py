@@ -198,7 +198,9 @@ class ConsoleDimensions(NamedTuple):
     """Size of the terminal."""
 
     width: int
+    """The width of the console in 'cells'."""
     height: int
+    """The height of the console in lines."""
 
 
 def _is_jupyter() -> bool:  # pragma: no cover

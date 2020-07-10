@@ -11,8 +11,12 @@ re_tags = re.compile(r"(\[\[)|(\]\])|\[(.*?)\]")
 
 
 class Tag(NamedTuple):
+    """A tag in console markup."""
+
     name: str
+    """The tag name. e.g. 'bold'."""
     parameters: Optional[str]
+    """Any additional parameters after the name."""
 
     def __str__(self) -> str:
         return (

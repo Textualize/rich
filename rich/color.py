@@ -260,9 +260,13 @@ class Color(NamedTuple):
     """Terminal color definition."""
 
     name: str
+    """The name of the color (typically the input to Color.parse)."""
     type: ColorType
+    """The type of the color."""
     number: Optional[int] = None
+    """The color number, if a standard color, or None."""
     triplet: Optional[ColorTriplet] = None
+    """A triplet of color components, if an RGB color."""
 
     def __str__(self) -> str:
         """Render the color to the terminal."""
