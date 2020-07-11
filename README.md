@@ -285,3 +285,8 @@ Here's what it looks like on Windows:
 ![traceback_windows](https://github.com/willmcgugan/rich/raw/master/imgs/traceback_windows.png)
 
 See the [rich traceback](https://rich.readthedocs.io/en/latest/traceback.html) documentation for the details.
+
+## Plugins
+### Pdbr
+[Pdbr](https://github.com/cansarigol/pdbr) is a pdb module that uses Rich library.
+
