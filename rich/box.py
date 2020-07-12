@@ -81,7 +81,7 @@ class Box:
     def get_row(
         self,
         widths: Iterable[int],
-        level: Literal["head", "row", "foot"] = "row",
+        level: Literal["head", "row", "foot", "mid"] = "row",
         edge: bool = True,
     ) -> str:
         """Get the top of a simple box.
