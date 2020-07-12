@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0] - 2020-07-12
+
+### Added
+
+- Added title and title_align options to Panel
+- Added pad and width parameters to Align
+- Added end parameter to Rule
+- Added Text.pad and Text.align methods
+- Added leading parameter to Table
+
 ## [3.2.0] - 2020-07-10
 
 ### Added

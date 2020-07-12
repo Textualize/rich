@@ -102,6 +102,11 @@ class Box:
             horizontal = self.row_horizontal
             cross = self.row_cross
             right = self.row_right
+        elif level == "mid":
+            left = self.mid_left
+            horizontal = " "
+            cross = self.mid_vertical
+            right = self.mid_right
         elif level == "foot":
             left = self.foot_row_left
             horizontal = self.foot_row_horizontal

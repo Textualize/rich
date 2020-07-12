@@ -8,11 +8,13 @@ from .text import Text
 
 
 class Rule(JupyterMixin):
-    """A console renderable to draw a horizontal rule (line).
+    r"""A console renderable to draw a horizontal rule (line).
     
     Args:
         title (Union[str, Text], optional): Text to render in the rule. Defaults to "".
         character (str, optional): Character used to draw the line. Defaults to "─".
+        style (StyleType, optional): Style of Rule. Defaults to "rule.line".
+        end (str, optional): Character at end of Rule. defaults to "\\n"
     """
 
     def __init__(
@@ -21,12 +23,14 @@ class Rule(JupyterMixin):
         *,
         character: str = None,
         style: Union[str, Style] = "rule.line",
+        end: str = "\n",
     ) -> None:
         if character and cell_len(character) != 1:
             raise ValueError("'character' argument must have a cell width of 1")
         self.title = title
         self.character = character
         self.style = style
+        self.end = end
 
     def __repr__(self) -> str:
         return f"Rule({self.title!r}, {self.character!r})"
@@ -51,7 +55,7 @@ class Rule(JupyterMixin):
 
             title_text.plain = title_text.plain.replace("\n", " ")
             title_text = title_text.tabs_to_spaces()
-            rule_text = Text()
+            rule_text = Text(end=self.end)
             center = (width - cell_len(title_text.plain)) // 2
             rule_text.append(character * (center - 1) + " ", self.style)
             rule_text.append(title_text)
