@@ -517,3 +517,27 @@ def test_truncate_ellipsis_pad(input, count, expected):
     text = Text(input)
     text.truncate(count, overflow="ellipsis", pad=True)
     assert text.plain == expected
+
+
+def test_pad():
+    test = Text("foo")
+    test.pad(2)
+    assert test.plain == "  foo  "
+
+
+def test_align_left():
+    test = Text("foo")
+    test.align("left", 10)
+    assert test.plain == "foo       "
+
+
+def test_align_right():
+    test = Text("foo")
+    test.align("right", 10)
+    assert test.plain == "       foo"
+
+
+def test_align_center():
+    test = Text("foo")
+    test.align("center", 10)
+    assert test.plain == "   foo    "

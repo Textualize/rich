@@ -16,6 +16,7 @@ from typing import (
 
 from ._loop import loop_last
 from ._wrap import divide_line
+from .align import AlignValues
 from .cells import cell_len, set_cell_size
 from .containers import Lines
 from .control import strip_control_codes
@@ -617,6 +618,15 @@ class Text(JupyterMixin):
                 append(span)
         self._spans[:] = spans
 
+    def pad(self, count: int, character: str = " ") -> None:
+        """Pad left and right with a given number of characters.
+
+        Args:
+            count (int): Width of padding.
+        """
+        self.pad_left(count, character=character)
+        self.pad_right(count, character=character)
+
     def pad_left(self, count: int, character: str = " ") -> None:
         """Pad the left with a given character.
         
@@ -639,6 +649,26 @@ class Text(JupyterMixin):
         assert len(character) == 1, "Character must be a string of length 1"
         if count:
             self.plain = f"{self.plain}{character * count}"
+
+    def align(self, align: AlignValues, width: int, character: str = " ") -> None:
+        """Align text to a given width.
+
+        Args:
+            align (AlignValues): One of "left", "center", or "right".
+            width (int): Desired width.
+            character (str, optional): Character to pad with. Defaults to " ".
+        """
+        self.truncate(width)
+        excess_space = width - cell_len(self.plain)
+        if excess_space:
+            if align == "left":
+                self.pad_right(excess_space, character)
+            elif align == "center":
+                left = excess_space // 2
+                self.pad_left(left, character)
+                self.pad_right(excess_space - left, character)
+            else:
+                self.pad_left(excess_space, character)
 
     def append(
         self, text: Union["Text", str], style: Union[str, "Style"] = None

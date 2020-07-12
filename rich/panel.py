@@ -2,6 +2,7 @@ from typing import Optional, Union
 
 from .box import get_safe_box, Box, SQUARE, ROUNDED
 
+from .align import AlignValues
 from .console import (
     Console,
     ConsoleOptions,
@@ -12,7 +13,7 @@ from .console import (
 from .jupyter import JupyterMixin
 from .padding import Padding, PaddingDimensions
 from .style import Style, StyleType
-from .text import Text
+from .text import Text, TextType
 from .segment import Segment
 
 
@@ -40,6 +41,8 @@ class Panel(JupyterMixin):
         renderable: RenderableType,
         box: Box = ROUNDED,
         *,
+        title: TextType = None,
+        title_align: AlignValues = "center",
         safe_box: Optional[bool] = None,
         expand: bool = True,
         style: StyleType = "none",
@@ -49,6 +52,8 @@ class Panel(JupyterMixin):
     ) -> None:
         self.renderable = renderable
         self.box = box
+        self.title = title
+        self.title_align = title_align
         self.safe_box = safe_box
         self.expand = expand
         self.style = style
@@ -62,6 +67,8 @@ class Panel(JupyterMixin):
         renderable: RenderableType,
         box: Box = ROUNDED,
         *,
+        title: TextType = None,
+        title_align: AlignValues = "center",
         safe_box: Optional[bool] = None,
         style: StyleType = "none",
         border_style: StyleType = "none",
@@ -72,6 +79,8 @@ class Panel(JupyterMixin):
         return cls(
             renderable,
             box,
+            title=title,
+            title_align=title_align,
             safe_box=safe_box,
             style=style,
             border_style=border_style,
@@ -108,7 +117,24 @@ class Panel(JupyterMixin):
         line_start = Segment(box.mid_left, border_style)
         line_end = Segment(f"{box.mid_right}", border_style)
         new_line = Segment.line()
-        yield Segment(box.get_top([width - 2]), border_style)
+        if self.title is None:
+            yield Segment(box.get_top([width - 2]), border_style)
+        else:
+            title_text = (
+                Text.from_markup(self.title)
+                if isinstance(self.title, str)
+                else self.title.copy()
+            )
+            title_text.style = border_style
+            title_text.end = ""
+            title_text.plain = title_text.plain.replace("\n", " ")
+            title_text = title_text.tabs_to_spaces()
+            title_text.pad(1)
+            title_text.align(self.title_align, width - 4, character=box.top)
+            yield Segment(box.top_left + box.top, border_style)
+            yield title_text
+            yield Segment(box.top + box.top_right, border_style)
+
         yield new_line
         for line in lines:
             yield line_start
@@ -129,7 +155,7 @@ if __name__ == "__main__":  # pragma: no cover
     c = Console()
 
     from .padding import Padding
-    from .box import ROUNDED
+    from .box import ROUNDED, DOUBLE
 
     p = Panel(
         Panel.fit(
@@ -138,7 +164,8 @@ if __name__ == "__main__":  # pragma: no cover
             safe_box=True,
             style="on red",
         ),
-        border_style="on blue",
+        title="[b]Hello, World",
+        box=DOUBLE,
     )
 
     print(p)
