@@ -406,7 +406,7 @@ class Text(JupyterMixin):
         return count
 
     def rstrip(self) -> None:
-        """Trip whitespace from end of text."""
+        """Strip whitespace from end of text."""
         self.plain = self.plain.rstrip()
 
     def rstrip_end(self, size: int):
