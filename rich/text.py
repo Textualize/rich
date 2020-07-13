@@ -109,8 +109,10 @@ class Text(JupyterMixin):
             style (Union[str, Style], optional): Base style for text. Defaults to "".
             justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
             overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None. 
+            no_wrap (bool, optional): Disable text wrapping, or None for default. Defaults to None.
             end (str, optional): Character to end text with. Defaults to "\n".
             tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
+            spans (List[Span], optional). A list of predefined style spans. Defaults to None.
     """
 
     __slots__ = [
