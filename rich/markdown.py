@@ -100,7 +100,6 @@ class TextElement(MarkdownElement):
         self.text = Text(justify="left")
 
     def on_text(self, context: "MarkdownContext", text: str) -> None:
-        text = text.replace("---", "—").replace("--", "–").replace("...", "…")
         self.text.append(text, context.current_style)
 
     def on_leave(self, context: "MarkdownContext") -> None:

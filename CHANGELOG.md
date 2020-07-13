@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - box.ASCII_DOUBLE_HEAD
 
+### Changed
+
+- Removed replace of -- --- ... from Markdown, as it made it impossible to include CLI info
+
 ## [3.3.0] - 2020-07-12
 
 ### Added
