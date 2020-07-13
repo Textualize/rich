@@ -174,6 +174,19 @@ ASCII2: Box = Box(
 """
 )
 
+ASCII_DOUBLE_HEAD: Box = Box(
+    """\
++-++
+| ||
++=++
+| ||
++-++
++-++
+| ||
++-++
+"""
+)
+
 SQUARE: Box = Box(
     """\
 ┌─┬┐
@@ -412,6 +425,7 @@ if __name__ == "__main__":  # pragma: no cover
     BOXES = [
         "ASCII",
         "ASCII2",
+        "ASCII_DOUBLE_HEAD",
         "SQUARE",
         "MINIMAL",
         "MINIMAL_HEAVY_HEAD",

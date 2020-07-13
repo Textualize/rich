@@ -294,7 +294,7 @@ class Table(JupyterMixin):
             style (Union[str, Style], optional): Style for the column cells. Defaults to "none".
             justify (JustifyMethod, optional): Alignment for cells. Defaults to "left".
             width (int, optional): A minimum width in characters. Defaults to None.
-            ratio (int, optional): Flexible ratio for the column. Defaults to None.
+            ratio (int, optional): Flexible ratio for the column (requires ``Table.expand`` or ``Table.width``). Defaults to None.
             no_wrap (bool, optional): Set to ``True`` to disable wrapping of this column.
         """
 
@@ -652,13 +652,13 @@ class Table(JupyterMixin):
                 cells.append(lines)
 
             cells[:] = [
-                Segment.set_shape(_cell, width, max_height, style=table_style)
+                _Segment.set_shape(_cell, width, max_height, style=table_style)
                 for width, _cell in zip(widths, cells)
             ]
 
             if _box:
                 if last and show_footer:
-                    yield Segment(
+                    yield _Segment(
                         _box.get_row(widths, "foot", edge=show_edge), border_style
                     )
                     yield new_line
