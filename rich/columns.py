@@ -9,6 +9,7 @@ from .constrain import Constrain
 from .measure import Measurement
 from .padding import Padding, PaddingDimensions
 from .table import Table
+from .text import TextType
 from .jupyter import JupyterMixin
 
 
@@ -24,6 +25,7 @@ class Columns(JupyterMixin):
         column_first (bool, optional): Align items from top to bottom (rather than left to right). Defaults to False.
         right_to_left (bool, optional): Start column from right hand side. Defaults to False.
         align (str, optional): Align value ("left", "right", or "center") or None for default. Defaults to None.
+        title (TextType, optional): Optional title for Columns.
     """
 
     def __init__(
@@ -37,6 +39,7 @@ class Columns(JupyterMixin):
         column_first: bool = False,
         right_to_left: bool = False,
         align: AlignValues = None,
+        title: TextType = None,
     ) -> None:
         self.renderables = list(renderables or [])
         self.width = width
@@ -46,6 +49,7 @@ class Columns(JupyterMixin):
         self.column_first = column_first
         self.right_to_left = right_to_left
         self.align = align
+        self.title = title
 
     def add_renderable(self, renderable: RenderableType) -> None:
         """Add a renderable to the columns.
@@ -114,6 +118,7 @@ class Columns(JupyterMixin):
 
         table = Table.grid(padding=self.padding, collapse_padding=True, pad_edge=False)
         table.expand = self.expand
+        table.title = self.title
 
         if self.width is not None:
             column_count = max_width // self.width

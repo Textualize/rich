@@ -1,20 +1,17 @@
-from typing import Optional, Union
+from typing import Optional, TYPE_CHECKING
 
 from .box import get_safe_box, Box, SQUARE, ROUNDED
 
 from .align import AlignValues
-from .console import (
-    Console,
-    ConsoleOptions,
-    RenderableType,
-    RenderResult,
-    Measurement,
-)
 from .jupyter import JupyterMixin
+from .measure import Measurement
 from .padding import Padding, PaddingDimensions
-from .style import Style, StyleType
+from .style import StyleType
 from .text import Text, TextType
 from .segment import Segment
+
+if TYPE_CHECKING:
+    from .console import Console, ConsoleOptions, RenderableType, RenderResult
 
 
 class Panel(JupyterMixin):
@@ -38,7 +35,7 @@ class Panel(JupyterMixin):
 
     def __init__(
         self,
-        renderable: RenderableType,
+        renderable: "RenderableType",
         box: Box = ROUNDED,
         *,
         title: TextType = None,
@@ -64,7 +61,7 @@ class Panel(JupyterMixin):
     @classmethod
     def fit(
         cls,
-        renderable: RenderableType,
+        renderable: "RenderableType",
         box: Box = ROUNDED,
         *,
         title: TextType = None,
@@ -90,8 +87,8 @@ class Panel(JupyterMixin):
         )
 
     def __rich_console__(
-        self, console: Console, options: ConsoleOptions
-    ) -> RenderResult:
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
         _padding = Padding.unpack(self.padding)
         renderable = (
             Padding(self.renderable, _padding) if any(_padding) else self.renderable
@@ -125,14 +122,16 @@ class Panel(JupyterMixin):
                 if isinstance(self.title, str)
                 else self.title.copy()
             )
+
             title_text.style = border_style
             title_text.end = ""
             title_text.plain = title_text.plain.replace("\n", " ")
             title_text = title_text.tabs_to_spaces()
             title_text.pad(1)
             title_text.align(self.title_align, width - 4, character=box.top)
+
             yield Segment(box.top_left + box.top, border_style)
-            yield title_text
+            yield from console.render(title_text)
             yield Segment(box.top + box.top_right, border_style)
 
         yield new_line
@@ -144,7 +143,7 @@ class Panel(JupyterMixin):
         yield Segment(box.get_bottom([width - 2]), border_style)
         yield new_line
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
+    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         width = Measurement.get(console, self.renderable, max_width - 2).maximum + 2
         return Measurement(width, width)
 

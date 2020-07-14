@@ -26,7 +26,10 @@ class Segment(NamedTuple):
 
     def __repr__(self) -> str:
         """Simplified repr."""
-        return f"Segment({self.text!r}, {self.style!r}, {self.is_control!r})"
+        if self.is_control:
+            return f"Segment.control({self.text!r}, {self.style!r})"
+        else:
+            return f"Segment({self.text!r}, {self.style!r})"
 
     def __bool__(self) -> bool:
         """Check if the segment contains text."""
