@@ -81,7 +81,7 @@ class Box:
     def get_row(
         self,
         widths: Iterable[int],
-        level: Literal["head", "row", "foot"] = "row",
+        level: Literal["head", "row", "foot", "mid"] = "row",
         edge: bool = True,
     ) -> str:
         """Get the top of a simple box.
@@ -102,6 +102,11 @@ class Box:
             horizontal = self.row_horizontal
             cross = self.row_cross
             right = self.row_right
+        elif level == "mid":
+            left = self.mid_left
+            horizontal = " "
+            cross = self.mid_vertical
+            right = self.mid_right
         elif level == "foot":
             left = self.foot_row_left
             horizontal = self.foot_row_horizontal
@@ -161,6 +166,19 @@ ASCII2: Box = Box(
 +-++
 | ||
 +-++
+| ||
++-++
++-++
+| ||
++-++
+"""
+)
+
+ASCII_DOUBLE_HEAD: Box = Box(
+    """\
++-++
+| ||
++=++
 | ||
 +-++
 +-++
@@ -407,6 +425,7 @@ if __name__ == "__main__":  # pragma: no cover
     BOXES = [
         "ASCII",
         "ASCII2",
+        "ASCII_DOUBLE_HEAD",
         "SQUARE",
         "MINIMAL",
         "MINIMAL_HEAVY_HEAD",

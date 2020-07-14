@@ -64,6 +64,22 @@ def test_measure():
     assert _max == 7
 
 
+def test_align_no_pad():
+    console = Console(file=io.StringIO(), width=10)
+    console.print(Align("foo", "center", pad=False))
+    console.print(Align("foo", "left", pad=False))
+    assert console.file.getvalue() == "   foo\nfoo\n"
+
+
+def test_align_width():
+    console = Console(file=io.StringIO(), width=40)
+    words = "Deep in the human unconscious is a pervasive need for a logical universe that makes sense. But the real universe is always one step beyond logic"
+    console.print(Align(words, "center", width=30))
+    result = console.file.getvalue()
+    expected = "     Deep in the human unconscious      \n     is a pervasive need for a          \n     logical universe that makes        \n     sense. But the real universe       \n     is always one step beyond          \n     logic                              \n"    
+    assert result == expected
+
+
 def test_shortcuts():
     assert Align.left("foo").align == "left"
     assert Align.left("foo").renderable == "foo"
