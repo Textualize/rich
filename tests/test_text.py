@@ -106,6 +106,12 @@ def test_rstrip():
     assert str(test) == "Hello, World!"
 
 
+def test_rstrip_end():
+    test = Text("Hello, World!    ")
+    test.rstrip_end(14)
+    assert str(test) == "Hello, World! "
+
+
 def test_stylize():
     test = Text("Hello, World!")
     test.stylize(7, 11, "bold")
