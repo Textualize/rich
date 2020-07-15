@@ -3,7 +3,7 @@
 Rich Text
 =========
 
-Rich has a :class:`~rich.text.Text` class you can use to mark up strings with color and style attributes. You can consider this class to be a mutable string with additional style information.
+Rich has a :class:`~rich.text.Text` class you can use to mark up strings with color and style attributes. You can consider this class to be like a mutable string which also contains style information.
 
 One way to add a style to Text is the :meth:`~rich.text.Text.stylize` method which applies a style to a start and end offset. Here is an example::
 
