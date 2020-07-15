@@ -76,7 +76,7 @@ def test_align_width():
     words = "Deep in the human unconscious is a pervasive need for a logical universe that makes sense. But the real universe is always one step beyond logic"
     console.print(Align(words, "center", width=30))
     result = console.file.getvalue()
-    expected = "     Deep in the human unconscious      \n     is a pervasive need for a          \n     logical universe that makes        \n     sense. But the real universe       \n     is always one step beyond          \n     logic                              \n"    
+    expected = "     Deep in the human unconscious      \n     is a pervasive need for a          \n     logical universe that makes        \n     sense. But the real universe       \n     is always one step beyond          \n     logic                              \n"
     assert result == expected
 
 
@@ -87,4 +87,3 @@ def test_shortcuts():
     assert Align.right("foo").renderable == "foo"
     assert Align.center("foo").align == "center"
     assert Align.center("foo").renderable == "foo"
-

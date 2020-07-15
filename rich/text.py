@@ -412,7 +412,7 @@ class Text(JupyterMixin):
         """Strip whitespace from end of text."""
         self.plain = self.plain.rstrip()
 
-    def rstrip_end(self, size: int):
+    def rstrip_end(self, size: int) -> None:
         """Remove whitespace beyond a certain width at the end of the text.
 
         Args:

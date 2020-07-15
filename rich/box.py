@@ -460,4 +460,3 @@ if __name__ == "__main__":  # pragma: no cover
     console.print(columns)
 
     # console.save_html("box.html", inline_styles=True)
-

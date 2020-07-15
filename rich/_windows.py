@@ -69,4 +69,3 @@ if __name__ == "__main__":
 
     print(f'platform="{platform.system()}"')
     print(repr(features))
-

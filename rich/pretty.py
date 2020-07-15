@@ -29,4 +29,3 @@ class Pretty:
         text = Text(pretty_str)
         measurement = Measurement.get(console, text, max_width)
         return measurement
-
