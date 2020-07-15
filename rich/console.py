@@ -37,6 +37,7 @@ from .color import ColorSystem
 from .control import Control
 from .highlighter import NullHighlighter, ReprHighlighter
 from .pretty import Pretty
+from .scope import render_scope
 from .style import Style
 from .tabulate import tabulate_mapping
 from . import themes
@@ -542,7 +543,7 @@ class Console:
             self.control("\033[?25h" if show else "\033[?25l")
 
     def render(
-        self, renderable: RenderableType, options: ConsoleOptions
+        self, renderable: RenderableType, options: ConsoleOptions = None
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
 
@@ -552,16 +553,18 @@ class Console:
         Args:
             renderable (RenderableType): An object supporting the console protocol, or
                 an object that may be converted to a string.
-            options (ConsoleOptions): An options objects. Defaults to None.
+            options (ConsoleOptions, optional): An options object, or None to use self.options. Defaults to None.
 
         Returns:
             Iterable[Segment]: An iterable of segments that may be rendered.
         """
+
+        _options = options or self.options
         render_iterable: RenderResult
         if isinstance(renderable, ConsoleRenderable):
-            render_iterable = renderable.__rich_console__(self, options)
+            render_iterable = renderable.__rich_console__(self, _options)
         elif isinstance(renderable, str):
-            yield from self.render(self.render_str(renderable), options)
+            yield from self.render(self.render_str(renderable), _options)
             return
         else:
             raise errors.NotRenderableError(
@@ -579,12 +582,12 @@ class Console:
             if isinstance(render_output, Segment):
                 yield render_output
             else:
-                yield from self.render(render_output, options)
+                yield from self.render(render_output, _options)
 
     def render_lines(
         self,
         renderable: RenderableType,
-        options: Optional[ConsoleOptions],
+        options: Optional[ConsoleOptions] = None,
         *,
         style: Optional[Style] = None,
         pad: bool = True,
@@ -596,7 +599,7 @@ class Console:
 
         Args:
             renderables (Iterable[RenderableType]): Any object or objects renderable in the console.
-            options (Optional[ConsoleOptions]): Console options used to render with.
+            options (Optional[ConsoleOptions], optional): Console options, or None to use self.options. Default to ``None``.
             style (Style, optional): Optional style to apply to renderables. Defaults to ``None``.
             pad (bool, optional): Pad lines shorter than render width. Defaults to ``True``.
 
@@ -927,7 +930,7 @@ class Console:
                     for key, value in caller.frame.f_locals.items()
                     if not key.startswith("__")
                 }
-                renderables.append(tabulate_mapping(locals_map, title="Locals"))
+                renderables.append(render_scope(locals_map, title="[i]locals"))
 
             renderables = [
                 self._log_render(

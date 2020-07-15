@@ -3,7 +3,8 @@ from rich.style import Style
 
 
 def test_repr():
-    assert repr(Segment("foo")) == "Segment('foo', None, False)"
+    assert repr(Segment("foo")) == "Segment('foo', None)"
+    assert repr(Segment.control("foo")) == "Segment.control('foo', None)"
 
 
 def test_line():

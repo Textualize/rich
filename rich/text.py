@@ -626,8 +626,15 @@ class Text(JupyterMixin):
         Args:
             count (int): Width of padding.
         """
-        self.pad_left(count, character=character)
-        self.pad_right(count, character=character)
+        assert len(character) == 1, "Character must be a string of length 1"
+        if count:
+            pad_characters = character * count
+            self.plain = f"{pad_characters}{self.plain}{pad_characters}"
+            _Span = Span
+            self._spans[:] = [
+                _Span(start + count, end + count, style)
+                for start, end, style in self._spans
+            ]
 
     def pad_left(self, count: int, character: str = " ") -> None:
         """Pad the left with a given character.
@@ -639,7 +646,11 @@ class Text(JupyterMixin):
         assert len(character) == 1, "Character must be a string of length 1"
         if count:
             self.plain = f"{character * count}{self.plain}"
-            self._spans[:] = [span.move(count) for span in self._spans]
+            _Span = Span
+            self._spans[:] = [
+                _Span(start + count, end + count, style)
+                for start, end, style in self._spans
+            ]
 
     def pad_right(self, count: int, character: str = " ") -> None:
         """Pad the right with a given character.

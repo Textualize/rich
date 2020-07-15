@@ -17,11 +17,16 @@ class Pretty:
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
+        # TODO: pformat tends to render a smaller width than it needs to, investigate why
         pretty_str = pformat(self._object, width=options.max_width)
         pretty_str = pretty_str.replace("\r", "")
         pretty_text = self.highlighter(pretty_str)
         yield pretty_text
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
-        text = Text(pformat(self._object, width=max_width))
-        return Measurement.get(console, text, max_width)
+        pretty_str = pformat(self._object, width=max_width)
+        pretty_str = pretty_str.replace("\r", "")
+        text = Text(pretty_str)
+        measurement = Measurement.get(console, text, max_width)
+        return measurement
+
