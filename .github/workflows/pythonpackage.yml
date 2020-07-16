@@ -30,5 +30,7 @@ jobs:
           pip install .
           pytest tests/ -v --cov=rich --cov-report=xml --cov-append
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-actions@1.0.10
+      - name: "Upload code coverage"
+        uses: codecov/codecov-action@v1
+        with:
+          name: rich
