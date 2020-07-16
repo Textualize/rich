@@ -22,6 +22,11 @@ class Measurement(NamedTuple):
         return self.maximum - self.minimum
 
     def normalize(self) -> "Measurement":
+        """Get measurement that ensures that minimum <= maximum and minimum >= 0
+
+        Returns:
+            Measurement: A normalized measurement.
+        """
         minimum, maximum = self
         minimum = min(max(0, minimum), maximum)
         return Measurement(max(0, minimum), max(0, max(minimum, maximum)))

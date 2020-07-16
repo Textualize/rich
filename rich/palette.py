@@ -17,7 +17,14 @@ class Palette:
     # This is somewhat inefficient and needs caching
     @lru_cache(maxsize=1024)
     def match(self, color: Tuple[int, int, int]) -> int:
-        """Find a color from a palette that most closely matches a given color"""
+        """Find a color from a palette that most closely matches a given color.
+
+        Args:
+            color (Tuple[int, int, int]): RGB components in range 0 > 255.
+
+        Returns:
+            int: Index of closes matching color.
+        """
         red1, green1, blue1 = color
         _sqrt = sqrt
 

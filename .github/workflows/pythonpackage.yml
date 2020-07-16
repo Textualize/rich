@@ -28,4 +28,6 @@ jobs:
       - name: Test with pytest
         run: |
           pip install .
-          pytest tests/ -v
+          pytest tests/ -v --cov=rich --cov-report=xml
+      - name: Upload coverge to Codecov
+        uses: codecov/codecov-actions@1
