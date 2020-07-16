@@ -28,7 +28,7 @@ jobs:
       - name: Test with pytest
         run: |
           pip install .
-          pytest tests/ -v --cov=rich --cov-report=xml:./coverage-${{ matrix.os }}.xml --cov-append
+          pytest tests/ -v --cov=./rich --cov-report=xml:./coverage-${{ matrix.os }}.xml --cov-append
 
       - name: Upload code coverage
         uses: codecov/codecov-action@v1
@@ -36,4 +36,4 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage-${{ matrix.os }}.xml
           name: rich
-          flags: unittests
+          flags: unittests-${{ matrix.os }}
