@@ -28,10 +28,10 @@ jobs:
       - name: Test with pytest
         run: |
           pip install .
-          pytest ./tests -v --cov=./rich --cov-report=xml:./coverage.xml
+          pytest ./tests -v --cov=./rich --cov-report=xml:./coverage.xml --cov-report term-missing
 
       - name: Upload code coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v1.0.10
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
