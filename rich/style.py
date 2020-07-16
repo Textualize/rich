@@ -339,6 +339,9 @@ class Style:
         Returns:
             `Style`: A Style instance.
         """
+        if style_definition.strip() == "none":
+            return cls()
+
         style_attributes = {
             "dim": "dim",
             "d": "dim",
