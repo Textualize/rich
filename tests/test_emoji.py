@@ -2,7 +2,7 @@ import pytest
 
 from rich.emoji import Emoji, NoEmoji
 
-from render import render
+from .render import render
 
 
 def test_no_emoji():

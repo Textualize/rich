@@ -220,7 +220,7 @@ def test_columns() -> None:
         console.log("hello")
         console.print("world")
         progress.refresh()
-    from render import replace_link_ids
+    from .render import replace_link_ids
 
     result = replace_link_ids(console.file.getvalue())
     print(repr(result))

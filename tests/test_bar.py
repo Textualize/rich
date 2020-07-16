@@ -2,7 +2,7 @@ from rich.bar import Bar
 from rich.segment import Segment
 from rich.style import Style
 
-from render import render
+from .render import render
 
 
 def test_init():

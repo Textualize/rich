@@ -5,7 +5,7 @@ import io
 
 from rich.console import Console
 
-from render import replace_link_ids
+from .render import replace_link_ids
 
 
 test_data = [1, 2, 3]
