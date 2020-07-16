@@ -31,4 +31,4 @@ jobs:
           pytest tests/ -v --cov=rich --cov-report=xml --cov-append
 
       - name: Upload coverge to Codecov
-        uses: codecov/codecov-actions@master
+        uses: codecov/codecov-actions@1.0.10
