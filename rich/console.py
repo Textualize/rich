@@ -1010,7 +1010,7 @@ class Console:
         """
         if prompt:
             self.print(prompt, markup=markup, emoji=emoji, end="")
-        result = getpass() if password else input()
+        result = getpass("") if password else input()
         return result
 
     def export_text(self, *, clear: bool = True, styles: bool = False) -> str:

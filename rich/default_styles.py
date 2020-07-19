@@ -64,6 +64,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.uuid": Style(color="bright_yellow", bold=False),
     "rule.line": Style(color="bright_green"),
     "rule.text": Style(),
+    "prompt": Style(),
     "prompt.choices": Style(color="magenta", bold=True),
     "prompt.default": Style(color="cyan", bold=True),
     "prompt.invalid": Style(color="red"),
