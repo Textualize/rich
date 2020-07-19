@@ -1,8 +1,8 @@
 from collections.abc import Mapping, Sequence
 
 from dataclasses import dataclass, field, replace
-
 from functools import wraps
+from getpass import getpass
 import inspect
 
 import os
@@ -990,7 +990,12 @@ class Console:
         return rendered
 
     def input(
-        self, prompt: TextType = "", *, markup: bool = True, emoji: bool = True
+        self,
+        prompt: TextType = "",
+        *,
+        markup: bool = True,
+        emoji: bool = True,
+        password: bool = False,
     ) -> str:
         """Displays a prompt and waits for input from the user. The prompt may contain color / style. 
 
@@ -998,12 +1003,14 @@ class Console:
             prompt (Union[str, Text]): Text to render in the prompt.
             markup (bool, optional): Enable console markup (requires a str prompt). Defaults to True.
             emoji (bool, optional): Enable emoji (requires a str prompt). Defaults to True.
+            password: (bool, optional): Hide typed text. Defaults to False.
         
         Returns:
             str: Text read from stdin.
         """
-        self.print(prompt, markup=markup, emoji=emoji, end="")
-        result = input()
+        if prompt:
+            self.print(prompt, markup=markup, emoji=emoji, end="")
+        result = getpass() if password else input()
         return result
 
     def export_text(self, *, clear: bool = True, styles: bool = False) -> str:

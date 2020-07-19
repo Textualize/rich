@@ -67,7 +67,7 @@ def track(
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
 ) -> Iterable[ProgressType]:
-    """Track progress of processing a sequence.
+    """Track progress by iterating over a sequence.
     
     Args:
         sequence (Iterable[ProgressType]): A sequence (must support "len") you wish to iterate over.
@@ -336,7 +336,7 @@ class Task:
     """bool: Indicates if this task is visible in the progress display."""
 
     fields: Dict[str, Any] = field(default_factory=dict)
-    """Arbitrary fields passed in via Progress.update."""
+    """dict: Arbitrary fields passed in via Progress.update."""
 
     start_time: Optional[float] = field(default=None, init=False, repr=False)
     """Optional[float]: Time this task was started, or None if not started."""
@@ -349,7 +349,7 @@ class Task:
     )
 
     def get_time(self) -> float:
-        """Get the current time, in seconds."""
+        """float: Get the current time, in seconds."""
         return self._get_time()  # type: ignore
 
     @property
@@ -378,7 +378,7 @@ class Task:
 
     @property
     def percentage(self) -> float:
-        """float: Get progress of task as a percantage."""
+        """float: Get progress of task as a percentage."""
         if not self.total:
             return 0.0
         completed = (self.completed / self.total) * 100.0
@@ -612,7 +612,7 @@ class Progress(JupyterMixin, RenderHook):
         task_id: Optional[TaskID] = None,
         description="Working...",
     ) -> Iterable[ProgressType]:
-        """[summary]
+        """Track progress by iterating over a sequence.
         
         Args:
             sequence (Sequence[ProgressType]): A sequence of values you want to iterate over and track progress.
@@ -678,6 +678,7 @@ class Progress(JupyterMixin, RenderHook):
         total: float = None,
         completed: float = None,
         advance: float = None,
+        description: str = None,
         visible: bool = None,
         refresh: bool = False,
         **fields: Any,
@@ -689,6 +690,7 @@ class Progress(JupyterMixin, RenderHook):
             total (float, optional): Updates task.total if not None.
             completed (float, optional): Updates task.completed if not None.
             advance (float, optional): Add a value to task.completed if not None.
+            description (str, optional): Change task description if not None.
             visible (bool, optional): Set visible flag if not None.
             refresh (bool): Force a refresh of progress information. Default is False.
             **fields (Any): Additional data fields required for rendering.
@@ -704,6 +706,8 @@ class Progress(JupyterMixin, RenderHook):
                 task.completed += advance
             if completed is not None:
                 task.completed = completed
+            if description is not None:
+                task.description = description
             if visible is not None:
                 task.visible = visible
             task.fields.update(fields)
