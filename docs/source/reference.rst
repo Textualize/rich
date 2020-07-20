@@ -18,6 +18,7 @@ Reference
    reference/padding.rst
    reference/panel.rst
    reference/progress.rst
+   reference/prompt.rst
    reference/rule.rst
    reference/segment.rst
    reference/style.rst

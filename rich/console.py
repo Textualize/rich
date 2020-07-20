@@ -1,5 +1,7 @@
 from collections.abc import Mapping, Sequence
 
+
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, replace
 from functools import wraps
 from getpass import getpass
@@ -21,6 +23,7 @@ from typing import (
     Iterable,
     List,
     Optional,
+    TextIO,
     TYPE_CHECKING,
     NamedTuple,
     Union,
@@ -238,9 +241,10 @@ class ConsoleThreadLocals(threading.local):
     buffer_index: int = 0
 
 
-class RenderHook:
+class RenderHook(ABC):
     """Provides hooks in to the render process."""
 
+    @abstractmethod
     def process_renderables(
         self, renderables: List[ConsoleRenderable]
     ) -> List[ConsoleRenderable]:
@@ -254,7 +258,6 @@ class RenderHook:
         Returns:
             List[ConsoleRenderable]: A replacement list of renderables.
         """
-        return renderables
 
 
 _windows_console_features: Optional["WindowsConsoleFeatures"] = None
@@ -996,6 +999,7 @@ class Console:
         markup: bool = True,
         emoji: bool = True,
         password: bool = False,
+        stream: TextIO = None,
     ) -> str:
         """Displays a prompt and waits for input from the user. The prompt may contain color / style. 
 
@@ -1004,13 +1008,18 @@ class Console:
             markup (bool, optional): Enable console markup (requires a str prompt). Defaults to True.
             emoji (bool, optional): Enable emoji (requires a str prompt). Defaults to True.
             password: (bool, optional): Hide typed text. Defaults to False.
+            stream: (IO[str], optional): Optional file to read input from (rather than stdin). Defaults to None.
         
         Returns:
             str: Text read from stdin.
         """
         if prompt:
             self.print(prompt, markup=markup, emoji=emoji, end="")
-        result = getpass("") if password else input()
+        result = (
+            getpass("", stream=stream)
+            if password
+            else (stream.readline() if stream else input())
+        )
         return result
 
     def export_text(self, *, clear: bool = True, styles: bool = False) -> str:
