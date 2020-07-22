@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.1] - 2020-07-22
+
+### Fixed
+
+- Fixed incorrect default of expand in Table.grid
+
 ## [3.4.0] - 2020-07-22
 
 ### Added

@@ -180,7 +180,7 @@ class Table(JupyterMixin):
         padding: PaddingDimensions = 0,
         collapse_padding: bool = True,
         pad_edge: bool = False,
-        expand: bool = True,
+        expand: bool = False,
     ) -> "Table":
         """Get a table with no lines, headers, or footer.
 
