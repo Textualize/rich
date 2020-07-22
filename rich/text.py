@@ -209,6 +209,31 @@ class Text(JupyterMixin):
         return rendered_text
 
     @classmethod
+    def styled(
+        cls,
+        text: str,
+        style: StyleType = "",
+        *,
+        justify: "JustifyMethod" = None,
+        overflow: "OverflowMethod" = None,
+    ) -> "Text":
+        """Construct a Text instance with a pre-applied styled. A style applied in this way won't be used
+        to pad the text when it is justified.
+
+        Args:
+            text (str): A string containing console markup.
+            style (Union[str, Style]): Style to apply to the text. Defaults to "".
+            justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
+            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None. 
+        
+        Returns:
+            Text: A text instance with a style applied to the entire string.
+        """
+        styled_text = cls(text, justify=justify, overflow=overflow)
+        styled_text.stylize_all(style)
+        return styled_text
+
+    @classmethod
     def assemble(
         cls,
         *parts: Union[str, "Text", Tuple[str, StyleType]],

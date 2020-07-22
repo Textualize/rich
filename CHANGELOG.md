@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added description parameter to Progress.update
 - Added rich.prompt
 - Added detecting 'dumb' terminals
+- Added Text.styled alternative constructor
 
 ### Fixes
 

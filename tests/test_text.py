@@ -484,6 +484,13 @@ def test_assemble():
     assert text._spans == [Span(3, 6, "bold")]
 
 
+def test_styled():
+    text = Text.styled("foo", "bold red")
+    assert text.style == ""
+    assert str(text) == "foo"
+    assert text._spans == [Span(0, 3, "bold red")]
+
+
 def test_strip_control_codes():
     text = Text("foo\rbar")
     assert str(text) == "foobar"
