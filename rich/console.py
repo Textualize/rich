@@ -332,7 +332,11 @@ class Console:
         highlighter: Optional["HighlighterType"] = ReprHighlighter(),
         legacy_windows: bool = None,
         safe_box: bool = True,
+        _environ: Dict[str, str] = None,
     ):
+        # Copy of os.environ allows us to replace it for testing
+        self._environ = os.environ if _environ is None else _environ
+
         self.is_jupyter = force_jupyter or _is_jupyter()
         if self.is_jupyter:
             width = width or 93
@@ -395,7 +399,7 @@ class Console:
         """Detect color system from env vars."""
         if self.is_jupyter:
             return ColorSystem.TRUECOLOR
-        if not self.is_terminal or "NO_COLOR" in os.environ:
+        if not self.is_terminal or "NO_COLOR" in self._environ or self.is_dumb_terminal:
             return None
         if WINDOWS:  # pragma: no cover
             if self.legacy_windows:  # pragma: no cover
@@ -407,7 +411,7 @@ class Console:
                 else ColorSystem.EIGHT_BIT
             )
         else:
-            color_term = os.environ.get("COLORTERM", "").strip().lower()
+            color_term = self._environ.get("COLORTERM", "").strip().lower()
             return (
                 ColorSystem.TRUECOLOR
                 if color_term in ("truecolor", "24bit")
@@ -472,13 +476,27 @@ class Console:
         """Check if the console is writing to a terminal.
 
         Returns:
-            bool: True if the console writting to a device capable of
+            bool: True if the console writing to a device capable of
             understanding terminal codes, otherwise False.
         """
         if self._force_terminal:
             return True
         isatty = getattr(self.file, "isatty", None)
         return False if isatty is None else isatty()
+
+    @property
+    def is_dumb_terminal(self) -> bool:
+        """Detect dumb terminal.
+        
+        Returns:
+            bool: True if writing to a dumb terminal, otherwise False.
+        
+        """
+        is_dumb = "TERM" in self._environ and self._environ["TERM"].lower() in (
+            "dumb",
+            "unknown",
+        )
+        return self.is_terminal and is_dumb
 
     @property
     def options(self) -> ConsoleOptions:
@@ -497,8 +515,12 @@ class Console:
         Returns:
             ConsoleDimensions: A named tuple containing the dimensions.
         """
+
         if self._width is not None and self._height is not None:
             return ConsoleDimensions(self._width, self._height)
+
+        if self.is_terminal and self.is_dumb_terminal:
+            return ConsoleDimensions(80, 25)
 
         width, height = shutil.get_terminal_size()
         return ConsoleDimensions(
@@ -791,9 +813,9 @@ class Console:
         Args:
             control_codes (str): Control codes, such as those that may move the cursor.
         """
-
-        self._buffer.append(Segment.control(str(control_codes)))
-        self._check_buffer()
+        if not self.is_dumb_terminal:
+            self._buffer.append(Segment.control(str(control_codes)))
+            self._check_buffer()
 
     def print(
         self,
@@ -1008,7 +1030,7 @@ class Console:
             markup (bool, optional): Enable console markup (requires a str prompt). Defaults to True.
             emoji (bool, optional): Enable emoji (requires a str prompt). Defaults to True.
             password: (bool, optional): Hide typed text. Defaults to False.
-            stream: (IO[str], optional): Optional file to read input from (rather than stdin). Defaults to None.
+            stream: (TextIO, optional): Optional file to read input from (rather than stdin). Defaults to None.
         
         Returns:
             str: Text read from stdin.

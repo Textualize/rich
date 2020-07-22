@@ -751,7 +751,7 @@ class Progress(JupyterMixin, RenderHook):
                         self.ipy_widget.clear_output(wait=True)
                         self.console.print(self.get_renderable())
 
-        elif self.console.is_terminal:
+        elif self.console.is_terminal and not self.console.is_dumb_terminal:
             with self._lock:
                 self._live_render.set_renderable(self.get_renderable())
                 with self.console:

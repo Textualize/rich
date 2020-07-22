@@ -83,7 +83,9 @@ class Bar(JupyterMixin):
 
         if color_system != "truecolor":
             segments += [Segment(bar, fore_style)] * (PULSE_SIZE // 2)
-            segments += [Segment(bar, back_style)] * (PULSE_SIZE - (PULSE_SIZE // 2))
+            segments += [Segment(bar if color_system else " ", back_style)] * (
+                PULSE_SIZE - (PULSE_SIZE // 2)
+            )
             return segments
 
         append = segments.append
@@ -178,7 +180,7 @@ class Bar(JupyterMixin):
             yield _Segment(half_bar_right * half_bar_count, complete_style)
 
         remaining_bars = width - bar_count - half_bar_count
-        if remaining_bars:
+        if remaining_bars and console.color_system is not None:
             if not half_bar_count and bar_count:
                 yield _Segment(half_bar_left, style)
                 remaining_bars -= 1

@@ -180,6 +180,7 @@ class Table(JupyterMixin):
         padding: PaddingDimensions = 0,
         collapse_padding: bool = True,
         pad_edge: bool = False,
+        expand: bool = True,
     ) -> "Table":
         """Get a table with no lines, headers, or footer.
 
@@ -187,6 +188,7 @@ class Table(JupyterMixin):
             padding (PaddingDimensions, optional): Get padding around cells. Defaults to 0.
             collapse_padding (bool, optional): Enable collapsing of padding around cells. Defaults to True.
             pad_edge (bool, optional): Enable padding around edges of table. Defaults to False.
+            expand (bool, optional): Expand the table to fit the available space if ``True``, otherwise the table width will be auto-calculated. Defaults to False.
         
         Returns:
             Table: A table instance.
@@ -199,6 +201,7 @@ class Table(JupyterMixin):
             show_footer=False,
             show_edge=False,
             pad_edge=pad_edge,
+            expand=expand,
         )
 
     @property

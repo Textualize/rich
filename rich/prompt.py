@@ -24,17 +24,18 @@ class PromptError(Exception):
 
 
 class InvalidResponse(PromptError):
-    """Exception to indicate a response was invalid.
+    """Exception to indicate a response was invalid. Raise this within process_respons to indicate an error
+    and provide an error message.
 
         Args:
             message (str): Error message.
     """
 
-    def __init__(self, message: str) -> None:
+    def __init__(self, message: TextType) -> None:
         self.message = message
 
     def __rich__(self) -> RenderableType:
-        return Text.from_markup(self.message)
+        return self.message
 
 
 class PromptBase(Generic[PromptType]):
@@ -126,7 +127,7 @@ class PromptBase(Generic[PromptType]):
         default: Any = ...,
         stream: TextIO = None,
     ) -> Any:
-        """Shortcut to run prompt loop and return the result.
+        """Shortcut to construct and run a prompt loop and return the result.
 
         Example:
             >>> filename = Promot.ask("Enter a filename")
