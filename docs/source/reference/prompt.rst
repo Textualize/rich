@@ -1,5 +1,5 @@
-rich.progress
-=============
+rich.prompt
+===========
 
 .. automodule:: rich.prompt
     :members:
