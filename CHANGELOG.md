@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added rich.prompt
 - Added detecting 'dumb' terminals
 
+### Fixes
+
+- Fixed progress bars so that they are readable when color is disabled
+
 ## [3.3.2] - 2020-07-14
 
 ### Changed
