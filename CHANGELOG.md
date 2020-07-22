@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0] - 2020-07-22
+
+### Added
+
+- Added stream parameter to Console.input
+- Added password parameter to Console.input
+- Added description parameter to Progress.update
+- Added rich.prompt
+- Added detecting 'dumb' terminals
+- Added Text.styled alternative constructor
+
+### Fixes
+
+- Fixed progress bars so that they are readable when color is disabled
+
 ## [3.3.2] - 2020-07-14
 
 ### Changed

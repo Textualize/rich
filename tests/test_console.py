@@ -13,6 +13,17 @@ from rich.style import Style
 from rich.theme import Theme
 
 
+def test_dumb_terminal():
+    console = Console(force_terminal=True)
+    assert console.color_system is not None
+
+    console = Console(force_terminal=True, _environ={"TERM": "dumb"})
+    assert console.color_system is None
+    width, height = console.size
+    assert width == 80
+    assert height == 25
+
+
 def test_console_options_update():
     options = ConsoleOptions(
         min_width=10, max_width=20, is_terminal=False, encoding="utf-8"
