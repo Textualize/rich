@@ -130,7 +130,7 @@ class PromptBase(Generic[PromptType]):
         """Shortcut to construct and run a prompt loop and return the result.
 
         Example:
-            >>> filename = Promot.ask("Enter a filename")
+            >>> filename = Prompt.ask("Enter a filename")
 
         Args:
             prompt (TextType, optional): Prompt text. Defaults to "".
@@ -139,7 +139,7 @@ class PromptBase(Generic[PromptType]):
             choices (List[str], optional): A list of valid choices. Defaults to None.
             show_default (bool, optional): Show default in prompt. Defaults to True.
             show_choices (bool, optional): Show choices in prompt. Defaults to True.
-            stream (TextIO, optional): Optional text file open for readding to get input. Defaults to None.
+            stream (TextIO, optional): Optional text file open for reading to get input. Defaults to None.
         """
         _prompt = cls(
             prompt,
