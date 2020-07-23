@@ -52,7 +52,7 @@ def test_prompt_confirm_no():
     console = Console(file=io.StringIO())
     answer = Confirm.ask("continue", console=console, stream=io.StringIO(INPUT),)
     assert answer is False
-    expected = "continue [y/N]: Please enter Y or N\ncontinue [y/N]: Please enter Y or N\ncontinue [y/N]: "
+    expected = "continue [y/n]: Please enter Y or N\ncontinue [y/n]: Please enter Y or N\ncontinue [y/n]: "
     output = console.file.getvalue()
     print(repr(output))
     assert output == expected
@@ -63,8 +63,20 @@ def test_prompt_confirm_yes():
     console = Console(file=io.StringIO())
     answer = Confirm.ask("continue", console=console, stream=io.StringIO(INPUT),)
     assert answer is True
-    expected = "continue [y/N]: Please enter Y or N\ncontinue [y/N]: Please enter Y or N\ncontinue [y/N]: "
+    expected = "continue [y/n]: Please enter Y or N\ncontinue [y/n]: Please enter Y or N\ncontinue [y/n]: "
     output = console.file.getvalue()
     print(repr(output))
     assert output == expected
 
+
+def test_prompt_confirm_default():
+    INPUT = "foo\nNO\ny"
+    console = Console(file=io.StringIO())
+    answer = Confirm.ask(
+        "continue", console=console, stream=io.StringIO(INPUT), default=True
+    )
+    assert answer is True
+    expected = "continue [y/n] (y): Please enter Y or N\ncontinue [y/n] (y): Please enter Y or N\ncontinue [y/n] (y): "
+    output = console.file.getvalue()
+    print(repr(output))
+    assert output == expected

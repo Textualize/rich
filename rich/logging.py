@@ -4,17 +4,22 @@ from logging import Handler, LogRecord
 from pathlib import Path
 from typing import ClassVar, List, Optional, Type
 
-from . import get_console
 from rich._log_render import LogRender
 from rich.console import Console
 from rich.highlighter import Highlighter, ReprHighlighter
 from rich.text import Text
 
+from . import get_console
+
 
 class RichHandler(Handler):
     """A logging handler that renders output with Rich. The time / level / message and file are displayed in columns.
-    The level is color coded, and the message is syntax highlighted.
-        
+    The level is color coded, and the message is syntax highlighted.            
+
+    Note:
+        Be careful when enabling console markup in log messages if you have configured logging for libraries not 
+        under your control. If a dependency writes messages containing square brackets, it may not produce the intended output.
+
     Args:
         level (int, optional): Log level. Defaults to logging.NOTSET.
         console (:class:`~rich.console.Console`, optional): Optional console instance to write logs.
@@ -22,6 +27,7 @@ class RichHandler(Handler):
         show_path (bool, optional): Show the path to the original log call. Defaults to True.
         enable_link_path (bool, optional): Enable terminal link of path column to file. Defaults to True.
         highlighter (Highlighter, optional): Highlighter to style log messages, or None to use ReprHighlighter. Defaults to None.
+        markup (bool, optional): Enable console markup in log messages. Defaults to False.
   
     """
 
@@ -45,12 +51,14 @@ class RichHandler(Handler):
         show_path: bool = True,
         enable_link_path: bool = True,
         highlighter: Highlighter = None,
+        markup: bool = False,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
         self.highlighter = highlighter or self.HIGHLIGHTER_CLASS()
         self._log_render = LogRender(show_level=True, show_path=show_path)
         self.enable_link_path = enable_link_path
+        self.markup = markup
 
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
@@ -63,7 +71,10 @@ class RichHandler(Handler):
         level = Text()
         level.append(record.levelname, log_style)
 
-        if getattr(record, "markup", False):
+        use_markup = (
+            getattr(record, "markup") if hasattr(record, "markup") else self.markup
+        )
+        if use_markup:
             message_text = Text.from_markup(message)
         else:
             message_text = Text(message)

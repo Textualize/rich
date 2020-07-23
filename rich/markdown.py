@@ -337,9 +337,8 @@ class ImageItem(TextElement):
     ) -> RenderResult:
         link_style = Style(link=self.link or self.destination or None)
         title = self.text or Text(self.destination.strip("/").rsplit("/", 1)[-1])
-
         if self.hyperlinks:
-            title.stylize_all(link_style)
+            title.stylize(link_style)
         yield Text.assemble("🌆 ", title, " ", end="")
 
 

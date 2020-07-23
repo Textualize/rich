@@ -13,7 +13,7 @@ from rich.highlighter import Highlighter
 class RainbowHighlighter(Highlighter):
     def highlight(self, text):
         for index in range(len(text)):
-            text.stylize(index, index + 1, str(randint(16, 255)))
+            text.stylize(str(randint(16, 255)), index, index + 1)
 
 
 rainbow = RainbowHighlighter()

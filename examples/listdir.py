@@ -22,7 +22,7 @@ else:
     def make_filename_text(filename):
         path = os.path.abspath(os.path.join(root_path, filename))
         text = Text(filename, style="bold blue" if os.path.isdir(path) else "default")
-        text.stylize_all(f"link file://{path}")
+        text.stylize(f"link file://{path}")
         text.highlight_regex(r"\..*?$", "bold")
         return text
 
