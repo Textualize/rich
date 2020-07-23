@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2020-07-23
+
+Major version bump for a breaking change to `Text.stylize signature`, which corrects a minor but irritating API wart. The style now comes first and the `start` and `end` offsets default to the entire text. This allows for `text.stylize_all(style)` to be replaced with `text.stylize(style)`. The `start` and `end` offsets now support negative indexing, so `text.stylize("bold", -1)` makes the last character bold.
+
+### Added
+
+- Added markup switch to RichHandler https://github.com/willmcgugan/rich/issues/171
+
+### Changed
+
+- Change signature of Text.stylize to accept style first
+- Remove Text.stylize_all which is no longer necessary
+
+### Fixed
+
+- Fixed rendering of Confirm prompt https://github.com/willmcgugan/rich/issues/170
+
 ## [3.4.1] - 2020-07-22
 
 ### Fixed

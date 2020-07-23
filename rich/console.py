@@ -1,51 +1,45 @@
-from collections.abc import Mapping, Sequence
-
-
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field, replace
-from functools import wraps
-from getpass import getpass
 import inspect
-
 import os
-
 import platform
-
 import shutil
 import sys
 import threading
+from abc import ABC, abstractmethod
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, field, replace
+from functools import wraps
+from getpass import getpass
 from typing import (
+    IO,
+    TYPE_CHECKING,
     Any,
     Callable,
-    cast,
     Dict,
-    IO,
     Iterable,
     List,
+    NamedTuple,
     Optional,
     TextIO,
-    TYPE_CHECKING,
-    NamedTuple,
     Union,
+    cast,
 )
-from typing_extensions import Protocol, runtime_checkable, Literal
 
+from typing_extensions import Literal, Protocol, runtime_checkable
+
+from . import errors, themes
 from ._emoji_replace import _emoji_replace
-from .align import Align, AlignValues
-from .markup import render as render_markup
-from .measure import measure_renderables, Measurement
 from ._log_render import LogRender
-from . import errors
+from .align import Align, AlignValues
 from .color import ColorSystem
 from .control import Control
 from .highlighter import NullHighlighter, ReprHighlighter
+from .markup import render as render_markup
+from .measure import Measurement, measure_renderables
 from .pretty import Pretty
 from .scope import render_scope
-from .style import Style
-from .tabulate import tabulate_mapping
-from . import themes
-from .terminal_theme import TerminalTheme, DEFAULT_TERMINAL_THEME
 from .segment import Segment
+from .style import Style
+from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
 from .text import Text, TextType
 from .theme import Theme
 

@@ -15,6 +15,7 @@ from typing import (
 )
 
 from ._loop import loop_last
+from ._pick import pick_bool
 from ._wrap import divide_line
 from .align import AlignValues
 from .cells import cell_len, set_cell_size
@@ -22,7 +23,6 @@ from .containers import Lines
 from .control import strip_control_codes
 from .jupyter import JupyterMixin
 from .measure import Measurement
-from ._pick import pick_bool
 from .segment import Segment
 from .style import Style, StyleType
 
@@ -230,7 +230,7 @@ class Text(JupyterMixin):
             Text: A text instance with a style applied to the entire string.
         """
         styled_text = cls(text, justify=justify, overflow=overflow)
-        styled_text.stylize_all(style)
+        styled_text.stylize(style)
         return styled_text
 
     @classmethod
@@ -321,31 +321,28 @@ class Text(JupyterMixin):
         copy_self._spans[:] = self._spans
         return copy_self
 
-    def stylize(self, start: int, end: int, style: Union[str, Style]) -> None:
-        """Apply a style to a portion of the text.
-        
-        Args:
-            start (int): Start offset.
-            end (int): End offset.
+    def stylize(
+        self, style: Union[str, Style], start: int = 0, end: Optional[int] = None
+    ) -> None:
+        """Apply a style to the text, or a portion of the text.        
+
+        Args:            
             style (Union[str, Style]): Style instance or style definition to apply.
+            start (int): Start offset (negative indexing is supported). Defaults to 0.
+            end (Optional[int], optional): End offset (negative indexing is supported), or None for end of text. Defaults to None.
 
         """
         length = len(self)
-        if end < 0 or start >= length:
-            # span not in range
+        if start < 0:
+            start = length + start
+        if end is None:
+            end = length
+        if end < 0:
+            end = length + end
+        if start >= length or end <= start:
+            # Span not in text or not valid
             return
-        self._spans.append(Span(max(0, start), min(length + 1, end), style))
-
-    def stylize_all(self, style: Union[str, Style]) -> None:
-        """Apply a style to all the text.
-
-        Args:
-            start (int): Start offset.
-            end (int): End offset.
-            style (Union[str, Style]): Style instance or style definition to apply.
-
-        """
-        self._spans.append(Span(0, len(self), style))
+        self._spans.append(Span(start, min(length, end), style))
 
     def get_style_at_offset(self, console: "Console", offset: int) -> Style:
         """Get the style of a character at give offset.
@@ -417,6 +414,7 @@ class Text(JupyterMixin):
         Args:
             words (Iterable[str]): Worlds to highlight.
             style (Union[str, Style]): Style to apply.
+            case_sensitive (bool, optional): Enable case sensitive matchings. Defaults to True.
         
         Returns:
             int: Number of words highlighted.

@@ -69,4 +69,20 @@ This allows you to specify the text of the column only. If you want to set other
         title="Star Wars Movies"
     )
 
+Grids
+~~~~~
 
+The Table class can also make a great layout tool. If you disable headers and borders you can use it to position content within the terminal. The alternative constructor :meth:`~rich.table.Table.grid` can create such a table for you.
+
+For instance, the following code displays two pieces of text aligned to both the left and right edges of the terminal on a single line::
+
+
+    from rich import print
+    from rich.table import Table
+
+    grid = Table.grid(expand=True)
+    grid.add_column()
+    grid.add_column(justify="right")
+    grid.add_row("Raising shields", "[bold magenta]COMPLETED [green]:heavy_check_mark:")
+
+    print(grid)

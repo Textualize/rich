@@ -61,6 +61,16 @@ If Rich detects that it is not writing to a terminal it will strip control codes
 Letting Rich auto-detect terminals is useful as it will write plain text when you pipe output to a file or other application.
 
 
+Environment variables
+---------------------
+
+Rich respects some standard environment variables.
+
+Settings the environment variable ``TERM`` to ``"dumb"`` or ``"unknown"`` will disable color/style and some features that require moving the cursor, such as progress bars.
+
+If the environment variable ``NO_COLOR`` is set, Rich will disable all color in the output.
+
+
 Printing
 --------
 

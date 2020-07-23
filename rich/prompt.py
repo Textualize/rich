@@ -1,19 +1,8 @@
-from typing import (
-    Any,
-    Generic,
-    IO,
-    List,
-    overload,
-    Optional,
-    TextIO,
-    TypeVar,
-    Union,
-)
+from typing import IO, Any, Generic, List, Optional, TextIO, TypeVar, Union, overload
 
 from .__init__ import get_console
-from .console import Console, RenderableType
+from .console import Console
 from .text import Text, TextType
-
 
 PromptType = TypeVar("PromptType")
 DefaultType = TypeVar("DefaultType")
@@ -34,7 +23,7 @@ class InvalidResponse(PromptError):
     def __init__(self, message: TextType) -> None:
         self.message = message
 
-    def __rich__(self) -> RenderableType:
+    def __rich__(self) -> TextType:
         return self.message
 
 
@@ -151,6 +140,17 @@ class PromptBase(Generic[PromptType]):
         )
         return _prompt(default=default, stream=stream)
 
+    def render_default(self, default: DefaultType) -> Text:
+        """Turn the supplied default in to a Text instance.
+
+        Args:
+            default (DefaultType): Default value.
+
+        Returns:
+            Text: Text containing rendering of default value.
+        """
+        return Text(f"({default})", "prompt.default")
+
     def make_prompt(self, default: DefaultType) -> Text:
         """Make prompt text.
 
@@ -175,7 +175,8 @@ class PromptBase(Generic[PromptType]):
             and isinstance(default, (str, self.response_type))
         ):
             prompt.append(" ")
-            prompt.append(f"({default})", "prompt.default")
+            _default = self.render_default(default)
+            prompt.append(_default)
 
         prompt.append(self.prompt_suffix)
 
@@ -325,20 +326,28 @@ class Confirm(PromptBase[bool]):
 
     response_type = bool
     validate_error_message = "[prompt.invalid]Please enter Y or N"
-    choices = ["y", "N"]
+    choices = ["y", "n"]
+
+    def render_default(self, default: DefaultType) -> Text:
+        """Render the default as (y) or (n) rather than True/False."""
+        assert self.choices is not None
+        yes, no = self.choices
+        return Text(f"({yes})" if default else f"({no})", style="prompt.default")
 
     def process_response(self, value: str) -> bool:
+        """Convert choices to a bool."""
         value = value.strip().lower()
-        if value not in ["y", "n"]:
+        if value not in self.choices:
             raise InvalidResponse(self.validate_error_message)
-        return value == "y"
+        assert self.choices is not None
+        return value == self.choices[0]
 
 
 if __name__ == "__main__":  # pragma: no cover
 
     from rich import print
 
-    if Confirm.ask("Run [i]prompt[/i] tests?"):
+    if Confirm.ask("Run [i]prompt[/i] tests?", default=True):
         while True:
             result = IntPrompt.ask(
                 ":rocket: Enter a number betwen [b]1[/b] and [b]10[/b]", default=5
@@ -363,4 +372,3 @@ if __name__ == "__main__":  # pragma: no cover
 
     else:
         print("[b]OK :loudly_crying_face:")
-

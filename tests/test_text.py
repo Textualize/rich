@@ -114,10 +114,16 @@ def test_rstrip_end():
 
 def test_stylize():
     test = Text("Hello, World!")
-    test.stylize(7, 11, "bold")
+    test.stylize("bold", 7, 11)
     assert test._spans == [Span(7, 11, "bold")]
-    test.stylize(20, 25, "bold")
+    test.stylize("bold", 20, 25)
     assert test._spans == [Span(7, 11, "bold")]
+
+
+def test_stylize_negative_index():
+    test = Text("Hello, World!")
+    test.stylize("bold", -6, -1)
+    assert test._spans == [Span(7, 12, "bold")]
 
 
 def test_highlight_regex():
@@ -213,8 +219,8 @@ def test_set_length():
     assert test == Text("Hello     ")
 
     test = Text("Hello World")
-    test.stylize(0, 5, "bold")
-    test.stylize(7, 9, "italic")
+    test.stylize("bold", 0, 5)
+    test.stylize("italic", 7, 9)
 
     test.set_length(3)
     expected = Text()
