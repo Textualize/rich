@@ -9,7 +9,7 @@ One way to add a style to Text is the :meth:`~rich.text.Text.stylize` method whi
 
     from rich.text import Text
     text = Text("Hello, World!")
-    text.stylize(0, 6, "bold magenta")
+    text.stylize("bold magenta", 0, 6)
     console.print(text)
 
 This will print "Hello, World!" to the terminal, with the first word in bold magenta.
