@@ -386,12 +386,12 @@ LEGACY_WINDOWS_SUBSTITUTIONS = {
 
 
 @overload
-def get_safe_box(box: None, legacy_windows: bool) -> None:  # pragma: no cover
+def get_safe_box(box: None, legacy_windows: bool) -> None:
     ...
 
 
 @overload
-def get_safe_box(box: Box, legacy_windows: bool) -> Box:  # pragma: no cover
+def get_safe_box(box: Box, legacy_windows: bool) -> Box:
     ...
 
 
