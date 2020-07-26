@@ -229,6 +229,8 @@ class Syntax(JupyterMixin):
         if self.dedent:
             code = textwrap.dedent(code)
         text = self._highlight(self.lexer_name)
+        if text.plain.endswith("\n"):
+            text.plain = text.plain[:-1]
         if not self.line_numbers:
             if self.code_width is None:
                 yield text

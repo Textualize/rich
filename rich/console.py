@@ -784,6 +784,7 @@ class Console:
                 append_text(_highlighter(str(renderable)))
 
         check_text()
+
         return renderables
 
     def rule(

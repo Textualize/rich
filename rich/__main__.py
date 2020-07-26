@@ -75,7 +75,7 @@ def make_test_card() -> Table:
         "Text",
         RenderGroup(
             Text.from_markup(
-                """Word wrap text. Justify [green]left[/], [yellow]center[/], [blue]right[/] or [red]full[/].\n\n"""
+                """Word wrap text. Justify [green]left[/], [yellow]center[/], [blue]right[/] or [red]full[/].\n"""
             ),
             lorem_table,
         ),

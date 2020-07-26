@@ -156,7 +156,7 @@ class Heading(TextElement):
         else:
             # Styled text for h2 and beyond
             if self.level == 2:
-                yield Text("\n")
+                yield Text("")
             yield text
 
 
