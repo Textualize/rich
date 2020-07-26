@@ -96,7 +96,7 @@ def track(
     complete_style: StyleType = "bar.complete",
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
-    update_period: float = 0.02,
+    update_period: float = 0.025,
 ) -> Iterable[ProgressType]:
     """Track progress by iterating over a sequence.
     
@@ -648,7 +648,7 @@ class Progress(JupyterMixin, RenderHook):
         total: int = None,
         task_id: Optional[TaskID] = None,
         description="Working...",
-        update_period: float = 0.05,
+        update_period: float = 0.025,
     ) -> Iterable[ProgressType]:
         """Track progress by iterating over a sequence.
         
