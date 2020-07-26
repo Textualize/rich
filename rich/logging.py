@@ -58,7 +58,9 @@ class RichHandler(Handler):
         super().__init__(level=level)
         self.console = console or get_console()
         self.highlighter = highlighter or self.HIGHLIGHTER_CLASS()
-        self._log_render = LogRender(show_time=show_time, show_level=show_level, show_path=show_path)
+        self._log_render = LogRender(
+            show_time=show_time, show_level=show_level, show_path=show_path
+        )
         self.enable_link_path = enable_link_path
         self.markup = markup
 

@@ -364,7 +364,10 @@ class Console:
 
         self._lock = threading.RLock()
         self._log_render = LogRender(
-            show_time=log_time, show_level=log_level, show_path=log_path, time_format=log_time_format
+            show_time=log_time,
+            show_level=log_level,
+            show_path=log_path,
+            time_format=log_time_format,
         )
         self.highlighter: HighlighterType = highlighter or _null_highlighter
         self.safe_box = safe_box
