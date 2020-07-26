@@ -1,12 +1,12 @@
 name: Test Rich module
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 4
+      # max-parallel: 4
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: [3.6, 3.7, 3.8]
