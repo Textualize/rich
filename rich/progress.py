@@ -54,7 +54,7 @@ GetTimeCallable = Callable[[], float]
 
 
 def iter_track(
-    values: ProgressType, update_period: float = 0.05
+    values: Iterable[ProgressType], update_period: float = 0.05
 ) -> Iterable[List[ProgressType]]:
     """Break a sequence in to chunks based on time.
 
@@ -68,7 +68,7 @@ def iter_track(
     output: List[ProgressType] = []
     append = output.append
     get_time = perf_counter
-    period_size = 1
+    period_size = 1.0
     for value in values:
         append(value)
         if len(output) >= period_size:
