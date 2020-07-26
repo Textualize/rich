@@ -14,6 +14,7 @@ from typing import (
     Deque,
     Dict,
     Iterable,
+    Iterator,
     IO,
     List,
     Optional,
@@ -54,8 +55,8 @@ GetTimeCallable = Callable[[], float]
 
 
 def iter_track(
-    values: Iterable[ProgressType], update_period: float = 0.05
-) -> Iterable[List[ProgressType]]:
+    values: Iterable[ProgressType], total: int, update_period: float = 0.05
+) -> Iterable[Iterable[ProgressType]]:
     """Break a sequence in to chunks based on time.
 
     Args:
@@ -65,22 +66,34 @@ def iter_track(
         Iterable[List[ProgressType]]: An iterable containing lists of values from sequence.
 
     """
-    output: List[ProgressType] = []
-    append = output.append
+    if update_period == 0:
+        for value in values:
+            yield [value]
+        return
+
     get_time = perf_counter
     period_size = 1.0
-    for value in values:
-        append(value)
-        if len(output) >= period_size:
-            start_time = get_time()
-            yield output
-            time_taken = get_time() - start_time
-            del output[:]
-            if abs(time_taken - update_period) > 0.2 * update_period:
-                period_size = period_size * (1.5 if time_taken < update_period else 0.8)
 
-    if output:
-        yield output
+    def gen_values(
+        iter_values: Iterator[ProgressType], size: int
+    ) -> Iterable[ProgressType]:
+        try:
+            for _ in range(size):
+                yield next(iter_values)
+        except StopIteration:
+            pass
+
+    iter_values = iter(values)
+    value_count = 0
+
+    while value_count < total:
+        _count = int(period_size)
+        start_time = get_time()
+        yield gen_values(iter_values, _count)
+        time_taken = get_time() - start_time
+        value_count += _count
+        if abs(time_taken - update_period) > 0.2 * update_period:
+            period_size = period_size * (1.5 if time_taken < update_period else 0.8)
 
 
 def track(
@@ -155,10 +168,15 @@ def track(
     advance = progress.advance
     with progress:
         for values in iter_track(
-            sequence, update_period=update_period if auto_refresh else 0
+            sequence, task_total, update_period=update_period if auto_refresh else 0
         ):
-            yield from values
-            advance(task_id, len(values))
+            advance_total = 0
+            for value in values:
+                yield value
+                advance_total += 1
+            if advance_total == 0:
+                break
+            advance(task_id, advance_total)
             if not progress.auto_refresh:
                 progress.refresh()
 
@@ -679,10 +697,15 @@ class Progress(JupyterMixin, RenderHook):
         with self:
             advance = self.advance
             for values in iter_track(
-                sequence, update_period=update_period if self.auto_refresh else 0
+                sequence,
+                task_total,
+                update_period=update_period if self.auto_refresh else 0,
             ):
-                yield from values
-                advance(task_id, len(values))
+                advance_total = 0
+                for value in values:
+                    yield value
+                    advance_total += 1
+                advance(task_id, advance_total)
                 if not self.auto_refresh:
                     progress.refresh()
 
