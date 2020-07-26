@@ -15,10 +15,10 @@ def test_rich_print():
     backup_file = console.file
     try:
         console.file = output
-        rich.print("foo")
+        rich.print("foo", "bar")
         rich.print("foo\n")
         rich.print("foo\n\n")
-        assert output.getvalue() == "foo\nfoo\n\nfoo\n\n\n"
+        assert output.getvalue() == "foo bar\nfoo\n\nfoo\n\n\n"
     finally:
         console.file = backup_file
 
