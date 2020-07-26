@@ -6,7 +6,7 @@ from datetime import timedelta
 import io
 from math import ceil
 import sys
-from time import monotonic
+from time import monotonic, perf_counter
 from threading import Event, RLock, Thread
 from typing import (
     Any,
@@ -14,6 +14,7 @@ from typing import (
     Deque,
     Dict,
     Iterable,
+    Iterator,
     IO,
     List,
     Optional,
@@ -53,6 +54,48 @@ ProgressType = TypeVar("ProgressType")
 GetTimeCallable = Callable[[], float]
 
 
+def iter_track(
+    values: Iterable[ProgressType], total: int, update_period: float = 0.05
+) -> Iterable[Iterable[ProgressType]]:
+    """Break a sequence in to chunks based on time.
+
+    Args:
+        values (ProgressType): An iterable of values.
+
+    Returns:
+        Iterable[List[ProgressType]]: An iterable containing lists of values from sequence.
+
+    """
+    if update_period == 0:
+        for value in values:
+            yield [value]
+        return
+
+    get_time = perf_counter
+    period_size = 1.0
+
+    def gen_values(
+        iter_values: Iterator[ProgressType], size: int
+    ) -> Iterable[ProgressType]:
+        try:
+            for _ in range(size):
+                yield next(iter_values)
+        except StopIteration:
+            pass
+
+    iter_values = iter(values)
+    value_count = 0
+
+    while value_count < total:
+        _count = int(period_size)
+        start_time = get_time()
+        yield gen_values(iter_values, _count)
+        time_taken = get_time() - start_time
+        value_count += _count
+        if abs(time_taken - update_period) > 0.2 * update_period:
+            period_size = period_size * (1.5 if time_taken < update_period else 0.8)
+
+
 def track(
     sequence: Union[Sequence[ProgressType], Iterable[ProgressType]],
     description="Working...",
@@ -66,6 +109,7 @@ def track(
     complete_style: StyleType = "bar.complete",
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
+    update_period: float = 0.025,
 ) -> Iterable[ProgressType]:
     """Track progress by iterating over a sequence.
     
@@ -80,7 +124,8 @@ def track(
         style (StyleType, optional): Style for the bar background. Defaults to "bar.back".
         complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".   
-        pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".     
+        pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse". 
+        update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.05.
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
     
@@ -120,10 +165,18 @@ def track(
             )
 
     task_id = progress.add_task(description, total=task_total)
+    advance = progress.advance
     with progress:
-        for completed, value in enumerate(sequence, 1):
-            yield value
-            progress.update(task_id, completed=completed)
+        for values in iter_track(
+            sequence, task_total, update_period=update_period if auto_refresh else 0
+        ):
+            advance_total = 0
+            for value in values:
+                yield value
+                advance_total += 1
+            if advance_total == 0:
+                break
+            advance(task_id, advance_total)
             if not progress.auto_refresh:
                 progress.refresh()
 
@@ -390,13 +443,15 @@ class Task:
         """Optional[float]: Get the estimated speed in steps per second."""
         if self.start_time is None:
             return None
-        progress = list(self._progress)
+        progress = self._progress
         if not progress:
             return None
         total_time = progress[-1].timestamp - progress[0].timestamp
         if total_time == 0:
             return None
-        total_completed = sum(sample.completed for sample in progress[1:])
+        iter_progress = iter(progress)
+        next(iter_progress)
+        total_completed = sum(sample.completed for sample in iter_progress)
         speed = total_completed / total_time
         return speed
 
@@ -611,6 +666,7 @@ class Progress(JupyterMixin, RenderHook):
         total: int = None,
         task_id: Optional[TaskID] = None,
         description="Working...",
+        update_period: float = 0.025,
     ) -> Iterable[ProgressType]:
         """Track progress by iterating over a sequence.
         
@@ -619,6 +675,7 @@ class Progress(JupyterMixin, RenderHook):
             total: (int, optional): Total number of steps. Default is len(sequence).
             task_id: (TaskID): Task to track. Default is new task.
             description: (str, optional): Description of task, if new task is created.
+            update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.05.
         
         Returns:
             Iterable[ProgressType]: An iterable of values taken from the provided sequence.
@@ -638,9 +695,19 @@ class Progress(JupyterMixin, RenderHook):
         else:
             self.update(task_id, total=task_total)
         with self:
-            for completed, value in enumerate(sequence, 1):
-                yield value
-                self.update(task_id, completed=completed)
+            advance = self.advance
+            for values in iter_track(
+                sequence,
+                task_total,
+                update_period=update_period if self.auto_refresh else 0,
+            ):
+                advance_total = 0
+                for value in values:
+                    yield value
+                    advance_total += 1
+                advance(task_id, advance_total)
+                if not self.auto_refresh:
+                    progress.refresh()
 
     def start_task(self, task_id: TaskID) -> None:
         """Start a task.
@@ -716,9 +783,12 @@ class Progress(JupyterMixin, RenderHook):
             old_sample_time = current_time - self.speed_estimate_period
             _progress = task._progress
 
+            popleft = _progress.popleft
             while _progress and _progress[0].timestamp < old_sample_time:
-                _progress.popleft()
-            task._progress.append(ProgressSample(current_time, update_completed))
+                popleft()
+            while len(_progress) > 10:
+                popleft()
+            _progress.append(ProgressSample(current_time, update_completed))
             if refresh:
                 self.refresh()
 
@@ -729,7 +799,21 @@ class Progress(JupyterMixin, RenderHook):
             task_id (TaskID): ID of task.
             advance (float): Number of steps to advance. Default is 1.
         """
-        self.update(task_id, advance=advance)
+        current_time = self.get_time()
+        with self._lock:
+            task = self._tasks[task_id]
+            completed_start = task.completed
+            task.completed += advance
+            update_completed = task.completed - completed_start
+            old_sample_time = current_time - self.speed_estimate_period
+            _progress = task._progress
+
+            popleft = _progress.popleft
+            while _progress and _progress[0].timestamp < old_sample_time:
+                popleft()
+            while len(_progress) > 10:
+                popleft()
+            _progress.append(ProgressSample(current_time, update_completed))
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""

@@ -517,6 +517,9 @@ class Console:
             return ConsoleDimensions(80, 25)
 
         width, height = shutil.get_terminal_size()
+        # get_terminal_size can report 0, 0 if run from psuedo-terminal
+        width = width or 80
+        height = height or 25
         return ConsoleDimensions(
             (width - self.legacy_windows) if self._width is None else self._width,
             height if self._height is None else self._height,
