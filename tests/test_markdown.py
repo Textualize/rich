@@ -67,7 +67,6 @@ import io
 import re
 
 from rich.console import Console, RenderableType
-from rich.console import Console, RenderableType
 from rich.markdown import Markdown
 
 
