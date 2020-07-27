@@ -5,11 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.2.0] - 2020-07-26
+## [4.2.0] - 2020-07-27
 
 ### Fixed
 
 - Fixed missing new lines https://github.com/willmcgugan/rich/issues/178
+- Fixed Progress.track https://github.com/willmcgugan/rich/issues/184
+- Remove control codes from exported text https://github.com/willmcgugan/rich/issues/181
+- Implemented auto-detection and color rendition of 16-color mode
 
 ## [4.1.0] - 2020-07-26
 

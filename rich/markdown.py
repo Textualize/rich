@@ -180,7 +180,9 @@ class CodeBlock(TextElement):
     ) -> RenderResult:
         code = str(self.text).rstrip()
         syntax = Panel(
-            Syntax(code, self.lexer_name, theme=self.theme), style="dim", box=box.SQUARE
+            Syntax(code, self.lexer_name, theme=self.theme),
+            border_style="dim",
+            box=box.SQUARE,
         )
         yield syntax
 

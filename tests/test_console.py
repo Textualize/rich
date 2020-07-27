@@ -4,7 +4,7 @@ import tempfile
 
 import pytest
 
-from rich.color import ColorSystem
+from rich.color import Color, ColorSystem
 from rich.console import Console, ConsoleOptions
 from rich import errors
 from rich.panel import Panel
@@ -22,6 +22,19 @@ def test_dumb_terminal():
     width, height = console.size
     assert width == 80
     assert height == 25
+
+
+def test_16color_terminal():
+    console = Console(force_terminal=True, _environ={"TERM": "xterm-16color"})
+    assert console.color_system == "standard"
+
+
+def test_truecolor_terminal():
+    console = Console(
+        force_terminal=True,
+        _environ={"COLORTERM": "truecolor", "TERM": "xterm-16color"},
+    )
+    assert console.color_system == "truecolor"
 
 
 def test_console_options_update():

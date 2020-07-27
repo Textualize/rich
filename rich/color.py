@@ -1,11 +1,11 @@
+import platform
 import re
 from colorsys import rgb_to_hls
 from enum import IntEnum
 from functools import lru_cache
-import platform
-from typing import NamedTuple, Optional, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple, Optional, Tuple
 
-from ._palettes import STANDARD_PALETTE, EIGHT_BIT_PALETTE
+from ._palettes import EIGHT_BIT_PALETTE, STANDARD_PALETTE, WINDOWS_PALETTE
 from .color_triplet import ColorTriplet
 from .terminal_theme import DEFAULT_TERMINAL_THEME
 
@@ -297,10 +297,7 @@ class Color(NamedTuple):
             return self.triplet
         elif self.type == ColorType.EIGHT_BIT:
             assert self.number is not None
-            if self.number <= 15:
-                return theme.ansi_colors[self.number]
-            else:
-                return EIGHT_BIT_PALETTE[self.number]
+            return EIGHT_BIT_PALETTE[self.number]
         elif self.type == ColorType.STANDARD:
             assert self.number is not None
             return theme.ansi_colors[self.number]
@@ -347,7 +344,7 @@ class Color(NamedTuple):
                 color,
                 type=(
                     ColorType.STANDARD
-                    if named_color_number < 8
+                    if named_color_number < 16
                     else ColorType.EIGHT_BIT
                 ),
                 number=named_color_number,
@@ -362,7 +359,11 @@ class Color(NamedTuple):
             number = int(color_8)
             if number > 255:
                 raise ColorParseError(f"8bit colors must be <= 255 in {color!r}")
-            return cls(color, ColorType.EIGHT_BIT, number=number)
+            return cls(
+                color,
+                ColorType.STANDARD if number < 16 else ColorType.EIGHT_BIT,
+                number=number,
+            )
 
         elif color_24:
             triplet = ColorTriplet(
@@ -387,10 +388,16 @@ class Color(NamedTuple):
         if _type == ColorType.DEFAULT:
             return ("39" if foreground else "49",)
 
-        elif _type in (ColorType.STANDARD, ColorType.WINDOWS):
+        elif _type == ColorType.WINDOWS:
             number = self.number
             assert number is not None
             return (str(30 + number if foreground else 40 + number),)
+
+        elif _type == ColorType.STANDARD:
+            number = self.number
+            assert number is not None
+            fore, back = (30, 40) if number < 8 else (82, 92)
+            return (str(fore + number if foreground else back + number),)
 
         elif _type == ColorType.EIGHT_BIT:
             assert self.number is not None
@@ -410,6 +417,7 @@ class Color(NamedTuple):
         # Convert to 8-bit color from truecolor color
         if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:
             assert self.triplet is not None
+
             red, green, blue = self.triplet.normalized
             _h, l, s = rgb_to_hls(red, green, blue)
 
@@ -453,7 +461,7 @@ class Color(NamedTuple):
                     return Color(self.name, ColorType.WINDOWS, number=self.number - 8)
                 triplet = ColorTriplet(*EIGHT_BIT_PALETTE[self.number])
 
-            color_number = STANDARD_PALETTE.match(triplet)
+            color_number = WINDOWS_PALETTE.match(triplet)
             return Color(self.name, ColorType.WINDOWS, number=color_number)
 
         return self

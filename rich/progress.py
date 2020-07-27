@@ -55,7 +55,10 @@ GetTimeCallable = Callable[[], float]
 
 
 def iter_track(
-    values: Iterable[ProgressType], total: int, update_period: float = 0.05
+    values: Iterable[ProgressType],
+    total: int,
+    update_period: float = 0.05,
+    get_time: Callable[[], float] = None,
 ) -> Iterable[Iterable[ProgressType]]:
     """Break a sequence in to chunks based on time.
 
@@ -71,7 +74,7 @@ def iter_track(
             yield [value]
         return
 
-    get_time = perf_counter
+    get_time = get_time or perf_counter
     period_size = 1.0
 
     def gen_values(
@@ -87,7 +90,7 @@ def iter_track(
     value_count = 0
 
     while value_count < total:
-        _count = int(period_size)
+        _count = min(int(period_size), total - value_count)
         start_time = get_time()
         yield gen_values(iter_values, _count)
         time_taken = get_time() - start_time
@@ -649,7 +652,7 @@ class Progress(JupyterMixin, RenderHook):
             self._refresh_thread = None
         if self.transient:
             self.console.control(self._live_render.restore_cursor())
-        if self.ipy_widget is not None and self.transient:
+        if self.ipy_widget is not None and self.transient:  # pragma: no cover
             self.ipy_widget.clear_output()
             self.ipy_widget.close()
 
@@ -707,7 +710,7 @@ class Progress(JupyterMixin, RenderHook):
                     advance_total += 1
                 advance(task_id, advance_total)
                 if not self.auto_refresh:
-                    progress.refresh()
+                    self.refresh()
 
     def start_task(self, task_id: TaskID) -> None:
         """Start a task.
