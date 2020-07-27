@@ -1,5 +1,6 @@
 import io
 import os
+import sys
 import tempfile
 
 import pytest
@@ -24,13 +25,15 @@ def test_dumb_terminal():
     assert height == 25
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 def test_16color_terminal():
     console = Console(
         force_terminal=True, _environ={"TERM": "xterm-16color"}, legacy_windows=False
     )
-    assert console.color_system in ("windows", "standard")
+    assert console.color_system == "standard"
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 def test_truecolor_terminal():
     console = Console(
         force_terminal=True,
