@@ -296,7 +296,7 @@ class Console:
         emoji (bool, optional): Enable emoji code. Defaults to True.
         highlight (bool, optional): Enable automatic highlighting. Defaults to True.
         log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
-        log_level (bool, optional): Boolean to enable logging of level by :meth:`log` methods. Defaults to True.
+        log_level (bool, optional): Boolean to enable logging of level by :meth:`log` methods. Defaults to False.
         log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
         log_time_format (str, optional): Log time format if ``log_time`` is enabled. Defaults to "[%X] ".
         highlighter (HighlighterType, optional): Default highlighter.
@@ -322,7 +322,7 @@ class Console:
         emoji: bool = True,
         highlight: bool = True,
         log_time: bool = True,
-        log_level: bool = True,
+        log_level: bool = False,
         log_path: bool = True,
         log_time_format: str = "[%X]",
         highlighter: Optional["HighlighterType"] = ReprHighlighter(),
