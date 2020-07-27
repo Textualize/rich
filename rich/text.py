@@ -769,6 +769,8 @@ class Text(JupyterMixin):
         
         Args:
             separator (str, optional): String to split on. Defaults to "\n".
+            include_separator (bool, optional): Include the separator in the lines. Defaults to False.
+            allow_blank (bool, optional): Return a blank line if the text ends with a separator. Defaults to False.
         
         Returns:
             List[RichText]: A list of rich text, one per line of the original.

@@ -25,13 +25,16 @@ def test_dumb_terminal():
 
 
 def test_16color_terminal():
-    console = Console(force_terminal=True, _environ={"TERM": "xterm-16color"})
-    assert console.color_system == "standard"
+    console = Console(
+        force_terminal=True, _environ={"TERM": "xterm-16color"}, legacy_windows=False
+    )
+    assert console.color_system in ("windows", "standard")
 
 
 def test_truecolor_terminal():
     console = Console(
         force_terminal=True,
+        legacy_windows=False,
         _environ={"COLORTERM": "truecolor", "TERM": "xterm-16color"},
     )
     assert console.color_system == "truecolor"
