@@ -1,10 +1,11 @@
 import io
 import os
+import sys
 import tempfile
 
 import pytest
 
-from rich.color import ColorSystem
+from rich.color import Color, ColorSystem
 from rich.console import Console, ConsoleOptions
 from rich import errors
 from rich.panel import Panel
@@ -22,6 +23,24 @@ def test_dumb_terminal():
     width, height = console.size
     assert width == 80
     assert height == 25
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
+def test_16color_terminal():
+    console = Console(
+        force_terminal=True, _environ={"TERM": "xterm-16color"}, legacy_windows=False
+    )
+    assert console.color_system == "standard"
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
+def test_truecolor_terminal():
+    console = Console(
+        force_terminal=True,
+        legacy_windows=False,
+        _environ={"COLORTERM": "truecolor", "TERM": "xterm-16color"},
+    )
+    assert console.color_system == "truecolor"
 
 
 def test_console_options_update():

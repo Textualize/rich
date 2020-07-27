@@ -758,11 +758,19 @@ class Text(JupyterMixin):
         """
         self._spans.extend(text._spans)
 
-    def split(self, separator="\n", *, include_separator: bool = False) -> Lines:
+    def split(
+        self,
+        separator="\n",
+        *,
+        include_separator: bool = False,
+        allow_blank: bool = False,
+    ) -> Lines:
         r"""Split rich text in to lines, preserving styles.
         
         Args:
             separator (str, optional): String to split on. Defaults to "\n".
+            include_separator (bool, optional): Include the separator in the lines. Defaults to False.
+            allow_blank (bool, optional): Return a blank line if the text ends with a separator. Defaults to False.
         
         Returns:
             List[RichText]: A list of rich text, one per line of the original.
@@ -772,7 +780,7 @@ class Text(JupyterMixin):
         text = self.plain
         if separator not in text:
             return Lines([self.copy()])
-        if text.endswith(separator):
+        if not allow_blank and text.endswith(separator):
             text = text[: -len(separator)]
         offsets: List[int] = []
         append = offsets.append
@@ -886,8 +894,8 @@ class Text(JupyterMixin):
             "OverflowMethod", overflow or self.overflow or DEFAULT_OVERFLOW
         )
         no_wrap = pick_bool(no_wrap, self.no_wrap, False)
-        lines: Lines = Lines()
-        for line in self.split():
+        lines = Lines()
+        for line in self.split(allow_blank=True):
             if "\t" in line:
                 line = line.tabs_to_spaces(tab_size)
             if no_wrap:
@@ -904,7 +912,6 @@ class Text(JupyterMixin):
             for line in new_lines:
                 line.truncate(width, overflow=wrap_overflow)
             lines.extend(new_lines)
-
         return lines
 
     def fit(self, width: int) -> Lines:

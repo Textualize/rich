@@ -28,9 +28,9 @@ class Palette:
         red1, green1, blue1 = color
         _sqrt = sqrt
 
-        def get_color_distance(color: Tuple[int, int, int]) -> float:
+        def get_color_distance(index: int) -> float:
             """Get the distance to a color."""
-            red2, green2, blue2 = color
+            red2, green2, blue2 = self._colors[index]
             red_mean = int((red1 + red2) / 2)
             red = red1 - red2
             green = green1 - green2
@@ -41,7 +41,5 @@ class Palette:
                 + (((767 - red_mean) * blue * blue) >> 8)
             )
 
-        min_index, _min_color = min(
-            enumerate(self._colors), key=lambda _color: get_color_distance(_color[1]),
-        )
+        min_index = min(range(len(self._colors)), key=get_color_distance)
         return min_index

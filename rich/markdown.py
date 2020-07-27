@@ -156,7 +156,7 @@ class Heading(TextElement):
         else:
             # Styled text for h2 and beyond
             if self.level == 2:
-                yield Text("\n")
+                yield Text("")
             yield text
 
 
@@ -180,7 +180,9 @@ class CodeBlock(TextElement):
     ) -> RenderResult:
         code = str(self.text).rstrip()
         syntax = Panel(
-            Syntax(code, self.lexer_name, theme=self.theme), style="dim", box=box.SQUARE
+            Syntax(code, self.lexer_name, theme=self.theme),
+            border_style="dim",
+            box=box.SQUARE,
         )
         yield syntax
 

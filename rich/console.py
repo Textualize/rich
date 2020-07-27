@@ -73,6 +73,8 @@ body {{
 </html>
 """
 
+_TERM_COLORS = {"256color": ColorSystem.EIGHT_BIT, "16color": ColorSystem.STANDARD}
+
 
 @dataclass
 class ConsoleOptions:
@@ -406,11 +408,12 @@ class Console:
             )
         else:
             color_term = self._environ.get("COLORTERM", "").strip().lower()
-            return (
-                ColorSystem.TRUECOLOR
-                if color_term in ("truecolor", "24bit")
-                else ColorSystem.EIGHT_BIT
-            )
+            if color_term in ("truecolor", "24bit"):
+                return ColorSystem.TRUECOLOR
+            term = self._environ.get("TERM", "").strip().lower()
+            _term_name, _hyphen, colors = term.partition("-")
+            color_system = _TERM_COLORS.get(colors, ColorSystem.STANDARD)
+            return color_system
 
     def _enter_buffer(self) -> None:
         """Enter in to a buffer context, and buffer all output."""
@@ -784,6 +787,7 @@ class Console:
                 append_text(_highlighter(str(renderable)))
 
         check_text()
+
         return renderables
 
     def rule(
@@ -1046,7 +1050,7 @@ class Console:
 
         Args:
             clear (bool, optional): Set to ``True`` to clear the record buffer after exporting.
-            styles (bool, optional): If ``True``, ansi style codes will be included. ``False`` for plain text.
+            styles (bool, optional): If ``True``, ansi escape codes will be included. ``False`` for plain text.
                 Defaults to ``False``.
 
         Returns:
@@ -1064,7 +1068,11 @@ class Console:
                     for text, style, _ in self._record_buffer
                 )
             else:
-                text = "".join(text for text, _, _ in self._record_buffer)
+                text = "".join(
+                    segment.text
+                    for segment in self._record_buffer
+                    if not segment.is_control
+                )
             if clear:
                 del self._record_buffer[:]
         return text
@@ -1196,6 +1204,7 @@ class Console:
 
 if __name__ == "__main__":  # pragma: no cover
     console = Console()
+
     console.log(
         "JSONRPC [i]request[/i]",
         5,
