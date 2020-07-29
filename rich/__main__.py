@@ -1,16 +1,16 @@
 import io
 from time import process_time
 
-from rich.console import Console, ConsoleOptions, RenderGroup, RenderResult
-from rich.markdown import Markdown
-from rich.measure import Measurement
-from rich.padding import Padding
-from rich.panel import Panel
-from rich.style import Style
-from rich.table import Table
-from rich.syntax import Syntax
-from rich.text import Text
-from rich import box
+from .console import Console, ConsoleOptions, RenderGroup, RenderResult
+from .markdown import Markdown
+from .measure import Measurement
+from .padding import Padding
+from .panel import Panel
+from .style import Style
+from .table import Table
+from .syntax import Syntax
+from .text import Text
+from . import box
 
 
 class ColorBox:

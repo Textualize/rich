@@ -144,7 +144,7 @@ class Align(JupyterMixin):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from rich.console import Console
+    from .console import Console
 
     console = Console()
 

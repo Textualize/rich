@@ -345,7 +345,7 @@ class Confirm(PromptBase[bool]):
 
 if __name__ == "__main__":  # pragma: no cover
 
-    from rich import print
+    from . import print
 
     if Confirm.ask("Run [i]prompt[/i] tests?", default=True):
         while True:

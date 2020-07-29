@@ -549,7 +549,7 @@ if __name__ == "__main__":  # pragma: no cover
     )
     args = parser.parse_args()
 
-    from rich.console import Console
+    from .console import Console
 
     with open(args.path, "rt", encoding="utf-8") as markdown_file:
         markdown = Markdown(

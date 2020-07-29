@@ -29,7 +29,7 @@ def tabulate_mapping(mapping: Mapping, title: str = None) -> Table:
 
 if __name__ == "__main__":  # pragma: no cover
 
-    from rich import print
+    from . import print
 
     def test(foo, bar):
         list_of_things = [1, 2, 3, None, 4, True, False, "Hello World"]

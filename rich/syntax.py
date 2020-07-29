@@ -338,7 +338,7 @@ if __name__ == "__main__":  # pragma: no cover
     )
     args = parser.parse_args()
 
-    from rich.console import Console
+    from .console import Console
 
     console = Console(force_terminal=args.force_color, width=args.width)
 

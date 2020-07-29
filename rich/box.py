@@ -413,8 +413,8 @@ def get_safe_box(box: Optional[Box], legacy_windows: bool) -> Optional[Box]:
 
 if __name__ == "__main__":  # pragma: no cover
 
-    from rich.columns import Columns
-    from rich.panel import Panel
+    from .columns import Columns
+    from .panel import Panel
     from .console import Console
     from .table import Table
     from .text import Text

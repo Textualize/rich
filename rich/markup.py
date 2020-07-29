@@ -143,8 +143,8 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
 
 if __name__ == "__main__":  # pragma: no cover
     # from rich import print
-    from rich.console import Console
-    from rich.text import Text
+    from .console import Console
+    from .text import Text
 
     console = Console(highlight=False)
 

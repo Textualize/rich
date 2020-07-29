@@ -59,8 +59,8 @@ class Emoji(JupyterMixin):
 if __name__ == "__main__":  # pragma: no cover
     import sys
 
-    from rich.columns import Columns
-    from rich.console import Console
+    from .columns import Columns
+    from .console import Console
 
     console = Console(record=True)
 

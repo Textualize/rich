@@ -33,8 +33,8 @@ class Styled:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from rich import print
-    from rich.panel import Panel
+    from . import print
+    from .panel import Panel
 
     panel = Styled(Panel("hello"), "on blue")
     print(panel)

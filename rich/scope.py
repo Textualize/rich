@@ -48,7 +48,7 @@ def render_scope(
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from rich import print
+    from . import print
 
     print()
 
