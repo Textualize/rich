@@ -104,7 +104,7 @@ if __name__ == "__main__":  # pragma: no cover
     FORMAT = "%(message)s"
     # FORMAT = "%(asctime)-15s - %(level) - %(message)s"
     logging.basicConfig(
-        level="NOTSET", format=FORMAT, datefmt="[%X]", handlers=[RichHandler()]
+        level="NOTSET", format=FORMAT, datefmt="[%X]", handlers=[RichHandler()],
     )
     log = logging.getLogger("rich")
 
@@ -127,6 +127,9 @@ if __name__ == "__main__":  # pragma: no cover
             "id": "194521489",
         },
         {"version": "1.1", "result": True, "error": None, "id": "194521489"},
+    )
+    log.debug(
+        "Loading configuration file /adasd/asdasd/qeqwe/qwrqwrqwr/sdgsdgsdg/werwerwer/dfgerert/ertertert/ertetert/werwerwer"
     )
     log.error("Unable to find 'pomelo' in database!")
     log.info("POST /jsonrpc/ 200 65532")

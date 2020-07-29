@@ -69,6 +69,7 @@ def iter_track(
         Iterable[List[ProgressType]]: An iterable containing lists of values from sequence.
 
     """
+
     if update_period == 0:
         for value in values:
             yield [value]
@@ -90,7 +91,7 @@ def iter_track(
     value_count = 0
 
     while value_count < total:
-        _count = min(int(period_size), total - value_count)
+        _count = max(1, min(int(period_size), total - value_count))
         start_time = get_time()
         yield gen_values(iter_values, _count)
         time_taken = get_time() - start_time

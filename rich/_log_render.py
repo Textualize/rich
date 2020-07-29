@@ -43,7 +43,7 @@ class LogRender:
             output.add_column(style="log.time")
         if self.show_level:
             output.add_column(style="log.level", width=8)
-        output.add_column(ratio=1, style="log.message")
+        output.add_column(ratio=1, style="log.message", overflow="fold")
         if self.show_path and path:
             output.add_column(style="log.path")
         row: List["RenderableType"] = []
