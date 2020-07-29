@@ -1,4 +1,5 @@
 import inspect
+import io
 import os
 import platform
 import shutil
@@ -983,7 +984,14 @@ class Console:
                 else:
                     text = self._render_buffer()
                     if text:
-                        self.file.write(text)
+                        if WINDOWS:  # pragma: no cover
+                            # https://bugs.python.org/issue37871
+                            CHUNK_SIZE = 8192
+                            write = self.file.write
+                            for offset in range(0, len(text), CHUNK_SIZE):
+                                write(text[offset : offset + CHUNK_SIZE])
+                        else:
+                            self.file.write(text)
                         self.file.flush()
 
     def _render_buffer(self) -> str:

@@ -24,6 +24,8 @@ class RichHandler(Handler):
         level (int, optional): Log level. Defaults to logging.NOTSET.
         console (:class:`~rich.console.Console`, optional): Optional console instance to write logs.
             Default will use a global console instance writing to stdout.
+        show_time (bool, optional): Show a column for the time. Defaults to True.
+        show_level (bool, optional): Show a column for the level. Defaults to True.
         show_path (bool, optional): Show the path to the original log call. Defaults to True.
         enable_link_path (bool, optional): Enable terminal link of path column to file. Defaults to True.
         highlighter (Highlighter, optional): Highlighter to style log messages, or None to use ReprHighlighter. Defaults to None.

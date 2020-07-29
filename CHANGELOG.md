@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.1] - 2020-07-29
+
+### Added
+
+- Added show_time and show_level parameters to RichHandler https://github.com/willmcgugan/rich/pull/182
+
+### Fixed
+
+- Fixed progress.track iterator exiting early https://github.com/willmcgugan/rich/issues/189
+- Added workaround for Python bug https://bugs.python.org/issue37871, fixing https://github.com/willmcgugan/rich/issues/186
+
+### Changed
+
+- Set overflow=fold for log messages https://github.com/willmcgugan/rich/issues/190
+
 ## [4.2.0] - 2020-07-27
 
 ### Fixed

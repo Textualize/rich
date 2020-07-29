@@ -177,5 +177,10 @@ if __name__ == "__main__":  # pragma: no cover
     start = process_time()
     console.print(test_card)
     taken = round((process_time() - start) * 1000.0, 1)
-    print(console.file.getvalue())  # type: ignore
+
+    text = console.file.getvalue()
+    # https://bugs.python.org/issue37871
+    for offset in range(0, len(text), 8192):
+        print(text[offset : offset + 8192], end="")
+
     print(f"rendered in {taken}ms")

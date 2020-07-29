@@ -1,46 +1,45 @@
+import io
+import sys
 from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Sized
 from dataclasses import dataclass, field
 from datetime import timedelta
-import io
 from math import ceil
-import sys
-from time import monotonic, perf_counter
 from threading import Event, RLock, Thread
+from time import monotonic, perf_counter
 from typing import (
+    IO,
+    TYPE_CHECKING,
     Any,
     Callable,
     Deque,
     Dict,
     Iterable,
     Iterator,
-    IO,
     List,
-    Optional,
     NamedTuple,
+    NewType,
+    Optional,
     Sequence,
     Tuple,
     TypeVar,
-    TYPE_CHECKING,
-    NewType,
     Union,
 )
 
-from . import get_console
+from . import filesize, get_console
 from .bar import Bar
 from .console import (
     Console,
     ConsoleRenderable,
     JustifyMethod,
+    RenderableType,
     RenderGroup,
     RenderHook,
-    RenderableType,
 )
 from .control import Control
 from .highlighter import Highlighter
 from .jupyter import JupyterMixin
-from . import filesize
 from .live_render import LiveRender
 from .style import StyleType
 from .table import Table
@@ -766,7 +765,6 @@ class Progress(JupyterMixin, RenderHook):
             refresh (bool): Force a refresh of progress information. Default is False.
             **fields (Any): Additional data fields required for rendering.
         """
-        current_time = self.get_time()
         with self._lock:
             task = self._tasks[task_id]
             completed_start = task.completed
@@ -782,19 +780,21 @@ class Progress(JupyterMixin, RenderHook):
             if visible is not None:
                 task.visible = visible
             task.fields.update(fields)
-
             update_completed = task.completed - completed_start
+
+            if refresh:
+                self.refresh()
+
+            current_time = self.get_time()
             old_sample_time = current_time - self.speed_estimate_period
             _progress = task._progress
 
             popleft = _progress.popleft
             while _progress and _progress[0].timestamp < old_sample_time:
                 popleft()
-            while len(_progress) > 10:
+            while len(_progress) > 20:
                 popleft()
             _progress.append(ProgressSample(current_time, update_completed))
-            if refresh:
-                self.refresh()
 
     def advance(self, task_id: TaskID, advance: float = 1) -> None:
         """Advance task by a number of steps.
@@ -997,9 +997,9 @@ if __name__ == "__main__":  # pragma: no coverage
     console = Console()
     with Progress(console=console, transient=True) as progress:
 
-        task1 = progress.add_task(" [red]Downloading", total=1000)
-        task2 = progress.add_task(" [green]Processing", total=1000)
-        task3 = progress.add_task(" [yellow]Thinking", total=1000, start=False)
+        task1 = progress.add_task("[red]Downloading", total=1000)
+        task2 = progress.add_task("[green]Processing", total=1000)
+        task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
 
         while not progress.finished:
             progress.update(task1, advance=0.5)
