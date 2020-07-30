@@ -180,7 +180,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     text = console.file.getvalue()
     # https://bugs.python.org/issue37871
-    for offset in range(0, len(text), 8192):
-        print(text[offset : offset + 8192], end="")
+    for line in text.splitlines():
+        print(line)
 
     print(f"rendered in {taken}ms")
