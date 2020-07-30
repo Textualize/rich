@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Added thread to automatically call update() in progress.track(). Replacing previous adaptive algorithm.
+- Second attempt at working around https://bugs.python.org/issue37871
 
 ## [4.2.1] - 2020-07-29
 
