@@ -67,15 +67,16 @@ class _TrackThread(Thread):
 
     def run(self) -> None:
         task_id = self.task_id
-        progress = self.progress
+        advance = self.progress.advance
         update_period = self.update_period
         last_completed = 0
-        while not self.done.wait(update_period):
+        wait = self.done.wait
+        while not wait(update_period):
             completed = self.completed
             if last_completed != completed:
-                progress.advance(task_id, completed - last_completed)
+                advance(task_id, completed - last_completed)
                 last_completed = completed
-        progress.update(self.task_id, completed=self.completed, refresh=True)
+        self.progress.update(self.task_id, completed=self.completed, refresh=True)
 
     def __enter__(self) -> "_TrackThread":
         self.start()
