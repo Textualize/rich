@@ -53,50 +53,37 @@ ProgressType = TypeVar("ProgressType")
 GetTimeCallable = Callable[[], float]
 
 
-def iter_track(
-    values: Iterable[ProgressType],
-    total: int,
-    update_period: float = 0.05,
-    get_time: Callable[[], float] = None,
-) -> Iterable[Iterable[ProgressType]]:
-    """Break a sequence in to chunks based on time.
+class _TrackThread(Thread):
+    """A thread to periodically update progress."""
 
-    Args:
-        values (ProgressType): An iterable of values.
+    def __init__(self, progress: "Progress", task_id: "TaskID", update_period: float):
+        self.progress = progress
+        self.task_id = task_id
+        self.update_period = update_period
+        self.done = Event()
 
-    Returns:
-        Iterable[List[ProgressType]]: An iterable containing lists of values from sequence.
+        self.completed = 0
+        super().__init__()
 
-    """
+    def run(self) -> None:
+        task_id = self.task_id
+        progress = self.progress
+        update_period = self.update_period
+        last_completed = 0
+        while not self.done.wait(update_period):
+            completed = self.completed
+            if last_completed != completed:
+                progress.advance(task_id, completed - last_completed)
+                last_completed = completed
+        progress.update(self.task_id, completed=self.completed, refresh=True)
 
-    if update_period == 0:
-        for value in values:
-            yield [value]
-        return
+    def __enter__(self) -> "_TrackThread":
+        self.start()
+        return self
 
-    get_time = get_time or perf_counter
-    period_size = 1.0
-
-    def gen_values(
-        iter_values: Iterator[ProgressType], size: int
-    ) -> Iterable[ProgressType]:
-        try:
-            for _ in range(size):
-                yield next(iter_values)
-        except StopIteration:
-            pass
-
-    iter_values = iter(values)
-    value_count = 0
-
-    while value_count < total:
-        _count = max(1, min(int(period_size), total - value_count))
-        start_time = get_time()
-        yield gen_values(iter_values, _count)
-        time_taken = get_time() - start_time
-        value_count += _count
-        if abs(time_taken - update_period) > 0.2 * update_period:
-            period_size = period_size * (1.5 if time_taken < update_period else 0.8)
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        self.done.set()
+        self.join()
 
 
 def track(
@@ -112,7 +99,7 @@ def track(
     complete_style: StyleType = "bar.complete",
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
-    update_period: float = 0.025,
+    update_period: float = 0.1,
 ) -> Iterable[ProgressType]:
     """Track progress by iterating over a sequence.
     
@@ -128,7 +115,7 @@ def track(
         complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".   
         pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse". 
-        update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.05.
+        update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
     
@@ -158,30 +145,9 @@ def track(
         refresh_per_second=refresh_per_second,
     )
 
-    task_total = total
-    if task_total is None:
-        if isinstance(sequence, Sized):
-            task_total = len(sequence)
-        else:
-            raise ValueError(
-                f"unable to get size of {sequence!r}, please specify 'total'"
-            )
-
-    task_id = progress.add_task(description, total=task_total)
-    advance = progress.advance
-    with progress:
-        for values in iter_track(
-            sequence, task_total, update_period=update_period if auto_refresh else 0
-        ):
-            advance_total = 0
-            for value in values:
-                yield value
-                advance_total += 1
-            if advance_total == 0:
-                break
-            advance(task_id, advance_total)
-            if not progress.auto_refresh:
-                progress.refresh()
+    yield from progress.track(
+        sequence, total=total, description=description, update_period=update_period
+    )
 
 
 class ProgressColumn(ABC):
@@ -669,7 +635,7 @@ class Progress(JupyterMixin, RenderHook):
         total: int = None,
         task_id: Optional[TaskID] = None,
         description="Working...",
-        update_period: float = 0.025,
+        update_period: float = 0.1,
     ) -> Iterable[ProgressType]:
         """Track progress by iterating over a sequence.
         
@@ -678,7 +644,7 @@ class Progress(JupyterMixin, RenderHook):
             total: (int, optional): Total number of steps. Default is len(sequence).
             task_id: (TaskID): Task to track. Default is new task.
             description: (str, optional): Description of task, if new task is created.
-            update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.05.
+            update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
         
         Returns:
             Iterable[ProgressType]: An iterable of values taken from the provided sequence.
@@ -698,19 +664,18 @@ class Progress(JupyterMixin, RenderHook):
         else:
             self.update(task_id, total=task_total)
         with self:
-            advance = self.advance
-            for values in iter_track(
-                sequence,
-                task_total,
-                update_period=update_period if self.auto_refresh else 0,
-            ):
-                advance_total = 0
-                for value in values:
+            if self.auto_refresh:
+                with _TrackThread(self, task_id, update_period) as track_thread:
+                    for value in sequence:
+                        yield value
+                        track_thread.completed += 1
+            else:
+                advance = self.advance
+                refresh = self.refresh
+                for value in sequence:
                     yield value
-                    advance_total += 1
-                advance(task_id, advance_total)
-                if not self.auto_refresh:
-                    self.refresh()
+                    advance(task_id, 1)
+                    refresh()
 
     def start_task(self, task_id: TaskID) -> None:
         """Start a task.
