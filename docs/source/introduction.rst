@@ -1,9 +1,9 @@
 Introduction
 ============
 
-Rich is a Python library for writing *rich* text (with color and formatting) to the terminal, and for rendering content such as tables, markdown, and syntax highlighted code.
+Rich is a Python library for writing *rich* text (with color and style) to the terminal, and for displaying advanced content such as tables, markdown, and syntax highlighted code.
 
-Use Rich to make command line applications visually appealing and present data in a more readable way. Rich can also be a useful debugging aid by pretty printing and syntax highlighting data structures.
+Use Rich to make your command line applications visually appealing and present data in a more readable way. Rich can also be a useful debugging aid by pretty printing and syntax highlighting data structures.
 
 Requirements
 ------------
