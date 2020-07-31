@@ -1,9 +1,9 @@
 Introduction
 ============
 
-Rich is a Python library for writing *rich* text (with color and formatting) to the terminal, and for rendering rich content such as tables, markdown, syntax highlighted code.
+Rich is a Python library for writing *rich* text (with color and formatting) to the terminal, and for rendering content such as tables, markdown, and syntax highlighted code.
 
-Use Rich to make command line applications more visually appealing and present data in a more readable way. Rich can also be a useful debugging aid by pretty printing and syntax highlighting data structures.
+Use Rich to make command line applications visually appealing and present data in a more readable way. Rich can also be a useful debugging aid by pretty printing and syntax highlighting data structures.
 
 Requirements
 ------------
@@ -23,7 +23,7 @@ You can install Rich with from PyPi with `pip` or your favorite package manager:
 
 Add the ``-U`` switch to update to the current version, if Rich is already installed.
 
-If you intend to use Rich with Jupyter then there are some additional dependencies, which you can install with the following command::
+If you intend to use Rich with Jupyter then there are some additional dependencies which you can install with the following command::
 
     pip install rich[jupyter]
 
@@ -31,13 +31,13 @@ If you intend to use Rich with Jupyter then there are some additional dependenci
 Quick Start
 -----------
 
-The quickest way to get up and running with Rich is to import the alternative ``print`` function, which can be used as a drop-in replacement for Python's built in function. Here's how you would do that::
+The quickest way to get up and running with Rich is to import the alternative ``print`` function which may be used as a drop-in replacement for Python's built in function. Here's how you would do that::
 
     from rich import print
 
-You can then print content to the terminal in the usual way. Rich will pretty print and syntax highlight any Python objects you print, and display the file/line where the print function was called.
+You can then print strings or objects to the terminal in the usual way. Rich will do some basic syntax highlighting and format data structures to make them easier to read.
 
-Strings may contain :ref:`console_markup` which can be used to easily insert color and styles in to the output.
+Strings may contain :ref:`console_markup` which can be used to insert color and styles in to the output.
 
 The following demonstrates both console markup and pretty formatting of Python objects::
 
@@ -47,7 +47,7 @@ This writes the following output to the terminal (including all the colors and s
 
 .. raw:: html
 
-    <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #800000; font-style: italic">Hello</span> World!                                                 <span style="color: #7f7f7f">&lt;stdin&gt;:1</span>
+    <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #800000; font-style: italic">Hello</span> World!                                                 
     <span style="font-weight: bold">{</span>
         <span style="color: #008000">'__annotations__'</span>: <span style="font-weight: bold">{}</span>,
         <span style="color: #008000">'__builtins__'</span>: <span style="font-weight: bold"><</span><span style="color: #ff00ff">module</span><span style="color: #000000"> </span><span style="color: #008000">'builtins'</span><span style="color: #000000"> </span><span style="color: #000000; font-weight: bold">(</span><span style="color: #000000">built-in</span><span style="color: #000000; font-weight: bold">)</span><span style="font-weight: bold">></span>,
