@@ -7,7 +7,13 @@ from .text import Span, Text
 from ._emoji_replace import _emoji_replace
 
 
-re_tags = re.compile(r"(\[\[)|(\]\])|\[([a-zA-Z\-_#\/].*?)\]")
+RE_TAGS = re.compile(
+    r"""
+(\\\[)|
+\[([a-z#\/].*?)\]
+""",
+    re.VERBOSE,
+)
 
 
 class Tag(NamedTuple):
@@ -41,7 +47,7 @@ def escape(markup: str) -> str:
     Returns:
         str: Markup with square brackets escaped.
     """
-    return markup.replace("[", "[[").replace("]", "]]")
+    return markup.replace("[", "\[")
 
 
 def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
@@ -52,19 +58,19 @@ def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
     
     """
     position = 0
-    for match in re_tags.finditer(markup):
-        escape_open, escape_close, tag_text = match.groups()
+    for match in RE_TAGS.finditer(markup):
+        (escape_open, tag_text) = match.groups()
         start, end = match.span()
         if start > position:
             yield start, markup[position:start], None
-        if tag_text:
+        if escape_open:
+            yield start, "[", None
+        else:
             text, equals, parameters = tag_text.partition("=")
             if equals:
                 yield start, None, Tag(text, parameters)
             else:
                 yield start, None, Tag(tag_text.strip(), None)
-        else:
-            yield start, (escape_open and "[") or (escape_close and "]"), None  # type: ignore
         position = end
     if position < len(markup):
         yield position, markup[position:], None

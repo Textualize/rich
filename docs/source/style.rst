@@ -116,6 +116,10 @@ You can also use these custom styles via markup. For example::
 
     console.print("[warning]The pod bay doors are locked[/warning]")
 
+
+.. note::
+    style names must be lower case, start with a letter, and only contain letters or the characters ``"."``, ``"-"``, ``"_"``.
+
 If you prefer you can write your styles in an external config file rather than in Python. Here's an example of the format::
 
     [styles]

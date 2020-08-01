@@ -38,16 +38,13 @@ If your terminal software supports hyperlinks, you will be able to click the wor
 Escaping
 ~~~~~~~~
 
-Occasionally you may want to print something that Rich would interpret as markup. You can *escape* square brackets by doubling them up. Here's an example::
+Occasionally you may want to print something that Rich would interpret as markup. You can *escape* a tab by preceding it with backslash. Here's an example::
 
     >>> from rich import print
-    >>> print("foo[[bar]]")
+    >>> print("foo\[bar]")
     foo[bar]
 
 The function :func:`~rich.markup.escape` will handle escape of text for you.
-
-.. warning::
-    Be careful when using f-strings with console markup. You will need to escape any variables if they could contain square brackets.
 
 Rendering Markup
 ----------------
