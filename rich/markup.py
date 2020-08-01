@@ -7,7 +7,7 @@ from .text import Span, Text
 from ._emoji_replace import _emoji_replace
 
 
-re_tags = re.compile(r"(\[\[)|(\]\])|\[(.*?)\]")
+re_tags = re.compile(r"(\[\[)|(\]\])|\[([a-zA-Z\-_#\/].*?)\]")
 
 
 class Tag(NamedTuple):
@@ -151,6 +151,7 @@ if __name__ == "__main__":  # pragma: no cover
     # t = Text.from_markup('Hello [link="https://www.willmcgugan.com"]W[b]o[/b]rld[/]!')
     # print(repr(t._spans))
 
+    console.print("Hello [1], [1,2,3] ['hello']")
     console.print("foo")
     console.print("Hello [link=https://www.willmcgugan.com]W[b]o[/b]rld[/]!")
 

@@ -40,6 +40,12 @@ def test_render():
     assert result.spans == [Span(0, 3, "bold")]
 
 
+def test_render_not_tags():
+    result = render('[1], [1,2,3,4], ["hello"]')
+    assert str(result) == '[1], [1,2,3,4], ["hello"]'
+    assert result.spans == []
+
+
 def test_render_link():
     result = render("[link=foo]FOO[/link]")
     assert str(result) == "FOO"

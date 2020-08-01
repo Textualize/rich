@@ -34,8 +34,8 @@ def test_windows() -> None:
 def test_truecolor() -> None:
     assert Color.parse("#ff0000").get_truecolor() == ColorTriplet(255, 0, 0)
     assert Color.parse("red").get_truecolor() == ColorTriplet(128, 0, 0)
-    assert Color.parse("1").get_truecolor() == ColorTriplet(128, 0, 0)
-    assert Color.parse("17").get_truecolor() == ColorTriplet(0, 0, 95)
+    assert Color.parse("color(1)").get_truecolor() == ColorTriplet(128, 0, 0)
+    assert Color.parse("color(17)").get_truecolor() == ColorTriplet(0, 0, 95)
     assert Color.parse("default").get_truecolor() == ColorTriplet(0, 0, 0)
     assert Color.parse("default").get_truecolor(foreground=False) == ColorTriplet(
         255, 255, 255
@@ -50,7 +50,9 @@ def test_parse_success() -> None:
     assert Color.parse("red") == Color("red", ColorType.STANDARD, 1, None)
     assert Color.parse("bright_red") == Color("bright_red", ColorType.STANDARD, 9, None)
     assert Color.parse("yellow4") == Color("yellow4", ColorType.EIGHT_BIT, 106, None)
-    assert Color.parse("100") == Color("100", ColorType.EIGHT_BIT, 100, None)
+    assert Color.parse("color(100)") == Color(
+        "color(100)", ColorType.EIGHT_BIT, 100, None
+    )
     assert Color.parse("#112233") == Color(
         "#112233", ColorType.TRUECOLOR, None, ColorTriplet(0x11, 0x22, 0x33)
     )
@@ -73,6 +75,8 @@ def test_parse_error() -> None:
     with pytest.raises(ColorParseError):
         Color.parse("256")
     with pytest.raises(ColorParseError):
+        Color.parse("color(256)")
+    with pytest.raises(ColorParseError):
         Color.parse("rgb(999,0,0)")
     with pytest.raises(ColorParseError):
         Color.parse("rgb(0,0)")
@@ -89,15 +93,17 @@ def test_get_ansi_codes() -> None:
     assert Color.parse("default").get_ansi_codes(False) == ("49",)
     assert Color.parse("red").get_ansi_codes() == ("31",)
     assert Color.parse("red").get_ansi_codes(False) == ("41",)
-    assert Color.parse("1").get_ansi_codes() == ("31",)
-    assert Color.parse("1").get_ansi_codes(False) == ("41",)
+    assert Color.parse("color(1)").get_ansi_codes() == ("31",)
+    assert Color.parse("color(1)").get_ansi_codes(False) == ("41",)
     assert Color.parse("#ff0000").get_ansi_codes() == ("38", "2", "255", "0", "0")
     assert Color.parse("#ff0000").get_ansi_codes(False) == ("48", "2", "255", "0", "0")
 
 
 def test_downgrade() -> None:
 
-    assert Color.parse("9").downgrade(0) == Color("9", ColorType.STANDARD, 9, None)
+    assert Color.parse("color(9)").downgrade(0) == Color(
+        "color(9)", ColorType.STANDARD, 9, None
+    )
 
     assert Color.parse("#000000").downgrade(ColorSystem.EIGHT_BIT) == Color(
         "#000000", ColorType.EIGHT_BIT, 16, None
@@ -119,12 +125,12 @@ def test_downgrade() -> None:
         "#ff0000", ColorType.STANDARD, 1, None
     )
 
-    assert Color.parse("9").downgrade(ColorSystem.STANDARD) == Color(
-        "9", ColorType.STANDARD, 9, None
+    assert Color.parse("color(9)").downgrade(ColorSystem.STANDARD) == Color(
+        "color(9)", ColorType.STANDARD, 9, None
     )
 
-    assert Color.parse("20").downgrade(ColorSystem.STANDARD) == Color(
-        "20", ColorType.STANDARD, 4, None
+    assert Color.parse("color(20)").downgrade(ColorSystem.STANDARD) == Color(
+        "color(20)", ColorType.STANDARD, 4, None
     )
 
     assert Color.parse("red").downgrade(ColorSystem.WINDOWS) == Color(
@@ -139,8 +145,8 @@ def test_downgrade() -> None:
         "#ff0000", ColorType.WINDOWS, 1, None
     )
 
-    assert Color.parse("255").downgrade(ColorSystem.WINDOWS) == Color(
-        "255", ColorType.WINDOWS, 7, None
+    assert Color.parse("color(255)").downgrade(ColorSystem.WINDOWS) == Color(
+        "color(255)", ColorType.WINDOWS, 7, None
     )
 
     assert Color.parse("#00ff00").downgrade(ColorSystem.STANDARD) == Color(

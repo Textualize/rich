@@ -27,3 +27,24 @@ Since building Text instances from parts is a common requirement, Rich offers :m
     console.print(text)
 
 You can apply a style to given words in the text with :meth:`~rich.text.Text.highlight_words` or for ultimate control call :meth:`~rich.text.Text.highlight_regex` to highlight text matching a *regular expression*. 
+
+
+Text attributes
+~~~~~~~~~~~~~~~
+
+The Text class has a number of parameters you can set on the constructor to modify how the text is display.
+
+- ``justify`` should be "left", "center", "right", or "full", and will override default justify behaviour if set.
+- ``overflow`` should be "fold", "crop", or "ellipsis" and will override default overflow if set.
+- ``no_wrap`` prevents wrapping if the text is longer then the available width.
+- ``tab_size`` Sets the number of characters in a tab.
+
+A Text instance may be used in place of a plain string virtually everywhere in the Rich API, which gives you a lot of control in how text is displays within other Rich renderables. For instance, the following right aligns text within a :class:`rich.panel.Panel`::
+
+    from rich import print
+    from rich.panel import Panel
+    from rich.text import Text
+    panel = Panel(Text("Hello", justify="right"))
+    print(panel)
+
+

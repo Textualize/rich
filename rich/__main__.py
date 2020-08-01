@@ -24,7 +24,7 @@ class ColorBox:
         for color_start in range(start, start + 36, 6):
             text = Text()
             for color_no in range(color_start, color_start + 6):
-                text.append("  ", Style(bgcolor=str(color_no)))
+                text.append("  ", Style(bgcolor=f"color({color_no})"))
             yield text
 
     def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
