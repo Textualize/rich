@@ -32,14 +32,14 @@ You can apply a style to given words in the text with :meth:`~rich.text.Text.hig
 Text attributes
 ~~~~~~~~~~~~~~~
 
-The Text class has a number of parameters you can set on the constructor to modify how the text is display.
+The Text class has a number of parameters you can set on the constructor to modify how the text is displayed.
 
-- ``justify`` should be "left", "center", "right", or "full", and will override default justify behaviour if set.
-- ``overflow`` should be "fold", "crop", or "ellipsis" and will override default overflow if set.
+- ``justify`` should be "left", "center", "right", or "full", and will override default justify behaviour.
+- ``overflow`` should be "fold", "crop", or "ellipsis", and will override default overflow.
 - ``no_wrap`` prevents wrapping if the text is longer then the available width.
 - ``tab_size`` Sets the number of characters in a tab.
 
-A Text instance may be used in place of a plain string virtually everywhere in the Rich API, which gives you a lot of control in how text is displays within other Rich renderables. For instance, the following right aligns text within a :class:`rich.panel.Panel`::
+A Text instance may be used in place of a plain string virtually everywhere in the Rich API, which gives you a lot of control in how text renders within other Rich renderables. For instance, the following example right aligns text within a :class:`rich.panel.Panel`::
 
     from rich import print
     from rich.panel import Panel
