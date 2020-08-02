@@ -44,7 +44,7 @@ Occasionally you may want to print something that Rich would interpret as markup
     >>> print("foo\[bar]")
     foo[bar]
 
-The function :func:`~rich.markup.escape` will handle escape of text for you.
+The function :func:`~rich.markup.escape` will handle escaping of text for you.
 
 Rendering Markup
 ----------------

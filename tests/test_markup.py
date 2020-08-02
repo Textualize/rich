@@ -58,8 +58,8 @@ def test_render():
 
 
 def test_render_not_tags():
-    result = render('[[1], [1,2,3,4], ["hello"], [None], [False], [True]]')
-    assert str(result) == '[[1], [1,2,3,4], ["hello"], [None], [False], [True]]'
+    result = render('[[1], [1,2,3,4], ["hello"], [None], [False], [True]] []')
+    assert str(result) == '[[1], [1,2,3,4], ["hello"], [None], [False], [True]] []'
     assert result.spans == []
 
 
