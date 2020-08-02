@@ -21,6 +21,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
           poetry install
+      - name: Format check with black
+        run: |
+          make format
       - name: Typecheck with mypy
         run: |
           make typecheck
