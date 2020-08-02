@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2020-08-01
+
+### Changed
+
+- Change to console markup syntax to not parse Python structures as markup, i.e. `[1,2,3]` is not treated as a literal, not a tag.
+- Standard color numbers syntax has changed to `"color(<number>)"` so that `[5]` (for example) is considered a literal.
+
 ## [4.2.2] - 2020-07-30
 
 ### Changed

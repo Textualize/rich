@@ -4,12 +4,11 @@ from logging import Handler, LogRecord
 from pathlib import Path
 from typing import ClassVar, List, Optional, Type
 
-from rich._log_render import LogRender
-from rich.console import Console
-from rich.highlighter import Highlighter, ReprHighlighter
-from rich.text import Text
-
 from . import get_console
+from ._log_render import LogRender
+from .console import Console
+from .highlighter import Highlighter, ReprHighlighter
+from .text import Text
 
 
 class RichHandler(Handler):

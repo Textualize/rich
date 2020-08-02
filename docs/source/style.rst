@@ -16,9 +16,9 @@ To specify a foreground color use one of the 256 :ref:`appendix-colors`. For exa
 
     console.print("Hello", style="magenta")
 
-You may also use the color's number (an integer between 0 and 255). The following will give the equivalent output::
+You may also use the color's number (an integer between 0 and 255) with the syntax `"color(<number>)"`. The following will give the equivalent output::
 
-    console.print("Hello", style="5")
+    console.print("Hello", style="color(5)")
 
 Alteratively you can use a CSS-like syntax to specify a color with a "#" followed by three pairs of hex characters, or in RGB form with three decimal integers. The following two lines both print "Hello" in the same color (purple)::
 
@@ -115,6 +115,10 @@ To use a style theme, construct a :class:`~rich.theme.Theme` instance and pass i
 You can also use these custom styles via markup. For example::
 
     console.print("[warning]The pod bay doors are locked[/warning]")
+
+
+.. note::
+    style names must be lower case, start with a letter, and only contain letters or the characters ``"."``, ``"-"``, ``"_"``.
 
 If you prefer you can write your styles in an external config file rather than in Python. Here's an example of the format::
 
