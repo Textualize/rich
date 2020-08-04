@@ -299,4 +299,3 @@ EIGHT_BIT_PALETTE = Palette(
         (238, 238, 238),
     ]
 )
-
