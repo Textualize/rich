@@ -12,7 +12,7 @@ class Rule(JupyterMixin):
     
     Args:
         title (Union[str, Text], optional): Text to render in the rule. Defaults to "".
-        character (str, optional): Character used to draw the line. Defaults to "─".
+        characters (str, optional): Character(s) used to draw the line. Defaults to "─".
         style (StyleType, optional): Style of Rule. Defaults to "rule.line".
         end (str, optional): Character at end of Rule. defaults to "\\n"
     """
@@ -21,29 +21,29 @@ class Rule(JupyterMixin):
         self,
         title: Union[str, Text] = "",
         *,
-        character: str = None,
+        characters: str = None,
         style: Union[str, Style] = "rule.line",
         end: str = "\n",
     ) -> None:
-        if character and cell_len(character) != 1:
-            raise ValueError("'character' argument must have a cell width of 1")
+        if cell_len(characters) < 1:
+            raise ValueError("'character' argument must at least have a cell width of 1")
         self.title = title
-        self.character = character
+        self.characters = characters
         self.style = style
         self.end = end
 
     def __repr__(self) -> str:
-        return f"Rule({self.title!r}, {self.character!r})"
+        return f"Rule({self.title!r}, {self.characters!r})"
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         width = options.max_width
 
-        character = self.character or "─"
+        characters = self.characters or "─"
 
         if not self.title:
-            yield Text(character * width, self.style)
+            yield Text(characters * (width//len(characters)), self.style)
         else:
             if isinstance(self.title, Text):
                 title_text = self.title
@@ -56,12 +56,12 @@ class Rule(JupyterMixin):
             title_text.plain = title_text.plain.replace("\n", " ")
             title_text = title_text.tabs_to_spaces()
             rule_text = Text(end=self.end)
-            center = (width - cell_len(title_text.plain)) // 2
-            rule_text.append(character * (center - 1) + " ", self.style)
+            side_width = (width - cell_len(title_text.plain)) // 2
+            side = Text(characters * side_width)
+            side.truncate(side_width - 1)
+            rule_text.append(str(side) + " ", self.style)
             rule_text.append(title_text)
-            rule_text.append(
-                " " + character * (width - cell_len(rule_text.plain) - 1), self.style
-            )
+            rule_text.append(" " + str(side), self.style)
             yield rule_text
 
 
@@ -72,6 +72,6 @@ if __name__ == "__main__":  # pragma: no cover
     try:
         text = sys.argv[1]
     except IndexError:
-        text = "Hello, World"
+        text = "Hello"
     console = Console()
-    console.print(Rule(text))
+    console.print(Rule(text, characters="-*+"))
