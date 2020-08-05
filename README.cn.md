@@ -1,7 +1,7 @@
 # Rich
 
 [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
-[![PyPI](https://img.shields.io/pypi/pyversions/rich.svg)](https://pypi.org/project/rich/)
+[![codecov](https://codecov.io/gh/willmcgugan/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/willmcgugan/rich)
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
