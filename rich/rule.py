@@ -69,6 +69,7 @@ class Rule(JupyterMixin):
                 side = Text(characters * side_width)
             else:
                 side = Text(characters * (side_width // (chars_len - 1)))
+                print(side)
             side.truncate(side_width - 1)
             rule_text.append(str(side) + " ", self.style)
             rule_text.append(title_text)
