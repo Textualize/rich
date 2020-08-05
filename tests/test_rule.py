@@ -50,8 +50,10 @@ def test_characters():
     )
     console.rule(characters="+*")
     console.rule("foo", characters="+*")
+    console.print(Rule(characters=".,"))
     expected = "+*+*+*+*+*+*+*+*\n"
     expected += "+*+*+ foo +*+*++\n"
+    expected += ".,.,.,.,.,.,.,.,\n"
     assert console.file.getvalue() == expected
 
 
