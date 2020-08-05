@@ -26,7 +26,9 @@ class Rule(JupyterMixin):
         end: str = "\n",
     ) -> None:
         if cell_len(characters) < 1:
-            raise ValueError("'character' argument must at least have a cell width of 1")
+            raise ValueError(
+                "'character' argument must at least have a cell width of 1"
+            )
         self.title = title
         self.characters = characters
         self.style = style
@@ -43,7 +45,7 @@ class Rule(JupyterMixin):
         characters = self.characters or "─"
 
         if not self.title:
-            yield Text(characters * (width//len(characters)), self.style)
+            yield Text(characters * (width // len(characters)), self.style)
         else:
             if isinstance(self.title, Text):
                 title_text = self.title
@@ -78,4 +80,4 @@ if __name__ == "__main__":  # pragma: no cover
         text = "Hello"
     console = Console(width=16)
     console.print(Rule(title="foo"))
-    #console.print("." * 16)
+    # console.print("." * 16)
