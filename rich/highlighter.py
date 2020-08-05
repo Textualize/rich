@@ -75,7 +75,7 @@ class ReprHighlighter(RegexHighlighter):
         r"(?P<tag_start>\<)(?P<tag_name>\w*)(?P<tag_contents>.*?)(?P<tag_end>\>)",
         r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?[\w_]+\"?)",
         r"(?P<bool_true>True)|(?P<bool_false>False)|(?P<none>None)",
-        r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*\b)",
+        r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[\-\+]?\d+?)?\b)",
         r"(?P<number>0x[0-9a-f]*)",
         r"(?P<path>\B(\/[\w\.\-\_\+]+)*\/)(?P<filename>[\w\.\-\_\+]*)?",
         r"(?<!\\)(?P<str>b?\'\'\'.*?(?<!\\)\'\'\'|b?\'.*?(?<!\\)\'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
@@ -105,3 +105,7 @@ if __name__ == "__main__":  # pragma: no cover
     console.print("foo /foo/bar/baz/egg.py word")
     console.print("foo /foo/bar/ba._++z/egg+.py word")
     console.print("https://example.org?foo=bar")
+
+    console.print(1234567.34)
+    console.print(1 / 2)
+    console.print(-1 / 123123123123)

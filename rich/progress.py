@@ -16,7 +16,6 @@ from typing import (
     Deque,
     Dict,
     Iterable,
-    Iterator,
     List,
     NamedTuple,
     NewType,
