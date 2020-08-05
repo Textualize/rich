@@ -50,7 +50,6 @@ class Rule(JupyterMixin):
             chars_len = 0
             for i in list(characters):
                 chars_len += get_char_size(i)
-        print(chars_len)
         if not self.title:
             yield Text(characters * (width // chars_len), self.style)
         else:
@@ -88,4 +87,4 @@ if __name__ == "__main__":  # pragma: no cover
     except IndexError:
         text = "Hello"
     console = Console(width=16)
-    console.print(Rule(title="foo", characters="😊😊"))
+    console.print(Rule(title="foo", characters="好"))
