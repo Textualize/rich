@@ -21,7 +21,7 @@ class Rule(JupyterMixin):
         self,
         title: Union[str, Text] = "",
         *,
-        characters: str = None,
+        characters: str = "─",
         style: Union[str, Style] = "rule.line",
         end: str = "\n",
     ) -> None:
@@ -57,7 +57,10 @@ class Rule(JupyterMixin):
             title_text = title_text.tabs_to_spaces()
             rule_text = Text(end=self.end)
             side_width = (width - cell_len(title_text.plain)) // 2
-            side = Text(characters * (side_width // (cell_len(characters) - 1)))
+            if cell_len(characters) == 1:
+                side = Text(characters * side_width)
+            else:
+                side = Text(characters * (side_width // (cell_len(characters) - 1)))
             side.truncate(side_width - 1)
             rule_text.append(str(side) + " ", self.style)
             rule_text.append(title_text)
@@ -73,5 +76,6 @@ if __name__ == "__main__":  # pragma: no cover
         text = sys.argv[1]
     except IndexError:
         text = "Hello"
-    console = Console()
-    console.print(Rule(text, characters="1234567890"))
+    console = Console(width=16)
+    console.print(Rule(title="foo"))
+    #console.print("." * 16)

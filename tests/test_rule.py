@@ -41,4 +41,4 @@ def test_repr():
 
 def test_error():
     with pytest.raises(ValueError):
-        Rule(character="bar")
+        Rule(characters="")
