@@ -27,7 +27,7 @@ class Rule(JupyterMixin):
     ) -> None:
         if cell_len(characters) < 1:
             raise ValueError(
-                "'character' argument must at least have a cell width of 1"
+                "'characters' argument must have at least a cell width of 1"
             )
         self.title = title
         self.characters = characters
