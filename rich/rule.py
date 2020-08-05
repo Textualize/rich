@@ -1,6 +1,6 @@
 from typing import Union
 
-from .cells import cell_len
+from .cells import cell_len, get_character_cell_size as get_char_size
 from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin
 from .style import Style
@@ -44,8 +44,15 @@ class Rule(JupyterMixin):
 
         characters = self.characters or "─"
 
+        if cell_len(characters) == 1:
+            chars_len = get_char_size(characters)
+        else:
+            chars_len = 0
+            for i in list(characters):
+                chars_len += get_char_size(i)
+        print(chars_len)
         if not self.title:
-            yield Text(characters * (width // len(characters)), self.style)
+            yield Text(characters * (width // chars_len), self.style)
         else:
             if isinstance(self.title, Text):
                 title_text = self.title
@@ -59,10 +66,10 @@ class Rule(JupyterMixin):
             title_text = title_text.tabs_to_spaces()
             rule_text = Text(end=self.end)
             side_width = (width - cell_len(title_text.plain)) // 2
-            if cell_len(characters) == 1:
+            if chars_len == 1:
                 side = Text(characters * side_width)
             else:
-                side = Text(characters * (side_width // (cell_len(characters) - 1)))
+                side = Text(characters * (side_width // (chars_len - 1)))
             side.truncate(side_width - 1)
             rule_text.append(str(side) + " ", self.style)
             rule_text.append(title_text)
@@ -81,4 +88,4 @@ if __name__ == "__main__":  # pragma: no cover
     except IndexError:
         text = "Hello"
     console = Console(width=16)
-    console.print(Rule(title="foo"))
+    console.print(Rule(title="foo", characters="😊😊"))

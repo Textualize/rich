@@ -26,6 +26,7 @@ def test_rule():
     assert result == expected
 
 
+# doesn't work for now
 def test_rule_cjk():
     console = Console(
         width=16,
