@@ -67,6 +67,8 @@ class Rule(JupyterMixin):
             rule_text.append(str(side) + " ", self.style)
             rule_text.append(title_text)
             rule_text.append(" " + str(side), self.style)
+            if len(rule_text) < width:
+                rule_text.append(characters[0], self.style)
             yield rule_text
 
 
@@ -79,5 +81,4 @@ if __name__ == "__main__":  # pragma: no cover
     except IndexError:
         text = "Hello"
     console = Console(width=16)
-    console.print(Rule(title="foo"))
-    # console.print("." * 16)
+    console.print(Rule(title="欢迎！"))
