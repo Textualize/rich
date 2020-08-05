@@ -11,13 +11,16 @@ def test_rule():
     console = Console(
         width=16, file=io.StringIO(), force_terminal=True, legacy_windows=False
     )
-    console.rule()
-    console.rule("foo")
+    console.print(Rule())
+    console.print(Rule("foo"))
     console.rule(Text("foo", style="bold"))
     console.rule("foobarbazeggfoobarbazegg")
-    expected = "\x1b[92m────────────────\x1b[0m\n\x1b[92m───── \x1b[0mfoo\x1b[92m ──────\x1b[0m\n\x1b[92m───── \x1b[0m\x1b[1mfoo\x1b[0m\x1b[92m ──────\x1b[0m\n\x1b[92m─ \x1b[0mfoobarbazeg…\x1b[92m ─\x1b[0m\n"
+    expected = "\x1b[92m────────────────\x1b[0m\n"
+    expected += "\x1b[92m───── \x1b[0mfoo\x1b[92m ─────\x1b[0m\x1b[92m─\x1b[0m\n"
+    expected += "\x1b[92m───── \x1b[0m\x1b[1mfoo\x1b[0m\x1b[92m ─────\x1b[0m\x1b[92m─\x1b[0m\n"
+    expected += "\x1b[92m─ \x1b[0mfoobarbazeg…\x1b[92m ─\x1b[0m\n"
+
     result = console.file.getvalue()
-    print(repr(result))
     assert result == expected
 
 
