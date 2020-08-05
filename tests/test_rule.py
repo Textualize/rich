@@ -17,7 +17,9 @@ def test_rule():
     console.rule("foobarbazeggfoobarbazegg")
     expected = "\x1b[92m────────────────\x1b[0m\n"
     expected += "\x1b[92m───── \x1b[0mfoo\x1b[92m ─────\x1b[0m\x1b[92m─\x1b[0m\n"
-    expected += "\x1b[92m───── \x1b[0m\x1b[1mfoo\x1b[0m\x1b[92m ─────\x1b[0m\x1b[92m─\x1b[0m\n"
+    expected += (
+        "\x1b[92m───── \x1b[0m\x1b[1mfoo\x1b[0m\x1b[92m ─────\x1b[0m\x1b[92m─\x1b[0m\n"
+    )
     expected += "\x1b[92m─ \x1b[0mfoobarbazeg…\x1b[92m ─\x1b[0m\n"
 
     result = console.file.getvalue()
