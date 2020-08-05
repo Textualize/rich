@@ -47,7 +47,7 @@ def escape(markup: str) -> str:
     Returns:
         str: Markup with square brackets escaped.
     """
-    return markup.replace("[", "\[")
+    return markup.replace("[", r"\[")
 
 
 def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:

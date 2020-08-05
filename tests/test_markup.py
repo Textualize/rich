@@ -23,11 +23,11 @@ def test_re_match():
 
 
 def test_escape():
-    assert escape("foo[bar]") == "foo\[bar]"
+    assert escape("foo[bar]") == r"foo\[bar]"
 
 
 def test_parse():
-    result = list(_parse("[foo]hello[/foo][bar]world[/]\[escaped]"))
+    result = list(_parse(r"[foo]hello[/foo][bar]world[/]\[escaped]"))
     expected = [
         (0, None, Tag(name="foo", parameters=None)),
         (10, "hello", None),
