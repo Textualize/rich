@@ -57,7 +57,7 @@ class Rule(JupyterMixin):
             title_text = title_text.tabs_to_spaces()
             rule_text = Text(end=self.end)
             side_width = (width - cell_len(title_text.plain)) // 2
-            side = Text(characters * side_width)
+            side = Text(characters * (side_width // (cell_len(characters) - 1)))
             side.truncate(side_width - 1)
             rule_text.append(str(side) + " ", self.style)
             rule_text.append(title_text)
@@ -74,4 +74,4 @@ if __name__ == "__main__":  # pragma: no cover
     except IndexError:
         text = "Hello"
     console = Console()
-    console.print(Rule(text, characters="-*+"))
+    console.print(Rule(text, characters="1234567890"))
