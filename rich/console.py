@@ -1229,7 +1229,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     console.log("Hello, World!", "{'a': 1}", repr(console))
 
-    console.log(
+    console.print(
         {
             "name": None,
             "empty": [],
