@@ -984,14 +984,18 @@ class Console:
                 else:
                     text = self._render_buffer()
                     if text:
-                        if WINDOWS:  # pragma: no cover
-                            # https://bugs.python.org/issue37871
-                            write = self.file.write
-                            for line in text.splitlines(True):
-                                write(line)
-                        else:
-                            self.file.write(text)
-                        self.file.flush()
+                        try:
+                            if WINDOWS:  # pragma: no cover
+                                # https://bugs.python.org/issue37871
+                                write = self.file.write
+                                for line in text.splitlines(True):
+                                    write(line)
+                            else:
+                                self.file.write(text)
+                            self.file.flush()
+                        except UnicodeEncodeError as error:
+                            error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
+                            raise
 
     def _render_buffer(self) -> str:
         """Render buffered output, and clear buffer."""

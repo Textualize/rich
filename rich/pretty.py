@@ -1,9 +1,12 @@
-from dataclasses import dataclass
+import sys
 
-from typing import Any, Iterable, List, Optional, Tuple, TYPE_CHECKING
+from dataclasses import dataclass, field
+from rich.highlighter import ReprHighlighter
 
-from pprintpp import pformat
+from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING
 
+from .cells import cell_len
+from .highlighter import Highlighter, NullHighlighter, ReprHighlighter
 from ._loop import loop_last
 from .measure import Measurement
 from .text import Text
@@ -12,101 +15,250 @@ if TYPE_CHECKING:  # pragma: no cover
     from .console import Console, ConsoleOptions, HighlighterType, RenderResult
 
 
+def install(console: "Console" = None) -> None:
+    """Install automatic pretty printing in the Python REPL."""
+    from rich import get_console
+
+    console = console or get_console()
+
+    def display_hook(value: Any) -> None:
+        if value is not None:
+            console.print(
+                value
+                if hasattr(value, "__rich_console__") or hasattr(value, "__rich__")
+                else pretty_repr(value)
+            )
+
+    sys.displayhook = display_hook
+
+
 class Pretty:
+    """A rich renderable that pretty prints an object."""
+
     def __init__(self, _object: Any, highlighter: "HighlighterType" = None) -> None:
         self._object = _object
-        self.highlighter = highlighter or Text
+        self.highlighter = highlighter or NullHighlighter()
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-        # TODO: pformat tends to render a smaller width than it needs to, investigate why
-        print(options)
-        _min, max_width = Measurement.get(console, self, options.max_width)
-        pretty_str = pformat(self._object, width=max_width)
-        pretty_str = pretty_str.replace("\r", "")
-        pretty_text = self.highlighter(pretty_str)
+        pretty_text = pretty_repr(self._object, max_width=options.max_width)
         yield pretty_text
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
-        pretty_str = pformat(self._object, width=max_width)
-        pretty_str = pretty_str.replace("\r", "")
-        text = Text(pretty_str)
-        measurement = Measurement.get(console, text, max_width)
-        print(measurement)
-        return measurement
-
-
-@dataclass
-class _Node:
-    indent: int = -1
-    object_repr: Optional[str] = None
-    name: str = ""
-    braces: Optional[Tuple[str, str]] = None
-    values: Optional[List["_Node"]] = None
-    items: Optional[List[Tuple[str, "_Node"]]] = None
-    expanded: bool = False
+        pretty_text = pretty_repr(self._object, max_width=max_width)
+        text_width = max(cell_len(line) for line in pretty_text.plain.splitlines())
+        return Measurement(text_width, text_width)
 
 
 _BRACES = {
-    list: ("", "[", "]"),
-    tuple: ("", "(", ")"),
-    set: ("", "{", "}"),
-    frozenset: ("frozenset", "({", "})"),
+    dict: (Text("{", "repr.brace"), Text("}", "repr.brace")),
+    frozenset: (
+        Text.assemble("frozenset(", ("{", "repr.brace")),
+        Text.assemble(("}", "repr.brace"), ")"),
+    ),
+    list: (Text("[", "repr.brace"), Text("]", "repr.brace")),
+    set: (Text("{", "repr.brace"), Text("}", "repr.brace")),
+    tuple: (Text("(", "repr.brace"), Text(")", "repr.brace")),
+}
+_CONTAINERS = tuple(_BRACES.keys())
+_REPR_STYLES = {
+    type(None): "repr.none",
+    str: "repr.str",
+    float: "repr.number",
+    int: "repr.number",
 }
 
 
 @dataclass
-class _Value:
-    object_repr: str
+class _Line:
+    """A line in a pretty repr."""
+
+    parts: List[Text] = field(default_factory=list)
+    _cell_len: int = 0
+
+    def append(self, text: Text) -> None:
+        """Add text to line."""
+        # Efficiently keep track of cell length
+        self.parts.append(text)
+        self._cell_len += text.cell_len
+
+    @property
+    def cell_len(self) -> int:
+        return (
+            self._cell_len
+            if self.parts and not self.parts[-1].plain.endswith(" ")
+            else self._cell_len - 1
+        )
+
+    @property
+    def text(self):
+        """The text as a while."""
+        return Text("").join(self.parts)
 
 
-@dataclass
-class _Container:
-    braces: Tuple[str]
+def pretty_repr(
+    _object: Any,
+    *,
+    max_width: Optional[int] = 80,
+    indent_size: int = 4,
+    highlighter: Highlighter = None,
+) -> Text:
+    """Return a 'pretty' repr.
 
+    Args:
+        _object (Any): Object to repr.
+        max_width (int, optional): Maximum desired width. Defaults to 80.
+        indent_size (int, optional): Number of spaces in an indent. Defaults to 4.
+        highlighter (Highlighter, optional): A highlighter for repr strings. Defaults to ReprHighlighter.
 
-def pretty_repr(_object: Any, *, width: int = 80, indent_size: int = 4) -> str:
+    Returns:
+        Text: A Text instance conaining a pretty repr.
+    """
+
+    class MaxLineReached(Exception):
+        """Line is greater than maximum"""
+
+        def __init__(self, line_no: int) -> None:
+            self.line_no = line_no
+            super().__init__()
+
+    if highlighter is None:
+        highlighter = ReprHighlighter()
 
     indent = " " * indent_size
 
-    stack = []
-    push = stack.append
+    expand_level = 0
 
-    node = _object
+    lines: List[_Line] = [_Line()]
 
-    if isinstance(node, (tuple, list, set, dict)):
-        braces = _BRACES[type(node)]
-        push(_Container())
+    visited_set: Set[int] = set()
+    repr_cache: Dict[int, Text] = {}
+    repr_cache_get = repr_cache.get
 
-    def add_node(parent_node: _Node, node_object: Any) -> _Node:
-        if isinstance(node_object, (list, set, frozenset, tuple)):
-            name, open_brace, close_brace = _BRACES[type(node_object)]
-            node = _Node(
-                indent=parent_node.indent + 1, braces=(open_brace, close_brace)
-            )
-            node.values = [add_node(node, child) for child in node_object]
-        elif isinstance(node_object, dict):
-            node = _Node(indent=parent_node.indent + 1, braces=("{", "}"))
-            node.items = [
-                (key, add_node(node, value)) for key, value in node_object.items()
-            ]
+    def to_repr_text(node: Any) -> Text:
+        node_id = id(node)
+        cached = repr_cache_get(node_id)
+        if cached is not None:
+            return cached
+        style: Optional[str]
+        if node is True:
+            style = "repr.bool_true"
+        elif node is False:
+            style = "repr.bool_false"
         else:
-            node = _Node(indent=parent_node.indent + 1, object_repr=repr(node_object))
-        return node
+            style = _REPR_STYLES.get(type(node))
+        try:
+            repr_text = repr(node)
+        except Exception as error:
+            text = Text(f"<error in repr: {error}>", "repr.error")
+        else:
+            if style is None:
+                text = highlighter(Text(repr_text))
+            else:
+                text = Text(repr_text, style)
+        repr_cache[node_id] = text
+        visited_set.add(node_id)
+        return text
 
-    node = add_node(_Node(), _object)
-    print(node)
-    node.expanded = True
+    comma = Text(", ")
+    colon = Text(": ")
+    line_break: Optional[int] = None
 
-    output = []
+    def traverse(node: Any, level: int = 0) -> None:
+        nonlocal line_break
 
-    return ""
+        append_line = lines.append
+
+        def append_text(text: Text) -> None:
+            nonlocal line_break
+            line = lines[-1]
+            line.append(text)
+            if max_width is not None and line.cell_len > max_width:
+                if line_break is not None and len(lines) <= line_break:
+                    return
+                line_break = len(lines)
+                raise MaxLineReached(level)
+
+        node_id = id(node)
+        if node_id in visited_set:
+            append_text(Text("...", "repr.error"))
+            return
+
+        visited_set.add(node_id)
+
+        if type(node) in _CONTAINERS:
+            brace_open, brace_close = _BRACES[type(node)]
+            expanded = level < expand_level
+
+            append_text(brace_open)
+            if isinstance(node, dict):
+                for last, (key, value) in loop_last(node.items()):
+                    if expanded:
+                        append_line(_Line())
+                        append_text(Text(indent * (level + 1)))
+                    append_text(to_repr_text(key))
+                    append_text(colon)
+                    traverse(value, level + 1)
+                    if not last:
+                        append_text(comma)
+            else:
+                for last, value in loop_last(node):
+                    if expanded:
+                        append_line(_Line())
+                        append_text(Text(indent * (level + 1)))
+                    traverse(value, level + 1)
+                    if not last:
+                        append_text(comma)
+            if expanded:
+                lines.append(_Line())
+                append_text(Text.assemble(f"{indent * level}", brace_close))
+            else:
+                append_text(brace_close)
+        else:
+            append_text(to_repr_text(node))
+
+        visited_set.remove(node_id)
+
+    while True:
+        try:
+            traverse(_object)
+        except MaxLineReached as max_line:
+            del lines[:]
+            visited_set.clear()
+            lines.append(_Line())
+            expand_level += 1
+        else:
+            break  # pragma: no cover
+
+    return Text("\n").join(line.text for line in lines)
 
 
 if __name__ == "__main__":
-    data = {"d": [1, "Hello World!", 2, 3, 4, {5, 6, 7, (1, 2, 3, 4), 8}]}
+    from collections import defaultdict
+
+    class BrokenRepr:
+        def __repr__(self):
+            1 / 0
+
+    d = defaultdict(int)
+    d["foo"] = 5
+    data = {
+        "foo": [1, "Hello World!", 2, 3, 4, {5, 6, 7, (1, 2, 3, 4), 8}],
+        "bar": frozenset({1, 2, 3}),
+        False: "This is false",
+        True: "This is true",
+        None: "This is None",
+        "Broken": BrokenRepr(),
+    }
+    data["foo"].append(data)
+
+    from rich.console import Console
+
+    console = Console()
+    print("-" * console.width)
     from rich import print
 
-    print(pretty_repr(data))
-
+    p = Pretty(data)
+    print(Measurement.get(console, p))
+    console.print(p)

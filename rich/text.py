@@ -180,6 +180,11 @@ class Text(JupyterMixin):
             return other.plain in self.plain
         return False
 
+    @property
+    def cell_len(self) -> int:
+        """Get the number of cells required to render this text."""
+        return cell_len(self.plain)
+
     @classmethod
     def from_markup(
         cls,
@@ -560,11 +565,16 @@ class Text(JupyterMixin):
         """
 
         new_text = self.blank_copy()
-        append = new_text.append
-        for last, line in loop_last(lines):
-            append(line)
-            if not last:
-                append(self)
+        append = new_text.append_text
+        if self.plain:
+            for last, line in loop_last(lines):
+                append(line)
+                if not last:
+                    append(self)
+        else:
+            for line in lines:
+                append(line)
+
         return new_text
 
     def tabs_to_spaces(self, tab_size: int = None) -> "Text":
@@ -716,38 +726,57 @@ class Text(JupyterMixin):
             style (str, optional): A style name. Defaults to None.
         
         Returns:
-            text (Text): Returns self for chaining.
+            Text: Returns self for chaining.
         """
 
         if not isinstance(text, (str, Text)):
             raise TypeError("Only str or Text can be appended to Text")
 
-        if not len(text):
-            return self
-        if isinstance(text, str):
-            text = strip_control_codes(text)
-            self._text.append(text)
-            offset = len(self)
-            text_length = len(text)
-            if style is not None:
-                self._spans.append(Span(offset, offset + text_length, style))
-            self._length += text_length
-        elif isinstance(text, Text):
-            _Span = Span
-            if style is not None:
-                raise ValueError("style must not be set when appending Text instance")
+        if len(text):
+            if isinstance(text, str):
+                text = strip_control_codes(text)
+                self._text.append(text)
+                offset = len(self)
+                text_length = len(text)
+                if style is not None:
+                    self._spans.append(Span(offset, offset + text_length, style))
+                self._length += text_length
+            elif isinstance(text, Text):
+                _Span = Span
+                if style is not None:
+                    raise ValueError(
+                        "style must not be set when appending Text instance"
+                    )
 
-            text_length = self._length
-            if text.style is not None:
-                self._spans.append(
-                    _Span(text_length, text_length + len(text), text.style)
+                text_length = self._length
+                if text.style is not None:
+                    self._spans.append(
+                        _Span(text_length, text_length + len(text), text.style)
+                    )
+                self._text.append(text.plain)
+                self._spans.extend(
+                    _Span(start + text_length, end + text_length, style)
+                    for start, end, style in text._spans
                 )
-            self._text.append(text.plain)
-            self._spans.extend(
-                _Span(start + text_length, end + text_length, style)
-                for start, end, style in text._spans
-            )
-            self._length += len(text)
+                self._length += len(text)
+        return self
+
+    def append_text(self, text: "Text") -> "Text":
+        """Append another Text instance. This method is more performant that Text.append.
+
+        Returns:
+            Text: Returns self for chaining.
+        """
+        _Span = Span
+        text_length = self._length
+        if text.style is not None:
+            self._spans.append(_Span(text_length, text_length + len(text), text.style))
+        self._text.append(text.plain)
+        self._spans.extend(
+            _Span(start + text_length, end + text_length, style)
+            for start, end, style in text._spans
+        )
+        self._length += len(text)
         return self
 
     def copy_styles(self, text: "Text") -> None:

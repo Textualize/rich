@@ -432,6 +432,12 @@ class Table(JupyterMixin):
                 widths = ratio_reduce(excess_width, [1] * len(widths), widths, widths)
                 table_width = sum(widths)
 
+            width_ranges = [
+                self._measure_column(console, column, width)
+                for width, column in zip(widths, columns)
+            ]
+            widths = [_range.maximum or 1 for _range in width_ranges]
+
         if table_width < max_width and self.expand:
             pad_widths = ratio_distribute(max_width - table_width, widths)
             widths = [_width + pad for _width, pad in zip(widths, pad_widths)]
