@@ -26,18 +26,17 @@ def test_rule():
     assert result == expected
 
 
-# doesn't work for now
-# def test_rule_cjk():
-#     console = Console(
-#         width=16,
-#         file=io.StringIO(),
-#         force_terminal=True,
-#         color_system=None,
-#         legacy_windows=False,
-#     )
-#     console.rule("欢迎！")
-#     expected = "──── 欢迎！ ────\n"
-#     assert console.file.getvalue() == expected
+def test_rule_cjk():
+    console = Console(
+        width=16,
+        file=io.StringIO(),
+        force_terminal=True,
+        color_system=None,
+        legacy_windows=False,
+    )
+    console.rule("欢迎！")
+    expected = "──── 欢迎！ ────\n"
+    assert console.file.getvalue() == expected
 
 
 def test_characters():
