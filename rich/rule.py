@@ -88,4 +88,4 @@ if __name__ == "__main__":  # pragma: no cover
     except IndexError:
         text = "Hello"
     console = Console(width=16)
-    console.print(Rule(title="fo", characters="=."))
+    console.print(Rule(title="foo", characters="好"))
