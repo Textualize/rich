@@ -10,7 +10,8 @@ def ratio_reduce(
     Args:
         total (int): The total to divide.
         ratios (List[int]): A list of integer ratios.
-        minimums (List[int]): List of minimum values for each slot. 
+        maximums (List[int]): List of maximums values for each slot. 
+        values (List[int]): List of values
     
     Returns:
         List[int]: A list of integers garanteed to sum to total.
