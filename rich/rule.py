@@ -86,6 +86,6 @@ if __name__ == "__main__":  # pragma: no cover
     try:
         text = sys.argv[1]
     except IndexError:
-        text = "Hello"
-    console = Console(width=16)
-    console.print(Rule(title="好", characters="+-"))
+        text = "Hello, World"
+    console = Console()
+    console.print(Rule(title=text))
