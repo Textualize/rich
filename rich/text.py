@@ -565,16 +565,32 @@ class Text(JupyterMixin):
         """
 
         new_text = self.blank_copy()
-        append = new_text.append_text
-        if self.plain:
-            for last, line in loop_last(lines):
-                append(line)
-                if not last:
-                    append(self)
-        else:
-            for line in lines:
-                append(line)
 
+        def iter_text() -> Iterable["Text"]:
+            if self.plain:
+                for last, line in loop_last(lines):
+                    yield line
+                    if not last:
+                        yield self
+            else:
+                yield from lines
+
+        extend_text = new_text._text.extend
+        append_span = new_text._spans.append
+        extend_spans = new_text._spans.extend
+        offset = 0
+        _Span = Span
+
+        for text in iter_text():
+            extend_text(text._text)
+            if text.style is not None:
+                append_span(_Span(offset, offset + len(text), text.style))
+            extend_spans(
+                _Span(offset + start, offset + end, style)
+                for start, end, style in text._spans
+            )
+            offset += len(text)
+        new_text._length = offset
         return new_text
 
     def tabs_to_spaces(self, tab_size: int = None) -> "Text":

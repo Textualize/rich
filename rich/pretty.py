@@ -1,9 +1,10 @@
 import sys
 
+from collections import defaultdict
 from dataclasses import dataclass, field
 from rich.highlighter import ReprHighlighter
 
-from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Set, Tuple, TYPE_CHECKING
 
 from .cells import cell_len
 from .highlighter import Highlighter, NullHighlighter, ReprHighlighter
@@ -12,21 +13,32 @@ from .measure import Measurement
 from .text import Text
 
 if TYPE_CHECKING:  # pragma: no cover
-    from .console import Console, ConsoleOptions, HighlighterType, RenderResult
+    from .console import (
+        Console,
+        ConsoleOptions,
+        HighlighterType,
+        OverflowMethod,
+        RenderResult,
+    )
 
 
 def install(console: "Console" = None) -> None:
-    """Install automatic pretty printing in the Python REPL."""
+    """Install automatic pretty printing in the Python REPL.
+
+    Args:
+        console (Console, optional): Console instance or ``None`` to use global console. Defaults to None.
+    """
     from rich import get_console
 
     console = console or get_console()
 
     def display_hook(value: Any) -> None:
         if value is not None:
+            assert console is not None
             console.print(
                 value
                 if hasattr(value, "__rich_console__") or hasattr(value, "__rich__")
-                else pretty_repr(value)
+                else pretty_repr(value, no_wrap=True, overflow="ellipsis")
             )
 
     sys.displayhook = display_hook
@@ -35,31 +47,51 @@ def install(console: "Console" = None) -> None:
 class Pretty:
     """A rich renderable that pretty prints an object."""
 
-    def __init__(self, _object: Any, highlighter: "HighlighterType" = None) -> None:
+    def __init__(
+        self,
+        _object: Any,
+        highlighter: "HighlighterType" = None,
+        *,
+        indent_size: int = 4,
+        overflow: "OverflowMethod" = None,
+        no_wrap: bool = None,
+    ) -> None:
         self._object = _object
         self.highlighter = highlighter or NullHighlighter()
+        self.indent_size = indent_size
+        self.overflow = overflow
+        self.no_wrap = no_wrap
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-        pretty_text = pretty_repr(self._object, max_width=options.max_width)
+        pretty_text = pretty_repr(
+            self._object,
+            max_width=options.max_width,
+            indent_size=self.indent_size,
+            overflow=self.overflow or options.overflow,
+            no_wrap=self.no_wrap if self.no_wrap is not None else options.no_wrap,
+        )
         yield pretty_text
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
-        pretty_text = pretty_repr(self._object, max_width=max_width)
+        pretty_text = pretty_repr(
+            self._object, max_width=max_width, indent_size=self.indent_size
+        )
         text_width = max(cell_len(line) for line in pretty_text.plain.splitlines())
         return Measurement(text_width, text_width)
 
 
-_BRACES = {
-    dict: (Text("{", "repr.brace"), Text("}", "repr.brace")),
+_BRACES: Dict[type, Tuple[Text, Text, Text]] = {
+    dict: (Text("{", "repr.brace"), Text("}", "repr.brace"), Text("{}", "repr.brace")),
     frozenset: (
         Text.assemble("frozenset(", ("{", "repr.brace")),
         Text.assemble(("}", "repr.brace"), ")"),
+        Text("frozenset()"),
     ),
-    list: (Text("[", "repr.brace"), Text("]", "repr.brace")),
-    set: (Text("{", "repr.brace"), Text("}", "repr.brace")),
-    tuple: (Text("(", "repr.brace"), Text(")", "repr.brace")),
+    list: (Text("[", "repr.brace"), Text("]", "repr.brace"), Text("[]", "repr.brace")),
+    set: (Text("{", "repr.brace"), Text("}", "repr.brace"), Text("set()")),
+    tuple: (Text("(", "repr.brace"), Text(")", "repr.brace"), Text("()", "repr.brace")),
 }
 _CONTAINERS = tuple(_BRACES.keys())
 _REPR_STYLES = {
@@ -103,6 +135,8 @@ def pretty_repr(
     max_width: Optional[int] = 80,
     indent_size: int = 4,
     highlighter: Highlighter = None,
+    overflow: "OverflowMethod" = None,
+    no_wrap: bool = True,
 ) -> Text:
     """Return a 'pretty' repr.
 
@@ -153,10 +187,10 @@ def pretty_repr(
         except Exception as error:
             text = Text(f"<error in repr: {error}>", "repr.error")
         else:
-            if style is None:
+            if style is None and highlighter is not None:
                 text = highlighter(Text(repr_text))
             else:
-                text = Text(repr_text, style)
+                text = Text(repr_text, style or "")
         repr_cache[node_id] = text
         return text
 
@@ -187,12 +221,11 @@ def pretty_repr(
         visited_set.add(node_id)
 
         if type(node) in _CONTAINERS:
-            brace_open, brace_close = _BRACES[type(node)]
+            brace_open, brace_close, empty = _BRACES[type(node)]
             expanded = level < expand_level
 
             if not node:
-                append_text(brace_open)
-                append_text(brace_close)
+                append_text(empty)
             else:
                 append_text(brace_open)
                 if isinstance(node, dict):
@@ -234,10 +267,13 @@ def pretty_repr(
         else:
             break  # pragma: no cover
 
-    return Text("\n").join(line.text for line in lines)
+    text = Text("\n", overflow=overflow, no_wrap=no_wrap).join(
+        line.text for line in lines
+    )
+    return text
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     from collections import defaultdict
 
     class BrokenRepr:
@@ -254,14 +290,13 @@ if __name__ == "__main__":
         None: "This is None",
         "Broken": BrokenRepr(),
     }
-    data["foo"].append(data)
+    data["foo"].append(data)  # type: ignore
 
     from rich.console import Console
 
     console = Console()
-    print("-" * console.width)
     from rich import print
 
-    p = Pretty(data)
+    p = Pretty(data, overflow="ellipsis")
     print(Measurement.get(console, p))
     console.print(p)
