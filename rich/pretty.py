@@ -10,6 +10,7 @@ from .cells import cell_len
 from .highlighter import Highlighter, NullHighlighter, ReprHighlighter
 from ._loop import loop_last
 from .measure import Measurement
+from ._pick import pick_bool
 from .text import Text
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -70,7 +71,7 @@ class Pretty:
             max_width=options.max_width,
             indent_size=self.indent_size,
             overflow=self.overflow or options.overflow,
-            no_wrap=self.no_wrap if self.no_wrap is not None else options.no_wrap,
+            no_wrap=pick_bool(self.no_wrap, options.no_wrap, True),
         )
         yield pretty_text
 
