@@ -61,16 +61,14 @@ class Rule(JupyterMixin):
             title_text = title_text.tabs_to_spaces()
             rule_text = Text(end=self.end)
             side_width = (width - cell_len(title_text.plain)) // 2
-            if chars_len == 1:
-                side = Text(characters * side_width)
-            else:
-                side = Text(characters * (side_width // (chars_len - 1)))
-            side.truncate(side_width - 1)
-            rule_text.append(str(side) + " ", self.style)
+            left = Text(characters * (side_width // chars_len + 1))
+            left.truncate(side_width - 1)
+            right_length = width - cell_len(left.plain) - cell_len(title_text.plain)
+            right = Text(characters * (side_width // chars_len + 1))
+            right.truncate(right_length)
+            rule_text.append(left.plain + " ", self.style)
             rule_text.append(title_text)
-            rule_text.append(" " + str(side), self.style)
-            if len(rule_text) < width:
-                rule_text.append(characters[0], self.style)
+            rule_text.append(" " + right.plain, self.style)
             rule_text.plain = set_cell_size(rule_text.plain, width)
         yield rule_text
 
