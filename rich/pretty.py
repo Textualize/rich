@@ -162,9 +162,7 @@ def pretty_repr(
         highlighter = ReprHighlighter()
 
     indent = " " * indent_size
-
     expand_level = 0
-
     lines: List[_Line] = [_Line()]
 
     visited_set: Set[int] = set()
@@ -172,6 +170,7 @@ def pretty_repr(
     repr_cache_get = repr_cache.get
 
     def to_repr_text(node: Any) -> Text:
+        """Convert object to repr."""
         node_id = id(node)
         cached = repr_cache_get(node_id)
         if cached is not None:
@@ -200,8 +199,8 @@ def pretty_repr(
     line_break: Optional[int] = None
 
     def traverse(node: Any, level: int = 0) -> None:
+        """Walk the data structure."""
         nonlocal line_break
-
         append_line = lines.append
 
         def append_text(text: Text) -> None:
@@ -216,11 +215,11 @@ def pretty_repr(
 
         node_id = id(node)
         if node_id in visited_set:
+            # Recursion detected
             append_text(Text("...", "repr.error"))
             return
 
         visited_set.add(node_id)
-
         if type(node) in _CONTAINERS:
             brace_open, brace_close, empty = _BRACES[type(node)]
             expanded = level < expand_level
@@ -254,9 +253,9 @@ def pretty_repr(
                     append_text(brace_close)
         else:
             append_text(to_repr_text(node))
-
         visited_set.remove(node_id)
 
+    # Keep expanding levels until the text fits
     while True:
         try:
             traverse(_object)
