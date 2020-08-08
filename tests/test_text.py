@@ -275,6 +275,13 @@ def test_append():
         test.append(1)
 
 
+def test_append_text():
+    test = Text("foo")
+    test.append_text(Text("bar", style="bold"))
+    assert str(test) == "foobar"
+    assert test._spans == [Span(3, 6, "bold")]
+
+
 def test_split():
     test = Text()
     test.append("foo", "red")
