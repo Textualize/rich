@@ -2,7 +2,7 @@
 name = "rich"
 homepage = "https://github.com/willmcgugan/rich"
 documentation = "https://rich.readthedocs.io/en/latest/"
-version = "5.0.0"
+version = "5.1.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"
@@ -23,7 +23,6 @@ include = ["rich/py.typed"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
-pprintpp = "^0.4.0"
 typing-extensions = "^3.7.4"
 dataclasses = {version="^0.7", python = "~3.6"} 
 pygments = "^2.6.0"

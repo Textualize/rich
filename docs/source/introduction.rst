@@ -65,3 +65,19 @@ If you would rather not shadow Python's builtin print, you can import ``rich.pri
     from rich import print as rprint
 
 Continue reading to learn about the more advanced features of Rich.
+
+Python in the REPL
+------------------
+
+Rich may be installed in the REPL so that Python data structures are pretty printed with syntax highlighting. Here's how::
+
+    >>> from rich import pretty
+    >>> pretty.install() 
+    >>> ["Rich and pretty", True]
+
+You can also use this feature to try out Rich *renderables*. Here's an example::
+
+    >>> from rich.panel import panel
+    >>> Panel.fit("[bold yellow]Hi, I'm a Panel", border_style="red")
+
+Read on to learn more about Rich renderables.

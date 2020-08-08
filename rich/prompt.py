@@ -13,11 +13,11 @@ class PromptError(Exception):
 
 
 class InvalidResponse(PromptError):
-    """Exception to indicate a response was invalid. Raise this within process_respons to indicate an error
+    """Exception to indicate a response was invalid. Raise this within process_response() to indicate an error
     and provide an error message.
 
         Args:
-            message (str): Error message.
+            message (Union[str, Text]): Error message.
     """
 
     def __init__(self, message: TextType) -> None:

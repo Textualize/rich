@@ -41,6 +41,17 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/print.png)
 
+## Rich REPL
+
+Rich can be installed in the Python REPL, so that any data structures will be pretty printed and highlighted.
+
+```python
+>>> from rich import pretty
+>>> pretty.install()
+```
+
+![REPL](https://github.com/willmcgugan/rich/raw/master/imgs/repl.png)
+
 ## Using the Console
 
 For more control over rich terminal content, import and construct a [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console) object.

@@ -27,7 +27,7 @@ def render_scope(
         RenderableType: A renderable object.
     """
     highlighter = ReprHighlighter()
-    items_table = Table.grid(padding=(0, 1))
+    items_table = Table.grid(padding=(0, 1), expand=False)
     items_table.add_column(justify="right")
 
     def sort_items(item: Tuple[str, Any]) -> Tuple[bool, str]:
