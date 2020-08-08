@@ -158,7 +158,6 @@ def pretty_repr(
             else:
                 text = Text(repr_text, style)
         repr_cache[node_id] = text
-        visited_set.add(node_id)
         return text
 
     comma = Text(", ")
@@ -191,30 +190,34 @@ def pretty_repr(
             brace_open, brace_close = _BRACES[type(node)]
             expanded = level < expand_level
 
-            append_text(brace_open)
-            if isinstance(node, dict):
-                for last, (key, value) in loop_last(node.items()):
-                    if expanded:
-                        append_line(_Line())
-                        append_text(Text(indent * (level + 1)))
-                    append_text(to_repr_text(key))
-                    append_text(colon)
-                    traverse(value, level + 1)
-                    if not last:
-                        append_text(comma)
-            else:
-                for last, value in loop_last(node):
-                    if expanded:
-                        append_line(_Line())
-                        append_text(Text(indent * (level + 1)))
-                    traverse(value, level + 1)
-                    if not last:
-                        append_text(comma)
-            if expanded:
-                lines.append(_Line())
-                append_text(Text.assemble(f"{indent * level}", brace_close))
-            else:
+            if not node:
+                append_text(brace_open)
                 append_text(brace_close)
+            else:
+                append_text(brace_open)
+                if isinstance(node, dict):
+                    for last, (key, value) in loop_last(node.items()):
+                        if expanded:
+                            append_line(_Line())
+                            append_text(Text(indent * (level + 1)))
+                        append_text(to_repr_text(key))
+                        append_text(colon)
+                        traverse(value, level + 1)
+                        if not last:
+                            append_text(comma)
+                else:
+                    for last, value in loop_last(node):
+                        if expanded:
+                            append_line(_Line())
+                            append_text(Text(indent * (level + 1)))
+                        traverse(value, level + 1)
+                        if not last:
+                            append_text(comma)
+                if expanded:
+                    lines.append(_Line())
+                    append_text(Text.assemble(f"{indent * level}", brace_close))
+                else:
+                    append_text(brace_close)
         else:
             append_text(to_repr_text(node))
 
