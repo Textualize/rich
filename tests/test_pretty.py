@@ -43,3 +43,11 @@ def test_broken_repr():
     result = pretty_repr(test)
     expected = "[<error in repr: division by zero>]"
     assert result.plain == expected
+
+
+def test_recursive():
+    test = []
+    test.append(test)
+    result = pretty_repr(test)
+    expected = "[...]"
+    assert result.plain == expected
