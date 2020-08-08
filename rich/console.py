@@ -733,7 +733,7 @@ class Console:
         Args:
             renderables (Iterable[Union[str, ConsoleRenderable]]): Anyting that Rich can render.
             sep (str, optional): String to write between print data. Defaults to " ".
-            end (str, optional): String to write at end of print data. Defaults to "\n". 
+            end (str, optional): String to write at end of print data. Defaults to "\\n".
             justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.       
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default.
@@ -833,12 +833,12 @@ class Console:
         highlight: bool = None,
         width: int = None,
     ) -> None:
-        r"""Print to the console.
+        """Print to the console.
 
         Args:
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
-            end (str, optional): String to write at end of print data. Defaults to "\n".
+            end (str, optional): String to write at end of print data. Defaults to "\\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             justify (str, optional): Justify method: "default", "left", "right", "center", or "full". Defaults to ``None``.
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
@@ -915,12 +915,12 @@ class Console:
         log_locals: bool = False,
         _stack_offset=1,
     ) -> None:
-        r"""Log rich content to the terminal.
+        """Log rich content to the terminal.
 
         Args:
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
-            end (str, optional): String to write at end of print data. Defaults to "\n".
+            end (str, optional): String to write at end of print data. Defaults to "\\n".
             justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to None.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to None.
