@@ -102,7 +102,7 @@ class Span(NamedTuple):
 
 
 class Text(JupyterMixin):
-    r"""Text with color / style.
+    """Text with color / style.
         
         Args:
             text (str, optional): Default unstyled text. Defaults to "".
@@ -110,7 +110,7 @@ class Text(JupyterMixin):
             justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
             overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None. 
             no_wrap (bool, optional): Disable text wrapping, or None for default. Defaults to None.
-            end (str, optional): Character to end text with. Defaults to "\n".
+            end (str, optional): Character to end text with. Defaults to "\\n".
             tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
             spans (List[Span], optional). A list of predefined style spans. Defaults to None.
     """
@@ -248,7 +248,7 @@ class Text(JupyterMixin):
         end: str = "\n",
         tab_size: int = 8,
     ) -> "Text":
-        r"""Construct a text instance by combining a sequence of strings with optional styles.
+        """Construct a text instance by combining a sequence of strings with optional styles.
         The positional arguments should be either strings, or a tuple of string + style.        
 
         Args:            
@@ -811,10 +811,10 @@ class Text(JupyterMixin):
         include_separator: bool = False,
         allow_blank: bool = False,
     ) -> Lines:
-        r"""Split rich text in to lines, preserving styles.
+        """Split rich text in to lines, preserving styles.
         
         Args:
-            separator (str, optional): String to split on. Defaults to "\n".
+            separator (str, optional): String to split on. Defaults to "\\n".
             include_separator (bool, optional): Include the separator in the lines. Defaults to False.
             allow_blank (bool, optional): Return a blank line if the text ends with a separator. Defaults to False.
         

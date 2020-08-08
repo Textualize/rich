@@ -216,10 +216,10 @@ class Segment(NamedTuple):
 
     @classmethod
     def get_line_length(cls, line: List["Segment"]) -> int:
-        r"""Get the length of list of segments.
+        """Get the length of list of segments.
 
         Args:
-            line (List[Segment]): A line encoded as a list of Segments (assumes no '\n' characters),
+            line (List[Segment]): A line encoded as a list of Segments (assumes no '\\n' characters),
 
         Returns:
             int: The length of the line.
@@ -228,10 +228,10 @@ class Segment(NamedTuple):
 
     @classmethod
     def get_shape(cls, lines: List[List["Segment"]]) -> Tuple[int, int]:
-        r"""Get the shape (enclosing rectangle) of a list of lines.
+        """Get the shape (enclosing rectangle) of a list of lines.
 
         Args:
-            lines (List[List[Segment]]): A list of lines (no '\n' characters).
+            lines (List[List[Segment]]): A list of lines (no '\\n' characters).
 
         Returns:
             Tuple[int, int]: Width and height in characters.
