@@ -1,6 +1,6 @@
 from typing import Union
 
-from .cells import cell_len, get_character_cell_size as get_char_size, set_cell_size
+from .cells import cell_len, set_cell_size
 from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin
 from .style import Style
@@ -44,14 +44,10 @@ class Rule(JupyterMixin):
 
         characters = self.characters or "─"
 
-        if cell_len(characters) == 1:
-            chars_len = get_char_size(characters)
-        else:
-            chars_len = 0
-            for i in list(characters):
-                chars_len += get_char_size(i)
+        chars_len = cell_len(characters)
         if not self.title:
-            yield Text(characters * (width // chars_len), self.style)
+            rule_text = Text(characters * ((width // chars_len) + 1), self.style)
+            rule_text.truncate(width)
         else:
             if isinstance(self.title, Text):
                 title_text = self.title
@@ -76,7 +72,7 @@ class Rule(JupyterMixin):
             if len(rule_text) < width:
                 rule_text.append(characters[0], self.style)
             rule_text.plain = set_cell_size(rule_text.plain, width)
-            yield rule_text
+        yield rule_text
 
 
 if __name__ == "__main__":  # pragma: no cover
