@@ -177,8 +177,6 @@ def pretty_repr(
         repr_cache[node_id] = repr_text
         return repr_text
 
-    comma = ", "
-    colon = ": "
     line_break: Optional[int] = None
 
     def traverse(node: Any, level: int = 0) -> None:
@@ -217,10 +215,10 @@ def pretty_repr(
                             append_line(_Line())
                             append_text(indent * (level + 1))
                         append_text(to_repr_text(key))
-                        append_text(colon)
+                        append_text(": ")
                         traverse(value, level + 1)
                         if not last:
-                            append_text(comma)
+                            append_text(", ")
                 else:
                     for last, value in loop_last(node):
                         if expanded:
@@ -228,7 +226,7 @@ def pretty_repr(
                             append_text(indent * (level + 1))
                         traverse(value, level + 1)
                         if not last:
-                            append_text(comma)
+                            append_text(", ")
                 if expanded:
                     lines.append(_Line())
                     append_text(f"{indent * level}{brace_close}")
@@ -284,17 +282,3 @@ if __name__ == "__main__":  # pragma: no cover
     p = Pretty(data, overflow="ellipsis")
     print(Measurement.get(console, p))
     console.print(p)
-
-
-# if __name__ == "__main__":
-#     import json
-#     from time import time
-#     from rich.console import Console
-
-#     with open("cats.json") as f:
-#         cats = json.load(f)
-#     c = Console()
-#     start = time()
-#     c.print(Pretty(cats))
-#     print((time() - start) * 1000)
-
