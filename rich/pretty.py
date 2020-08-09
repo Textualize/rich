@@ -23,7 +23,9 @@ if TYPE_CHECKING:  # pragma: no cover
     )
 
 
-def install(console: "Console" = None) -> None:
+def install(
+    console: "Console" = None, no_wrap: bool = False, overflow: "OverflowMethod" = None
+) -> None:
     """Install automatic pretty printing in the Python REPL.
 
     Args:
@@ -39,7 +41,9 @@ def install(console: "Console" = None) -> None:
             console.print(
                 value
                 if hasattr(value, "__rich_console__") or hasattr(value, "__rich__")
-                else pretty_repr(value, no_wrap=True, overflow="ellipsis")
+                else pretty_repr(
+                    value, max_width=console.width, no_wrap=False, overflow=overflow
+                )
             )
 
     sys.displayhook = display_hook
@@ -83,51 +87,41 @@ class Pretty:
         return Measurement(text_width, text_width)
 
 
-_BRACES: Dict[type, Tuple[Text, Text, Text]] = {
-    dict: (Text("{", "repr.brace"), Text("}", "repr.brace"), Text("{}", "repr.brace")),
-    frozenset: (
-        Text.assemble("frozenset(", ("{", "repr.brace")),
-        Text.assemble(("}", "repr.brace"), ")"),
-        Text("frozenset()"),
-    ),
-    list: (Text("[", "repr.brace"), Text("]", "repr.brace"), Text("[]", "repr.brace")),
-    set: (Text("{", "repr.brace"), Text("}", "repr.brace"), Text("set()")),
-    tuple: (Text("(", "repr.brace"), Text(")", "repr.brace"), Text("()", "repr.brace")),
+_BRACES: Dict[type, Tuple[str, str, str]] = {
+    dict: ("{", "}", "{}"),
+    frozenset: ("frozenset({", "})", "frozenset()"),
+    list: ("[", "]", "[]"),
+    set: ("{", "}", "set()"),
+    tuple: ("(", ")", "tuple()"),
 }
 _CONTAINERS = tuple(_BRACES.keys())
-_REPR_STYLES = {
-    type(None): "repr.none",
-    str: "repr.str",
-    float: "repr.number",
-    int: "repr.number",
-}
 
 
 @dataclass
 class _Line:
     """A line in a pretty repr."""
 
-    parts: List[Text] = field(default_factory=list)
+    parts: List[str] = field(default_factory=list)
     _cell_len: int = 0
 
-    def append(self, text: Text) -> None:
+    def append(self, text: str) -> None:
         """Add text to line."""
         # Efficiently keep track of cell length
         self.parts.append(text)
-        self._cell_len += text.cell_len
+        self._cell_len += cell_len(text)
 
     @property
     def cell_len(self) -> int:
         return (
             self._cell_len
-            if self.parts and not self.parts[-1].plain.endswith(" ")
+            if self.parts and not self.parts[-1].endswith(" ")
             else self._cell_len - 1
         )
 
     @property
-    def text(self):
+    def text(self) -> str:
         """The text as a while."""
-        return Text("").join(self.parts)
+        return "".join(self.parts)
 
 
 def pretty_repr(
@@ -154,10 +148,6 @@ def pretty_repr(
     class MaxLineReached(Exception):
         """Line is greater than maximum"""
 
-        def __init__(self, line_no: int) -> None:
-            self.line_no = line_no
-            super().__init__()
-
     if highlighter is None:
         highlighter = ReprHighlighter()
 
@@ -166,36 +156,22 @@ def pretty_repr(
     lines: List[_Line] = [_Line()]
 
     visited_set: Set[int] = set()
-    repr_cache: Dict[int, Text] = {}
+    repr_cache: Dict[int, str] = {}
     repr_cache_get = repr_cache.get
 
-    def to_repr_text(node: Any) -> Text:
+    def to_repr_text(node: Any) -> str:
         """Convert object to repr."""
         node_id = id(node)
         cached = repr_cache_get(node_id)
         if cached is not None:
             return cached
-        style: Optional[str]
-        if node is True:
-            style = "repr.bool_true"
-        elif node is False:
-            style = "repr.bool_false"
-        else:
-            style = _REPR_STYLES.get(type(node))
         try:
             repr_text = repr(node)
         except Exception as error:
-            text = Text(f"<error in repr: {error}>", "repr.error")
-        else:
-            if style is None and highlighter is not None:
-                text = highlighter(Text(repr_text))
-            else:
-                text = Text(repr_text, style or "")
-        repr_cache[node_id] = text
-        return text
+            repr_text = f"<error in repr: {error}>"
+        repr_cache[node_id] = repr_text
+        return repr_text
 
-    comma = Text(", ")
-    colon = Text(": ")
     line_break: Optional[int] = None
 
     def traverse(node: Any, level: int = 0) -> None:
@@ -203,7 +179,7 @@ def pretty_repr(
         nonlocal line_break
         append_line = lines.append
 
-        def append_text(text: Text) -> None:
+        def append_text(text: str) -> None:
             nonlocal line_break
             line = lines[-1]
             line.append(text)
@@ -216,7 +192,7 @@ def pretty_repr(
         node_id = id(node)
         if node_id in visited_set:
             # Recursion detected
-            append_text(Text("...", "repr.error"))
+            append_text("...")
             return
 
         visited_set.add(node_id)
@@ -232,23 +208,23 @@ def pretty_repr(
                     for last, (key, value) in loop_last(node.items()):
                         if expanded:
                             append_line(_Line())
-                            append_text(Text(indent * (level + 1)))
+                            append_text(indent * (level + 1))
                         append_text(to_repr_text(key))
-                        append_text(colon)
+                        append_text(": ")
                         traverse(value, level + 1)
                         if not last:
-                            append_text(comma)
+                            append_text(", ")
                 else:
                     for last, value in loop_last(node):
                         if expanded:
                             append_line(_Line())
-                            append_text(Text(indent * (level + 1)))
+                            append_text(indent * (level + 1))
                         traverse(value, level + 1)
                         if not last:
-                            append_text(comma)
+                            append_text(", ")
                 if expanded:
                     lines.append(_Line())
-                    append_text(Text.assemble(f"{indent * level}", brace_close))
+                    append_text(f"{indent * level}{brace_close}")
                 else:
                     append_text(brace_close)
         else:
@@ -259,7 +235,7 @@ def pretty_repr(
     while True:
         try:
             traverse(_object)
-        except MaxLineReached as max_line:
+        except MaxLineReached:
             del lines[:]
             visited_set.clear()
             lines.append(_Line())
@@ -267,9 +243,10 @@ def pretty_repr(
         else:
             break  # pragma: no cover
 
-    text = Text("\n", overflow=overflow, no_wrap=no_wrap).join(
-        line.text for line in lines
+    text = Text(
+        "\n".join(line.text for line in lines), overflow=overflow, no_wrap=no_wrap
     )
+    text = highlighter(text)
     return text
 
 

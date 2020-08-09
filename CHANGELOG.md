@@ -5,12 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.1] - 2020-08-09
+
+### Fixed
+
+- Optimized pretty printing ~3X faster
+
 ## [5.1.0] - 2020-08-08
 
 ### Added
 
 - Added Text.cell_len
-- Added helpful message regarding unicode decoding errors
+- Added helpful message regarding unicode decoding errors https://github.com/willmcgugan/rich/issues/212
+- Added display hook with pretty.install()
 
 ### Fixed
 
@@ -19,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Implemented pretty printing, and removed pprintpp from dependancies
+- Implemented pretty printing, and removed pprintpp from dependencies
 - Optimized Text.join
 
 ## [5.0.0] - 2020-08-02
