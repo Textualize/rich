@@ -144,14 +144,9 @@ def pretty_repr(
     Returns:
         Text: A Text instance conaining a pretty repr.
     """
-    print("MAX WIDTH=", max_width)
 
     class MaxLineReached(Exception):
         """Line is greater than maximum"""
-
-        def __init__(self, line_no: int) -> None:
-            self.line_no = line_no
-            super().__init__()
 
     if highlighter is None:
         highlighter = ReprHighlighter()
@@ -240,7 +235,7 @@ def pretty_repr(
     while True:
         try:
             traverse(_object)
-        except MaxLineReached as max_line:
+        except MaxLineReached:
             del lines[:]
             visited_set.clear()
             lines.append(_Line())
