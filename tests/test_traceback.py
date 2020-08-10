@@ -6,7 +6,7 @@ import pytest
 from rich.console import Console
 from rich.traceback import install, Traceback
 
-from .render import render
+# from .render import render
 
 try:
     from ._exception_render import expected
@@ -90,6 +90,32 @@ def test_syntax_error():
         console.print_exception()
     exception_text = console.file.getvalue()
     assert "SyntaxError" in exception_text
+
+
+def test_nested_exception():
+    console = Console(width=100, file=io.StringIO())
+    value_error_message = "ValueError because of ZeroDivisionEerror"
+
+    try:
+        try:
+            1 / 0
+        except ZeroDivisionError:
+            raise ValueError(value_error_message)
+    except Exception:
+        console.print_exception()
+    exception_text = console.file.getvalue()
+
+    text_should_contain = [
+        value_error_message,
+        "ZeroDivisionError",
+        "ValueError",
+        "During handling of the above exception",
+    ]
+
+    assert [msg in exception_text for msg in text_should_contain]
+
+    # ZeroDivisionError should come before ValueError
+    assert exception_text.find("ZeroDivisionError") < exception_text.find("ValueError")
 
 
 if __name__ == "__main__":  # pragma: no cover
