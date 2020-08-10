@@ -125,7 +125,7 @@ def test_filename_with_bracket():
     except Exception:
         console.print_exception()
     exception_text = console.file.getvalue()
-    assert 'File "<\string>"' in exception_text
+    assert 'File "<string>"' in exception_text
 
 
 def test_filename_not_a_file():
@@ -135,7 +135,7 @@ def test_filename_not_a_file():
     except Exception:
         console.print_exception()
     exception_text = console.file.getvalue()
-    assert 'File "\string"' in exception_text
+    assert 'File "string"' in exception_text
 
 
 if __name__ == "__main__":  # pragma: no cover
