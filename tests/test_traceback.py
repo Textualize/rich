@@ -81,6 +81,17 @@ def test_print_exception():
     assert "ZeroDivisionError" in exception_text
 
 
+def test_syntax_error():
+    console = Console(width=100, file=io.StringIO())
+    try:
+        # raises SyntaxError: unexpected EOF while parsing
+        eval("(2 + 2")
+    except Exception:
+        console.print_exception()
+    exception_text = console.file.getvalue()
+    assert "SyntaxError" in exception_text
+
+
 if __name__ == "__main__":  # pragma: no cover
 
     expected = render(get_exception())
