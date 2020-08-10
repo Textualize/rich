@@ -103,20 +103,18 @@ class _Line:
 
     parts: List[str] = field(default_factory=list)
     _cell_len: int = 0
+    _space: bool = False
 
     def append(self, text: str) -> None:
         """Add text to line."""
         # Efficiently keep track of cell length
         self.parts.append(text)
         self._cell_len += cell_len(text)
+        self._space = text.endswith(" ")
 
     @property
     def cell_len(self) -> int:
-        return (
-            self._cell_len
-            if self.parts and not self.parts[-1].endswith(" ")
-            else self._cell_len - 1
-        )
+        return self._cell_len - 1 if self._space else self._cell_len
 
     @property
     def text(self) -> str:
@@ -176,18 +174,21 @@ def pretty_repr(
 
     def traverse(node: Any, level: int = 0) -> None:
         """Walk the data structure."""
+
         nonlocal line_break
         append_line = lines.append
 
         def append_text(text: str) -> None:
+            nonlocal max_width
             nonlocal line_break
             line = lines[-1]
             line.append(text)
             if max_width is not None and line.cell_len > max_width:
                 if line_break is not None and len(lines) <= line_break:
-                    return
-                line_break = len(lines)
-                raise MaxLineReached(level)
+                    max_width = None
+                else:
+                    line_break = len(lines)
+                    raise MaxLineReached(level)
 
         node_id = id(node)
         if node_id in visited_set:
@@ -209,8 +210,7 @@ def pretty_repr(
                         if expanded:
                             append_line(_Line())
                             append_text(indent * (level + 1))
-                        append_text(to_repr_text(key))
-                        append_text(": ")
+                        append_text(f"{to_repr_text(key)}: ")
                         traverse(value, level + 1)
                         if not last:
                             append_text(", ")
@@ -223,7 +223,7 @@ def pretty_repr(
                         if not last:
                             append_text(", ")
                 if expanded:
-                    lines.append(_Line())
+                    append_line(_Line())
                     append_text(f"{indent * level}{brace_close}")
                 else:
                     append_text(brace_close)
