@@ -208,7 +208,9 @@ class Traceback:
                 exc_value = cause
                 traceback = cause.__traceback__
                 continue
-            break
+            # No cover, code is reached but coverage doesn't recognize it.
+            break  # pragma: no cover
+
         trace = Trace(stacks=stacks)
         return trace
 
