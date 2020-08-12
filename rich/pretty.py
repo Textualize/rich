@@ -18,18 +18,25 @@ if TYPE_CHECKING:  # pragma: no cover
         Console,
         ConsoleOptions,
         HighlighterType,
+        JustifyMethod,
         OverflowMethod,
         RenderResult,
     )
 
 
 def install(
-    console: "Console" = None, no_wrap: bool = False, overflow: "OverflowMethod" = None
+    console: "Console" = None,
+    no_wrap: bool = False,
+    overflow: "OverflowMethod" = None,
+    crop: bool = False,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
 
     Args:
         console (Console, optional): Console instance or ``None`` to use global console. Defaults to None.
+        no_wrap (Optional[bool], optional): Don't wrap long lines. Defaults to False.
+        overflow (Optional[OverflowMethod], optional): Overflow method. Defaults to None.
+        crop (Optional[bool], optional): Enable cropping of long lines. Defaults to False.
     """
     from rich import get_console
 
@@ -42,8 +49,13 @@ def install(
                 value
                 if hasattr(value, "__rich_console__") or hasattr(value, "__rich__")
                 else pretty_repr(
-                    value, max_width=console.width, no_wrap=False, overflow=overflow
-                )
+                    value,
+                    max_width=console.width,
+                    no_wrap=no_wrap,
+                    justify="default" if crop else "ignore",
+                    overflow=overflow,
+                ),
+                crop=crop,
             )
 
     sys.displayhook = display_hook
@@ -58,12 +70,14 @@ class Pretty:
         highlighter: "HighlighterType" = None,
         *,
         indent_size: int = 4,
+        justify: "JustifyMethod" = None,
         overflow: "OverflowMethod" = None,
         no_wrap: bool = None,
     ) -> None:
         self._object = _object
         self.highlighter = highlighter or NullHighlighter()
         self.indent_size = indent_size
+        self.justify = justify
         self.overflow = overflow
         self.no_wrap = no_wrap
 
@@ -74,6 +88,7 @@ class Pretty:
             self._object,
             max_width=options.max_width,
             indent_size=self.indent_size,
+            justify=self.justify or options.justify,
             overflow=self.overflow or options.overflow,
             no_wrap=pick_bool(self.no_wrap, options.no_wrap, True),
         )
@@ -128,6 +143,7 @@ def pretty_repr(
     max_width: Optional[int] = 80,
     indent_size: int = 4,
     highlighter: Highlighter = None,
+    justify: "JustifyMethod" = None,
     overflow: "OverflowMethod" = None,
     no_wrap: bool = True,
 ) -> Text:
@@ -244,7 +260,10 @@ def pretty_repr(
             break  # pragma: no cover
 
     text = Text(
-        "\n".join(line.text for line in lines), overflow=overflow, no_wrap=no_wrap
+        "\n".join(line.text for line in lines),
+        justify=justify,
+        overflow=overflow,
+        no_wrap=no_wrap,
     )
     text = highlighter(text)
     return text
@@ -274,6 +293,6 @@ if __name__ == "__main__":  # pragma: no cover
     console = Console()
     from rich import print
 
-    p = Pretty(data, overflow="ellipsis")
+    p = Pretty(data, overflow="ellipsis", justify="ignore")
     print(Measurement.get(console, p))
-    console.print(p)
+    console.print(p, crop=False)

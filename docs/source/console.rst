@@ -99,10 +99,20 @@ The :meth:`~rich.console.Console.log` methods offers the same capabilities as pr
 To help with debugging, the log() method has a ``log_locals`` parameter. If you set this to ``True``, Rich will display a table of local variables where the method was called.
 
 
+Cropping
+--------
+
+The `~rich.console.Console.print` method has a boolean ``crop`` argument. The default value for crop is True which tells Rich to crop any content that would otherwise run on to the next line. 
+
+If you set ``crop`` to False then long lines will be allowed to run on to the following line. This generally makes content hard to read, but it does mean that you can resize the console window after printing content.
+
+Note that you generally don't need to think about cropping, as Rich will wrap text and resize other content so that it fits within the available width.
+
+
 Justify / Alignment
 -------------------
 
-Both print and log support a ``justify`` argument which if set must be one of "default", "left", "right", "center", or "full".  If "left", any text printed (or logged) will be left aligned, if "right" text will be aligned to the right of the terminal, if "center" the text will be centered, and if "full" the text will be lined up with both the left and right edges of the terminal (like printed text in a book). 
+Both print and log support a ``justify`` argument which if set must be one of "default", "left", "right", "center", "full", or "ignore".  If "left", any text printed (or logged) will be left aligned, if "right" text will be aligned to the right of the terminal, if "center" the text will be centered, and if "full" the text will be lined up with both the left and right edges of the terminal (like printed text in a book). Finally, if justify is set to "ignore" then text will not be justified and allowed to extend to the next line(s).
 
 The default for ``justify`` is ``"default"`` which will generally look the same as ``"left"`` but with a subtle difference. Left justify will pad the right of the text with spaces, while a default justify will not. You will only notice the difference if you set a background color with the ``style`` argument. The following example demonstrates the difference::
 

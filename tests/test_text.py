@@ -33,6 +33,11 @@ def test_len():
     assert len(Text("foo")) == 3
 
 
+def test_cell_len():
+    assert Text("foo").cell_len == 3
+    assert Text("😀").cell_len == 2
+
+
 def test_bool():
     assert Text("foo")
     assert not Text("")
@@ -404,6 +409,19 @@ def test_wrap_long_words():
     assert lines[0] == Text("X 12")
     assert lines[1] == Text("3456")
     assert lines[2] == Text("789 ")
+
+
+def test_justify_ignore():
+    test = Text("Hello World!" * 3)
+
+    console = Console(width=20, file=StringIO())
+    console.print(test, justify="ignore")
+    console.print(test, justify="ignore", crop=False)
+
+    assert (
+        console.file.getvalue()
+        == "Hello World!Hello Wo\nHello World!Hello World!Hello World!\n"
+    )
 
 
 def test_fit():
