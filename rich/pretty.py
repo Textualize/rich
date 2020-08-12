@@ -26,15 +26,13 @@ if TYPE_CHECKING:  # pragma: no cover
 
 def install(
     console: "Console" = None,
-    no_wrap: bool = False,
-    overflow: "OverflowMethod" = None,
+    overflow: "OverflowMethod" = "ignore",
     crop: bool = False,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
 
     Args:
-        console (Console, optional): Console instance or ``None`` to use global console. Defaults to None.
-        no_wrap (Optional[bool], optional): Don't wrap long lines. Defaults to False.
+        console (Console, optional): Console instance or ``None`` to use global console. Defaults to None.        
         overflow (Optional[OverflowMethod], optional): Overflow method. Defaults to None.
         crop (Optional[bool], optional): Enable cropping of long lines. Defaults to False.
     """
@@ -48,9 +46,7 @@ def install(
             console.print(
                 value
                 if hasattr(value, "__rich_console__") or hasattr(value, "__rich__")
-                else pretty_repr(
-                    value, max_width=console.width, no_wrap=no_wrap, overflow=overflow
-                ),
+                else pretty_repr(value, max_width=console.width, overflow=overflow),
                 crop=crop,
             )
 
@@ -68,14 +64,12 @@ class Pretty:
         indent_size: int = 4,
         justify: "JustifyMethod" = None,
         overflow: "OverflowMethod" = None,
-        no_wrap: bool = None,
     ) -> None:
         self._object = _object
         self.highlighter = highlighter or NullHighlighter()
         self.indent_size = indent_size
         self.justify = justify
         self.overflow = overflow
-        self.no_wrap = no_wrap
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -86,7 +80,6 @@ class Pretty:
             indent_size=self.indent_size,
             justify=self.justify or options.justify,
             overflow=self.overflow or options.overflow,
-            no_wrap=pick_bool(self.no_wrap, options.no_wrap, True),
         )
         yield pretty_text
 
