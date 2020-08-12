@@ -49,11 +49,7 @@ def install(
                 value
                 if hasattr(value, "__rich_console__") or hasattr(value, "__rich__")
                 else pretty_repr(
-                    value,
-                    max_width=console.width,
-                    no_wrap=no_wrap,
-                    justify="default" if crop else "ignore",
-                    overflow=overflow,
+                    value, max_width=console.width, no_wrap=no_wrap, overflow=overflow
                 ),
                 crop=crop,
             )

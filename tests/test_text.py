@@ -411,13 +411,14 @@ def test_wrap_long_words():
     assert lines[2] == Text("789 ")
 
 
-def test_justify_ignore():
+def test_no_wrap_no_crop():
     test = Text("Hello World!" * 3)
 
     console = Console(width=20, file=StringIO())
-    console.print(test, justify="ignore")
-    console.print(test, justify="ignore", crop=False)
+    console.print(test, no_wrap=True)
+    console.print(test, no_wrap=True, crop=False, overflow="ignore")
 
+    print(repr(console.file.getvalue()))
     assert (
         console.file.getvalue()
         == "Hello World!Hello Wo\nHello World!Hello World!Hello World!\n"

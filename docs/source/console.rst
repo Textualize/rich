@@ -112,7 +112,7 @@ Note that you generally don't need to think about cropping, as Rich will wrap te
 Justify / Alignment
 -------------------
 
-Both print and log support a ``justify`` argument which if set must be one of "default", "left", "right", "center", "full", or "ignore".  If "left", any text printed (or logged) will be left aligned, if "right" text will be aligned to the right of the terminal, if "center" the text will be centered, and if "full" the text will be lined up with both the left and right edges of the terminal (like printed text in a book). Finally, if justify is set to "ignore" then text will not be justified and allowed to extend to the next line(s).
+Both print and log support a ``justify`` argument which if set must be one of "default", "left", "right", "center", "full", or "ignore".  If "left", any text printed (or logged) will be left aligned, if "right" text will be aligned to the right of the terminal, if "center" the text will be centered, and if "full" the text will be lined up with both the left and right edges of the terminal (like printed text in a book). 
 
 The default for ``justify`` is ``"default"`` which will generally look the same as ``"left"`` but with a subtle difference. Left justify will pad the right of the text with spaces, while a default justify will not. You will only notice the difference if you set a background color with the ``style`` argument. The following example demonstrates the difference::
 
@@ -142,13 +142,13 @@ Overflow
 
 Overflow is what happens when text you print is larger than the available space. Overflow may occur if you print long 'words' such as URLs for instance, or if you have text inside a panel or table cell with restricted space.
 
-You can specify how Rich should handle overflow with the ``overflow`` argument to  :meth:`~rich.console.Console.print` which should be one of the following strings: "fold", "crop", or "ellipsis". The default is "fold" which will put any excess characters on the following line, creating as many new lines as required to fit the text.
+You can specify how Rich should handle overflow with the ``overflow`` argument to  :meth:`~rich.console.Console.print` which should be one of the following strings: "fold", "crop", "ellipsis", or "ignore". The default is "fold" which will put any excess characters on the following line, creating as many new lines as required to fit the text.
 
 The "crop" method truncates the text at the end of the line, discarding any characters that would overflow.
 
 The "ellipsis" method is similar to "crop", but will insert an ellipsis character ("…") at the end of any text that has been truncated.
 
-The following code demonstrates Rich's overflow methods::
+The following code demonstrates the basic overflow methods::
 
     from typing import List
     from rich.console import Console, OverflowMethod
@@ -179,6 +179,7 @@ This produces the following output:
     </span>
     </pre>
 
+You can also set overflow to "ignore" which allows text to run on to the next line. In practice this will look the same as "crop" unless you also set ``crop=False` in :meth:`~rich.console.Console.print`.
 
 Input
 -----

@@ -639,16 +639,17 @@ class Text(JupyterMixin):
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None, to use self.overflow.
             pad (bool, optional): Pad with spaces if the length is less than max_width. Defaults to False.
         """
-        length = cell_len(self.plain)
         _overflow = overflow or self.overflow or DEFAULT_OVERFLOW
-        if length > max_width:
-            if _overflow == "ellipsis":
-                self.plain = set_cell_size(self.plain, max_width - 1).rstrip() + "…"
-            else:
-                self.plain = set_cell_size(self.plain, max_width)
-        if pad and length < max_width:
-            spaces = max_width - length
-            self.plain = f"{self.plain}{' ' * spaces}"
+        if _overflow != "ignore":
+            length = cell_len(self.plain)
+            if length > max_width:
+                if _overflow == "ellipsis":
+                    self.plain = set_cell_size(self.plain, max_width - 1).rstrip() + "…"
+                else:
+                    self.plain = set_cell_size(self.plain, max_width)
+            if pad and length < max_width:
+                spaces = max_width - length
+                self.plain = f"{self.plain}{' ' * spaces}"
 
     def _trim_spans(self) -> None:
         """Remove or modify any spans that are over the end of the text."""
@@ -939,31 +940,26 @@ class Text(JupyterMixin):
         wrap_overflow = cast(
             "OverflowMethod", overflow or self.overflow or DEFAULT_OVERFLOW
         )
-        no_wrap = pick_bool(no_wrap, self.no_wrap, False)
+        no_wrap = pick_bool(no_wrap, self.no_wrap, False) or overflow == "ignore"
 
-        if wrap_justify == "ignore":
-            lines = Lines(self.split(allow_blank=True))
-        else:
-            lines = Lines()
-            for line in self.split(allow_blank=True):
-                if "\t" in line:
-                    line = line.tabs_to_spaces(tab_size)
-                if no_wrap:
-                    new_lines = Lines([line])
-                else:
-                    offsets = divide_line(
-                        str(line), width, fold=wrap_overflow == "fold"
-                    )
-                    new_lines = line.divide(offsets)
-                for line in new_lines:
-                    line.rstrip_end(width)
-                if wrap_justify:
-                    new_lines.justify(
-                        console, width, justify=wrap_justify, overflow=wrap_overflow
-                    )
-                for line in new_lines:
-                    line.truncate(width, overflow=wrap_overflow)
-                lines.extend(new_lines)
+        lines = Lines()
+        for line in self.split(allow_blank=True):
+            if "\t" in line:
+                line = line.tabs_to_spaces(tab_size)
+            if no_wrap:
+                new_lines = Lines([line])
+            else:
+                offsets = divide_line(str(line), width, fold=wrap_overflow == "fold")
+                new_lines = line.divide(offsets)
+            for line in new_lines:
+                line.rstrip_end(width)
+            if wrap_justify:
+                new_lines.justify(
+                    console, width, justify=wrap_justify, overflow=wrap_overflow
+                )
+            for line in new_lines:
+                line.truncate(width, overflow=wrap_overflow)
+            lines.extend(new_lines)
         return lines
 
     def fit(self, width: int) -> Lines:
