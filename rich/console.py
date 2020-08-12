@@ -977,11 +977,17 @@ class Console:
             ]
             for hook in self._render_hooks:
                 renderables = hook.process_renderables(renderables)
-            extend = self._buffer.extend
+            new_segments: List[Segment] = []
+            extend = new_segments.extend
             render = self.render
             render_options = self.options
             for renderable in renderables:
                 extend(render(renderable, render_options))
+            buffer_extend = self._buffer.extend
+            for line in Segment.split_and_crop_lines(
+                new_segments, self.width, pad=False
+            ):
+                buffer_extend(line)
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered."""
