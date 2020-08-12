@@ -282,6 +282,6 @@ if __name__ == "__main__":  # pragma: no cover
     console = Console()
     from rich import print
 
-    p = Pretty(data, overflow="ellipsis", justify="ignore")
+    p = Pretty(data, overflow="ignore")
     print(Measurement.get(console, p))
     console.print(p, crop=False)
