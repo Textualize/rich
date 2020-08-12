@@ -291,8 +291,28 @@ Here's what it looks like on OSX (similar on Linux):
 
 ![traceback](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
 
-Here's what it looks like on Windows:
+## Project using Rich
 
-![traceback_windows](https://github.com/willmcgugan/rich/raw/master/imgs/traceback_windows.png)
+Here are a few projects using Rich:
 
-See the [rich traceback](https://rich.readthedocs.io/en/latest/traceback.html) documentation for the details.
+- [BrancoLab/BrainRender](https://github.com/BrancoLab/BrainRender)
+  a python package for the visualization of three dimensional neuro-anatomical data
+- [Ciphey/Ciphey](https://github.com/Ciphey/Ciphey)
+  Automated decryption tool
+- [emeryberger/scalene](https://github.com/emeryberger/scalene)
+  a high-performance, high-precision CPU and memory profiler for Python
+- [hedythedev/StarCli](https://github.com/hedythedev/starcli)
+  Browse GitHub trending projects from your command line
+- [intel/cve-bin-tool](https://github.com/intel/cve-bin-tool)
+  This tool scans for a number of common, vulnerable components (openssl, libpng, libxml2, expat and a few others) to let you know if your system includes common libraries with known vulnerabilities.
+- [nf-core/tools](https://github.com/nf)
+  Python package with helper tools for the nf-core community.-core/tools)
+- [cansarigol/pdbr](https://github.com/cansarigol/pdbr)
+  pdb + Rich library for enhanced debugging
+- [plant99/felicette](https://github.com/plant99/felicette)
+  Satellite imagery for dummies.
+- [seleniumbase/SeleniumBase](https://github.com/seleniumbase/SeleniumBase)
+  Automate & test 10x faster with Selenium & pytest. Batteries included.
+- [smacke/ffsubsync](https://github.com/smacke/ffsubsync)
+  Automagically synchronize subtitles with video.
+- +[Many more](https://github.com/willmcgugan/rich/network/dependents)!
