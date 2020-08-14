@@ -1,6 +1,6 @@
 from typing import Union
 
-from .cells import cell_len
+from .cells import cell_len, set_cell_size
 from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin
 from .style import Style
@@ -12,7 +12,8 @@ class Rule(JupyterMixin):
     
     Args:
         title (Union[str, Text], optional): Text to render in the rule. Defaults to "".
-        character (str, optional): Character used to draw the line. Defaults to "─".
+        character: Will be deprecated in v6.0.0, please use characters argument instead.
+        characters (str, optional): Character(s) used to draw the line. Defaults to "─".
         style (StyleType, optional): Style of Rule. Defaults to "rule.line".
         end (str, optional): Character at end of Rule. defaults to "\\n"
     """
@@ -21,29 +22,37 @@ class Rule(JupyterMixin):
         self,
         title: Union[str, Text] = "",
         *,
-        character: str = None,
+        character: Union[str, None] = None,
+        characters: str = "─",
         style: Union[str, Style] = "rule.line",
         end: str = "\n",
     ) -> None:
-        if character and cell_len(character) != 1:
-            raise ValueError("'character' argument must have a cell width of 1")
+        if character:
+            characters = character
+
+        if cell_len(characters) < 1:
+            raise ValueError(
+                "'characters' argument must have at least a cell width of 1"
+            )
         self.title = title
-        self.character = character
+        self.characters = characters
         self.style = style
         self.end = end
 
     def __repr__(self) -> str:
-        return f"Rule({self.title!r}, {self.character!r})"
+        return f"Rule({self.title!r}, {self.characters!r})"
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         width = options.max_width
 
-        character = self.character or "─"
+        characters = self.characters or "─"
 
+        chars_len = cell_len(characters)
         if not self.title:
-            yield Text(character * width, self.style)
+            rule_text = Text(characters * ((width // chars_len) + 1), self.style)
+            rule_text.truncate(width)
         else:
             if isinstance(self.title, Text):
                 title_text = self.title
@@ -56,13 +65,17 @@ class Rule(JupyterMixin):
             title_text.plain = title_text.plain.replace("\n", " ")
             title_text = title_text.tabs_to_spaces()
             rule_text = Text(end=self.end)
-            center = (width - cell_len(title_text.plain)) // 2
-            rule_text.append(character * (center - 1) + " ", self.style)
+            side_width = (width - cell_len(title_text.plain)) // 2
+            left = Text(characters * (side_width // chars_len + 1))
+            left.truncate(side_width - 1)
+            right_length = width - cell_len(left.plain) - cell_len(title_text.plain)
+            right = Text(characters * (side_width // chars_len + 1))
+            right.truncate(right_length)
+            rule_text.append(left.plain + " ", self.style)
             rule_text.append(title_text)
-            rule_text.append(
-                " " + character * (width - cell_len(rule_text.plain) - 1), self.style
-            )
-            yield rule_text
+            rule_text.append(" " + right.plain, self.style)
+            rule_text.plain = set_cell_size(rule_text.plain, width)
+        yield rule_text
 
 
 if __name__ == "__main__":  # pragma: no cover
@@ -74,4 +87,4 @@ if __name__ == "__main__":  # pragma: no cover
     except IndexError:
         text = "Hello, World"
     console = Console()
-    console.print(Rule(text))
+    console.print(Rule(title=text))
