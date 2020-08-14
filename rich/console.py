@@ -808,9 +808,7 @@ class Console:
         """
         from .rule import Rule
 
-        if character:
-            characters = character
-        rule = Rule(title=title, characters=characters, style=style)
+        rule = Rule(title=title, characters=character or characters, style=style)
         self.print(rule)
 
     def control(self, control_codes: Union["Control", str]) -> None:
