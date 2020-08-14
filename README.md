@@ -154,7 +154,7 @@ Here's a simpler table example:
 
 ```python
 from rich.console import Console
-from rich.table import Column, Table
+from rich.table import Table
 
 console = Console()
 

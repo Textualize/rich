@@ -795,18 +795,22 @@ class Console:
         self,
         title: str = "",
         *,
-        character: str = "─",
+        character: Optional[str] = None,
+        characters: str = "─",
         style: Union[str, Style] = "rule.line",
     ) -> None:
         """Draw a line with optional centered title.
         
         Args:
             title (str, optional): Text to render over the rule. Defaults to "".
-            character (str, optional): Character to form the line. Defaults to "─".
+            character: Will be deprecated in v6.0.0, please use characters argument instead.
+            characters (str, optional): Character(s) to form the line. Defaults to "─".
         """
         from .rule import Rule
 
-        rule = Rule(title=title, character=character, style=style)
+        if character:
+            characters = character
+        rule = Rule(title=title, characters=characters, style=style)
         self.print(rule)
 
     def control(self, control_codes: Union["Control", str]) -> None:

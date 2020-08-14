@@ -11,13 +11,16 @@ def test_rule():
     console = Console(
         width=16, file=io.StringIO(), force_terminal=True, legacy_windows=False
     )
-    console.rule()
-    console.rule("foo")
+    console.print(Rule())
+    console.print(Rule("foo"))
     console.rule(Text("foo", style="bold"))
     console.rule("foobarbazeggfoobarbazegg")
-    expected = "\x1b[92m────────────────\x1b[0m\n\x1b[92m───── \x1b[0mfoo\x1b[92m ──────\x1b[0m\n\x1b[92m───── \x1b[0m\x1b[1mfoo\x1b[0m\x1b[92m ──────\x1b[0m\n\x1b[92m─ \x1b[0mfoobarbazeg…\x1b[92m ─\x1b[0m\n"
+    expected = "\x1b[92m────────────────\x1b[0m\n"
+    expected += "\x1b[92m───── \x1b[0mfoo\x1b[92m ──────\x1b[0m\n"
+    expected += "\x1b[92m───── \x1b[0m\x1b[1mfoo\x1b[0m\x1b[92m ──────\x1b[0m\n"
+    expected += "\x1b[92m─ \x1b[0mfoobarbazeg…\x1b[92m ─\x1b[0m\n"
+
     result = console.file.getvalue()
-    print(repr(result))
     assert result == expected
 
 
@@ -34,6 +37,23 @@ def test_rule_cjk():
     assert console.file.getvalue() == expected
 
 
+def test_characters():
+    console = Console(
+        width=16,
+        file=io.StringIO(),
+        force_terminal=True,
+        color_system=None,
+        legacy_windows=False,
+    )
+    console.rule(characters="+*")
+    console.rule("foo", characters="+*")
+    console.print(Rule(characters=".,"))
+    expected = "+*+*+*+*+*+*+*+*\n"
+    expected += "+*+*+ foo +*+*+*\n"
+    expected += ".,.,.,.,.,.,.,.,\n"
+    assert console.file.getvalue() == expected
+
+
 def test_repr():
     rule = Rule("foo")
     assert isinstance(repr(rule), str)
@@ -41,4 +61,4 @@ def test_repr():
 
 def test_error():
     with pytest.raises(ValueError):
-        Rule(character="bar")
+        Rule(characters="")
