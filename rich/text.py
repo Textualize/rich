@@ -639,16 +639,17 @@ class Text(JupyterMixin):
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None, to use self.overflow.
             pad (bool, optional): Pad with spaces if the length is less than max_width. Defaults to False.
         """
-        length = cell_len(self.plain)
         _overflow = overflow or self.overflow or DEFAULT_OVERFLOW
-        if length > max_width:
-            if _overflow == "ellipsis":
-                self.plain = set_cell_size(self.plain, max_width - 1).rstrip() + "…"
-            else:
-                self.plain = set_cell_size(self.plain, max_width)
-        if pad and length < max_width:
-            spaces = max_width - length
-            self.plain = f"{self.plain}{' ' * spaces}"
+        if _overflow != "ignore":
+            length = cell_len(self.plain)
+            if length > max_width:
+                if _overflow == "ellipsis":
+                    self.plain = set_cell_size(self.plain, max_width - 1).rstrip() + "…"
+                else:
+                    self.plain = set_cell_size(self.plain, max_width)
+            if pad and length < max_width:
+                spaces = max_width - length
+                self.plain = f"{self.plain}{' ' * spaces}"
 
     def _trim_spans(self) -> None:
         """Remove or modify any spans that are over the end of the text."""
@@ -939,7 +940,8 @@ class Text(JupyterMixin):
         wrap_overflow = cast(
             "OverflowMethod", overflow or self.overflow or DEFAULT_OVERFLOW
         )
-        no_wrap = pick_bool(no_wrap, self.no_wrap, False)
+        no_wrap = pick_bool(no_wrap, self.no_wrap, False) or overflow == "ignore"
+
         lines = Lines()
         for line in self.split(allow_blank=True):
             if "\t" in line:
