@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from .cells import cell_len, set_cell_size
 from .console import Console, ConsoleOptions, RenderResult
@@ -22,17 +22,16 @@ class Rule(JupyterMixin):
         self,
         title: Union[str, Text] = "",
         *,
-        character: Union[str, None] = None,
+        character: Optional[str] = None,
         characters: str = "─",
         style: Union[str, Style] = "rule.line",
         end: str = "\n",
     ) -> None:
-        if character:
-            characters = character
+        characters = character or characters
 
         if cell_len(characters) < 1:
             raise ValueError(
-                "'characters' argument must have at least a cell width of 1"
+                "'characters' argument must have a cell width of at least 1"
             )
         self.title = title
         self.characters = characters

@@ -51,7 +51,7 @@ WINDOWS = platform.system() == "Windows"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
-OverflowMethod = Literal["fold", "crop", "ellipsis"]
+OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
 
 
 CONSOLE_HTML_FORMAT = """\
@@ -808,9 +808,7 @@ class Console:
         """
         from .rule import Rule
 
-        if character:
-            characters = character
-        rule = Rule(title=title, characters=characters, style=style)
+        rule = Rule(title=title, characters=character or characters, style=style)
         self.print(rule)
 
     def control(self, control_codes: Union["Control", str]) -> None:
@@ -836,6 +834,7 @@ class Console:
         markup: bool = None,
         highlight: bool = None,
         width: int = None,
+        crop: bool = True,
     ) -> None:
         """Print to the console.
 
@@ -851,6 +850,7 @@ class Console:
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to ``None``.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
             width (Optional[int], optional): Width of output, or ``None`` to auto-detect. Defaults to ``None``.
+            crop (Optional[bool], optional): Crop output to width of terminal. Defaults to True.
         """
         if not objects:
             self.line()
@@ -871,7 +871,8 @@ class Console:
             render_options = self.options.update(
                 justify=justify, overflow=overflow, width=width, no_wrap=no_wrap
             )
-            extend = self._buffer.extend
+            new_segments: List[Segment] = []
+            extend = new_segments.extend
             render = self.render
             if style is None:
                 for renderable in renderables:
@@ -883,6 +884,14 @@ class Console:
                             render(renderable, render_options), self.get_style(style)
                         )
                     )
+            if crop:
+                buffer_extend = self._buffer.extend
+                for line in Segment.split_and_crop_lines(
+                    new_segments, self.width, pad=False
+                ):
+                    buffer_extend(line)
+            else:
+                self._buffer.extend(new_segments)
 
     def print_exception(
         self,
@@ -926,6 +935,7 @@ class Console:
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\\n".
             justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
+            overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to None.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to None.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to None.
@@ -970,11 +980,17 @@ class Console:
             ]
             for hook in self._render_hooks:
                 renderables = hook.process_renderables(renderables)
-            extend = self._buffer.extend
+            new_segments: List[Segment] = []
+            extend = new_segments.extend
             render = self.render
             render_options = self.options
             for renderable in renderables:
                 extend(render(renderable, render_options))
+            buffer_extend = self._buffer.extend
+            for line in Segment.split_and_crop_lines(
+                new_segments, self.width, pad=False
+            ):
+                buffer_extend(line)
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered."""
@@ -1013,19 +1029,16 @@ class Console:
                 self._record_buffer.extend(buffer)
         del self._buffer[:]
         not_terminal = not self.is_terminal
-        for line in Segment.split_and_crop_lines(buffer, self.width, pad=False):
-            for text, style, is_control in line:
-                if style and not is_control:
-                    append(
-                        style.render(
-                            text,
-                            color_system=color_system,
-                            legacy_windows=legacy_windows,
-                        )
+        for text, style, is_control in buffer:
+            if style and not is_control:
+                append(
+                    style.render(
+                        text, color_system=color_system, legacy_windows=legacy_windows,
                     )
-                else:
-                    if not (not_terminal and is_control):
-                        append(text)
+                )
+            else:
+                if not (not_terminal and is_control):
+                    append(text)
 
         rendered = "".join(output)
         return rendered

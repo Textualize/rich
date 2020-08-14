@@ -95,11 +95,7 @@ class Panel(JupyterMixin):
         )
         style = console.get_style(self.style)
         border_style = style + console.get_style(self.border_style)
-        width = (
-            options.max_width
-            if self.width is None
-            else min(self.width, options.max_width)
-        )
+        width = options.max_width if self.width is None else self.width
         child_width = (
             width - 2
             if self.expand

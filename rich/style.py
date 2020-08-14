@@ -452,7 +452,7 @@ class Style:
         return "; ".join(css)
 
     @classmethod
-    def combine(self, styles: Iterable["Style"]) -> "Style":
+    def combine(cls, styles: Iterable["Style"]) -> "Style":
         """Combine styles and get result.
         
         Args:
@@ -465,7 +465,7 @@ class Style:
         return sum(styles, Style())
 
     @classmethod
-    def chain(self, *styles: "Style") -> "Style":
+    def chain(cls, *styles: "Style") -> "Style":
         """Combine styles from positional argument in to a single style.
         
         Args:

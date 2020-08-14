@@ -99,6 +99,16 @@ The :meth:`~rich.console.Console.log` methods offers the same capabilities as pr
 To help with debugging, the log() method has a ``log_locals`` parameter. If you set this to ``True``, Rich will display a table of local variables where the method was called.
 
 
+Cropping
+--------
+
+The :meth:`~rich.console.Console.print` method has a boolean ``crop`` argument. The default value for crop is True which tells Rich to crop any content that would otherwise run on to the next line. 
+
+If you set ``crop`` to False then long lines will be allowed to run on to the following line. This generally makes content hard to read, but it does mean that you can resize the terminal after printing to fit in more text.
+
+Note that you generally don't need to think about cropping, as Rich will wrap text and resize content to fit within the available width.
+
+
 Justify / Alignment
 -------------------
 
@@ -132,13 +142,13 @@ Overflow
 
 Overflow is what happens when text you print is larger than the available space. Overflow may occur if you print long 'words' such as URLs for instance, or if you have text inside a panel or table cell with restricted space.
 
-You can specify how Rich should handle overflow with the ``overflow`` argument to  :meth:`~rich.console.Console.print` which should be one of the following strings: "fold", "crop", or "ellipsis". The default is "fold" which will put any excess characters on the following line, creating as many new lines as required to fit the text.
+You can specify how Rich should handle overflow with the ``overflow`` argument to  :meth:`~rich.console.Console.print` which should be one of the following strings: "fold", "crop", "ellipsis", or "ignore". The default is "fold" which will put any excess characters on the following line, creating as many new lines as required to fit the text.
 
 The "crop" method truncates the text at the end of the line, discarding any characters that would overflow.
 
 The "ellipsis" method is similar to "crop", but will insert an ellipsis character ("…") at the end of any text that has been truncated.
 
-The following code demonstrates Rich's overflow methods::
+The following code demonstrates the basic overflow methods::
 
     from typing import List
     from rich.console import Console, OverflowMethod
@@ -169,6 +179,7 @@ This produces the following output:
     </span>
     </pre>
 
+You can also set overflow to "ignore" which allows text to run on to the next line. In practice this will look the same as "crop" unless you also set ``crop=False`` when calling :meth:`~rich.console.Console.print`.
 
 Input
 -----
