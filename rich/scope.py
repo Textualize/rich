@@ -10,7 +10,7 @@ from .table import Table
 
 
 if TYPE_CHECKING:
-    from .console import ConsoleRenderable
+    from .console import ConsoleRenderable, RenderableType
 
 
 def render_scope(

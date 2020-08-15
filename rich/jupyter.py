@@ -20,7 +20,7 @@ class JupyterRenderable:
         self.html = html
 
     @classmethod
-    def render(self, rich_renderable: "RenderableType") -> str:
+    def render(cls, rich_renderable: "RenderableType") -> str:
         console = get_console()
         segments = console.render(rich_renderable, console.options)
         html = _render_segments(segments)

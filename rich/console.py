@@ -1,5 +1,4 @@
 import inspect
-import io
 import os
 import platform
 import shutil
@@ -158,7 +157,7 @@ class RenderGroup:
 
     """
 
-    def __init__(self, *renderables: RenderableType, fit: bool = True) -> None:
+    def __init__(self, *renderables: "RenderableType", fit: bool = True) -> None:
         self._renderables = renderables
         self.fit = fit
         self._render: Optional[List[RenderableType]] = None
