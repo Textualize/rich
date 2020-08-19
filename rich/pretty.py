@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from rich.highlighter import ReprHighlighter
 
-from typing import Any, Dict, List, Optional, Set, Tuple, TYPE_CHECKING
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, TYPE_CHECKING
 
 from .cells import cell_len
 from .highlighter import Highlighter, NullHighlighter, ReprHighlighter
@@ -101,29 +101,205 @@ _BRACES: Dict[type, Tuple[str, str, str]] = {
 _CONTAINERS = tuple(_BRACES.keys())
 
 
+# @dataclass
+# class _Line:
+#     """A line in a pretty repr."""
+
+#     parts: List[str] = field(default_factory=list)
+#     _cell_len: int = 0
+#     _space: bool = False
+
+#     def append(self, text: str) -> None:
+#         """Add text to line."""
+#         # Efficiently keep track of cell length
+#         self.parts.append(text)
+#         self._cell_len += cell_len(text)
+#         self._space = text.endswith(" ")
+
+#     @property
+#     def cell_len(self) -> int:
+#         return self._cell_len - 1 if self._space else self._cell_len
+
+#     @property
+#     def text(self) -> str:
+#         """The text as a while."""
+#         return "".join(self.parts)
+
+
+# def pretty_repr(
+#     _object: Any,
+#     *,
+#     max_width: Optional[int] = 80,
+#     indent_size: int = 4,
+#     highlighter: Highlighter = None,
+#     justify: "JustifyMethod" = None,
+#     overflow: "OverflowMethod" = None,
+#     no_wrap: bool = True,
+# ) -> Text:
+#     """Return a 'pretty' repr.
+
+#     Args:
+#         _object (Any): Object to repr.
+#         max_width (int, optional): Maximum desired width. Defaults to 80.
+#         indent_size (int, optional): Number of spaces in an indent. Defaults to 4.
+#         highlighter (Highlighter, optional): A highlighter for repr strings. Defaults to ReprHighlighter.
+
+#     Returns:
+#         Text: A Text instance conaining a pretty repr.
+#     """
+
+#     class MaxLineReached(Exception):
+#         """Line is greater than maximum"""
+
+#     if highlighter is None:
+#         highlighter = ReprHighlighter()
+
+#     indent = " " * indent_size
+#     expand_level = 0
+#     lines: List[_Line] = [_Line()]
+
+#     visited_set: Set[int] = set()
+#     repr_cache: Dict[int, str] = {}
+#     repr_cache_get = repr_cache.get
+
+#     def to_repr_text(node: Any) -> str:
+#         """Convert object to repr."""
+#         node_id = id(node)
+#         cached = repr_cache_get(node_id)
+#         if cached is not None:
+#             return cached
+#         try:
+#             repr_text = repr(node)
+#         except Exception as error:
+#             repr_text = f"<error in repr: {error}>"
+#         repr_cache[node_id] = repr_text
+#         return repr_text
+
+#     line_break: Optional[int] = None
+
+#     def traverse(node: Any, level: int = 0) -> None:
+#         """Walk the data structure."""
+
+#         nonlocal line_break
+#         append_line = lines.append
+
+#         def append_text(text: str) -> None:
+#             nonlocal max_width
+#             nonlocal line_break
+#             line = lines[-1]
+#             line.append(text)
+#             if max_width is not None and line.cell_len > max_width:
+#                 if line_break is not None and len(lines) <= line_break:
+#                     max_width = None
+#                 else:
+#                     line_break = len(lines)
+#                     raise MaxLineReached(level)
+
+#         node_id = id(node)
+#         if node_id in visited_set:
+#             # Recursion detected
+#             append_text("...")
+#             return
+
+#         visited_set.add(node_id)
+#         if type(node) in _CONTAINERS:
+#             brace_open, brace_close, empty = _BRACES[type(node)]
+#             expanded = level < expand_level
+
+#             if not node:
+#                 append_text(empty)
+#             else:
+#                 append_text(brace_open)
+#                 if isinstance(node, dict):
+#                     for last, (key, value) in loop_last(node.items()):
+#                         if expanded:
+#                             append_line(_Line())
+#                             append_text(indent * (level + 1))
+#                         append_text(f"{to_repr_text(key)}: ")
+#                         traverse(value, level + 1)
+#                         if not last:
+#                             append_text(", ")
+#                 else:
+#                     for last, value in loop_last(node):
+#                         if expanded:
+#                             append_line(_Line())
+#                             append_text(indent * (level + 1))
+#                         traverse(value, level + 1)
+#                         if not last:
+#                             append_text(", ")
+#                 if expanded:
+#                     append_line(_Line())
+#                     append_text(f"{indent * level}{brace_close}")
+#                 else:
+#                     append_text(brace_close)
+#         else:
+#             append_text(to_repr_text(node))
+#         visited_set.remove(node_id)
+
+#     # Keep expanding levels until the text fits
+#     while True:
+#         try:
+#             traverse(_object)
+#         except MaxLineReached:
+#             del lines[:]
+#             visited_set.clear()
+#             lines.append(_Line())
+#             expand_level += 1
+#         else:
+#             break  # pragma: no cover
+
+#     text = Text(
+#         "\n".join(line.text for line in lines),
+#         justify=justify,
+#         overflow=overflow,
+#         no_wrap=no_wrap,
+#     )
+#     text = highlighter(text)
+#     return text
+
+
+@dataclass
+class _Node:
+
+    key_repr: str = ""
+    value_repr: str = ""
+    cell_len: int = 0
+    open_brace: str = ""
+    close_brace: str = ""
+    children: Optional[List["_Node"]] = None
+
+    def __str__(self) -> str:
+        if self.key_repr is not None:
+            return f"{self.key_repr}: {self.value_repr}"
+        elif self.value_repr is not None:
+            return self.value_repr
+        else:
+            values = ",".join(str(child) for child in self.children)
+            return f"{self.open_brace}{values}{self.close_brace}"
+
+
 @dataclass
 class _Line:
-    """A line in a pretty repr."""
+    node: Optional[_Node] = None
+    text: str = ""
+    indent: int = 0
+    cell_len: int = 0
+    expanded: bool = False
+    text: Optional[str] = None
 
-    parts: List[str] = field(default_factory=list)
-    _cell_len: int = 0
-    _space: bool = False
-
-    def append(self, text: str) -> None:
-        """Add text to line."""
-        # Efficiently keep track of cell length
-        self.parts.append(text)
-        self._cell_len += cell_len(text)
-        self._space = text.endswith(" ")
-
-    @property
-    def cell_len(self) -> int:
-        return self._cell_len - 1 if self._space else self._cell_len
-
-    @property
-    def text(self) -> str:
-        """The text as a while."""
-        return "".join(self.parts)
+    def expand(self) -> Iterable["_Line"]:
+        node = self.node
+        indent = self.indent
+        yield _Line(
+            text=node.open_brace, cell_len=cell_len(node.open_brace), indent=indent
+        )
+        child_indent = indent + 1
+        for last, child in loop_last(self.node.children):
+            
+            line = _Line(node=child, indent=child_indent, cell_len=child.cell_len)
+        yield _Line(
+            text=node.close_brace, cell_len=cell_len(node.close_brace), indent=indent
+        )
 
 
 def pretty_repr(
@@ -136,126 +312,74 @@ def pretty_repr(
     overflow: "OverflowMethod" = None,
     no_wrap: bool = True,
 ) -> Text:
-    """Return a 'pretty' repr.
 
-    Args:
-        _object (Any): Object to repr.
-        max_width (int, optional): Maximum desired width. Defaults to 80.
-        indent_size (int, optional): Number of spaces in an indent. Defaults to 4.
-        highlighter (Highlighter, optional): A highlighter for repr strings. Defaults to ReprHighlighter.
+    comma = ", "
+    colon = ": "
 
-    Returns:
-        Text: A Text instance conaining a pretty repr.
-    """
-
-    class MaxLineReached(Exception):
-        """Line is greater than maximum"""
-
-    if highlighter is None:
-        highlighter = ReprHighlighter()
-
-    indent = " " * indent_size
-    expand_level = 0
-    lines: List[_Line] = [_Line()]
-
-    visited_set: Set[int] = set()
-    repr_cache: Dict[int, str] = {}
-    repr_cache_get = repr_cache.get
-
-    def to_repr_text(node: Any) -> str:
-        """Convert object to repr."""
-        node_id = id(node)
-        cached = repr_cache_get(node_id)
-        if cached is not None:
-            return cached
+    def to_repr(obj: Any) -> str:
         try:
-            repr_text = repr(node)
+            obj_repr = repr(obj)
         except Exception as error:
-            repr_text = f"<error in repr: {error}>"
-        repr_cache[node_id] = repr_text
-        return repr_text
+            obj_repr = f"<repr error {error}>"
+        return obj_repr
 
-    line_break: Optional[int] = None
+    def traverse(obj: Any) -> _Node:
 
-    def traverse(node: Any, level: int = 0) -> None:
-        """Walk the data structure."""
-
-        nonlocal line_break
-        append_line = lines.append
-
-        def append_text(text: str) -> None:
-            nonlocal max_width
-            nonlocal line_break
-            line = lines[-1]
-            line.append(text)
-            if max_width is not None and line.cell_len > max_width:
-                if line_break is not None and len(lines) <= line_break:
-                    max_width = None
+        if isinstance(obj, _CONTAINERS):
+            open_brace, close_brace, empty = _BRACES[type(obj)]
+            if obj:
+                node = _Node(
+                    open_brace=open_brace, close_brace=close_brace, children=[]
+                )
+                children = node.children
+                append = children.append
+                if isinstance(obj, dict):
+                    for key, child in obj.items():
+                        child_node = traverse(child)
+                        child_node.key_repr = to_repr(key)
+                        append(child_node)
+                        node.cell_len += child_node.cell_len
                 else:
-                    line_break = len(lines)
-                    raise MaxLineReached(level)
-
-        node_id = id(node)
-        if node_id in visited_set:
-            # Recursion detected
-            append_text("...")
-            return
-
-        visited_set.add(node_id)
-        if type(node) in _CONTAINERS:
-            brace_open, brace_close, empty = _BRACES[type(node)]
-            expanded = level < expand_level
-
-            if not node:
-                append_text(empty)
+                    for child in obj:
+                        child_node = traverse(child)
+                        append(child_node)
+                        node.cell_len += child_node.cell_len
+                if children:
+                    node.cell_len += cell_len(comma) * (len(children) - 1)
             else:
-                append_text(brace_open)
-                if isinstance(node, dict):
-                    for last, (key, value) in loop_last(node.items()):
-                        if expanded:
-                            append_line(_Line())
-                            append_text(indent * (level + 1))
-                        append_text(f"{to_repr_text(key)}: ")
-                        traverse(value, level + 1)
-                        if not last:
-                            append_text(", ")
-                else:
-                    for last, value in loop_last(node):
-                        if expanded:
-                            append_line(_Line())
-                            append_text(indent * (level + 1))
-                        traverse(value, level + 1)
-                        if not last:
-                            append_text(", ")
-                if expanded:
-                    append_line(_Line())
-                    append_text(f"{indent * level}{brace_close}")
-                else:
-                    append_text(brace_close)
-        else:
-            append_text(to_repr_text(node))
-        visited_set.remove(node_id)
+                node = _Node(value_repr=empty)
 
-    # Keep expanding levels until the text fits
-    while True:
-        try:
-            traverse(_object)
-        except MaxLineReached:
-            del lines[:]
-            visited_set.clear()
-            lines.append(_Line())
-            expand_level += 1
         else:
-            break  # pragma: no cover
+            object_repr = to_repr(obj)
+            node = _Node(value_repr=to_repr(obj), cell_len=cell_len(object_repr))
 
-    text = Text(
-        "\n".join(line.text for line in lines),
-        justify=justify,
-        overflow=overflow,
-        no_wrap=no_wrap,
+        return node
+
+    node = traverse(_object)
+
+    def render(lines: List[_Line]):
+        line_no = 0
+        expanded = True
+        while expanded:
+            expanded = False
+            while line_no < len(lines):
+                line = lines[line_no]
+                if line.node and not line.expanded:
+                    cell_len = line.cell_len + indent_size * line.indent
+                    if cell_len > max_width:
+                        expanded = True
+                        expand_lines = list(line.expand())
+                        lines[line_no:line_no] = expand_lines
+                        line_no += len(expand_lines)
+                line_no += 1
+
+    lines = [_Line(node=node, cell_len=node.cell_len)]
+    render(lines)
+    repr_str = "\n".join(
+        f"{' ' * (line.indent * indent_size)}{line.text}" for line in lines
     )
-    text = highlighter(text)
-    return text
+    print("-" * max_width)
+    return repr_str
 
 
 if __name__ == "__main__":  # pragma: no cover
@@ -273,15 +397,17 @@ if __name__ == "__main__":  # pragma: no cover
         False: "This is false",
         True: "This is true",
         None: "This is None",
-        "Broken": BrokenRepr(),
+        # "Broken": BrokenRepr(),
     }
-    data["foo"].append(data)  # type: ignore
+    # data["foo"].append(data)  # type: ignore
 
-    from rich.console import Console
+    print(pretty_repr(data, max_width=160))
 
-    console = Console()
-    from rich import print
+    # from rich.console import Console
 
-    p = Pretty(data, overflow="ignore")
-    print(Measurement.get(console, p))
-    console.print(p, crop=False)
+    # console = Console()
+    # from rich import print
+
+    # p = Pretty(data, overflow="ignore")
+    # print(Measurement.get(console, p))
+    # console.print(p, crop=False)
