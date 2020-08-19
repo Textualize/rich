@@ -45,14 +45,14 @@ def install(
 
         if value is not None:
             assert console is not None
-            builtins._ = None
+            builtins._ = None  # type: ignore
             console.print(
                 value
                 if hasattr(value, "__rich_console__") or hasattr(value, "__rich__")
                 else pretty_repr(value, max_width=console.width, overflow=overflow),
                 crop=crop,
             )
-            builtins._ = value
+            builtins._ = value  # type: ignore
 
     sys.displayhook = display_hook
 
