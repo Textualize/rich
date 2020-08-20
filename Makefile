@@ -1,7 +1,7 @@
 test:
 	pytest --cov-report term-missing --cov=rich tests/ -vv
 format:
-	black --check rich
+	black --check rich tests
 typecheck:
 	mypy -p rich --ignore-missing-imports --warn-unreachable
 typecheck-report:
