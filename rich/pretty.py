@@ -1,3 +1,4 @@
+import builtins
 import sys
 
 from collections import defaultdict
@@ -41,14 +42,17 @@ def install(
     console = console or get_console()
 
     def display_hook(value: Any) -> None:
+
         if value is not None:
             assert console is not None
+            builtins._ = None  # type: ignore
             console.print(
                 value
                 if hasattr(value, "__rich_console__") or hasattr(value, "__rich__")
                 else pretty_repr(value, max_width=console.width, overflow=overflow),
                 crop=crop,
             )
+            builtins._ = value  # type: ignore
 
     sys.displayhook = display_hook
 
