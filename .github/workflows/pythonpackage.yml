@@ -23,7 +23,7 @@ jobs:
           poetry install
       - name: Format check with black
         run: |
-          make format-check
+          make format
       - name: Typecheck with mypy
         run: |
           make typecheck
