@@ -18,6 +18,7 @@ def get_content(user):
     name = f"{user['name']['first']} {user['name']['last']}"
     return f"[b]{name}[/b]\n[yellow]{country}"
 
+
 console = Console()
 
 

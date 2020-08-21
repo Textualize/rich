@@ -32,4 +32,3 @@ def test_lines_rich_console():
 
     result = list(lines.__rich_console__(console, console.options))
     assert result == [Text("foo")]
-

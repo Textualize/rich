@@ -45,4 +45,8 @@ Please add type annotations for all new code.
 
 ### Code Formatting
 
-Rich uses `black` for code formatting. I recommend setting up black in your editor to format on save.
+Rich uses [`black`](https://github.com/psf/black) for code formatting.
+I recommend setting up black in your editor to format on save.
+
+To run black from the command line, use `make format-check` to check your formatting,
+and use `make format` to format and write to the files.
