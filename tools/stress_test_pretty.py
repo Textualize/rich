@@ -9,4 +9,3 @@ DATA = {
 console = Console()
 for w in range(130):
     console.print(Panel(Pretty(DATA), width=w))
-

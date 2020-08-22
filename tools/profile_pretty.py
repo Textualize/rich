@@ -5,7 +5,6 @@ from rich.console import Console
 from rich.pretty import Pretty
 
 
-
 console = Console(file=io.StringIO(), color_system="truecolor", width=100)
 
 with open("cats.json") as fh:
