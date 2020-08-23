@@ -267,43 +267,85 @@ class _Node:
 
     key_repr: str = ""
     value_repr: str = ""
-    cell_len: int = 0
     open_brace: str = ""
     close_brace: str = ""
+    empty: str = ""
     children: Optional[List["_Node"]] = None
+    _tokens: Optional[List[str]] = None
+
+    def expandable(self) -> bool:
+        return self.children is not None
+
+    def iter_tokens(self) -> Iterable[str]:
+        if self._tokens is not None:
+            yield from self._tokens
+
+        def tokenize() -> Iterable[str]:
+            if self.key_repr:
+                yield self.key_repr
+                yield ": "
+            if self.value_repr:
+                yield self.value_repr
+            elif self.children is not None:
+                if self.children:
+                    yield self.open_brace
+                    for last, child in loop_last(self.children):
+                        yield from child.iter_tokens()
+                        if not last:
+                            yield ", "
+                    yield self.close_brace
+                else:
+                    self.empty
+
+        tokens: List[str] = []
+        append = tokens.append
+        for token in tokenize():
+            append(token)
+            yield token
+        self._tokens = tokens
+
+    def check_length(self, start_length: int, max_length: int) -> bool:
+        total_length = start_length
+        for token in self.iter_tokens():
+            total_length += cell_len(token)
+            if total_length > max_length:
+                return False
+        return True
 
     def __str__(self) -> str:
-        if self.key_repr is not None:
-            return f"{self.key_repr}: {self.value_repr}"
-        elif self.value_repr is not None:
-            return self.value_repr
-        else:
-            values = ",".join(str(child) for child in self.children)
-            return f"{self.open_brace}{values}{self.close_brace}"
+        repr_text = "".join(self.iter_tokens())
+        return repr_text
 
 
 @dataclass
 class _Line:
     node: Optional[_Node] = None
     text: str = ""
-    indent: int = 0
-    cell_len: int = 0
+    suffix: str = ""
+    whitespace: str = ""
     expanded: bool = False
-    text: Optional[str] = None
 
-    def expand(self) -> Iterable["_Line"]:
+    def check_length(self, max_length: int) -> bool:
+        start_length = len(self.whitespace) + cell_len(self.suffix)
+        return self.node.check_length(start_length, max_length)
+
+    def expand(self, indent_size: int) -> Iterable["_Line"]:
         node = self.node
-        indent = self.indent
+        whitespace = self.whitespace
         yield _Line(
-            text=node.open_brace, cell_len=cell_len(node.open_brace), indent=indent
+            text=node.open_brace, whitespace=whitespace, expanded=True,
         )
-        child_indent = indent + 1
-        for last, child in loop_last(self.node.children):
-            
-            line = _Line(node=child, indent=child_indent, cell_len=child.cell_len)
+        child_whitespace = self.whitespace + " " * indent_size
+        for child in self.node.children:
+            line = _Line(node=child, whitespace=child_whitespace, suffix=",")
+            yield line
+
         yield _Line(
-            text=node.close_brace, cell_len=cell_len(node.close_brace), indent=indent
+            text=node.close_brace, whitespace=whitespace, expanded=True,
         )
+
+    def __str__(self) -> str:
+        return f"{self.whitespace}{self.text}{self.node or ''}{self.suffix}"
 
 
 def pretty_repr(
@@ -333,7 +375,7 @@ def pretty_repr(
             open_brace, close_brace, empty = _BRACES[type(obj)]
             if obj:
                 node = _Node(
-                    open_brace=open_brace, close_brace=close_brace, children=[]
+                    open_brace=open_brace, close_brace=close_brace, children=[],
                 )
                 children = node.children
                 append = children.append
@@ -342,76 +384,79 @@ def pretty_repr(
                         child_node = traverse(child)
                         child_node.key_repr = to_repr(key)
                         append(child_node)
-                        node.cell_len += child_node.cell_len
                 else:
                     for child in obj:
                         child_node = traverse(child)
                         append(child_node)
-                        node.cell_len += child_node.cell_len
-                if children:
-                    node.cell_len += cell_len(comma) * (len(children) - 1)
             else:
                 node = _Node(value_repr=empty)
-
         else:
-            object_repr = to_repr(obj)
-            node = _Node(value_repr=to_repr(obj), cell_len=cell_len(object_repr))
+            node = _Node(value_repr=to_repr(obj))
 
         return node
 
     node = traverse(_object)
+    print(str(node))
 
     def render(lines: List[_Line]):
         line_no = 0
-        expanded = True
-        while expanded:
-            expanded = False
-            while line_no < len(lines):
-                line = lines[line_no]
-                if line.node and not line.expanded:
-                    cell_len = line.cell_len + indent_size * line.indent
-                    if cell_len > max_width:
-                        expanded = True
-                        expand_lines = list(line.expand())
-                        lines[line_no:line_no] = expand_lines
-                        line_no += len(expand_lines)
-                line_no += 1
 
-    lines = [_Line(node=node, cell_len=node.cell_len)]
+        while line_no < len(lines):
+            line = lines[line_no]
+            if line.node and not line.expanded:
+                if not line.check_length(max_width):
+                    expand_lines = list(line.expand(indent_size))
+                    lines[line_no : line_no + 1] = expand_lines
+            line_no += 1
+
+    lines = [_Line(node=node)]
+
     render(lines)
-    repr_str = "\n".join(
-        f"{' ' * (line.indent * indent_size)}{line.text}" for line in lines
-    )
+    repr_str = "\n".join(str(line) for line in lines)
     print("-" * max_width)
     return repr_str
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from collections import defaultdict
 
-    class BrokenRepr:
-        def __repr__(self):
-            1 / 0
+    data = [["Hello, world!"] * 3, [1000, 2323, 2424, 23423, 2323, 343434]]
 
-    d = defaultdict(int)
-    d["foo"] = 5
-    data = {
-        "foo": [1, "Hello World!", 2, 3, 4, {5, 6, 7, (1, 2, 3, 4), 8}],
-        "bar": frozenset({1, 2, 3}),
-        False: "This is false",
-        True: "This is true",
-        None: "This is None",
-        # "Broken": BrokenRepr(),
-    }
-    # data["foo"].append(data)  # type: ignore
+    # data = {
+    #     "foo": [1, "Hello World!", 2, 3, 4, {5, 6, 7, (1, 2, 3, 4), 8}],
+    #     "bar": frozenset({1, 2, 3}),
+    #     False: "This is false",
+    #     True: "This is true",
+    #     None: "This is None",
+    #     # "Broken": BrokenRepr(),
+    # }
 
-    print(pretty_repr(data, max_width=160))
+    print(pretty_repr(data, max_width=50))
 
-    # from rich.console import Console
+    if 0:
 
-    # console = Console()
-    # from rich import print
+        class BrokenRepr:
+            def __repr__(self):
+                1 / 0
 
-    # p = Pretty(data, overflow="ignore")
-    # print(Measurement.get(console, p))
-    # console.print(p, crop=False)
+        d = defaultdict(int)
+        d["foo"] = 5
+        data = {
+            "foo": [1, "Hello World!", 2, 3, 4, {5, 6, 7, (1, 2, 3, 4), 8}],
+            "bar": frozenset({1, 2, 3}),
+            False: "This is false",
+            True: "This is true",
+            None: "This is None",
+            # "Broken": BrokenRepr(),
+        }
+        # data["foo"].append(data)  # type: ignore
+
+        print(pretty_repr(data, max_width=60))
+
+        # from rich.console import Console
+
+        # console = Console()
+        # from rich import print
+
+        # p = Pretty(data, overflow="ignore")
+        # print(Measurement.get(console, p))
+        # console.print(p, crop=False)
