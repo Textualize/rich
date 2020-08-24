@@ -586,6 +586,8 @@ class Console:
 
         _options = options or self.options
         render_iterable: RenderResult
+        if hasattr(renderable, "__rich__"):
+            renderable = renderable.__rich__()
         if isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__rich_console__(self, _options)
         elif isinstance(renderable, str):

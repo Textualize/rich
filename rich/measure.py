@@ -66,7 +66,9 @@ class Measurement(NamedTuple):
         if isinstance(renderable, str):
             renderable = console.render_str(renderable)
 
-        renderable = getattr(renderable, "__rich__", renderable)
+        if hasattr(renderable, "__rich__"):
+            renderable = renderable.__rich__()
+
         if is_renderable(renderable):
             get_console_width = getattr(renderable, "__rich_measure__", None)
             if get_console_width is not None:
