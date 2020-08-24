@@ -836,6 +836,7 @@ class Console:
         highlight: bool = None,
         width: int = None,
         crop: bool = True,
+        soft_wrap: bool = False,
     ) -> None:
         """Print to the console.
 
@@ -845,17 +846,25 @@ class Console:
             end (str, optional): String to write at end of print data. Defaults to "\\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             justify (str, optional): Justify method: "default", "left", "right", "center", or "full". Defaults to ``None``.
-            overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
+            overflow (str, optional): Overflow method: "ignore", "crop", "fold", or "ellipsis". Defaults to None.
             no_wrap (Optional[bool], optional): Disable word wrapping. Defaults to None.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to ``None``.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to ``None``.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
             width (Optional[int], optional): Width of output, or ``None`` to auto-detect. Defaults to ``None``.
             crop (Optional[bool], optional): Crop output to width of terminal. Defaults to True.
+            soft_wrap (bool, optional): Enable soft wrap mode which disables word wrapping and cropping. Defaults to False.
         """
         if not objects:
             self.line()
             return
+
+        if soft_wrap:
+            if no_wrap is None:
+                no_wrap = True
+            if overflow is None:
+                overflow = "ignore"
+            crop = False
 
         with self:
             renderables = self._collect_renderables(

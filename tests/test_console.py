@@ -288,3 +288,9 @@ def test_no_wrap():
     console = Console(width=10, file=io.StringIO())
     console.print("foo bar baz egg", no_wrap=True)
     assert console.file.getvalue() == "foo bar ba\n"
+
+
+def test_soft_wrap():
+    console = Console(width=10, file=io.StringIO())
+    console.print("foo bar baz egg", soft_wrap=True)
+    assert console.file.getvalue() == "foo bar baz egg\n"
