@@ -1085,7 +1085,7 @@ class Console:
         """Generate text from console contents (requires record=True argument in constructor).
 
         Args:
-            clear (bool, optional): Set to ``True`` to clear the record buffer after exporting.
+            clear (bool, optional): Clear record buffer after exportint. Defaults to ``True``.
             styles (bool, optional): If ``True``, ansi escape codes will be included. ``False`` for plain text.
                 Defaults to ``False``.
 
@@ -1118,7 +1118,7 @@ class Console:
 
         Args:
             path (str): Path to write text files.
-            clear (bool, optional): Set to ``True`` to clear the record buffer after exporting.
+            clear (bool, optional): Clear record buffer after exportint. Defaults to ``True``.
             styles (bool, optional): If ``True``, ansi style codes will be included. ``False`` for plain text.
                 Defaults to ``False``.
 
@@ -1139,7 +1139,7 @@ class Console:
 
         Args:
             theme (TerminalTheme, optional): TerminalTheme object containing console colors.
-            clear (bool, optional): Set to ``True`` to clear the record buffer after generating the HTML.
+            clear (bool, optional): Clear record buffer after exportint. Defaults to ``True``.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
             inline_styles (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
@@ -1220,7 +1220,7 @@ class Console:
         Args:
             path (str): Path to write html file.
             theme (TerminalTheme, optional): TerminalTheme object containing console colors.
-            clear (bool, optional): Set to True to clear the record buffer after generating the HTML.
+            clear (bool, optional): Clear record buffer after exportint. Defaults to ``True``.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
             inline_styes (bool, optional): If ``True`` styles will be inlined in to spans, which makes files

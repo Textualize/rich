@@ -345,11 +345,22 @@ if __name__ == "__main__":  # pragma: no cover
     d = defaultdict(int)
     d["foo"] = 5
     data = {
-        "foo": [1, "Hello World!", 2, 3, 4, {5, 6, 7, (1, 2, 3, 4), 8}],
+        "foo": [
+            1,
+            "Hello World!",
+            100.123,
+            323.232,
+            432324.0,
+            {5, 6, 7, (1, 2, 3, 4), 8},
+        ],
         "bar": frozenset({1, 2, 3}),
-        False: "This is false",
-        True: "This is true",
-        None: "This is None",
+        "defaultdict": defaultdict(
+            list, {"crumble": ["apple", "rhubarb", "butter", "sugar", "flour"]}
+        ),
+        "counter": Counter(
+            ["apple", "orange", "pear", "kumquat", "kumquat", "durian",]
+        ),
+        "atomic": (False, True, None),
         "Broken": BrokenRepr(),
     }
     data["foo"].append(data)  # type: ignore

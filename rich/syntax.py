@@ -1,3 +1,4 @@
+import os.path
 import platform
 import textwrap
 from typing import Any, Dict, Optional, Set, Tuple, Type, Union
@@ -112,11 +113,25 @@ class Syntax(JupyterMixin):
         """
         with open(path, "rt", encoding=encoding) as code_file:
             code = code_file.read()
+
+        lexer = None
+        lexer_name = "default"
         try:
-            lexer = guess_lexer_for_filename(path, code)
-            lexer_name = lexer.name
+            _, ext = os.path.splitext(path)
+            if ext:
+                extension = ext.lstrip(".").lower()
+                lexer = get_lexer_by_name(extension)
+                lexer_name = lexer.name
         except ClassNotFound:
-            lexer_name = "default"
+            pass
+
+        if lexer is None:
+            try:
+                lexer = guess_lexer_for_filename(path, code)
+                lexer_name = lexer.name
+            except ClassNotFound:
+                pass
+
         return cls(
             code,
             lexer_name,
@@ -127,6 +142,7 @@ class Syntax(JupyterMixin):
             start_line=start_line,
             highlight_lines=highlight_lines,
             code_width=code_width,
+            tab_size=tab_size,
             word_wrap=word_wrap,
         )
 

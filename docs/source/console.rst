@@ -175,7 +175,7 @@ You can also set overflow to "ignore" which allows text to run on to the next li
 Soft Wrapping
 -------------
 
-Rich will word wrap text you print by inserting line breaks. You can disable this behavior by setting ``soft_wrap=True`` when calling :meth:`~rich.console.Console.print`. With *soft wrapping* enabled text any text that doesn't fit will run on to the following line(s), just like the builtin ``print``.
+Rich word wraps text you print by inserting line breaks. You can disable this behavior by setting ``soft_wrap=True`` when calling :meth:`~rich.console.Console.print`. With *soft wrapping* enabled text any text that doesn't fit will run on to the following line(s), just like the builtin ``print``.
 
 
 Cropping
