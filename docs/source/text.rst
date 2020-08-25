@@ -34,7 +34,7 @@ Text attributes
 
 The Text class has a number of parameters you can set on the constructor to modify how the text is displayed.
 
-- ``justify`` should be "left", "center", "right", or "full", and will override default justify behaviour.
+- ``justify`` should be "left", "center", "right", or "full", and will override default justify behavior.
 - ``overflow`` should be "fold", "crop", or "ellipsis", and will override default overflow.
 - ``no_wrap`` prevents wrapping if the text is longer then the available width.
 - ``tab_size`` Sets the number of characters in a tab.

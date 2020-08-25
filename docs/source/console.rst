@@ -99,16 +99,6 @@ The :meth:`~rich.console.Console.log` methods offers the same capabilities as pr
 To help with debugging, the log() method has a ``log_locals`` parameter. If you set this to ``True``, Rich will display a table of local variables where the method was called.
 
 
-Cropping
---------
-
-The :meth:`~rich.console.Console.print` method has a boolean ``crop`` argument. The default value for crop is True which tells Rich to crop any content that would otherwise run on to the next line. 
-
-If you set ``crop`` to False then long lines will be allowed to run on to the following line. This generally makes content hard to read, but it does mean that you can resize the terminal after printing to fit in more text.
-
-Note that you generally don't need to think about cropping, as Rich will wrap text and resize content to fit within the available width.
-
-
 Justify / Alignment
 -------------------
 
@@ -180,6 +170,22 @@ This produces the following output:
     </pre>
 
 You can also set overflow to "ignore" which allows text to run on to the next line. In practice this will look the same as "crop" unless you also set ``crop=False`` when calling :meth:`~rich.console.Console.print`.
+
+
+Soft Wrapping
+-------------
+
+Rich word wraps text you print by inserting line breaks. You can disable this behavior by setting ``soft_wrap=True`` when calling :meth:`~rich.console.Console.print`. With *soft wrapping* enabled text any text that doesn't fit will run on to the following line(s), just like the builtin ``print``.
+
+
+Cropping
+--------
+
+The :meth:`~rich.console.Console.print` method has a boolean ``crop`` argument. The default value for crop is True which tells Rich to crop any content that would otherwise run on to the next line. You generally don't need to think about cropping, as Rich will resize content to fit within the available width.
+
+.. note::
+    Cropping is automatically disabled if you print with ``soft_wrap==True``.
+
 
 Input
 -----

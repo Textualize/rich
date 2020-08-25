@@ -288,3 +288,20 @@ def test_no_wrap():
     console = Console(width=10, file=io.StringIO())
     console.print("foo bar baz egg", no_wrap=True)
     assert console.file.getvalue() == "foo bar ba\n"
+
+
+def test_soft_wrap():
+    console = Console(width=10, file=io.StringIO())
+    console.print("foo bar baz egg", soft_wrap=True)
+    assert console.file.getvalue() == "foo bar baz egg\n"
+
+
+def test_unicode_error() -> None:
+    try:
+        with tempfile.TemporaryFile("wt", encoding="ascii") as tmpfile:
+            console = Console(file=tmpfile)
+            console.print(":vampire:")
+    except UnicodeEncodeError as error:
+        assert "PYTHONIOENCODING" in str(error)
+    else:
+        assert False, "didn't raise UnicodeEncodeError"

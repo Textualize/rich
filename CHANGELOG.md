@@ -5,11 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.0] - 2020-08-25
+
+### Fixed
+
+- Fixed use of `__rich__` cast
+
+### Changed
+
+- New algorithm to pretty print which fits more on a line if possible
+- Deprecated `character` parameter in Rule and Console.rule, in favor of `characters`
+- Optimized Syntax.from_path to avoid searching all lexers, which also speeds up tracebacks
+
+### Added
+
+- Added soft_wrap flag to Console.print
+
 ## [5.2.1] - 2020-08-19
+
+### Fixed
 
 - Fixed underscore with display hook https://github.com/willmcgugan/rich/issues/235
 
 ## [5.2.0] - 2020-08-14
+
+### Changed
 
 - Added crop argument to Console.print
 - Added "ignore" overflow method
