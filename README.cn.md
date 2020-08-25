@@ -282,3 +282,29 @@ Rich 可以渲染漂亮的回溯，比标准 Python 回溯更容易阅读，并�
 ![回溯_windows](https://github.com/willmcgugan/rich/raw/master/imgs/traceback_windows.png)
 
 有关详细信息，请参见[rich 回溯](https://rich.readthedocs.io/en/latest/traceback.html)文档记述。
+
+## 使用Rich的项目
+
+这里是一些使用Rich的项目:
+
+- [BrancoLab/BrainRender](https://github.com/BrancoLab/BrainRender)
+  一个用于三维神经解剖数据可视化的python包
+- [Ciphey/Ciphey](https://github.com/Ciphey/Ciphey)
+  自动解密工具
+- [emeryberger/scalene](https://github.com/emeryberger/scalene)
+  一个高性能、高精度的Python CPU和内存剖析器
+- [hedythedev/StarCli](https://github.com/hedythedev/starcli)
+  通过命令行浏览GitHub热门项目
+- [intel/cve-bin-tool](https://github.com/intel/cve-bin-tool)
+  这个工具可以扫描一些常见的、有漏洞的组件（openssl、libpng、libxml2、expat和其他一些组件），让你知道你的系统是否包含有已知漏洞的常用库。
+- [nf-core/tools](https://github.com/nf)
+  包含nf-core社区帮助工具的Python包
+- [cansarigol/pdbr](https://github.com/cansarigol/pdbr)
+  pdb + rich 的库，增强调试功能
+- [plant99/felicette](https://github.com/plant99/felicette)
+  傻瓜式卫星图像
+- [seleniumbase/SeleniumBase](https://github.com/seleniumbase/SeleniumBase)
+  使用Selenium和pytest使自动化和测试速度提高10倍，包括电池
+- [smacke/ffsubsync](https://github.com/smacke/ffsubsync)
+  自动将字幕与视频同步
+- +[还有很多](https://github.com/willmcgugan/rich/network/dependents)!
