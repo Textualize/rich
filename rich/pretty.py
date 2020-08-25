@@ -86,7 +86,7 @@ class Pretty:
         *,
         indent_size: int = 4,
         justify: "JustifyMethod" = None,
-        overflow: "OverflowMethod" = "crop",
+        overflow: Optional["OverflowMethod"] = "crop",
         no_wrap: Optional[bool] = False,
     ) -> None:
         self._object = _object
@@ -222,11 +222,13 @@ class _Line:
         start_length = (
             len(self.whitespace) + cell_len(self.text) + cell_len(self.suffix)
         )
+        assert self.node is not None
         return self.node.check_length(start_length, max_length)
 
     def expand(self, indent_size: int) -> Iterable["_Line"]:
         """Expand this line by adding children on their own line."""
         node = self.node
+        assert node is not None
         whitespace = self.whitespace
         assert node.children
         if node.key_repr:
@@ -236,7 +238,7 @@ class _Line:
         else:
             yield _Line(text=node.open_brace, whitespace=whitespace)
         child_whitespace = self.whitespace + " " * indent_size
-        for child in self.node.children:
+        for child in node.children:
             line = _Line(
                 node=child,
                 whitespace=child_whitespace,
@@ -293,13 +295,13 @@ def pretty_repr(
 
             open_brace, close_brace, empty = _BRACES[type(obj)](obj)
             if obj:
+                children: List[_Node] = []
                 node = _Node(
                     open_brace=open_brace,
                     close_brace=close_brace,
-                    children=[],
+                    children=children,
                     last=root,
                 )
-                children = node.children
                 append = children.append
                 if isinstance(obj, dict):
                     for last, (key, child) in loop_last(obj.items()):

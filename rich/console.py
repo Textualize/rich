@@ -586,7 +586,7 @@ class Console:
 
         _options = options or self.options
         render_iterable: RenderResult
-        if hasattr(renderable, "__rich__"):
+        if isinstance(renderable, RichCast):
             renderable = renderable.__rich__()
         if isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__rich_console__(self, _options)
@@ -1085,7 +1085,7 @@ class Console:
         """Generate text from console contents (requires record=True argument in constructor).
 
         Args:
-            clear (bool, optional): Clear record buffer after exportint. Defaults to ``True``.
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             styles (bool, optional): If ``True``, ansi escape codes will be included. ``False`` for plain text.
                 Defaults to ``False``.
 
@@ -1118,7 +1118,7 @@ class Console:
 
         Args:
             path (str): Path to write text files.
-            clear (bool, optional): Clear record buffer after exportint. Defaults to ``True``.
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             styles (bool, optional): If ``True``, ansi style codes will be included. ``False`` for plain text.
                 Defaults to ``False``.
 
@@ -1139,7 +1139,7 @@ class Console:
 
         Args:
             theme (TerminalTheme, optional): TerminalTheme object containing console colors.
-            clear (bool, optional): Clear record buffer after exportint. Defaults to ``True``.
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
             inline_styles (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
@@ -1220,7 +1220,7 @@ class Console:
         Args:
             path (str): Path to write html file.
             theme (TerminalTheme, optional): TerminalTheme object containing console colors.
-            clear (bool, optional): Clear record buffer after exportint. Defaults to ``True``.
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
             inline_styes (bool, optional): If ``True`` styles will be inlined in to spans, which makes files

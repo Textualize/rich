@@ -61,12 +61,13 @@ class Measurement(NamedTuple):
         Returns:
             Measurement: Measurement object containing range of character widths required to render the object.
         """
+        from rich.console import RichCast
 
         _max_width = console.width if max_width is None else max_width
         if isinstance(renderable, str):
             renderable = console.render_str(renderable)
 
-        if hasattr(renderable, "__rich__"):
+        if isinstance(renderable, RichCast):
             renderable = renderable.__rich__()
 
         if is_renderable(renderable):
