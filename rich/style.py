@@ -332,6 +332,9 @@ class Style:
     @lru_cache(maxsize=1024)
     def parse(cls, style_definition: str) -> "Style":
         """Parse a style definition.
+
+        Args:
+            style_definition (str): A string containing a style.
         
         Raises:
             errors.StyleSyntaxError: If the style definition syntax is invalid.            
@@ -383,7 +386,7 @@ class Style:
                 except ColorParseError as error:
                     raise errors.StyleSyntaxError(
                         f"unable to parse {word} in {style_definition!r}; {error}"
-                    )
+                    ) from None
                 bgcolor = word
 
             elif word == "not":
@@ -410,7 +413,7 @@ class Style:
                 except ColorParseError as error:
                     raise errors.StyleSyntaxError(
                         f"unable to parse {word!r} in style {style_definition!r}; {error}"
-                    )
+                    ) from None
                 color = word
         style = Style(color=color, bgcolor=bgcolor, link=link, **attributes)
         return style

@@ -1,7 +1,7 @@
-from array import array
 import builtins
 import sys
-from collections import Counter, deque, defaultdict
+from array import array
+from collections import Counter, defaultdict, deque
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
@@ -18,13 +18,13 @@ from typing import (
 from rich.highlighter import ReprHighlighter
 
 from ._loop import loop_last
+from ._pick import pick_bool
 from .cells import cell_len
 from .highlighter import ReprHighlighter
 from .measure import Measurement
-from ._pick import pick_bool
 from .text import Text
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from .console import (
         Console,
         ConsoleOptions,
@@ -44,7 +44,7 @@ def install(
 
     Args:
         console (Console, optional): Console instance or ``None`` to use global console. Defaults to None.        
-        overflow (Optional[OverflowMethod], optional): Overflow method. Defaults to None.
+        overflow (Optional[OverflowMethod], optional): Overflow method. Defaults to "ignore".
         crop (Optional[bool], optional): Enable cropping of long lines. Defaults to False.
     """
     from rich import get_console
@@ -266,7 +266,7 @@ def pretty_repr(
         expand_all (bool, optional): Expand all containers regardless of available width. Defaults to False.
 
     Returns:
-        str: [description]
+        str: A possibly multi-line representation of the object.
     """
 
     def to_repr(obj: Any) -> str:
@@ -282,6 +282,7 @@ def pretty_repr(
     pop_visited = visited_ids.remove
 
     def traverse(obj: Any, root: bool = False) -> _Node:
+        """Walk the object depth first."""
         if isinstance(obj, _CONTAINERS):
 
             obj_id = id(obj)
@@ -291,7 +292,6 @@ def pretty_repr(
             push_visited(obj_id)
 
             open_brace, close_brace, empty = _BRACES[type(obj)](obj)
-
             if obj:
                 node = _Node(
                     open_brace=open_brace,
@@ -308,7 +308,6 @@ def pretty_repr(
                         child_node.last = last
                         append(child_node)
                 else:
-
                     for last, child in loop_last(obj):
                         child_node = traverse(child)
                         child_node.last = last
@@ -339,19 +338,6 @@ def pretty_repr(
 
 if __name__ == "__main__":  # pragma: no cover
 
-    # data = [["Hello, world!"] * 3, [1000, 2323, 2424, 23423, 2323, 343434]]
-
-    # data = {
-    #     "foo": [1, "Hello World!", 2, 3, 4, {5, 6, 7, (1, 2, 3, 4), 8}],
-    #     "bar": frozenset({1, 2, 3}),
-    #     False: "This is false",
-    #     True: "This is true",
-    #     None: "This is None",
-    #     # "Broken": BrokenRepr(),
-    # }
-
-    # print(pretty_repr(data, max_width=30))
-
     class BrokenRepr:
         def __repr__(self):
             1 / 0
@@ -371,4 +357,3 @@ if __name__ == "__main__":  # pragma: no cover
     from rich import print
 
     print(Pretty(data))
-

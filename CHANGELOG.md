@@ -9,11 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed use of **rich** cast
+- Fixed use of `__rich__` cast
 
 ### Changed
 
 - New algorithm to pretty print which fits more on a line if possible
+- Deprecated `character` parameter in Rule and Console.rule, in favor of `characters`
 
 ### Added
 
