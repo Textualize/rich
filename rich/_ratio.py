@@ -6,13 +6,13 @@ def ratio_reduce(
     total: int, ratios: List[int], maximums: List[int], values: List[int]
 ) -> List[int]:
     """Divide an integer total in to parts based on ratios.
-    
+
     Args:
         total (int): The total to divide.
         ratios (List[int]): A list of integer ratios.
-        maximums (List[int]): List of maximums values for each slot. 
+        maximums (List[int]): List of maximums values for each slot.
         values (List[int]): List of values
-    
+
     Returns:
         List[int]: A list of integers garanteed to sum to total.
     """
@@ -38,12 +38,12 @@ def ratio_distribute(
     total: int, ratios: List[int], minimums: List[int] = None
 ) -> List[int]:
     """Distribute an integer total in to parts based on ratios.
-    
+
     Args:
         total (int): The total to divide.
         ratios (List[int]): A list of integer ratios.
-        minimums (List[int]): List of minimum values for each slot. 
-    
+        minimums (List[int]): List of minimum values for each slot.
+
     Returns:
         List[int]: A list of integers garanteed to sum to total.
     """

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class Panel(JupyterMixin):
     """A console renderable that draws a border around its contents.
-    
+
     Example:
         >>> console.print(Panel("Hello, World!"))
 
@@ -25,7 +25,7 @@ class Panel(JupyterMixin):
         box (Box, optional): A Box instance that defines the look of the border (see :ref:`appendix_box`.
             Defaults to box.ROUNDED.
         safe_box (bool, optional): Disable box characters that don't display on windows legacy terminal with *raster* fonts. Defaults to True.
-        expand (bool, optional): If True the panel will stretch to fill the console 
+        expand (bool, optional): If True the panel will stretch to fill the console
             width, otherwise it will be sized to fit the contents. Defaults to True.
         style (str, optional): The style of the panel (border and contents). Defaults to "none".
         border_style (str, optional): The style of the border. Defaults to "none".

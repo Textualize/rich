@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 class Constrain(JupyterMixin):
     """Constrain the width of a renderable to a given number of characters.
-    
+
     Args:
         renderable (RenderableType): A renderable object.
         width (int, optional): The maximum width (in characters) to render. Defaults to 80.

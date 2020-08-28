@@ -13,10 +13,10 @@ from .text import Text
 
 class RichHandler(Handler):
     """A logging handler that renders output with Rich. The time / level / message and file are displayed in columns.
-    The level is color coded, and the message is syntax highlighted.            
+    The level is color coded, and the message is syntax highlighted.
 
     Note:
-        Be careful when enabling console markup in log messages if you have configured logging for libraries not 
+        Be careful when enabling console markup in log messages if you have configured logging for libraries not
         under your control. If a dependency writes messages containing square brackets, it may not produce the intended output.
 
     Args:
@@ -29,7 +29,7 @@ class RichHandler(Handler):
         enable_link_path (bool, optional): Enable terminal link of path column to file. Defaults to True.
         highlighter (Highlighter, optional): Highlighter to style log messages, or None to use ReprHighlighter. Defaults to None.
         markup (bool, optional): Enable console markup in log messages. Defaults to False.
-  
+
     """
 
     KEYWORDS: ClassVar[Optional[List[str]]] = [
@@ -109,7 +109,10 @@ if __name__ == "__main__":  # pragma: no cover
     FORMAT = "%(message)s"
     # FORMAT = "%(asctime)-15s - %(level) - %(message)s"
     logging.basicConfig(
-        level="NOTSET", format=FORMAT, datefmt="[%X]", handlers=[RichHandler()],
+        level="NOTSET",
+        format=FORMAT,
+        datefmt="[%X]",
+        handlers=[RichHandler()],
     )
     log = logging.getLogger("rich")
 

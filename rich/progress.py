@@ -102,7 +102,7 @@ def track(
     update_period: float = 0.1,
 ) -> Iterable[ProgressType]:
     """Track progress by iterating over a sequence.
-    
+
     Args:
         sequence (Iterable[ProgressType]): A sequence (must support "len") you wish to iterate over.
         description (str, optional): Description of task show next to progress bar. Defaults to "Working".
@@ -113,12 +113,12 @@ def track(
         refresh_per_second (Optional[int], optional): Number of times per second to refresh the progress information, or None to use default. Defaults to None.
         style (StyleType, optional): Style for the bar background. Defaults to "bar.back".
         complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
-        finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".   
-        pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse". 
+        finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
+        pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
         update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
-    
+
     """
 
     columns: List["ProgressColumn"] = (
@@ -161,10 +161,10 @@ class ProgressColumn(ABC):
 
     def __call__(self, task: "Task") -> RenderableType:
         """Called by the Progress object to return a renderable for the given task.
-        
+
         Args:
             task (Task): An object containing information regarding the task.
-        
+
         Returns:
             RenderableType: Anything renderable (including str).
         """
@@ -334,7 +334,7 @@ class ProgressSample(NamedTuple):
 @dataclass
 class Task:
     """Information regarding a progress task.
-    
+
     This object should be considered read-only outside of the :class:`~Progress` class.
 
     """
@@ -491,7 +491,7 @@ class _FileProxy(io.TextIOBase):
 
 class Progress(JupyterMixin, RenderHook):
     """Renders an auto-updating progress bar(s).
-    
+
     Args:
         console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
@@ -638,14 +638,14 @@ class Progress(JupyterMixin, RenderHook):
         update_period: float = 0.1,
     ) -> Iterable[ProgressType]:
         """Track progress by iterating over a sequence.
-        
+
         Args:
             sequence (Sequence[ProgressType]): A sequence of values you want to iterate over and track progress.
             total: (int, optional): Total number of steps. Default is len(sequence).
             task_id: (TaskID): Task to track. Default is new task.
             description: (str, optional): Description of task, if new task is created.
             update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
-        
+
         Returns:
             Iterable[ProgressType]: An iterable of values taken from the provided sequence.
         """
@@ -682,7 +682,7 @@ class Progress(JupyterMixin, RenderHook):
 
         Starts a task (used when calculating elapsed time). You may need to call this manually,
         if you called ``add_task`` with ``start=False``.
-        
+
         Args:
             task_id (TaskID): ID of task.
         """
@@ -695,7 +695,7 @@ class Progress(JupyterMixin, RenderHook):
         """Stop a task.
 
         This will freeze the elapsed time on the task.
-        
+
         Args:
             task_id (TaskID): ID of task.
         """
@@ -719,9 +719,9 @@ class Progress(JupyterMixin, RenderHook):
         **fields: Any,
     ) -> None:
         """Update information associated with a task.
-        
+
         Args:
-            task_id (TaskID): Task id (returned by add_task).            
+            task_id (TaskID): Task id (returned by add_task).
             total (float, optional): Updates task.total if not None.
             completed (float, optional): Updates task.completed if not None.
             advance (float, optional): Add a value to task.completed if not None.
@@ -763,7 +763,7 @@ class Progress(JupyterMixin, RenderHook):
 
     def advance(self, task_id: TaskID, advance: float = 1) -> None:
         """Advance task by a number of steps.
-        
+
         Args:
             task_id (TaskID): ID of task.
             advance (float): Number of steps to advance. Default is 1.
@@ -859,7 +859,7 @@ class Progress(JupyterMixin, RenderHook):
         **fields: Any,
     ) -> TaskID:
         """Add a new 'task' to the Progress display.
-        
+
         Args:
             description (str): A description of the task.
             start (bool, optional): Start the task immediately (to calculate elapsed time). If set to False,
@@ -868,7 +868,7 @@ class Progress(JupyterMixin, RenderHook):
             completed (int, optional): Number of steps completed so far.. Defaults to 0.
             visible (bool, optional): Enable display of the task. Defaults to True.
             **fields (str): Additional data fields required for rendering.
-        
+
         Returns:
             TaskID: An ID you can use when calling `update`.
         """
@@ -893,10 +893,10 @@ class Progress(JupyterMixin, RenderHook):
 
     def remove_task(self, task_id: TaskID) -> None:
         """Delete a task if it exists.
-        
+
         Args:
             task_id (TaskID): A task ID.
-        
+
         """
         with self._lock:
             del self._tasks[task_id]

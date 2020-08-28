@@ -39,7 +39,7 @@ class Tag(NamedTuple):
 
 
 def escape(markup: str) -> str:
-    """Escapes text so that it won't be interpreted as markup. 
+    """Escapes text so that it won't be interpreted as markup.
 
     Args:
         markup (str): Content to be inserted in to markup.
@@ -52,10 +52,10 @@ def escape(markup: str) -> str:
 
 def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
     """Parse markup in to an iterable of tuples of (position, text, tag).
-    
+
     Args:
         markup (str): A string containing console markup
-    
+
     """
     position = 0
     for match in RE_TAGS.finditer(markup):
@@ -82,10 +82,10 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
     Args:
         markup (str): A string containing console markup.
         emoji (bool, optional): Also render emoji code. Defaults to True.
-    
+
     Raises:
         MarkupError: If there is a syntax error in the markup.
-    
+
     Returns:
         Text: A test instance.
     """

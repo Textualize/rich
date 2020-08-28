@@ -23,7 +23,7 @@ DEFAULT_THEME = "monokai"
 
 class Syntax(JupyterMixin):
     """Construct a Syntax object to render syntax highlighted code.
-    
+
     Args:
         code (str): Code to highlight.
         lexer_name (str): Lexer to use (see https://pygments.org/docs/lexers/)
@@ -93,7 +93,7 @@ class Syntax(JupyterMixin):
         word_wrap: bool = False,
     ) -> "Syntax":
         """Construct a Syntax object from a file.
-        
+
         Args:
             path (str): Path to file to highlight.
             encoding (str): Encoding of file.
@@ -298,12 +298,14 @@ class Syntax(JupyterMixin):
                     if highlight_line(line_no):
                         yield _Segment(line_pointer, number_style)
                         yield _Segment(
-                            line_column, highlight_number_style,
+                            line_column,
+                            highlight_number_style,
                         )
                     else:
                         yield _Segment("  ", highlight_number_style)
                         yield _Segment(
-                            line_column, number_style,
+                            line_column,
+                            number_style,
                         )
                 else:
                     yield padding

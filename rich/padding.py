@@ -19,7 +19,7 @@ PaddingDimensions = Union[int, Tuple[int], Tuple[int, int], Tuple[int, int, int,
 class Padding(JupyterMixin):
     """Draw space around content.
 
-    Example:        
+    Example:
         >>> print(Padding("Hello", (2, 4), style="on blue"))
 
     Args:

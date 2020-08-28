@@ -17,11 +17,11 @@ class Emoji(JupyterMixin):
 
     def __init__(self, name: str, style: Union[str, Style] = "none") -> None:
         """A single emoji character.
-        
+
         Args:
             name (str): Name of emoji.
             style (Union[str, Style], optional): Optional style. Defaults to None.
-        
+
         Raises:
             NoEmoji: If the emoji doesn't exist.
         """
@@ -35,10 +35,10 @@ class Emoji(JupyterMixin):
     @classmethod
     def replace(cls, text: str) -> str:
         """Replace emoji markup with coresponding unicode characters.
-        
+
         Args:
             text (str): A string with emojis codes, e.g. "Hello :smiley:!"
-        
+
         Returns:
             str: A string with emoji codes replaces with actual emoji.
         """

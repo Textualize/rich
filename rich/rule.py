@@ -9,9 +9,9 @@ from .text import Text
 
 class Rule(JupyterMixin):
     """A console renderable to draw a horizontal rule (line).
-    
+
     Args:
-        title (Union[str, Text], optional): Text to render in the rule. Defaults to "".        
+        title (Union[str, Text], optional): Text to render in the rule. Defaults to "".
         characters (str, optional): Character(s) used to draw the line. Defaults to "─".
         style (StyleType, optional): Style of Rule. Defaults to "rule.line".
         end (str, optional): Character at end of Rule. defaults to "\\n"

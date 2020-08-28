@@ -311,10 +311,10 @@ class Color(NamedTuple):
     @classmethod
     def from_triplet(cls, triplet: "ColorTriplet") -> "Color":
         """Create a truecolor RGB color from a triplet of values.
-        
+
         Args:
             triplet (ColorTriplet): A color triplet containing red, green and blue components.
-        
+
         Returns:
             Color: A new color object.
         """
@@ -323,7 +323,7 @@ class Color(NamedTuple):
     @classmethod
     def default(cls) -> "Color":
         """Get a Color instance representing the default color.
-        
+
         Returns:
             Color: Default color.
         """

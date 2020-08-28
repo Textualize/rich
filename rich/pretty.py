@@ -43,7 +43,7 @@ def install(
     """Install automatic pretty printing in the Python REPL.
 
     Args:
-        console (Console, optional): Console instance or ``None`` to use global console. Defaults to None.        
+        console (Console, optional): Console instance or ``None`` to use global console. Defaults to None.
         overflow (Optional[OverflowMethod], optional): Overflow method. Defaults to "ignore".
         crop (Optional[bool], optional): Enable cropping of long lines. Defaults to False.
     """
@@ -70,14 +70,14 @@ def install(
 class Pretty:
     """A rich renderable that pretty prints an object.
 
-        Args:
-            _object (Any): An object to pretty print.
-            highlighter (HighlighterType, optional): Highlighter object to apply to result, or None for ReprHighlighter. Defaults to None.
-            indent_size (int, optional): Number of spaces in indent. Defaults to 4.
-            justify (JustifyMethod, optional): Justify method, or None for default. Defaults to None.
-            overflow (OverflowMethod, optional): Overflow method, or None for default. Defaults to None.
-            no_wrap (Optional[bool], optional): Disable word wrapping. Defaults to False.
-        """
+    Args:
+        _object (Any): An object to pretty print.
+        highlighter (HighlighterType, optional): Highlighter object to apply to result, or None for ReprHighlighter. Defaults to None.
+        indent_size (int, optional): Number of spaces in indent. Defaults to 4.
+        justify (JustifyMethod, optional): Justify method, or None for default. Defaults to None.
+        overflow (OverflowMethod, optional): Overflow method, or None for default. Defaults to None.
+        no_wrap (Optional[bool], optional): Disable word wrapping. Defaults to False.
+    """
 
     def __init__(
         self,
@@ -360,7 +360,14 @@ if __name__ == "__main__":  # pragma: no cover
             list, {"crumble": ["apple", "rhubarb", "butter", "sugar", "flour"]}
         ),
         "counter": Counter(
-            ["apple", "orange", "pear", "kumquat", "kumquat", "durian",]
+            [
+                "apple",
+                "orange",
+                "pear",
+                "kumquat",
+                "kumquat",
+                "durian",
+            ]
         ),
         "atomic": (False, True, None),
         "Broken": BrokenRepr(),

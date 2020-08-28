@@ -7,7 +7,7 @@ from .style import Style, StyleType
 
 class Theme:
     """A container for style information, used by :class:`~rich.console.Console`.
-    
+
     Args:
         styles (Dict[str, Style], optional): A mapping of style names on to styles. Defaults to None for empty styles.
         inherit (bool, optional): Inherit default styles. Defaults to True.
@@ -40,8 +40,8 @@ class Theme:
         Args:
             config_file (IO[str]): An open conf file.
             source (str, optional): The filename of the open file. Defaults to None.
-            inherit (bool, optional): Inherit default styles. Defaults to True. 
-        
+            inherit (bool, optional): Inherit default styles. Defaults to True.
+
         Returns:
             Theme: A New theme instance.
         """
@@ -56,9 +56,9 @@ class Theme:
         """Read a theme from a path.
 
         Args:
-            path (str): Path to a config file readable by Python configparser module.            
-            inherit (bool, optional): Inherit default styles. Defaults to True. 
-        
+            path (str): Path to a config file readable by Python configparser module.
+            inherit (bool, optional): Inherit default styles. Defaults to True.
+
         Returns:
             Theme: A new theme instance.
         """

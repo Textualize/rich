@@ -23,7 +23,11 @@ def get_console() -> "Console":
 
 
 def print(
-    *objects: Any, sep=" ", end="\n", file: IO[str] = None, flush: bool = False,
+    *objects: Any,
+    sep=" ",
+    end="\n",
+    file: IO[str] = None,
+    flush: bool = False,
 ):
     from .console import Console
 

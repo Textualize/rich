@@ -9,11 +9,11 @@ from .table import Table
 
 def tabulate_mapping(mapping: Mapping, title: str = None) -> Table:
     """Generate a simple table from a mapping.
-    
+
     Args:
         mapping (Mapping): A mapping object (e.g. a dict);
         title (str, optional): Optional title to be displayed over the table.
-    
+
     Returns:
         Table: A table instance which may be rendered by the Console.
     """

@@ -28,11 +28,11 @@ class MarkdownElement:
     @classmethod
     def create(cls, markdown: "Markdown", node: Any) -> "MarkdownElement":
         """Factory to create markdown element,
-        
+
         Args:
             markdown (Markdown): THe parent Markdown object.
             node (Any): A node from Pygments.
-        
+
         Returns:
             MarkdownElement: A new markdown element
         """
@@ -40,21 +40,21 @@ class MarkdownElement:
 
     def on_enter(self, context: "MarkdownContext"):
         """Called when the node is entered.
-        
+
         Args:
             context (MarkdownContext): The markdown context.
         """
 
     def on_text(self, context: "MarkdownContext", text: str) -> None:
         """Called when text is parsed.
-        
+
         Args:
             context (MarkdownContext): The markdown context.
         """
 
     def on_leave(self, context: "MarkdownContext") -> None:
         """Called when the parser leaves the element.
-        
+
         Args:
             context (MarkdownContext): [description]
         """
@@ -65,11 +65,11 @@ class MarkdownElement:
         """Called when a child element is closed.
 
         This method allows a parent element to take over rendering of its children.
-        
+
         Args:
             context (MarkdownContext): The markdown context.
             child (MarkdownElement): The child markdown element.
-        
+
         Returns:
             bool: Return True to render the element, or False to not render the element.
         """
@@ -83,10 +83,10 @@ class MarkdownElement:
 
 class UnknownElement(MarkdownElement):
     """An unknown element.
-    
+
     Hopefully there will be no unknown elements, and we will have a MarkdownElement for
     everything in the document.
-    
+
     """
 
 
@@ -151,7 +151,9 @@ class Heading(TextElement):
         if self.level == 1:
             # Draw a border around h1s
             yield Panel(
-                text, box=box.DOUBLE, style="markdown.h1.border",
+                text,
+                box=box.DOUBLE,
+                style="markdown.h1.border",
             )
         else:
             # Styled text for h2 and beyond
@@ -313,11 +315,11 @@ class ImageItem(TextElement):
     @classmethod
     def create(cls, markdown: "Markdown", node: Any) -> "MarkdownElement":
         """Factory to create markdown element,
-        
+
         Args:
             markdown (Markdown): THe parent Markdown object.
             node (Any): A node from Pygments.
-        
+
         Returns:
             MarkdownElement: A new markdown element
         """

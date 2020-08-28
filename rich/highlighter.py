@@ -9,13 +9,13 @@ class Highlighter(ABC):
 
     def __call__(self, text: Union[str, Text]) -> Text:
         """Highlight a str or Text instance.
-        
+
         Args:
             text (Union[str, ~Text]): Text to highlight.
-        
+
         Raises:
             TypeError: If not called with text or str.
-        
+
         Returns:
             Text: A test instance with highlighting applied.
         """
@@ -31,7 +31,7 @@ class Highlighter(ABC):
     @abstractmethod
     def highlight(self, text: Text) -> None:
         """Apply highlighting in place to text.
-        
+
         Args:
             text (~Text): A text object highlight.
         """
@@ -39,9 +39,9 @@ class Highlighter(ABC):
 
 class NullHighlighter(Highlighter):
     """A highlighter object that doesn't highlight.
-    
+
     May be used to disable highlighting entirely.
-    
+
     """
 
     def highlight(self, text: Text) -> None:
@@ -56,10 +56,10 @@ class RegexHighlighter(Highlighter):
 
     def highlight(self, text: Text) -> None:
         """Highlight :class:`rich.text.Text` using regular expressions.
-        
+
         Args:
             text (~Text): Text to highlighted.
-        
+
         """
         highlight_regex = text.highlight_regex
         for re_highlight in self.highlights:

@@ -37,15 +37,15 @@ def install(
     """Install a rich traceback handler.
 
     Once installed, any tracebacks will be printed with syntax highlighting and rich formatting.
-    
-    
+
+
     Args:
         console (Optional[Console], optional): Console to write exception to. Default uses internal Console instance.
         width (Optional[int], optional): Width (in characters) of traceback. Defaults to 100.
         line_numbers (bool, optional): Enable line numbers.
         extra_lines (int, optional): Extra lines of code. Defaults to 3.
         theme (Optional[str], optional): Pygments theme to use in traceback. Defaults to ``None`` which will pick
-            a theme appropriate for the platform. 
+            a theme appropriate for the platform.
         word_wrap(bool, optional): Enable word wrapping of long lines. Defaults to False.
 
     Returns:
@@ -55,7 +55,9 @@ def install(
     traceback_console = Console(file=sys.stderr) if console is None else console
 
     def excepthook(
-        type_: Type[BaseException], value: BaseException, traceback: TracebackType,
+        type_: Type[BaseException],
+        value: BaseException,
+        traceback: TracebackType,
     ) -> None:
         traceback_console.print(
             Traceback.from_exception(
@@ -110,7 +112,7 @@ class PathHighlighter(RegexHighlighter):
 
 class Traceback:
     """A Console renderable that renders a traceback.
-    
+
     Args:
         trace (Trace, optional): A `Trace` object produced from `extract`. Defaults to None, which uses
             the last exception.
@@ -169,12 +171,12 @@ class Traceback:
         traceback: TracebackType,
     ) -> Trace:
         """Extrace traceback information.
-        
+
         Args:
             exc_type (Type[BaseException]): Exception type.
             exc_value (BaseException): Exception value.
             traceback (TracebackType): Python Traceback object.
-        
+
         Returns:
             Trace: A Trace instance which you can use to construct a `Traceback`.
         """
