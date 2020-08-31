@@ -352,7 +352,9 @@ class Console:
         )
 
         self._color_system: Optional[ColorSystem]
-        self._force_terminal = force_terminal if self._environ.get("FORCE_TERMINAL") is None else True
+        self._force_terminal = (
+            force_terminal if self._environ.get("FORCE_TERMINAL") is None else True
+        )
         self.file = file or sys.stdout
 
         if color_system is None:
