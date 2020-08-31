@@ -18,6 +18,9 @@ def test_dumb_terminal():
     console = Console(force_terminal=True)
     assert console.color_system is not None
 
+    console = Console(_environ={"FORCE_TERMINAL": "1"})
+    assert console.color_system is not None
+
     console = Console(force_terminal=True, _environ={"TERM": "dumb"})
     assert console.color_system is None
     width, height = console.size
