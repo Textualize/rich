@@ -5,6 +5,11 @@ from rich import inspect
 from rich.console import Console
 
 
+class InspectError(Exception):
+    def __str__(self) -> str:
+        return "INSPECT ERROR"
+
+
 class Foo:
     """Foo test
 
@@ -17,7 +22,7 @@ class Foo:
 
     @property
     def broken(self):
-        1 / 0
+        raise InspectError()
 
     def method(self, a, b) -> str:
         """Multi line
@@ -37,5 +42,5 @@ def test_render():
     inspect(foo, console=console, all=True)
     result = console.file.getvalue()
     print(repr(result))
-    expected = "╭──────────── <class 'tests.test_inspect.Foo'> ────────────╮\n│ Foo test                                                 │\n│                                                          │\n│   broken = ZeroDivisionError('division by zero')         │\n│ __init__ = __init__(foo: int) -> None: constructor docs. │\n│   method = method(a, b) -> str: Multi line               │\n╰──────────────────────────────────────────────────────────╯\n"
+    expected = "╭──────────── <class 'tests.test_inspect.Foo'> ────────────╮\n│ Foo test                                                 │\n│                                                          │\n│   broken = InspectError()                                │\n│ __init__ = __init__(foo: int) -> None: constructor docs. │\n│   method = method(a, b) -> str: Multi line               │\n╰──────────────────────────────────────────────────────────╯\n"
     assert expected == result
