@@ -1,4 +1,5 @@
 import builtins
+import os
 import sys
 from array import array
 from collections import Counter, defaultdict, deque
@@ -132,6 +133,7 @@ def _get_braces_for_array(_object: array) -> Tuple[str, str, str]:
 
 
 _BRACES: Dict[type, Callable[[Any], Tuple[str, str, str]]] = {
+    os._Environ: lambda _object: ("environ({", "})", "environ({})"),
     array: _get_braces_for_array,
     defaultdict: _get_braces_for_defaultdict,
     Counter: lambda _object: ("Counter({", "})", "Counter()"),
@@ -143,6 +145,7 @@ _BRACES: Dict[type, Callable[[Any], Tuple[str, str, str]]] = {
     tuple: lambda _object: ("(", ")", "tuple()"),
 }
 _CONTAINERS = tuple(_BRACES.keys())
+_MAPPING_CONTAINERS = (dict, os._Environ)
 
 
 @dataclass
@@ -285,15 +288,16 @@ def pretty_repr(
 
     def traverse(obj: Any, root: bool = False) -> _Node:
         """Walk the object depth first."""
-        if isinstance(obj, _CONTAINERS):
-
+        obj_type = type(obj)
+        if obj_type in _CONTAINERS:
             obj_id = id(obj)
+
             if obj_id in visited_ids:
                 # Recursion detected
                 return _Node(value_repr="...")
             push_visited(obj_id)
+            open_brace, close_brace, empty = _BRACES[obj_type](obj)
 
-            open_brace, close_brace, empty = _BRACES[type(obj)](obj)
             if obj:
                 children: List[_Node] = []
                 node = _Node(
@@ -303,7 +307,7 @@ def pretty_repr(
                     last=root,
                 )
                 append = children.append
-                if isinstance(obj, dict):
+                if isinstance(obj, _MAPPING_CONTAINERS):
                     for last, (key, child) in loop_last(obj.items()):
                         child_node = traverse(child)
                         child_node.key_repr = to_repr(key)

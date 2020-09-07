@@ -52,7 +52,7 @@ Here's a silly example that highlights every character with a different color::
     class RainbowHighlighter(Highlighter):
         def highlight(self, text):
             for index in range(len(text)):
-                text.stylize(str(randint(16, 255)), index, index + 1)
+                text.stylize(f"color({randint(16, 255)})", index, index + 1)
 
 
     rainbow = RainbowHighlighter()
