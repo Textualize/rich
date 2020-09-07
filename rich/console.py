@@ -286,8 +286,8 @@ class Console:
     Args:
         color_system (str, optional): The color system supported by your terminal,
             either ``"standard"``, ``"256"`` or ``"truecolor"``. Leave as ``"auto"`` to autodetect.
-        force_terminal (bool, optional): Force the Console to write control codes even when a terminal is not detected. Defaults to False.
-        force_jupyter (bool, optional): Force the Console to write to Jupyter even when Jupyter is not detected. Defaults to False
+        force_terminal (Optional[bool], optional): Enable/disable terminal control codes, or None to auto-detect terminal. Defaults to None.
+        force_jupyter (Optional[bool], optional): Enable/disable Jupyter rendering, or None to auto-detect Jupyter. Defaults to None.
         theme (Theme, optional): An optional style theme object, or ``None`` for default theme.
         file (IO, optional): A file object where the console should write to. Defaults to stdoutput.
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
@@ -311,8 +311,8 @@ class Console:
         color_system: Optional[
             Literal["auto", "standard", "256", "truecolor", "windows"]
         ] = "auto",
-        force_terminal: bool = False,
-        force_jupyter: bool = False,
+        force_terminal: bool = None,
+        force_jupyter: bool = None,
         theme: Theme = None,
         file: IO[str] = None,
         width: int = None,
@@ -333,7 +333,7 @@ class Console:
         # Copy of os.environ allows us to replace it for testing
         self._environ = os.environ if _environ is None else _environ
 
-        self.is_jupyter = force_jupyter or _is_jupyter()
+        self.is_jupyter = _is_jupyter() if force_jupyter is None else force_jupyter
         if self.is_jupyter:
             width = width or 93
             height = height or 100
@@ -478,8 +478,8 @@ class Console:
             bool: True if the console writing to a device capable of
             understanding terminal codes, otherwise False.
         """
-        if self._force_terminal:
-            return True
+        if self._force_terminal is not None:
+            return self._force_terminal
         isatty = getattr(self.file, "isatty", None)
         return False if isatty is None else isatty()
 
@@ -491,10 +491,8 @@ class Console:
             bool: True if writing to a dumb terminal, otherwise False.
 
         """
-        is_dumb = "TERM" in self._environ and self._environ["TERM"].lower() in (
-            "dumb",
-            "unknown",
-        )
+        _term = self._environ.get("TERM", "")
+        is_dumb = _term.lower() in ("dumb", "unknown")
         return self.is_terminal and is_dumb
 
     @property
@@ -518,7 +516,7 @@ class Console:
         if self._width is not None and self._height is not None:
             return ConsoleDimensions(self._width, self._height)
 
-        if self.is_terminal and self.is_dumb_terminal:
+        if self.is_dumb_terminal:
             return ConsoleDimensions(80, 25)
 
         width, height = shutil.get_terminal_size()
@@ -587,6 +585,9 @@ class Console:
         """
 
         _options = options or self.options
+        if _options.max_width < 1:
+            # No space to render anything. This prevents potential recursion errors.
+            return
         render_iterable: RenderResult
         if isinstance(renderable, RichCast):
             renderable = renderable.__rich__()
@@ -1052,9 +1053,8 @@ class Console:
                         legacy_windows=legacy_windows,
                     )
                 )
-            else:
-                if not (not_terminal and is_control):
-                    append(text)
+            elif not (not_terminal and is_control):
+                append(text)
 
         rendered = "".join(output)
         return rendered

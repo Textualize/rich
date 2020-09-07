@@ -888,7 +888,7 @@ class Text(JupyterMixin):
                 while True:
                     line_index -= 1
                     line_start, line_end = line_ranges[line_index]
-                    if span.end >= line_start:
+                    if span.start >= line_start:
                         break
             elif span.start > line_end:
                 while True:

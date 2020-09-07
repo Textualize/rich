@@ -114,8 +114,11 @@ class Padding(JupyterMixin):
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         extra_width = self.left + self.right
-        min_width, max_width = Measurement.get(
-            console, self.renderable, max(1, max_width - extra_width)
+        if max_width - extra_width < 1:
+            return Measurement(max_width, max_width)
+        measure_min, measure_max = Measurement.get(
+            console, self.renderable, max(0, max_width - extra_width)
         )
-        render_width = Measurement(min_width + extra_width, max_width + extra_width)
-        return render_width
+        measurement = Measurement(measure_min + extra_width, measure_max + extra_width)
+        measurement = measurement.with_maximum(max_width)
+        return measurement

@@ -64,6 +64,8 @@ class Measurement(NamedTuple):
         from rich.console import RichCast
 
         _max_width = console.width if max_width is None else max_width
+        if _max_width < 1:
+            return Measurement(0, 0)
         if isinstance(renderable, str):
             renderable = console.render_str(renderable)
 
@@ -78,9 +80,11 @@ class Measurement(NamedTuple):
                     .normalize()
                     .with_maximum(_max_width)
                 )
+                if render_width.maximum < 1:
+                    return Measurement(0, 0)
                 return render_width.normalize()
             else:
-                return Measurement(1, _max_width)
+                return Measurement(0, _max_width)
         else:
             raise errors.NotRenderableError(
                 f"Unable to get render width for {renderable!r}; "
@@ -102,7 +106,8 @@ def measure_renderables(
         Measurement: Measurement object containing range of character widths required to
         contain all given renderables.
     """
-
+    if not renderables:
+        return Measurement(0, 0)
     get_measurement = Measurement.get
     measurements = [
         get_measurement(console, renderable, max_width) for renderable in renderables

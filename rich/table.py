@@ -235,6 +235,9 @@ class Table(JupyterMixin):
             if self.show_edge:
                 max_width -= 2
 
+        if max_width < 0:
+            return Measurement(0, 0)
+
         extra_width = self._extra_width
         _measure_column = self._measure_column
 
@@ -545,6 +548,9 @@ class Table(JupyterMixin):
         self, console: "Console", column: Column, max_width: int
     ) -> Measurement:
         """Get the minimum and maximum width of the column."""
+
+        if max_width < 1:
+            return Measurement(0, 0)
 
         padding_width = self._get_padding_width(column.index)
 
