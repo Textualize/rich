@@ -289,7 +289,7 @@ class Color(NamedTuple):
     def get_truecolor(
         self, theme: "TerminalTheme" = None, foreground=True
     ) -> ColorTriplet:
-        """Get am equivalent color triplet for this color.
+        """Get an equivalent color triplet for this color.
 
         Args:
             theme (TerminalTheme, optional): Optional terminal theme, or None to use default. Defaults to None.
