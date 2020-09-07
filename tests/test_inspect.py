@@ -8,7 +8,8 @@ from rich.console import Console
 
 
 skip_py36 = pytest.mark.skipif(
-    sys.version_info <= (3, 6), reason="rendered differently on py3.6"
+    sys.version_info.minor == 6 and sys.version_info.major == 3,
+    reason="rendered differently on py3.6",
 )
 
 
