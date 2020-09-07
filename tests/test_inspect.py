@@ -1,8 +1,15 @@
 import io
+import sys
 
+import pytest
 
 from rich import inspect
 from rich.console import Console
+
+
+skip_py36 = pytest.mark.skipif(
+    sys.version_info <= (3, 6), reason="rendered differently on py3.6"
+)
 
 
 class InspectError(Exception):
@@ -35,6 +42,7 @@ class Foo:
         return ["__init__", "broken", "method"]
 
 
+@skip_py36
 def test_render():
     console = Console(width=100, file=io.StringIO(), legacy_windows=False)
 
