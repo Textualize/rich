@@ -101,7 +101,9 @@ class Inspect(JupyterMixin):
         signature_text = self.highlighter(_signature)
 
         qualname = name or getattr(obj, "__qualname__", name)
-        qual_signature = Text.assemble((qualname, "inspect.callable"), signature_text)
+        qual_signature = Text.assemble(
+            ("def ", "inspect.def"), (qualname, "inspect.callable"), signature_text
+        )
 
         return qual_signature
 

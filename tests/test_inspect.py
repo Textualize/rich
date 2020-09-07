@@ -51,5 +51,5 @@ def test_render():
     inspect(foo, console=console, all=True)
     result = console.file.getvalue()
     print(repr(result))
-    expected = "╭──────────── <class 'tests.test_inspect.Foo'> ────────────╮\n│ Foo test                                                 │\n│                                                          │\n│   broken = InspectError()                                │\n│ __init__ = __init__(foo: int) -> None: constructor docs. │\n│   method = method(a, b) -> str: Multi line               │\n╰──────────────────────────────────────────────────────────╯\n"
+    expected = "╭────────────── <class 'tests.test_inspect.Foo'> ──────────────╮\n│ Foo test                                                     │\n│                                                              │\n│   broken = InspectError()                                    │\n│ __init__ = def __init__(foo: int) -> None: constructor docs. │\n│   method = def method(a, b) -> str: Multi line               │\n╰──────────────────────────────────────────────────────────────╯\n"
     assert expected == result
