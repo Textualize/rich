@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [6.1.2] - Unreleased
 
+### Added
+
+- Added ipv4 and ipv6 to ReprHighlighter
+
 ### Changed
 
-- The `#` sign is accepted as part of a URL
+- The `#` sign is included in url highlighting
 
 ## [6.1.1] - 2020-09-07
 

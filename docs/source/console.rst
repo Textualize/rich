@@ -53,6 +53,18 @@ The Console object will write to standard output (i.e. the terminal). You can al
     error_console.print("[bold red]This is an error!")
 
 
+Capturing output
+----------------
+
+There may be situations where you want to capture the output from a Console rather than writing it directly to the terminal. You can do this by setting the ``file`` argument to a :py:class:`io.StringIO` instance. Here's an example::
+
+    from io import StringIO
+    from rich.console import Console
+    console = Console(file=StringIO)
+    console.print("[bold red]Hello[/] World")
+    str_output = console.file.getvalue()
+
+
 Terminal detection
 ------------------
 
