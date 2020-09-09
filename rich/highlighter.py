@@ -79,7 +79,7 @@ class ReprHighlighter(RegexHighlighter):
         r"(?P<number>0x[0-9a-f]*)",
         r"(?P<path>\B(\/[\w\.\-\_\+]+)*\/)(?P<filename>[\w\.\-\_\+]*)?",
         r"(?<!\\)(?P<str>b?\'\'\'.*?(?<!\\)\'\'\'|b?\'.*?(?<!\\)\'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
-        r"(?P<url>https?:\/\/[0-9a-zA-Z\$\-\_\+\!`\(\)\,\.\?\/\;\:\&\=\%]*)",
+        r"(?P<url>https?:\/\/[0-9a-zA-Z\$\-\_\+\!`\(\)\,\.\?\/\;\:\&\=\%\#]*)",
         r"(?P<uuid>[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12})",
     ]
 
@@ -104,7 +104,7 @@ if __name__ == "__main__":  # pragma: no cover
     console.print(" /foo/bar/baz/egg.py word")
     console.print("foo /foo/bar/baz/egg.py word")
     console.print("foo /foo/bar/ba._++z/egg+.py word")
-    console.print("https://example.org?foo=bar")
+    console.print("https://example.org?foo=bar#header")
 
     console.print(1234567.34)
     console.print(1 / 2)
