@@ -14,7 +14,7 @@ def ratio_reduce(
         values (List[int]): List of values
 
     Returns:
-        List[int]: A list of integers garanteed to sum to total.
+        List[int]: A list of integers guaranteed to sum to total.
     """
     ratios = [ratio if _max else 0 for ratio, _max in zip(ratios, maximums)]
     total_ratio = sum(ratios)
@@ -45,7 +45,7 @@ def ratio_distribute(
         minimums (List[int]): List of minimum values for each slot.
 
     Returns:
-        List[int]: A list of integers garanteed to sum to total.
+        List[int]: A list of integers guaranteed to sum to total.
     """
     if minimums:
         ratios = [ratio if _min else 0 for ratio, _min in zip(ratios, minimums)]
