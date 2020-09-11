@@ -60,7 +60,7 @@ There may be situations where you want to capture the output from a Console rath
 
     from io import StringIO
     from rich.console import Console
-    console = Console(file=StringIO)
+    console = Console(file=StringIO())
     console.print("[bold red]Hello[/] World")
     str_output = console.file.getvalue()
 
