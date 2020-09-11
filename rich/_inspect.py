@@ -1,9 +1,9 @@
 from __future__ import absolute_import
 
-from inspect import cleandoc, getdoc, getfile, isclass, isfunction, ismodule, signature
-from typing import Any, Iterable, List, Optional, Tuple
+from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
+from typing import Any, Iterable, Optional, Tuple
 
-from .console import Console, ConsoleOptions, RenderableType, RenderGroup, RenderResult
+from .console import RenderableType, RenderGroup
 from .highlighter import ReprHighlighter
 from .jupyter import JupyterMixin
 from .panel import Panel
@@ -74,7 +74,7 @@ class Inspect(JupyterMixin):
         title_text = self.highlighter(title_str)
         return title_text
 
-    def __rich__(self) -> "RenderableType":
+    def __rich__(self) -> Panel:
         return Panel.fit(
             RenderGroup(*self._render()),
             title=self.title,

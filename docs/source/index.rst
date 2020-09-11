@@ -21,7 +21,9 @@ Welcome to Rich's documentation!
 
    markup.rst
    tables.rst
-   panel.rst   
+   padding.rst
+   panel.rst 
+   group.rst  
    columns.rst
    progress.rst
    markdown.rst

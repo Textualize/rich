@@ -511,6 +511,7 @@ if __name__ == "__main__":  # pragma: no cover
         "--force-color",
         dest="force_color",
         action="store_true",
+        default=None,
         help="force color for non-terminals",
     )
     parser.add_argument(
