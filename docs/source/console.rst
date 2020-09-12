@@ -64,6 +64,7 @@ There may be situations where you want to capture the output from a Console rath
     console.print("[bold red]Hello[/] World")
     str_output = console.file.getvalue()
 
+You may also want to set ``force_terminal=True`` on the Console constructor if you want control codes for colour and style in the resulting string.
 
 Terminal detection
 ------------------
