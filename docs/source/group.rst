@@ -3,7 +3,7 @@ Render Groups
 
 The :class:`~rich.console.RenderGroup` class allows you to group several renderables together so they may be rendered in a context where only a single renderable may be supplied. For instance, you might want to display several renderables within a :class:`~rich.panel.Panel`.
 
-To render two panels within a third panel, you would construct a RenderGroup with the *child* renderables as positional arguments then construct another panel with the result::
+To render two panels within a third panel, you would construct a RenderGroup with the *child* renderables as positional arguments then wrap the result in another Panel::
 
     from rich import print
     from rich.console import RenderGroup
