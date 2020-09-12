@@ -1,7 +1,7 @@
 Padding
 =======
 
-The :class:`~rich.padding.Padding` class may be used to add whitespace around text or other renderable. The following example will print the word "Hello" with a padding of 1 character, so there will be a blank line above and below, and on the left and right sides::
+The :class:`~rich.padding.Padding` class may be used to add whitespace around text or other renderable. The following example will print the word "Hello" with a padding of 1 character, so there will be a blank line above and below, and a space on the left and right edges::
 
     from rich import print
     from rich.padding import Padding
