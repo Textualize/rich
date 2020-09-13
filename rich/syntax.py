@@ -11,7 +11,7 @@ from pygments.util import ClassNotFound
 
 from ._loop import loop_first
 from .color import Color, blend_rgb, parse_rgb_hex
-from .console import Console, ConsoleOptions, RenderResult, Segment
+from .console import Console, ConsoleOptions, JustifyMethod, RenderResult, Segment
 from .jupyter import JupyterMixin
 from .measure import Measurement
 from .style import Style
@@ -173,18 +173,25 @@ class Syntax(JupyterMixin):
         style = style + Style(bgcolor=self._pygments_style_class.background_color)
         return style
 
-    def _highlight(self, lexer_name: str) -> Text:
+    def highlight(self, code: str = None) -> Text:
+        """Highlight a string with the given lexter and return a Text instance.
+
+        Returns:
+            Text: A text instance containing highlights.
+        """
+        if code is None:
+            code = self.code
         default_style = self._get_default_style()
         try:
-            lexer = get_lexer_by_name(lexer_name)
+            lexer = get_lexer_by_name(self.lexer_name)
         except ClassNotFound:
             return Text(
-                self.code, justify="left", style=default_style, tab_size=self.tab_size
+                code, justify="left", style=default_style, tab_size=self.tab_size
             )
         text = Text(justify="left", style=default_style, tab_size=self.tab_size)
         append = text.append
         _get_theme_style = self._get_theme_style
-        for token_type, token in lexer.get_tokens(self.code):
+        for token_type, token in lexer.get_tokens(code):
             append(token, _get_theme_style(token_type))
         return text
 
@@ -244,7 +251,7 @@ class Syntax(JupyterMixin):
         code = self.code
         if self.dedent:
             code = textwrap.dedent(code)
-        text = self._highlight(self.lexer_name)
+        text = self.highlight()
         if text.plain.endswith("\n"):
             text.plain = text.plain[:-1]
         if not self.line_numbers:
