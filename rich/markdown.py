@@ -5,13 +5,7 @@ from commonmark.blocks import Parser
 from . import box
 from ._loop import loop_first
 from ._stack import Stack
-from .console import (
-    Console,
-    ConsoleOptions,
-    JustifyMethod,
-    RenderResult,
-    Segment,
-)
+from .console import Console, ConsoleOptions, JustifyMethod, RenderResult, Segment
 from .containers import Renderables
 from .jupyter import JupyterMixin
 from .panel import Panel
@@ -354,8 +348,8 @@ class MarkdownContext:
         console: Console,
         options: ConsoleOptions,
         style: Style,
-        inline_code_theme: str,
         inline_code_lexer: str = None,
+        inline_code_theme: str = "monokai",
     ) -> None:
         self.console = console
         self.options = options
@@ -428,8 +422,8 @@ class Markdown(JupyterMixin):
         justify: JustifyMethod = None,
         style: Union[str, Style] = "none",
         hyperlinks: bool = True,
-        inline_code_theme: str = None,
         inline_code_lexer: str = None,
+        inline_code_theme: str = None,
     ) -> None:
         self.markup = markup
         parser = Parser()
@@ -450,8 +444,8 @@ class Markdown(JupyterMixin):
             console,
             options,
             style,
-            inline_code_theme=self.inline_code_theme,
             inline_code_lexer=self.inline_code_lexer,
+            inline_code_theme=self.inline_code_theme,
         )
         nodes = self.parsed.walker()
         inlines = self.inlines
