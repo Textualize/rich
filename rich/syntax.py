@@ -174,10 +174,14 @@ class Syntax(JupyterMixin):
         return style
 
     def highlight(self, code: str = None) -> Text:
-        """Highlight a string with the given lexter and return a Text instance.
+        """Highlight code and return a Text instance.
+
+        Args:
+            code (Optional[str], optional). Highlight code if a str is given, or
+                None to use self.code.
 
         Returns:
-            Text: A text instance containing highlights.
+            Text: A text instance containing syntax highlight.
         """
         if code is None:
             code = self.code
