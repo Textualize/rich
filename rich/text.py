@@ -527,12 +527,13 @@ class Text(JupyterMixin):
 
         _Segment = Segment
         style_cache: Dict[Tuple[int, ...], Style] = {}
+        style_cache_get = style_cache.get
         combine = Style.combine
 
         def get_current_style() -> Style:
             """Construct current style from stack."""
             style_ids = tuple(sorted(stack))
-            cached_style = style_cache.get(style_ids)
+            cached_style = style_cache_get(style_ids)
             if cached_style is not None:
                 return cached_style
             current_style = combine(style_map[_style_id] for _style_id in style_ids)
