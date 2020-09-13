@@ -354,8 +354,8 @@ class MarkdownContext:
         console: Console,
         options: ConsoleOptions,
         style: Style,
-        inline_code_theme: str = None,
-        inline_code_lexer: str = "python",
+        inline_code_theme: str,
+        inline_code_lexer: str = None,
     ) -> None:
         self.console = console
         self.options = options
@@ -363,7 +363,7 @@ class MarkdownContext:
         self.stack: Stack[MarkdownElement] = Stack()
 
         self._syntax: Optional[Syntax] = None
-        if inline_code_theme is not None:
+        if inline_code_lexer is not None:
             self._syntax = Syntax("", inline_code_lexer, theme=inline_code_theme)
 
     @property
@@ -376,7 +376,9 @@ class MarkdownContext:
         if node_type == "code" and self._syntax is not None:
             highlight_text = self._syntax.highlight(text)
             highlight_text.rstrip()
-            self.stack.top.on_text(self, highlight_text)
+            self.stack.top.on_text(
+                self, Text.assemble(highlight_text, style=self.style_stack.current)
+            )
         else:
             self.stack.top.on_text(self, text)
 
@@ -426,8 +428,8 @@ class Markdown(JupyterMixin):
         justify: JustifyMethod = None,
         style: Union[str, Style] = "none",
         hyperlinks: bool = True,
-        inline_code_theme: Optional[str] = None,
-        inline_code_lexer: str = "python",
+        inline_code_theme: str = None,
+        inline_code_lexer: str = None,
     ) -> None:
         self.markup = markup
         parser = Parser()
@@ -437,7 +439,7 @@ class Markdown(JupyterMixin):
         self.style = style
         self.hyperlinks = hyperlinks
         self.inline_code_lexer = inline_code_lexer
-        self.inline_code_theme = inline_code_theme
+        self.inline_code_theme = inline_code_theme or code_theme
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
@@ -552,6 +554,13 @@ if __name__ == "__main__":  # pragma: no cover
         help="pygments code theme",
     )
     parser.add_argument(
+        "-i",
+        "--inline-code-lexer",
+        dest="inline_code_lexer",
+        default=None,
+        help="inline_code_lexer",
+    )
+    parser.add_argument(
         "-y",
         "--hyperlinks",
         dest="hyperlinks",
@@ -590,6 +599,7 @@ if __name__ == "__main__":  # pragma: no cover
             justify="full" if args.justify else "left",
             code_theme=args.code_theme,
             hyperlinks=args.hyperlinks,
+            inline_code_lexer=args.inline_code_lexer,
         )
     if args.page:
         import pydoc
