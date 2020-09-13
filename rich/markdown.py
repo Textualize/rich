@@ -397,10 +397,10 @@ class Markdown(JupyterMixin):
         justify (JustifyMethod, optional): Justify value for paragraphs. Defaults to None.
         style (Union[str, Style], optional): Optional style to apply to markdown.
         hyperlinks (bool, optional): Enable hyperlinks. Defaults to ``True``.
+        inline_code_lexer: (str, optional): Lexer to use if inline code highlighting is
+            enabled. Defaults to "python".
         inline_code_theme: (Optional[str], optional): Pygments theme for inline code
             highlighting, or None for no highlighting. Defaults to None.
-        inline_code_lexter: (str, optional): Lexer to use if inline code highlighting is
-            enabled. Defaults to "python".
     """
 
     elements: ClassVar[Dict[str, Type[MarkdownElement]]] = {
