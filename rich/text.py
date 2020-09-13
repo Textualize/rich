@@ -506,7 +506,6 @@ class Text(JupyterMixin):
         """
 
         text = self.plain
-        style_map: Dict[int, Style] = {}
         null_style = Style()
 
         def get_style(style: Union[str, Style]) -> Style:
