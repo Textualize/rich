@@ -100,7 +100,6 @@ class TextElement(MarkdownElement):
         self.text = Text(justify="left")
 
     def on_text(self, context: "MarkdownContext", text: TextType) -> None:
-
         self.text.append(text, context.current_style if isinstance(text, str) else None)
 
     def on_leave(self, context: "MarkdownContext") -> None:
@@ -402,6 +401,10 @@ class Markdown(JupyterMixin):
         justify (JustifyMethod, optional): Justify value for paragraphs. Defaults to None.
         style (Union[str, Style], optional): Optional style to apply to markdown.
         hyperlinks (bool, optional): Enable hyperlinks. Defaults to ``True``.
+        inline_code_theme: (Optional[str], optional): Pygments theme for inline code
+            highlighting, or None for no highlighting. Defaults to None.
+        inline_code_lexter: (str, optional): Lexer to use if inline code highlighting is
+            enabled. Defaults to "python".
     """
 
     elements: ClassVar[Dict[str, Type[MarkdownElement]]] = {
@@ -423,7 +426,7 @@ class Markdown(JupyterMixin):
         justify: JustifyMethod = None,
         style: Union[str, Style] = "none",
         hyperlinks: bool = True,
-        inline_code_theme: Optional[str] = "monokai",
+        inline_code_theme: Optional[str] = None,
         inline_code_lexer: str = "python",
     ) -> None:
         self.markup = markup
@@ -527,84 +530,77 @@ class Markdown(JupyterMixin):
 
 if __name__ == "__main__":  # pragma: no cover
 
-    test = """# Hello
-This is a test of inline code: `import this` , `for a in range(10):`"""
-    from rich import print
+    import argparse
 
-    print(Markdown(test, inline_code_theme="emacs"))
+    parser = argparse.ArgumentParser(
+        description="Render Markdown to the console with Rich"
+    )
+    parser.add_argument("path", metavar="PATH", help="path to markdown file")
+    parser.add_argument(
+        "-c",
+        "--force-color",
+        dest="force_color",
+        action="store_true",
+        default=None,
+        help="force color for non-terminals",
+    )
+    parser.add_argument(
+        "-t",
+        "--code-theme",
+        dest="code_theme",
+        default="monokai",
+        help="pygments code theme",
+    )
+    parser.add_argument(
+        "-y",
+        "--hyperlinks",
+        dest="hyperlinks",
+        action="store_true",
+        help="enable hyperlinks",
+    )
+    parser.add_argument(
+        "-w",
+        "--width",
+        type=int,
+        dest="width",
+        default=None,
+        help="width of output (default will auto-detect)",
+    )
+    parser.add_argument(
+        "-j",
+        "--justify",
+        dest="justify",
+        action="store_true",
+        help="enable full text justify",
+    )
+    parser.add_argument(
+        "-p",
+        "--page",
+        dest="page",
+        action="store_true",
+        help="use pager to scroll output",
+    )
+    args = parser.parse_args()
 
-    if 0:
-        import argparse
+    from rich.console import Console
 
-        parser = argparse.ArgumentParser(
-            description="Render Markdown to the console with Rich"
+    with open(args.path, "rt", encoding="utf-8") as markdown_file:
+        markdown = Markdown(
+            markdown_file.read(),
+            justify="full" if args.justify else "left",
+            code_theme=args.code_theme,
+            hyperlinks=args.hyperlinks,
         )
-        parser.add_argument("path", metavar="PATH", help="path to markdown file")
-        parser.add_argument(
-            "-c",
-            "--force-color",
-            dest="force_color",
-            action="store_true",
-            default=None,
-            help="force color for non-terminals",
-        )
-        parser.add_argument(
-            "-t",
-            "--code-theme",
-            dest="code_theme",
-            default="monokai",
-            help="pygments code theme",
-        )
-        parser.add_argument(
-            "-y",
-            "--hyperlinks",
-            dest="hyperlinks",
-            action="store_true",
-            help="enable hyperlinks",
-        )
-        parser.add_argument(
-            "-w",
-            "--width",
-            type=int,
-            dest="width",
-            default=None,
-            help="width of output (default will auto-detect)",
-        )
-        parser.add_argument(
-            "-j",
-            "--justify",
-            dest="justify",
-            action="store_true",
-            help="enable full text justify",
-        )
-        parser.add_argument(
-            "-p",
-            "--page",
-            dest="page",
-            action="store_true",
-            help="use pager to scroll output",
-        )
-        args = parser.parse_args()
+    if args.page:
+        import pydoc
+        import io
 
-        from rich.console import Console
+        console = Console(
+            file=io.StringIO(), force_terminal=args.force_color, width=args.width
+        )
+        console.print(markdown)
+        pydoc.pager(console.file.getvalue())  # type: ignore
 
-        with open(args.path, "rt", encoding="utf-8") as markdown_file:
-            markdown = Markdown(
-                markdown_file.read(),
-                justify="full" if args.justify else "left",
-                code_theme=args.code_theme,
-                hyperlinks=args.hyperlinks,
-            )
-        if args.page:
-            import pydoc
-            import io
-
-            console = Console(
-                file=io.StringIO(), force_terminal=args.force_color, width=args.width
-            )
-            console.print(markdown)
-            pydoc.pager(console.file.getvalue())  # type: ignore
-
-        else:
-            console = Console(force_terminal=args.force_color, width=args.width)
-            console.print(markdown)
+    else:
+        console = Console(force_terminal=args.force_color, width=args.width)
+        console.print(markdown)
