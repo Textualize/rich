@@ -875,7 +875,6 @@ class Text(JupyterMixin):
             (offset, offset + len(line))
             for offset, line in zip(divide_offsets, new_lines)
         ]
-
         for span in self._spans:
             line_index = (span.start // average_line_length) % len(line_ranges)
 

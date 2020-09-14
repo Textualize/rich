@@ -173,18 +173,16 @@ class Syntax(JupyterMixin):
         style = style + Style(bgcolor=self._pygments_style_class.background_color)
         return style
 
-    def highlight(self, code: str = None) -> Text:
+    def highlight(self, code: str) -> Text:
         """Highlight code and return a Text instance.
 
         Args:
-            code (Optional[str], optional). Highlight code if a str is given, or
-                None to use self.code.
+            code (str). Code to highlight.
 
         Returns:
             Text: A text instance containing syntax highlight.
         """
-        if code is None:
-            code = self.code
+
         default_style = self._get_default_style()
         try:
             lexer = get_lexer_by_name(self.lexer_name)
@@ -255,7 +253,7 @@ class Syntax(JupyterMixin):
         code = self.code
         if self.dedent:
             code = textwrap.dedent(code)
-        text = self.highlight()
+        text = self.highlight(self.code)
         if text.plain.endswith("\n"):
             text.plain = text.plain[:-1]
         if not self.line_numbers:
