@@ -84,7 +84,7 @@ class _Cell(NamedTuple):
 
 class Table(JupyterMixin):
     """A console renderable to draw a table.
-    
+
     Args:
         *headers (Union[Column, str]): Column headers, either as a string, or :class:`~rich.table.Column` instance.
         title (Union[str, Text], optional): The title of the table rendered at the top. Defaults to None.
@@ -180,7 +180,7 @@ class Table(JupyterMixin):
             collapse_padding (bool, optional): Enable collapsing of padding around cells. Defaults to True.
             pad_edge (bool, optional): Enable padding around edges of table. Defaults to False.
             expand (bool, optional): Expand the table to fit the available space if ``True``, otherwise the table width will be auto-calculated. Defaults to False.
-        
+
         Returns:
             Table: A table instance.
         """
@@ -235,6 +235,9 @@ class Table(JupyterMixin):
             if self.show_edge:
                 max_width -= 2
 
+        if max_width < 0:
+            return Measurement(0, 0)
+
         extra_width = self._extra_width
         _measure_column = self._measure_column
 
@@ -277,7 +280,7 @@ class Table(JupyterMixin):
         no_wrap: bool = False,
     ) -> None:
         """Add a column to the table.
-        
+
         Args:
             header (RenderableType, optional): Text or renderable for the header.
                 Defaults to "".
@@ -315,7 +318,7 @@ class Table(JupyterMixin):
         self, *renderables: Optional["RenderableType"], style: StyleType = None
     ) -> None:
         """Add a row of renderables.
-        
+
         Args:
             *renderables (None or renderable): Each cell in a row must be a renderable object (including str),
                 or ``None`` for a blank cell.
@@ -545,6 +548,9 @@ class Table(JupyterMixin):
         self, console: "Console", column: Column, max_width: int
     ) -> Measurement:
         """Get the minimum and maximum width of the column."""
+
+        if max_width < 1:
+            return Measurement(0, 0)
 
         padding_width = self._get_padding_width(column.index)
 

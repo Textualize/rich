@@ -181,6 +181,8 @@ class RenderGroup:
 
 
 def render_group(fit: bool = False) -> Callable:
+    """A decorator that turns an iterable of renderables in to a group."""
+    
     def decorator(method):
         """Convert a method that returns an iterable of renderables in to a RenderGroup."""
 
@@ -286,14 +288,14 @@ class Console:
     Args:
         color_system (str, optional): The color system supported by your terminal,
             either ``"standard"``, ``"256"`` or ``"truecolor"``. Leave as ``"auto"`` to autodetect.
-        force_terminal (bool, optional): Force the Console to write control codes even when a terminal is not detected. Defaults to False.
-        force_jupyter (bool, optional): Force the Console to write to Jupyter even when Jupyter is not detected. Defaults to False
+        force_terminal (Optional[bool], optional): Enable/disable terminal control codes, or None to auto-detect terminal. Defaults to None.
+        force_jupyter (Optional[bool], optional): Enable/disable Jupyter rendering, or None to auto-detect Jupyter. Defaults to None.
         theme (Theme, optional): An optional style theme object, or ``None`` for default theme.
         file (IO, optional): A file object where the console should write to. Defaults to stdoutput.
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
         height (int, optional): The height of the terminal. Leave as default to auto-detect height.
         record (bool, optional): Boolean to enable recording of terminal output,
-            required to call :meth:`export_html` and :meth:`export_text`. Defaults to False.        
+            required to call :meth:`export_html` and :meth:`export_text`. Defaults to False.
         markup (bool, optional): Boolean to enable :ref:`console_markup`. Defaults to True.
         emoji (bool, optional): Enable emoji code. Defaults to True.
         highlight (bool, optional): Enable automatic highlighting. Defaults to True.
@@ -311,8 +313,8 @@ class Console:
         color_system: Optional[
             Literal["auto", "standard", "256", "truecolor", "windows"]
         ] = "auto",
-        force_terminal: bool = False,
-        force_jupyter: bool = False,
+        force_terminal: bool = None,
+        force_jupyter: bool = None,
         theme: Theme = None,
         file: IO[str] = None,
         width: int = None,
@@ -333,7 +335,7 @@ class Console:
         # Copy of os.environ allows us to replace it for testing
         self._environ = os.environ if _environ is None else _environ
 
-        self.is_jupyter = force_jupyter or _is_jupyter()
+        self.is_jupyter = _is_jupyter() if force_jupyter is None else force_jupyter
         if self.is_jupyter:
             width = width or 93
             height = height or 100
@@ -364,7 +366,9 @@ class Console:
 
         self._lock = threading.RLock()
         self._log_render = LogRender(
-            show_time=log_time, show_path=log_path, time_format=log_time_format,
+            show_time=log_time,
+            show_path=log_path,
+            time_format=log_time_format,
         )
         self.highlighter: HighlighterType = highlighter or _null_highlighter
         self.safe_box = safe_box
@@ -476,23 +480,21 @@ class Console:
             bool: True if the console writing to a device capable of
             understanding terminal codes, otherwise False.
         """
-        if self._force_terminal:
-            return True
+        if self._force_terminal is not None:
+            return self._force_terminal
         isatty = getattr(self.file, "isatty", None)
         return False if isatty is None else isatty()
 
     @property
     def is_dumb_terminal(self) -> bool:
         """Detect dumb terminal.
-        
+
         Returns:
             bool: True if writing to a dumb terminal, otherwise False.
-        
+
         """
-        is_dumb = "TERM" in self._environ and self._environ["TERM"].lower() in (
-            "dumb",
-            "unknown",
-        )
+        _term = self._environ.get("TERM", "")
+        is_dumb = _term.lower() in ("dumb", "unknown")
         return self.is_terminal and is_dumb
 
     @property
@@ -516,7 +518,7 @@ class Console:
         if self._width is not None and self._height is not None:
             return ConsoleDimensions(self._width, self._height)
 
-        if self.is_terminal and self.is_dumb_terminal:
+        if self.is_dumb_terminal:
             return ConsoleDimensions(80, 25)
 
         width, height = shutil.get_terminal_size()
@@ -560,7 +562,7 @@ class Console:
 
     def show_cursor(self, show: bool = True) -> None:
         """Show or hide the cursor.
-        
+
         Args:
             show (bool, optional): Set visibility of the cursor.
         """
@@ -585,7 +587,12 @@ class Console:
         """
 
         _options = options or self.options
+        if _options.max_width < 1:
+            # No space to render anything. This prevents potential recursion errors.
+            return
         render_iterable: RenderResult
+        if isinstance(renderable, RichCast):
+            renderable = renderable.__rich__()
         if isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__rich_console__(self, _options)
         elif isinstance(renderable, str):
@@ -730,10 +737,10 @@ class Console:
         """Combined a number of renderables and text in to one renderable.
 
         Args:
-            renderables (Iterable[Union[str, ConsoleRenderable]]): Anyting that Rich can render.
+            renderables (Iterable[Union[str, ConsoleRenderable]]): Anything that Rich can render.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\\n".
-            justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.       
+            justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default.
@@ -794,20 +801,18 @@ class Console:
         self,
         title: str = "",
         *,
-        character: Optional[str] = None,
         characters: str = "─",
         style: Union[str, Style] = "rule.line",
     ) -> None:
         """Draw a line with optional centered title.
-        
+
         Args:
             title (str, optional): Text to render over the rule. Defaults to "".
-            character: Will be deprecated in v6.0.0, please use characters argument instead.
             characters (str, optional): Character(s) to form the line. Defaults to "─".
         """
         from .rule import Rule
 
-        rule = Rule(title=title, characters=character or characters, style=style)
+        rule = Rule(title=title, characters=characters, style=style)
         self.print(rule)
 
     def control(self, control_codes: Union["Control", str]) -> None:
@@ -834,6 +839,7 @@ class Console:
         highlight: bool = None,
         width: int = None,
         crop: bool = True,
+        soft_wrap: bool = False,
     ) -> None:
         """Print to the console.
 
@@ -843,17 +849,25 @@ class Console:
             end (str, optional): String to write at end of print data. Defaults to "\\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             justify (str, optional): Justify method: "default", "left", "right", "center", or "full". Defaults to ``None``.
-            overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
+            overflow (str, optional): Overflow method: "ignore", "crop", "fold", or "ellipsis". Defaults to None.
             no_wrap (Optional[bool], optional): Disable word wrapping. Defaults to None.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to ``None``.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to ``None``.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
             width (Optional[int], optional): Width of output, or ``None`` to auto-detect. Defaults to ``None``.
             crop (Optional[bool], optional): Crop output to width of terminal. Defaults to True.
+            soft_wrap (bool, optional): Enable soft wrap mode which disables word wrapping and cropping. Defaults to False.
         """
         if not objects:
             self.line()
             return
+
+        if soft_wrap:
+            if no_wrap is None:
+                no_wrap = True
+            if overflow is None:
+                overflow = "ignore"
+            crop = False
 
         with self:
             renderables = self._collect_renderables(
@@ -901,7 +915,7 @@ class Console:
         word_wrap: bool = False,
     ) -> None:
         """Prints a rich render of the last exception and traceback.
-        
+
         Args:
             code_width (Optional[int], optional): Number of characters used to render code. Defaults to 88.
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
@@ -974,7 +988,11 @@ class Console:
 
             renderables = [
                 self._log_render(
-                    self, renderables, path=path, line_no=line_no, link_path=link_path,
+                    self,
+                    renderables,
+                    path=path,
+                    line_no=line_no,
+                    link_path=link_path,
                 )
             ]
             for hook in self._render_hooks:
@@ -1032,12 +1050,13 @@ class Console:
             if style and not is_control:
                 append(
                     style.render(
-                        text, color_system=color_system, legacy_windows=legacy_windows,
+                        text,
+                        color_system=color_system,
+                        legacy_windows=legacy_windows,
                     )
                 )
-            else:
-                if not (not_terminal and is_control):
-                    append(text)
+            elif not (not_terminal and is_control):
+                append(text)
 
         rendered = "".join(output)
         return rendered
@@ -1051,7 +1070,7 @@ class Console:
         password: bool = False,
         stream: TextIO = None,
     ) -> str:
-        """Displays a prompt and waits for input from the user. The prompt may contain color / style. 
+        """Displays a prompt and waits for input from the user. The prompt may contain color / style.
 
         Args:
             prompt (Union[str, Text]): Text to render in the prompt.
@@ -1059,7 +1078,7 @@ class Console:
             emoji (bool, optional): Enable emoji (requires a str prompt). Defaults to True.
             password: (bool, optional): Hide typed text. Defaults to False.
             stream: (TextIO, optional): Optional file to read input from (rather than stdin). Defaults to None.
-        
+
         Returns:
             str: Text read from stdin.
         """
@@ -1076,7 +1095,7 @@ class Console:
         """Generate text from console contents (requires record=True argument in constructor).
 
         Args:
-            clear (bool, optional): Set to ``True`` to clear the record buffer after exporting.
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             styles (bool, optional): If ``True``, ansi escape codes will be included. ``False`` for plain text.
                 Defaults to ``False``.
 
@@ -1109,7 +1128,7 @@ class Console:
 
         Args:
             path (str): Path to write text files.
-            clear (bool, optional): Set to ``True`` to clear the record buffer after exporting.
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             styles (bool, optional): If ``True``, ansi style codes will be included. ``False`` for plain text.
                 Defaults to ``False``.
 
@@ -1130,7 +1149,7 @@ class Console:
 
         Args:
             theme (TerminalTheme, optional): TerminalTheme object containing console colors.
-            clear (bool, optional): Set to ``True`` to clear the record buffer after generating the HTML.
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
             inline_styles (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
@@ -1211,7 +1230,7 @@ class Console:
         Args:
             path (str): Path to write html file.
             theme (TerminalTheme, optional): TerminalTheme object containing console colors.
-            clear (bool, optional): Set to True to clear the record buffer after generating the HTML.
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
             inline_styes (bool, optional): If ``True`` styles will be inlined in to spans, which makes files

@@ -289,9 +289,18 @@ class Color(NamedTuple):
     def get_truecolor(
         self, theme: "TerminalTheme" = None, foreground=True
     ) -> ColorTriplet:
+        """Get an equivalent color triplet for this color.
+
+        Args:
+            theme (TerminalTheme, optional): Optional terminal theme, or None to use default. Defaults to None.
+            foreground (bool, optional): True for a foreground color, or False for background. Defaults to True.
+
+        Returns:
+            ColorTriplet: A color triplet containing RGB components.
+        """
+
         if theme is None:
             theme = DEFAULT_TERMINAL_THEME
-        """Get a color triplet for this color."""
         if self.type == ColorType.TRUECOLOR:
             assert self.triplet is not None
             return self.triplet
@@ -311,10 +320,10 @@ class Color(NamedTuple):
     @classmethod
     def from_triplet(cls, triplet: "ColorTriplet") -> "Color":
         """Create a truecolor RGB color from a triplet of values.
-        
+
         Args:
             triplet (ColorTriplet): A color triplet containing red, green and blue components.
-        
+
         Returns:
             Color: A new color object.
         """
@@ -323,7 +332,7 @@ class Color(NamedTuple):
     @classmethod
     def default(cls) -> "Color":
         """Get a Color instance representing the default color.
-        
+
         Returns:
             Color: Default color.
         """

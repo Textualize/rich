@@ -10,7 +10,7 @@ from typing import Iterable, List, Tuple
 
 class Segment(NamedTuple):
     """A piece of text with associated style.
-    
+
     Args:
         text (str): A piece of text.
         style (:class:`~rich.style.Style`, optional): An optional style to apply to the text.
@@ -90,7 +90,7 @@ class Segment(NamedTuple):
 
         Returns:
             Iterable[Segment]: And iterable of Segment instances.
-        
+
         """
         if is_control:
             return filter(attrgetter("is_control"), segments)
@@ -183,7 +183,7 @@ class Segment(NamedTuple):
             segments (Iterable[Segment]): A list of segments in a single line.
             length (int): The desired width of the line.
             style (Style, optional): The style of padding if used (space on the end). Defaults to None.
-            pad (bool, optional): Pad lines with spaces if they are shorter than `length`. Defaults to True. 
+            pad (bool, optional): Pad lines with spaces if they are shorter than `length`. Defaults to True.
 
         Returns:
             List[Segment]: A line of segments with the desired length.

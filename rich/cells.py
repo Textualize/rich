@@ -7,10 +7,10 @@ from ._lru_cache import LRUCache
 
 def cell_len(text: str, _cache: Dict[str, int] = LRUCache(1024 * 4)) -> int:
     """Get the number of cells required to display text.
-    
+
     Args:
         text (str): Text to display.
-    
+
     Returns:
         int: Number of cells required to display the text.
     """
@@ -27,10 +27,10 @@ def cell_len(text: str, _cache: Dict[str, int] = LRUCache(1024 * 4)) -> int:
 
 def get_character_cell_size(character: str) -> int:
     """Get the cell size of a character.
-    
+
     Args:
         character (str): A single character.
-    
+
     Returns:
         int: Number of cells (0, 1 or 2) occupied by that character.
     """
@@ -45,10 +45,10 @@ def get_character_cell_size(character: str) -> int:
 @lru_cache(maxsize=4096)
 def _get_codepoint_cell_size(codepoint: int) -> int:
     """Get the cell size of a character.
-    
+
     Args:
         character (str): A single character.
-    
+
     Returns:
         int: Number of cells (0, 1 or 2) occupied by that character.
     """

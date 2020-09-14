@@ -6,7 +6,7 @@ from ._loop import loop_last
 
 class Box:
     """Defines characters to render boxes.
-    
+
     ┌─┬┐ top
     │ ││ head
     ├─┼┤ head_row
@@ -16,7 +16,7 @@ class Box:
     │ ││ foot
     └─┴┘ bottom
 
-    
+
     """
 
     def __init__(self, box: str) -> None:
@@ -60,10 +60,10 @@ class Box:
 
     def get_top(self, widths: Iterable[int]) -> str:
         """Get the top of a simple box.
-        
+
         Args:
             widths (List[int]): Widths of columns.
-        
+
         Returns:
             str: A string of box characters.
         """
@@ -85,10 +85,10 @@ class Box:
         edge: bool = True,
     ) -> str:
         """Get the top of a simple box.
-        
+
         Args:
             width (List[int]): Widths of columns.
-        
+
         Returns:
             str: A string of box characters.
         """
@@ -129,10 +129,10 @@ class Box:
 
     def get_bottom(self, widths: Iterable[int]) -> str:
         """Get the bottom of a simple box.
-        
+
         Args:
             widths (List[int]): Widths of columns.
-        
+
         Returns:
             str: A string of box characters.
         """

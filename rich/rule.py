@@ -9,10 +9,9 @@ from .text import Text
 
 class Rule(JupyterMixin):
     """A console renderable to draw a horizontal rule (line).
-    
+
     Args:
         title (Union[str, Text], optional): Text to render in the rule. Defaults to "".
-        character: Will be deprecated in v6.0.0, please use characters argument instead.
         characters (str, optional): Character(s) used to draw the line. Defaults to "─".
         style (StyleType, optional): Style of Rule. Defaults to "rule.line".
         end (str, optional): Character at end of Rule. defaults to "\\n"
@@ -22,13 +21,10 @@ class Rule(JupyterMixin):
         self,
         title: Union[str, Text] = "",
         *,
-        character: Optional[str] = None,
         characters: str = "─",
         style: Union[str, Style] = "rule.line",
         end: str = "\n",
     ) -> None:
-        characters = character or characters
-
         if cell_len(characters) < 1:
             raise ValueError(
                 "'characters' argument must have a cell width of at least 1"

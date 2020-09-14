@@ -18,7 +18,7 @@ PULSE_SIZE = 20
 
 class Bar(JupyterMixin):
     """Renders a (progress) bar.
-        
+
     Args:
         total (float, optional): Number of steps in the bar. Defaults to 100.
         completed (float, optional): Number of steps completed. Defaults to 0.
@@ -114,7 +114,7 @@ class Bar(JupyterMixin):
 
     def update(self, completed: float, total: float = None) -> None:
         """Update progress with new values.
-        
+
         Args:
             completed (float): Number of steps completed.
             total (float, optional): Total number of steps, or ``None`` to not change. Defaults to None.

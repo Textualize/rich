@@ -1,3 +1,4 @@
+import os.path
 import platform
 import textwrap
 from typing import Any, Dict, Optional, Set, Tuple, Type, Union
@@ -22,7 +23,7 @@ DEFAULT_THEME = "monokai"
 
 class Syntax(JupyterMixin):
     """Construct a Syntax object to render syntax highlighted code.
-    
+
     Args:
         code (str): Code to highlight.
         lexer_name (str): Lexer to use (see https://pygments.org/docs/lexers/)
@@ -92,7 +93,7 @@ class Syntax(JupyterMixin):
         word_wrap: bool = False,
     ) -> "Syntax":
         """Construct a Syntax object from a file.
-        
+
         Args:
             path (str): Path to file to highlight.
             encoding (str): Encoding of file.
@@ -112,11 +113,25 @@ class Syntax(JupyterMixin):
         """
         with open(path, "rt", encoding=encoding) as code_file:
             code = code_file.read()
+
+        lexer = None
+        lexer_name = "default"
         try:
-            lexer = guess_lexer_for_filename(path, code)
-            lexer_name = lexer.name
+            _, ext = os.path.splitext(path)
+            if ext:
+                extension = ext.lstrip(".").lower()
+                lexer = get_lexer_by_name(extension)
+                lexer_name = lexer.name
         except ClassNotFound:
-            lexer_name = "default"
+            pass
+
+        if lexer is None:
+            try:
+                lexer = guess_lexer_for_filename(path, code)
+                lexer_name = lexer.name
+            except ClassNotFound:
+                pass
+
         return cls(
             code,
             lexer_name,
@@ -127,6 +142,7 @@ class Syntax(JupyterMixin):
             start_line=start_line,
             highlight_lines=highlight_lines,
             code_width=code_width,
+            tab_size=tab_size,
             word_wrap=word_wrap,
         )
 
@@ -282,12 +298,14 @@ class Syntax(JupyterMixin):
                     if highlight_line(line_no):
                         yield _Segment(line_pointer, number_style)
                         yield _Segment(
-                            line_column, highlight_number_style,
+                            line_column,
+                            highlight_number_style,
                         )
                     else:
                         yield _Segment("  ", highlight_number_style)
                         yield _Segment(
-                            line_column, number_style,
+                            line_column,
+                            number_style,
                         )
                 else:
                     yield padding
@@ -308,6 +326,7 @@ if __name__ == "__main__":  # pragma: no cover
         "--force-color",
         dest="force_color",
         action="store_true",
+        default=None,
         help="force color for non-terminals",
     )
     parser.add_argument(

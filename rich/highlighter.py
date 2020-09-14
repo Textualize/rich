@@ -9,13 +9,13 @@ class Highlighter(ABC):
 
     def __call__(self, text: Union[str, Text]) -> Text:
         """Highlight a str or Text instance.
-        
+
         Args:
             text (Union[str, ~Text]): Text to highlight.
-        
+
         Raises:
             TypeError: If not called with text or str.
-        
+
         Returns:
             Text: A test instance with highlighting applied.
         """
@@ -31,7 +31,7 @@ class Highlighter(ABC):
     @abstractmethod
     def highlight(self, text: Text) -> None:
         """Apply highlighting in place to text.
-        
+
         Args:
             text (~Text): A text object highlight.
         """
@@ -39,9 +39,9 @@ class Highlighter(ABC):
 
 class NullHighlighter(Highlighter):
     """A highlighter object that doesn't highlight.
-    
+
     May be used to disable highlighting entirely.
-    
+
     """
 
     def highlight(self, text: Text) -> None:
@@ -56,10 +56,10 @@ class RegexHighlighter(Highlighter):
 
     def highlight(self, text: Text) -> None:
         """Highlight :class:`rich.text.Text` using regular expressions.
-        
+
         Args:
             text (~Text): Text to highlighted.
-        
+
         """
         highlight_regex = text.highlight_regex
         for re_highlight in self.highlights:
@@ -72,14 +72,16 @@ class ReprHighlighter(RegexHighlighter):
     base_style = "repr."
     highlights = [
         r"(?P<brace>[\{\[\(\)\]\}])",
-        r"(?P<tag_start>\<)(?P<tag_name>[\w\-\.]*)(?P<tag_contents>.*?)(?P<tag_end>\>)",
-        r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?[\w_]+\"?)",
+        r"(?P<tag_start>\<)(?P<tag_name>[\w\-\.\:]*)(?P<tag_contents>.*?)(?P<tag_end>\>)",
+        r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?[\w_]+\"?)?",
         r"(?P<bool_true>True)|(?P<bool_false>False)|(?P<none>None)",
         r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[\-\+]?\d+?)?\b)",
         r"(?P<number>0x[0-9a-f]*)",
         r"(?P<path>\B(\/[\w\.\-\_\+]+)*\/)(?P<filename>[\w\.\-\_\+]*)?",
+        r"(?P<ipv4>[0-9]{1,3}\.[0-9]{1,3}\.[0-gt9]{1,3}\.[0-9]{1,3})",
+        r"(?P<ipv6>([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})",
         r"(?<!\\)(?P<str>b?\'\'\'.*?(?<!\\)\'\'\'|b?\'.*?(?<!\\)\'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
-        r"(?P<url>https?:\/\/[0-9a-zA-Z\$\-\_\+\!`\(\)\,\.\?\/\;\:\&\=\%]*)",
+        r"(?P<url>https?:\/\/[0-9a-zA-Z\$\-\_\+\!`\(\)\,\.\?\/\;\:\&\=\%\#]*)",
         r"(?P<uuid>[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12})",
     ]
 
@@ -104,8 +106,12 @@ if __name__ == "__main__":  # pragma: no cover
     console.print(" /foo/bar/baz/egg.py word")
     console.print("foo /foo/bar/baz/egg.py word")
     console.print("foo /foo/bar/ba._++z/egg+.py word")
-    console.print("https://example.org?foo=bar")
+    console.print("https://example.org?foo=bar#header")
 
     console.print(1234567.34)
     console.print(1 / 2)
     console.print(-1 / 123123123123)
+
+    console.print(
+        "127.0.1.1 bar 192.168.1.4 2001:0db8:85a3:0000:0000:8a2e:0370:7334 foo"
+    )

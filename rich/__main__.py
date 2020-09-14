@@ -91,7 +91,10 @@ def make_test_card() -> Table:
     table.add_row(
         "CJK support",
         Panel(
-            "该库支持中文，日文和韩文文本！", expand=False, border_style="red", box=box.DOUBLE_EDGE,
+            "该库支持中文，日文和韩文文本！",
+            expand=False,
+            border_style="red",
+            box=box.DOUBLE_EDGE,
         ),
     )
 
@@ -102,7 +105,8 @@ def make_test_card() -> Table:
 
     markup_example = "[bold magenta]Rich[/] supports a simple [i]bbcode[/i] like [b]markup[/b], you can use to insert [yellow]color[/] and [underline]style[/]."
     table.add_row(
-        "Console markup", comparison(Text(markup_example), markup_example),
+        "Console markup",
+        comparison(Text(markup_example), markup_example),
     )
 
     example_table = Table(

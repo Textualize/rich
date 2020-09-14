@@ -13,7 +13,7 @@ with open("cats.json") as fh:
 
 start = time()
 pretty = Pretty(cats)
-console.print(pretty)
+console.print(pretty, overflow="ignore", crop=False)
 taken = (time() - start) * 1000
 
 

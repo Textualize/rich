@@ -5,7 +5,7 @@ from collections.abc import Mapping
 from .highlighter import ReprHighlighter
 from .panel import Panel
 from .pretty import Pretty
-from .text import Text
+from .text import Text, TextType
 from .table import Table
 
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def render_scope(
-    scope: Mapping, *, title: str = None, sort_keys: bool = True
+    scope: Mapping, *, title: TextType = None, sort_keys: bool = True
 ) -> "ConsoleRenderable":
     """Render python variables in a given scope.
 
@@ -43,7 +43,10 @@ def render_scope(
         )
         items_table.add_row(key_text, Pretty(value, highlighter=highlighter))
     return Panel.fit(
-        items_table, title=title, border_style="scope.border", padding=(0, 1)
+        items_table,
+        title=title,
+        border_style="scope.border",
+        padding=(0, 1),
     )
 
 

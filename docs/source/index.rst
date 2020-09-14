@@ -15,16 +15,20 @@ Welcome to Rich's documentation!
    style.rst
    text.rst
    highlighting.rst
+   logging.rst
+   traceback.rst
+   prompt.rst
+
    markup.rst
    tables.rst
-   panel.rst
-   prompt.rst
+   padding.rst
+   panel.rst 
+   group.rst  
    columns.rst
-   logging.rst
    progress.rst
    markdown.rst
    syntax.rst   
-   traceback.rst
+   
    protocol.rst
 
    reference.rst

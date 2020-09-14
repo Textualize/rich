@@ -1,0 +1,7 @@
+rich
+====
+
+.. automodule:: rich
+    :members:
+    
+

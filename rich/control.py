@@ -39,7 +39,7 @@ def strip_control_codes(text: str, _translate_table=_CONTROL_TRANSLATE) -> str:
     """Remove control codes from text.
 
     Args:
-        text (str): A string possibly contain control codes.        
+        text (str): A string possibly contain control codes.
 
     Returns:
         str: String with control codes removed.

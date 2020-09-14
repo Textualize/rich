@@ -110,13 +110,13 @@ class Lines:
         overflow: "OverflowMethod" = "fold",
     ) -> None:
         """Justify and overflow text to a given width.
-        
+
         Args:
             console (Console): Console instance.
             width (int): Number of characters per line.
             justify (str, optional): Default justify method for text: "left", "center", "full" or "right". Defaults to "left".
-            overflow (str, optional): Default overflow for text: "crop", "fold", or "ellipisis". Defaults to "fold".            
-            
+            overflow (str, optional): Default overflow for text: "crop", "fold", or "ellipisis". Defaults to "fold".
+
         """
         from .text import Text
 

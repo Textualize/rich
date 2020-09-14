@@ -32,7 +32,7 @@ class Style:
     A terminal style consists of a color (`color`), a backround color (`bgcolor`), and a number of attributes, such
     as bold, italic etc. The attributes have 3 states: they can either be on
     (``True``), off (``False``), or not set (``None``).
-    
+
     Args:
         color (Union[Color, str], optional): Color of terminal text. Defaults to None.
         bgcolor (Union[Color, str], optional): Color of terminal background. Defaults to None.
@@ -50,7 +50,7 @@ class Style:
         encircle (bool, optional): Enable encircled text. Defaults to None.
         overline (bool, optional): Enable overlined text. Defaults to None.
         link (str, link): Link URL. Defaults to None.
-    
+
     """
 
     _color: Optional[Color]
@@ -267,10 +267,10 @@ class Style:
     def normalize(cls, style: str) -> str:
         """Normalize a style definition so that styles with the same effect have the same string
         representation.
-        
+
         Args:
             style (str): A style definition.
-        
+
         Returns:
             str: Normal form of style definition.
         """
@@ -332,10 +332,13 @@ class Style:
     @lru_cache(maxsize=1024)
     def parse(cls, style_definition: str) -> "Style":
         """Parse a style definition.
-        
+
+        Args:
+            style_definition (str): A string containing a style.
+
         Raises:
-            errors.StyleSyntaxError: If the style definition syntax is invalid.            
-        
+            errors.StyleSyntaxError: If the style definition syntax is invalid.
+
         Returns:
             `Style`: A Style instance.
         """
@@ -383,7 +386,7 @@ class Style:
                 except ColorParseError as error:
                     raise errors.StyleSyntaxError(
                         f"unable to parse {word} in {style_definition!r}; {error}"
-                    )
+                    ) from None
                 bgcolor = word
 
             elif word == "not":
@@ -410,7 +413,7 @@ class Style:
                 except ColorParseError as error:
                     raise errors.StyleSyntaxError(
                         f"unable to parse {word!r} in style {style_definition!r}; {error}"
-                    )
+                    ) from None
                 color = word
         style = Style(color=color, bgcolor=bgcolor, link=link, **attributes)
         return style
@@ -454,10 +457,10 @@ class Style:
     @classmethod
     def combine(cls, styles: Iterable["Style"]) -> "Style":
         """Combine styles and get result.
-        
+
         Args:
             styles (Iterable[Style]): Styles to combine.
-        
+
         Returns:
             Style: A new style instance.
         """
@@ -467,10 +470,10 @@ class Style:
     @classmethod
     def chain(cls, *styles: "Style") -> "Style":
         """Combine styles from positional argument in to a single style.
-        
+
         Args:
             *styles (Iterable[Style]): Styles to combine.
-        
+
         Returns:
             Style: A new style instance.
         """
@@ -478,7 +481,7 @@ class Style:
 
     def copy(self) -> "Style":
         """Get a copy of this style.
-        
+
         Returns:
             Style: A new Style instance with identical attributes.
         """
@@ -501,11 +504,11 @@ class Style:
         legacy_windows: bool = False,
     ) -> str:
         """Render the ANSI codes for the style.
-        
+
         Args:
             text (str, optional): A string to style. Defaults to "".
             color_system (Optional[ColorSystem], optional): Color system to render to. Defaults to ColorSystem.TRUECOLOR.
-        
+
         Returns:
             str: A string containing ANSI style codes.
         """
@@ -524,10 +527,10 @@ class Style:
         """Write text with style directly to terminal.
 
         This method is for testing purposes only.
-        
+
         Args:
             text (Optional[str], optional): Text to style or None for style name.
-        
+
         Returns:
             None:
         """
@@ -571,7 +574,7 @@ class StyleStack:
 
     def push(self, style: Style) -> None:
         """Push a new style on to the stack.
-        
+
         Args:
             style (Style): New style to combine with current style.
         """
@@ -579,7 +582,7 @@ class StyleStack:
 
     def pop(self) -> Style:
         """Pop last style and discard.
-        
+
         Returns:
             Style: New current style (also available as stack.current)
         """

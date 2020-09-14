@@ -5,7 +5,6 @@ Rich can apply styles to patterns in text which you :meth:`~rich.console.Console
 
 You can disable highlighting either by setting ``highlight=False`` on :meth:`~rich.console.Console.print` or :meth:`~rich.console.Console.log`, or by setting ``highlight=False`` on the :class:`~rich.console.Console` constructor which disables it everywhere. If you disable highlighting on the constructor, you can still selectively *enable* highlighting with ``highlight=True`` on print/log.
 
-
 Custom Highlighters
 -------------------
 
@@ -52,7 +51,7 @@ Here's a silly example that highlights every character with a different color::
     class RainbowHighlighter(Highlighter):
         def highlight(self, text):
             for index in range(len(text)):
-                text.stylize(str(randint(16, 255)), index, index + 1)
+                text.stylize(f"color({randint(16, 255)})", index, index + 1)
 
 
     rainbow = RainbowHighlighter()

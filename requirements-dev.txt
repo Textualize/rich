@@ -1,5 +1,5 @@
-black==19.10b0
+black==20.8b1
 mypy==0.782
 poetry==1.0.10
 pytest==5.4.3
-pytest-cov==2.10.0
+pytest-cov==2.10.1

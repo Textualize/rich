@@ -76,10 +76,10 @@ class Span(NamedTuple):
 
     def move(self, offset: int) -> "Span":
         """Move start and end by a given offset.
-        
+
         Args:
             offset (int): Number of characters to add to start and end.
-        
+
         Returns:
             TextSpan: A new TextSpan with adjusted position.
         """
@@ -88,10 +88,10 @@ class Span(NamedTuple):
 
     def right_crop(self, offset: int) -> "Span":
         """Crop the span at the given offset.
-        
+
         Args:
             offset (int): A value between start and end.
-        
+
         Returns:
             Span: A new (possibly smaller) span.
         """
@@ -103,16 +103,16 @@ class Span(NamedTuple):
 
 class Text(JupyterMixin):
     """Text with color / style.
-        
-        Args:
-            text (str, optional): Default unstyled text. Defaults to "".
-            style (Union[str, Style], optional): Base style for text. Defaults to "".
-            justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
-            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None. 
-            no_wrap (bool, optional): Disable text wrapping, or None for default. Defaults to None.
-            end (str, optional): Character to end text with. Defaults to "\\n".
-            tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
-            spans (List[Span], optional). A list of predefined style spans. Defaults to None.
+
+    Args:
+        text (str, optional): Default unstyled text. Defaults to "".
+        style (Union[str, Style], optional): Base style for text. Defaults to "".
+        justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
+        overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
+        no_wrap (bool, optional): Disable text wrapping, or None for default. Defaults to None.
+        end (str, optional): Character to end text with. Defaults to "\\n".
+        tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
+        spans (List[Span], optional). A list of predefined style spans. Defaults to None.
     """
 
     __slots__ = [
@@ -196,13 +196,13 @@ class Text(JupyterMixin):
         overflow: "OverflowMethod" = None,
     ) -> "Text":
         """Create Text instance from markup.
-        
+
         Args:
             text (str): A string containing console markup.
             emoji (bool, optional): Also render emoji code. Defaults to True.
             justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
-            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None. 
-        
+            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
+
         Returns:
             Text: A Text instance with markup rendered.
         """
@@ -229,8 +229,8 @@ class Text(JupyterMixin):
             text (str): A string containing console markup.
             style (Union[str, Style]): Style to apply to the text. Defaults to "".
             justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
-            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None. 
-        
+            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
+
         Returns:
             Text: A text instance with a style applied to the entire string.
         """
@@ -249,12 +249,12 @@ class Text(JupyterMixin):
         tab_size: int = 8,
     ) -> "Text":
         """Construct a text instance by combining a sequence of strings with optional styles.
-        The positional arguments should be either strings, or a tuple of string + style.        
+        The positional arguments should be either strings, or a tuple of string + style.
 
-        Args:            
+        Args:
             style (Union[str, Style], optional): Base style for text. Defaults to "".
             justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
-            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None. 
+            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
             end (str, optional): Character to end text with. Defaults to "\\n".
             tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
 
@@ -329,9 +329,9 @@ class Text(JupyterMixin):
     def stylize(
         self, style: Union[str, Style], start: int = 0, end: Optional[int] = None
     ) -> None:
-        """Apply a style to the text, or a portion of the text.        
+        """Apply a style to the text, or a portion of the text.
 
-        Args:            
+        Args:
             style (Union[str, Style]): Style instance or style definition to apply.
             start (int): Start offset (negative indexing is supported). Defaults to 0.
             end (Optional[int], optional): End offset (negative indexing is supported), or None for end of text. Defaults to None.
@@ -383,7 +383,7 @@ class Text(JupyterMixin):
             re_highlight (str): A regular expression.
             style (Union[GetStyleCallable, StyleType]): Optional style to apply to whole match, or a callable
                 which accepts the matched text and returns a style. Defaults to None.
-            style_prefix (str, optional): Optional prefix to add to style group names.            
+            style_prefix (str, optional): Optional prefix to add to style group names.
 
         Returns:
             int: Number of regex matches
@@ -415,12 +415,12 @@ class Text(JupyterMixin):
         case_sensitive: bool = True,
     ) -> int:
         """Highlight words with a style.
-        
+
         Args:
             words (Iterable[str]): Worlds to highlight.
             style (Union[str, Style]): Style to apply.
             case_sensitive (bool, optional): Enable case sensitive matchings. Defaults to True.
-        
+
         Returns:
             int: Number of words highlighted.
         """
@@ -496,11 +496,11 @@ class Text(JupyterMixin):
 
     def render(self, console: "Console", end: str = "") -> Iterable["Segment"]:
         """Render the text as Segments.
-        
+
         Args:
-            console (Console): Console instance.  
-            end (Optional[str], optional): Optional end character.          
-        
+            console (Console): Console instance.
+            end (Optional[str], optional): Optional end character.
+
         Returns:
             Iterable[Segment]: Result of render that may be written to the console.
         """
@@ -556,10 +556,10 @@ class Text(JupyterMixin):
 
     def join(self, lines: Iterable["Text"]) -> "Text":
         """Join text together with this instance as the separator.
-        
+
         Args:
             lines (Iterable[Text]): An iterable of Text instances to join.
-        
+
         Returns:
             Text: A new text instance containing join text.
         """
@@ -595,7 +595,7 @@ class Text(JupyterMixin):
 
     def tabs_to_spaces(self, tab_size: int = None) -> "Text":
         """Get a new string with tabs converted to spaces.
-        
+
         Args:
             tab_size (int, optional): Size of tabs. Defaults to 8.
 
@@ -644,7 +644,7 @@ class Text(JupyterMixin):
             length = cell_len(self.plain)
             if length > max_width:
                 if _overflow == "ellipsis":
-                    self.plain = set_cell_size(self.plain, max_width - 1).rstrip() + "…"
+                    self.plain = set_cell_size(self.plain, max_width - 1) + "…"
                 else:
                     self.plain = set_cell_size(self.plain, max_width)
             if pad and length < max_width:
@@ -688,7 +688,7 @@ class Text(JupyterMixin):
 
     def pad_left(self, count: int, character: str = " ") -> None:
         """Pad the left with a given character.
-        
+
         Args:
             count (int): Number of characters to pad.
             character (str, optional): Character to pad with. Defaults to " ".
@@ -704,7 +704,7 @@ class Text(JupyterMixin):
 
     def pad_right(self, count: int, character: str = " ") -> None:
         """Pad the right with a given character.
-        
+
         Args:
             count (int): Number of characters to pad.
             character (str, optional): Character to pad with. Defaults to " ".
@@ -737,11 +737,11 @@ class Text(JupyterMixin):
         self, text: Union["Text", str], style: Union[str, "Style"] = None
     ) -> "Text":
         """Add text with an optional style.
-        
+
         Args:
             text (Union[Text, str]): A str or Text to append.
             style (str, optional): A style name. Defaults to None.
-        
+
         Returns:
             Text: Returns self for chaining.
         """
@@ -813,12 +813,12 @@ class Text(JupyterMixin):
         allow_blank: bool = False,
     ) -> Lines:
         """Split rich text in to lines, preserving styles.
-        
+
         Args:
             separator (str, optional): String to split on. Defaults to "\\n".
             include_separator (bool, optional): Include the separator in the lines. Defaults to False.
             allow_blank (bool, optional): Return a blank line if the text ends with a separator. Defaults to False.
-        
+
         Returns:
             List[RichText]: A list of rich text, one per line of the original.
         """
@@ -851,7 +851,7 @@ class Text(JupyterMixin):
 
         Args:
             offsets (Iterable[int]): Offsets used to divide text.
-        
+
         Returns:
             Lines: New RichText instances between offsets.
         """
@@ -888,7 +888,7 @@ class Text(JupyterMixin):
                 while True:
                     line_index -= 1
                     line_start, line_end = line_ranges[line_index]
-                    if span.end >= line_start:
+                    if span.start >= line_start:
                         break
             elif span.start > line_end:
                 while True:
@@ -923,7 +923,7 @@ class Text(JupyterMixin):
         no_wrap: bool = None,
     ) -> Lines:
         """Word wrap the text.
-        
+
         Args:
             console (Console): Console instance.
             width (int): Number of characters per line.
@@ -932,7 +932,7 @@ class Text(JupyterMixin):
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
             tab_size (int, optional): Default tab size. Defaults to 8.
             no_wrap (bool, optional): Disable wrapping, Defaults to False.
-        
+
         Returns:
             Lines: Number of lines.
         """
@@ -964,10 +964,10 @@ class Text(JupyterMixin):
 
     def fit(self, width: int) -> Lines:
         """Fit the text in to given width by chopping in to lines.
-        
+
         Args:
             width (int): Maximum characters in a line.
-        
+
         Returns:
             Lines: List of lines.
         """

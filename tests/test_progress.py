@@ -19,6 +19,7 @@ from rich.progress import (
     TextColumn,
     TimeRemainingColumn,
     track,
+    _TrackThread,
     TaskID,
     _RefreshThread,
 )
@@ -297,6 +298,20 @@ def test_refresh_thread() -> None:
     progress = Progress()
     thread = _RefreshThread(progress, 10)
     assert thread.progress == progress
+
+
+def test_track_thread() -> None:
+    progress = Progress()
+    task_id = progress.add_task("foo")
+    track_thread = _TrackThread(progress, task_id, 0.1)
+    assert track_thread.completed == 0
+    from time import sleep
+
+    with track_thread:
+        track_thread.completed = 1
+        sleep(0.2)
+        assert progress.tasks[task_id].completed == 1
+        track_thread.completed += 1
 
 
 if __name__ == "__main__":
