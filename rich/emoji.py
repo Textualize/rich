@@ -34,7 +34,7 @@ class Emoji(JupyterMixin):
 
     @classmethod
     def replace(cls, text: str) -> str:
-        """Replace emoji markup with coresponding unicode characters.
+        """Replace emoji markup with corresponding unicode characters.
 
         Args:
             text (str): A string with emojis codes, e.g. "Hello :smiley:!"

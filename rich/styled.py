@@ -13,7 +13,7 @@ class Styled:
 
     Args:
         renderable (RenderableType): Any renderable.
-        style (StyleType): A style to apply accross the entire renderable.
+        style (StyleType): A style to apply across the entire renderable.
     """
 
     def __init__(self, renderable: "RenderableType", style: "StyleType") -> None:

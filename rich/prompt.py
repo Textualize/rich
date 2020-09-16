@@ -354,7 +354,7 @@ if __name__ == "__main__":  # pragma: no cover
     if Confirm.ask("Run [i]prompt[/i] tests?", default=True):
         while True:
             result = IntPrompt.ask(
-                ":rocket: Enter a number betwen [b]1[/b] and [b]10[/b]", default=5
+                ":rocket: Enter a number between [b]1[/b] and [b]10[/b]", default=5
             )
             if result >= 1 and result <= 10:
                 break

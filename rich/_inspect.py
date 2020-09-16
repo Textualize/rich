@@ -33,7 +33,7 @@ class Inspect(JupyterMixin):
         help (bool, optional): Show full help text rather than just first paragraph. Defaults to False.
         methods (bool, optional): Enable inspection of callables. Defaults to False.
         docs (bool, optional): Also render doc strings. Defaults to True.
-        private (bool, optional): Show private attributes (begining with underscore). Defaults to False.
+        private (bool, optional): Show private attributes (beginning with underscore). Defaults to False.
         dunder (bool, optional): Show attributes starting with double underscore. Defaults to False.
         sort (bool, optional): Sort attributes alphabetically. Defaults to True.
         all (bool, optional): Show all attributes. Defaults to False.
