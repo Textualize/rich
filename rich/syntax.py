@@ -1,12 +1,24 @@
 import os.path
 import platform
 import textwrap
+from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional, Set, Tuple, Type, Union
 
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
 from pygments.style import Style as PygmentsStyle
 from pygments.styles import get_style_by_name
-from pygments.token import Token
+from pygments.token import (
+    Comment,
+    Error,
+    Generic,
+    Keyword,
+    Name,
+    Number,
+    Operator,
+    String,
+    Token,
+    Whitespace,
+)
 from pygments.util import ClassNotFound
 
 from ._loop import loop_first
@@ -19,6 +31,149 @@ from .text import Text
 
 WINDOWS = platform.system() == "Windows"
 DEFAULT_THEME = "monokai"
+
+# The following styles are based on https://github.com/pygments/pygments/blob/master/pygments/formatters/terminal.py
+# A few modifications were made
+
+ANSI_LIGHT: Dict[Tuple, Style] = {
+    Token: Style(),
+    Whitespace: Style(color="white"),
+    Comment: Style(dim=True),
+    Comment.Preproc: Style(color="cyan"),
+    Keyword: Style(color="blue"),
+    Keyword.Type: Style(color="cyan"),
+    Operator.Word: Style(color="magenta"),
+    Name.Builtin: Style(color="cyan"),
+    Name.Function: Style(color="green"),
+    Name.Namespace: Style(color="cyan", underline=True),
+    Name.Class: Style(color="green", underline=True),
+    Name.Exception: Style(color="cyan"),
+    Name.Decorator: Style(color="magenta", bold=True),
+    Name.Variable: Style(color="red"),
+    Name.Constant: Style(color="red"),
+    Name.Attribute: Style(color="cyan"),
+    Name.Tag: Style(color="bright_blue"),
+    String: Style(color="yellow"),
+    Number: Style(color="blue"),
+    Generic.Deleted: Style(color="bright_red"),
+    Generic.Inserted: Style(color="green"),
+    Generic.Heading: Style(bold=True),
+    Generic.Subheading: Style(color="magenta", bold=True),
+    Generic.Prompt: Style(bold=True),
+    Generic.Error: Style(color="bright_red"),
+    Error: Style(color="red", underline=True),
+}
+
+ANSI_DARK: Dict[Tuple, Style] = {
+    Token: Style(),
+    Whitespace: Style(color="bright_black"),
+    Comment: Style(dim=True),
+    Comment.Preproc: Style(color="bright_cyan"),
+    Keyword: Style(color="bright_blue"),
+    Keyword.Type: Style(color="bright_cyan"),
+    Operator.Word: Style(color="bright_magenta"),
+    Name.Builtin: Style(color="bright_cyan"),
+    Name.Function: Style(color="bright_green"),
+    Name.Namespace: Style(color="bright_cyan", underline=True),
+    Name.Class: Style(color="bright_green", underline=True),
+    Name.Exception: Style(color="bright_cyan"),
+    Name.Decorator: Style(color="bright_magenta", bold=True),
+    Name.Variable: Style(color="bright_red"),
+    Name.Constant: Style(color="bright_red"),
+    Name.Attribute: Style(color="bright_cyan"),
+    Name.Tag: Style(color="bright_blue"),
+    String: Style(color="yellow"),
+    Number: Style(color="bright_blue"),
+    Generic.Deleted: Style(color="bright_red"),
+    Generic.Inserted: Style(color="bright_green"),
+    Generic.Heading: Style(bold=True),
+    Generic.Subheading: Style(color="bright_magenta", bold=True),
+    Generic.Prompt: Style(bold=True),
+    Generic.Error: Style(color="bright_red"),
+    Error: Style(color="red", underline=True),
+}
+
+RICH_SYNTAX_THEMES = {"ansi_light": ANSI_LIGHT, "ansi_dark": ANSI_DARK}
+
+
+class SyntaxTheme(ABC):
+    """Base class for a syntax theme."""
+
+    @abstractmethod
+    def get_style_for_token(self, token_type: Any) -> Style:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_background_style(self) -> Style:
+        raise NotImplementedError
+
+
+class PygmentsSyntaxTheme(ABC):
+    """Syntax theme that delagates to Pygments theme."""
+
+    def __init__(self, theme: Union[str, Type[PygmentsStyle]]) -> None:
+        self._style_cache: Dict[Tuple, Style] = {}
+        if isinstance(theme, str):
+            try:
+                self._pygments_style_class = get_style_by_name(theme)
+            except ClassNotFound:
+                self._pygments_style_class = get_style_by_name("default")
+        else:
+            self._pygments_style_class = theme
+
+        self._background_color = self._pygments_style_class.background_color
+        self._background_style = Style(bgcolor=self._background_color)
+
+    def get_style_for_token(self, token_type: Tuple) -> Style:
+        try:
+            return self._style_cache[token_type]
+        except KeyError:
+            try:
+                pygments_style = self._pygments_style_class.style_for_token(token_type)
+            except KeyError:
+                style = Style()
+            else:
+                color = pygments_style["color"]
+                bgcolor = pygments_style["bgcolor"]
+                style = Style(
+                    color="#" + color if color else "#000000",
+                    bgcolor="#" + bgcolor if bgcolor else self._background_color,
+                    bold=pygments_style["bold"],
+                    italic=pygments_style["italic"],
+                    underline=pygments_style["underline"],
+                )
+            self._style_cache[token_type] = style
+        return style
+
+    def get_background_style(self) -> Style:
+        return self._background_style
+
+
+class ANSISyntaxTheme(SyntaxTheme):
+    def __init__(self, style_map: Dict[Tuple, Style]) -> None:
+        self.style_map = style_map
+        self._missing_style = Style()
+        self._background_style = Style()
+        self._style_cache: Dict[Tuple, Style] = {}
+
+    def get_style_for_token(self, token_type: tuple) -> Style:
+        try:
+            return self._style_cache[token_type]
+        except KeyError:
+            get_style = self.style_map.get
+            token = tuple(token_type)
+            style = self._missing_style
+            while token:
+                _style = get_style(token)
+                if _style is not None:
+                    style = _style
+                    break
+                token = token[:-1]
+            self._style_cache[token_type] = style
+            return style
+
+    def get_background_style(self) -> Style:
+        return self._background_style
 
 
 class Syntax(JupyterMixin):
@@ -39,13 +194,14 @@ class Syntax(JupyterMixin):
     """
 
     _pygments_style_class: Type[PygmentsStyle]
+    _theme: SyntaxTheme
 
     def __init__(
         self,
         code: str,
         lexer_name: str,
         *,
-        theme: Union[str, Type[PygmentsStyle]] = DEFAULT_THEME,
+        theme: Union[str, Type[PygmentsStyle], SyntaxTheme] = DEFAULT_THEME,
         dedent: bool = False,
         line_numbers: bool = False,
         start_line: int = 1,
@@ -53,7 +209,8 @@ class Syntax(JupyterMixin):
         highlight_lines: Set[int] = None,
         code_width: Optional[int] = None,
         tab_size: int = 4,
-        word_wrap: bool = False
+        word_wrap: bool = False,
+        background_color: str = None,
     ) -> None:
         self.code = code
         self.lexer_name = lexer_name
@@ -65,17 +222,14 @@ class Syntax(JupyterMixin):
         self.code_width = code_width
         self.tab_size = tab_size
         self.word_wrap = word_wrap
+        self.background_color = background_color
 
-        self._style_cache: Dict[Any, Style] = {}
-
-        if not isinstance(theme, str) and issubclass(theme, PygmentsStyle):
-            self._pygments_style_class = theme
+        if isinstance(theme, SyntaxTheme):
+            self._theme = theme
+        elif isinstance(theme, str) and theme in RICH_SYNTAX_THEMES:
+            self._theme = ANSISyntaxTheme(RICH_SYNTAX_THEMES[theme])
         else:
-            try:
-                self._pygments_style_class = get_style_by_name(theme)
-            except ClassNotFound:
-                self._pygments_style_class = get_style_by_name("default")
-        self._background_color = self._pygments_style_class.background_color
+            self._theme = PygmentsSyntaxTheme(theme)
 
     @classmethod
     def from_path(
@@ -146,32 +300,8 @@ class Syntax(JupyterMixin):
             word_wrap=word_wrap,
         )
 
-    def _get_theme_style(self, token_type) -> Style:
-        if token_type in self._style_cache:
-            style = self._style_cache[token_type]
-        else:
-            try:
-                pygments_style = self._pygments_style_class.style_for_token(token_type)
-            except KeyError:
-                style = Style()
-            else:
-                color = pygments_style["color"]
-                bgcolor = pygments_style["bgcolor"]
-                style = Style(
-                    color="#" + color if color else "#000000",
-                    bgcolor="#" + bgcolor if bgcolor else self._background_color,
-                    bold=pygments_style["bold"],
-                    italic=pygments_style["italic"],
-                    underline=pygments_style["underline"],
-                )
-            self._style_cache[token_type] = style
-
-        return style
-
     def _get_default_style(self) -> Style:
-        style = self._get_theme_style(Token.Text)
-        style = style + Style(bgcolor=self._pygments_style_class.background_color)
-        return style
+        return self._theme.get_background_style()
 
     def highlight(self, code: str) -> Text:
         """Highlight code and return a Text instance.
@@ -184,15 +314,16 @@ class Syntax(JupyterMixin):
         """
 
         default_style = self._get_default_style()
+        justify = "default" if default_style.bgcolor is None else "left"
         try:
             lexer = get_lexer_by_name(self.lexer_name)
         except ClassNotFound:
             return Text(
-                code, justify="left", style=default_style, tab_size=self.tab_size
+                code, justify=justify, style=default_style, tab_size=self.tab_size
             )
-        text = Text(justify="left", style=default_style, tab_size=self.tab_size)
+        text = Text(justify=justify, style=default_style, tab_size=self.tab_size)
         append = text.append
-        _get_theme_style = self._get_theme_style
+        _get_theme_style = self._theme.get_style_for_token
         for token_type, token in lexer.get_tokens(code):
             append(token, _get_theme_style(token_type))
         return text
