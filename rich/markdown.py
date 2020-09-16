@@ -5,20 +5,14 @@ from commonmark.blocks import Parser
 from . import box
 from ._loop import loop_first
 from ._stack import Stack
-from .console import (
-    Console,
-    ConsoleOptions,
-    JustifyMethod,
-    RenderResult,
-    Segment,
-)
+from .console import Console, ConsoleOptions, JustifyMethod, RenderResult, Segment
 from .containers import Renderables
 from .jupyter import JupyterMixin
 from .panel import Panel
 from .rule import Rule
 from .style import Style, StyleStack
 from .syntax import Syntax
-from .text import Text
+from .text import Text, TextType
 
 
 class MarkdownElement:
@@ -45,7 +39,7 @@ class MarkdownElement:
             context (MarkdownContext): The markdown context.
         """
 
-    def on_text(self, context: "MarkdownContext", text: str) -> None:
+    def on_text(self, context: "MarkdownContext", text: TextType) -> None:
         """Called when text is parsed.
 
         Args:
@@ -99,8 +93,8 @@ class TextElement(MarkdownElement):
         self.style = context.enter_style(self.style_name)
         self.text = Text(justify="left")
 
-    def on_text(self, context: "MarkdownContext", text: str) -> None:
-        self.text.append(text, context.current_style)
+    def on_text(self, context: "MarkdownContext", text: TextType) -> None:
+        self.text.append(text, context.current_style if isinstance(text, str) else None)
 
     def on_leave(self, context: "MarkdownContext") -> None:
         context.leave_style()
@@ -349,20 +343,38 @@ class ImageItem(TextElement):
 class MarkdownContext:
     """Manages the console render state."""
 
-    def __init__(self, console: Console, options: ConsoleOptions, style: Style) -> None:
+    def __init__(
+        self,
+        console: Console,
+        options: ConsoleOptions,
+        style: Style,
+        inline_code_lexer: str = None,
+        inline_code_theme: str = "monokai",
+    ) -> None:
         self.console = console
         self.options = options
         self.style_stack: StyleStack = StyleStack(style)
         self.stack: Stack[MarkdownElement] = Stack()
+
+        self._syntax: Optional[Syntax] = None
+        if inline_code_lexer is not None:
+            self._syntax = Syntax("", inline_code_lexer, theme=inline_code_theme)
 
     @property
     def current_style(self) -> Style:
         """Current style which is the product of all styles on the stack."""
         return self.style_stack.current
 
-    def on_text(self, text: str) -> None:
+    def on_text(self, text: str, node_type: str) -> None:
         """Called when the parser visits text."""
-        self.stack.top.on_text(self, text)
+        if node_type == "code" and self._syntax is not None:
+            highlight_text = self._syntax.highlight(text)
+            highlight_text.rstrip()
+            self.stack.top.on_text(
+                self, Text.assemble(highlight_text, style=self.style_stack.current)
+            )
+        else:
+            self.stack.top.on_text(self, text)
 
     def enter_style(self, style_name: Union[str, Style]) -> Style:
         """Enter a style context."""
@@ -385,6 +397,10 @@ class Markdown(JupyterMixin):
         justify (JustifyMethod, optional): Justify value for paragraphs. Defaults to None.
         style (Union[str, Style], optional): Optional style to apply to markdown.
         hyperlinks (bool, optional): Enable hyperlinks. Defaults to ``True``.
+        inline_code_lexer: (str, optional): Lexer to use if inline code highlighting is
+            enabled. Defaults to "python".
+        inline_code_theme: (Optional[str], optional): Pygments theme for inline code
+            highlighting, or None for no highlighting. Defaults to None.
     """
 
     elements: ClassVar[Dict[str, Type[MarkdownElement]]] = {
@@ -406,6 +422,8 @@ class Markdown(JupyterMixin):
         justify: JustifyMethod = None,
         style: Union[str, Style] = "none",
         hyperlinks: bool = True,
+        inline_code_lexer: str = None,
+        inline_code_theme: str = None,
     ) -> None:
         self.markup = markup
         parser = Parser()
@@ -414,26 +432,34 @@ class Markdown(JupyterMixin):
         self.justify = justify
         self.style = style
         self.hyperlinks = hyperlinks
+        self.inline_code_lexer = inline_code_lexer
+        self.inline_code_theme = inline_code_theme or code_theme
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         """Render markdown to the console."""
         style = console.get_style(self.style, default="none")
-        context = MarkdownContext(console, options, style)
+        context = MarkdownContext(
+            console,
+            options,
+            style,
+            inline_code_lexer=self.inline_code_lexer,
+            inline_code_theme=self.inline_code_theme,
+        )
         nodes = self.parsed.walker()
         inlines = self.inlines
         new_line = False
         for current, entering in nodes:
             node_type = current.t
             if node_type in ("html_inline", "html_block", "text"):
-                context.on_text(current.literal.replace("\n", " "))
+                context.on_text(current.literal.replace("\n", " "), node_type)
             elif node_type == "linebreak":
                 if entering:
-                    context.on_text("\n")
+                    context.on_text("\n", node_type)
             elif node_type == "softbreak":
                 if entering:
-                    context.on_text(" ")
+                    context.on_text(" ", node_type)
             elif node_type == "link":
                 if entering:
                     link_style = console.get_style("markdown.link", default="none")
@@ -443,14 +469,14 @@ class Markdown(JupyterMixin):
                 else:
                     context.leave_style()
                     if not self.hyperlinks:
-                        context.on_text(" (")
+                        context.on_text(" (", node_type)
                         style = Style(underline=True) + console.get_style(
                             "markdown.link_url", default="none"
                         )
                         context.enter_style(style)
-                        context.on_text(current.destination)
+                        context.on_text(current.destination, node_type)
                         context.leave_style()
-                        context.on_text(")")
+                        context.on_text(")", node_type)
             elif node_type in inlines:
                 if current.is_container():
                     if entering:
@@ -460,7 +486,7 @@ class Markdown(JupyterMixin):
                 else:
                     context.enter_style(f"markdown.{node_type}")
                     if current.literal:
-                        context.on_text(current.literal)
+                        context.on_text(current.literal, node_type)
                     context.leave_style()
             else:
                 element_class = self.elements.get(node_type) or UnknownElement
@@ -522,6 +548,13 @@ if __name__ == "__main__":  # pragma: no cover
         help="pygments code theme",
     )
     parser.add_argument(
+        "-i",
+        "--inline-code-lexer",
+        dest="inline_code_lexer",
+        default=None,
+        help="inline_code_lexer",
+    )
+    parser.add_argument(
         "-y",
         "--hyperlinks",
         dest="hyperlinks",
@@ -560,6 +593,7 @@ if __name__ == "__main__":  # pragma: no cover
             justify="full" if args.justify else "left",
             code_theme=args.code_theme,
             hyperlinks=args.hyperlinks,
+            inline_code_lexer=args.inline_code_lexer,
         )
     if args.page:
         import pydoc

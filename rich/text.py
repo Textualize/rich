@@ -1,3 +1,4 @@
+from functools import partial
 import re
 from operator import itemgetter
 from typing import (
@@ -363,7 +364,7 @@ class Text(JupyterMixin):
             offset = len(self) + offset
 
         get_style = console.get_style
-        style = console.get_style(self.style).copy()
+        style = get_style(self.style).copy()
         for start, end, span_style in self._spans:
             if offset >= start and offset < end:
                 style += get_style(span_style)
@@ -506,14 +507,9 @@ class Text(JupyterMixin):
         """
 
         text = self.plain
-        style_map: Dict[int, Style] = {}
         null_style = Style()
-
-        def get_style(style: Union[str, Style]) -> Style:
-            return console.get_style(style, default=null_style)
-
         enumerated_spans = list(enumerate(self._spans, 1))
-
+        get_style = partial(console.get_style, default=null_style)
         style_map = {index: get_style(span.style) for index, span in enumerated_spans}
         style_map[0] = get_style(self.style)
 
@@ -530,14 +526,14 @@ class Text(JupyterMixin):
         stack_pop = stack.remove
 
         _Segment = Segment
-
         style_cache: Dict[Tuple[int, ...], Style] = {}
+        style_cache_get = style_cache.get
         combine = Style.combine
 
         def get_current_style() -> Style:
             """Construct current style from stack."""
             style_ids = tuple(sorted(stack))
-            cached_style = style_cache.get(style_ids)
+            cached_style = style_cache_get(style_ids)
             if cached_style is not None:
                 return cached_style
             current_style = combine(style_map[_style_id] for _style_id in style_ids)
@@ -879,7 +875,6 @@ class Text(JupyterMixin):
             (offset, offset + len(line))
             for offset, line in zip(divide_offsets, new_lines)
         ]
-
         for span in self._spans:
             line_index = (span.start // average_line_length) % len(line_ranges)
 

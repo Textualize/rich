@@ -182,7 +182,7 @@ class RenderGroup:
 
 def render_group(fit: bool = False) -> Callable:
     """A decorator that turns an iterable of renderables in to a group."""
-    
+
     def decorator(method):
         """Convert a method that returns an iterable of renderables in to a RenderGroup."""
 
