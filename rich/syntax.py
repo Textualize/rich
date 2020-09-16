@@ -29,13 +29,15 @@ from .measure import Measurement
 from .style import Style
 from .text import Text
 
+TokenType = Tuple[str, ...]
+
 WINDOWS = platform.system() == "Windows"
 DEFAULT_THEME = "monokai"
 
 # The following styles are based on https://github.com/pygments/pygments/blob/master/pygments/formatters/terminal.py
 # A few modifications were made
 
-ANSI_LIGHT: Dict[Tuple, Style] = {
+ANSI_LIGHT: Dict[TokenType, Style] = {
     Token: Style(),
     Whitespace: Style(color="white"),
     Comment: Style(dim=True),
@@ -64,7 +66,7 @@ ANSI_LIGHT: Dict[Tuple, Style] = {
     Error: Style(color="red", underline=True),
 }
 
-ANSI_DARK: Dict[Tuple, Style] = {
+ANSI_DARK: Dict[TokenType, Style] = {
     Token: Style(),
     Whitespace: Style(color="bright_black"),
     Comment: Style(dim=True),
@@ -100,11 +102,13 @@ class SyntaxTheme(ABC):
     """Base class for a syntax theme."""
 
     @abstractmethod
-    def get_style_for_token(self, token_type: Any) -> Style:
+    def get_style_for_token(self, token_type: TokenType) -> Style:
+        """Get a style for a given Pygments token."""
         raise NotImplementedError
 
     @abstractmethod
     def get_background_style(self) -> Style:
+        """Get the background color."""
         raise NotImplementedError
 
 
@@ -112,7 +116,7 @@ class PygmentsSyntaxTheme(ABC):
     """Syntax theme that delagates to Pygments theme."""
 
     def __init__(self, theme: Union[str, Type[PygmentsStyle]]) -> None:
-        self._style_cache: Dict[Tuple, Style] = {}
+        self._style_cache: Dict[TokenType, Style] = {}
         if isinstance(theme, str):
             try:
                 self._pygments_style_class = get_style_by_name(theme)
@@ -124,7 +128,8 @@ class PygmentsSyntaxTheme(ABC):
         self._background_color = self._pygments_style_class.background_color
         self._background_style = Style(bgcolor=self._background_color)
 
-    def get_style_for_token(self, token_type: Tuple) -> Style:
+    def get_style_for_token(self, token_type: TokenType) -> Style:
+        """Get a style from a Pygments class."""
         try:
             return self._style_cache[token_type]
         except KeyError:
@@ -150,16 +155,22 @@ class PygmentsSyntaxTheme(ABC):
 
 
 class ANSISyntaxTheme(SyntaxTheme):
-    def __init__(self, style_map: Dict[Tuple, Style]) -> None:
+    """Syntax theme to use standard colors."""
+
+    def __init__(self, style_map: Dict[TokenType, Style]) -> None:
         self.style_map = style_map
         self._missing_style = Style()
         self._background_style = Style()
-        self._style_cache: Dict[Tuple, Style] = {}
+        self._style_cache: Dict[TokenType, Style] = {}
 
-    def get_style_for_token(self, token_type: tuple) -> Style:
+    def get_style_for_token(self, token_type: TokenType) -> Style:
+        """Look up style in the style map."""
         try:
             return self._style_cache[token_type]
         except KeyError:
+            # Styles form a hierarchy
+            # We need to go from most to least specific
+            # e.g. ("foo", "bar", "baz") to ("foo", "bar")  to ("foo",)
             get_style = self.style_map.get
             token = tuple(token_type)
             style = self._missing_style
@@ -201,7 +212,7 @@ class Syntax(JupyterMixin):
         code: str,
         lexer_name: str,
         *,
-        theme: Union[str, Type[PygmentsStyle], SyntaxTheme] = DEFAULT_THEME,
+        theme: Union[str, SyntaxTheme] = DEFAULT_THEME,
         dedent: bool = False,
         line_numbers: bool = False,
         start_line: int = 1,
@@ -226,7 +237,7 @@ class Syntax(JupyterMixin):
 
         if isinstance(theme, SyntaxTheme):
             self._theme = theme
-        elif isinstance(theme, str) and theme in RICH_SYNTAX_THEMES:
+        elif theme in RICH_SYNTAX_THEMES:
             self._theme = ANSISyntaxTheme(RICH_SYNTAX_THEMES[theme])
         else:
             self._theme = PygmentsSyntaxTheme(theme)
