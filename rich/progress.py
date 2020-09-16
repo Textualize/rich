@@ -757,7 +757,7 @@ class Progress(JupyterMixin, RenderHook):
             popleft = _progress.popleft
             while _progress and _progress[0].timestamp < old_sample_time:
                 popleft()
-            while len(_progress) > 20:
+            while len(_progress) > 1000:
                 popleft()
             _progress.append(ProgressSample(current_time, update_completed))
 
