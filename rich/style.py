@@ -8,7 +8,7 @@ from . import errors
 from .color import Color, ColorParseError, ColorSystem, blend_rgb
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
 
-# Style instances and style definitions are often interchangable
+# Style instances and style definitions are often interchangeable
 StyleType = Union[str, "Style"]
 
 
@@ -29,7 +29,7 @@ class _Bit:
 class Style:
     """A terminal style.
 
-    A terminal style consists of a color (`color`), a backround color (`bgcolor`), and a number of attributes, such
+    A terminal style consists of a color (`color`), a background color (`bgcolor`), and a number of attributes, such
     as bold, italic etc. The attributes have 3 states: they can either be on
     (``True``), off (``False``), or not set (``None``).
 

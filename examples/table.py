@@ -14,7 +14,7 @@ table.add_column("Box Office", justify="right", style="green")
 table.add_row("Dec 20, 2019", "Star Wars: The Rise of Skywalker", "$952,110,690")
 table.add_row("May 25, 2018", "Solo: A Star Wars Story", "$393,151,347")
 table.add_row("Dec 15, 2017", "Star Wars Ep. V111: The Last Jedi", "$1,332,539,889")
-table.add_row("Dec 16, 2016", "Rouge One: A Star Wars Story", "$1,332,439,889")
+table.add_row("Dec 16, 2016", "Rogue One: A Star Wars Story", "$1,332,439,889")
 
 console = Console()
 console.print(table, justify="center")

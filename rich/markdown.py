@@ -212,7 +212,7 @@ class BlockQuote(TextElement):
 
 
 class HorizontalRule(MarkdownElement):
-    """A horizontal rule to divide secions."""
+    """A horizontal rule to divide sections."""
 
     new_line = False
 

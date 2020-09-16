@@ -29,7 +29,7 @@ class LiveRender:
         self.renderable = renderable
 
     def position_cursor(self) -> Control:
-        """Get control codes to move cursor to beggining of live render.
+        """Get control codes to move cursor to beginning of live render.
 
         Returns:
             Control: A control instance that may be printed.
