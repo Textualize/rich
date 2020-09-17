@@ -328,6 +328,11 @@ class Style:
         """Link text, if set."""
         return self._link
 
+    @property
+    def transaprent_background(self) -> bool:
+        """Check if the style specified a transparent background."""
+        return self.bgcolor is None or self.bgcolor.is_default
+
     @classmethod
     @lru_cache(maxsize=1024)
     def parse(cls, style_definition: str) -> "Style":
@@ -464,8 +469,9 @@ class Style:
         Returns:
             Style: A new style instance.
         """
-
-        return sum(styles, Style())
+        iter_styles = iter(styles)
+        first_style = next(iter_styles)
+        return sum(iter_styles, first_style)
 
     @classmethod
     def chain(cls, *styles: "Style") -> "Style":
@@ -477,7 +483,9 @@ class Style:
         Returns:
             Style: A new style instance.
         """
-        return sum(styles, Style())
+        iter_styles = iter(styles)
+        first_style = next(iter_styles)
+        return sum(iter_styles, first_style)
 
     def copy(self) -> "Style":
         """Get a copy of this style.

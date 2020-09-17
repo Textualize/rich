@@ -112,7 +112,7 @@ class SyntaxTheme(ABC):
         raise NotImplementedError
 
 
-class PygmentsSyntaxTheme(ABC):
+class PygmentsSyntaxTheme(SyntaxTheme):
     """Syntax theme that delagates to Pygments theme."""
 
     def __init__(self, theme: Union[str, Type[PygmentsStyle]]) -> None:
@@ -202,6 +202,7 @@ class Syntax(JupyterMixin):
         code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
         tab_size (int, optional): Size of tabs. Defaults to 4.
         word_wrap (bool, optional): Enable word wrapping.
+        background_color (str, optional): Optional background color, or None to use theme color. Defaults to None.
     """
 
     _pygments_style_class: Type[PygmentsStyle]
@@ -247,7 +248,7 @@ class Syntax(JupyterMixin):
         cls,
         path: str,
         encoding: str = "utf-8",
-        theme: Union[str, Type[PygmentsStyle]] = DEFAULT_THEME,
+        theme: Union[str, SyntaxTheme] = DEFAULT_THEME,
         dedent: bool = True,
         line_numbers: bool = False,
         line_range: Tuple[int, int] = None,
@@ -256,6 +257,7 @@ class Syntax(JupyterMixin):
         code_width: Optional[int] = None,
         tab_size: int = 4,
         word_wrap: bool = False,
+        background_color: str = None,
     ) -> "Syntax":
         """Construct a Syntax object from a file.
 
@@ -272,6 +274,7 @@ class Syntax(JupyterMixin):
             code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
             tab_size (int, optional): Size of tabs. Defaults to 4.
             word_wrap (bool, optional): Enable word wrapping of code.
+            background_color (str, optional): Optional background color, or None to use theme color. Defaults to None.
 
         Returns:
             [Syntax]: A Syntax object that may be printed to the console
@@ -309,10 +312,29 @@ class Syntax(JupyterMixin):
             code_width=code_width,
             tab_size=tab_size,
             word_wrap=word_wrap,
+            background_color=background_color,
         )
 
-    def _get_default_style(self) -> Style:
-        return self._theme.get_background_style()
+    def _get_base_style(self) -> Style:
+        """Get the base style."""
+        default_style = (
+            Style(bgcolor=self.background_color)
+            if self.background_color is not None
+            else self._theme.get_background_style()
+        )
+        return default_style
+
+    def _get_token_color(self, token_type: TokenType) -> Optional[Color]:
+        """Get a color (if any) for the given token.
+
+        Args:
+            token_type (TokenType): A token type tuple from Pygments.
+
+        Returns:
+            Optional[Color]: Color from theme, or None for no color.
+        """
+        style = self._theme.get_style_for_token(token_type)
+        return style.color
 
     def highlight(self, code: str) -> Text:
         """Highlight code and return a Text instance.
@@ -324,58 +346,72 @@ class Syntax(JupyterMixin):
             Text: A text instance containing syntax highlight.
         """
 
-        default_style = self._get_default_style()
-        justify = "default" if default_style.bgcolor is None else "left"
+        base_style = self._get_base_style()
+        justify: JustifyMethod = (
+            "default" if base_style.transaprent_background else "left"
+        )
+
+        text = Text(
+            justify=justify,
+            style=base_style,
+            tab_size=self.tab_size,
+            no_wrap=not self.word_wrap,
+        )
         try:
             lexer = get_lexer_by_name(self.lexer_name)
         except ClassNotFound:
-            return Text(
-                code, justify=justify, style=default_style, tab_size=self.tab_size
+            text.append(code)
+        else:
+            _get_theme_style = self._theme.get_style_for_token
+            text.append_tokens(
+                (token, _get_theme_style(token_type))
+                for token_type, token in lexer.get_tokens(code)
             )
-        text = Text(justify=justify, style=default_style, tab_size=self.tab_size)
-        append = text.append
-        _get_theme_style = self._theme.get_style_for_token
-        for token_type, token in lexer.get_tokens(code):
-            append(token, _get_theme_style(token_type))
+            if self.background_color is not None:
+                text.stylize(f"on {self.background_color}")
         return text
 
     def _get_line_numbers_color(self, blend: float = 0.3) -> Color:
-        background_color = parse_rgb_hex(
-            self._pygments_style_class.background_color[1:]
-        )
-        foreground_color = self._get_theme_style(Token.Text)._color
-        if foreground_color is None:
-            return Color.default()
-        # TODO: Handle no full colors here
-        assert foreground_color.triplet is not None
+        background_color = self._theme.get_background_style().bgcolor
+        if background_color is None or background_color.is_system_defined:
+            return background_color or Color.default()
+        foreground_color = self._get_token_color(Token.Text)
+        if foreground_color is None or foreground_color.is_system_defined:
+            return foreground_color or Color.default()
         new_color = blend_rgb(
-            background_color, foreground_color.triplet, cross_fade=blend
+            background_color.get_truecolor(),
+            foreground_color.get_truecolor(),
+            cross_fade=blend,
         )
         return Color.from_triplet(new_color)
 
     @property
     def _numbers_column_width(self) -> int:
         """Get the number of characters used to render the numbers column."""
+        column_width = 0
         if self.line_numbers:
-            return len(str(self.start_line + self.code.count("\n"))) + 2
-        return 0
+            column_width = len(str(self.start_line + self.code.count("\n"))) + 2
+        return column_width
 
     def _get_number_styles(self, console: Console) -> Tuple[Style, Style, Style]:
         """Get background, number, and highlight styles for line numbers."""
-        background_style = Style(bgcolor=self._pygments_style_class.background_color)
+        background_style = self._get_base_style()
+        if background_style.transaprent_background:
+            return Style(), Style(dim=True), Style()
         if console.color_system in ("256", "truecolor"):
             number_style = Style.chain(
                 background_style,
-                self._get_theme_style(Token.Text),
+                self._theme.get_style_for_token(Token.Text),
                 Style(color=self._get_line_numbers_color()),
             )
             highlight_number_style = Style.chain(
                 background_style,
-                self._get_theme_style(Token.Text),
+                self._theme.get_style_for_token(Token.Text),
                 Style(bold=True, color=self._get_line_numbers_color(0.9)),
             )
         else:
-            number_style = highlight_number_style = Style()
+            number_style = background_style + Style(dim=True)
+            highlight_number_style = background_style + Style(dim=False)
         return background_style, number_style, highlight_number_style
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
@@ -387,28 +423,20 @@ class Syntax(JupyterMixin):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
+        transparent_background = self._get_base_style().transaprent_background
         code_width = (
             (options.max_width - self._numbers_column_width - 1)
             if self.code_width is None
             else self.code_width
         )
-        code = self.code
-        if self.dedent:
-            code = textwrap.dedent(code)
-        text = self.highlight(self.code)
-        if text.plain.endswith("\n"):
-            text.plain = text.plain[:-1]
+        text = self.highlight(textwrap.dedent(self.code) if self.dedent else self.code)
+        text.removesuffix("\n")
         if not self.line_numbers:
-            if self.code_width is None:
-                yield text
-            else:
-                yield from console.render(
-                    text, options=options.update(width=code_width)
-                )
+            # Simple case of just rendering text
+            yield from console.render(text, options=options.update(width=code_width))
             return
 
         lines = text.split("\n")
-
         line_offset = 0
         if self.line_range:
             start_line, end_line = self.line_range
@@ -434,30 +462,33 @@ class Syntax(JupyterMixin):
         for line_no, line in enumerate(lines, self.start_line + line_offset):
             if self.word_wrap:
                 wrapped_lines = console.render_lines(
-                    line, render_options, style=background_style
+                    line,
+                    render_options,
+                    style=background_style,
+                    pad=not transparent_background,
                 )
             else:
                 segments = list(line.render(console, end=""))
-                wrapped_lines = [
-                    Segment.adjust_line_length(
-                        segments, render_options.max_width, style=background_style
-                    )
-                ]
+                if options.no_wrap:
+                    wrapped_lines = [segments]
+                else:
+                    wrapped_lines = [
+                        _Segment.adjust_line_length(
+                            segments,
+                            render_options.max_width,
+                            style=background_style,
+                            pad=not transparent_background,
+                        )
+                    ]
             for first, wrapped_line in loop_first(wrapped_lines):
                 if first:
                     line_column = str(line_no).rjust(numbers_column_width - 2) + " "
                     if highlight_line(line_no):
                         yield _Segment(line_pointer, number_style)
-                        yield _Segment(
-                            line_column,
-                            highlight_number_style,
-                        )
+                        yield _Segment(line_column, highlight_number_style)
                     else:
                         yield _Segment("  ", highlight_number_style)
-                        yield _Segment(
-                            line_column,
-                            number_style,
-                        )
+                        yield _Segment(line_column, number_style)
                 else:
                     yield padding
                 yield from wrapped_line
@@ -504,7 +535,22 @@ if __name__ == "__main__":  # pragma: no cover
         help="word wrap long lines",
     )
     parser.add_argument(
+        "-s",
+        "--soft-wrap",
+        action="store_true",
+        dest="soft_wrap",
+        default=False,
+        help="enable soft wrapping mode",
+    )
+    parser.add_argument(
         "-t", "--theme", dest="theme", default="monokai", help="pygments theme"
+    )
+    parser.add_argument(
+        "-b",
+        "--background-color",
+        dest="background_color",
+        default=None,
+        help="Overide background color",
     )
     args = parser.parse_args()
 
@@ -517,5 +563,6 @@ if __name__ == "__main__":  # pragma: no cover
         line_numbers=args.line_numbers,
         word_wrap=args.word_wrap,
         theme=args.theme,
+        background_color=args.background_color,
     )
-    console.print(syntax)
+    console.print(syntax, soft_wrap=args.soft_wrap)

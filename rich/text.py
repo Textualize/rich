@@ -246,6 +246,7 @@ class Text(JupyterMixin):
         style: Union[str, Style] = "",
         justify: "JustifyMethod" = None,
         overflow: "OverflowMethod" = None,
+        no_wrap: bool = None,
         end: str = "\n",
         tab_size: int = 8,
     ) -> "Text":
@@ -263,7 +264,12 @@ class Text(JupyterMixin):
             Text: A new text instance.
         """
         text = cls(
-            style=style, justify=justify, overflow=overflow, end=end, tab_size=tab_size
+            style=style,
+            justify=justify,
+            overflow=overflow,
+            no_wrap=no_wrap,
+            end=end,
+            tab_size=tab_size,
         )
         append = text.append
         _Text = Text
@@ -349,6 +355,15 @@ class Text(JupyterMixin):
             # Span not in text or not valid
             return
         self._spans.append(Span(start, min(length, end), style))
+
+    def removesuffix(self, suffix: str) -> None:
+        """Remove a suffix if it exists.
+
+        Args:
+            suffix (str): Suffix to remove.
+        """
+        if self.plain.endswith(suffix):
+            self.plain = self.plain[: -len(suffix)]
 
     def get_style_at_offset(self, console: "Console", offset: int) -> Style:
         """Get the style of a character at give offset.
@@ -536,7 +551,7 @@ class Text(JupyterMixin):
             cached_style = style_cache_get(style_ids)
             if cached_style is not None:
                 return cached_style
-            current_style = combine(style_map[_style_id] for _style_id in style_ids)
+            current_style = combine([style_map[_style_id] for _style_id in style_ids])
             style_cache[style_ids] = current_style
             return current_style
 
@@ -791,6 +806,26 @@ class Text(JupyterMixin):
             for start, end, style in text._spans
         )
         self._length += len(text)
+        return self
+
+    def append_tokens(self, tokens: Iterable[Tuple[str, StyleType]]):
+        """Append iterable of str and style. Style may be a Style instance or a style definition.
+
+        Args:
+            pairs (Iterable[Tuple[str, StyleType]]): An iterable of tuples containing str content and style.
+
+        Returns:
+            Text: Returns self for chaining.
+        """
+        append_text = self._text.append
+        append_span = self._spans.append
+        _Span = Span
+        offset = len(self)
+        for content, style in tokens:
+            append_text(content)
+            append_span(_Span(offset, offset + len(content), style))
+            offset += len(content)
+        self._length = offset
         return self
 
     def copy_styles(self, text: "Text") -> None:

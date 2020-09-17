@@ -286,6 +286,16 @@ class Color(NamedTuple):
             return ColorSystem.STANDARD
         return ColorSystem(int(self.type))
 
+    @property
+    def is_system_defined(self) -> bool:
+        """Check if the color is ultimately defined by the system."""
+        return self.system not in (ColorSystem.EIGHT_BIT, ColorSystem.TRUECOLOR)
+
+    @property
+    def is_default(self) -> bool:
+        """Check if the color is a default color."""
+        return self.type == ColorType.DEFAULT
+
     def get_truecolor(
         self, theme: "TerminalTheme" = None, foreground=True
     ) -> ColorTriplet:
