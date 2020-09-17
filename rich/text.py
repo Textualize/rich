@@ -541,18 +541,18 @@ class Text(JupyterMixin):
         stack_pop = stack.remove
 
         _Segment = Segment
-        style_cache: Dict[Tuple[int, ...], Style] = {}
+        style_cache: Dict[Tuple[Style, ...], Style] = {}
         style_cache_get = style_cache.get
         combine = Style.combine
 
         def get_current_style() -> Style:
             """Construct current style from stack."""
-            style_ids = tuple(sorted(stack))
-            cached_style = style_cache_get(style_ids)
+            styles = tuple(style_map[_style_id] for _style_id in sorted(stack))
+            cached_style = style_cache_get(styles)
             if cached_style is not None:
                 return cached_style
-            current_style = combine([style_map[_style_id] for _style_id in style_ids])
-            style_cache[style_ids] = current_style
+            current_style = combine(styles)
+            style_cache[styles] = current_style
             return current_style
 
         for (offset, leaving, style_id), (next_offset, _, _) in zip(spans, spans[1:]):
@@ -615,7 +615,6 @@ class Text(JupyterMixin):
         """
         if "\t" not in self.plain:
             return self.copy()
-        parts = self.split("\t", include_separator=True)
         pos = 0
         if tab_size is None:
             tab_size = self.tab_size
@@ -623,17 +622,19 @@ class Text(JupyterMixin):
         result = self.blank_copy()
         append = result.append
 
-        for part in parts:
-            if part.plain.endswith("\t"):
-                part._text = [part.plain[:-1] + " "]
-                append(part)
-                pos += len(part)
-                spaces = tab_size - ((pos - 1) % tab_size) - 1
-                if spaces:
-                    append(" " * spaces, self.style)
-                    pos += spaces
-            else:
-                append(part)
+        for line in self.split("\n", include_separator=True):
+            parts = line.split("\t", include_separator=True)
+            for part in parts:
+                if part.plain.endswith("\t"):
+                    part._text = [part.plain[:-1] + " "]
+                    append(part)
+                    pos += len(part)
+                    spaces = tab_size - ((pos - 1) % tab_size) - 1
+                    if spaces:
+                        append(" " * spaces, self.style)
+                        pos += spaces
+                else:
+                    append(part)
         return result
 
     def truncate(
@@ -1010,16 +1011,8 @@ class Text(JupyterMixin):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from rich.console import Console
+    from rich import print
 
-    console = Console()
-    t = Text("foo bar", justify="left")
-    print(repr(t.wrap(console, 4)))
-
-    test = Text("Vulnerability CVE-2018-6543 detected")
-
-    def get_style(text: str) -> str:
-        return f"bold link https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword={text}"
-
-    test.highlight_regex(r"CVE-\d{4}-\d+", get_style)
-    console.print(test)
+    text = Text("<span>\n\tHello\n</span>")
+    text = text.tabs_to_spaces(4)
+    print(text)

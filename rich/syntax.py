@@ -194,7 +194,7 @@ class Syntax(JupyterMixin):
         code (str): Code to highlight.
         lexer_name (str): Lexer to use (see https://pygments.org/docs/lexers/)
         theme (str, optional): Color theme, aka Pygments style (see https://pygments.org/docs/styles/#getting-a-list-of-available-styles). Defaults to "monokai".
-        dedent (bool, optional): Enable stripping of initial whitespace. Defaults to True.
+        dedent (bool, optional): Enable stripping of initial whitespace. Defaults to False.
         line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
         start_line (int, optional): Starting number for line numbers. Defaults to 1.
         line_range (Tuple[int, int], optional): If given should be a tuple of the start and end line to render.
@@ -249,7 +249,7 @@ class Syntax(JupyterMixin):
         path: str,
         encoding: str = "utf-8",
         theme: Union[str, SyntaxTheme] = DEFAULT_THEME,
-        dedent: bool = True,
+        dedent: bool = False,
         line_numbers: bool = False,
         line_range: Tuple[int, int] = None,
         start_line: int = 1,
@@ -429,8 +429,11 @@ class Syntax(JupyterMixin):
             if self.code_width is None
             else self.code_width
         )
-        text = self.highlight(textwrap.dedent(self.code) if self.dedent else self.code)
+        code = textwrap.dedent(self.code) if self.dedent else self.code
+        code = code.expandtabs(self.tab_size)
+        text = self.highlight(code)
         text.removesuffix("\n")
+        text = text.tabs_to_spaces(self.tab_size)
         if not self.line_numbers:
             # Simple case of just rendering text
             yield from console.render(text, options=options.update(width=code_width))
