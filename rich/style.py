@@ -158,7 +158,7 @@ class Style:
                 self._bgcolor,
                 self._attributes,
                 self._set_attributes,
-                self._link,
+                link,
             )
         )
 
