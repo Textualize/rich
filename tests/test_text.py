@@ -481,16 +481,20 @@ def test_print_sep_end(print_text, result):
 
 def test_tabs_to_spaces():
     test = Text("\tHello\tWorld", tab_size=8)
-    assert test.tabs_to_spaces().plain == "        Hello   World"
+    test.expand_tabs()
+    assert test.plain == "        Hello   World"
 
     test = Text("\tHello\tWorld", tab_size=4)
-    assert test.tabs_to_spaces().plain == "    Hello   World"
+    test.expand_tabs()
+    assert test.plain == "    Hello   World"
 
     test = Text(".\t..\t...\t....\t", tab_size=4)
-    assert test.tabs_to_spaces().plain == ".   ..  ... ....    "
+    test.expand_tabs()
+    assert test.plain == ".   ..  ... ....    "
 
     test = Text("No Tabs")
-    assert test.tabs_to_spaces().plain == "No Tabs"
+    test.expand_tabs()
+    assert test.plain == "No Tabs"
 
 
 def test_markup_switch():

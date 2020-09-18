@@ -246,6 +246,7 @@ class Text(JupyterMixin):
         style: Union[str, Style] = "",
         justify: "JustifyMethod" = None,
         overflow: "OverflowMethod" = None,
+        no_wrap: bool = None,
         end: str = "\n",
         tab_size: int = 8,
     ) -> "Text":
@@ -263,7 +264,12 @@ class Text(JupyterMixin):
             Text: A new text instance.
         """
         text = cls(
-            style=style, justify=justify, overflow=overflow, end=end, tab_size=tab_size
+            style=style,
+            justify=justify,
+            overflow=overflow,
+            no_wrap=no_wrap,
+            end=end,
+            tab_size=tab_size,
         )
         append = text.append
         _Text = Text
@@ -349,6 +355,15 @@ class Text(JupyterMixin):
             # Span not in text or not valid
             return
         self._spans.append(Span(start, min(length, end), style))
+
+    def remove_suffix(self, suffix: str) -> None:
+        """Remove a suffix if it exists.
+
+        Args:
+            suffix (str): Suffix to remove.
+        """
+        if self.plain.endswith(suffix):
+            self.plain = self.plain[: -len(suffix)]
 
     def get_style_at_offset(self, console: "Console", offset: int) -> Style:
         """Get the style of a character at give offset.
@@ -526,18 +541,18 @@ class Text(JupyterMixin):
         stack_pop = stack.remove
 
         _Segment = Segment
-        style_cache: Dict[Tuple[int, ...], Style] = {}
+        style_cache: Dict[Tuple[Style, ...], Style] = {}
         style_cache_get = style_cache.get
         combine = Style.combine
 
         def get_current_style() -> Style:
             """Construct current style from stack."""
-            style_ids = tuple(sorted(stack))
-            cached_style = style_cache_get(style_ids)
+            styles = tuple(style_map[_style_id] for _style_id in sorted(stack))
+            cached_style = style_cache_get(styles)
             if cached_style is not None:
                 return cached_style
-            current_style = combine(style_map[_style_id] for _style_id in style_ids)
-            style_cache[style_ids] = current_style
+            current_style = combine(styles)
+            style_cache[styles] = current_style
             return current_style
 
         for (offset, leaving, style_id), (next_offset, _, _) in zip(spans, spans[1:]):
@@ -589,18 +604,15 @@ class Text(JupyterMixin):
         new_text._length = offset
         return new_text
 
-    def tabs_to_spaces(self, tab_size: int = None) -> "Text":
-        """Get a new string with tabs converted to spaces.
+    def expand_tabs(self, tab_size: int = None) -> None:
+        """Converts tabs to spaces.
 
         Args:
             tab_size (int, optional): Size of tabs. Defaults to 8.
 
-        Returns:
-            Text: A new instance with tabs replaces by spaces.
         """
         if "\t" not in self.plain:
-            return self.copy()
-        parts = self.split("\t", include_separator=True)
+            return
         pos = 0
         if tab_size is None:
             tab_size = self.tab_size
@@ -608,18 +620,22 @@ class Text(JupyterMixin):
         result = self.blank_copy()
         append = result.append
 
-        for part in parts:
-            if part.plain.endswith("\t"):
-                part._text = [part.plain[:-1] + " "]
-                append(part)
-                pos += len(part)
-                spaces = tab_size - ((pos - 1) % tab_size) - 1
-                if spaces:
-                    append(" " * spaces, self.style)
-                    pos += spaces
-            else:
-                append(part)
-        return result
+        _style = self.style
+        for line in self.split("\n", include_separator=True):
+            parts = line.split("\t", include_separator=True)
+            for part in parts:
+                if part.plain.endswith("\t"):
+                    part._text = [part.plain[:-1] + " "]
+                    append(part)
+                    pos += len(part)
+                    spaces = tab_size - ((pos - 1) % tab_size) - 1
+                    if spaces:
+                        append(" " * spaces, _style)
+                        pos += spaces
+                else:
+                    append(part)
+        self._text = [result.plain]
+        self._spans[:] = result._spans
 
     def truncate(
         self,
@@ -793,6 +809,26 @@ class Text(JupyterMixin):
         self._length += len(text)
         return self
 
+    def append_tokens(self, tokens: Iterable[Tuple[str, StyleType]]):
+        """Append iterable of str and style. Style may be a Style instance or a str style definition.
+
+        Args:
+            pairs (Iterable[Tuple[str, StyleType]]): An iterable of tuples containing str content and style.
+
+        Returns:
+            Text: Returns self for chaining.
+        """
+        append_text = self._text.append
+        append_span = self._spans.append
+        _Span = Span
+        offset = len(self)
+        for content, style in tokens:
+            append_text(content)
+            append_span(_Span(offset, offset + len(content), style))
+            offset += len(content)
+        self._length = offset
+        return self
+
     def copy_styles(self, text: "Text") -> None:
         """Copy styles from another Text instance.
 
@@ -940,7 +976,7 @@ class Text(JupyterMixin):
         lines = Lines()
         for line in self.split(allow_blank=True):
             if "\t" in line:
-                line = line.tabs_to_spaces(tab_size)
+                line.expand_tabs(tab_size)
             if no_wrap:
                 new_lines = Lines([line])
             else:
@@ -975,16 +1011,8 @@ class Text(JupyterMixin):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from rich.console import Console
+    from rich import print
 
-    console = Console()
-    t = Text("foo bar", justify="left")
-    print(repr(t.wrap(console, 4)))
-
-    test = Text("Vulnerability CVE-2018-6543 detected")
-
-    def get_style(text: str) -> str:
-        return f"bold link https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword={text}"
-
-    test.highlight_regex(r"CVE-\d{4}-\d+", get_style)
-    console.print(test)
+    text = Text("<span>\n\tHello\n</span>")
+    text.expand_tabs(4)
+    print(text)

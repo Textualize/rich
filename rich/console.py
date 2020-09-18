@@ -717,7 +717,9 @@ class Console:
 
         try:
             style = self._styles.get(name)
-            return style.copy() if style is not None else Style.parse(name).copy()
+            if style is None:
+                style = Style.parse(name)
+            return style.copy() if style.link else style
         except errors.StyleSyntaxError as error:
             if default is not None:
                 return self.get_style(default)

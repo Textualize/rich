@@ -28,9 +28,6 @@ if TYPE_CHECKING:
 class Column:
     """Defines a column in a table."""
 
-    index: int
-    """Index of column."""
-
     header: "RenderableType" = ""
     """RenderableType: Renderable for the header (typically a string)"""
 
@@ -59,6 +56,9 @@ class Column:
 
     no_wrap: bool = False
     """bool: Prevent wrapping of text within the column. Defaults to ``False``."""
+
+    _index: int = 0
+    """Index of column."""
 
     _cells: List["RenderableType"] = field(default_factory=list)
 
@@ -138,10 +138,15 @@ class Table(JupyterMixin):
         caption_style: StyleType = None,
     ) -> None:
 
-        self.columns = [
-            (Column(index, header) if isinstance(header, str) else header)
-            for index, header in enumerate(headers)
-        ]
+        self.columns: List[Column] = []
+        append_column = self.columns.append
+        for index, header in enumerate(headers):
+            if isinstance(header, str):
+                append_column(Column(_index=index, header=header))
+            else:
+                header._index = index
+                append_column(header)
+
         self.title = title
         self.caption = caption
         self.width = width
@@ -296,7 +301,7 @@ class Table(JupyterMixin):
         """
 
         column = Column(
-            index=len(self.columns),
+            _index=len(self.columns),
             header=header,
             footer=footer,
             header_style=Style.pick_first(
@@ -343,7 +348,7 @@ class Table(JupyterMixin):
             ]
         for index, renderable in enumerate(cell_renderables):
             if index == len(columns):
-                column = Column(index)
+                column = Column(_index=index)
                 for _ in range(self._row_count):
                     add_cell(column, Text(""))
                 self.columns.append(column)
@@ -411,7 +416,7 @@ class Table(JupyterMixin):
                     for _range, column in zip(width_ranges, columns)
                 ]
                 flex_minimum = [
-                    (column.width or 1) + get_padding_width(column.index)
+                    (column.width or 1) + get_padding_width(column._index)
                     for column in columns
                     if column.flexible
                 ]
@@ -552,7 +557,7 @@ class Table(JupyterMixin):
         if max_width < 1:
             return Measurement(0, 0)
 
-        padding_width = self._get_padding_width(column.index)
+        padding_width = self._get_padding_width(column._index)
 
         if column.width is not None:
             # Fixed width column
@@ -565,7 +570,7 @@ class Table(JupyterMixin):
         append_min = min_widths.append
         append_max = max_widths.append
         get_render_width = Measurement.get
-        for cell in self._get_cells(column.index, column):
+        for cell in self._get_cells(column._index, column):
             _min, _max = get_render_width(console, cell.renderable, max_width)
             append_min(_min)
             append_max(_max)
