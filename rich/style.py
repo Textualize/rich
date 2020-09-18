@@ -57,6 +57,7 @@ class Style:
     _bgcolor: Optional[Color]
     _attributes: int
     _set_attributes: int
+    _hash: int
 
     __slots__ = [
         "_color",
@@ -67,6 +68,7 @@ class Style:
         "_link_id",
         "_ansi",
         "_style_definition",
+        "_hash",
     ]
 
     # maps bits on to SGR parameter
@@ -150,6 +152,15 @@ class Style:
         )
         self._link = link
         self._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
+        self._hash = hash(
+            (
+                self._color,
+                self._bgcolor,
+                self._attributes,
+                self._set_attributes,
+                self._link,
+            )
+        )
 
     bold = _Bit(0)
     dim = _Bit(1)
@@ -303,15 +314,7 @@ class Style:
         )
 
     def __hash__(self) -> int:
-        return hash(
-            (
-                self._color,
-                self._bgcolor,
-                self._attributes,
-                self._set_attributes,
-                self._link,
-            )
-        )
+        return self._hash
 
     @property
     def color(self) -> Optional[Color]:
@@ -502,6 +505,7 @@ class Style:
         style._set_attributes = self._set_attributes
         style._link = self._link
         style._link_id = f"{time()}-{randint(0, 999999)}" if self._link else ""
+        style._hash = self._hash
         return style
 
     def render(
@@ -561,6 +565,7 @@ class Style:
         new_style._set_attributes = self._set_attributes | style._set_attributes
         new_style._link = style._link or self._link
         new_style._link_id = style._link_id or self._link_id
+        new_style._hash = style._hash
         return new_style
 
 

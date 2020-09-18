@@ -433,7 +433,7 @@ class Syntax(JupyterMixin):
         code = code.expandtabs(self.tab_size)
         text = self.highlight(code)
         text.removesuffix("\n")
-        text = text.tabs_to_spaces(self.tab_size)
+        text.expand_tabs(self.tab_size)
         if not self.line_numbers:
             # Simple case of just rendering text
             yield from console.render(text, options=options.update(width=code_width))

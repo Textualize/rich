@@ -58,7 +58,7 @@ class Rule(JupyterMixin):
                 title_text.truncate(width - 4, overflow="ellipsis")
 
             title_text.plain = title_text.plain.replace("\n", " ")
-            title_text = title_text.tabs_to_spaces()
+            title_text.expand_tabs()
             rule_text = Text(end=self.end)
             side_width = (width - cell_len(title_text.plain)) // 2
             left = Text(characters * (side_width // chars_len + 1))

@@ -604,17 +604,15 @@ class Text(JupyterMixin):
         new_text._length = offset
         return new_text
 
-    def tabs_to_spaces(self, tab_size: int = None) -> "Text":
-        """Get a new string with tabs converted to spaces.
+    def expand_tabs(self, tab_size: int = None) -> None:
+        """Converts tabs to spaces.
 
         Args:
             tab_size (int, optional): Size of tabs. Defaults to 8.
 
-        Returns:
-            Text: A new instance with tabs replaces by spaces.
         """
         if "\t" not in self.plain:
-            return self.copy()
+            return
         pos = 0
         if tab_size is None:
             tab_size = self.tab_size
@@ -622,6 +620,7 @@ class Text(JupyterMixin):
         result = self.blank_copy()
         append = result.append
 
+        _style = self.style
         for line in self.split("\n", include_separator=True):
             parts = line.split("\t", include_separator=True)
             for part in parts:
@@ -631,11 +630,12 @@ class Text(JupyterMixin):
                     pos += len(part)
                     spaces = tab_size - ((pos - 1) % tab_size) - 1
                     if spaces:
-                        append(" " * spaces, self.style)
+                        append(" " * spaces, _style)
                         pos += spaces
                 else:
                     append(part)
-        return result
+        self._text = [result.plain]
+        self._spans[:] = result._spans
 
     def truncate(
         self,
@@ -976,7 +976,7 @@ class Text(JupyterMixin):
         lines = Lines()
         for line in self.split(allow_blank=True):
             if "\t" in line:
-                line = line.tabs_to_spaces(tab_size)
+                line.expand_tabs(tab_size)
             if no_wrap:
                 new_lines = Lines([line])
             else:
@@ -1014,5 +1014,5 @@ if __name__ == "__main__":  # pragma: no cover
     from rich import print
 
     text = Text("<span>\n\tHello\n</span>")
-    text = text.tabs_to_spaces(4)
+    text.expand_tabs(4)
     print(text)

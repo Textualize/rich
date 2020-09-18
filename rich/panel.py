@@ -96,7 +96,7 @@ class Panel(JupyterMixin):
             )
             title_text.end = ""
             title_text.plain = title_text.plain.replace("\n", " ")
-            title_text = title_text.tabs_to_spaces()
+            title_text.expand_tabs()
             title_text.pad(1)
             return title_text
         return None
