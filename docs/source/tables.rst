@@ -65,7 +65,7 @@ This allows you to specify the text of the column only. If you want to set other
     table = Table(
         "Released",
         "Title",
-        Column("Box Office", align="right"),
+        Column(header="Box Office", align="right"),
         title="Star Wars Movies"
     )
 
