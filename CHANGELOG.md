@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - New ansi_dark and ansi_light themes
 - Added Text.append_tokens for fast appending of string + Style pairs
+- Added Text.remove_suffix
+- Added Text.append_tokens
 
 ### Changed
 

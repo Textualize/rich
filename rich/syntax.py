@@ -432,7 +432,7 @@ class Syntax(JupyterMixin):
         code = textwrap.dedent(self.code) if self.dedent else self.code
         code = code.expandtabs(self.tab_size)
         text = self.highlight(code)
-        text.removesuffix("\n")
+        text.remove_suffix("\n")
         text.expand_tabs(self.tab_size)
         if not self.line_numbers:
             # Simple case of just rendering text

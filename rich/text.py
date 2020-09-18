@@ -356,7 +356,7 @@ class Text(JupyterMixin):
             return
         self._spans.append(Span(start, min(length, end), style))
 
-    def removesuffix(self, suffix: str) -> None:
+    def remove_suffix(self, suffix: str) -> None:
         """Remove a suffix if it exists.
 
         Args:
