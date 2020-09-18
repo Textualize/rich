@@ -59,7 +59,7 @@ You may also add columns by specifying them in the positional arguments of the :
 
     table = Table("Released", "Title", "Box Office", title="Star Wars Movies") 
 
-This allows you to specify the text of the column only. If you want to set other attributes, such as width, style, and alignment, you can add an :class:`~rich.table.Column` class. Here's an example::
+This allows you to specify the text of the column only. If you want to set other attributes, such as width and style, you can add an :class:`~rich.table.Column` class. Here's an example::
 
     from rich.table import Column
     table = Table(

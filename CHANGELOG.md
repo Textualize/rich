@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Text.tabs_to_spaces was renamed to Text.expand_tabs, which works in place rather than returning a new instance
+-
 - Optimized Style.combine and Style.chain
 - Optimized text rendering by fixing internal cache mechanism
 - Optimized hash generation for Styles

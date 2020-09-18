@@ -810,7 +810,7 @@ class Text(JupyterMixin):
         return self
 
     def append_tokens(self, tokens: Iterable[Tuple[str, StyleType]]):
-        """Append iterable of str and style. Style may be a Style instance or a style definition.
+        """Append iterable of str and style. Style may be a Style instance or a str style definition.
 
         Args:
             pairs (Iterable[Tuple[str, StyleType]]): An iterable of tuples containing str content and style.
