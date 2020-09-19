@@ -56,6 +56,7 @@ OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
 CONSOLE_HTML_FORMAT = """\
 <!DOCTYPE html>
 <head>
+<meta charset="UTF-8">
 <style>
 {stylesheet}
 body {{
