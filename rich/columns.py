@@ -178,7 +178,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich.panel import Panel
 
-    files = [f"{i} {s}" for i, s in enumerate(sorted(os.listdir()))]
+    files = [Panel(f"{i} {s}") for i, s in enumerate(sorted(os.listdir()))]
     columns = Columns(files, padding=(0, 1), expand=False, equal=False)
     console.print(columns)
     console.rule()
