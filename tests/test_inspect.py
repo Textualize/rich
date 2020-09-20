@@ -85,6 +85,7 @@ def test_inspect_text():
     assert expected == render(t)
 
 
+@skip_py36
 def test_inspect_empty_dict():
 
     expected = (
@@ -128,6 +129,7 @@ def test_inspect_builtin_function():
     assert expected == render(print)
 
 
+@skip_py36
 def test_inspect_integer():
 
     expected = (
@@ -144,6 +146,7 @@ def test_inspect_integer():
     assert expected == render(1)
 
 
+@skip_py36
 def test_inspect_integer_with_methods():
 
     expected = (
