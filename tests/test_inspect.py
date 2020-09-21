@@ -13,6 +13,12 @@ skip_py36 = pytest.mark.skipif(
 )
 
 
+skip_py37 = pytest.mark.skipif(
+    sys.version_info.minor == 7 and sys.version_info.major == 3,
+    reason="rendered differently on py3.7",
+)
+
+
 def render(obj, methods=False) -> str:
     console = Console(file=io.StringIO(), width=50, legacy_windows=False)
     inspect(obj, console=console, methods=methods)
@@ -86,6 +92,7 @@ def test_inspect_text():
 
 
 @skip_py36
+@skip_py37
 def test_inspect_empty_dict():
 
     expected = (
@@ -147,6 +154,7 @@ def test_inspect_integer():
 
 
 @skip_py36
+@skip_py37
 def test_inspect_integer_with_methods():
 
     expected = (
