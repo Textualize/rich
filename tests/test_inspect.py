@@ -68,27 +68,19 @@ def test_render():
 
 
 def test_inspect_text():
-    from rich.text import Text
-
-    t = Text("Hello, World")
 
     expected = (
-        "╭─ <class 'rich.text.Text'> ─╮\n"
-        "│ Text with color / style.   │\n"
-        "│                            │\n"
-        "│ cell_len = 12              │\n"
-        "│      end = '\\n'            │\n"
-        "│  justify = None            │\n"
-        "│  no_wrap = None            │\n"
-        "│ overflow = None            │\n"
-        "│    plain = 'Hello, World'  │\n"
-        "│    spans = []              │\n"
-        "│    style = ''              │\n"
-        "│ tab_size = 8               │\n"
-        "╰────────────────────────────╯\n"
+        "╭──────────────── <class 'str'> ─────────────────╮\n"
+        "│ str(object='') -> str                          │\n"
+        "│ str(bytes_or_buffer[, encoding[, errors]]) ->  │\n"
+        "│ str                                            │\n"
+        "│                                                │\n"
+        "│ 33 attribute(s) not shown. Use                 │\n"
+        "│ inspect(<OBJECT>, all=True) to see all         │\n"
+        "│ attributes.                                    │\n"
+        "╰────────────────────────────────────────────────╯\n"
     )
-
-    assert expected == render(t)
+    assert expected == render("Hello")
 
 
 @skip_py36
