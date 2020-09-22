@@ -1,20 +1,20 @@
 from collections.abc import Mapping
+from typing import Optional
 
+from rich.console import JustifyMethod
 
 from . import box
 from .highlighter import ReprHighlighter
 from .pretty import Pretty
 from .table import Table
 
-_NOT_PROVIDED = object()
-
 
 def tabulate_mapping(
     mapping: Mapping,
     title: str = None,
     caption: str = None,
-    title_justify: str = _NOT_PROVIDED,
-    caption_justify: str = _NOT_PROVIDED,
+    title_justify: Optional[JustifyMethod] = None,
+    caption_justify: Optional[JustifyMethod] = None,
 ) -> Table:
     """Generate a simple table from a mapping.
 
@@ -37,9 +37,9 @@ def tabulate_mapping(
     )
     table.title = title
     table.caption = caption
-    if title_justify is not _NOT_PROVIDED:
+    if title_justify is not None:
         table.title_justify = title_justify
-    if caption_justify is not _NOT_PROVIDED:
+    if caption_justify is not None:
         table.caption_justify = caption_justify
     highlighter = ReprHighlighter()
     for key, value in mapping.items():

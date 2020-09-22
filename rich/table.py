@@ -138,8 +138,8 @@ class Table(JupyterMixin):
         border_style: StyleType = None,
         title_style: StyleType = None,
         caption_style: StyleType = None,
-        title_justify: str = "center",
-        caption_justify: str = "center",
+        title_justify: "JustifyMethod" = "center",
+        caption_justify: "JustifyMethod" = "center",
     ) -> None:
 
         self.columns: List[Column] = []
@@ -387,7 +387,7 @@ class Table(JupyterMixin):
         render_options = options.update(width=table_width)
 
         def render_annotation(
-            text: TextType, style: StyleType, justify: str = "center"
+            text: TextType, style: StyleType, justify: JustifyMethod = "center"
         ) -> "RenderResult":
             render_text = (
                 console.render_str(text, style=style) if isinstance(text, str) else text
