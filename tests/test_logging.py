@@ -29,6 +29,54 @@ def test_log():
     assert render == expected
 
 
+def test_exception():
+    console = Console(
+        file=io.StringIO(), force_terminal=True, width=80, color_system="truecolor"
+    )
+    handler_with_tracebacks = RichHandler(
+        console=console, enable_link_path=False, handle_tracebacks=True
+    )
+    log.addHandler(handler_with_tracebacks)
+
+    try:
+        1 / 0
+    except ZeroDivisionError:
+        log.exception("message")
+
+    render = handler_with_tracebacks.console.file.getvalue()
+    print(render)
+
+    excpected = "ZeroDivisionError: \x1b[0mdivision by zero\n"
+    assert excpected == render[-40:]
+    assert render.count("\n") == 13
+
+
+def test_exception_with_extra_lines():
+    console = Console(
+        file=io.StringIO(), force_terminal=True, width=80, color_system="truecolor"
+    )
+    handler_extra_lines = RichHandler(
+        console=console,
+        enable_link_path=False,
+        markup=True,
+        handle_tracebacks=True,
+        tracebacks_extra_lines=5,
+    )
+    log.addHandler(handler_extra_lines)
+
+    try:
+        1 / 0
+    except ZeroDivisionError:
+        log.exception("message")
+
+    render = handler_extra_lines.console.file.getvalue()
+    print(render)
+
+    excpected = "ZeroDivisionError: \x1b[0mdivision by zero\n"
+    assert excpected == render[-40:]
+    assert render.count("\n") == 17
+
+
 if __name__ == "__main__":
     render = make_log()
     print(render)
