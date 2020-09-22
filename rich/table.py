@@ -387,7 +387,7 @@ class Table(JupyterMixin):
         render_options = options.update(width=table_width)
 
         def render_annotation(
-            text: TextType, style: StyleType, justify: JustifyMethod = "center"
+            text: TextType, style: StyleType, justify: "JustifyMethod" = "center"
         ) -> "RenderResult":
             render_text = (
                 console.render_str(text, style=style) if isinstance(text, str) else text
