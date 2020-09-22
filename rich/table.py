@@ -108,6 +108,8 @@ class Table(JupyterMixin):
         border_style (Union[str, Style], optional): Style of the border. Defaults to None.
         title_style (Union[str, Style], optional): Style of the title. Defaults to None.
         caption_style (Union[str, Style], optional): Style of the caption. Defaults to None.
+        title_justify (str, optional): Justification for title. Defaults to "center".
+        caption_justify (str, optional): Justification for caption. Defaults to "center".
     """
 
     columns: List[Column]
@@ -136,6 +138,8 @@ class Table(JupyterMixin):
         border_style: StyleType = None,
         title_style: StyleType = None,
         caption_style: StyleType = None,
+        title_justify: str = "center",
+        caption_justify: str = "center",
     ) -> None:
 
         self.columns: List[Column] = []
@@ -167,6 +171,8 @@ class Table(JupyterMixin):
         self.border_style = border_style
         self.title_style = title_style
         self.caption_style = title_style
+        self.title_justify = title_justify
+        self.caption_justify = caption_justify
         self._row_count = 0
         self.row_styles = list(row_styles or [])
 
@@ -380,23 +386,28 @@ class Table(JupyterMixin):
 
         render_options = options.update(width=table_width)
 
-        def render_annotation(text: TextType, style: StyleType) -> "RenderResult":
+        def render_annotation(
+            text: TextType, style: StyleType, justify: str = "center"
+        ) -> "RenderResult":
             render_text = (
                 console.render_str(text, style=style) if isinstance(text, str) else text
             )
             return console.render(
-                render_text, options=render_options.update(justify="center")
+                render_text, options=render_options.update(justify=justify)
             )
 
         if self.title:
             yield from render_annotation(
-                self.title, style=Style.pick_first(self.title_style, "table.title")
+                self.title,
+                style=Style.pick_first(self.title_style, "table.title"),
+                justify=self.title_justify,
             )
         yield from self._render(console, render_options, widths)
         if self.caption:
             yield from render_annotation(
                 self.caption,
                 style=Style.pick_first(self.caption_style, "table.caption"),
+                justify=self.caption_justify,
             )
 
     def _calculate_column_widths(self, console: "Console", max_width: int) -> List[int]:
