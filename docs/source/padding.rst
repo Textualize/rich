@@ -6,7 +6,7 @@ The :class:`~rich.padding.Padding` class may be used to add whitespace around te
     from rich import print
     from rich.padding import Padding
     test = Padding("Hello", 1)
-    print(text)
+    print(test)
 
 You can specify the padding on a more granular level by using a tuple of values rather than a single value. A tuple of 2 values sets the top/bottom and left/right padding, whereas a tuple of 4 values sets the padding for top, right, bottom, and left sides. You may recognize this scheme if you are familiar with CSS.
 
