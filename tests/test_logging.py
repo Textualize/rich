@@ -1,5 +1,7 @@
 import io
+import sys
 import logging
+import pytest
 
 from rich.console import Console
 from rich.logging import RichHandler
@@ -16,6 +18,12 @@ logging.basicConfig(
 log = logging.getLogger("rich")
 
 
+skip_py37 = pytest.mark.skipif(
+    sys.version_info.minor == 7 and sys.version_info.major == 3,
+    reason="rendered differently on py3.7",
+)
+
+
 def make_log():
     log.debug("foo")
     render = handler.console.file.getvalue()
@@ -25,10 +33,11 @@ def make_log():
 def test_log():
     render = make_log()
     print(repr(render))
-    expected = "\x1b[2;36m[DATE]\x1b[0m\x1b[2;36m \x1b[0m\x1b[32mDEBUG\x1b[0m    foo                                           \x1b[2mtest_logging.py\x1b[0m\x1b[2m:20\x1b[0m\n"
+    expected = "\x1b[2;36m[DATE]\x1b[0m\x1b[2;36m \x1b[0m\x1b[32mDEBUG\x1b[0m    foo                                           \x1b[2mtest_logging.py\x1b[0m\x1b[2m:28\x1b[0m\n"
     assert render == expected
 
 
+@skip_py37
 def test_exception():
     console = Console(
         file=io.StringIO(), force_terminal=True, width=80, color_system="truecolor"
