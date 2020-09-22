@@ -71,7 +71,9 @@ if __name__ == "__main__":  # pragma: no cover
             )
         )
 
-    for title_justify, caption_justify in itertools.product([None, "left", "center", "right"], repeat=2):
+    for title_justify, caption_justify in itertools.product(
+        [None, "left", "center", "right"], repeat=2
+    ):
         print()
         print((title_justify, caption_justify))
         test(20.3423, 3.1427, title_justify, caption_justify)
