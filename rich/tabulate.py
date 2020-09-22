@@ -50,10 +50,9 @@ def tabulate_mapping(
 
 
 if __name__ == "__main__":  # pragma: no cover
-    import itertools
     from rich import print
 
-    def test(foo, bar, tjustify, cjustify):
+    def test(foo, bar, tjustify=None, cjustify=None):
         list_of_things = [1, 2, 3, None, 4, True, False, "Hello World"]
         dict_of_things = {
             "version": "1.1",
@@ -71,11 +70,6 @@ if __name__ == "__main__":  # pragma: no cover
             )
         )
 
-    for title_justify, caption_justify in itertools.product(
-        [None, "left", "center", "right"], repeat=2
-    ):
-        print()
-        print((title_justify, caption_justify))
-        test(20.3423, 3.1427, title_justify, caption_justify)
-
+    print()
+    test(20.3423, 3.1427, cjustify="right")
     print()
