@@ -5,13 +5,11 @@ import tempfile
 
 import pytest
 
-from rich.color import Color, ColorSystem
-from rich.console import Console, ConsoleOptions
+from rich.color import ColorSystem
+from rich.console import CaptureError, Console, ConsoleOptions
 from rich import errors
 from rich.panel import Panel
-from rich.segment import Segment
 from rich.style import Style
-from rich.theme import Theme
 
 
 def test_dumb_terminal():
@@ -160,10 +158,37 @@ def test_control():
     assert console.file.getvalue() == "FOOBAR\n"
 
 
+def test_capture():
+    console = Console()
+    with console.capture() as capture:
+        with pytest.raises(CaptureError):
+            capture.get()
+        console.print("Hello")
+    assert capture.get() == "Hello\n"
+
+
 def test_input(monkeypatch, capsys):
-    monkeypatch.setattr("builtins.input", lambda: "bar")
+    def fake_input(prompt):
+        console.file.write(prompt)
+        return "bar"
+
+    monkeypatch.setattr("builtins.input", fake_input)
     console = Console()
     user_input = console.input(prompt="foo:")
+    assert capsys.readouterr().out == "foo:"
+    assert user_input == "bar"
+
+
+def test_input_password(monkeypatch, capsys):
+    def fake_input(prompt, stream=None):
+        console.file.write(prompt)
+        return "bar"
+
+    import rich.console
+
+    monkeypatch.setattr(rich.console, "getpass", fake_input)
+    console = Console()
+    user_input = console.input(prompt="foo:", password=True)
     assert capsys.readouterr().out == "foo:"
     assert user_input == "bar"
 

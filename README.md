@@ -54,6 +54,15 @@ Rich can be installed in the Python REPL, so that any data structures will be pr
 
 ![REPL](https://github.com/willmcgugan/rich/raw/master/imgs/repl.png)
 
+## Rich Inspect
+
+Rich has an [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) function which can produce a report on any Python object, such as class, instance, or builtin.
+
+```python
+>>> from rich import inspect
+>>> inspect(str, methods=True)
+```
+
 ## Using the Console
 
 For more control over rich terminal content, import and construct a [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console) object.

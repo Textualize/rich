@@ -522,7 +522,7 @@ class Text(JupyterMixin):
         """
 
         text = self.plain
-        null_style = Style()
+        null_style = Style.empty()
         enumerated_spans = list(enumerate(self._spans, 1))
         get_style = partial(console.get_style, default=null_style)
         style_map = {index: get_style(span.style) for index, span in enumerated_spans}

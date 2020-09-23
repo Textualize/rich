@@ -150,6 +150,38 @@ RenderResult = Iterable[Union[RenderableType, Segment]]
 _null_highlighter = NullHighlighter()
 
 
+class CaptureError(Exception):
+    """An error in the Capture context manager."""
+
+
+class Capture:
+    """Context manager to capture the result of printing to the console.
+    See :meth:`~rich.console.Console.capture` for how to use.
+
+    Args:
+        console (Console): A console instance to capture output.
+    """
+
+    def __init__(self, console: "Console") -> None:
+        self._console = console
+        self._result: Optional[str] = None
+
+    def __enter__(self) -> "Capture":
+        self._console.begin_capture()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        self._result = self._console.end_capture()
+
+    def get(self) -> str:
+        """Get the result of the capture."""
+        if self._result is None:
+            raise CaptureError(
+                "Capture result is not available until context manager exits."
+            )
+        return self._result
+
+
 class RenderGroup:
     """Takes a group of renderables and returns a renderable object that renders the group.
 
@@ -451,6 +483,21 @@ class Console:
         """Exit buffer context."""
         self._exit_buffer()
 
+    def begin_capture(self) -> None:
+        """Begin capturing console output. Call :meth:`end_capture` to exit capture mode and return output."""
+        self._enter_buffer()
+
+    def end_capture(self) -> str:
+        """End capture mode and return captured string.
+
+        Returns:
+            str: Console output.
+        """
+        render_result = self._render_buffer()
+        del self._buffer[:]
+        self._exit_buffer()
+        return render_result
+
     @property
     def color_system(self) -> Optional[str]:
         """Get color system string.
@@ -540,6 +587,23 @@ class Console:
         """
         width, _ = self.size
         return width
+
+    def capture(self) -> Capture:
+        """A context manager to *capture* the result of print() or log() in a string,
+        rather than writing it to the console.
+
+        Example:
+            >>> from rich.console import Console
+            >>> console = Console()
+            >>> with console.capture() as capture:
+            ...     console.print("[bold magenta]Hello World[/])
+            >>> print(capture.result)
+
+        Returns:
+            Capture: Context manager which will contain the attribute `result` on exit.
+        """
+        capture = Capture(self)
+        return capture
 
     def line(self, count: int = 1) -> None:
         """Write new line(s).
@@ -1085,13 +1149,19 @@ class Console:
         Returns:
             str: Text read from stdin.
         """
+        prompt_str = ""
         if prompt:
-            self.print(prompt, markup=markup, emoji=emoji, end="")
-        result = (
-            getpass("", stream=stream)
-            if password
-            else (stream.readline() if stream else input())
-        )
+            with self.capture() as capture:
+                self.print(prompt, markup=markup, emoji=emoji, end="")
+            prompt_str = capture.get()
+        if password:
+            result = getpass(prompt_str, stream=stream)
+        else:
+            if stream:
+                self.file.write(prompt_str)
+                result = stream.readline()
+            else:
+                result = input(prompt_str)
         return result
 
     def export_text(self, *, clear: bool = True, styles: bool = False) -> str:

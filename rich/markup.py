@@ -31,6 +31,7 @@ class Tag(NamedTuple):
 
     @property
     def markup(self) -> str:
+        """Get the string representation of this tag."""
         return (
             f"[{self.name}]"
             if self.parameters is None
