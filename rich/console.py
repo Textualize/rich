@@ -597,7 +597,7 @@ class Console:
             >>> console = Console()
             >>> with console.capture() as capture:
             ...     console.print("[bold magenta]Hello World[/])
-            >>> print(capture.result)
+            >>> print(capture.get())
 
         Returns:
             Capture: Context manager which will contain the attribute `result` on exit.
