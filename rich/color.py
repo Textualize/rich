@@ -508,7 +508,7 @@ def blend_rgb(
 if __name__ == "__main__":  # pragma: no cover
 
     from .console import Console
-    from .table import Column, Table
+    from .table import Table
     from .text import Text
     from . import box
 

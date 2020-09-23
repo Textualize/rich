@@ -162,6 +162,21 @@ class Style:
             )
         )
 
+    @classmethod
+    def empty(cls) -> "Style":
+        """Create an 'empty' style, equivalent to Style(), but more performant."""
+        style = cls.__new__(Style)
+        style._ansi = None
+        style._style_definition = None
+        style._color = None
+        style._bgcolor = None
+        style._attributes = 0
+        style._set_attributes = 0
+        style._link = None
+        style._link_id = None
+        style._hash = hash((None, None, 0, 0, None))
+        return style
+
     bold = _Bit(0)
     dim = _Bit(1)
     italic = _Bit(2)
@@ -532,7 +547,6 @@ class Style:
             rendered = (
                 f"\x1b]8;id={self._link_id};{self._link}\x1b\\{rendered}\x1b]8;;\x1b\\"
             )
-
         return rendered
 
     def test(self, text: Optional[str] = None) -> None:

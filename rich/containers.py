@@ -156,7 +156,7 @@ class Lines:
                     tokens.append(word)
                     if index < len(spaces):
                         if next_word is None:
-                            space_style = Style()
+                            space_style = Style.empty()
                         else:
                             style = word.get_style_at_offset(console, -1)
                             next_style = next_word.get_style_at_offset(console, 0)

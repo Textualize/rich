@@ -71,6 +71,10 @@ def test_hash():
     assert isinstance(hash(Style()), int)
 
 
+def test_empty():
+    assert Style.empty() == Style()
+
+
 def test_bool():
     assert bool(Style()) is False
     assert bool(Style(bold=True)) is True

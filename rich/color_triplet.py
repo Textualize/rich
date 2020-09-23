@@ -22,7 +22,7 @@ class ColorTriplet(NamedTuple):
         """The color in RGB format.
 
         Returns:
-            str: An rgb color, e.g. ``"rgb(100, 23, 255)"``.
+            str: An rgb color, e.g. ``"rgb(100,23,255)"``.
         """
         red, green, blue = self
         return f"rgb({red},{green},{blue})"
