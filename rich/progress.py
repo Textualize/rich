@@ -205,7 +205,7 @@ class TextColumn(ProgressColumn):
         self.highlighter = highlighter
         super().__init__()
 
-    def render(self, task: "Task"):
+    def render(self, task: "Task") -> Text:
         _text = self.text_format.format(task=task)
         if self.markup:
             text = Text.from_markup(_text, style=self.style, justify=self.justify)

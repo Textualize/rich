@@ -154,6 +154,20 @@ class Traceback:
         theme: Optional[str] = None,
         word_wrap: bool = False,
     ) -> "Traceback":
+        """Create a traceback from exception info
+
+        Args:
+            exc_type (Type[BaseException]): Exception type.
+            exc_value (BaseException): Exception value.
+            traceback (TracebackType): Python Traceback object.
+            width (Optional[int], optional): Number of characters used to traceback. Defaults to 100.
+            extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
+            theme (str, optional): Override pygments theme used in traceback.
+            word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
+
+        Returns:
+            Traceback: A Traceback instance that may be printed.
+        """
         rich_traceback = cls.extract(exc_type, exc_value, traceback)
         return Traceback(
             rich_traceback,

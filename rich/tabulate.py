@@ -22,8 +22,8 @@ def tabulate_mapping(
         mapping (Mapping): A mapping object (e.g. a dict);
         title (str, optional): Optional title to be displayed over the table.
         caption (str, optional): Optional caption to be displayed below the table.
-        title_justify (str, optional): Optional "right", "center", "left" string indicating title justification
-        caption_justify (str, optional): Optional "right", "center", "left" string indicating caption justification
+        title_justify (str, optional): Justify method for title. Defaults to None.
+        caption_justify (str, optional): Justify method for caption. Defaults to None.
 
     Returns:
         Table: A table instance which may be rendered by the Console.

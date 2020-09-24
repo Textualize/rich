@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added Console.capture method
+- Added Console.begin_capture, Console.end_capture and Console.capture
+- Added Table.title_justify and Table.caption_justify https://github.com/willmcgugan/rich/issues/301
 
 ### Changed
 

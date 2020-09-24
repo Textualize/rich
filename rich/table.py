@@ -108,8 +108,8 @@ class Table(JupyterMixin):
         border_style (Union[str, Style], optional): Style of the border. Defaults to None.
         title_style (Union[str, Style], optional): Style of the title. Defaults to None.
         caption_style (Union[str, Style], optional): Style of the caption. Defaults to None.
-        title_justify (str, optional): Justification for title. Defaults to "center".
-        caption_justify (str, optional): Justification for caption. Defaults to "center".
+        title_justify (str, optional): Justify method for title. Defaults to "center".
+        caption_justify (str, optional): Justify method for caption. Defaults to "center".
     """
 
     columns: List[Column]
