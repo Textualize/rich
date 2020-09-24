@@ -9,6 +9,7 @@ from ._log_render import LogRender
 from .console import Console
 from .highlighter import Highlighter, ReprHighlighter
 from .text import Text
+from .traceback import Traceback
 
 
 class RichHandler(Handler):
@@ -91,6 +92,16 @@ class RichHandler(Handler):
         level = Text()
         level.append(record.levelname, log_style)
 
+        traceback = None
+        if self.handle_tracebacks and record.exc_info:
+            traceback = Traceback(
+                width=self.tracebacks_width,
+                extra_lines=self.tracebacks_extra_lines,
+                theme=self.tracebacks_theme,
+                word_wrap=self.tracebacks_word_wrap,
+            )
+            message = record.getMessage()
+
         use_markup = (
             getattr(record, "markup") if hasattr(record, "markup") else self.markup
         )
@@ -104,26 +115,18 @@ class RichHandler(Handler):
         if self.KEYWORDS:
             message_text.highlight_words(self.KEYWORDS, "logging.keyword")
 
-        if self.handle_tracebacks and record.exc_info:
-            self.console.print_exception(
-                width=self.tracebacks_width,
-                extra_lines=self.tracebacks_extra_lines,
-                theme=self.tracebacks_theme,
-                word_wrap=self.tracebacks_word_wrap,
+        self.console.print(
+            self._log_render(
+                self.console,
+                [message_text] if not traceback else [message_text, traceback],
+                log_time=log_time,
+                time_format=time_format,
+                level=level,
+                path=path,
+                line_no=record.lineno,
+                link_path=record.pathname if self.enable_link_path else None,
             )
-        else:
-            self.console.print(
-                self._log_render(
-                    self.console,
-                    [message_text],
-                    log_time=log_time,
-                    time_format=time_format,
-                    level=level,
-                    path=path,
-                    line_no=record.lineno,
-                    link_path=record.pathname if self.enable_link_path else None,
-                )
-            )
+        )
 
 
 if __name__ == "__main__":  # pragma: no cover
