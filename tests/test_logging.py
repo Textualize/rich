@@ -56,9 +56,10 @@ def test_exception():
     render = handler_with_tracebacks.console.file.getvalue()
     print(render)
 
-    excpected = "ZeroDivisionError: \x1b[0mdivision by zero\n"
-    assert excpected == render[-40:]
-    assert render.count("\n") == 13
+    assert render.count("\n") == 16
+    assert "ZeroDivisionError" in render
+    assert "message" in render
+    assert "division by zero" in render
 
 
 def test_exception_with_extra_lines():
@@ -82,9 +83,10 @@ def test_exception_with_extra_lines():
     render = handler_extra_lines.console.file.getvalue()
     print(render)
 
-    excpected = "ZeroDivisionError: \x1b[0mdivision by zero\n"
-    assert excpected == render[-40:]
-    assert render.count("\n") == 17
+    assert render.count("\n") == 21
+    assert "ZeroDivisionError" in render
+    assert "message" in render
+    assert "division by zero" in render
 
 
 if __name__ == "__main__":
