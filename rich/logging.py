@@ -94,7 +94,8 @@ class RichHandler(Handler):
 
         traceback = None
         if self.handle_tracebacks and record.exc_info:
-            traceback = Traceback(
+            traceback = Traceback.from_exception(
+                *record.exc_info,
                 width=self.tracebacks_width,
                 extra_lines=self.tracebacks_extra_lines,
                 theme=self.tracebacks_theme,
