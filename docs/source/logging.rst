@@ -20,4 +20,17 @@ Rich logs won't render :ref:`console_markup` in logging by default as most libra
 
     log.error("[bold red blink]Server is shutting down![/]", extra={"markup": True})
 
+
+Handle exceptions
+-------------------
+
+Rich's :class:`~rich.logging.RichHandler` class can be configured to handle exceptions. Here's an example::
+
+    handler = RichHandler(handle_tracebacks=True)
+
+    try:
+        1 / 0
+    except ZeroDivisionError:
+        log.exception("Exception message")
+
 There are a number of options you can use to configure logging output, see the :class:`~rich.logging.RichHandler` reference for details.

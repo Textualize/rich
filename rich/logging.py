@@ -9,6 +9,7 @@ from ._log_render import LogRender
 from .console import Console
 from .highlighter import Highlighter, ReprHighlighter
 from .text import Text
+from .traceback import Traceback
 
 
 class RichHandler(Handler):
@@ -29,6 +30,11 @@ class RichHandler(Handler):
         enable_link_path (bool, optional): Enable terminal link of path column to file. Defaults to True.
         highlighter (Highlighter, optional): Highlighter to style log messages, or None to use ReprHighlighter. Defaults to None.
         markup (bool, optional): Enable console markup in log messages. Defaults to False.
+        handle_tracebacks (bool, optional): Enable rich tracebacks with syntax highlighting and formatting. Defaults to False.
+        tracebacks_width (Optional[int], optional): Number of characters used to render tracebacks code. Defaults to 88.
+        tracebacks_extra_lines (int, optional): Additional lines of code to render tracebacks. Defaults to 3.
+        tracebacks_theme (str, optional): Override pygments theme used in traceback
+        tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to False.
 
     """
 
@@ -55,6 +61,11 @@ class RichHandler(Handler):
         enable_link_path: bool = True,
         highlighter: Highlighter = None,
         markup: bool = False,
+        handle_tracebacks: bool = False,
+        tracebacks_width: Optional[int] = 88,
+        tracebacks_extra_lines: int = 3,
+        tracebacks_theme: Optional[str] = None,
+        tracebacks_word_wrap: bool = False,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
@@ -64,6 +75,11 @@ class RichHandler(Handler):
         )
         self.enable_link_path = enable_link_path
         self.markup = markup
+        self.handle_tracebacks = handle_tracebacks
+        self.tracebacks_width = tracebacks_width
+        self.tracebacks_extra_lines = tracebacks_extra_lines
+        self.tracebacks_theme = tracebacks_theme
+        self.tracebacks_word_wrap = tracebacks_word_wrap
 
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
@@ -75,6 +91,17 @@ class RichHandler(Handler):
 
         level = Text()
         level.append(record.levelname, log_style)
+
+        traceback = None
+        if self.handle_tracebacks and record.exc_info:
+            traceback = Traceback.from_exception(
+                *record.exc_info,
+                width=self.tracebacks_width,
+                extra_lines=self.tracebacks_extra_lines,
+                theme=self.tracebacks_theme,
+                word_wrap=self.tracebacks_word_wrap,
+            )
+            message = record.getMessage()
 
         use_markup = (
             getattr(record, "markup") if hasattr(record, "markup") else self.markup
@@ -92,7 +119,7 @@ class RichHandler(Handler):
         self.console.print(
             self._log_render(
                 self.console,
-                [message_text],
+                [message_text] if not traceback else [message_text, traceback],
                 log_time=log_time,
                 time_format=time_format,
                 level=level,
