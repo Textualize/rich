@@ -309,8 +309,8 @@ def test_track_thread() -> None:
 
     with track_thread:
         track_thread.completed = 1
-        sleep(0.2)
-        assert progress.tasks[task_id].completed == 1
+        sleep(0.3)
+        assert progress.tasks[task_id].completed >= 1
         track_thread.completed += 1
 
 

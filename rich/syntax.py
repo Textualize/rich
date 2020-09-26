@@ -208,6 +208,18 @@ class Syntax(JupyterMixin):
     _pygments_style_class: Type[PygmentsStyle]
     _theme: SyntaxTheme
 
+    @classmethod
+    def get_theme(cls, name: Union[str, SyntaxTheme]) -> SyntaxTheme:
+        """Get a syntax theme instance."""
+        if isinstance(name, SyntaxTheme):
+            return name
+        theme: SyntaxTheme
+        if name in RICH_SYNTAX_THEMES:
+            theme = ANSISyntaxTheme(RICH_SYNTAX_THEMES[name])
+        else:
+            theme = PygmentsSyntaxTheme(name)
+        return theme
+
     def __init__(
         self,
         code: str,
@@ -236,12 +248,7 @@ class Syntax(JupyterMixin):
         self.word_wrap = word_wrap
         self.background_color = background_color
 
-        if isinstance(theme, SyntaxTheme):
-            self._theme = theme
-        elif theme in RICH_SYNTAX_THEMES:
-            self._theme = ANSISyntaxTheme(RICH_SYNTAX_THEMES[theme])
-        else:
-            self._theme = PygmentsSyntaxTheme(theme)
+        self._theme = self.get_theme(theme)
 
     @classmethod
     def from_path(

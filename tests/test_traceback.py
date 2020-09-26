@@ -21,7 +21,7 @@ def test_handler():
     console = Console(file=io.StringIO(), width=100, color_system=None)
     expected_old_handler = sys.excepthook
     try:
-        old_handler = install(console=console, line_numbers=False)
+        old_handler = install(console=console)
         try:
             1 / 0
         except Exception:
@@ -125,7 +125,7 @@ def test_filename_with_bracket():
     except Exception:
         console.print_exception()
     exception_text = console.file.getvalue()
-    assert 'File "<string>"' in exception_text
+    assert "<string>" in exception_text
 
 
 def test_filename_not_a_file():
@@ -135,7 +135,7 @@ def test_filename_not_a_file():
     except Exception:
         console.print_exception()
     exception_text = console.file.getvalue()
-    assert 'File "string"' in exception_text
+    assert "string" in exception_text
 
 
 if __name__ == "__main__":  # pragma: no cover

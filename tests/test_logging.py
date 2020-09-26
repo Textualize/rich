@@ -41,10 +41,10 @@ def test_log():
 @skip_win
 def test_exception():
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=80, color_system="truecolor"
+        file=io.StringIO(), force_terminal=True, width=140, color_system="truecolor"
     )
     handler_with_tracebacks = RichHandler(
-        console=console, enable_link_path=False, handle_tracebacks=True
+        console=console, enable_link_path=False, rich_tracebacks=True
     )
     log.addHandler(handler_with_tracebacks)
 
@@ -56,7 +56,6 @@ def test_exception():
     render = handler_with_tracebacks.console.file.getvalue()
     print(render)
 
-    assert render.count("\n") == 16
     assert "ZeroDivisionError" in render
     assert "message" in render
     assert "division by zero" in render
@@ -64,13 +63,13 @@ def test_exception():
 
 def test_exception_with_extra_lines():
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=80, color_system="truecolor"
+        file=io.StringIO(), force_terminal=True, width=140, color_system="truecolor"
     )
     handler_extra_lines = RichHandler(
         console=console,
         enable_link_path=False,
         markup=True,
-        handle_tracebacks=True,
+        rich_tracebacks=True,
         tracebacks_extra_lines=5,
     )
     log.addHandler(handler_extra_lines)
@@ -83,7 +82,6 @@ def test_exception_with_extra_lines():
     render = handler_extra_lines.console.file.getvalue()
     print(render)
 
-    assert render.count("\n") == 21
     assert "ZeroDivisionError" in render
     assert "message" in render
     assert "division by zero" in render

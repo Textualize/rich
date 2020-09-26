@@ -596,7 +596,7 @@ class Console:
             >>> from rich.console import Console
             >>> console = Console()
             >>> with console.capture() as capture:
-            ...     console.print("[bold magenta]Hello World[/])
+            ...     console.print("[bold magenta]Hello World[/]")
             >>> print(capture.get())
 
         Returns:
