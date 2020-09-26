@@ -24,13 +24,13 @@ Rich logs won't render :ref:`console_markup` in logging by default as most libra
 Handle exceptions
 -------------------
 
-Rich's :class:`~rich.logging.RichHandler` class can be configured to handle exceptions. Here's an example::
+The :class:`~rich.logging.RichHandler` class may be configured to ues Rich's :class:`~rich.traceback.Traceback` class to format exceptions, which provides more context than a builtin exception. To get beautiful exceptions in your logs set ``rich_tracebacks=True`` on the handler constructor::
 
-    handler = RichHandler(handle_tracebacks=True)
+    handler = RichHandler(rich_tracebacks=True)
 
     try:
         1 / 0
     except ZeroDivisionError:
         log.exception("Exception message")
 
-There are a number of options you can use to configure logging output, see the :class:`~rich.logging.RichHandler` reference for details.
+There are a number of other options you can use to configure logging output, see the :class:`~rich.logging.RichHandler` reference for details.

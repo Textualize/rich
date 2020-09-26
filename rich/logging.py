@@ -30,10 +30,10 @@ class RichHandler(Handler):
         enable_link_path (bool, optional): Enable terminal link of path column to file. Defaults to True.
         highlighter (Highlighter, optional): Highlighter to style log messages, or None to use ReprHighlighter. Defaults to None.
         markup (bool, optional): Enable console markup in log messages. Defaults to False.
-        handle_tracebacks (bool, optional): Enable rich tracebacks with syntax highlighting and formatting. Defaults to False.
+        rich_tracebacks (bool, optional): Enable rich tracebacks with syntax highlighting and formatting. Defaults to False.
         tracebacks_width (Optional[int], optional): Number of characters used to render tracebacks code. Defaults to 88.
-        tracebacks_extra_lines (int, optional): Additional lines of code to render tracebacks. Defaults to 3.
-        tracebacks_theme (str, optional): Override pygments theme used in traceback
+        tracebacks_extra_lines (int, optional): Additional lines of code to render tracebacks, or None for full width. Defaults to None.
+        tracebacks_theme (str, optional): Override pygments theme used in traceback.
         tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to False.
 
     """
@@ -61,11 +61,11 @@ class RichHandler(Handler):
         enable_link_path: bool = True,
         highlighter: Highlighter = None,
         markup: bool = False,
-        handle_tracebacks: bool = False,
+        rich_tracebacks: bool = False,
         tracebacks_width: Optional[int] = 88,
         tracebacks_extra_lines: int = 3,
         tracebacks_theme: Optional[str] = None,
-        tracebacks_word_wrap: bool = False,
+        tracebacks_word_wrap: bool = True,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
@@ -75,7 +75,7 @@ class RichHandler(Handler):
         )
         self.enable_link_path = enable_link_path
         self.markup = markup
-        self.handle_tracebacks = handle_tracebacks
+        self.rich_tracebacks = rich_tracebacks
         self.tracebacks_width = tracebacks_width
         self.tracebacks_extra_lines = tracebacks_extra_lines
         self.tracebacks_theme = tracebacks_theme
@@ -93,9 +93,18 @@ class RichHandler(Handler):
         level.append(record.levelname, log_style)
 
         traceback = None
-        if self.handle_tracebacks and record.exc_info:
+        if (
+            self.rich_tracebacks
+            and record.exc_info
+            and record.exc_info != (None, None, None)
+        ):
+            exc_type, exc_value, exc_traceback = record.exc_info
+            assert exc_type is not None
+            assert exc_value is not None
             traceback = Traceback.from_exception(
-                *record.exc_info,
+                exc_type,
+                exc_value,
+                exc_traceback,
                 width=self.tracebacks_width,
                 extra_lines=self.tracebacks_extra_lines,
                 theme=self.tracebacks_theme,
@@ -139,7 +148,7 @@ if __name__ == "__main__":  # pragma: no cover
         level="NOTSET",
         format=FORMAT,
         datefmt="[%X]",
-        handlers=[RichHandler()],
+        handlers=[RichHandler(rich_tracebacks=True)],
     )
     log = logging.getLogger("rich")
 

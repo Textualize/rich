@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [7.1.0] - unreleased
+## [7.1.0] - 2020-09-26
 
 ### Added
 
@@ -14,7 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Improved formatting of exceptions
+- Enabled Rich exceptions in logging https://github.com/taliraj
 - UTF-8 encoding is now mentioned in HTML head section
+
+### Removed
+
+- Removed line_numbers argument from traceback.install, which was undocumented and did nothing
 
 ## [7.0.0] - 2020-09-18
 

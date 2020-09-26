@@ -5,9 +5,11 @@ import sys
 from dataclasses import dataclass, field
 from traceback import extract_tb
 from types import TracebackType
-from typing import Callable, List, Optional, Type
+from typing import Callable, Dict, List, Optional, Type
 
-from ._loop import loop_last
+from pygments.token import Token, String, Name, Number
+
+from ._loop import loop_first, loop_last
 from .console import (
     Console,
     ConsoleOptions,
@@ -20,6 +22,7 @@ from .highlighter import RegexHighlighter, ReprHighlighter
 from .padding import Padding
 from .panel import Panel
 from .syntax import Syntax
+from .style import Style
 from .text import Text
 
 WINDOWS = platform.system() == "Windows"
@@ -29,7 +32,6 @@ def install(
     *,
     console: Console = None,
     width: Optional[int] = 100,
-    line_numbers: bool = True,
     extra_lines: int = 3,
     theme: Optional[str] = None,
     word_wrap: bool = False,
@@ -42,14 +44,13 @@ def install(
     Args:
         console (Optional[Console], optional): Console to write exception to. Default uses internal Console instance.
         width (Optional[int], optional): Width (in characters) of traceback. Defaults to 100.
-        line_numbers (bool, optional): Enable line numbers.
         extra_lines (int, optional): Extra lines of code. Defaults to 3.
         theme (Optional[str], optional): Pygments theme to use in traceback. Defaults to ``None`` which will pick
             a theme appropriate for the platform.
         word_wrap(bool, optional): Enable word wrapping of long lines. Defaults to False.
 
     Returns:
-        Callable: The previous exception handler that was replaced
+        Callable: The previous exception handler that was replaced.
 
     """
     traceback_console = Console(file=sys.stderr) if console is None else console
@@ -107,7 +108,7 @@ class Trace:
 
 
 class PathHighlighter(RegexHighlighter):
-    highlights = [r'"(?P<dim>.*/)(?P<_>.+)"']
+    highlights = [r"(?P<dim>.*/)(?P<bold>.+)"]
 
 
 class Traceback:
@@ -140,15 +141,15 @@ class Traceback:
         self.trace = trace
         self.width = width
         self.extra_lines = extra_lines
-        self.theme = theme
+        self.theme = Syntax.get_theme(theme or "ansi_dark")
         self.word_wrap = word_wrap
 
     @classmethod
     def from_exception(
         cls,
-        exc_type: Type[BaseException],
+        exc_type: Type,
         exc_value: BaseException,
-        traceback: TracebackType,
+        traceback: Optional[TracebackType],
         width: Optional[int] = 100,
         extra_lines: int = 3,
         theme: Optional[str] = None,
@@ -182,7 +183,7 @@ class Traceback:
         cls,
         exc_type: Type[BaseException],
         exc_value: BaseException,
-        traceback: TracebackType,
+        traceback: Optional[TracebackType],
     ) -> Trace:
         """Extrace traceback information.
 
@@ -223,7 +224,8 @@ class Traceback:
                 exc_type = cause.__class__
                 exc_value = cause
                 traceback = cause.__traceback__
-                continue
+                if traceback:
+                    continue
             # No cover, code is reached but coverage doesn't recognize it.
             break  # pragma: no cover
 
@@ -233,68 +235,94 @@ class Traceback:
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
+        theme = self.theme
+        background_style = theme.get_background_style()
+
+        styles = {
+            "text": theme.get_style_for_token(Token),
+            "string": theme.get_style_for_token(String),
+            "function": theme.get_style_for_token(Name.Function),
+            "number": theme.get_style_for_token(Number),
+        }
         highlighter = ReprHighlighter()
         for last, stack in loop_last(reversed(self.trace.stacks)):
             if stack.frames:
-                yield Text.from_markup("[b]Traceback[/b] [dim](most recent call last):")
                 stack_renderable: ConsoleRenderable = Panel(
-                    self._render_stack(stack), style="blue", expand=False
+                    self._render_stack(stack, styles),
+                    title="[traceback.title]Traceback [dim](most recent call last)",
+                    style=background_style,
+                    border_style="traceback.border.syntax_error",
+                    expand=False,
+                    padding=(0, 1),
                 )
                 stack_renderable = Constrain(stack_renderable, self.width)
                 yield stack_renderable
             if stack.syntax_error is not None:
                 yield Constrain(
                     Panel(
-                        self._render_syntax_error(stack.syntax_error),
-                        style="red",
+                        self._render_syntax_error(stack.syntax_error, styles),
+                        style=background_style,
+                        border_style="traceback.border",
                         expand=False,
+                        padding=(0, 1),
                     ),
                     self.width,
                 )
                 yield Text.assemble(
-                    (f"{stack.exc_type}: ", "traceback.exc_type"), end=""
+                    (f"{stack.exc_type}: ", "traceback.exc_type"),
+                    highlighter(stack.syntax_error.msg),
                 )
-                yield highlighter(stack.syntax_error.msg)
             else:
                 yield Text.assemble(
-                    (f"{stack.exc_type}: ", "traceback.exc_type"), end=""
+                    (f"{stack.exc_type}: ", "traceback.exc_type"),
+                    highlighter(stack.exc_value),
                 )
-                yield highlighter(stack.exc_value)
+
             if not last:
                 yield Text.from_markup(
-                    "\n[i]During handling of the above exception, another exception occurred:\n\n",
+                    "\n[i]During handling of the above exception, another exception occurred:\n",
                 )
 
     @render_group()
-    def _render_syntax_error(self, syntax_error: _SyntaxError) -> RenderResult:
+    def _render_syntax_error(
+        self, syntax_error: _SyntaxError, styles: Dict[str, Style]
+    ) -> RenderResult:
         highlighter = ReprHighlighter()
         path_highlighter = PathHighlighter()
-        text = Text.assemble(
-            (" File ", "traceback.text"),
-            (f'"{syntax_error.filename}"', "traceback.filename"),
-            (", line ", "traceback.text"),
-            (str(syntax_error.lineno), "traceback.lineno"),
-        )
-        yield path_highlighter(text)
-        yield highlighter("   " + syntax_error.line)
-        yield Text.from_markup(
-            "   " + " " * (syntax_error.offset - 1) + "[traceback.offset]▲[/]\n"
-        )
-
-    @render_group()
-    def _render_stack(self, stack: Stack) -> RenderResult:
-        path_highlighter = PathHighlighter()
-        theme = self.theme or ("fruity" if WINDOWS else "monokai")
-        for frame in stack.frames:
+        if syntax_error.filename != "<stdin>":
             text = Text.assemble(
-                (" File ", "traceback.text"),
-                (f'"{frame.filename}"', "traceback.filename"),
-                (", line ", "traceback.text"),
-                (str(frame.lineno), "traceback.lineno"),
-                (", in ", "traceback.text"),
-                (frame.name, "traceback.name"),
+                (f" {syntax_error.filename}", styles["string"]),
+                (":", styles["text"]),
+                (str(syntax_error.lineno), styles["number"]),
+                style=styles["text"],
             )
             yield path_highlighter(text)
+        syntax_error_text = highlighter(syntax_error.line.rstrip())
+        syntax_error_text.no_wrap = True
+        offset = min(syntax_error.offset - 1, len(syntax_error_text))
+        syntax_error_text.stylize("bold underline", offset, offset + 1)
+        syntax_error_text += Text.from_markup(
+            "\n" + " " * offset + "[traceback.offset]▲[/]",
+            style=styles["text"],
+        )
+        yield syntax_error_text
+
+    @render_group()
+    def _render_stack(self, stack: Stack, styles: Dict[str, Style]) -> RenderResult:
+        path_highlighter = PathHighlighter()
+        theme = self.theme
+        for first, frame in loop_first(stack.frames):
+            text = Text.assemble(
+                path_highlighter(Text(frame.filename, style=styles["string"])),
+                (":", styles["text"]),
+                (str(frame.lineno), styles["number"]),
+                " in ",
+                (frame.name, styles["function"]),
+                style=styles["text"],
+            )
+            if not frame.filename.startswith("<") and not first:
+                yield ""
+            yield text
             if frame.filename.startswith("<"):
                 continue
             try:
@@ -309,10 +337,11 @@ class Traceback:
                     highlight_lines={frame.lineno},
                     word_wrap=self.word_wrap,
                 )
+                yield ""
             except Exception:
                 pass
             else:
-                yield Padding.indent(syntax, 2)
+                yield syntax
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -137,6 +137,11 @@ def test_get_style():
     console.get_style("repr.brace") == Style(bold=True)
 
 
+def test_get_style_default():
+    console = Console()
+    console.get_style("foobar", default="red") == Style(color="red")
+
+
 def test_get_style_error():
     console = Console()
     with pytest.raises(errors.MissingStyle):
