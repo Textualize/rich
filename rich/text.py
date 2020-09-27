@@ -473,12 +473,11 @@ class Text(JupyterMixin):
     def set_length(self, new_length: int) -> None:
         """Set new length of the text, clipping or padding is required."""
         length = len(self)
-        if length == new_length:
-            return
-        if length < new_length:
-            self.pad_right(new_length - length)
-        else:
-            self.plain = self.plain[:new_length]
+        if length != new_length:
+            if length < new_length:
+                self.pad_right(new_length - length)
+            else:
+                self.plain = self.plain[:new_length]
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"

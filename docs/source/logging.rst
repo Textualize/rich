@@ -26,11 +26,22 @@ Handle exceptions
 
 The :class:`~rich.logging.RichHandler` class may be configured to ues Rich's :class:`~rich.traceback.Traceback` class to format exceptions, which provides more context than a builtin exception. To get beautiful exceptions in your logs set ``rich_tracebacks=True`` on the handler constructor::
 
-    handler = RichHandler(rich_tracebacks=True)
 
+    import logging
+    from rich.logging import RichHandler
+    
+    logging.basicConfig(
+        level="NOTSET",
+        format="%(message)s",
+        datefmt="[%X]",
+        handlers=[RichHandler(rich_tracebacks=True)]
+    )
+
+    log = logging.getLogger("rich")
     try:
-        1 / 0
-    except ZeroDivisionError:
-        log.exception("Exception message")
+        print(1 / 0)
+    except Exception:
+        log.exception("unable print!")
+
 
 There are a number of other options you can use to configure logging output, see the :class:`~rich.logging.RichHandler` reference for details.
