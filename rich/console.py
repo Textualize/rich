@@ -5,7 +5,7 @@ import shutil
 import sys
 import threading
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, Sequence
+from collections import abc
 from dataclasses import dataclass, field, replace
 from functools import wraps
 from getpass import getpass
@@ -588,6 +588,10 @@ class Console:
         width, _ = self.size
         return width
 
+    def bell(self) -> None:
+        """Play a 'bell' sound (if supported by the terminal)."""
+        self.control("\x07")
+
     def capture(self) -> Capture:
         """A context manager to *capture* the result of print() or log() in a string,
         rather than writing it to the console.
@@ -600,7 +604,7 @@ class Console:
             >>> print(capture.get())
 
         Returns:
-            Capture: Context manager which will contain the attribute `result` on exit.
+            Capture: Context manager with disables writing to the terminal.
         """
         capture = Capture(self)
         return capture
@@ -854,7 +858,7 @@ class Console:
             elif isinstance(renderable, ConsoleRenderable):
                 check_text()
                 append(renderable)
-            elif isinstance(renderable, (Mapping, Sequence)):
+            elif isinstance(renderable, (abc.Mapping, abc.Sequence, abc.Set)):
                 check_text()
                 append(Pretty(renderable, highlighter=_highlighter))
             else:

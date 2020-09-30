@@ -72,7 +72,7 @@ def test_hash():
 
 
 def test_empty():
-    assert Style.empty() == Style()
+    assert Style.null() == Style()
 
 
 def test_bool():

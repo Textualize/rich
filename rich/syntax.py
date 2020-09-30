@@ -136,7 +136,7 @@ class PygmentsSyntaxTheme(SyntaxTheme):
             try:
                 pygments_style = self._pygments_style_class.style_for_token(token_type)
             except KeyError:
-                style = Style.empty()
+                style = Style.null()
             else:
                 color = pygments_style["color"]
                 bgcolor = pygments_style["bgcolor"]
@@ -159,8 +159,8 @@ class ANSISyntaxTheme(SyntaxTheme):
 
     def __init__(self, style_map: Dict[TokenType, Style]) -> None:
         self.style_map = style_map
-        self._missing_style = Style.empty()
-        self._background_style = Style.empty()
+        self._missing_style = Style.null()
+        self._background_style = Style.null()
         self._style_cache: Dict[TokenType, Style] = {}
 
     def get_style_for_token(self, token_type: TokenType) -> Style:
@@ -404,7 +404,7 @@ class Syntax(JupyterMixin):
         """Get background, number, and highlight styles for line numbers."""
         background_style = self._get_base_style()
         if background_style.transaprent_background:
-            return Style.empty(), Style(dim=True), Style.empty()
+            return Style.null(), Style(dim=True), Style.null()
         if console.color_system in ("256", "truecolor"):
             number_style = Style.chain(
                 background_style,

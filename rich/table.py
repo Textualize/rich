@@ -235,7 +235,7 @@ class Table(JupyterMixin):
         """Get the current row style."""
         if self.row_styles:
             return self.row_styles[index % len(self.row_styles)]
-        return Style.empty()
+        return Style.null()
 
     def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
         if self.width is not None:
@@ -654,7 +654,7 @@ class Table(JupyterMixin):
             max_height = 1
             cells: List[List[List[Segment]]] = []
             if header_row or footer_row:
-                row_style = Style.empty()
+                row_style = Style.null()
             else:
                 row_style = get_style(
                     get_row_style(index - 1 if show_header else index)

@@ -335,3 +335,10 @@ def test_unicode_error() -> None:
         assert "PYTHONIOENCODING" in str(error)
     else:
         assert False, "didn't raise UnicodeEncodeError"
+
+
+def test_bell() -> None:
+    console = Console(force_terminal=True)
+    console.begin_capture()
+    console.bell()
+    assert console.end_capture() == "\x07"

@@ -352,6 +352,7 @@ class Color(NamedTuple):
     @lru_cache(maxsize=1024)
     def parse(cls, color: str) -> "Color":
         """Parse a color definition."""
+        original_color = color
         color = color.lower().strip()
 
         if color == "default":
@@ -367,7 +368,7 @@ class Color(NamedTuple):
 
         color_match = RE_COLOR.match(color)
         if color_match is None:
-            raise ColorParseError(f"{color!r} is not a valid color")
+            raise ColorParseError(f"{original_color!r} is not a valid color")
 
         color_24, color_8, color_rgb = color_match.groups()
         if color_24:
@@ -389,11 +390,15 @@ class Color(NamedTuple):
         else:  #  color_rgb:
             components = color_rgb.split(",")
             if len(components) != 3:
-                raise ColorParseError(f"expected three components in {color!r}")
+                raise ColorParseError(
+                    f"expected three components in {original_color!r}"
+                )
             red, green, blue = components
             triplet = ColorTriplet(int(red), int(green), int(blue))
             if not all(component <= 255 for component in triplet):
-                raise ColorParseError(f"color components must be <= 255 in {color!r}")
+                raise ColorParseError(
+                    f"color components must be <= 255 in {original_color!r}"
+                )
             return cls(color, ColorType.TRUECOLOR, triplet=triplet)
 
     @lru_cache(maxsize=1024)
