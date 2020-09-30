@@ -162,7 +162,7 @@ class Panel(JupyterMixin):
                 measure_renderables(
                     console, [self.renderable, _title], max_width
                 ).maximum
-                + 2
+                + 4
             )
         return Measurement(width, width)
 

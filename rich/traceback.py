@@ -3,13 +3,14 @@ from __future__ import absolute_import
 import platform
 import sys
 from dataclasses import dataclass, field
-from traceback import extract_tb
+from traceback import extract_tb, walk_tb, StackSummary
 from types import TracebackType
-from typing import Callable, Dict, List, Optional, Type
+from typing import Any, Callable, Dict, List, Optional, Type
 
 from pygments.token import Token, String, Name, Number
 
 from ._loop import loop_first, loop_last
+from .columns import Columns
 from .console import (
     Console,
     ConsoleOptions,
@@ -21,6 +22,8 @@ from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
 from .padding import Padding
 from .panel import Panel
+from . import pretty
+from .scope import render_scope
 from .syntax import Syntax
 from .style import Style
 from .text import Text
@@ -35,6 +38,7 @@ def install(
     extra_lines: int = 3,
     theme: Optional[str] = None,
     word_wrap: bool = False,
+    show_locals: bool = False,
 ) -> Callable:
     """Install a rich traceback handler.
 
@@ -47,7 +51,8 @@ def install(
         extra_lines (int, optional): Extra lines of code. Defaults to 3.
         theme (Optional[str], optional): Pygments theme to use in traceback. Defaults to ``None`` which will pick
             a theme appropriate for the platform.
-        word_wrap(bool, optional): Enable word wrapping of long lines. Defaults to False.
+        word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
+        show_locals (bool, optional): Enable display of local variables. Defaults to False.
 
     Returns:
         Callable: The previous exception handler that was replaced.
@@ -69,6 +74,7 @@ def install(
                 extra_lines=extra_lines,
                 theme=theme,
                 word_wrap=word_wrap,
+                show_locals=show_locals,
             )
         )
 
@@ -83,6 +89,7 @@ class Frame:
     lineno: int
     name: str
     line: str = ""
+    locals: Optional[Dict[str, pretty.Node]] = None
 
 
 @dataclass
@@ -121,6 +128,7 @@ class Traceback:
         extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
         theme (str, optional): Override pygments theme used in traceback.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
+        show_locals (bool, optional): Enable display of local variables. Defaults to False.
     """
 
     def __init__(
@@ -130,6 +138,7 @@ class Traceback:
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
+        show_locals: bool = False,
     ):
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
@@ -137,12 +146,15 @@ class Traceback:
                 raise ValueError(
                     "Value for 'trace' required if not called in except: block"
                 )
-            trace = self.extract(exc_type, exc_value, traceback)
+            trace = self.extract(
+                exc_type, exc_value, traceback, show_locals=show_locals
+            )
         self.trace = trace
         self.width = width
         self.extra_lines = extra_lines
         self.theme = Syntax.get_theme(theme or "ansi_dark")
         self.word_wrap = word_wrap
+        self.show_locals = show_locals
 
     @classmethod
     def from_exception(
@@ -154,6 +166,7 @@ class Traceback:
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
+        show_locals: bool = False,
     ) -> "Traceback":
         """Create a traceback from exception info
 
@@ -165,6 +178,7 @@ class Traceback:
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
             theme (str, optional): Override pygments theme used in traceback.
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
+            show_locals (bool, optional): Enable display of local variables. Defaults to False.
 
         Returns:
             Traceback: A Traceback instance that may be printed.
@@ -176,6 +190,7 @@ class Traceback:
             extra_lines=extra_lines,
             theme=theme,
             word_wrap=word_wrap,
+            show_locals=show_locals,
         )
 
     @classmethod
@@ -184,6 +199,7 @@ class Traceback:
         exc_type: Type[BaseException],
         exc_value: BaseException,
         traceback: Optional[TracebackType],
+        show_locals: bool = False,
     ) -> Trace:
         """Extrace traceback information.
 
@@ -191,10 +207,12 @@ class Traceback:
             exc_type (Type[BaseException]): Exception type.
             exc_value (BaseException): Exception value.
             traceback (TracebackType): Python Traceback object.
+            show_locals (bool, optional): Enable display of local variables. Defaults to False.
 
         Returns:
             Trace: A Trace instance which you can use to construct a `Traceback`.
         """
+
         stacks: List[Stack] = []
         while True:
             stack = Stack(exc_type=str(exc_type.__name__), exc_value=str(exc_value))
@@ -211,11 +229,17 @@ class Traceback:
             stacks.append(stack)
             append = stack.frames.append
 
-            for frame_summary in extract_tb(traceback):
+            for frame_summary, line_no in walk_tb(traceback):
                 frame = Frame(
-                    filename=frame_summary.filename,
-                    lineno=frame_summary.lineno,
-                    name=frame_summary.name,
+                    filename=frame_summary.f_code.co_filename or "?",
+                    lineno=line_no,
+                    name=frame_summary.f_code.co_name,
+                    locals={
+                        key: pretty.traverse(value)
+                        for key, value in frame_summary.f_locals.items()
+                    }
+                    if show_locals
+                    else None,
                 )
                 append(frame)
 
@@ -247,6 +271,8 @@ class Traceback:
         highlighter = ReprHighlighter()
         for last, stack in loop_last(reversed(self.trace.stacks)):
             if stack.frames:
+                stack_renderable = self._render_stack(stack, styles)
+
                 stack_renderable: ConsoleRenderable = Panel(
                     self._render_stack(stack, styles),
                     title="[traceback.title]Traceback [dim](most recent call last)",
@@ -336,12 +362,22 @@ class Traceback:
                     ),
                     highlight_lines={frame.lineno},
                     word_wrap=self.word_wrap,
+                    code_width=88,
                 )
                 yield ""
             except Exception:
                 pass
             else:
-                yield syntax
+                if frame.locals:
+                    yield Columns(
+                        [
+                            syntax,
+                            render_scope(frame.locals, title="locals"),
+                        ],
+                        padding=1,
+                    )
+                else:
+                    yield syntax
 
 
 if __name__ == "__main__":  # pragma: no cover
@@ -352,17 +388,23 @@ if __name__ == "__main__":  # pragma: no cover
     import sys
 
     def bar(a):  # 这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑
-        print(1 / a)
+        one = 1
+        print(one / a)
 
     def foo(a):
+        zed = {"list_of_things": ["foo", "bar", "baz"] * 3}
         bar(a)
 
-    try:
+    def error():
+
         try:
-            foo(0)
+            try:
+                foo(0)
+            except:
+                slfkjsldkfj  # type: ignore
         except:
-            slfkjsldkfj  # type: ignore
-    except:
-        tb = Traceback()
-        # print(fooads)
-        console.print(tb)
+            tb = Traceback(show_locals=True, theme="monokai")
+            # print(fooads)
+            console.print(tb)
+
+    error()

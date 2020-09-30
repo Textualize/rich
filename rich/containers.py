@@ -93,8 +93,7 @@ class Lines:
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         """Console render method to insert line-breaks."""
-        for line in self._lines:
-            yield line
+        yield from self._lines
 
     def append(self, line: "Text") -> None:
         self._lines.append(line)
@@ -115,7 +114,7 @@ class Lines:
             console (Console): Console instance.
             width (int): Number of characters per line.
             justify (str, optional): Default justify method for text: "left", "center", "full" or "right". Defaults to "left".
-            overflow (str, optional): Default overflow for text: "crop", "fold", or "ellipisis". Defaults to "fold".
+            overflow (str, optional): Default overflow for text: "crop", "fold", or "ellipsis". Defaults to "fold".
 
         """
         from .text import Text

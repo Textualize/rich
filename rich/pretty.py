@@ -149,7 +149,7 @@ _MAPPING_CONTAINERS = (dict, os._Environ)
 
 
 @dataclass
-class _Node:
+class Node:
     """A node in a repr tree. May be atomic or a container."""
 
     key_repr: str = ""
@@ -159,7 +159,7 @@ class _Node:
     empty: str = ""
     last: bool = False
     is_tuple: bool = False
-    children: Optional[List["_Node"]] = None
+    children: Optional[List["Node"]] = None
 
     def iter_tokens(self) -> Iterable[str]:
         """Generate tokens for this node."""
@@ -204,12 +204,37 @@ class _Node:
         repr_text = "".join(self.iter_tokens())
         return repr_text
 
+    def render(
+        self, max_width: int = 80, indent_size: int = 4, expand_all: bool = False
+    ) -> str:
+        """Render the node to a pretty repr.
+
+        Args:
+            max_width (int, optional): Maximum width of the repr. Defaults to 80.
+            indent_size (int, optional): Size of indents. Defaults to 4.
+            expand_all (bool, optional): Expand all levels. Defaults to False.
+
+        Returns:
+            str: A repr string of the original object.
+        """
+        lines = [_Line(node=self)]
+        line_no = 0
+        while line_no < len(lines):
+            line = lines[line_no]
+            if line.expandable and not line.expanded:
+                if expand_all or not line.check_length(max_width):
+                    lines[line_no : line_no + 1] = line.expand(indent_size)
+            line_no += 1
+
+        repr_str = "\n".join(str(line) for line in lines)
+        return repr_str
+
 
 @dataclass
 class _Line:
     """A line in repr output."""
 
-    node: Optional[_Node] = None
+    node: Optional[Node] = None
     text: str = ""
     suffix: str = ""
     whitespace: str = ""
@@ -259,6 +284,73 @@ class _Line:
         return f"{self.whitespace}{self.text}{self.node or ''}{self.suffix}"
 
 
+def traverse(_object: Any) -> Node:
+    """Traverse object and generate a tree.
+
+    Args:
+        _object (Any): Object to be traversed.
+
+    Returns:
+        Node: The root of a tree structure which can be used to render a pretty repr.
+    """
+
+    def to_repr(obj: Any) -> str:
+        """Get repr string for an object, but catch errors."""
+        try:
+            obj_repr = repr(obj)
+        except Exception as error:
+            obj_repr = f"<repr-error '{error}'>"
+        return obj_repr
+
+    visited_ids: Set[int] = set()
+    push_visited = visited_ids.add
+    pop_visited = visited_ids.remove
+
+    def _traverse(obj: Any, root: bool = False) -> Node:
+        """Walk the object depth first."""
+        obj_type = type(obj)
+        if obj_type in _CONTAINERS:
+            obj_id = id(obj)
+
+            if obj_id in visited_ids:
+                # Recursion detected
+                return Node(value_repr="...")
+            push_visited(obj_id)
+            open_brace, close_brace, empty = _BRACES[obj_type](obj)
+
+            if obj:
+                children: List[Node] = []
+                node = Node(
+                    open_brace=open_brace,
+                    close_brace=close_brace,
+                    children=children,
+                    last=root,
+                )
+                append = children.append
+                if isinstance(obj, _MAPPING_CONTAINERS):
+                    for last, (key, child) in loop_last(obj.items()):
+                        child_node = _traverse(child)
+                        child_node.key_repr = to_repr(key)
+                        child_node.last = last
+                        append(child_node)
+                else:
+                    for last, child in loop_last(obj):
+                        child_node = _traverse(child)
+                        child_node.last = last
+                        append(child_node)
+            else:
+                node = Node(empty=empty, children=[], last=root)
+
+            pop_visited(obj_id)
+        else:
+            node = Node(value_repr=to_repr(obj), last=root)
+        node.is_tuple = isinstance(obj, tuple)
+        return node
+
+    node = _traverse(_object, root=True)
+    return node
+
+
 def pretty_repr(
     _object: Any, *, max_width: int = 80, indent_size: int = 4, expand_all: bool = False
 ) -> str:
@@ -274,71 +366,13 @@ def pretty_repr(
         str: A possibly multi-line representation of the object.
     """
 
-    def to_repr(obj: Any) -> str:
-        """Get repr string for an object, but catch errors."""
-        try:
-            obj_repr = repr(obj)
-        except Exception as error:
-            obj_repr = f"<repr-error '{error}'>"
-        return obj_repr
-
-    visited_ids: Set[int] = set()
-    push_visited = visited_ids.add
-    pop_visited = visited_ids.remove
-
-    def traverse(obj: Any, root: bool = False) -> _Node:
-        """Walk the object depth first."""
-        obj_type = type(obj)
-        if obj_type in _CONTAINERS:
-            obj_id = id(obj)
-
-            if obj_id in visited_ids:
-                # Recursion detected
-                return _Node(value_repr="...")
-            push_visited(obj_id)
-            open_brace, close_brace, empty = _BRACES[obj_type](obj)
-
-            if obj:
-                children: List[_Node] = []
-                node = _Node(
-                    open_brace=open_brace,
-                    close_brace=close_brace,
-                    children=children,
-                    last=root,
-                )
-                append = children.append
-                if isinstance(obj, _MAPPING_CONTAINERS):
-                    for last, (key, child) in loop_last(obj.items()):
-                        child_node = traverse(child)
-                        child_node.key_repr = to_repr(key)
-                        child_node.last = last
-                        append(child_node)
-                else:
-                    for last, child in loop_last(obj):
-                        child_node = traverse(child)
-                        child_node.last = last
-                        append(child_node)
-            else:
-                node = _Node(empty=empty, children=[], last=root)
-
-            pop_visited(obj_id)
-        else:
-            node = _Node(value_repr=to_repr(obj), last=root)
-        node.is_tuple = isinstance(obj, tuple)
-        return node
-
-    node = traverse(_object, root=True)
-
-    lines = [_Line(node=node)]
-    line_no = 0
-    while line_no < len(lines):
-        line = lines[line_no]
-        if line.expandable and not line.expanded:
-            if expand_all or not line.check_length(max_width):
-                lines[line_no : line_no + 1] = line.expand(indent_size)
-        line_no += 1
-
-    repr_str = "\n".join(str(line) for line in lines)
+    if isinstance(_object, Node):
+        node = _object
+    else:
+        node = traverse(_object)
+    repr_str = node.render(
+        max_width=max_width, indent_size=indent_size, expand_all=expand_all
+    )
     return repr_str
 
 
