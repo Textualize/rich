@@ -271,8 +271,6 @@ class Traceback:
         highlighter = ReprHighlighter()
         for last, stack in loop_last(reversed(self.trace.stacks)):
             if stack.frames:
-                stack_renderable = self._render_stack(stack, styles)
-
                 stack_renderable: ConsoleRenderable = Panel(
                     self._render_stack(stack, styles),
                     title="[traceback.title]Traceback [dim](most recent call last)",
