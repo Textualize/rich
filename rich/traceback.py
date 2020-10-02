@@ -7,6 +7,7 @@ from traceback import extract_tb, walk_tb, StackSummary
 from types import TracebackType
 from typing import Any, Callable, Dict, List, Optional, Type
 
+from pygments.lexers import guess_lexer_for_filename
 from pygments.token import Token, String, Name, Number
 
 from ._loop import loop_first, loop_last
@@ -335,6 +336,24 @@ class Traceback:
     def _render_stack(self, stack: Stack, styles: Dict[str, Style]) -> RenderResult:
         path_highlighter = PathHighlighter()
         theme = self.theme
+        code_cache: Dict[str, str] = {}
+
+        def read_code(filename: str) -> str:
+            """Read files, and cache results on filename.
+
+            Args:
+                filename (str): Filename to read
+
+            Returns:
+                str: Contents of file
+            """
+            code = code_cache.get(filename)
+            if code is None:
+                with open(filename, "rt") as code_file:
+                    code = code_file.read()
+                code_cache[filename] = code
+            return code
+
         for first, frame in loop_first(stack.frames):
             text = Text.assemble(
                 path_highlighter(Text(frame.filename, style=styles["string"])),
@@ -350,8 +369,12 @@ class Traceback:
             if frame.filename.startswith("<"):
                 continue
             try:
-                syntax = Syntax.from_path(
-                    frame.filename,
+                code = read_code(frame.filename)
+                lexer = guess_lexer_for_filename(frame.filename, code)
+                lexer_name = lexer.name
+                syntax = Syntax(
+                    code,
+                    lexer_name,
                     theme=theme,
                     line_numbers=True,
                     line_range=(
@@ -366,16 +389,17 @@ class Traceback:
             except Exception:
                 pass
             else:
-                if frame.locals:
-                    yield Columns(
+                yield (
+                    Columns(
                         [
                             syntax,
                             render_scope(frame.locals, title="locals"),
                         ],
                         padding=1,
                     )
-                else:
-                    yield syntax
+                    if frame.locals
+                    else syntax
+                )
 
 
 if __name__ == "__main__":  # pragma: no cover

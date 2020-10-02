@@ -41,7 +41,7 @@ from .segment import Segment
 from .style import Style
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
 from .text import Text, TextType
-from .theme import Theme
+from .theme import Theme, ThemeStack
 
 if TYPE_CHECKING:
     from ._windows import WindowsConsoleFeatures
@@ -180,6 +180,22 @@ class Capture:
                 "Capture result is not available until context manager exits."
             )
         return self._result
+
+
+class ThemeContext:
+    """A context manager to use a temporary theme. See :meth:`~rich.console.Console.theme` for usage."""
+
+    def __init__(self, console: "Console", theme: Theme, inherit: bool = True) -> None:
+        self.console = console
+        self.theme = theme
+        self.inherit = inherit
+
+    def __enter__(self) -> "ThemeContext":
+        self.console.push_theme(self.theme)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        self.console.pop_theme()
 
 
 class RenderGroup:
@@ -372,7 +388,7 @@ class Console:
         if self.is_jupyter:
             width = width or 93
             height = height or 100
-        self._styles = themes.DEFAULT.styles if theme is None else theme.styles
+        self._theme_stack = ThemeStack(themes.DEFAULT if theme is None else theme)
         self._width = width
         self._height = height
         self.tab_size = tab_size
@@ -497,6 +513,33 @@ class Console:
         del self._buffer[:]
         self._exit_buffer()
         return render_result
+
+    def push_theme(self, theme: Theme, inherit: bool = True) -> None:
+        """Push a new theme on to the top of the stack, overwriting the styles from the previous theme.
+        Generally speaking, you call :meth:`~rich.console.Console.theme` to get a context manager, rather
+        than calling this method directly.
+
+        Args:
+            theme (Theme): A theme instance.
+            inherit (bool, optional): Inherit existing styles. Defaults to True.
+        """
+        self._theme_stack.push_theme(theme, inherit=inherit)
+
+    def pop_theme(self) -> None:
+        """Remove theme from top of stack, restoring previous theme."""
+        self._theme_stack.pop_theme()
+
+    def theme(self, theme: Theme, inherit: bool = True) -> ThemeContext:
+        """Use a new temporary theme for the duration of the context manager.
+
+        Args:
+            theme (Theme): Theme instance to user.
+            inherit (bool, optional): Inherit existing styles. Defaults to True.
+
+        Returns:
+            ThemeContext: [description]
+        """
+        return ThemeContext(self, theme, inherit)
 
     @property
     def color_system(self) -> Optional[str]:
@@ -785,7 +828,7 @@ class Console:
             return name
 
         try:
-            style = self._styles.get(name)
+            style = self._theme_stack.get(name)
             if style is None:
                 style = Style.parse(name)
             return style.copy() if style.link else style
