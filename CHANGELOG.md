@@ -20,6 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optimized combining styles involving a null style
 - Change error messages in Style.parse to read better
 
+### Fixed
+
+- Fixed Table.\_\_rich_measure\_\_
+- Fixed incorrect calculation of fixed width columns
+
 ## [7.1.0] - 2020-09-26
 
 ### Added
