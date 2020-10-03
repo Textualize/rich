@@ -284,6 +284,7 @@ _COLOR_SYSTEMS_NAMES = {system: name for name, system in COLOR_SYSTEMS.items()}
 class ConsoleThreadLocals(threading.local):
     """Thread local values for Console context."""
 
+    theme_stack: ThemeStack
     buffer: List[Segment] = field(default_factory=list)
     buffer_index: int = 0
 
@@ -388,7 +389,6 @@ class Console:
         if self.is_jupyter:
             width = width or 93
             height = height or 100
-        self._theme_stack = ThemeStack(themes.DEFAULT if theme is None else theme)
         self._width = width
         self._height = height
         self.tab_size = tab_size
@@ -423,7 +423,9 @@ class Console:
         self.safe_box = safe_box
 
         self._record_buffer_lock = threading.RLock()
-        self._thread_locals = ConsoleThreadLocals()
+        self._thread_locals = ConsoleThreadLocals(
+            theme_stack=ThemeStack(themes.DEFAULT if theme is None else theme)
+        )
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
 
@@ -443,6 +445,11 @@ class Console:
     @_buffer_index.setter
     def _buffer_index(self, value: int) -> None:
         self._thread_locals.buffer_index = value
+
+    @property
+    def _theme_stack(self) -> ThemeStack:
+        """Get the thread local theme stack."""
+        return self._thread_locals.theme_stack
 
     def _detect_color_system(self) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
