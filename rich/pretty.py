@@ -59,7 +59,10 @@ def install(
             builtins._ = None  # type: ignore
             console.print(
                 value
-                if hasattr(value, "__rich_console__") or hasattr(value, "__rich__")
+                if hasattr(value, "__rich_console__")
+                and callable(value.__rich_console__)
+                or hasattr(value, "__rich__")
+                and callable(value.__rich__)
                 else Pretty(value, overflow=overflow),
                 crop=crop,
             )
