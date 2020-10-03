@@ -58,6 +58,7 @@ class Style:
     _attributes: int
     _set_attributes: int
     _hash: int
+    _null: bool
 
     __slots__ = [
         "_color",
@@ -69,6 +70,7 @@ class Style:
         "_ansi",
         "_style_definition",
         "_hash",
+        "_null",
     ]
 
     # maps bits on to SGR parameter
@@ -116,23 +118,6 @@ class Style:
 
         self._color = None if color is None else _make_color(color)
         self._bgcolor = None if bgcolor is None else _make_color(bgcolor)
-        self._attributes = sum(
-            (
-                bold and 1 or 0,
-                dim and 2 or 0,
-                italic and 4 or 0,
-                underline and 8 or 0,
-                blink and 16 or 0,
-                blink2 and 32 or 0,
-                reverse and 64 or 0,
-                conceal and 128 or 0,
-                strike and 256 or 0,
-                underline2 and 512 or 0,
-                frame and 1024 or 0,
-                encircle and 2048 or 0,
-                overline and 4096 or 0,
-            )
-        )
         self._set_attributes = sum(
             (
                 bold is not None,
@@ -150,6 +135,28 @@ class Style:
                 overline is not None and 4096,
             )
         )
+        self._attributes = (
+            sum(
+                (
+                    bold and 1 or 0,
+                    dim and 2 or 0,
+                    italic and 4 or 0,
+                    underline and 8 or 0,
+                    blink and 16 or 0,
+                    blink2 and 32 or 0,
+                    reverse and 64 or 0,
+                    conceal and 128 or 0,
+                    strike and 256 or 0,
+                    underline2 and 512 or 0,
+                    frame and 1024 or 0,
+                    encircle and 2048 or 0,
+                    overline and 4096 or 0,
+                )
+            )
+            if self._set_attributes
+            else 0
+        )
+
         self._link = link
         self._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
         self._hash = hash(
@@ -161,21 +168,12 @@ class Style:
                 link,
             )
         )
+        self._null = not (self._set_attributes or color or bgcolor or link)
 
     @classmethod
-    def empty(cls) -> "Style":
-        """Create an 'empty' style, equivalent to Style(), but more performant."""
-        style = cls.__new__(Style)
-        style._ansi = None
-        style._style_definition = None
-        style._color = None
-        style._bgcolor = None
-        style._attributes = 0
-        style._set_attributes = 0
-        style._link = None
-        style._link_id = None
-        style._hash = hash((None, None, 0, 0, None))
-        return style
+    def null(cls) -> "Style":
+        """Create an 'null' style, equivalent to Style(), but more performant."""
+        return NULL_STYLE
 
     bold = _Bit(0)
     dim = _Bit(1)
@@ -244,7 +242,7 @@ class Style:
 
     def __bool__(self) -> bool:
         """A Style is false if it has no attributes, colors, or links."""
-        return bool(self._set_attributes or self._color or self._bgcolor or self._link)
+        return not self._null
 
     def _make_ansi_codes(self, color_system: ColorSystem) -> str:
         """Generate ANSI codes for this style.
@@ -408,7 +406,7 @@ class Style:
                     Color.parse(word) is None
                 except ColorParseError as error:
                     raise errors.StyleSyntaxError(
-                        f"unable to parse {word} in {style_definition!r}; {error}"
+                        f"unable to parse {word!r} as background color; {error}"
                     ) from None
                 bgcolor = word
 
@@ -417,7 +415,7 @@ class Style:
                 attribute = style_attributes.get(word)
                 if attribute is None:
                     raise errors.StyleSyntaxError(
-                        f"expected style attribute after 'not', found {original_word!r}"
+                        f"expected style attribute after 'not', found {word!r}"
                     )
                 attributes[attribute] = False
 
@@ -435,7 +433,7 @@ class Style:
                     Color.parse(word)
                 except ColorParseError as error:
                     raise errors.StyleSyntaxError(
-                        f"unable to parse {word!r} in style {style_definition!r}; {error}"
+                        f"unable to parse {word!r} as color; {error}"
                     ) from None
                 color = word
         style = Style(color=color, bgcolor=bgcolor, link=link, **attributes)
@@ -488,8 +486,7 @@ class Style:
             Style: A new style instance.
         """
         iter_styles = iter(styles)
-        first_style = next(iter_styles)
-        return sum(iter_styles, first_style)
+        return sum(iter_styles, next(iter_styles))
 
     @classmethod
     def chain(cls, *styles: "Style") -> "Style":
@@ -502,8 +499,7 @@ class Style:
             Style: A new style instance.
         """
         iter_styles = iter(styles)
-        first_style = next(iter_styles)
-        return sum(iter_styles, first_style)
+        return sum(iter_styles, next(iter_styles))
 
     def copy(self) -> "Style":
         """Get a copy of this style.
@@ -511,6 +507,8 @@ class Style:
         Returns:
             Style: A new Style instance with identical attributes.
         """
+        if self._null:
+            return NULL_STYLE
         style = self.__new__(Style)
         style._ansi = self._ansi
         style._style_definition = self._style_definition
@@ -521,6 +519,7 @@ class Style:
         style._link = self._link
         style._link_id = f"{time()}-{randint(0, 999999)}" if self._link else ""
         style._hash = self._hash
+        style._null = False
         return style
 
     def render(
@@ -557,17 +556,17 @@ class Style:
         Args:
             text (Optional[str], optional): Text to style or None for style name.
 
-        Returns:
-            None:
         """
         text = text or str(self)
         sys.stdout.write(f"{self.render(text)}\n")
 
     def __add__(self, style: Optional["Style"]) -> "Style":
-        if style is None:
-            return self
-        if not isinstance(style, Style):
+        if not (isinstance(style, Style) or style is None):
             return NotImplemented  # type: ignore
+        if style is None or style._null:
+            return self
+        if self._null:
+            return style
         new_style = self.__new__(Style)
         new_style._ansi = None
         new_style._style_definition = None
@@ -580,7 +579,11 @@ class Style:
         new_style._link = style._link or self._link
         new_style._link_id = style._link_id or self._link_id
         new_style._hash = style._hash
+        new_style._null = self._null or style._null
         return new_style
+
+
+NULL_STYLE = Style()
 
 
 class StyleStack:

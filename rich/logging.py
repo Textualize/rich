@@ -31,7 +31,7 @@ class RichHandler(Handler):
         highlighter (Highlighter, optional): Highlighter to style log messages, or None to use ReprHighlighter. Defaults to None.
         markup (bool, optional): Enable console markup in log messages. Defaults to False.
         rich_tracebacks (bool, optional): Enable rich tracebacks with syntax highlighting and formatting. Defaults to False.
-        tracebacks_width (Optional[int], optional): Number of characters used to render tracebacks code. Defaults to 88.
+        tracebacks_width (Optional[int], optional): Number of characters used to render tracebacks, or None for full width. Defaults to None.
         tracebacks_extra_lines (int, optional): Additional lines of code to render tracebacks, or None for full width. Defaults to None.
         tracebacks_theme (str, optional): Override pygments theme used in traceback.
         tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to False.
@@ -62,7 +62,7 @@ class RichHandler(Handler):
         highlighter: Highlighter = None,
         markup: bool = False,
         rich_tracebacks: bool = False,
-        tracebacks_width: Optional[int] = 88,
+        tracebacks_width: Optional[int] = None,
         tracebacks_extra_lines: int = 3,
         tracebacks_theme: Optional[str] = None,
         tracebacks_word_wrap: bool = True,

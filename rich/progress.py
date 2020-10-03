@@ -75,6 +75,7 @@ class _TrackThread(Thread):
             if last_completed != completed:
                 advance(task_id, completed - last_completed)
                 last_completed = completed
+
         self.progress.update(self.task_id, completed=self.completed, refresh=True)
 
     def __enter__(self) -> "_TrackThread":
@@ -780,7 +781,7 @@ class Progress(JupyterMixin, RenderHook):
             popleft = _progress.popleft
             while _progress and _progress[0].timestamp < old_sample_time:
                 popleft()
-            while len(_progress) > 10:
+            while len(_progress) > 1000:
                 popleft()
             _progress.append(ProgressSample(current_time, update_completed))
 
@@ -926,7 +927,7 @@ if __name__ == "__main__":  # pragma: no coverage
 
     syntax = Syntax(
         '''def loop_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
-    """Iterate and generate a tup`le with a flag for last value."""
+    """Iterate and generate a tuple with a flag for last value."""
     iter_values = iter(values)
     try:
         previous_value = next(iter_values)

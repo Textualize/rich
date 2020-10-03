@@ -34,7 +34,7 @@ If you intend to use Rich with Jupyter then there are some additional dependenci
 Quick Start
 -----------
 
-The quickest way to get up and running with Rich is to import the alternative ``print`` function which may be used as a drop-in replacement for Python's built in function. Here's how you would do that::
+The quickest way to get up and running with Rich is to import the alternative ``print`` function which takes the same arguments as the built-in ``print`` and may be used as a drop-in replacement. Here's how you would do that::
 
     from rich import print
 

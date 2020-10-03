@@ -104,12 +104,12 @@ class SyntaxTheme(ABC):
     @abstractmethod
     def get_style_for_token(self, token_type: TokenType) -> Style:
         """Get a style for a given Pygments token."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def get_background_style(self) -> Style:
         """Get the background color."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 class PygmentsSyntaxTheme(SyntaxTheme):
@@ -136,7 +136,7 @@ class PygmentsSyntaxTheme(SyntaxTheme):
             try:
                 pygments_style = self._pygments_style_class.style_for_token(token_type)
             except KeyError:
-                style = Style.empty()
+                style = Style.null()
             else:
                 color = pygments_style["color"]
                 bgcolor = pygments_style["bgcolor"]
@@ -159,8 +159,8 @@ class ANSISyntaxTheme(SyntaxTheme):
 
     def __init__(self, style_map: Dict[TokenType, Style]) -> None:
         self.style_map = style_map
-        self._missing_style = Style.empty()
-        self._background_style = Style.empty()
+        self._missing_style = Style.null()
+        self._background_style = Style.null()
         self._style_cache: Dict[TokenType, Style] = {}
 
     def get_style_for_token(self, token_type: TokenType) -> Style:
@@ -302,8 +302,7 @@ class Syntax(JupyterMixin):
 
         if lexer is None:
             try:
-                lexer = guess_lexer_for_filename(path, code)
-                lexer_name = lexer.name
+                lexer_name = guess_lexer_for_filename(path, code).name
             except ClassNotFound:
                 pass
 
@@ -404,7 +403,7 @@ class Syntax(JupyterMixin):
         """Get background, number, and highlight styles for line numbers."""
         background_style = self._get_base_style()
         if background_style.transaprent_background:
-            return Style.empty(), Style(dim=True), Style.empty()
+            return Style.null(), Style(dim=True), Style.null()
         if console.color_system in ("256", "truecolor"):
             number_style = Style.chain(
                 background_style,
@@ -494,7 +493,7 @@ class Syntax(JupyterMixin):
                 if first:
                     line_column = str(line_no).rjust(numbers_column_width - 2) + " "
                     if highlight_line(line_no):
-                        yield _Segment(line_pointer, number_style)
+                        yield _Segment(line_pointer, Style(color="red"))
                         yield _Segment(line_column, highlight_number_style)
                     else:
                         yield _Segment("  ", highlight_number_style)

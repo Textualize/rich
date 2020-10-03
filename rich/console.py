@@ -5,7 +5,7 @@ import shutil
 import sys
 import threading
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, Sequence
+from collections import abc
 from dataclasses import dataclass, field, replace
 from functools import wraps
 from getpass import getpass
@@ -41,7 +41,7 @@ from .segment import Segment
 from .style import Style
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
 from .text import Text, TextType
-from .theme import Theme
+from .theme import Theme, ThemeStack
 
 if TYPE_CHECKING:
     from ._windows import WindowsConsoleFeatures
@@ -182,6 +182,22 @@ class Capture:
         return self._result
 
 
+class ThemeContext:
+    """A context manager to use a temporary theme. See :meth:`~rich.console.Console.theme` for usage."""
+
+    def __init__(self, console: "Console", theme: Theme, inherit: bool = True) -> None:
+        self.console = console
+        self.theme = theme
+        self.inherit = inherit
+
+    def __enter__(self) -> "ThemeContext":
+        self.console.push_theme(self.theme)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        self.console.pop_theme()
+
+
 class RenderGroup:
     """Takes a group of renderables and returns a renderable object that renders the group.
 
@@ -268,6 +284,7 @@ _COLOR_SYSTEMS_NAMES = {system: name for name, system in COLOR_SYSTEMS.items()}
 class ConsoleThreadLocals(threading.local):
     """Thread local values for Console context."""
 
+    theme_stack: ThemeStack
     buffer: List[Segment] = field(default_factory=list)
     buffer_index: int = 0
 
@@ -372,7 +389,6 @@ class Console:
         if self.is_jupyter:
             width = width or 93
             height = height or 100
-        self._styles = themes.DEFAULT.styles if theme is None else theme.styles
         self._width = width
         self._height = height
         self.tab_size = tab_size
@@ -407,7 +423,9 @@ class Console:
         self.safe_box = safe_box
 
         self._record_buffer_lock = threading.RLock()
-        self._thread_locals = ConsoleThreadLocals()
+        self._thread_locals = ConsoleThreadLocals(
+            theme_stack=ThemeStack(themes.DEFAULT if theme is None else theme)
+        )
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
 
@@ -427,6 +445,11 @@ class Console:
     @_buffer_index.setter
     def _buffer_index(self, value: int) -> None:
         self._thread_locals.buffer_index = value
+
+    @property
+    def _theme_stack(self) -> ThemeStack:
+        """Get the thread local theme stack."""
+        return self._thread_locals.theme_stack
 
     def _detect_color_system(self) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
@@ -497,6 +520,33 @@ class Console:
         del self._buffer[:]
         self._exit_buffer()
         return render_result
+
+    def push_theme(self, theme: Theme, *, inherit: bool = True) -> None:
+        """Push a new theme on to the top of the stack, replacing the styles from the previous theme.
+        Generally speaking, you should call :meth:`~rich.console.Console.use_theme` to get a context manager, rather
+        than calling this method directly.
+
+        Args:
+            theme (Theme): A theme instance.
+            inherit (bool, optional): Inherit existing styles. Defaults to True.
+        """
+        self._theme_stack.push_theme(theme, inherit=inherit)
+
+    def pop_theme(self) -> None:
+        """Remove theme from top of stack, restoring previous theme."""
+        self._theme_stack.pop_theme()
+
+    def use_theme(self, theme: Theme, *, inherit: bool = True) -> ThemeContext:
+        """Use a different theme for the duration of the context manager.
+
+        Args:
+            theme (Theme): Theme instance to user.
+            inherit (bool, optional): Inherit existing console styles. Defaults to True.
+
+        Returns:
+            ThemeContext: [description]
+        """
+        return ThemeContext(self, theme, inherit)
 
     @property
     def color_system(self) -> Optional[str]:
@@ -588,6 +638,10 @@ class Console:
         width, _ = self.size
         return width
 
+    def bell(self) -> None:
+        """Play a 'bell' sound (if supported by the terminal)."""
+        self.control("\x07")
+
     def capture(self) -> Capture:
         """A context manager to *capture* the result of print() or log() in a string,
         rather than writing it to the console.
@@ -600,7 +654,7 @@ class Console:
             >>> print(capture.get())
 
         Returns:
-            Capture: Context manager which will contain the attribute `result` on exit.
+            Capture: Context manager with disables writing to the terminal.
         """
         capture = Capture(self)
         return capture
@@ -781,7 +835,7 @@ class Console:
             return name
 
         try:
-            style = self._styles.get(name)
+            style = self._theme_stack.get(name)
             if style is None:
                 style = Style.parse(name)
             return style.copy() if style.link else style
@@ -854,7 +908,7 @@ class Console:
             elif isinstance(renderable, ConsoleRenderable):
                 check_text()
                 append(renderable)
-            elif isinstance(renderable, (Mapping, Sequence)):
+            elif isinstance(renderable, (abc.Mapping, abc.Sequence, abc.Set)):
                 check_text()
                 append(Pretty(renderable, highlighter=_highlighter))
             else:
@@ -976,10 +1030,11 @@ class Console:
     def print_exception(
         self,
         *,
-        width: Optional[int] = 88,
+        width: Optional[int] = 100,
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
+        show_locals: bool = False,
     ) -> None:
         """Prints a rich render of the last exception and traceback.
 
@@ -988,11 +1043,16 @@ class Console:
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
             theme (str, optional): Override pygments theme used in traceback
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
+            show_locals (bool, optional): Enable display of local variables. Defaults to False.
         """
         from .traceback import Traceback
 
         traceback = Traceback(
-            width=width, extra_lines=extra_lines, theme=theme, word_wrap=word_wrap
+            width=width,
+            extra_lines=extra_lines,
+            theme=theme,
+            word_wrap=word_wrap,
+            show_locals=show_locals,
         )
         self.print(traceback)
 

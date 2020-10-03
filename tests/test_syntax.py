@@ -1,5 +1,16 @@
 # coding=utf-8
 
+import sys
+import os, tempfile
+
+import pytest
+from .render import render
+
+from rich.panel import Panel
+from rich.style import Style
+from rich.syntax import Syntax, ANSISyntaxTheme
+
+
 CODE = '''
 def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
     """Iterate and generate a tuple with a flag for first and last value."""
@@ -15,12 +26,6 @@ def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
         previous_value = value
     yield first, True, previous_value
 '''
-
-from .render import render
-
-from rich.panel import Panel
-from rich.style import Style
-from rich.syntax import Syntax, ANSISyntaxTheme
 
 
 def test_python_render():
@@ -46,6 +51,30 @@ def test_ansi_theme():
     theme = ANSISyntaxTheme({("foo", "bar"): style})
     assert theme.get_style_for_token(("foo", "bar", "baz")) == style
     assert theme.get_background_style() == Style()
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="permissions error on Windows")
+def test_from_file():
+    fh, path = tempfile.mkstemp("example.py")
+    try:
+        os.write(fh, b"import this\n")
+        syntax = Syntax.from_path(path)
+        assert syntax.lexer_name == "Python"
+        assert syntax.code == "import this\n"
+    finally:
+        os.remove(path)
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="permissions error on Windows")
+def test_from_file_unknown_lexer():
+    fh, path = tempfile.mkstemp("example.nosuchtype")
+    try:
+        os.write(fh, b"import this\n")
+        syntax = Syntax.from_path(path)
+        assert syntax.lexer_name == "default"
+        assert syntax.code == "import this\n"
+    finally:
+        os.remove(path)
 
 
 if __name__ == "__main__":

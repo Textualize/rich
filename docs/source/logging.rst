@@ -29,7 +29,7 @@ The :class:`~rich.logging.RichHandler` class may be configured to ues Rich's :cl
 
     import logging
     from rich.logging import RichHandler
-    
+
     logging.basicConfig(
         level="NOTSET",
         format="%(message)s",
