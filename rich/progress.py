@@ -300,8 +300,8 @@ class DownloadColumn(ProgressColumn):
         total = int(task.total)
         unit, suffix = filesize.pick_unit_and_suffix(
             total,
-            ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"],
-            1024,
+            ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
+            1000,
         )
         completed_ratio = completed / unit
         total_ratio = total / unit
