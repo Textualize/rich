@@ -315,4 +315,6 @@ Aquí hay algunos proyectos que usan Rich:
   Automatice y pruebe 10 veces más rápido con Selenium y pytest. Baterias incluidas.
 - [smacke/ffsubsync](https://github.com/smacke/ffsubsync)
   Sincronice automáticamente los subtítulos con el video.
+- [tryolabs/norfair](https://github.com/tryolabs/norfair)
+- Libreria de Python para agregar tracking a cualquier detector.
 - +¡[Muchos más](https://github.com/willmcgugan/rich/network/dependents)!
