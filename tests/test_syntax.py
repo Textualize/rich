@@ -1,5 +1,16 @@
 # coding=utf-8
 
+import sys
+import os, tempfile
+
+import pytest
+from .render import render
+
+from rich.panel import Panel
+from rich.style import Style
+from rich.syntax import Syntax, ANSISyntaxTheme
+
+
 CODE = '''
 def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
     """Iterate and generate a tuple with a flag for first and last value."""
@@ -15,14 +26,6 @@ def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
         previous_value = value
     yield first, True, previous_value
 '''
-
-import os, tempfile
-
-from .render import render
-
-from rich.panel import Panel
-from rich.style import Style
-from rich.syntax import Syntax, ANSISyntaxTheme
 
 
 def test_python_render():
@@ -50,6 +53,7 @@ def test_ansi_theme():
     assert theme.get_background_style() == Style()
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="permissions error on Windows")
 def test_from_file():
     fh, path = tempfile.mkstemp("example.py")
     try:
@@ -61,6 +65,7 @@ def test_from_file():
         os.remove(path)
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="permissions error on Windows")
 def test_from_file_unknown_lexer():
     fh, path = tempfile.mkstemp("example.nosuchtype")
     try:
