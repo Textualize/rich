@@ -91,10 +91,9 @@ class ThemeStack:
             inherit (boolean, optional): Inherit styles from current top of stack.
         """
         styles: Dict[str, Style]
-        if inherit:
-            styles = {**self._entries[-1], **theme.styles}
-        else:
-            styles = theme.styles.copy()
+        styles = (
+            {**self._entries[-1], **theme.styles} if inherit else theme.styles.copy()
+        )
         self._entries.append(styles)
         self.get = self._entries[-1].get
 

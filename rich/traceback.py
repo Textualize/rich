@@ -3,13 +3,24 @@ from __future__ import absolute_import
 import platform
 import sys
 from dataclasses import dataclass, field
-from traceback import extract_tb, walk_tb, StackSummary
+from traceback import walk_tb
 from types import TracebackType
-from typing import Any, Callable, Dict, List, Optional, Type
+from typing import Callable, Dict, List, Optional, Type
 
 from pygments.lexers import guess_lexer_for_filename
-from pygments.token import Token, String, Name, Number
+from pygments.token import (
+    Comment,
+    Generic,
+    Keyword,
+    Name,
+    Number,
+    Operator,
+    String,
+    Token,
+    Text as TextToken,
+)
 
+from . import pretty
 from ._loop import loop_first, loop_last
 from .columns import Columns
 from .console import (
@@ -21,13 +32,12 @@ from .console import (
 )
 from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
-from .padding import Padding
 from .panel import Panel
-from . import pretty
 from .scope import render_scope
-from .syntax import Syntax
 from .style import Style
+from .syntax import Syntax
 from .text import Text
+from .theme import Theme
 
 WINDOWS = platform.system() == "Windows"
 
@@ -262,18 +272,33 @@ class Traceback:
     ) -> RenderResult:
         theme = self.theme
         background_style = theme.get_background_style()
+        token_style = theme.get_style_for_token
 
-        styles = {
-            "text": theme.get_style_for_token(Token),
-            "string": theme.get_style_for_token(String),
-            "function": theme.get_style_for_token(Name.Function),
-            "number": theme.get_style_for_token(Number),
-        }
+        traceback_theme = Theme(
+            {
+                "pretty": token_style(TextToken),
+                "pygments.text": token_style(Token),
+                "pygments.string": token_style(String),
+                "pygments.function": token_style(Name.Function),
+                "pygments.number": token_style(Number),
+                "repr.str": token_style(String),
+                "repr.brace": token_style(TextToken) + Style(bold=True),
+                "repr.number": token_style(Number),
+                "repr.bool_true": token_style(Keyword.Constant),
+                "repr.bool_false": token_style(Keyword.Constant),
+                "repr.none": token_style(Keyword.Constant),
+                "scope.border": token_style(String.Delimiter),
+                "scope.equals": token_style(Operator),
+                "scope.key": token_style(Name),
+                "scope.key.special": token_style(Name.Constant) + Style(dim=True),
+            }
+        )
+
         highlighter = ReprHighlighter()
         for last, stack in loop_last(reversed(self.trace.stacks)):
             if stack.frames:
                 stack_renderable: ConsoleRenderable = Panel(
-                    self._render_stack(stack, styles),
+                    self._render_stack(stack),
                     title="[traceback.title]Traceback [dim](most recent call last)",
                     style=background_style,
                     border_style="traceback.border.syntax_error",
@@ -281,18 +306,20 @@ class Traceback:
                     padding=(0, 1),
                 )
                 stack_renderable = Constrain(stack_renderable, self.width)
-                yield stack_renderable
+                with console.use_theme(traceback_theme):
+                    yield stack_renderable
             if stack.syntax_error is not None:
-                yield Constrain(
-                    Panel(
-                        self._render_syntax_error(stack.syntax_error, styles),
-                        style=background_style,
-                        border_style="traceback.border",
-                        expand=False,
-                        padding=(0, 1),
-                    ),
-                    self.width,
-                )
+                with console.use_theme(traceback_theme):
+                    yield Constrain(
+                        Panel(
+                            self._render_syntax_error(stack.syntax_error),
+                            style=background_style,
+                            border_style="traceback.border",
+                            expand=False,
+                            padding=(0, 1),
+                        ),
+                        self.width,
+                    )
                 yield Text.assemble(
                     (f"{stack.exc_type}: ", "traceback.exc_type"),
                     highlighter(stack.syntax_error.msg),
@@ -309,17 +336,15 @@ class Traceback:
                 )
 
     @render_group()
-    def _render_syntax_error(
-        self, syntax_error: _SyntaxError, styles: Dict[str, Style]
-    ) -> RenderResult:
+    def _render_syntax_error(self, syntax_error: _SyntaxError) -> RenderResult:
         highlighter = ReprHighlighter()
         path_highlighter = PathHighlighter()
         if syntax_error.filename != "<stdin>":
             text = Text.assemble(
-                (f" {syntax_error.filename}", styles["string"]),
-                (":", styles["text"]),
-                (str(syntax_error.lineno), styles["number"]),
-                style=styles["text"],
+                (f" {syntax_error.filename}", "pygments.string"),
+                (":", "pgments.text"),
+                (str(syntax_error.lineno), "pygments.number"),
+                style="pygments.text",
             )
             yield path_highlighter(text)
         syntax_error_text = highlighter(syntax_error.line.rstrip())
@@ -328,12 +353,12 @@ class Traceback:
         syntax_error_text.stylize("bold underline", offset, offset + 1)
         syntax_error_text += Text.from_markup(
             "\n" + " " * offset + "[traceback.offset]▲[/]",
-            style=styles["text"],
+            style="pygments.text",
         )
         yield syntax_error_text
 
     @render_group()
-    def _render_stack(self, stack: Stack, styles: Dict[str, Style]) -> RenderResult:
+    def _render_stack(self, stack: Stack) -> RenderResult:
         path_highlighter = PathHighlighter()
         theme = self.theme
         code_cache: Dict[str, str] = {}
@@ -356,12 +381,12 @@ class Traceback:
 
         for first, frame in loop_first(stack.frames):
             text = Text.assemble(
-                path_highlighter(Text(frame.filename, style=styles["string"])),
-                (":", styles["text"]),
-                (str(frame.lineno), styles["number"]),
+                path_highlighter(Text(frame.filename, style="pygments.string")),
+                (":", "pygments.text"),
+                (str(frame.lineno), "pygments.number"),
                 " in ",
-                (frame.name, styles["function"]),
-                style=styles["text"],
+                (frame.name, "pygments.function"),
+                style="pygments.text",
             )
             if not frame.filename.startswith("<") and not first:
                 yield ""
@@ -414,7 +439,15 @@ if __name__ == "__main__":  # pragma: no cover
         print(one / a)
 
     def foo(a):
-        zed = {"list_of_things": ["foo", "bar", "baz"] * 3}
+        zed = {
+            "characters": {
+                "Paul Atriedies",
+                "Vladimir Harkonnen",
+                "Thufir Haway",
+                "Duncan Idaho",
+            },
+            "atomic_types": (None, False, True),
+        }
         bar(a)
 
     def error():
@@ -425,8 +458,6 @@ if __name__ == "__main__":  # pragma: no cover
             except:
                 slfkjsldkfj  # type: ignore
         except:
-            tb = Traceback(show_locals=True, theme="monokai")
-            # print(fooads)
-            console.print(tb)
+            console.print_exception(show_locals=True)
 
     error()

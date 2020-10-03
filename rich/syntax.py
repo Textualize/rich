@@ -104,12 +104,12 @@ class SyntaxTheme(ABC):
     @abstractmethod
     def get_style_for_token(self, token_type: TokenType) -> Style:
         """Get a style for a given Pygments token."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def get_background_style(self) -> Style:
         """Get the background color."""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 class PygmentsSyntaxTheme(SyntaxTheme):
@@ -302,8 +302,7 @@ class Syntax(JupyterMixin):
 
         if lexer is None:
             try:
-                lexer = guess_lexer_for_filename(path, code)
-                lexer_name = lexer.name
+                lexer_name = guess_lexer_for_filename(path, code).name
             except ClassNotFound:
                 pass
 
@@ -494,7 +493,7 @@ class Syntax(JupyterMixin):
                 if first:
                     line_column = str(line_no).rjust(numbers_column_width - 2) + " "
                     if highlight_line(line_no):
-                        yield _Segment(line_pointer, number_style)
+                        yield _Segment(line_pointer, Style(color="red"))
                         yield _Segment(line_column, highlight_number_style)
                     else:
                         yield _Segment("  ", highlight_number_style)

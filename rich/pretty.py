@@ -108,6 +108,7 @@ class Pretty:
             justify=self.justify or options.justify,
             overflow=self.overflow or options.overflow,
             no_wrap=pick_bool(self.no_wrap, options.no_wrap),
+            style="pretty",
         )
         pretty_text = self.highlighter(pretty_text)
         yield pretty_text

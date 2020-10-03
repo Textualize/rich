@@ -155,15 +155,14 @@ class Panel(JupyterMixin):
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         _title = self._title
-        if _title is None:
-            width = Measurement.get(console, self.renderable, max_width - 2).maximum + 2
-        else:
-            width = (
-                measure_renderables(
-                    console, [self.renderable, _title], max_width
-                ).maximum
-                + 4
-            )
+        _, right, _, left = Padding.unpack(self.padding)
+        padding = left + right
+        renderables = [self.renderable, _title] if _title else [self.renderable]
+        width = (
+            measure_renderables(console, renderables, max_width - padding - 2).maximum
+            + padding
+            + 2
+        )
         return Measurement(width, width)
 
 

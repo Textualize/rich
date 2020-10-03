@@ -241,19 +241,23 @@ class Table(JupyterMixin):
         if self.width is not None:
             max_width = self.width
 
-        if self.box:
-            max_width -= len(self.columns) - 1
-            if self.show_edge:
-                max_width -= 2
+        # if self.box:
+        #     max_width -= len(self.columns) - 1
+        #     if self.show_edge:
+        #         max_width -= 2
 
         if max_width < 0:
             return Measurement(0, 0)
 
         extra_width = self._extra_width
+
+        max_width = sum(self._calculate_column_widths(console, max_width))
+
         _measure_column = self._measure_column
 
         measurements = [
-            _measure_column(console, column, max_width) for column in self.columns
+            _measure_column(console, column, max_width - extra_width)
+            for column in self.columns
         ]
         minimum_width = (
             sum(measurement.minimum for measurement in measurements) + extra_width

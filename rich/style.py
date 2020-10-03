@@ -118,23 +118,6 @@ class Style:
 
         self._color = None if color is None else _make_color(color)
         self._bgcolor = None if bgcolor is None else _make_color(bgcolor)
-        self._attributes = sum(
-            (
-                bold and 1 or 0,
-                dim and 2 or 0,
-                italic and 4 or 0,
-                underline and 8 or 0,
-                blink and 16 or 0,
-                blink2 and 32 or 0,
-                reverse and 64 or 0,
-                conceal and 128 or 0,
-                strike and 256 or 0,
-                underline2 and 512 or 0,
-                frame and 1024 or 0,
-                encircle and 2048 or 0,
-                overline and 4096 or 0,
-            )
-        )
         self._set_attributes = sum(
             (
                 bold is not None,
@@ -152,6 +135,28 @@ class Style:
                 overline is not None and 4096,
             )
         )
+        self._attributes = (
+            sum(
+                (
+                    bold and 1 or 0,
+                    dim and 2 or 0,
+                    italic and 4 or 0,
+                    underline and 8 or 0,
+                    blink and 16 or 0,
+                    blink2 and 32 or 0,
+                    reverse and 64 or 0,
+                    conceal and 128 or 0,
+                    strike and 256 or 0,
+                    underline2 and 512 or 0,
+                    frame and 1024 or 0,
+                    encircle and 2048 or 0,
+                    overline and 4096 or 0,
+                )
+            )
+            if self._set_attributes
+            else 0
+        )
+
         self._link = link
         self._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
         self._hash = hash(

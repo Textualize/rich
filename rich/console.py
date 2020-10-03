@@ -514,9 +514,9 @@ class Console:
         self._exit_buffer()
         return render_result
 
-    def push_theme(self, theme: Theme, inherit: bool = True) -> None:
-        """Push a new theme on to the top of the stack, overwriting the styles from the previous theme.
-        Generally speaking, you call :meth:`~rich.console.Console.theme` to get a context manager, rather
+    def push_theme(self, theme: Theme, *, inherit: bool = True) -> None:
+        """Push a new theme on to the top of the stack, replacing the styles from the previous theme.
+        Generally speaking, you should call :meth:`~rich.console.Console.use_theme` to get a context manager, rather
         than calling this method directly.
 
         Args:
@@ -529,12 +529,12 @@ class Console:
         """Remove theme from top of stack, restoring previous theme."""
         self._theme_stack.pop_theme()
 
-    def theme(self, theme: Theme, inherit: bool = True) -> ThemeContext:
-        """Use a new temporary theme for the duration of the context manager.
+    def use_theme(self, theme: Theme, *, inherit: bool = True) -> ThemeContext:
+        """Use a different theme for the duration of the context manager.
 
         Args:
             theme (Theme): Theme instance to user.
-            inherit (bool, optional): Inherit existing styles. Defaults to True.
+            inherit (bool, optional): Inherit existing console styles. Defaults to True.
 
         Returns:
             ThemeContext: [description]
@@ -1023,10 +1023,11 @@ class Console:
     def print_exception(
         self,
         *,
-        width: Optional[int] = 88,
+        width: Optional[int] = 100,
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
+        show_locals: bool = False,
     ) -> None:
         """Prints a rich render of the last exception and traceback.
 
@@ -1035,11 +1036,16 @@ class Console:
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
             theme (str, optional): Override pygments theme used in traceback
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
+            show_locals (bool, optional): Enable display of local variables. Defaults to False.
         """
         from .traceback import Traceback
 
         traceback = Traceback(
-            width=width, extra_lines=extra_lines, theme=theme, word_wrap=word_wrap
+            width=width,
+            extra_lines=extra_lines,
+            theme=theme,
+            word_wrap=word_wrap,
+            show_locals=show_locals,
         )
         self.print(traceback)
 

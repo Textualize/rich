@@ -16,6 +16,8 @@ def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
     yield first, True, previous_value
 '''
 
+import os, tempfile
+
 from .render import render
 
 from rich.panel import Panel
@@ -46,6 +48,28 @@ def test_ansi_theme():
     theme = ANSISyntaxTheme({("foo", "bar"): style})
     assert theme.get_style_for_token(("foo", "bar", "baz")) == style
     assert theme.get_background_style() == Style()
+
+
+def test_from_file():
+    fh, path = tempfile.mkstemp("example.py")
+    try:
+        os.write(fh, b"import this\n")
+        syntax = Syntax.from_path(path)
+        assert syntax.lexer_name == "Python"
+        assert syntax.code == "import this\n"
+    finally:
+        os.remove(path)
+
+
+def test_from_file_unknown_lexer():
+    fh, path = tempfile.mkstemp("example.nosuchtype")
+    try:
+        os.write(fh, b"import this\n")
+        syntax = Syntax.from_path(path)
+        assert syntax.lexer_name == "default"
+        assert syntax.code == "import this\n"
+    finally:
+        os.remove(path)
 
 
 if __name__ == "__main__":
