@@ -326,4 +326,6 @@ Here are a few projects using Rich:
   Automate & test 10x faster with Selenium & pytest. Batteries included.
 - [smacke/ffsubsync](https://github.com/smacke/ffsubsync)
   Automagically synchronize subtitles with video.
+- [tryolabs/norfair](https://github.com/tryolabs/norfair)
+  Lightweight Python library for adding real-time 2D object tracking to any detector.
 - +[Many more](https://github.com/willmcgugan/rich/network/dependents)!
