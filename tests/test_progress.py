@@ -173,7 +173,7 @@ def test_track() -> None:
     test = ["foo", "bar", "baz"]
     expected_values = iter(test)
     for value in track(
-            test, "test", console=console, auto_refresh=False, get_time=MockClock(auto=True)
+        test, "test", console=console, auto_refresh=False, get_time=MockClock(auto=True)
     ):
         assert value == next(expected_values)
     result = console.file.getvalue()
@@ -270,7 +270,7 @@ def test_download_progress_uses_decimal_units() -> None:
         transient=True,
         console=console,
         auto_refresh=False,
-        get_time=MockClock()
+        get_time=MockClock(),
     )
     size_params = [pow(10, ex) for ex in range(3, 25, 3)]
     units = ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
@@ -280,13 +280,11 @@ def test_download_progress_uses_decimal_units() -> None:
         test_task = progress.add_task(f"test_{units[i]}", total=size_params[i])
         list_rendered = []
         for n in range(10):
-            progress.advance(test_task, size_params[i]/10)
-            list_rendered.append(
-                str(progress.columns[1].render(progress.tasks[i]))
-            )
-        expected = [
-            f"0.{completed}/1.0 {units[i]}" for completed in range(1, 10)
-        ] + [f"1.0/1.0 {units[i]}"]
+            progress.advance(test_task, size_params[i] / 10)
+            list_rendered.append(str(progress.columns[1].render(progress.tasks[i])))
+        expected = [f"0.{completed}/1.0 {units[i]}" for completed in range(1, 10)] + [
+            f"1.0/1.0 {units[i]}"
+        ]
         assert list_rendered == expected
 
 
