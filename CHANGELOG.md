@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [8.0.1] - unreleased
+
+### Changed
+
+- Change the render prefix to correspond to the decimal units in progress
+
 ## [8.0.0] - 2020-10-03
 
 ### Added
@@ -19,7 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed Style.empty to Style.null to better reflect what it does
 - Optimized combining styles involving a null style
 - Change error messages in Style.parse to read better
-- Change the render prefix to correspond to the decimal units in progress
 
 ### Fixed
 

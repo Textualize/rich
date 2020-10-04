@@ -79,6 +79,28 @@ def test_time_remaining_column():
     assert str(text) == "0:01:00"
 
 
+def test_download_progress_uses_decimal_units() -> None:
+
+    column = DownloadColumn()
+
+    size_params = [pow(10, ex) for ex in range(3, 25, 3)]
+    units = ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+
+    # Check rendering params for all sizes
+    for i in range(len(size_params)):
+        test_task = Task(
+            i, f"test_{units[i]}", size_params[i], 0, _get_time=lambda: 1.0
+        )
+        list_rendered = []
+        for n in range(10):
+            test_task.completed = size_params[i] / 10 * (n + 1)
+            list_rendered.append(str(column.render(test_task)))
+        expected = [f"0.{completed}/1.0 {units[i]}" for completed in range(1, 10)] + [
+            f"1.0/1.0 {units[i]}"
+        ]
+        assert list_rendered == expected
+
+
 def test_task_ids():
     progress = make_progress()
     assert progress.task_ids == [0, 1, 2, 4]
@@ -252,40 +274,6 @@ def test_columns() -> None:
     print(repr(result))
     expected = "\x1b[?25ltest foo \x1b[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m10 bytes\x1b[0m \x1b[32m0/10 bytes\x1b[0m \x1b[31m?\x1b[0m\ntest bar \x1b[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m7 bytes \x1b[0m \x1b[32m0/7 bytes \x1b[0m \x1b[31m?\x1b[0m\r\x1b[2K\x1b[1A\x1b[2Kfoo\ntest foo \x1b[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m10 bytes\x1b[0m \x1b[32m0/10 bytes\x1b[0m \x1b[31m?\x1b[0m\ntest bar \x1b[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m7 bytes \x1b[0m \x1b[32m0/7 bytes \x1b[0m \x1b[31m?\x1b[0m\r\x1b[2K\x1b[1A\x1b[2K\x1b[2;36m[TIME]\x1b[0m\x1b[2;36m \x1b[0mhello                                                                    \ntest foo \x1b[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m10 bytes\x1b[0m \x1b[32m0/10 bytes\x1b[0m \x1b[31m?\x1b[0m\ntest bar \x1b[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m7 bytes \x1b[0m \x1b[32m0/7 bytes \x1b[0m \x1b[31m?\x1b[0m\r\x1b[2K\x1b[1A\x1b[2Kworld\ntest foo \x1b[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m10 bytes\x1b[0m \x1b[32m0/10 bytes\x1b[0m \x1b[31m?\x1b[0m\ntest bar \x1b[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m7 bytes \x1b[0m \x1b[32m0/7 bytes \x1b[0m \x1b[31m?\x1b[0m\r\x1b[2K\x1b[1A\x1b[2Ktest foo \x1b[38;2;114;156;31m━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[36m0:00:00\x1b[0m \x1b[32m12 bytes\x1b[0m \x1b[32m10 bytes\x1b[0m \x1b[32m12/10 bytes\x1b[0m \x1b[31m1 byte/s \x1b[0m\ntest bar \x1b[38;2;114;156;31m━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[36m0:00:00\x1b[0m \x1b[32m16 bytes\x1b[0m \x1b[32m7 bytes \x1b[0m \x1b[32m16/7 bytes \x1b[0m \x1b[31m2 bytes/s\x1b[0m\r\x1b[2K\x1b[1A\x1b[2Ktest foo \x1b[38;2;114;156;31m━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[36m0:00:00\x1b[0m \x1b[32m12 bytes\x1b[0m \x1b[32m10 bytes\x1b[0m \x1b[32m12/10 bytes\x1b[0m \x1b[31m1 byte/s \x1b[0m\ntest bar \x1b[38;2;114;156;31m━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[36m0:00:00\x1b[0m \x1b[32m16 bytes\x1b[0m \x1b[32m7 bytes \x1b[0m \x1b[32m16/7 bytes \x1b[0m \x1b[31m2 bytes/s\x1b[0m\n\x1b[?25h\r\x1b[1A\x1b[2K\x1b[1A\x1b[2K"
     assert result == expected
-
-
-def test_download_progress_uses_decimal_units() -> None:
-    console = Console(
-        file=io.StringIO(),
-        force_terminal=True,
-        width=80,
-        log_time_format="[TIME]",
-        color_system="truecolor",
-        legacy_windows=False,
-        log_path=False,
-    )
-    progress = Progress(
-        "test",
-        DownloadColumn(),
-        transient=True,
-        console=console,
-        auto_refresh=False,
-        get_time=MockClock(),
-    )
-    size_params = [pow(10, ex) for ex in range(3, 25, 3)]
-    units = ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-
-    # Check rendering params for all sizes
-    for i in range(len(size_params)):
-        test_task = progress.add_task(f"test_{units[i]}", total=size_params[i])
-        list_rendered = []
-        for n in range(10):
-            progress.advance(test_task, size_params[i] / 10)
-            list_rendered.append(str(progress.columns[1].render(progress.tasks[i])))
-        expected = [f"0.{completed}/1.0 {units[i]}" for completed in range(1, 10)] + [
-            f"1.0/1.0 {units[i]}"
-        ]
-        assert list_rendered == expected
 
 
 def test_task_create() -> None:
