@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed Style.empty to Style.null to better reflect what it does
 - Optimized combining styles involving a null style
 - Change error messages in Style.parse to read better
+- Change the render prefix to correspond to the decimal units in progress
 
 ### Fixed
 
