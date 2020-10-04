@@ -1,4 +1,4 @@
-# Rich
+`# Rich
 
 [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
 [![codecov](https://codecov.io/gh/willmcgugan/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/willmcgugan/rich)
@@ -33,7 +33,7 @@ pip install rich
 
 ## Rich print function
 
-To effortlessly add rich output to your application, you can import the [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) method, which has the same signature as the builtin Python function. Try this:
+To effortlessly add rich output to your application, you can import the [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) method, which has the same signature as the built-in Python function. Try this:
 
 ```python
 from rich import print
@@ -45,7 +45,7 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ## Rich REPL
 
-Rich can be installed in the Python REPL, so that any data structures will be pretty printed and highlighted.
+Rich can be installed in the Python REPL, so that any data structures will be pretty-printed and highlighted.
 
 ```python
 >>> from rich import pretty
@@ -56,7 +56,7 @@ Rich can be installed in the Python REPL, so that any data structures will be pr
 
 ## Rich Inspect
 
-Rich has an [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) function which can produce a report on any Python object, such as class, instance, or builtin.
+Rich has an [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) function which can produce a report on any Python object, such as class, instance, or built-in.
 
 ```python
 >>> from rich import inspect
@@ -73,13 +73,13 @@ from rich.console import Console
 console = Console()
 ```
 
-The Console object has a `print` method which has an intentionally similar interface to the builtin `print` function. Here's an example of use:
+The Console object has a `print` method which has an intentionally similar interface to the built-in `print` function. Here's an example of use:
 
 ```python
 console.print("Hello", "World!")
 ```
 
-As you might expect, this will print `"Hello World!"` to the terminal. Note that unlike the builtin `print` function, Rich will word-wrap your text to fit within the terminal width.
+As you might expect, this will print `"Hello World!"` to the terminal. Note that unlike the built-in `print` function, Rich will word-wrap your text to fit within the terminal width.
 
 There are a few ways of adding color and style to your output. You can set a style for the entire output by adding a `style` keyword argument. Here's an example:
 
@@ -101,7 +101,7 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ### Console logging
 
-The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default Rich will do syntax highlighting for Python structures and for repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
+The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default, Rich will do syntax highlighting for Python structures and repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
 
 ```python
 from rich.console import Console
@@ -132,11 +132,11 @@ The above produces the following output:
 
 Note the `log_locals` argument, which outputs a table containing the local variables where the log method was called.
 
-The log method could be used for logging to the terminal for long running applications such as servers, but is also a very nice debugging aid.
+The log method could be used for logging to the terminal for long-running applications such as servers but is also a very nice debugging aid.
 
 ### Logging Handler
 
-You can also use the builtin [Handler class](https://rich.readthedocs.io/en/latest/logging.html) to format and colorize output from Python's logging module. Here's an example of the output:
+You can also use the built-in [Handler class](https://rich.readthedocs.io/en/latest/logging.html) to format and colorize output from Python's logging module. Here's an example of the output:
 
 ![Logging](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
 
@@ -195,7 +195,7 @@ This produces the following output:
 
 ![table](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
 
-Note that console markup is rendered in the same way as `print()` and `log()`. In fact, anything that is renderable by Rich may be included in the headers / rows (even other tables).
+Note that console markup is rendered in the same way as `print()` and `log()`. Anything that is renderable by Rich may be included in the headers/rows (even other tables).
 
 The `Table` class is smart enough to resize columns to fit the available width of the terminal, wrapping text as required. Here's the same example, with the terminal made smaller than the table above:
 
@@ -226,7 +226,7 @@ To try this out yourself, see [examples/downloader.py](https://github.com/willmc
 
 ## Columns
 
-Rich can render content in neat [columns](https://rich.readthedocs.io/en/latest/columns.html) with equal or optimal width. Here's a very basic clone of the (MacOS / Linux) `ls` command which displays a directory listing in columns:
+Rich can render content in neat [columns](https://rich.readthedocs.io/en/latest/columns.html) with equal or optimal width. Here's a very basic clone of the (macOS  / Linux) `ls` command which displays a directory listing in columns:
 
 ```python
 import os
@@ -329,3 +329,4 @@ Here are a few projects using Rich:
 - [tryolabs/norfair](https://github.com/tryolabs/norfair)
   Lightweight Python library for adding real-time 2D object tracking to any detector.
 - +[Many more](https://github.com/willmcgugan/rich/network/dependents)!
+`
