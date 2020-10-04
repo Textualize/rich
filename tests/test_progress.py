@@ -254,6 +254,48 @@ def test_columns() -> None:
     assert result == expected
 
 
+def test_download_column() -> None:
+
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=80,
+        color_system="truecolor",
+        legacy_windows=False,
+    )
+    progress = Progress(
+        "test",
+        TextColumn("{task.description}"),
+        BarColumn(bar_width=None),
+        DownloadColumn(),
+        transient=True,
+        console=console,
+        auto_refresh=False,
+        get_time=MockClock(),
+    )
+    # Prefix decimal
+    symbols = {
+        "bytes": pow(10, 0),
+        "kB": pow(10, 3),
+        "MB": pow(10, 6),
+        "GB": pow(10, 9),
+        "TB": pow(10, 12),
+        "PB": pow(10, 15),
+        "EB": pow(10, 18),
+        "ZB": pow(10, 21),
+        "YB": pow(10, 24),
+    }
+    column = DownloadColumn()
+    task1 = progress.add_task("foo", total=symbols["YB"])
+
+    with progress:
+        for _, units in symbols.items():
+            progress.advance(task1, units)
+        progress.refresh()
+        result = column(progress.tasks[0])
+        assert str(result) == "1.0/1.0 YB"
+
+
 def test_task_create() -> None:
     task = Task(TaskID(1), "foo", 100, 0, _get_time=lambda: 1)
     assert task.elapsed is None

@@ -13,12 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Set to types that Console.print will automatically pretty print
 - Added show_locals to Traceback
 - Added theme stack mechanism, see Console.push_theme and Console.pop_theme
+- Add test_download_column in test_progress
 
 ### Changed
 
 - Changed Style.empty to Style.null to better reflect what it does
 - Optimized combining styles involving a null style
 - Change error messages in Style.parse to read better
+- Change units binaries to units decimals
 
 ### Fixed
 
