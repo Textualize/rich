@@ -1,4 +1,4 @@
-`# Rich
+# Rich
 
 [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
 [![codecov](https://codecov.io/gh/willmcgugan/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/willmcgugan/rich)
