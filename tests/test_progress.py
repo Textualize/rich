@@ -82,23 +82,10 @@ def test_time_remaining_column():
 def test_download_progress_uses_decimal_units() -> None:
 
     column = DownloadColumn()
-
-    size_params = [pow(10, ex) for ex in range(3, 25, 3)]
-    units = ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-
-    # Check rendering params for all sizes
-    for i in range(len(size_params)):
-        test_task = Task(
-            i, f"test_{units[i]}", size_params[i], 0, _get_time=lambda: 1.0
-        )
-        list_rendered = []
-        for n in range(10):
-            test_task.completed = size_params[i] / 10 * (n + 1)
-            list_rendered.append(str(column.render(test_task)))
-        expected = [f"0.{completed}/1.0 {units[i]}" for completed in range(1, 10)] + [
-            f"1.0/1.0 {units[i]}"
-        ]
-        assert list_rendered == expected
+    test_task = Task(1, "test", 1000, 500, _get_time=lambda: 1.0)
+    rendered_progress = str(column.render(test_task))
+    expected = "0.5/1.0 KB"
+    assert rendered_progress == expected
 
 
 def test_task_ids():
