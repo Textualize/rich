@@ -3,3 +3,4 @@ mypy==0.782
 poetry==1.0.10
 pytest==6.1.0
 pytest-cov==2.10.1
+commonmark==0.9.1
