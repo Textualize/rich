@@ -8,7 +8,8 @@ from .render import render
 
 from rich.panel import Panel
 from rich.style import Style
-from rich.syntax import Syntax, ANSISyntaxTheme
+from rich.syntax import Syntax, ANSISyntaxTheme, PygmentsSyntaxTheme
+from pygments.styles import get_style_by_name
 
 
 CODE = '''
@@ -51,6 +52,13 @@ def test_ansi_theme():
     theme = ANSISyntaxTheme({("foo", "bar"): style})
     assert theme.get_style_for_token(("foo", "bar", "baz")) == style
     assert theme.get_background_style() == Style()
+
+
+def test_custom_pygments_theme():
+     pg_theme = get_style_by_name('arduino')
+     theme = PygmentsSyntaxTheme(pg_theme)
+
+     assert theme.get_background_style() == Style(bgcolor="#ffffff")
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="permissions error on Windows")
