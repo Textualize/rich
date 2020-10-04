@@ -1,5 +1,5 @@
 """
-Randomly Prints Names in random Colors to Show examples of how to use randbow text in an Text Generator.
+Randomly Prints Names in random Colors to Show examples of how to use randbow text with an Array output.
 """
 from random import randint
 
