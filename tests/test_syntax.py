@@ -8,7 +8,14 @@ from .render import render
 
 from rich.panel import Panel
 from rich.style import Style
-from rich.syntax import Syntax, ANSISyntaxTheme, PygmentsSyntaxTheme
+from rich.syntax import (
+    Syntax,
+    ANSISyntaxTheme,
+    PygmentsSyntaxTheme,
+    Color,
+    Console,
+    ConsoleOptions,
+)
 
 
 CODE = '''
@@ -46,25 +53,33 @@ def test_python_render():
     assert rendered_syntax == expected
 
 
-def test_get_theme():
-    syntax = Syntax(
-        CODE,
-        lexer_name="python",
-        line_numbers=True,
-        line_range=(2, 10),
-        theme="foo",
-        code_width=60,
-        word_wrap=True,
-    )
+def test_pygments_syntax_theme_non_str():
     from pygments.style import Style as PygmentsStyle
 
-    style = PygmentsStyle()
-    assert syntax.get_theme(style).get_background_style().bgcolor.name == "#ffffff"
+    style = PygmentsSyntaxTheme(PygmentsStyle())
+    assert style.get_background_style().bgcolor == Color.parse("#ffffff")
 
 
 def test_pygments_syntax_theme():
     style = PygmentsSyntaxTheme("default")
     assert style.get_style_for_token("abc") == Style.parse("none")
+
+
+def test_get_line_color_none():
+    style = PygmentsSyntaxTheme("default")
+    style._background_style = Style(bgcolor=None)
+    syntax = Syntax(
+        CODE,
+        lexer_name="python",
+        line_numbers=True,
+        line_range=(2, 10),
+        theme=style,
+        code_width=60,
+        word_wrap=True,
+        background_color="red",
+    )
+
+    assert syntax._get_line_numbers_color() == Color.default()
 
 
 def test_highlight_background_color():
@@ -78,8 +93,17 @@ def test_highlight_background_color():
         word_wrap=True,
         background_color="red",
     )
-    text = syntax.highlight(CODE)
-    assert syntax.highlight(CODE) == text
+    assert syntax.highlight(CODE).style == Style.parse("on red")
+
+
+def test_get_number_styles():
+    syntax = Syntax(CODE, "python", theme="monokai", line_numbers=True)
+    console = Console(color_system="windows")
+    assert syntax._get_number_styles(console=console) == (
+        Style.parse("on #272822"),
+        Style.parse("dim on #272822"),
+        Style.parse("not dim on #272822"),
+    )
 
 
 def test_ansi_theme():
