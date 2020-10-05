@@ -4,7 +4,7 @@ import io
 import sys
 
 from rich.console import Console
-from rich.pretty import install, pretty_repr
+from rich.pretty import install, pretty_repr, Node
 
 
 def test_install():
@@ -72,3 +72,8 @@ def test_array():
 
 def test_tuple_of_one():
     assert pretty_repr((1,)) == "(1,)"
+
+
+def test_node():
+    node = Node("abc")
+    assert pretty_repr(node) == "abc: "
