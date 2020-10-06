@@ -611,7 +611,9 @@ class Table(JupyterMixin):
         )
         safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box  # type: ignore
         _box = (
-            box.get_safe_box(self.box, console.legacy_windows) if safe_box else self.box
+            box.get_safe_box(self.box, console.legacy_windows, options.encoding)
+            if safe_box
+            else self.box
         )
 
         # _box = self.box

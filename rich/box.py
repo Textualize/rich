@@ -19,8 +19,9 @@ class Box:
 
     """
 
-    def __init__(self, box: str) -> None:
+    def __init__(self, box: str, *, ascii: bool = False) -> None:
         self._box = box
+        self.ascii = ascii
         line1, line2, line3, line4, line5, line6, line7, line8 = box.splitlines()
         # top
         self.top_left, self.top, self.top_divider, self.top_right = iter(line1)
@@ -158,7 +159,8 @@ ASCII: Box = Box(
 |-+|
 | ||
 +--+
-"""
+""",
+    ascii=True,
 )
 
 ASCII2: Box = Box(
@@ -171,7 +173,8 @@ ASCII2: Box = Box(
 +-++
 | ||
 +-++
-"""
+""",
+    ascii=True,
 )
 
 ASCII_DOUBLE_HEAD: Box = Box(
@@ -184,7 +187,8 @@ ASCII_DOUBLE_HEAD: Box = Box(
 +-++
 | ||
 +-++
-"""
+""",
+    ascii=True,
 )
 
 SQUARE: Box = Box(
@@ -386,29 +390,34 @@ LEGACY_WINDOWS_SUBSTITUTIONS = {
 
 
 @overload
-def get_safe_box(box: None, legacy_windows: bool) -> None:
+def get_safe_box(box: None, legacy_windows: bool, encoding: str) -> None:
     ...
 
 
 @overload
-def get_safe_box(box: Box, legacy_windows: bool) -> Box:
+def get_safe_box(box: Box, legacy_windows: bool, encoding: str) -> Box:
     ...
 
 
-def get_safe_box(box: Optional[Box], legacy_windows: bool) -> Optional[Box]:
-    """Substitute Box constants that don't render on windows legacy.
+def get_safe_box(
+    box: Optional[Box], legacy_windows: bool, encoding: str = "utf-8"
+) -> Optional[Box]:
+    """Substitute Box constants that are unlikely to render in the terminal.
 
     Args:
         box (Optional[Box]): A Box instance.
         legacy_windows (bool): Enable legacy Windows.
+        encoding (str, optional): Encoding used to render box.
 
     Returns:
         Optional[Box]: A Box instance (potentially a new instance).
     """
-    if legacy_windows and box is not None:
-        return LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box)
-    else:
-        return box
+    if box is not None:
+        if encoding.lower() not in ("utf-8", "utf8") and not box.ascii:
+            box = ASCII
+        elif legacy_windows:
+            box = LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box)
+    return box
 
 
 if __name__ == "__main__":  # pragma: no cover

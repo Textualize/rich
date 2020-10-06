@@ -568,7 +568,7 @@ class Console:
         Returns:
             str: A standard encoding string.
         """
-        return getattr(self.file, "encoding", "utf-8")
+        return (getattr(self.file, "encoding", "utf-8") or "utf-8").lower()
 
     @property
     def is_terminal(self) -> bool:

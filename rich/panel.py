@@ -113,7 +113,11 @@ class Panel(JupyterMixin):
         width = options.max_width if self.width is None else self.width
 
         safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box  # type: ignore
-        box = get_safe_box(self.box, console.legacy_windows) if safe_box else self.box
+        box = (
+            get_safe_box(self.box, console.legacy_windows, options.encoding)
+            if safe_box
+            else self.box
+        )
 
         title_text = self._title
         if title_text is not None:
