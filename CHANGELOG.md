@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Change the render prefix to correspond to the decimal units in progress
+- Add ability to mention soft_wrap value when initializing Console
 
 ## [8.0.0] - 2020-10-03
 

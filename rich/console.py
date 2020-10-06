@@ -355,6 +355,7 @@ class Console:
         highlighter (HighlighterType, optional): Default highlighter.
         legacy_windows (bool, optional): Enable legacy Windows mode, or ``None`` to auto detect. Defaults to ``None``.
         safe_box (bool, optional): Restrict box options that don't render on legacy Windows.
+        soft_wrap (bool, optional): Default no_wrap value to use for print. Defaults to ``False``.
     """
 
     def __init__(
@@ -381,6 +382,7 @@ class Console:
         legacy_windows: bool = None,
         safe_box: bool = True,
         _environ: Dict[str, str] = None,
+        soft_wrap: bool = False,
     ):
         # Copy of os.environ allows us to replace it for testing
         self._environ = os.environ if _environ is None else _environ
@@ -428,6 +430,7 @@ class Console:
         )
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
+        self.soft_wrap = soft_wrap
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
@@ -960,7 +963,7 @@ class Console:
         highlight: bool = None,
         width: int = None,
         crop: bool = True,
-        soft_wrap: bool = False,
+        soft_wrap: bool = None,
     ) -> None:
         """Print to the console.
 
@@ -977,11 +980,14 @@ class Console:
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
             width (Optional[int], optional): Width of output, or ``None`` to auto-detect. Defaults to ``None``.
             crop (Optional[bool], optional): Crop output to width of terminal. Defaults to True.
-            soft_wrap (bool, optional): Enable soft wrap mode which disables word wrapping and cropping. Defaults to False.
+            soft_wrap (bool, optional): Enable soft wrap mode which disables word wrapping and cropping. Defaults to None which uses instance preference.
         """
         if not objects:
             self.line()
             return
+
+        if soft_wrap is None:
+            soft_wrap = self.soft_wrap
 
         if soft_wrap:
             if no_wrap is None:
