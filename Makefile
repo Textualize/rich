@@ -1,11 +1,11 @@
 test:
 	pytest --cov-report term-missing --cov=rich tests/ -vv
-format-check:
-	black --check .
+lint:
+	pre-commit run -a
 format:
-	black .
+	pre-commit run black -a
 typecheck:
-	mypy -p rich --ignore-missing-imports --warn-unreachable
+	pre-commit run mypy -a
 typecheck-report:
 	mypy -p rich --ignore-missing-imports --warn-unreachable --html-report mypy_report
 .PHONY: docs

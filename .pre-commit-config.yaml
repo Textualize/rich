@@ -1,0 +1,17 @@
+# to bump linters just run: pre-commit autoupdate
+repos:
+  - repo: https://github.com/psf/black
+    rev: 20.8b1
+    hooks:
+      - id: black
+        language_version: python3
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.790
+    hooks:
+    - id: mypy
+      # empty args needed in order to match mypy cli behavior
+      pass_filenames: false
+      args: ["--ignore-missing-imports", "--warn-unreachable", "--html-report", "mypy_report"]
+      entry: mypy -p rich
+      additional_dependencies:
+        - lxml  # html report requires it
