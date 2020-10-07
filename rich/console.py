@@ -893,7 +893,11 @@ class Console:
                 del text[:]
 
         for renderable in objects:
-            rich_cast = getattr(renderable, "__rich__", None)
+            try:
+                rich_cast = getattr(renderable, "__rich__", None)
+            except (KeyError, AttributeError):
+                rich_cast = renderable.get("__rich__", None)
+
             if rich_cast:
                 renderable = rich_cast()
             if isinstance(renderable, str):
@@ -905,6 +909,8 @@ class Console:
                         highlighter=_highlighter,
                     )
                 )
+            elif isinstance(renderable, dict):
+                append_text(_highlighter(str(renderable)))
             elif isinstance(renderable, ConsoleRenderable):
                 check_text()
                 append(renderable)
