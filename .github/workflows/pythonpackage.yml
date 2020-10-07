@@ -31,6 +31,9 @@ jobs:
         run: |
           pip install .
           python -m pytest tests -v --cov=./rich --cov-report=xml:./coverage.xml --cov-report term-missing
+      - name: Check if pip editable installs still work
+        run: |
+          pip install -e .
 
       - name: Upload code coverage
         uses: codecov/codecov-action@v1.0.10
