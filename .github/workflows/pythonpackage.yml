@@ -21,6 +21,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
           poetry install
+          # Verify that rich package can really be found by current python
+          cd tools
+          python -c "import rich; print(rich.__file__)"
       - name: Format check with black
         run: |
           make format-check
