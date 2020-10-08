@@ -7,7 +7,7 @@ import pytest
 from rich import errors
 from rich.console import Console
 from rich.measure import Measurement
-from rich.table import Table
+from rich.table import Table, Column
 from rich.text import Text
 
 
@@ -90,6 +90,18 @@ def test_not_renderable():
     table = Table()
     with pytest.raises(errors.NotRenderableError):
         table.add_row(Foo())
+
+
+def test_append_column():
+    header_names = ["header1", "header2", "header3"]
+    test_columns = [
+        Column(_index=index, header=header) for index, header in enumerate(header_names)
+    ]
+
+    # Test appending of strings for header names
+    assert Table("header1", "header2", "header3").columns == test_columns
+    # Test directly passing a Table Column objects
+    assert Table(*test_columns).columns == test_columns
 
 
 if __name__ == "__main__":
