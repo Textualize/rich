@@ -110,9 +110,9 @@ def test_rich_measure():
         Console(), -1
     ) == Measurement(0, 0)
     # Check __rich_measure__() for a negative Table.width attribute
-    assert Table("test_header", width=-1).__rich_measure__(
-        Console(), 1
-    ) == Measurement(0, 0)
+    assert Table("test_header", width=-1).__rich_measure__(Console(), 1) == Measurement(
+        0, 0
+    )
     # Check __rich_measure__() for a positive width passed as an argument
     assert Table("test_header", width=None).__rich_measure__(
         Console(), 10
