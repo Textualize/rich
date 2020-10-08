@@ -99,9 +99,16 @@ def test_append_column():
     ]
 
     # Test appending of strings for header names
-    assert Table("header1", "header2", "header3").columns == test_columns
+    assert Table(*header_names).columns == test_columns
     # Test directly passing a Table Column objects
     assert Table(*test_columns).columns == test_columns
+
+
+def test_rich_measure():
+    # Check __rich_measure__() for a negative width passed as an argument
+    assert Table().__rich_measure__(Console(), -1) == Measurement(0, 0)
+    # Check __rich_measure__() for a negative Table.width attribute
+    assert Table(width=-1).__rich_measure__(Console(), 1) == Measurement(0, 0)
 
 
 if __name__ == "__main__":
