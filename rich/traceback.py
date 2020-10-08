@@ -9,8 +9,6 @@ from typing import Callable, Dict, List, Optional, Type
 
 from pygments.lexers import guess_lexer_for_filename
 from pygments.token import (
-    Comment,
-    Generic,
     Keyword,
     Name,
     Number,
@@ -212,7 +210,7 @@ class Traceback:
         traceback: Optional[TracebackType],
         show_locals: bool = False,
     ) -> Trace:
-        """Extrace traceback information.
+        """Extract traceback information.
 
         Args:
             exc_type (Type[BaseException]): Exception type.
@@ -342,7 +340,7 @@ class Traceback:
         if syntax_error.filename != "<stdin>":
             text = Text.assemble(
                 (f" {syntax_error.filename}", "pygments.string"),
-                (":", "pgments.text"),
+                (":", "pygments.text"),
                 (str(syntax_error.lineno), "pygments.number"),
                 style="pygments.text",
             )

@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Change the render prefix to correspond to the decimal units in progress
 
+### Fixed
+
+- Fixed typo in `Style.transparent_background` method name.
+
 ## [8.0.0] - 2020-10-03
 
 ### Added
