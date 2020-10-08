@@ -92,7 +92,7 @@ def test_not_renderable():
         table.add_row(Foo())
 
 
-def test_append_column():
+def test_init_append_column():
     header_names = ["header1", "header2", "header3"]
     test_columns = [
         Column(_index=index, header=header) for index, header in enumerate(header_names)
@@ -106,9 +106,21 @@ def test_append_column():
 
 def test_rich_measure():
     # Check __rich_measure__() for a negative width passed as an argument
-    assert Table().__rich_measure__(Console(), -1) == Measurement(0, 0)
+    assert Table("test_header", width=None).__rich_measure__(
+        Console(), -1
+    ) == Measurement(0, 0)
     # Check __rich_measure__() for a negative Table.width attribute
-    assert Table(width=-1).__rich_measure__(Console(), 1) == Measurement(0, 0)
+    assert Table("test_header", width=-1).__rich_measure__(
+        Console(), 1
+    ) == Measurement(0, 0)
+    # Check __rich_measure__() for a positive width passed as an argument
+    assert Table("test_header", width=None).__rich_measure__(
+        Console(), 10
+    ) == Measurement(10, 10)
+    # Check __rich_measure__() for a positive Table.width attribute
+    assert Table("test_header", width=10).__rich_measure__(
+        Console(), -1
+    ) == Measurement(10, 10)
 
 
 if __name__ == "__main__":
