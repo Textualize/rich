@@ -3,7 +3,7 @@ import pytest
 
 from rich.errors import NotRenderableError
 from rich.console import Console
-from rich.measure import Measurement
+from rich.measure import Measurement, measure_renderables
 
 
 def test_span():
@@ -26,5 +26,8 @@ def test_null_get():
     assert Measurement.get(Console(), None, -1) == Measurement(0, 0)
 
 
-if __name__ == "__main__":
-    test_null_get()
+def test_measure_renderables():
+    # Test measure_renderables returning a null Measurement object
+    assert measure_renderables(Console(), None, None) == Measurement(0, 0)
+    # Test measure_renderables returning a valid Measurement object
+    assert measure_renderables(Console(width=1), ["test"], 1) == Measurement(1, 1)
