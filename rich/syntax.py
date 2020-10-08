@@ -353,7 +353,7 @@ class Syntax(JupyterMixin):
 
         base_style = self._get_base_style()
         justify: JustifyMethod = (
-            "default" if base_style.transaprent_background else "left"
+            "default" if base_style.transparent_background else "left"
         )
 
         text = Text(
@@ -401,7 +401,7 @@ class Syntax(JupyterMixin):
     def _get_number_styles(self, console: Console) -> Tuple[Style, Style, Style]:
         """Get background, number, and highlight styles for line numbers."""
         background_style = self._get_base_style()
-        if background_style.transaprent_background:
+        if background_style.transparent_background:
             return Style.null(), Style(dim=True), Style.null()
         if console.color_system in ("256", "truecolor"):
             number_style = Style.chain(
@@ -428,7 +428,7 @@ class Syntax(JupyterMixin):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        transparent_background = self._get_base_style().transaprent_background
+        transparent_background = self._get_base_style().transparent_background
         code_width = (
             (options.max_width - self._numbers_column_width - 1)
             if self.code_width is None
