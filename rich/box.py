@@ -1,7 +1,11 @@
-from typing import Iterable, List, Optional, overload
+from typing import Iterable, List, Optional, overload, TYPE_CHECKING
 from typing_extensions import Literal
 
 from ._loop import loop_last
+
+
+if TYPE_CHECKING:
+    from rich.console import ConsoleOptions
 
 
 class Box:
@@ -58,6 +62,23 @@ class Box:
 
     def __str__(self) -> str:
         return self._box
+
+    def substitute(self, options: "ConsoleOptions", safe: bool = True) -> "Box":
+        """Substitute this box for another if it won't render due to platform issues.
+
+        Args:
+            safe (bool, optional): Substitute this for another Box if there are known problems
+                in displaying (currently only relevant on Windows).
+
+        Returns:
+            [Box]: A different Box or the same Box.
+        """
+        box = self
+        if options.legacy_windows and safe:
+            box = LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box)
+        if options.ascii_only:
+            box = ASCII
+        return box
 
     def get_top(self, widths: Iterable[int]) -> str:
         """Get the top of a simple box.
@@ -204,6 +225,18 @@ SQUARE: Box = Box(
 """
 )
 
+SQUARE_DOUBLE_HEAD: Box = Box(
+    """\
+┌─┬┐
+│ ││
+╞═╪╡
+│ ││
+├─┼┤
+├─┼┤
+│ ││
+└─┴┘
+"""
+)
 
 MINIMAL: Box = Box(
     """\
@@ -389,37 +422,6 @@ LEGACY_WINDOWS_SUBSTITUTIONS = {
 }
 
 
-@overload
-def get_safe_box(box: None, legacy_windows: bool, ascii: bool = False) -> None:
-    ...
-
-
-@overload
-def get_safe_box(box: Box, legacy_windows: bool, ascii: bool = False) -> Box:
-    ...
-
-
-def get_safe_box(
-    box: Optional[Box], legacy_windows: bool, ascii: bool = False
-) -> Optional[Box]:
-    """Substitute Box constants that are unlikely to render in the terminal.
-
-    Args:
-        box (Optional[Box]): A Box instance.
-        legacy_windows (bool): Enable legacy Windows.
-        ascii (bool, optional): Allow only ascii characters.
-
-    Returns:
-        Optional[Box]: A Box instance (potentially a new instance).
-    """
-    if box is not None:
-        if ascii and not box.ascii:
-            box = ASCII
-        elif legacy_windows:
-            box = LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box)
-    return box
-
-
 if __name__ == "__main__":  # pragma: no cover
 
     from rich.columns import Columns
@@ -436,6 +438,7 @@ if __name__ == "__main__":  # pragma: no cover
         "ASCII2",
         "ASCII_DOUBLE_HEAD",
         "SQUARE",
+        "SQUARE_DOUBLE_HEAD",
         "MINIMAL",
         "MINIMAL_HEAVY_HEAD",
         "MINIMAL_DOUBLE_HEAD",

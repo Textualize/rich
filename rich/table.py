@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Iterable, List, NamedTuple, Optional, Tuple, U
 
 from . import box, errors
 from ._loop import loop_first_last, loop_last
+from ._pick import pick_bool
 from ._ratio import ratio_distribute, ratio_reduce
 from .jupyter import JupyterMixin
 from .measure import Measurement
@@ -494,6 +495,7 @@ class Table(JupyterMixin):
                         for width, allow_wrap in zip(widths, wrapable)
                     )
                 except ValueError:
+                    1 / 0
                     second_max_column = 0
                 column_difference = max_column - second_max_column
                 ratios = [
@@ -609,11 +611,12 @@ class Table(JupyterMixin):
                 )
             )
         )
-        safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box  # type: ignore
         _box = (
-            box.get_safe_box(self.box, console.legacy_windows, ascii=options.ascii_only)
-            if safe_box
-            else self.box
+            self.box.substitute(
+                options, safe=pick_bool(self.safe_box, console.safe_box)
+            )
+            if self.box
+            else None
         )
 
         # _box = self.box

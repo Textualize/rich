@@ -1,6 +1,6 @@
 from typing import Optional, TYPE_CHECKING
 
-from .box import get_safe_box, Box, SQUARE, ROUNDED
+from .box import Box, ROUNDED
 
 from .align import AlignValues
 from .jupyter import JupyterMixin
@@ -113,11 +113,7 @@ class Panel(JupyterMixin):
         width = options.max_width if self.width is None else self.width
 
         safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box  # type: ignore
-        box = (
-            get_safe_box(self.box, console.legacy_windows, ascii=options.ascii_only)
-            if safe_box
-            else self.box
-        )
+        box = self.box.substitute(options, safe=safe_box)
 
         title_text = self._title
         if title_text is not None:

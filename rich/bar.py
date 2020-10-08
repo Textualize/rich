@@ -157,7 +157,7 @@ class Bar(JupyterMixin):
     ) -> RenderResult:
 
         width = min(self.width or options.max_width, options.max_width)
-        ascii = console.legacy_windows or options.ascii_only
+        ascii = options.legacy_windows or options.ascii_only
         if self.pulse:
             yield from self._render_pulse(console, width, ascii=ascii)
             return

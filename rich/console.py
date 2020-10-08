@@ -83,6 +83,8 @@ _TERM_COLORS = {"256color": ColorSystem.EIGHT_BIT, "16color": ColorSystem.STANDA
 class ConsoleOptions:
     """Options for __rich_console__ method."""
 
+    legacy_windows: bool
+    """legacy_windows: flat for legacy windows."""
     min_width: int
     """Minimum width of renderable."""
     max_width: int
@@ -606,6 +608,7 @@ class Console:
     def options(self) -> ConsoleOptions:
         """Get default console options."""
         return ConsoleOptions(
+            legacy_windows=self.legacy_windows,
             min_width=1,
             max_width=self.width,
             encoding=self.encoding,
