@@ -17,3 +17,14 @@ def test_no_renderable():
 
     with pytest.raises(NotRenderableError):
         Measurement.get(console, None, console.width)
+
+
+def test_null_get():
+    # Test negative console.width passed into get method
+    assert Measurement.get(Console(width=-1), None) == Measurement(0, 0)
+    # Test negative max_width passed into get method
+    assert Measurement.get(Console(), None, -1) == Measurement(0, 0)
+
+
+if __name__ == "__main__":
+    test_null_get()
