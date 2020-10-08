@@ -1413,7 +1413,7 @@ if __name__ == "__main__":  # pragma: no cover
                         "options": [
                             "New York Bulls",
                             "Los Angeles Kings",
-                            "Golden State Warriros",
+                            "Golden State Warriors",
                             "Huston Rocket",
                         ],
                         "answer": "Huston Rocket",
