@@ -8,6 +8,10 @@ def test_repr():
     assert isinstance(repr(padding), str)
 
 
+def test_indent():
+    assert Padding.indent("test", 4).left == 4
+
+
 def test_unpack():
     assert Padding.unpack(3) == (3, 3, 3, 3)
     assert Padding.unpack((3,)) == (3, 3, 3, 3)
