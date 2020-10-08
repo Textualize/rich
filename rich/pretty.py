@@ -359,7 +359,7 @@ def pretty_repr(
 
     Args:
         _object (Any): Object to repr.
-        max_width (int, optional): Diresired maximum width of repr string. Defaults to 80.
+        max_width (int, optional): Desired maximum width of repr string. Defaults to 80.
         indent_size (int, optional): Number of spaces to indent. Defaults to 4.
         expand_all (bool, optional): Expand all containers regardless of available width. Defaults to False.
 
