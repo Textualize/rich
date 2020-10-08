@@ -67,8 +67,9 @@ class Box:
         """Substitute this box for another if it won't render due to platform issues.
 
         Args:
+            options (ConsoleOptions): Console options used in rendering.
             safe (bool, optional): Substitute this for another Box if there are known problems
-                in displaying (currently only relevant on Windows).
+                in displaying (currently only relevant on Windows). Default is True.
 
         Returns:
             [Box]: A different Box or the same Box.
