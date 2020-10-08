@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [8.0.1] - unreleased
 
+### Added
+
+- Added solid block bar class
+
 ### Changed
 
 - Change the render prefix to correspond to the decimal units in progress
