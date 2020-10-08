@@ -98,6 +98,11 @@ class ConsoleOptions:
     no_wrap: Optional[bool] = False
     """"Disable wrapping for text."""
 
+    @property
+    def ascii_only(self) -> bool:
+        """Check if renderables should use ascii only."""
+        return not self.encoding.startswith("utf")
+
     def update(
         self,
         width: int = None,

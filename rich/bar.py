@@ -71,14 +71,14 @@ class Bar(JupyterMixin):
         fore_style: Style,
         back_style: Style,
         color_system: str,
-        legacy_windows: bool,
+        ascii: bool = False,
     ) -> List[Segment]:
         """Get a list of segments to render a pulse animation.
 
         Returns:
             List[Segment]: A list of segments, one segment per character.
         """
-        bar = "─" if legacy_windows else "━"
+        bar = "-" if ascii else "━"
         segments: List[Segment] = []
 
         if color_system != "truecolor":
@@ -122,7 +122,9 @@ class Bar(JupyterMixin):
         self.completed = completed
         self.total = total if total is not None else self.total
 
-    def _render_pulse(self, console: Console, width: int) -> Iterable[Segment]:
+    def _render_pulse(
+        self, console: Console, width: int, ascii: bool = False
+    ) -> Iterable[Segment]:
         """Renders the pulse animation.
 
         Args:
@@ -139,7 +141,7 @@ class Bar(JupyterMixin):
         back_style = console.get_style(self.style, default="black")
 
         pulse_segments = self._get_pulse_segments(
-            fore_style, back_style, console.color_system, console.legacy_windows
+            fore_style, back_style, console.color_system, ascii=ascii
         )
         segment_count = len(pulse_segments)
         current_time = (
@@ -155,15 +157,16 @@ class Bar(JupyterMixin):
     ) -> RenderResult:
 
         width = min(self.width or options.max_width, options.max_width)
+        ascii = console.legacy_windows or options.ascii_only
         if self.pulse:
-            yield from self._render_pulse(console, width)
+            yield from self._render_pulse(console, width, ascii=ascii)
             return
 
         completed = min(self.total, max(0, self.completed))
-        legacy_windows = console.legacy_windows
-        bar = "─" if legacy_windows else "━"
-        half_bar_right = " " if legacy_windows else "╸"
-        half_bar_left = " " if legacy_windows else "╺"
+
+        bar = "-" if ascii else "━"
+        half_bar_right = " " if ascii else "╸"
+        half_bar_left = " " if ascii else "╺"
         complete_halves = (
             int(width * 2 * completed / self.total) if self.total else width * 2
         )

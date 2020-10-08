@@ -390,30 +390,30 @@ LEGACY_WINDOWS_SUBSTITUTIONS = {
 
 
 @overload
-def get_safe_box(box: None, legacy_windows: bool, encoding: str) -> None:
+def get_safe_box(box: None, legacy_windows: bool, ascii: bool = False) -> None:
     ...
 
 
 @overload
-def get_safe_box(box: Box, legacy_windows: bool, encoding: str) -> Box:
+def get_safe_box(box: Box, legacy_windows: bool, ascii: bool = False) -> Box:
     ...
 
 
 def get_safe_box(
-    box: Optional[Box], legacy_windows: bool, encoding: str = "utf-8"
+    box: Optional[Box], legacy_windows: bool, ascii: bool = False
 ) -> Optional[Box]:
     """Substitute Box constants that are unlikely to render in the terminal.
 
     Args:
         box (Optional[Box]): A Box instance.
         legacy_windows (bool): Enable legacy Windows.
-        encoding (str, optional): Encoding used to render box.
+        ascii (bool, optional): Allow only ascii characters.
 
     Returns:
         Optional[Box]: A Box instance (potentially a new instance).
     """
     if box is not None:
-        if encoding.lower() not in ("utf-8", "utf8") and not box.ascii:
+        if ascii and not box.ascii:
             box = ASCII
         elif legacy_windows:
             box = LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box)
