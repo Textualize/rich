@@ -84,7 +84,7 @@ class ConsoleOptions:
     """Options for __rich_console__ method."""
 
     legacy_windows: bool
-    """legacy_windows: flat for legacy windows."""
+    """legacy_windows: flag for legacy windows."""
     min_width: int
     """Minimum width of renderable."""
     max_width: int
