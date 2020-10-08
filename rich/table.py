@@ -495,7 +495,6 @@ class Table(JupyterMixin):
                         for width, allow_wrap in zip(widths, wrapable)
                     )
                 except ValueError:
-                    1 / 0
                     second_max_column = 0
                 column_difference = max_column - second_max_column
                 ratios = [
