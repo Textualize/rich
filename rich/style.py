@@ -345,7 +345,7 @@ class Style:
         return self._link
 
     @property
-    def transaprent_background(self) -> bool:
+    def transparent_background(self) -> bool:
         """Check if the style specified a transparent background."""
         return self.bgcolor is None or self.bgcolor.is_default
 

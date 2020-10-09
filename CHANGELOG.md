@@ -16,10 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added legacy_windows to ConsoleOptions
 - Added ascii_only to ConsoleOptions
 - Addded box.SQUARE_DOUBLE_HEAD
+- Added highlighting of EUI-48 and EUI-64 (MAC addresses)
 
 ### Changed
 
 - Dropped box.get_safe_box function in favor of Box.substitute
+
+### Fixed
+
+- Fixed typo in `Style.transparent_background` method name.
 
 ## [8.0.0] - 2020-10-03
 

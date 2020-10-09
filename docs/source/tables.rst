@@ -69,6 +69,11 @@ This allows you to specify the text of the column only. If you want to set other
         title="Star Wars Movies"
     )
 
+Lines
+~~~~~
+
+By default, Tables will show a line under the header only. If you want to show lines between all rows add ``show_lines=True`` to the constructor.
+
 Grids
 ~~~~~
 

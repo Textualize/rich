@@ -630,7 +630,7 @@ class Console:
             return ConsoleDimensions(80, 25)
 
         width, height = shutil.get_terminal_size()
-        # get_terminal_size can report 0, 0 if run from psuedo-terminal
+        # get_terminal_size can report 0, 0 if run from pseudo-terminal
         width = width or 80
         height = height or 25
         return ConsoleDimensions(
@@ -759,7 +759,7 @@ class Console:
         is required, such as the Panel class which draws a border around any renderable object.
 
         Args:
-            renderables (Iterable[RenderableType]): Any object or objects renderable in the console.
+            renderable (RenderableType): Any object renderable in the console.
             options (Optional[ConsoleOptions], optional): Console options, or None to use self.options. Default to ``None``.
             style (Style, optional): Optional style to apply to renderables. Defaults to ``None``.
             pad (bool, optional): Pad lines shorter than render width. Defaults to ``True``.
@@ -868,7 +868,7 @@ class Console:
         """Combined a number of renderables and text in to one renderable.
 
         Args:
-            renderables (Iterable[Union[str, ConsoleRenderable]]): Anything that Rich can render.
+            objects (Iterable[Any]): Anything that Rich can render.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\\n".
             justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
@@ -1376,7 +1376,7 @@ class Console:
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             code_format (str, optional): Format string to render HTML, should contain {foreground}
                 {background} and {code}.
-            inline_styes (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
+            inline_styles (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
                 larger but easier to cut and paste markup. If ``False``, styles will be embedded in a style tag.
                 Defaults to False.
 
