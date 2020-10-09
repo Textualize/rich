@@ -61,6 +61,8 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.comma": Style(bold=True),
     "repr.ipv4": Style(bold=True, color="bright_green"),
     "repr.ipv6": Style(bold=True, color="bright_green"),
+    "repr.eui48": Style(bold=True, color="bright_green"),
+    "repr.eui64": Style(bold=True, color="bright_green"),
     "repr.tag_start": Style(bold=True),
     "repr.tag_name": Style(color="bright_magenta", bold=True),
     "repr.tag_contents": Style(color="default"),
