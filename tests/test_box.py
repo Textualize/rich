@@ -1,6 +1,7 @@
 import pytest
 
-from rich.box import get_safe_box, ASCII, DOUBLE, ROUNDED, HEAVY, SQUARE
+from rich.console import ConsoleOptions
+from rich.box import ASCII, DOUBLE, ROUNDED, HEAVY, SQUARE
 
 
 def test_str():
@@ -35,8 +36,18 @@ def test_get_bottom():
     assert bottom == "┗━┻━━┻━━━┛"
 
 
-def test_get_safe_box():
-    assert get_safe_box(HEAVY, True) == SQUARE
-    assert get_safe_box(HEAVY, False) == HEAVY
-    assert get_safe_box(None, True) is None
-    assert get_safe_box(None, False) is None
+def test_box_substitute():
+    options = ConsoleOptions(
+        legacy_windows=True,
+        min_width=1,
+        max_width=100,
+        is_terminal=True,
+        encoding="utf-8",
+    )
+    assert HEAVY.substitute(options) == SQUARE
+
+    options.legacy_windows = False
+    assert HEAVY.substitute(options) == HEAVY
+
+    options.encoding = "ascii"
+    assert HEAVY.substitute(options) == ASCII

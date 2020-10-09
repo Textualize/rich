@@ -5,15 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [8.1.0] - unreleased
+## [9.0.0] - unreleased
+
+### Fixed
+
+- Progress download column now displays decimal units
 
 ### Added
 
+- Added legacy_windows to ConsoleOptions
+- Added ascii_only to ConsoleOptions
+- Addded box.SQUARE_DOUBLE_HEAD
 - Added highlighting of EUI-48 and EUI-64 (MAC addresses)
 
 ### Changed
 
-- Change the render prefix to correspond to the decimal units in progress
+- Dropped box.get_safe_box function in favor of Box.substitute
 
 ### Fixed
 

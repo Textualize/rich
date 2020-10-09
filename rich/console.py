@@ -81,6 +81,8 @@ _TERM_COLORS = {"256color": ColorSystem.EIGHT_BIT, "16color": ColorSystem.STANDA
 class ConsoleOptions:
     """Options for __rich_console__ method."""
 
+    legacy_windows: bool
+    """legacy_windows: flag for legacy windows."""
     min_width: int
     """Minimum width of renderable."""
     max_width: int
@@ -95,6 +97,11 @@ class ConsoleOptions:
     """Overflow value override for renderable."""
     no_wrap: Optional[bool] = False
     """"Disable wrapping for text."""
+
+    @property
+    def ascii_only(self) -> bool:
+        """Check if renderables should use ascii only."""
+        return not self.encoding.startswith("utf")
 
     def update(
         self,
@@ -341,7 +348,7 @@ class Console:
         force_terminal (Optional[bool], optional): Enable/disable terminal control codes, or None to auto-detect terminal. Defaults to None.
         force_jupyter (Optional[bool], optional): Enable/disable Jupyter rendering, or None to auto-detect Jupyter. Defaults to None.
         theme (Theme, optional): An optional style theme object, or ``None`` for default theme.
-        file (IO, optional): A file object where the console should write to. Defaults to stdoutput.
+        file (IO, optional): A file object where the console should write to. Defaults to stdout.
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
         height (int, optional): The height of the terminal. Leave as default to auto-detect height.
         record (bool, optional): Boolean to enable recording of terminal output,
@@ -568,7 +575,7 @@ class Console:
         Returns:
             str: A standard encoding string.
         """
-        return getattr(self.file, "encoding", "utf-8")
+        return (getattr(self.file, "encoding", "utf-8") or "utf-8").lower()
 
     @property
     def is_terminal(self) -> bool:
@@ -599,6 +606,7 @@ class Console:
     def options(self) -> ConsoleOptions:
         """Get default console options."""
         return ConsoleOptions(
+            legacy_windows=self.legacy_windows,
             min_width=1,
             max_width=self.width,
             encoding=self.encoding,

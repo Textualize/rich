@@ -1,7 +1,11 @@
-from typing import Iterable, List, Optional, overload
+from typing import TYPE_CHECKING, Iterable, List
+
 from typing_extensions import Literal
 
 from ._loop import loop_last
+
+if TYPE_CHECKING:
+    from rich.console import ConsoleOptions
 
 
 class Box:
@@ -16,11 +20,14 @@ class Box:
     │ ││ foot
     └─┴┘ bottom
 
-
+    Args:
+        box (str): Characters making up box.
+        ascii (bool, optional): True if this box uses ascii characters only. Default is False.
     """
 
-    def __init__(self, box: str) -> None:
+    def __init__(self, box: str, *, ascii: bool = False) -> None:
         self._box = box
+        self.ascii = ascii
         line1, line2, line3, line4, line5, line6, line7, line8 = box.splitlines()
         # top
         self.top_left, self.top, self.top_divider, self.top_right = iter(line1)
@@ -57,6 +64,24 @@ class Box:
 
     def __str__(self) -> str:
         return self._box
+
+    def substitute(self, options: "ConsoleOptions", safe: bool = True) -> "Box":
+        """Substitute this box for another if it won't render due to platform issues.
+
+        Args:
+            options (ConsoleOptions): Console options used in rendering.
+            safe (bool, optional): Substitute this for another Box if there are known problems
+                displaying on the platform (currently only relevant on Windows). Default is True.
+
+        Returns:
+            Box: A different Box or the same Box.
+        """
+        box = self
+        if options.legacy_windows and safe:
+            box = LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box)
+        if options.ascii_only:
+            box = ASCII
+        return box
 
     def get_top(self, widths: Iterable[int]) -> str:
         """Get the top of a simple box.
@@ -158,7 +183,8 @@ ASCII: Box = Box(
 |-+|
 | ||
 +--+
-"""
+""",
+    ascii=True,
 )
 
 ASCII2: Box = Box(
@@ -171,7 +197,8 @@ ASCII2: Box = Box(
 +-++
 | ||
 +-++
-"""
+""",
+    ascii=True,
 )
 
 ASCII_DOUBLE_HEAD: Box = Box(
@@ -184,7 +211,8 @@ ASCII_DOUBLE_HEAD: Box = Box(
 +-++
 | ||
 +-++
-"""
+""",
+    ascii=True,
 )
 
 SQUARE: Box = Box(
@@ -200,6 +228,18 @@ SQUARE: Box = Box(
 """
 )
 
+SQUARE_DOUBLE_HEAD: Box = Box(
+    """\
+┌─┬┐
+│ ││
+╞═╪╡
+│ ││
+├─┼┤
+├─┼┤
+│ ││
+└─┴┘
+"""
+)
 
 MINIMAL: Box = Box(
     """\
@@ -385,40 +425,15 @@ LEGACY_WINDOWS_SUBSTITUTIONS = {
 }
 
 
-@overload
-def get_safe_box(box: None, legacy_windows: bool) -> None:
-    ...
-
-
-@overload
-def get_safe_box(box: Box, legacy_windows: bool) -> Box:
-    ...
-
-
-def get_safe_box(box: Optional[Box], legacy_windows: bool) -> Optional[Box]:
-    """Substitute Box constants that don't render on windows legacy.
-
-    Args:
-        box (Optional[Box]): A Box instance.
-        legacy_windows (bool): Enable legacy Windows.
-
-    Returns:
-        Optional[Box]: A Box instance (potentially a new instance).
-    """
-    if legacy_windows and box is not None:
-        return LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box)
-    else:
-        return box
-
-
 if __name__ == "__main__":  # pragma: no cover
 
     from rich.columns import Columns
     from rich.panel import Panel
+
+    from . import box
     from .console import Console
     from .table import Table
     from .text import Text
-    from . import box
 
     console = Console(record=True)
 
@@ -427,6 +442,7 @@ if __name__ == "__main__":  # pragma: no cover
         "ASCII2",
         "ASCII_DOUBLE_HEAD",
         "SQUARE",
+        "SQUARE_DOUBLE_HEAD",
         "MINIMAL",
         "MINIMAL_HEAVY_HEAD",
         "MINIMAL_DOUBLE_HEAD",

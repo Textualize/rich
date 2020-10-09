@@ -43,7 +43,11 @@ def test_truecolor_terminal():
 
 def test_console_options_update():
     options = ConsoleOptions(
-        min_width=10, max_width=20, is_terminal=False, encoding="utf-8"
+        legacy_windows=False,
+        min_width=10,
+        max_width=20,
+        is_terminal=False,
+        encoding="utf-8",
     )
     options1 = options.update(width=15)
     assert options1.min_width == 15 and options1.max_width == 15
