@@ -1,6 +1,4 @@
-import codecs
 import inspect
-import io
 import os
 import platform
 import shutil

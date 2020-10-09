@@ -1,8 +1,8 @@
-from typing import Iterable, List, Optional, overload, TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable, List
+
 from typing_extensions import Literal
 
 from ._loop import loop_last
-
 
 if TYPE_CHECKING:
     from rich.console import ConsoleOptions
@@ -429,10 +429,11 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich.columns import Columns
     from rich.panel import Panel
+
+    from . import box
     from .console import Console
     from .table import Table
     from .text import Text
-    from . import box
 
     console = Console(record=True)
 
