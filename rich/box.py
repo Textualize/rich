@@ -20,7 +20,9 @@ class Box:
     │ ││ foot
     └─┴┘ bottom
 
-
+    Args:
+        box (str): Characters making up box.
+        ascii (bool, optional): True if this box uses ascii characters only. Default is False.
     """
 
     def __init__(self, box: str, *, ascii: bool = False) -> None:
@@ -69,10 +71,10 @@ class Box:
         Args:
             options (ConsoleOptions): Console options used in rendering.
             safe (bool, optional): Substitute this for another Box if there are known problems
-                in displaying (currently only relevant on Windows). Default is True.
+                displaying on the platform (currently only relevant on Windows). Default is True.
 
         Returns:
-            [Box]: A different Box or the same Box.
+            Box: A different Box or the same Box.
         """
         box = self
         if options.legacy_windows and safe:
