@@ -45,7 +45,7 @@ def test_lines_justify():
     lines1.justify(console, 10, justify="right")
     assert lines1._lines == [Text("       foo"), Text("      test")]
 
-    lines2 = Lines([Text("foo  bar"), Text("test")])
+    lines2 = Lines([Text("foo bar"), Text("test")])
     lines2.justify(console, 7, justify="full")
     assert lines2._lines == [
         Text(
