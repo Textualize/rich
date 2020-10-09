@@ -195,118 +195,6 @@ class Bar(JupyterMixin):
         )
 
 
-BLOCK_ELEMS = [" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉"]
-FULL_BLOCK = "█"
-
-
-class BlockBar(JupyterMixin):
-    """Renders a (progress) bar.
-
-    Args:
-        total (float, optional): Number of steps in the bar. Defaults to 100.
-        completed (float, optional): Number of steps completed. Defaults to 0.
-        width (int, optional): Width of the bar, or ``None`` for maximum width. Defaults to None.
-        style (StyleType, optional): Style for the bar background. Defaults to "bar.back".
-        complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
-        finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
-        blend_colors (bool, optional): Blend colors according to completion. Defaults to False.
-    """
-
-    def __init__(
-        self,
-        total: float = 100,
-        completed: float = 0,
-        width: int = None,
-        style: StyleType = "bar.back",
-        complete_style: StyleType = "bar.complete",
-        finished_style: StyleType = "bar.finished",
-        blend_colors: bool = False,
-    ):
-        self.total = total
-        self.completed = completed
-        self.width = width
-        self.style = style
-        self.complete_style = complete_style
-        self.finished_style = finished_style
-        self.blend_colors = blend_colors
-
-    def __repr__(self) -> str:
-        return f"<BlockBar {self.completed!r} of {self.total!r}>"
-
-    @property
-    def percentage_completed(self) -> float:
-        """Calculate percentage complete."""
-        completed = (self.completed / self.total) * 100.0
-        completed = min(100, max(0.0, completed))
-        return completed
-
-    def update(self, completed: float, total: float = None) -> None:
-        """Update progress with new values.
-
-        Args:
-            completed (float): Number of steps completed.
-            total (float, optional): Total number of steps, or ``None`` to not change. Defaults to None.
-        """
-        self.completed = completed
-        self.total = total if total is not None else self.total
-
-    def __rich_console__(
-        self, console: Console, options: ConsoleOptions
-    ) -> RenderResult:
-
-        width = min(self.width or options.max_width, options.max_width)
-
-        completed = min(self.total, max(0, self.completed))
-        complete_eights = (
-            int(width * 8 * completed / self.total) if self.total else width * 8
-        )
-        bar_count = complete_eights // 8
-        eights_count = complete_eights % 8
-        space_style = console.get_style(self.style)
-
-        if self.completed < self.total:
-            if self.blend_colors:
-                begin_style = console.get_style(self.complete_style)
-                begin_color = (
-                    begin_style.color.get_truecolor()
-                    if begin_style.color
-                    else ColorTriplet(200, 0, 0)
-                )
-                end_style = console.get_style(self.finished_style)
-                end_color = (
-                    end_style.color.get_truecolor()
-                    if end_style.color
-                    else ColorTriplet(0, 200, 0)
-                )
-                fraction_completed = completed / self.total
-                blended_color = blend_rgb(
-                    begin_color, end_color, cross_fade=fraction_completed
-                )
-                blended_style = Style(color=Color.from_triplet(blended_color))
-                bar_style = console.get_style(self.complete_style) + blended_style
-            else:
-                bar_style = console.get_style(self.complete_style)
-        else:
-            bar_style = console.get_style(self.finished_style)
-
-        _Segment = Segment
-        if bar_count:
-            yield _Segment(FULL_BLOCK * bar_count, bar_style)
-        if eights_count:
-            yield _Segment(BLOCK_ELEMS[eights_count], bar_style)
-
-        remaining_bars = width - bar_count - int(eights_count > 0)
-        if remaining_bars and console.color_system is not None:
-            yield _Segment(" " * remaining_bars, space_style)
-
-    def __rich_measure__(self, console: Console, max_width: int) -> Measurement:
-        return (
-            Measurement(self.width, self.width)
-            if self.width is not None
-            else Measurement(4, max_width)
-        )
-
-
 if __name__ == "__main__":  # pragma: no cover
     console = Console()
     bar = Bar(width=50, total=100)
@@ -317,17 +205,6 @@ if __name__ == "__main__":  # pragma: no cover
     for n in range(0, 101, 1):
         bar.update(n)
         console.print(bar)
-        console.file.write("\r")
-        time.sleep(0.05)
-    console.show_cursor(True)
-    console.print()
-
-    block_bar = BlockBar(width=50, total=100, blend_colors=True)
-
-    console.show_cursor(False)
-    for n in range(0, 101, 1):
-        block_bar.update(n)
-        console.print(block_bar)
         console.file.write("\r")
         time.sleep(0.05)
     console.show_cursor(True)
