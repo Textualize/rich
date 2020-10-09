@@ -6,7 +6,7 @@ from .render import render
 expected = [
     "\x1b[39;49m     ▐█████████████████████████                   \x1b[0m",
     "\x1b[39;49m      ██████████████████████                      \x1b[0m",
-    '\x1b[39;49m                                                  \x1b[0m'
+    "\x1b[39;49m                                                  \x1b[0m",
 ]
 
 
@@ -46,4 +46,3 @@ if __name__ == "__main__":
     bar = BlockBar(size=100, begin=60, end=40, width=50)
     bar_render = render(bar)
     print(repr(bar_render))
-
