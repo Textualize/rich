@@ -17,7 +17,7 @@ class Pager(ABC):
 class SystemPager(Pager):
     """Uses the pager installed on the system."""
 
-    _pager = pydoc.pager
+    _pager = lambda self, content: pydoc.pager(content)
 
     def show(self, content: str) -> None:
         """Use the same pager used by pydoc."""
