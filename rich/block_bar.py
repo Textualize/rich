@@ -36,8 +36,8 @@ class BlockBar(JupyterMixin):
         bgcolor: Union[Color, str] = "default",
     ):
         self.size = size
-        self.begin = begin
-        self.end = end
+        self.begin = max(begin, 0)
+        self.end = min(end, size)
         self.width = width
         self.style = Style(color=color, bgcolor=bgcolor)
 

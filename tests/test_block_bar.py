@@ -10,11 +10,16 @@ expected = [
 ]
 
 
+def test_repr():
+    bar = BlockBar(size=100, begin=11, end=62, width=50)
+    assert repr(bar) == "<BlockBar 11..62 of 100>"
+
+
 def test_render():
     bar = BlockBar(size=100, begin=11, end=62, width=50)
     bar_render = render(bar)
     assert bar_render == expected[0]
-    bar = BlockBar(size=100, begin=12, end=56, width=50)
+    bar = BlockBar(size=100, begin=12, end=57, width=50)
     bar_render = render(bar)
     assert bar_render == expected[1]
     # begin after end
@@ -40,7 +45,7 @@ if __name__ == "__main__":
     bar = BlockBar(size=100, begin=11, end=62, width=50)
     bar_render = render(bar)
     print(repr(bar_render))
-    bar = BlockBar(size=100, begin=12, end=56, width=50)
+    bar = BlockBar(size=100, begin=12, end=57, width=50)
     bar_render = render(bar)
     print(repr(bar_render))
     bar = BlockBar(size=100, begin=60, end=40, width=50)
