@@ -78,7 +78,6 @@ def test_get_line_color_none():
         word_wrap=True,
         background_color="red",
     )
-
     assert syntax._get_line_numbers_color() == Color.default()
 
 
@@ -105,6 +104,48 @@ def test_get_number_styles():
         Style.parse("not dim on #272822"),
     )
 
+def test_get_style_for_token():
+    # from pygments.style import Style as PygmentsStyle
+    # pygments_style = PygmentsStyle()
+    from pygments.style import Token
+
+    style = PygmentsSyntaxTheme("default")
+    style_dict = {Token.Text: Style(color=None)}
+    style._style_cache = style_dict
+    syntax = Syntax(
+        CODE,
+        lexer_name="python",
+        line_numbers=True,
+        line_range=(2, 10),
+        theme=style,
+        code_width=60,
+        word_wrap=True,
+        background_color="red",
+    )
+    assert syntax._get_line_numbers_color() == Color.default()
+
+def test_option_no_wrap():
+
+    from rich.console import Console
+    console = Console
+
+    syntax = Syntax(
+        CODE,
+        lexer_name="python",
+        line_numbers=True,
+        line_range=(2, 10),
+        code_width=60,
+        word_wrap=False,
+        background_color="red"
+    )
+    
+    rendered_syntax = render(syntax, True)
+    # print(repr(rendered_syntax))
+
+    expected = '\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 2 \x1b[0m\x1b[38;2;248;248;242;41m    \x1b[0m\x1b[38;2;230;219;116;41m"""Iterate and generate a tuple with a flag for first and last value."""\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 3 \x1b[0m\x1b[38;2;248;248;242;41m    \x1b[0m\x1b[38;2;248;248;242;41miter_values\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;249;38;114;41m=\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;248;248;242;41miter\x1b[0m\x1b[38;2;248;248;242;41m(\x1b[0m\x1b[38;2;248;248;242;41mvalues\x1b[0m\x1b[38;2;248;248;242;41m)\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 4 \x1b[0m\x1b[38;2;248;248;242;41m    \x1b[0m\x1b[38;2;102;217;239;41mtry\x1b[0m\x1b[38;2;248;248;242;41m:\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 5 \x1b[0m\x1b[38;2;248;248;242;41m        \x1b[0m\x1b[38;2;248;248;242;41mprevious_value\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;249;38;114;41m=\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;248;248;242;41mnext\x1b[0m\x1b[38;2;248;248;242;41m(\x1b[0m\x1b[38;2;248;248;242;41miter_values\x1b[0m\x1b[38;2;248;248;242;41m)\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 6 \x1b[0m\x1b[38;2;248;248;242;41m    \x1b[0m\x1b[38;2;102;217;239;41mexcept\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;166;226;46;41mStopIteration\x1b[0m\x1b[38;2;248;248;242;41m:\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 7 \x1b[0m\x1b[38;2;248;248;242;41m        \x1b[0m\x1b[38;2;102;217;239;41mreturn\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 8 \x1b[0m\x1b[38;2;248;248;242;41m    \x1b[0m\x1b[38;2;248;248;242;41mfirst\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;249;38;114;41m=\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;102;217;239;41mTrue\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 9 \x1b[0m\x1b[38;2;248;248;242;41m    \x1b[0m\x1b[38;2;102;217;239;41mfor\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;248;248;242;41mvalue\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;249;38;114;41min\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;248;248;242;41miter_values\x1b[0m\x1b[38;2;248;248;242;41m:\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m10 \x1b[0m\x1b[38;2;248;248;242;41m        \x1b[0m\x1b[38;2;102;217;239;41myield\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;248;248;242;41mfirst\x1b[0m\x1b[38;2;248;248;242;41m,\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;102;217;239;41mFalse\x1b[0m\x1b[38;2;248;248;242;41m,\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;248;248;242;41mprevious_value\x1b[0m\n'
+    # console.print(syntax, no_wrap=True)
+
+    assert rendered_syntax == expected
 
 def test_ansi_theme():
     style = Style(color="red")
