@@ -104,6 +104,7 @@ def test_get_number_styles():
         Style.parse("not dim on #272822"),
     )
 
+
 def test_get_style_for_token():
     # from pygments.style import Style as PygmentsStyle
     # pygments_style = PygmentsStyle()
@@ -124,9 +125,11 @@ def test_get_style_for_token():
     )
     assert syntax._get_line_numbers_color() == Color.default()
 
+
 def test_option_no_wrap():
 
     from rich.console import Console
+
     console = Console
 
     syntax = Syntax(
@@ -136,9 +139,9 @@ def test_option_no_wrap():
         line_range=(2, 10),
         code_width=60,
         word_wrap=False,
-        background_color="red"
+        background_color="red",
     )
-    
+
     rendered_syntax = render(syntax, True)
     # print(repr(rendered_syntax))
 
@@ -146,6 +149,7 @@ def test_option_no_wrap():
     # console.print(syntax, no_wrap=True)
 
     assert rendered_syntax == expected
+
 
 def test_ansi_theme():
     style = Style(color="red")
