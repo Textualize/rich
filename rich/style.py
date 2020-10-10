@@ -501,7 +501,7 @@ class Style:
         iter_styles = iter(styles)
         return sum(iter_styles, next(iter_styles))
 
-    def copy(self) -> "Style":
+    def copy(self, link: str = None) -> "Style":
         """Get a copy of this style.
 
         Returns:
@@ -516,8 +516,9 @@ class Style:
         style._bgcolor = self._bgcolor
         style._attributes = self._attributes
         style._set_attributes = self._set_attributes
-        style._link = self._link
-        style._link_id = f"{time()}-{randint(0, 999999)}" if self._link else ""
+        _link = self._link if link is None else link
+        style._link = _link
+        style._link_id = f"{time()}-{randint(0, 999999)}" if _link else ""
         style._hash = self._hash
         style._null = False
         return style

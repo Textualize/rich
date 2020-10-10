@@ -35,6 +35,7 @@ from .control import Control
 from .highlighter import NullHighlighter, ReprHighlighter
 from .markup import render as render_markup
 from .measure import Measurement, measure_renderables
+from .pager import Pager, SystemPager
 from .pretty import Pretty
 from .scope import render_scope
 from .segment import Segment
@@ -203,6 +204,39 @@ class ThemeContext:
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         self.console.pop_theme()
+
+
+class PagerContext:
+    """A context manager that 'pages' content. See :meth:`~rich.console.Console.pager` for usage."""
+
+    def __init__(
+        self,
+        console: "Console",
+        pager: Pager = None,
+        styles: bool = False,
+        links: bool = False,
+    ) -> None:
+        self._console = console
+        self.pager = SystemPager() if pager is None else pager
+        self.styles = styles
+        self.links = links
+
+    def __enter__(self) -> "PagerContext":
+        self._console._enter_buffer()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        if exc_type is None:
+            with self._console._lock:
+                buffer: List[Segment] = self._console._buffer[:]
+                del self._console._buffer[:]
+                segments: Iterable[Segment] = buffer
+                if not self.styles:
+                    segments = Segment.strip_styles(segments)
+                elif not self.links:
+                    segments = Segment.strip_links(segments)
+                content = self._console._render_buffer(segments)
+            self.pager.show(content)
 
 
 class RenderGroup:
@@ -666,6 +700,29 @@ class Console:
         """
         capture = Capture(self)
         return capture
+
+    def pager(
+        self, pager: Pager = None, styles: bool = False, links: bool = False
+    ) -> PagerContext:
+        """A context manager to display anything printed within a "pager". The pager used
+        is defined by the system and will typically support at less pressing a key to scroll.
+
+        Args:
+            pager (Pager, optional): A pager object, or None to use :class:~rich.pager.SystemPager`. Defaults to None.
+            styles (bool, optional): Show styles in pager. Defaults to False.
+            links (bool, optional): Show links in pager. Defaults to False.
+
+        Example:
+            >>> from rich.console import Console
+            >>> from rich.__main__ import make_test_card
+            >>> console = Console()
+            >>> with console.pager():
+                    console.print(make_test_card())
+
+        Returns:
+            PagerContext: A context manager.
+        """
+        return PagerContext(self, pager=pager, styles=styles, links=links)
 
     def line(self, count: int = 1) -> None:
         """Write new line(s).
@@ -1154,7 +1211,8 @@ class Console:
                     display(self._buffer)
                     del self._buffer[:]
                 else:
-                    text = self._render_buffer()
+                    text = self._render_buffer(self._buffer[:])
+                    del self._buffer[:]
                     if text:
                         try:
                             if WINDOWS:  # pragma: no cover
@@ -1169,17 +1227,15 @@ class Console:
                             error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
                             raise
 
-    def _render_buffer(self) -> str:
+    def _render_buffer(self, buffer: Iterable[Segment]) -> str:
         """Render buffered output, and clear buffer."""
         output: List[str] = []
         append = output.append
         color_system = self._color_system
         legacy_windows = self.legacy_windows
-        buffer = self._buffer[:]
         if self.record:
             with self._record_buffer_lock:
                 self._record_buffer.extend(buffer)
-        del self._buffer[:]
         not_terminal = not self.is_terminal
         for text, style, is_control in buffer:
             if style and not is_control:
