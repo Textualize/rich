@@ -557,7 +557,7 @@ class Console:
         Returns:
             str: Console output.
         """
-        render_result = self._render_buffer()
+        render_result = self._render_buffer(self._buffer)
         del self._buffer[:]
         self._exit_buffer()
         return render_result

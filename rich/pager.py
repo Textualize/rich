@@ -14,7 +14,7 @@ class Pager(ABC):
         """
 
 
-class SystemPager:
+class SystemPager(Pager):
     """Uses the pager installed on the system."""
 
     def show(self, content: str) -> None:
