@@ -210,6 +210,25 @@ An alternative way of capturing output is to set the Console file to a :py:class
     console.print("[bold red]Hello[/] World")
     str_output = console.file.getvalue()
 
+Paging
+------
+
+If you have some long output to present to the user you can use a *pager* to display it. A pager is typically an application defined by your operating system which will at least support pressing a key to scroll, but will often support scroll up and down through the text.
+
+You can page output from a Console by calling :meth:`~rich.console.Console.pager` which returns a context manger. When the pager exits, anything that was printed will be sent to the pager. Here's an example::
+
+    from rich.__main__ import make_test_card
+    from rich.console import Console
+
+    console = Console()
+    with console.pager():
+        console.print(make_test_card())
+
+Since the default pager on most platforms don't support color, Rich will strip color from the output. If you know that your pager supports color, you can set ``style=True`` when calling the :meth:`~rich.console.Console.pager` method.
+
+.. note::
+    Rich will use the ``PAGER`` environment variable to get the pager command. On Linux and macOS you can set this to ``less -r`` to enable paging with ANSI styles.
+
 
 Terminal detection
 ------------------

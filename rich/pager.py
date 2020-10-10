@@ -27,5 +27,5 @@ if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
     console = Console()
-    with console.pager():
+    with console.pager(styles=True):
         console.print(make_test_card())
