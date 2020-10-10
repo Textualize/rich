@@ -86,3 +86,13 @@ def test_filter_control():
     assert list(Segment.filter_control(segments, is_control=True)) == [
         Segment("bar", is_control=True)
     ]
+
+
+def test_strip_styles():
+    segments = [Segment("foo", Style(bold=True))]
+    assert list(Segment.strip_styles(segments)) == [Segment("foo", None)]
+
+
+def test_strip_links():
+    segments = [Segment("foo", Style(bold=True, link="https://www.example.org"))]
+    assert list(Segment.strip_links(segments)) == [Segment("foo", Style(bold=True))]

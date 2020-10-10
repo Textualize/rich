@@ -312,7 +312,7 @@ class Segment(NamedTuple):
                 yield segment
             else:
                 text, style, _is_control = segment
-                yield cls(text, style.copy(link=None) if style else None)
+                yield cls(text, style.update_link(None) if style else None)
 
     @classmethod
     def strip_styles(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
