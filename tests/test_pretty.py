@@ -18,7 +18,7 @@ def test_install():
 
 def test_pretty():
     test = {
-        "foo": [1, 2, 3, {4, 5, 6, (7, 8, 9)}, {}],
+        "foo": [1, 2, 3, (4, 5, {6}, 7, 8, {9}), {}],
         "bar": {"egg": "baz", "words": ["Hello World"] * 10},
         False: "foo",
         True: "",
@@ -28,7 +28,7 @@ def test_pretty():
     result = pretty_repr(test, max_width=80)
     print(result)
     print(repr(result))
-    expected = "{\n    'foo': [1, 2, 3, {(7, 8, 9), 4, 5, 6}, {}],\n    'bar': {\n        'egg': 'baz',\n        'words': [\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World'\n        ]\n    },\n    False: 'foo',\n    True: '',\n    'text': ('Hello World', 'foo bar baz egg')\n}"
+    expected = "{\n    'foo': [1, 2, 3, (4, 5, {6}, 7, 8, {9}), {}],\n    'bar': {\n        'egg': 'baz',\n        'words': [\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World'\n        ]\n    },\n    False: 'foo',\n    True: '',\n    'text': ('Hello World', 'foo bar baz egg')\n}"
     assert result == expected
 
 
