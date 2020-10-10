@@ -2,14 +2,13 @@ import io
 import os
 import sys
 import tempfile
-from threading import setprofile
 from typing import Optional
 
 import pytest
 
+from rich import errors
 from rich.color import ColorSystem
 from rich.console import CaptureError, Console, ConsoleOptions
-from rich import errors
 from rich.pager import SystemPager
 from rich.panel import Panel
 from rich.style import Style
