@@ -3,6 +3,7 @@ import os
 import sys
 import tempfile
 from threading import setprofile
+from typing import Optional
 
 import pytest
 
@@ -353,16 +354,20 @@ def test_bell() -> None:
 def test_pager() -> None:
     console = Console()
 
-    pager_called = False
+    pager_content: Optional[str] = None
 
     def mock_pager(content: str) -> None:
-        nonlocal pager_called
-        pager_called = True
+        nonlocal pager_content
+        pager_content = content
 
     pager = SystemPager()
-    pager._pager = dummy_pager
+    pager._pager = mock_pager
 
     with console.pager(pager):
-        console.print("Hello World")
+        console.print("[bold]Hello World")
+    assert pager_content == "Hello World\n"
 
-    assert pager_called
+    with console.pager(pager, styles=True, links=False):
+        console.print("[bold link https:/example.org]Hello World")
+
+    assert pager_content == "Hello World\n"
