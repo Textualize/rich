@@ -483,13 +483,10 @@ class Table(JupyterMixin):
                 max_column = max(
                     width for width, allow_wrap in zip(widths, wrapable) if allow_wrap
                 )
-                try:
-                    second_max_column = max(
-                        width if allow_wrap and width != max_column else 0
-                        for width, allow_wrap in zip(widths, wrapable)
-                    )
-                except ValueError:
-                    second_max_column = 0
+                second_max_column = max(
+                    width if allow_wrap and width != max_column else 0
+                    for width, allow_wrap in zip(widths, wrapable)
+                )
                 column_difference = max_column - second_max_column
                 ratios = [
                     (1 if (width == max_column and allow_wrap) else 0)

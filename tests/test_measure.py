@@ -3,7 +3,7 @@ import pytest
 
 from rich.errors import NotRenderableError
 from rich.console import Console
-from rich.measure import Measurement
+from rich.measure import Measurement, measure_renderables
 
 
 def test_span():
@@ -17,3 +17,17 @@ def test_no_renderable():
 
     with pytest.raises(NotRenderableError):
         Measurement.get(console, None, console.width)
+
+
+def test_null_get():
+    # Test negative console.width passed into get method
+    assert Measurement.get(Console(width=-1), None) == Measurement(0, 0)
+    # Test negative max_width passed into get method
+    assert Measurement.get(Console(), None, -1) == Measurement(0, 0)
+
+
+def test_measure_renderables():
+    # Test measure_renderables returning a null Measurement object
+    assert measure_renderables(Console(), None, None) == Measurement(0, 0)
+    # Test measure_renderables returning a valid Measurement object
+    assert measure_renderables(Console(width=1), ["test"], 1) == Measurement(1, 1)
