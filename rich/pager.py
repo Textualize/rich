@@ -2,19 +2,7 @@ from abc import ABC, abstractmethod
 import pydoc
 
 
-class Pager(ABC):
-    """Base class for a pager."""
-
-    @abstractmethod
-    def show(self, content: str) -> None:
-        """Show content in pager.
-
-        Args:
-            content (str): Content to be displayed.
-        """
-
-
-class SystemPager(Pager):
+class SystemPager:
     """Uses the pager installed on the system."""
 
     _pager = lambda self, content: pydoc.pager(content)
