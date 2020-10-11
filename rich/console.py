@@ -35,7 +35,7 @@ from .control import Control
 from .highlighter import NullHighlighter, ReprHighlighter
 from .markup import render as render_markup
 from .measure import Measurement, measure_renderables
-from .pager import SystemPager
+from .pager import Pager, SystemPager
 from .pretty import Pretty
 from .scope import render_scope
 from .segment import Segment
@@ -212,10 +212,12 @@ class PagerContext:
     def __init__(
         self,
         console: "Console",
+        pager: Pager = None,
         styles: bool = False,
         links: bool = False,
     ) -> None:
         self._console = console
+        self.pager = SystemPager() if pager is None else pager
         self.styles = styles
         self.links = links
 
@@ -234,8 +236,7 @@ class PagerContext:
                 elif not self.links:
                     segments = Segment.strip_links(segments)
                 content = self._console._render_buffer(segments)
-            pager = SystemPager()
-            pager.show(content)
+            self.pager.show(content)
         self._console._exit_buffer()
 
 
@@ -701,11 +702,14 @@ class Console:
         capture = Capture(self)
         return capture
 
-    def pager(self, styles: bool = False, links: bool = False) -> PagerContext:
+    def pager(
+        self, pager: Pager = None, styles: bool = False, links: bool = False
+    ) -> PagerContext:
         """A context manager to display anything printed within a "pager". The pager used
         is defined by the system and will typically support at less pressing a key to scroll.
 
         Args:
+            pager (Pager, optional): A pager object, or None to use :class:~rich.pager.SystemPager`. Defaults to None.
             styles (bool, optional): Show styles in pager. Defaults to False.
             links (bool, optional): Show links in pager. Defaults to False.
 
@@ -719,7 +723,7 @@ class Console:
         Returns:
             PagerContext: A context manager.
         """
-        return PagerContext(self, styles=styles, links=links)
+        return PagerContext(self, pager=pager, styles=styles, links=links)
 
     def line(self, count: int = 1) -> None:
         """Write new line(s).
