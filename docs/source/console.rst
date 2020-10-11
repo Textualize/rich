@@ -69,6 +69,15 @@ The :meth:`~rich.console.Console.log` methods offers the same capabilities as pr
 
 To help with debugging, the log() method has a ``log_locals`` parameter. If you set this to ``True``, Rich will display a table of local variables where the method was called.
 
+Low level output
+----------------
+
+In additional to :meth:`~rich.console.Console.print` and :meth:`~rich.console.Console.log`, Rich has a :meth:`~rich.console.Console.out` method which provides a lower-level way of writing to the terminal. The out() method converts all the positional arguments to strings and won't pretty print, word wrap, or apply markup to the output, but can apply a basic style and will optionally do highlighting.
+
+Here's an example::
+
+    >>> console.out("Locals", locals())
+
 
 Justify / Alignment
 -------------------

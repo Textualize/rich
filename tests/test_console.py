@@ -370,3 +370,10 @@ def test_pager() -> None:
         console.print("[bold link https:/example.org]Hello World")
 
     assert pager_content == "Hello World\n"
+
+
+def test_out() -> None:
+    console = Console(width=10)
+    console.begin_capture()
+    console.out(*(["foo bar"] * 5), sep=".", end="X")
+    assert console.end_capture() == "foo bar.foo bar.foo bar.foo bar.foo barX"
