@@ -42,7 +42,11 @@ class Rule(JupyterMixin):
     ) -> RenderResult:
         width = options.max_width
 
-        characters = self.characters or "─"
+        characters = (
+            "-"
+            if (options.ascii_only and not self.characters.isascii())
+            else self.characters
+        )
 
         chars_len = cell_len(characters)
         if not self.title:
