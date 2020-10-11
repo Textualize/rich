@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support for Python 3.9
 - Added legacy_windows to ConsoleOptions
 - Added ascii_only to ConsoleOptions
 - Addded box.SQUARE_DOUBLE_HEAD
