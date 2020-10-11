@@ -171,7 +171,7 @@ class Table(JupyterMixin):
         self.footer_style = footer_style
         self.border_style = border_style
         self.title_style = title_style
-        self.caption_style = title_style
+        self.caption_style = caption_style
         self.title_justify = title_justify
         self.caption_justify = caption_justify
         self._row_count = 0
@@ -241,12 +241,6 @@ class Table(JupyterMixin):
     def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
         if self.width is not None:
             max_width = self.width
-
-        # if self.box:
-        #     max_width -= len(self.columns) - 1
-        #     if self.show_edge:
-        #         max_width -= 2
-
         if max_width < 0:
             return Measurement(0, 0)
 

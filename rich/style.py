@@ -522,6 +522,28 @@ class Style:
         style._null = False
         return style
 
+    def update_link(self, link: str = None) -> "Style":
+        """Get a copy with a different value for link.
+
+        Args:
+            link (str, optional): New value for link. Defaults to None.
+
+        Returns:
+            Style: A new Style instance.
+        """
+        style = self.__new__(Style)
+        style._ansi = self._ansi
+        style._style_definition = self._style_definition
+        style._color = self._color
+        style._bgcolor = self._bgcolor
+        style._attributes = self._attributes
+        style._set_attributes = self._set_attributes
+        style._link = link
+        style._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
+        style._hash = self._hash
+        style._null = False
+        return style
+
     def render(
         self,
         text: str = "",

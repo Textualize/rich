@@ -2,12 +2,14 @@ import io
 import os
 import sys
 import tempfile
+from typing import Optional
 
 import pytest
 
+from rich import errors
 from rich.color import ColorSystem
 from rich.console import CaptureError, Console, ConsoleOptions
-from rich import errors
+from rich.pager import SystemPager
 from rich.panel import Panel
 from rich.style import Style
 
@@ -346,3 +348,25 @@ def test_bell() -> None:
     console.begin_capture()
     console.bell()
     assert console.end_capture() == "\x07"
+
+
+def test_pager() -> None:
+    console = Console()
+
+    pager_content: Optional[str] = None
+
+    def mock_pager(content: str) -> None:
+        nonlocal pager_content
+        pager_content = content
+
+    pager = SystemPager()
+    pager._pager = mock_pager
+
+    with console.pager(pager):
+        console.print("[bold]Hello World")
+    assert pager_content == "Hello World\n"
+
+    with console.pager(pager, styles=True, links=False):
+        console.print("[bold link https:/example.org]Hello World")
+
+    assert pager_content == "Hello World\n"
