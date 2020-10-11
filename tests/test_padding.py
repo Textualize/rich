@@ -32,7 +32,11 @@ def test_rich_console():
     renderable = "test renderable"
     style = Style(color="red")
     options = ConsoleOptions(
-        min_width=10, max_width=20, is_terminal=False, encoding="utf-8"
+        legacy_windows=False,
+        min_width=10,
+        max_width=20,
+        is_terminal=False,
+        encoding="utf-8",
     )
 
     expected_outputs = [

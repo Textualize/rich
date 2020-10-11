@@ -1012,6 +1012,37 @@ class Console:
             self._buffer.append(Segment.control(str(control_codes)))
             self._check_buffer()
 
+    def out(
+        self,
+        *objects: Any,
+        sep=" ",
+        end="\n",
+        style: Union[str, Style] = None,
+        highlight: bool = True,
+    ) -> None:
+        """Output to the terminal. This is a low-level way of writing to the terminal which unlike
+        :meth:`~rich.console.Console.print` doesn't pretty print, wrap text, nor markup, but will highlighting
+        and apply basic style.
+
+        Args:
+            sep (str, optional): String to write between print data. Defaults to " ".
+            end (str, optional): String to write at end of print data. Defaults to "\\n".
+            style (Union[str, Style], optional): A style to apply to output. Defaults to None.
+            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
+        """
+        raw_output: str = sep.join(str(_object) for _object in objects)
+        self.print(
+            raw_output,
+            style=style,
+            highlight=highlight,
+            emoji=False,
+            markup=False,
+            no_wrap=True,
+            overflow="ignore",
+            crop=False,
+            end=end,
+        )
+
     def print(
         self,
         *objects: Any,
