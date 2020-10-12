@@ -2,10 +2,20 @@
 
 
 import io
+import re
 
 from rich.console import Console
 
-from .render import replace_link_ids
+
+re_link_ids = re.compile(r"id=[\d\.\-]*?;.*?\x1b")
+
+
+def replace_link_ids(render: str) -> str:
+    """Link IDs have a random ID and system path which is a problem for
+    reproducible tests.
+
+    """
+    return re_link_ids.sub("id=0;foo\x1b", render)
 
 
 test_data = [1, 2, 3]
@@ -28,7 +38,7 @@ def render_log():
 
 def test_log():
     expected = replace_link_ids(
-        "\n\x1b[2;36m[TIME]\x1b[0m\x1b[2;36m \x1b[0mHello from \x1b[1m<\x1b[0m\x1b[1;95mconsole\x1b[0m\x1b[39m \x1b[0m\x1b[3;33mwidth\x1b[0m\x1b[39m=\x1b[0m\x1b[1;34m80\x1b[0m\x1b[39m ColorSystem.TRUECOLOR\x1b[0m\x1b[1m>\x1b[0m !      \x1b]8;id=0;foo\x1b\\\x1b[2mtest_log.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:24\x1b[0m\n\x1b[2;36m      \x1b[0m\x1b[2;36m \x1b[0m\x1b[1m[\x1b[0m\x1b[1;34m1\x1b[0m, \x1b[1;34m2\x1b[0m, \x1b[1;34m3\x1b[0m\x1b[1m]\x1b[0m                                                  \x1b]8;id=0;foo\x1b\\\x1b[2mtest_log.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:25\x1b[0m\n       \x1b[34m╭─\x1b[0m\x1b[34m───────────────────── \x1b[0m\x1b[3;34mlocals\x1b[0m\x1b[34m ─────────────────────\x1b[0m\x1b[34m─╮\x1b[0m                   \n       \x1b[34m│\x1b[0m \x1b[3;33mconsole\x1b[0m\x1b[31m =\x1b[0m \x1b[1m<\x1b[0m\x1b[1;95mconsole\x1b[0m\x1b[39m \x1b[0m\x1b[3;33mwidth\x1b[0m\x1b[39m=\x1b[0m\x1b[1;34m80\x1b[0m\x1b[39m ColorSystem.TRUECOLOR\x1b[0m\x1b[1m>\x1b[0m \x1b[34m│\x1b[0m                   \n       \x1b[34m╰────────────────────────────────────────────────────╯\x1b[0m                   \n"
+        "\n\x1b[2;36m[TIME]\x1b[0m\x1b[2;36m \x1b[0mHello from \x1b[1m<\x1b[0m\x1b[1;95mconsole\x1b[0m\x1b[39m \x1b[0m\x1b[3;33mwidth\x1b[0m\x1b[39m=\x1b[0m\x1b[35m80\x1b[0m\x1b[39m ColorSystem.TRUECOLOR\x1b[0m\x1b[1m>\x1b[0m !      \x1b]8;id=0;foo\x1b\\\x1b[2mtest_log.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:34\x1b[0m\n\x1b[2;36m      \x1b[0m\x1b[2;36m \x1b[0m\x1b[1m[\x1b[0m\x1b[1;34m1\x1b[0m, \x1b[1;34m2\x1b[0m, \x1b[1;34m3\x1b[0m\x1b[1m]\x1b[0m                                                  \x1b]8;id=0;foo\x1b\\\x1b[2mtest_log.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:35\x1b[0m\n       \x1b[34m╭─\x1b[0m\x1b[34m───────────────────── \x1b[0m\x1b[3;34mlocals\x1b[0m\x1b[34m ─────────────────────\x1b[0m\x1b[34m─╮\x1b[0m                   \n       \x1b[34m│\x1b[0m \x1b[3;33mconsole\x1b[0m\x1b[31m =\x1b[0m \x1b[1m<\x1b[0m\x1b[1;95mconsole\x1b[0m\x1b[39m \x1b[0m\x1b[3;33mwidth\x1b[0m\x1b[39m=\x1b[0m\x1b[35m80\x1b[0m\x1b[39m ColorSystem.TRUECOLOR\x1b[0m\x1b[1m>\x1b[0m \x1b[34m│\x1b[0m                   \n       \x1b[34m╰────────────────────────────────────────────────────╯\x1b[0m                   \n"
     )
     rendered = render_log()
     print(repr(rendered))
