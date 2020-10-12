@@ -38,6 +38,7 @@ highlight_tests = [
     (" 1 ", [Span(1, 2, "repr.number")]),
     (" 1.2 ", [Span(1, 4, "repr.number")]),
     (" 0xff ", [Span(1, 5, "repr.number")]),
+    (" 1e10 ", [Span(1, 5, "repr.number")]),
     (" /foo ", [Span(1, 2, "repr.path"), Span(2, 5, "repr.filename")]),
     (" /foo/bar.html ", [Span(1, 6, "repr.path"), Span(6, 14, "repr.filename")]),
     ("01-23-45-67-89-AB", [Span(0, 17, "repr.eui48")]),  # 6x2 hyphen
