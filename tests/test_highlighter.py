@@ -13,6 +13,7 @@ def test_wrong_type():
 
 
 highlight_tests = [
+    ("", []),
     (" ", []),
     (
         "<foo>",
@@ -51,8 +52,9 @@ highlight_tests = [
     ("ED-ED-ED-ED-ED-ED", [Span(0, 17, "repr.eui48")]),  # uppercase
     ("Ed-Ed-Ed-Ed-Ed-Ed", [Span(0, 17, "repr.eui48")]),  # mixed case
     ("0-00-1-01-2-02", [Span(0, 14, "repr.eui48")]),  # dropped zero
-    ("https://example.org", [Span(0, 19, "repr.url")]),
-    ("http://example.org", [Span(0, 18, "repr.url")]),
+    (" https://example.org ", [Span(1, 20, "repr.url")]),
+    (" http://example.org ", [Span(1, 19, "repr.url")]),
+    (" http://example.org/index.html ", [Span(1, 30, "repr.url")]),
     ("No place like 127.0.0.1", [Span(14, 23, "repr.ipv4")]),
     ("''", [Span(0, 2, "repr.str")]),
     ("'hello'", [Span(0, 7, "repr.str")]),
