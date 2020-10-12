@@ -13,6 +13,7 @@ def test_wrong_type():
 
 
 highlight_tests = [
+    ("( ) { } [ ]", [Span(0, 1, "repr.brace")]),
     ("01-23-45-67-89-AB", [Span(0, 17, "repr.eui48")]),  # 6x2 hyphen
     ("01-23-45-FF-FE-67-89-AB", [Span(0, 23, "repr.eui64")]),  # 8x2 hyphen
     ("01:23:45:67:89:AB", [Span(0, 17, "repr.ipv6")]),  # 6x2 colon
