@@ -13,7 +13,21 @@ def test_wrong_type():
 
 
 highlight_tests = [
-    ("( ) { } [ ]", [Span(0, 1, "repr.brace")]),
+    (
+        "<foo>",
+        [
+            Span(0, 1, "repr.tag_start"),
+            Span(1, 4, "repr.tag_name"),
+            Span(4, 5, "repr.tag_end"),
+        ],
+    ),
+    ("( )", [Span(0, 1, "repr.brace"), Span(2, 3, "repr.brace")]),
+    ("[ ]", [Span(0, 1, "repr.brace"), Span(2, 3, "repr.brace")]),
+    ("{ }", [Span(0, 1, "repr.brace"), Span(2, 3, "repr.brace")]),
+    (" 1 ", [Span(1, 2, "repr.number")]),
+    (" 1.2 ", [Span(1, 4, "repr.number")]),
+    (" 0xff ", [Span(1, 5, "repr.number")]),
+    (" /foo ", [Span(1, 2, "repr.path"), Span(2, 5, "repr.filename")]),
     ("01-23-45-67-89-AB", [Span(0, 17, "repr.eui48")]),  # 6x2 hyphen
     ("01-23-45-FF-FE-67-89-AB", [Span(0, 23, "repr.eui64")]),  # 8x2 hyphen
     ("01:23:45:67:89:AB", [Span(0, 17, "repr.ipv6")]),  # 6x2 colon
