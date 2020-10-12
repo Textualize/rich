@@ -53,7 +53,7 @@ else:
         vt = bool(result and console_mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING)
         truecolor = False
         if vt:
-            win_version = sys.getwindowsversion()
+            win_version = sys.getwindowsversion()  # type: ignore
             truecolor = win_version.major > 10 or (
                 win_version.major == 10 and win_version.build >= 15063
             )
