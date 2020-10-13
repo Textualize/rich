@@ -294,7 +294,7 @@ class DownloadColumn(ProgressColumn):
     """Renders file size downloaded and total, e.g. '0.5/2.3 GB'.
 
     Args:
-        decimal_suffix (bool, optional): Flag to renser filesize in desired format, disable to render in binary. Defaults to True.
+        decimal_suffix (bool, optional): Flag to render filesize in decimal format, disable to render in binary. Defaults to True.
     """
 
     def __init__(self, decimal_suffix: bool = True) -> None:
