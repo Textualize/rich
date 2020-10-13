@@ -48,7 +48,6 @@ TaskID = NewType("TaskID", int)
 
 ProgressType = TypeVar("ProgressType")
 
-
 GetTimeCallable = Callable[[], float]
 
 
@@ -292,15 +291,30 @@ class TotalFileSizeColumn(ProgressColumn):
 
 
 class DownloadColumn(ProgressColumn):
-    """Renders file size downloaded and total, e.g. '0.5/2.3 GB'."""
+    """Renders file size downloaded and total, e.g. '0.5/2.3 GB'.
+
+    Args:
+        decimal_suffix (bool, optional): Flag to renser filesize in desired format, disable to render in binary. Defaults to True.
+    """
+
+    def __init__(self, decimal_suffix: bool = True) -> None:
+        self.decimal_ssuffix = decimal_suffix
+        super().__init__()
 
     def render(self, task: "Task") -> Text:
         """Calculate common unit for completed and total."""
         completed = int(task.completed)
         total = int(task.total)
-        unit, suffix = filesize.pick_unit_and_suffix(
-            total, ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], 1000
-        )
+        if self.decimal_ssuffix:
+            unit, suffix = filesize.pick_unit_and_suffix(
+                total, ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], 1000
+            )
+        else:
+            unit, suffix = filesize.pick_unit_and_suffix(
+                total,
+                ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"],
+                1024,
+            )
         completed_ratio = completed / unit
         total_ratio = total / unit
         precision = 0 if unit == 1 else 1

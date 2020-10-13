@@ -88,6 +88,15 @@ def test_download_progress_uses_decimal_units() -> None:
     assert rendered_progress == expected
 
 
+def test_download_progress_uses_binary_units() -> None:
+
+    column = DownloadColumn(decimal_suffix=False)
+    test_task = Task(1, "test", 1024, 512, _get_time=lambda: 1.0)
+    rendered_progress = str(column.render(test_task))
+    expected = "0.5/1.0 KiB"
+    assert rendered_progress == expected
+
+
 def test_task_ids():
     progress = make_progress()
     assert progress.task_ids == [0, 1, 2, 4]
