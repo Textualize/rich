@@ -42,7 +42,15 @@ class Rule(JupyterMixin):
     ) -> RenderResult:
         width = options.max_width
 
-        characters = self.characters or "─"
+        # Python3.6 doesn't have an isascii method on str
+        isascii = getattr(str, "isascii", None) or (
+            lambda s: all(ord(c) < 128 for c in s)
+        )
+        characters = (
+            "-"
+            if (options.ascii_only and not isascii(self.characters))
+            else self.characters
+        )
 
         chars_len = cell_len(characters)
         if not self.title:

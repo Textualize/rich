@@ -171,7 +171,7 @@ class Table(JupyterMixin):
         self.footer_style = footer_style
         self.border_style = border_style
         self.title_style = title_style
-        self.caption_style = title_style
+        self.caption_style = caption_style
         self.title_justify = title_justify
         self.caption_justify = caption_justify
         self._row_count = 0
@@ -241,12 +241,6 @@ class Table(JupyterMixin):
     def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
         if self.width is not None:
             max_width = self.width
-
-        # if self.box:
-        #     max_width -= len(self.columns) - 1
-        #     if self.show_edge:
-        #         max_width -= 2
-
         if max_width < 0:
             return Measurement(0, 0)
 
@@ -489,13 +483,10 @@ class Table(JupyterMixin):
                 max_column = max(
                     width for width, allow_wrap in zip(widths, wrapable) if allow_wrap
                 )
-                try:
-                    second_max_column = max(
-                        width if allow_wrap and width != max_column else 0
-                        for width, allow_wrap in zip(widths, wrapable)
-                    )
-                except ValueError:
-                    second_max_column = 0
+                second_max_column = max(
+                    width if allow_wrap and width != max_column else 0
+                    for width, allow_wrap in zip(widths, wrapable)
+                )
                 column_difference = max_column - second_max_column
                 ratios = [
                     (1 if (width == max_column and allow_wrap) else 0)

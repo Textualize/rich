@@ -4,6 +4,15 @@ from typing import List, Union
 from .text import Text
 
 
+def _combine_regex(*regexes: str) -> str:
+    """Combine a number of regexes in to a single regex.
+
+    Returns:
+        str: New regex with all regexes ORed together.
+    """
+    return "|".join(regexes)
+
+
 class Highlighter(ABC):
     """Abstract base class for highlighters."""
 
@@ -61,6 +70,7 @@ class RegexHighlighter(Highlighter):
             text (~Text): Text to highlighted.
 
         """
+
         highlight_regex = text.highlight_regex
         for re_highlight in self.highlights:
             highlight_regex(re_highlight, style_prefix=self.base_style)
@@ -71,24 +81,21 @@ class ReprHighlighter(RegexHighlighter):
 
     base_style = "repr."
     highlights = [
-        r"(?P<brace>[\{\[\(\)\]\}])",
         r"(?P<tag_start>\<)(?P<tag_name>[\w\-\.\:]*)(?P<tag_contents>.*?)(?P<tag_end>\>)",
-        r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?[\w_]+\"?)?",
-        r"(?P<bool_true>True)|(?P<bool_false>False)|(?P<none>None)",
-        r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[\-\+]?\d+?)?\b)",
-        r"(?P<number>0x[0-9a-f]*)",
-        r"(?P<path>\B(\/[\w\.\-\_\+]+)*\/)(?P<filename>[\w\.\-\_\+]*)?",
-        r"(?P<ipv4>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})",
-        r"(?P<ipv6>([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})",
-        r"(?P<eui48>([0-9A-Fa-f]{1,2}-){5}[0-9A-Fa-f]{1,2})",  # EUI-48 6x2 hyphen
-        r"(?P<eui64>([0-9A-Fa-f]{1,2}-){7}[0-9A-Fa-f]{1,2})",  # EUI-64 8x2 hyphen
-        r"(?P<eui48>([0-9A-Fa-f]{1,2}:){5}[0-9A-Fa-f]{1,2})",  # EUI-48 6x2 colon
-        r"(?P<eui64>([0-9A-Fa-f]{1,2}:){7}[0-9A-Fa-f]{1,2})",  # EUI-64 8x2 colon
-        r"(?P<eui48>([0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})",  # EUI-48 3x4 dot
-        r"(?P<eui64>([0-9A-Fa-f]{4}\.){3}[0-9A-Fa-f]{4})",  # EUI-64 4x4 dot
-        r"(?<!\\)(?P<str>b?\'\'\'.*?(?<!\\)\'\'\'|b?\'.*?(?<!\\)\'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
-        r"(?P<url>https?:\/\/[0-9a-zA-Z\$\-\_\+\!`\(\)\,\.\?\/\;\:\&\=\%\#]*)",
-        r"(?P<uuid>[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12})",
+        _combine_regex(
+            r"(?P<ipv4>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})",
+            r"(?P<ipv6>([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})",
+            r"(?P<eui64>(?:[0-9A-Fa-f]{1,2}-){7}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{1,2}:){7}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{4}\.){3}[0-9A-Fa-f]{4})",
+            r"(?P<eui48>(?:[0-9A-Fa-f]{1,2}-){5}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{1,2}:){5}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})",
+            r"(?P<brace>[\{\[\(\)\]\}])",
+            r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?[\w_]+\"?)?",
+            r"(?P<bool_true>True)|(?P<bool_false>False)|(?P<none>None)",
+            r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[\-\+]?\d+?)?\b|0x[0-9a-f]*)",
+            r"(?P<path>\B(\/[\w\.\-\_\+]+)*\/)(?P<filename>[\w\.\-\_\+]*)?",
+            r"(?<!\\)(?P<str>b?\'\'\'.*?(?<!\\)\'\'\'|b?\'.*?(?<!\\)\'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
+            r"(?P<uuid>[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12})",
+            r"(?P<url>https?:\/\/[0-9a-zA-Z\$\-\_\+\!`\(\)\,\.\?\/\;\:\&\=\%\#]*)",
+        ),
     ]
 
 

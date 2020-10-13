@@ -148,18 +148,13 @@ class Lines:
                         num_spaces += 1
                         index = (index + 1) % len(spaces)
                 tokens: List[Text] = []
-                index = 0
                 for index, (word, next_word) in enumerate(
                     zip_longest(words, words[1:])
                 ):
                     tokens.append(word)
                     if index < len(spaces):
-                        if next_word is None:
-                            space_style = Style.null()
-                        else:
-                            style = word.get_style_at_offset(console, -1)
-                            next_style = next_word.get_style_at_offset(console, 0)
-                            space_style = style if style == next_style else line.style
+                        style = word.get_style_at_offset(console, -1)
+                        next_style = next_word.get_style_at_offset(console, 0)
+                        space_style = style if style == next_style else line.style
                         tokens.append(Text(" " * spaces[index], style=space_style))
-                    index += 1
                 self[line_index] = Text("").join(tokens)

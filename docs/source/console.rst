@@ -69,6 +69,15 @@ The :meth:`~rich.console.Console.log` methods offers the same capabilities as pr
 
 To help with debugging, the log() method has a ``log_locals`` parameter. If you set this to ``True``, Rich will display a table of local variables where the method was called.
 
+Low level output
+----------------
+
+In additional to :meth:`~rich.console.Console.print` and :meth:`~rich.console.Console.log`, Rich has a :meth:`~rich.console.Console.out` method which provides a lower-level way of writing to the terminal. The out() method converts all the positional arguments to strings and won't pretty print, word wrap, or apply markup to the output, but can apply a basic style and will optionally do highlighting.
+
+Here's an example::
+
+    >>> console.out("Locals", locals())
+
 
 Justify / Alignment
 -------------------
@@ -209,6 +218,25 @@ An alternative way of capturing output is to set the Console file to a :py:class
     console = Console(file=StringIO())
     console.print("[bold red]Hello[/] World")
     str_output = console.file.getvalue()
+
+Paging
+------
+
+If you have some long output to present to the user you can use a *pager* to display it. A pager is typically an application on by your operating system which will at least support pressing a key to scroll, but will often support scrolling up and down through the text and other features.
+
+You can page output from a Console by calling :meth:`~rich.console.Console.pager` which returns a context manger. When the pager exits, anything that was printed will be sent to the pager. Here's an example::
+
+    from rich.__main__ import make_test_card
+    from rich.console import Console
+
+    console = Console()
+    with console.pager():
+        console.print(make_test_card())
+
+Since the default pager on most platforms don't support color, Rich will strip color from the output. If you know that your pager supports color, you can set ``style=True`` when calling the :meth:`~rich.console.Console.pager` method.
+
+.. note::
+    Rich will use the ``PAGER`` environment variable to get the pager command. On Linux and macOS you can set this to ``less -r`` to enable paging with ANSI styles.
 
 
 Terminal detection

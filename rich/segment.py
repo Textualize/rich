@@ -300,6 +300,30 @@ class Segment(NamedTuple):
                 last_segment = segment
         yield last_segment
 
+    @classmethod
+    def strip_links(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
+        """Remove all links from an iterable of styles.
+
+        Yields:
+            Segment: Segments with link removed.
+        """
+        for segment in segments:
+            if segment.is_control or segment.style is None:
+                yield segment
+            else:
+                text, style, _is_control = segment
+                yield cls(text, style.update_link(None) if style else None)
+
+    @classmethod
+    def strip_styles(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
+        """Remove all styles from an iterable of segments.
+
+        Yields:
+            Segment: Segments with styles replace with None
+        """
+        for text, _style, is_control in segments:
+            yield cls(text, None, is_control)
+
 
 if __name__ == "__main__":  # pragma: no cover
     lines = [[Segment("Hello")]]
