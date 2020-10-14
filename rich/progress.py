@@ -297,7 +297,7 @@ class DownloadColumn(ProgressColumn):
         binary_units (bool, optional): Flag to render filesize in decimal format, disable to render in binary. Defaults to True.
     """
 
-    def __init__(self, binary_units: bool = True) -> None:
+    def __init__(self, binary_units: bool = False) -> None:
         self.binary_units = binary_units
         super().__init__()
 
