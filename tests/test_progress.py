@@ -90,7 +90,7 @@ def test_download_progress_uses_decimal_units() -> None:
 
 def test_download_progress_uses_binary_units() -> None:
 
-    column = DownloadColumn(decimal_suffix=False)
+    column = DownloadColumn(binary_units=True)
     test_task = Task(1, "test", 1024, 512, _get_time=lambda: 1.0)
     rendered_progress = str(column.render(test_task))
     expected = "0.5/1.0 KiB"
