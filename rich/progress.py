@@ -294,26 +294,26 @@ class DownloadColumn(ProgressColumn):
     """Renders file size downloaded and total, e.g. '0.5/2.3 GB'.
 
     Args:
-        decimal_suffix (bool, optional): Flag to render filesize in decimal format, disable to render in binary. Defaults to True.
+        binary_units (bool, optional): Flag to render filesize in decimal format, disable to render in binary. Defaults to True.
     """
 
-    def __init__(self, decimal_suffix: bool = True) -> None:
-        self.decimal_ssuffix = decimal_suffix
+    def __init__(self, binary_units: bool = True) -> None:
+        self.binary_units = binary_units
         super().__init__()
 
     def render(self, task: "Task") -> Text:
         """Calculate common unit for completed and total."""
         completed = int(task.completed)
         total = int(task.total)
-        if self.decimal_ssuffix:
-            unit, suffix = filesize.pick_unit_and_suffix(
-                total, ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], 1000
-            )
-        else:
+        if self.binary_units:
             unit, suffix = filesize.pick_unit_and_suffix(
                 total,
                 ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"],
                 1024,
+            )
+        else:
+            unit, suffix = filesize.pick_unit_and_suffix(
+                total, ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], 1000
             )
         completed_ratio = completed / unit
         total_ratio = total / unit
