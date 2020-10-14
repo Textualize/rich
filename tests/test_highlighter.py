@@ -32,7 +32,14 @@ highlight_tests = [
         ],
     ),
     ("foo=bar", [Span(0, 3, "repr.attrib_name"), Span(4, 7, "repr.attrib_value")]),
-    ('foo="bar"', [Span(0, 3, "repr.attrib_name"), Span(4, 9, "repr.attrib_value")]),
+    (
+        'foo="bar"',
+        [
+            Span(0, 3, "repr.attrib_name"),
+            Span(4, 9, "repr.attrib_value"),
+            Span(4, 9, "repr.str"),
+        ],
+    ),
     ("( )", [Span(0, 1, "repr.brace"), Span(2, 3, "repr.brace")]),
     ("[ ]", [Span(0, 1, "repr.brace"), Span(2, 3, "repr.brace")]),
     ("{ }", [Span(0, 1, "repr.brace"), Span(2, 3, "repr.brace")]),
