@@ -271,7 +271,7 @@ class RenderGroup:
         yield from self.renderables
 
 
-def render_group(fit: bool = False) -> Callable:
+def render_group(fit: bool = True) -> Callable:
     """A decorator that turns an iterable of renderables in to a group."""
 
     def decorator(method):
