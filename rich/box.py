@@ -79,7 +79,7 @@ class Box:
         box = self
         if options.legacy_windows and safe:
             box = LEGACY_WINDOWS_SUBSTITUTIONS.get(box, box)
-        if options.ascii_only:
+        if options.ascii_only and not box.ascii:
             box = ASCII
         return box
 

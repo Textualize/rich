@@ -300,7 +300,7 @@ class Table(JupyterMixin):
             footer_style (Union[str, Style], optional): Style for the header. Defaults to "none".
             style (Union[str, Style], optional): Style for the column cells. Defaults to "none".
             justify (JustifyMethod, optional): Alignment for cells. Defaults to "left".
-            width (int, optional): A minimum width in characters. Defaults to None.
+            width (int, optional): Desired width of column in characters, or None to fit to contents. Defaults to None.
             ratio (int, optional): Flexible ratio for the column (requires ``Table.expand`` or ``Table.width``). Defaults to None.
             no_wrap (bool, optional): Set to ``True`` to disable wrapping of this column.
         """
@@ -376,12 +376,10 @@ class Table(JupyterMixin):
         max_width = options.max_width
         if self.width is not None:
             max_width = self.width
-        if self.box:
-            max_width -= len(self.columns) - 1
-            if self.show_edge:
-                max_width -= 2
-        widths = self._calculate_column_widths(console, max_width)
-        table_width = sum(widths) + self._extra_width
+
+        extra_width = self._extra_width
+        widths = self._calculate_column_widths(console, max_width - extra_width)
+        table_width = sum(widths) + extra_width
 
         render_options = options.update(width=table_width)
 
@@ -437,10 +435,11 @@ class Table(JupyterMixin):
                     if column.flexible:
                         widths[index] = fixed_widths[index] + next(iter_flex_widths)
         table_width = sum(widths)
-
         if table_width > max_width:
             widths = self._collapse_widths(
-                widths, [not column.no_wrap for column in columns], max_width
+                widths,
+                [(column.width is None and not column.no_wrap) for column in columns],
+                max_width,
             )
             table_width = sum(widths)
 
@@ -570,7 +569,7 @@ class Table(JupyterMixin):
             # Fixed width column
             return Measurement(
                 column.width + padding_width, column.width + padding_width
-            )
+            ).with_maximum(max_width)
         # Flexible column, we need to measure contents
         min_widths: List[int] = []
         max_widths: List[int] = []
@@ -582,10 +581,11 @@ class Table(JupyterMixin):
             append_min(_min)
             append_max(_max)
 
-        return Measurement(
+        measurement = Measurement(
             max(min_widths) if min_widths else 1,
             max(max_widths) if max_widths else max_width,
-        )
+        ).with_maximum(max_width)
+        return measurement
 
     def _render(
         self, console: "Console", options: "ConsoleOptions", widths: List[int]
@@ -683,13 +683,16 @@ class Table(JupyterMixin):
                         _box.get_row(widths, "foot", edge=show_edge), border_style
                     )
                     yield new_line
-                if first:
-                    left, right, divider = box_segments[0]
-                elif last:
-                    left, right, divider = box_segments[2]
-                else:
-                    left, right, divider = box_segments[1]
+                left, right, _divider = box_segments[0 if first else (2 if last else 1)]
 
+                # If the column divider is whitespace also style it with the row background
+                divider = (
+                    _divider
+                    if _divider.text.strip()
+                    else _Segment(
+                        _divider.text, row_style.background_style + _divider.style
+                    )
+                )
                 for line_no in range(max_height):
                     if show_edge:
                         yield left
@@ -706,7 +709,7 @@ class Table(JupyterMixin):
                         yield from rendered_cell[line_no]
                     yield new_line
             if _box and first and show_header:
-                yield Segment(
+                yield _Segment(
                     _box.get_row(widths, "head", edge=show_edge), border_style
                 )
                 yield new_line
@@ -735,24 +738,24 @@ class Table(JupyterMixin):
 
 if __name__ == "__main__":  # pragma: no cover
     from .console import Console
+    from . import box
 
     c = Console()
     table = Table(
         show_lines=False,
-        row_styles=["red", "green"],
+        row_styles=["on blue", "on red"],
         expand=False,
         show_header=True,
         show_footer=False,
         show_edge=True,
+        box=box.SIMPLE,
     )
     table.add_column("foo", no_wrap=True, footer="BAR")
     table.add_column("bar")
     table.add_column("baz")
     table.add_row("Magnet", "foo" * 20, "bar" * 10, "egg" * 15)
+    table.add_row("Magnet", "foo" * 20, "bar" * 10, "egg" * 15)
+    table.add_row("Magnet", "foo" * 20, "bar" * 10, "egg" * 15)
+    table.add_row("Magnet", "foo" * 20, "bar" * 10, "egg" * 15)
 
-    for width in range(170, 1, -1):
-        print(" " * width + "<|")
-        c = Console(width=width)
-        c.print(table)
-
-    c.print("Some more words", width=4, overflow="ellipsis")
+    c.print(table)

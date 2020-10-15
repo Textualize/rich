@@ -20,5 +20,5 @@ def test_rich_cast():
 def test_rich_cast_container():
     foo = Foo()
     console = Console(file=io.StringIO(), legacy_windows=False)
-    console.print(Panel.fit(foo))
+    console.print(Panel.fit(foo, padding=0))
     assert console.file.getvalue() == "╭───╮\n│Foo│\n╰───╯\n"

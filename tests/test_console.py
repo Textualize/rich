@@ -232,7 +232,7 @@ def test_justify_renderable_none():
     console = Console(
         file=io.StringIO(), force_terminal=True, width=20, legacy_windows=False
     )
-    console.print(Panel("FOO", expand=False), justify=None)
+    console.print(Panel("FOO", expand=False, padding=0), justify=None)
     assert console.file.getvalue() == "╭───╮\n│FOO│\n╰───╯\n"
 
 
@@ -240,7 +240,7 @@ def test_justify_renderable_left():
     console = Console(
         file=io.StringIO(), force_terminal=True, width=10, legacy_windows=False
     )
-    console.print(Panel("FOO", expand=False), justify="left")
+    console.print(Panel("FOO", expand=False, padding=0), justify="left")
     assert console.file.getvalue() == "╭───╮     \n│FOO│     \n╰───╯     \n"
 
 
@@ -248,7 +248,7 @@ def test_justify_renderable_center():
     console = Console(
         file=io.StringIO(), force_terminal=True, width=10, legacy_windows=False
     )
-    console.print(Panel("FOO", expand=False), justify="center")
+    console.print(Panel("FOO", expand=False, padding=0), justify="center")
     assert console.file.getvalue() == "  ╭───╮   \n  │FOO│   \n  ╰───╯   \n"
 
 
@@ -256,7 +256,7 @@ def test_justify_renderable_right():
     console = Console(
         file=io.StringIO(), force_terminal=True, width=20, legacy_windows=False
     )
-    console.print(Panel("FOO", expand=False), justify="right")
+    console.print(Panel("FOO", expand=False, padding=0), justify="right")
     assert (
         console.file.getvalue()
         == "               ╭───╮\n               │FOO│\n               ╰───╯\n"

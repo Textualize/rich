@@ -45,7 +45,8 @@ def test_python_render():
             theme="foo",
             code_width=60,
             word_wrap=True,
-        )
+        ),
+        padding=0,
     )
     rendered_syntax = render(syntax)
     print(repr(rendered_syntax))
@@ -192,7 +193,8 @@ if __name__ == "__main__":
             theme="foo",
             code_width=60,
             word_wrap=True,
-        )
+        ),
+        padding=0,
     )
     rendered = render(markdown)
     print(rendered)
