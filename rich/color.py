@@ -351,8 +351,7 @@ class Color(NamedTuple):
         Returns:
             Color: A new color object.
         """
-        triplet = ColorTriplet(int(red), int(green), int(blue))
-        return cls.from_triplet(triplet)
+        return cls.from_triplet(ColorTriplet(int(red), int(green), int(blue)))
 
     @classmethod
     def default(cls) -> "Color":
