@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Progress.reset
 - Added Style.background_style property
 
+### Added
+
+- Added solid block bar class
+
 ### Changed
 
 - Dropped box.get_safe_box function in favor of Box.substitute
