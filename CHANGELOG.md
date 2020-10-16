@@ -22,16 +22,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Console.out
 - Added Progress.reset
 - Added Style.background_style property
-
-### Added
-
-- Added solid block bar class
+- Added Bar renderable https://github.com/willmcgugan/rich/pull/361
 
 ### Changed
 
 - Dropped box.get_safe_box function in favor of Box.substitute
 - Changed default padding in Panel from 0 to (0, 1) https://github.com/willmcgugan/rich/issues/385
 - Table with row_styles will extend background color between cells if the box has no vertical dividerhttps://github.com/willmcgugan/rich/issues/383
+- Renamed rich.bar to rich.progress_bar, and Bar class to ProgressBar, rich.bar is now the new solid bar class
 
 ### Fixed
 
