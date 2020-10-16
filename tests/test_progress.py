@@ -5,7 +5,7 @@ from time import time
 
 import pytest
 
-from rich.bar import Bar
+from rich.progress_bar import ProgressBar
 from rich.console import Console
 from rich.highlighter import NullHighlighter
 from rich.progress import (
@@ -49,7 +49,7 @@ def test_bar_columns():
     assert bar_column.bar_width == 100
     task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
     bar = bar_column(task)
-    assert isinstance(bar, Bar)
+    assert isinstance(bar, ProgressBar)
     assert bar.completed == 20
     assert bar.total == 100
 

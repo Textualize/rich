@@ -27,7 +27,7 @@ from typing import (
 )
 
 from . import filesize, get_console
-from .bar import Bar
+from .progress_bar import ProgressBar
 from .console import (
     Console,
     ConsoleRenderable,
@@ -244,9 +244,9 @@ class BarColumn(ProgressColumn):
         self.pulse_style = pulse_style
         super().__init__()
 
-    def render(self, task: "Task") -> Bar:
+    def render(self, task: "Task") -> ProgressBar:
         """Gets a progress bar widget for a task."""
-        return Bar(
+        return ProgressBar(
             total=max(0, task.total),
             completed=max(0, task.completed),
             width=None if self.bar_width is None else max(1, self.bar_width),
