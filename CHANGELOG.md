@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dropped box.get_safe_box function in favor of Box.substitute
 - Changed default padding in Panel from 0 to (0, 1) https://github.com/willmcgugan/rich/issues/385
 - Table with row_styles will extend background color between cells if the box has no vertical dividerhttps://github.com/willmcgugan/rich/issues/383
+- Changed default of fit kwarg in render_group() from False to True
 - Renamed rich.bar to rich.progress_bar, and Bar class to ProgressBar, rich.bar is now the new solid bar class
 
 ### Fixed
