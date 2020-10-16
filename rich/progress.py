@@ -27,7 +27,7 @@ from typing import (
 )
 
 from . import filesize, get_console
-from .bar import Bar
+from .progress_bar import ProgressBar
 from .console import (
     Console,
     ConsoleRenderable,
@@ -47,7 +47,6 @@ from .text import Text
 TaskID = NewType("TaskID", int)
 
 ProgressType = TypeVar("ProgressType")
-
 
 GetTimeCallable = Callable[[], float]
 
@@ -244,9 +243,9 @@ class BarColumn(ProgressColumn):
         self.pulse_style = pulse_style
         super().__init__()
 
-    def render(self, task: "Task") -> Bar:
+    def render(self, task: "Task") -> ProgressBar:
         """Gets a progress bar widget for a task."""
-        return Bar(
+        return ProgressBar(
             total=max(0, task.total),
             completed=max(0, task.completed),
             width=None if self.bar_width is None else max(1, self.bar_width),
@@ -293,15 +292,30 @@ class TotalFileSizeColumn(ProgressColumn):
 
 
 class DownloadColumn(ProgressColumn):
-    """Renders file size downloaded and total, e.g. '0.5/2.3 GB'."""
+    """Renders file size downloaded and total, e.g. '0.5/2.3 GB'.
+
+    Args:
+        binary_units (bool, optional): Use binary units, KiB, MiB etc. Defaults to False.
+    """
+
+    def __init__(self, binary_units: bool = False) -> None:
+        self.binary_units = binary_units
+        super().__init__()
 
     def render(self, task: "Task") -> Text:
         """Calculate common unit for completed and total."""
         completed = int(task.completed)
         total = int(task.total)
-        unit, suffix = filesize.pick_unit_and_suffix(
-            total, ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], 1000
-        )
+        if self.binary_units:
+            unit, suffix = filesize.pick_unit_and_suffix(
+                total,
+                ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"],
+                1024,
+            )
+        else:
+            unit, suffix = filesize.pick_unit_and_suffix(
+                total, ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], 1000
+            )
         completed_ratio = completed / unit
         total_ratio = total / unit
         precision = 0 if unit == 1 else 1

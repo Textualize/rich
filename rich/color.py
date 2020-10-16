@@ -340,6 +340,20 @@ class Color(NamedTuple):
         return cls(name=triplet.hex, type=ColorType.TRUECOLOR, triplet=triplet)
 
     @classmethod
+    def from_rgb(cls, red: float, green: float, blue: float) -> "Color":
+        """Create a truecolor from three color components in the range(0->255).
+
+        Args:
+            red (float): Red component.
+            green (float): Green component.
+            blue (float): Blue component.
+
+        Returns:
+            Color: A new color object.
+        """
+        return cls.from_triplet(ColorTriplet(int(red), int(green), int(blue)))
+
+    @classmethod
     def default(cls) -> "Color":
         """Get a Color instance representing the default color.
 
