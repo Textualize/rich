@@ -295,7 +295,7 @@ class DownloadColumn(ProgressColumn):
     """Renders file size downloaded and total, e.g. '0.5/2.3 GB'.
 
     Args:
-        binary_units (bool, optional): Flag to render filesize in binary format, enable to render in binary. Defaults to False.
+        binary_units (bool, optional): Use binary units, KiB, MiB etc. Defaults to False.
     """
 
     def __init__(self, binary_units: bool = False) -> None:
