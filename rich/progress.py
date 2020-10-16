@@ -27,7 +27,7 @@ from typing import (
 )
 
 from . import filesize, get_console
-from .bar import Bar
+from .progress_bar import ProgressBar
 from .console import (
     Console,
     ConsoleRenderable,
@@ -145,9 +145,10 @@ def track(
         refresh_per_second=refresh_per_second,
     )
 
-    yield from progress.track(
-        sequence, total=total, description=description, update_period=update_period
-    )
+    with progress:
+        yield from progress.track(
+            sequence, total=total, description=description, update_period=update_period
+        )
 
 
 class ProgressColumn(ABC):
@@ -242,9 +243,9 @@ class BarColumn(ProgressColumn):
         self.pulse_style = pulse_style
         super().__init__()
 
-    def render(self, task: "Task") -> Bar:
+    def render(self, task: "Task") -> ProgressBar:
         """Gets a progress bar widget for a task."""
-        return Bar(
+        return ProgressBar(
             total=max(0, task.total),
             completed=max(0, task.completed),
             width=None if self.bar_width is None else max(1, self.bar_width),
@@ -449,6 +450,10 @@ class Task:
             return None
         estimate = ceil(self.remaining / speed)
         return estimate
+
+    def _reset(self) -> None:
+        """Reset progress."""
+        self._progress.clear()
 
 
 class _RefreshThread(Thread):
@@ -678,19 +683,19 @@ class Progress(JupyterMixin, RenderHook):
             task_id = self.add_task(description, total=task_total)
         else:
             self.update(task_id, total=task_total)
-        with self:
-            if self.auto_refresh:
-                with _TrackThread(self, task_id, update_period) as track_thread:
-                    for value in sequence:
-                        yield value
-                        track_thread.completed += 1
-            else:
-                advance = self.advance
-                refresh = self.refresh
+
+        if self.auto_refresh:
+            with _TrackThread(self, task_id, update_period) as track_thread:
                 for value in sequence:
                     yield value
-                    advance(task_id, 1)
-                    refresh()
+                    track_thread.completed += 1
+        else:
+            advance = self.advance
+            refresh = self.refresh
+            for value in sequence:
+                yield value
+                advance(task_id, 1)
+                refresh()
 
     def start_task(self, task_id: TaskID) -> None:
         """Start a task.
@@ -751,6 +756,7 @@ class Progress(JupyterMixin, RenderHook):
 
             if total is not None:
                 task.total = total
+                task._reset()
             if advance is not None:
                 task.completed += advance
             if completed is not None:
@@ -775,6 +781,42 @@ class Progress(JupyterMixin, RenderHook):
             while len(_progress) > 1000:
                 popleft()
             _progress.append(ProgressSample(current_time, update_completed))
+
+    def reset(
+        self,
+        task_id: TaskID,
+        *,
+        start: bool = True,
+        total: Optional[int] = None,
+        completed: int = 0,
+        visible: Optional[bool] = None,
+        description: Optional[str] = None,
+        **fields: Any,
+    ) -> None:
+        """Reset a task so completed is 0 and the clock is reset.
+
+        Args:
+            task_id (TaskID): ID of task.
+            start (bool, optional): Start the task after reset. Defaults to True.
+            total (int, optional): New total steps in task, or None to use current total. Defaults to None.
+            completed (int, optional): Number of steps completed. Defaults to 0.
+            **fields (str): Additional data fields required for rendering.
+        """
+        current_time = self.get_time()
+        with self._lock:
+            task = self._tasks[task_id]
+            task._reset()
+            task.start_time = current_time if start else None
+            if total is not None:
+                task.total = total
+            task.completed = completed
+            if visible is not None:
+                task.visible = visible
+            if fields:
+                task.fields = fields
+            if description is not None:
+                task.description = description
+            self.refresh()
 
     def advance(self, task_id: TaskID, advance: float = 1) -> None:
         """Advance task by a number of steps.

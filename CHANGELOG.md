@@ -16,15 +16,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for Python 3.9
 - Added legacy_windows to ConsoleOptions
 - Added ascii_only to ConsoleOptions
-- Addded box.SQUARE_DOUBLE_HEAD
+- Added box.SQUARE_DOUBLE_HEAD
 - Added highlighting of EUI-48 and EUI-64 (MAC addresses)
 - Added Console.pager
 - Added Console.out
 - Added binary_units in progress download column
+- Added Progress.reset
+- Added Style.background_style property
+- Added Bar renderable https://github.com/willmcgugan/rich/pull/361
 
 ### Changed
 
 - Dropped box.get_safe_box function in favor of Box.substitute
+- Changed default padding in Panel from 0 to (0, 1) https://github.com/willmcgugan/rich/issues/385
+- Table with row_styles will extend background color between cells if the box has no vertical dividerhttps://github.com/willmcgugan/rich/issues/383
+- Renamed rich.bar to rich.progress_bar, and Bar class to ProgressBar, rich.bar is now the new solid bar class
 
 ### Fixed
 

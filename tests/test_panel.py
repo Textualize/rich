@@ -5,12 +5,12 @@ from rich.panel import Panel
 import pytest
 
 tests = [
-    Panel("Hello, World"),
-    Panel("Hello, World", expand=False),
-    Panel.fit("Hello, World"),
-    Panel("Hello, World", width=8),
-    Panel(Panel("Hello, World")),
-    Panel("Hello, World", title="FOO"),
+    Panel("Hello, World", padding=0),
+    Panel("Hello, World", expand=False, padding=0),
+    Panel.fit("Hello, World", padding=0),
+    Panel("Hello, World", width=8, padding=0),
+    Panel(Panel("Hello, World", padding=0), padding=0),
+    Panel("Hello, World", title="FOO", padding=0),
 ]
 
 expected = [
@@ -38,8 +38,8 @@ def test_console_width():
     console = Console(file=io.StringIO(), width=50, legacy_windows=False)
     panel = Panel("Hello, World", expand=False)
     min_width, max_width = panel.__rich_measure__(console, 50)
-    assert min_width == 14
-    assert max_width == 14
+    assert min_width == 16
+    assert max_width == 16
 
 
 if __name__ == "__main__":

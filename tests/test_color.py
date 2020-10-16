@@ -67,6 +67,12 @@ def test_from_triplet() -> None:
     )
 
 
+def test_from_rgb() -> None:
+    assert Color.from_rgb(0x10, 0x20, 0x30) == Color(
+        "#102030", ColorType.TRUECOLOR, None, ColorTriplet(0x10, 0x20, 0x30)
+    )
+
+
 def test_default() -> None:
     assert Color.default() == Color("default", ColorType.DEFAULT, None, None)
 

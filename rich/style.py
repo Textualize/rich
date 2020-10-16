@@ -349,6 +349,11 @@ class Style:
         """Check if the style specified a transparent background."""
         return self.bgcolor is None or self.bgcolor.is_default
 
+    @property
+    def background_style(self) -> "Style":
+        """A Style with background only."""
+        return Style(bgcolor=self.bgcolor)
+
     @classmethod
     @lru_cache(maxsize=1024)
     def parse(cls, style_definition: str) -> "Style":

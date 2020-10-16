@@ -67,7 +67,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.tag_name": Style(color="bright_magenta", bold=True),
     "repr.tag_contents": Style(color="default"),
     "repr.tag_end": Style(bold=True),
-    "repr.attrib_name": Style(color="yellow", italic=True),
+    "repr.attrib_name": Style(color="yellow", italic=False),
     "repr.attrib_equal": Style(bold=True),
     "repr.attrib_value": Style(color="magenta", italic=False),
     "repr.number": Style(color="blue", bold=True, italic=False),
