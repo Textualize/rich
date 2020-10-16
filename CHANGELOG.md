@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added highlighting of EUI-48 and EUI-64 (MAC addresses)
 - Added Console.pager
 - Added Console.out
+- Added binary_units in progress download column
 - Added Progress.reset
 - Added Style.background_style property
 - Added Bar renderable https://github.com/willmcgugan/rich/pull/361
