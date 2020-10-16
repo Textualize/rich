@@ -245,7 +245,7 @@ class RenderGroup:
 
     Args:
         renderables (Iterable[RenderableType]): An iterable of renderable objects.
-        fit (bool, optional): Use the longest constituent renderable as the group's minimum width if ``True``, otherwise expand the group to fit the availabe space. Defaults to True.
+        fit (bool, optional): Fit dimension of group to contents, or fill available space. Defaults to True.
     """
 
     def __init__(self, *renderables: "RenderableType", fit: bool = True) -> None:
@@ -275,7 +275,7 @@ def render_group(fit: bool = True) -> Callable:
     """A decorator that turns an iterable of renderables in to a group.
 
     Args:
-        fit (bool, optional): Use the longest constituent renderable as the group's minimum width if ``True``, otherwise expand the group to fit the availabe space. Defaults to True.
+        fit (bool, optional): Fit dimension of group to contents, or fill available space. Defaults to True.
     """
 
     def decorator(method):
