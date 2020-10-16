@@ -8,7 +8,8 @@ import pytest
 
 from rich import errors
 from rich.color import ColorSystem
-from rich.console import CaptureError, Console, ConsoleOptions
+from rich.console import CaptureError, Console, ConsoleOptions, render_group
+from rich.measure import measure_renderables
 from rich.pager import SystemPager
 from rich.panel import Panel
 from rich.style import Style
@@ -377,3 +378,19 @@ def test_out() -> None:
     console.begin_capture()
     console.out(*(["foo bar"] * 5), sep=".", end="X")
     assert console.end_capture() == "foo bar.foo bar.foo bar.foo bar.foo barX"
+
+
+def test_render_group_fit() -> None:
+    @render_group()
+    def renderable():
+        yield "one"
+        yield "two"
+        yield "three"  # <- largest width of 5
+        yield "four"
+
+    renderables = [renderable() for _ in range(4)]
+
+    console = Console(width=42)
+
+    min_width, _ = measure_renderables(console, renderables, 42)
+    assert min_width == 5
