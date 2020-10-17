@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Progress.reset
 - Added Style.background_style property
 - Added Bar renderable https://github.com/willmcgugan/rich/pull/361
+- Added Table.min_width
+- Added table.Column.min_width and table.Column.max_width, and same to Table.add_column
 
 ### Changed
 
