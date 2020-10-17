@@ -519,7 +519,7 @@ class Progress(JupyterMixin, RenderHook):
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         redirect_stout: (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
-        redirect_stout: (bool, optional): Enable redirection of stderr. Defaults to True.
+        redirect_stderr: (bool, optional): Enable redirection of stderr. Defaults to True.
         get_time: (Callable, optional): A callable that gets the current time, or None to use time.monotonic. Defaults to None.
     """
 
