@@ -255,13 +255,12 @@ class Table(JupyterMixin):
 
         extra_width = self._extra_width
 
-        max_width = sum(self._calculate_column_widths(console, max_width))
+        max_width = sum(self._calculate_column_widths(console, max_width - extra_width))
 
         _measure_column = self._measure_column
 
         measurements = [
-            _measure_column(console, column, max_width - extra_width)
-            for column in self.columns
+            _measure_column(console, column, max_width) for column in self.columns
         ]
         minimum_width = (
             sum(measurement.minimum for measurement in measurements) + extra_width
@@ -769,11 +768,16 @@ class Table(JupyterMixin):
 
 if __name__ == "__main__":  # pragma: no cover
     from rich.console import Console
+    from rich.highlighter import ReprHighlighter
     from rich.table import Table
 
-    table = Table(title="Star Wars Movies")
+    table = Table(
+        title="Star Wars Movies",
+        caption="Rich example table",
+        caption_justify="right",
+    )
 
-    table.add_column("Released", style="cyan", no_wrap=True)
+    table.add_column("Released", header_style="bright_cyan", style="cyan", no_wrap=True)
     table.add_column("Title", style="magenta")
     table.add_column("Box Office", justify="right", style="green")
 
@@ -782,5 +786,43 @@ if __name__ == "__main__":  # pragma: no cover
     table.add_row("Dec 15, 2017", "Star Wars Ep. V111: The Last Jedi", "$1,332,539,889")
     table.add_row("Dec 16, 2016", "Rogue One: A Star Wars Story", "$1,332,439,889")
 
+    def header(text) -> None:
+        console.print()
+        console.rule(highlight(text))
+        console.print()
+
     console = Console()
+    highlight = ReprHighlighter()
+    header("Example Table")
+    console.print(table, justify="center")
+
+    table.expand = True
+    header("expand=True")
+    console.print(table, justify="center")
+
+    table.width = 50
+    header("width=50")
+
+    console.print(table, justify="center")
+
+    table.width = None
+    table.expand = False
+    table.row_styles = ["dim", "none"]
+    header("row_styles=['dim', 'none']")
+
+    console.print(table, justify="center")
+
+    table.width = None
+    table.expand = False
+    table.row_styles = ["dim", "none"]
+    table.leading = 1
+    header("leading=1, row_styles=['dim', 'none']")
+    console.print(table, justify="center")
+
+    table.width = None
+    table.expand = False
+    table.row_styles = ["dim", "none"]
+    table.show_lines = True
+    table.leading = 0
+    header("show_lines=True, row_styles=['dim', 'none']")
     console.print(table, justify="center")
