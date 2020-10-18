@@ -990,7 +990,7 @@ class Console:
 
     def rule(
         self,
-        title: str = "",
+        title: TextType = "",
         *,
         characters: str = "─",
         style: Union[str, Style] = "rule.line",
