@@ -785,7 +785,7 @@ if __name__ == "__main__":  # pragma: no cover
     table.add_row("Dec 15, 2017", "Star Wars Ep. V111: The Last Jedi", "$1,332,539,889")
     table.add_row("Dec 16, 2016", "Rogue One: A Star Wars Story", "$1,332,439,889")
 
-    def header(text:str) -> None:
+    def header(text: str) -> None:
         console.print()
         console.rule(highlight(text))
         console.print()
