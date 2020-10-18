@@ -474,8 +474,7 @@ class Table(JupyterMixin):
             widths = [_range.maximum or 1 for _range in width_ranges]
 
         if (table_width < max_width and self.expand) or (
-            self.min_width is not None
-            and table_width < (self.min_width - self._extra_width)
+            self.min_width is not None and table_width < (self.min_width - extra_width)
         ):
             _max_width = (
                 max_width
