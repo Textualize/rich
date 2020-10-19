@@ -191,6 +191,18 @@ def test_input(monkeypatch, capsys):
     assert user_input == "bar"
 
 
+def test_input_legacy_windows(monkeypatch, capsys):
+    def fake_input(prompt):
+        console.file.write(prompt)
+        return "bar"
+
+    monkeypatch.setattr("builtins.input", fake_input)
+    console = Console(legacy_windows=True)
+    user_input = console.input(prompt="foo:")
+    assert capsys.readouterr().out == "foo:"
+    assert user_input == "bar"
+
+
 def test_input_password(monkeypatch, capsys):
     def fake_input(prompt, stream=None):
         console.file.write(prompt)
@@ -378,6 +390,20 @@ def test_out() -> None:
     console.begin_capture()
     console.out(*(["foo bar"] * 5), sep=".", end="X")
     assert console.end_capture() == "foo bar.foo bar.foo bar.foo bar.foo barX"
+
+
+def test_render_group() -> None:
+    @render_group(fit=False)
+    def renderable():
+        yield "one"
+        yield "two"
+        yield "three"  # <- largest width of 5
+        yield "four"
+
+    renderables = [renderable() for _ in range(4)]
+    console = Console(width=42)
+    min_width, _ = measure_renderables(console, renderables, 42)
+    assert min_width == 42
 
 
 def test_render_group_fit() -> None:
