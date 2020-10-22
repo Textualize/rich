@@ -1040,12 +1040,12 @@ class Text(JupyterMixin):
         """Adds indent guide lines to text.
 
         Args:
-            indent_size (int): Size of indentation.
+            indent_size (Optional[int]): Size of indentation, or None to auto detect. Defaults to None.
             character (str, optional): Character to use for indentation. Defaults to "│".
             style (Union[Style, str], optional): Style of indent guides.
 
         Returns:
-            [type]: [description]
+            Text: New text with indentation guides.
         """
 
         _indent_size = self.detect_indentation() if indent_size is None else indent_size

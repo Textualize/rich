@@ -303,11 +303,11 @@ class Traceback:
                     title="[traceback.title]Traceback [dim](most recent call last)",
                     style=background_style,
                     border_style="traceback.border.syntax_error",
-                    expand=False,
+                    expand=True,
                     padding=(0, 1),
+                    width=self.width,
                 )
-                # stack_renderable = Constrain(stack_renderable, self.width)
-
+                stack_renderable = Constrain(stack_renderable, self.width)
                 with console.use_theme(traceback_theme):
                     yield stack_renderable
             if stack.syntax_error is not None:
@@ -317,7 +317,7 @@ class Traceback:
                             self._render_syntax_error(stack.syntax_error),
                             style=background_style,
                             border_style="traceback.border",
-                            expand=False,
+                            expand=True,
                             padding=(0, 1),
                         ),
                         self.width,
