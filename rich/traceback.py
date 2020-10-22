@@ -3,12 +3,14 @@ from __future__ import absolute_import
 import platform
 import sys
 from dataclasses import dataclass, field
+from textwrap import indent
 from traceback import walk_tb
 from types import TracebackType
 from typing import Callable, Dict, List, Optional, Type
 
 from pygments.lexers import guess_lexer_for_filename
 from pygments.token import (
+    Comment,
     Keyword,
     Name,
     Number,
@@ -279,6 +281,7 @@ class Traceback:
                 "pygments.string": token_style(String),
                 "pygments.function": token_style(Name.Function),
                 "pygments.number": token_style(Number),
+                "repr.indent": token_style(Comment),
                 "repr.str": token_style(String),
                 "repr.brace": token_style(TextToken) + Style(bold=True),
                 "repr.number": token_style(Number),
@@ -407,6 +410,7 @@ class Traceback:
                     highlight_lines={frame.lineno},
                     word_wrap=self.word_wrap,
                     code_width=88,
+                    indent_guides=False,
                 )
                 yield ""
             except Exception:
@@ -437,6 +441,7 @@ if __name__ == "__main__":  # pragma: no cover
         print(one / a)
 
     def foo(a):
+
         zed = {
             "characters": {
                 "Paul Atriedies",

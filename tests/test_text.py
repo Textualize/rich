@@ -598,3 +598,41 @@ def test_align_center():
     test = Text("foo")
     test.align("center", 10)
     assert test.plain == "   foo    "
+
+
+def test_detect_indentation():
+    test = """\
+foo
+    bar
+    """
+    assert Text(test).detect_indentation() == 4
+    test = """\
+foo
+    bar
+      baz
+    """
+    assert Text(test).detect_indentation() == 2
+    assert Text("").detect_indentation() == 1
+    assert Text(" ").detect_indentation() == 1
+
+
+def test_indentation_guides():
+    test = Text(
+        """\
+for a in range(10):
+    print(a)
+
+foo = [
+    1,
+    {
+        2
+    }
+]
+
+"""
+    )
+    result = test.with_indent_guides()
+    print(result.plain)
+    print(repr(result.plain))
+    expected = "for a in range(10):\n│   print(a)\n\nfoo = [\n│   1,\n│   {\n│   │   2\n│   }\n]\n"
+    assert result.plain == expected

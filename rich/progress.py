@@ -780,7 +780,8 @@ class Progress(JupyterMixin, RenderHook):
                 popleft()
             while len(_progress) > 1000:
                 popleft()
-            _progress.append(ProgressSample(current_time, update_completed))
+            if update_completed > 0:
+                _progress.append(ProgressSample(current_time, update_completed))
 
     def reset(
         self,

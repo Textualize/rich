@@ -40,6 +40,7 @@ def install(
     console: "Console" = None,
     overflow: "OverflowMethod" = "ignore",
     crop: bool = False,
+    indent_guides: bool = False,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
 
@@ -47,6 +48,7 @@ def install(
         console (Console, optional): Console instance or ``None`` to use global console. Defaults to None.
         overflow (Optional[OverflowMethod], optional): Overflow method. Defaults to "ignore".
         crop (Optional[bool], optional): Enable cropping of long lines. Defaults to False.
+        indent_guides (bool, optional): Enable indentation guides. Defaults to False.
     """
     from rich import get_console
 
@@ -60,7 +62,7 @@ def install(
             console.print(
                 value
                 if hasattr(value, "__rich_console__") or hasattr(value, "__rich__")
-                else Pretty(value, overflow=overflow),
+                else Pretty(value, overflow=overflow, indent_guides=indent_guides),
                 crop=crop,
             )
             builtins._ = value  # type: ignore
@@ -78,6 +80,7 @@ class Pretty:
         justify (JustifyMethod, optional): Justify method, or None for default. Defaults to None.
         overflow (OverflowMethod, optional): Overflow method, or None for default. Defaults to None.
         no_wrap (Optional[bool], optional): Disable word wrapping. Defaults to False.
+        indent_guides (bool, optional): Enable indentation guides. Defaults to False.
     """
 
     def __init__(
@@ -89,6 +92,7 @@ class Pretty:
         justify: "JustifyMethod" = None,
         overflow: Optional["OverflowMethod"] = "crop",
         no_wrap: Optional[bool] = False,
+        indent_guides: bool = False,
     ) -> None:
         self._object = _object
         self.highlighter = highlighter or ReprHighlighter()
@@ -96,6 +100,7 @@ class Pretty:
         self.justify = justify
         self.overflow = overflow
         self.no_wrap = no_wrap
+        self.indent_guides = indent_guides
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -111,6 +116,10 @@ class Pretty:
             style="pretty",
         )
         pretty_text = self.highlighter(pretty_text)
+        if self.indent_guides and not options.ascii_only:
+            pretty_text = pretty_text.with_indent_guides(
+                self.indent_size, style="repr.indent"
+            )
         yield pretty_text
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
@@ -415,4 +424,4 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich import print
 
-    print(Pretty(data))
+    print(Pretty(data, indent_guides=True))

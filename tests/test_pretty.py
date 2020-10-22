@@ -4,7 +4,7 @@ import io
 import sys
 
 from rich.console import Console
-from rich.pretty import install, pretty_repr, Node
+from rich.pretty import install, Pretty, pretty_repr, Node
 
 
 def test_install():
@@ -77,3 +77,19 @@ def test_tuple_of_one():
 def test_node():
     node = Node("abc")
     assert pretty_repr(node) == "abc: "
+
+
+def test_indent_lines():
+    console = Console(width=100, color_system=None)
+    console.begin_capture()
+    console.print(Pretty([100, 200], indent_guides=True), width=8)
+    expected = """\
+[
+│   100,
+│   200
+]
+"""
+    result = console.end_capture()
+    print(repr(result))
+    print(result)
+    assert result == expected

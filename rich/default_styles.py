@@ -55,6 +55,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "log.time": Style(color="cyan", dim=True),
     "log.message": Style.null(),
     "log.path": Style(dim=True),
+    "repr.indent": Style(color="green", dim=True),
     "repr.error": Style(color="red", bold=True),
     "repr.str": Style(color="green", italic=False, bold=False),
     "repr.brace": Style(bold=True),
