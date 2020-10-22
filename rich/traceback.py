@@ -410,7 +410,7 @@ class Traceback:
                     highlight_lines={frame.lineno},
                     word_wrap=self.word_wrap,
                     code_width=88,
-                    indent_guides=False,
+                    indent_guides=True,
                 )
                 yield ""
             except Exception:
@@ -420,7 +420,9 @@ class Traceback:
                     Columns(
                         [
                             syntax,
-                            render_scope(frame.locals, title="locals"),
+                            render_scope(
+                                frame.locals, title="locals", indent_guides=True
+                            ),
                         ],
                         padding=1,
                     )
