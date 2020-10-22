@@ -1060,7 +1060,7 @@ class Text(JupyterMixin):
         blank_lines = 0
         for line in text.split():
             match = re_indent.match(line.plain)
-            if not match.group(2):
+            if not match or not match.group(2):
                 blank_lines += 1
                 continue
             indent = match.group(1)
