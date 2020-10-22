@@ -306,7 +306,8 @@ class Traceback:
                     expand=False,
                     padding=(0, 1),
                 )
-                stack_renderable = Constrain(stack_renderable, self.width)
+                # stack_renderable = Constrain(stack_renderable, self.width)
+
                 with console.use_theme(traceback_theme):
                     yield stack_renderable
             if stack.syntax_error is not None:
