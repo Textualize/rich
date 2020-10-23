@@ -16,4 +16,4 @@ DATA = {
 }
 console = Console()
 for w in range(130):
-    console.print(Panel(Pretty(DATA), width=w))
+    console.print(Panel(Pretty(DATA, indent_guides=True), width=w))

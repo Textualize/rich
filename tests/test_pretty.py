@@ -4,7 +4,7 @@ import io
 import sys
 
 from rich.console import Console
-from rich.pretty import install, pretty_repr, Node
+from rich.pretty import install, Pretty, pprint, pretty_repr, Node
 
 
 def test_install():
@@ -77,3 +77,40 @@ def test_tuple_of_one():
 def test_node():
     node = Node("abc")
     assert pretty_repr(node) == "abc: "
+
+
+def test_indent_lines():
+    console = Console(width=100, color_system=None)
+    console.begin_capture()
+    console.print(Pretty([100, 200], indent_guides=True), width=8)
+    expected = """\
+[
+│   100,
+│   200
+]
+"""
+    result = console.end_capture()
+    print(repr(result))
+    print(result)
+    assert result == expected
+
+
+def test_pprint():
+    console = Console(color_system=None)
+    console.begin_capture()
+    pprint(1, console=console)
+    assert console.end_capture() == "1\n"
+
+
+def test_pprint_max_values():
+    console = Console(color_system=None)
+    console.begin_capture()
+    pprint([1, 2, 3, 4, 5, 6, 7, 8, 9, 0], console=console, max_length=2)
+    assert console.end_capture() == "[1, 2, ... +8]\n"
+
+
+def test_pprint_max_items():
+    console = Console(color_system=None)
+    console.begin_capture()
+    pprint({"foo": 1, "bar": 2, "egg": 3}, console=console, max_length=2)
+    assert console.end_capture() == """{'foo': 1, 'bar': 2, ... +1}\n"""
