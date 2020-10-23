@@ -14,10 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Pretty.indent_guides
 - Added Syntax.indent_guides
 - Added indent_guides parameter on pretty.install
+- Added rich.pretty.pprint
+- Added max_length to Pretty
 
 ### Changed
 
-- Enabled indent guides on Tracebacl
+- Enabled indent guides on Tracebacks
 
 ## [9.0.1] - 2020-10-19
 

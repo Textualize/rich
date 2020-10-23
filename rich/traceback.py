@@ -50,6 +50,7 @@ def install(
     theme: Optional[str] = None,
     word_wrap: bool = False,
     show_locals: bool = False,
+    indent_guides: bool = True,
 ) -> Callable:
     """Install a rich traceback handler.
 
@@ -64,6 +65,7 @@ def install(
             a theme appropriate for the platform.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
+        indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
 
     Returns:
         Callable: The previous exception handler that was replaced.
@@ -86,6 +88,7 @@ def install(
                 theme=theme,
                 word_wrap=word_wrap,
                 show_locals=show_locals,
+                indent_guides=indent_guides,
             )
         )
 
@@ -140,6 +143,7 @@ class Traceback:
         theme (str, optional): Override pygments theme used in traceback.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
+        indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
     """
 
     def __init__(
@@ -150,6 +154,7 @@ class Traceback:
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
+        indent_guides: bool = True,
     ):
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
@@ -166,6 +171,7 @@ class Traceback:
         self.theme = Syntax.get_theme(theme or "ansi_dark")
         self.word_wrap = word_wrap
         self.show_locals = show_locals
+        self.indent_guides = indent_guides
 
     @classmethod
     def from_exception(
@@ -178,6 +184,7 @@ class Traceback:
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
+        indent_guides: bool = True,
     ) -> "Traceback":
         """Create a traceback from exception info
 
@@ -190,6 +197,7 @@ class Traceback:
             theme (str, optional): Override pygments theme used in traceback.
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
+            indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
 
         Returns:
             Traceback: A Traceback instance that may be printed.
@@ -202,6 +210,7 @@ class Traceback:
             theme=theme,
             word_wrap=word_wrap,
             show_locals=show_locals,
+            indent_guides=indent_guides,
         )
 
     @classmethod
@@ -305,7 +314,6 @@ class Traceback:
                     border_style="traceback.border.syntax_error",
                     expand=True,
                     padding=(0, 1),
-                    width=self.width,
                 )
                 stack_renderable = Constrain(stack_renderable, self.width)
                 with console.use_theme(traceback_theme):
@@ -319,6 +327,7 @@ class Traceback:
                             border_style="traceback.border",
                             expand=True,
                             padding=(0, 1),
+                            width=self.width,
                         ),
                         self.width,
                     )
@@ -411,7 +420,7 @@ class Traceback:
                     highlight_lines={frame.lineno},
                     word_wrap=self.word_wrap,
                     code_width=88,
-                    indent_guides=True,
+                    indent_guides=self.indent_guides,
                 )
                 yield ""
             except Exception:
@@ -422,7 +431,9 @@ class Traceback:
                         [
                             syntax,
                             render_scope(
-                                frame.locals, title="locals", indent_guides=True
+                                frame.locals,
+                                title="locals",
+                                indent_guides=self.indent_guides,
                             ),
                         ],
                         padding=1,
