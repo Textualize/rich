@@ -1,35 +1,36 @@
 """
 Basic example to show how to print an traceback of an exception
 """
-
+from typing import List, Tuple
 from rich.console import Console
-from rich.panel import Panel
 
 console = Console()
 
 
-def zero(number: int) -> int:
-    same_number = number
-    result = same_number / 0
+def divide_by(number: float, divisor: float) -> float:
+    """Divide any number by zero."""
+    # Will throw a ZeroDivisionError if divisor is 0
+    result = number / divisor
     return result
 
 
-if __name__ == "__main__":
-    console.print(Panel("[i] Print exception traceback[/i]"))
+def divide_all(divides: List[Tuple[float, float]]) -> None:
+    """Do something impossible every day."""
     try:
-        zero(10)
-    except:
-        console.print_exception()
-        console.print("[red]Exception catched")
-
-    console.print(
-        Panel(
-            "[i] Print exception traceback with 5 extra lines and locals[/i]",
-            style="yellow",
-        )
-    )
-    try:
-        zero(20)
-    except:
+        for number, divisor in divides:
+            result = divide_by(number, divisor)
+            console.print(f"{number} divided by {divisor} is {result}")
+    except Exception:
         console.print_exception(extra_lines=5, show_locals=True)
-        console.print("[red]Exception also catched")
+
+
+DIVIDES = [
+    (1000, 200),
+    (10000, 500),
+    (0, 1000000),
+    (3.1427, 2),
+    (2 ** 32, 2 ** 16),
+    (1, 0),
+]
+
+divide_all(DIVIDES)
