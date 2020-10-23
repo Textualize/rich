@@ -157,7 +157,7 @@ if __name__ == "__main__":  # pragma: no cover
         level="NOTSET",
         format=FORMAT,
         datefmt="[%X]",
-        handlers=[RichHandler(rich_tracebacks=True, show_level=lambda level: level[:4])],
+        handlers=[RichHandler(rich_tracebacks=True)],
     )
     log = logging.getLogger("rich")
 
