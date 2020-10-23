@@ -71,11 +71,15 @@ class RichHandler(Handler):
         self.console = console or get_console()
         self.highlighter = highlighter or self.HIGHLIGHTER_CLASS()
         self._log_render = LogRender(
-            show_time=show_time, 
-            show_level=(False if show_level is False
-                        else 8 if show_level is True
-                        else len(show_level('CRITICAL'))), 
-            show_path=show_path
+            show_time=show_time,
+            show_level=(
+                False
+                if show_level is False
+                else len(show_level("CRITICAL"))
+                if callable(show_level)
+                else 8
+            ),
+            show_path=show_path,
         )
         self.show_level = show_level
         self.enable_link_path = enable_link_path
@@ -96,10 +100,12 @@ class RichHandler(Handler):
 
         level = Text()
         if self.show_level:
-            level.append(self.show_level(record.levelname)
-                         if callable(self.show_level)
-                         else record.levelname, 
-                         log_style)
+            level.append(
+                self.show_level(record.levelname)
+                if callable(self.show_level)
+                else record.levelname,
+                log_style,
+            )
 
         traceback = None
         if (
