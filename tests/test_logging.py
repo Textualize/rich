@@ -75,24 +75,20 @@ def test_exception_with_extra_lines():
 
 
 def test_custom_levelname():
-    console = Console(
-        file=io.StringIO(), force_terminal=True, color_system="truecolor"
-    )
+    console = Console(file=io.StringIO(), force_terminal=True, color_system="truecolor")
     handler_custom_levelname = RichHandler(
-        console=console,
-        show_level=lambda level: level[0]
+        console=console, show_level=lambda level: level[0]
     )
     log.addHandler(handler_custom_levelname)
 
-    log.error('')
-    log.warning('')
+    log.error("")
+    log.warning("")
 
     render = handler_custom_levelname.console.file.getvalue()
     print(render)
 
     assert "E" in render and "ERROR" not in render
     assert "W" in render and "WARNING" not in render
-
 
 
 if __name__ == "__main__":
