@@ -13,7 +13,7 @@ class LogRender:
     def __init__(
         self,
         show_time: bool = True,
-        show_level: bool = False,
+        show_level: Union[int, bool] = False,
         show_path: bool = True,
         time_format: str = "[%x %X]",
     ) -> None:
@@ -42,7 +42,7 @@ class LogRender:
         if self.show_time:
             output.add_column(style="log.time")
         if self.show_level:
-            output.add_column(style="log.level", width=8)
+            output.add_column(style="log.level", width=self.show_level)
         output.add_column(ratio=1, style="log.message", overflow="fold")
         if self.show_path and path:
             output.add_column(style="log.path")

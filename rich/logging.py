@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from logging import Handler, LogRecord
 from pathlib import Path
-from typing import ClassVar, List, Optional, Type
+from typing import ClassVar, List, Optional, Type, Union, Callable
 
 from . import get_console
 from ._log_render import LogRender
@@ -56,7 +56,7 @@ class RichHandler(Handler):
         console: Console = None,
         *,
         show_time: bool = True,
-        show_level: bool = True,
+        show_level: Union[Callable[[str], str], bool] = True,
         show_path: bool = True,
         enable_link_path: bool = True,
         highlighter: Highlighter = None,
@@ -71,8 +71,13 @@ class RichHandler(Handler):
         self.console = console or get_console()
         self.highlighter = highlighter or self.HIGHLIGHTER_CLASS()
         self._log_render = LogRender(
-            show_time=show_time, show_level=show_level, show_path=show_path
+            show_time=show_time, 
+            show_level=(False if show_level is False
+                        else 8 if show_level is True
+                        else len(show_level('CRITICAL'))), 
+            show_path=show_path
         )
+        self.show_level = show_level
         self.enable_link_path = enable_link_path
         self.markup = markup
         self.rich_tracebacks = rich_tracebacks
@@ -90,7 +95,11 @@ class RichHandler(Handler):
         log_time = datetime.fromtimestamp(record.created)
 
         level = Text()
-        level.append(record.levelname, log_style)
+        if self.show_level:
+            level.append(self.show_level(record.levelname)
+                         if callable(self.show_level)
+                         else record.levelname, 
+                         log_style)
 
         traceback = None
         if (
@@ -148,7 +157,7 @@ if __name__ == "__main__":  # pragma: no cover
         level="NOTSET",
         format=FORMAT,
         datefmt="[%X]",
-        handlers=[RichHandler(rich_tracebacks=True)],
+        handlers=[RichHandler(rich_tracebacks=True, show_level=lambda level: level[:4])],
     )
     log = logging.getLogger("rich")
 
