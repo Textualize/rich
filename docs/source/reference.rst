@@ -19,6 +19,7 @@ Reference
    reference/padding.rst
    reference/panel.rst
    reference/progress.rst
+   reference/progress_bar.rst
    reference/prompt.rst
    reference/rule.rst
    reference/segment.rst

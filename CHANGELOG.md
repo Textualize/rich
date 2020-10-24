@@ -5,7 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [9.0.0] - unreleased
+## [9.1.0] - 2020-10-23
+
+### Added
+
+- Added Text.with_indentation_guide
+- Added Text.detect_indentation
+- Added Pretty.indent_guides
+- Added Syntax.indent_guides
+- Added indent_guides parameter on pretty.install
+- Added rich.pretty.pprint
+- Added max_length to Pretty
+
+### Changed
+
+- Enabled indent guides on Tracebacks
+
+### Fixed
+
+- Fixed negative time remaining in Progress bars https://github.com/willmcgugan/rich/issues/378
+
+## [9.0.1] - 2020-10-19
+
+### Fixed
+
+- Fixed broken ANSI codes in input on windows legacy https://github.com/willmcgugan/rich/issues/393
+
+## [9.0.0] - 2020-10-18
 
 ### Fixed
 
@@ -16,14 +42,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for Python 3.9
 - Added legacy_windows to ConsoleOptions
 - Added ascii_only to ConsoleOptions
-- Addded box.SQUARE_DOUBLE_HEAD
+- Added box.SQUARE_DOUBLE_HEAD
 - Added highlighting of EUI-48 and EUI-64 (MAC addresses)
 - Added Console.pager
 - Added Console.out
+- Added binary_units in progress download column
+- Added Progress.reset
+- Added Style.background_style property
+- Added Bar renderable https://github.com/willmcgugan/rich/pull/361
+- Added Table.min_width
+- Added table.Column.min_width and table.Column.max_width, and same to Table.add_column
 
 ### Changed
 
 - Dropped box.get_safe_box function in favor of Box.substitute
+- Changed default padding in Panel from 0 to (0, 1) https://github.com/willmcgugan/rich/issues/385
+- Table with row_styles will extend background color between cells if the box has no vertical dividerhttps://github.com/willmcgugan/rich/issues/383
+- Changed default of fit kwarg in render_group() from False to True
+- Renamed rich.bar to rich.progress_bar, and Bar class to ProgressBar, rich.bar is now the new solid bar class
 
 ### Fixed
 

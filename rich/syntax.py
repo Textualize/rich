@@ -203,6 +203,7 @@ class Syntax(JupyterMixin):
         tab_size (int, optional): Size of tabs. Defaults to 4.
         word_wrap (bool, optional): Enable word wrapping.
         background_color (str, optional): Optional background color, or None to use theme color. Defaults to None.
+        indent_guides (bool, optional): Show indent guides. Defaults to False.
     """
 
     _pygments_style_class: Type[PygmentsStyle]
@@ -235,6 +236,7 @@ class Syntax(JupyterMixin):
         tab_size: int = 4,
         word_wrap: bool = False,
         background_color: str = None,
+        indent_guides: bool = False,
     ) -> None:
         self.code = code
         self.lexer_name = lexer_name
@@ -247,6 +249,7 @@ class Syntax(JupyterMixin):
         self.tab_size = tab_size
         self.word_wrap = word_wrap
         self.background_color = background_color
+        self.indent_guides = indent_guides
 
         self._theme = self.get_theme(theme)
 
@@ -265,6 +268,7 @@ class Syntax(JupyterMixin):
         tab_size: int = 4,
         word_wrap: bool = False,
         background_color: str = None,
+        indent_guides: bool = False,
     ) -> "Syntax":
         """Construct a Syntax object from a file.
 
@@ -281,6 +285,7 @@ class Syntax(JupyterMixin):
             tab_size (int, optional): Size of tabs. Defaults to 4.
             word_wrap (bool, optional): Enable word wrapping of code.
             background_color (str, optional): Optional background color, or None to use theme color. Defaults to None.
+            indent_guides (bool, optional): Show indent guides. Defaults to False.
 
         Returns:
             [Syntax]: A Syntax object that may be printed to the console
@@ -318,6 +323,7 @@ class Syntax(JupyterMixin):
             tab_size=tab_size,
             word_wrap=word_wrap,
             background_color=background_color,
+            indent_guides=indent_guides,
         )
 
     def _get_base_style(self) -> Style:
@@ -439,6 +445,17 @@ class Syntax(JupyterMixin):
         text = self.highlight(code)
         text.remove_suffix("\n")
         text.expand_tabs(self.tab_size)
+
+        (
+            background_style,
+            number_style,
+            highlight_number_style,
+        ) = self._get_number_styles(console)
+
+        if self.indent_guides and not options.ascii_only:
+            style = self._get_base_style() + self._theme.get_style_for_token(Comment)
+            text = text.with_indent_guides(self.tab_size, style=style)
+
         if not self.line_numbers:
             # Simple case of just rendering text
             yield from console.render(text, options=options.update(width=code_width))
@@ -453,12 +470,6 @@ class Syntax(JupyterMixin):
 
         numbers_column_width = self._numbers_column_width
         render_options = options.update(width=code_width)
-
-        (
-            background_style,
-            number_style,
-            highlight_number_style,
-        ) = self._get_number_styles(console)
 
         highlight_line = self.highlight_lines.__contains__
         _Segment = Segment
@@ -520,6 +531,14 @@ if __name__ == "__main__":  # pragma: no cover
         help="force color for non-terminals",
     )
     parser.add_argument(
+        "-i",
+        "--indent-guides",
+        dest="indent_guides",
+        action="store_true",
+        default=False,
+        help="display indent guides",
+    )
+    parser.add_argument(
         "-l",
         "--line-numbers",
         dest="line_numbers",
@@ -572,5 +591,6 @@ if __name__ == "__main__":  # pragma: no cover
         word_wrap=args.word_wrap,
         theme=args.theme,
         background_color=args.background_color,
+        indent_guides=args.indent_guides,
     )
     console.print(syntax, soft_wrap=args.soft_wrap)

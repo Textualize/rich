@@ -245,7 +245,7 @@ class RenderGroup:
 
     Args:
         renderables (Iterable[RenderableType]): An iterable of renderable objects.
-
+        fit (bool, optional): Fit dimension of group to contents, or fill available space. Defaults to True.
     """
 
     def __init__(self, *renderables: "RenderableType", fit: bool = True) -> None:
@@ -271,8 +271,12 @@ class RenderGroup:
         yield from self.renderables
 
 
-def render_group(fit: bool = False) -> Callable:
-    """A decorator that turns an iterable of renderables in to a group."""
+def render_group(fit: bool = True) -> Callable:
+    """A decorator that turns an iterable of renderables in to a group.
+
+    Args:
+        fit (bool, optional): Fit dimension of group to contents, or fill available space. Defaults to True.
+    """
 
     def decorator(method):
         """Convert a method that returns an iterable of renderables in to a RenderGroup."""
@@ -986,7 +990,7 @@ class Console:
 
     def rule(
         self,
-        title: str = "",
+        title: TextType = "",
         *,
         characters: str = "─",
         style: Union[str, Style] = "rule.line",
@@ -1310,6 +1314,10 @@ class Console:
             with self.capture() as capture:
                 self.print(prompt, markup=markup, emoji=emoji, end="")
             prompt_str = capture.get()
+        if self.legacy_windows:
+            # Legacy windows doesn't like ANSI codes in getpass or input (colorama bug)?
+            self.file.write(prompt_str)
+            prompt_str = ""
         if password:
             result = getpass(prompt_str, stream=stream)
         else:

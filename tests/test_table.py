@@ -1,6 +1,7 @@
 # encoding=utf-8
 
 import io
+from rich import color
 
 import pytest
 
@@ -121,6 +122,18 @@ def test_rich_measure():
     assert Table("test_header", width=10).__rich_measure__(
         Console(), -1
     ) == Measurement(10, 10)
+
+
+def test_min_width():
+    table = Table("foo", min_width=30)
+    table.add_row("bar")
+    assert table.__rich_measure__(Console(), 100) == Measurement(30, 30)
+    console = Console(color_system=None)
+    console.begin_capture()
+    console.print(table)
+    output = console.end_capture()
+    print(output)
+    assert all(len(line) == 30 for line in output.splitlines())
 
 
 if __name__ == "__main__":

@@ -3,12 +3,14 @@ from __future__ import absolute_import
 import platform
 import sys
 from dataclasses import dataclass, field
+from textwrap import indent
 from traceback import walk_tb
 from types import TracebackType
 from typing import Callable, Dict, List, Optional, Type
 
 from pygments.lexers import guess_lexer_for_filename
 from pygments.token import (
+    Comment,
     Keyword,
     Name,
     Number,
@@ -48,6 +50,7 @@ def install(
     theme: Optional[str] = None,
     word_wrap: bool = False,
     show_locals: bool = False,
+    indent_guides: bool = True,
 ) -> Callable:
     """Install a rich traceback handler.
 
@@ -62,6 +65,7 @@ def install(
             a theme appropriate for the platform.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
+        indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
 
     Returns:
         Callable: The previous exception handler that was replaced.
@@ -84,6 +88,7 @@ def install(
                 theme=theme,
                 word_wrap=word_wrap,
                 show_locals=show_locals,
+                indent_guides=indent_guides,
             )
         )
 
@@ -138,6 +143,7 @@ class Traceback:
         theme (str, optional): Override pygments theme used in traceback.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
+        indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
     """
 
     def __init__(
@@ -148,6 +154,7 @@ class Traceback:
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
+        indent_guides: bool = True,
     ):
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
@@ -164,6 +171,7 @@ class Traceback:
         self.theme = Syntax.get_theme(theme or "ansi_dark")
         self.word_wrap = word_wrap
         self.show_locals = show_locals
+        self.indent_guides = indent_guides
 
     @classmethod
     def from_exception(
@@ -176,6 +184,7 @@ class Traceback:
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
+        indent_guides: bool = True,
     ) -> "Traceback":
         """Create a traceback from exception info
 
@@ -188,6 +197,7 @@ class Traceback:
             theme (str, optional): Override pygments theme used in traceback.
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
+            indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
 
         Returns:
             Traceback: A Traceback instance that may be printed.
@@ -200,6 +210,7 @@ class Traceback:
             theme=theme,
             word_wrap=word_wrap,
             show_locals=show_locals,
+            indent_guides=indent_guides,
         )
 
     @classmethod
@@ -279,6 +290,7 @@ class Traceback:
                 "pygments.string": token_style(String),
                 "pygments.function": token_style(Name.Function),
                 "pygments.number": token_style(Number),
+                "repr.indent": token_style(Comment),
                 "repr.str": token_style(String),
                 "repr.brace": token_style(TextToken) + Style(bold=True),
                 "repr.number": token_style(Number),
@@ -300,7 +312,7 @@ class Traceback:
                     title="[traceback.title]Traceback [dim](most recent call last)",
                     style=background_style,
                     border_style="traceback.border.syntax_error",
-                    expand=False,
+                    expand=True,
                     padding=(0, 1),
                 )
                 stack_renderable = Constrain(stack_renderable, self.width)
@@ -313,8 +325,9 @@ class Traceback:
                             self._render_syntax_error(stack.syntax_error),
                             style=background_style,
                             border_style="traceback.border",
-                            expand=False,
+                            expand=True,
                             padding=(0, 1),
+                            width=self.width,
                         ),
                         self.width,
                     )
@@ -407,6 +420,7 @@ class Traceback:
                     highlight_lines={frame.lineno},
                     word_wrap=self.word_wrap,
                     code_width=88,
+                    indent_guides=self.indent_guides,
                 )
                 yield ""
             except Exception:
@@ -416,7 +430,11 @@ class Traceback:
                     Columns(
                         [
                             syntax,
-                            render_scope(frame.locals, title="locals"),
+                            render_scope(
+                                frame.locals,
+                                title="locals",
+                                indent_guides=self.indent_guides,
+                            ),
                         ],
                         padding=1,
                     )
@@ -437,6 +455,7 @@ if __name__ == "__main__":  # pragma: no cover
         print(one / a)
 
     def foo(a):
+
         zed = {
             "characters": {
                 "Paul Atriedies",

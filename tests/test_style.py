@@ -190,3 +190,9 @@ def test_style_stack():
 def test_pick_first():
     with pytest.raises(ValueError):
         Style.pick_first()
+
+
+def test_background_style():
+    assert Style(bold=True, color="yellow", bgcolor="red").background_style == Style(
+        bgcolor="red"
+    )

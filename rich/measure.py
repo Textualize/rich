@@ -38,10 +38,40 @@ class Measurement(NamedTuple):
             width (int): Maximum desired width.
 
         Returns:
-            RenderableWidth: new RenderableWidth object.
+            Measurement: New Measurement object.
         """
         minimum, maximum = self
         return Measurement(min(minimum, width), min(maximum, width))
+
+    def with_minimum(self, width: int) -> "Measurement":
+        """Get a RenderableWith where the widths are >= width.
+
+        Args:
+            width (int): Minimum desired width.
+
+        Returns:
+            Measurement: New Measurement object.
+        """
+        minimum, maximum = self
+        width = max(0, width)
+        return Measurement(max(minimum, width), max(maximum, width))
+
+    def clamp(self, min_width: int = None, max_width: int = None) -> "Measurement":
+        """Clamp a measurement within the specified range.
+
+        Args:
+            min_width (int): Minimum desired width, or ``None`` for no minimum. Defaults to None.
+            max_width (int): Maximum desired width, or ``None`` for no maximum. Defaults to None.
+
+        Returns:
+            Measurement: New Measurement object.
+        """
+        measurement = self
+        if min_width is not None:
+            measurement = measurement.with_minimum(min_width)
+        if max_width is not None:
+            measurement = measurement.with_maximum(max_width)
+        return measurement
 
     @classmethod
     def get(

@@ -1,4 +1,5 @@
-from functools import partial
+from functools import partial, reduce
+from math import gcd
 import re
 from operator import itemgetter
 from typing import (
@@ -1008,10 +1009,91 @@ class Text(JupyterMixin):
             append(line)
         return lines
 
+    def detect_indentation(self) -> int:
+        """Auto-detect indentation of code.
+
+        Returns:
+            int: Number of spaces used to indent code.
+        """
+
+        _indentations = {
+            len(match.group(1))
+            for match in re.finditer(r"^( *)(.*)$", self.plain, flags=re.MULTILINE)
+        }
+
+        try:
+            indentation = (
+                reduce(gcd, [indent for indent in _indentations if not indent % 2]) or 1
+            )
+        except TypeError:
+            indentation = 1
+
+        return indentation
+
+    def with_indent_guides(
+        self,
+        indent_size: int = None,
+        *,
+        character: str = "│",
+        style: StyleType = "dim green",
+    ) -> "Text":
+        """Adds indent guide lines to text.
+
+        Args:
+            indent_size (Optional[int]): Size of indentation, or None to auto detect. Defaults to None.
+            character (str, optional): Character to use for indentation. Defaults to "│".
+            style (Union[Style, str], optional): Style of indent guides.
+
+        Returns:
+            Text: New text with indentation guides.
+        """
+
+        _indent_size = self.detect_indentation() if indent_size is None else indent_size
+
+        text = self.copy()
+        text.expand_tabs()
+        indent_line = f"{character}{' ' * (_indent_size - 1)}"
+
+        re_indent = re.compile(r"^( *)(.*)$")
+        new_lines: List[Text] = []
+        add_line = new_lines.append
+        blank_lines = 0
+        for line in text.split():
+            match = re_indent.match(line.plain)
+            if not match or not match.group(2):
+                blank_lines += 1
+                continue
+            indent = match.group(1)
+            full_indents, remaining_space = divmod(len(indent), _indent_size)
+            new_indent = f"{indent_line * full_indents}{' ' * remaining_space}"
+            line.plain = new_indent + line.plain[len(new_indent) :]
+            line.stylize(style, 0, len(new_indent))
+            if blank_lines:
+                new_lines.extend([Text(new_indent, style=style)] * blank_lines)
+                blank_lines = 0
+            add_line(line)
+        if blank_lines:
+            new_lines.extend([Text("", style=style)] * blank_lines)
+
+        new_text = Text("\n").join(new_lines)
+        return new_text
+
 
 if __name__ == "__main__":  # pragma: no cover
     from rich import print
 
     text = Text("<span>\n\tHello\n</span>")
     text.expand_tabs(4)
+    print(text)
+
+    code = """
+def __add__(self, other: Any) -> "Text":
+    if isinstance(other, (str, Text)):
+        result = self.copy()
+        result.append(other)
+        return result
+    return NotImplemented
+"""
+    text = Text(code)
+    text = text.with_indent_guides()
     print(text)

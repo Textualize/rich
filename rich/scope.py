@@ -14,7 +14,11 @@ if TYPE_CHECKING:
 
 
 def render_scope(
-    scope: Mapping, *, title: TextType = None, sort_keys: bool = True
+    scope: Mapping,
+    *,
+    title: TextType = None,
+    sort_keys: bool = True,
+    indent_guides: bool = False
 ) -> "ConsoleRenderable":
     """Render python variables in a given scope.
 
@@ -22,6 +26,7 @@ def render_scope(
         scope (Mapping): A mapping containing variable names and values.
         title (str, optional): Optional title. Defaults to None.
         sort_keys (bool, optional): Enable sorting of items. Defaults to True.
+        indent_guides (bool, optional): Enable indentaton guides. Defaults to False.
 
     Returns:
         RenderableType: A renderable object.
@@ -41,7 +46,10 @@ def render_scope(
             (key, "scope.key.special" if key.startswith("__") else "scope.key"),
             (" =", "scope.equals"),
         )
-        items_table.add_row(key_text, Pretty(value, highlighter=highlighter))
+        items_table.add_row(
+            key_text,
+            Pretty(value, highlighter=highlighter, indent_guides=indent_guides),
+        )
     return Panel.fit(
         items_table,
         title=title,

@@ -8,7 +8,8 @@ import pytest
 
 from rich import errors
 from rich.color import ColorSystem
-from rich.console import CaptureError, Console, ConsoleOptions
+from rich.console import CaptureError, Console, ConsoleOptions, render_group
+from rich.measure import measure_renderables
 from rich.pager import SystemPager
 from rich.panel import Panel
 from rich.style import Style
@@ -190,6 +191,18 @@ def test_input(monkeypatch, capsys):
     assert user_input == "bar"
 
 
+def test_input_legacy_windows(monkeypatch, capsys):
+    def fake_input(prompt):
+        console.file.write(prompt)
+        return "bar"
+
+    monkeypatch.setattr("builtins.input", fake_input)
+    console = Console(legacy_windows=True)
+    user_input = console.input(prompt="foo:")
+    assert capsys.readouterr().out == "foo:"
+    assert user_input == "bar"
+
+
 def test_input_password(monkeypatch, capsys):
     def fake_input(prompt, stream=None):
         console.file.write(prompt)
@@ -232,7 +245,7 @@ def test_justify_renderable_none():
     console = Console(
         file=io.StringIO(), force_terminal=True, width=20, legacy_windows=False
     )
-    console.print(Panel("FOO", expand=False), justify=None)
+    console.print(Panel("FOO", expand=False, padding=0), justify=None)
     assert console.file.getvalue() == "╭───╮\n│FOO│\n╰───╯\n"
 
 
@@ -240,7 +253,7 @@ def test_justify_renderable_left():
     console = Console(
         file=io.StringIO(), force_terminal=True, width=10, legacy_windows=False
     )
-    console.print(Panel("FOO", expand=False), justify="left")
+    console.print(Panel("FOO", expand=False, padding=0), justify="left")
     assert console.file.getvalue() == "╭───╮     \n│FOO│     \n╰───╯     \n"
 
 
@@ -248,7 +261,7 @@ def test_justify_renderable_center():
     console = Console(
         file=io.StringIO(), force_terminal=True, width=10, legacy_windows=False
     )
-    console.print(Panel("FOO", expand=False), justify="center")
+    console.print(Panel("FOO", expand=False, padding=0), justify="center")
     assert console.file.getvalue() == "  ╭───╮   \n  │FOO│   \n  ╰───╯   \n"
 
 
@@ -256,7 +269,7 @@ def test_justify_renderable_right():
     console = Console(
         file=io.StringIO(), force_terminal=True, width=20, legacy_windows=False
     )
-    console.print(Panel("FOO", expand=False), justify="right")
+    console.print(Panel("FOO", expand=False, padding=0), justify="right")
     assert (
         console.file.getvalue()
         == "               ╭───╮\n               │FOO│\n               ╰───╯\n"
@@ -377,3 +390,33 @@ def test_out() -> None:
     console.begin_capture()
     console.out(*(["foo bar"] * 5), sep=".", end="X")
     assert console.end_capture() == "foo bar.foo bar.foo bar.foo bar.foo barX"
+
+
+def test_render_group() -> None:
+    @render_group(fit=False)
+    def renderable():
+        yield "one"
+        yield "two"
+        yield "three"  # <- largest width of 5
+        yield "four"
+
+    renderables = [renderable() for _ in range(4)]
+    console = Console(width=42)
+    min_width, _ = measure_renderables(console, renderables, 42)
+    assert min_width == 42
+
+
+def test_render_group_fit() -> None:
+    @render_group()
+    def renderable():
+        yield "one"
+        yield "two"
+        yield "three"  # <- largest width of 5
+        yield "four"
+
+    renderables = [renderable() for _ in range(4)]
+
+    console = Console(width=42)
+
+    min_width, _ = measure_renderables(console, renderables, 42)
+    assert min_width == 5

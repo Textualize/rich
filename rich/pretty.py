@@ -4,6 +4,7 @@ import sys
 from array import array
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass
+from itertools import islice
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -18,7 +19,7 @@ from typing import (
 
 from rich.highlighter import ReprHighlighter
 
-from ._loop import loop_last
+from .__init__ import get_console
 from ._pick import pick_bool
 from .cells import cell_len
 from .highlighter import ReprHighlighter
@@ -40,6 +41,8 @@ def install(
     console: "Console" = None,
     overflow: "OverflowMethod" = "ignore",
     crop: bool = False,
+    indent_guides: bool = False,
+    max_length: int = None,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
 
@@ -47,6 +50,9 @@ def install(
         console (Console, optional): Console instance or ``None`` to use global console. Defaults to None.
         overflow (Optional[OverflowMethod], optional): Overflow method. Defaults to "ignore".
         crop (Optional[bool], optional): Enable cropping of long lines. Defaults to False.
+        indent_guides (bool, optional): Enable indentation guides. Defaults to False.
+        max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to None.
     """
     from rich import get_console
 
@@ -60,7 +66,12 @@ def install(
             console.print(
                 value
                 if hasattr(value, "__rich_console__") or hasattr(value, "__rich__")
-                else Pretty(value, overflow=overflow),
+                else Pretty(
+                    value,
+                    overflow=overflow,
+                    indent_guides=indent_guides,
+                    max_length=max_length,
+                ),
                 crop=crop,
             )
             builtins._ = value  # type: ignore
@@ -78,6 +89,9 @@ class Pretty:
         justify (JustifyMethod, optional): Justify method, or None for default. Defaults to None.
         overflow (OverflowMethod, optional): Overflow method, or None for default. Defaults to None.
         no_wrap (Optional[bool], optional): Disable word wrapping. Defaults to False.
+        indent_guides (bool, optional): Enable indentation guides. Defaults to False.
+        max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to None.
     """
 
     def __init__(
@@ -89,6 +103,8 @@ class Pretty:
         justify: "JustifyMethod" = None,
         overflow: Optional["OverflowMethod"] = "crop",
         no_wrap: Optional[bool] = False,
+        indent_guides: bool = False,
+        max_length: int = None,
     ) -> None:
         self._object = _object
         self.highlighter = highlighter or ReprHighlighter()
@@ -96,12 +112,17 @@ class Pretty:
         self.justify = justify
         self.overflow = overflow
         self.no_wrap = no_wrap
+        self.indent_guides = indent_guides
+        self.max_length = max_length
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         pretty_str = pretty_repr(
-            self._object, max_width=options.max_width, indent_size=self.indent_size
+            self._object,
+            max_width=options.max_width,
+            indent_size=self.indent_size,
+            max_length=self.max_length,
         )
         pretty_text = Text(
             pretty_str,
@@ -111,6 +132,10 @@ class Pretty:
             style="pretty",
         )
         pretty_text = self.highlighter(pretty_text)
+        if self.indent_guides and not options.ascii_only:
+            pretty_text = pretty_text.with_indent_guides(
+                self.indent_size, style="repr.indent"
+            )
         yield pretty_text
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
@@ -285,11 +310,13 @@ class _Line:
         return f"{self.whitespace}{self.text}{self.node or ''}{self.suffix}"
 
 
-def traverse(_object: Any) -> Node:
+def traverse(_object: Any, max_length: int = None) -> Node:
     """Traverse object and generate a tree.
 
     Args:
         _object (Any): Object to be traversed.
+        max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to None.
 
     Returns:
         Node: The root of a tree structure which can be used to render a pretty repr.
@@ -328,17 +355,28 @@ def traverse(_object: Any) -> Node:
                     last=root,
                 )
                 append = children.append
+                num_items = len(obj)
+                last_item_index = num_items - 1
+
                 if isinstance(obj, _MAPPING_CONTAINERS):
-                    for last, (key, child) in loop_last(obj.items()):
+                    iter_items = iter(obj.items())
+                    if max_length is not None:
+                        iter_items = islice(iter_items, max_length)
+                    for index, (key, child) in enumerate(iter_items):
                         child_node = _traverse(child)
                         child_node.key_repr = to_repr(key)
-                        child_node.last = last
+                        child_node.last = index == last_item_index
                         append(child_node)
                 else:
-                    for last, child in loop_last(obj):
+                    iter_values = iter(obj)
+                    if max_length is not None:
+                        iter_values = islice(iter_values, max_length)
+                    for index, child in enumerate(iter_values):
                         child_node = _traverse(child)
-                        child_node.last = last
+                        child_node.last = index == last_item_index
                         append(child_node)
+                if max_length is not None and num_items > max_length:
+                    append(Node(value_repr=f"... +{num_items-max_length}", last=True))
             else:
                 node = Node(empty=empty, children=[], last=root)
 
@@ -353,7 +391,12 @@ def traverse(_object: Any) -> Node:
 
 
 def pretty_repr(
-    _object: Any, *, max_width: int = 80, indent_size: int = 4, expand_all: bool = False
+    _object: Any,
+    *,
+    max_width: int = 80,
+    indent_size: int = 4,
+    expand_all: bool = False,
+    max_length: int = None,
 ) -> str:
     """Prettify repr string by expanding on to new lines to fit within a given width.
 
@@ -362,6 +405,8 @@ def pretty_repr(
         max_width (int, optional): Desired maximum width of repr string. Defaults to 80.
         indent_size (int, optional): Number of spaces to indent. Defaults to 4.
         expand_all (bool, optional): Expand all containers regardless of available width. Defaults to False.
+        max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to None.
 
     Returns:
         str: A possibly multi-line representation of the object.
@@ -370,11 +415,31 @@ def pretty_repr(
     if isinstance(_object, Node):
         node = _object
     else:
-        node = traverse(_object)
+        node = traverse(_object, max_length=max_length)
     repr_str = node.render(
         max_width=max_width, indent_size=indent_size, expand_all=expand_all
     )
     return repr_str
+
+
+def pprint(
+    _object: Any,
+    *,
+    console: "Console" = None,
+    max_length: int = None,
+    indent_guides: bool = True,
+):
+    """A convenience function for pretty printing.
+
+    Args:
+        _object (Any): Object to pretty print.
+        console (Console, optional): Console instance, or None to use default. Defaults to None.
+        max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to None.
+        indent_guides (bool, optional): Enable indentation guides. Defaults to True.
+    """
+    _console = get_console() if console is None else console
+    _console.print(Pretty(_object, max_length=max_length, indent_guides=indent_guides))
 
 
 if __name__ == "__main__":  # pragma: no cover
@@ -415,4 +480,4 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich import print
 
-    print(Pretty(data))
+    print(Pretty(data, indent_guides=True))

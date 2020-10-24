@@ -28,6 +28,13 @@ def test_unpack():
         Padding.unpack((1, 2, 3))
 
 
+def test_expand_false():
+    console = Console(width=100, color_system=None)
+    console.begin_capture()
+    console.print(Padding("foo", 1, expand=False))
+    assert console.end_capture() == "     \n foo \n     \n"
+
+
 def test_rich_console():
     renderable = "test renderable"
     style = Style(color="red")

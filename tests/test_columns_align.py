@@ -10,7 +10,7 @@ from rich.panel import Panel
 
 def render():
     console = Console(file=io.StringIO(), width=100, legacy_windows=False)
-    panel = Panel.fit("foo", box=box.SQUARE)
+    panel = Panel.fit("foo", box=box.SQUARE, padding=0)
     columns = Columns([panel] * 4)
     columns.expand = True
     console.rule("no align")
