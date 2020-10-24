@@ -1,6 +1,6 @@
 import sys
 from threading import Event, RLock, Thread
-from typing import IO, Any, List, Optional, final
+from typing import IO, Any, List, Optional
 
 from .__init__ import get_console
 from .console import Console, ConsoleRenderable, RenderableType, RenderHook
