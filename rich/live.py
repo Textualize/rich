@@ -1,6 +1,6 @@
 import sys
 from threading import Event, RLock, Thread
-from typing import IO, Any, List, Optional
+from typing import IO, Any, List, Optional, Text
 
 from .__init__ import get_console
 from .console import Console, ConsoleRenderable, RenderableType, RenderHook
@@ -8,6 +8,7 @@ from .control import Control
 from .jupyter import JupyterMixin
 from .live_render import LiveRender
 from .progress import _FileProxy
+from .segment import Segment
 
 
 class _RefreshThread(Thread):
@@ -37,7 +38,8 @@ class Live(JupyterMixin, RenderHook):
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
         auto_refresh: bool = True,
-        refresh_per_second: float = 1.0
+        refresh_per_second: float = 1.0,
+        hide_overflow: bool = True
     ) -> None:
         self.console = console if console is not None else get_console()
         self._live_render = LiveRender(renderable)
@@ -55,6 +57,11 @@ class Live(JupyterMixin, RenderHook):
 
         self._refresh_thread: Optional[_RefreshThread] = None
         self.refresh_per_second = refresh_per_second
+
+        self.hide_overflow = hide_overflow
+        self._is_overflowing = False
+
+        self._hide_render = LiveRender("Terminal too small\n")
 
     def start(self) -> None:
         with self._lock:
@@ -158,7 +165,34 @@ class Live(JupyterMixin, RenderHook):
         if self.console.is_terminal:
             # lock needs acquiring as user can modify live_render renerable at any time unlike in Progress.
             with self._lock:
-                renderables = [
+                # check that renderable doesn't overflow terminal height or it will
+                if (
+                    self.hide_overflow
+                    and self._started  # on non-transient allow the final live render to be displayed
+                ):
+                    # determine height of renderable
+                    lines = self.console.render_lines(
+                        self._live_render.renderable, pad=False
+                    )
+                    renderable_height = Segment.get_shape(lines)[1]
+                    if renderable_height >= self.console.size.height:
+                        # continued overflow re-render terminal too small
+                        if self._is_overflowing:
+                            return [
+                                self._hide_render.position_cursor(),
+                                *renderables,
+                                self._hide_render,
+                            ]
+                        else:
+                            # on first overflow clear the live-render and display terminal too small message
+                            self._is_overflowing = True
+                            return [
+                                self._live_render.position_cursor(),
+                                *renderables,
+                                self._hide_render,
+                            ]
+                self._is_overflowing = False
+                return [
                     self._live_render.position_cursor(),
                     *renderables,
                     self._live_render,
