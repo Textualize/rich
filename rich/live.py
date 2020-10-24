@@ -34,13 +34,28 @@ class Live(JupyterMixin, RenderHook):
         renderable: RenderableType = "",
         *,
         console: Console = None,
+        auto_refresh: bool = True,
+        refresh_per_second: float = 1,
         transient: bool = False,
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
-        auto_refresh: bool = True,
-        refresh_per_second: float = 1.0,
         hide_overflow: bool = True,
     ) -> None:
+        """Renders an auto-updating live display of any given renderable.
+
+        Args:
+            renderable (RenderableType, optional): [The renderable to live display. Defaults to displaying nothing.
+            console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
+            auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()` or `update()` with refresh flag. Defaults to True
+            refresh_per_second (float, optional): Number of times per second to refresh the live display. Defaults to 1.
+            transient (bool, optional): Clear the renderable on exit. Defaults to False.
+            redirect_stdout (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
+            redirect_stderr (bool, optional): Enable redirection of stderr. Defaults to True.
+            hide_overflow (bool, optional): Checks that the renderable isn't too large for terminal and auto-hides. Defaults to True.
+        """
+        assert (
+            refresh_per_second is None or refresh_per_second > 0
+        ), "refresh_per_second must be > 0"
         self.console = console if console is not None else get_console()
         self._live_render = LiveRender(renderable)
 
@@ -60,10 +75,10 @@ class Live(JupyterMixin, RenderHook):
 
         self.hide_overflow = hide_overflow
         self._is_overflowing = False
-
         self._hide_render = LiveRender("Terminal too small\n")
 
     def start(self) -> None:
+        """Start live rendering display."""
         with self._lock:
             if self._started:
                 return
@@ -78,6 +93,7 @@ class Live(JupyterMixin, RenderHook):
                 self._refresh_thread.start()
 
     def stop(self) -> None:
+        """Stop live rendering display."""
         with self._lock:
             if not self._started:
                 return
@@ -118,16 +134,28 @@ class Live(JupyterMixin, RenderHook):
 
     @property
     def item(self) -> RenderableType:
+        """Get the renderable that is being displayed
+
+        Returns:
+            RenderableType: Displayed renderable.
+        """
         with self._lock:
             return self._live_render.renderable
 
     def update(self, renderable: RenderableType, *, refresh: bool = False) -> None:
+        """Update the renderable that is being displayed
+
+        Args:
+            renderable (RenderableType): New renderable to use.
+            refresh (bool, optional): Refresh the display. Defaults to False.
+        """
         with self._lock:
             self._live_render.set_renderable(renderable)
             if refresh:
                 self.refresh()
 
     def refresh(self) -> None:
+        """Update the display of the Live Render."""
         if self.console.is_jupyter:  # pragma: no cover
             try:
                 from IPython.display import display
