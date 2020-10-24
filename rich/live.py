@@ -13,9 +13,9 @@ from .progress import _FileProxy
 class _RefreshThread(Thread):
     """A thread that calls refresh() at regular intervals."""
 
-    def __init__(self, live: "Live", refresh_rate: float) -> None:
+    def __init__(self, live: "Live", refresh_per_second: float) -> None:
         self.live = live
-        self.refresh_rate = refresh_rate
+        self.refresh_per_second = refresh_per_second
         self.done = Event()
         super().__init__()
 
@@ -23,7 +23,7 @@ class _RefreshThread(Thread):
         self.done.set()
 
     def run(self) -> None:
-        while not self.done.wait(self.refresh_rate):
+        while not self.done.wait(1 / self.refresh_per_second):
             self.live.refresh()
 
 
@@ -37,7 +37,7 @@ class Live(JupyterMixin, RenderHook):
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
         auto_refresh: bool = True,
-        refresh_rate: float = 1.0
+        refresh_per_second: float = 1.0
     ) -> None:
         self.console = console if console is not None else get_console()
         self._live_render = LiveRender(renderable)
@@ -54,7 +54,7 @@ class Live(JupyterMixin, RenderHook):
         self.transient = transient
 
         self._refresh_thread: Optional[_RefreshThread] = None
-        self.refresh_rate = refresh_rate
+        self.refresh_per_second = refresh_per_second
 
     def start(self) -> None:
         with self._lock:
@@ -67,7 +67,7 @@ class Live(JupyterMixin, RenderHook):
             self._started = True
 
             if self.auto_refresh:
-                self._refresh_thread = _RefreshThread(self, self.refresh_rate)
+                self._refresh_thread = _RefreshThread(self, self.refresh_per_second)
                 self._refresh_thread.start()
 
     def stop(self) -> None:
