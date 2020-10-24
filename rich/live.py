@@ -53,9 +53,7 @@ class Live(JupyterMixin, RenderHook):
             redirect_stderr (bool, optional): Enable redirection of stderr. Defaults to True.
             hide_overflow (bool, optional): Checks that the renderable isn't too large for terminal and auto-hides. Defaults to True.
         """
-        assert (
-            refresh_per_second is None or refresh_per_second > 0
-        ), "refresh_per_second must be > 0"
+        assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self.console = console if console is not None else get_console()
         self._live_render = LiveRender(renderable)
 
