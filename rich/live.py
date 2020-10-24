@@ -156,7 +156,8 @@ class Live(JupyterMixin, RenderHook):
     ) -> List[ConsoleRenderable]:
         """Process renderables to restore cursor and display progress."""
         if self.console.is_terminal:
-            with self._lock:  # need to ensure data is not updating in between
+            # lock needs acquiring as user can modify live_render renerable at any time unlike in Progress.
+            with self._lock:
                 renderables = [
                     self._live_render.position_cursor(),
                     *renderables,
