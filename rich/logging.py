@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from logging import Handler, LogRecord
 from pathlib import Path
-from typing import ClassVar, List, Optional, Type
+from typing import ClassVar, List, Optional, Type, Dict
 
 from . import get_console
 from ._log_render import LogRender
@@ -10,6 +10,10 @@ from .console import Console
 from .highlighter import Highlighter, ReprHighlighter
 from .text import Text
 from .traceback import Traceback
+
+# we need this to retrieve the style for the
+# log level name with the same level number
+_original_levels = logging._levelToName.copy()
 
 
 class RichHandler(Handler):
@@ -50,6 +54,9 @@ class RichHandler(Handler):
     ]
     HIGHLIGHTER_CLASS: ClassVar[Type[Highlighter]] = ReprHighlighter
 
+    levels: Dict[int, str]
+    level_width: int
+
     def __init__(
         self,
         level: int = logging.NOTSET,
@@ -70,8 +77,21 @@ class RichHandler(Handler):
         super().__init__(level=level)
         self.console = console or get_console()
         self.highlighter = highlighter or self.HIGHLIGHTER_CLASS()
+
+        levels = getattr(self.__class__, "levels", {})
+        for level, level_name in levels.items():
+            logging.addLevelName(level, level_name)
+
+        level_width = getattr(self.__class__, "level_width", None)
+        level_width = level_width or max(
+            len(level_name) for level_name in logging._levelToName.values()
+        )
+
         self._log_render = LogRender(
-            show_time=show_time, show_level=show_level, show_path=show_path
+            show_time=show_time,
+            show_level=show_level,
+            show_path=show_path,
+            level_width=level_width,
         )
         self.enable_link_path = enable_link_path
         self.markup = markup
@@ -84,7 +104,8 @@ class RichHandler(Handler):
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
         path = Path(record.pathname).name
-        log_style = f"logging.level.{record.levelname.lower()}"
+        log_style = f"logging.level.{_original_levels.get(record.levelno, '')}"
+        log_style = log_style.lower()
         message = self.format(record)
         time_format = None if self.formatter is None else self.formatter.datefmt
         log_time = datetime.fromtimestamp(record.created)

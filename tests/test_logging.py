@@ -74,6 +74,35 @@ def test_exception_with_extra_lines():
     assert "division by zero" in render
 
 
+def test_custom_level_name():
+    console = Console(file=io.StringIO())
+
+    class MyHandler(RichHandler):
+        levels = {
+            logging.WARNING: "WARN",
+            logging.ERROR: "ERR",
+            # custom level
+            9: "FOO",
+        }
+        level_width = 4
+
+    handler_custom_levels = MyHandler(console=console)
+    log.addHandler(handler_custom_levels)
+
+    log.warning("Deprecated!")
+    log.error("Access denied!")
+    log._log(9, "Custom log level", ())
+    log.critical("Longer name")
+
+    render = handler_custom_levels.console.file.getvalue()
+    print(render)
+
+    assert "WARN Deprecated!" in render
+    assert "ERR  Access denied!" in render
+    assert "FOO  Custom log level" in render
+    assert "CRI… Longer name" in render
+
+
 if __name__ == "__main__":
     render = make_log()
     print(render)
