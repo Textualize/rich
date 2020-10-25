@@ -141,6 +141,15 @@ class Live(JupyterMixin, RenderHook):
         with self._lock:
             return self._live_render.renderable
 
+    @property
+    def is_started(self) -> bool:
+        """Indicate if it is currently live rendering.
+
+        Returns:
+            bool: Is live rendering.
+        """
+        return self._started
+
     def update(self, renderable: RenderableType, *, refresh: bool = False) -> None:
         """Update the renderable that is being displayed
 
