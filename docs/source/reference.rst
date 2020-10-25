@@ -11,7 +11,8 @@ Reference
    reference/columns.rst
    reference/console.rst
    reference/emoji.rst
-   reference/highlighter.rst   
+   reference/highlighter.rst
+   reference/live.rst
    reference/logging.rst
    reference/markdown.rst
    reference/markup.rst
