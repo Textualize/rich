@@ -1,4 +1,3 @@
-import difflib
 import io
 import os
 
@@ -35,17 +34,6 @@ def check_output(output_file: str, output: str) -> None:
         set_capture_text("live", output_file, output=output)
 
     correct_output = get_capture_text("live", output_file)
-
-    if output != correct_output:
-        print("The difference between these two files")
-        print(
-            difflib.unified_diff(
-                correct_output,
-                output,
-                fromfile="Correct Output",
-                tofile="Current Output",
-            )
-        )
 
     assert output == correct_output, "Console output differs from the correct output"
 
@@ -114,7 +102,7 @@ def test_growing_table_logging() -> None:
     table = create_base_table()
 
     with console.capture() as capture, Live(table, console=console):
-        for step in range(20):
+        for step in range(21):
             console.print(f"Attempting Step #{step}")
             table.add_row(f"{step}", f"{step}", f"{step}")
     output = capture.get()
