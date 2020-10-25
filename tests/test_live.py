@@ -176,6 +176,29 @@ def test_growing_table_large_overflow() -> None:
     check_output("growing_table_large_overflow.txt", output=output)
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python3.7 or higher")
+def test_growing_table_file_console() -> None:
+    console = Console(
+        width=120,
+        height=80,
+        file=io.StringIO(),
+        legacy_windows=False,
+        color_system=None,
+    )
+
+    table = create_base_table()
+
+    with console.capture() as capture, Live(
+        table, console=console, transient=True
+    ) as live:
+        for step in range(20):
+            table.add_row(f"{step}", f"{step}", f"{step}")
+            live.refresh()
+
+    output = capture.get()
+    assert output == ""  # ensure nothing is printed for a file
+
+
 def generate_random_data_table() -> Table:
     Data = List[List[int]]
 
