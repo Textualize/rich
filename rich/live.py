@@ -252,26 +252,22 @@ if __name__ == "__main__":
         def generate_data() -> Data:
             return [
                 [random.randint(0, 20) for _ in range(random.randint(0, 8))]
-                for _ in range(random.randint(0, 20))
+                for _ in range(random.randint(12, 20))
             ]
 
-        with Live(
-            console=console, refresh_per_second=0.25, transient=True
-        ) as live_table:
+        with Live(console=console, refresh_per_second=1, transient=True) as live_table:
             for _ in range(20):
                 data = generate_data()
-                time.sleep(0.2)
+                time.sleep(0.5)
                 console.print("hello")
                 live_table.update(generate_table(data))
 
     def panel_example() -> None:
 
-        with Live() as live_panel:
+        with Live(auto_refresh=False) as live_panel:
             for index in range(20):
-                panel = Panel(
-                    f"Hello, [red]World! {index}" * (index ** 3 % 40), title="Welcome"
-                )
-                live_panel.update(panel)
+                panel = Panel(f"Hello, [red]World! {index}\n" * index, title="Welcome")
+                live_panel.update(panel, refresh=True)
                 time.sleep(0.2)
 
     def table_example2() -> None:
