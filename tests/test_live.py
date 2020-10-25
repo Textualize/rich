@@ -1,6 +1,8 @@
 import io
 import os
+import sys
 
+import pytest
 from rich.console import Console
 from rich.live import Live
 from rich.table import Table
@@ -35,11 +37,10 @@ def check_output(output_file: str, output: str) -> None:
 
     correct_output = get_capture_text("live", output_file)
 
-    assert (
-        output.encode("utf-8").decode("utf-8") == correct_output
-    ), "Console output differs from the correct output"
+    assert output == correct_output, "Console output differs from the correct output"
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python3.7 or higher")
 def test_growing_table() -> None:
     """Test generating a table and adding more rows of data. No auto-refresh"""
     console = create_capture_console()
@@ -55,6 +56,7 @@ def test_growing_table() -> None:
     check_output("growing_table.txt", output=output)
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python3.7 or higher")
 def test_growing_table_transient() -> None:
     """Test generating a table and adding more rows of data. Delete data at then end. No auto-refresh."""
     console = create_capture_console()
@@ -71,6 +73,7 @@ def test_growing_table_transient() -> None:
     check_output("growing_table_transient.txt", output=output)
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python3.7 or higher")
 def test_growing_table_overflow() -> None:
     """Test generating a table and adding more rows of data. No auto-refresh"""
     console = create_capture_console()
@@ -86,6 +89,7 @@ def test_growing_table_overflow() -> None:
     check_output("growing_table_overflow.txt", output=output)
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python3.7 or higher")
 def test_growing_table_autorefresh() -> None:
     """Test generating a table but using auto-refresh from threading"""
     console = create_capture_console()
@@ -98,6 +102,7 @@ def test_growing_table_autorefresh() -> None:
     check_output("growing_table_autorefresh.txt", output=output)
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python3.7 or higher")
 def test_growing_table_logging() -> None:
     """Test generating a table but also add in console logging."""
     console = create_capture_console()
