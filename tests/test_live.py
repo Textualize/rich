@@ -35,7 +35,9 @@ def check_output(output_file: str, output: str) -> None:
 
     correct_output = get_capture_text("live", output_file)
 
-    assert output == correct_output, "Console output differs from the correct output"
+    assert (
+        output.encode("utf-8").decode("utf-8") == correct_output
+    ), "Console output differs from the correct output"
 
 
 def test_growing_table() -> None:
