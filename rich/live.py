@@ -72,8 +72,9 @@ class Live(JupyterMixin, RenderHook):
         self.refresh_per_second = refresh_per_second
 
         self.hide_overflow = hide_overflow
-        self._is_overflowing = False
         self._hide_render = LiveRender("Terminal too small\n")
+        # cant store just clear_control as the live_render shape is lazily computed on render
+        self._clear_render = self._live_render
 
     def start(self) -> None:
         """Start live rendering display."""
@@ -191,11 +192,12 @@ class Live(JupyterMixin, RenderHook):
         if self.console.is_terminal:
             # lock needs acquiring as user can modify live_render renerable at any time unlike in Progress.
             with self._lock:
+                # determine the control command needed to clear previous rendering
+                clear_control = self._clear_render.position_cursor()
+
+                # on non-transient allow the final live render to be displayed
                 # check that renderable doesn't overflow terminal height or it will
-                if (
-                    self.hide_overflow
-                    and self._started  # on non-transient allow the final live render to be displayed
-                ):
+                if self.hide_overflow and self._started:
                     # determine height of renderable
                     lines = self.console.render_lines(
                         self._live_render.renderable, pad=False
@@ -203,23 +205,16 @@ class Live(JupyterMixin, RenderHook):
                     renderable_height = Segment.get_shape(lines)[1]
                     if renderable_height >= self.console.size.height:
                         # continued overflow re-render terminal too small
-                        if self._is_overflowing:
-                            return [
-                                self._hide_render.position_cursor(),
-                                *renderables,
-                                self._hide_render,
-                            ]
-                        else:
-                            # on first overflow clear the live-render and display terminal too small message
-                            self._is_overflowing = True
-                            return [
-                                self._live_render.position_cursor(),
-                                *renderables,
-                                self._hide_render,
-                            ]
-                self._is_overflowing = False
+                        self._clear_render = self._hide_render
+                        return [
+                            clear_control,
+                            *renderables,
+                            self._hide_render,
+                        ]
+                # new clear
+                self._clear_render = self._live_render
                 return [
-                    self._live_render.position_cursor(),
+                    clear_control,
                     *renderables,
                     self._live_render,
                 ]
@@ -319,7 +314,7 @@ if __name__ == "__main__":
                             soure,
                             dest,
                             Text(
-                                repr(exchange_rate),
+                                f"{exchange_rate:.4f}",
                                 style="red" if exchange_rate < 1.0 else "green",
                             ),
                         )
