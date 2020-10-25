@@ -50,9 +50,11 @@ def check_output(output_file: str, output: str) -> None:
 
 def test_live_state() -> None:
 
-    with Live() as live:
+    with Live("") as live:
         assert live.is_started
         live.start()
+
+        assert live.item == ""
 
         assert live.is_started
         live.stop()
