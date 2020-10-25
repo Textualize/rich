@@ -37,7 +37,9 @@ def check_output(output_file: str, output: str) -> None:
 
     correct_output = get_capture_text("live", output_file)
 
-    assert output == correct_output, "Console output differs from the correct output"
+    assert output.replace("\r", "") == correct_output.replace(
+        "\r", ""
+    ), "Console output differs from the correct output"
 
 
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python3.7 or higher")
