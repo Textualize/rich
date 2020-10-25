@@ -1,3 +1,4 @@
+import difflib
 import io
 import os
 
@@ -37,6 +38,11 @@ def check_output(output_file: str, output: str) -> None:
     print("Make sure your console is tall enough or it may look odd")
     print("Current Output:\n", output)
     print("Correct Output:\n", correct_output)
+
+    if output != correct_output:
+        difflib.unified_diff(
+            correct_output, output, fromfile="Correct Output", tofile="Current Output"
+        )
     assert output == correct_output, "Console output differs from the correct output"
 
 
