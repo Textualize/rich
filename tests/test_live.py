@@ -35,14 +35,18 @@ def check_output(output_file: str, output: str) -> None:
         set_capture_text("live", output_file, output=output)
 
     correct_output = get_capture_text("live", output_file)
-    print("Make sure your console is tall enough or it may look odd")
-    print("Current Output:\n", output)
-    print("Correct Output:\n", correct_output)
 
     if output != correct_output:
-        difflib.unified_diff(
-            correct_output, output, fromfile="Correct Output", tofile="Current Output"
+        print("The difference between these two files")
+        print(
+            difflib.unified_diff(
+                correct_output,
+                output,
+                fromfile="Correct Output",
+                tofile="Current Output",
+            )
         )
+
     assert output == correct_output, "Console output differs from the correct output"
 
 
@@ -74,7 +78,6 @@ def test_growing_table_transient() -> None:
             live.refresh()
 
     output = capture.get()
-    capture_path = ("live",)
     check_output("growing_table_transient.txt", output=output)
 
 
@@ -98,7 +101,7 @@ def test_growing_table_autorefresh() -> None:
     console = create_capture_console()
     table = create_base_table()
 
-    with console.capture() as capture, Live(table, console=console) as live:
+    with console.capture() as capture, Live(table, console=console):
         for step in range(20):
             table.add_row(f"{step}", f"{step}", f"{step}")
     output = capture.get()
@@ -110,7 +113,7 @@ def test_growing_table_logging() -> None:
     console = create_capture_console()
     table = create_base_table()
 
-    with console.capture() as capture, Live(table, console=console) as live:
+    with console.capture() as capture, Live(table, console=console):
         for step in range(20):
             console.print(f"Attempting Step #{step}")
             table.add_row(f"{step}", f"{step}", f"{step}")
