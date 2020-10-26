@@ -132,7 +132,7 @@ def test_growing_table_logging() -> None:
     console = create_capture_console()
     table = create_base_table()
 
-    with console.capture() as capture, Live(table, console=console):
+    with console.capture() as capture, Live(table, console=console, auto_refresh=False):
         for step in range(20):
             console.print(f"Attempting Step #{step}")
             table.add_row(f"{step}", f"{step}", f"{step}")
