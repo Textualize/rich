@@ -11,9 +11,14 @@ from .highlighter import Highlighter, ReprHighlighter
 from .text import Text
 from .traceback import Traceback
 
-# we need this to retrieve the style for the
-# log level name with the same level number
-_original_levels = logging._levelToName.copy()
+# default styles for the level names
+_level_styles = {
+    logging.DEBUG: "logging.level.debug",
+    logging.INFO: "logging.level.info",
+    logging.WARNING: "logging.level.warning",
+    logging.ERROR: "logging.level.error",
+    logging.CRITICAL: "logging.level.critical",
+}
 
 
 class RichHandler(Handler):
@@ -54,8 +59,9 @@ class RichHandler(Handler):
     ]
     HIGHLIGHTER_CLASS: ClassVar[Type[Highlighter]] = ReprHighlighter
 
-    levels: Dict[int, str]
-    level_width: int
+    levels: ClassVar[Dict[int, str]] = {}
+    level_style: ClassVar[Dict[int, str]] = {}
+    level_width: ClassVar[Optional[int]] = None
 
     def __init__(
         self,
@@ -78,12 +84,10 @@ class RichHandler(Handler):
         self.console = console or get_console()
         self.highlighter = highlighter or self.HIGHLIGHTER_CLASS()
 
-        levels = getattr(self.__class__, "levels", {})
-        for level, level_name in levels.items():
+        for level, level_name in self.__class__.levels.items():
             logging.addLevelName(level, level_name)
 
-        level_width = getattr(self.__class__, "level_width", None)
-        level_width = level_width or max(
+        level_width = self.__class__.level_width or max(
             len(level_name) for level_name in logging._levelToName.values()
         )
 
@@ -104,8 +108,9 @@ class RichHandler(Handler):
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
         path = Path(record.pathname).name
-        log_style = f"logging.level.{_original_levels.get(record.levelno, '')}"
-        log_style = log_style.lower()
+        log_style = self.__class__.level_style.get(
+            record.levelno, _level_styles.get(record.levelno, "")
+        )
         message = self.format(record)
         time_format = None if self.formatter is None else self.formatter.datefmt
         log_time = datetime.fromtimestamp(record.created)

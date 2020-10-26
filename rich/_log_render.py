@@ -10,6 +10,16 @@ if TYPE_CHECKING:
 
 
 class LogRender:
+    """A helper class to render log records.
+
+    Args:
+        show_time (bool): Show a column for the time. Defaults to True.
+        show_level (bool): Show a column for the level. Defaults to True.
+        show_path (bool): Show the path to the original log call. Defaults to True.
+        time_format (str): The time format for the log time. Defaults to "[%x %X]".
+        level_width (int): The width of the level column. Defaults to 8.
+    """
+
     def __init__(
         self,
         show_time: bool = True,

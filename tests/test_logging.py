@@ -82,16 +82,17 @@ def test_custom_level_name():
             logging.WARNING: "WARN",
             logging.ERROR: "ERR",
             # custom level
-            9: "FOO",
+            11: "FOO",
         }
         level_width = 4
 
     handler_custom_levels = MyHandler(console=console)
     log.addHandler(handler_custom_levels)
+    log.setLevel(logging.DEBUG)
 
     log.warning("Deprecated!")
     log.error("Access denied!")
-    log._log(9, "Custom log level", ())
+    log.log(11, "Custom log level")
     log.critical("Longer name")
 
     render = handler_custom_levels.console.file.getvalue()
