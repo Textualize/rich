@@ -149,11 +149,6 @@ The Live class will create an internal Console object which you can access via `
             time.sleep(0.4)
             table.add_row(f"{row}", f"description {row}", "[red]ERROR")
 
-    with Live() as live:
-        task = progress.add_task(total=10)
-        for job in range(10):
-            run_job(job)
-            progress.advance(task)
 
 If you have another Console object you want to use, pass it in to the :class:`~rich.live.Live` constructor. Here's an example::
 
