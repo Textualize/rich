@@ -35,7 +35,7 @@ class Live(JupyterMixin, RenderHook):
         *,
         console: Console = None,
         auto_refresh: bool = True,
-        refresh_per_second: float = 1,
+        refresh_per_second: float = 4,
         transient: bool = False,
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
