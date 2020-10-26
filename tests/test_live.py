@@ -21,7 +21,7 @@ def create_capture_console(*, width: int = 60, height: int = 80) -> Console:
         file=io.StringIO(),
         force_terminal=True,
         legacy_windows=False,
-        color_system=None,
+        color_system=None,  # use no color system to reduce complexity of output
     )
 
 
@@ -188,15 +188,14 @@ def test_growing_table_file_console() -> None:
 
     table = create_base_table()
 
-    with console.capture() as capture, Live(
-        table, console=console, transient=True
-    ) as live:
+    with console.capture() as capture, Live(table, console=console) as live:
         for step in range(20):
+            console.print(f"step {step}")
             table.add_row(f"{step}", f"{step}", f"{step}")
             live.refresh()
 
     output = capture.get()
-    assert output == ""  # ensure nothing is printed for a file
+    check_output("growing_table_file_console.txt", output=output)
 
 
 def generate_random_data_table() -> Table:

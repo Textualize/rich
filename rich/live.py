@@ -184,6 +184,11 @@ class Live(JupyterMixin, RenderHook):
         elif self.console.is_terminal and not self.console.is_dumb_terminal:
             with self._lock, self.console:
                 self.console.print(Control(""))
+        elif (
+            not self.is_started and not self.transient
+        ):  # if it is finished allow files or dumb-terminals to see final result
+            with self.console:
+                self.console.print(Control(""))
 
     def _disable_redirect_io(self):
         """Disable redirecting of stdout / stderr."""
@@ -227,6 +232,11 @@ class Live(JupyterMixin, RenderHook):
                     *renderables,
                     self._live_render,
                 ]
+        elif (
+            not self.is_started and not self.transient
+        ):  # if it is finished render the final output for files or dumb_terminals
+            return [*renderables, self._live_render]
+
         return renderables
 
 
