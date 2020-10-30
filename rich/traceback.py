@@ -202,7 +202,9 @@ class Traceback:
         Returns:
             Traceback: A Traceback instance that may be printed.
         """
-        rich_traceback = cls.extract(exc_type, exc_value, traceback)
+        rich_traceback = cls.extract(
+            exc_type, exc_value, traceback, show_locals=show_locals
+        )
         return Traceback(
             rich_traceback,
             width=width,
@@ -290,7 +292,7 @@ class Traceback:
                 "pygments.string": token_style(String),
                 "pygments.function": token_style(Name.Function),
                 "pygments.number": token_style(Number),
-                "repr.indent": token_style(Comment),
+                "repr.indent": token_style(Comment) + Style(dim=True),
                 "repr.str": token_style(String),
                 "repr.brace": token_style(TextToken) + Style(bold=True),
                 "repr.number": token_style(Number),
