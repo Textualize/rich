@@ -117,6 +117,7 @@ def track(
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
         pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
         update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
+        show_remaining_time (bool, optional): Show a column with the estimated time remaining. Defaults to True.
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
 
