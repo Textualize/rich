@@ -72,7 +72,10 @@ class RichHandler(Handler):
         self.console = console or get_console()
         self.highlighter = highlighter or self.HIGHLIGHTER_CLASS()
         self._log_render = LogRender(
-            show_time=show_time, show_level=show_level, show_path=show_path
+            show_time=show_time,
+            show_level=show_level,
+            show_path=show_path,
+            level_width=None,
         )
         self.enable_link_path = enable_link_path
         self.markup = markup
@@ -93,7 +96,9 @@ class RichHandler(Handler):
             Text: A tuple of the style and level name.
         """
         level_name = record.levelname
-        level_text = Text.styled(level_name, f"logging.level.{level_name.lower()}")
+        level_text = Text.styled(
+            level_name.ljust(8), f"logging.level.{level_name.lower()}"
+        )
         return level_text
 
     def emit(self, record: LogRecord) -> None:
