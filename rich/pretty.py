@@ -92,6 +92,7 @@ class Pretty:
         indent_guides (bool, optional): Enable indentation guides. Defaults to False.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
+        max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
     """
 
     def __init__(
@@ -105,6 +106,7 @@ class Pretty:
         no_wrap: Optional[bool] = False,
         indent_guides: bool = False,
         max_length: int = None,
+        max_string: int = None,
     ) -> None:
         self._object = _object
         self.highlighter = highlighter or ReprHighlighter()
@@ -114,6 +116,7 @@ class Pretty:
         self.no_wrap = no_wrap
         self.indent_guides = indent_guides
         self.max_length = max_length
+        self.max_string = max_string
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -123,6 +126,7 @@ class Pretty:
             max_width=options.max_width,
             indent_size=self.indent_size,
             max_length=self.max_length,
+            max_string=self.max_string,
         )
         pretty_text = Text(
             pretty_str,
@@ -310,12 +314,14 @@ class _Line:
         return f"{self.whitespace}{self.text}{self.node or ''}{self.suffix}"
 
 
-def traverse(_object: Any, max_length: int = None) -> Node:
+def traverse(_object: Any, max_length: int = None, max_string: int = None) -> Node:
     """Traverse object and generate a tree.
 
     Args:
         _object (Any): Object to be traversed.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to None.
+        max_string (int, optional): Maximum length of string before truncating, or None to disable truncating.
             Defaults to None.
 
     Returns:
@@ -324,10 +330,18 @@ def traverse(_object: Any, max_length: int = None) -> Node:
 
     def to_repr(obj: Any) -> str:
         """Get repr string for an object, but catch errors."""
-        try:
-            obj_repr = repr(obj)
-        except Exception as error:
-            obj_repr = f"<repr-error '{error}'>"
+        if (
+            max_string is not None
+            and isinstance(obj, (bytes, str))
+            and len(obj) > max_string
+        ):
+            truncated = len(obj) - max_string
+            obj_repr = f"{obj[:max_string]!r}+{truncated}"
+        else:
+            try:
+                obj_repr = repr(obj)
+            except Exception as error:
+                obj_repr = f"<repr-error '{error}'>"
         return obj_repr
 
     visited_ids: Set[int] = set()
@@ -397,6 +411,7 @@ def pretty_repr(
     indent_size: int = 4,
     expand_all: bool = False,
     max_length: int = None,
+    max_string: int = None,
 ) -> str:
     """Prettify repr string by expanding on to new lines to fit within a given width.
 
@@ -407,6 +422,8 @@ def pretty_repr(
         expand_all (bool, optional): Expand all containers regardless of available width. Defaults to False.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
+        max_string (int, optional): Maximum length of string before truncating, or None to disable truncating.
+            Defaults to None.
 
     Returns:
         str: A possibly multi-line representation of the object.
@@ -415,7 +432,7 @@ def pretty_repr(
     if isinstance(_object, Node):
         node = _object
     else:
-        node = traverse(_object, max_length=max_length)
+        node = traverse(_object, max_length=max_length, max_string=max_string)
     repr_str = node.render(
         max_width=max_width, indent_size=indent_size, expand_all=expand_all
     )
@@ -427,6 +444,7 @@ def pprint(
     *,
     console: "Console" = None,
     max_length: int = None,
+    max_string: int = None,
     indent_guides: bool = True,
 ):
     """A convenience function for pretty printing.
@@ -436,10 +454,18 @@ def pprint(
         console (Console, optional): Console instance, or None to use default. Defaults to None.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
+        max_string (int, optional): Maximum length of strings before truncating, or None to disable. Defaults to None.
         indent_guides (bool, optional): Enable indentation guides. Defaults to True.
     """
     _console = get_console() if console is None else console
-    _console.print(Pretty(_object, max_length=max_length, indent_guides=indent_guides))
+    _console.print(
+        Pretty(
+            _object,
+            max_length=max_length,
+            max_string=max_string,
+            indent_guides=indent_guides,
+        )
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover
@@ -470,7 +496,7 @@ if __name__ == "__main__":  # pragma: no cover
                 "pear",
                 "kumquat",
                 "kumquat",
-                "durian",
+                "durian" * 100,
             ]
         ),
         "atomic": (False, True, None),
@@ -480,4 +506,4 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich import print
 
-    print(Pretty(data, indent_guides=True))
+    print(Pretty(data, indent_guides=True, max_string=20))

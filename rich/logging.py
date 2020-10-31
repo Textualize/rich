@@ -35,7 +35,7 @@ class RichHandler(Handler):
         tracebacks_extra_lines (int, optional): Additional lines of code to render tracebacks, or None for full width. Defaults to None.
         tracebacks_theme (str, optional): Override pygments theme used in traceback.
         tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to False.
-
+        tracebacks_show_locals (bool, optional): Enable display of locals in tracebacks. Defaults to False.
     """
 
     KEYWORDS: ClassVar[Optional[List[str]]] = [
@@ -66,6 +66,7 @@ class RichHandler(Handler):
         tracebacks_extra_lines: int = 3,
         tracebacks_theme: Optional[str] = None,
         tracebacks_word_wrap: bool = True,
+        tracebacks_show_locals: bool = False,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
@@ -80,6 +81,7 @@ class RichHandler(Handler):
         self.tracebacks_extra_lines = tracebacks_extra_lines
         self.tracebacks_theme = tracebacks_theme
         self.tracebacks_word_wrap = tracebacks_word_wrap
+        self.tracebacks_show_locals = tracebacks_show_locals
 
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
@@ -109,6 +111,7 @@ class RichHandler(Handler):
                 extra_lines=self.tracebacks_extra_lines,
                 theme=self.tracebacks_theme,
                 word_wrap=self.tracebacks_word_wrap,
+                show_locals=self.tracebacks_show_locals,
             )
             message = record.getMessage()
 
@@ -148,7 +151,7 @@ if __name__ == "__main__":  # pragma: no cover
         level="NOTSET",
         format=FORMAT,
         datefmt="[%X]",
-        handlers=[RichHandler(rich_tracebacks=True)],
+        handlers=[RichHandler(rich_tracebacks=True, tracebacks_show_locals=True)],
     )
     log = logging.getLogger("rich")
 
@@ -179,10 +182,16 @@ if __name__ == "__main__":  # pragma: no cover
     log.info("POST /jsonrpc/ 200 65532")
     log.info("POST /admin/ 401 42234")
     log.warning("password was rejected for admin site.")
-    try:
-        1 / 0
-    except:
-        log.exception("An error of some kind occurred!")
+
+    def divide():
+        number = 1
+        divisor = 0
+        try:
+            number / divisor
+        except:
+            log.exception("An error of some kind occurred!")
+
+    divide()
     sleep(1)
     log.critical("Out of memory!")
     log.info("Server exited with code=-1")

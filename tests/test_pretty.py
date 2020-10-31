@@ -114,3 +114,10 @@ def test_pprint_max_items():
     console.begin_capture()
     pprint({"foo": 1, "bar": 2, "egg": 3}, console=console, max_length=2)
     assert console.end_capture() == """{'foo': 1, 'bar': 2, ... +1}\n"""
+
+
+def test_pprint_max_string():
+    console = Console(color_system=None)
+    console.begin_capture()
+    pprint(["Hello" * 20], console=console, max_string=8)
+    assert console.end_capture() == """['HelloHel'+92]\n"""
