@@ -1,13 +1,11 @@
-from typing import Any, Tuple, TYPE_CHECKING
-
 from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any, Tuple
 
 from .highlighter import ReprHighlighter
 from .panel import Panel
 from .pretty import Pretty
-from .text import Text, TextType
 from .table import Table
-
+from .text import Text, TextType
 
 if TYPE_CHECKING:
     from .console import ConsoleRenderable, RenderableType

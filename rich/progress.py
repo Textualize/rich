@@ -27,7 +27,6 @@ from typing import (
 )
 
 from . import filesize, get_console
-from .progress_bar import ProgressBar
 from .console import (
     Console,
     ConsoleRenderable,
@@ -40,6 +39,7 @@ from .control import Control
 from .highlighter import Highlighter
 from .jupyter import JupyterMixin
 from .live_render import LiveRender
+from .progress_bar import ProgressBar
 from .style import StyleType
 from .table import Table
 from .text import Text
@@ -846,8 +846,8 @@ class Progress(JupyterMixin, RenderHook):
         """Refresh (render) the progress information."""
         if self.console.is_jupyter:  # pragma: no cover
             try:
-                from ipywidgets import Output
                 from IPython.display import display
+                from ipywidgets import Output
             except ImportError:
                 import warnings
 
@@ -974,13 +974,13 @@ class Progress(JupyterMixin, RenderHook):
 
 if __name__ == "__main__":  # pragma: no coverage
 
-    import time
     import random
+    import time
 
     from .panel import Panel
+    from .rule import Rule
     from .syntax import Syntax
     from .table import Table
-    from .rule import Rule
 
     syntax = Syntax(
         '''def loop_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
