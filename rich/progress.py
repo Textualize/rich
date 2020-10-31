@@ -100,6 +100,7 @@ def track(
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
     update_period: float = 0.1,
+    show_remaining_time: bool = True,
 ) -> Iterable[ProgressType]:
     """Track progress by iterating over a sequence.
 
@@ -133,9 +134,12 @@ def track(
                 pulse_style=pulse_style,
             ),
             TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-            TimeRemainingColumn(),
         )
     )
+
+    if show_remaining_time:
+        columns.append(TimeRemainingColumn())
+
     progress = Progress(
         *columns,
         auto_refresh=auto_refresh,
