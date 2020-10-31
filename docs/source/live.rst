@@ -101,7 +101,6 @@ You should set this to something lower than 4 if you know your updates will not 
 
 You might want to disable auto-refresh entirely if your updates are not very frequent, which you can do by setting ``auto_refresh=False`` on the constructor.
 If you disable auto-refresh you will need to call :meth:`~rich.live.Live.refresh` manually or :meth:`~rich.live.Live.update` with ``refresh=True``.
-This is
 
 Hide "Terminal Too Small" Warning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -243,103 +243,105 @@ class Live(JupyterMixin, RenderHook):
 if __name__ == "__main__":
     import random
     import time
+    from itertools import cycle
     from typing import Dict, List, Tuple
 
-    from .console import Console, RenderGroup
+    from .console import Console
     from .live import Live
     from .panel import Panel
+    from .rule import Rule
+    from .syntax import Syntax
     from .table import Table
     from .text import Text
 
     console = Console()
 
-    def table_example() -> None:
-        Data = List[List[int]]
+    syntax = Syntax(
+        '''def loop_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
+    """Iterate and generate a tuple with a flag for last value."""
+    iter_values = iter(values)
+    try:
+        previous_value = next(iter_values)
+    except StopIteration:
+        return
+    for value in iter_values:
+        yield False, previous_value
+        previous_value = value
+    yield True, previous_value''',
+        "python",
+        line_numbers=True,
+    )
 
-        def generate_table(data: Data) -> Table:
-            table = Table()
-            for data_row in data:
-                table.add_row(*[hex(data_cell) for data_cell in data_row])
+    table = Table("foo", "bar", "baz")
+    table.add_row("1", "2", "3")
 
-            return table
+    progress_renderables = [
+        "You can make the terminal shorter and taller to see the live table hide"
+        "Text may be printed while the progress bars are rendering.",
+        Panel("In fact, [i]any[/i] renderable will work"),
+        "Such as [magenta]tables[/]...",
+        table,
+        "Pretty printed structures...",
+        {"type": "example", "text": "Pretty printed"},
+        "Syntax...",
+        syntax,
+        Rule("Give it a try!"),
+    ]
 
-        def generate_data() -> Data:
-            return [
-                [random.randint(0, 20) for _ in range(random.randint(0, 8))]
-                for _ in range(random.randint(12, 20))
-            ]
+    examples = cycle(progress_renderables)
 
-        with Live(console=console, refresh_per_second=1, transient=True) as live_table:
-            for _ in range(20):
-                data = generate_data()
-                time.sleep(0.5)
-                console.print("hello")
-                live_table.update(generate_table(data))
+    exchanges = [
+        "SGD",
+        "MYR",
+        "EUR",
+        "USD",
+        "AUD",
+        "JPY",
+        "CNH",
+        "HKD",
+        "CAD",
+        "INR",
+        "DKK",
+        "GBP",
+        "RUB",
+        "NZD",
+        "MXN",
+        "IDR",
+        "TWD",
+        "THB",
+        "VND",
+    ]
+    with Live(console=console) as live_table:
+        exchange_rate_dict: Dict[Tuple[str, str], float] = {}
 
-    def panel_example() -> None:
+        for index in range(100):
+            select_exchange = exchanges[index % len(exchanges)]
 
-        with Live(auto_refresh=False) as live_panel:
-            for index in range(20):
-                panel = Panel(f"Hello, [red]World! {index}\n" * index, title="Welcome")
-                live_panel.update(panel, refresh=True)
-                time.sleep(0.2)
+            for exchange in exchanges:
+                if exchange == select_exchange:
+                    continue
+                time.sleep(0.4)
+                if random.randint(0, 10) < 1:
+                    console.log(next(examples))
+                exchange_rate_dict[(select_exchange, exchange)] = 200 / (
+                    (random.random() * 320) + 1
+                )
+                if len(exchange_rate_dict) > len(exchanges) - 1:
+                    exchange_rate_dict.pop(list(exchange_rate_dict.keys())[0])
+                table = Table(title="Exchange Rates")
 
-    def table_example2() -> None:
-        exchanges = [
-            "SGD",
-            "MYR",
-            "EUR",
-            "USD",
-            "AUD",
-            "JPY",
-            "CNH",
-            "HKD",
-            "CAD",
-            "INR",
-            "DKK",
-            "GBP",
-            "RUB",
-            "NZD",
-            "MXN",
-            "IDR",
-            "TWD",
-            "THB",
-            "VND",
-        ]
-        with Live(console=console) as live_table:
-            exchange_rate_dict: Dict[Tuple[str, str], float] = {}
+                table.add_column("Source Currency")
+                table.add_column("Destination Currency")
+                table.add_column("Exchange Rate")
 
-            for index in range(100):
-                select_exchange = exchanges[index % len(exchanges)]
-                time.sleep(0.1)
-                console.log("can still log")
-                for exchange in exchanges:
-                    if exchange == select_exchange:
-                        continue
-
-                    exchange_rate_dict[(select_exchange, exchange)] = 20 / (
-                        (random.random() * 40) + 1
+                for ((soure, dest), exchange_rate) in exchange_rate_dict.items():
+                    table.add_row(
+                        soure,
+                        dest,
+                        Text(
+                            f"{exchange_rate:.4f}",
+                            style="red" if exchange_rate < 1.0 else "green",
+                        ),
                     )
-                    if len(exchange_rate_dict) > len(exchanges) - 1:
-                        exchange_rate_dict.pop(list(exchange_rate_dict.keys())[0])
-                    table = Table(title="Exchange Rates")
 
-                    table.add_column("Source Currency")
-                    table.add_column("Destination Currency")
-                    table.add_column("Exchange Rate")
-
-                    for ((soure, dest), exchange_rate) in exchange_rate_dict.items():
-                        table.add_row(
-                            soure,
-                            dest,
-                            Text(
-                                f"{exchange_rate:.4f}",
-                                style="red" if exchange_rate < 1.0 else "green",
-                            ),
-                        )
-
-                    live_table.update(table)
-
-    table_example()
-    table_example2()
-    panel_example()
+                live_table.update(table)
