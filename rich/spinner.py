@@ -10,8 +10,14 @@ class Spinner:
     def loop(self):
         i = 0
         while self._run:
-            print("{r}{icon} {message}".format(r=RECALL, icon=self._icons[i % len(self._icons)], message=self.message),
-                  end="")
+            print(
+                "{r}{icon} {message}".format(
+                    r=RECALL,
+                    icon=self._icons[i % len(self._icons)],
+                    message=self.message,
+                ),
+                end="",
+            )
             i += 1
             sleep(self._delay)
 
