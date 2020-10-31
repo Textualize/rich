@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from logging import Handler, LogRecord
 from pathlib import Path
-from typing import ClassVar, List, Optional, Tuple, Type
+from typing import ClassVar, List, Optional, Type
 
 from . import get_console
 from ._log_render import LogRender
@@ -83,27 +83,26 @@ class RichHandler(Handler):
         self.tracebacks_word_wrap = tracebacks_word_wrap
         self.tracebacks_show_locals = tracebacks_show_locals
 
-    def get_style_and_level(self, record: LogRecord) -> Tuple[str, str]:
+    def get_level_text(self, record: LogRecord) -> Text:
         """Get the level name from the record.
 
         Args:
             record (LogRecord): LogRecord instance.
 
         Returns:
-            Tuple[str, str]: A tuple of the style and level name.
+            Text: A tuple of the style and level name.
         """
         level_name = record.levelname
-        style = f"logging.level.{level_name.lower()}"
-        return (style, level_name)
+        level_text = Text.styled(level_name, f"logging.level.{level_name.lower()}")
+        return level_text
 
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
         path = Path(record.pathname).name
-        log_style, level_name = self.get_style_and_level(record)
+        level = self.get_level_text(record)
         message = self.format(record)
         time_format = None if self.formatter is None else self.formatter.datefmt
         log_time = datetime.fromtimestamp(record.created)
-        level = Text.styled(level_name, log_style)
 
         traceback = None
         if (
