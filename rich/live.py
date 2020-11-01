@@ -103,7 +103,7 @@ class Live(JupyterMixin, RenderHook):
         transient (bool, optional): Clear the renderable on exit. Defaults to False.
         redirect_stdout (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
         redirect_stderr (bool, optional): Enable redirection of stderr. Defaults to True.
-        hide_overflow (bool, optional): Checks that the renderable isn't too large for terminal and auto-hides. Defaults to True.
+        vertical_overflow (VerticalOverflowMethod, optional): How to handle renderable when it is too tall for the console. Defaults to "ellipsis".
     """
 
     def __init__(
