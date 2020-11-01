@@ -154,8 +154,6 @@ def test_growing_display_file_console() -> None:
             display += f"Step {step}\n"
             live.update(display, refresh=True)
     output = console.end_capture()
-    print(repr(output))
-    print(output)
     assert (
         output
         == "Step 0\nStep 1\nStep 2\nStep 3\nStep 4\nStep 5\nStep 6\nStep 7\nStep 8\nStep 9\n"
