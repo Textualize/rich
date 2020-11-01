@@ -2,7 +2,10 @@ import sys
 from threading import Event, RLock, Thread
 from typing import IO, Any, List, Optional
 
+from typing_extensions import Literal
+
 from .__init__ import get_console
+from ._loop import loop_last
 from .console import (
     Console,
     ConsoleOptions,
@@ -13,10 +16,10 @@ from .console import (
 )
 from .control import Control
 from .jupyter import JupyterMixin
-from .live_render import LiveRender
 from .progress import _FileProxy
 from .segment import Segment
-from ._loop import loop_last
+
+VerticalOverflowMethod = Literal["crop", "ellipsis", "visible"]
 
 
 class _RefreshThread(Thread):
@@ -37,20 +40,20 @@ class _RefreshThread(Thread):
 
 
 class _LiveRender:
-    def __init__(self, renderable: RenderableType, hide_overflow: bool) -> None:
+    def __init__(
+        self, renderable: RenderableType, vertical_overflow: VerticalOverflowMethod
+    ) -> None:
         self.renderable = renderable
-        self.hide_overflow = hide_overflow
+        self.vertical_overflow = vertical_overflow
         self.shape: Optional[Tuple[int, int]] = None
 
     def set_renderable(self, renderable: RenderableType) -> None:
         self.renderable = renderable
 
-    def position_cursor(self, max_height: int) -> Control:
+    def position_cursor(self) -> Control:
         if self.shape is not None:
             _, height = self.shape
-            return Control(
-                "\r\x1b[2K" + "\x1b[1A\x1b[2K" * (min(height, max_height) - 1)
-            )
+            return Control("\r\x1b[2K" + "\x1b[1A\x1b[2K" * (height - 1))
         return Control("")
 
     def restore_cursor(self) -> Control:
@@ -70,11 +73,14 @@ class _LiveRender:
         lines = console.render_lines(self.renderable, options, pad=False)
 
         shape = Segment.get_shape(lines)
-
-        if self.hide_overflow and shape[1] > console.size.height:
-            lines = console.render_lines("Terminal too small", options, pad=False)
-            shape = Segment.get_shape(lines)
-
+        width, height = shape
+        if shape[1] > console.size.height:
+            if self.vertical_overflow == "crop":
+                lines = lines[: console.size.height]
+                shape = Segment.get_shape(lines)
+            elif self.vertical_overflow == "ellipsis":
+                lines = lines[: (console.size.height - 1)] + [[Segment("...")]]
+                shape = Segment.get_shape(lines)
         self.shape = shape
 
         width, height = self.shape
@@ -109,11 +115,11 @@ class Live(JupyterMixin, RenderHook):
         transient: bool = False,
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
-        hide_overflow: bool = True,
+        vertical_overflow: VerticalOverflowMethod = "crop",
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self.console = console if console is not None else get_console()
-        self._live_render = _LiveRender(renderable, hide_overflow=hide_overflow)
+        self._live_render = _LiveRender(renderable, vertical_overflow=vertical_overflow)
 
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
@@ -129,7 +135,7 @@ class Live(JupyterMixin, RenderHook):
         self._refresh_thread: Optional[_RefreshThread] = None
         self.refresh_per_second = refresh_per_second
 
-        self.hide_overflow = hide_overflow
+        self.vertical_overflow = vertical_overflow
         # cant store just clear_control as the live_render shape is lazily computed on render
 
     def start(self) -> None:
@@ -142,7 +148,7 @@ class Live(JupyterMixin, RenderHook):
             self._enable_redirect_io()
             self.console.push_render_hook(self)
             self._started = True
-            self._live_render.hide_overflow = self.hide_overflow
+            self._live_render.vertical_overflow = self.vertical_overflow
 
             if self.auto_refresh:
                 self._refresh_thread = _RefreshThread(self, self.refresh_per_second)
@@ -158,7 +164,7 @@ class Live(JupyterMixin, RenderHook):
                 if self.auto_refresh and self._refresh_thread is not None:
                     self._refresh_thread.stop()
                 # allow it to fully render on the last even if overflow
-                self._live_render.hide_overflow = False
+                self._live_render.vertical_overflow = "visible"
                 self.refresh()
                 if self.console.is_terminal:
                     self.console.line()
@@ -258,7 +264,7 @@ class Live(JupyterMixin, RenderHook):
             with self._lock:
                 # determine the control command needed to clear previous rendering
                 return [
-                    self._live_render.position_cursor(self.console.size.height),
+                    self._live_render.position_cursor(),
                     *renderables,
                     self._live_render,
                 ]

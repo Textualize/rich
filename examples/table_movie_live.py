@@ -74,7 +74,9 @@ table_centered = Columns((table,), align="center", expand=True)
 
 console.clear()
 
-with Live(table_centered, console=console, refresh_per_second=10):
+with Live(
+    table_centered, console=console, refresh_per_second=10, vertical_overflow="ellipsis"
+):
 
     with beat(10):
         table.add_column("Release Date", no_wrap=True)
