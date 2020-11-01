@@ -41,10 +41,6 @@ def check_output(output_file: str, output: str) -> None:
 
     correct_output = get_capture_text("live", output_file).replace("\r", "")
 
-    if os.getenv("VERBOSE") is not None:
-        print("Current Output\n", output)
-        print("Correct Output\n", correct_output)
-
     assert output == correct_output, "Console output differs from the correct output"
 
 

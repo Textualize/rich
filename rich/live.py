@@ -86,6 +86,19 @@ class _LiveRender:
 
 
 class Live(JupyterMixin, RenderHook):
+    """Renders an auto-updating live display of any given renderable.
+
+    Args:
+        renderable (RenderableType, optional): [The renderable to live display. Defaults to displaying nothing.
+        console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
+        auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()` or `update()` with refresh flag. Defaults to True
+        refresh_per_second (float, optional): Number of times per second to refresh the live display. Defaults to 1.
+        transient (bool, optional): Clear the renderable on exit. Defaults to False.
+        redirect_stdout (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
+        redirect_stderr (bool, optional): Enable redirection of stderr. Defaults to True.
+        hide_overflow (bool, optional): Checks that the renderable isn't too large for terminal and auto-hides. Defaults to True.
+    """
+
     def __init__(
         self,
         renderable: RenderableType = "",
@@ -98,18 +111,6 @@ class Live(JupyterMixin, RenderHook):
         redirect_stderr: bool = True,
         hide_overflow: bool = True,
     ) -> None:
-        """Renders an auto-updating live display of any given renderable.
-
-        Args:
-            renderable (RenderableType, optional): [The renderable to live display. Defaults to displaying nothing.
-            console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
-            auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()` or `update()` with refresh flag. Defaults to True
-            refresh_per_second (float, optional): Number of times per second to refresh the live display. Defaults to 1.
-            transient (bool, optional): Clear the renderable on exit. Defaults to False.
-            redirect_stdout (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
-            redirect_stderr (bool, optional): Enable redirection of stderr. Defaults to True.
-            hide_overflow (bool, optional): Checks that the renderable isn't too large for terminal and auto-hides. Defaults to True.
-        """
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self.console = console if console is not None else get_console()
         self._live_render = _LiveRender(renderable, hide_overflow=hide_overflow)
@@ -190,7 +191,7 @@ class Live(JupyterMixin, RenderHook):
                 sys.stdout = _FileProxy(self.console, sys.stdout)
 
     @property
-    def item(self) -> RenderableType:
+    def renderable(self) -> RenderableType:
         """Get the renderable that is being displayed
 
         Returns:
@@ -198,15 +199,6 @@ class Live(JupyterMixin, RenderHook):
         """
         with self._lock:
             return self._live_render.renderable
-
-    @property
-    def is_started(self) -> bool:
-        """Indicate if it is currently live rendering.
-
-        Returns:
-            bool: Is live rendering.
-        """
-        return self._started
 
     def update(self, renderable: RenderableType, *, refresh: bool = False) -> None:
         """Update the renderable that is being displayed
@@ -243,7 +235,7 @@ class Live(JupyterMixin, RenderHook):
             with self._lock, self.console:
                 self.console.print(Control(""))
         elif (
-            not self.is_started and not self.transient
+            not self._started and not self.transient
         ):  # if it is finished allow files or dumb-terminals to see final result
             with self.console:
                 self.console.print(Control(""))
@@ -271,14 +263,14 @@ class Live(JupyterMixin, RenderHook):
                     self._live_render,
                 ]
         elif (
-            not self.is_started and not self.transient
+            not self._started and not self.transient
         ):  # if it is finished render the final output for files or dumb_terminals
             return [*renderables, self._live_render]
 
         return renderables
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     import random
     import time
     from itertools import cycle
