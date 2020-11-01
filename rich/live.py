@@ -37,9 +37,9 @@ class _RefreshThread(Thread):
 
 
 class _LiveRender:
-    def __init__(self, renderable: RenderableType, auto_hide: bool) -> None:
+    def __init__(self, renderable: RenderableType, hide_overflow: bool) -> None:
         self.renderable = renderable
-        self.auto_hide = auto_hide
+        self.hide_overflow = hide_overflow
         self.shape: Optional[Tuple[int, int]] = None
 
     def set_renderable(self, renderable: RenderableType) -> None:
@@ -71,7 +71,7 @@ class _LiveRender:
 
         shape = Segment.get_shape(lines)
 
-        if self.auto_hide and shape[1] > console.size.height:
+        if self.hide_overflow and shape[1] > console.size.height:
             lines = console.render_lines("Terminal too small", options, pad=False)
             shape = Segment.get_shape(lines)
 
@@ -112,7 +112,7 @@ class Live(JupyterMixin, RenderHook):
         """
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self.console = console if console is not None else get_console()
-        self._live_render = _LiveRender(renderable, auto_hide=hide_overflow)
+        self._live_render = _LiveRender(renderable, hide_overflow=hide_overflow)
 
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
@@ -141,6 +141,7 @@ class Live(JupyterMixin, RenderHook):
             self._enable_redirect_io()
             self.console.push_render_hook(self)
             self._started = True
+            self._live_render.hide_overflow = self.hide_overflow
 
             if self.auto_refresh:
                 self._refresh_thread = _RefreshThread(self, self.refresh_per_second)
@@ -155,9 +156,8 @@ class Live(JupyterMixin, RenderHook):
             try:
                 if self.auto_refresh and self._refresh_thread is not None:
                     self._refresh_thread.stop()
-                self._live_render.auto_hide = (
-                    False  # allow it to fully render on the last
-                )
+                # allow it to fully render on the last even if overflow
+                self._live_render.hide_overflow = False
                 self.refresh()
                 if self.console.is_terminal:
                     self.console.line()
