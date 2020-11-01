@@ -16,6 +16,7 @@ from .console import (
 )
 from .control import Control
 from .jupyter import JupyterMixin
+from .live_render import LiveRender
 from .progress import _FileProxy
 from .segment import Segment
 from .style import Style
@@ -40,33 +41,13 @@ class _RefreshThread(Thread):
             self.live.refresh()
 
 
-class _LiveRender:
+class _LiveRender(LiveRender):
     def __init__(
         self, renderable: RenderableType, vertical_overflow: VerticalOverflowMethod
     ) -> None:
         self.renderable = renderable
         self.vertical_overflow = vertical_overflow
-        self.shape: Optional[Tuple[int, int]] = None
-
-    def set_renderable(self, renderable: RenderableType) -> None:
-        self.renderable = renderable
-
-    def position_cursor(self) -> Control:
-        if self.shape is not None:
-            _, height = self.shape
-            return Control("\r\x1b[2K" + "\x1b[1A\x1b[2K" * (height - 1))
-        return Control("")
-
-    def restore_cursor(self) -> Control:
-        """Get control codes to clear the render and restore the cursor to its previous position.
-
-        Returns:
-            Control: A Control instance that may be printed.
-        """
-        if self.shape is not None:
-            _, height = self.shape
-            return Control("\r" + "\x1b[1A\x1b[2K" * height)
-        return Control("")
+        self._shape: Optional[Tuple[int, int]] = None
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
@@ -84,7 +65,7 @@ class _LiveRender:
                     [Segment("...", style=Style(bold=True))]
                 ]
                 shape = Segment.get_shape(lines)
-        self.shape = shape
+        self._shape = shape
 
         for last, line in loop_last(lines):
             yield from line
