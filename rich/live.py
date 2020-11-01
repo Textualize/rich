@@ -18,6 +18,7 @@ from .control import Control
 from .jupyter import JupyterMixin
 from .progress import _FileProxy
 from .segment import Segment
+from .style import Style
 
 VerticalOverflowMethod = Literal["crop", "ellipsis", "visible"]
 
@@ -73,18 +74,18 @@ class _LiveRender:
         lines = console.render_lines(self.renderable, options, pad=False)
 
         shape = Segment.get_shape(lines)
-        width, height = shape
-        if shape[1] > console.size.height:
+        _, height = shape
+        if height > console.size.height:
             if self.vertical_overflow == "crop":
                 lines = lines[: console.size.height]
                 shape = Segment.get_shape(lines)
             elif self.vertical_overflow == "ellipsis":
-                lines = lines[: (console.size.height - 1)] + [[Segment("...")]]
+                lines = lines[: (console.size.height - 1)] + [
+                    [Segment("...", style=Style(bold=True))]
+                ]
                 shape = Segment.get_shape(lines)
         self.shape = shape
 
-        width, height = self.shape
-        lines = Segment.set_shape(lines, width, height)
         for last, line in loop_last(lines):
             yield from line
             if not last:
@@ -115,7 +116,7 @@ class Live(JupyterMixin, RenderHook):
         transient: bool = False,
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
-        vertical_overflow: VerticalOverflowMethod = "crop",
+        vertical_overflow: VerticalOverflowMethod = "ellipsis",
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self.console = console if console is not None else get_console()

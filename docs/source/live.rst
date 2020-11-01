@@ -1,6 +1,5 @@
 .. _live:
 
-
 Live Display
 ============
 
@@ -12,7 +11,7 @@ To see some live display examples, try this from the command line::
 
 .. note::
 
-    Make sure your terminal is tall enough or you may see it print "Terminal too small"
+    If you see ellipsis "...", this indicates that the terminal is not tall enough to show the full table.
 
 Basic Usage
 -----------
@@ -92,7 +91,6 @@ You can also make the live display disappear on exit by setting ``transient=True
     with Live(transient=True) as live:
         ...
 
-
 Auto refresh
 ~~~~~~~~~~~~
 
@@ -102,21 +100,19 @@ You should set this to something lower than 4 if you know your updates will not 
 You might want to disable auto-refresh entirely if your updates are not very frequent, which you can do by setting ``auto_refresh=False`` on the constructor.
 If you disable auto-refresh you will need to call :meth:`~rich.live.Live.refresh` manually or :meth:`~rich.live.Live.update` with ``refresh=True``.
 
-Hide "Terminal Too Small" Warning
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Vertical Overflow
+~~~~~~~~~~~~~~~~~
 
-By default, the live display will not render if the renderable is too tall for the console and instead will render a warning line "Terminal Too Small".
-This is because the console cannot properly clear a renderable if it is too large (limitation on terminals). You can disable this by setting ``hide_overflow=False`` on the constructor.
+By default, the live display will display ellipsis if the renderable is too large for the terminal. You can adjust this by setting the
+``vertical_overflow`` argument on the :class:`~rich.live.Live` constructor.
 
-You may want to disable this feature if:
-
-1. You want to always see the live display and also do not mind that it will fill-up with previous renderings.
-2. If you need the display to render as fast as possible. (This check performs a pre-rendering of the renderable which may be costly)
-
+- crop: Show renderable up to the terminal height. The rest is hidden
+- ellipsis: Similar to crop except last line shows "...". This is the default behavior.
+- visible: Will allow the whole renderable to be shown. Note that the display cannot be properly cleared in this mode.
 
 .. note::
 
-    Once the live display stops, even if the display is too small it will render the last frame since it doesn't have to clear it.
+    Once the live display stops on a non-transient renderable, the last frame will render as **visible** since it doesn't have to be cleared clear it.
 
 Complex Renders
 ~~~~~~~~~~~~~~~
