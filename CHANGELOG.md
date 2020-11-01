@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added tracebacks_show_locals parameter to RichHandler
 - Applied dim=True to indent guide styles
 - Added max_string to Pretty
+- Added show_remaining_time parameter to progress.track
 
 ## [9.1.0] - 2020-10-23
 
