@@ -94,9 +94,12 @@ class AnsiDecoder:
             if plain_text is not None:
                 append(plain_text, self.style or None)
             elif ansi_codes is not None and ansi_codes.startswith("["):
+                # Translate in to semi-colon separated codes
+                # Ignore invalid codes, because we want to be lenient
                 codes = [
                     int(_code) for _code in ansi_codes[1:].split(";") if _code.isdigit()
                 ]
+                codes = [code for code in codes if code <= 255]
                 iter_codes = iter(codes)
                 for code in iter_codes:
                     if code == 0:
