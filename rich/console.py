@@ -1404,8 +1404,15 @@ class Console:
         _theme = theme or DEFAULT_TERMINAL_THEME
         stylesheet = ""
 
+        def strip_ansi_escape(text: str) -> str:
+            """Remove all ANSI escapes from string or bytes."""
+            return re.sub(r"\x1b[^m]*m", "", data)
+
         def escape(text: str) -> str:
             """Escape html."""
+            # As HTML will never render ANSI text, we better clean it until
+            # we can use a converter.
+            text = strip_ansi_escape(text)
             return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
         render_code_format = CONSOLE_HTML_FORMAT if code_format is None else code_format
