@@ -1,3 +1,4 @@
+"""Same as the table_movie.py but uses Live to update"""
 from contextlib import contextmanager
 import time
 

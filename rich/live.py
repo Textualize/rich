@@ -3,12 +3,20 @@ from threading import Event, RLock, Thread
 from typing import IO, Any, List, Optional
 
 from .__init__ import get_console
-from .console import Console, ConsoleRenderable, RenderableType, RenderHook
+from .console import (
+    Console,
+    ConsoleOptions,
+    ConsoleRenderable,
+    RenderableType,
+    RenderHook,
+    RenderResult,
+)
 from .control import Control
 from .jupyter import JupyterMixin
 from .live_render import LiveRender
 from .progress import _FileProxy
 from .segment import Segment
+from ._loop import loop_last
 
 
 class _RefreshThread(Thread):
@@ -26,6 +34,55 @@ class _RefreshThread(Thread):
     def run(self) -> None:
         while not self.done.wait(1 / self.refresh_per_second):
             self.live.refresh()
+
+
+class _LiveRender:
+    def __init__(self, renderable: RenderableType, auto_hide: bool) -> None:
+        self.renderable = renderable
+        self.auto_hide = auto_hide
+        self.shape: Optional[Tuple[int, int]] = None
+
+    def set_renderable(self, renderable: RenderableType) -> None:
+        self.renderable = renderable
+
+    def position_cursor(self, max_height: int) -> Control:
+        if self.shape is not None:
+            _, height = self.shape
+            return Control(
+                "\r\x1b[2K" + "\x1b[1A\x1b[2K" * (min(height, max_height) - 1)
+            )
+        return Control("")
+
+    def restore_cursor(self) -> Control:
+        """Get control codes to clear the render and restore the cursor to its previous position.
+
+        Returns:
+            Control: A Control instance that may be printed.
+        """
+        if self.shape is not None:
+            _, height = self.shape
+            return Control("\r" + "\x1b[1A\x1b[2K" * height)
+        return Control("")
+
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
+        lines = console.render_lines(self.renderable, options, pad=False)
+
+        shape = Segment.get_shape(lines)
+
+        if self.auto_hide and shape[1] > console.size.height:
+            lines = console.render_lines("Terminal too small", options, pad=False)
+            shape = Segment.get_shape(lines)
+
+        self.shape = shape
+
+        width, height = self.shape
+        lines = Segment.set_shape(lines, width, height)
+        for last, line in loop_last(lines):
+            yield from line
+            if not last:
+                yield Segment.line()
 
 
 class Live(JupyterMixin, RenderHook):
@@ -55,7 +112,7 @@ class Live(JupyterMixin, RenderHook):
         """
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self.console = console if console is not None else get_console()
-        self._live_render = LiveRender(renderable)
+        self._live_render = _LiveRender(renderable, auto_hide=hide_overflow)
 
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
@@ -72,9 +129,7 @@ class Live(JupyterMixin, RenderHook):
         self.refresh_per_second = refresh_per_second
 
         self.hide_overflow = hide_overflow
-        self._hide_render = LiveRender("Terminal too small\n")
         # cant store just clear_control as the live_render shape is lazily computed on render
-        self._clear_render = self._live_render
 
     def start(self) -> None:
         """Start live rendering display."""
@@ -100,6 +155,9 @@ class Live(JupyterMixin, RenderHook):
             try:
                 if self.auto_refresh and self._refresh_thread is not None:
                     self._refresh_thread.stop()
+                self._live_render.auto_hide = (
+                    False  # allow it to fully render on the last
+                )
                 self.refresh()
                 if self.console.is_terminal:
                     self.console.line()
@@ -207,28 +265,8 @@ class Live(JupyterMixin, RenderHook):
             # lock needs acquiring as user can modify live_render renerable at any time unlike in Progress.
             with self._lock:
                 # determine the control command needed to clear previous rendering
-                clear_control = self._clear_render.position_cursor()
-
-                # on non-transient allow the final live render to be displayed
-                # check that renderable doesn't overflow terminal height or it will
-                if self.hide_overflow and self._started:
-                    # determine height of renderable
-                    lines = self.console.render_lines(
-                        self._live_render.renderable, pad=False
-                    )
-                    renderable_height = Segment.get_shape(lines)[1]
-                    if renderable_height >= self.console.size.height:
-                        # continued overflow re-render terminal too small
-                        self._clear_render = self._hide_render
-                        return [
-                            clear_control,
-                            *renderables,
-                            self._hide_render,
-                        ]
-                # new clear
-                self._clear_render = self._live_render
                 return [
-                    clear_control,
+                    self._live_render.position_cursor(self.console.size.height),
                     *renderables,
                     self._live_render,
                 ]
