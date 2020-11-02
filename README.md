@@ -316,7 +316,7 @@ Here are a few projects using Rich:
   Browse GitHub trending projects from your command line
 - [intel/cve-bin-tool](https://github.com/intel/cve-bin-tool)
   This tool scans for a number of common, vulnerable components (openssl, libpng, libxml2, expat and a few others) to let you know if your system includes common libraries with known vulnerabilities.
-- [nf-core/tools](https://github.com/nf)
+- [nf-core/tools](https://github.com/nf-core/tools)
   Python package with helper tools for the nf-core community.
 - [cansarigol/pdbr](https://github.com/cansarigol/pdbr)
   pdb + Rich library for enhanced debugging
