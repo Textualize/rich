@@ -335,7 +335,7 @@ class Color(NamedTuple):
             number (int): A number between 0-255 inclusive.
 
         Returns:
-            Color: A new Color isntance.
+            Color: A new Color instance.
         """
         return cls(
             name=f"color({number})",
