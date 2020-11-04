@@ -1,3 +1,4 @@
+from contextlib import suppress
 import re
 from typing import Iterable, NamedTuple
 
@@ -24,10 +25,11 @@ def _ansi_tokenize(ansi_text: str) -> Iterable[AnsiToken]:
         ansi_text (str): A String containing ANSI codes.
 
     Yields:
-        Tuple[Optional[str], Optional[str]]: A tuple of plain text, ansi codes.
+        AnsiToken: A named tuple of (plain, sgr, osc)
     """
 
     def remove_csi(ansi_text: str) -> str:
+        """Remove unknown CSI sequences."""
         return re_csi.sub("", ansi_text)
 
     position = 0
@@ -42,33 +44,65 @@ def _ansi_tokenize(ansi_text: str) -> Iterable[AnsiToken]:
         yield AnsiToken(remove_csi(ansi_text[position:]))
 
 
-STYLE_MAP = {
+SGR_STYLE_MAP = {
     1: "bold",
-    21: "not bold",
     2: "dim",
-    22: "not dim",
     3: "italic",
-    23: "not italic",
     4: "underline",
-    24: "not underline",
     5: "blink",
-    25: "not blink",
     6: "blink2",
-    26: "not blink2",
     7: "reverse",
-    27: "not reverse",
     8: "conceal",
-    28: "not conceal",
     9: "strike",
-    29: "not strike",
     21: "underline2",
+    22: "not dim not bold",
+    23: "not italic",
+    24: "not underline",
+    25: "not blink",
+    26: "not blink2",
+    27: "not reverse",
+    28: "not conceal",
+    29: "not strike",
+    30: "color(0)",
+    31: "color(1)",
+    32: "color(2)",
+    33: "color(3)",
+    34: "color(4)",
+    35: "color(5)",
+    36: "color(6)",
+    37: "color(7)",
+    39: "default",
+    40: "on color(0)",
+    41: "on color(1)",
+    42: "on color(2)",
+    43: "on color(3)",
+    44: "on color(4)",
+    45: "on color(5)",
+    46: "on color(6)",
+    47: "on color(7)",
+    49: "on default",
     51: "frame",
-    54: "not frame not encircle",
     52: "encircle",
     53: "overline",
+    54: "not frame not encircle",
     55: "not overline",
+    90: "color(8)",
+    91: "color(9)",
+    92: "color(10)",
+    93: "color(11)",
+    94: "color(12)",
+    95: "color(13)",
+    96: "color(14)",
+    97: "color(15)",
+    100: "on color(8)",
+    101: "on color(9)",
+    102: "on color(10)",
+    103: "on color(11)",
+    104: "on color(12)",
+    105: "on color(13)",
+    106: "on color(14)",
+    107: "on color(15)",
 }
-SGR_CODES = set(STYLE_MAP.keys())
 
 
 class AnsiDecoder:
@@ -99,7 +133,8 @@ class AnsiDecoder:
         Returns:
             Text: A Text instance marked up according to ansi codes.
         """
-        _Color = Color
+        from_ansi = Color.from_ansi
+        from_rgb = Color.from_rgb
         _Style = Style
         text = Text()
         append = text.append
@@ -108,78 +143,37 @@ class AnsiDecoder:
             if plain_text:
                 append(plain_text, self.style or None)
             elif osc:
-                if not osc.startswith("8;"):
-                    continue
-                _params, semicolon, link = osc[2:].partition(";")
-                if semicolon:
-                    self.style = self.style.update_link(link)
+                if osc.startswith("8;"):
+                    _params, semicolon, link = osc[2:].partition(";")
+                    if semicolon:
+                        self.style = self.style.update_link(link)
             elif sgr:
                 # Translate in to semi-colon separated codes
                 # Ignore invalid codes, because we want to be lenient
                 codes = [int(_code) for _code in sgr.split(";") if _code.isdigit()]
-                # codes = [code for code in codes if code <= 255]
+                codes = [code for code in codes if code <= 255]
                 iter_codes = iter(codes)
                 for code in iter_codes:
                     if code == 0:
-                        self.style = _Style()
-                    elif code in SGR_CODES:
-                        self.style += _Style.parse(STYLE_MAP[code])
-                    elif code == 39:
-                        self.style += _Style(color="default")
-                    elif code == 49:
-                        self.style += _Style(bgcolor="default")
-                    elif 38 > code >= 30:
-                        self.style += _Style(color=_Color.from_ansi(code - 30))
-                    elif 48 > code >= 40:
-                        self.style += _Style(bgcolor=_Color.from_ansi(code - 40))
-                    elif 99 > code >= 90:
-                        self.style += _Style(color=_Color.from_ansi(code - 90 + 8))
-                    elif 108 > code >= 100:
-                        self.style += _Style(bgcolor=_Color.from_ansi(code - 100 + 8))
+                        self.style = _Style.null()
+                    elif code in SGR_STYLE_MAP:
+                        self.style += _Style.parse(SGR_STYLE_MAP[code])
                     elif code in (38, 48):
-                        try:
+                        with suppress(StopIteration):
                             color_type = next(iter_codes)
                             if color_type == 5:
-                                number = next(iter_codes)
-                                color = _Color.from_ansi(number)
-                                self.style += (
-                                    _Style(color=color)
-                                    if code == 38
-                                    else _Style(bgcolor=color)
-                                )
+                                color = from_ansi(next(iter_codes))
                             elif color_type == 2:
-                                color = _Color.from_rgb(
+                                color = from_rgb(
                                     next(iter_codes), next(iter_codes), next(iter_codes)
                                 )
-                                self.style += (
-                                    _Style(color=color)
-                                    if code == 38
-                                    else _Style(bgcolor=color)
-                                )
-                        except StopIteration:
-                            # Unexpected end of codes
-                            break
+                            else:
+                                continue
+                        self.style += (
+                            _Style(color=color) if code == 38 else _Style(bgcolor=color)
+                        )
         return text
 
-
-# if __name__ == "__main__":  # pragma: no cover
-#     from .console import Console
-#     from .text import Text
-
-#     console = Console()
-#     console.begin_capture()
-#     console.print(
-#         "[bold magenta]bold magenta [i]italic[/i][/] [link http://example.org]Hello World[/] not linked"
-#     )
-#     ansi = console.end_capture()
-
-#     print(ansi)
-
-#     ansi_decoder = AnsiDecoder()
-#     for line in ansi_decoder.decode(ansi):
-#         print("*", repr(line))
-#         print(line)
-#         console.print(line)
 
 if __name__ == "__main__":  # pragma: no cover
     import pty
