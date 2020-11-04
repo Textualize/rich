@@ -1,14 +1,23 @@
 import re
-from typing import Iterable, Optional, Tuple
+from typing import Iterable, NamedTuple
 
 from .color import Color
 from .style import Style
 from .text import Text
 
-re_ansi = re.compile("\x1b(.*?)m")
+re_ansi = re.compile(r"(?:\x1b\[(.*?)m)|(?:\x1b\](.*?)\x1b\\)")
+re_csi = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
 
-def ansi_tokenize(ansi_text: str) -> Iterable[Tuple[Optional[str], Optional[str]]]:
+class AnsiToken(NamedTuple):
+    """Result of ansi tokenized string."""
+
+    plain: str = ""
+    sgr: str = ""
+    osc: str = ""
+
+
+def _ansi_tokenize(ansi_text: str) -> Iterable[AnsiToken]:
     """Tokenize a string in to plain text and ANSI codes.
 
     Args:
@@ -17,16 +26,20 @@ def ansi_tokenize(ansi_text: str) -> Iterable[Tuple[Optional[str], Optional[str]
     Yields:
         Tuple[Optional[str], Optional[str]]: A tuple of plain text, ansi codes.
     """
+
+    def remove_csi(ansi_text: str) -> str:
+        return re_csi.sub("", ansi_text)
+
     position = 0
     for match in re_ansi.finditer(ansi_text):
         start, end = match.span(0)
-        ansi_code = match.group(1)
+        sgr, osc = match.groups()
         if start > position:
-            yield ansi_text[position:start], None
-        yield None, ansi_code
+            yield AnsiToken(remove_csi(ansi_text[position:start]))
+        yield AnsiToken("", sgr, osc)
         position = end
     if position < len(ansi_text):
-        yield ansi_text[position:], None
+        yield AnsiToken(remove_csi(ansi_text[position:]))
 
 
 STYLE_MAP = {
@@ -90,16 +103,21 @@ class AnsiDecoder:
         _Style = Style
         text = Text()
         append = text.append
-        for plain_text, ansi_codes in ansi_tokenize(line):
-            if plain_text is not None:
+        for token in _ansi_tokenize(line):
+            plain_text, sgr, osc = token
+            if plain_text:
                 append(plain_text, self.style or None)
-            elif ansi_codes is not None and ansi_codes.startswith("["):
+            elif osc:
+                if not osc.startswith("8;"):
+                    continue
+                _params, semicolon, link = osc[2:].partition(";")
+                if semicolon:
+                    self.style = self.style.update_link(link)
+            elif sgr:
                 # Translate in to semi-colon separated codes
                 # Ignore invalid codes, because we want to be lenient
-                codes = [
-                    int(_code) for _code in ansi_codes[1:].split(";") if _code.isdigit()
-                ]
-                codes = [code for code in codes if code <= 255]
+                codes = [int(_code) for _code in sgr.split(";") if _code.isdigit()]
+                # codes = [code for code in codes if code <= 255]
                 iter_codes = iter(codes)
                 for code in iter_codes:
                     if code == 0:
@@ -114,10 +132,14 @@ class AnsiDecoder:
                         self.style += _Style(color=_Color.from_ansi(code - 30))
                     elif 48 > code >= 40:
                         self.style += _Style(bgcolor=_Color.from_ansi(code - 40))
+                    elif 99 > code >= 90:
+                        self.style += _Style(color=_Color.from_ansi(code - 90 + 8))
+                    elif 108 > code >= 100:
+                        self.style += _Style(bgcolor=_Color.from_ansi(code - 100 + 8))
                     elif code in (38, 48):
                         try:
                             color_type = next(iter_codes)
-                            if color_type == "5":
+                            if color_type == 5:
                                 number = next(iter_codes)
                                 color = _Color.from_ansi(number)
                                 self.style += (
@@ -125,11 +147,11 @@ class AnsiDecoder:
                                     if code == 38
                                     else _Style(bgcolor=color)
                                 )
-                            elif color_type == "2":
+                            elif color_type == 2:
                                 color = _Color.from_rgb(
                                     next(iter_codes), next(iter_codes), next(iter_codes)
                                 )
-                                self.style = (
+                                self.style += (
                                     _Style(color=color)
                                     if code == 38
                                     else _Style(bgcolor=color)
@@ -140,21 +162,50 @@ class AnsiDecoder:
         return text
 
 
+# if __name__ == "__main__":  # pragma: no cover
+#     from .console import Console
+#     from .text import Text
+
+#     console = Console()
+#     console.begin_capture()
+#     console.print(
+#         "[bold magenta]bold magenta [i]italic[/i][/] [link http://example.org]Hello World[/] not linked"
+#     )
+#     ansi = console.end_capture()
+
+#     print(ansi)
+
+#     ansi_decoder = AnsiDecoder()
+#     for line in ansi_decoder.decode(ansi):
+#         print("*", repr(line))
+#         print(line)
+#         console.print(line)
+
 if __name__ == "__main__":  # pragma: no cover
+    import pty
+    import io
+    import os
+    import sys
+
+    decoder = AnsiDecoder()
+
+    stdout = io.BytesIO()
+
+    def read(fd):
+        data = os.read(fd, 1024)
+        stdout.write(data)
+        return data
+
+    pty.spawn(sys.argv[1:], read)
+
     from .console import Console
-    from .text import Text
 
-    console = Console()
-    console.begin_capture()
-    console.print(
-        "[u]H[s]ell[/s]o[/u] [bold Magenta][blink]World[/][/]!\n[reverse]Reverse"
-    )
-    ansi = console.end_capture()
+    console = Console(record=True)
 
-    print(ansi)
+    stdout_result = stdout.getvalue().decode("utf-8")
+    print(stdout_result)
 
-    ansi_decoder = AnsiDecoder()
-    for line in ansi_decoder.decode(ansi):
-        print("*", repr(line))
-        print(line)
+    for line in decoder.decode(stdout_result):
         console.print(line)
+
+    console.save_html("stdout.html")

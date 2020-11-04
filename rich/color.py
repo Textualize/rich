@@ -339,7 +339,7 @@ class Color(NamedTuple):
         """
         return cls(
             name=f"color({number})",
-            type=(ColorType.STANDARD if number < 8 else ColorType.EIGHT_BIT),
+            type=(ColorType.STANDARD if number < 16 else ColorType.EIGHT_BIT),
             number=number,
         )
 
