@@ -109,7 +109,7 @@ class AnsiDecoder:
     """Translate ANSI code in to styled Text."""
 
     def __init__(self):
-        self.style = Style()
+        self.style = Style.null()
 
     def decode(self, terminal_text: str) -> Iterable[Text]:
         """Decode ANSI codes in an interable of lines.
