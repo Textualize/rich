@@ -355,7 +355,7 @@ class Style:
         return Style(bgcolor=self.bgcolor)
 
     @classmethod
-    @lru_cache(maxsize=1024)
+    @lru_cache(maxsize=4096)
     def parse(cls, style_definition: str) -> "Style":
         """Parse a style definition.
 
@@ -369,7 +369,7 @@ class Style:
             `Style`: A Style instance.
         """
         if style_definition.strip() == "none":
-            return cls()
+            return cls.null()
 
         style_attributes = {
             "dim": "dim",
