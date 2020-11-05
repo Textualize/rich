@@ -146,12 +146,13 @@ class AnsiDecoder:
                 if osc.startswith("8;"):
                     _params, semicolon, link = osc[2:].partition(";")
                     if semicolon:
-                        self.style = self.style.update_link(link)
+                        self.style = self.style.update_link(link or None)
             elif sgr:
                 # Translate in to semi-colon separated codes
                 # Ignore invalid codes, because we want to be lenient
-                codes = [int(_code) for _code in sgr.split(";") if _code.isdigit()]
-                codes = [code for code in codes if code <= 255]
+                codes = [
+                    min(255, int(_code)) for _code in sgr.split(";") if _code.isdigit()
+                ]
                 iter_codes = iter(codes)
                 for code in iter_codes:
                     if code == 0:
@@ -163,15 +164,21 @@ class AnsiDecoder:
                             color_type = next(iter_codes)
                             if color_type == 5:
                                 color = from_ansi(next(iter_codes))
+                                self.style += (
+                                    _Style(color=color)
+                                    if code == 38
+                                    else _Style(bgcolor=color)
+                                )
                             elif color_type == 2:
                                 color = from_rgb(
                                     next(iter_codes), next(iter_codes), next(iter_codes)
                                 )
-                            else:
-                                continue
-                        self.style += (
-                            _Style(color=color) if code == 38 else _Style(bgcolor=color)
-                        )
+                                self.style += (
+                                    _Style(color=color)
+                                    if code == 38
+                                    else _Style(bgcolor=color)
+                                )
+
         return text
 
 

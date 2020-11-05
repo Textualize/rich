@@ -18,6 +18,7 @@ Reference
    reference/measure.rst
    reference/padding.rst
    reference/panel.rst
+   reference/pretty.rst
    reference/progress.rst
    reference/progress_bar.rst
    reference/prompt.rst
