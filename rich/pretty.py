@@ -93,6 +93,7 @@ class Pretty:
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
+        expand_all (bool, optional): Expand all containers. Defaults to False.
     """
 
     def __init__(
@@ -107,6 +108,7 @@ class Pretty:
         indent_guides: bool = False,
         max_length: int = None,
         max_string: int = None,
+        expand_all: bool = False,
     ) -> None:
         self._object = _object
         self.highlighter = highlighter or ReprHighlighter()
@@ -117,6 +119,7 @@ class Pretty:
         self.indent_guides = indent_guides
         self.max_length = max_length
         self.max_string = max_string
+        self.expand_all = expand_all
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -127,6 +130,7 @@ class Pretty:
             indent_size=self.indent_size,
             max_length=self.max_length,
             max_string=self.max_string,
+            expand_all=self.expand_all,
         )
         pretty_text = Text(
             pretty_str,
@@ -443,9 +447,10 @@ def pprint(
     _object: Any,
     *,
     console: "Console" = None,
+    indent_guides: bool = True,
     max_length: int = None,
     max_string: int = None,
-    indent_guides: bool = True,
+    expand_all: bool = False,
 ):
     """A convenience function for pretty printing.
 
@@ -456,6 +461,7 @@ def pprint(
             Defaults to None.
         max_string (int, optional): Maximum length of strings before truncating, or None to disable. Defaults to None.
         indent_guides (bool, optional): Enable indentation guides. Defaults to True.
+        expand_all (bool, optional): Expand all containers. Defaults to False.
     """
     _console = get_console() if console is None else console
     _console.print(
@@ -464,7 +470,10 @@ def pprint(
             max_length=max_length,
             max_string=max_string,
             indent_guides=indent_guides,
-        )
+            expand_all=expand_all,
+            overflow="ignore",
+        ),
+        soft_wrap=True,
     )
 
 

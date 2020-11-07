@@ -10,12 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added tracebacks_show_locals parameter to RichHandler
-- Applied dim=True to indent guide styles
 - Added max_string to Pretty
-- Factored out RichHandler.get_style_and_level to allow for overriding in subclasses
 - Added rich.ansi.AnsiDecoder
 - Added decoding of ansi codes to captured stdout in Progress
+
+- Added expand_all to rich.pretty.pprint
+
+### Changed
+
+- Applied dim=True to indent guide styles
+- Factored out RichHandler.get_style_and_level to allow for overriding in subclasses
 - Hid progress bars from html export
+- rich.pretty.pprint now soft wraps
 
 ## [9.1.0] - 2020-10-23
 
