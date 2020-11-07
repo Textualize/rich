@@ -175,6 +175,35 @@ class Style:
         """Create an 'null' style, equivalent to Style(), but more performant."""
         return NULL_STYLE
 
+    @classmethod
+    def from_color(cls, color: Color = None, bgcolor: Color = None) -> "Style":
+        """Create a new style with colors and no attributes.
+
+        Returns:
+            color (Optional[Color]): A (foreground) color, or None for no color. Defaults to None.
+            bgcolor (Optional[Color]): A (background) color, or None for no color. Defaults to None.
+        """
+        style = cls.__new__(Style)
+        style._ansi = None
+        style._style_definition = None
+        style._color = color
+        style._bgcolor = bgcolor
+        style._set_attributes = 0
+        style._attributes = 0
+        style._link = None
+        style._link_id = ""
+        style._hash = hash(
+            (
+                color,
+                bgcolor,
+                None,
+                None,
+                None,
+            )
+        )
+        style._null = not (color or bgcolor)
+        return style
+
     bold = _Bit(0)
     dim = _Bit(1)
     italic = _Bit(2)
@@ -355,7 +384,7 @@ class Style:
         return Style(bgcolor=self.bgcolor)
 
     @classmethod
-    @lru_cache(maxsize=1024)
+    @lru_cache(maxsize=4096)
     def parse(cls, style_definition: str) -> "Style":
         """Parse a style definition.
 
@@ -369,7 +398,7 @@ class Style:
             `Style`: A Style instance.
         """
         if style_definition.strip() == "none":
-            return cls()
+            return cls.null()
 
         style_attributes = {
             "dim": "dim",

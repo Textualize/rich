@@ -55,8 +55,8 @@ class LiveRender:
     ) -> RenderResult:
         style = console.get_style(self.style)
         lines = console.render_lines(self.renderable, options, style=style, pad=False)
-
-        shape = Segment.get_shape(lines)
+        _Segment = Segment
+        shape = _Segment.get_shape(lines)
         if self._shape is None:
             self._shape = shape
         else:
@@ -68,8 +68,8 @@ class LiveRender:
             )
 
         width, height = self._shape
-        lines = Segment.set_shape(lines, width, height)
+        lines = _Segment.set_shape(lines, width, height)
         for last, line in loop_last(lines):
-            yield from line
+            yield from _Segment.make_control(line)
             if not last:
-                yield Segment.line()
+                yield _Segment.line(is_control=True)

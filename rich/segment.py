@@ -41,21 +41,31 @@ class Segment(NamedTuple):
         return 0 if self.is_control else cell_len(self.text)
 
     @classmethod
-    def control(cls, text: str) -> "Segment":
+    def control(cls, text: str, style: Optional[Style] = None) -> "Segment":
         """Create a Segment with control codes.
 
         Args:
             text (str): Text containing non-printable control codes.
+            style (Optional[style]): Optional style.
 
         Returns:
             Segment: A Segment instance with ``is_control=True``.
         """
-        return Segment(text, is_control=True)
+        return Segment(text, style, is_control=True)
 
     @classmethod
-    def line(cls) -> "Segment":
+    def make_control(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
+        """Convert all segments in to control segments.
+
+        Returns:
+            Iterable[Segments]: Segments with is_control=True
+        """
+        return [cls(text, style, True) for text, style, _ in segments]
+
+    @classmethod
+    def line(cls, is_control: bool = False) -> "Segment":
         """Make a new line segment."""
-        return Segment("\n")
+        return Segment("\n", is_control=is_control)
 
     @classmethod
     def apply_style(
