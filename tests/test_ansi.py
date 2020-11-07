@@ -7,7 +7,9 @@ from rich.text import Span, Text
 
 
 def test_decode():
-    console = Console(force_terminal=True, color_system="truecolor")
+    console = Console(
+        force_terminal=True, legacy_windows=False, color_system="truecolor"
+    )
     console.begin_capture()
     console.print("Hello")
     console.print("[b]foo[/b]")
