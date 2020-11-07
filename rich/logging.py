@@ -72,7 +72,10 @@ class RichHandler(Handler):
         self.console = console or get_console()
         self.highlighter = highlighter or self.HIGHLIGHTER_CLASS()
         self._log_render = LogRender(
-            show_time=show_time, show_level=show_level, show_path=show_path
+            show_time=show_time,
+            show_level=show_level,
+            show_path=show_path,
+            level_width=None,
         )
         self.enable_link_path = enable_link_path
         self.markup = markup
@@ -83,16 +86,28 @@ class RichHandler(Handler):
         self.tracebacks_word_wrap = tracebacks_word_wrap
         self.tracebacks_show_locals = tracebacks_show_locals
 
+    def get_level_text(self, record: LogRecord) -> Text:
+        """Get the level name from the record.
+
+        Args:
+            record (LogRecord): LogRecord instance.
+
+        Returns:
+            Text: A tuple of the style and level name.
+        """
+        level_name = record.levelname
+        level_text = Text.styled(
+            level_name.ljust(8), f"logging.level.{level_name.lower()}"
+        )
+        return level_text
+
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
         path = Path(record.pathname).name
-        log_style = f"logging.level.{record.levelname.lower()}"
+        level = self.get_level_text(record)
         message = self.format(record)
         time_format = None if self.formatter is None else self.formatter.datefmt
         log_time = datetime.fromtimestamp(record.created)
-
-        level = Text()
-        level.append(record.levelname, log_style)
 
         traceback = None
         if (
