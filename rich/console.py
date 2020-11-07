@@ -1274,7 +1274,7 @@ class Console:
                 self._record_buffer.extend(buffer)
         not_terminal = not self.is_terminal
         for text, style, is_control in buffer:
-            if style and not is_control:
+            if style:
                 append(
                     style.render(
                         text,

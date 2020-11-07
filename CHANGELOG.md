@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Applied dim=True to indent guide styles
 - Added max_string to Pretty
 - Factored out RichHandler.get_style_and_level to allow for overriding in subclasses
+- Added rich.ansi.AnsiDecoder
+- Added decoding of ansi codes to captured stdout in Progress
+- Hid progress bars from html export
 
 ## [9.1.0] - 2020-10-23
 

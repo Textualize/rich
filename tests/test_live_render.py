@@ -37,7 +37,7 @@ def test_rich_console(live_render):
         encoding="utf-8",
     )
     rich_console = live_render.__rich_console__(Console(), options)
-    assert [Segment("my string", Style.parse("none"))] == list(rich_console)
+    assert [Segment.control("my string", Style.parse("none"))] == list(rich_console)
     live_render.style = "red"
     rich_console = live_render.__rich_console__(Console(), options)
-    assert [Segment("my string", Style.parse("red"))] == list(rich_console)
+    assert [Segment.control("my string", Style.parse("red"))] == list(rich_console)

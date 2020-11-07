@@ -233,7 +233,7 @@ You can page output from a Console by calling :meth:`~rich.console.Console.pager
     with console.pager():
         console.print(make_test_card())
 
-Since the default pager on most platforms don't support color, Rich will strip color from the output. If you know that your pager supports color, you can set ``style=True`` when calling the :meth:`~rich.console.Console.pager` method.
+Since the default pager on most platforms don't support color, Rich will strip color from the output. If you know that your pager supports color, you can set ``styles=True`` when calling the :meth:`~rich.console.Console.pager` method.
 
 .. note::
     Rich will use the ``PAGER`` environment variable to get the pager command. On Linux and macOS you can set this to ``less -r`` to enable paging with ANSI styles.
