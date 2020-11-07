@@ -10,7 +10,7 @@ re_ansi = re.compile(r"(?:\x1b\[(.*?)m)|(?:\x1b\](.*?)\x1b\\)")
 re_csi = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
 
-class AnsiToken(NamedTuple):
+class _AnsiToken(NamedTuple):
     """Result of ansi tokenized string."""
 
     plain: str = ""
@@ -18,7 +18,7 @@ class AnsiToken(NamedTuple):
     osc: str = ""
 
 
-def _ansi_tokenize(ansi_text: str) -> Iterable[AnsiToken]:
+def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
     """Tokenize a string in to plain text and ANSI codes.
 
     Args:
@@ -37,11 +37,11 @@ def _ansi_tokenize(ansi_text: str) -> Iterable[AnsiToken]:
         start, end = match.span(0)
         sgr, osc = match.groups()
         if start > position:
-            yield AnsiToken(remove_csi(ansi_text[position:start]))
-        yield AnsiToken("", sgr, osc)
+            yield _AnsiToken(remove_csi(ansi_text[position:start]))
+        yield _AnsiToken("", sgr, osc)
         position = end
     if position < len(ansi_text):
-        yield AnsiToken(remove_csi(ansi_text[position:]))
+        yield _AnsiToken(remove_csi(ansi_text[position:]))
 
 
 SGR_STYLE_MAP = {
@@ -108,7 +108,7 @@ SGR_STYLE_MAP = {
 class AnsiDecoder:
     """Translate ANSI code in to styled Text."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.style = Style.null()
 
     def decode(self, terminal_text: str) -> Iterable[Text]:
@@ -138,6 +138,7 @@ class AnsiDecoder:
         _Style = Style
         text = Text()
         append = text.append
+        line = line.rsplit("\r", 1)[-1]
         for token in _ansi_tokenize(line):
             plain_text, sgr, osc = token
             if plain_text:
@@ -156,27 +157,43 @@ class AnsiDecoder:
                 iter_codes = iter(codes)
                 for code in iter_codes:
                     if code == 0:
+                        # reset
                         self.style = _Style.null()
                     elif code in SGR_STYLE_MAP:
+                        # styles
                         self.style += _Style.parse(SGR_STYLE_MAP[code])
-                    elif code in (38, 48):
+                    elif code == 38:
+                        #  Foreground
                         with suppress(StopIteration):
                             color_type = next(iter_codes)
                             if color_type == 5:
-                                color = from_ansi(next(iter_codes))
-                                self.style += (
-                                    _Style(color=color)
-                                    if code == 38
-                                    else _Style(bgcolor=color)
+                                self.style += _Style.from_color(
+                                    from_ansi(next(iter_codes))
                                 )
                             elif color_type == 2:
-                                color = from_rgb(
-                                    next(iter_codes), next(iter_codes), next(iter_codes)
+                                self.style += _Style.from_color(
+                                    from_rgb(
+                                        next(iter_codes),
+                                        next(iter_codes),
+                                        next(iter_codes),
+                                    )
                                 )
-                                self.style += (
-                                    _Style(color=color)
-                                    if code == 38
-                                    else _Style(bgcolor=color)
+                    elif code == 48:
+                        # Background
+                        with suppress(StopIteration):
+                            color_type = next(iter_codes)
+                            if color_type == 5:
+                                self.style += _Style.from_color(
+                                    None, from_ansi(next(iter_codes))
+                                )
+                            elif color_type == 2:
+                                self.style += _Style.from_color(
+                                    None,
+                                    from_rgb(
+                                        next(iter_codes),
+                                        next(iter_codes),
+                                        next(iter_codes),
+                                    ),
                                 )
 
         return text

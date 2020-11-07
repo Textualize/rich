@@ -13,17 +13,18 @@ def test_decode():
     console.print("[b]foo[/b]")
     console.print("[link http://example.org]bar")
     console.print("[#ff0000 on color(200)]red")
+    console.print("[color(200) on #ff0000]red")
     terminal_codes = console.end_capture()
 
     decoder = AnsiDecoder()
     lines = list(decoder.decode(terminal_codes))
 
-    parse = Style.parse
     expected = [
         Text("Hello"),
-        Text("foo", spans=[Span(0, 3, parse("bold"))]),
-        Text("bar", spans=[Span(0, 3, parse("link http://example.org"))]),
-        Text("red", spans=[Span(0, 3, parse("#ff0000 on color(200)"))]),
+        Text("foo", spans=[Span(0, 3, Style.parse("bold"))]),
+        Text("bar", spans=[Span(0, 3, Style.parse("link http://example.org"))]),
+        Text("red", spans=[Span(0, 3, Style.parse("#ff0000 on color(200)"))]),
+        Text("red", spans=[Span(0, 3, Style.parse("color(200) on #ff0000"))]),
     ]
 
     assert lines == expected

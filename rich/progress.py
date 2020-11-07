@@ -1021,16 +1021,19 @@ if __name__ == "__main__":  # pragma: no coverage
 
     examples = cycle(progress_renderables)
 
-    console = Console()
-    with Progress(console=console, transient=True) as progress:
+    console = Console(record=True)
+    try:
+        with Progress(console=console, transient=True) as progress:
 
-        task1 = progress.add_task("[red]Downloading", total=1000)
-        task2 = progress.add_task("[green]Processing", total=1000)
-        task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
+            task1 = progress.add_task("[red]Downloading", total=1000)
+            task2 = progress.add_task("[green]Processing", total=1000)
+            task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
 
-        while not progress.finished:
-            progress.update(task1, advance=0.5)
-            progress.update(task2, advance=0.3)
-            time.sleep(0.01)
-            if random.randint(0, 100) < 1:
-                progress.log(next(examples))
+            while not progress.finished:
+                progress.update(task1, advance=0.5)
+                progress.update(task2, advance=0.3)
+                time.sleep(0.01)
+                if random.randint(0, 100) < 1:
+                    progress.log(next(examples))
+    except:
+        console.save_html("progress.html")
