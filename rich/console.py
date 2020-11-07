@@ -709,8 +709,8 @@ class Console:
     def pager(
         self, pager: Pager = None, styles: bool = False, links: bool = False
     ) -> PagerContext:
-        """A context manager to display anything printed within a "pager". The pager used
-        is defined by the system and will typically support at less pressing a key to scroll.
+        """A context manager to display anything printed within a "pager". The pager application
+        is defined by the system and will typically support at least pressing a key to scroll.
 
         Args:
             pager (Pager, optional): A pager object, or None to use :class:~rich.pager.SystemPager`. Defaults to None.
@@ -1025,14 +1025,15 @@ class Console:
         highlight: bool = True,
     ) -> None:
         """Output to the terminal. This is a low-level way of writing to the terminal which unlike
-        :meth:`~rich.console.Console.print` doesn't pretty print, wrap text, nor markup, but will highlighting
-        and apply basic style.
+        :meth:`~rich.console.Console.print` won't pretty print, wrap text, or apply markup, but will
+        optionally apply highlighting and a basic style.
 
         Args:
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
-            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
+            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use
+                console default. Defaults to ``None``.
         """
         raw_output: str = sep.join(str(_object) for _object in objects)
         self.print(
