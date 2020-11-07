@@ -1037,3 +1037,4 @@ if __name__ == "__main__":  # pragma: no coverage
                     progress.log(next(examples))
     except:
         console.save_html("progress.html")
+        print("wrote progress.html")
