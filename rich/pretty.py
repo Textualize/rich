@@ -413,9 +413,9 @@ def pretty_repr(
     *,
     max_width: int = 80,
     indent_size: int = 4,
-    expand_all: bool = False,
     max_length: int = None,
     max_string: int = None,
+    expand_all: bool = False,
 ) -> str:
     """Prettify repr string by expanding on to new lines to fit within a given width.
 
@@ -423,11 +423,11 @@ def pretty_repr(
         _object (Any): Object to repr.
         max_width (int, optional): Desired maximum width of repr string. Defaults to 80.
         indent_size (int, optional): Number of spaces to indent. Defaults to 4.
-        expand_all (bool, optional): Expand all containers regardless of available width. Defaults to False.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable truncating.
             Defaults to None.
+        expand_all (bool, optional): Expand all containers regardless of available width. Defaults to False.
 
     Returns:
         str: A possibly multi-line representation of the object.
