@@ -13,7 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added max_string to Pretty
 - Added rich.ansi.AnsiDecoder
 - Added decoding of ansi codes to captured stdout in Progress
-
 - Added expand_all to rich.pretty.pprint
 
 ### Changed
