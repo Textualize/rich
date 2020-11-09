@@ -38,13 +38,18 @@ class _RefreshThread(Thread):
 
     def run(self) -> None:
         while not self.done.wait(1 / self.refresh_per_second):
-            self.live.refresh()
+            with self.live._lock:
+                self.live.refresh()
 
 
 class _LiveRender(LiveRender):
     def __init__(
-        self, renderable: RenderableType, vertical_overflow: VerticalOverflowMethod
+        self,
+        live: "Live",
+        renderable: RenderableType,
+        vertical_overflow: VerticalOverflowMethod,
     ) -> None:
+        self._live = live
         self.renderable = renderable
         self.vertical_overflow = vertical_overflow
         self._shape: Optional[Tuple[int, int]] = None
@@ -52,25 +57,26 @@ class _LiveRender(LiveRender):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        lines = console.render_lines(self.renderable, options, pad=False)
+        with self._live._lock:
+            lines = console.render_lines(self.renderable, options, pad=False)
 
-        shape = Segment.get_shape(lines)
-        _, height = shape
-        if height > console.size.height:
-            if self.vertical_overflow == "crop":
-                lines = lines[: console.size.height]
-                shape = Segment.get_shape(lines)
-            elif self.vertical_overflow == "ellipsis":
-                lines = lines[: (console.size.height - 1)] + [
-                    [Segment("...", style=Style(bold=True))]
-                ]
-                shape = Segment.get_shape(lines)
-        self._shape = shape
+            shape = Segment.get_shape(lines)
+            _, height = shape
+            if height > console.size.height:
+                if self.vertical_overflow == "crop":
+                    lines = lines[: console.size.height]
+                    shape = Segment.get_shape(lines)
+                elif self.vertical_overflow == "ellipsis":
+                    lines = lines[: (console.size.height - 1)] + [
+                        [Segment("...", style=Style(bold=True))]
+                    ]
+                    shape = Segment.get_shape(lines)
+            self._shape = shape
 
-        for last, line in loop_last(lines):
-            yield from line
-            if not last:
-                yield Segment.line()
+            for last, line in loop_last(lines):
+                yield from line
+                if not last:
+                    yield Segment.line()
 
 
 class Live(JupyterMixin, RenderHook):
@@ -101,7 +107,9 @@ class Live(JupyterMixin, RenderHook):
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self.console = console if console is not None else get_console()
-        self._live_render = _LiveRender(renderable, vertical_overflow=vertical_overflow)
+        self._live_render = _LiveRender(
+            self, renderable, vertical_overflow=vertical_overflow
+        )
 
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
