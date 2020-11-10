@@ -43,15 +43,9 @@ class _RefreshThread(Thread):
 
 
 class _LiveRender(LiveRender):
-    def __init__(
-        self,
-        live: "Live",
-        renderable: RenderableType,
-        vertical_overflow: VerticalOverflowMethod,
-    ) -> None:
+    def __init__(self, live: "Live", renderable: RenderableType) -> None:
         self._live = live
         self.renderable = renderable
-        self.vertical_overflow = vertical_overflow
         self._shape: Optional[Tuple[int, int]] = None
 
     def __rich_console__(
@@ -63,10 +57,10 @@ class _LiveRender(LiveRender):
             shape = Segment.get_shape(lines)
             _, height = shape
             if height > console.size.height:
-                if self.vertical_overflow == "crop":
+                if self._live.vertical_overflow == "crop":
                     lines = lines[: console.size.height]
                     shape = Segment.get_shape(lines)
-                elif self.vertical_overflow == "ellipsis":
+                elif self._live.vertical_overflow == "ellipsis":
                     lines = lines[: (console.size.height - 1)] + [
                         [Segment("...", style=Style(bold=True))]
                     ]
@@ -107,9 +101,7 @@ class Live(JupyterMixin, RenderHook):
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self.console = console if console is not None else get_console()
-        self._live_render = _LiveRender(
-            self, renderable, vertical_overflow=vertical_overflow
-        )
+        self._live_render = _LiveRender(self, renderable)
 
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
@@ -138,7 +130,6 @@ class Live(JupyterMixin, RenderHook):
             self._enable_redirect_io()
             self.console.push_render_hook(self)
             self._started = True
-            self._live_render.vertical_overflow = self.vertical_overflow
 
             if self.auto_refresh:
                 self._refresh_thread = _RefreshThread(self, self.refresh_per_second)
@@ -154,7 +145,7 @@ class Live(JupyterMixin, RenderHook):
                 if self.auto_refresh and self._refresh_thread is not None:
                     self._refresh_thread.stop()
                 # allow it to fully render on the last even if overflow
-                self._live_render.vertical_overflow = "visible"
+                self.vertical_overflow = "visible"
                 self.refresh()
                 if self.console.is_terminal:
                     self.console.line()
