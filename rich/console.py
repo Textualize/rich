@@ -7,6 +7,7 @@ import threading
 from abc import ABC, abstractmethod
 from collections import abc
 from dataclasses import dataclass, field, replace
+from datetime import datetime
 from functools import wraps
 from getpass import getpass
 from typing import (
@@ -401,6 +402,8 @@ class Console:
         highlighter (HighlighterType, optional): Default highlighter.
         legacy_windows (bool, optional): Enable legacy Windows mode, or ``None`` to auto detect. Defaults to ``None``.
         safe_box (bool, optional): Restrict box options that don't render on legacy Windows.
+        get_datetime (Callable[[], datetime], optional): Callable that gets the current time as a datetime.datetime object (used by Console.log),
+            or None for datetime.now.
     """
 
     def __init__(
@@ -426,6 +429,7 @@ class Console:
         highlighter: Optional["HighlighterType"] = ReprHighlighter(),
         legacy_windows: bool = None,
         safe_box: bool = True,
+        get_datetime: Callable[[], datetime] = None,
         _environ: Dict[str, str] = None,
     ):
         # Copy of os.environ allows us to replace it for testing
@@ -467,6 +471,7 @@ class Console:
         )
         self.highlighter: HighlighterType = highlighter or _null_highlighter
         self.safe_box = safe_box
+        self._get_datetime = get_datetime or datetime.now
 
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals(
@@ -1219,6 +1224,7 @@ class Console:
                 self._log_render(
                     self,
                     renderables,
+                    log_time=self._get_datetime(),
                     path=path,
                     line_no=line_no,
                     link_path=link_path,

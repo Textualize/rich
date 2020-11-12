@@ -51,7 +51,7 @@ class Segment(NamedTuple):
         Returns:
             Segment: A Segment instance with ``is_control=True``.
         """
-        return Segment(text, style, is_control=True)
+        return cls(text, style, is_control=True)
 
     @classmethod
     def make_control(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
@@ -65,7 +65,7 @@ class Segment(NamedTuple):
     @classmethod
     def line(cls, is_control: bool = False) -> "Segment":
         """Make a new line segment."""
-        return Segment("\n", is_control=is_control)
+        return cls("\n", is_control=is_control)
 
     @classmethod
     def apply_style(
