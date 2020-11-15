@@ -288,7 +288,7 @@ class Segment(NamedTuple):
         """Simplify an iterable of segments by combining contiguous segments with the same style.
 
         Args:
-            segments (Iterable[Segment]): An iterable segments.
+            segments (Iterable[Segment]): An iterable of segments.
 
         Returns:
             Iterable[Segment]: A possibly smaller iterable of segments that will render the same way.
@@ -313,6 +313,9 @@ class Segment(NamedTuple):
     @classmethod
     def strip_links(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
         """Remove all links from an iterable of styles.
+
+        Args:
+            segments (Iterable[Segment]): An iterable segments.
 
         Yields:
             Segment: Segments with link removed.
