@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added get_datetime parameter to Console, to allow for repeatable tests
 - Added get_time parameter to Console
-- Added rich.protocol.is_rich_object and rich.abc.RichRenderable
+- Added rich.abc.RichRenderable
 
 ### Fixed
 
