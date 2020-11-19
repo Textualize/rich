@@ -10,6 +10,7 @@ from dataclasses import dataclass, field, replace
 from datetime import datetime
 from functools import wraps
 from getpass import getpass
+from time import monotonic
 from typing import (
     IO,
     TYPE_CHECKING,
@@ -404,6 +405,7 @@ class Console:
         safe_box (bool, optional): Restrict box options that don't render on legacy Windows.
         get_datetime (Callable[[], datetime], optional): Callable that gets the current time as a datetime.datetime object (used by Console.log),
             or None for datetime.now.
+        get_time (Callable[[], time], optional): Callable that gets the current time in seconds, default uses time.monotonic.
     """
 
     def __init__(
@@ -430,6 +432,7 @@ class Console:
         legacy_windows: bool = None,
         safe_box: bool = True,
         get_datetime: Callable[[], datetime] = None,
+        get_time: Callable[[], float] = None,
         _environ: Dict[str, str] = None,
     ):
         # Copy of os.environ allows us to replace it for testing
@@ -471,7 +474,8 @@ class Console:
         )
         self.highlighter: HighlighterType = highlighter or _null_highlighter
         self.safe_box = safe_box
-        self._get_datetime = get_datetime or datetime.now
+        self.get_datetime = get_datetime or datetime.now
+        self.get_time = get_time or monotonic
 
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals(
@@ -1224,7 +1228,7 @@ class Console:
                 self._log_render(
                     self,
                     renderables,
-                    log_time=self._get_datetime(),
+                    log_time=self.get_datetime(),
                     path=path,
                     line_no=line_no,
                     link_path=link_path,

@@ -22,6 +22,7 @@ Reference
    reference/progress.rst
    reference/progress_bar.rst
    reference/prompt.rst
+   reference/protocol.rst
    reference/rule.rst
    reference/segment.rst
    reference/style.rst

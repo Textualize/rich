@@ -50,8 +50,7 @@ class LogRender:
             output.add_column(style="log.path")
         row: List["RenderableType"] = []
         if self.show_time:
-            if log_time is None:
-                log_time = datetime.now()
+            log_time = log_time or console.get_datetime()
             log_time_display = log_time.strftime(time_format or self.time_format)
             if log_time_display == self._last_time:
                 row.append(Text(" " * len(log_time_display)))

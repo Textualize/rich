@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added get_datetime parameter to Console, to allow for repeatable tests
+- Added get_time parameter to Console
+- Added rich.protocol.is_rich_object and rich.abc.RichRenderable
+
+### Fixed
+
+- Fixed redirecting of stderr in Progress
 
 ## [9.2.0] - 2020-11-08
 

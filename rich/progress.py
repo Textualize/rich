@@ -524,7 +524,7 @@ class Progress(JupyterMixin, RenderHook):
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         redirect_stdout: (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
         redirect_stderr: (bool, optional): Enable redirection of stderr. Defaults to True.
-        get_time: (Callable, optional): A callable that gets the current time, or None to use time.monotonic. Defaults to None.
+        get_time: (Callable, optional): A callable that gets the current time, or None to use Console.get_time. Defaults to None.
     """
 
     def __init__(
@@ -556,7 +556,7 @@ class Progress(JupyterMixin, RenderHook):
         self.transient = transient
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
-        self.get_time = get_time or monotonic
+        self.get_time = get_time or self.console.get_time
         self._tasks: Dict[TaskID, Task] = {}
         self._live_render = LiveRender(self.get_renderable())
         self._task_index: TaskID = TaskID(0)
@@ -596,7 +596,7 @@ class Progress(JupyterMixin, RenderHook):
                 sys.stdout = _FileProxy(self.console, sys.stdout)
             if self._redirect_stderr:
                 self._restore_stderr = sys.stderr
-                sys.stdout = _FileProxy(self.console, sys.stdout)
+                sys.stderr = _FileProxy(self.console, sys.stderr)
 
     def _disable_redirect_io(self):
         """Disable redirecting of stdout / stderr."""
