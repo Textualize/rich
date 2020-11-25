@@ -216,9 +216,9 @@ class Segment(NamedTuple):
                     append(segment)
                     line_length += segment_length
                 else:
-                    text, style, _ = segment
+                    text, segment_style, _ = segment
                     text = set_cell_size(text, length - line_length)
-                    append(cls(text, style))
+                    append(cls(text, segment_style))
                     break
         else:
             new_line = line[:]
