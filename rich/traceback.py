@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import os.path
 import platform
 import sys
 from dataclasses import dataclass, field
@@ -252,8 +253,10 @@ class Traceback:
             append = stack.frames.append
 
             for frame_summary, line_no in walk_tb(traceback):
+                filename = frame_summary.f_code.co_filename
+                filename = os.path.abspath(filename) if filename else "?"
                 frame = Frame(
-                    filename=frame_summary.f_code.co_filename or "?",
+                    filename=filename,
                     lineno=line_no,
                     name=frame_summary.f_code.co_name,
                     locals={
