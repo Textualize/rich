@@ -193,14 +193,13 @@ def iter_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
 
     pretty_data = {
         "foo": [
-            1,
-            "Hello World!",
-            100.123,
-            323.232,
-            432324.0,
-            {5, 6, 7, (1, 2, 3, 4), 8},
+            3.1427,
+            (
+                "Paul Atriedies",
+                "Vladimir Harkonnen",
+                "Thufir Haway",
+            ),
         ],
-        "bar": frozenset({1, 2, 3}),
         "atomic": (False, True, None),
     }
     table.add_row(
