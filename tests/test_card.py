@@ -1,8 +1,5 @@
 import io
 import re
-import sys
-
-import pytest
 
 from rich.console import Console, RenderableType
 from rich.__main__ import make_test_card
@@ -10,18 +7,6 @@ from rich.__main__ import make_test_card
 from ._card_render import expected
 
 re_link_ids = re.compile(r"id=[\d\.\-]*?;.*?\x1b")
-
-
-skip_py36 = pytest.mark.skipif(
-    sys.version_info.minor == 6 and sys.version_info.major == 3,
-    reason="rendered differently on py3.6",
-)
-
-
-skip_py37 = pytest.mark.skipif(
-    sys.version_info.minor == 7 and sys.version_info.major == 3,
-    reason="rendered differently on py3.7",
-)
 
 
 def replace_link_ids(render: str) -> str:
@@ -41,8 +26,6 @@ def render(renderable: RenderableType) -> str:
     return output
 
 
-@skip_py36
-@skip_py37
 def test_card_render():
     card = make_test_card()
     result = render(card)
