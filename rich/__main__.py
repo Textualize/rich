@@ -113,7 +113,7 @@ def make_test_card() -> Table:
             box=box.DOUBLE_EDGE,
         ),
         Panel(
-            Text("도서관은 중국어, 일본어 및 한국어 텍스트를 지원합니다", overflow="fold"),
+            Text("이 라이브러리는 중국어, 일본어 및 한국어 텍스트를 지원합니다", overflow="fold"),
             expand=False,
             border_style="Red",
             box=box.DOUBLE_EDGE,
@@ -121,7 +121,7 @@ def make_test_card() -> Table:
     )
     table.add_row(
         "Asian languages",
-        ":flag_for_china:  该库支持中文，日文和韩文文本！\n:flag_for_japan:  ライブラリは中国語、日本語、韓国語のテキストをサポートしています\n:flag_for_south_korea:  도서관은 중국어, 일본어 및 한국어 텍스트를 지원합니다",
+        ":flag_for_china:  该库支持中文，日文和韩文文本！\n:flag_for_japan:  ライブラリは中国語、日本語、韓国語のテキストをサポートしています\n:flag_for_south_korea:  이 라이브러리는 중국어, 일본어 및 한국어 텍스트를 지원합니다",
     )
 
     markup_example = (
