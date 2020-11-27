@@ -40,7 +40,7 @@ def make_test_card() -> Table:
     """Get a renderable that demonstrates a number of features."""
     table = Table.grid(padding=1, pad_edge=True)
     table.title = "Rich features"
-    table.add_column("Feature", no_wrap=True, justify="right", style="bold red")
+    table.add_column("Feature", no_wrap=True, justify="center", style="bold red")
     table.add_column("Demonstration")
 
     color_table = Table(
@@ -95,38 +95,14 @@ def make_test_card() -> Table:
         table.add_row(renderable1, renderable2)
         return table
 
-    cjk_table = Table.grid()
-    cjk_table.add_column(ratio=1)
-    cjk_table.add_column(ratio=2)
-    cjk_table.add_column(ratio=3)
-    cjk_table.add_row(
-        Panel(
-            Text("该库支持中文，日文和韩文文本！", overflow="fold"),
-            expand=False,
-            border_style="red",
-            box=box.DOUBLE_EDGE,
-        ),
-        Panel(
-            Text("ライブラリは中国語、日本語、韓国語のテキストをサポートしています", overflow="fold"),
-            expand=False,
-            border_style="Red",
-            box=box.DOUBLE_EDGE,
-        ),
-        Panel(
-            Text("이 라이브러리는 중국어, 일본어 및 한국어 텍스트를 지원합니다", overflow="fold"),
-            expand=False,
-            border_style="Red",
-            box=box.DOUBLE_EDGE,
-        ),
-    )
     table.add_row(
         "Asian languages",
         ":flag_for_china:  该库支持中文，日文和韩文文本！\n:flag_for_japan:  ライブラリは中国語、日本語、韓国語のテキストをサポートしています\n:flag_for_south_korea:  이 라이브러리는 중국어, 일본어 및 한국어 텍스트를 지원합니다",
     )
 
     markup_example = (
-        "[bold magenta]Rich[/] supports a simple [i]bbcode[/i] like [b]markup[/b] for [yellow]color[/] and [underline]style[/]. "
-        "Also renders emoji code: :+1: :apple: :ant: :bear: :baguette_bread: :bus: "
+        "[bold magenta]Rich[/] supports a simple [i]bbcode[/i] like [b]markup[/b] for [yellow]color[/], [underline]style[/], and emoji! "
+        ":+1: :apple: :ant: :bear: :baguette_bread: :bus: "
     )
     table.add_row("Console markup", markup_example)
 
@@ -203,7 +179,7 @@ def iter_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
         "atomic": (False, True, None),
     }
     table.add_row(
-        "Syntax highlighting\n&\nPretty printing",
+        "Syntax\nhighlighting\n&\npretty\nprinting",
         comparison(
             Syntax(code, "python3", line_numbers=True, indent_guides=True),
             Pretty(pretty_data, indent_guides=True),
