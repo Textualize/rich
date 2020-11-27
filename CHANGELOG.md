@@ -12,10 +12,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added get_datetime parameter to Console, to allow for repeatable tests
 - Added get_time parameter to Console
 - Added rich.abc.RichRenderable
+- Added expand_all to rich.pretty.install()
+
+### Changed
+
+- Reformatted test card (python -m rich)
 
 ### Fixed
 
 - Fixed redirecting of stderr in Progress
+- Fixed broken expanded tuple of one https://github.com/willmcgugan/rich/issues/445
 
 ## [9.2.0] - 2020-11-08
 
