@@ -19,6 +19,7 @@ from typing import (
 
 from rich.highlighter import ReprHighlighter
 
+from .abc import RichRenderable
 from .__init__ import get_console
 from ._pick import pick_bool
 from .cells import cell_len
@@ -43,6 +44,7 @@ def install(
     crop: bool = False,
     indent_guides: bool = False,
     max_length: int = None,
+    expand_all: bool = False,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
 
@@ -53,6 +55,7 @@ def install(
         indent_guides (bool, optional): Enable indentation guides. Defaults to False.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
+        expand_all (bool, optional): Expand all containers. Defaults to False
     """
     from rich import get_console
 
@@ -65,12 +68,13 @@ def install(
             builtins._ = None  # type: ignore
             console.print(
                 value
-                if hasattr(value, "__rich_console__") or hasattr(value, "__rich__")
+                if isinstance(value, RichRenderable)
                 else Pretty(
                     value,
                     overflow=overflow,
                     indent_guides=indent_guides,
                     max_length=max_length,
+                    expand_all=expand_all,
                 ),
                 crop=crop,
             )
@@ -195,6 +199,11 @@ class Node:
     is_tuple: bool = False
     children: Optional[List["Node"]] = None
 
+    @property
+    def separator(self) -> str:
+        """Get separator between items."""
+        return "" if self.last else ","
+
     def iter_tokens(self) -> Iterable[str]:
         """Generate tokens for this node."""
         if self.key_repr:
@@ -251,7 +260,7 @@ class Node:
         Returns:
             str: A repr string of the original object.
         """
-        lines = [_Line(node=self)]
+        lines = [_Line(node=self, is_root=True)]
         line_no = 0
         while line_no < len(lines):
             line = lines[line_no]
@@ -268,6 +277,7 @@ class Node:
 class _Line:
     """A line in repr output."""
 
+    is_root: bool = False
     node: Optional[Node] = None
     text: str = ""
     suffix: str = ""
@@ -300,18 +310,20 @@ class _Line:
         else:
             yield _Line(text=node.open_brace, whitespace=whitespace)
         child_whitespace = self.whitespace + " " * indent_size
+        tuple_of_one = node.is_tuple and len(node.children) == 1
         for child in node.children:
+            separator = "," if tuple_of_one else child.separator
             line = _Line(
                 node=child,
                 whitespace=child_whitespace,
-                suffix="" if child.last else ",",
+                suffix=separator,
             )
             yield line
 
         yield _Line(
             text=node.close_brace,
             whitespace=whitespace,
-            suffix="" if node.last else ",",
+            suffix="," if (tuple_of_one and not self.is_root) else node.separator,
         )
 
     def __str__(self) -> str:

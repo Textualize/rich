@@ -29,6 +29,7 @@ def test_pretty():
     print(result)
     print(repr(result))
     expected = "{\n    'foo': [1, 2, 3, (4, 5, {6}, 7, 8, {9}), {}],\n    'bar': {\n        'egg': 'baz',\n        'words': [\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World'\n        ]\n    },\n    False: 'foo',\n    True: '',\n    'text': ('Hello World', 'foo bar baz egg')\n}"
+    print(expected)
     assert result == expected
 
 
@@ -121,3 +122,15 @@ def test_pprint_max_string():
     console.begin_capture()
     pprint(["Hello" * 20], console=console, max_string=8)
     assert console.end_capture() == """['HelloHel'+92]\n"""
+
+
+def test_tuples():
+    console = Console(color_system=None)
+    console.begin_capture()
+    pprint((1,), console=console)
+    pprint((1,), expand_all=True, console=console)
+    pprint(((1,),), expand_all=True, console=console)
+    result = console.end_capture()
+    print(repr(result))
+    expected = "(1,)\n(\n│   1,\n)\n(\n│   (\n│   │   1,\n│   ),\n)\n"
+    assert result == expected
