@@ -44,6 +44,7 @@ def install(
     crop: bool = False,
     indent_guides: bool = False,
     max_length: int = None,
+    max_string: int = None,
     expand_all: bool = False,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
@@ -55,6 +56,7 @@ def install(
         indent_guides (bool, optional): Enable indentation guides. Defaults to False.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
+        max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
         expand_all (bool, optional): Expand all containers. Defaults to False
     """
     from rich import get_console
@@ -74,6 +76,7 @@ def install(
                     overflow=overflow,
                     indent_guides=indent_guides,
                     max_length=max_length,
+                    max_string=max_string,
                     expand_all=expand_all,
                 ),
                 crop=crop,

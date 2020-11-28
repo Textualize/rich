@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added get_time parameter to Console
 - Added rich.abc.RichRenderable
 - Added expand_all to rich.pretty.install()
+- Added locals_max_length, and locals_max_string to Traceback and logging
 
 ### Changed
 

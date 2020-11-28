@@ -145,6 +145,9 @@ class Traceback:
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
+        locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to None.
+        locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
     """
 
     def __init__(
@@ -156,6 +159,8 @@ class Traceback:
         word_wrap: bool = False,
         show_locals: bool = False,
         indent_guides: bool = True,
+        locals_max_length: int = None,
+        locals_max_string: int = None,
     ):
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
@@ -173,6 +178,8 @@ class Traceback:
         self.word_wrap = word_wrap
         self.show_locals = show_locals
         self.indent_guides = indent_guides
+        self.locals_max_length = locals_max_length
+        self.locals_max_string = locals_max_string
 
     @classmethod
     def from_exception(
@@ -186,6 +193,8 @@ class Traceback:
         word_wrap: bool = False,
         show_locals: bool = False,
         indent_guides: bool = True,
+        locals_max_length: int = None,
+        locals_max_string: int = None,
     ) -> "Traceback":
         """Create a traceback from exception info
 
@@ -199,6 +208,9 @@ class Traceback:
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
             indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
+            locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+                Defaults to None.
+            locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
 
         Returns:
             Traceback: A Traceback instance that may be printed.
@@ -214,6 +226,8 @@ class Traceback:
             word_wrap=word_wrap,
             show_locals=show_locals,
             indent_guides=indent_guides,
+            locals_max_length=locals_max_length,
+            locals_max_string=locals_max_string,
         )
 
     @classmethod
@@ -439,6 +453,8 @@ class Traceback:
                                 frame.locals,
                                 title="locals",
                                 indent_guides=self.indent_guides,
+                                max_length=self.locals_max_length,
+                                max_string=self.locals_max_string,
                             ),
                         ],
                         padding=1,
