@@ -525,6 +525,7 @@ class Progress(JupyterMixin, RenderHook):
         redirect_stdout: (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
         redirect_stderr: (bool, optional): Enable redirection of stderr. Defaults to True.
         get_time: (Callable, optional): A callable that gets the current time, or None to use Console.get_time. Defaults to None.
+        disable (bool, optional): Disable progress display. Defaults to False
     """
 
     def __init__(
@@ -538,6 +539,7 @@ class Progress(JupyterMixin, RenderHook):
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
         get_time: GetTimeCallable = None,
+        disable: bool = False,
     ) -> None:
         assert (
             refresh_per_second is None or refresh_per_second > 0
@@ -557,6 +559,7 @@ class Progress(JupyterMixin, RenderHook):
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
         self.get_time = get_time or self.console.get_time
+        self.disable = disable
         self._tasks: Dict[TaskID, Task] = {}
         self._live_render = LiveRender(self.get_renderable())
         self._task_index: TaskID = TaskID(0)
@@ -866,7 +869,11 @@ class Progress(JupyterMixin, RenderHook):
                         self.ipy_widget.clear_output(wait=True)
                         self.console.print(self.get_renderable())
 
-        elif self.console.is_terminal and not self.console.is_dumb_terminal:
+        elif (
+            self.console.is_terminal
+            and not self.console.is_dumb_terminal
+            and not self.disable
+        ):
             with self._lock:
                 self._live_render.set_renderable(self.get_renderable())
                 with self.console:

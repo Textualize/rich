@@ -37,8 +37,8 @@ class RichHandler(Handler):
         tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to False.
         tracebacks_show_locals (bool, optional): Enable display of locals in tracebacks. Defaults to False.
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
-            Defaults to None.
-        locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
+            Defaults to 10.
+        locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
     """
 
     KEYWORDS: ClassVar[Optional[List[str]]] = [
@@ -70,8 +70,8 @@ class RichHandler(Handler):
         tracebacks_theme: Optional[str] = None,
         tracebacks_word_wrap: bool = True,
         tracebacks_show_locals: bool = False,
-        locals_max_length: int = None,
-        locals_max_string: int = None,
+        locals_max_length: int = 10,
+        locals_max_string: int = 80,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
