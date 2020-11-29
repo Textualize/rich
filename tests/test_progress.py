@@ -341,7 +341,7 @@ def test_refresh_thread() -> None:
     thread = _RefreshThread(progress, 10)
     assert thread.progress == progress
     thread.start()
-    sleep(0.2)
+    sleep(0.5)
     thread.stop()
     assert progress.count >= 1
 
