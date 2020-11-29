@@ -7,10 +7,8 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 from math import ceil
 from threading import Event, RLock, Thread
-from time import monotonic
 from typing import (
     IO,
-    TYPE_CHECKING,
     Any,
     Callable,
     Deque,

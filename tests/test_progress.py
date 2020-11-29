@@ -143,8 +143,10 @@ def make_progress() -> Progress:
 
 def render_progress() -> str:
     progress = make_progress()
+    progress.start()  # superfluous noop
     with progress:
         pass
+    progress.stop()  # superfluous noop
     progress_render = progress.console.file.getvalue()
     return progress_render
 
