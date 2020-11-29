@@ -338,10 +338,10 @@ def test_refresh_thread() -> None:
             self.count += 1
 
     progress = MockProgress()
-    thread = _RefreshThread(progress, 10)
+    thread = _RefreshThread(progress, 100)
     assert thread.progress == progress
     thread.start()
-    sleep(0.5)
+    sleep(0.2)
     thread.stop()
     assert progress.count >= 1
 
