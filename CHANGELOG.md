@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed redirecting of stderr in Progress
 - Fixed broken expanded tuple of one https://github.com/willmcgugan/rich/issues/445
+- Fixed traceback message with `from` exceptions
 
 ## [9.2.0] - 2020-11-08
 

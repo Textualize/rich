@@ -121,6 +121,7 @@ class Stack:
     exc_type: str
     exc_value: str
     syntax_error: Optional[_SyntaxError] = None
+    is_cause: bool = False
     frames: List[Frame] = field(default_factory=list)
 
 
@@ -237,8 +238,13 @@ class Traceback:
         """
 
         stacks: List[Stack] = []
+        is_cause = False
         while True:
-            stack = Stack(exc_type=str(exc_type.__name__), exc_value=str(exc_value))
+            stack = Stack(
+                exc_type=str(exc_type.__name__),
+                exc_value=str(exc_value),
+                is_cause=is_cause,
+            )
 
             if isinstance(exc_value, SyntaxError):
                 stack.syntax_error = _SyntaxError(
@@ -268,12 +274,22 @@ class Traceback:
                 )
                 append(frame)
 
+            cause = getattr(exc_value, "__cause__", None)
+            if cause and cause.__traceback__:
+                exc_type = cause.__class__
+                exc_value = cause
+                traceback = cause.__traceback__
+                if traceback:
+                    is_cause = True
+                    continue
+
             cause = exc_value.__context__
             if cause and cause.__traceback__:
                 exc_type = cause.__class__
                 exc_value = cause
                 traceback = cause.__traceback__
                 if traceback:
+                    is_cause = False
                     continue
             # No cover, code is reached but coverage doesn't recognize it.
             break  # pragma: no cover
@@ -347,9 +363,14 @@ class Traceback:
                 )
 
             if not last:
-                yield Text.from_markup(
-                    "\n[i]During handling of the above exception, another exception occurred:\n",
-                )
+                if stack.is_cause:
+                    yield Text.from_markup(
+                        "\n[i]The above exception was the direct cause of the following exception:\n",
+                    )
+                else:
+                    yield Text.from_markup(
+                        "\n[i]During handling of the above exception, another exception occurred:\n",
+                    )
 
     @render_group()
     def _render_syntax_error(self, syntax_error: _SyntaxError) -> RenderResult:
