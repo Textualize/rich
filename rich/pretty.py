@@ -155,7 +155,11 @@ class Pretty:
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         pretty_str = pretty_repr(
-            self._object, max_width=max_width, indent_size=self.indent_size
+            self._object,
+            max_width=max_width,
+            indent_size=self.indent_size,
+            max_length=self.max_length,
+            max_string=self.max_string,
         )
         text_width = max(cell_len(line) for line in pretty_str.splitlines())
         return Measurement(text_width, text_width)

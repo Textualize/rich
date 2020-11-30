@@ -210,6 +210,8 @@ if __name__ == "__main__":  # pragma: no cover
     def divide():
         number = 1
         divisor = 0
+        foos = ["foo"] * 100
+        log.debug("in divide")
         try:
             number / divisor
         except:
