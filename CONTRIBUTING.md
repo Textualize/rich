@@ -8,11 +8,22 @@ to discuss it first.
 
 ## Development Environment
 
-To start developing with Rich, run the following to install requirements:
+Rich uses [poetry](https://python-poetry.org/docs/) for packaging and 
+dependency management. To start developing with Rich, either install the 
+recommended way (using curl) as described in their 
+[docs](https://python-poetry.org/docs/#installation), or simply run:
+
+```
+pip install poetry
+```
+
+Once Poetry is installed, run
 
 ```
 poetry install
 ```
+
+To install dependencies
 
 ### Tests
 

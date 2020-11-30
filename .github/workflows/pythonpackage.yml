@@ -6,7 +6,6 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
         python-version: [3.6, 3.7, 3.8, 3.9]
@@ -44,4 +43,3 @@ jobs:
           name: rich
           flags: unittests
           env_vars: OS,PYTHON
-          fail_ci_if_error: true
