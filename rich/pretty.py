@@ -20,7 +20,7 @@ from typing import (
 from rich.highlighter import ReprHighlighter
 
 from .abc import RichRenderable
-from .__init__ import get_console
+from . import get_console
 from ._pick import pick_bool
 from .cells import cell_len
 from .highlighter import ReprHighlighter
