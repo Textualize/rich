@@ -1,6 +1,6 @@
 from typing import Iterable, List, TYPE_CHECKING
 
-from .__init__ import get_console
+from . import get_console
 from .segment import Segment
 from .terminal_theme import DEFAULT_TERMINAL_THEME
 
