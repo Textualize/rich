@@ -72,3 +72,11 @@ class LogRender:
 
         output.add_row(*row)
         return output
+
+
+if __name__ == "__main__":  # pragma: no cover
+    from rich.console import Console
+
+    c = Console()
+    c.print("[on blue]Hello", justify="right")
+    c.log("[on blue]hello", justify="right")
