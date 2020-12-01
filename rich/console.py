@@ -967,7 +967,7 @@ class Console:
 
         def check_text() -> None:
             if text:
-                sep_text = Text(sep, end=end)
+                sep_text = Text(sep, justify=justify, end=end)
                 append(sep_text.join(text))
                 del text[:]
 

@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added get_time parameter to Console
 - Added rich.abc.RichRenderable
 - Added expand_all to rich.pretty.install()
+- Added locals_max_length, and locals_max_string to Traceback and logging.RichHandler
+- Set defaults of max_length and max_string for Traceback to 10 and 80
+- Added disable argument to Progress
 
 ### Changed
 
@@ -22,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed redirecting of stderr in Progress
 - Fixed broken expanded tuple of one https://github.com/willmcgugan/rich/issues/445
+- Fixed justify argument not working in console.log https://github.com/willmcgugan/rich/issues/460
 
 ## [9.2.0] - 2020-11-08
 

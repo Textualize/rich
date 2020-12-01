@@ -36,6 +36,9 @@ class RichHandler(Handler):
         tracebacks_theme (str, optional): Override pygments theme used in traceback.
         tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to False.
         tracebacks_show_locals (bool, optional): Enable display of locals in tracebacks. Defaults to False.
+        locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to 10.
+        locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
     """
 
     KEYWORDS: ClassVar[Optional[List[str]]] = [
@@ -67,6 +70,8 @@ class RichHandler(Handler):
         tracebacks_theme: Optional[str] = None,
         tracebacks_word_wrap: bool = True,
         tracebacks_show_locals: bool = False,
+        locals_max_length: int = 10,
+        locals_max_string: int = 80,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
@@ -85,6 +90,8 @@ class RichHandler(Handler):
         self.tracebacks_theme = tracebacks_theme
         self.tracebacks_word_wrap = tracebacks_word_wrap
         self.tracebacks_show_locals = tracebacks_show_locals
+        self.locals_max_length = locals_max_length
+        self.locals_max_string = locals_max_string
 
     def get_level_text(self, record: LogRecord) -> Text:
         """Get the level name from the record.
@@ -127,6 +134,8 @@ class RichHandler(Handler):
                 theme=self.tracebacks_theme,
                 word_wrap=self.tracebacks_word_wrap,
                 show_locals=self.tracebacks_show_locals,
+                locals_max_length=self.locals_max_length,
+                locals_max_string=self.locals_max_string,
             )
             message = record.getMessage()
 
@@ -201,6 +210,8 @@ if __name__ == "__main__":  # pragma: no cover
     def divide():
         number = 1
         divisor = 0
+        foos = ["foo"] * 100
+        log.debug("in divide")
         try:
             number / divisor
         except:

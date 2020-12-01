@@ -44,6 +44,7 @@ def install(
     crop: bool = False,
     indent_guides: bool = False,
     max_length: int = None,
+    max_string: int = None,
     expand_all: bool = False,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
@@ -55,6 +56,7 @@ def install(
         indent_guides (bool, optional): Enable indentation guides. Defaults to False.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
+        max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
         expand_all (bool, optional): Expand all containers. Defaults to False
     """
     from rich import get_console
@@ -74,6 +76,7 @@ def install(
                     overflow=overflow,
                     indent_guides=indent_guides,
                     max_length=max_length,
+                    max_string=max_string,
                     expand_all=expand_all,
                 ),
                 crop=crop,
@@ -152,7 +155,11 @@ class Pretty:
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         pretty_str = pretty_repr(
-            self._object, max_width=max_width, indent_size=self.indent_size
+            self._object,
+            max_width=max_width,
+            indent_size=self.indent_size,
+            max_length=self.max_length,
+            max_string=self.max_string,
         )
         text_width = max(cell_len(line) for line in pretty_str.splitlines())
         return Measurement(text_width, text_width)
