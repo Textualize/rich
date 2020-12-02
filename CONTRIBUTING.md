@@ -1,15 +1,29 @@
 # Contributing to Rich
 
-This project welcomes contributions in the form of Pull Requests. For clear bug-fixes / typos etc. just submit a PR. For new features or if there is any doubt in how to fix a bug, you might want to open an issue prior to starting work, or email willmcgugan+rich@gmail.com to discuss it first.
+This project welcomes contributions in the form of Pull Requests. 
+For clear bug-fixes / typos etc. just submit a PR. 
+For new features or if there is any doubt in how to fix a bug, you might want 
+to open an issue prior to starting work, or email willmcgugan+rich@gmail.com 
+to discuss it first.
 
 ## Development Environment
 
-To start developing with Rich, first create a _virtual environment_ then run the following to install development requirements:
+Rich uses [poetry](https://python-poetry.org/docs/) for packaging and 
+dependency management. To start developing with Rich, either install the 
+recommended way (using curl) as described in their 
+[docs](https://python-poetry.org/docs/#installation), or simply run:
 
 ```
-pip install -r requirements-dev.txt
+pip install poetry
+```
+
+Once Poetry is installed, run
+
+```
 poetry install
 ```
+
+To install dependencies
 
 ### Tests
 
@@ -29,7 +43,8 @@ New code should ideally have tests and not break existing tests.
 
 ### Type Checking
 
-Rich uses type annotations throughout, and `mypy` to do the checking. Run the following to type check Rich:
+Rich uses type annotations throughout, and `mypy` to do the checking. 
+Run the following to type check Rich:
 
 ```
 make typecheck

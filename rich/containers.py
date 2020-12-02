@@ -8,8 +8,6 @@ from typing import (
     TYPE_CHECKING,
 )
 
-from .style import Style
-
 if TYPE_CHECKING:
     from .console import (
         Console,
