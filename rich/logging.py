@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from logging import Handler, LogRecord
 from pathlib import Path
-from typing import ClassVar, List, Optional, Type
+from typing import ClassVar, List, Optional, Type, Union
 
 from . import get_console
 from ._log_render import LogRender
@@ -55,7 +55,7 @@ class RichHandler(Handler):
 
     def __init__(
         self,
-        level: int = logging.NOTSET,
+        level: Union[int, str] = logging.NOTSET,
         console: Console = None,
         *,
         show_time: bool = True,
