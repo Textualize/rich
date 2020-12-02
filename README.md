@@ -31,6 +31,12 @@ Install with `pip` or your favorite PyPi package manager.
 pip install rich
 ```
 
+Run the following to test Rich output on your terminal:
+
+```
+python -m rich
+```
+
 ## Rich print function
 
 To effortlessly add rich output to your application, you can import the [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) method, which has the same signature as the builtin Python function. Try this:
