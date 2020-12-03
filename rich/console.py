@@ -31,7 +31,7 @@ from typing_extensions import Literal, Protocol, runtime_checkable
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
 from ._log_render import LogRender
-from .align import Align, AlignValues, AlignMethod
+from .align import Align, AlignMethod
 from .color import ColorSystem
 from .control import Control
 from .highlighter import NullHighlighter, ReprHighlighter
@@ -946,7 +946,7 @@ class Console:
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default.
 
         Returns:
-            List[ConsoleRenderable]: A list of things to render.
+            List[ConsoleRenderable]: A list oxf things to render.
         """
         renderables: List[ConsoleRenderable] = []
         _append = renderables.append
