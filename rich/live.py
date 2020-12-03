@@ -257,7 +257,7 @@ class Live(JupyterMixin, RenderHook):
             # lock needs acquiring as user can modify live_render renerable at any time unlike in Progress.
             with self._lock:
                 # determine the control command needed to clear previous rendering
-                return [
+                renderables = [
                     self._live_render.position_cursor(),
                     *renderables,
                     self._live_render,
@@ -265,7 +265,7 @@ class Live(JupyterMixin, RenderHook):
         elif (
             not self._started and not self.transient
         ):  # if it is finished render the final output for files or dumb_terminals
-            return [*renderables, self._live_render]
+            renderables = [*renderables, self._live_render]
 
         return renderables
 
