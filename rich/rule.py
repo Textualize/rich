@@ -73,14 +73,12 @@ class Rule(JupyterMixin):
         else:
             title_text = console.render_str(self.title, style="rule.text")
 
-        if cell_len(title_text.plain) > width - 4:
-            title_text.truncate(width - 4, overflow="ellipsis")
-
         title_text.plain = title_text.plain.replace("\n", " ")
         title_text.expand_tabs()
         rule_text = Text(end=self.end)
 
         if self.align == "center":
+            title_text.truncate(width - 4, overflow="ellipsis")
             side_width = (width - cell_len(title_text.plain)) // 2
             left = Text(characters * (side_width // chars_len + 1))
             left.truncate(side_width - 1)
@@ -91,10 +89,12 @@ class Rule(JupyterMixin):
             rule_text.append(title_text)
             rule_text.append(" " + right.plain, self.style)
         elif self.align == "left":
+            title_text.truncate(width - 2, overflow="ellipsis")
             rule_text.append(title_text)
             rule_text.append(" ")
             rule_text.append(characters * (width - rule_text.cell_len), self.style)
         elif self.align == "right":
+            title_text.truncate(width - 2, overflow="ellipsis")
             rule_text.append(characters * (width - title_text.cell_len - 1), self.style)
             rule_text.append(" ")
             rule_text.append(title_text)
