@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Union
 
 from .cells import cell_len, set_cell_size
 from .console import Console, ConsoleOptions, RenderResult

@@ -5,13 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [9.2.0] - Unreleased
+## [9.3.0] - 2020-12-1
+
+### Added
+
+- Added get_datetime parameter to Console, to allow for repeatable tests
+- Added get_time parameter to Console
+- Added rich.abc.RichRenderable
+- Added expand_all to rich.pretty.install()
+- Added locals_max_length, and locals_max_string to Traceback and logging.RichHandler
+- Set defaults of max_length and max_string for Traceback to 10 and 80
+- Added disable argument to Progress
+
+### Changed
+
+- Reformatted test card (python -m rich)
+
+### Fixed
+
+- Fixed redirecting of stderr in Progress
+- Fixed broken expanded tuple of one https://github.com/willmcgugan/rich/issues/445
+- Fixed justify argument not working in console.log https://github.com/willmcgugan/rich/issues/460
+
+## [9.2.0] - 2020-11-08
 
 ### Added
 
 - Added tracebacks_show_locals parameter to RichHandler
-- Applied dim=True to indent guide styles
 - Added max_string to Pretty
+- Added rich.ansi.AnsiDecoder
+- Added decoding of ansi codes to captured stdout in Progress
+- Added expand_all to rich.pretty.pprint
+
+### Changed
+
+- Applied dim=True to indent guide styles
+- Factored out RichHandler.get_style_and_level to allow for overriding in subclasses
+- Hid progress bars from html export
+- rich.pretty.pprint now soft wraps
 
 ## [9.1.0] - 2020-10-23
 

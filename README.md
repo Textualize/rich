@@ -31,6 +31,12 @@ Install with `pip` or your favorite PyPi package manager.
 pip install rich
 ```
 
+Run the following to test Rich output on your terminal:
+
+```
+python -m rich
+```
+
 ## Rich print function
 
 To effortlessly add rich output to your application, you can import the [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) method, which has the same signature as the builtin Python function. Try this:
@@ -316,7 +322,7 @@ Here are a few projects using Rich:
   Browse GitHub trending projects from your command line
 - [intel/cve-bin-tool](https://github.com/intel/cve-bin-tool)
   This tool scans for a number of common, vulnerable components (openssl, libpng, libxml2, expat and a few others) to let you know if your system includes common libraries with known vulnerabilities.
-- [nf-core/tools](https://github.com/nf)
+- [nf-core/tools](https://github.com/nf-core/tools)
   Python package with helper tools for the nf-core community.
 - [cansarigol/pdbr](https://github.com/cansarigol/pdbr)
   pdb + Rich library for enhanced debugging

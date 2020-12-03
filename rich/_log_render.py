@@ -16,11 +16,13 @@ class LogRender:
         show_level: bool = False,
         show_path: bool = True,
         time_format: str = "[%x %X]",
+        level_width: Optional[int] = 8,
     ) -> None:
         self.show_time = show_time
         self.show_level = show_level
         self.show_path = show_path
         self.time_format = time_format
+        self.level_width = level_width
         self._last_time: Optional[str] = None
 
     def __call__(
@@ -42,14 +44,13 @@ class LogRender:
         if self.show_time:
             output.add_column(style="log.time")
         if self.show_level:
-            output.add_column(style="log.level", width=8)
+            output.add_column(style="log.level", width=self.level_width)
         output.add_column(ratio=1, style="log.message", overflow="fold")
         if self.show_path and path:
             output.add_column(style="log.path")
         row: List["RenderableType"] = []
         if self.show_time:
-            if log_time is None:
-                log_time = datetime.now()
+            log_time = log_time or console.get_datetime()
             log_time_display = log_time.strftime(time_format or self.time_format)
             if log_time_display == self._last_time:
                 row.append(Text(" " * len(log_time_display)))
@@ -71,3 +72,11 @@ class LogRender:
 
         output.add_row(*row)
         return output
+
+
+if __name__ == "__main__":  # pragma: no cover
+    from rich.console import Console
+
+    c = Console()
+    c.print("[on blue]Hello", justify="right")
+    c.log("[on blue]hello", justify="right")

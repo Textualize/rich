@@ -1,5 +1,6 @@
 import io
 from rich.console import Console
+from rich.measure import Measurement
 from rich.panel import Panel
 
 import pytest
@@ -40,6 +41,14 @@ def test_console_width():
     min_width, max_width = panel.__rich_measure__(console, 50)
     assert min_width == 16
     assert max_width == 16
+
+
+def test_fixed_width():
+    console = Console(file=io.StringIO(), width=50, legacy_windows=False)
+    panel = Panel("Hello World", width=20)
+    min_width, max_width = panel.__rich_measure__(console, 100)
+    assert min_width == 20
+    assert max_width == 20
 
 
 if __name__ == "__main__":

@@ -73,6 +73,10 @@ def test_from_rgb() -> None:
     )
 
 
+def test_from_ansi() -> None:
+    assert Color.from_ansi(1) == Color("color(1)", ColorType.STANDARD, 1)
+
+
 def test_default() -> None:
     assert Color.default() == Color("default", ColorType.DEFAULT, None, None)
 

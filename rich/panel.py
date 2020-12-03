@@ -158,11 +158,17 @@ class Panel(JupyterMixin):
         _, right, _, left = Padding.unpack(self.padding)
         padding = left + right
         renderables = [self.renderable, _title] if _title else [self.renderable]
-        width = (
-            measure_renderables(console, renderables, max_width - padding - 2).maximum
-            + padding
-            + 2
-        )
+
+        if self.width is None:
+            width = (
+                measure_renderables(
+                    console, renderables, max_width - padding - 2
+                ).maximum
+                + padding
+                + 2
+            )
+        else:
+            width = self.width
         return Measurement(width, width)
 
 

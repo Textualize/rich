@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import os.path
 import platform
 import sys
 from dataclasses import dataclass, field
@@ -40,6 +41,9 @@ from .text import Text
 from .theme import Theme
 
 WINDOWS = platform.system() == "Windows"
+
+LOCALS_MAX_LENGTH = 10
+LOCALS_MAX_STRING = 80
 
 
 def install(
@@ -144,6 +148,9 @@ class Traceback:
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
+        locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to 10.
+        locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
     """
 
     def __init__(
@@ -155,6 +162,8 @@ class Traceback:
         word_wrap: bool = False,
         show_locals: bool = False,
         indent_guides: bool = True,
+        locals_max_length: int = LOCALS_MAX_LENGTH,
+        locals_max_string: int = LOCALS_MAX_STRING,
     ):
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
@@ -172,6 +181,8 @@ class Traceback:
         self.word_wrap = word_wrap
         self.show_locals = show_locals
         self.indent_guides = indent_guides
+        self.locals_max_length = locals_max_length
+        self.locals_max_string = locals_max_string
 
     @classmethod
     def from_exception(
@@ -185,6 +196,8 @@ class Traceback:
         word_wrap: bool = False,
         show_locals: bool = False,
         indent_guides: bool = True,
+        locals_max_length: int = LOCALS_MAX_LENGTH,
+        locals_max_string: int = LOCALS_MAX_STRING,
     ) -> "Traceback":
         """Create a traceback from exception info
 
@@ -198,6 +211,9 @@ class Traceback:
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
             indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
+            locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+                Defaults to 10.
+            locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
 
         Returns:
             Traceback: A Traceback instance that may be printed.
@@ -213,6 +229,8 @@ class Traceback:
             word_wrap=word_wrap,
             show_locals=show_locals,
             indent_guides=indent_guides,
+            locals_max_length=locals_max_length,
+            locals_max_string=locals_max_string,
         )
 
     @classmethod
@@ -222,6 +240,8 @@ class Traceback:
         exc_value: BaseException,
         traceback: Optional[TracebackType],
         show_locals: bool = False,
+        locals_max_length: int = LOCALS_MAX_LENGTH,
+        locals_max_string: int = LOCALS_MAX_STRING,
     ) -> Trace:
         """Extract traceback information.
 
@@ -230,6 +250,9 @@ class Traceback:
             exc_value (BaseException): Exception value.
             traceback (TracebackType): Python Traceback object.
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
+            locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+                Defaults to 10.
+            locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
 
         Returns:
             Trace: A Trace instance which you can use to construct a `Traceback`.
@@ -252,12 +275,18 @@ class Traceback:
             append = stack.frames.append
 
             for frame_summary, line_no in walk_tb(traceback):
+                filename = frame_summary.f_code.co_filename
+                filename = os.path.abspath(filename) if filename else "?"
                 frame = Frame(
-                    filename=frame_summary.f_code.co_filename or "?",
+                    filename=filename,
                     lineno=line_no,
                     name=frame_summary.f_code.co_name,
                     locals={
-                        key: pretty.traverse(value)
+                        key: pretty.traverse(
+                            value,
+                            max_length=locals_max_length,
+                            max_string=locals_max_string,
+                        )
                         for key, value in frame_summary.f_locals.items()
                     }
                     if show_locals
@@ -436,6 +465,8 @@ class Traceback:
                                 frame.locals,
                                 title="locals",
                                 indent_guides=self.indent_guides,
+                                max_length=self.locals_max_length,
+                                max_string=self.locals_max_string,
                             ),
                         ],
                         padding=1,

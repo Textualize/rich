@@ -1,10 +1,8 @@
 from typing import Any
 
+from .abc import RichRenderable
 
-def is_renderable(test_renderable: Any) -> bool:
+
+def is_renderable(check_object: Any) -> bool:
     """Check if an object may be rendered by Rich."""
-    return (
-        isinstance(test_renderable, str)
-        or hasattr(test_renderable, "__rich_console__")
-        or hasattr(test_renderable, "__rich__")
-    )
+    return isinstance(check_object, str) or isinstance(check_object, RichRenderable)

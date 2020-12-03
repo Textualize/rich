@@ -7,10 +7,8 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 from math import ceil
 from threading import Event, RLock, Thread
-from time import monotonic
 from typing import (
     IO,
-    TYPE_CHECKING,
     Any,
     Callable,
     Deque,
@@ -27,7 +25,7 @@ from typing import (
 )
 
 from . import filesize, get_console
-from .progress_bar import ProgressBar
+from .ansi import AnsiDecoder
 from .console import (
     Console,
     ConsoleRenderable,
@@ -40,6 +38,7 @@ from .control import Control
 from .highlighter import Highlighter
 from .jupyter import JupyterMixin
 from .live_render import LiveRender
+from .progress_bar import ProgressBar
 from .style import StyleType
 from .table import Table
 from .text import Text
@@ -480,6 +479,7 @@ class _FileProxy(io.TextIOBase):
         self.__console = console
         self.__file = file
         self.__buffer: List[str] = []
+        self.__ansi_decoder = AnsiDecoder()
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__file, name)
@@ -498,7 +498,9 @@ class _FileProxy(io.TextIOBase):
         if lines:
             console = self.__console
             with console:
-                output = "\n".join(lines)
+                output = Text("\n").join(
+                    self.__ansi_decoder.decode_line(line) for line in lines
+                )
                 console.print(output, markup=False, emoji=False, highlight=False)
         return len(text)
 
@@ -520,7 +522,8 @@ class Progress(JupyterMixin, RenderHook):
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         redirect_stdout: (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
         redirect_stderr: (bool, optional): Enable redirection of stderr. Defaults to True.
-        get_time: (Callable, optional): A callable that gets the current time, or None to use time.monotonic. Defaults to None.
+        get_time: (Callable, optional): A callable that gets the current time, or None to use Console.get_time. Defaults to None.
+        disable (bool, optional): Disable progress display. Defaults to False
     """
 
     def __init__(
@@ -534,6 +537,7 @@ class Progress(JupyterMixin, RenderHook):
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
         get_time: GetTimeCallable = None,
+        disable: bool = False,
     ) -> None:
         assert (
             refresh_per_second is None or refresh_per_second > 0
@@ -552,7 +556,8 @@ class Progress(JupyterMixin, RenderHook):
         self.transient = transient
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
-        self.get_time = get_time or monotonic
+        self.get_time = get_time or self.console.get_time
+        self.disable = disable
         self._tasks: Dict[TaskID, Task] = {}
         self._live_render = LiveRender(self.get_renderable())
         self._task_index: TaskID = TaskID(0)
@@ -592,7 +597,7 @@ class Progress(JupyterMixin, RenderHook):
                 sys.stdout = _FileProxy(self.console, sys.stdout)
             if self._redirect_stderr:
                 self._restore_stderr = sys.stderr
-                sys.stdout = _FileProxy(self.console, sys.stdout)
+                sys.stderr = _FileProxy(self.console, sys.stderr)
 
     def _disable_redirect_io(self):
         """Disable redirecting of stdout / stderr."""
@@ -846,8 +851,8 @@ class Progress(JupyterMixin, RenderHook):
         """Refresh (render) the progress information."""
         if self.console.is_jupyter:  # pragma: no cover
             try:
-                from ipywidgets import Output
                 from IPython.display import display
+                from ipywidgets import Output
             except ImportError:
                 import warnings
 
@@ -862,7 +867,11 @@ class Progress(JupyterMixin, RenderHook):
                         self.ipy_widget.clear_output(wait=True)
                         self.console.print(self.get_renderable())
 
-        elif self.console.is_terminal and not self.console.is_dumb_terminal:
+        elif (
+            self.console.is_terminal
+            and not self.console.is_dumb_terminal
+            and not self.disable
+        ):
             with self._lock:
                 self._live_render.set_renderable(self.get_renderable())
                 with self.console:
@@ -974,13 +983,13 @@ class Progress(JupyterMixin, RenderHook):
 
 if __name__ == "__main__":  # pragma: no coverage
 
-    import time
     import random
+    import time
 
     from .panel import Panel
+    from .rule import Rule
     from .syntax import Syntax
     from .table import Table
-    from .rule import Rule
 
     syntax = Syntax(
         '''def loop_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
@@ -1017,16 +1026,20 @@ if __name__ == "__main__":  # pragma: no coverage
 
     examples = cycle(progress_renderables)
 
-    console = Console()
-    with Progress(console=console, transient=True) as progress:
+    console = Console(record=True)
+    try:
+        with Progress(console=console, transient=True) as progress:
 
-        task1 = progress.add_task("[red]Downloading", total=1000)
-        task2 = progress.add_task("[green]Processing", total=1000)
-        task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
+            task1 = progress.add_task("[red]Downloading", total=1000)
+            task2 = progress.add_task("[green]Processing", total=1000)
+            task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
 
-        while not progress.finished:
-            progress.update(task1, advance=0.5)
-            progress.update(task2, advance=0.3)
-            time.sleep(0.01)
-            if random.randint(0, 100) < 1:
-                progress.log(next(examples))
+            while not progress.finished:
+                progress.update(task1, advance=0.5)
+                progress.update(task2, advance=0.3)
+                time.sleep(0.01)
+                if random.randint(0, 100) < 1:
+                    progress.log(next(examples))
+    except:
+        console.save_html("progress.html")
+        print("wrote progress.html")

@@ -36,6 +36,9 @@ class RichHandler(Handler):
         tracebacks_theme (str, optional): Override pygments theme used in traceback.
         tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to False.
         tracebacks_show_locals (bool, optional): Enable display of locals in tracebacks. Defaults to False.
+        locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to 10.
+        locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
     """
 
     KEYWORDS: ClassVar[Optional[List[str]]] = [
@@ -67,12 +70,17 @@ class RichHandler(Handler):
         tracebacks_theme: Optional[str] = None,
         tracebacks_word_wrap: bool = True,
         tracebacks_show_locals: bool = False,
+        locals_max_length: int = 10,
+        locals_max_string: int = 80,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
         self.highlighter = highlighter or self.HIGHLIGHTER_CLASS()
         self._log_render = LogRender(
-            show_time=show_time, show_level=show_level, show_path=show_path
+            show_time=show_time,
+            show_level=show_level,
+            show_path=show_path,
+            level_width=None,
         )
         self.enable_link_path = enable_link_path
         self.markup = markup
@@ -82,17 +90,31 @@ class RichHandler(Handler):
         self.tracebacks_theme = tracebacks_theme
         self.tracebacks_word_wrap = tracebacks_word_wrap
         self.tracebacks_show_locals = tracebacks_show_locals
+        self.locals_max_length = locals_max_length
+        self.locals_max_string = locals_max_string
+
+    def get_level_text(self, record: LogRecord) -> Text:
+        """Get the level name from the record.
+
+        Args:
+            record (LogRecord): LogRecord instance.
+
+        Returns:
+            Text: A tuple of the style and level name.
+        """
+        level_name = record.levelname
+        level_text = Text.styled(
+            level_name.ljust(8), f"logging.level.{level_name.lower()}"
+        )
+        return level_text
 
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
         path = Path(record.pathname).name
-        log_style = f"logging.level.{record.levelname.lower()}"
+        level = self.get_level_text(record)
         message = self.format(record)
         time_format = None if self.formatter is None else self.formatter.datefmt
         log_time = datetime.fromtimestamp(record.created)
-
-        level = Text()
-        level.append(record.levelname, log_style)
 
         traceback = None
         if (
@@ -112,6 +134,8 @@ class RichHandler(Handler):
                 theme=self.tracebacks_theme,
                 word_wrap=self.tracebacks_word_wrap,
                 show_locals=self.tracebacks_show_locals,
+                locals_max_length=self.locals_max_length,
+                locals_max_string=self.locals_max_string,
             )
             message = record.getMessage()
 
@@ -186,6 +210,8 @@ if __name__ == "__main__":  # pragma: no cover
     def divide():
         number = 1
         divisor = 0
+        foos = ["foo"] * 100
+        log.debug("in divide")
         try:
             number / divisor
         except:

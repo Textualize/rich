@@ -1,6 +1,6 @@
-from typing import IO, Any, Generic, List, Optional, TextIO, TypeVar, Union, overload
+from typing import Any, Generic, List, Optional, TextIO, TypeVar, Union, overload
 
-from .__init__ import get_console
+from . import get_console
 from .console import Console
 from .text import Text, TextType
 

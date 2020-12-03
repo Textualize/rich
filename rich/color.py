@@ -328,6 +328,22 @@ class Color(NamedTuple):
             return theme.foreground_color if foreground else theme.background_color
 
     @classmethod
+    def from_ansi(cls, number: int) -> "Color":
+        """Create a Color number from it's 8-bit ansi number.
+
+        Args:
+            number (int): A number between 0-255 inclusive.
+
+        Returns:
+            Color: A new Color instance.
+        """
+        return cls(
+            name=f"color({number})",
+            type=(ColorType.STANDARD if number < 16 else ColorType.EIGHT_BIT),
+            number=number,
+        )
+
+    @classmethod
     def from_triplet(cls, triplet: "ColorTriplet") -> "Color":
         """Create a truecolor RGB color from a triplet of values.
 

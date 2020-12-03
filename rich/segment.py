@@ -41,21 +41,31 @@ class Segment(NamedTuple):
         return 0 if self.is_control else cell_len(self.text)
 
     @classmethod
-    def control(cls, text: str) -> "Segment":
+    def control(cls, text: str, style: Optional[Style] = None) -> "Segment":
         """Create a Segment with control codes.
 
         Args:
             text (str): Text containing non-printable control codes.
+            style (Optional[style]): Optional style.
 
         Returns:
             Segment: A Segment instance with ``is_control=True``.
         """
-        return Segment(text, is_control=True)
+        return cls(text, style, is_control=True)
 
     @classmethod
-    def line(cls) -> "Segment":
+    def make_control(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
+        """Convert all segments in to control segments.
+
+        Returns:
+            Iterable[Segments]: Segments with is_control=True
+        """
+        return [cls(text, style, True) for text, style, _ in segments]
+
+    @classmethod
+    def line(cls, is_control: bool = False) -> "Segment":
         """Make a new line segment."""
-        return Segment("\n")
+        return cls("\n", is_control=is_control)
 
     @classmethod
     def apply_style(
@@ -206,9 +216,9 @@ class Segment(NamedTuple):
                     append(segment)
                     line_length += segment_length
                 else:
-                    text, style, _ = segment
+                    text, segment_style, _ = segment
                     text = set_cell_size(text, length - line_length)
-                    append(cls(text, style))
+                    append(cls(text, segment_style))
                     break
         else:
             new_line = line[:]
@@ -278,7 +288,7 @@ class Segment(NamedTuple):
         """Simplify an iterable of segments by combining contiguous segments with the same style.
 
         Args:
-            segments (Iterable[Segment]): An iterable segments.
+            segments (Iterable[Segment]): An iterable of segments.
 
         Returns:
             Iterable[Segment]: A possibly smaller iterable of segments that will render the same way.
@@ -303,6 +313,9 @@ class Segment(NamedTuple):
     @classmethod
     def strip_links(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
         """Remove all links from an iterable of styles.
+
+        Args:
+            segments (Iterable[Segment]): An iterable segments.
 
         Yields:
             Segment: Segments with link removed.

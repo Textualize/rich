@@ -1,3 +1,4 @@
+import datetime
 import io
 import os
 import sys
@@ -420,3 +421,11 @@ def test_render_group_fit() -> None:
 
     min_width, _ = measure_renderables(console, renderables, 42)
     assert min_width == 5
+
+
+def test_get_time() -> None:
+    console = Console(
+        get_time=lambda: 99, get_datetime=lambda: datetime.datetime(1974, 7, 5)
+    )
+    assert console.get_time() == 99
+    assert console.get_datetime() == datetime.datetime(1974, 7, 5)
