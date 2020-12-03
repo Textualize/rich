@@ -1003,16 +1003,19 @@ class Console:
         *,
         characters: str = "─",
         style: Union[str, Style] = "rule.line",
+        align: str = "center",
     ) -> None:
         """Draw a line with optional centered title.
 
         Args:
             title (str, optional): Text to render over the rule. Defaults to "".
             characters (str, optional): Character(s) to form the line. Defaults to "─".
+            style (str, optional): Style of line. Defaults to "rule.line".
+            align (str, optional): Where to align title, one of "left", "center", or "right". Defaults to "center".
         """
         from .rule import Rule
 
-        rule = Rule(title=title, characters=characters, style=style)
+        rule = Rule(title=title, characters=characters, style=style, align=align)
         self.print(rule)
 
     def control(self, control_codes: Union["Control", str]) -> None:

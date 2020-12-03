@@ -24,6 +24,25 @@ def test_rule():
     assert result == expected
 
 
+def test_rule_error():
+    console = Console(width=16, file=io.StringIO(), legacy_windows=False)
+    with pytest.raises(ValueError):
+        console.rule("foo", align="foo")
+
+
+def test_rule_align():
+    console = Console(width=16, file=io.StringIO(), legacy_windows=False)
+    console.rule("foo")
+    console.rule("foo", align="left")
+    console.rule("foo", align="center")
+    console.rule("foo", align="right")
+    console.rule()
+    result = console.file.getvalue()
+    print(repr(result))
+    expected = "───── foo ──────\nfoo ────────────\n───── foo ──────\n──────────── foo\n────────────────\n"
+    assert result == expected
+
+
 def test_rule_cjk():
     console = Console(
         width=16,

@@ -71,7 +71,7 @@ class _LiveRender(LiveRender):
                                     overflow="crop",
                                     justify="center",
                                     end="",
-                                    style=Style(bold=True),
+                                    style="live.ellipsis",
                                 )
                             )
                         )
@@ -188,7 +188,7 @@ class Live(JupyterMixin, RenderHook):
                 sys.stdout = _FileProxy(self.console, sys.stdout)
             if self._redirect_stderr:
                 self._restore_stderr = sys.stderr
-                sys.stdout = _FileProxy(self.console, sys.stdout)
+                sys.stderr = _FileProxy(self.console, sys.stderr)
 
     @property
     def renderable(self) -> RenderableType:
