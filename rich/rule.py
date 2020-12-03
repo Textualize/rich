@@ -1,5 +1,6 @@
 from typing import Union
 
+from .align import AlignMethod
 from .cells import cell_len, set_cell_size
 from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin
@@ -25,7 +26,7 @@ class Rule(JupyterMixin):
         characters: str = "─",
         style: Union[str, Style] = "rule.line",
         end: str = "\n",
-        align: str = "center",
+        align: AlignMethod = "center",
     ) -> None:
         if cell_len(characters) < 1:
             raise ValueError(

@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult, RenderableType
 
 AlignValues = Literal["left", "center", "right"]
+AlignMethod = AlignValues  # TODO: deprecate AlignValues
 
 
 class Align(JupyterMixin):

@@ -31,7 +31,7 @@ from typing_extensions import Literal, Protocol, runtime_checkable
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
 from ._log_render import LogRender
-from .align import Align, AlignValues
+from .align import Align, AlignValues, AlignMethod
 from .color import ColorSystem
 from .control import Control
 from .highlighter import NullHighlighter, ReprHighlighter
@@ -957,7 +957,7 @@ class Console:
         if justify in ("left", "center", "right"):
 
             def align_append(renderable: RenderableType) -> None:
-                _append(Align(renderable, cast(AlignValues, justify)))
+                _append(Align(renderable, cast(AlignMethod, justify)))
 
             append = align_append
 
@@ -1003,7 +1003,7 @@ class Console:
         *,
         characters: str = "─",
         style: Union[str, Style] = "rule.line",
-        align: str = "center",
+        align: AlignMethod = "center",
     ) -> None:
         """Draw a line with optional centered title.
 
