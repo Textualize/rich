@@ -31,7 +31,7 @@ from typing_extensions import Literal, Protocol, runtime_checkable
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
 from ._log_render import LogRender
-from .align import Align, AlignValues
+from .align import Align, AlignMethod
 from .color import ColorSystem
 from .control import Control
 from .highlighter import NullHighlighter, ReprHighlighter
@@ -946,7 +946,7 @@ class Console:
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default.
 
         Returns:
-            List[ConsoleRenderable]: A list of things to render.
+            List[ConsoleRenderable]: A list oxf things to render.
         """
         renderables: List[ConsoleRenderable] = []
         _append = renderables.append
@@ -957,7 +957,7 @@ class Console:
         if justify in ("left", "center", "right"):
 
             def align_append(renderable: RenderableType) -> None:
-                _append(Align(renderable, cast(AlignValues, justify)))
+                _append(Align(renderable, cast(AlignMethod, justify)))
 
             append = align_append
 
@@ -1003,16 +1003,19 @@ class Console:
         *,
         characters: str = "─",
         style: Union[str, Style] = "rule.line",
+        align: AlignMethod = "center",
     ) -> None:
         """Draw a line with optional centered title.
 
         Args:
             title (str, optional): Text to render over the rule. Defaults to "".
             characters (str, optional): Character(s) to form the line. Defaults to "─".
+            style (str, optional): Style of line. Defaults to "rule.line".
+            align (str, optional): How to align the title, one of "left", "center", or "right". Defaults to "center".
         """
         from .rule import Rule
 
-        rule = Rule(title=title, characters=characters, style=style)
+        rule = Rule(title=title, characters=characters, style=style, align=align)
         self.print(rule)
 
     def control(self, control_codes: Union["Control", str]) -> None:

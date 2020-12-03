@@ -75,7 +75,7 @@ def create_process_table(height: int) -> Table:
 
 console = Console()
 
-with Live(console=console, transient=True, refresh_per_second=10) as live:
+with Live(console=console, transient=True, auto_refresh=False) as live:
     while True:
-        live.update(create_process_table(console.size.height - 4))
-        time.sleep(1.5)
+        live.update(create_process_table(console.size.height - 4), refresh=True)
+        time.sleep(1)
