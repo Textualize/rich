@@ -20,6 +20,7 @@ from .live_render import LiveRender
 from .progress import _FileProxy
 from .segment import Segment
 from .style import Style
+from .text import Text
 
 VerticalOverflowMethod = Literal["crop", "ellipsis", "visible"]
 
@@ -61,10 +62,22 @@ class _LiveRender(LiveRender):
                     lines = lines[: console.size.height]
                     shape = Segment.get_shape(lines)
                 elif self._live.vertical_overflow == "ellipsis":
-                    lines = lines[: (console.size.height - 1)] + [
-                        [Segment("...", style=Style(bold=True))]
-                    ]
+                    lines = lines[: (console.size.height - 1)]
+                    lines.append(
+                        list(
+                            console.render(
+                                Text(
+                                    "...",
+                                    overflow="crop",
+                                    justify="center",
+                                    end="",
+                                    style=Style(bold=True),
+                                )
+                            )
+                        )
+                    )
                     shape = Segment.get_shape(lines)
+
             self._shape = shape
 
             for last, line in loop_last(lines):
@@ -269,7 +282,6 @@ if __name__ == "__main__":  # pragma: no cover
     from .rule import Rule
     from .syntax import Syntax
     from .table import Table
-    from .text import Text
 
     console = Console()
 
