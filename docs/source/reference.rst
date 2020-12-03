@@ -3,15 +3,16 @@ Reference
 
 .. toctree::
    :maxdepth: 3
-   
+
    reference/align.rst
    reference/bar.rst
    reference/color.rst
    reference/columns.rst
    reference/console.rst
    reference/emoji.rst
-   reference/highlighter.rst   
+   reference/highlighter.rst
    reference/init.rst
+   reference/live.rst
    reference/logging.rst
    reference/markdown.rst
    reference/markup.rst

@@ -7,3 +7,4 @@ The following people have contributed to the development of Rich:
 - [Oleksis Fraga](https://github.com/oleksis)
 - [Hedy Li](https://github.com/hedythedev)
 - [Will McGugan](https://github.com/willmcgugan)
+- [Nathan Page](https://github.com/nathanrpage97)
