@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from logging import Handler, LogRecord
 from pathlib import Path
-from typing import ClassVar, List, Optional, Type
+from typing import ClassVar, List, Optional, Type, Union
 
 from . import get_console
 from ._log_render import LogRender
@@ -21,7 +21,7 @@ class RichHandler(Handler):
         under your control. If a dependency writes messages containing square brackets, it may not produce the intended output.
 
     Args:
-        level (int, optional): Log level. Defaults to logging.NOTSET.
+        level (Union[int, str], optional): Log level. Defaults to logging.NOTSET.
         console (:class:`~rich.console.Console`, optional): Optional console instance to write logs.
             Default will use a global console instance writing to stdout.
         show_time (bool, optional): Show a column for the time. Defaults to True.
@@ -55,7 +55,7 @@ class RichHandler(Handler):
 
     def __init__(
         self,
-        level: int = logging.NOTSET,
+        level: Union[int, str] = logging.NOTSET,
         console: Console = None,
         *,
         show_time: bool = True,
