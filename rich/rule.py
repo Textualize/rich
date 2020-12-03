@@ -16,7 +16,7 @@ class Rule(JupyterMixin):
         characters (str, optional): Character(s) used to draw the line. Defaults to "─".
         style (StyleType, optional): Style of Rule. Defaults to "rule.line".
         end (str, optional): Character at end of Rule. defaults to "\\n"
-        align (str, optional):
+        align (str, optional): How to align the title, one of "left", "center", or "right". Defaults to "center".
     """
 
     def __init__(
