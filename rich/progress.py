@@ -25,7 +25,7 @@ from typing import (
 )
 
 from . import filesize, get_console
-from .ansi import AnsiDecoder
+
 from .console import (
     Console,
     ConsoleRenderable,
@@ -35,6 +35,7 @@ from .console import (
     RenderHook,
 )
 from .control import Control
+from .file_proxy import FileProxy
 from .highlighter import Highlighter
 from .jupyter import JupyterMixin
 from .live_render import LiveRender
@@ -472,45 +473,6 @@ class _RefreshThread(Thread):
             self.progress.refresh()
 
 
-class _FileProxy(io.TextIOBase):
-    """Wraps a file (e.g. sys.stdout) and redirects writes to a console."""
-
-    def __init__(self, console: Console, file: IO[str]) -> None:
-        self.__console = console
-        self.__file = file
-        self.__buffer: List[str] = []
-        self.__ansi_decoder = AnsiDecoder()
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.__file, name)
-
-    def write(self, text: str) -> int:
-        buffer = self.__buffer
-        lines: List[str] = []
-        while text:
-            line, new_line, text = text.partition("\n")
-            if new_line:
-                lines.append("".join(buffer) + line)
-                del buffer[:]
-            else:
-                buffer.append(line)
-                break
-        if lines:
-            console = self.__console
-            with console:
-                output = Text("\n").join(
-                    self.__ansi_decoder.decode_line(line) for line in lines
-                )
-                console.print(output, markup=False, emoji=False, highlight=False)
-        return len(text)
-
-    def flush(self) -> None:
-        buffer = self.__buffer
-        if buffer:
-            self.__console.print("".join(buffer))
-            del buffer[:]
-
-
 class Progress(JupyterMixin, RenderHook):
     """Renders an auto-updating progress bar(s).
 
@@ -594,10 +556,10 @@ class Progress(JupyterMixin, RenderHook):
         if self.console.is_terminal:
             if self._redirect_stdout:
                 self._restore_stdout = sys.stdout
-                sys.stdout = _FileProxy(self.console, sys.stdout)
+                sys.stdout = FileProxy(self.console, sys.stdout)
             if self._redirect_stderr:
                 self._restore_stderr = sys.stderr
-                sys.stderr = _FileProxy(self.console, sys.stderr)
+                sys.stderr = FileProxy(self.console, sys.stderr)
 
     def _disable_redirect_io(self):
         """Disable redirecting of stdout / stderr."""

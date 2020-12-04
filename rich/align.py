@@ -32,7 +32,7 @@ class Align(JupyterMixin):
     def __init__(
         self,
         renderable: "RenderableType",
-        align: AlignValues,
+        align: AlignMethod,
         style: StyleType = None,
         *,
         pad: bool = True,

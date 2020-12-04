@@ -1,4 +1,5 @@
 from functools import partial, reduce
+from io import UnsupportedOperation
 from math import gcd
 import re
 from operator import itemgetter
@@ -181,6 +182,32 @@ class Text(JupyterMixin):
         elif isinstance(other, Text):
             return other.plain in self.plain
         return False
+
+    def __getitem__(self, slice: Union[int, slice]) -> "Text":
+        def get_text_at(offset) -> "Text":
+            _Span = Span
+            text = Text(
+                self.plain[offset],
+                spans=[
+                    _Span(0, 1, style)
+                    for start, end, style in self._spans
+                    if end > offset >= start
+                ],
+                end="",
+            )
+            return text
+
+        if isinstance(slice, int):
+            return get_text_at(slice)
+        else:
+            start, stop, step = slice.indices(len(self.plain))
+            if step == 1:
+                lines = self.divide([start, stop])
+                return lines[1]
+            else:
+                # This would be a bit of work to implement efficiently
+                # For now, its not required
+                raise TypeError("slices with step!=1 are not supported")
 
     @property
     def cell_len(self) -> int:
