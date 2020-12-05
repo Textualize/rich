@@ -25,7 +25,6 @@ from typing import (
 )
 
 from . import filesize, get_console
-
 from .console import (
     Console,
     ConsoleRenderable,
@@ -40,9 +39,10 @@ from .highlighter import Highlighter
 from .jupyter import JupyterMixin
 from .live_render import LiveRender
 from .progress_bar import ProgressBar
+from .spinner import Spinner
 from .style import StyleType
 from .table import Table
-from .text import Text
+from .text import Text, TextType
 
 TaskID = NewType("TaskID", int)
 
@@ -100,6 +100,7 @@ def track(
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
     update_period: float = 0.1,
+    disable: bool = False,
 ) -> Iterable[ProgressType]:
     """Track progress by iterating over a sequence.
 
@@ -116,6 +117,7 @@ def track(
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
         pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
         update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
+        disable (bool, optional): Disable display of progress.
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
 
@@ -143,6 +145,7 @@ def track(
         transient=transient,
         get_time=get_time,
         refresh_per_second=refresh_per_second,
+        disable=disable,
     )
 
     with progress:
@@ -186,6 +189,38 @@ class ProgressColumn(ABC):
     @abstractmethod
     def render(self, task: "Task") -> RenderableType:
         """Should return a renderable object."""
+
+
+class SpinnerColumn(ProgressColumn):
+    """A column with a 'spinner' animation.
+
+    Args:
+        spinner_name (str, optional): Name of spinner animation. Defaults to "dots".
+        style (StyleType, optional): Style of spinner. Defaults to "progress.spinner".
+        speed (float, optional): Speed faxtor of spinner. Defaults to 1.0.
+        finished_text (TextType, optional): Text used when task is finished. Defaults to " ".
+    """
+
+    def __init__(
+        self,
+        spinner_name: str = "dots",
+        style: StyleType = "progress.spinner",
+        speed: float = 1.0,
+        finished_text: TextType = " ",
+    ):
+        self.spinner = Spinner(spinner_name, style=style, speed=speed)
+        self.finished_text = (
+            Text.from_markup(finished_text)
+            if isinstance(finished_text, str)
+            else finished_text
+        )
+        super().__init__()
+
+    def render(self, task: "Task") -> Text:
+        if task.finished:
+            return self.finished_text
+        text = self.spinner.render(task._get_time())
+        return text
 
 
 class TextColumn(ProgressColumn):
@@ -811,33 +846,30 @@ class Progress(JupyterMixin, RenderHook):
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
-        if self.console.is_jupyter:  # pragma: no cover
-            try:
-                from IPython.display import display
-                from ipywidgets import Output
-            except ImportError:
-                import warnings
+        if not self.disable:
+            if self.console.is_jupyter:  # pragma: no cover
+                try:
+                    from IPython.display import display
+                    from ipywidgets import Output
+                except ImportError:
+                    import warnings
 
-                warnings.warn('install "ipywidgets" for Jupyter support')
-            else:
+                    warnings.warn('install "ipywidgets" for Jupyter support')
+                else:
+                    with self._lock:
+                        if self.ipy_widget is None:
+                            self.ipy_widget = Output()
+                            display(self.ipy_widget)
+
+                        with self.ipy_widget:
+                            self.ipy_widget.clear_output(wait=True)
+                            self.console.print(self.get_renderable())
+
+            elif self.console.is_terminal and not self.console.is_dumb_terminal:
                 with self._lock:
-                    if self.ipy_widget is None:
-                        self.ipy_widget = Output()
-                        display(self.ipy_widget)
-
-                    with self.ipy_widget:
-                        self.ipy_widget.clear_output(wait=True)
-                        self.console.print(self.get_renderable())
-
-        elif (
-            self.console.is_terminal
-            and not self.console.is_dumb_terminal
-            and not self.disable
-        ):
-            with self._lock:
-                self._live_render.set_renderable(self.get_renderable())
-                with self.console:
-                    self.console.print(Control(""))
+                    self._live_render.set_renderable(self.get_renderable())
+                    with self.console:
+                        self.console.print(Control(""))
 
     def get_renderable(self) -> RenderableType:
         """Get a renderable for the progress display."""
@@ -990,7 +1022,15 @@ if __name__ == "__main__":  # pragma: no coverage
 
     console = Console(record=True)
     try:
-        with Progress(console=console, transient=True) as progress:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            TimeRemainingColumn(),
+            console=console,
+            transient=True,
+        ) as progress:
 
             task1 = progress.add_task("[red]Downloading", total=1000)
             task2 = progress.add_task("[green]Processing", total=1000)

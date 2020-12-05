@@ -1,22 +1,31 @@
 import typing
 from typing import Optional
 
+from ._spinners import SPINNERS
 from .console import Console
 from .measure import Measurement
 from .style import StyleType
 from .text import Text, TextType
-from ._spinners import SPINNERS
 
 if typing.TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult
 
 
 class Spinner:
-    """Base class for a spinner."""
-
     def __init__(
-        self, name: str, text: TextType = "", style: StyleType = None, speed=1.0
+        self, name: str, text: TextType = "", *, style: StyleType = None, speed=1.0
     ) -> None:
+        """A spinner animation.
+
+        Args:
+            name (str): Name of spinner (run python -m rich.spinner).
+            text (TextType, optional): Text to display at the right of the spinner. Defaults to "".
+            style (StyleType, optional): Style for sinner amimation. Defaults to None.
+            speed (float, optional): Speed factor for animation. Defaults to 1.0.
+
+        Raises:
+            KeyError: If name isn't one of the supported spinner animations.
+        """
         try:
             spinner = SPINNERS[name]
         except KeyError:
@@ -43,20 +52,24 @@ class Spinner:
         return Measurement.get(console, text, max_width)
 
     def render(self, time: float) -> Text:
-        frame_no = int((time * self.speed) / (self.interval / 1000.0)) % len(
-            self.frames
-        )
-        frame = Text(self.frames[frame_no])
-        if self.style is not None:
-            frame.stylize(self.style)
+        """Render the spinner for a given time.
+
+        Args:
+            time (float): Time in seconds.
+
+        Returns:
+            Text: A Text instance containing animation frame.
+        """
+        frame_no = int((time * self.speed) / (self.interval / 1000.0))
+        frame = Text(self.frames[frame_no % len(self.frames)], style=self.style or "")
         return Text.assemble(frame, " ", self.text) if self.text else frame
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from .live import Live
     from time import sleep
 
     from .columns import Columns
+    from .live import Live
 
     all_spinners = Columns(
         [
@@ -68,4 +81,3 @@ if __name__ == "__main__":  # pragma: no cover
     with Live(all_spinners, refresh_per_second=20) as live:
         while True:
             sleep(0.1)
-            live.refresh()

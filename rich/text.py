@@ -20,7 +20,7 @@ from typing import (
 from ._loop import loop_last
 from ._pick import pick_bool
 from ._wrap import divide_line
-from .align import AlignValues
+from .align import AlignMethod
 from .cells import cell_len, set_cell_size
 from .containers import Lines
 from .control import strip_control_codes
@@ -548,10 +548,16 @@ class Text(JupyterMixin):
             Iterable[Segment]: Result of render that may be written to the console.
         """
 
+        _Segment = Segment
+        if not self._spans:
+            yield _Segment(self.plain)
+            if self.end:
+                yield _Segment(end)
+            return
+
         text = self.plain
-        null_style = Style.null()
         enumerated_spans = list(enumerate(self._spans, 1))
-        get_style = partial(console.get_style, default=null_style)
+        get_style = partial(console.get_style, default=Style.null())
         style_map = {index: get_style(span.style) for index, span in enumerated_spans}
         style_map[0] = get_style(self.style)
 
@@ -567,7 +573,6 @@ class Text(JupyterMixin):
         stack_append = stack.append
         stack_pop = stack.remove
 
-        _Segment = Segment
         style_cache: Dict[Tuple[Style, ...], Style] = {}
         style_cache_get = style_cache.get
         combine = Style.combine
@@ -752,11 +757,11 @@ class Text(JupyterMixin):
         if count:
             self.plain = f"{self.plain}{character * count}"
 
-    def align(self, align: AlignValues, width: int, character: str = " ") -> None:
+    def align(self, align: AlignMethod, width: int, character: str = " ") -> None:
         """Align text to a given width.
 
         Args:
-            align (AlignValues): One of "left", "center", or "right".
+            align (AlignMethod): One of "left", "center", or "right".
             width (int): Desired width.
             character (str, optional): Character to pad with. Defaults to " ".
         """

@@ -81,7 +81,7 @@ The :meth:`~rich.console.Console.rule` method will draw a horizontal line with a
 
     <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><span style="color: #00ff00">─────────────────────────────── </span><span style="color: #800000; font-weight: bold">Chapter 2</span><span style="color: #00ff00"> ───────────────────────────────</span></pre>
 
-The rule method also accepts a `style` parameter to set the style of the line, and an `align` parameter to align the title ("left", "center", or "right").
+The rule method also accepts a ``style`` parameter to set the style of the line, and an ``align`` parameter to align the title ("left", "center", or "right").
 
 Low level output
 ----------------

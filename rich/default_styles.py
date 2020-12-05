@@ -116,6 +116,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "progress.percentage": Style(color="magenta"),
     "progress.remaining": Style(color="cyan"),
     "progress.data.speed": Style(color="red"),
+    "progress.spinner": Style(color="green"),
 }
 
 MARKDOWN_STYLES = {
