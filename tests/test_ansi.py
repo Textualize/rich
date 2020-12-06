@@ -1,4 +1,3 @@
-
 from rich.ansi import AnsiDecoder
 from rich.console import Console
 from rich.style import Style
