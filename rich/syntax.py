@@ -22,7 +22,7 @@ from pygments.token import (
 from pygments.util import ClassNotFound
 
 from ._loop import loop_first
-from .color import Color, blend_rgb, parse_rgb_hex
+from .color import Color, blend_rgb
 from .console import Console, ConsoleOptions, JustifyMethod, RenderResult, Segment
 from .jupyter import JupyterMixin
 from .measure import Measurement

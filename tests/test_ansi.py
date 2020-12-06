@@ -1,4 +1,3 @@
-import io
 
 from rich.ansi import AnsiDecoder
 from rich.console import Console
