@@ -761,7 +761,7 @@ class Text(JupyterMixin):
         if not isinstance(text, (str, Text)):
             raise TypeError("Only str or Text can be appended to Text")
 
-        if len(text):
+        if text:
             if isinstance(text, str):
                 text = strip_control_codes(text)
                 self._text.append(text)
