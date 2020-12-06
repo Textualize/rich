@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 
 from .measure import Measurement
 from .segment import Segment
+from .style import StyleType
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult, RenderableType
