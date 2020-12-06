@@ -8,6 +8,7 @@ enabled = true
 
   [analyzers.meta]
   runtime_version = "3.x.x"
+  type_checker = "mypy"
 
 [[transformers]]
 name = "black"
