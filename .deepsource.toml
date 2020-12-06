@@ -1,0 +1,14 @@
+version = 1
+
+test_patterns = ["/tests/test_*.py"]
+
+[[analyzers]]
+name = "python"
+enabled = true
+
+  [analyzers.meta]
+  runtime_version = "3.x.x"
+
+[[transformers]]
+name = "black"
+enabled = true
