@@ -351,7 +351,6 @@ def test_track_thread() -> None:
     task_id = progress.add_task("foo")
     track_thread = _TrackThread(progress, task_id, 0.1)
     assert track_thread.completed == 0
-    from time import sleep
 
     with track_thread:
         track_thread.completed = 1

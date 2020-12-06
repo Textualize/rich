@@ -149,8 +149,6 @@ def test_get_style_for_token():
 
 def test_option_no_wrap():
 
-    from rich.console import Console
-
     console = Console
 
     syntax = Syntax(
