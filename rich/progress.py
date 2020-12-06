@@ -94,7 +94,7 @@ def track(
     console: Optional[Console] = None,
     transient: bool = False,
     get_time: Callable[[], float] = None,
-    refresh_per_second: int = None,
+    refresh_per_second: float = None,
     style: StyleType = "bar.back",
     complete_style: StyleType = "bar.complete",
     finished_style: StyleType = "bar.finished",
@@ -111,7 +111,7 @@ def track(
         auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         console (Console, optional): Console to write to. Default creates internal Console instance.
-        refresh_per_second (Optional[int], optional): Number of times per second to refresh the progress information, or None to use default. Defaults to None.
+        refresh_per_second (Optional[float], optional): Number of times per second to refresh the progress information, or None to use default. Defaults to None.
         style (StyleType, optional): Style for the bar background. Defaults to "bar.back".
         complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
@@ -191,6 +191,15 @@ class ProgressColumn(ABC):
         """Should return a renderable object."""
 
 
+class RenderableColumn(ProgressColumn):
+    def __init__(self, renderable: RenderableType = None):
+        self.renderable = renderable
+        super().__init__()
+
+    def render(self, task: "Task") -> RenderableType:
+        return Text("") if self.renderable is None else self.renderable
+
+
 class SpinnerColumn(ProgressColumn):
     """A column with a 'spinner' animation.
 
@@ -204,7 +213,7 @@ class SpinnerColumn(ProgressColumn):
     def __init__(
         self,
         spinner_name: str = "dots",
-        style: StyleType = "progress.spinner",
+        style: Optional[StyleType] = "progress.spinner",
         speed: float = 1.0,
         finished_text: TextType = " ",
     ):
@@ -215,6 +224,14 @@ class SpinnerColumn(ProgressColumn):
             else finished_text
         )
         super().__init__()
+
+    def set_spinner(
+        self,
+        spinner_name: str,
+        spinner_style: Optional[StyleType] = None,
+        speed: float = 1.0,
+    ):
+        self.spinner = Spinner(spinner_name, style=spinner_style, speed=speed)
 
     def render(self, task: "Task") -> Text:
         if task.finished:
@@ -494,7 +511,7 @@ class Task:
 class _RefreshThread(Thread):
     """A thread that calls refresh() on the Process object at regular intervals."""
 
-    def __init__(self, progress: "Progress", refresh_per_second: int = 10) -> None:
+    def __init__(self, progress: "Progress", refresh_per_second: float = 10) -> None:
         self.progress = progress
         self.refresh_per_second = refresh_per_second
         self.done = Event()
@@ -514,7 +531,7 @@ class Progress(JupyterMixin, RenderHook):
     Args:
         console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
-        refresh_per_second (Optional[int], optional): Number of times per second to refresh the progress information or None to use default (10). Defaults to None.
+        refresh_per_second (Optional[float], optional): Number of times per second to refresh the progress information or None to use default (10). Defaults to None.
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         redirect_stdout: (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
@@ -528,7 +545,7 @@ class Progress(JupyterMixin, RenderHook):
         *columns: Union[str, ProgressColumn],
         console: Console = None,
         auto_refresh: bool = True,
-        refresh_per_second: int = None,
+        refresh_per_second: float = None,
         speed_estimate_period: float = 30.0,
         transient: bool = False,
         redirect_stdout: bool = True,
