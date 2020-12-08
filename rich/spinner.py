@@ -1,5 +1,5 @@
 import typing
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from ._spinners import SPINNERS
 from .console import Console
@@ -7,7 +7,7 @@ from .measure import Measurement
 from .style import StyleType
 from .text import Text, TextType
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult
 
 

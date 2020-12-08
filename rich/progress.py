@@ -1,4 +1,3 @@
-import io
 import sys
 from abc import ABC, abstractmethod
 from collections import deque
@@ -192,7 +191,13 @@ class ProgressColumn(ABC):
 
 
 class RenderableColumn(ProgressColumn):
-    def __init__(self, renderable: RenderableType = None):
+    """A column to insert an arbitrary column.
+
+    Args:
+        renderable (RenderableType, optional): Any renderable. Defaults to empty string.
+    """
+
+    def __init__(self, renderable: RenderableType = ""):
         self.renderable = renderable
         super().__init__()
 
@@ -206,7 +211,7 @@ class SpinnerColumn(ProgressColumn):
     Args:
         spinner_name (str, optional): Name of spinner animation. Defaults to "dots".
         style (StyleType, optional): Style of spinner. Defaults to "progress.spinner".
-        speed (float, optional): Speed faxtor of spinner. Defaults to 1.0.
+        speed (float, optional): Speed factor of spinner. Defaults to 1.0.
         finished_text (TextType, optional): Text used when task is finished. Defaults to " ".
     """
 
@@ -228,9 +233,16 @@ class SpinnerColumn(ProgressColumn):
     def set_spinner(
         self,
         spinner_name: str,
-        spinner_style: Optional[StyleType] = None,
+        spinner_style: Optional[StyleType] = "progress.spinner",
         speed: float = 1.0,
     ):
+        """Set a new spinner.
+
+        Args:
+            spinner_name (str): Spinner name, see python -m rich.spinner.
+            spinner_style (Optional[StyleType], optional): Spinner style. Defaults to "progress.spinner".
+            speed (float, optional): Speed factor of spinner. Defaults to 1.0.
+        """
         self.spinner = Spinner(spinner_name, style=spinner_style, speed=speed)
 
     def render(self, task: "Task") -> Text:

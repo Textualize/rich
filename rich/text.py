@@ -549,12 +549,6 @@ class Text(JupyterMixin):
         """
 
         _Segment = Segment
-        if not self._spans:
-            yield _Segment(self.plain)
-            if self.end:
-                yield _Segment(end)
-            return
-
         text = self.plain
         enumerated_spans = list(enumerate(self._spans, 1))
         get_style = partial(console.get_style, default=Style.null())
@@ -962,7 +956,8 @@ class Text(JupyterMixin):
 
             while True:
                 span, new_span = span.split(line_end)
-                new_lines[line_index]._spans.append(span.move(-line_start))
+                if span:
+                    new_lines[line_index]._spans.append(span.move(-line_start))
                 if new_span is None:
                     break
                 span = new_span

@@ -451,6 +451,14 @@ def test_render():
     assert output == expected
 
 
+def test_render_simple():
+    console = Console(width=80)
+    console.begin_capture()
+    console.print(Text("foo"))
+    result = console.end_capture()
+    assert result == "foo\n"
+
+
 @pytest.mark.parametrize(
     "print_text,result",
     [
@@ -636,3 +644,18 @@ foo = [
     print(repr(result.plain))
     expected = "for a in range(10):\n│   print(a)\n\nfoo = [\n│   1,\n│   {\n│   │   2\n│   }\n]\n"
     assert result.plain == expected
+
+
+def test_slice():
+
+    text = Text.from_markup("[red]foo [bold]bar[/red] baz[/bold]")
+    assert text[0] == Text("f", spans=[Span(0, 1, "red")])
+    assert text[4] == Text("b", spans=[Span(0, 1, "red"), Span(0, 1, "bold")])
+
+    assert text[:3] == Text("foo", spans=[Span(0, 3, "red")])
+    assert text[:4] == Text("foo ", spans=[Span(0, 4, "red")])
+    assert text[:5] == Text("foo b", spans=[Span(0, 5, "red"), Span(4, 5, "bold")])
+    assert text[4:] == Text("bar baz", spans=[Span(0, 3, "red"), Span(0, 7, "bold")])
+
+    with pytest.raises(TypeError):
+        text[::-1]
