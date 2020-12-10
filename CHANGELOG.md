@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added getitem to Text
 - Added style parameter to Console.log
 
+### Changed
+
+- Table.add_row style argument now applies to entire line and not just cells
+- Added end_section parameter to Table.add_row to force a line underneath row
+
 ## [9.3.0] - 2020-12-1
 
 ### Added
