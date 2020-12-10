@@ -26,6 +26,8 @@ Reference
    reference/protocol.rst
    reference/rule.rst
    reference/segment.rst
+   reference/spinner.rst
+   reference/status.rst
    reference/style.rst
    reference/styled.rst
    reference/syntax.rst

@@ -2,7 +2,7 @@ from typing import Optional, TYPE_CHECKING
 
 from .box import Box, ROUNDED
 
-from .align import AlignValues
+from .align import AlignMethod
 from .jupyter import JupyterMixin
 from .measure import Measurement, measure_renderables
 from .padding import Padding, PaddingDimensions
@@ -39,7 +39,7 @@ class Panel(JupyterMixin):
         box: Box = ROUNDED,
         *,
         title: TextType = None,
-        title_align: AlignValues = "center",
+        title_align: AlignMethod = "center",
         safe_box: Optional[bool] = None,
         expand: bool = True,
         style: StyleType = "none",
@@ -65,7 +65,7 @@ class Panel(JupyterMixin):
         box: Box = ROUNDED,
         *,
         title: TextType = None,
-        title_align: AlignValues = "center",
+        title_align: AlignMethod = "center",
         safe_box: Optional[bool] = None,
         style: StyleType = "none",
         border_style: StyleType = "none",

@@ -15,9 +15,9 @@ from .console import (
     RenderResult,
 )
 from .control import Control
+from .file_proxy import FileProxy
 from .jupyter import JupyterMixin
 from .live_render import LiveRender
-from .progress import _FileProxy
 from .segment import Segment
 from .style import Style
 from .text import Text
@@ -185,10 +185,10 @@ class Live(JupyterMixin, RenderHook):
         if self.console.is_terminal:
             if self._redirect_stdout:
                 self._restore_stdout = sys.stdout
-                sys.stdout = _FileProxy(self.console, sys.stdout)
+                sys.stdout = FileProxy(self.console, sys.stdout)
             if self._redirect_stderr:
                 self._restore_stderr = sys.stderr
-                sys.stderr = _FileProxy(self.console, sys.stderr)
+                sys.stderr = FileProxy(self.console, sys.stderr)
 
     @property
     def renderable(self) -> RenderableType:

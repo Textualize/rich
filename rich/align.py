@@ -20,7 +20,7 @@ class Align(JupyterMixin):
 
     Args:
         renderable (RenderableType): A console renderable.
-        align (AlignValues): One of "left", "center", or "right""
+        align (AlignMethod): One of "left", "center", or "right""
         style (StyleType, optional): An optional style to apply to the renderable.
         pad (bool, optional): Pad the right with spaces. Defaults to True.
         width (int, optional): Restrict contents to given width, or None to use default width. Defaults to None.
@@ -32,7 +32,7 @@ class Align(JupyterMixin):
     def __init__(
         self,
         renderable: "RenderableType",
-        align: AlignValues,
+        align: AlignMethod,
         style: StyleType = None,
         *,
         pad: bool = True,

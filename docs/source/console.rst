@@ -81,7 +81,25 @@ The :meth:`~rich.console.Console.rule` method will draw a horizontal line with a
 
     <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><span style="color: #00ff00">─────────────────────────────── </span><span style="color: #800000; font-weight: bold">Chapter 2</span><span style="color: #00ff00"> ───────────────────────────────</span></pre>
 
-The rule method also accepts a `style` parameter to set the style of the line, and an `align` parameter to align the title ("left", "center", or "right").
+The rule method also accepts a ``style`` parameter to set the style of the line, and an ``align`` parameter to align the title ("left", "center", or "right").
+
+
+Status
+------
+
+Rich can display a status message with a 'spinner' animation that won't interfere with regular console output. Run the following command for a demo of this feature::
+
+    python -m rich.status
+
+To display a status message call :meth:`~rich.console.Console.status` with the status message (which may be a string, Text, or other renderable). The result is a context manager which starts and stop the status display around a block of code. Here's an example::
+
+    with console.status("Working...")
+        do_work()
+
+You can change the spinner animation via the ``spinner`` parameter. Run the following command to see the available choices::
+
+    python -m rich.spinner
+
 
 Low level output
 ----------------

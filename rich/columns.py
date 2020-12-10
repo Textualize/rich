@@ -3,7 +3,7 @@ from itertools import chain
 from operator import itemgetter
 from typing import Dict, Iterable, List, Optional, Tuple
 
-from .align import Align, AlignValues
+from .align import Align, AlignMethod
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .constrain import Constrain
 from .measure import Measurement
@@ -38,7 +38,7 @@ class Columns(JupyterMixin):
         equal: bool = False,
         column_first: bool = False,
         right_to_left: bool = False,
-        align: AlignValues = None,
+        align: AlignMethod = None,
         title: TextType = None,
     ) -> None:
         self.renderables = list(renderables or [])

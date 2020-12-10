@@ -42,11 +42,13 @@ from .pretty import Pretty
 from .scope import render_scope
 from .segment import Segment
 from .style import Style
+from .styled import Styled
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
 from .text import Text, TextType
 from .theme import Theme, ThemeStack
 
 if TYPE_CHECKING:
+    from .status import Status
     from ._windows import WindowsConsoleFeatures
 
 WINDOWS = platform.system() == "Windows"
@@ -758,6 +760,39 @@ class Console:
         """
         self.control("\033[2J\033[H" if home else "\033[2J")
 
+    def status(
+        self,
+        status: RenderableType,
+        spinner: str = "dots",
+        spinner_style: str = "status.spinner",
+        speed: float = 1.0,
+        refresh_per_second: float = 12.5,
+    ) -> "Status":
+        """Display a status and spinner.
+
+        Args:
+            status (RenderableType): A status renderable (str or Text typically).
+            console (Console, optional): Console instance to use, or None for global console. Defaults to None.
+            spinner (str, optional): Name of spinner animation (see python -m rich.spinner). Defaults to "dots".
+            spinner_style (StyleType, optional): Style of spinner. Defaults to "status.spinner".
+            speed (float, optional): Speed factor for spinner animation. Defaults to 1.0.
+            refresh_per_second (float, optional): Number of refreshes per second. Defaults to 12.5.
+
+        Returns:
+            Status: A Status object that may be used as a context manager.
+        """
+        from .status import Status
+
+        status_renderable = Status(
+            status,
+            console=self,
+            spinner=spinner,
+            spinner_style=spinner_style,
+            speed=speed,
+            refresh_per_second=refresh_per_second,
+        )
+        return status_renderable
+
     def show_cursor(self, show: bool = True) -> None:
         """Show or hide the cursor.
 
@@ -1175,6 +1210,7 @@ class Console:
         *objects: Any,
         sep=" ",
         end="\n",
+        style: Union[str, Style] = None,
         justify: JustifyMethod = None,
         emoji: bool = None,
         markup: bool = None,
@@ -1188,6 +1224,7 @@ class Console:
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\\n".
+            style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to None.
@@ -1210,6 +1247,8 @@ class Console:
                 markup=markup,
                 highlight=highlight,
             )
+            if style is not None:
+                renderables = [Styled(renderable, style) for renderable in renderables]
 
             caller = inspect.stack()[_stack_offset]
             link_path = (
