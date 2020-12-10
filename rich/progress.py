@@ -202,7 +202,7 @@ class RenderableColumn(ProgressColumn):
         super().__init__()
 
     def render(self, task: "Task") -> RenderableType:
-        return Text("") if self.renderable is None else self.renderable
+        return self.renderable
 
 
 class SpinnerColumn(ProgressColumn):
@@ -248,7 +248,7 @@ class SpinnerColumn(ProgressColumn):
     def render(self, task: "Task") -> Text:
         if task.finished:
             return self.finished_text
-        text = self.spinner.render(task._get_time())
+        text = self.spinner.render(task.get_time())
         return text
 
 

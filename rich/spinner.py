@@ -1,5 +1,4 @@
-import typing
-from typing import Optional, TYPE_CHECKING
+from typing import cast, List, Optional, TYPE_CHECKING
 
 from ._spinners import SPINNERS
 from .console import Console
@@ -31,8 +30,8 @@ class Spinner:
         except KeyError:
             raise KeyError(f"no spinner called {name!r}")
         self.text = text
-        self.frames = spinner["frames"][:]
-        self.interval = spinner["interval"]
+        self.frames = cast(List[str], spinner["frames"])[:]
+        self.interval = cast(float, spinner["interval"])
         self.start_time: Optional[float] = None
         self.style = style
         self.speed = speed

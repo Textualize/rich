@@ -768,9 +768,22 @@ class Console:
         speed: float = 1.0,
         refresh_per_second: float = 12.5,
     ) -> "Status":
+        """Display a status and spinner.
+
+        Args:
+            status (RenderableType): A status renderable (str or Text typically).
+            console (Console, optional): Console instance to use, or None for global console. Defaults to None.
+            spinner (str, optional): Name of spinner animation (see python -m rich.spinner). Defaults to "dots".
+            spinner_style (StyleType, optional): Style of spinner. Defaults to "status.spinner".
+            speed (float, optional): Speed factor for spinner animation. Defaults to 1.0.
+            refresh_per_second (float, optional): Number of refreshes per second. Defaults to 12.5.
+
+        Returns:
+            Status: A Status object that may be used as a context manager.
+        """
         from .status import Status
 
-        status = Status(
+        status_renderable = Status(
             status,
             console=self,
             spinner=spinner,
@@ -778,7 +791,7 @@ class Console:
             speed=speed,
             refresh_per_second=refresh_per_second,
         )
-        return status
+        return status_renderable
 
     def show_cursor(self, show: bool = True) -> None:
         """Show or hide the cursor.
