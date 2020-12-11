@@ -261,6 +261,7 @@ class Traceback:
 
         stacks: List[Stack] = []
         is_cause = False
+
         while True:
             stack = Stack(
                 exc_type=str(exc_type.__name__),
@@ -310,7 +311,11 @@ class Traceback:
                     continue
 
             cause = exc_value.__context__
-            if cause and cause.__traceback__:
+            if (
+                cause
+                and cause.__traceback__
+                and not getattr(exc_value, "__suppress_context__", False)
+            ):
                 exc_type = cause.__class__
                 exc_value = cause
                 traceback = cause.__traceback__
