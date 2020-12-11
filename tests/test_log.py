@@ -45,6 +45,14 @@ def test_log():
     assert rendered == expected
 
 
+def test_justify():
+    console = Console(width=20, log_path=False, log_time=False, color_system=None)
+    console.begin_capture()
+    console.log("foo", justify="right")
+    result = console.end_capture()
+    assert result == "                 foo\n"
+
+
 if __name__ == "__main__":
     render = render_log()
     print(render)

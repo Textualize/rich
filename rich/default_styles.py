@@ -44,6 +44,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "inspect.equals": Style(),
     "inspect.help": Style(color="cyan"),
     "inspect.doc": Style(dim=True),
+    "live.ellipsis": Style(bold=True, color="red"),
     "logging.keyword": Style(bold=True, color="yellow"),
     "logging.level.notset": Style(dim=True),
     "logging.level.debug": Style(color="green"),
@@ -115,6 +116,8 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "progress.percentage": Style(color="magenta"),
     "progress.remaining": Style(color="cyan"),
     "progress.data.speed": Style(color="red"),
+    "progress.spinner": Style(color="green"),
+    "status.spinner": Style(color="green"),
 }
 
 MARKDOWN_STYLES = {

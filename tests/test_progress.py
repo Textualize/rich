@@ -1,7 +1,7 @@
 # encoding=utf-8
 
 import io
-from time import time
+from time import sleep
 
 import pytest
 
@@ -143,8 +143,10 @@ def make_progress() -> Progress:
 
 def render_progress() -> str:
     progress = make_progress()
+    progress.start()  # superfluous noop
     with progress:
         pass
+    progress.stop()  # superfluous noop
     progress_render = progress.console.file.getvalue()
     return progress_render
 
@@ -328,9 +330,20 @@ def test_progress_create() -> None:
 
 
 def test_refresh_thread() -> None:
-    progress = Progress()
-    thread = _RefreshThread(progress, 10)
+    class MockProgress:
+        def __init__(self):
+            self.count = 0
+
+        def refresh(self):
+            self.count += 1
+
+    progress = MockProgress()
+    thread = _RefreshThread(progress, 100)
     assert thread.progress == progress
+    thread.start()
+    sleep(0.2)
+    thread.stop()
+    assert progress.count >= 1
 
 
 def test_track_thread() -> None:
@@ -370,6 +383,42 @@ def test_reset() -> None:
     assert task.description == "bar"
     assert task.fields == {"example": "egg"}
     assert not task._progress
+
+
+def test_progress_max_refresh() -> None:
+    """Test max_refresh argment."""
+    time = 0.0
+
+    def get_time() -> float:
+        nonlocal time
+        try:
+            return time
+        finally:
+            time = time + 1.0
+
+    console = Console(
+        color_system=None, width=80, legacy_windows=False, force_terminal=True
+    )
+    column = TextColumn("{task.description}")
+    column.max_refresh = 3
+    progress = Progress(
+        column,
+        get_time=get_time,
+        auto_refresh=False,
+        console=console,
+    )
+    console.begin_capture()
+    with progress:
+        task_id = progress.add_task("start")
+        for tick in range(6):
+            progress.update(task_id, description=f"tick {tick}")
+            progress.refresh()
+    result = console.end_capture()
+    print(repr(result))
+    assert (
+        result
+        == "\x1b[?25l\r\x1b[2Kstart\r\x1b[2Kstart\r\x1b[2Ktick 1\r\x1b[2Ktick 1\r\x1b[2Ktick 3\r\x1b[2Ktick 3\r\x1b[2Ktick 5\r\x1b[2Ktick 5\n\x1b[?25h"
+    )
 
 
 if __name__ == "__main__":

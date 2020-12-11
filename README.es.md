@@ -219,6 +219,7 @@ Rich puede representar contenido en [columnas](https://rich.readthedocs.io/en/la
 
 ```python
 import os
+import sys
 
 from rich import print
 from rich.columns import Columns

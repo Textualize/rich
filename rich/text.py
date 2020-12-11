@@ -1,4 +1,5 @@
 from functools import partial, reduce
+from io import UnsupportedOperation
 from math import gcd
 import re
 from operator import itemgetter
@@ -19,7 +20,7 @@ from typing import (
 from ._loop import loop_last
 from ._pick import pick_bool
 from ._wrap import divide_line
-from .align import AlignValues
+from .align import AlignMethod
 from .cells import cell_len, set_cell_size
 from .containers import Lines
 from .control import strip_control_codes
@@ -181,6 +182,32 @@ class Text(JupyterMixin):
         elif isinstance(other, Text):
             return other.plain in self.plain
         return False
+
+    def __getitem__(self, slice: Union[int, slice]) -> "Text":
+        def get_text_at(offset) -> "Text":
+            _Span = Span
+            text = Text(
+                self.plain[offset],
+                spans=[
+                    _Span(0, 1, style)
+                    for start, end, style in self._spans
+                    if end > offset >= start
+                ],
+                end="",
+            )
+            return text
+
+        if isinstance(slice, int):
+            return get_text_at(slice)
+        else:
+            start, stop, step = slice.indices(len(self.plain))
+            if step == 1:
+                lines = self.divide([start, stop])
+                return lines[1]
+            else:
+                # This would be a bit of work to implement efficiently
+                # For now, its not required
+                raise TypeError("slices with step!=1 are not supported")
 
     @property
     def cell_len(self) -> int:
@@ -521,10 +548,10 @@ class Text(JupyterMixin):
             Iterable[Segment]: Result of render that may be written to the console.
         """
 
+        _Segment = Segment
         text = self.plain
-        null_style = Style.null()
         enumerated_spans = list(enumerate(self._spans, 1))
-        get_style = partial(console.get_style, default=null_style)
+        get_style = partial(console.get_style, default=Style.null())
         style_map = {index: get_style(span.style) for index, span in enumerated_spans}
         style_map[0] = get_style(self.style)
 
@@ -540,7 +567,6 @@ class Text(JupyterMixin):
         stack_append = stack.append
         stack_pop = stack.remove
 
-        _Segment = Segment
         style_cache: Dict[Tuple[Style, ...], Style] = {}
         style_cache_get = style_cache.get
         combine = Style.combine
@@ -725,11 +751,11 @@ class Text(JupyterMixin):
         if count:
             self.plain = f"{self.plain}{character * count}"
 
-    def align(self, align: AlignValues, width: int, character: str = " ") -> None:
+    def align(self, align: AlignMethod, width: int, character: str = " ") -> None:
         """Align text to a given width.
 
         Args:
-            align (AlignValues): One of "left", "center", or "right".
+            align (AlignMethod): One of "left", "center", or "right".
             width (int): Desired width.
             character (str, optional): Character to pad with. Defaults to " ".
         """
@@ -930,7 +956,8 @@ class Text(JupyterMixin):
 
             while True:
                 span, new_span = span.split(line_end)
-                new_lines[line_index]._spans.append(span.move(-line_start))
+                if span:
+                    new_lines[line_index]._spans.append(span.move(-line_start))
                 if new_span is None:
                     break
                 span = new_span

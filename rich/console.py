@@ -31,7 +31,7 @@ from typing_extensions import Literal, Protocol, runtime_checkable
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
 from ._log_render import LogRender
-from .align import Align, AlignValues
+from .align import Align, AlignMethod
 from .color import ColorSystem
 from .control import Control
 from .highlighter import NullHighlighter, ReprHighlighter
@@ -42,11 +42,13 @@ from .pretty import Pretty
 from .scope import render_scope
 from .segment import Segment
 from .style import Style
+from .styled import Styled
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
 from .text import Text, TextType
 from .theme import Theme, ThemeStack
 
 if TYPE_CHECKING:
+    from .status import Status
     from ._windows import WindowsConsoleFeatures
 
 WINDOWS = platform.system() == "Windows"
@@ -758,6 +760,39 @@ class Console:
         """
         self.control("\033[2J\033[H" if home else "\033[2J")
 
+    def status(
+        self,
+        status: RenderableType,
+        spinner: str = "dots",
+        spinner_style: str = "status.spinner",
+        speed: float = 1.0,
+        refresh_per_second: float = 12.5,
+    ) -> "Status":
+        """Display a status and spinner.
+
+        Args:
+            status (RenderableType): A status renderable (str or Text typically).
+            console (Console, optional): Console instance to use, or None for global console. Defaults to None.
+            spinner (str, optional): Name of spinner animation (see python -m rich.spinner). Defaults to "dots".
+            spinner_style (StyleType, optional): Style of spinner. Defaults to "status.spinner".
+            speed (float, optional): Speed factor for spinner animation. Defaults to 1.0.
+            refresh_per_second (float, optional): Number of refreshes per second. Defaults to 12.5.
+
+        Returns:
+            Status: A Status object that may be used as a context manager.
+        """
+        from .status import Status
+
+        status_renderable = Status(
+            status,
+            console=self,
+            spinner=spinner,
+            spinner_style=spinner_style,
+            speed=speed,
+            refresh_per_second=refresh_per_second,
+        )
+        return status_renderable
+
     def show_cursor(self, show: bool = True) -> None:
         """Show or hide the cursor.
 
@@ -946,7 +981,7 @@ class Console:
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default.
 
         Returns:
-            List[ConsoleRenderable]: A list of things to render.
+            List[ConsoleRenderable]: A list oxf things to render.
         """
         renderables: List[ConsoleRenderable] = []
         _append = renderables.append
@@ -957,7 +992,7 @@ class Console:
         if justify in ("left", "center", "right"):
 
             def align_append(renderable: RenderableType) -> None:
-                _append(Align(renderable, cast(AlignValues, justify)))
+                _append(Align(renderable, cast(AlignMethod, justify)))
 
             append = align_append
 
@@ -967,7 +1002,7 @@ class Console:
 
         def check_text() -> None:
             if text:
-                sep_text = Text(sep, end=end)
+                sep_text = Text(sep, justify=justify, end=end)
                 append(sep_text.join(text))
                 del text[:]
 
@@ -1003,16 +1038,19 @@ class Console:
         *,
         characters: str = "─",
         style: Union[str, Style] = "rule.line",
+        align: AlignMethod = "center",
     ) -> None:
         """Draw a line with optional centered title.
 
         Args:
             title (str, optional): Text to render over the rule. Defaults to "".
             characters (str, optional): Character(s) to form the line. Defaults to "─".
+            style (str, optional): Style of line. Defaults to "rule.line".
+            align (str, optional): How to align the title, one of "left", "center", or "right". Defaults to "center".
         """
         from .rule import Rule
 
-        rule = Rule(title=title, characters=characters, style=style)
+        rule = Rule(title=title, characters=characters, style=style, align=align)
         self.print(rule)
 
     def control(self, control_codes: Union["Control", str]) -> None:
@@ -1172,6 +1210,7 @@ class Console:
         *objects: Any,
         sep=" ",
         end="\n",
+        style: Union[str, Style] = None,
         justify: JustifyMethod = None,
         emoji: bool = None,
         markup: bool = None,
@@ -1185,6 +1224,7 @@ class Console:
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
             end (str, optional): String to write at end of print data. Defaults to "\\n".
+            style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to None.
@@ -1207,6 +1247,8 @@ class Console:
                 markup=markup,
                 highlight=highlight,
             )
+            if style is not None:
+                renderables = [Styled(renderable, style) for renderable in renderables]
 
             caller = inspect.stack()[_stack_offset]
             link_path = (

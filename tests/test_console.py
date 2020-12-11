@@ -13,6 +13,7 @@ from rich.console import CaptureError, Console, ConsoleOptions, render_group
 from rich.measure import measure_renderables
 from rich.pager import SystemPager
 from rich.panel import Panel
+from rich.status import Status
 from rich.style import Style
 
 
@@ -95,6 +96,21 @@ def test_print():
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print("foo")
     assert console.file.getvalue() == "foo\n"
+
+
+def test_log():
+    console = Console(
+        file=io.StringIO(),
+        width=80,
+        color_system="truecolor",
+        log_time_format="TIME",
+        log_path=False,
+    )
+    console.log("foo", style="red")
+    expected = "\x1b[2;36mTIME\x1b[0m\x1b[2;36m \x1b[0m\x1b[31mfoo\x1b[0m\x1b[31m                                                                        \x1b[0m\n"
+    result = console.file.getvalue()
+    print(repr(result))
+    assert result == expected
 
 
 def test_print_empty():
@@ -216,6 +232,12 @@ def test_input_password(monkeypatch, capsys):
     user_input = console.input(prompt="foo:", password=True)
     assert capsys.readouterr().out == "foo:"
     assert user_input == "bar"
+
+
+def test_status():
+    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    status = console.status("foo")
+    assert isinstance(status, Status)
 
 
 def test_justify_none():
