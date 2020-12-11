@@ -205,6 +205,7 @@ Rich 可以将内容通过排列整齐的，具有相等或最佳的宽度的[�
 
 ```python
 import os
+import sys
 
 from rich import print
 from rich.columns import Columns

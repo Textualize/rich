@@ -258,6 +258,7 @@ Rich can render content in neat [columns](https://rich.readthedocs.io/en/latest/
 
 ```python
 import os
+import sys
 
 from rich import print
 from rich.columns import Columns
