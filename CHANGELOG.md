@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [9.4.0] - 2020-12-11
+## [9.4.0] - 2020-12-12
 
 ### Added
 
@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added rich.Status class and Console.status
 - Added getitem to Text
 - Added style parameter to Console.log
+- Added rich.diagnose command
 
 ### Changed
 
