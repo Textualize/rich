@@ -232,7 +232,7 @@ To try this out yourself, see [examples/downloader.py](https://github.com/willmc
 
 ## Status
 
-For situations where it is hard to calculate progress, you can use the status method which will display a 'spinner' animation with a status message that won't prevent you from writing to the terminal. Here's an example:
+For situations where it is hard to calculate progress, you can use the [status](https://rich.readthedocs.io/en/latest/reference/status.html) method which will display a 'spinner' animation and message. The animation won't prevent you from using the console as normal. Here's an example:
 
 ```python
 from time import sleep
@@ -251,6 +251,16 @@ with console.status("[bold green]Working on tasks...") as status:
 This generates the following output in the terminal.
 
 ![status](https://github.com/willmcgugan/rich/raw/master/imgs/status.gif)
+
+The spinner animations were borrowed from [cli-spinners])https://www.npmjs.com/package/cli-spinners). You can select a spinner by specifying the `spinner` parameter when calling status(). Run the following command to see the available values:
+
+```
+python -m rich.spinner
+```
+
+The above command generate the following output in the terminal:
+
+![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
 
 ## Columns
 
