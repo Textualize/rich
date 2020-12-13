@@ -232,7 +232,7 @@ To try this out yourself, see [examples/downloader.py](https://github.com/willmc
 
 ## Status
 
-For situations where it is hard to calculate progress, you can use the [status](https://rich.readthedocs.io/en/latest/reference/status.html) method which will display a 'spinner' animation and message. The animation won't prevent you from using the console as normal. Here's an example:
+For situations where it is hard to calculate progress, you can use the [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) method which will display a 'spinner' animation and message. The animation won't prevent you from using the console as normal. Here's an example:
 
 ```python
 from time import sleep
