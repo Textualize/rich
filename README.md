@@ -252,7 +252,7 @@ This generates the following output in the terminal.
 
 ![status](https://github.com/willmcgugan/rich/raw/master/imgs/status.gif)
 
-The spinner animations were borrowed from [cli-spinners]https://www.npmjs.com/package/cli-spinners). You can select a spinner by specifying the `spinner` parameter. Run the following command to see the available values:
+The spinner animations were borrowed from [cli-spinners](https://www.npmjs.com/package/cli-spinners). You can select a spinner by specifying the `spinner` parameter. Run the following command to see the available values:
 
 ```
 python -m rich.spinner
