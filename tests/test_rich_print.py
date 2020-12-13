@@ -9,6 +9,11 @@ def test_get_console():
     assert isinstance(console, Console)
 
 
+def test_reconfigure_console():
+    rich.reconfigure(width=100)
+    assert rich.get_console().width == 100
+
+
 def test_rich_print():
     console = rich.get_console()
     output = io.StringIO()

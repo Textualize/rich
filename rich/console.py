@@ -391,6 +391,7 @@ class Console:
         force_terminal (Optional[bool], optional): Enable/disable terminal control codes, or None to auto-detect terminal. Defaults to None.
         force_jupyter (Optional[bool], optional): Enable/disable Jupyter rendering, or None to auto-detect Jupyter. Defaults to None.
         theme (Theme, optional): An optional style theme object, or ``None`` for default theme.
+        stderr (bool, optional): User stderr rather than stdout if ``file `` is not specified. Defaults to False.
         file (IO, optional): A file object where the console should write to. Defaults to stdout.
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
         height (int, optional): The height of the terminal. Leave as default to auto-detect height.
@@ -419,6 +420,7 @@ class Console:
         force_terminal: bool = None,
         force_jupyter: bool = None,
         theme: Theme = None,
+        stderr: bool = False,
         file: IO[str] = None,
         width: int = None,
         height: int = None,
@@ -459,7 +461,8 @@ class Console:
 
         self._color_system: Optional[ColorSystem]
         self._force_terminal = force_terminal
-        self.file = file or sys.stdout
+        self._file = file
+        self.stderr = stderr
 
         if color_system is None:
             self._color_system = None
@@ -478,6 +481,7 @@ class Console:
         self.safe_box = safe_box
         self.get_datetime = get_datetime or datetime.now
         self.get_time = get_time or monotonic
+        self.stderr = stderr
 
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals(
@@ -488,6 +492,18 @@ class Console:
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
+
+    @property
+    def file(self) -> IO[str]:
+        """Get the file object to write to."""
+        file = self._file or (sys.stderr if self.stderr else sys.stdout)
+        file = getattr(file, "rich_proxied_file", file)
+        return file
+
+    @file.setter
+    def file(self, new_file: IO[str]) -> None:
+        """Set a new file object."""
+        self._file = new_file
 
     @property
     def _buffer(self) -> List[Segment]:

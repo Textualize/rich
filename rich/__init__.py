@@ -25,6 +25,18 @@ def get_console() -> "Console":
     return _console
 
 
+def reconfigure(*args, **kwargs) -> None:
+    """Reconfigures the global console bu replacing it with another.
+
+    Args:
+        console (Console): Replacement console instance.
+    """
+    from rich.console import Console
+
+    new_console = Console(*args, **kwargs)
+    _console.__dict__ = new_console.__dict__
+
+
 def print(*objects: Any, sep=" ", end="\n", file: IO[str] = None, flush: bool = False):
     r"""Print object(s) supplied via positional arguments.
     This function has an identical signature to the built-in print.

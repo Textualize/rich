@@ -9,7 +9,7 @@ from rich.spinner import Spinner, SPINNERS
 all_spinners = Columns(
     [
         Spinner(spinner_name, text=Text(repr(spinner_name), style="green"))
-        for spinner_name in sorted(SPINNERS.keys())
+        for spinner_name in sorted(SPINNERS)
     ],
     column_first=True,
     expand=True,

@@ -17,6 +17,11 @@ class FileProxy(io.TextIOBase):
         self.__buffer: List[str] = []
         self.__ansi_decoder = AnsiDecoder()
 
+    @property
+    def rich_proxied_file(self) -> IO[str]:
+        """Get proxied file."""
+        return self.__file
+
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__file, name)
 
