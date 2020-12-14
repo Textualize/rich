@@ -157,9 +157,12 @@ class Live(JupyterMixin, RenderHook):
             try:
                 if self.auto_refresh and self._refresh_thread is not None:
                     self._refresh_thread.stop()
+                    self._refresh_thread.join()
+                    self._refresh_thread = None
                 # allow it to fully render on the last even if overflow
                 self.vertical_overflow = "visible"
-                self.refresh()
+                if not self.console.is_jupyter:
+                    self.refresh()
                 if self.console.is_terminal:
                     self.console.line()
             finally:
@@ -169,9 +172,13 @@ class Live(JupyterMixin, RenderHook):
 
             if self.transient:
                 self.console.control(self._live_render.restore_cursor())
-            if self.ipy_widget is not None and self.transient:  # pragma: no cover
-                self.ipy_widget.clear_output()
-                self.ipy_widget.close()
+            if self.ipy_widget is not None:  # pragma: no cover
+                if self.transient:
+                    self.ipy_widget.close()
+                else:
+                    # jupyter last refresh must occur after console pop render hook
+                    # i am not sure why this is needed
+                    self.refresh()
 
     def __enter__(self) -> "Live":
         self.start()
