@@ -157,7 +157,7 @@ class Traceback:
     def __init__(
         self,
         trace: Trace = None,
-        width: Optional[int] = 88,
+        width: Optional[int] = 100,
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
