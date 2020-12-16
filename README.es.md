@@ -213,6 +213,38 @@ Las columnas pueden configurarse para mostrar los detalles que desee. Las column
 
 Para probar esto usted mismo, consulte [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) que puede descargar varias URL simultáneamente mientras muestra el progreso.
 
+## Estado
+
+Para situaciones en las que es difícil calcular el progreso, puede utilizar el método [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) que mostrará una animación y un mensaje de "spinner". La animación no le impedirá usar la consola con normalidad. He aquí un ejemplo:
+
+```python
+from time import sleep
+from rich.console import Console
+
+console = Console()
+tasks = [f"task {n}" for n in range(1, 11)]
+
+with console.status("[bold green]Working on tasks...") as status:
+    while tasks:
+        task = tasks.pop(0)
+        sleep(1)
+        console.log(f"{task} complete")
+```
+
+Esto genera la siguiente salida en el terminal.
+
+![status](https://github.com/willmcgugan/rich/raw/master/imgs/status.gif)
+
+Las animaciones de spinner fueron tomadas de [cli-spinners](https://www.npmjs.com/package/cli-spinners). Puede seleccionar un spinner especificando el `spinner` parameter. Ejecute el siguiente comando para ver los valores disponibles:
+
+```
+python -m rich.spinner
+```
+
+El comando anterior genera la siguiente salida en la terminal:
+
+![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
+
 ## Columnas
 
 Rich puede representar contenido en [columnas](https://rich.readthedocs.io/en/latest/columns.html) ordenadas con un ancho igual u óptimo. Aquí hay un clon muy básico del comando (MacOS / Linux) `ls` que muestra una lista de directorios en columnas:
@@ -317,5 +349,7 @@ Aquí hay algunos proyectos que usan Rich:
 - [smacke/ffsubsync](https://github.com/smacke/ffsubsync)
   Sincronice automáticamente los subtítulos con el video.
 - [tryolabs/norfair](https://github.com/tryolabs/norfair)
-- Libreria de Python para agregar tracking a cualquier detector.
+  Libreria de Python para agregar tracking a cualquier detector.
+- [ansible/ansible-lint](https://github.com/ansible/ansible-lint) Ansible-lint comprueba los playbooks en busca de prácticas y comportamientos que podrían mejorarse
+- [ansible-community/molecule](https://github.com/ansible-community/molecule) Marco de prueba de Ansible Molecule
 - +¡[Muchos más](https://github.com/willmcgugan/rich/network/dependents)!
