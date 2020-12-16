@@ -9,7 +9,7 @@ To syntax highlight code, construct a :class:`~rich.syntax.Syntax` object and pr
     from rich.syntax import Syntax
 
     console = Console()
-    with open("syntax.py", "wt") as code_file:
+    with open("syntax.py", "rt") as code_file:
         syntax = Syntax(code_file.read(), "python")     
     console.print(syntax)
 
