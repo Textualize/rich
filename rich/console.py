@@ -1160,7 +1160,8 @@ class Console:
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
             width (Optional[int], optional): Width of output, or ``None`` to auto-detect. Defaults to ``None``.
             crop (Optional[bool], optional): Crop output to width of terminal. Defaults to True.
-            soft_wrap (bool, optional): Enable soft wrap mode which disables word wrapping and cropping of text. Defaults to False.
+            soft_wrap (bool, optional): Enable soft wrap mode which disables word wrapping and cropping of text or None for
+                Console default. Defaults to ``None``.
         """
         if not objects:
             self.line()
