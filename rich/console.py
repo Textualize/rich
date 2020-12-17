@@ -1059,7 +1059,8 @@ class Console:
         check_text()
 
         if self.style is not None:
-            renderables = [Styled(renderable, self.style) for renderable in renderables]
+            style = self.get_style(self.style)
+            renderables = [Styled(renderable, style) for renderable in renderables]
 
         return renderables
 
