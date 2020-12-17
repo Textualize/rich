@@ -253,7 +253,7 @@ File output
         console = Console(file=report_file)
         console.rule(f"Report Generated {datetime.now().ctime()}")
         
-Note that when writing to a file, Rich can't auto-detect the width of the terminal and will default to 80 characters. Therefore you may want to set the ``width`` parameter on the Console constructor.
+Note that when writing to a file you may also want to explicitly the ``width`` of the console as you may not wan it to wrap to the current console width.
 
 Capturing output
 ----------------

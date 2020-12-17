@@ -390,6 +390,7 @@ class Console:
             either ``"standard"``, ``"256"`` or ``"truecolor"``. Leave as ``"auto"`` to autodetect.
         force_terminal (Optional[bool], optional): Enable/disable terminal control codes, or None to auto-detect terminal. Defaults to None.
         force_jupyter (Optional[bool], optional): Enable/disable Jupyter rendering, or None to auto-detect Jupyter. Defaults to None.
+        soft_wrap (Optional[bool], optional): Set soft wrap default on print method. Defaults to False.
         theme (Theme, optional): An optional style theme object, or ``None`` for default theme.
         stderr (bool, optional): Use stderr rather than stdout if ``file `` is not specified. Defaults to False.
         file (IO, optional): A file object where the console should write to. Defaults to stdout.
@@ -420,6 +421,7 @@ class Console:
         ] = "auto",
         force_terminal: bool = None,
         force_jupyter: bool = None,
+        soft_wrap: bool = False,
         theme: Theme = None,
         stderr: bool = False,
         file: IO[str] = None,
@@ -448,6 +450,7 @@ class Console:
         if self.is_jupyter:
             width = width or 93
             height = height or 100
+        self.soft_wrap = soft_wrap
         self._width = width
         self._height = height
         self.tab_size = tab_size
@@ -1140,7 +1143,7 @@ class Console:
         highlight: bool = None,
         width: int = None,
         crop: bool = True,
-        soft_wrap: bool = False,
+        soft_wrap: bool = None,
     ) -> None:
         """Print to the console.
 
@@ -1157,12 +1160,14 @@ class Console:
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
             width (Optional[int], optional): Width of output, or ``None`` to auto-detect. Defaults to ``None``.
             crop (Optional[bool], optional): Crop output to width of terminal. Defaults to True.
-            soft_wrap (bool, optional): Enable soft wrap mode which disables word wrapping and cropping. Defaults to False.
+            soft_wrap (bool, optional): Enable soft wrap mode which disables word wrapping and cropping of text. Defaults to False.
         """
         if not objects:
             self.line()
             return
 
+        if soft_wrap is None:
+            soft_wrap = self.soft_wrap
         if soft_wrap:
             if no_wrap is None:
                 no_wrap = True

@@ -28,6 +28,12 @@ def test_dumb_terminal():
     assert height == 25
 
 
+def test_soft_wrap():
+    console = Console(file=io.StringIO(), width=20, soft_wrap=True)
+    console.print("foo " * 10)
+    assert console.file.getvalue() == "foo " * 20
+
+
 @pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 def test_16color_terminal():
     console = Console(
