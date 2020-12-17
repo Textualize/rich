@@ -209,12 +209,10 @@ Supports much of the *markdown*, __syntax__!
 
 
 if __name__ == "__main__":  # pragma: no cover
-    import shutil
 
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
-        width=shutil.get_terminal_size().columns,
     )
     test_card = make_test_card()
 
