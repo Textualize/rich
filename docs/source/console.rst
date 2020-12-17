@@ -243,7 +243,7 @@ You might also want to set the ``style`` parameter on the Console to make error 
 File output
 -----------
 
- You can also tell the Console object to write to a file by setting the ``file`` argument on the constructor -- which should be a file-like object opened for writing text. You could use this to write to a file without the output ever appearing on the terminal. Here's an example::
+You can also tell the Console object to write to a file by setting the ``file`` argument on the constructor -- which should be a file-like object opened for writing text. You could use this to write to a file without the output ever appearing on the terminal. Here's an example::
 
     import sys
     from rich.console import Console
@@ -253,7 +253,7 @@ File output
         console = Console(file=report_file)
         console.rule(f"Report Generated {datetime.now().ctime()}")
         
-Note that when writing to a file you may also want to explicitly the ``width`` of the console as you may not wan it to wrap to the current console width.
+Note that when writing to a file you may want to explicitly the ``width`` argument if you don't want to wrap the output to the current console width.
 
 Capturing output
 ----------------
