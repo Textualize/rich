@@ -48,8 +48,8 @@ from .text import Text, TextType
 from .theme import Theme, ThemeStack
 
 if TYPE_CHECKING:
-    from .status import Status
     from ._windows import WindowsConsoleFeatures
+    from .status import Status
 
 WINDOWS = platform.system() == "Windows"
 
