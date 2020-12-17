@@ -7,18 +7,28 @@ from rich.color import (
     ColorType,
     ColorTriplet,
 )
-
-from rich import terminal_theme
+from rich.style import Style
+from rich.text import Text, Span
 
 import pytest
 
 
 def test_str() -> None:
-    assert str(Color.parse("red")) == "\x1b[31m⬤  \x1b[0m<color 'red' (standard)>"
+    assert str(Color.parse("red")) == "<color 'red' (standard)>"
 
 
 def test_repr() -> None:
     assert repr(Color.parse("red")) == "<color 'red' (standard)>"
+
+
+def test_rich() -> None:
+    color = Color.parse("red")
+    as_text = color.__rich__()
+    print(repr(as_text))
+    print(repr(as_text.spans))
+    assert as_text == Text(
+        "<color 'red' (standard)⬤ >", spans=[Span(23, 24, Style(color=color))]
+    )
 
 
 def test_system() -> None:

@@ -451,3 +451,13 @@ def test_get_time() -> None:
     )
     assert console.get_time() == 99
     assert console.get_datetime() == datetime.datetime(1974, 7, 5)
+
+
+def test_console_style() -> None:
+    console = Console(
+        file=io.StringIO(), color_system="truecolor", force_terminal=True, style="red"
+    )
+    console.print("foo")
+    expected = "\x1b[31mfoo\x1b[0m\n"
+    result = console.file.getvalue()
+    assert result == expected

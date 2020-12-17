@@ -10,11 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - If file is not specified on Console then the Console.file will return the current sys.stdout
+- Changed `Color.__str__` to not include ansi codes
+- Changed Console.size to get the terminal dimensions via sys.stdin.
 
 ### Added
 
 - Added stderr parameter to Console
 - Added rich.reconfigure
+- Added `Color.__rich__`
+- Added Console.style parameter
+
+### Fixed
+
+- Fixed double output in rich.live https://github.com/willmcgugan/rich/issues/485
+- Fixed Console.out highlighting not reflecting defaults https://github.com/willmcgugan/rich/issues/827
+- FileProxy now raises TypeError for empty non-str arguments https://github.com/willmcgugan/rich/issues/828
 
 ## [9.4.0] - 2020-12-12
 

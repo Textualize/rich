@@ -11,6 +11,7 @@ from .terminal_theme import DEFAULT_TERMINAL_THEME
 
 if TYPE_CHECKING:  # pragma: no cover
     from .terminal_theme import TerminalTheme
+    from .text import Text
 
 
 WINDOWS = platform.system() == "Windows"
@@ -268,16 +269,19 @@ class Color(NamedTuple):
     triplet: Optional[ColorTriplet] = None
     """A triplet of color components, if an RGB color."""
 
-    def __str__(self) -> str:
-        """Render the color to the terminal."""
-        attrs = self.get_ansi_codes(foreground=True)
-        return (
-            f"\x1b[{';'.join(attrs)}m⬤  \x1b[0m"
-            f"<color {self.name!r} ({self.type.name.lower()})>"
-        )
-
     def __repr__(self) -> str:
         return f"<color {self.name!r} ({self.type.name.lower()})>"
+
+    def __rich__(self) -> "Text":
+        """Dispays the actual color if Rich printed."""
+        from .text import Text
+        from .style import Style
+
+        return Text.assemble(
+            f"<color {self.name!r} ({self.type.name.lower()})",
+            ("⬤", Style(color=self)),
+            " >",
+        )
 
     @property
     def system(self) -> ColorSystem:

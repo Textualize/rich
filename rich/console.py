@@ -1,7 +1,7 @@
 import inspect
+import io
 import os
 import platform
-import shutil
 import sys
 import threading
 from abc import ABC, abstractmethod
@@ -41,7 +41,7 @@ from .pager import Pager, SystemPager
 from .pretty import Pretty
 from .scope import render_scope
 from .segment import Segment
-from .style import Style
+from .style import Style, StyleType
 from .styled import Styled
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
 from .text import Text, TextType
@@ -391,10 +391,11 @@ class Console:
         force_terminal (Optional[bool], optional): Enable/disable terminal control codes, or None to auto-detect terminal. Defaults to None.
         force_jupyter (Optional[bool], optional): Enable/disable Jupyter rendering, or None to auto-detect Jupyter. Defaults to None.
         theme (Theme, optional): An optional style theme object, or ``None`` for default theme.
-        stderr (bool, optional): User stderr rather than stdout if ``file `` is not specified. Defaults to False.
+        stderr (bool, optional): Use stderr rather than stdout if ``file `` is not specified. Defaults to False.
         file (IO, optional): A file object where the console should write to. Defaults to stdout.
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
         height (int, optional): The height of the terminal. Leave as default to auto-detect height.
+        style (StyleType, optional): Style to apply to all output, or None for no style. Defaults to None.
         record (bool, optional): Boolean to enable recording of terminal output,
             required to call :meth:`export_html` and :meth:`export_text`. Defaults to False.
         markup (bool, optional): Boolean to enable :ref:`console_markup`. Defaults to True.
@@ -424,6 +425,7 @@ class Console:
         file: IO[str] = None,
         width: int = None,
         height: int = None,
+        style: StyleType = None,
         tab_size: int = 8,
         record: bool = False,
         markup: bool = True,
@@ -482,6 +484,7 @@ class Console:
         self.get_datetime = get_datetime or datetime.now
         self.get_time = get_time or monotonic
         self.stderr = stderr
+        self.style: Optional[Style] = None
 
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals(
@@ -489,6 +492,7 @@ class Console:
         )
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
+        self.style = self.get_style(style) if style else None
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
@@ -693,7 +697,13 @@ class Console:
         if self.is_dumb_terminal:
             return ConsoleDimensions(80, 25)
 
-        width, height = shutil.get_terminal_size()
+        width: Optional[int] = None
+        height: Optional[int] = None
+        try:
+            width, height = os.get_terminal_size(sys.stdin.fileno())
+        except (AttributeError, ValueError, OSError):
+            pass
+
         # get_terminal_size can report 0, 0 if run from pseudo-terminal
         width = width or 80
         height = height or 25
@@ -1046,6 +1056,11 @@ class Console:
 
         check_text()
 
+        if self.style is not None:
+            renderables = [
+                Styled(renderable, style=self.style) for renderable in renderables
+            ]
+
         return renderables
 
     def rule(
@@ -1085,7 +1100,7 @@ class Console:
         sep=" ",
         end="\n",
         style: Union[str, Style] = None,
-        highlight: bool = True,
+        highlight: bool = None,
     ) -> None:
         """Output to the terminal. This is a low-level way of writing to the terminal which unlike
         :meth:`~rich.console.Console.print` won't pretty print, wrap text, or apply markup, but will
@@ -1168,7 +1183,10 @@ class Console:
             for hook in self._render_hooks:
                 renderables = hook.process_renderables(renderables)
             render_options = self.options.update(
-                justify=justify, overflow=overflow, width=width, no_wrap=no_wrap
+                justify=justify,
+                overflow=overflow,
+                width=min(width, self.width) if width else None,
+                no_wrap=no_wrap,
             )
             new_segments: List[Segment] = []
             extend = new_segments.extend
