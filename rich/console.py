@@ -101,7 +101,7 @@ class ConsoleOptions:
     overflow: Optional[OverflowMethod] = None
     """Overflow value override for renderable."""
     no_wrap: Optional[bool] = False
-    """"Disable wrapping for text."""
+    """Disable wrapping for text."""
 
     @property
     def ascii_only(self) -> bool:

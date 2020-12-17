@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - If file is not specified on Console then the Console.file will return the current sys.stdout. Prior to 9.5.0 sys.stdout was cached on the Console, which could break code that wrapped sys.stdout after the Console was constructed.
 - Changed `Color.__str__` to not include ansi codes
-- Changed Console.size to get the terminal dimensions via sys.stdin.
+- Changed Console.size to get the terminal dimensions via sys.stdin. This means that if you set file to be an io.StringIO file then the width will be set to the current terminal dimensions and not a default of 80.
 
 ### Added
 
