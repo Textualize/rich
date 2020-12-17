@@ -487,7 +487,7 @@ class Console:
         self.get_datetime = get_datetime or datetime.now
         self.get_time = get_time or monotonic
         self.stderr = stderr
-        self.style: Optional[Style] = None
+        self.style = style
 
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals(
@@ -495,7 +495,6 @@ class Console:
         )
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
-        self.style = self.get_style(style) if style else None
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
