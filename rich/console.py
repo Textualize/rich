@@ -1,7 +1,7 @@
 import inspect
-import io
 import os
 import platform
+import shutil
 import sys
 import threading
 from abc import ABC, abstractmethod
@@ -706,10 +706,13 @@ class Console:
 
         width: Optional[int] = None
         height: Optional[int] = None
-        try:
-            width, height = os.get_terminal_size(sys.stdin.fileno())
-        except (AttributeError, ValueError, OSError):
-            pass
+        if WINDOWS:  # type: ignore
+            width, height = shutil.get_terminal_size()
+        else:
+            try:
+                width, height = os.get_terminal_size(sys.stdin.fileno())
+            except (AttributeError, ValueError, OSError):
+                pass
 
         # get_terminal_size can report 0, 0 if run from pseudo-terminal
         width = width or 80
