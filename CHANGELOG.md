@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added rich.reconfigure
 - Added `Color.__rich__`
 - Added Console.style parameter
+- Added Table.highlight parameter to enable highlighting of cells
+- Added Panel.highlight parameter to enable highlighting of panel title
+- Added highlight to ConsoleOptions
 
 ### Fixed
 

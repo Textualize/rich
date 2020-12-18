@@ -31,6 +31,7 @@ class Panel(JupyterMixin):
         border_style (str, optional): The style of the border. Defaults to "none".
         width (Optional[int], optional): Optional width of panel. Defaults to None to auto-detect.
         padding (Optional[PaddingDimensions]): Optional padding around renderable. Defaults to 0.
+        highlight (bool, optional): Enable automatic highlighting of panel title (if str). Defaults to False.
     """
 
     def __init__(
@@ -46,6 +47,7 @@ class Panel(JupyterMixin):
         border_style: StyleType = "none",
         width: Optional[int] = None,
         padding: PaddingDimensions = (0, 1),
+        highlight: bool = False,
     ) -> None:
         self.renderable = renderable
         self.box = box
@@ -57,6 +59,7 @@ class Panel(JupyterMixin):
         self.border_style = border_style
         self.width = width
         self.padding = padding
+        self.highlight = highlight
 
     @classmethod
     def fit(
@@ -131,7 +134,7 @@ class Panel(JupyterMixin):
             )
 
         width = child_width + 2
-        child_options = options.update(width=child_width)
+        child_options = options.update(width=child_width, highlight=self.highlight)
         lines = console.render_lines(renderable, child_options, style=style)
 
         line_start = Segment(box.mid_left, border_style)

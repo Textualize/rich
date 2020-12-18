@@ -102,6 +102,8 @@ class ConsoleOptions:
     """Overflow value override for renderable."""
     no_wrap: Optional[bool] = False
     """Disable wrapping for text."""
+    highlight: Optional[bool] = None
+    """Highlight override for render_str."""
 
     @property
     def ascii_only(self) -> bool:
@@ -116,6 +118,7 @@ class ConsoleOptions:
         justify: JustifyMethod = None,
         overflow: OverflowMethod = None,
         no_wrap: bool = None,
+        highlight: bool = None,
     ) -> "ConsoleOptions":
         """Update values, return a copy."""
         options = replace(self)
@@ -131,6 +134,8 @@ class ConsoleOptions:
             options.overflow = overflow
         if no_wrap is not None:
             options.no_wrap = no_wrap
+        if highlight is not None:
+            options.highlight = highlight
         return options
 
 
@@ -857,7 +862,9 @@ class Console:
         if isinstance(renderable, ConsoleRenderable):
             render_iterable = renderable.__rich_console__(self, _options)
         elif isinstance(renderable, str):
-            yield from self.render(self.render_str(renderable), _options)
+            yield from self.render(
+                self.render_str(renderable, highlight=options.highlight), _options
+            )
             return
         else:
             raise errors.NotRenderableError(
@@ -919,6 +926,7 @@ class Console:
         overflow: OverflowMethod = None,
         emoji: bool = None,
         markup: bool = None,
+        highlight: bool = None,
         highlighter: HighlighterType = None,
     ) -> "Text":
         """Convert a string to a Text instance. This is is called automatically if
@@ -931,6 +939,7 @@ class Console:
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to ``None``.
             emoji (Optional[bool], optional): Enable emoji, or ``None`` to use Console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use Console default.
+            highlight (Optional[bool], optional): Enable highlighting, or ``None`` to use Console default.
             highlighter (HighlighterType, optional): Optional highlighter to apply.
         Returns:
             ConsoleRenderable: Renderable object.
@@ -938,6 +947,7 @@ class Console:
         """
         emoji_enabled = emoji or (emoji is None and self._emoji)
         markup_enabled = markup or (markup is None and self._markup)
+        highlight_enabled = highlight or (highlight is None and self._highlight)
 
         if markup_enabled:
             rich_text = render_markup(text, style=style, emoji=emoji_enabled)
@@ -951,8 +961,9 @@ class Console:
                 style=style,
             )
 
-        if highlighter is not None:
-            highlight_text = highlighter(str(rich_text))
+        _highlighter = (highlighter or self.highlighter) if highlight_enabled else None
+        if _highlighter is not None:
+            highlight_text = _highlighter(str(rich_text))
             highlight_text.copy_styles(rich_text)
             return highlight_text
 
@@ -1041,10 +1052,7 @@ class Console:
             if isinstance(renderable, str):
                 append_text(
                     self.render_str(
-                        renderable,
-                        emoji=emoji,
-                        markup=markup,
-                        highlighter=_highlighter,
+                        renderable, emoji=emoji, markup=markup, highlighter=_highlighter
                     )
                 )
             elif isinstance(renderable, ConsoleRenderable):
