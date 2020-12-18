@@ -863,7 +863,7 @@ class Console:
             render_iterable = renderable.__rich_console__(self, _options)
         elif isinstance(renderable, str):
             yield from self.render(
-                self.render_str(renderable, highlight=options.highlight), _options
+                self.render_str(renderable, highlight=_options.highlight), _options
             )
             return
         else:

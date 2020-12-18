@@ -162,7 +162,7 @@ class Table(JupyterMixin):
         caption_style: StyleType = None,
         title_justify: "JustifyMethod" = "center",
         caption_justify: "JustifyMethod" = "center",
-        highlight: bool = False
+        highlight: bool = False,
     ) -> None:
 
         self.columns: List[Column] = []
