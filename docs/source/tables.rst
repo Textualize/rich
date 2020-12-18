@@ -55,9 +55,9 @@ The :class:`~rich.table.Table` class offers a number of configuration options to
 Adding columns
 ~~~~~~~~~~~~~~
 
-You may also add columns by specifying them in the positional arguments of the :class:`~rich.table.Table` constructor. For example, we could construct a table with three columns like this:: 
+You may also add columns by specifying them in the positional arguments of the :class:`~rich.table.Table` constructor. For example, we could construct a table with three columns like this::
 
-    table = Table("Released", "Title", "Box Office", title="Star Wars Movies") 
+    table = Table("Released", "Title", "Box Office", title="Star Wars Movies")
 
 This allows you to specify the text of the column only. If you want to set other attributes, such as width and style, you can add an :class:`~rich.table.Column` class. Here's an example::
 
@@ -65,7 +65,7 @@ This allows you to specify the text of the column only. If you want to set other
     table = Table(
         "Released",
         "Title",
-        Column(header="Box Office", align="right"),
+        Column(header="Box Office", justify="right"),
         title="Star Wars Movies"
     )
 
