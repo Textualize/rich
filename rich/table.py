@@ -129,6 +129,7 @@ class Table(JupyterMixin):
         caption_style (Union[str, Style], optional): Style of the caption. Defaults to None.
         title_justify (str, optional): Justify method for title. Defaults to "center".
         caption_justify (str, optional): Justify method for caption. Defaults to "center".
+        highlight (bool, optional): Highlight cell contents (if str). Defaults to False.
     """
 
     columns: List[Column]
@@ -161,6 +162,7 @@ class Table(JupyterMixin):
         caption_style: StyleType = None,
         title_justify: "JustifyMethod" = "center",
         caption_justify: "JustifyMethod" = "center",
+        highlight: bool = False,
     ) -> None:
 
         self.columns: List[Column] = []
@@ -196,6 +198,7 @@ class Table(JupyterMixin):
         self.caption_style = caption_style
         self.title_justify = title_justify
         self.caption_justify = caption_justify
+        self.highlight = highlight
         self.row_styles = list(row_styles or [])
 
     @classmethod
@@ -413,13 +416,15 @@ class Table(JupyterMixin):
         widths = self._calculate_column_widths(console, max_width - extra_width)
         table_width = sum(widths) + extra_width
 
-        render_options = options.update(width=table_width)
+        render_options = options.update(width=table_width, highlight=self.highlight)
 
         def render_annotation(
             text: TextType, style: StyleType, justify: "JustifyMethod" = "center"
         ) -> "RenderResult":
             render_text = (
-                console.render_str(text, style=style) if isinstance(text, str) else text
+                console.render_str(text, style=style, highlight=False)
+                if isinstance(text, str)
+                else text
             )
             return console.render(
                 render_text, options=render_options.update(justify=justify)

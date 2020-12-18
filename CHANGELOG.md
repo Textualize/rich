@@ -9,12 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- If file is not specified on Console then the Console.file will return the current sys.stdout
+- If file is not specified on Console then the Console.file will return the current sys.stdout. Prior to 9.5.0 sys.stdout was cached on the Console, which could break code that wrapped sys.stdout after the Console was constructed.
+- Changed `Color.__str__` to not include ansi codes
+- Changed Console.size to get the terminal dimensions via sys.stdin. This means that if you set file to be an io.StringIO file then the width will be set to the current terminal dimensions and not a default of 80.
 
 ### Added
 
 - Added stderr parameter to Console
 - Added rich.reconfigure
+- Added `Color.__rich__`
+- Added Console.style parameter
+- Added Table.highlight parameter to enable highlighting of cells
+- Added Panel.highlight parameter to enable highlighting of panel title
+- Added highlight to ConsoleOptions
+
+### Fixed
+
+- Fixed double output in rich.live https://github.com/willmcgugan/rich/issues/485
+- Fixed Console.out highlighting not reflecting defaults https://github.com/willmcgugan/rich/issues/827
+- FileProxy now raises TypeError for empty non-str arguments https://github.com/willmcgugan/rich/issues/828
 
 ## [9.4.0] - 2020-12-12
 

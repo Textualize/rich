@@ -2,20 +2,17 @@ import colorsys
 import io
 from time import process_time
 
+from rich import box
 from rich.color import Color
-from rich.columns import Columns
 from rich.console import Console, ConsoleOptions, RenderGroup, RenderResult
 from rich.markdown import Markdown
 from rich.measure import Measurement
-from rich.padding import Padding
-from rich.panel import Panel
 from rich.pretty import Pretty
 from rich.segment import Segment
 from rich.style import Style
-from rich.table import Table
 from rich.syntax import Syntax
+from rich.table import Table
 from rich.text import Text
-from rich import box
 
 
 class ColorBox:
@@ -209,7 +206,11 @@ Supports much of the *markdown*, __syntax__!
 
 
 if __name__ == "__main__":  # pragma: no cover
-    console = Console(file=io.StringIO(), force_terminal=True)
+
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+    )
     test_card = make_test_card()
 
     # Print once to warm cache
