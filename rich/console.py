@@ -491,7 +491,6 @@ class Console:
         self.safe_box = safe_box
         self.get_datetime = get_datetime or datetime.now
         self.get_time = get_time or monotonic
-        self.stderr = stderr
         self.style = style
 
         self._record_buffer_lock = threading.RLock()
