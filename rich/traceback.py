@@ -404,7 +404,8 @@ class Traceback:
                     )
 
     @render_group()
-    def _render_syntax_error(self, syntax_error: _SyntaxError) -> RenderResult:
+    @staticmethod
+    def _render_syntax_error(syntax_error: _SyntaxError) -> RenderResult:
         highlighter = ReprHighlighter()
         path_highlighter = PathHighlighter()
         if syntax_error.filename != "<stdin>":

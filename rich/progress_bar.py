@@ -65,8 +65,8 @@ class ProgressBar(JupyterMixin):
         return completed
 
     @lru_cache(maxsize=16)
+    @staticmethod
     def _get_pulse_segments(
-        self,
         fore_style: Style,
         back_style: Style,
         color_system: str,

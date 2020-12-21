@@ -53,8 +53,9 @@ class MarkdownElement:
             context (MarkdownContext): [description]
         """
 
+    @staticmethod
     def on_child_close(
-        self, context: "MarkdownContext", child: "MarkdownElement"
+        context: "MarkdownContext", child: "MarkdownElement"
     ) -> bool:
         """Called when a child element is closed.
 
@@ -69,8 +70,9 @@ class MarkdownElement:
         """
         return True
 
+    @staticmethod
     def __rich_console__(
-        self, console: "Console", options: "ConsoleOptions"
+        console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         return ()
 

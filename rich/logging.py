@@ -93,7 +93,8 @@ class RichHandler(Handler):
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
 
-    def get_level_text(self, record: LogRecord) -> Text:
+    @staticmethod
+    def get_level_text(record: LogRecord) -> Text:
         """Get the level name from the record.
 
         Args:

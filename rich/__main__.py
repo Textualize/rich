@@ -16,8 +16,9 @@ from rich.text import Text
 
 
 class ColorBox:
+    @staticmethod
     def __rich_console__(
-        self, console: Console, options: ConsoleOptions
+        console: Console, options: ConsoleOptions
     ) -> RenderResult:
         for y in range(0, 5):
             for x in range(options.max_width):
@@ -30,7 +31,8 @@ class ColorBox:
                 yield Segment("▄", Style(color=color, bgcolor=bgcolor))
             yield Segment.line()
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
+    @staticmethod
+    def __rich_measure__(console: "Console", max_width: int) -> Measurement:
         return Measurement(1, max_width)
 
 
