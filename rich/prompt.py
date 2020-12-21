@@ -140,7 +140,8 @@ class PromptBase(Generic[PromptType]):
         )
         return _prompt(default=default, stream=stream)
 
-    def render_default(self, default: DefaultType) -> Text:
+    @staticmethod
+    def render_default(default: DefaultType) -> Text:
         """Turn the supplied default in to a Text instance.
 
         Args:
