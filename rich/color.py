@@ -364,9 +364,9 @@ class Color(NamedTuple):
         """Create a truecolor from three color components in the range(0->255).
 
         Args:
-            red (float): Red component.
-            green (float): Green component.
-            blue (float): Blue component.
+            red (float): Red component in range 0-255.
+            green (float): Green component in range 0-255.
+            blue (float): Blue component in range 0-255.
 
         Returns:
             Color: A new color object.
@@ -471,10 +471,8 @@ class Color(NamedTuple):
         # Convert to 8-bit color from truecolor color
         if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:
             assert self.triplet is not None
-
             red, green, blue = self.triplet.normalized
             _h, l, s = rgb_to_hls(red, green, blue)
-
             # If saturation is under 10% assume it is grayscale
             if s < 0.1:
                 gray = round(l * 25.0)
@@ -566,7 +564,7 @@ if __name__ == "__main__":  # pragma: no cover
         if color_number < 16:
             table.add_row(color_cell, f"{color_number}", Text(f'"{name}"'))
         else:
-            color = EIGHT_BIT_PALETTE[color_number]
+            color = EIGHT_BIT_PALETTE[color_number]  # type: ignore
             table.add_row(
                 color_cell, str(color_number), Text(f'"{name}"'), color.hex, color.rgb
             )

@@ -16,7 +16,7 @@ To specify a foreground color use one of the 256 :ref:`appendix-colors`. For exa
 
     console.print("Hello", style="magenta")
 
-You may also use the color's number (an integer between 0 and 255) with the syntax `"color(<number>)"`. The following will give the equivalent output::
+You may also use the color's number (an integer between 0 and 255) with the syntax ``"color(<number>)"``. The following will give the equivalent output::
 
     console.print("Hello", style="color(5)")
 

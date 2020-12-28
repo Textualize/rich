@@ -322,6 +322,18 @@ class BarColumn(ProgressColumn):
         )
 
 
+class TimeElapsedColumn(ProgressColumn):
+    """Renders time elapsed."""
+
+    def render(self, task: "Task") -> Text:
+        """Show time remaining."""
+        elapsed = task.finished_time if task.finished else task.elapsed
+        if elapsed is None:
+            return Text("-:--:--", style="progress.elapsed")
+        delta = timedelta(seconds=int(elapsed))
+        return Text(str(delta), style="progress.elapsed")
+
+
 class TimeRemainingColumn(ProgressColumn):
     """Renders estimated time remaining."""
 
@@ -434,6 +446,9 @@ class Task:
     _get_time: GetTimeCallable
     """Callable to get the current time."""
 
+    finished_time: Optional[float] = None
+    """float: Time task was finished."""
+
     visible: bool = True
     """bool: Indicates if this task is visible in the progress display."""
 
@@ -475,8 +490,8 @@ class Task:
 
     @property
     def finished(self) -> bool:
-        """bool: Check if the task has completed."""
-        return self.completed >= self.total
+        """Check if the task has finished."""
+        return self.finished_time is not None
 
     @property
     def percentage(self) -> float:
@@ -518,6 +533,7 @@ class Task:
     def _reset(self) -> None:
         """Reset progress."""
         self._progress.clear()
+        self.finished_time = None
 
 
 class _RefreshThread(Thread):
@@ -813,6 +829,8 @@ class Progress(JupyterMixin, RenderHook):
                 popleft()
             if update_completed > 0:
                 _progress.append(ProgressSample(current_time, update_completed))
+            if task.completed >= task.total and task.finished_time is None:
+                task.finished_time = task.elapsed
 
     def reset(
         self,
@@ -848,6 +866,7 @@ class Progress(JupyterMixin, RenderHook):
                 task.fields = fields
             if description is not None:
                 task.description = description
+            task.finished_time = None
             self.refresh()
 
     def advance(self, task_id: TaskID, advance: float = 1) -> None:
@@ -872,6 +891,8 @@ class Progress(JupyterMixin, RenderHook):
             while len(_progress) > 1000:
                 popleft()
             _progress.append(ProgressSample(current_time, update_completed))
+            if task.completed >= task.total and task.finished_time is None:
+                task.finished_time = task.elapsed
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
@@ -1057,6 +1078,7 @@ if __name__ == "__main__":  # pragma: no coverage
             BarColumn(),
             TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
             TimeRemainingColumn(),
+            TimeElapsedColumn(),
             console=console,
             transient=True,
         ) as progress:
@@ -1074,3 +1096,4 @@ if __name__ == "__main__":  # pragma: no coverage
     except:
         console.save_html("progress.html")
         print("wrote progress.html")
+        raise
