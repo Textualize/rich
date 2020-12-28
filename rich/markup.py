@@ -104,6 +104,7 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
     append_span = spans.append
 
     _Span = Span
+    _Tag = Tag
 
     def pop_style(style_name: str) -> Tuple[int, Tag]:
         """Pop tag matching given style name."""
@@ -125,18 +126,18 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
                     except KeyError:
                         raise MarkupError(
                             f"closing tag '{tag.markup}' at position {position} doesn't match any open tag"
-                        )
+                        ) from None
                 else:  # implicit close
                     try:
                         start, open_tag = pop()
                     except IndexError:
                         raise MarkupError(
                             f"closing tag '[/]' at position {position} has nothing to close"
-                        )
+                        ) from None
 
                 append_span(_Span(start, len(text), str(open_tag)))
             else:  # Opening tag
-                normalized_tag = Tag(normalize(tag.name), tag.parameters)
+                normalized_tag = _Tag(normalize(tag.name), tag.parameters)
                 style_stack.append((len(text), normalized_tag))
 
     text_length = len(text)
