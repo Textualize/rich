@@ -63,7 +63,7 @@ def install(
 
     console = console or get_console()
 
-    def display_hook(value: Any) -> None:
+    def display_hook(value: Any, *_args, **_kwargs) -> None:
         """Replacement sys.displayhook which prettifies objects with Rich."""
         if value is not None:
             assert console is not None
@@ -83,7 +83,16 @@ def install(
             )
             builtins._ = value  # type: ignore
 
-    sys.displayhook = display_hook
+    try:
+        ip = get_ipython()  # type: ignore
+        from IPython.core.formatters import BaseFormatter
+
+        # replace plain text formatter with rich formatter
+        formatter = BaseFormatter()
+        ip.display_formatter.formatters["text/plain"] = formatter
+        formatter.for_type(object, func=display_hook)
+    except:
+        sys.displayhook = display_hook
 
 
 class Pretty:
