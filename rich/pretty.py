@@ -83,7 +83,7 @@ def install(
             )
             builtins._ = value  # type: ignore
 
-    try:
+    try:  # pragma: no cover
         ip = get_ipython()  # type: ignore
         from IPython.core.formatters import BaseFormatter
 
