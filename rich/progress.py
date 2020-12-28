@@ -815,6 +815,9 @@ class Progress(JupyterMixin, RenderHook):
             task.fields.update(fields)
             update_completed = task.completed - completed_start
 
+            if refresh:
+                self.refresh()
+
             current_time = self.get_time()
             old_sample_time = current_time - self.speed_estimate_period
             _progress = task._progress
@@ -828,9 +831,6 @@ class Progress(JupyterMixin, RenderHook):
                 _progress.append(ProgressSample(current_time, update_completed))
             if task.completed >= task.total and task.finished_time is None:
                 task.finished_time = task.elapsed
-
-            if refresh:
-                self.refresh()
 
     def reset(
         self,
