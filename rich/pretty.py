@@ -2,7 +2,7 @@ import builtins
 import os
 import sys
 from array import array
-from collections import Counter, defaultdict, deque
+from collections import Counter, abc, defaultdict, deque
 from dataclasses import dataclass
 from itertools import islice
 from typing import (
@@ -24,6 +24,7 @@ from . import get_console
 from ._pick import pick_bool
 from .cells import cell_len
 from .highlighter import ReprHighlighter
+from .jupyter import JupyterRenderable
 from .measure import Measurement
 from .text import Text
 
@@ -60,6 +61,7 @@ def install(
         expand_all (bool, optional): Expand all containers. Defaults to False
     """
     from rich import get_console
+    from .console import ConsoleRenderable  # needed here to prevent circular import
 
     console = console or get_console()
 
@@ -83,7 +85,44 @@ def install(
             )
             builtins._ = value  # type: ignore
 
-    sys.displayhook = display_hook
+    def ipy_display_hook(value: Any) -> None:  # pragma: no cover
+        assert console is not None
+        # always skip rich generated jupyter renderables or None values
+        if isinstance(value, JupyterRenderable) or value is None:
+            return
+        # on jupyter rich display, if using one of the special representations dont use rich
+        if console.is_jupyter and any(attr.startswith("_repr_") for attr in dir(value)):
+            return
+
+        # certain renderables should start on a new line
+        requires_newline = (ConsoleRenderable, abc.Mapping, abc.Sequence, abc.Set)
+        if isinstance(value, requires_newline):
+            console.line()
+
+        console.print(
+            value
+            if isinstance(value, RichRenderable)
+            else Pretty(
+                value,
+                overflow=overflow,
+                indent_guides=indent_guides,
+                max_length=max_length,
+                max_string=max_string,
+                expand_all=expand_all,
+            ),
+            crop=crop,
+        )
+
+    try:  # pragma: no cover
+        ip = get_ipython()  # type: ignore
+        from IPython.core.formatters import BaseFormatter
+
+        # replace plain text formatter with rich formatter
+        rich_formatter = BaseFormatter()
+        rich_formatter.for_type(object, func=ipy_display_hook)
+        ip.display_formatter.formatters["text/plain"] = rich_formatter
+    except Exception:
+        sys.displayhook = display_hook
 
 
 class Pretty:
