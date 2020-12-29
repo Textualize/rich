@@ -141,6 +141,7 @@ class Pretty:
         max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
         expand_all (bool, optional): Expand all containers. Defaults to False.
         margin (int, optional): Subtrace a margin from width to force containers to expand earlier. Defaults to 0.
+        insert_line (bool, optional): Insert a new line if the output has multiple new lines. Defaults to False.
     """
 
     def __init__(
@@ -157,6 +158,7 @@ class Pretty:
         max_string: int = None,
         expand_all: bool = False,
         margin: int = 0,
+        insert_line: bool = False,
     ) -> None:
         self._object = _object
         self.highlighter = highlighter or ReprHighlighter()
@@ -169,6 +171,7 @@ class Pretty:
         self.max_string = max_string
         self.expand_all = expand_all
         self.margin = margin
+        self.insert_line = insert_line
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -193,6 +196,8 @@ class Pretty:
             pretty_text = pretty_text.with_indent_guides(
                 self.indent_size, style="repr.indent"
             )
+        if self.insert_line and "\n" in pretty_text:
+            yield ""
         yield pretty_text
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
