@@ -2,7 +2,7 @@ import builtins
 import os
 import sys
 from array import array
-from collections import Counter, defaultdict, deque
+from collections import Counter, abc, defaultdict, deque
 from dataclasses import dataclass
 from itertools import islice
 from typing import (
@@ -60,10 +60,11 @@ def install(
         expand_all (bool, optional): Expand all containers. Defaults to False
     """
     from rich import get_console
+    from .console import ConsoleRenderable  # needed here to prevent circular import
 
     console = console or get_console()
 
-    def display_hook(value: Any, *_args, **_kwargs) -> None:
+    def display_hook(value: Any) -> None:
         """Replacement sys.displayhook which prettifies objects with Rich."""
         if value is not None:
             assert console is not None
@@ -87,11 +88,19 @@ def install(
         ip = get_ipython()  # type: ignore
         from IPython.core.formatters import BaseFormatter
 
+        def ipy_display_hook(value: Any, *_args: Any, **_kwargs: Any) -> None:
+            assert console is not None
+            requires_newline = (ConsoleRenderable, abc.Mapping, abc.Sequence, abc.Set)
+            if isinstance(value, requires_newline):
+                console.line()
+
+            display_hook(value)
+
         # replace plain text formatter with rich formatter
-        formatter = BaseFormatter()
-        ip.display_formatter.formatters["text/plain"] = formatter
-        formatter.for_type(object, func=display_hook)
-    except:
+        rich_formatter = BaseFormatter()
+        rich_formatter.for_type(object, func=ipy_display_hook)
+        ip.display_formatter.formatters["text/plain"] = rich_formatter
+    except Exception:
         sys.displayhook = display_hook
 
 
