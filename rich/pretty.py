@@ -24,6 +24,7 @@ from . import get_console
 from ._pick import pick_bool
 from .cells import cell_len
 from .highlighter import ReprHighlighter
+from .jupyter import JupyterRenderable
 from .measure import Measurement
 from .text import Text
 
@@ -84,17 +85,37 @@ def install(
             )
             builtins._ = value  # type: ignore
 
+    def ipy_display_hook(value: Any) -> None:
+        assert console is not None
+        # always skip rich generated jupyter renderables or None values
+        if isinstance(value, JupyterRenderable) or value is None:
+            return
+        # on jupyter rich display, if using one of the special representations dont use rich
+        if console.is_jupyter and any(attr.startswith("_repr_") for attr in dir(value)):
+            return
+
+        # certain renderables should start on a new line
+        requires_newline = (ConsoleRenderable, abc.Mapping, abc.Sequence, abc.Set)
+        if isinstance(value, requires_newline):
+            console.line()
+
+        console.print(
+            value
+            if isinstance(value, RichRenderable)
+            else Pretty(
+                value,
+                overflow=overflow,
+                indent_guides=indent_guides,
+                max_length=max_length,
+                max_string=max_string,
+                expand_all=expand_all,
+            ),
+            crop=crop,
+        )
+
     try:  # pragma: no cover
         ip = get_ipython()  # type: ignore
         from IPython.core.formatters import BaseFormatter
-
-        def ipy_display_hook(value: Any, *_args: Any, **_kwargs: Any) -> None:
-            assert console is not None
-            requires_newline = (ConsoleRenderable, abc.Mapping, abc.Sequence, abc.Set)
-            if isinstance(value, requires_newline):
-                console.line()
-
-            display_hook(value)
 
         # replace plain text formatter with rich formatter
         rich_formatter = BaseFormatter()
