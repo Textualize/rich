@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - MarkupError exception raise from None to omit internal exception
+- Factored out RichHandler.render and RichHandler.render_message for easier extending
 
 ### Added
 

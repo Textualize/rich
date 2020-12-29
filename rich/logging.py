@@ -6,7 +6,7 @@ from typing import ClassVar, List, Optional, Type, Union
 
 from . import get_console
 from ._log_render import LogRender
-from .console import Console
+from .console import Console, ConsoleRenderable
 from .highlighter import Highlighter, ReprHighlighter
 from .text import Text
 from .traceback import Traceback
@@ -110,11 +110,7 @@ class RichHandler(Handler):
 
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
-        path = Path(record.pathname).name
-        level = self.get_level_text(record)
         message = self.format(record)
-        time_format = None if self.formatter is None else self.formatter.datefmt
-        log_time = datetime.fromtimestamp(record.created)
 
         traceback = None
         if (
@@ -139,31 +135,66 @@ class RichHandler(Handler):
             )
             message = record.getMessage()
 
+        message_renderable = self.render_message(record, message)
+        log_renderable = self.render(
+            record=record, traceback=traceback, message_renderable=message_renderable
+        )
+        self.console.print(log_renderable)
+
+    def render_message(self, record: LogRecord, message: str) -> "ConsoleRenderable":
+        """Render message text in to Text.
+
+        record (LogRecord): logging Record.
+        message (str): String cotaining log message.
+
+        Returns:
+            ConsoleRenderable: Renderable to display log message.
+        """
         use_markup = (
             getattr(record, "markup") if hasattr(record, "markup") else self.markup
         )
-        if use_markup:
-            message_text = Text.from_markup(message)
-        else:
-            message_text = Text(message)
+        message_text = Text.from_markup(message) if use_markup else Text(message)
 
         if self.highlighter:
             message_text = self.highlighter(message_text)
         if self.KEYWORDS:
             message_text.highlight_words(self.KEYWORDS, "logging.keyword")
 
-        self.console.print(
-            self._log_render(
-                self.console,
-                [message_text] if not traceback else [message_text, traceback],
-                log_time=log_time,
-                time_format=time_format,
-                level=level,
-                path=path,
-                line_no=record.lineno,
-                link_path=record.pathname if self.enable_link_path else None,
-            )
+        return message_text
+
+    def render(
+        self,
+        *,
+        record: LogRecord,
+        traceback: Optional[Traceback],
+        message_renderable: "ConsoleRenderable",
+    ) -> "ConsoleRenderable":
+        """Render log for display.
+
+        Args:
+            record (LogRecord): logging Record.
+            traceback (Optional[Traceback]): Traceback instance or None for no Traceback.
+            message_renderable (ConsoleRenderable): Renderable (typically Text) containing log message contents.
+
+        Returns:
+            ConsoleRenderable: Renderable to display log.
+        """
+        path = Path(record.pathname).name
+        level = self.get_level_text(record)
+        time_format = None if self.formatter is None else self.formatter.datefmt
+        log_time = datetime.fromtimestamp(record.created)
+
+        log_renderable = self._log_render(
+            self.console,
+            [message_renderable] if not traceback else [message_renderable, traceback],
+            log_time=log_time,
+            time_format=time_format,
+            level=level,
+            path=path,
+            line_no=record.lineno,
+            link_path=record.pathname if self.enable_link_path else None,
         )
+        return log_renderable
 
 
 if __name__ == "__main__":  # pragma: no cover
