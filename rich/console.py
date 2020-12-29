@@ -705,7 +705,7 @@ class Console:
 
         width: Optional[int] = None
         height: Optional[int] = None
-        if WINDOWS:  # type: ignore
+        if WINDOWS:  # pragma: no cover
             width, height = shutil.get_terminal_size()
         else:
             try:

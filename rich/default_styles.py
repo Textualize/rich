@@ -113,6 +113,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "progress.filesize": Style(color="green"),
     "progress.filesize.total": Style(color="green"),
     "progress.download": Style(color="green"),
+    "progress.elapsed": Style(color="yellow"),
     "progress.percentage": Style(color="magenta"),
     "progress.remaining": Style(color="cyan"),
     "progress.data.speed": Style(color="red"),
