@@ -19,9 +19,9 @@ skip_py37 = pytest.mark.skipif(
 )
 
 
-def render(obj, methods=False) -> str:
+def render(obj, methods=False, value=False) -> str:
     console = Console(file=io.StringIO(), width=50, legacy_windows=False)
-    inspect(obj, console=console, methods=methods)
+    inspect(obj, console=console, methods=methods, value=value)
     return console.file.getvalue()
 
 
@@ -60,7 +60,7 @@ def test_render():
     console = Console(width=100, file=io.StringIO(), legacy_windows=False)
 
     foo = Foo("hello")
-    inspect(foo, console=console, all=True)
+    inspect(foo, console=console, all=True, value=False)
     result = console.file.getvalue()
     print(repr(result))
     expected = "╭────────────── <class 'tests.test_inspect.Foo'> ──────────────╮\n│ Foo test                                                     │\n│                                                              │\n│   broken = InspectError()                                    │\n│ __init__ = def __init__(foo: int) -> None: constructor docs. │\n│   method = def method(a, b) -> str: Multi line               │\n╰──────────────────────────────────────────────────────────────╯\n"
@@ -75,11 +75,11 @@ def test_inspect_text():
         "│ str(bytes_or_buffer[, encoding[, errors]]) ->  │\n"
         "│ str                                            │\n"
         "│                                                │\n"
-        "│ 33 attribute(s) not shown. Use                 │\n"
-        "│ inspect(<OBJECT>, all=True) to see all         │\n"
-        "│ attributes.                                    │\n"
+        "│ 33 attribute(s) not shown. Run                 │\n"
+        "│ inspect(inspect) for options.                  │\n"
         "╰────────────────────────────────────────────────╯\n"
     )
+    print(repr(expected))
     assert expected == render("Hello")
 
 
@@ -116,9 +116,8 @@ def test_inspect_builtin_function():
         "│ print(value, ..., sep=' ', end='\\n',           │\n"
         "│ file=sys.stdout, flush=False)                  │\n"
         "│                                                │\n"
-        "│ 29 attribute(s) not shown. Use                 │\n"
-        "│ inspect(<OBJECT>, all=True) to see all         │\n"
-        "│ attributes.                                    │\n"
+        "│ 29 attribute(s) not shown. Run                 │\n"
+        "│ inspect(inspect) for options.                  │\n"
         "╰────────────────────────────────────────────────╯\n"
     )
     assert expected == render(print)
@@ -139,6 +138,25 @@ def test_inspect_integer():
         "╰────────────────────────────╯\n"
     )
     assert expected == render(1)
+
+
+@skip_py36
+def test_inspect_integer_with_value():
+
+    expected = (
+        "╭────── <class 'int'> ───────╮\n"
+        "│ int([x]) -> integer        │\n"
+        "│ int(x, base=10) -> integer │\n"
+        "│                            │\n"
+        "│ 1                          │\n"
+        "│                            │\n"
+        "│ denominator = 1            │\n"
+        "│        imag = 0            │\n"
+        "│   numerator = 1            │\n"
+        "│        real = 1            │\n"
+        "╰────────────────────────────╯\n"
+    )
+    assert expected == render(1, value=True)
 
 
 @skip_py36

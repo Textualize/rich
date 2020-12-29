@@ -187,7 +187,7 @@ _BRACES: Dict[type, Callable[[Any], Tuple[str, str, str]]] = {
     frozenset: lambda _object: ("frozenset({", "})", "frozenset()"),
     list: lambda _object: ("[", "]", "[]"),
     set: lambda _object: ("{", "}", "set()"),
-    tuple: lambda _object: ("(", ")", "tuple()"),
+    tuple: lambda _object: ("(", ")", "()"),
 }
 _CONTAINERS = tuple(_BRACES.keys())
 _MAPPING_CONTAINERS = (dict, os._Environ)

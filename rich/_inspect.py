@@ -37,6 +37,7 @@ class Inspect(JupyterMixin):
         dunder (bool, optional): Show attributes starting with double underscore. Defaults to False.
         sort (bool, optional): Sort attributes alphabetically. Defaults to True.
         all (bool, optional): Show all attributes. Defaults to False.
+        value (bool, optional): Pretty print value of object. Defaults to True.
     """
 
     def __init__(
@@ -51,6 +52,7 @@ class Inspect(JupyterMixin):
         dunder: bool = False,
         sort: bool = True,
         all: bool = True,
+        value: bool = True,
     ) -> None:
         self.highlighter = ReprHighlighter()
         self.obj = obj
@@ -63,6 +65,7 @@ class Inspect(JupyterMixin):
         self.private = private or dunder
         self.dunder = dunder
         self.sort = sort
+        self.value = value
 
     def _make_title(self, obj: Any) -> Text:
         """Make a default title."""
@@ -151,6 +154,10 @@ class Inspect(JupyterMixin):
             yield doc_text
             yield ""
 
+        if self.value and not (isclass(obj) or callable(obj) or ismodule(obj)):
+            yield Pretty(obj, indent_guides=True, max_length=10, max_string=60)
+            yield ""
+
         for key, (error, value) in items:
             key_text = Text.assemble(
                 (
@@ -189,7 +196,7 @@ class Inspect(JupyterMixin):
         else:
             yield self.highlighter(
                 Text.from_markup(
-                    f"[i]{not_shown_count} attribute(s) not shown.[/i] Use inspect(<OBJECT>, all=True) to see all attributes."
+                    f"[i][b]{not_shown_count}[/b] attribute(s) not shown.[/i] Run [b][red]inspect[/red]([not b]inspect[/])[/b] for options."
                 )
             )
 
