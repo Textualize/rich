@@ -85,7 +85,7 @@ def install(
             )
             builtins._ = value  # type: ignore
 
-    def ipy_display_hook(value: Any) -> None:
+    def ipy_display_hook(value: Any) -> None:  # pragma: no cover
         assert console is not None
         # always skip rich generated jupyter renderables or None values
         if isinstance(value, JupyterRenderable) or value is None:
