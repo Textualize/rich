@@ -126,9 +126,9 @@ Print / log
 The Progress class will create an internal Console object which you can access via ``progress.console``. If you print or log to this console, the output will be displayed *above* the progress display. Here's an example::
 
     with Progress() as progress:
-        task = progress.add_task(total=10)
+        task = progress.add_task("twiddling thumbs", total=10)
         for job in range(10):
-            progress.console.print("Working on job #{job}")
+            progress.console.print(f"Working on job #{job}")
             run_job(job)
             progress.advance(task)
 
