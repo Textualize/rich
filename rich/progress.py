@@ -26,11 +26,13 @@ from typing import (
 from . import filesize, get_console
 from .console import (
     Console,
+    ConsoleOptions,
     ConsoleRenderable,
     JustifyMethod,
     RenderableType,
     RenderGroup,
     RenderHook,
+    RenderResult,
 )
 from .control import Control
 from .file_proxy import FileProxy
@@ -1023,6 +1025,41 @@ class Progress(JupyterMixin, RenderHook):
                 self._live_render,
             ]
         return renderables
+
+
+class ProgressComponent(Progress):
+    """Renders a progress bar without auto-updating.
+
+    Args:
+        speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
+        get_time: (Callable, optional): A callable that gets the current time, or None to use Console.get_time. Defaults to None.
+    """
+
+    def __init__(
+        self,
+        *columns: Union[str, ProgressColumn],
+        speed_estimate_period: float = 30.0,
+        get_time: GetTimeCallable = None,
+    ) -> None:
+        super().__init__(
+            *columns,
+            console=None,
+            auto_refresh=False,
+            speed_estimate_period=speed_estimate_period,
+            transient=False,
+            redirect_stdout=False,
+            redirect_stderr=False,
+            get_time=get_time,
+            disable=True,
+        )
+
+    def refresh(self) -> None:
+        pass
+
+    def __rich_console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
+        return self.make_tasks_table(self.tasks).__rich_console__(console, options)
 
 
 if __name__ == "__main__":  # pragma: no coverage

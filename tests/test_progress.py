@@ -15,6 +15,7 @@ from rich.progress import (
     DownloadColumn,
     TransferSpeedColumn,
     Progress,
+    ProgressComponent,
     Task,
     TextColumn,
     TimeElapsedColumn,
@@ -420,6 +421,27 @@ def test_progress_max_refresh() -> None:
     assert (
         result
         == "\x1b[?25l\r\x1b[2Kstart\r\x1b[2Kstart\r\x1b[2Ktick 1\r\x1b[2Ktick 1\r\x1b[2Ktick 3\r\x1b[2Ktick 3\r\x1b[2Ktick 5\r\x1b[2Ktick 5\n\x1b[?25h"
+    )
+
+
+def test_component():
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=60,
+        color_system="truecolor",
+        legacy_windows=False,
+    )
+    console.begin_capture()
+    progress = ProgressComponent()
+    task = progress.add_task("test")
+    progress.refresh()  # this should no-op
+    progress.update(task, completed=50)
+    console.print(progress)
+    result = console.end_capture()
+    assert (
+        result
+        == "test \x1b[38;2;249;38;114m━━━━━━━━━━━━━━━━━━━━\x1b[0m\x1b[38;5;237m╺\x1b[0m\x1b[38;5;237m━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[35m 50%\x1b[0m \x1b[36m-:--:--\x1b[0m\n"
     )
 
 

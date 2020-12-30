@@ -52,6 +52,30 @@ Here's a simple example::
 The ``total`` value associated with a task is the number of steps that must be completed for the progress to reach 100%. A *step* in this context is whatever makes sense for your application; it could be number of bytes of a file read, or number of images processed, etc.
 
 
+Combining with Live
+~~~~~~~~~~~~~~~~~~~
+
+If you would like to use a progress bar with the :class:`~rich.live.Live` to create complex updating dashboards, you should instead use the :class:`~rich.progress.ProgressComponent`.
+
+
+Here's a simple example::
+
+    import time
+
+    from rich.console import RenderGroup
+    from rich.live import Live
+    from rich.progress import ProgressComponent
+    from rich.table import Table
+
+    table = Table("1", "2", "3")
+    progress = ProgressComponent()
+    display = RenderGroup(table, progress)
+
+    with Live(display) as live:
+        for step in progress.track(range(10), description="Updating"):
+            table.add_row(str(step))
+            time.sleep(1)
+
 Updating tasks
 ~~~~~~~~~~~~~~
 
@@ -140,7 +164,7 @@ If you have another Console object you want to use, pass it in to the :class:`~r
     with Progress(console=my_console) as progress:
         my_console.print("[bold blue]Starting work!")
         do_work(progress)
-        
+
 
 Redirecting stdout / stderr
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -158,7 +182,7 @@ If the :class:`~rich.progress.Progress` class doesn't offer exactly what you nee
 
     class MyProgress(Progress):
         def get_renderables(self):
-            yield Panel(self.make_tasks_table(self.tasks))            
+            yield Panel(self.make_tasks_table(self.tasks))
 
 Example
 -------
