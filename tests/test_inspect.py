@@ -143,20 +143,10 @@ def test_inspect_integer():
 @skip_py36
 def test_inspect_integer_with_value():
 
-    expected = (
-        "╭────── <class 'int'> ───────╮\n"
-        "│ int([x]) -> integer        │\n"
-        "│ int(x, base=10) -> integer │\n"
-        "│                            │\n"
-        "│ 1                          │\n"
-        "│                            │\n"
-        "│ denominator = 1            │\n"
-        "│        imag = 0            │\n"
-        "│   numerator = 1            │\n"
-        "│        real = 1            │\n"
-        "╰────────────────────────────╯\n"
-    )
-    assert expected == render(1, value=True)
+    expected = "╭────── <class 'int'> ───────╮\n│ int([x]) -> integer        │\n│ int(x, base=10) -> integer │\n│                            │\n│ ╭────────────────────────╮ │\n│ │ 1                      │ │\n│ ╰────────────────────────╯ │\n│                            │\n│ denominator = 1            │\n│        imag = 0            │\n│   numerator = 1            │\n│        real = 1            │\n╰────────────────────────────╯\n"
+    value = render(1, value=True)
+    print(repr(value))
+    assert expected == value
 
 
 @skip_py36

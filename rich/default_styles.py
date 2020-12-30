@@ -44,6 +44,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "inspect.equals": Style(),
     "inspect.help": Style(color="cyan"),
     "inspect.doc": Style(dim=True),
+    "inspect.value.border": Style(color="green"),
     "live.ellipsis": Style(bold=True, color="red"),
     "logging.keyword": Style(bold=True, color="yellow"),
     "logging.level.notset": Style(dim=True),
