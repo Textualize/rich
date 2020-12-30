@@ -155,7 +155,10 @@ class Inspect(JupyterMixin):
             yield ""
 
         if self.value and not (isclass(obj) or callable(obj) or ismodule(obj)):
-            yield Pretty(obj, indent_guides=True, max_length=10, max_string=60)
+            yield Panel(
+                Pretty(obj, indent_guides=True, max_length=10, max_string=60),
+                border_style="inspect.value.border",
+            )
             yield ""
 
         for key, (error, value) in items:
