@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from textwrap import indent
 from traceback import walk_tb
 from types import TracebackType
-from typing import Callable, Dict, List, Optional, Type
+from typing import Callable, Dict, Iterable, List, Optional, Type
 
 from pygments.lexers import guess_lexer_for_filename
 from pygments.token import (
@@ -283,7 +283,8 @@ class Traceback:
 
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
-                filename = os.path.abspath(filename) if filename else "?"
+                if filename and not filename.startswith("<"):
+                    filename = os.path.abspath(filename) if filename else "?"
                 frame = Frame(
                     filename=filename,
                     lineno=line_no,
@@ -447,6 +448,16 @@ class Traceback:
                 code_cache[filename] = code
             return code
 
+        def render_locals(frame: Frame) -> Iterable[ConsoleRenderable]:
+            if frame.locals:
+                yield render_scope(
+                    frame.locals,
+                    title="locals",
+                    indent_guides=self.indent_guides,
+                    max_length=self.locals_max_length,
+                    max_string=self.locals_max_string,
+                )
+
         for first, frame in loop_first(stack.frames):
             text = Text.assemble(
                 path_highlighter(Text(frame.filename, style="pygments.string")),
@@ -460,6 +471,7 @@ class Traceback:
                 yield ""
             yield text
             if frame.filename.startswith("<"):
+                yield from render_locals(frame)
                 continue
             try:
                 code = read_code(frame.filename)
@@ -487,13 +499,7 @@ class Traceback:
                     Columns(
                         [
                             syntax,
-                            render_scope(
-                                frame.locals,
-                                title="locals",
-                                indent_guides=self.indent_guides,
-                                max_length=self.locals_max_length,
-                                max_string=self.locals_max_string,
-                            ),
+                            *render_locals(frame),
                         ],
                         padding=1,
                     )

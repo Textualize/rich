@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Progress.TimeElapsedColumn
 
+### Fixed
+
+- Fixed display of locals in Traceback for stdin
+
 ## [9.5.1] - 2020-12-19
 
 ### Fixed

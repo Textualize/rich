@@ -134,3 +134,12 @@ def test_tuples():
     print(repr(result))
     expected = "(1,)\n(\n│   1,\n)\n(\n│   (\n│   │   1,\n│   ),\n)\n"
     assert result == expected
+
+
+def test_newline():
+    console = Console(color_system=None)
+    console.begin_capture()
+    console.print(Pretty((1,), insert_line=True, expand_all=True))
+    result = console.end_capture()
+    expected = "\n(\n    1,\n)\n"
+    assert result == expected

@@ -64,6 +64,7 @@ def install(
     from .console import ConsoleRenderable  # needed here to prevent circular import
 
     console = console or get_console()
+    assert console is not None
 
     def display_hook(value: Any) -> None:
         """Replacement sys.displayhook which prettifies objects with Rich."""
@@ -95,8 +96,7 @@ def install(
             return
 
         # certain renderables should start on a new line
-        requires_newline = (ConsoleRenderable, abc.Mapping, abc.Sequence, abc.Set)
-        if isinstance(value, requires_newline):
+        if isinstance(value, ConsoleRenderable):
             console.line()
 
         console.print(
@@ -109,6 +109,7 @@ def install(
                 max_length=max_length,
                 max_string=max_string,
                 expand_all=expand_all,
+                margin=12,
             ),
             crop=crop,
         )
@@ -140,6 +141,8 @@ class Pretty:
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
         expand_all (bool, optional): Expand all containers. Defaults to False.
+        margin (int, optional): Subtrace a margin from width to force containers to expand earlier. Defaults to 0.
+        insert_line (bool, optional): Insert a new line if the output has multiple new lines. Defaults to False.
     """
 
     def __init__(
@@ -155,6 +158,8 @@ class Pretty:
         max_length: int = None,
         max_string: int = None,
         expand_all: bool = False,
+        margin: int = 0,
+        insert_line: bool = False,
     ) -> None:
         self._object = _object
         self.highlighter = highlighter or ReprHighlighter()
@@ -166,13 +171,15 @@ class Pretty:
         self.max_length = max_length
         self.max_string = max_string
         self.expand_all = expand_all
+        self.margin = margin
+        self.insert_line = insert_line
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         pretty_str = pretty_repr(
             self._object,
-            max_width=options.max_width,
+            max_width=options.max_width - self.margin,
             indent_size=self.indent_size,
             max_length=self.max_length,
             max_string=self.max_string,
@@ -190,6 +197,8 @@ class Pretty:
             pretty_text = pretty_text.with_indent_guides(
                 self.indent_size, style="repr.indent"
             )
+        if self.insert_line and "\n" in pretty_text:
+            yield ""
         yield pretty_text
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
