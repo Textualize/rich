@@ -55,7 +55,9 @@ The ``total`` value associated with a task is the number of steps that must be c
 Combining with Live
 ~~~~~~~~~~~~~~~~~~~
 
-If you would like to use a progress bar with the :class:`~rich.live.Live` to create complex updating dashboards, you should instead use the :class:`~rich.progress.ProgressComponent`.
+If you would like to use a progress bar with :class:`~rich.live.Live` to create complex updating dashboards,
+then you must use :class:`~rich.progress.ProgressComponent`. It has all of the functionality of
+:class:`~rich.progress.Progress` except auto-refreshing which is handled by :class:`~rich.live.Live`.
 
 
 Here's a simple example::
