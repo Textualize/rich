@@ -3,9 +3,9 @@ rich.progress
 
 .. automodule:: rich.progress
     :members:
-    :exclude-members: ProgressComponent
+    :exclude-members: RenderableProgress
 
 
-    .. autoclass:: ProgressComponent
-        :members:
-        :inherited-members:
+.. autoclass:: rich.progress.RenderableProgress
+    :members:
+    :inherited-members:

@@ -56,8 +56,8 @@ Combining with Live
 ~~~~~~~~~~~~~~~~~~~
 
 If you would like to use a progress bar with :class:`~rich.live.Live` to create complex updating dashboards,
-then you must use :class:`~rich.progress.ProgressComponent`. It has all of the functionality of
-:class:`~rich.progress.Progress` except auto-refreshing which is handled by :class:`~rich.live.Live`.
+then you must not use `with` for :class:`~rich.progress.Progress`. Instead you allow :class:`~rich.live.Live`
+to handle the auto-refreshing and create progress with :meth:`Progress.renderable() <rich.progress.Progress.renderable>`.
 
 
 Here's a simple example::
@@ -66,11 +66,11 @@ Here's a simple example::
 
     from rich.console import RenderGroup
     from rich.live import Live
-    from rich.progress import ProgressComponent
+    from rich.progress import Progress
     from rich.table import Table
 
     table = Table("1", "2", "3")
-    progress = ProgressComponent()
+    progress = Progress.renderable()
     display = RenderGroup(table, progress)
 
     with Live(display) as live:

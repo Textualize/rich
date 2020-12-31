@@ -613,6 +613,27 @@ class Progress(JupyterMixin, RenderHook):
         self._restore_stderr: Optional[IO[str]] = None
         self.ipy_widget: Optional[Any] = None
 
+    @staticmethod
+    def renderable(
+        *columns: Union[str, ProgressColumn],
+        speed_estimate_period: float = 30.0,
+        get_time: GetTimeCallable = None,
+    ) -> "RenderableProgress":
+        """Return a renderable progress
+
+        Args:
+            speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
+            get_time: (Callable, optional): A callable that gets the current time, or None to use Console.get_time. Defaults to None.
+
+        Returns:
+            Progress: A renderable progress
+        """
+        return RenderableProgress(
+            *columns,
+            get_time=get_time,
+            speed_estimate_period=speed_estimate_period,
+        )
+
     @property
     def tasks(self) -> List[Task]:
         """Get a list of Task instances."""
@@ -898,30 +919,31 @@ class Progress(JupyterMixin, RenderHook):
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
-        if not self.disable:
-            if self.console.is_jupyter:  # pragma: no cover
-                try:
-                    from IPython.display import display
-                    from ipywidgets import Output
-                except ImportError:
-                    import warnings
+        if self.disable:
+            return
+        if self.console.is_jupyter:  # pragma: no cover
+            try:
+                from IPython.display import display
+                from ipywidgets import Output
+            except ImportError:
+                import warnings
 
-                    warnings.warn('install "ipywidgets" for Jupyter support')
-                else:
-                    with self._lock:
-                        if self.ipy_widget is None:
-                            self.ipy_widget = Output()
-                            display(self.ipy_widget)
-
-                        with self.ipy_widget:
-                            self.ipy_widget.clear_output(wait=True)
-                            self.console.print(self.get_renderable())
-
-            elif self.console.is_terminal and not self.console.is_dumb_terminal:
+                warnings.warn('install "ipywidgets" for Jupyter support')
+            else:
                 with self._lock:
-                    self._live_render.set_renderable(self.get_renderable())
-                    with self.console:
-                        self.console.print(Control(""))
+                    if self.ipy_widget is None:
+                        self.ipy_widget = Output()
+                        display(self.ipy_widget)
+
+                    with self.ipy_widget:
+                        self.ipy_widget.clear_output(wait=True)
+                        self.console.print(self.get_renderable())
+
+        elif self.console.is_terminal and not self.console.is_dumb_terminal:
+            with self._lock:
+                self._live_render.set_renderable(self.get_renderable())
+                with self.console:
+                    self.console.print(Control(""))
 
     def get_renderable(self) -> RenderableType:
         """Get a renderable for the progress display."""
@@ -1027,30 +1049,21 @@ class Progress(JupyterMixin, RenderHook):
         return renderables
 
 
-class ProgressComponent(Progress):
-    """Renders a progress bar without auto-updating.
-
-    Args:
-        speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
-        get_time: (Callable, optional): A callable that gets the current time, or None to use Console.get_time. Defaults to None.
-    """
-
+class RenderableProgress(Progress):
     def __init__(
         self,
         *columns: Union[str, ProgressColumn],
         speed_estimate_period: float = 30.0,
-        get_time: GetTimeCallable = None,
+        get_time: Optional[GetTimeCallable] = None,
     ) -> None:
         super().__init__(
             *columns,
-            console=None,
-            auto_refresh=False,
-            speed_estimate_period=speed_estimate_period,
-            transient=False,
-            redirect_stdout=False,
-            redirect_stderr=False,
             get_time=get_time,
+            speed_estimate_period=speed_estimate_period,
             disable=True,
+            auto_refresh=False,
+            redirect_stderr=False,
+            redirect_stdout=False,
         )
 
     def refresh(self) -> None:

@@ -1,6 +1,7 @@
 # encoding=utf-8
 
 import io
+from rich import errors
 from time import sleep
 
 import pytest
@@ -15,7 +16,6 @@ from rich.progress import (
     DownloadColumn,
     TransferSpeedColumn,
     Progress,
-    ProgressComponent,
     Task,
     TextColumn,
     TimeElapsedColumn,
@@ -424,7 +424,7 @@ def test_progress_max_refresh() -> None:
     )
 
 
-def test_component():
+def test_renderable():
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
@@ -432,12 +432,13 @@ def test_component():
         color_system="truecolor",
         legacy_windows=False,
     )
+
+    renderable_progress = Progress.renderable()
+    task = renderable_progress.add_task("test")
     console.begin_capture()
-    progress = ProgressComponent()
-    task = progress.add_task("test")
-    progress.refresh()  # this should no-op
-    progress.update(task, completed=50)
-    console.print(progress)
+    renderable_progress.update(task, completed=50)
+    renderable_progress.refresh()  # esnure no-op
+    console.print(renderable_progress)
     result = console.end_capture()
     assert (
         result
