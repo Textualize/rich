@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed encoding error on Windows when loading code on Windows
+- Fixed encoding error on Windows when loading code for Tracebacks
 
 ## [9.6.0] - 2020-12-30
 
