@@ -1066,6 +1066,12 @@ class RenderableProgress(Progress):
             redirect_stdout=False,
         )
 
+    def start(self) -> None:
+        pass
+
+    def stop(self) -> None:
+        pass
+
     def refresh(self) -> None:
         pass
 
