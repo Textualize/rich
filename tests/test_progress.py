@@ -424,6 +424,24 @@ def test_progress_max_refresh() -> None:
     )
 
 
+def test_disable():
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=60,
+        color_system="truecolor",
+        legacy_windows=False,
+    )
+
+    with Progress(disable=True, console=console, auto_refresh=False) as progress:
+        console.begin_capture()
+        task = progress.add_task("test")
+        progress.update(task, completed=50)
+        output = console.end_capture()
+
+    assert output == ""
+
+
 def test_renderable():
     console = Console(
         file=io.StringIO(),
