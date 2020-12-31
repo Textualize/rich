@@ -443,7 +443,9 @@ class Traceback:
             """
             code = code_cache.get(filename)
             if code is None:
-                with open(filename, "rt") as code_file:
+                with open(
+                    filename, "rt", encoding="utf-8", errors="replace"
+                ) as code_file:
                     code = code_file.read()
                 code_cache[filename] = code
             return code
@@ -492,8 +494,10 @@ class Traceback:
                     indent_guides=self.indent_guides,
                 )
                 yield ""
-            except Exception:
-                pass
+            except Exception as error:
+                yield Text.assemble(
+                    (f"{error.__class__.__name__}: {error}", "traceback.error"),
+                )
             else:
                 yield (
                     Columns(
