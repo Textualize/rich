@@ -454,8 +454,9 @@ def test_renderable():
     renderable_progress = Progress.renderable()
     task = renderable_progress.add_task("test")
     console.begin_capture()
-    renderable_progress.update(task, completed=50)
-    renderable_progress.refresh()  # esnure no-op
+    with renderable_progress:
+        renderable_progress.update(task, completed=50)
+        renderable_progress.refresh()  # esnure no-op
     console.print(renderable_progress)
     result = console.end_capture()
     assert (
