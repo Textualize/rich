@@ -40,6 +40,17 @@ class Segment(NamedTuple):
         """Get cell length of segment."""
         return 0 if self.is_control else cell_len(self.text)
 
+    def with_style(self, style: Style) -> "Segment":
+        """Get a copy of the segment with a new style.
+
+        Args:
+            style (Style): New style to set.
+
+        Returns:
+            Segment: New segment instance.
+        """
+        return Segment(self.text, style, self.is_control)
+
     @classmethod
     def control(cls, text: str, style: Optional[Style] = None) -> "Segment":
         """Create a Segment with control codes.
