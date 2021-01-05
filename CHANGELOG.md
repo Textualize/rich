@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed markup escaping edge case https://github.com/willmcgugan/rich/issues/878
+- Double tag escape, i.e. `"\\[foo]"` results in a backslash plus `[foo]` tag
 
 ## [9.6.1] - 2020-12-31
 
