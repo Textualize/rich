@@ -3,20 +3,35 @@ from typing import Iterable, List, NamedTuple, Tuple
 from .console import Console, ConsoleOptions, RenderResult, RenderableType
 from ._loop import loop_first, loop_last
 from .segment import Segment
-from .style import Style, StyleType
+from .style import Style, StyleStack, StyleType
+from .styled import Styled
 
 
 class Tree:
     def __init__(
-        self, renderable: RenderableType, line_style: StyleType = "tree.line"
+        self,
+        renderable: RenderableType,
+        style: StyleType = "tree",
+        guide_style: StyleType = "tree.line",
+        expanded=True,
     ) -> None:
         self.renderable = renderable
-        self.line_style = line_style
+        self.style = style
+        self.guide_style = guide_style
         self.children: List[Tree] = []
+        self.expanded = expanded
 
-    def add(self, renderable: RenderableType, line_style: StyleType = None) -> "Tree":
+    def add(
+        self,
+        renderable: RenderableType,
+        *,
+        style: StyleType = None,
+        guide_style: StyleType = None
+    ) -> "Tree":
         node = Tree(
-            renderable, line_style=self.line_style if line_style is None else line_style
+            renderable,
+            style=self.style if style is None else style,
+            guide_style=self.guide_style if guide_style is None else guide_style,
         )
         self.children.append(node)
         return node
@@ -30,15 +45,32 @@ class Tree:
         push = stack.append
         new_line = Segment.line()
 
-        line_style = console.get_style(self.line_style)
-        SPACE, CONTINUE, FORK, END = [
-            Segment("    ", line_style),
-            Segment("│   ", line_style),
-            Segment("├── ", line_style),
-            Segment("└── ", line_style),
+        get_style = console.get_style
+        guide_style = get_style(self.guide_style)
+        SPACE, CONTINUE, FORK, END = range(4)
+
+        ASCII_GUIDES = ("    ", "|   ", "+-- ", "`-- ")
+        TREE_GUIDES = [
+            ("    ", "│   ", "├── ", "└── "),
+            ("    ", "┃   ", "┣━━ ", "┗━━ "),
+            ("    ", "║   ", "╠══ ", "╚══ "),
         ]
-        levels: List[Segment] = [SPACE]
+        _Segment = Segment
+
+        def make_guide(index: int, style: Style = None) -> Segment:
+            _style = guide_style if style is None else style
+            if options.ascii_only:
+                line = ASCII_GUIDES[index]
+            else:
+                guide = 1 if _style.bold else (2 if _style.underline2 else 0)
+                line = TREE_GUIDES[guide][index]
+            return _Segment(line, _style)
+
+        levels: List[Segment] = [make_guide(SPACE)]
         push(loop_last([self]))
+
+        guide_style_stack = StyleStack(get_style(self.guide_style))
+        style_stack = StyleStack(get_style(self.style))
 
         while stack:
             stack_node = pop()
@@ -47,36 +79,39 @@ class Tree:
             except StopIteration:
                 levels.pop()
                 if levels:
-                    levels[-1] = FORK
+                    guide_style = levels[-1].style
+                    levels[-1] = make_guide(FORK)
+                    guide_style_stack.pop()
+                    style_stack.pop()
                 continue
             push(stack_node)
             if last:
-                levels[-1] = END.with_style(levels[-1].style)
-            line_style = console.get_style(node.line_style)
+                levels[-1] = make_guide(END, levels[-1].style)
 
-            lines_length = sum(level.cell_length for level in levels[1:])
+            guide_style = guide_style_stack.current + get_style(node.guide_style)
+            style = style_stack.current + get_style(node.style)
+
             renderable_lines = console.render_lines(
-                node.renderable,
-                options.update(width=options.max_width - lines_length),
+                Styled(node.renderable, style),
+                options.update(
+                    width=options.max_width
+                    - sum(level.cell_length for level in levels[1:])
+                ),
             )
 
             prefix = levels[1:]
             for first, line in loop_first(renderable_lines):
-                yield from prefix
+                yield from _Segment.apply_style(prefix, style.background_style)
                 yield from line
                 yield new_line
                 if first:
-                    prefix = levels[1:-1] + [
-                        SPACE if last else CONTINUE.with_style(line_style)
-                    ]
+                    prefix = levels[1:-1] + [make_guide(SPACE if last else CONTINUE)]
 
-            if node.children:
-                levels[-1] = SPACE if last else CONTINUE
-                levels.append(
-                    END.with_style(line_style)
-                    if len(node.children) == 1
-                    else FORK.with_style(line_style)
-                )
+            if node.expanded and node.children:
+                levels[-1] = make_guide(SPACE if last else CONTINUE, levels[-1].style)
+                levels.append(make_guide(END if len(node.children) == 1 else FORK))
+                style_stack.push(get_style(node.style))
+                guide_style_stack.push(get_style(node.guide_style))
                 push(loop_last(node.children))
 
 
@@ -88,7 +123,7 @@ class Tree:
 #     tree = Tree("Root")
 #     foo_node = tree.add("Foo")
 #     foo_node.add("1")
-#     two_node = foo_node.add("2", line_style="red")
+#     two_node = foo_node.add("2", guide_style="red")
 #     two_node.add(Panel("hello"))
 #     two_node.add("[bold magenta]World!").add("foo").add("bar")
 #     foo_node.add("3")
@@ -135,14 +170,17 @@ class Segment(NamedTuple):
 """
     )
 
-    root = Tree(":open_file_folder: The Root node", line_style="cyan")
+    root = Tree(":open_file_folder: The Root node")
 
     node = root.add(":file_folder: Renderables")
-    simple_node = node.add(":file_folder: [bold red]Atomic", line_style="green")
+    simple_node = node.add(":file_folder: [bold red]Atomic", guide_style="uu green")
     simple_node.add(RenderGroup("📄 Syntax", syntax))
     simple_node.add(RenderGroup("📄 Markdown", markdown))
 
-    containers_node = node.add(":file_folder: [bold red]Containers", line_style="blue")
+    containers_node = node.add(
+        ":file_folder: [bold red]Containers", guide_style="bold magenta"
+    )
+    containers_node.expanded = True
     panel = Panel.fit("Just a panel", border_style="red")
     containers_node.add(RenderGroup("📄 Panels", panel))
 
