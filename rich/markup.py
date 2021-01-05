@@ -9,6 +9,7 @@ from ._emoji_replace import _emoji_replace
 
 RE_TAGS = re.compile(
     r"""
+((?:\\\\)+)|
 (\\\[)|
 \[([a-z#\/].*?)\]
 """,
@@ -60,11 +61,13 @@ def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
     """
     position = 0
     for match in RE_TAGS.finditer(markup):
-        (escape_open, tag_text) = match.groups()
+        (escape_escape, escape_open, tag_text) = match.groups()
         start, end = match.span()
         if start > position:
             yield start, markup[position:start], None
-        if escape_open:
+        if escape_escape:
+            yield start, escape_escape.replace("\\\\", "\\"), None
+        elif escape_open:
             yield start, "[", None
         else:
             text, equals, parameters = tag_text.partition("=")
@@ -77,7 +80,12 @@ def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
         yield position, markup[position:], None
 
 
-def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Text:
+def render(
+    markup: str,
+    style: Union[str, Style] = "",
+    emoji: bool = True,
+    _re_require_parse=re.compile(r"[\[\\]").search,
+) -> Text:
     """Render console markup in to a Text instance.
 
     Args:
@@ -91,7 +99,7 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
         Text: A test instance.
     """
     emoji_replace = _emoji_replace
-    if "[" not in markup:
+    if _re_require_parse(markup) is None:
         return Text(emoji_replace(markup) if emoji else markup, style=style)
     text = Text(style=style)
     append = text.append
@@ -149,20 +157,29 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
     return text
 
 
-if __name__ == "__main__":  # pragma: no cover
-    # from rich import print
-    from rich.console import Console
-    from rich.text import Text
+# if __name__ == "__main__":  # pragma: no cover
+#     # from rich import print
+#     from rich.console import Console
+#     from rich.text import Text
 
-    console = Console(highlight=False)
+#     console = Console(highlight=False)
 
-    # t = Text.from_markup('Hello [link="https://www.willmcgugan.com"]W[b]o[/b]rld[/]!')
-    # print(repr(t._spans))
+#     # t = Text.from_markup('Hello [link="https://www.willmcgugan.com"]W[b]o[/b]rld[/]!')
+#     # print(repr(t._spans))
 
-    console.print("Hello [1], [1,2,3] ['hello']")
-    console.print("foo")
-    console.print("Hello [link=https://www.willmcgugan.com]W[b]o[/b]rld[/]!")
+#     console.print("Hello [1], [1,2,3] ['hello']")
+#     console.print("foo")
+#     console.print("Hello [link=https://www.willmcgugan.com]W[b]o[/b]rld[/]!")
 
-    # console.print("[bold]1 [not bold]2[/] 3[/]")
+#     # console.print("[bold]1 [not bold]2[/] 3[/]")
 
-    # console.print("[green]XXX[blue]XXX[/]XXX[/]")
+#     # console.print("[green]XXX[blue]XXX[/]XXX[/]")
+
+
+if __name__ == "__main__":
+    from rich import print
+
+    test = r"\\[bold]some text[/]'"
+    test = r"\\\\"
+    print(list(_parse(test)))
+    print(test)

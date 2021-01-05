@@ -106,3 +106,21 @@ def test_markup_error():
         assert render("foo[/bar]")
     with pytest.raises(MarkupError):
         assert render("[foo]hello[/bar]")
+
+
+def test_escape_escape():
+    # escaped escapes (i.e. double backslash)should be treated as literal
+    result = render(r"\\[bold]FOO[/bold]")
+    assert str(result) == "\\FOO"
+
+    result = render(r"\[bold]FOO\[/bold]")
+    assert str(result) == "[bold]FOO[/bold]"
+
+    result = render(r"\\[bold]some text[/]")
+    assert str(result) == "\\some text"
+
+    result = render(r"\\")
+    assert str(result) == "\\"
+
+    result = render(r"\\\\")
+    assert str(result) == "\\\\"
