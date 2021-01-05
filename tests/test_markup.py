@@ -35,9 +35,9 @@ def test_parse():
         (16, None, Tag(name="bar", parameters=None)),
         (26, "world", None),
         (26, None, Tag(name="/", parameters=None)),
-        (29, "[", None),
-        (31, "escaped]", None),
+        (29, "[escaped]", None),
     ]
+    print(repr(result))
     assert result == expected
 
 
@@ -120,7 +120,7 @@ def test_escape_escape():
     assert str(result) == "\\some text"
 
     result = render(r"\\")
-    assert str(result) == "\\"
+    assert str(result) == r"\\"
 
     result = render(r"\\\\")
-    assert str(result) == "\\\\"
+    assert str(result) == r"\\\\"

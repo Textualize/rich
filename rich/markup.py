@@ -8,11 +8,7 @@ from ._emoji_replace import _emoji_replace
 
 
 RE_TAGS = re.compile(
-    r"""
-((?:\\\\)+)|
-(\\\[)|
-\[([a-z#\/].*?)\]
-""",
+    r"""((\\{0,2})\[([a-z#\/].*?)\])""",
     re.VERBOSE,
 )
 
@@ -61,31 +57,26 @@ def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
     """
     position = 0
     for match in RE_TAGS.finditer(markup):
-        (escape_escape, escape_open, tag_text) = match.groups()
+        full_text, escapes, tag_text = match.groups()
         start, end = match.span()
         if start > position:
             yield start, markup[position:start], None
-        if escape_escape:
-            yield start, escape_escape.replace("\\\\", "\\"), None
-        elif escape_open:
-            yield start, "[", None
+        if escapes == "\\":
+            # tag is escaped and much be treated as verbatim
+            yield start, full_text[1:], None
         else:
+            if escapes == "\\\\":
+                # Double escape treats the backslash as a literal
+                yield start, "\\", None
+                start += 2
             text, equals, parameters = tag_text.partition("=")
-            if equals:
-                yield start, None, Tag(text, parameters)
-            else:
-                yield start, None, Tag(tag_text.strip(), None)
+            yield start, None, Tag(text, parameters if equals else None)
         position = end
     if position < len(markup):
         yield position, markup[position:], None
 
 
-def render(
-    markup: str,
-    style: Union[str, Style] = "",
-    emoji: bool = True,
-    _re_require_parse=re.compile(r"[\[\\]").search,
-) -> Text:
+def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Text:
     """Render console markup in to a Text instance.
 
     Args:
@@ -99,7 +90,7 @@ def render(
         Text: A test instance.
     """
     emoji_replace = _emoji_replace
-    if _re_require_parse(markup) is None:
+    if "[" not in markup:
         return Text(emoji_replace(markup) if emoji else markup, style=style)
     text = Text(style=style)
     append = text.append
@@ -157,29 +148,13 @@ def render(
     return text
 
 
-# if __name__ == "__main__":  # pragma: no cover
-#     # from rich import print
-#     from rich.console import Console
-#     from rich.text import Text
+if __name__ == "__main__":  # pragma: no cover
 
-#     console = Console(highlight=False)
+    from rich.console import Console
+    from rich.text import Text
 
-#     # t = Text.from_markup('Hello [link="https://www.willmcgugan.com"]W[b]o[/b]rld[/]!')
-#     # print(repr(t._spans))
+    console = Console(highlight=False)
 
-#     console.print("Hello [1], [1,2,3] ['hello']")
-#     console.print("foo")
-#     console.print("Hello [link=https://www.willmcgugan.com]W[b]o[/b]rld[/]!")
-
-#     # console.print("[bold]1 [not bold]2[/] 3[/]")
-
-#     # console.print("[green]XXX[blue]XXX[/]XXX[/]")
-
-
-if __name__ == "__main__":
-    from rich import print
-
-    test = r"\\[bold]some text[/]'"
-    test = r"\\\\"
-    print(list(_parse(test)))
-    print(test)
+    console.print("Hello [1], [1,2,3] ['hello']")
+    console.print("foo")
+    console.print("Hello [link=https://www.willmcgugan.com]W[b red]o[/]rld[/]!")
