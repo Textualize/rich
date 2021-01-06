@@ -8,7 +8,7 @@ from ._emoji_replace import _emoji_replace
 
 
 RE_TAGS = re.compile(
-    r"""((\\{0,2})\[([a-z#\/].*?)\])""",
+    r"""((\\*)\[([a-z#\/].*?)\])""",
     re.VERBOSE,
 )
 
@@ -36,7 +36,7 @@ class Tag(NamedTuple):
         )
 
 
-def escape(markup: str) -> str:
+def escape(markup: str, _escape=re.compile(r"(\\*)\[").sub) -> str:
     """Escapes text so that it won't be interpreted as markup.
 
     Args:
@@ -45,7 +45,13 @@ def escape(markup: str) -> str:
     Returns:
         str: Markup with square brackets escaped.
     """
-    return markup.replace("[", r"\[")
+
+    def escape_backslashes(match) -> str:
+        backslashes = match.group(1) or ""
+        return f"{backslashes}{backslashes}\\["
+
+    markup = _escape(escape_backslashes, markup)
+    return markup
 
 
 def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
@@ -61,16 +67,19 @@ def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
         start, end = match.span()
         if start > position:
             yield start, markup[position:start], None
-        if escapes == "\\":
-            # tag is escaped and much be treated as verbatim
-            yield start, full_text[1:], None
-        else:
-            if escapes == "\\\\":
-                # Double escape treats the backslash as a literal
-                yield start, "\\", None
-                start += 2
-            text, equals, parameters = tag_text.partition("=")
-            yield start, None, Tag(text, parameters if equals else None)
+        if escapes:
+            backslashes, escaped = divmod(len(escapes), 2)
+            if backslashes:
+                # Literal backslashes
+                yield start, "\\" * backslashes, None
+                start += backslashes * 2
+            if escaped:
+                # Escape of tag
+                yield start, full_text[len(escapes) :], None
+                position = end
+                continue
+        text, equals, parameters = tag_text.partition("=")
+        yield start, None, Tag(text, parameters if equals else None)
         position = end
     if position < len(markup):
         yield position, markup[position:], None
@@ -158,3 +167,10 @@ if __name__ == "__main__":  # pragma: no cover
     console.print("Hello [1], [1,2,3] ['hello']")
     console.print("foo")
     console.print("Hello [link=https://www.willmcgugan.com]W[b red]o[/]rld[/]!")
+
+    from rich import print
+
+    print(escape("[red]"))
+    print(escape(r"\[red]"))
+    print(escape(r"\\[red]"))
+    print(escape(r"\\\[red]"))

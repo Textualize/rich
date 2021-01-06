@@ -1,5 +1,6 @@
 import pytest
 
+from rich.console import Console
 from rich.markup import escape, MarkupError, _parse, render, Tag, RE_TAGS
 from rich.text import Span
 
@@ -24,6 +25,18 @@ def test_re_match():
 
 def test_escape():
     assert escape("foo[bar]") == r"foo\[bar]"
+    assert escape(r"foo\[bar]") == r"foo\\\[bar]"
+
+
+def test_render_escape():
+    console = Console(color_system=None)
+    console.begin_capture()
+    console.print(
+        escape(r"[red]"), escape(r"\[red]"), escape(r"\\[red]"), escape(r"\\\[red]")
+    )
+    result = console.end_capture()
+    expected = r"[red] \[red] \\[red] \\\[red]" + "\n"
+    assert result == expected
 
 
 def test_parse():
@@ -109,16 +122,23 @@ def test_markup_error():
 
 
 def test_escape_escape():
-    # escaped escapes (i.e. double backslash)should be treated as literal
-    result = render(r"\\[bold]FOO[/bold]")
-    assert str(result) == "\\FOO"
+    # Escaped escapes (i.e. double backslash)should be treated as literal
+    result = render(r"\\[bold]FOO")
+    assert str(result) == r"\FOO"
 
-    result = render(r"\[bold]FOO\[/bold]")
-    assert str(result) == "[bold]FOO[/bold]"
+    # Single backslash makes the tag literal
+    result = render(r"\[bold]FOO")
+    assert str(result) == "[bold]FOO"
 
+    # Double backslash produces a backslash
     result = render(r"\\[bold]some text[/]")
-    assert str(result) == "\\some text"
+    assert str(result) == r"\some text"
 
+    # Triple backslash parsed as literal backslash plus escaped tag
+    result = render(r"\\\[bold]some text\[/]")
+    assert str(result) == r"\[bold]some text[/]"
+
+    # Backslash escaping only happens when preceding a tag
     result = render(r"\\")
     assert str(result) == r"\\"
 
