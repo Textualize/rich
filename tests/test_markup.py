@@ -29,7 +29,7 @@ def test_escape():
 
 
 def test_render_escape():
-    console = Console(color_system=None)
+    console = Console(width=80, color_system=None)
     console.begin_capture()
     console.print(
         escape(r"[red]"), escape(r"\[red]"), escape(r"\\[red]"), escape(r"\\\[red]")
