@@ -25,6 +25,15 @@ There is a shorthand for closing a style. If you omit the style name from the cl
     print("[bold red]Bold and red[/] not bold or red")
 
 
+Errors
+~~~~~~
+
+Rich will raise :class:`~rich.errors.MarkupError` if the markup contains one of the following errors:
+
+- Mismatched tags, e.g. ``"[bold]Hello[/red]"``
+- No matching tag for implicit close, e.g. ``"no tags[/]"``
+
+
 Links
 ~~~~~
 
@@ -38,13 +47,25 @@ If your terminal software supports hyperlinks, you will be able to click the wor
 Escaping
 ~~~~~~~~
 
-Occasionally you may want to print something that Rich would interpret as markup. You can *escape* a tag by preceding it with backslash. Here's an example::
+Occasionally you may want to print something that Rich would interpret as markup. You can *escape* a tag by preceding it with a backslash. Here's an example::
 
     >>> from rich import print
-    >>> print("foo\[bar]")
+    >>> print(r"foo\[bar]")
     foo[bar]
 
+If you want to prevent the backslash from escaping the tag, you can precede it with two slashes.
+
 The function :func:`~rich.markup.escape` will handle escaping of text for you.
+
+Escaping is important if you construct console markup dynamically, with ``str.format`` or f strings (for example). Without escaping it may be possible to inject tags where you don't want them. Consider the following function::
+
+    def greet(name):
+        console.print(f"Hello {name}!")
+
+Calling ``greet("Will")`` will print a greeting, but if you were to call ``greet("[blink]Gotcha![/blink]"])`` then you will also get blinking text, which may not be desirable. The solution is to escape the arguments::
+
+    def greet(name):
+        console.print(f"Hello {escape(name)}!")
 
 Rendering Markup
 ----------------
