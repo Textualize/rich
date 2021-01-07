@@ -1,5 +1,5 @@
 import re
-from typing import Iterable, List, NamedTuple, Optional, Tuple, Union
+from typing import Iterable, List, Match, NamedTuple, Optional, Tuple, Union
 
 from .errors import MarkupError
 from .style import Style
@@ -8,10 +8,7 @@ from ._emoji_replace import _emoji_replace
 
 
 RE_TAGS = re.compile(
-    r"""
-(\\\[)|
-\[([a-z#\/].*?)\]
-""",
+    r"""((\\*)\[([a-z#\/].*?)\])""",
     re.VERBOSE,
 )
 
@@ -39,7 +36,7 @@ class Tag(NamedTuple):
         )
 
 
-def escape(markup: str) -> str:
+def escape(markup: str, _escape=re.compile(r"(\\*)(\[[a-z#\/].*?\])").sub) -> str:
     """Escapes text so that it won't be interpreted as markup.
 
     Args:
@@ -48,7 +45,14 @@ def escape(markup: str) -> str:
     Returns:
         str: Markup with square brackets escaped.
     """
-    return markup.replace("[", r"\[")
+
+    def escape_backslashes(match: Match[str]) -> str:
+        """Called by re.sub replace matches."""
+        backslashes, text = match.groups()
+        return f"{backslashes}{backslashes}\\{text}"
+
+    markup = _escape(escape_backslashes, markup)
+    return markup
 
 
 def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
@@ -59,19 +63,26 @@ def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
 
     """
     position = 0
+    _divmod = divmod
+    _Tag = Tag
     for match in RE_TAGS.finditer(markup):
-        (escape_open, tag_text) = match.groups()
+        full_text, escapes, tag_text = match.groups()
         start, end = match.span()
         if start > position:
             yield start, markup[position:start], None
-        if escape_open:
-            yield start, "[", None
-        else:
-            text, equals, parameters = tag_text.partition("=")
-            if equals:
-                yield start, None, Tag(text, parameters)
-            else:
-                yield start, None, Tag(tag_text.strip(), None)
+        if escapes:
+            backslashes, escaped = _divmod(len(escapes), 2)
+            if backslashes:
+                # Literal backslashes
+                yield start, "\\" * backslashes, None
+                start += backslashes * 2
+            if escaped:
+                # Escape of tag
+                yield start, full_text[len(escapes) :], None
+                position = end
+                continue
+        text, equals, parameters = tag_text.partition("=")
+        yield start, None, _Tag(text, parameters if equals else None)
         position = end
     if position < len(markup):
         yield position, markup[position:], None
@@ -150,19 +161,19 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
 
 
 if __name__ == "__main__":  # pragma: no cover
-    # from rich import print
+
     from rich.console import Console
     from rich.text import Text
 
     console = Console(highlight=False)
 
-    # t = Text.from_markup('Hello [link="https://www.willmcgugan.com"]W[b]o[/b]rld[/]!')
-    # print(repr(t._spans))
-
     console.print("Hello [1], [1,2,3] ['hello']")
     console.print("foo")
-    console.print("Hello [link=https://www.willmcgugan.com]W[b]o[/b]rld[/]!")
+    console.print("Hello [link=https://www.willmcgugan.com]W[b red]o[/]rld[/]!")
 
-    # console.print("[bold]1 [not bold]2[/] 3[/]")
+    from rich import print
 
-    # console.print("[green]XXX[blue]XXX[/]XXX[/]")
+    print(escape("[red]"))
+    print(escape(r"\[red]"))
+    print(escape(r"\\[red]"))
+    print(escape(r"\\\[red]"))
