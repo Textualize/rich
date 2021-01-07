@@ -1,4 +1,4 @@
-from typing import Iterable, List, NamedTuple, Tuple
+from typing import Iterator, Iterable, List, NamedTuple, Tuple
 
 from .console import Console, ConsoleOptions, RenderResult, RenderableType
 from .jupyter import JupyterMixin
@@ -9,6 +9,15 @@ from .styled import Styled
 
 
 class Tree(JupyterMixin):
+    """A renderable for a tree structure.
+
+    Args:
+        renderable (RenderableType): The renderable or text for the root node.
+        style (StyleType, optional): Style of this tree. Defaults to "tree".
+        guide_style (StyleType, optional): Style of the guide lines. Defaults to "tree.line".
+        expanded (bool, optional): Also display children. Defaults to True.
+    """
+
     def __init__(
         self,
         renderable: RenderableType,
@@ -16,15 +25,6 @@ class Tree(JupyterMixin):
         guide_style: StyleType = "tree.line",
         expanded=True,
     ) -> None:
-        """A renderable for a tree structure.
-
-        Args:
-            renderable (RenderableType): The renderable or text for the root node.
-            style (StyleType, optional): Style of this tree. Defaults to "tree".
-            guide_style (StyleType, optional): Style of the guide lines. Defaults to "tree.line".
-            expanded (bool, optional): Also display children. Defaults to True.
-        """
-
         self.renderable = renderable
         self.style = style
         self.guide_style = guide_style
@@ -50,13 +50,13 @@ class Tree(JupyterMixin):
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
 
-        stack: List[Iterable[Tuple[bool, Tree]]] = []
+        stack: List[Iterator[Tuple[bool, Tree]]] = []
         pop = stack.pop
         push = stack.append
         new_line = Segment.line()
 
         get_style = console.get_style
-        guide_style = get_style(self.guide_style)
+        guide_style = get_style(self.guide_style) or Style.null()
         SPACE, CONTINUE, FORK, END = range(4)
 
         ASCII_GUIDES = ("    ", "|   ", "+-- ", "`-- ")
@@ -77,7 +77,7 @@ class Tree(JupyterMixin):
             return _Segment(line, _style)
 
         levels: List[Segment] = [make_guide(CONTINUE)]
-        push(loop_last([self]))
+        push(iter(loop_last([self])))
 
         guide_style_stack = StyleStack(get_style(self.guide_style))
         style_stack = StyleStack(get_style(self.style))
@@ -89,7 +89,7 @@ class Tree(JupyterMixin):
             except StopIteration:
                 levels.pop()
                 if levels:
-                    guide_style = levels[-1].style
+                    guide_style = levels[-1].style or Style.null()
                     levels[-1] = make_guide(FORK)
                     guide_style_stack.pop()
                     style_stack.pop()
@@ -100,16 +100,13 @@ class Tree(JupyterMixin):
 
             guide_style = guide_style_stack.current + get_style(node.guide_style)
             style = style_stack.current + get_style(node.style)
-
+            prefix = levels[1:]
             renderable_lines = console.render_lines(
                 Styled(node.renderable, style),
                 options.update(
-                    width=options.max_width
-                    - sum(level.cell_length for level in levels[1:])
+                    width=options.max_width - sum(level.cell_length for level in prefix)
                 ),
             )
-
-            prefix = levels[1:]
             for first, line in loop_first(renderable_lines):
                 if prefix:
                     yield from _Segment.apply_style(prefix, style.background_style)
@@ -125,7 +122,7 @@ class Tree(JupyterMixin):
                 levels.append(make_guide(END if len(node.children) == 1 else FORK))
                 style_stack.push(get_style(node.style))
                 guide_style_stack.push(get_style(node.guide_style))
-                push(loop_last(node.children))
+                push(iter(loop_last(node.children)))
 
 
 # if __name__ == "__main__":
@@ -176,26 +173,26 @@ class Segment(NamedTuple):
 
     markdown = Markdown(
         """\
-## Header 2
+### example.md
 > Hello, World!
 > 
 > Markdown _all_ the things
 """
     )
 
-    root = Tree(":open_file_folder: The Root node\n", guide_style="red")
+    root = Tree(":open_file_folder: The Root node", guide_style="red")
 
-    node = root.add(":file_folder: Renderables\n")
-    simple_node = node.add(":file_folder: [bold red]Atomic\n", guide_style="uu green")
+    node = root.add(":file_folder: Renderables")
+    simple_node = node.add(":file_folder: [bold red]Atomic", guide_style="uu green")
     simple_node.add(RenderGroup("📄 Syntax", syntax))
-    simple_node.add(RenderGroup("📄 Markdown", markdown))
+    simple_node.add(RenderGroup("📄 Markdown", Panel(markdown, border_style="green")))
 
     containers_node = node.add(
         ":file_folder: [bold red]Containers", guide_style="bold magenta"
     )
     containers_node.expanded = True
     panel = Panel.fit("Just a panel", border_style="red")
-    containers_node.add(RenderGroup("📄 Panels\n", panel))
+    containers_node.add(RenderGroup("📄 Panels", panel))
 
     containers_node.add(RenderGroup("📄 [b magenta]Table", table))
 

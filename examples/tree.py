@@ -13,7 +13,7 @@ from rich.tree import Tree
 def walk_directory(directory, tree):
     paths = sorted(
         pathlib.Path(directory).iterdir(),
-        key=lambda path: (path.name.lower(), path.is_file()),
+        key=lambda path: (path.is_file(), path.name.lower()),
     )
     for path in paths:
         if path.name.startswith("."):
