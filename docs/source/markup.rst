@@ -24,6 +24,9 @@ There is a shorthand for closing a style. If you omit the style name from the cl
 
     print("[bold red]Bold and red[/] not bold or red")
 
+These markup tags may be use in combination with each other and don't need to be strictly nested. The following examples demonstrates overlapping of markup tags:: 
+
+    print("[bold]Bold[italic] bold and italic [/bold] italic[/italic]")
 
 Errors
 ~~~~~~
@@ -53,7 +56,10 @@ Occasionally you may want to print something that Rich would interpret as markup
     >>> print(r"foo\[bar]")
     foo[bar]
 
-If you want to prevent the backslash from escaping the tag, you can precede it with two slashes.
+Without the backslash, Rich will assume that ``[bar]`` is a tag and remove it from the output if there is no "bar" style.
+
+.. note::
+    If you want to prevent the backslash from escaping the tag and output a literal backslash before a tag you can enter two backslashes.
 
 The function :func:`~rich.markup.escape` will handle escaping of text for you.
 
@@ -64,6 +70,7 @@ Escaping is important if you construct console markup dynamically, with ``str.fo
 
 Calling ``greet("Will")`` will print a greeting, but if you were to call ``greet("[blink]Gotcha![/blink]"])`` then you will also get blinking text, which may not be desirable. The solution is to escape the arguments::
 
+    from rich.markup import escape
     def greet(name):
         console.print(f"Hello {escape(name)}!")
 

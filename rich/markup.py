@@ -36,7 +36,7 @@ class Tag(NamedTuple):
         )
 
 
-def escape(markup: str, _escape=re.compile(r"(\\*)\[").sub) -> str:
+def escape(markup: str, _escape=re.compile(r"(\\*)(\[[a-z#\/].*?\])").sub) -> str:
     """Escapes text so that it won't be interpreted as markup.
 
     Args:
@@ -46,9 +46,10 @@ def escape(markup: str, _escape=re.compile(r"(\\*)\[").sub) -> str:
         str: Markup with square brackets escaped.
     """
 
-    def escape_backslashes(match) -> str:
-        backslashes = match.group(1) or ""
-        return f"{backslashes}{backslashes}\\["
+    def escape_backslashes(match: re.Match[str]) -> str:
+        """Called by re.sub replace matches."""
+        backslashes, text = match.groups()
+        return f"{backslashes}{backslashes}\\{text}"
 
     markup = _escape(escape_backslashes, markup)
     return markup
