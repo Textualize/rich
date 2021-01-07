@@ -1,11 +1,11 @@
 import os
-from operator import attrgetter
 import pathlib
 import sys
 
 from rich import print
 from rich.filesize import decimal
 from rich.markup import escape
+from rich.style import Style
 from rich.text import Text
 from rich.tree import Tree
 
@@ -19,9 +19,9 @@ def walk_directory(directory, tree):
         if path.name.startswith("."):
             continue
         if path.is_dir():
-            style = "dim not bold" if path.name.startswith("__") else ""
+            style = "dim" if path.name.startswith("__") else ""
             branch = tree.add(
-                f"[bold magenta]:open_file_folder: {escape(path.name)}",
+                f"[bold magenta]:open_file_folder: [link file://{path}]{escape(path.name)}",
                 style=style,
                 guide_style=style,
             )
@@ -29,6 +29,7 @@ def walk_directory(directory, tree):
         else:
             text_filename = Text(path.name, "green")
             text_filename.highlight_regex(r"\..*$", "bold red")
+            text_filename.stylize(f"link file://{ path }")
             file_size = path.stat().st_size
             text_filename.append(f" ({decimal(file_size)})", "blue")
             tree.add(Text("🐍 " if path.suffix == ".py" else "📄 ") + text_filename)
@@ -39,6 +40,9 @@ try:
 except IndexError:
     print("[b]Usage:[/] python tree.py <DIRECTORY>")
 else:
-    tree = Tree(directory, guide_style="bold cyan")
+    tree = Tree(
+        f":open_file_folder: [link file://{directory}]{directory}",
+        guide_style="bold bright_blue",
+    )
     walk_directory(directory, tree)
     print(tree)

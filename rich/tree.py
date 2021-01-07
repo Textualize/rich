@@ -1,13 +1,14 @@
 from typing import Iterable, List, NamedTuple, Tuple
 
 from .console import Console, ConsoleOptions, RenderResult, RenderableType
+from .jupyter import JupyterMixin
 from ._loop import loop_first, loop_last
 from .segment import Segment
 from .style import Style, StyleStack, StyleType
 from .styled import Styled
 
 
-class Tree:
+class Tree(JupyterMixin):
     def __init__(
         self,
         renderable: RenderableType,
@@ -15,6 +16,15 @@ class Tree:
         guide_style: StyleType = "tree.line",
         expanded=True,
     ) -> None:
+        """A renderable for a tree structure.
+
+        Args:
+            renderable (RenderableType): The renderable or text for the root node.
+            style (StyleType, optional): Style of this tree. Defaults to "tree".
+            guide_style (StyleType, optional): Style of the guide lines. Defaults to "tree.line".
+            expanded (bool, optional): Also display children. Defaults to True.
+        """
+
         self.renderable = renderable
         self.style = style
         self.guide_style = guide_style
@@ -66,7 +76,7 @@ class Tree:
                 line = TREE_GUIDES[guide][index]
             return _Segment(line, _style)
 
-        levels: List[Segment] = [make_guide(SPACE)]
+        levels: List[Segment] = [make_guide(CONTINUE)]
         push(loop_last([self]))
 
         guide_style_stack = StyleStack(get_style(self.guide_style))
@@ -101,11 +111,14 @@ class Tree:
 
             prefix = levels[1:]
             for first, line in loop_first(renderable_lines):
-                yield from _Segment.apply_style(prefix, style.background_style)
+                if prefix:
+                    yield from _Segment.apply_style(prefix, style.background_style)
                 yield from line
                 yield new_line
-                if first:
-                    prefix = levels[1:-1] + [make_guide(SPACE if last else CONTINUE)]
+                if first and prefix:
+                    prefix[-1] = make_guide(
+                        SPACE if last else CONTINUE, prefix[-1].style
+                    )
 
             if node.expanded and node.children:
                 levels[-1] = make_guide(SPACE if last else CONTINUE, levels[-1].style)
@@ -170,10 +183,10 @@ class Segment(NamedTuple):
 """
     )
 
-    root = Tree(":open_file_folder: The Root node")
+    root = Tree(":open_file_folder: The Root node\n", guide_style="red")
 
-    node = root.add(":file_folder: Renderables")
-    simple_node = node.add(":file_folder: [bold red]Atomic", guide_style="uu green")
+    node = root.add(":file_folder: Renderables\n")
+    simple_node = node.add(":file_folder: [bold red]Atomic\n", guide_style="uu green")
     simple_node.add(RenderGroup("📄 Syntax", syntax))
     simple_node.add(RenderGroup("📄 Markdown", markdown))
 
@@ -182,7 +195,7 @@ class Segment(NamedTuple):
     )
     containers_node.expanded = True
     panel = Panel.fit("Just a panel", border_style="red")
-    containers_node.add(RenderGroup("📄 Panels", panel))
+    containers_node.add(RenderGroup("📄 Panels\n", panel))
 
     containers_node.add(RenderGroup("📄 [b magenta]Table", table))
 
