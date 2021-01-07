@@ -24,8 +24,13 @@ def test_re_match():
 
 
 def test_escape():
+    # Potential tags
     assert escape("foo[bar]") == r"foo\[bar]"
     assert escape(r"foo\[bar]") == r"foo\\\[bar]"
+
+    # Not tags (escape not required)
+    assert escape("[5]") == "[5]"
+    assert escape("\\[5]") == "\\[5]"
 
 
 def test_render_escape():

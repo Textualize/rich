@@ -1,5 +1,5 @@
 import re
-from typing import Iterable, List, NamedTuple, Optional, Tuple, Union
+from typing import Iterable, List, Match, NamedTuple, Optional, Tuple, Union
 
 from .errors import MarkupError
 from .style import Style
@@ -46,7 +46,7 @@ def escape(markup: str, _escape=re.compile(r"(\\*)(\[[a-z#\/].*?\])").sub) -> st
         str: Markup with square brackets escaped.
     """
 
-    def escape_backslashes(match: re.Match[str]) -> str:
+    def escape_backslashes(match: Match[str]) -> str:
         """Called by re.sub replace matches."""
         backslashes, text = match.groups()
         return f"{backslashes}{backslashes}\\{text}"
