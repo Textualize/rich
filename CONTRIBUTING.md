@@ -30,7 +30,7 @@ Run tests with the following command:
 make test
 ```
 
-Or if you don't have make, run the following:
+Or if you don't have `make`, run the following:
 
 ```
 pytest --cov-report term-missing --cov=rich tests/ -vv
