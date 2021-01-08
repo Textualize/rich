@@ -34,7 +34,9 @@ If you require multiple tasks in the display, or wish to configure the columns i
 The Progress class is designed to be used as a *context manager* which will start and stop the progress display automatically.
 
 Here's a simple example::
-
+    
+    import time
+    
     from rich.progress import Progress
 
     with Progress() as progress:
