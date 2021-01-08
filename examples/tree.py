@@ -47,5 +47,5 @@ else:
         f":open_file_folder: [link file://{directory}]{directory}",
         guide_style="bold bright_blue",
     )
-    walk_directory(directory, tree)
+    walk_directory(pathlib.Path(directory), tree)
     print(tree)
