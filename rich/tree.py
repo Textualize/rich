@@ -1,8 +1,8 @@
-from typing import Iterator, Iterable, List, NamedTuple, Tuple
+from typing import Iterator, List, Tuple
 
-from .console import Console, ConsoleOptions, RenderResult, RenderableType
-from .jupyter import JupyterMixin
 from ._loop import loop_first, loop_last
+from .console import Console, ConsoleOptions, RenderableType, RenderResult
+from .jupyter import JupyterMixin
 from .segment import Segment
 from .style import Style, StyleStack, StyleType
 from .styled import Styled
@@ -12,36 +12,56 @@ class Tree(JupyterMixin):
     """A renderable for a tree structure.
 
     Args:
-        renderable (RenderableType): The renderable or text for the root node.
+        renderable (RenderableType): The renderable or str for the tree label.
         style (StyleType, optional): Style of this tree. Defaults to "tree".
         guide_style (StyleType, optional): Style of the guide lines. Defaults to "tree.line".
         expanded (bool, optional): Also display children. Defaults to True.
+        highlight (bool, optional): Highlight renderable (if str). Defaults to False.
     """
 
     def __init__(
         self,
         renderable: RenderableType,
+        *,
         style: StyleType = "tree",
         guide_style: StyleType = "tree.line",
         expanded=True,
+        highlight=False,
     ) -> None:
         self.renderable = renderable
         self.style = style
         self.guide_style = guide_style
         self.children: List[Tree] = []
         self.expanded = expanded
+        self.highlight = highlight
 
     def add(
         self,
         renderable: RenderableType,
         *,
         style: StyleType = None,
-        guide_style: StyleType = None
+        guide_style: StyleType = None,
+        expanded=True,
+        highlight=False,
     ) -> "Tree":
+        """Add a child tree.
+
+        Args:
+            renderable (RenderableType): The renderable or str for the tree label.
+            style (StyleType, optional): Style of this tree. Defaults to "tree".
+            guide_style (StyleType, optional): Style of the guide lines. Defaults to "tree.line".
+            expanded (bool, optional): Also display children. Defaults to True.
+            highlight (Optional[bool], optional): Highlight renderable (if str). Defaults to False.
+
+        Returns:
+            Tree: A new child Tree, which may be further modified.
+        """
         node = Tree(
             renderable,
             style=self.style if style is None else style,
             guide_style=self.guide_style if guide_style is None else guide_style,
+            expanded=expanded,
+            highlight=self.highlight if highlight is None else highlight,
         )
         self.children.append(node)
         return node
@@ -56,7 +76,8 @@ class Tree(JupyterMixin):
         new_line = Segment.line()
 
         get_style = console.get_style
-        guide_style = get_style(self.guide_style) or Style.null()
+        null_style = Style.null()
+        guide_style = get_style(self.guide_style) or null_style
         SPACE, CONTINUE, FORK, END = range(4)
 
         ASCII_GUIDES = ("    ", "|   ", "+-- ", "`-- ")
@@ -67,16 +88,16 @@ class Tree(JupyterMixin):
         ]
         _Segment = Segment
 
-        def make_guide(index: int, style: Style = None) -> Segment:
-            _style = guide_style if style is None else style
+        def make_guide(index: int, style: Style) -> Segment:
+            """Make a Segment for a level of the guide lines."""
             if options.ascii_only:
                 line = ASCII_GUIDES[index]
             else:
-                guide = 1 if _style.bold else (2 if _style.underline2 else 0)
+                guide = 1 if style.bold else (2 if style.underline2 else 0)
                 line = TREE_GUIDES[guide][index]
-            return _Segment(line, _style)
+            return _Segment(line, style)
 
-        levels: List[Segment] = [make_guide(CONTINUE)]
+        levels: List[Segment] = [make_guide(CONTINUE, guide_style)]
         push(iter(loop_last([self])))
 
         guide_style_stack = StyleStack(get_style(self.guide_style))
@@ -89,14 +110,14 @@ class Tree(JupyterMixin):
             except StopIteration:
                 levels.pop()
                 if levels:
-                    guide_style = levels[-1].style or Style.null()
-                    levels[-1] = make_guide(FORK)
+                    guide_style = levels[-1].style or null_style
+                    levels[-1] = make_guide(FORK, guide_style)
                     guide_style_stack.pop()
                     style_stack.pop()
                 continue
             push(stack_node)
             if last:
-                levels[-1] = make_guide(END, levels[-1].style)
+                levels[-1] = make_guide(END, levels[-1].style or null_style)
 
             guide_style = guide_style_stack.current + get_style(node.guide_style)
             style = style_stack.current + get_style(node.style)
@@ -104,7 +125,9 @@ class Tree(JupyterMixin):
             renderable_lines = console.render_lines(
                 Styled(node.renderable, style),
                 options.update(
-                    width=options.max_width - sum(level.cell_length for level in prefix)
+                    width=options.max_width
+                    - sum(level.cell_length for level in prefix),
+                    highlight=self.highlight,
                 ),
             )
             for first, line in loop_first(renderable_lines):
@@ -114,37 +137,22 @@ class Tree(JupyterMixin):
                 yield new_line
                 if first and prefix:
                     prefix[-1] = make_guide(
-                        SPACE if last else CONTINUE, prefix[-1].style
+                        SPACE if last else CONTINUE, prefix[-1].style or null_style
                     )
 
             if node.expanded and node.children:
-                levels[-1] = make_guide(SPACE if last else CONTINUE, levels[-1].style)
-                levels.append(make_guide(END if len(node.children) == 1 else FORK))
+                levels[-1] = make_guide(
+                    SPACE if last else CONTINUE, levels[-1].style or null_style
+                )
+                levels.append(
+                    make_guide(END if len(node.children) == 1 else FORK, guide_style)
+                )
                 style_stack.push(get_style(node.style))
                 guide_style_stack.push(get_style(node.guide_style))
                 push(iter(loop_last(node.children)))
 
 
-# if __name__ == "__main__":
-#     from rich import print
-#     from rich.console import Console
-#     from rich.panel import Panel
-
-#     tree = Tree("Root")
-#     foo_node = tree.add("Foo")
-#     foo_node.add("1")
-#     two_node = foo_node.add("2", guide_style="red")
-#     two_node.add(Panel("hello"))
-#     two_node.add("[bold magenta]World!").add("foo").add("bar")
-#     foo_node.add("3")
-#     tree.add("bar")
-#     tree.add("baz")
-
-#     console = Console()
-#     console.print(tree, width=40)
-#     console.print(two_node)
-
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
 
     from rich.console import RenderGroup
     from rich.markdown import Markdown
@@ -180,7 +188,7 @@ class Segment(NamedTuple):
 """
     )
 
-    root = Tree(":open_file_folder: The Root node", guide_style="red")
+    root = Tree(":open_file_folder: The Root node", guide_style="red", highlight=True)
 
     node = root.add(":file_folder: Renderables")
     simple_node = node.add(":file_folder: [bold red]Atomic", guide_style="uu green")

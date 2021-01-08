@@ -5,17 +5,19 @@ import sys
 from rich import print
 from rich.filesize import decimal
 from rich.markup import escape
-from rich.style import Style
 from rich.text import Text
 from rich.tree import Tree
 
 
-def walk_directory(directory, tree):
+def walk_directory(directory: pathlib.Path, tree: Tree) -> None:
+    """Recursively build a Tree with directory contents."""
+    # Sort dirs first then by filename
     paths = sorted(
         pathlib.Path(directory).iterdir(),
         key=lambda path: (path.is_file(), path.name.lower()),
     )
     for path in paths:
+        # Remove hidden files
         if path.name.startswith("."):
             continue
         if path.is_dir():
@@ -29,10 +31,11 @@ def walk_directory(directory, tree):
         else:
             text_filename = Text(path.name, "green")
             text_filename.highlight_regex(r"\..*$", "bold red")
-            text_filename.stylize(f"link file://{ path }")
+            text_filename.stylize(f"link file://{path}")
             file_size = path.stat().st_size
             text_filename.append(f" ({decimal(file_size)})", "blue")
-            tree.add(Text("🐍 " if path.suffix == ".py" else "📄 ") + text_filename)
+            icon = "🐍 " if path.suffix == ".py" else "📄 "
+            tree.add(Text(icon) + text_filename)
 
 
 try:
