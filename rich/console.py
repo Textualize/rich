@@ -1379,7 +1379,7 @@ class Console:
             with self._record_buffer_lock:
                 self._record_buffer.extend(buffer)
         not_terminal = not self.is_terminal
-        if self.no_color and self.color_system:
+        if self.no_color and color_system:
             buffer = Segment.remove_color(buffer)
         for text, style, is_control in buffer:
             if style:
