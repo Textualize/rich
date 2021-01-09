@@ -188,15 +188,15 @@ class Segment(NamedTuple):
 """
     )
 
-    root = Tree(":open_file_folder: The Root node", guide_style="red", highlight=True)
+    root = Tree("🌲 [b green]Rich Tree", highlight=True)
 
-    node = root.add(":file_folder: Renderables")
-    simple_node = node.add(":file_folder: [bold red]Atomic", guide_style="uu green")
+    node = root.add(":file_folder: Renderables", guide_style="red")
+    simple_node = node.add(":file_folder: [bold yellow]Atomic", guide_style="uu green")
     simple_node.add(RenderGroup("📄 Syntax", syntax))
     simple_node.add(RenderGroup("📄 Markdown", Panel(markdown, border_style="green")))
 
     containers_node = node.add(
-        ":file_folder: [bold red]Containers", guide_style="bold magenta"
+        ":file_folder: [bold magenta]Containers", guide_style="bold magenta"
     )
     containers_node.expanded = True
     panel = Panel.fit("Just a panel", border_style="red")
