@@ -13,13 +13,13 @@ The following code creates and prints a tree with a simple text label::
     from rich import print
 
     tree = Tree("Rich Tree")
-    print(root)
+    print(tree)
 
 With only a single ``Tree`` instance this will output nothing more than the text "Rich Tree". Things get more interesting when we call :meth:`~rich.tree.Tree.add` to add more branches to the Tree. The following code adds two more branches::
 
     tree.add("foo")
     tree.add("bar")
-    print(root)
+    print(tree)
 
 The tree will now have two branches connected to the original tree with guide lines.
 
