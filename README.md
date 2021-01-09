@@ -264,7 +264,7 @@ The above command generate the following output in the terminal:
 
 ## Tree
 
-Rich can render tree views with guide lines. A tree view is ideal for displaying a file structure, or any other hierarchical data.
+Rich can render a [tree](https://rich.readthedocs.io/en/latest/tree.html) with guide lines. A tree is ideal for displaying a file structure, or any other hierarchical data.
 
 The labels of the tree can be simple text or anything else Rich can render. Run the following for a demonstration:
 
@@ -275,6 +275,8 @@ python -m rich.tree
 This generates the following output:
 
 ![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
+
+See the [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) example for a script that displays a tree view of any directory, similar to the linux `tree` command.
 
 ## Columns
 
