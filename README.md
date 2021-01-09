@@ -274,7 +274,7 @@ python -m rich.tree
 
 This generates the following output:
 
-![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
+![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
 
 ## Columns
 
