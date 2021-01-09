@@ -36,4 +36,4 @@ Reference
    reference/theme.rst
    reference/traceback.rst
    reference/tree.rst
-   references/abc.rst
+   reference/abc.rst
