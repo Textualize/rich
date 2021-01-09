@@ -12,7 +12,7 @@ class Tree(JupyterMixin):
     """A renderable for a tree structure.
 
     Args:
-        renderable (RenderableType): The renderable or str for the tree label.
+        label (RenderableType): The renderable or str for the tree label.
         style (StyleType, optional): Style of this tree. Defaults to "tree".
         guide_style (StyleType, optional): Style of the guide lines. Defaults to "tree.line".
         expanded (bool, optional): Also display children. Defaults to True.
@@ -21,14 +21,14 @@ class Tree(JupyterMixin):
 
     def __init__(
         self,
-        renderable: RenderableType,
+        label: RenderableType,
         *,
         style: StyleType = "tree",
         guide_style: StyleType = "tree.line",
         expanded=True,
         highlight=False,
     ) -> None:
-        self.renderable = renderable
+        self.label = label
         self.style = style
         self.guide_style = guide_style
         self.children: List[Tree] = []
@@ -37,7 +37,7 @@ class Tree(JupyterMixin):
 
     def add(
         self,
-        renderable: RenderableType,
+        label: RenderableType,
         *,
         style: StyleType = None,
         guide_style: StyleType = None,
@@ -47,7 +47,7 @@ class Tree(JupyterMixin):
         """Add a child tree.
 
         Args:
-            renderable (RenderableType): The renderable or str for the tree label.
+            label (RenderableType): The renderable or str for the tree label.
             style (StyleType, optional): Style of this tree. Defaults to "tree".
             guide_style (StyleType, optional): Style of the guide lines. Defaults to "tree.line".
             expanded (bool, optional): Also display children. Defaults to True.
@@ -57,7 +57,7 @@ class Tree(JupyterMixin):
             Tree: A new child Tree, which may be further modified.
         """
         node = Tree(
-            renderable,
+            label,
             style=self.style if style is None else style,
             guide_style=self.guide_style if guide_style is None else guide_style,
             expanded=expanded,
@@ -123,7 +123,7 @@ class Tree(JupyterMixin):
             style = style_stack.current + get_style(node.style)
             prefix = levels[1:]
             renderable_lines = console.render_lines(
-                Styled(node.renderable, style),
+                Styled(node.label, style),
                 options.update(
                     width=options.max_width
                     - sum(level.cell_length for level in prefix),
