@@ -33,7 +33,7 @@ When you call :meth:`~rich.tree.Tree.add` a new Tree instance is returned. You c
 Tree Styles
 ~~~~~~~~~~~
 
-The Tree constructor or :meth:`~rich.tree.Tree.add` method allow you to specify a ``style`` which sets a style for the entire branch, and ``guide_style`` which sets the style for the guide lines.
+The Tree constructor and :meth:`~rich.tree.Tree.add` method allows you to specify a ``style`` argument which sets a style for the entire branch, and ``guide_style`` which sets the style for the guide lines. These styles are inherited by the branches and will apply to any sub-trees as well.
 
 If you set ``guide_style`` to bold, Rich will select the thicker variations of unicode line characters. Similarly, if you select the "underline2" style you will get double line style of unicode characters.
 
