@@ -402,6 +402,7 @@ class Console:
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
         height (int, optional): The height of the terminal. Leave as default to auto-detect height.
         style (StyleType, optional): Style to apply to all output, or None for no style. Defaults to None.
+        no_color (Optional[bool], optional): Enabled no color mode, or None to auto detect. Defaults to None.
         record (bool, optional): Boolean to enable recording of terminal output,
             required to call :meth:`export_html` and :meth:`export_text`. Defaults to False.
         markup (bool, optional): Boolean to enable :ref:`console_markup`. Defaults to True.
@@ -433,6 +434,7 @@ class Console:
         width: int = None,
         height: int = None,
         style: StyleType = None,
+        no_color: bool = None,
         tab_size: int = 8,
         record: bool = False,
         markup: bool = True,
@@ -492,6 +494,9 @@ class Console:
         self.get_datetime = get_datetime or datetime.now
         self.get_time = get_time or monotonic
         self.style = style
+        self.no_color = (
+            no_color if no_color is not None else "NO_COLOR" in self._environ
+        )
 
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals(
@@ -538,7 +543,7 @@ class Console:
         """Detect color system from env vars."""
         if self.is_jupyter:
             return ColorSystem.TRUECOLOR
-        if not self.is_terminal or "NO_COLOR" in self._environ or self.is_dumb_terminal:
+        if not self.is_terminal or self.is_dumb_terminal:
             return None
         if WINDOWS:  # pragma: no cover
             if self.legacy_windows:  # pragma: no cover
@@ -1374,6 +1379,8 @@ class Console:
             with self._record_buffer_lock:
                 self._record_buffer.extend(buffer)
         not_terminal = not self.is_terminal
+        if self.no_color and color_system:
+            buffer = Segment.remove_color(buffer)
         for text, style, is_control in buffer:
             if style:
                 append(

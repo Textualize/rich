@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added rich.tree
+- Added no_color argument to Console
 
 ## [9.6.2] - 2021-01-07
 

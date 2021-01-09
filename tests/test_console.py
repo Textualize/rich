@@ -467,3 +467,14 @@ def test_console_style() -> None:
     expected = "\x1b[31mfoo\x1b[0m\n"
     result = console.file.getvalue()
     assert result == expected
+
+
+def test_no_color():
+    console = Console(
+        file=io.StringIO(), color_system="truecolor", force_terminal=True, no_color=True
+    )
+    console.print("[bold magenta on red]FOO")
+    expected = "\x1b[1mFOO\x1b[0m\n"
+    result = console.file.getvalue()
+    print(repr(result))
+    assert result == expected
