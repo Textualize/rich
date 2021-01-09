@@ -262,6 +262,20 @@ The above command generate the following output in the terminal:
 
 ![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
 
+## Tree
+
+Rich can render tree views with guide lines. A tree view is ideal for displaying a file structure, or any other hierarchical data.
+
+The labels of the tree can be simple text or anything else Rich can render. Run the following for a demonstration:
+
+```
+python -m rich.tree
+```
+
+This generates the following output:
+
+![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
+
 ## Columns
 
 Rich can render content in neat [columns](https://rich.readthedocs.io/en/latest/columns.html) with equal or optimal width. Here's a very basic clone of the (MacOS / Linux) `ls` command which displays a directory listing in columns:

@@ -121,6 +121,8 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "progress.data.speed": Style(color="red"),
     "progress.spinner": Style(color="green"),
     "status.spinner": Style(color="green"),
+    "tree": Style(),
+    "tree.line": Style(),
 }
 
 MARKDOWN_STYLES = {

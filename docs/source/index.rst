@@ -20,15 +20,16 @@ Welcome to Rich's documentation!
    traceback.rst
    prompt.rst
 
-   tables.rst
+   columns.rst
+   group.rst
+   live.rst
+   markdown.rst
    padding.rst
    panel.rst
-   group.rst
-   columns.rst
-   live.rst
    progress.rst
-   markdown.rst
    syntax.rst
+   tables.rst
+   tree.rst
 
    protocol.rst
 
