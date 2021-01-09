@@ -446,6 +446,7 @@ class Console:
         safe_box: bool = True,
         get_datetime: Callable[[], datetime] = None,
         get_time: Callable[[], float] = None,
+        no_color: bool = None,
         _environ: Dict[str, str] = None,
     ):
         # Copy of os.environ allows us to replace it for testing
@@ -492,6 +493,9 @@ class Console:
         self.get_datetime = get_datetime or datetime.now
         self.get_time = get_time or monotonic
         self.style = style
+        self.no_color = (
+            no_color if no_color is not None else "NO_COLOR" in self._environ
+        )
 
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals(
@@ -538,7 +542,7 @@ class Console:
         """Detect color system from env vars."""
         if self.is_jupyter:
             return ColorSystem.TRUECOLOR
-        if not self.is_terminal or "NO_COLOR" in self._environ or self.is_dumb_terminal:
+        if not self.is_terminal or self.is_dumb_terminal:
             return None
         if WINDOWS:  # pragma: no cover
             if self.legacy_windows:  # pragma: no cover
@@ -1374,6 +1378,8 @@ class Console:
             with self._record_buffer_lock:
                 self._record_buffer.extend(buffer)
         not_terminal = not self.is_terminal
+        if self.no_color and self.color_system:
+            buffer = Segment.remove_color(buffer)
         for text, style, is_control in buffer:
             if style:
                 append(

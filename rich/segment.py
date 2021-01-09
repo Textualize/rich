@@ -1,4 +1,4 @@
-from typing import NamedTuple, Optional
+from typing import Dict, NamedTuple, Optional
 
 from .cells import cell_len, set_cell_size
 from .style import Style
@@ -331,11 +331,36 @@ class Segment(NamedTuple):
     def strip_styles(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
         """Remove all styles from an iterable of segments.
 
+        Args:
+            segments (Iterable[Segment]): An iterable segments.
+
         Yields:
             Segment: Segments with styles replace with None
         """
         for text, _style, is_control in segments:
             yield cls(text, None, is_control)
+
+    @classmethod
+    def remove_color(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
+        """Remove all color from an iterable of segments.
+
+        Args:
+            segments (Iterable[Segment]): An iterable segments.
+
+        Yields:
+            Segment: Segments with colorless style.
+        """
+
+        cache: Dict[Style, Style] = {}
+        for text, style, is_control in segments:
+            if style:
+                colorless_style = cache.get(style)
+                if colorless_style is None:
+                    colorless_style = style.without_color
+                    cache[style] = colorless_style
+                yield cls(text, colorless_style, is_control)
+            else:
+                yield cls(text, None, is_control)
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -383,6 +383,24 @@ class Style:
         """A Style with background only."""
         return Style(bgcolor=self.bgcolor)
 
+    @property
+    def without_color(self) -> "Style":
+        """Get a copy of the style with color removed."""
+        if self._null:
+            return NULL_STYLE
+        style = self.__new__(Style)
+        style._ansi = None
+        style._style_definition = None
+        style._color = None
+        style._bgcolor = None
+        style._attributes = self._attributes
+        style._set_attributes = self._set_attributes
+        style._link = self._link
+        style._link_id = f"{time()}-{randint(0, 999999)}" if self._link else ""
+        style._hash = self._hash
+        style._null = False
+        return style
+
     @classmethod
     @lru_cache(maxsize=4096)
     def parse(cls, style_definition: str) -> "Style":
