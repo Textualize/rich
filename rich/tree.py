@@ -172,7 +172,7 @@ class Tree(JupyterMixin):
             indent = level * 4
             minimum = max(min_measure + indent, minimum)
             maximum = max(max_measure + indent, maximum)
-            if tree.children and tree.expanded:
+            if tree.expanded and tree.children:
                 push(iter(tree.children))
                 level += 1
         return Measurement(minimum, maximum)
