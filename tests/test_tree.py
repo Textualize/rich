@@ -1,4 +1,5 @@
 from rich.console import Console
+from rich.measure import Measurement
 from rich.tree import Tree
 
 
@@ -68,3 +69,12 @@ def test_render():
     print(repr(result))
     expected = "foo                 \n├── \x1b[3mbar\x1b[0m\x1b[3m             \x1b[0m\n\x1b[44m├── \x1b[0m\x1b[44mbaz\x1b[0m\x1b[44m             \x1b[0m\n\x1b[44m│   \x1b[0m\x1b[1;31;44m┣━━ \x1b[0m\x1b[44m1\x1b[0m\x1b[44m           \x1b[0m\n\x1b[44m│   \x1b[0m\x1b[1;31;44m┗━━ \x1b[0m\x1b[44m2\x1b[0m\x1b[44m           \x1b[0m\n└── egg             \n"
     assert result == expected
+
+
+def test_tree_measure():
+    tree = Tree("foo")
+    tree.add("bar")
+    tree.add("musroom risotto")
+    console = Console()
+    measurement = Measurement.get(console, tree)
+    assert measurement == Measurement(11, 19)

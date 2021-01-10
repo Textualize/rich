@@ -33,6 +33,7 @@ def test_rich_console(live_render):
         legacy_windows=False,
         min_width=10,
         max_width=20,
+        height=25,
         is_terminal=False,
         encoding="utf-8",
     )

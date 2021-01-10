@@ -92,6 +92,8 @@ class ConsoleOptions:
     """Minimum width of renderable."""
     max_width: int
     """Maximum width of renderable."""
+    height: int
+    """Available height (number of lines)."""
     is_terminal: bool
     """True if the target is a terminal, otherwise False."""
     encoding: str
@@ -115,6 +117,7 @@ class ConsoleOptions:
         width: int = None,
         min_width: int = None,
         max_width: int = None,
+        height: int = None,
         justify: JustifyMethod = None,
         overflow: OverflowMethod = None,
         no_wrap: bool = None,
@@ -128,6 +131,8 @@ class ConsoleOptions:
             options.min_width = min_width
         if max_width is not None:
             options.max_width = max_width
+        if height is not None:
+            options.height = height
         if justify is not None:
             options.justify = justify
         if overflow is not None:
@@ -690,6 +695,7 @@ class Console:
             legacy_windows=self.legacy_windows,
             min_width=1,
             max_width=self.width,
+            height=self.size.height,
             encoding=self.encoding,
             is_terminal=self.is_terminal,
         )

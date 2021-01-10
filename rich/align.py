@@ -173,21 +173,16 @@ class VerticalCenter(JupyterMixin):
     ) -> "RenderResult":
         lines = console.render_lines(self.renderable, options, pad=False)
         new_line = Segment.line()
-        height = console.size.height
-        if len(lines) >= height:
-            for line in lines:
-                yield from line
-                yield new_line
-        else:
-            top_space = (height - len(lines)) // 2
-            bottom_space = height - top_space - len(lines)
-            if top_space:
-                yield Segment("\n" * top_space)
-            for line in lines:
-                yield from line
-                yield new_line
-            if bottom_space:
-                yield Segment("\n" * bottom_space)
+        height = options.height
+        top_space = (height - len(lines)) // 2
+        bottom_space = height - top_space - len(lines)
+        if top_space > 0:
+            yield Segment(f"\n" * top_space)
+        for line in lines:
+            yield from line
+            yield new_line
+        if bottom_space > 0:
+            yield Segment("\n" * bottom_space)
 
     def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
         measurement = Measurement.get(console, self.renderable, max_width)
@@ -195,9 +190,20 @@ class VerticalCenter(JupyterMixin):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from rich.console import Console
+    from rich.console import Console, RenderGroup
+    from rich.panel import Panel
 
     console = Console()
 
-    for align in ["left", "center", "right"]:
-        console.print(Align("Hello\nWorld!\nWorld!!!", align))  # type: ignore
+    panel = Align.center(
+        Panel(
+            RenderGroup(
+                Align("Left", "left"),
+                Align("Center", "right"),
+                Align("Right", "center"),
+            ),
+            width=60,
+        )
+    )
+
+    console.print(VerticalCenter(panel))

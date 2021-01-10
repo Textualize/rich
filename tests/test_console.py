@@ -57,17 +57,19 @@ def test_console_options_update():
         legacy_windows=False,
         min_width=10,
         max_width=20,
+        height=25,
         is_terminal=False,
         encoding="utf-8",
     )
     options1 = options.update(width=15)
     assert options1.min_width == 15 and options1.max_width == 15
 
-    options2 = options.update(min_width=5, max_width=15, justify="right")
+    options2 = options.update(min_width=5, max_width=15, height=50, justify="right")
     assert (
         options2.min_width == 5
         and options2.max_width == 15
         and options2.justify == "right"
+        and options2.height == 50
     )
 
     options_copy = options.update()
