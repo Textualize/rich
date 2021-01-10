@@ -177,7 +177,7 @@ class VerticalCenter(JupyterMixin):
         top_space = (height - len(lines)) // 2
         bottom_space = height - top_space - len(lines) - 1
         if top_space > 0:
-            yield Segment(f"\n" * top_space)
+            yield Segment("\n" * top_space)
         for line in lines:
             yield from line
             yield new_line
