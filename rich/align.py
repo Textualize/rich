@@ -48,6 +48,9 @@ class Align(JupyterMixin):
         self.pad = pad
         self.width = width
 
+    def __repr__(self) -> str:
+        return f"Align({self.renderable!r}, {self.align!r})"
+
     @classmethod
     def left(
         cls,
@@ -89,7 +92,15 @@ class Align(JupyterMixin):
     ) -> "RenderResult":
 
         align = self.align
-        rendered = console.render(Constrain(self.renderable, width=self.width), options)
+
+        width = Measurement.get(console, self.renderable).maximum
+
+        rendered = console.render(
+            Constrain(
+                self.renderable, width if self.width is None else min(width, self.width)
+            ),
+            options,
+        )
         lines = list(Segment.split_lines(rendered))
         width, height = Segment.get_shape(lines)
         lines = Segment.set_shape(lines, width, height)
@@ -138,6 +149,45 @@ class Align(JupyterMixin):
             style = console.get_style(self.style)
             iter_segments = Segment.apply_style(iter_segments, style)
         return iter_segments
+
+    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
+        measurement = Measurement.get(console, self.renderable, max_width)
+        return measurement
+
+
+class VerticalCenter(JupyterMixin):
+    """Vertically aligns a renderable.
+
+    Args:
+        renderable (RenderableType): A renderable object.
+    """
+
+    def __init__(self, renderable: "RenderableType") -> None:
+        self.renderable = renderable
+
+    def __repr__(self) -> str:
+        return f"VerticalCenter({self.renderable!r})"
+
+    def __rich_console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
+        lines = console.render_lines(self.renderable, options, pad=False)
+        new_line = Segment.line()
+        height = console.size.height
+        if len(lines) >= height:
+            for line in lines:
+                yield from line
+                yield new_line
+        else:
+            top_space = (height - len(lines)) // 2
+            bottom_space = height - top_space - len(lines)
+            if top_space:
+                yield Segment("\n" * top_space)
+            for line in lines:
+                yield from line
+                yield new_line
+            if bottom_space:
+                yield Segment("\n" * bottom_space)
 
     def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
         measurement = Measurement.get(console, self.renderable, max_width)

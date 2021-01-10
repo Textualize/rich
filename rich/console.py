@@ -1202,7 +1202,7 @@ class Console:
             for hook in self._render_hooks:
                 renderables = hook.process_renderables(renderables)
             render_options = self.options.update(
-                justify=justify,
+                justify="default",
                 overflow=overflow,
                 width=min(width, self.width) if width else None,
                 no_wrap=no_wrap,
