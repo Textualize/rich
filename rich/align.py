@@ -173,9 +173,9 @@ class VerticalCenter(JupyterMixin):
     ) -> "RenderResult":
         lines = console.render_lines(self.renderable, options, pad=False)
         new_line = Segment.line()
-        height = options.height
+        height = console.size.height
         top_space = (height - len(lines)) // 2
-        bottom_space = height - top_space - len(lines)
+        bottom_space = height - top_space - len(lines) - 1
         if top_space > 0:
             yield Segment(f"\n" * top_space)
         for line in lines:
@@ -206,4 +206,7 @@ if __name__ == "__main__":  # pragma: no cover
         )
     )
 
-    console.print(VerticalCenter(panel))
+    console.print(VerticalCenter(panel), end="")
+    import time
+
+    time.sleep(20)

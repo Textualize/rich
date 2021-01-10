@@ -41,7 +41,6 @@ def test_box_substitute():
         legacy_windows=True,
         min_width=1,
         max_width=100,
-        height=25,
         is_terminal=True,
         encoding="utf-8",
     )
