@@ -222,7 +222,7 @@ class Traceback:
         rich_traceback = cls.extract(
             exc_type, exc_value, traceback, show_locals=show_locals
         )
-        return Traceback(
+        return cls(
             rich_traceback,
             width=width,
             extra_lines=extra_lines,
