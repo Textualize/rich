@@ -21,7 +21,7 @@ class Align(JupyterMixin):
     Args:
         renderable (RenderableType): A console renderable.
         align (AlignMethod): One of "left", "center", or "right""
-        style (StyleType, optional): An optional style to apply to the renderable.
+        style (StyleType, optional): An optional style to apply to the background.
         pad (bool, optional): Pad the right with spaces. Defaults to True.
         width (int, optional): Restrict contents to given width, or None to use default width. Defaults to None.
 
@@ -106,6 +106,7 @@ class Align(JupyterMixin):
         lines = Segment.set_shape(lines, width, height)
         new_line = Segment.line()
         excess_space = options.max_width - width
+        style = console.get_style(self.style) if self.style is not None else None
 
         def generate_segments() -> Iterable[Segment]:
             if excess_space <= 0:
@@ -116,7 +117,7 @@ class Align(JupyterMixin):
 
             elif align == "left":
                 # Pad on the right
-                pad = Segment(" " * excess_space) if self.pad else None
+                pad = Segment(" " * excess_space, style) if self.pad else None
                 for line in lines:
                     yield from line
                     if pad:
@@ -126,8 +127,10 @@ class Align(JupyterMixin):
             elif align == "center":
                 # Pad left and right
                 left = excess_space // 2
-                pad = Segment(" " * left)
-                pad_right = Segment(" " * (excess_space - left)) if self.pad else None
+                pad = Segment(" " * left, style)
+                pad_right = (
+                    Segment(" " * (excess_space - left), style) if self.pad else None
+                )
                 for line in lines:
                     if left:
                         yield pad
@@ -138,7 +141,7 @@ class Align(JupyterMixin):
 
             elif align == "right":
                 # Padding on left
-                pad = Segment(" " * excess_space)
+                pad = Segment(" " * excess_space, style)
                 for line in lines:
                     yield pad
                     yield from line
@@ -162,8 +165,13 @@ class VerticalCenter(JupyterMixin):
         renderable (RenderableType): A renderable object.
     """
 
-    def __init__(self, renderable: "RenderableType") -> None:
+    def __init__(
+        self,
+        renderable: "RenderableType",
+        style: StyleType = None,
+    ) -> None:
         self.renderable = renderable
+        self.style = style
 
     def __repr__(self) -> str:
         return f"VerticalCenter({self.renderable!r})"
@@ -171,18 +179,27 @@ class VerticalCenter(JupyterMixin):
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
+        style = console.get_style(self.style) if self.style is not None else None
         lines = console.render_lines(self.renderable, options, pad=False)
+        width, _height = Segment.get_shape(lines)
         new_line = Segment.line()
         height = console.size.height
         top_space = (height - len(lines)) // 2
-        bottom_space = height - top_space - len(lines) - 1
+        bottom_space = height - top_space - len(lines)
+        blank_line = Segment(f"{' ' * width}", style)
+
+        def blank_lines(count) -> Iterable[Segment]:
+            for _ in range(count):
+                yield blank_line
+                yield new_line
+
         if top_space > 0:
-            yield Segment("\n" * top_space)
+            yield from blank_lines(top_space)
         for line in lines:
             yield from line
             yield new_line
         if bottom_space > 0:
-            yield Segment("\n" * bottom_space)
+            yield from blank_lines(bottom_space)
 
     def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
         measurement = Measurement.get(console, self.renderable, max_width)
@@ -191,22 +208,23 @@ class VerticalCenter(JupyterMixin):
 
 if __name__ == "__main__":  # pragma: no cover
     from rich.console import Console, RenderGroup
+    from rich.highlighter import ReprHighlighter
     from rich.panel import Panel
 
+    highlighter = ReprHighlighter()
     console = Console()
 
     panel = Align.center(
         Panel(
             RenderGroup(
-                Align("Left", "left"),
-                Align("Center", "right"),
-                Align("Right", "center"),
+                Align(highlighter("align='left'"), "left"),
+                Align(highlighter("align='center'"), "center"),
+                Align(highlighter("align='right'"), "right"),
             ),
             width=60,
-        )
+            style="on dark_blue",
+            title="VerticalCenter",
+        ),
+        style="on red",
     )
-
-    console.print(VerticalCenter(panel), end="")
-    import time
-
-    time.sleep(20)
+    console.print(VerticalCenter(panel, style="on red"))
