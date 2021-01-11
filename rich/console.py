@@ -716,7 +716,10 @@ class Console:
             try:
                 width, height = os.get_terminal_size(sys.stdin.fileno())
             except (AttributeError, ValueError, OSError):
-                pass
+                try:
+                    width, height = os.get_terminal_size(sys.stdout.fileno())
+                except (AttributeError, ValueError, OSError):
+                    pass
 
         # get_terminal_size can report 0, 0 if run from pseudo-terminal
         width = width or 80
