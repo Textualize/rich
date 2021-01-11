@@ -590,7 +590,7 @@ if __name__ == "__main__":  # pragma: no cover
         help="Overide background color",
     )
     parser.add_argument(
-        "-L",
+        "-x",
         "--lexer",
         default="default",
         dest="lexer_name",
@@ -602,17 +602,24 @@ if __name__ == "__main__":  # pragma: no cover
 
     console = Console(force_terminal=args.force_color, width=args.width)
 
-    kwargs = dict(
-        line_numbers=args.line_numbers,
-        word_wrap=args.word_wrap,
-        theme=args.theme,
-        background_color=args.background_color,
-        indent_guides=args.indent_guides,
-    )
-
     if not args.path or args.path == "-":
         code = sys.stdin.read()
-        syntax = Syntax(code=code, lexer_name=args.lexer_name, **kwargs)
+        syntax = Syntax(
+            code=code,
+            lexer_name=args.lexer_name,
+            line_numbers=args.line_numbers,
+            word_wrap=args.word_wrap,
+            theme=args.theme,
+            background_color=args.background_color,
+            indent_guides=args.indent_guides,
+        )
     else:
-        syntax = Syntax.from_path(args.path, **kwargs)
+        syntax = Syntax.from_path(
+            args.path,
+            line_numbers=args.line_numbers,
+            word_wrap=args.word_wrap,
+            theme=args.theme,
+            background_color=args.background_color,
+            indent_guides=args.indent_guides,
+        )
     console.print(syntax, soft_wrap=args.soft_wrap)

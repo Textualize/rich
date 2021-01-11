@@ -716,7 +716,10 @@ class Console:
             try:
                 width, height = os.get_terminal_size(sys.stdin.fileno())
             except (AttributeError, ValueError, OSError):
-                pass
+                try:
+                    width, height = os.get_terminal_size(sys.stdout.fileno())
+                except (AttributeError, ValueError, OSError):
+                    pass
 
         # get_terminal_size can report 0, 0 if run from pseudo-terminal
         width = width or 80
@@ -1053,6 +1056,12 @@ class Console:
                 del text[:]
 
         for renderable in objects:
+            # I promise this is sane
+            # This detects an object which claims to have all attributes, such as MagicMock.mock_calls
+            if hasattr(
+                renderable, "jwevpw_eors4dfo6mwo345ermk7kdnfnwerwer"
+            ):  # pragma: no cover
+                renderable = repr(renderable)
             rich_cast = getattr(renderable, "__rich__", None)
             if rich_cast:
                 renderable = rich_cast()
