@@ -1058,7 +1058,9 @@ class Console:
         for renderable in objects:
             # I promise this is sane
             # This detects an object which claims to have all attributes, such as MagicMock.mock_calls
-            if hasattr(renderable, "jwevpw_eors4dfo6mwo345ermk7kdnfnwerwer"):
+            if hasattr(
+                renderable, "jwevpw_eors4dfo6mwo345ermk7kdnfnwerwer"
+            ):  # pragma: no cover
                 renderable = repr(renderable)
             rich_cast = getattr(renderable, "__rich__", None)
             if rich_cast:

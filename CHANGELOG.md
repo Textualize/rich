@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed panel cropping when shrunk too bar
 - Allow passing markdown over STDIN when using `python -m rich.markdown`
+- Fix printing MagicMock.mock_calls https://github.com/willmcgugan/rich/issues/903
 
 ## [9.7.0] - 2021-01-09
 
