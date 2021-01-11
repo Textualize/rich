@@ -3,6 +3,7 @@ from typing import Iterator, List, Tuple
 from ._loop import loop_first, loop_last
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .jupyter import JupyterMixin
+from .measure import Measurement
 from .segment import Segment
 from .style import Style, StyleStack, StyleType
 from .styled import Styled
@@ -150,6 +151,31 @@ class Tree(JupyterMixin):
                 style_stack.push(get_style(node.style))
                 guide_style_stack.push(get_style(node.guide_style))
                 push(iter(loop_last(node.children)))
+
+    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
+        stack: List[Iterator[Tree]] = [iter([self])]
+        pop = stack.pop
+        push = stack.append
+        minimum = 0
+        maximum = 0
+        measure = Measurement.get
+        level = 0
+        while stack:
+            iter_tree = pop()
+            try:
+                tree = next(iter_tree)
+            except StopIteration:
+                level -= 1
+                continue
+            push(iter_tree)
+            min_measure, max_measure = measure(console, tree.label, max_width)
+            indent = level * 4
+            minimum = max(min_measure + indent, minimum)
+            maximum = max(max_measure + indent, maximum)
+            if tree.expanded and tree.children:
+                push(iter(tree.children))
+                level += 1
+        return Measurement(minimum, maximum)
 
 
 if __name__ == "__main__":  # pragma: no cover
