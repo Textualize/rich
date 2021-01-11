@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed panel cropping when shrunk too bar
+- Allow passing markdown over STDIN when using `python -m rich.markdown`
 
 ## [9.7.0] - 2021-01-09
 
