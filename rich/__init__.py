@@ -77,7 +77,7 @@ def inspect(
     * inspect(<OBJECT>, methods=True) to see methods.
     * inspect(<OBJECT>, help=True) to see full (non-abbreviated) help.
     * inspect(<OBJECT>, private=True) to see private attributes (single underscore).
-    * inspect(<OBJECT>, dunder=True) to see attributes begining with double underscore.
+    * inspect(<OBJECT>, dunder=True) to see attributes beginning with double underscore.
     * inspect(<OBJECT>, all=True) to see all attributes.
 
     Args:
