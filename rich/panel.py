@@ -114,7 +114,11 @@ class Panel(JupyterMixin):
         )
         style = console.get_style(self.style)
         border_style = style + console.get_style(self.border_style)
-        width = options.max_width if self.width is None else self.width
+        width = (
+            options.max_width
+            if self.width is None
+            else min(options.max_width, self.width)
+        )
 
         safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box  # type: ignore
         box = self.box.substitute(options, safe=safe_box)
@@ -130,7 +134,7 @@ class Panel(JupyterMixin):
         )
         if title_text is not None:
             child_width = min(
-                options.max_width, max(child_width, title_text.cell_len + 2)
+                options.max_width - 2, max(child_width, title_text.cell_len + 2)
             )
 
         width = child_width + 2

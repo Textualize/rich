@@ -102,6 +102,7 @@ def test_vertical_center():
     repr(vertical_center)
     console.print(vertical_center)
     result = console.end_capture()
-    expected = "\n\nfoo\n\n\n"
+    print(repr(result))
+    expected = "   \n   \nfoo\n   \n   \n   \n"
     assert result == expected
     assert Measurement.get(console, vertical_center) == Measurement(3, 3)

@@ -11,7 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added **rich_measure** for tree
 - Added rich.align.VerticalCenter
-- Added height to ConsoleOptions
+
+### Changed
+
+- The `style` argument on Align now applies to background only
+- Changed display of progress bars in no_color mode for clarity
+
+### Fixed
+
+- Fixed panel cropping when shrunk too bar
 
 ## [9.7.0] - 2021-01-09
 

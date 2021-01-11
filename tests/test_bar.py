@@ -62,7 +62,7 @@ def test_pulse():
 def test_get_pulse_segments():
     bar = ProgressBar()
     segments = bar._get_pulse_segments(
-        Style.parse("red"), Style.parse("yellow"), "standard", False
+        Style.parse("red"), Style.parse("yellow"), None, False, False
     )
     print(repr(segments))
     expected = [
