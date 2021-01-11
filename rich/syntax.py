@@ -521,11 +521,17 @@ class Syntax(JupyterMixin):
 if __name__ == "__main__":  # pragma: no cover
 
     import argparse
+    import sys
 
     parser = argparse.ArgumentParser(
         description="Render syntax to the console with Rich"
     )
-    parser.add_argument("path", metavar="PATH", help="path to file")
+    parser.add_argument(
+        "path",
+        metavar="PATH",
+        nargs="?",
+        help="path to file",
+    )
     parser.add_argument(
         "-c",
         "--force-color",
@@ -583,18 +589,30 @@ if __name__ == "__main__":  # pragma: no cover
         default=None,
         help="Overide background color",
     )
+    parser.add_argument(
+        "-L",
+        "--lexer",
+        default="default",
+        dest="lexer_name",
+        help="Lexer name",
+    )
     args = parser.parse_args()
 
     from rich.console import Console
 
     console = Console(force_terminal=args.force_color, width=args.width)
 
-    syntax = Syntax.from_path(
-        args.path,
+    kwargs = dict(
         line_numbers=args.line_numbers,
         word_wrap=args.word_wrap,
         theme=args.theme,
         background_color=args.background_color,
         indent_guides=args.indent_guides,
     )
+
+    if not args.path or args.path == "-":
+        code = sys.stdin.read()
+        syntax = Syntax(code=code, lexer_name=args.lexer_name, **kwargs)
+    else:
+        syntax = Syntax.from_path(args.path, **kwargs)
     console.print(syntax, soft_wrap=args.soft_wrap)

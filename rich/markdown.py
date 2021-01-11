@@ -527,11 +527,17 @@ class Markdown(JupyterMixin):
 if __name__ == "__main__":  # pragma: no cover
 
     import argparse
+    import sys
 
     parser = argparse.ArgumentParser(
         description="Render Markdown to the console with Rich"
     )
-    parser.add_argument("path", metavar="PATH", help="path to markdown file")
+    parser.add_argument(
+        "path",
+        metavar="PATH",
+        nargs="?",
+        help="path to markdown file",
+    )
     parser.add_argument(
         "-c",
         "--force-color",
@@ -587,14 +593,18 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich.console import Console
 
-    with open(args.path, "rt", encoding="utf-8") as markdown_file:
-        markdown = Markdown(
-            markdown_file.read(),
-            justify="full" if args.justify else "left",
-            code_theme=args.code_theme,
-            hyperlinks=args.hyperlinks,
-            inline_code_lexer=args.inline_code_lexer,
-        )
+    if not args.path or args.path == "-":
+        markdown_body = sys.stdin.read()
+    else:
+        with open(args.path, "rt", encoding="utf-8") as markdown_file:
+            markdown_body = markdown_file.read()
+    markdown = Markdown(
+        markdown_body,
+        justify="full" if args.justify else "left",
+        code_theme=args.code_theme,
+        hyperlinks=args.hyperlinks,
+        inline_code_lexer=args.inline_code_lexer,
+    )
     if args.page:
         import pydoc
         import io
