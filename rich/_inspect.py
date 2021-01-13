@@ -85,12 +85,14 @@ class Inspect(JupyterMixin):
             padding=(0, 1),
         )
 
-    def _get_signature(self, name: str, obj: Any) -> Text:
+    def _get_signature(self, name: str, obj: Any) -> Optional[Text]:
         """Get a signature for a callable."""
         try:
             _signature = str(signature(obj)) + ":"
         except ValueError:
             _signature = "(...)"
+        except TypeError:
+            return None
 
         source_filename: Optional[str] = None
         try:
@@ -142,8 +144,10 @@ class Inspect(JupyterMixin):
         highlighter = self.highlighter
 
         if callable(obj):
-            yield self._get_signature("", obj)
-            yield ""
+            signature = self._get_signature("", obj)
+            if signature is not None:
+                yield signature
+                yield ""
 
         _doc = getdoc(obj)
         if _doc is not None:
@@ -178,20 +182,23 @@ class Inspect(JupyterMixin):
             if callable(value):
                 if not self.methods:
                     continue
+
                 _signature_text = self._get_signature(key, value)
+                if _signature_text is None:
+                    add_row(key_text, Pretty(value, highlighter=highlighter))
+                else:
+                    if self.docs:
+                        docs = getdoc(value)
+                        if docs is not None:
+                            _doc = _reformat_doc(str(docs))
+                            if not self.help:
+                                _doc = _first_paragraph(_doc)
+                            _signature_text.append("\n" if "\n" in _doc else " ")
+                            doc = highlighter(_doc)
+                            doc.stylize("inspect.doc")
+                            _signature_text.append(doc)
 
-                if self.docs:
-                    docs = getdoc(value)
-                    if docs is not None:
-                        _doc = _reformat_doc(str(docs))
-                        if not self.help:
-                            _doc = _first_paragraph(_doc)
-                        _signature_text.append("\n" if "\n" in _doc else " ")
-                        doc = highlighter(_doc)
-                        doc.stylize("inspect.doc")
-                        _signature_text.append(doc)
-
-                add_row(key_text, _signature_text)
+                    add_row(key_text, _signature_text)
             else:
                 add_row(key_text, Pretty(value, highlighter=highlighter))
         if items_table.row_count:

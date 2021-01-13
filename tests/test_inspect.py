@@ -19,8 +19,8 @@ skip_py37 = pytest.mark.skipif(
 )
 
 
-def render(obj, methods=False, value=False) -> str:
-    console = Console(file=io.StringIO(), width=50, legacy_windows=False)
+def render(obj, methods=False, value=False, width=50) -> str:
+    console = Console(file=io.StringIO(), width=width, legacy_windows=False)
     inspect(obj, console=console, methods=methods, value=value)
     return console.file.getvalue()
 
@@ -183,3 +183,23 @@ def test_inspect_integer_with_methods():
         "╰────────────────────────────────────────────────╯\n"
     )
     assert expected == render(1, methods=True)
+
+
+@skip_py36
+@skip_py37
+def test_broken_call_attr():
+    class NotCallable:
+        __call__ = 5  # Passes callable() but isn't really callable
+
+        def __repr__(self):
+            return "NotCallable()"
+
+    class Foo:
+        foo = NotCallable()
+
+    foo = Foo()
+    assert callable(foo.foo)
+    expected = "╭─ <class 'tests.test_inspect.test_broken_call_attr.<locals>.Foo'> ─╮\n│ foo = NotCallable()                                               │\n╰───────────────────────────────────────────────────────────────────╯\n"
+    result = render(foo, methods=True, width=100)
+    print(repr(result))
+    assert expected == result
