@@ -4,7 +4,7 @@ from typing import IO, Any, List, Optional
 
 from typing_extensions import Literal
 
-from .__init__ import get_console
+from . import get_console
 from ._loop import loop_last
 from .console import (
     Console,
