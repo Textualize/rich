@@ -480,7 +480,7 @@ class Syntax(JupyterMixin):
         padding = _Segment(" " * numbers_column_width + " ", background_style)
         new_line = _Segment("\n")
 
-        line_pointer = "❱ "
+        line_pointer = "> " if options.legacy_windows else "❱ "
 
         for line_no, line in enumerate(lines, self.start_line + line_offset):
             if self.word_wrap:
