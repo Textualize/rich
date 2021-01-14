@@ -157,7 +157,11 @@ class Live(JupyterMixin, RenderHook):
             try:
                 if self.auto_refresh and self._refresh_thread is not None:
                     self._refresh_thread.stop()
-                    self._refresh_thread.join()
+                    self._lock.release()
+                    try:
+                        self._refresh_thread.join()
+                    finally:
+                        self._lock.acquire()
                     self._refresh_thread = None
                 # allow it to fully render on the last even if overflow
                 self.vertical_overflow = "visible"
