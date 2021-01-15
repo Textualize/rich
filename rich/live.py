@@ -40,7 +40,8 @@ class _RefreshThread(Thread):
     def run(self) -> None:
         while not self.done.wait(1 / self.refresh_per_second):
             with self.live._lock:
-                self.live.refresh()
+                if not self.done.is_set():
+                    self.live.refresh()
 
 
 class _LiveRender(LiveRender):
