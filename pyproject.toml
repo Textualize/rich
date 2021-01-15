@@ -2,7 +2,7 @@
 name = "rich"
 homepage = "https://github.com/willmcgugan/rich"
 documentation = "https://rich.readthedocs.io/en/latest/"
-version = "9.8.1"
+version = "9.8.2"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"
@@ -18,6 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Typing :: Typed"
 ]
 include = ["rich/py.typed"]
 
