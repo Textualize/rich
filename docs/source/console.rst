@@ -99,7 +99,7 @@ Rich can display a status message with a 'spinner' animation that won't interfer
 
     python -m rich.status
 
-To display a status message call :meth:`~rich.console.Console.status` with the status message (which may be a string, Text, or other renderable). The result is a context manager which starts and stop the status display around a block of code. Here's an example::
+To display a status message, call :meth:`~rich.console.Console.status` with the status message (which may be a string, Text, or other renderable). The result is a context manager which starts and stop the status display around a block of code. Here's an example::
 
     with console.status("Working...")
         do_work()
@@ -204,7 +204,7 @@ Cropping
 The :meth:`~rich.console.Console.print` method has a boolean ``crop`` argument. The default value for crop is True which tells Rich to crop any content that would otherwise run on to the next line. You generally don't need to think about cropping, as Rich will resize content to fit within the available width.
 
 .. note::
-    Cropping is automatically disabled if you print with ``soft_wrap==True``.
+    Cropping is automatically disabled if you print with ``soft_wrap=True``.
 
 
 Input
@@ -277,7 +277,7 @@ An alternative way of capturing output is to set the Console file to a :py:class
 Paging
 ------
 
-If you have some long output to present to the user you can use a *pager* to display it. A pager is typically an application on by your operating system which will at least support pressing a key to scroll, but will often support scrolling up and down through the text and other features.
+If you have some long output to present to the user you can use a *pager* to display it. A pager is typically an application on your operating system which will at least support pressing a key to scroll, but will often support scrolling up and down through the text and other features.
 
 You can page output from a Console by calling :meth:`~rich.console.Console.pager` which returns a context manger. When the pager exits, anything that was printed will be sent to the pager. Here's an example::
 
