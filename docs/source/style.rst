@@ -4,7 +4,7 @@
 Styles
 ======
 
-In various places in the Rich API you can set a "style" which defines the color of the text and various attributes such as bold, italic etc. A style may be given as a string containing a *style definition* or as in instance of a :class:`~rich.style.Style` class.
+In various places in the Rich API you can set a "style" which defines the color of the text and various attributes such as bold, italic etc. A style may be given as a string containing a *style definition* or as an instance of a :class:`~rich.style.Style` class.
 
 
 Defining Styles
