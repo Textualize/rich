@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import os.path
 import platform
 import sys
+import inspect
 from dataclasses import dataclass, field
 from textwrap import indent
 from traceback import walk_tb
@@ -44,6 +45,8 @@ WINDOWS = platform.system() == "Windows"
 
 LOCALS_MAX_LENGTH = 10
 LOCALS_MAX_STRING = 80
+
+_load_cwd = os.path.abspath(os.getcwd())
 
 
 def install(
@@ -108,6 +111,7 @@ class Frame:
     name: str
     line: str = ""
     locals: Optional[Dict[str, pretty.Node]] = None
+    source: str = ""
 
 
 @dataclass
@@ -282,9 +286,23 @@ class Traceback:
             append = stack.frames.append
 
             for frame_summary, line_no in walk_tb(traceback):
-                filename = frame_summary.f_code.co_filename
-                if filename and not filename.startswith("<"):
-                    filename = os.path.abspath(filename) if filename else "?"
+                try:
+                    if (
+                        inspect.getsourcefile(frame_summary) == sys.argv[0]
+                    ):  # current script, not absolute
+                        filename = os.path.join(_load_cwd, sys.argv[0])
+                    else:
+                        filename = inspect.getabsfile(frame_summary)
+                except:
+                    filename = frame_summary.f_code.co_filename
+                    if filename and not filename.startswith("<"):
+                        filename = os.path.abspath(filename) if filename else "?"
+                try:
+                    with open(filename, "rb") as op:
+                        source = op.read().decode("utf-8", errors="replace")
+
+                except:
+                    source = ""
                 frame = Frame(
                     filename=filename,
                     lineno=line_no,
@@ -299,6 +317,7 @@ class Traceback:
                     }
                     if show_locals
                     else None,
+                    source=source,
                 )
                 append(frame)
 
@@ -430,25 +449,6 @@ class Traceback:
     def _render_stack(self, stack: Stack) -> RenderResult:
         path_highlighter = PathHighlighter()
         theme = self.theme
-        code_cache: Dict[str, str] = {}
-
-        def read_code(filename: str) -> str:
-            """Read files, and cache results on filename.
-
-            Args:
-                filename (str): Filename to read
-
-            Returns:
-                str: Contents of file
-            """
-            code = code_cache.get(filename)
-            if code is None:
-                with open(
-                    filename, "rt", encoding="utf-8", errors="replace"
-                ) as code_file:
-                    code = code_file.read()
-                code_cache[filename] = code
-            return code
 
         def render_locals(frame: Frame) -> Iterable[ConsoleRenderable]:
             if frame.locals:
@@ -476,7 +476,29 @@ class Traceback:
                 yield from render_locals(frame)
                 continue
             try:
-                code = read_code(frame.filename)
+                if frame.source:
+                    code = frame.source
+                    line_range = (
+                        frame.lineno - self.extra_lines,
+                        frame.lineno + self.extra_lines,
+                    )
+                else:
+                    code = "# source not available"
+                    line_range = (0, 1)
+                # leading empty lines get filtered from the output
+                # but to actually show the correct section & highlight
+                # we need to adjust the line range accordingly.
+                leading_empty_lines = 0
+                while (
+                    code
+                    and leading_empty_lines < len(code)
+                    and code[leading_empty_lines] == "\n"
+                ):
+                    leading_empty_lines += 1
+                line_range = (
+                    line_range[0] - leading_empty_lines,
+                    line_range[1] - leading_empty_lines,
+                )
                 lexer = guess_lexer_for_filename(frame.filename, code)
                 lexer_name = lexer.name
                 syntax = Syntax(
@@ -484,11 +506,8 @@ class Traceback:
                     lexer_name,
                     theme=theme,
                     line_numbers=True,
-                    line_range=(
-                        frame.lineno - self.extra_lines,
-                        frame.lineno + self.extra_lines,
-                    ),
-                    highlight_lines={frame.lineno},
+                    line_range=line_range,
+                    highlight_lines={frame.lineno - leading_empty_lines},
                     word_wrap=self.word_wrap,
                     code_width=88,
                     indent_guides=self.indent_guides,

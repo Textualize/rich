@@ -156,14 +156,78 @@ def test_filename_with_bracket():
     assert "<string>" in exception_text
 
 
-def test_filename_not_a_file():
+def test_filename_not_a_file_unknown_lexer():
     console = Console(width=100, file=io.StringIO())
     try:
         exec(compile("1/0", filename="string", mode="exec"))
     except Exception:
         console.print_exception()
     exception_text = console.file.getvalue()
+    print(exception_text)
     assert "string" in exception_text
+    assert "no lexer" in exception_text
+
+
+def test_filename_not_a_file_py_lexer():
+    console = Console(width=100, file=io.StringIO())
+    try:
+        exec(compile("1/0", filename="string.py", mode="exec"))
+    except Exception:
+        console.print_exception()
+    exception_text = console.file.getvalue()
+    print(exception_text)
+    assert "string.py" in exception_text
+    assert "source not available" in exception_text
+
+
+def test_cwd_change():
+    import tempfile
+    from pathlib import Path
+    import subprocess
+    import os
+
+    with tempfile.TemporaryDirectory() as td:
+        fn = Path(td).absolute() / "test.py"
+        fn.write_text(
+            """
+import rich.traceback
+import os
+rich.traceback.install()
+
+def explode():
+    1/0 # sentinel1
+
+# a bunch
+# of unrelated
+# lines to get
+# beyond the extra
+# lines
+
+os.chdir('/tmp')
+explode() # sentinel2
+"""
+        )
+        td2 = Path(td) / "2"
+        td2.mkdir()
+        old = os.getcwd()
+        try:
+            os.chdir(td2)
+            p = subprocess.Popen(
+                [sys.executable, "test.py"],
+                cwd=td,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            stdout, stderr = p.communicate()
+        finally:
+            os.chdir(old)
+        stderr = stderr.decode("utf-8")
+        # assert str(fn) in stderr # unfortunatly, inspect.getfileabs() is not good enough here.
+        print(stderr)
+        assert stderr.count("sentinel1") == 1
+        assert stderr.count("sentinel2") == 1
+        # checks we highlight the right thing even though our source starts with a new line
+        assert "❱  6 │   1/0 # sentinel1" in stderr
 
 
 if __name__ == "__main__":  # pragma: no cover
