@@ -53,11 +53,12 @@ class Palette:
         """
         red1, green1, blue1 = color
         _sqrt = sqrt
+        get_color = self._colors.__getitem__
 
         def get_color_distance(index: int) -> float:
             """Get the distance to a color."""
-            red2, green2, blue2 = self._colors[index]
-            red_mean = int((red1 + red2) / 2)
+            red2, green2, blue2 = get_color(index)
+            red_mean = (red1 + red2) // 2
             red = red1 - red2
             green = green1 - green2
             blue = blue1 - blue2

@@ -82,7 +82,7 @@ class ReprHighlighter(RegexHighlighter):
     base_style = "repr."
     highlights = [
         r"(?P<tag_start>\<)(?P<tag_name>[\w\-\.\:]*)(?P<tag_contents>.*?)(?P<tag_end>\>)",
-        r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?[\w_]+\"?)?",
+        r"(?P<attrib_name>[\w_]{1,50})=(?P<attrib_value>\"?[\w_]+\"?)?",
         _combine_regex(
             r"(?P<ipv4>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})",
             r"(?P<ipv6>([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})",
