@@ -86,15 +86,21 @@ class Segment(NamedTuple):
         Returns:
             Iterable[Segments]: A new iterable of segments (possibly the same iterable).
         """
-        if style:
+        if style is not None:
             apply = style.__add__
             segments = (
                 cls(text, None if is_control else apply(_style), is_control)
                 for text, _style, is_control in segments
             )
-        if post_style:
+        if post_style is not None:
             segments = (
-                cls(text, None if is_control else _style + post_style, is_control)
+                cls(
+                    text,
+                    None
+                    if is_control
+                    else (_style + post_style if _style else post_style),
+                    is_control,
+                )
                 for text, _style, is_control in segments
             )
         return segments
