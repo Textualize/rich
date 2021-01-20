@@ -14,11 +14,11 @@ import pytest
 
 
 def test_str() -> None:
-    assert str(Color.parse("red")) == "<color 'red' (standard)>"
+    assert str(Color.parse("red")) == "<color 'red' 1 (standard)>"
 
 
 def test_repr() -> None:
-    assert repr(Color.parse("red")) == "<color 'red' (standard)>"
+    assert repr(Color.parse("red")) == "<color 'red' 1 (standard)>"
 
 
 def test_rich() -> None:
@@ -51,7 +51,7 @@ def test_truecolor() -> None:
         255, 255, 255
     )
     assert Color("red", ColorType.WINDOWS, number=1).get_truecolor() == ColorTriplet(
-        170, 0, 0
+        197, 15, 31
     )
 
 
@@ -158,7 +158,7 @@ def test_downgrade() -> None:
     )
 
     assert Color.parse("bright_red").downgrade(ColorSystem.WINDOWS) == Color(
-        "bright_red", ColorType.WINDOWS, 1, None
+        "bright_red", ColorType.WINDOWS, 9, None
     )
 
     assert Color.parse("#ff0000").downgrade(ColorSystem.WINDOWS) == Color(
@@ -166,7 +166,7 @@ def test_downgrade() -> None:
     )
 
     assert Color.parse("color(255)").downgrade(ColorSystem.WINDOWS) == Color(
-        "color(255)", ColorType.WINDOWS, 7, None
+        "color(255)", ColorType.WINDOWS, 15, None
     )
 
     assert Color.parse("#00ff00").downgrade(ColorSystem.STANDARD) == Color(

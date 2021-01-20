@@ -95,7 +95,7 @@ class Tree(JupyterMixin):
                 line = ASCII_GUIDES[index]
             else:
                 guide = 1 if style.bold else (2 if style.underline2 else 0)
-                line = TREE_GUIDES[guide][index]
+                line = TREE_GUIDES[0 if options.legacy_windows else guide][index]
             return _Segment(line, style)
 
         levels: List[Segment] = [make_guide(CONTINUE, guide_style)]
@@ -103,6 +103,7 @@ class Tree(JupyterMixin):
 
         guide_style_stack = StyleStack(get_style(self.guide_style))
         style_stack = StyleStack(get_style(self.style))
+        remove_guide_styles = Style(bold=False, underline2=False)
 
         while stack:
             stack_node = pop()
@@ -133,7 +134,11 @@ class Tree(JupyterMixin):
             )
             for first, line in loop_first(renderable_lines):
                 if prefix:
-                    yield from _Segment.apply_style(prefix, style.background_style)
+                    yield from _Segment.apply_style(
+                        prefix,
+                        style.background_style,
+                        post_style=remove_guide_styles,
+                    )
                 yield from line
                 yield new_line
                 if first and prefix:

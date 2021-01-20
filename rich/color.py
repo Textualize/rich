@@ -270,7 +270,11 @@ class Color(NamedTuple):
     """A triplet of color components, if an RGB color."""
 
     def __repr__(self) -> str:
-        return f"<color {self.name!r} ({self.type.name.lower()})>"
+        return (
+            f"<color {self.name!r} ({self.type.name.lower()})>"
+            if self.number is None
+            else f"<color {self.name!r} {self.number} ({self.type.name.lower()})>"
+        )
 
     def __rich__(self) -> "Text":
         """Dispays the actual color if Rich printed."""
@@ -326,7 +330,7 @@ class Color(NamedTuple):
             return theme.ansi_colors[self.number]
         elif self.type == ColorType.WINDOWS:
             assert self.number is not None
-            return STANDARD_PALETTE[self.number]
+            return WINDOWS_PALETTE[self.number]
         else:  # self.type == ColorType.DEFAULT:
             assert self.number is None
             return theme.foreground_color if foreground else theme.background_color
@@ -445,7 +449,8 @@ class Color(NamedTuple):
         elif _type == ColorType.WINDOWS:
             number = self.number
             assert number is not None
-            return (str(30 + number if foreground else 40 + number),)
+            fore, back = (30, 40) if number < 8 else (82, 92)
+            return (str(fore + number if foreground else back + number),)
 
         elif _type == ColorType.STANDARD:
             number = self.number
@@ -507,10 +512,8 @@ class Color(NamedTuple):
                 triplet = self.triplet
             else:  # self.system == ColorSystem.EIGHT_BIT
                 assert self.number is not None
-                if self.number < 8:
+                if self.number < 16:
                     return Color(self.name, ColorType.WINDOWS, number=self.number)
-                elif self.number < 16:
-                    return Color(self.name, ColorType.WINDOWS, number=self.number - 8)
                 triplet = ColorTriplet(*EIGHT_BIT_PALETTE[self.number])
 
             color_number = WINDOWS_PALETTE.match(triplet)

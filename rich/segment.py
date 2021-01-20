@@ -69,24 +69,35 @@ class Segment(NamedTuple):
 
     @classmethod
     def apply_style(
-        cls, segments: Iterable["Segment"], style: Style = None
+        cls,
+        segments: Iterable["Segment"],
+        style: Style = None,
+        post_style: Style = None,
     ) -> Iterable["Segment"]:
-        """Apply a style to an iterable of segments.
+        """Apply style(s) to an iterable of segments.
+
+        Returns an iterable of segments where the style is replaced by ``style + segment.style + post_style``.
 
         Args:
             segments (Iterable[Segment]): Segments to process.
-            style (Style, optional): A style to apply. Defaults to None.
+            style (Style, optional): Base style. Defaults to None.
+            post_style (Style, optional): Style to apply on top of segment style. Defaults to None.
 
         Returns:
             Iterable[Segments]: A new iterable of segments (possibly the same iterable).
         """
-        if style is None:
-            return segments
-        apply = style.__add__
-        return (
-            cls(text, None if is_control else apply(style), is_control)
-            for text, style, is_control in segments
-        )
+        if style:
+            apply = style.__add__
+            segments = (
+                cls(text, None if is_control else apply(_style), is_control)
+                for text, _style, is_control in segments
+            )
+        if post_style:
+            segments = (
+                cls(text, None if is_control else _style + post_style, is_control)
+                for text, _style, is_control in segments
+            )
+        return segments
 
     @classmethod
     def filter_control(

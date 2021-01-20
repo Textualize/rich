@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.9.0] - Unreleased
+
+### Changed
+
+- Extended Windows palette to 16 colors
+- Modified windows palette to Windows 10 colors
+- Change regex for attrib_name to be more performant
+
+### Fixed
+
+- Fix double line tree guides on Windows
+
+### Added
+
+- Added post_style argument to Segment.apply_style
+
 ## [9.8.2] - 2021-01-15
 
 ### Fixed
