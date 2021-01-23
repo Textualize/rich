@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix double line tree guides on Windows
+- Fix initial table headers missing style https://github.com/willmcgugan/rich/issues/953
 
 ### Added
 
