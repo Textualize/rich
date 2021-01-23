@@ -1,14 +1,13 @@
 # encoding=utf-8
 
 import io
-from rich import color
 
 import pytest
 
-from rich import errors
+from rich import color, errors
 from rich.console import Console
 from rich.measure import Measurement
-from rich.table import Table, Column
+from rich.table import Column, Table
 from rich.text import Text
 
 
@@ -103,6 +102,40 @@ def test_init_append_column():
     assert Table(*header_names).columns == test_columns
     # Test directly passing a Table Column objects
     assert Table(*test_columns).columns == test_columns
+
+
+def test_init_append_column_style():
+    header_names = ["header1", "header2", "header3"]
+
+    test_columns_with_style = [
+        Column(_index=index, header=header, header_style="bold red")
+        for index, header in enumerate(header_names)
+    ]
+
+    # Test appending of strings for header names with style
+    assert (
+        Table(*header_names, header_style="bold red").columns == test_columns_with_style
+    )
+
+    test_columns_without_style = [
+        Column(_index=index, header=header) for index, header in enumerate(header_names)
+    ]
+
+    # Test appending of strings for header names without style
+    assert (
+        Table(*test_columns_without_style, header_style="bold red").columns
+        == test_columns_with_style
+    )
+
+    test_columns_with_diff_style = [
+        Column(_index=index, header=header, header_style="bold green")
+        for index, header in enumerate(header_names)
+    ]
+    # Test directly passing a Table Column objects with different style
+    assert (
+        Table(*test_columns_with_diff_style, header_style="bold red").columns
+        == test_columns_with_diff_style
+    )
 
 
 def test_rich_measure():
