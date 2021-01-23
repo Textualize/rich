@@ -12,10 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extended Windows palette to 16 colors
 - Modified windows palette to Windows 10 colors
 - Change regex for attrib_name to be more performant
+- Optimized traceback generation
 
 ### Fixed
 
 - Fix double line tree guides on Windows
+- Fixed Tracebacks ignoring initial blank lines
 
 ### Added
 
@@ -65,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed markup escaping edge case https://github.com/willmcgugan/rich/issues/878
 - Double tag escape, i.e. `"\\[foo]"` results in a backslash plus `[foo]` tag
+- Fixed header_style not applying to headers in positional args https://github.com/willmcgugan/rich/issues/953
 
 ## [9.6.1] - 2020-12-31
 

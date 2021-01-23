@@ -306,6 +306,15 @@ def test_split():
     assert list(Text("foo").split("\n")) == [Text("foo")]
 
 
+def test_split_spans():
+    test = Text.from_markup("[red]Hello\nWorld")
+    lines = test.split("\n")
+    assert lines[0].plain == "Hello"
+    assert lines[1].plain == "World"
+    assert lines[0].spans == [Span(0, 5, "red")]
+    assert lines[1].spans == [Span(0, 5, "red")]
+
+
 def test_divide():
     lines = Text("foo").divide([])
     assert len(lines) == 1

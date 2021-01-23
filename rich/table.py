@@ -167,14 +167,6 @@ class Table(JupyterMixin):
 
         self.columns: List[Column] = []
         self.rows: List[Row] = []
-        append_column = self.columns.append
-        for index, header in enumerate(headers):
-            if isinstance(header, str):
-                append_column(Column(_index=index, header=header))
-            else:
-                header._index = index
-                append_column(header)
-
         self.title = title
         self.caption = caption
         self.width = width
@@ -200,6 +192,13 @@ class Table(JupyterMixin):
         self.caption_justify = caption_justify
         self.highlight = highlight
         self.row_styles = list(row_styles or [])
+        append_column = self.columns.append
+        for header in headers:
+            if isinstance(header, str):
+                self.add_column(header=header)
+            else:
+                header._index = len(self.columns)
+                append_column(header)
 
     @classmethod
     def grid(

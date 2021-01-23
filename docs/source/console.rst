@@ -104,7 +104,12 @@ To display a status message, call :meth:`~rich.console.Console.status` with the 
     with console.status("Working...")
         do_work()
 
-You can change the spinner animation via the ``spinner`` parameter. Run the following command to see the available choices::
+You can change the spinner animation via the ``spinner`` parameter::
+
+    with console.status("Monkeying around...", spinner="monkey"):
+        do_work
+
+Run the following command to see the available choices for ``spinner``::
 
     python -m rich.spinner
 

@@ -23,6 +23,7 @@ from pygments.token import (
 
 from . import pretty
 from ._loop import loop_first, loop_last
+from ._timer import timer
 from .columns import Columns
 from .console import (
     Console,
@@ -153,6 +154,8 @@ class Traceback:
             Defaults to 10.
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
     """
+
+    LEXERS = {".py": "python", ".pxd": "cython", ".pyx": "cython", ".pxi": "pyrex"}
 
     def __init__(
         self,
@@ -426,6 +429,14 @@ class Traceback:
         )
         yield syntax_error_text
 
+    @classmethod
+    def _guess_lexer(cls, filename: str, code: str) -> str:
+        ext = os.path.splitext(filename)[-1]
+        lexer_name = (
+            cls.LEXERS.get(ext) or guess_lexer_for_filename(filename, code).name
+        )
+        return lexer_name
+
     @render_group()
     def _render_stack(self, stack: Stack) -> RenderResult:
         path_highlighter = PathHighlighter()
@@ -477,8 +488,7 @@ class Traceback:
                 continue
             try:
                 code = read_code(frame.filename)
-                lexer = guess_lexer_for_filename(frame.filename, code)
-                lexer_name = lexer.name
+                lexer_name = self._guess_lexer(frame.filename, code)
                 syntax = Syntax(
                     code,
                     lexer_name,
@@ -492,6 +502,7 @@ class Traceback:
                     word_wrap=self.word_wrap,
                     code_width=88,
                     indent_guides=self.indent_guides,
+                    dedent=False,
                 )
                 yield ""
             except Exception as error:
