@@ -1,10 +1,12 @@
+# pragma: no cover
+
 from time import time
 
 import contextlib
 
 
 @contextlib.contextmanager
-def timer(subject: str = "time"):  # pragma: no cover
+def timer(subject: str = "time"):
     """print the elapsed time. (only used in debugging)"""
     start = time()
     yield

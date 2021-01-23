@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix double line tree guides on Windows
 - Fixed Tracebacks ignoring initial blank lines
+- Partial fix for tracebacks not finding source after chdir
 
 ### Added
 

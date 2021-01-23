@@ -1,10 +1,10 @@
 from __future__ import absolute_import
 
-import os.path
+import os
 import platform
 import sys
 from dataclasses import dataclass, field
-from textwrap import indent
+import inspect
 from traceback import walk_tb
 from types import TracebackType
 from typing import Callable, Dict, Iterable, List, Optional, Type
@@ -257,6 +257,8 @@ class Traceback:
         stacks: List[Stack] = []
         is_cause = False
 
+        from rich import _IMPORT_CWD
+
         while True:
             stack = Stack(
                 exc_type=str(exc_type.__name__),
@@ -279,9 +281,10 @@ class Traceback:
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
                 if filename and not filename.startswith("<"):
-                    filename = os.path.abspath(filename) if filename else "?"
+                    if not os.path.isabs(filename):
+                        filename = os.path.join(_IMPORT_CWD, filename)
                 frame = Frame(
-                    filename=filename,
+                    filename=filename or "?",
                     lineno=line_no,
                     name=frame_summary.f_code.co_name,
                     locals={
