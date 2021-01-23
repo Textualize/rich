@@ -10,20 +10,12 @@ from types import TracebackType
 from typing import Callable, Dict, Iterable, List, Optional, Type
 
 from pygments.lexers import guess_lexer_for_filename
-from pygments.token import (
-    Comment,
-    Keyword,
-    Name,
-    Number,
-    Operator,
-    String,
-    Token,
-    Text as TextToken,
-)
+from pygments.token import Comment, Keyword, Name, Number, Operator, String
+from pygments.token import Text as TextToken
+from pygments.token import Token
 
 from . import pretty
 from ._loop import loop_first, loop_last
-from ._timer import timer
 from .columns import Columns
 from .console import (
     Console,

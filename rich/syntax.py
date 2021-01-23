@@ -27,8 +27,7 @@ from .console import Console, ConsoleOptions, JustifyMethod, RenderResult, Segme
 from .jupyter import JupyterMixin
 from .measure import Measurement
 from .style import Style
-from .text import Span, Text
-from ._timer import timer
+from .text import Text
 
 TokenType = Tuple[str, ...]
 
@@ -670,5 +669,4 @@ if __name__ == "__main__":  # pragma: no cover
             background_color=args.background_color,
             indent_guides=args.indent_guides,
         )
-    with timer():
-        console.print(syntax, soft_wrap=args.soft_wrap)
+    console.print(syntax, soft_wrap=args.soft_wrap)
