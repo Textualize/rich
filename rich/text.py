@@ -949,7 +949,7 @@ class Text(JupyterMixin):
                 append_span(line_span)
                 position -= 1
                 if position < 0 or not span_stack:
-                    break
+                    break  # pragma: no cover
             line._spans.sort(key=get_order)
 
         return new_lines
