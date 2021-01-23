@@ -170,9 +170,17 @@ class Table(JupyterMixin):
         append_column = self.columns.append
         for index, header in enumerate(headers):
             if isinstance(header, str):
-                append_column(Column(_index=index, header=header))
+                append_column(
+                    Column(
+                        _index=index,
+                        header=header,
+                        header_style=Style.pick_first(header_style, "table.header"),
+                    )
+                )
             else:
                 header._index = index
+                if header.header_style == "table.header":
+                    header.header_style = Style.pick_first(header_style, "table.header")
                 append_column(header)
 
         self.title = title
