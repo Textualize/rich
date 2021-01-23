@@ -1,7 +1,6 @@
-from functools import partial, reduce
-from io import UnsupportedOperation
-from math import gcd
 import re
+from functools import partial, reduce
+from math import gcd
 from operator import attrgetter, itemgetter
 from typing import (
     TYPE_CHECKING,
@@ -30,12 +29,7 @@ from .segment import Segment
 from .style import Style, StyleType
 
 if TYPE_CHECKING:  # pragma: no cover
-    from .console import (
-        Console,
-        ConsoleOptions,
-        JustifyMethod,
-        OverflowMethod,
-    )
+    from .console import Console, ConsoleOptions, JustifyMethod, OverflowMethod
 
 DEFAULT_JUSTIFY: "JustifyMethod" = "default"
 DEFAULT_OVERFLOW: "OverflowMethod" = "fold"
@@ -901,6 +895,14 @@ class Text(JupyterMixin):
         return lines
 
     def divide(self, offsets: Iterable[int]) -> Lines:
+        """Divide text in to a number of lines at given offsets.
+
+        Args:	
+            offsets (Iterable[int]): Offsets used to divide text.	
+
+        Returns:	
+            Lines: New RichText instances between offsets.	
+        """
         if not offsets:
             return Lines([self.copy()])
 

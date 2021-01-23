@@ -4,7 +4,6 @@ import os
 import platform
 import sys
 from dataclasses import dataclass, field
-import inspect
 from traceback import walk_tb
 from types import TracebackType
 from typing import Callable, Dict, Iterable, List, Optional, Type
