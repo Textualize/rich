@@ -807,6 +807,7 @@ class Console:
     def status(
         self,
         status: RenderableType,
+        *,
         spinner: str = "dots",
         spinner_style: str = "status.spinner",
         speed: float = 1.0,

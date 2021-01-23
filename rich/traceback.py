@@ -1,25 +1,17 @@
 from __future__ import absolute_import
 
-import os.path
+import os
 import platform
 import sys
 from dataclasses import dataclass, field
-from textwrap import indent
 from traceback import walk_tb
 from types import TracebackType
 from typing import Callable, Dict, Iterable, List, Optional, Type
 
 from pygments.lexers import guess_lexer_for_filename
-from pygments.token import (
-    Comment,
-    Keyword,
-    Name,
-    Number,
-    Operator,
-    String,
-    Token,
-    Text as TextToken,
-)
+from pygments.token import Comment, Keyword, Name, Number, Operator, String
+from pygments.token import Text as TextToken
+from pygments.token import Token
 
 from . import pretty
 from ._loop import loop_first, loop_last
@@ -154,6 +146,8 @@ class Traceback:
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
     """
 
+    LEXERS = {".py": "python", ".pxd": "cython", ".pyx": "cython", ".pxi": "pyrex"}
+
     def __init__(
         self,
         trace: Trace = None,
@@ -262,6 +256,8 @@ class Traceback:
         stacks: List[Stack] = []
         is_cause = False
 
+        from rich import _IMPORT_CWD
+
         while True:
             stack = Stack(
                 exc_type=str(exc_type.__name__),
@@ -284,9 +280,10 @@ class Traceback:
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
                 if filename and not filename.startswith("<"):
-                    filename = os.path.abspath(filename) if filename else "?"
+                    if not os.path.isabs(filename):
+                        filename = os.path.join(_IMPORT_CWD, filename)
                 frame = Frame(
-                    filename=filename,
+                    filename=filename or "?",
                     lineno=line_no,
                     name=frame_summary.f_code.co_name,
                     locals={
@@ -426,6 +423,14 @@ class Traceback:
         )
         yield syntax_error_text
 
+    @classmethod
+    def _guess_lexer(cls, filename: str, code: str) -> str:
+        ext = os.path.splitext(filename)[-1]
+        lexer_name = (
+            cls.LEXERS.get(ext) or guess_lexer_for_filename(filename, code).name
+        )
+        return lexer_name
+
     @render_group()
     def _render_stack(self, stack: Stack) -> RenderResult:
         path_highlighter = PathHighlighter()
@@ -477,8 +482,7 @@ class Traceback:
                 continue
             try:
                 code = read_code(frame.filename)
-                lexer = guess_lexer_for_filename(frame.filename, code)
-                lexer_name = lexer.name
+                lexer_name = self._guess_lexer(frame.filename, code)
                 syntax = Syntax(
                     code,
                     lexer_name,
@@ -492,6 +496,7 @@ class Traceback:
                     word_wrap=self.word_wrap,
                     code_width=88,
                     indent_guides=self.indent_guides,
+                    dedent=False,
                 )
                 yield ""
             except Exception as error:

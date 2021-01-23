@@ -1,5 +1,6 @@
 """Rich text and beautiful formatting in the terminal."""
 
+import os
 from typing import Any, IO, Optional, TYPE_CHECKING
 
 __all__ = ["get_console", "reconfigure", "print", "inspect"]
@@ -9,6 +10,8 @@ if TYPE_CHECKING:
 
 # Global console used by alternative print
 _console: Optional["Console"] = None
+
+_IMPORT_CWD = os.path.abspath(os.getcwd())
 
 
 def get_console() -> "Console":

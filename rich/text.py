@@ -1,8 +1,7 @@
-from functools import partial, reduce
-from io import UnsupportedOperation
-from math import gcd
 import re
-from operator import itemgetter
+from functools import partial, reduce
+from math import gcd
+from operator import attrgetter, itemgetter
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -30,12 +29,7 @@ from .segment import Segment
 from .style import Style, StyleType
 
 if TYPE_CHECKING:  # pragma: no cover
-    from .console import (
-        Console,
-        ConsoleOptions,
-        JustifyMethod,
-        OverflowMethod,
-    )
+    from .console import Console, ConsoleOptions, JustifyMethod, OverflowMethod
 
 DEFAULT_JUSTIFY: "JustifyMethod" = "default"
 DEFAULT_OVERFLOW: "OverflowMethod" = "fold"
@@ -835,11 +829,11 @@ class Text(JupyterMixin):
         self._length += len(text)
         return self
 
-    def append_tokens(self, tokens: Iterable[Tuple[str, StyleType]]):
+    def append_tokens(self, tokens: Iterable[Tuple[str, Optional[StyleType]]]):
         """Append iterable of str and style. Style may be a Style instance or a str style definition.
 
         Args:
-            pairs (Iterable[Tuple[str, StyleType]]): An iterable of tuples containing str content and style.
+            pairs (Iterable[Tuple[str, Optional[StyleType]]]): An iterable of tuples containing str content and style.
 
         Returns:
             Text: Returns self for chaining.
@@ -850,7 +844,8 @@ class Text(JupyterMixin):
         offset = len(self)
         for content, style in tokens:
             append_text(content)
-            append_span(_Span(offset, offset + len(content), style))
+            if style is not None:
+                append_span(_Span(offset, offset + len(content), style))
             offset += len(content)
         self._length = offset
         return self
@@ -887,21 +882,16 @@ class Text(JupyterMixin):
             return Lines([self.copy()])
         if not allow_blank and text.endswith(separator):
             text = text[: -len(separator)]
-        offsets: List[int] = []
-        append = offsets.append
-        offset = 0
-        while True:
-            try:
-                offset = text.index(separator, offset) + len(separator)
-            except ValueError:
-                break
-            append(offset)
+        offsets = [
+            match.start() + 1 for match in re.finditer(re.escape(separator), text)
+        ]
         lines = self.divide(offsets)
         if not include_separator:
             separator_length = len(separator)
             for line in lines:
                 if line.plain.endswith(separator):
                     line.right_crop(separator_length)
+
         return lines
 
     def divide(self, offsets: Iterable[int]) -> Lines:
@@ -913,56 +903,56 @@ class Text(JupyterMixin):
         Returns:
             Lines: New RichText instances between offsets.
         """
-
         if not offsets:
-            line = self.copy()
-            return Lines([line])
+            return Lines([self.copy()])
 
         text = self.plain
         text_length = len(text)
         divide_offsets = [0, *offsets, text_length]
         line_ranges = list(zip(divide_offsets, divide_offsets[1:]))
-        average_line_length = -(-text_length // len(line_ranges))
 
+        style = self.style
+        justify = self.justify
+        overflow = self.overflow
+        _Text = Text
         new_lines = Lines(
-            Text(
+            _Text(
                 text[start:end],
-                style=self.style,
-                justify=self.justify,
-                overflow=self.overflow,
+                style=style,
+                justify=justify,
+                overflow=overflow,
             )
             for start, end in line_ranges
         )
-        line_ranges = [
-            (offset, offset + len(line))
-            for offset, line in zip(divide_offsets, new_lines)
-        ]
-        for span in self._spans:
-            line_index = (span.start // average_line_length) % len(line_ranges)
+        if not self._spans:
+            return new_lines
+        order = {span: span_index for span_index, span in enumerate(self._spans)}
+        span_stack = sorted(self._spans, key=attrgetter("start"), reverse=True)
 
-            line_start, line_end = line_ranges[line_index]
-            if span.start < line_start:
-                while True:
-                    line_index -= 1
-                    line_start, line_end = line_ranges[line_index]
-                    if span.start >= line_start:
-                        break
-            elif span.start > line_end:
-                while True:
-                    line_index += 1
-                    line_start, line_end = line_ranges[line_index]
-                    if span.start <= line_end:
-                        break
+        pop = span_stack.pop
+        push = span_stack.append
+        _Span = Span
+        get_order = order.__getitem__
 
-            while True:
-                span, new_span = span.split(line_end)
-                if span:
-                    new_lines[line_index]._spans.append(span.move(-line_start))
-                if new_span is None:
-                    break
-                span = new_span
-                line_index = (line_index + 1) % len(line_ranges)
-                line_start, line_end = line_ranges[line_index]
+        for line, (start, end) in zip(new_lines, line_ranges):
+            if not span_stack:
+                break
+            append_span = line._spans.append
+            position = len(span_stack) - 1
+            while span_stack[position].start < end:
+                span = pop(position)
+                add_span, remaining_span = span.split(end)
+                if remaining_span:
+                    push(remaining_span)
+                    order[remaining_span] = order[span]
+                span_start, span_end, span_style = add_span
+                line_span = _Span(span_start - start, span_end - start, span_style)
+                order[line_span] = order[span]
+                append_span(line_span)
+                position -= 1
+                if position < 0 or not span_stack:
+                    break  # pragma: no cover
+            line._spans.sort(key=get_order)
 
         return new_lines
 
