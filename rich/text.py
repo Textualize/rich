@@ -897,11 +897,11 @@ class Text(JupyterMixin):
     def divide(self, offsets: Iterable[int]) -> Lines:
         """Divide text in to a number of lines at given offsets.
 
-        Args:	
-            offsets (Iterable[int]): Offsets used to divide text.	
+        Args:
+            offsets (Iterable[int]): Offsets used to divide text.
 
-        Returns:	
-            Lines: New RichText instances between offsets.	
+        Returns:
+            Lines: New RichText instances between offsets.
         """
         if not offsets:
             return Lines([self.copy()])
