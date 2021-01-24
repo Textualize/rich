@@ -1020,19 +1020,19 @@ class Console:
         markup: bool = None,
         highlight: bool = None,
     ) -> List[ConsoleRenderable]:
-        """Combined a number of renderables and text in to one renderable.
+        """Combine a number of renderables and text into one renderable.
 
         Args:
             objects (Iterable[Any]): Anything that Rich can render.
-            sep (str, optional): String to write between print data. Defaults to " ".
-            end (str, optional): String to write at end of print data. Defaults to "\\n".
+            sep (str): String to write between print data.
+            end (str): String to write at end of print data.
             justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default.
 
         Returns:
-            List[ConsoleRenderable]: A list oxf things to render.
+            List[ConsoleRenderable]: A list of things to render.
         """
         renderables: List[ConsoleRenderable] = []
         _append = renderables.append
