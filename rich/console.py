@@ -1024,8 +1024,8 @@ class Console:
 
         Args:
             objects (Iterable[Any]): Anything that Rich can render.
-            sep (str): String to write between print data. Defaults to " ".
-            end (str): String to write at end of print data. Defaults to "\\n".
+            sep (str): String to write between print data.
+            end (str): String to write at end of print data.
             justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default.
