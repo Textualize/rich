@@ -385,7 +385,7 @@ class Text(JupyterMixin):
             suffix (str): Suffix to remove.
         """
         if self.plain.endswith(suffix):
-            self.plain = self.plain[: -len(suffix)]
+            self.right_crop(len(suffix))
 
     def get_style_at_offset(self, console: "Console", offset: int) -> Style:
         """Get the style of a character at give offset.
@@ -490,7 +490,7 @@ class Text(JupyterMixin):
             whitespace_match = _re_whitespace.search(self.plain)
             if whitespace_match is not None:
                 whitespace_count = len(whitespace_match.group(0))
-                self.plain = self.plain[: -min(whitespace_count, excess)]
+                self.right_crop(min(whitespace_count, excess))
 
     def set_length(self, new_length: int) -> None:
         """Set new length of the text, clipping or padding is required."""
@@ -499,7 +499,7 @@ class Text(JupyterMixin):
             if length < new_length:
                 self.pad_right(new_length - length)
             else:
-                self.plain = self.plain[:new_length]
+                self.right_crop(length - new_length)
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -655,6 +655,7 @@ class Text(JupyterMixin):
                 else:
                     append(part)
         self._text = [result.plain]
+        self._length = len(self.plain)
         self._spans[:] = result._spans
 
     def truncate(
@@ -681,26 +682,23 @@ class Text(JupyterMixin):
                     self.plain = set_cell_size(self.plain, max_width)
             if pad and length < max_width:
                 spaces = max_width - length
-                self.plain = f"{self.plain}{' ' * spaces}"
+                self._text = [f"{self.plain}{' ' * spaces}"]
+                self._length = len(self.plain)
 
     def _trim_spans(self) -> None:
         """Remove or modify any spans that are over the end of the text."""
-        new_length = self._length
-        spans: List[Span] = []
-        append = spans.append
+        # new_length = self._length
+        max_offset = len(self.plain)
         _Span = Span
-        for span in self._spans:
-            if span.end < new_length:
-                append(span)
-                continue
-            if span.start >= new_length:
-                continue
-            if span.end > new_length:
-                start, end, style = span
-                append(_Span(start, min(new_length, end), style))
-            else:
-                append(span)
-        self._spans[:] = spans
+        self._spans[:] = [
+            (
+                span
+                if span.end < max_offset
+                else _Span(span.start, min(max_offset, span.end), span.style)
+            )
+            for span in self._spans
+            if span.start < max_offset
+        ]
 
     def pad(self, count: int, character: str = " ") -> None:
         """Pad left and right with a given number of characters.
@@ -796,7 +794,6 @@ class Text(JupyterMixin):
                     raise ValueError(
                         "style must not be set when appending Text instance"
                     )
-
                 text_length = self._length
                 if text.style is not None:
                     self._spans.append(
@@ -882,9 +879,7 @@ class Text(JupyterMixin):
             return Lines([self.copy()])
         if not allow_blank and text.endswith(separator):
             text = text[: -len(separator)]
-        offsets = [
-            match.start() + 1 for match in re.finditer(re.escape(separator), text)
-        ]
+        offsets = [match.end() for match in re.finditer(re.escape(separator), text)]
         lines = self.divide(offsets)
         if not include_separator:
             separator_length = len(separator)
@@ -958,7 +953,19 @@ class Text(JupyterMixin):
 
     def right_crop(self, amount: int = 1) -> None:
         """Remove a number of characters from the end of the text."""
-        self.plain = self.plain[:-amount]
+        max_offset = len(self.plain) - amount
+        _Span = Span
+        self._spans[:] = [
+            (
+                span
+                if span.end < max_offset
+                else _Span(span.start, min(max_offset, span.end), span.style)
+            )
+            for span in self._spans
+            if span.start < max_offset
+        ]
+        self._text = [self.plain[:-amount]]
+        self._length -= amount
 
     def wrap(
         self,
