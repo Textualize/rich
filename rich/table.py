@@ -122,8 +122,8 @@ class Table(JupyterMixin):
         leading (bool, optional): Number of blank lines between rows (precludes ``show_lines``). Defaults to 0.
         style (Union[str, Style], optional): Default style for the table. Defaults to "none".
         row_styles (List[Union, str], optional): Optional list of row styles, if more that one style is give then the styles will alternate. Defaults to None.
-        header_style (Union[str, Style], optional): Style of the header. Defaults to None.
-        footer_style (Union[str, Style], optional): Style of the footer. Defaults to None.
+        header_style (Union[str, Style], optional): Style of the header. Defaults to "table.header".
+        footer_style (Union[str, Style], optional): Style of the footer. Defaults to "table.footer".
         border_style (Union[str, Style], optional): Style of the border. Defaults to None.
         title_style (Union[str, Style], optional): Style of the title. Defaults to None.
         caption_style (Union[str, Style], optional): Style of the caption. Defaults to None.
@@ -183,8 +183,8 @@ class Table(JupyterMixin):
         self.leading = leading
         self.collapse_padding = collapse_padding
         self.style = style
-        self.header_style = header_style
-        self.footer_style = footer_style
+        self.header_style = header_style or ""
+        self.footer_style = footer_style or ""
         self.border_style = border_style
         self.title_style = title_style
         self.caption_style = caption_style

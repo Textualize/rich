@@ -107,7 +107,7 @@ class Text(JupyterMixin):
         justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
         overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
         no_wrap (bool, optional): Disable text wrapping, or None for default. Defaults to None.
-        end (str, optional): Character to end text with. Defaults to "\\n".
+        end (str, optional): Character to end text with. Defaults to "\\\\n".
         tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
         spans (List[Span], optional). A list of predefined style spans. Defaults to None.
     """
@@ -279,7 +279,7 @@ class Text(JupyterMixin):
             style (Union[str, Style], optional): Base style for text. Defaults to "".
             justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
             overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
-            end (str, optional): Character to end text with. Defaults to "\\n".
+            end (str, optional): Character to end text with. Defaults to "\\\\n".
             tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
 
         Returns:
@@ -865,7 +865,7 @@ class Text(JupyterMixin):
         """Split rich text in to lines, preserving styles.
 
         Args:
-            separator (str, optional): String to split on. Defaults to "\\n".
+            separator (str, optional): String to split on. Defaults to "\\\\n".
             include_separator (bool, optional): Include the separator in the lines. Defaults to False.
             allow_blank (bool, optional): Return a blank line if the text ends with a separator. Defaults to False.
 
@@ -877,15 +877,25 @@ class Text(JupyterMixin):
         text = self.plain
         if separator not in text:
             return Lines([self.copy()])
+
+        if include_separator:
+            lines = self.divide(
+                match.end() for match in re.finditer(re.escape(separator), text)
+            )
+        else:
+
+            def flatten_spans() -> Iterable[int]:
+                for match in re.finditer(re.escape(separator), text):
+                    start, end = match.span()
+                    yield start
+                    yield end
+
+            lines = Lines(
+                line for line in self.divide(flatten_spans()) if line.plain != separator
+            )
+
         if not allow_blank and text.endswith(separator):
-            text = text[: -len(separator)]
-        offsets = [match.end() for match in re.finditer(re.escape(separator), text)]
-        lines = self.divide(offsets)
-        if not include_separator:
-            separator_length = len(separator)
-            for line in lines:
-                if line.plain.endswith(separator):
-                    line.right_crop(separator_length)
+            lines.pop()
 
         return lines
 
@@ -898,12 +908,13 @@ class Text(JupyterMixin):
         Returns:
             Lines: New RichText instances between offsets.
         """
-        if not offsets:
+        _offsets = list(offsets)
+        if not _offsets:
             return Lines([self.copy()])
 
         text = self.plain
         text_length = len(text)
-        divide_offsets = [0, *offsets, text_length]
+        divide_offsets = [0, *_offsets, text_length]
         line_ranges = list(zip(divide_offsets, divide_offsets[1:]))
 
         style = self.style

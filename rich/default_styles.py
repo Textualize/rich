@@ -99,7 +99,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "table.cell": Style.null(),
     "table.title": Style(italic=True),
     "table.caption": Style(italic=True, dim=True),
-    "traceback.error": Style(dim=True, color="red", bold=True),
+    "traceback.error": Style(color="red", italic=True),
     "traceback.border.syntax_error": Style(color="bright_red"),
     "traceback.border": Style(color="red"),
     "traceback.text": Style.null(),

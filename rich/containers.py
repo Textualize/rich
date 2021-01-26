@@ -99,6 +99,9 @@ class Lines:
     def extend(self, lines: Iterable["Text"]) -> None:
         self._lines.extend(lines)
 
+    def pop(self, index=-1) -> "Text":
+        return self._lines.pop(index)
+
     def justify(
         self,
         console: "Console",

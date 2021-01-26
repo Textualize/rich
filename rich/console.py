@@ -200,7 +200,7 @@ class Capture:
 
 
 class ThemeContext:
-    """A context manager to use a temporary theme. See :meth:`~rich.console.Console.theme` for usage."""
+    """A context manager to use a temporary theme. See :meth:`~rich.console.Console.use_theme` for usage."""
 
     def __init__(self, console: "Console", theme: Theme, inherit: bool = True) -> None:
         self.console = console
@@ -397,7 +397,7 @@ class Console:
         force_jupyter (Optional[bool], optional): Enable/disable Jupyter rendering, or None to auto-detect Jupyter. Defaults to None.
         soft_wrap (Optional[bool], optional): Set soft wrap default on print method. Defaults to False.
         theme (Theme, optional): An optional style theme object, or ``None`` for default theme.
-        stderr (bool, optional): Use stderr rather than stdout if ``file `` is not specified. Defaults to False.
+        stderr (bool, optional): Use stderr rather than stdout if ``file`` is not specified. Defaults to False.
         file (IO, optional): A file object where the console should write to. Defaults to stdout.
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
         height (int, optional): The height of the terminal. Leave as default to auto-detect height.
@@ -1135,7 +1135,7 @@ class Console:
 
         Args:
             sep (str, optional): String to write between print data. Defaults to " ".
-            end (str, optional): String to write at end of print data. Defaults to "\\n".
+            end (str, optional): String to write at end of print data. Defaults to "\\\\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use
                 console default. Defaults to ``None``.
@@ -1174,7 +1174,7 @@ class Console:
         Args:
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
-            end (str, optional): String to write at end of print data. Defaults to "\\n".
+            end (str, optional): String to write at end of print data. Defaults to "\\\\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             justify (str, optional): Justify method: "default", "left", "right", "center", or "full". Defaults to ``None``.
             overflow (str, optional): Overflow method: "ignore", "crop", "fold", or "ellipsis". Defaults to None.
@@ -1287,7 +1287,7 @@ class Console:
         Args:
             objects (positional args): Objects to log to the terminal.
             sep (str, optional): String to write between print data. Defaults to " ".
-            end (str, optional): String to write at end of print data. Defaults to "\\n".
+            end (str, optional): String to write at end of print data. Defaults to "\\\\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
