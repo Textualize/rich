@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Some optimizations for Text
+- Further optimized Tracebacks by not tokenizing code more that necessary
 - Table Column.header_style and Column.footer_style are now added to Table header/footer style
 
 ## [9.9.0] - 2021-01-23

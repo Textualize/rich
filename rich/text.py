@@ -687,7 +687,6 @@ class Text(JupyterMixin):
 
     def _trim_spans(self) -> None:
         """Remove or modify any spans that are over the end of the text."""
-        # new_length = self._length
         max_offset = len(self.plain)
         _Span = Span
         self._spans[:] = [
