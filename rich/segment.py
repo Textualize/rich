@@ -9,7 +9,8 @@ from typing import Iterable, List, Tuple
 
 
 class Segment(NamedTuple):
-    """A piece of text with associated style.
+    """A piece of text with associated style. Segments are produced by the Console render process and
+    are ultimately converted in to strings to be written to the terminal.
 
     Args:
         text (str): A piece of text.
@@ -246,7 +247,7 @@ class Segment(NamedTuple):
         """Get the length of list of segments.
 
         Args:
-            line (List[Segment]): A line encoded as a list of Segments (assumes no '\\n' characters),
+            line (List[Segment]): A line encoded as a list of Segments (assumes no '\\\\n' characters),
 
         Returns:
             int: The length of the line.
@@ -258,7 +259,7 @@ class Segment(NamedTuple):
         """Get the shape (enclosing rectangle) of a list of lines.
 
         Args:
-            lines (List[List[Segment]]): A list of lines (no '\\n' characters).
+            lines (List[List[Segment]]): A list of lines (no '\\\\n' characters).
 
         Returns:
             Tuple[int, int]: Width and height in characters.

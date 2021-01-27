@@ -8,7 +8,7 @@ from .table import Table
 from .text import Text, TextType
 
 if TYPE_CHECKING:
-    from .console import ConsoleRenderable, RenderableType
+    from .console import ConsoleRenderable
 
 
 def render_scope(
@@ -32,7 +32,7 @@ def render_scope(
         max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
 
     Returns:
-        RenderableType: A renderable object.
+        ConsoleRenderable: A renderable object.
     """
     highlighter = ReprHighlighter()
     items_table = Table.grid(padding=(0, 1), expand=False)

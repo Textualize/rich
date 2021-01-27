@@ -406,9 +406,6 @@ class Syntax(JupyterMixin):
                             line_no += 1
                             if line_no >= line_end:
                                 break
-                    # Exhaust tokens
-                    for token_type, token in tokens:
-                        yield (token, None)
 
                 text.append_tokens(tokens_to_spans())
 

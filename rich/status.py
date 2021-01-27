@@ -58,8 +58,8 @@ class Status:
 
     def update(
         self,
-        *,
         status: Optional[RenderableType] = None,
+        *,
         spinner: Optional[str] = None,
         spinner_style: Optional[StyleType] = None,
         speed: Optional[float] = None,

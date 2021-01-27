@@ -501,7 +501,7 @@ class Traceback:
                 yield ""
             except Exception as error:
                 yield Text.assemble(
-                    (f"{error.__class__.__name__}: {error}", "traceback.error"),
+                    (f"\n{error}", "traceback.error"),
                 )
             else:
                 yield (

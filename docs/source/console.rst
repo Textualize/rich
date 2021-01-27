@@ -101,13 +101,13 @@ Rich can display a status message with a 'spinner' animation that won't interfer
 
 To display a status message, call :meth:`~rich.console.Console.status` with the status message (which may be a string, Text, or other renderable). The result is a context manager which starts and stop the status display around a block of code. Here's an example::
 
-    with console.status("Working...")
+    with console.status("Working..."):
         do_work()
 
 You can change the spinner animation via the ``spinner`` parameter::
 
     with console.status("Monkeying around...", spinner="monkey"):
-        do_work
+        do_work()
 
 Run the following command to see the available choices for ``spinner``::
 

@@ -415,7 +415,7 @@ class Style:
         Returns:
             `Style`: A Style instance.
         """
-        if style_definition.strip() == "none":
+        if style_definition.strip() == "none" or not style_definition:
             return cls.null()
 
         style_attributes = {

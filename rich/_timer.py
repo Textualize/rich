@@ -1,4 +1,7 @@
-# pragma: no cover
+"""
+Timer context manager, only used in debug.
+
+"""
 
 from time import time
 
