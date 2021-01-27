@@ -9,7 +9,8 @@ from typing import Iterable, List, Tuple
 
 
 class Segment(NamedTuple):
-    """A piece of text with associated style.
+    """A piece of text with associated style. Segments are produced by the Console render process and
+    are ultimately converted in to strings to be written to the terminal.
 
     Args:
         text (str): A piece of text.
