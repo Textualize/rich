@@ -34,7 +34,7 @@ class RichHandler(Handler):
         tracebacks_width (Optional[int], optional): Number of characters used to render tracebacks, or None for full width. Defaults to None.
         tracebacks_extra_lines (int, optional): Additional lines of code to render tracebacks, or None for full width. Defaults to None.
         tracebacks_theme (str, optional): Override pygments theme used in traceback.
-        tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to False.
+        tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to True.
         tracebacks_show_locals (bool, optional): Enable display of locals in tracebacks. Defaults to False.
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to 10.
