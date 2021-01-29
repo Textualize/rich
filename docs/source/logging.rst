@@ -24,7 +24,7 @@ Rich logs won't render :ref:`console_markup` in logging by default as most libra
 Handle exceptions
 -------------------
 
-The :class:`~rich.logging.RichHandler` class may be configured to ues Rich's :class:`~rich.traceback.Traceback` class to format exceptions, which provides more context than a builtin exception. To get beautiful exceptions in your logs set ``rich_tracebacks=True`` on the handler constructor::
+The :class:`~rich.logging.RichHandler` class may be configured to use Rich's :class:`~rich.traceback.Traceback` class to format exceptions, which provides more context than a builtin exception. To get beautiful exceptions in your logs set ``rich_tracebacks=True`` on the handler constructor::
 
 
     import logging
