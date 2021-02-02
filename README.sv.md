@@ -9,7 +9,7 @@
 
 Rich är ett Python bibliotek för _rich_ text och vacker formattering i terminalen.
 
-[Rich API](https://rich.readthedocs.io/en/latest/) gör det enkelt att lägga till färg och stil till terminal utmatning. Rich kan också framställa fina tabeller, framstegsfält, markdown, syntax markerad källkod, tracebacks, och mera - redo att använda.
+[Rich API](https://rich.readthedocs.io/en/latest/) gör det enkelt att lägga till färg och stil till terminal utmatning. Rich kan också framställa fina tabeller, framstegsfält, märkspråk, syntaxmarkerad källkod, tillbaka-spårning, och mera - redo att använda.
 
 ![Funktioner](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
 
@@ -39,7 +39,7 @@ python -m rich
 
 ## Rich utskrivningsfunktion
 
-För att enkelt lägga till rich utmatning i din application, kan du importera [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) metoden, vilket har den samma signaturen som den inbyggda Python funktionen. Testa detta:
+För att enkelt lägga till rich utmatning i din applikation, kan du importera [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) metoden, vilket har den samma signatur som den inbyggda Python funktionen. Testa detta:
 
 ```python
 from rich import print
@@ -51,7 +51,7 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ## Rich REPL
 
-Rich kan installeras i Python REPL, så att varje datastruktur kommer fint skrivas ut och markeras. 
+Rich kan installeras i Python REPL, så att varje datastruktur kommer att skrivas ut fint och markeras. 
 
 ```python
 >>> from rich import pretty
@@ -79,7 +79,7 @@ from rich.console import Console
 console = Console()
 ```
 
-Console objektet har en `print` metod vilket har ett avsiktligt liknande gränssnitt till den inbyggda `print` funktionen. Här är ett exempel av användningen:
+`Console` objektet har en `print` metod vilket har ett avsiktligt liknande gränssnitt till den inbyggda `print` funktionen. Här är ett exempel av användningen:
 
 ```python
 console.print("Hello", "World!")
@@ -105,9 +105,9 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![Konsol märkspråk](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
 
-### Console logging
+### Konsollogging
 
-Konsol objektet har en `log()` metod vilket har liknande gränssnitt som `print()`, men framställer även en kolumn för den nuvarande tid och fil samt rad vilket gjorde anroppet. Som standard kommer Rich att markera syntax för Python strukturer och för repr strängar. Ifall du loggar en samling (det vill säga en ordbok eller en lista) kommer Rich att finskriva ut det så att det passar i det tillgängliga utrymme. Här är ett exempel av dessa funktioner.
+`Console` objektet har en `log()` metod vilket har liknande gränssnitt som `print()`, men framställer även en kolumn för den nuvarande tid och fil samt rad vilket gjorde anroppet. Som standard kommer Rich att markera syntax för Python strukturer och för repr strängar. Ifall du loggar en samling (det vill säga en ordbok eller en lista) kommer Rich att finskriva ut det så att det passar i det tillgängliga utrymme. Här är ett exempel av dessa funktioner.
 
 ```python
 from rich.console import Console
@@ -142,13 +142,13 @@ Log metoden kan användas för att logga till terminal för långkörande applik
 
 ### Loggningshanterare
 
-Du kan också använda den inbyggda [Hanterare klassen](https://rich.readthedocs.io/en/latest/logging.html) för att formatera och färglägga utmatningen från Pythons loggnings modul. här är ett exempel av utmatningen:
+Du kan också använda den inbyggda [Handler klassen](https://rich.readthedocs.io/en/latest/logging.html) för att formatera och färglägga utmatningen från Pythons loggningsmodul. Här är ett exempel av utmatningen:
 
 ![Loggning](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
 
 ## Emoji
 
-För att infoga en emoji till konsol utmatningen placera namnet mellan två kolon. Här är ett exempel:
+För att infoga en emoji till konsolutmatningen placera namnet mellan två kolon. Här är ett exempel:
 
 ```python
 >>> console.print(":smiley: :vampire: :pile_of_poo: :thumbs_up: :raccoon:")
@@ -159,7 +159,7 @@ Vänligen använd denna funktion klokt.
 
 ## Tabell
 
-Rich kan framställa flexibla [tabeller](https://rich.readthedocs.io/en/latest/tables.html) med unicode boxkaraktärer. Det finns en stor mängd av formateringsalternativ för gränser, stilar, och celljustering.
+Rich kan framställa flexibla [tabeller](https://rich.readthedocs.io/en/latest/tables.html) med unicode boxkaraktärer. Det finns en stor mängd av formateringsalternativ för gränser, stilar, och celljustering etc.
 
 ![Tabell film](https://github.com/willmcgugan/rich/raw/master/imgs/table_movie.gif)
 
@@ -201,7 +201,7 @@ Detta producerar följande utmatning:
 
 ![tabell](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
 
-Notera att konsoll märkspråk är framställt på samma sätt som `print()` och `log()`. I själva verket, vad som helst som är framställt av Rich kan inkluderas i rubriker / rader (även andra tabeller).
+Notera att konsol märkspråk är framställt på samma sätt som `print()` och `log()`. I själva verket, vad som helst som är framställt av Rich kan inkluderas i rubriker / rader (även andra tabeller).
 
 `Table` klassen är smart nog att storleksändra kolumner att passa den tillgängliga bredden av terminalen, och slår in text ifall det behövs. Här är samma exempel, med terminalen gjord mindre än tabell ovan:
 
@@ -211,7 +211,7 @@ Notera att konsoll märkspråk är framställt på samma sätt som `print()` och
 
 Rich kan framställa flera flimmerfria [framstegsfält](https://rich.readthedocs.io/en/latest/progress.html) för att följa långvariga uppgifter.
 
-För grundläggande användning, slå in valfri sekvens i `track` funktion och itera över resultatet. Här är ett exempel:
+För grundläggande användning, slå in valfri sekvens i `track` funktion och iterera över resultatet. Här är ett exempel:
 
 ```python
 from rich.progress import track
@@ -224,7 +224,7 @@ Det är inte mycket svårare att lägga till flera framstegsfält. Här är ett 
 
 ![framsteg](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
 
-Dessa kolumner kan konfigureras att visa vilka detaljer du vill. Inbyggda kolumner inkluderar procentuell färdigt, filstorlek, filhastighet, och återstående tid. Här är ännu ett exempel som visar en pågående nedladdning:
+Dessa kolumner kan konfigureras att visa vilka detaljer du vill. Inbyggda kolumner inkluderar procentuell färdig, filstorlek, filhastighet, och återstående tid. Här är ännu ett exempel som visar en pågående nedladdning:
 
 ![framsteg](https://github.com/willmcgugan/rich/raw/master/imgs/downloader.gif)
 
@@ -317,9 +317,9 @@ Detta kommer att producera utmatning som liknar följande:
 
 ![märkspråk](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
 
-## Syntax markering
+## Syntaxmarkering
 
-Rich använder [pygments](https://pygments.org/) biblioteket för att implementera [syntax markering](https://rich.readthedocs.io/en/latest/syntax.html). Användningen är liknande till framställa markdown; konstruera en `Syntax` objekt och skriv ut den till konsolen. Här är ett exempel:
+Rich använder [pygments](https://pygments.org/) biblioteket för att implementera [syntax markering](https://rich.readthedocs.io/en/latest/syntax.html). Användningen är liknande till framställa märkspråk; konstruera ett `Syntax` objekt och skriv ut den till konsolen. Här är ett exempel:
 
 ```python
 from rich.console import Console
@@ -349,11 +349,11 @@ Detta kommer producera följande utmatning:
 
 ![syntax](https://github.com/willmcgugan/rich/raw/master/imgs/syntax.png)
 
-## Tracebacks
+## Tillbaka-spårning
 
-Rich kan framställa [vackra tracebacks](https://rich.readthedocs.io/en/latest/traceback.html) vilket är enklare att läsa och visar mer kod än vanliga Python tracebacks. Du kan sätta Rich som standard spårningshanterare så att alla ofångade exceptions kommer att framställas av Rich.
+Rich kan framställa [vackra tillbaka-spårningar](https://rich.readthedocs.io/en/latest/traceback.html) vilket är enklare att läsa och visar mer kod än vanliga Python tillbaka-spårningar. Du kan sätta Rich som standard tillbaka-spårningshanterare så att alla ofångade undantag kommer att framställas av Rich.
 
-Här är hur det ser ut på OSX (liknande på Linux):
+Så här ser det ut på OSX (liknande på Linux):
 
 ![traceback](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
 
