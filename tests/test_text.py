@@ -668,3 +668,10 @@ def test_slice():
 
     with pytest.raises(TypeError):
         text[::-1]
+
+
+def test_wrap_invalid_style():
+    # https://github.com/willmcgugan/rich/issues/987
+    console = Console(width=100, color_system="truecolor")
+    a = "[#######.................] xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx [#######.................]"
+    console.print(a, justify="full")

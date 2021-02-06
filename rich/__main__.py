@@ -227,3 +227,42 @@ if __name__ == "__main__":  # pragma: no cover
         print(line)
 
     print(f"rendered in {taken}ms")
+
+    from rich.panel import Panel
+
+    console = Console()
+
+    sponsor_message = Text.from_markup(
+        """\
+[green]Github Sponsor:[/green] [u blue][link=https://github.com/sponsors/willmcgugan]https://github.com/sponsors/willmcgugan[/][/]
+
+[green]Buy me a coffee:[/green] [u blue][link=https://ko-fi.com/willmcgugan]https://ko-fi.com/willmcgugan[/link][/]
+
+[green]Twitter:[/green] [u blue][link=https://twitter.com/willmcgugan]https://twitter.com/willmcgugan[/link][/]
+
+[green]Blog:[/green] [u blue][link=https://www.willmcgugan.com]https://www.willmcgugan.com[/link][/]"""
+    )
+
+    intro_message = Text.from_markup(
+        """\
+Developing Rich and responding to issues can take a lot of my time
+
+Consider supporting my work via Github Sponsors (ask your company / Organization), or buy me a coffee to say thanks.
+
+- Will McGugan"""
+    )
+
+    message = Table.grid(padding=2)
+    message.add_row(intro_message, sponsor_message)
+
+    console.print(
+        Panel.fit(
+            message,
+            box=box.ROUNDED,
+            padding=(1, 2),
+            title="[b red]Thanks for trying out Rich!",
+            border_style="bright_blue",
+            width=122,
+        ),
+        justify="center",
+    )

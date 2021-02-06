@@ -1,13 +1,14 @@
 from typing import Optional
 
 from .console import Console, RenderableType
+from .jupyter import JupyterMixin
 from .live import Live
 from .spinner import Spinner
 from .style import StyleType
 from .table import Table
 
 
-class Status:
+class Status(JupyterMixin):
     """Displays a status indicator with a 'spinner' animation.
 
     Args:
@@ -92,6 +93,9 @@ class Status:
     def stop(self) -> None:
         """Stop the spinner animation."""
         self._live.stop()
+
+    def __rich__(self) -> RenderableType:
+        return self.renderable
 
     def __enter__(self) -> "Status":
         self.start()

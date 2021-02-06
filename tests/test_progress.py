@@ -14,6 +14,8 @@ from rich.progress import (
     TotalFileSizeColumn,
     DownloadColumn,
     TransferSpeedColumn,
+    RenderableColumn,
+    SpinnerColumn,
     Progress,
     Task,
     TextColumn,
@@ -22,7 +24,6 @@ from rich.progress import (
     track,
     _TrackThread,
     TaskID,
-    _RefreshThread,
 )
 from rich.text import Text
 
@@ -78,6 +79,22 @@ def test_time_remaining_column():
 
     text = column(FakeTask(1, "test", 100, 20, _get_time=lambda: 1.0))
     assert str(text) == "0:01:00"
+
+
+def test_renderable_column():
+    column = RenderableColumn("foo")
+    task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
+    assert column.render(task) == "foo"
+
+
+def test_spinner_column():
+    column = SpinnerColumn()
+    column.set_spinner("dots2")
+    task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
+    result = column.render(task)
+    print(repr(result))
+    expected = "⡿"
+    assert str(result) == expected
 
 
 def test_download_progress_uses_decimal_units() -> None:
@@ -171,7 +188,8 @@ def test_expand_bar() -> None:
         pass
     expected = "\x1b[?25l\x1b[38;5;237m━━━━━━━━━━\x1b[0m\r\x1b[2K\x1b[38;5;237m━━━━━━━━━━\x1b[0m\n\x1b[?25h"
     render_result = console.file.getvalue()
-    print(repr(render_result))
+    print("RESULT\n", repr(render_result))
+    print("EXPECTED\n", repr(expected))
     assert render_result == expected
 
 
@@ -329,23 +347,6 @@ def test_progress_create() -> None:
     assert progress.finished
     assert progress.tasks == []
     assert progress.task_ids == []
-
-
-def test_refresh_thread() -> None:
-    class MockProgress:
-        def __init__(self):
-            self.count = 0
-
-        def refresh(self):
-            self.count += 1
-
-    progress = MockProgress()
-    thread = _RefreshThread(progress, 100)
-    assert thread.progress == progress
-    thread.start()
-    sleep(0.2)
-    thread.stop()
-    assert progress.count >= 1
 
 
 def test_track_thread() -> None:

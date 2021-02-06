@@ -166,6 +166,21 @@ def test_filename_not_a_file():
     assert "string" in exception_text
 
 
+def test_broken_str():
+    class BrokenStr(Exception):
+        def __str__(self):
+            1 / 0
+
+    console = Console(width=100, file=io.StringIO())
+    try:
+        raise BrokenStr()
+    except Exception:
+        console.print_exception()
+    result = console.file.getvalue()
+    print(result)
+    assert "<exception str() failed>" in result
+
+
 if __name__ == "__main__":  # pragma: no cover
 
     expected = render(get_exception())

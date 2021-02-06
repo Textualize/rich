@@ -3,9 +3,9 @@
 Live Display
 ============
 
-Rich can display continiuously updated information for any renderable.
+Progress bars and status indicators use a *live* display to animate parts of the terminal. You can build custom live displays with the :class:`~rich.live.Live` class. 
 
-To see some live display examples, try this from the command line::
+For a demonstration of a live display, running the following command:
 
     python -m rich.live
 
@@ -21,7 +21,7 @@ The basic usage can be split into two use cases.
 1. Same Renderable
 ~~~~~~~~~~~~~~~~~~
 
-When keeping the same renderable, you simply pass the :class:`~rich.console.RenderableType` you would like to see updating and provide
+When keeping the same renderable, pass the :class:`~rich.console.RenderableType` you would like to see updating and provide
 a ``refresh_per_second`` parameter. The Live :class:`~rich.live.Live` will automatically update the console at the provided refresh rate.
 
 
@@ -47,8 +47,8 @@ a ``refresh_per_second`` parameter. The Live :class:`~rich.live.Live` will autom
 2. New Renderable
 ~~~~~~~~~~~~~~~~~
 
-You can also provide constant new renderable to :class:`~rich.live.Live` using the :meth:`~rich.live.Live.update` function. This allows you to
-completely change what is rendered live.
+You can also provide a new renderable to :class:`~rich.live.Live` using the :meth:`~rich.live.Live.update` function. This allows you to
+completely change the live display.
 
 **Example**::
 
@@ -162,6 +162,15 @@ Redirecting stdout / stderr
 
 To avoid breaking the live display visuals, Rich will redirect ``stdout`` and ``stderr`` so that you can use the builtin ``print`` statement.
 This feature is enabled by default, but you can disable by setting ``redirect_stdout`` or ``redirect_stderr`` to ``False``.
+
+Nesting Lives
+-------------
+
+Note that only a single live context may be active at any one time. The following will raise a :class:`~rich.errors.LiveError` because status also uses Live::
+
+    with Live(table, console=console):
+        with console.status("working"):  # Will not work
+            do_work()
 
 
 Examples

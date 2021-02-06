@@ -2,7 +2,7 @@ import os.path
 import platform
 import textwrap
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, Iterable, Optional, Set, Tuple, Type, Union
 
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
 from pygments.style import Style as PygmentsStyle
@@ -22,7 +22,7 @@ from pygments.token import (
 from pygments.util import ClassNotFound
 
 from ._loop import loop_first
-from .color import Color, blend_rgb, parse_rgb_hex
+from .color import Color, blend_rgb
 from .console import Console, ConsoleOptions, JustifyMethod, RenderResult, Segment
 from .jupyter import JupyterMixin
 from .measure import Measurement

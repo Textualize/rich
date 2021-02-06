@@ -24,3 +24,7 @@ class NotRenderableError(ConsoleError):
 
 class MarkupError(ConsoleError):
     """Markup was badly formatted."""
+
+
+class LiveError(ConsoleError):
+    """Error related to Live display."""

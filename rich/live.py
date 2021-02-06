@@ -1,28 +1,14 @@
 import sys
 from threading import Event, RLock, Thread
-from typing import IO, Any, List, Optional
-
-from typing_extensions import Literal
+from typing import IO, Any, Callable, List, Optional
 
 from . import get_console
-from ._loop import loop_last
-from .console import (
-    Console,
-    ConsoleOptions,
-    ConsoleRenderable,
-    RenderableType,
-    RenderHook,
-    RenderResult,
-)
+from .console import Console, ConsoleRenderable, RenderableType, RenderHook
 from .control import Control
 from .file_proxy import FileProxy
 from .jupyter import JupyterMixin
-from .live_render import LiveRender
-from .segment import Segment
-from .style import Style
+from .live_render import LiveRender, VerticalOverflowMethod
 from .text import Text
-
-VerticalOverflowMethod = Literal["crop", "ellipsis", "visible"]
 
 
 class _RefreshThread(Thread):
@@ -32,7 +18,7 @@ class _RefreshThread(Thread):
         self.live = live
         self.refresh_per_second = refresh_per_second
         self.done = Event()
-        super().__init__()
+        super().__init__(daemon=True)
 
     def stop(self) -> None:
         self.done.set()
@@ -44,54 +30,11 @@ class _RefreshThread(Thread):
                     self.live.refresh()
 
 
-class _LiveRender(LiveRender):
-    def __init__(self, live: "Live", renderable: RenderableType) -> None:
-        self._live = live
-        self.renderable = renderable
-        self._shape: Optional[Tuple[int, int]] = None
-
-    def __rich_console__(
-        self, console: Console, options: ConsoleOptions
-    ) -> RenderResult:
-        with self._live._lock:
-            lines = console.render_lines(self.renderable, options, pad=False)
-
-            shape = Segment.get_shape(lines)
-            _, height = shape
-            if height > console.size.height:
-                if self._live.vertical_overflow == "crop":
-                    lines = lines[: console.size.height]
-                    shape = Segment.get_shape(lines)
-                elif self._live.vertical_overflow == "ellipsis":
-                    lines = lines[: (console.size.height - 1)]
-                    lines.append(
-                        list(
-                            console.render(
-                                Text(
-                                    "...",
-                                    overflow="crop",
-                                    justify="center",
-                                    end="",
-                                    style="live.ellipsis",
-                                )
-                            )
-                        )
-                    )
-                    shape = Segment.get_shape(lines)
-
-            self._shape = shape
-
-            for last, line in loop_last(lines):
-                yield from line
-                if not last:
-                    yield Segment.line()
-
-
 class Live(JupyterMixin, RenderHook):
     """Renders an auto-updating live display of any given renderable.
 
     Args:
-        renderable (RenderableType, optional): [The renderable to live display. Defaults to displaying nothing.
+        renderable (RenderableType, optional): The renderable to live display. Defaults to displaying nothing.
         console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()` or `update()` with refresh flag. Defaults to True
         refresh_per_second (float, optional): Number of times per second to refresh the live display. Defaults to 1.
@@ -99,11 +42,12 @@ class Live(JupyterMixin, RenderHook):
         redirect_stdout (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
         redirect_stderr (bool, optional): Enable redirection of stderr. Defaults to True.
         vertical_overflow (VerticalOverflowMethod, optional): How to handle renderable when it is too tall for the console. Defaults to "ellipsis".
+        get_renderable (Callable[[], RenderableType], optional): Optional callable to get renderable. Defaults to None.
     """
 
     def __init__(
         self,
-        renderable: RenderableType = "",
+        renderable: RenderableType = None,
         *,
         console: Console = None,
         auto_refresh: bool = True,
@@ -112,10 +56,11 @@ class Live(JupyterMixin, RenderHook):
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
         vertical_overflow: VerticalOverflowMethod = "ellipsis",
+        get_renderable: Callable[[], RenderableType] = None,
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
+        self._renderable = renderable
         self.console = console if console is not None else get_console()
-        self._live_render = _LiveRender(self, renderable)
 
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
@@ -132,19 +77,36 @@ class Live(JupyterMixin, RenderHook):
         self.refresh_per_second = refresh_per_second
 
         self.vertical_overflow = vertical_overflow
+        self._get_renderable = get_renderable
+        self._live_render = LiveRender(
+            self.get_renderable(), vertical_overflow=vertical_overflow
+        )
         # cant store just clear_control as the live_render shape is lazily computed on render
 
-    def start(self) -> None:
-        """Start live rendering display."""
+    def get_renderable(self) -> RenderableType:
+        renderable = (
+            self._get_renderable()
+            if self._get_renderable is not None
+            else self._renderable
+        )
+        return renderable or ""
+
+    def start(self, refresh=False) -> None:
+        """Start live rendering display.
+
+        Args:
+            refresh (bool, optional): Also refresh. Defaults to False.
+        """
         with self._lock:
             if self._started:
                 return
-
+            self.console.set_live(self)
+            self._started = True
             self.console.show_cursor(False)
             self._enable_redirect_io()
             self.console.push_render_hook(self)
-            self._started = True
-
+            if refresh:
+                self.refresh()
             if self.auto_refresh:
                 self._refresh_thread = _RefreshThread(self, self.refresh_per_second)
                 self._refresh_thread.start()
@@ -154,6 +116,7 @@ class Live(JupyterMixin, RenderHook):
         with self._lock:
             if not self._started:
                 return
+            self.console.clear_live()
             self._started = False
             try:
                 if self.auto_refresh and self._refresh_thread is not None:
@@ -165,22 +128,22 @@ class Live(JupyterMixin, RenderHook):
                 if self.console.is_terminal:
                     self.console.line()
             finally:
+                self.console.show_cursor(True)
                 self._disable_redirect_io()
                 self.console.pop_render_hook()
-                self.console.show_cursor(True)
 
-            if self.transient:
-                self.console.control(self._live_render.restore_cursor())
-            if self.ipy_widget is not None:  # pragma: no cover
-                if self.transient:
-                    self.ipy_widget.close()
-                else:
-                    # jupyter last refresh must occur after console pop render hook
-                    # i am not sure why this is needed
-                    self.refresh()
-        if self.auto_refresh and self._refresh_thread is not None:
+        if self._refresh_thread is not None:
             self._refresh_thread.join()
             self._refresh_thread = None
+        if self.transient:
+            self.console.control(self._live_render.restore_cursor())
+        if self.ipy_widget is not None:  # pragma: no cover
+            if self.transient:
+                self.ipy_widget.close()
+            else:
+                # jupyter last refresh must occur after console pop render hook
+                # i am not sure why this is needed
+                self.refresh()
 
     def __enter__(self) -> "Live":
         self.start()
@@ -192,12 +155,21 @@ class Live(JupyterMixin, RenderHook):
     def _enable_redirect_io(self):
         """Enable redirecting of stdout / stderr."""
         if self.console.is_terminal:
-            if self._redirect_stdout:
+            if self._redirect_stdout and not isinstance(sys.stdout, FileProxy):  # type: ignore
                 self._restore_stdout = sys.stdout
                 sys.stdout = FileProxy(self.console, sys.stdout)
-            if self._redirect_stderr:
+            if self._redirect_stderr and not isinstance(sys.stderr, FileProxy):  # type: ignore
                 self._restore_stderr = sys.stderr
                 sys.stderr = FileProxy(self.console, sys.stderr)
+
+    def _disable_redirect_io(self):
+        """Disable redirecting of stdout / stderr."""
+        if self._restore_stdout:
+            sys.stdout = self._restore_stdout
+            self._restore_stdout = None
+        if self._restore_stderr:
+            sys.stderr = self._restore_stderr
+            self._restore_stderr = None
 
     @property
     def renderable(self) -> RenderableType:
@@ -206,8 +178,7 @@ class Live(JupyterMixin, RenderHook):
         Returns:
             RenderableType: Displayed renderable.
         """
-        with self._lock:
-            return self._live_render.renderable
+        return self.get_renderable()
 
     def update(self, renderable: RenderableType, *, refresh: bool = False) -> None:
         """Update the renderable that is being displayed
@@ -217,12 +188,13 @@ class Live(JupyterMixin, RenderHook):
             refresh (bool, optional): Refresh the display. Defaults to False.
         """
         with self._lock:
-            self._live_render.set_renderable(renderable)
+            self._renderable = renderable
             if refresh:
                 self.refresh()
 
     def refresh(self) -> None:
         """Update the display of the Live Render."""
+        self._live_render.set_renderable(self.renderable)
         if self.console.is_jupyter:  # pragma: no cover
             try:
                 from IPython.display import display
@@ -249,21 +221,13 @@ class Live(JupyterMixin, RenderHook):
             with self.console:
                 self.console.print(Control(""))
 
-    def _disable_redirect_io(self):
-        """Disable redirecting of stdout / stderr."""
-        if self._restore_stdout:
-            sys.stdout = self._restore_stdout
-            self._restore_stdout = None
-        if self._restore_stderr:
-            sys.stderr = self._restore_stderr
-            self._restore_stderr = None
-
     def process_renderables(
         self, renderables: List[ConsoleRenderable]
     ) -> List[ConsoleRenderable]:
         """Process renderables to restore cursor and display progress."""
-        if self.console.is_terminal:
-            # lock needs acquiring as user can modify live_render renerable at any time unlike in Progress.
+        self._live_render.vertical_overflow = self.vertical_overflow
+        if self.console.is_interactive:
+            # lock needs acquiring as user can modify live_render renderable at any time unlike in Progress.
             with self._lock:
                 # determine the control command needed to clear previous rendering
                 renderables = [
@@ -285,6 +249,7 @@ if __name__ == "__main__":  # pragma: no cover
     from itertools import cycle
     from typing import Dict, List, Tuple
 
+    from .align import Align
     from .console import Console
     from .live import Live
     from .panel import Panel
@@ -372,9 +337,9 @@ if __name__ == "__main__":  # pragma: no cover
                 table.add_column("Destination Currency")
                 table.add_column("Exchange Rate")
 
-                for ((soure, dest), exchange_rate) in exchange_rate_dict.items():
+                for ((source, dest), exchange_rate) in exchange_rate_dict.items():
                     table.add_row(
-                        soure,
+                        source,
                         dest,
                         Text(
                             f"{exchange_rate:.4f}",
@@ -382,4 +347,4 @@ if __name__ == "__main__":  # pragma: no cover
                         ),
                     )
 
-                live_table.update(table)
+                live_table.update(Align.center(table))

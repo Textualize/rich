@@ -306,6 +306,13 @@ If Rich detects that it is not writing to a terminal it will strip control codes
 
 Letting Rich auto-detect terminals is useful as it will write plain text when you pipe output to a file or other application.
 
+Interactive mode
+~~~~~~~~~~~~~~~~
+
+Rich will remove animations such as progress bars and status indicators when not writing to a terminal as you probably don't want to write these out to a text file (for example). You can override this behavior by setting the ``force_interactive`` argument on the constructor. Set it to True to enable animations or False to disable them.
+
+.. note::
+    Some CI systems support ANSI color and style but not anything that moves the cursor or selectively refreshes parts of the terminal. For these you might want to set ``force_terminal`` to ``True`` and ``force_interactve`` to ``False``.
 
 Environment variables
 ---------------------

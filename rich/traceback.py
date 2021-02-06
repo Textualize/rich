@@ -6,7 +6,7 @@ import sys
 from dataclasses import dataclass, field
 from traceback import walk_tb
 from types import TracebackType
-from typing import Callable, Dict, Iterable, List, Optional, Type
+from typing import Any, Callable, Dict, Iterable, List, Optional, Type
 
 from pygments.lexers import guess_lexer_for_filename
 from pygments.token import Comment, Keyword, Name, Number, Operator, String
@@ -258,10 +258,17 @@ class Traceback:
 
         from rich import _IMPORT_CWD
 
+        def safe_str(_object: Any) -> str:
+            """Don't allow exceptions from __str__ to propegate."""
+            try:
+                return str(_object)
+            except Exception:
+                return "<exception str() failed>"
+
         while True:
             stack = Stack(
-                exc_type=str(exc_type.__name__),
-                exc_value=str(exc_value),
+                exc_type=safe_str(exc_type.__name__),
+                exc_value=safe_str(exc_value),
                 is_cause=is_cause,
             )
 
@@ -386,6 +393,7 @@ class Traceback:
                     highlighter(stack.syntax_error.msg),
                 )
             else:
+                print(stack.exc_value)
                 yield Text.assemble(
                     (f"{stack.exc_type}: ", "traceback.exc_type"),
                     highlighter(stack.exc_value),

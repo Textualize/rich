@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.11.0] - Unreleased
+
+### Fixed
+
+- Fixed error message for tracebacks with broken `__str__` https://github.com/willmcgugan/rich/issues/980
+- Fixed markup edge case https://github.com/willmcgugan/rich/issues/987
+
+### Added
+
+- Added cheeky sponsorship request to test card
+- Added `quiet` argument to Console constructor
+
 ## [9.10.0] - 2021-01-27
 
 ### Changed

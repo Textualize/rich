@@ -478,3 +478,17 @@ def test_no_color():
     result = console.file.getvalue()
     print(repr(result))
     assert result == expected
+
+
+def test_quiet():
+    console = Console(file=io.StringIO(), quiet=True)
+    console.print("Hello, World!")
+    assert console.file.getvalue() == ""
+
+
+def test_no_nested_live():
+    console = Console()
+    with pytest.raises(errors.LiveError):
+        with console.status("foo"):
+            with console.status("bar"):
+                pass

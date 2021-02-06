@@ -49,6 +49,7 @@ from .theme import Theme, ThemeStack
 
 if TYPE_CHECKING:
     from ._windows import WindowsConsoleFeatures
+    from .live import Live
     from .status import Status
 
 WINDOWS = platform.system() == "Windows"
@@ -395,10 +396,12 @@ class Console:
             either ``"standard"``, ``"256"`` or ``"truecolor"``. Leave as ``"auto"`` to autodetect.
         force_terminal (Optional[bool], optional): Enable/disable terminal control codes, or None to auto-detect terminal. Defaults to None.
         force_jupyter (Optional[bool], optional): Enable/disable Jupyter rendering, or None to auto-detect Jupyter. Defaults to None.
+        force_interactive (Optional[bool], optional): Enable/disable interactive mode, or None to auto detect. Defaults to None.
         soft_wrap (Optional[bool], optional): Set soft wrap default on print method. Defaults to False.
         theme (Theme, optional): An optional style theme object, or ``None`` for default theme.
         stderr (bool, optional): Use stderr rather than stdout if ``file`` is not specified. Defaults to False.
         file (IO, optional): A file object where the console should write to. Defaults to stdout.
+        quiet (bool, Optional): Boolean to suppress all output. Defaults to False.
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
         height (int, optional): The height of the terminal. Leave as default to auto-detect height.
         style (StyleType, optional): Style to apply to all output, or None for no style. Defaults to None.
@@ -428,10 +431,12 @@ class Console:
         ] = "auto",
         force_terminal: bool = None,
         force_jupyter: bool = None,
+        force_interactive: bool = None,
         soft_wrap: bool = False,
         theme: Theme = None,
         stderr: bool = False,
         file: IO[str] = None,
+        quiet: bool = False,
         width: int = None,
         height: int = None,
         style: StyleType = None,
@@ -475,6 +480,7 @@ class Console:
         self._color_system: Optional[ColorSystem]
         self._force_terminal = force_terminal
         self._file = file
+        self.quiet = quiet
         self.stderr = stderr
 
         if color_system is None:
@@ -498,6 +504,11 @@ class Console:
         self.no_color = (
             no_color if no_color is not None else "NO_COLOR" in self._environ
         )
+        self.is_interactive = (
+            (self.is_terminal and not self.is_dumb_terminal)
+            if force_interactive is None
+            else force_interactive
+        )
 
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals(
@@ -505,6 +516,7 @@ class Console:
         )
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
+        self._live: Optional["Live"] = None
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
@@ -572,6 +584,25 @@ class Console:
         """Leave buffer context, and render content if required."""
         self._buffer_index -= 1
         self._check_buffer()
+
+    def set_live(self, live: "Live") -> None:
+        """Set Live instance. Used by Live context manager.
+
+        Args:
+            live (Live): Live instance using this Console.
+
+        Raises:
+            errors.LiveError: If this Console has a Live context currently active.
+        """
+        with self._lock:
+            if self._live is not None:
+                raise errors.LiveError("Only one live display may be active at once")
+            self._live = live
+
+    def clear_live(self) -> None:
+        """Clear the Live instance."""
+        with self._lock:
+            self._live = None
 
     def push_render_hook(self, hook: RenderHook) -> None:
         """Add a new render hook to the stack.
@@ -1007,7 +1038,9 @@ class Console:
         except errors.StyleSyntaxError as error:
             if default is not None:
                 return self.get_style(default)
-            raise errors.MissingStyle(f"Failed to get style {name!r}; {error}")
+            raise errors.MissingStyle(
+                f"Failed to get style {name!r}; {error}"
+            ) from None
 
     def _collect_renderables(
         self,
@@ -1356,6 +1389,9 @@ class Console:
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered."""
+        if self.quiet:
+            del self._buffer[:]
+            return
         with self._lock:
             if self._buffer_index == 0:
                 if self.is_jupyter:  # pragma: no cover

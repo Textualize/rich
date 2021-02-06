@@ -107,3 +107,11 @@ def test_remove_color():
         Segment("foo", Style(bold=True)),
         Segment("bar", None),
     ]
+
+
+def test_make_control():
+    segments = [Segment("foo"), Segment("bar")]
+    assert Segment.make_control(segments) == [
+        Segment.control("foo"),
+        Segment.control("bar"),
+    ]

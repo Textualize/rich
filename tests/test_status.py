@@ -19,3 +19,13 @@ def test_status():
     # TODO: Testing output is tricky with threads
     with status:
         sleep(0.2)
+
+
+def test_renderable():
+    console = Console(
+        color_system=None, width=80, legacy_windows=False, get_time=lambda: 0.0
+    )
+    status = Status("foo", console=console)
+    console.begin_capture()
+    console.print(status)
+    assert console.end_capture() == "⠋ foo\n"
