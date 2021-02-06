@@ -37,6 +37,7 @@ class Inspect(JupyterMixin):
         dunder (bool, optional): Show attributes starting with double underscore. Defaults to False.
         sort (bool, optional): Sort attributes alphabetically. Defaults to True.
         all (bool, optional): Show all attributes. Defaults to False.
+        value (bool, optional): Pretty print value of object. Defaults to True.
     """
 
     def __init__(
@@ -51,6 +52,7 @@ class Inspect(JupyterMixin):
         dunder: bool = False,
         sort: bool = True,
         all: bool = True,
+        value: bool = True,
     ) -> None:
         self.highlighter = ReprHighlighter()
         self.obj = obj
@@ -63,6 +65,7 @@ class Inspect(JupyterMixin):
         self.private = private or dunder
         self.dunder = dunder
         self.sort = sort
+        self.value = value
 
     def _make_title(self, obj: Any) -> Text:
         """Make a default title."""
@@ -82,12 +85,14 @@ class Inspect(JupyterMixin):
             padding=(0, 1),
         )
 
-    def _get_signature(self, name: str, obj: Any) -> Text:
+    def _get_signature(self, name: str, obj: Any) -> Optional[Text]:
         """Get a signature for a callable."""
         try:
             _signature = str(signature(obj)) + ":"
         except ValueError:
             _signature = "(...)"
+        except TypeError:
+            return None
 
         source_filename: Optional[str] = None
         try:
@@ -139,8 +144,10 @@ class Inspect(JupyterMixin):
         highlighter = self.highlighter
 
         if callable(obj):
-            yield self._get_signature("", obj)
-            yield ""
+            signature = self._get_signature("", obj)
+            if signature is not None:
+                yield signature
+                yield ""
 
         _doc = getdoc(obj)
         if _doc is not None:
@@ -149,6 +156,13 @@ class Inspect(JupyterMixin):
             doc_text = Text(_reformat_doc(_doc), style="inspect.help")
             doc_text = highlighter(doc_text)
             yield doc_text
+            yield ""
+
+        if self.value and not (isclass(obj) or callable(obj) or ismodule(obj)):
+            yield Panel(
+                Pretty(obj, indent_guides=True, max_length=10, max_string=60),
+                border_style="inspect.value.border",
+            )
             yield ""
 
         for key, (error, value) in items:
@@ -168,20 +182,23 @@ class Inspect(JupyterMixin):
             if callable(value):
                 if not self.methods:
                     continue
+
                 _signature_text = self._get_signature(key, value)
+                if _signature_text is None:
+                    add_row(key_text, Pretty(value, highlighter=highlighter))
+                else:
+                    if self.docs:
+                        docs = getdoc(value)
+                        if docs is not None:
+                            _doc = _reformat_doc(str(docs))
+                            if not self.help:
+                                _doc = _first_paragraph(_doc)
+                            _signature_text.append("\n" if "\n" in _doc else " ")
+                            doc = highlighter(_doc)
+                            doc.stylize("inspect.doc")
+                            _signature_text.append(doc)
 
-                if self.docs:
-                    docs = getdoc(value)
-                    if docs is not None:
-                        _doc = _reformat_doc(str(docs))
-                        if not self.help:
-                            _doc = _first_paragraph(_doc)
-                        _signature_text.append("\n" if "\n" in _doc else " ")
-                        doc = highlighter(_doc)
-                        doc.stylize("inspect.doc")
-                        _signature_text.append(doc)
-
-                add_row(key_text, _signature_text)
+                    add_row(key_text, _signature_text)
             else:
                 add_row(key_text, Pretty(value, highlighter=highlighter))
         if items_table.row_count:
@@ -189,7 +206,7 @@ class Inspect(JupyterMixin):
         else:
             yield self.highlighter(
                 Text.from_markup(
-                    f"[i]{not_shown_count} attribute(s) not shown.[/i] Use inspect(<OBJECT>, all=True) to see all attributes."
+                    f"[i][b]{not_shown_count}[/b] attribute(s) not shown.[/i] Run [b][red]inspect[/red]([not b]inspect[/])[/b] for options."
                 )
             )
 

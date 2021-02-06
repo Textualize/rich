@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Union
 
 from .color import Color
 from .console import Console, ConsoleOptions, RenderResult

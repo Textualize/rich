@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+Consider posting in https://github.com/willmcgugan/rich/discussions for feedback before raising a feature request.
+
 Have you checked the issues for a similar suggestions?
 
 **How would you improve Rich?**

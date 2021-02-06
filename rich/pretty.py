@@ -2,7 +2,7 @@ import builtins
 import os
 import sys
 from array import array
-from collections import Counter, defaultdict, deque
+from collections import Counter, abc, defaultdict, deque
 from dataclasses import dataclass
 from itertools import islice
 from typing import (
@@ -24,6 +24,7 @@ from . import get_console
 from ._pick import pick_bool
 from .cells import cell_len
 from .highlighter import ReprHighlighter
+from .jupyter import JupyterRenderable
 from .measure import Measurement
 from .text import Text
 
@@ -44,6 +45,7 @@ def install(
     crop: bool = False,
     indent_guides: bool = False,
     max_length: int = None,
+    max_string: int = None,
     expand_all: bool = False,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
@@ -55,11 +57,14 @@ def install(
         indent_guides (bool, optional): Enable indentation guides. Defaults to False.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
+        max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
         expand_all (bool, optional): Expand all containers. Defaults to False
     """
     from rich import get_console
+    from .console import ConsoleRenderable  # needed here to prevent circular import
 
     console = console or get_console()
+    assert console is not None
 
     def display_hook(value: Any) -> None:
         """Replacement sys.displayhook which prettifies objects with Rich."""
@@ -74,13 +79,51 @@ def install(
                     overflow=overflow,
                     indent_guides=indent_guides,
                     max_length=max_length,
+                    max_string=max_string,
                     expand_all=expand_all,
                 ),
                 crop=crop,
             )
             builtins._ = value  # type: ignore
 
-    sys.displayhook = display_hook
+    def ipy_display_hook(value: Any) -> None:  # pragma: no cover
+        assert console is not None
+        # always skip rich generated jupyter renderables or None values
+        if isinstance(value, JupyterRenderable) or value is None:
+            return
+        # on jupyter rich display, if using one of the special representations dont use rich
+        if console.is_jupyter and any(attr.startswith("_repr_") for attr in dir(value)):
+            return
+
+        # certain renderables should start on a new line
+        if isinstance(value, ConsoleRenderable):
+            console.line()
+
+        console.print(
+            value
+            if isinstance(value, RichRenderable)
+            else Pretty(
+                value,
+                overflow=overflow,
+                indent_guides=indent_guides,
+                max_length=max_length,
+                max_string=max_string,
+                expand_all=expand_all,
+                margin=12,
+            ),
+            crop=crop,
+        )
+
+    try:  # pragma: no cover
+        ip = get_ipython()  # type: ignore
+        from IPython.core.formatters import BaseFormatter
+
+        # replace plain text formatter with rich formatter
+        rich_formatter = BaseFormatter()
+        rich_formatter.for_type(object, func=ipy_display_hook)
+        ip.display_formatter.formatters["text/plain"] = rich_formatter
+    except Exception:
+        sys.displayhook = display_hook
 
 
 class Pretty:
@@ -98,6 +141,8 @@ class Pretty:
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
         expand_all (bool, optional): Expand all containers. Defaults to False.
+        margin (int, optional): Subtrace a margin from width to force containers to expand earlier. Defaults to 0.
+        insert_line (bool, optional): Insert a new line if the output has multiple new lines. Defaults to False.
     """
 
     def __init__(
@@ -113,6 +158,8 @@ class Pretty:
         max_length: int = None,
         max_string: int = None,
         expand_all: bool = False,
+        margin: int = 0,
+        insert_line: bool = False,
     ) -> None:
         self._object = _object
         self.highlighter = highlighter or ReprHighlighter()
@@ -124,13 +171,15 @@ class Pretty:
         self.max_length = max_length
         self.max_string = max_string
         self.expand_all = expand_all
+        self.margin = margin
+        self.insert_line = insert_line
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         pretty_str = pretty_repr(
             self._object,
-            max_width=options.max_width,
+            max_width=options.max_width - self.margin,
             indent_size=self.indent_size,
             max_length=self.max_length,
             max_string=self.max_string,
@@ -148,11 +197,17 @@ class Pretty:
             pretty_text = pretty_text.with_indent_guides(
                 self.indent_size, style="repr.indent"
             )
+        if self.insert_line and "\n" in pretty_text:
+            yield ""
         yield pretty_text
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         pretty_str = pretty_repr(
-            self._object, max_width=max_width, indent_size=self.indent_size
+            self._object,
+            max_width=max_width,
+            indent_size=self.indent_size,
+            max_length=self.max_length,
+            max_string=self.max_string,
         )
         text_width = max(cell_len(line) for line in pretty_str.splitlines())
         return Measurement(text_width, text_width)
@@ -180,7 +235,7 @@ _BRACES: Dict[type, Callable[[Any], Tuple[str, str, str]]] = {
     frozenset: lambda _object: ("frozenset({", "})", "frozenset()"),
     list: lambda _object: ("[", "]", "[]"),
     set: lambda _object: ("{", "}", "set()"),
-    tuple: lambda _object: ("(", ")", "tuple()"),
+    tuple: lambda _object: ("(", ")", "()"),
 }
 _CONTAINERS = tuple(_BRACES.keys())
 _MAPPING_CONTAINERS = (dict, os._Environ)

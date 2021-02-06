@@ -9,7 +9,10 @@ You can consider this class to be like a string with marked up regions of text. 
 
 One way to add a style to Text is the :meth:`~rich.text.Text.stylize` method which applies a style to a start and end offset. Here is an example::
 
+    from rich.console import Console
     from rich.text import Text
+
+    console = Console()
     text = Text("Hello, World!")
     text.stylize("bold magenta", 0, 6)
     console.print(text)

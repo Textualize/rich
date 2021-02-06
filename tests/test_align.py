@@ -3,7 +3,7 @@ import io
 import pytest
 
 from rich.console import Console
-from rich.align import Align
+from rich.align import Align, VerticalCenter
 from rich.measure import Measurement
 
 
@@ -23,6 +23,12 @@ def test_bad_align_legal():
         Align("foo", "")
     with pytest.raises(ValueError):
         Align("foo", "LEFT")
+
+
+def test_repr():
+    repr(Align("foo", "left"))
+    repr(Align("foo", "center"))
+    repr(Align("foo", "right"))
 
 
 def test_align_left():
@@ -87,3 +93,16 @@ def test_shortcuts():
     assert Align.right("foo").renderable == "foo"
     assert Align.center("foo").align == "center"
     assert Align.center("foo").renderable == "foo"
+
+
+def test_vertical_center():
+    console = Console(color_system=None, height=6)
+    console.begin_capture()
+    vertical_center = VerticalCenter("foo")
+    repr(vertical_center)
+    console.print(vertical_center)
+    result = console.end_capture()
+    print(repr(result))
+    expected = "   \n   \nfoo\n   \n   \n   \n"
+    assert result == expected
+    assert Measurement.get(console, vertical_center) == Measurement(3, 3)

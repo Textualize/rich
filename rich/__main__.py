@@ -2,20 +2,17 @@ import colorsys
 import io
 from time import process_time
 
+from rich import box
 from rich.color import Color
-from rich.columns import Columns
 from rich.console import Console, ConsoleOptions, RenderGroup, RenderResult
 from rich.markdown import Markdown
 from rich.measure import Measurement
-from rich.padding import Padding
-from rich.panel import Panel
 from rich.pretty import Pretty
 from rich.segment import Segment
 from rich.style import Style
-from rich.table import Table
 from rich.syntax import Syntax
+from rich.table import Table
 from rich.text import Text
-from rich import box
 
 
 class ColorBox:
@@ -26,10 +23,11 @@ class ColorBox:
             for x in range(options.max_width):
                 h = x / options.max_width
                 l = 0.1 + ((y / 5) * 0.7)
-                r, g, b = colorsys.hls_to_rgb(h, l, 1.0)
-                yield Segment(
-                    "█", Style(color=Color.from_rgb(r * 255, g * 255, b * 255))
-                )
+                r1, g1, b1 = colorsys.hls_to_rgb(h, l, 1.0)
+                r2, g2, b2 = colorsys.hls_to_rgb(h, l + 0.7 / 10, 1.0)
+                bgcolor = Color.from_rgb(r1 * 255, g1 * 255, b1 * 255)
+                color = Color.from_rgb(r2 * 255, g2 * 255, b2 * 255)
+                yield Segment("▄", Style(color=color, bgcolor=bgcolor))
             yield Segment.line()
 
     def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
@@ -96,7 +94,7 @@ def make_test_card() -> Table:
         return table
 
     table.add_row(
-        "Asian languages",
+        "Asian\nlanguage\nsupport",
         ":flag_for_china:  该库支持中文，日文和韩文文本！\n:flag_for_japan:  ライブラリは中国語、日本語、韓国語のテキストをサポートしています\n:flag_for_south_korea:  이 라이브러리는 중국어, 일본어 및 한국어 텍스트를 지원합니다",
     )
 
@@ -104,7 +102,7 @@ def make_test_card() -> Table:
         "[bold magenta]Rich[/] supports a simple [i]bbcode[/i] like [b]markup[/b] for [yellow]color[/], [underline]style[/], and emoji! "
         ":+1: :apple: :ant: :bear: :baguette_bread: :bus: "
     )
-    table.add_row("Console markup", markup_example)
+    table.add_row("Markup", markup_example)
 
     example_table = Table(
         show_edge=False,
@@ -201,14 +199,18 @@ Supports much of the *markdown*, __syntax__!
     )
 
     table.add_row(
-        "And more",
+        "+more!",
         """Progress bars, columns, styled logging handler, tracebacks, etc...""",
     )
     return table
 
 
 if __name__ == "__main__":  # pragma: no cover
-    console = Console(file=io.StringIO(), force_terminal=True)
+
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+    )
     test_card = make_test_card()
 
     # Print once to warm cache

@@ -1,4 +1,3 @@
-import io
 import sys
 from abc import ABC, abstractmethod
 from collections import deque
@@ -7,10 +6,8 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 from math import ceil
 from threading import Event, RLock, Thread
-from time import monotonic
 from typing import (
     IO,
-    TYPE_CHECKING,
     Any,
     Callable,
     Deque,
@@ -27,7 +24,6 @@ from typing import (
 )
 
 from . import filesize, get_console
-from .ansi import AnsiDecoder
 from .console import (
     Console,
     ConsoleRenderable,
@@ -37,13 +33,15 @@ from .console import (
     RenderHook,
 )
 from .control import Control
+from .file_proxy import FileProxy
 from .highlighter import Highlighter
 from .jupyter import JupyterMixin
 from .live_render import LiveRender
 from .progress_bar import ProgressBar
+from .spinner import Spinner
 from .style import StyleType
 from .table import Table
-from .text import Text
+from .text import Text, TextType
 
 TaskID = NewType("TaskID", int)
 
@@ -95,12 +93,13 @@ def track(
     console: Optional[Console] = None,
     transient: bool = False,
     get_time: Callable[[], float] = None,
-    refresh_per_second: int = None,
+    refresh_per_second: float = None,
     style: StyleType = "bar.back",
     complete_style: StyleType = "bar.complete",
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
     update_period: float = 0.1,
+    disable: bool = False,
 ) -> Iterable[ProgressType]:
     """Track progress by iterating over a sequence.
 
@@ -111,12 +110,13 @@ def track(
         auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         console (Console, optional): Console to write to. Default creates internal Console instance.
-        refresh_per_second (Optional[int], optional): Number of times per second to refresh the progress information, or None to use default. Defaults to None.
+        refresh_per_second (Optional[float], optional): Number of times per second to refresh the progress information, or None to use default. Defaults to None.
         style (StyleType, optional): Style for the bar background. Defaults to "bar.back".
         complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
         pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
         update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
+        disable (bool, optional): Disable display of progress.
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
 
@@ -144,6 +144,7 @@ def track(
         transient=transient,
         get_time=get_time,
         refresh_per_second=refresh_per_second,
+        disable=disable,
     )
 
     with progress:
@@ -187,6 +188,68 @@ class ProgressColumn(ABC):
     @abstractmethod
     def render(self, task: "Task") -> RenderableType:
         """Should return a renderable object."""
+
+
+class RenderableColumn(ProgressColumn):
+    """A column to insert an arbitrary column.
+
+    Args:
+        renderable (RenderableType, optional): Any renderable. Defaults to empty string.
+    """
+
+    def __init__(self, renderable: RenderableType = ""):
+        self.renderable = renderable
+        super().__init__()
+
+    def render(self, task: "Task") -> RenderableType:
+        return self.renderable
+
+
+class SpinnerColumn(ProgressColumn):
+    """A column with a 'spinner' animation.
+
+    Args:
+        spinner_name (str, optional): Name of spinner animation. Defaults to "dots".
+        style (StyleType, optional): Style of spinner. Defaults to "progress.spinner".
+        speed (float, optional): Speed factor of spinner. Defaults to 1.0.
+        finished_text (TextType, optional): Text used when task is finished. Defaults to " ".
+    """
+
+    def __init__(
+        self,
+        spinner_name: str = "dots",
+        style: Optional[StyleType] = "progress.spinner",
+        speed: float = 1.0,
+        finished_text: TextType = " ",
+    ):
+        self.spinner = Spinner(spinner_name, style=style, speed=speed)
+        self.finished_text = (
+            Text.from_markup(finished_text)
+            if isinstance(finished_text, str)
+            else finished_text
+        )
+        super().__init__()
+
+    def set_spinner(
+        self,
+        spinner_name: str,
+        spinner_style: Optional[StyleType] = "progress.spinner",
+        speed: float = 1.0,
+    ):
+        """Set a new spinner.
+
+        Args:
+            spinner_name (str): Spinner name, see python -m rich.spinner.
+            spinner_style (Optional[StyleType], optional): Spinner style. Defaults to "progress.spinner".
+            speed (float, optional): Speed factor of spinner. Defaults to 1.0.
+        """
+        self.spinner = Spinner(spinner_name, style=spinner_style, speed=speed)
+
+    def render(self, task: "Task") -> Text:
+        if task.finished:
+            return self.finished_text
+        text = self.spinner.render(task.get_time())
+        return text
 
 
 class TextColumn(ProgressColumn):
@@ -257,6 +320,18 @@ class BarColumn(ProgressColumn):
             finished_style=self.finished_style,
             pulse_style=self.pulse_style,
         )
+
+
+class TimeElapsedColumn(ProgressColumn):
+    """Renders time elapsed."""
+
+    def render(self, task: "Task") -> Text:
+        """Show time remaining."""
+        elapsed = task.finished_time if task.finished else task.elapsed
+        if elapsed is None:
+            return Text("-:--:--", style="progress.elapsed")
+        delta = timedelta(seconds=int(elapsed))
+        return Text(str(delta), style="progress.elapsed")
 
 
 class TimeRemainingColumn(ProgressColumn):
@@ -371,6 +446,9 @@ class Task:
     _get_time: GetTimeCallable
     """Callable to get the current time."""
 
+    finished_time: Optional[float] = None
+    """float: Time task was finished."""
+
     visible: bool = True
     """bool: Indicates if this task is visible in the progress display."""
 
@@ -412,8 +490,8 @@ class Task:
 
     @property
     def finished(self) -> bool:
-        """bool: Check if the task has completed."""
-        return self.completed >= self.total
+        """Check if the task has finished."""
+        return self.finished_time is not None
 
     @property
     def percentage(self) -> float:
@@ -455,12 +533,13 @@ class Task:
     def _reset(self) -> None:
         """Reset progress."""
         self._progress.clear()
+        self.finished_time = None
 
 
 class _RefreshThread(Thread):
     """A thread that calls refresh() on the Process object at regular intervals."""
 
-    def __init__(self, progress: "Progress", refresh_per_second: int = 10) -> None:
+    def __init__(self, progress: "Progress", refresh_per_second: float = 10) -> None:
         self.progress = progress
         self.refresh_per_second = refresh_per_second
         self.done = Event()
@@ -474,57 +553,19 @@ class _RefreshThread(Thread):
             self.progress.refresh()
 
 
-class _FileProxy(io.TextIOBase):
-    """Wraps a file (e.g. sys.stdout) and redirects writes to a console."""
-
-    def __init__(self, console: Console, file: IO[str]) -> None:
-        self.__console = console
-        self.__file = file
-        self.__buffer: List[str] = []
-        self.__ansi_decoder = AnsiDecoder()
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.__file, name)
-
-    def write(self, text: str) -> int:
-        buffer = self.__buffer
-        lines: List[str] = []
-        while text:
-            line, new_line, text = text.partition("\n")
-            if new_line:
-                lines.append("".join(buffer) + line)
-                del buffer[:]
-            else:
-                buffer.append(line)
-                break
-        if lines:
-            console = self.__console
-            with console:
-                output = Text("\n").join(
-                    self.__ansi_decoder.decode_line(line) for line in lines
-                )
-                console.print(output, markup=False, emoji=False, highlight=False)
-        return len(text)
-
-    def flush(self) -> None:
-        buffer = self.__buffer
-        if buffer:
-            self.__console.print("".join(buffer))
-            del buffer[:]
-
-
 class Progress(JupyterMixin, RenderHook):
     """Renders an auto-updating progress bar(s).
 
     Args:
         console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
-        refresh_per_second (Optional[int], optional): Number of times per second to refresh the progress information or None to use default (10). Defaults to None.
+        refresh_per_second (Optional[float], optional): Number of times per second to refresh the progress information or None to use default (10). Defaults to None.
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         redirect_stdout: (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
         redirect_stderr: (bool, optional): Enable redirection of stderr. Defaults to True.
         get_time: (Callable, optional): A callable that gets the current time, or None to use Console.get_time. Defaults to None.
+        disable (bool, optional): Disable progress display. Defaults to False
     """
 
     def __init__(
@@ -532,12 +573,13 @@ class Progress(JupyterMixin, RenderHook):
         *columns: Union[str, ProgressColumn],
         console: Console = None,
         auto_refresh: bool = True,
-        refresh_per_second: int = None,
+        refresh_per_second: float = None,
         speed_estimate_period: float = 30.0,
         transient: bool = False,
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
         get_time: GetTimeCallable = None,
+        disable: bool = False,
     ) -> None:
         assert (
             refresh_per_second is None or refresh_per_second > 0
@@ -557,6 +599,7 @@ class Progress(JupyterMixin, RenderHook):
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
         self.get_time = get_time or self.console.get_time
+        self.disable = disable
         self._tasks: Dict[TaskID, Task] = {}
         self._live_render = LiveRender(self.get_renderable())
         self._task_index: TaskID = TaskID(0)
@@ -593,10 +636,10 @@ class Progress(JupyterMixin, RenderHook):
         if self.console.is_terminal:
             if self._redirect_stdout:
                 self._restore_stdout = sys.stdout
-                sys.stdout = _FileProxy(self.console, sys.stdout)
+                sys.stdout = FileProxy(self.console, sys.stdout)
             if self._redirect_stderr:
                 self._restore_stderr = sys.stderr
-                sys.stderr = _FileProxy(self.console, sys.stderr)
+                sys.stderr = FileProxy(self.console, sys.stderr)
 
     def _disable_redirect_io(self):
         """Disable redirecting of stdout / stderr."""
@@ -786,6 +829,8 @@ class Progress(JupyterMixin, RenderHook):
                 popleft()
             if update_completed > 0:
                 _progress.append(ProgressSample(current_time, update_completed))
+            if task.completed >= task.total and task.finished_time is None:
+                task.finished_time = task.elapsed
 
     def reset(
         self,
@@ -821,6 +866,7 @@ class Progress(JupyterMixin, RenderHook):
                 task.fields = fields
             if description is not None:
                 task.description = description
+            task.finished_time = None
             self.refresh()
 
     def advance(self, task_id: TaskID, advance: float = 1) -> None:
@@ -845,32 +891,35 @@ class Progress(JupyterMixin, RenderHook):
             while len(_progress) > 1000:
                 popleft()
             _progress.append(ProgressSample(current_time, update_completed))
+            if task.completed >= task.total and task.finished_time is None:
+                task.finished_time = task.elapsed
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
-        if self.console.is_jupyter:  # pragma: no cover
-            try:
-                from IPython.display import display
-                from ipywidgets import Output
-            except ImportError:
-                import warnings
+        if not self.disable:
+            if self.console.is_jupyter:  # pragma: no cover
+                try:
+                    from IPython.display import display
+                    from ipywidgets import Output
+                except ImportError:
+                    import warnings
 
-                warnings.warn('install "ipywidgets" for Jupyter support')
-            else:
+                    warnings.warn('install "ipywidgets" for Jupyter support')
+                else:
+                    with self._lock:
+                        if self.ipy_widget is None:
+                            self.ipy_widget = Output()
+                            display(self.ipy_widget)
+
+                        with self.ipy_widget:
+                            self.ipy_widget.clear_output(wait=True)
+                            self.console.print(self.get_renderable())
+
+            elif self.console.is_terminal and not self.console.is_dumb_terminal:
                 with self._lock:
-                    if self.ipy_widget is None:
-                        self.ipy_widget = Output()
-                        display(self.ipy_widget)
-
-                    with self.ipy_widget:
-                        self.ipy_widget.clear_output(wait=True)
-                        self.console.print(self.get_renderable())
-
-        elif self.console.is_terminal and not self.console.is_dumb_terminal:
-            with self._lock:
-                self._live_render.set_renderable(self.get_renderable())
-                with self.console:
-                    self.console.print(Control(""))
+                    self._live_render.set_renderable(self.get_renderable())
+                    with self.console:
+                        self.console.print(Control(""))
 
     def get_renderable(self) -> RenderableType:
         """Get a renderable for the progress display."""
@@ -1023,7 +1072,16 @@ if __name__ == "__main__":  # pragma: no coverage
 
     console = Console(record=True)
     try:
-        with Progress(console=console, transient=True) as progress:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            TimeRemainingColumn(),
+            TimeElapsedColumn(),
+            console=console,
+            transient=True,
+        ) as progress:
 
             task1 = progress.add_task("[red]Downloading", total=1000)
             task2 = progress.add_task("[green]Processing", total=1000)
@@ -1038,3 +1096,4 @@ if __name__ == "__main__":  # pragma: no coverage
     except:
         console.save_html("progress.html")
         print("wrote progress.html")
+        raise

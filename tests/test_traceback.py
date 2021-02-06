@@ -94,7 +94,7 @@ def test_syntax_error():
 
 def test_nested_exception():
     console = Console(width=100, file=io.StringIO())
-    value_error_message = "ValueError because of ZeroDivisionEerror"
+    value_error_message = "ValueError because of ZeroDivisionError"
 
     try:
         try:
@@ -112,7 +112,35 @@ def test_nested_exception():
         "During handling of the above exception",
     ]
 
-    assert [msg in exception_text for msg in text_should_contain]
+    for msg in text_should_contain:
+        assert msg in exception_text
+
+    # ZeroDivisionError should come before ValueError
+    assert exception_text.find("ZeroDivisionError") < exception_text.find("ValueError")
+
+
+def test_caused_exception():
+    console = Console(width=100, file=io.StringIO())
+    value_error_message = "ValueError caused by ZeroDivisionError"
+
+    try:
+        try:
+            1 / 0
+        except ZeroDivisionError as e:
+            raise ValueError(value_error_message) from e
+    except Exception:
+        console.print_exception()
+    exception_text = console.file.getvalue()
+
+    text_should_contain = [
+        value_error_message,
+        "ZeroDivisionError",
+        "ValueError",
+        "The above exception was the direct cause",
+    ]
+
+    for msg in text_should_contain:
+        assert msg in exception_text
 
     # ZeroDivisionError should come before ValueError
     assert exception_text.find("ZeroDivisionError") < exception_text.find("ValueError")

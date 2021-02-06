@@ -11,6 +11,7 @@ from .terminal_theme import DEFAULT_TERMINAL_THEME
 
 if TYPE_CHECKING:  # pragma: no cover
     from .terminal_theme import TerminalTheme
+    from .text import Text
 
 
 WINDOWS = platform.system() == "Windows"
@@ -268,16 +269,23 @@ class Color(NamedTuple):
     triplet: Optional[ColorTriplet] = None
     """A triplet of color components, if an RGB color."""
 
-    def __str__(self) -> str:
-        """Render the color to the terminal."""
-        attrs = self.get_ansi_codes(foreground=True)
+    def __repr__(self) -> str:
         return (
-            f"\x1b[{';'.join(attrs)}m⬤  \x1b[0m"
             f"<color {self.name!r} ({self.type.name.lower()})>"
+            if self.number is None
+            else f"<color {self.name!r} {self.number} ({self.type.name.lower()})>"
         )
 
-    def __repr__(self) -> str:
-        return f"<color {self.name!r} ({self.type.name.lower()})>"
+    def __rich__(self) -> "Text":
+        """Dispays the actual color if Rich printed."""
+        from .text import Text
+        from .style import Style
+
+        return Text.assemble(
+            f"<color {self.name!r} ({self.type.name.lower()})",
+            ("⬤", Style(color=self)),
+            " >",
+        )
 
     @property
     def system(self) -> ColorSystem:
@@ -322,7 +330,7 @@ class Color(NamedTuple):
             return theme.ansi_colors[self.number]
         elif self.type == ColorType.WINDOWS:
             assert self.number is not None
-            return STANDARD_PALETTE[self.number]
+            return WINDOWS_PALETTE[self.number]
         else:  # self.type == ColorType.DEFAULT:
             assert self.number is None
             return theme.foreground_color if foreground else theme.background_color
@@ -360,9 +368,9 @@ class Color(NamedTuple):
         """Create a truecolor from three color components in the range(0->255).
 
         Args:
-            red (float): Red component.
-            green (float): Green component.
-            blue (float): Blue component.
+            red (float): Red component in range 0-255.
+            green (float): Green component in range 0-255.
+            blue (float): Blue component in range 0-255.
 
         Returns:
             Color: A new color object.
@@ -441,7 +449,8 @@ class Color(NamedTuple):
         elif _type == ColorType.WINDOWS:
             number = self.number
             assert number is not None
-            return (str(30 + number if foreground else 40 + number),)
+            fore, back = (30, 40) if number < 8 else (82, 92)
+            return (str(fore + number if foreground else back + number),)
 
         elif _type == ColorType.STANDARD:
             number = self.number
@@ -467,10 +476,8 @@ class Color(NamedTuple):
         # Convert to 8-bit color from truecolor color
         if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:
             assert self.triplet is not None
-
             red, green, blue = self.triplet.normalized
             _h, l, s = rgb_to_hls(red, green, blue)
-
             # If saturation is under 10% assume it is grayscale
             if s < 0.1:
                 gray = round(l * 25.0)
@@ -505,10 +512,8 @@ class Color(NamedTuple):
                 triplet = self.triplet
             else:  # self.system == ColorSystem.EIGHT_BIT
                 assert self.number is not None
-                if self.number < 8:
+                if self.number < 16:
                     return Color(self.name, ColorType.WINDOWS, number=self.number)
-                elif self.number < 16:
-                    return Color(self.name, ColorType.WINDOWS, number=self.number - 8)
                 triplet = ColorTriplet(*EIGHT_BIT_PALETTE[self.number])
 
             color_number = WINDOWS_PALETTE.match(triplet)
@@ -562,7 +567,7 @@ if __name__ == "__main__":  # pragma: no cover
         if color_number < 16:
             table.add_row(color_cell, f"{color_number}", Text(f'"{name}"'))
         else:
-            color = EIGHT_BIT_PALETTE[color_number]
+            color = EIGHT_BIT_PALETTE[color_number]  # type: ignore
             table.add_row(
                 color_cell, str(color_number), Text(f'"{name}"'), color.hex, color.rgb
             )

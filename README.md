@@ -5,7 +5,7 @@
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
-[中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md) • [lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md)
+[中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md) • [lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md) • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md)
 
 Rich is a Python library for _rich_ text and beautiful formatting in the terminal.
 
@@ -29,6 +29,12 @@ Install with `pip` or your favorite PyPi package manager.
 
 ```
 pip install rich
+```
+
+Run the following to test Rich output on your terminal:
+
+```
+python -m rich
 ```
 
 ## Rich print function
@@ -224,12 +230,61 @@ The columns may be configured to show any details you want. Built-in columns inc
 
 To try this out yourself, see [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) which can download multiple URLs simultaneously while displaying progress.
 
+## Status
+
+For situations where it is hard to calculate progress, you can use the [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) method which will display a 'spinner' animation and message. The animation won't prevent you from using the console as normal. Here's an example:
+
+```python
+from time import sleep
+from rich.console import Console
+
+console = Console()
+tasks = [f"task {n}" for n in range(1, 11)]
+
+with console.status("[bold green]Working on tasks...") as status:
+    while tasks:
+        task = tasks.pop(0)
+        sleep(1)
+        console.log(f"{task} complete")
+```
+
+This generates the following output in the terminal.
+
+![status](https://github.com/willmcgugan/rich/raw/master/imgs/status.gif)
+
+The spinner animations were borrowed from [cli-spinners](https://www.npmjs.com/package/cli-spinners). You can select a spinner by specifying the `spinner` parameter. Run the following command to see the available values:
+
+```
+python -m rich.spinner
+```
+
+The above command generate the following output in the terminal:
+
+![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
+
+## Tree
+
+Rich can render a [tree](https://rich.readthedocs.io/en/latest/tree.html) with guide lines. A tree is ideal for displaying a file structure, or any other hierarchical data.
+
+The labels of the tree can be simple text or anything else Rich can render. Run the following for a demonstration:
+
+```
+python -m rich.tree
+```
+
+This generates the following output:
+
+![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
+
+See the [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) example for a script that displays a tree view of any directory, similar to the linux `tree` command.
+
 ## Columns
 
 Rich can render content in neat [columns](https://rich.readthedocs.io/en/latest/columns.html) with equal or optimal width. Here's a very basic clone of the (MacOS / Linux) `ls` command which displays a directory listing in columns:
 
 ```python
 import os
+import sys
 
 from rich import print
 from rich.columns import Columns

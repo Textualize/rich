@@ -1,5 +1,6 @@
 import pytest
 
+from rich.console import Console
 from rich.markup import escape, MarkupError, _parse, render, Tag, RE_TAGS
 from rich.text import Span
 
@@ -23,7 +24,24 @@ def test_re_match():
 
 
 def test_escape():
+    # Potential tags
     assert escape("foo[bar]") == r"foo\[bar]"
+    assert escape(r"foo\[bar]") == r"foo\\\[bar]"
+
+    # Not tags (escape not required)
+    assert escape("[5]") == "[5]"
+    assert escape("\\[5]") == "\\[5]"
+
+
+def test_render_escape():
+    console = Console(width=80, color_system=None)
+    console.begin_capture()
+    console.print(
+        escape(r"[red]"), escape(r"\[red]"), escape(r"\\[red]"), escape(r"\\\[red]")
+    )
+    result = console.end_capture()
+    expected = r"[red] \[red] \\[red] \\\[red]" + "\n"
+    assert result == expected
 
 
 def test_parse():
@@ -35,9 +53,9 @@ def test_parse():
         (16, None, Tag(name="bar", parameters=None)),
         (26, "world", None),
         (26, None, Tag(name="/", parameters=None)),
-        (29, "[", None),
-        (31, "escaped]", None),
+        (29, "[escaped]", None),
     ]
+    print(repr(result))
     assert result == expected
 
 
@@ -106,3 +124,28 @@ def test_markup_error():
         assert render("foo[/bar]")
     with pytest.raises(MarkupError):
         assert render("[foo]hello[/bar]")
+
+
+def test_escape_escape():
+    # Escaped escapes (i.e. double backslash)should be treated as literal
+    result = render(r"\\[bold]FOO")
+    assert str(result) == r"\FOO"
+
+    # Single backslash makes the tag literal
+    result = render(r"\[bold]FOO")
+    assert str(result) == "[bold]FOO"
+
+    # Double backslash produces a backslash
+    result = render(r"\\[bold]some text[/]")
+    assert str(result) == r"\some text"
+
+    # Triple backslash parsed as literal backslash plus escaped tag
+    result = render(r"\\\[bold]some text\[/]")
+    assert str(result) == r"\[bold]some text[/]"
+
+    # Backslash escaping only happens when preceding a tag
+    result = render(r"\\")
+    assert str(result) == r"\\"
+
+    result = render(r"\\\\")
+    assert str(result) == r"\\\\"

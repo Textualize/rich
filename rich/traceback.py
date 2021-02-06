@@ -1,25 +1,17 @@
 from __future__ import absolute_import
 
-import os.path
+import os
 import platform
 import sys
 from dataclasses import dataclass, field
-from textwrap import indent
 from traceback import walk_tb
 from types import TracebackType
-from typing import Callable, Dict, List, Optional, Type
+from typing import Callable, Dict, Iterable, List, Optional, Type
 
 from pygments.lexers import guess_lexer_for_filename
-from pygments.token import (
-    Comment,
-    Keyword,
-    Name,
-    Number,
-    Operator,
-    String,
-    Token,
-    Text as TextToken,
-)
+from pygments.token import Comment, Keyword, Name, Number, Operator, String
+from pygments.token import Text as TextToken
+from pygments.token import Token
 
 from . import pretty
 from ._loop import loop_first, loop_last
@@ -41,6 +33,9 @@ from .text import Text
 from .theme import Theme
 
 WINDOWS = platform.system() == "Windows"
+
+LOCALS_MAX_LENGTH = 10
+LOCALS_MAX_STRING = 80
 
 
 def install(
@@ -121,6 +116,7 @@ class Stack:
     exc_type: str
     exc_value: str
     syntax_error: Optional[_SyntaxError] = None
+    is_cause: bool = False
     frames: List[Frame] = field(default_factory=list)
 
 
@@ -145,17 +141,24 @@ class Traceback:
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
+        locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to 10.
+        locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
     """
+
+    LEXERS = {".py": "python", ".pxd": "cython", ".pyx": "cython", ".pxi": "pyrex"}
 
     def __init__(
         self,
         trace: Trace = None,
-        width: Optional[int] = 88,
+        width: Optional[int] = 100,
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
         indent_guides: bool = True,
+        locals_max_length: int = LOCALS_MAX_LENGTH,
+        locals_max_string: int = LOCALS_MAX_STRING,
     ):
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
@@ -173,6 +176,8 @@ class Traceback:
         self.word_wrap = word_wrap
         self.show_locals = show_locals
         self.indent_guides = indent_guides
+        self.locals_max_length = locals_max_length
+        self.locals_max_string = locals_max_string
 
     @classmethod
     def from_exception(
@@ -186,6 +191,8 @@ class Traceback:
         word_wrap: bool = False,
         show_locals: bool = False,
         indent_guides: bool = True,
+        locals_max_length: int = LOCALS_MAX_LENGTH,
+        locals_max_string: int = LOCALS_MAX_STRING,
     ) -> "Traceback":
         """Create a traceback from exception info
 
@@ -199,6 +206,9 @@ class Traceback:
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
             indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
+            locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+                Defaults to 10.
+            locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
 
         Returns:
             Traceback: A Traceback instance that may be printed.
@@ -206,7 +216,7 @@ class Traceback:
         rich_traceback = cls.extract(
             exc_type, exc_value, traceback, show_locals=show_locals
         )
-        return Traceback(
+        return cls(
             rich_traceback,
             width=width,
             extra_lines=extra_lines,
@@ -214,6 +224,8 @@ class Traceback:
             word_wrap=word_wrap,
             show_locals=show_locals,
             indent_guides=indent_guides,
+            locals_max_length=locals_max_length,
+            locals_max_string=locals_max_string,
         )
 
     @classmethod
@@ -223,6 +235,8 @@ class Traceback:
         exc_value: BaseException,
         traceback: Optional[TracebackType],
         show_locals: bool = False,
+        locals_max_length: int = LOCALS_MAX_LENGTH,
+        locals_max_string: int = LOCALS_MAX_STRING,
     ) -> Trace:
         """Extract traceback information.
 
@@ -231,14 +245,25 @@ class Traceback:
             exc_value (BaseException): Exception value.
             traceback (TracebackType): Python Traceback object.
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
+            locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+                Defaults to 10.
+            locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
 
         Returns:
             Trace: A Trace instance which you can use to construct a `Traceback`.
         """
 
         stacks: List[Stack] = []
+        is_cause = False
+
+        from rich import _IMPORT_CWD
+
         while True:
-            stack = Stack(exc_type=str(exc_type.__name__), exc_value=str(exc_value))
+            stack = Stack(
+                exc_type=str(exc_type.__name__),
+                exc_value=str(exc_value),
+                is_cause=is_cause,
+            )
 
             if isinstance(exc_value, SyntaxError):
                 stack.syntax_error = _SyntaxError(
@@ -254,13 +279,19 @@ class Traceback:
 
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
-                filename = os.path.abspath(filename) if filename else "?"
+                if filename and not filename.startswith("<"):
+                    if not os.path.isabs(filename):
+                        filename = os.path.join(_IMPORT_CWD, filename)
                 frame = Frame(
-                    filename=filename,
+                    filename=filename or "?",
                     lineno=line_no,
                     name=frame_summary.f_code.co_name,
                     locals={
-                        key: pretty.traverse(value)
+                        key: pretty.traverse(
+                            value,
+                            max_length=locals_max_length,
+                            max_string=locals_max_string,
+                        )
                         for key, value in frame_summary.f_locals.items()
                     }
                     if show_locals
@@ -268,12 +299,26 @@ class Traceback:
                 )
                 append(frame)
 
-            cause = exc_value.__context__
+            cause = getattr(exc_value, "__cause__", None)
             if cause and cause.__traceback__:
                 exc_type = cause.__class__
                 exc_value = cause
                 traceback = cause.__traceback__
                 if traceback:
+                    is_cause = True
+                    continue
+
+            cause = exc_value.__context__
+            if (
+                cause
+                and cause.__traceback__
+                and not getattr(exc_value, "__suppress_context__", False)
+            ):
+                exc_type = cause.__class__
+                exc_value = cause
+                traceback = cause.__traceback__
+                if traceback:
+                    is_cause = False
                     continue
             # No cover, code is reached but coverage doesn't recognize it.
             break  # pragma: no cover
@@ -347,9 +392,14 @@ class Traceback:
                 )
 
             if not last:
-                yield Text.from_markup(
-                    "\n[i]During handling of the above exception, another exception occurred:\n",
-                )
+                if stack.is_cause:
+                    yield Text.from_markup(
+                        "\n[i]The above exception was the direct cause of the following exception:\n",
+                    )
+                else:
+                    yield Text.from_markup(
+                        "\n[i]During handling of the above exception, another exception occurred:\n",
+                    )
 
     @render_group()
     def _render_syntax_error(self, syntax_error: _SyntaxError) -> RenderResult:
@@ -373,6 +423,14 @@ class Traceback:
         )
         yield syntax_error_text
 
+    @classmethod
+    def _guess_lexer(cls, filename: str, code: str) -> str:
+        ext = os.path.splitext(filename)[-1]
+        lexer_name = (
+            cls.LEXERS.get(ext) or guess_lexer_for_filename(filename, code).name
+        )
+        return lexer_name
+
     @render_group()
     def _render_stack(self, stack: Stack) -> RenderResult:
         path_highlighter = PathHighlighter()
@@ -390,10 +448,22 @@ class Traceback:
             """
             code = code_cache.get(filename)
             if code is None:
-                with open(filename, "rt") as code_file:
+                with open(
+                    filename, "rt", encoding="utf-8", errors="replace"
+                ) as code_file:
                     code = code_file.read()
                 code_cache[filename] = code
             return code
+
+        def render_locals(frame: Frame) -> Iterable[ConsoleRenderable]:
+            if frame.locals:
+                yield render_scope(
+                    frame.locals,
+                    title="locals",
+                    indent_guides=self.indent_guides,
+                    max_length=self.locals_max_length,
+                    max_string=self.locals_max_string,
+                )
 
         for first, frame in loop_first(stack.frames):
             text = Text.assemble(
@@ -408,11 +478,11 @@ class Traceback:
                 yield ""
             yield text
             if frame.filename.startswith("<"):
+                yield from render_locals(frame)
                 continue
             try:
                 code = read_code(frame.filename)
-                lexer = guess_lexer_for_filename(frame.filename, code)
-                lexer_name = lexer.name
+                lexer_name = self._guess_lexer(frame.filename, code)
                 syntax = Syntax(
                     code,
                     lexer_name,
@@ -426,20 +496,19 @@ class Traceback:
                     word_wrap=self.word_wrap,
                     code_width=88,
                     indent_guides=self.indent_guides,
+                    dedent=False,
                 )
                 yield ""
-            except Exception:
-                pass
+            except Exception as error:
+                yield Text.assemble(
+                    (f"\n{error}", "traceback.error"),
+                )
             else:
                 yield (
                     Columns(
                         [
                             syntax,
-                            render_scope(
-                                frame.locals,
-                                title="locals",
-                                indent_guides=self.indent_guides,
-                            ),
+                            *render_locals(frame),
                         ],
                         padding=1,
                     )

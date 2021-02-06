@@ -82,7 +82,7 @@ class ReprHighlighter(RegexHighlighter):
     base_style = "repr."
     highlights = [
         r"(?P<tag_start>\<)(?P<tag_name>[\w\-\.\:]*)(?P<tag_contents>.*?)(?P<tag_end>\>)",
-        r"(?P<attrib_name>\w+?)=(?P<attrib_value>\"?[\w_]+\"?)?",
+        r"(?P<attrib_name>[\w_]{1,50})=(?P<attrib_value>\"?[\w_]+\"?)?",
         _combine_regex(
             r"(?P<ipv4>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})",
             r"(?P<ipv6>([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})",
@@ -91,7 +91,7 @@ class ReprHighlighter(RegexHighlighter):
             r"(?P<brace>[\{\[\(\)\]\}])",
             r"(?P<bool_true>True)|(?P<bool_false>False)|(?P<none>None)",
             r"(?P<ellipsis>\.\.\.)",
-            r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[\-\+]?\d+?)?\b|0x[0-9a-f]*)",
+            r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[\-\+]?\d+?)?\b|0x[0-9a-fA-F]*)",
             r"(?P<path>\B(\/[\w\.\-\_\+]+)*\/)(?P<filename>[\w\.\-\_\+]*)?",
             r"(?<!\\)(?P<str>b?\'\'\'.*?(?<!\\)\'\'\'|b?\'.*?(?<!\\)\'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
             r"(?P<uuid>[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12})",

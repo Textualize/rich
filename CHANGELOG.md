@@ -5,7 +5,155 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [9.3.0] - Unreleased
+## [9.10.0] - 2021-01-27
+
+### Changed
+
+- Some optimizations for Text
+- Further optimized Tracebacks by not tokenizing code more that necessary
+- Table Column.header_style and Column.footer_style are now added to Table header/footer style
+
+## [9.9.0] - 2021-01-23
+
+### Changed
+
+- Extended Windows palette to 16 colors
+- Modified windows palette to Windows 10 colors
+- Change regex for attrib_name to be more performant
+- Optimized traceback generation
+
+### Fixed
+
+- Fix double line tree guides on Windows
+- Fixed Tracebacks ignoring initial blank lines
+- Partial fix for tracebacks not finding source after chdir
+
+### Added
+
+- Added post_style argument to Segment.apply_style
+
+## [9.8.2] - 2021-01-15
+
+### Fixed
+
+- Fixed deadlock in live https://github.com/willmcgugan/rich/issues/927
+
+## [9.8.1] - 2021-01-13
+
+### Fixed
+
+- Fixed rich.inspect failing with attributes that claim to be callable but aren't https://github.com/willmcgugan/rich/issues/916
+
+## [9.8.0] - 2021-01-11
+
+### Added
+
+- Added **rich_measure** for tree
+- Added rich.align.VerticalCenter
+
+### Changed
+
+- The `style` argument on Align now applies to background only
+- Changed display of progress bars in no_color mode for clarity
+- Console property `size` will fall back to getting the terminal size of stdout it stdin fails, this allows size to be correctly determined when piping
+
+### Fixed
+
+- Fixed panel cropping when shrunk too bar
+- Allow passing markdown over STDIN when using `python -m rich.markdown`
+- Fix printing MagicMock.mock_calls https://github.com/willmcgugan/rich/issues/903
+
+## [9.7.0] - 2021-01-09
+
+### Added
+
+- Added rich.tree
+- Added no_color argument to Console
+
+## [9.6.2] - 2021-01-07
+
+### Fixed
+
+- Fixed markup escaping edge case https://github.com/willmcgugan/rich/issues/878
+- Double tag escape, i.e. `"\\[foo]"` results in a backslash plus `[foo]` tag
+- Fixed header_style not applying to headers in positional args https://github.com/willmcgugan/rich/issues/953
+
+## [9.6.1] - 2020-12-31
+
+### Fixed
+
+- Fixed encoding error on Windows when loading code for Tracebacks
+
+## [9.6.0] - 2020-12-30
+
+### Changed
+
+- MarkupError exception raise from None to omit internal exception
+- Factored out RichHandler.render and RichHandler.render_message for easier extending
+- Display pretty printed value in rich.inspect
+
+### Added
+
+- Added Progress.TimeElapsedColumn
+- Added IPython support to pretty.install
+
+### Fixed
+
+- Fixed display of locals in Traceback for stdin
+
+## [9.5.1] - 2020-12-19
+
+### Fixed
+
+- Fixed terminal size detection on Windows https://github.com/willmcgugan/rich/issues/836
+- Fixed hex number highlighting
+
+## [9.5.0] - 2020-12-18
+
+### Changed
+
+- If file is not specified on Console then the Console.file will return the current sys.stdout. Prior to 9.5.0 sys.stdout was cached on the Console, which could break code that wrapped sys.stdout after the Console was constructed.
+- Changed `Color.__str__` to not include ansi codes
+- Changed Console.size to get the terminal dimensions via sys.stdin. This means that if you set file to be an io.StringIO file then the width will be set to the current terminal dimensions and not a default of 80.
+
+### Added
+
+- Added stderr parameter to Console
+- Added rich.reconfigure
+- Added `Color.__rich__`
+- Added Console.soft_wrap
+- Added Console.style parameter
+- Added Table.highlight parameter to enable highlighting of cells
+- Added Panel.highlight parameter to enable highlighting of panel title
+- Added highlight to ConsoleOptions
+
+### Fixed
+
+- Fixed double output in rich.live https://github.com/willmcgugan/rich/issues/485
+- Fixed Console.out highlighting not reflecting defaults https://github.com/willmcgugan/rich/issues/827
+- FileProxy now raises TypeError for empty non-str arguments https://github.com/willmcgugan/rich/issues/828
+
+## [9.4.0] - 2020-12-12
+
+### Added
+
+- Added rich.live https://github.com/willmcgugan/rich/pull/382
+- Added algin parameter to Rule and Console.rule
+- Added rich.Status class and Console.status
+- Added getitem to Text
+- Added style parameter to Console.log
+- Added rich.diagnose command
+
+### Changed
+
+- Table.add_row style argument now applies to entire line and not just cells
+- Added end_section parameter to Table.add_row to force a line underneath row
+
+## Fixed
+
+- Fixed suppressed traceback context https://github.com/willmcgugan/rich/issues/468
+
+## [9.3.0] - 2020-12-1
 
 ### Added
 
@@ -13,6 +161,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added get_time parameter to Console
 - Added rich.abc.RichRenderable
 - Added expand_all to rich.pretty.install()
+- Added locals_max_length, and locals_max_string to Traceback and logging.RichHandler
+- Set defaults of max_length and max_string for Traceback to 10 and 80
+- Added disable argument to Progress
 
 ### Changed
 
@@ -22,6 +173,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed redirecting of stderr in Progress
 - Fixed broken expanded tuple of one https://github.com/willmcgugan/rich/issues/445
+- Fixed traceback message with `from` exceptions
+- Fixed justify argument not working in console.log https://github.com/willmcgugan/rich/issues/460
 
 ## [9.2.0] - 2020-11-08
 

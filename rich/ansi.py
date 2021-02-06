@@ -117,7 +117,6 @@ class AnsiDecoder:
         Args:
             lines (Iterable[str]): An iterable of lines of terminal output.
 
-
         Yields:
             Text: Marked up Text.
         """

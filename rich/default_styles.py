@@ -44,6 +44,8 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "inspect.equals": Style(),
     "inspect.help": Style(color="cyan"),
     "inspect.doc": Style(dim=True),
+    "inspect.value.border": Style(color="green"),
+    "live.ellipsis": Style(bold=True, color="red"),
     "logging.keyword": Style(bold=True, color="yellow"),
     "logging.level.notset": Style(dim=True),
     "logging.level.debug": Style(color="green"),
@@ -97,6 +99,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "table.cell": Style.null(),
     "table.title": Style(italic=True),
     "table.caption": Style(italic=True, dim=True),
+    "traceback.error": Style(color="red", italic=True),
     "traceback.border.syntax_error": Style(color="bright_red"),
     "traceback.border": Style(color="red"),
     "traceback.text": Style.null(),
@@ -112,9 +115,14 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "progress.filesize": Style(color="green"),
     "progress.filesize.total": Style(color="green"),
     "progress.download": Style(color="green"),
+    "progress.elapsed": Style(color="yellow"),
     "progress.percentage": Style(color="magenta"),
     "progress.remaining": Style(color="cyan"),
     "progress.data.speed": Style(color="red"),
+    "progress.spinner": Style(color="green"),
+    "status.spinner": Style(color="green"),
+    "tree": Style(),
+    "tree.line": Style(),
 }
 
 MARKDOWN_STYLES = {

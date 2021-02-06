@@ -1,4 +1,4 @@
-from typing import NamedTuple, Optional
+from typing import Dict, NamedTuple, Optional
 
 from .cells import cell_len, set_cell_size
 from .style import Style
@@ -9,7 +9,8 @@ from typing import Iterable, List, Tuple
 
 
 class Segment(NamedTuple):
-    """A piece of text with associated style.
+    """A piece of text with associated style. Segments are produced by the Console render process and
+    are ultimately converted in to strings to be written to the terminal.
 
     Args:
         text (str): A piece of text.
@@ -69,24 +70,41 @@ class Segment(NamedTuple):
 
     @classmethod
     def apply_style(
-        cls, segments: Iterable["Segment"], style: Style = None
+        cls,
+        segments: Iterable["Segment"],
+        style: Style = None,
+        post_style: Style = None,
     ) -> Iterable["Segment"]:
-        """Apply a style to an iterable of segments.
+        """Apply style(s) to an iterable of segments.
+
+        Returns an iterable of segments where the style is replaced by ``style + segment.style + post_style``.
 
         Args:
             segments (Iterable[Segment]): Segments to process.
-            style (Style, optional): A style to apply. Defaults to None.
+            style (Style, optional): Base style. Defaults to None.
+            post_style (Style, optional): Style to apply on top of segment style. Defaults to None.
 
         Returns:
             Iterable[Segments]: A new iterable of segments (possibly the same iterable).
         """
-        if style is None:
-            return segments
-        apply = style.__add__
-        return (
-            cls(text, None if is_control else apply(style), is_control)
-            for text, style, is_control in segments
-        )
+        if style is not None:
+            apply = style.__add__
+            segments = (
+                cls(text, None if is_control else apply(_style), is_control)
+                for text, _style, is_control in segments
+            )
+        if post_style is not None:
+            segments = (
+                cls(
+                    text,
+                    None
+                    if is_control
+                    else (_style + post_style if _style else post_style),
+                    is_control,
+                )
+                for text, _style, is_control in segments
+            )
+        return segments
 
     @classmethod
     def filter_control(
@@ -229,7 +247,7 @@ class Segment(NamedTuple):
         """Get the length of list of segments.
 
         Args:
-            line (List[Segment]): A line encoded as a list of Segments (assumes no '\\n' characters),
+            line (List[Segment]): A line encoded as a list of Segments (assumes no '\\\\n' characters),
 
         Returns:
             int: The length of the line.
@@ -241,7 +259,7 @@ class Segment(NamedTuple):
         """Get the shape (enclosing rectangle) of a list of lines.
 
         Args:
-            lines (List[List[Segment]]): A list of lines (no '\\n' characters).
+            lines (List[List[Segment]]): A list of lines (no '\\\\n' characters).
 
         Returns:
             Tuple[int, int]: Width and height in characters.
@@ -331,11 +349,36 @@ class Segment(NamedTuple):
     def strip_styles(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
         """Remove all styles from an iterable of segments.
 
+        Args:
+            segments (Iterable[Segment]): An iterable segments.
+
         Yields:
             Segment: Segments with styles replace with None
         """
         for text, _style, is_control in segments:
             yield cls(text, None, is_control)
+
+    @classmethod
+    def remove_color(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
+        """Remove all color from an iterable of segments.
+
+        Args:
+            segments (Iterable[Segment]): An iterable segments.
+
+        Yields:
+            Segment: Segments with colorless style.
+        """
+
+        cache: Dict[Style, Style] = {}
+        for text, style, is_control in segments:
+            if style:
+                colorless_style = cache.get(style)
+                if colorless_style is None:
+                    colorless_style = style.without_color
+                    cache[style] = colorless_style
+                yield cls(text, colorless_style, is_control)
+            else:
+                yield cls(text, None, is_control)
 
 
 if __name__ == "__main__":  # pragma: no cover

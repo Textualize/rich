@@ -2,11 +2,11 @@ import logging
 from datetime import datetime
 from logging import Handler, LogRecord
 from pathlib import Path
-from typing import ClassVar, List, Optional, Type
+from typing import ClassVar, List, Optional, Type, Union
 
 from . import get_console
 from ._log_render import LogRender
-from .console import Console
+from .console import Console, ConsoleRenderable
 from .highlighter import Highlighter, ReprHighlighter
 from .text import Text
 from .traceback import Traceback
@@ -21,7 +21,7 @@ class RichHandler(Handler):
         under your control. If a dependency writes messages containing square brackets, it may not produce the intended output.
 
     Args:
-        level (int, optional): Log level. Defaults to logging.NOTSET.
+        level (Union[int, str], optional): Log level. Defaults to logging.NOTSET.
         console (:class:`~rich.console.Console`, optional): Optional console instance to write logs.
             Default will use a global console instance writing to stdout.
         show_time (bool, optional): Show a column for the time. Defaults to True.
@@ -34,8 +34,11 @@ class RichHandler(Handler):
         tracebacks_width (Optional[int], optional): Number of characters used to render tracebacks, or None for full width. Defaults to None.
         tracebacks_extra_lines (int, optional): Additional lines of code to render tracebacks, or None for full width. Defaults to None.
         tracebacks_theme (str, optional): Override pygments theme used in traceback.
-        tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to False.
+        tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to True.
         tracebacks_show_locals (bool, optional): Enable display of locals in tracebacks. Defaults to False.
+        locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to 10.
+        locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
     """
 
     KEYWORDS: ClassVar[Optional[List[str]]] = [
@@ -52,7 +55,7 @@ class RichHandler(Handler):
 
     def __init__(
         self,
-        level: int = logging.NOTSET,
+        level: Union[int, str] = logging.NOTSET,
         console: Console = None,
         *,
         show_time: bool = True,
@@ -67,6 +70,8 @@ class RichHandler(Handler):
         tracebacks_theme: Optional[str] = None,
         tracebacks_word_wrap: bool = True,
         tracebacks_show_locals: bool = False,
+        locals_max_length: int = 10,
+        locals_max_string: int = 80,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
@@ -85,6 +90,8 @@ class RichHandler(Handler):
         self.tracebacks_theme = tracebacks_theme
         self.tracebacks_word_wrap = tracebacks_word_wrap
         self.tracebacks_show_locals = tracebacks_show_locals
+        self.locals_max_length = locals_max_length
+        self.locals_max_string = locals_max_string
 
     def get_level_text(self, record: LogRecord) -> Text:
         """Get the level name from the record.
@@ -103,11 +110,7 @@ class RichHandler(Handler):
 
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
-        path = Path(record.pathname).name
-        level = self.get_level_text(record)
         message = self.format(record)
-        time_format = None if self.formatter is None else self.formatter.datefmt
-        log_time = datetime.fromtimestamp(record.created)
 
         traceback = None
         if (
@@ -127,34 +130,69 @@ class RichHandler(Handler):
                 theme=self.tracebacks_theme,
                 word_wrap=self.tracebacks_word_wrap,
                 show_locals=self.tracebacks_show_locals,
+                locals_max_length=self.locals_max_length,
+                locals_max_string=self.locals_max_string,
             )
             message = record.getMessage()
 
+        message_renderable = self.render_message(record, message)
+        log_renderable = self.render(
+            record=record, traceback=traceback, message_renderable=message_renderable
+        )
+        self.console.print(log_renderable)
+
+    def render_message(self, record: LogRecord, message: str) -> "ConsoleRenderable":
+        """Render message text in to Text.
+
+        record (LogRecord): logging Record.
+        message (str): String cotaining log message.
+
+        Returns:
+            ConsoleRenderable: Renderable to display log message.
+        """
         use_markup = (
             getattr(record, "markup") if hasattr(record, "markup") else self.markup
         )
-        if use_markup:
-            message_text = Text.from_markup(message)
-        else:
-            message_text = Text(message)
-
+        message_text = Text.from_markup(message) if use_markup else Text(message)
         if self.highlighter:
             message_text = self.highlighter(message_text)
         if self.KEYWORDS:
             message_text.highlight_words(self.KEYWORDS, "logging.keyword")
+        return message_text
 
-        self.console.print(
-            self._log_render(
-                self.console,
-                [message_text] if not traceback else [message_text, traceback],
-                log_time=log_time,
-                time_format=time_format,
-                level=level,
-                path=path,
-                line_no=record.lineno,
-                link_path=record.pathname if self.enable_link_path else None,
-            )
+    def render(
+        self,
+        *,
+        record: LogRecord,
+        traceback: Optional[Traceback],
+        message_renderable: "ConsoleRenderable",
+    ) -> "ConsoleRenderable":
+        """Render log for display.
+
+        Args:
+            record (LogRecord): logging Record.
+            traceback (Optional[Traceback]): Traceback instance or None for no Traceback.
+            message_renderable (ConsoleRenderable): Renderable (typically Text) containing log message contents.
+
+        Returns:
+            ConsoleRenderable: Renderable to display log.
+        """
+        path = Path(record.pathname).name
+        level = self.get_level_text(record)
+        time_format = None if self.formatter is None else self.formatter.datefmt
+        log_time = datetime.fromtimestamp(record.created)
+
+        log_renderable = self._log_render(
+            self.console,
+            [message_renderable] if not traceback else [message_renderable, traceback],
+            log_time=log_time,
+            time_format=time_format,
+            level=level,
+            path=path,
+            line_no=record.lineno,
+            link_path=record.pathname if self.enable_link_path else None,
         )
+        return log_renderable
 
 
 if __name__ == "__main__":  # pragma: no cover
@@ -201,6 +239,8 @@ if __name__ == "__main__":  # pragma: no cover
     def divide():
         number = 1
         divisor = 0
+        foos = ["foo"] * 100
+        log.debug("in divide")
         try:
             number / divisor
         except:

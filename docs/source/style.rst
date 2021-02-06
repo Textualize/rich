@@ -4,7 +4,7 @@
 Styles
 ======
 
-In various places in the Rich API you can set a "style" which defines the color of the text and various attributes such as bold, italic etc. A style may be given as a string containing a *style definition* or as in instance of a :class:`~rich.style.Style` class.
+In various places in the Rich API you can set a "style" which defines the color of the text and various attributes such as bold, italic etc. A style may be given as a string containing a *style definition* or as an instance of a :class:`~rich.style.Style` class.
 
 
 Defining Styles
@@ -16,7 +16,7 @@ To specify a foreground color use one of the 256 :ref:`appendix-colors`. For exa
 
     console.print("Hello", style="magenta")
 
-You may also use the color's number (an integer between 0 and 255) with the syntax `"color(<number>)"`. The following will give the equivalent output::
+You may also use the color's number (an integer between 0 and 255) with the syntax ``"color(<number>)"``. The following will give the equivalent output::
 
     console.print("Hello", style="color(5)")
 

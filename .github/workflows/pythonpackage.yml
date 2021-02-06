@@ -9,7 +9,9 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
         python-version: [3.6, 3.7, 3.8, 3.9]
-
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python ${{ matrix.python-version }}
@@ -17,22 +19,22 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1.1.1
+        with:
+          version: 1.1.4
+          virtualenvs-create: false
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-          poetry install
+        run: poetry install
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       - name: Format check with black
-        run: |
-          make format-check
+        run: make format-check
       - name: Typecheck with mypy
-        run: |
-          make typecheck
+        run: make typecheck
       - name: Test with pytest
         run: |
           pip install .
           python -m pytest tests -v --cov=./rich --cov-report=xml:./coverage.xml --cov-report term-missing
-
       - name: Upload code coverage
         uses: codecov/codecov-action@v1.0.10
         with:

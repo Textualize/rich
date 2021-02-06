@@ -2,7 +2,7 @@ import os.path
 import platform
 import textwrap
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
 
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
 from pygments.style import Style as PygmentsStyle
@@ -347,14 +347,15 @@ class Syntax(JupyterMixin):
         style = self._theme.get_style_for_token(token_type)
         return style.color
 
-    def highlight(self, code: str) -> Text:
+    def highlight(self, code: str, line_range: Tuple[int, int] = None) -> Text:
         """Highlight code and return a Text instance.
 
         Args:
-            code (str). Code to highlight.
+            code (str): Code to highlight.
+            line_range(Tuple[int, int], optional): Optional line range to highlight.
 
         Returns:
-            Text: A text instance containing syntax highlight.
+            Text: A text instance containing highlighted syntax.
         """
 
         base_style = self._get_base_style()
@@ -368,16 +369,51 @@ class Syntax(JupyterMixin):
             tab_size=self.tab_size,
             no_wrap=not self.word_wrap,
         )
+        _get_theme_style = self._theme.get_style_for_token
         try:
             lexer = get_lexer_by_name(self.lexer_name)
         except ClassNotFound:
             text.append(code)
         else:
-            _get_theme_style = self._theme.get_style_for_token
-            text.append_tokens(
-                (token, _get_theme_style(token_type))
-                for token_type, token in lexer.get_tokens(code)
-            )
+            if line_range:
+                # More complicated path to only stylize a portion of the code
+                # This speeds up further operations as there are less spans to process
+                line_start, line_end = line_range
+
+                def line_tokenize() -> Iterable[Tuple[Any, str]]:
+                    """Split tokens to one per line."""
+                    for token_type, token in lexer.get_tokens(code):
+                        while token:
+                            line_token, new_line, token = token.partition("\n")
+                            yield token_type, line_token + new_line
+
+                def tokens_to_spans() -> Iterable[Tuple[str, Optional[Style]]]:
+                    """Convert tokens to spans."""
+                    tokens = iter(line_tokenize())
+                    line_no = 0
+                    _line_start = line_start - 1
+
+                    # Skip over tokens until line start
+                    while line_no < _line_start:
+                        _token_type, token = next(tokens)
+                        yield (token, None)
+                        if token.endswith("\n"):
+                            line_no += 1
+                    # Generate spans until line end
+                    for token_type, token in tokens:
+                        yield (token, _get_theme_style(token_type))
+                        if token.endswith("\n"):
+                            line_no += 1
+                            if line_no >= line_end:
+                                break
+
+                text.append_tokens(tokens_to_spans())
+
+            else:
+                text.append_tokens(
+                    (token, _get_theme_style(token_type))
+                    for token_type, token in lexer.get_tokens(code)
+                )
             if self.background_color is not None:
                 text.stylize(f"on {self.background_color}")
         return text
@@ -434,17 +470,23 @@ class Syntax(JupyterMixin):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
+
         transparent_background = self._get_base_style().transparent_background
         code_width = (
             (options.max_width - self._numbers_column_width - 1)
             if self.code_width is None
             else self.code_width
         )
+
+        line_offset = 0
+        if self.line_range:
+            start_line, end_line = self.line_range
+            line_offset = max(0, start_line - 1)
+
         code = textwrap.dedent(self.code) if self.dedent else self.code
         code = code.expandtabs(self.tab_size)
-        text = self.highlight(code)
+        text = self.highlight(code, self.line_range)
         text.remove_suffix("\n")
-        text.expand_tabs(self.tab_size)
 
         (
             background_style,
@@ -452,25 +494,27 @@ class Syntax(JupyterMixin):
             highlight_number_style,
         ) = self._get_number_styles(console)
 
-        if self.indent_guides and not options.ascii_only:
-            style = (
-                self._get_base_style()
-                + self._theme.get_style_for_token(Comment)
-                + Style(dim=True)
-            )
-            text = text.with_indent_guides(self.tab_size, style=style)
-
         if not self.line_numbers:
             # Simple case of just rendering text
             yield from console.render(text, options=options.update(width=code_width))
             return
 
         lines = text.split("\n")
-        line_offset = 0
         if self.line_range:
-            start_line, end_line = self.line_range
-            line_offset = max(0, start_line - 1)
             lines = lines[line_offset:end_line]
+
+        if self.indent_guides and not options.ascii_only:
+            style = (
+                self._get_base_style()
+                + self._theme.get_style_for_token(Comment)
+                + Style(dim=True)
+            )
+            lines = (
+                Text("\n")
+                .join(lines)
+                .with_indent_guides(self.tab_size, style=style)
+                .split("\n")
+            )
 
         numbers_column_width = self._numbers_column_width
         render_options = options.update(width=code_width)
@@ -480,7 +524,7 @@ class Syntax(JupyterMixin):
         padding = _Segment(" " * numbers_column_width + " ", background_style)
         new_line = _Segment("\n")
 
-        line_pointer = "❱ "
+        line_pointer = "> " if options.legacy_windows else "❱ "
 
         for line_no, line in enumerate(lines, self.start_line + line_offset):
             if self.word_wrap:
@@ -521,11 +565,17 @@ class Syntax(JupyterMixin):
 if __name__ == "__main__":  # pragma: no cover
 
     import argparse
+    import sys
 
     parser = argparse.ArgumentParser(
         description="Render syntax to the console with Rich"
     )
-    parser.add_argument("path", metavar="PATH", help="path to file")
+    parser.add_argument(
+        "path",
+        metavar="PATH",
+        nargs="?",
+        help="path to file",
+    )
     parser.add_argument(
         "-c",
         "--force-color",
@@ -583,18 +633,37 @@ if __name__ == "__main__":  # pragma: no cover
         default=None,
         help="Overide background color",
     )
+    parser.add_argument(
+        "-x",
+        "--lexer",
+        default="default",
+        dest="lexer_name",
+        help="Lexer name",
+    )
     args = parser.parse_args()
 
     from rich.console import Console
 
     console = Console(force_terminal=args.force_color, width=args.width)
 
-    syntax = Syntax.from_path(
-        args.path,
-        line_numbers=args.line_numbers,
-        word_wrap=args.word_wrap,
-        theme=args.theme,
-        background_color=args.background_color,
-        indent_guides=args.indent_guides,
-    )
+    if not args.path or args.path == "-":
+        code = sys.stdin.read()
+        syntax = Syntax(
+            code=code,
+            lexer_name=args.lexer_name,
+            line_numbers=args.line_numbers,
+            word_wrap=args.word_wrap,
+            theme=args.theme,
+            background_color=args.background_color,
+            indent_guides=args.indent_guides,
+        )
+    else:
+        syntax = Syntax.from_path(
+            args.path,
+            line_numbers=args.line_numbers,
+            word_wrap=args.word_wrap,
+            theme=args.theme,
+            background_color=args.background_color,
+            indent_guides=args.indent_guides,
+        )
     console.print(syntax, soft_wrap=args.soft_wrap)

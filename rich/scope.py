@@ -8,7 +8,7 @@ from .table import Table
 from .text import Text, TextType
 
 if TYPE_CHECKING:
-    from .console import ConsoleRenderable, RenderableType
+    from .console import ConsoleRenderable
 
 
 def render_scope(
@@ -16,7 +16,9 @@ def render_scope(
     *,
     title: TextType = None,
     sort_keys: bool = True,
-    indent_guides: bool = False
+    indent_guides: bool = False,
+    max_length: int = None,
+    max_string: int = None,
 ) -> "ConsoleRenderable":
     """Render python variables in a given scope.
 
@@ -25,9 +27,12 @@ def render_scope(
         title (str, optional): Optional title. Defaults to None.
         sort_keys (bool, optional): Enable sorting of items. Defaults to True.
         indent_guides (bool, optional): Enable indentaton guides. Defaults to False.
+        max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to None.
+        max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
 
     Returns:
-        RenderableType: A renderable object.
+        ConsoleRenderable: A renderable object.
     """
     highlighter = ReprHighlighter()
     items_table = Table.grid(padding=(0, 1), expand=False)
@@ -46,7 +51,13 @@ def render_scope(
         )
         items_table.add_row(
             key_text,
-            Pretty(value, highlighter=highlighter, indent_guides=indent_guides),
+            Pretty(
+                value,
+                highlighter=highlighter,
+                indent_guides=indent_guides,
+                max_length=max_length,
+                max_string=max_string,
+            ),
         )
     return Panel.fit(
         items_table,

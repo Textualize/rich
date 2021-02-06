@@ -13,6 +13,7 @@ from rich.console import CaptureError, Console, ConsoleOptions, render_group
 from rich.measure import measure_renderables
 from rich.pager import SystemPager
 from rich.panel import Panel
+from rich.status import Status
 from rich.style import Style
 
 
@@ -25,6 +26,12 @@ def test_dumb_terminal():
     width, height = console.size
     assert width == 80
     assert height == 25
+
+
+def test_soft_wrap():
+    console = Console(file=io.StringIO(), width=20, soft_wrap=True)
+    console.print("foo " * 10)
+    assert console.file.getvalue() == "foo " * 20
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
@@ -95,6 +102,21 @@ def test_print():
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print("foo")
     assert console.file.getvalue() == "foo\n"
+
+
+def test_log():
+    console = Console(
+        file=io.StringIO(),
+        width=80,
+        color_system="truecolor",
+        log_time_format="TIME",
+        log_path=False,
+    )
+    console.log("foo", style="red")
+    expected = "\x1b[2;36mTIME\x1b[0m\x1b[2;36m \x1b[0m\x1b[31mfoo\x1b[0m\x1b[31m                                                                        \x1b[0m\n"
+    result = console.file.getvalue()
+    print(repr(result))
+    assert result == expected
 
 
 def test_print_empty():
@@ -216,6 +238,12 @@ def test_input_password(monkeypatch, capsys):
     user_input = console.input(prompt="foo:", password=True)
     assert capsys.readouterr().out == "foo:"
     assert user_input == "bar"
+
+
+def test_status():
+    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    status = console.status("foo")
+    assert isinstance(status, Status)
 
 
 def test_justify_none():
@@ -429,3 +457,24 @@ def test_get_time() -> None:
     )
     assert console.get_time() == 99
     assert console.get_datetime() == datetime.datetime(1974, 7, 5)
+
+
+def test_console_style() -> None:
+    console = Console(
+        file=io.StringIO(), color_system="truecolor", force_terminal=True, style="red"
+    )
+    console.print("foo")
+    expected = "\x1b[31mfoo\x1b[0m\n"
+    result = console.file.getvalue()
+    assert result == expected
+
+
+def test_no_color():
+    console = Console(
+        file=io.StringIO(), color_system="truecolor", force_terminal=True, no_color=True
+    )
+    console.print("[bold magenta on red]FOO")
+    expected = "\x1b[1mFOO\x1b[0m\n"
+    result = console.file.getvalue()
+    print(repr(result))
+    assert result == expected
