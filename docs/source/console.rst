@@ -298,6 +298,24 @@ Since the default pager on most platforms don't support color, Rich will strip c
 .. note::
     Rich will use the ``PAGER`` environment variable to get the pager command. On Linux and macOS you can set this to ``less -r`` to enable paging with ANSI styles.
 
+Alternate screen
+----------------
+
+Terminals support an 'alternate screen' mode which consists of a single screen which doesn't scroll. This mode is typically used for more application-like interfaces. Rich supports this mode via the :meth:`~rich.console.Console.set_alt_screen` method, but it is recommended that you use :meth:`~rich.console.Console.screen` which returns a context manager. The context manager ensures that normal terminal operations are restored on exit.
+
+Here's an example of an alternate screen::
+
+    from time import sleep
+    from rich.console import Console
+
+    console = Console()
+    with console.screen():
+        console.print(locals())
+        sleep(5)
+    console.print("Back to normal terminal")
+
+.. node::
+    If you ever find yourself stuck in alternate mode after exiting Python code, type ``reset`` in the terminal
 
 Terminal detection
 ------------------

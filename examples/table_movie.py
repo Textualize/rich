@@ -75,7 +75,11 @@ table_centered = Columns((table,), align="center", expand=True)
 console.clear()
 
 with Live(
-    table_centered, console=console, refresh_per_second=10, vertical_overflow="ellipsis"
+    table_centered,
+    console=console,
+    screen=True,
+    refresh_per_second=10,
+    vertical_overflow="ellipsis",
 ):
 
     with beat(10):

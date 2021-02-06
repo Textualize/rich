@@ -250,6 +250,22 @@ class PagerContext:
         self._console._exit_buffer()
 
 
+class ScreenContext:
+    """A context manager that enables an alternative screen. See :meth:`~rich.console.Console.screen` for usage."""
+
+    def __init__(self, console: "Console") -> None:
+        self.console = console
+        self._changed = False
+
+    def __enter__(self) -> "ScreenContext":
+        self._changed = self.console.set_alt_screen(True)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        if self._changed:
+            self.console.set_alt_screen(False)
+
+
 class RenderGroup:
     """Takes a group of renderables and returns a renderable object that renders the group.
 
@@ -869,7 +885,7 @@ class Console:
         )
         return status_renderable
 
-    def show_cursor(self, show: bool = True) -> None:
+    def show_cursor(self, show: bool = True) -> bool:
         """Show or hide the cursor.
 
         Args:
@@ -877,6 +893,35 @@ class Console:
         """
         if self.is_terminal and not self.legacy_windows:
             self.control("\033[?25h" if show else "\033[?25l")
+            return True
+        return False
+
+    def set_alt_screen(self, enable: bool = True) -> bool:
+        """Enables alternative screen mode.
+
+        Note, if you enable this mode, you should ensure that is disabled before
+        the application exits. See :meth:`~rich.Console.screen` for a context manager
+        that handles this for you.
+
+        Args:
+            enable (bool, optional): [description]. Defaults to True.
+
+        Returns:
+            bool: True if the control codes were written.
+
+        """
+        if self.is_terminal and not self.legacy_windows:
+            self.control("\033[?1049h\033[H" if enable else "\033[?1049l")
+            return True
+        return False
+
+    def screen(self) -> "ScreenContext":
+        """Context manager to enable and disable 'alternative screen' mode.
+
+        Returns:
+            ~ScreenContext: Context which enables alternate screen on enter, and disables it on exit.
+        """
+        return ScreenContext(self)
 
     def render(
         self, renderable: RenderableType, options: ConsoleOptions = None
