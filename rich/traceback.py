@@ -72,7 +72,7 @@ def install(
     def excepthook(
         type_: Type[BaseException],
         value: BaseException,
-        traceback: TracebackType,
+        traceback: Optional[TracebackType],
     ) -> None:
         traceback_console.print(
             Traceback.from_exception(
@@ -88,9 +88,30 @@ def install(
             )
         )
 
-    old_excepthook = sys.excepthook
-    sys.excepthook = excepthook
-    return old_excepthook
+    try:  # pragma: no cover
+        ip = get_ipython()  # type: ignore
+
+        def ipy_excepthook(is_syntax: bool = False) -> None:
+            exc_tuple = ip._get_exc_info()
+
+            # syntax errors will show no traceback
+            if is_syntax:
+                exc_tuple = exc_tuple[0], exc_tuple[1], None
+            else:
+                # remove traceback of ipython exec call
+                exc_tuple = exc_tuple[0], exc_tuple[1], exc_tuple[2].tb_next
+            excepthook(*exc_tuple)  # type: ignore
+
+        # replace _showtraceback instead of showtraceback to allow ipython features such as debugging to work
+        # this is also what the ipython docs recommends to modify when subcalssing InteractiveShell
+        ip._showtraceback = lambda *args, **kwargs: ipy_excepthook()
+        ip.showsyntaxerror = lambda *args, **kwargs: ipy_excepthook(is_syntax=True)
+
+        return sys.excepthook
+    except Exception:
+        old_excepthook = sys.excepthook
+        sys.excepthook = excepthook
+        return old_excepthook
 
 
 @dataclass
