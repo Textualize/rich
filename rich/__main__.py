@@ -245,9 +245,9 @@ if __name__ == "__main__":  # pragma: no cover
 
     intro_message = Text.from_markup(
         """\
-Developing Rich and responding to issues can take a lot of my time
+It takes a lot of time to develop Rich and and provide support.
 
-Consider supporting my work via Github Sponsors (ask your company / Organization), or buy me a coffee to say thanks.
+Consider supporting my work via Github Sponsors (ask your company / Organization), or buy me a :coffee: to say thanks.
 
 - Will McGugan"""
     )
