@@ -88,27 +88,52 @@ def install(
             )
         )
 
-    try:  # pragma: no cover
-        ip = get_ipython()  # type: ignore
+    def ipy_excepthook_closure(ip) -> None:
+        tb_data = {}  # store information about showtraceback call
+        default_showtraceback = ip.showtraceback  # keep reference of default traceback
 
-        def ipy_excepthook(is_syntax: bool = False) -> None:
+        def ipy_show_traceback(*args, **kwargs) -> None:
+            """wrap the default ip.showtraceback to store info for ip._showtraceback"""
+            nonlocal tb_data
+            tb_data = kwargs
+            default_showtraceback(*args, **kwargs)
+
+        def ipy_display_traceback(*args, is_syntax: bool = False, **kwargs) -> None:
+            """Internally called traceback from ip._showtraceback"""
+            nonlocal tb_data
             exc_tuple = ip._get_exc_info()
 
-            # syntax errors will show no traceback
-            if is_syntax:
-                exc_tuple = exc_tuple[0], exc_tuple[1], None
-            else:
-                # remove traceback of ipython exec call
-                exc_tuple = exc_tuple[0], exc_tuple[1], exc_tuple[2].tb_next
-            excepthook(*exc_tuple)  # type: ignore
+            # do not display trace on syntax error
+            tb: Optional[TracebackType] = None if is_syntax else exc_tuple[2]
+
+            # determine correct tb_offset
+            compiled = tb_data.get("running_compiled_code", False)
+            tb_offset = tb_data.get("tb_offset", 1 if compiled else 0)
+            # remove ipython internal frames from trace with tb_offset
+            for _ in range(tb_offset):
+                if tb is None:
+                    break
+                tb = tb.tb_next
+
+            excepthook(exc_tuple[0], exc_tuple[1], tb)
+            tb_data = {}  # clear data upon usage
 
         # replace _showtraceback instead of showtraceback to allow ipython features such as debugging to work
-        # this is also what the ipython docs recommends to modify when subcalssing InteractiveShell
-        ip._showtraceback = lambda *args, **kwargs: ipy_excepthook()
-        ip.showsyntaxerror = lambda *args, **kwargs: ipy_excepthook(is_syntax=True)
+        # this is also what the ipython docs recommends to modify when subclassing InteractiveShell
+        ip._showtraceback = ipy_display_traceback
+        # add wrapper to capture tb_data
+        ip.showtraceback = ipy_show_traceback
+        ip.showsyntaxerror = lambda *args, **kwargs: ipy_display_traceback(
+            *args, is_syntax=True, **kwargs
+        )
 
+    try:  # pragma: no cover
+        # if wihin ipython, use customized traceback
+        ip = get_ipython()  # type: ignore
+        ipy_excepthook_closure(ip)
         return sys.excepthook
     except Exception:
+        # otherwise use default system hook
         old_excepthook = sys.excepthook
         sys.excepthook = excepthook
         return old_excepthook
