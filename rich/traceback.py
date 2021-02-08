@@ -88,7 +88,7 @@ def install(
             )
         )
 
-    def ipy_excepthook_closure(ip) -> None:
+    def ipy_excepthook_closure(ip) -> None:  # pragma: no cover
         tb_data = {}  # store information about showtraceback call
         default_showtraceback = ip.showtraceback  # keep reference of default traceback
 
