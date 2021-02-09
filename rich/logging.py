@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import ClassVar, List, Optional, Type, Union
 
 from . import get_console
-from ._log_render import LogRender
+from ._log_render import LogRender, FormatTimeCallable
 from .console import Console, ConsoleRenderable
 from .highlighter import Highlighter, ReprHighlighter
 from .text import Text
@@ -39,6 +39,7 @@ class RichHandler(Handler):
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to 10.
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
+        log_time_format (Union[str, TimeFormatterCallable], optional): If ``log_time`` is enabled, either string for strftime or callable that formats the time. Defaults to "[%x %X] ".
     """
 
     KEYWORDS: ClassVar[Optional[List[str]]] = [
@@ -72,6 +73,7 @@ class RichHandler(Handler):
         tracebacks_show_locals: bool = False,
         locals_max_length: int = 10,
         locals_max_string: int = 80,
+        log_time_format: Union[str, FormatTimeCallable] = "[%x %X]",
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
@@ -80,6 +82,7 @@ class RichHandler(Handler):
             show_time=show_time,
             show_level=show_level,
             show_path=show_path,
+            time_format=log_time_format,
             level_width=None,
         )
         self.enable_link_path = enable_link_path

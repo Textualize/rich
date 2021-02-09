@@ -15,6 +15,7 @@ from rich.pager import SystemPager
 from rich.panel import Panel
 from rich.status import Status
 from rich.style import Style
+from rich.text import Text
 
 
 def test_dumb_terminal():
@@ -117,6 +118,18 @@ def test_log():
     result = console.file.getvalue()
     print(repr(result))
     assert result == expected
+
+
+def test_log_milliseconds():
+    def time_formatter(timestamp: datetime) -> Text:
+        return Text("TIME")
+
+    console = Console(
+        file=io.StringIO(), width=40, log_time_format=time_formatter, log_path=False
+    )
+    console.log("foo")
+    result = console.file.getvalue()
+    assert result == "TIME foo                                \n"
 
 
 def test_print_empty():

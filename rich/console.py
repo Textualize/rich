@@ -30,7 +30,7 @@ from typing_extensions import Literal, Protocol, runtime_checkable
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
-from ._log_render import LogRender
+from ._log_render import LogRender, FormatTimeCallable
 from .align import Align, AlignMethod
 from .color import ColorSystem
 from .control import Control
@@ -414,7 +414,7 @@ class Console:
         highlight (bool, optional): Enable automatic highlighting. Defaults to True.
         log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
         log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
-        log_time_format (str, optional): Log time format if ``log_time`` is enabled. Defaults to "[%X] ".
+        log_time_format (Union[str, TimeFormatterCallable], optional): If ``log_time`` is enabled, either string for strftime or callable that formats the time. Defaults to "[%X] ".
         highlighter (HighlighterType, optional): Default highlighter.
         legacy_windows (bool, optional): Enable legacy Windows mode, or ``None`` to auto detect. Defaults to ``None``.
         safe_box (bool, optional): Restrict box options that don't render on legacy Windows.
@@ -448,7 +448,7 @@ class Console:
         highlight: bool = True,
         log_time: bool = True,
         log_path: bool = True,
-        log_time_format: str = "[%X]",
+        log_time_format: Union[str, FormatTimeCallable] = "[%X]",
         highlighter: Optional["HighlighterType"] = ReprHighlighter(),
         legacy_windows: bool = None,
         safe_box: bool = True,

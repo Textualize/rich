@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added cheeky sponsorship request to test card
 - Added `quiet` argument to Console constructor
+- Added support for a callback function to format timestamps (allows presentation of milliseconds)
 
 ## [9.10.0] - 2021-01-27
 
