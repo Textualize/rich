@@ -1052,6 +1052,7 @@ class Console:
         emoji: bool = None,
         markup: bool = None,
         highlight: bool = None,
+        overflow: OverflowMethod = "crop",
     ) -> List[ConsoleRenderable]:
         """Combine a number of renderables and text into one renderable.
 
@@ -1111,7 +1112,7 @@ class Console:
                 append(renderable)
             elif isinstance(renderable, (abc.Mapping, abc.Sequence, abc.Set)):
                 check_text()
-                append(Pretty(renderable, highlighter=_highlighter))
+                append(Pretty(renderable, highlighter=_highlighter, overflow=overflow))
             else:
                 append_text(_highlighter(str(renderable)))
 
@@ -1242,6 +1243,7 @@ class Console:
                 emoji=emoji,
                 markup=markup,
                 highlight=highlight,
+                overflow=overflow if overflow is not None else "crop",
             )
             for hook in self._render_hooks:
                 renderables = hook.process_renderables(renderables)
