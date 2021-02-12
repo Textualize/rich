@@ -492,3 +492,19 @@ def test_no_nested_live():
         with console.status("foo"):
             with console.status("bar"):
                 pass
+
+
+def test_screen():
+    console = Console(force_terminal=True, force_interactive=True)
+    with console.capture() as capture:
+        with console.screen():
+            console.print("Don't panic")
+    expected = "\x1b[?1049h\x1b[H\x1b[?25lDon't panic\n\x1b[?1049l\x1b[?25h"
+    result = capture.get()
+    print(repr(result))
+    assert result == expected
+
+
+def test_height():
+    console = Console(width=80, height=46)
+    assert console.height == 46

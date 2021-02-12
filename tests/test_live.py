@@ -5,6 +5,7 @@ from typing import Optional
 
 # import pytest
 from rich.console import Console
+from rich.text import Text
 from rich.live import Live
 
 
@@ -14,7 +15,6 @@ def create_capture_console(
     return Console(
         width=width,
         height=height,
-        file=io.StringIO(),
         force_terminal=force_terminal,
         legacy_windows=False,
         color_system=None,  # use no color system to reduce complexity of output
@@ -159,3 +159,14 @@ def test_growing_display_file_console() -> None:
         output
         == "Step 0\nStep 1\nStep 2\nStep 3\nStep 4\nStep 5\nStep 6\nStep 7\nStep 8\nStep 9\n"
     )
+
+
+def test_live_screen() -> None:
+    console = create_capture_console(width=20, height=5)
+    console.begin_capture()
+    with Live(Text("foo"), screen=True, console=console, auto_refresh=False) as live:
+        pass
+    result = console.end_capture()
+    print(repr(result))
+    expected = "\x1b[?1049h\x1b[H\x1b[?25l\x1b[Hfoo                 \n                    \n                    \n                    \n                    \n\x1b[?25h\x1b[?1049l"
+    assert result == expected

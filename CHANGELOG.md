@@ -16,6 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added cheeky sponsorship request to test card
 - Added `quiet` argument to Console constructor
+- Added Console.set_alt_screen and Console.screen
+- Added height to ConsoleOptions
+- Added `vertical` parameter to Algin
+- Added Layout class
+
+### Changed
+
+- Pretty.overflow now defaults to None
+- Panel now respects options.height
+- Traceback lexer defaults to Python if no extension on source
 
 ## [9.10.0] - 2021-01-27
 
@@ -39,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix double line tree guides on Windows
 - Fixed Tracebacks ignoring initial blank lines
 - Partial fix for tracebacks not finding source after chdir
+- Fixed error message when code in tracebacks doesn't have an extension https://github.com/willmcgugan/rich/issues/996
 
 ### Added
 

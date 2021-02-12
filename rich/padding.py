@@ -90,7 +90,7 @@ class Padding(JupyterMixin):
                 + self.right,
                 options.max_width,
             )
-        child_options = options.update(width=width - self.left - self.right)
+        child_options = options.update_width(width - self.left - self.right)
         lines = console.render_lines(
             self.renderable, child_options, style=style, pad=False
         )

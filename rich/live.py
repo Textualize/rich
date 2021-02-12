@@ -8,6 +8,7 @@ from .control import Control
 from .file_proxy import FileProxy
 from .jupyter import JupyterMixin
 from .live_render import LiveRender, VerticalOverflowMethod
+from .screen import Screen
 from .text import Text
 
 
@@ -186,7 +187,8 @@ class Live(JupyterMixin, RenderHook):
         Returns:
             RenderableType: Displayed renderable.
         """
-        return self.get_renderable()
+        renderable = self.get_renderable()
+        return Screen(renderable) if self._alt_screen else renderable
 
     def update(self, renderable: RenderableType, *, refresh: bool = False) -> None:
         """Update the renderable that is being displayed
@@ -238,10 +240,13 @@ class Live(JupyterMixin, RenderHook):
             # lock needs acquiring as user can modify live_render renderable at any time unlike in Progress.
             with self._lock:
                 # determine the control command needed to clear previous rendering
-                renderables = [
-                    Control("\033[H")
+                reset = (
+                    Control.home()
                     if self._alt_screen
-                    else self._live_render.position_cursor(),
+                    else self._live_render.position_cursor()
+                )
+                renderables = [
+                    reset,
                     *renderables,
                     self._live_render,
                 ]

@@ -1,5 +1,62 @@
-from math import ceil
-from typing import List
+from math import ceil, modf
+from typing import cast, List, Optional, Protocol
+
+
+class Edge(Protocol):
+    """Any object that defines an edge (such as Layout)."""
+
+    size: Optional[int] = None
+    ratio: int = 1
+    minimum_size: int = 1
+
+
+def ratio_resolve(total: int, edges: List[Edge]) -> List[int]:
+    """Divide total space based on size, ratio, and minimum_size, constraints.
+
+    Args:
+        total (int): Total number of characters.
+        edges (List[Edge]): Edges within total space.
+
+    Returns:
+        List[int]: Number of characters for each edge.
+    """
+    # Size of edge or None for yet to be determined
+    sizes = [(edge.size or None) for edge in edges]
+
+    # While any edges haven't been calculated
+    while any(size is None for size in sizes):
+        # Get flexible edges and index to map these back on to sizes list
+        flexible_edges = [
+            (index, edge)
+            for index, (size, edge) in enumerate(zip(sizes, edges))
+            if size is None
+        ]
+        # Remaining space in total
+        remaining = total - sum(size or 0 for size in sizes)
+        if remaining <= 0:
+            # No room for flexible edges
+            sizes[:] = [(size or 0) for size in sizes]
+            break
+        # Calculate number of characters in a ratio portion
+        portion = remaining / sum((edge.ratio or 1) for _, edge in flexible_edges)
+
+        # If any edges will be less than their minimum, replace size with the minimum
+        for index, edge in flexible_edges:
+            if portion * edge.ratio <= edge.minimum_size:
+                sizes[index] = edge.minimum_size
+                break
+        else:
+            # Distribute flexible space and compensate for rounding error
+            # Since edge sizes can only be integers we need to add the remainder
+            # to the following line
+            _modf = modf
+            remainder = 0.0
+            for index, edge in flexible_edges:
+                remainder, size = _modf(portion * edge.ratio + remainder)
+                sizes[index] = int(size)
+            break
+    # Sizes now contains integers only
+    return cast(List[int], sizes)
 
 
 def ratio_reduce(

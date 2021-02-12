@@ -146,7 +146,13 @@ class Traceback:
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
     """
 
-    LEXERS = {".py": "python", ".pxd": "cython", ".pyx": "cython", ".pxi": "pyrex"}
+    LEXERS = {
+        "": "text",
+        ".py": "python",
+        ".pxd": "cython",
+        ".pyx": "cython",
+        ".pxi": "pyrex",
+    }
 
     def __init__(
         self,
@@ -393,7 +399,6 @@ class Traceback:
                     highlighter(stack.syntax_error.msg),
                 )
             else:
-                print(stack.exc_value)
                 yield Text.assemble(
                     (f"{stack.exc_type}: ", "traceback.exc_type"),
                     highlighter(stack.exc_value),
@@ -434,6 +439,14 @@ class Traceback:
     @classmethod
     def _guess_lexer(cls, filename: str, code: str) -> str:
         ext = os.path.splitext(filename)[-1]
+        if not ext:
+            # No extension, look at first line to see if it is a hashbang
+            # Note, this is an educated guess and not a guarantee
+            # If it fails, the only downside is that the code is highlighted strangely
+            new_line_index = code.index("\n")
+            first_line = code[:new_line_index] if new_line_index != -1 else code
+            if first_line.startswith("#!") and "python" in first_line.lower():
+                return "python"
         lexer_name = (
             cls.LEXERS.get(ext) or guess_lexer_for_filename(filename, code).name
         )

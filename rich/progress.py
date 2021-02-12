@@ -35,7 +35,7 @@ from .live import Live
 from .progress_bar import ProgressBar
 from .spinner import Spinner
 from .style import StyleType
-from .table import Table
+from .table import Column, Table
 from .text import Text, TextType
 
 TaskID = NewType("TaskID", int)
@@ -153,9 +153,14 @@ class ProgressColumn(ABC):
 
     max_refresh: Optional[float] = None
 
-    def __init__(self) -> None:
+    def __init__(self, table_column: Column = None) -> None:
+        self._table_column = table_column
         self._renderable_cache: Dict[TaskID, Tuple[float, RenderableType]] = {}
         self._update_time: Optional[float] = None
+
+    def get_table_column(self) -> Column:
+        """Get a table column, used to build tasks table."""
+        return self._table_column or Column()
 
     def __call__(self, task: "Task") -> RenderableType:
         """Called by the Progress object to return a renderable for the given task.
@@ -192,9 +197,9 @@ class RenderableColumn(ProgressColumn):
         renderable (RenderableType, optional): Any renderable. Defaults to empty string.
     """
 
-    def __init__(self, renderable: RenderableType = ""):
+    def __init__(self, renderable: RenderableType = "", *, table_column: Column = None):
         self.renderable = renderable
-        super().__init__()
+        super().__init__(table_column=table_column)
 
     def render(self, task: "Task") -> RenderableType:
         return self.renderable
@@ -216,6 +221,7 @@ class SpinnerColumn(ProgressColumn):
         style: Optional[StyleType] = "progress.spinner",
         speed: float = 1.0,
         finished_text: TextType = " ",
+        table_column: Column = None,
     ):
         self.spinner = Spinner(spinner_name, style=style, speed=speed)
         self.finished_text = (
@@ -223,7 +229,7 @@ class SpinnerColumn(ProgressColumn):
             if isinstance(finished_text, str)
             else finished_text
         )
-        super().__init__()
+        super().__init__(table_column=table_column)
 
     def set_spinner(
         self,
@@ -259,13 +265,14 @@ class TextColumn(ProgressColumn):
         justify: JustifyMethod = "left",
         markup: bool = True,
         highlighter: Highlighter = None,
+        table_column: Column = None,
     ) -> None:
         self.text_format = text_format
         self.justify = justify
         self.style = style
         self.markup = markup
         self.highlighter = highlighter
-        super().__init__()
+        super().__init__(table_column=table_column or Column(no_wrap=True))
 
     def render(self, task: "Task") -> Text:
         _text = self.text_format.format(task=task)
@@ -296,13 +303,14 @@ class BarColumn(ProgressColumn):
         complete_style: StyleType = "bar.complete",
         finished_style: StyleType = "bar.finished",
         pulse_style: StyleType = "bar.pulse",
+        table_column: Column = None,
     ) -> None:
         self.bar_width = bar_width
         self.style = style
         self.complete_style = complete_style
         self.finished_style = finished_style
         self.pulse_style = pulse_style
-        super().__init__()
+        super().__init__(table_column=table_column)
 
     def render(self, task: "Task") -> ProgressBar:
         """Gets a progress bar widget for a task."""
@@ -371,9 +379,9 @@ class DownloadColumn(ProgressColumn):
         binary_units (bool, optional): Use binary units, KiB, MiB etc. Defaults to False.
     """
 
-    def __init__(self, binary_units: bool = False) -> None:
+    def __init__(self, binary_units: bool = False, table_column: Column = None) -> None:
         self.binary_units = binary_units
-        super().__init__()
+        super().__init__(table_column=table_column)
 
     def render(self, task: "Task") -> Text:
         """Calculate common unit for completed and total."""
@@ -550,6 +558,7 @@ class Progress(JupyterMixin):
         redirect_stderr: (bool, optional): Enable redirection of stderr. Defaults to True.
         get_time: (Callable, optional): A callable that gets the current time, or None to use Console.get_time. Defaults to None.
         disable (bool, optional): Disable progress display. Defaults to False
+        expand (bool, optional): Expand tasks table to fit width. Defaults to False.
     """
 
     def __init__(
@@ -564,10 +573,11 @@ class Progress(JupyterMixin):
         redirect_stderr: bool = True,
         get_time: GetTimeCallable = None,
         disable: bool = False,
+        expand: bool = False,
     ) -> None:
         assert (
-            refresh_per_second is None or refresh_per_second > 0
-        ), "refresh_per_second must be > 0"  # type: ignore
+            refresh_per_second is None or refresh_per_second > 0  # type: ignore
+        ), "refresh_per_second must be > 0"
         self._lock = RLock()
         self.columns = columns or (
             TextColumn("[progress.description]{task.description}"),
@@ -578,6 +588,7 @@ class Progress(JupyterMixin):
         self.speed_estimate_period = speed_estimate_period
 
         self.disable = disable
+        self.expand = expand
         self._tasks: Dict[TaskID, Task] = {}
         self._task_index: TaskID = TaskID(0)
         self.live = Live(
@@ -652,6 +663,7 @@ class Progress(JupyterMixin):
         Returns:
             Iterable[ProgressType]: An iterable of values taken from the provided sequence.
         """
+
         if total is None:
             if isinstance(sequence, Sized):
                 task_total = len(sequence)
@@ -855,23 +867,28 @@ class Progress(JupyterMixin):
             Table: A table instance.
         """
 
-        table = Table.grid(padding=(0, 1))
-        for _ in self.columns:
-            table.add_column()
+        table_columns = (
+            (
+                Column(no_wrap=True)
+                if isinstance(_column, str)
+                else _column.get_table_column().copy()
+            )
+            for _column in self.columns
+        )
+        table = Table.grid(*table_columns, padding=(0, 1), expand=self.expand)
+
         for task in tasks:
             if task.visible:
-                row: List[RenderableType] = []
-                append = row.append
-                for index, column in enumerate(self.columns):
-                    if isinstance(column, str):
-                        append(column.format(task=task))
-                        table.columns[index].no_wrap = True
-                    else:
-                        widget = column(task)
-                        append(widget)
-                        if isinstance(widget, (str, Text)):
-                            table.columns[index].no_wrap = True
-                table.add_row(*row)
+                table.add_row(
+                    *(
+                        (
+                            column.format(task=task)
+                            if isinstance(column, str)
+                            else column(task)
+                        )
+                        for column in self.columns
+                    )
+                )
         return table
 
     def __rich__(self) -> RenderableType:
@@ -977,29 +994,25 @@ if __name__ == "__main__":  # pragma: no coverage
     examples = cycle(progress_renderables)
 
     console = Console(record=True)
-    try:
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-            TimeRemainingColumn(),
-            TimeElapsedColumn(),
-            console=console,
-            transient=True,
-        ) as progress:
 
-            task1 = progress.add_task("[red]Downloading", total=1000)
-            task2 = progress.add_task("[green]Processing", total=1000)
-            task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        TimeRemainingColumn(),
+        TimeElapsedColumn(),
+        console=console,
+        transient=True,
+    ) as progress:
 
-            while not progress.finished:
-                progress.update(task1, advance=0.5)
-                progress.update(task2, advance=0.3)
-                time.sleep(0.01)
-                if random.randint(0, 100) < 1:
-                    progress.log(next(examples))
-    except:
-        # console.save_html("progress.html")
-        # print("wrote progress.html")
-        raise
+        task1 = progress.add_task("[red]Downloading", total=1000)
+        task2 = progress.add_task("[green]Processing", total=1000)
+        task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
+
+        while not progress.finished:
+            progress.update(task1, advance=0.5)
+            progress.update(task2, advance=0.3)
+            time.sleep(0.01)
+            if random.randint(0, 100) < 1:
+                progress.log(next(examples))

@@ -152,7 +152,7 @@ class Pretty:
         *,
         indent_size: int = 4,
         justify: "JustifyMethod" = None,
-        overflow: Optional["OverflowMethod"] = "crop",
+        overflow: Optional["OverflowMethod"] = None,
         no_wrap: Optional[bool] = False,
         indent_guides: bool = False,
         max_length: int = None,
