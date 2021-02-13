@@ -165,8 +165,8 @@ def test_live_screen() -> None:
     console = create_capture_console(width=20, height=5)
     console.begin_capture()
     with Live(Text("foo"), screen=True, console=console, auto_refresh=False) as live:
-        pass
+        live.refresh()
     result = console.end_capture()
     print(repr(result))
-    expected = "\x1b[?1049h\x1b[H\x1b[?25l\x1b[Hfoo                 \n                    \n                    \n                    \n                    \n\x1b[?25h\x1b[?1049l"
+    expected = "\x1b[?1049h\x1b[H\x1b[?25l\x1b[Hfoo                 \n                    \n                    \n                    \n                    \x1b[?25h\x1b[?1049l"
     assert result == expected

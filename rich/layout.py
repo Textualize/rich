@@ -185,7 +185,7 @@ class Layout:
     ) -> RenderResult:
         render_widths = ratio_resolve(options.max_width, self.children)
         renders = [
-            console.render_lines(child.renderable, options.update(width=render_width))
+            console.render_lines(child, options.update(width=render_width))
             for child, render_width in zip(self.children, render_widths)
         ]
         new_line = Segment.line()

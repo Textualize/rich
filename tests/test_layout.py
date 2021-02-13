@@ -22,6 +22,7 @@ def test_render():
         top["asdasd"]
 
     layout["left"].update("foobar")
+    print(layout["left"].children)
 
     console = Console(width=60, color_system=None)
 
