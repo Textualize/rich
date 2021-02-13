@@ -493,6 +493,7 @@ def test_no_nested_live():
             with console.status("bar"):
                 pass
 
+
 def test_screen():
     console = Console(force_terminal=True, force_interactive=True)
     with console.capture() as capture:
@@ -507,4 +508,3 @@ def test_screen():
 def test_height():
     console = Console(width=80, height=46)
     assert console.height == 46
-
