@@ -494,8 +494,9 @@ def test_no_nested_live():
                 pass
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 def test_screen():
-    console = Console(force_terminal=True, force_interactive=True)
+    console = Console(color_system=None, force_terminal=True, force_interactive=True)
     with console.capture() as capture:
         with console.screen():
             console.print("Don't panic")

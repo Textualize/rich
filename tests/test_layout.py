@@ -1,3 +1,4 @@
+import sys
 import pytest
 
 from rich.console import Console
@@ -5,6 +6,7 @@ from rich.layout import Layout
 from rich.panel import Panel
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 def test_render():
     layout = Layout(name="root")
     repr(layout)
