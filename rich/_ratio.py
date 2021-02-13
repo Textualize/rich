@@ -1,5 +1,6 @@
 from math import ceil, modf
-from typing import cast, List, Optional, Protocol, Sequence
+from typing import cast, List, Optional, Sequence
+from typing_extensions import Protocol
 
 
 class Edge(Protocol):
