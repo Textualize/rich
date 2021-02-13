@@ -1,5 +1,5 @@
 from math import ceil, modf
-from typing import cast, List, Optional, Protocol
+from typing import cast, List, Optional, Protocol, Sequence
 
 
 class Edge(Protocol):
@@ -10,7 +10,7 @@ class Edge(Protocol):
     minimum_size: int = 1
 
 
-def ratio_resolve(total: int, edges: List[Edge]) -> List[int]:
+def ratio_resolve(total: int, edges: Sequence[Edge]) -> List[int]:
     """Divide total space based on size, ratio, and minimum_size, constraints.
 
     Args:

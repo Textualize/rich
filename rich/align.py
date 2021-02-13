@@ -198,6 +198,7 @@ class Align(JupyterMixin):
                     yield blank_line
 
         vertical_height = self.height or options.height
+        iter_segments: Iterable[Segment]
         if self.vertical and vertical_height is not None:
             if self.vertical == "top":
                 bottom_space = vertical_height - height
