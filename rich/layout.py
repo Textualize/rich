@@ -8,10 +8,14 @@ from .segment import Segment
 from .style import StyleType
 
 
-from typing import Iterable, List, Optional
+from typing import List, Optional, TYPE_CHECKING
 from typing_extensions import Literal
 
 Direction = Literal["horizontal", "vertical"]
+
+
+if TYPE_CHECKING:
+    from rich.tree import Tree
 
 
 class Placeholder:
@@ -49,43 +53,56 @@ class Placeholder:
 
 
 class Layout:
+    """A renderable to divide a fixed height in to rows or columns.
+
+    Args:
+        renderable (RenderableType, optional): Renderable content, or None for placeholder. Defaults to None.
+        size (int, optional): Optional fixed size of layout. Defaults to None.
+        minimum_size (int, optional): Minimum size of layout. Defaults to 1.
+        ratio (int, optional): Optional ratio for flexible layout. Defaults to 1.
+        name (str, optional): Optional identifier for Layout. Defaults to None.
+        visible (bool, optional): Visibility of layout. Defaults to True.
+    """
+
     def __init__(
         self,
         renderable: RenderableType = None,
         *,
+        direction: str = "vertical",
         size: int = None,
         minimum_size: int = 1,
         ratio: int = 1,
-        direction: Direction = "vertical",
         name: str = None,
         visible: bool = True,
     ) -> None:
         self._renderable = renderable or Placeholder(self)
+        self.direction = direction
         self.size = size
         self.minimum_size = minimum_size
         self.ratio = ratio
-        self.direction = direction
         self.name = name
         self.visible = visible
         self._children: List[Layout] = []
 
     def __repr__(self) -> str:
-        return f"Layout(size={self.size!r}, minimum_size={self.size!r}, ratio={self.ratio!r}, name={self.name!r})"
+        return f"Layout(size={self.size!r}, minimum_size={self.size!r}, ratio={self.ratio!r}, name={self.name!r}, visible={self.visible!r})"
 
     @property
     def renderable(self) -> RenderableType:
-        return self if self._renderable is not None else self._renderable
+        """Layout renderable."""
+        return self if self._children else self._renderable
 
-    @renderable.setter
-    def renderable(self, renderable: RenderableType) -> None:
-        self._renderable = renderable
+    # @renderable.setter
+    # def renderable(self, renderable: RenderableType) -> None:
+    #     self._renderable = renderable
 
     @property
     def children(self) -> List["Layout"]:
-        """Gets visible layout children."""
+        """Gets (visible) layout children."""
         return [child for child in self._children if child.visible]
 
     def get(self, name) -> Optional["Layout"]:
+        """Get a named layout."""
         if self.name == name:
             return self
         else:
@@ -101,15 +118,49 @@ class Layout:
             raise KeyError(f"No layout with name {name!r}")
         return layout
 
+    @property
+    def tree(self) -> "Tree":
+        from rich.tree import Tree
+
+        def summary(layout):
+            name = repr(layout.name) + " " if layout.name else ""
+            if layout.size:
+                return f"{name}(size={layout.size})"
+            else:
+                return f"{name}(ratio={layout.ratio})"
+
+        layout = self
+        tree = Tree(summary(layout), highlight=True)
+
+        def recurse(tree, layout):
+            for child in layout.children:
+                recurse(tree.add(summary(child)), child)
+
+        recurse(tree, self)
+        return tree
+
     def split(
         self,
-        *layouts: "Layout",
-        direction: Direction = None,
-    ) -> Iterable["Layout"]:
-        self._children[:] = layouts
-        if direction is not None:
-            self.direction = direction
-        return self.children
+        renderable: RenderableType = None,
+        *,
+        size: int = None,
+        minimum_size: int = 1,
+        ratio: int = 1,
+        name: str = None,
+        visible: bool = True,
+        direction: Direction = "vertical",
+    ):
+        layout = Layout(
+            renderable,
+            size=size,
+            minimum_size=minimum_size,
+            ratio=ratio,
+            name=name,
+            visible=visible,
+            direction=direction,
+        )
+        self._children.append(layout)
+        return layout
 
     def update(self, renderable: RenderableType) -> None:
         """Update renderable.
@@ -123,13 +174,8 @@ class Layout:
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         if not self.children:
-            if self._renderable:
-                yield self._renderable
-            else:
-                yield ""
-            return
-
-        if self.direction == "vertical":
+            yield self._renderable or ""
+        elif self.direction == "vertical":
             yield from self._render_vertical(console, options)
         elif self.direction == "horizontal":
             yield from self._render_horizontal(console, options)
@@ -142,7 +188,6 @@ class Layout:
             console.render_lines(child.renderable, options.update(width=render_width))
             for child, render_width in zip(self.children, render_widths)
         ]
-
         new_line = Segment.line()
         for lines in zip(*renders):
             for line in lines:
@@ -157,7 +202,6 @@ class Layout:
             console.render_lines(child.renderable, options.update(height=render_height))
             for child, render_height in zip(self.children, render_heights)
         ]
-
         new_line = Segment.line()
         for render in renders:
             for line in render:
@@ -171,24 +215,25 @@ if __name__ == "__main__":  # type: ignore
 
     console = Console()
     layout = Layout()
-    pane1, pane2, pane3 = layout.split(
-        Layout(name="title", size=3),
-        Layout(ratio=3),
-        Layout(name="footer", minimum_size=8, ratio=1),
-        direction="vertical",
-    )
 
-    side1, side2 = pane2.split(
-        Layout(), Layout(name="body", ratio=3), direction="horizontal"
-    )
-    side1.split(Layout(name="info1"), Layout(name="info2"), direction="vertical")
+    header = layout.split(name="header", size=3)
+    body = layout.split(ratio=1, direction="horizontal")
+    footer = layout.split(size=10, name="footer")
 
-    from rich.live import Live
-    from time import sleep
+    side = body.split(name="side")
+    body.split(name="body", ratio=2)
 
-    with Live(layout, screen=True, refresh_per_second=2):
-        try:
-            while 1:
-                sleep(1)
-        except KeyboardInterrupt:
-            pass
+    side.split()
+    side.split()
+
+    console.print(layout)
+
+    # from rich.live import Live
+    # from time import sleep
+
+    # with Live(layout, screen=True, refresh_per_second=2):
+    #     try:
+    #         while 1:
+    #             sleep(1)
+    #     except KeyboardInterrupt:
+    #         pass

@@ -130,6 +130,7 @@ class Tree(JupyterMixin):
                     width=options.max_width
                     - sum(level.cell_length for level in prefix),
                     highlight=self.highlight,
+                    height=None,
                 ),
             )
             for first, line in loop_first(renderable_lines):
