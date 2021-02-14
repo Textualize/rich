@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from rich.tree import Tree
 
 
-class Placeholder:
+class _Placeholder:
     highlighter = ReprHighlighter()
 
     def __init__(self, layout: "Layout", style: StyleType = "") -> None:
@@ -75,7 +75,7 @@ class Layout:
         name: str = None,
         visible: bool = True,
     ) -> None:
-        self._renderable = renderable or Placeholder(self)
+        self._renderable = renderable or _Placeholder(self)
         self.direction = direction
         self.size = size
         self.minimum_size = minimum_size
@@ -91,10 +91,6 @@ class Layout:
     def renderable(self) -> RenderableType:
         """Layout renderable."""
         return self if self._children else self._renderable
-
-    # @renderable.setter
-    # def renderable(self, renderable: RenderableType) -> None:
-    #     self._renderable = renderable
 
     @property
     def children(self) -> List["Layout"]:
