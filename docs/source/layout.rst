@@ -37,10 +37,10 @@ This will divide the terminal screen in to two equal sized portions, one on top 
 
 The addition of the ``direction="horizontal"`` tells the Layout class to split left-to-right, rather than the default of top-to-bottom.
 
-You should now see the screen area divided in to 3 portions; An upper half and a lower half that is split in to two quarters. You can continue to call split() in this way to create as many parts to the screen as you wish.
+You should now see the screen area divided in to 3 portions; an upper half and a lower half that is split in to two quarters. You can continue to call split() in this way to create as many parts to the screen as you wish.
 
-Setting renderables
--------------------
+Updating renderables
+--------------------
 
 The Layout class would not be that useful if it only displayed placeholders. Fortunately we can tell the layout (or sub-layout) to display text or any other renderable in it's area of the screen by calling  :meth:`~rich.layout.Layout.update`. Here is an example::
 
