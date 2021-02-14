@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 
 
 class _Placeholder:
+    """An internal renderable used as a Layout placeholder."""
+
     highlighter = ReprHighlighter()
 
     def __init__(self, layout: "Layout", style: StyleType = "") -> None:
@@ -98,8 +100,15 @@ class Layout:
         """Gets (visible) layout children."""
         return [child for child in self._children if child.visible]
 
-    def get(self, name) -> Optional["Layout"]:
-        """Get a named layout."""
+    def get(self, name: str) -> Optional["Layout"]:
+        """Get a named layout, or None if it doesn't exist.
+
+        Args:
+            name (str): Name of layout.
+
+        Returns:
+            Optional[Layout]: Layout instance or None if no layout was found.
+        """
         if self.name == name:
             return self
         else:
@@ -109,7 +118,7 @@ class Layout:
                     return named_layout
         return None
 
-    def __getitem__(self, name) -> "Layout":
+    def __getitem__(self, name: str) -> "Layout":
         layout = self.get(name)
         if layout is None:
             raise KeyError(f"No layout with name {name!r}")
