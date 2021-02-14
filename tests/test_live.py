@@ -168,5 +168,5 @@ def test_live_screen() -> None:
         live.refresh()
     result = console.end_capture()
     print(repr(result))
-    expected = "\x1b[?1049h\x1b[H\x1b[?25l\x1b[Hfoo                 \n                    \n                    \n                    \n                    \x1b[?25h\x1b[?1049l"
+    expected = '\x1b[?1049h\x1b[H\x1b[?25l\x1b[Hfoo                 \n                    \n                    \n                    \n                    \x1b[Hfoo                 \n                    \n                    \n                    \n                    \x1b[?25h\x1b[?1049l'
     assert result == expected

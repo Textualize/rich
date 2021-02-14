@@ -1,6 +1,6 @@
 import pytest
 from rich.live_render import LiveRender
-from rich.console import Console, ConsoleOptions
+from rich.console import Console, ConsoleDimensions, ConsoleOptions
 from rich.style import Style
 from rich.segment import Segment
 
@@ -30,6 +30,7 @@ def test_restore_cursor(live_render):
 
 def test_rich_console(live_render):
     options = ConsoleOptions(
+        ConsoleDimensions(80, 25),
         legacy_windows=False,
         min_width=10,
         max_width=20,

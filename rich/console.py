@@ -93,10 +93,21 @@ body {{
 _TERM_COLORS = {"256color": ColorSystem.EIGHT_BIT, "16color": ColorSystem.STANDARD}
 
 
+class ConsoleDimensions(NamedTuple):
+    """Size of the terminal."""
+
+    width: int
+    """The width of the console in 'cells'."""
+    height: int
+    """The height of the console in lines."""
+
+
 @dataclass
 class ConsoleOptions:
     """Options for __rich_console__ method."""
 
+    size: ConsoleDimensions
+    """Size of console."""
     legacy_windows: bool
     """legacy_windows: flag for legacy windows."""
     min_width: int
@@ -366,15 +377,6 @@ def render_group(fit: bool = True) -> Callable:
         return _replace
 
     return decorator
-
-
-class ConsoleDimensions(NamedTuple):
-    """Size of the terminal."""
-
-    width: int
-    """The width of the console in 'cells'."""
-    height: int
-    """The height of the console in lines."""
 
 
 def _is_jupyter() -> bool:  # pragma: no cover
@@ -786,6 +788,7 @@ class Console:
     def options(self) -> ConsoleOptions:
         """Get default console options."""
         return ConsoleOptions(
+            size=self.size,
             legacy_windows=self.legacy_windows,
             min_width=1,
             max_width=self.width,

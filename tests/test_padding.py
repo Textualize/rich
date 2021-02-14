@@ -1,7 +1,7 @@
 import pytest
 
 from rich.padding import Padding
-from rich.console import Console, ConsoleOptions
+from rich.console import Console, ConsoleDimensions, ConsoleOptions
 from rich.style import Style
 from rich.segment import Segment
 
@@ -39,6 +39,7 @@ def test_rich_console():
     renderable = "test renderable"
     style = Style(color="red")
     options = ConsoleOptions(
+        ConsoleDimensions(80, 25),
         legacy_windows=False,
         min_width=10,
         max_width=20,

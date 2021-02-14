@@ -156,7 +156,7 @@ class Live(JupyterMixin, RenderHook):
                 self.refresh()
 
     def __enter__(self) -> "Live":
-        self.start()
+        self.start(refresh=self._renderable is not None)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:

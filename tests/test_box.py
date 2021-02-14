@@ -1,6 +1,6 @@
 import pytest
 
-from rich.console import ConsoleOptions
+from rich.console import ConsoleOptions, ConsoleDimensions
 from rich.box import ASCII, DOUBLE, ROUNDED, HEAVY, SQUARE
 
 
@@ -38,6 +38,7 @@ def test_get_bottom():
 
 def test_box_substitute():
     options = ConsoleOptions(
+        ConsoleDimensions(80, 25),
         legacy_windows=True,
         min_width=1,
         max_width=100,

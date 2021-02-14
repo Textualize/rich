@@ -257,7 +257,7 @@ class VerticalCenter(JupyterMixin):
         )
         width, _height = Segment.get_shape(lines)
         new_line = Segment.line()
-        height = options.height or console.size.height
+        height = options.height or options.size.height
         top_space = (height - len(lines)) // 2
         bottom_space = height - top_space - len(lines)
         blank_line = Segment(f"{' ' * width}", style)

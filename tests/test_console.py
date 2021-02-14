@@ -9,7 +9,13 @@ import pytest
 
 from rich import errors
 from rich.color import ColorSystem
-from rich.console import CaptureError, Console, ConsoleOptions, render_group
+from rich.console import (
+    CaptureError,
+    Console,
+    ConsoleDimensions,
+    ConsoleOptions,
+    render_group,
+)
 from rich.measure import measure_renderables
 from rich.pager import SystemPager
 from rich.panel import Panel
@@ -54,6 +60,7 @@ def test_truecolor_terminal():
 
 def test_console_options_update():
     options = ConsoleOptions(
+        ConsoleDimensions(80, 25),
         legacy_windows=False,
         min_width=10,
         max_width=20,

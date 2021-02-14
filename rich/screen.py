@@ -25,7 +25,7 @@ class Screen:
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-        width, height = console.size
+        width, height = options.size
         style = console.get_style(self.style) if self.style else None
         render_options = options.update(width=width, height=height)
         lines = console.render_lines(
