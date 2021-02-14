@@ -143,28 +143,33 @@ class Layout:
         recurse(tree, self)
         return tree
 
-    def split(
-        self,
-        renderable: RenderableType = None,
-        *,
-        size: int = None,
-        minimum_size: int = 1,
-        ratio: int = 1,
-        name: str = None,
-        visible: bool = True,
-        direction: Direction = "vertical",
-    ):
-        layout = Layout(
-            renderable,
-            size=size,
-            minimum_size=minimum_size,
-            ratio=ratio,
-            name=name,
-            visible=visible,
-            direction=direction,
-        )
-        self._children.append(layout)
+        # def split(
+        #     self,
+        #     renderable: RenderableType = None,
+        #     *,
+        #     size: int = None,
+        #     minimum_size: int = 1,
+        #     ratio: int = 1,
+        #     name: str = None,
+        #     visible: bool = True,
+        #     direction: Direction = "vertical",
+        # ):
+        #     layout = Layout(
+        #         renderable,
+        #         size=size,
+        #         minimum_size=minimum_size,
+        #         ratio=ratio,
+        #         name=name,
+        #         visible=visible,
+        #         direction=direction,
+        #     )
+        #     self._children.append(layout)
         return layout
+
+    def split(self, *layouts, direction: Direction = None) -> None:
+        if direction is not None:
+            self.direction = direction
+        self._children.extend(layouts)
 
     def update(self, renderable: RenderableType) -> None:
         """Update renderable.
@@ -221,14 +226,16 @@ if __name__ == "__main__":  # type: ignore
     console = Console()
     layout = Layout()
 
-    header = layout.split(name="header", size=3)
-    body = layout.split(ratio=1, direction="horizontal")
-    footer = layout.split(size=10, name="footer")
+    layout.split(
+        Layout(name="header", size=3),
+        Layout(ratio=1, name="main"),
+        Layout(size=10, name="footer"),
+    )
 
-    side = body.split(name="side")
-    body.split(name="body", ratio=2)
+    layout["main"].split(
+        Layout(name="side"), Layout(name="body", ratio=2), direction="horizontal"
+    )
 
-    side.split()
-    side.split()
+    layout["side"].split(Layout(), Layout())
 
     console.print(layout)

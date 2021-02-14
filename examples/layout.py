@@ -17,15 +17,17 @@ from rich.text import Text
 console = Console()
 layout = Layout()
 
-header = layout.split(name="header", size=1)
-body = layout.split(ratio=1, direction="horizontal")
-footer = layout.split(size=10, name="footer")
+layout.split(
+    Layout(name="header", size=1),
+    Layout(ratio=1, name="main"),
+    Layout(size=10, name="footer"),
+)
 
-side = body.split(name="side")
-body.split(name="body", ratio=2)
+layout["main"].split(
+    Layout(name="side"), Layout(name="body", ratio=2), direction="horizontal"
+)
 
-side.split()
-side.split()
+layout["side"].split(Layout(), Layout())
 
 layout["body"].update(
     Align.center(

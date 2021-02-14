@@ -14,15 +14,17 @@ console = Console()
 def make_layout() -> Layout:
     layout = Layout(name="root")
 
-    layout.split(name="header", size=3)
-    body = layout.split(name="main", ratio=1, direction="horizontal")
-    layout.split(size=7, name="footer")
-
-    side = body.split(name="side")
-    body.split(name="body", ratio=2)
-
-    side.split(name="box1")
-    side.split(name="box2")
+    layout.split(
+        Layout(name="header", size=3),
+        Layout(name="main", ratio=1),
+        Layout(name="footer", size=7),
+    )
+    layout["main"].split(
+        Layout(name="side"),
+        Layout(name="body", ratio=2),
+        direction="horizontal",
+    )
+    layout["side"].split(Layout(name="box1"), Layout(name="box2"))
     return layout
 
 
