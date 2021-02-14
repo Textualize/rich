@@ -29,7 +29,7 @@ class _Placeholder:
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         width = options.max_width
-        height = options.height
+        height = options.height or options.size.height
         layout = self.layout
 
         layout_info = {
@@ -116,20 +116,28 @@ class Layout:
 
     @property
     def tree(self) -> "Tree":
+        from rich.highlighter import ReprHighlighter
+        from rich.text import Text
         from rich.tree import Tree
 
-        def summary(layout):
+        highlighter = ReprHighlighter()
+
+        def summary(layout) -> "Text":
             name = repr(layout.name) + " " if layout.name else ""
+            direction = "➡" if layout.direction == "horizontal" else "⬇"
             if layout.size:
-                return f"{name}(size={layout.size})"
+                _summary = highlighter(f"{direction} {name}(size={layout.size})")
             else:
-                return f"{name}(ratio={layout.ratio})"
+                _summary = highlighter(f"{direction} {name}(ratio={layout.ratio})")
+            if not layout.visible:
+                _summary.stylize("dim")
+            return _summary
 
         layout = self
         tree = Tree(summary(layout), highlight=True)
 
         def recurse(tree, layout):
-            for child in layout.children:
+            for child in layout._children:
                 recurse(tree.add(summary(child)), child)
 
         recurse(tree, self)
@@ -169,8 +177,9 @@ class Layout:
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
+        options = options.update(height=options.height or options.size.height)
         if not self.children:
-            yield self._renderable or ""
+            yield from console.render(self._renderable or "", options)
         elif self.direction == "vertical":
             yield from self._render_vertical(console, options)
         elif self.direction == "horizontal":
@@ -223,13 +232,3 @@ if __name__ == "__main__":  # type: ignore
     side.split()
 
     console.print(layout)
-
-    # from rich.live import Live
-    # from time import sleep
-
-    # with Live(layout, screen=True, refresh_per_second=2):
-    #     try:
-    #         while 1:
-    #             sleep(1)
-    #     except KeyboardInterrupt:
-    #         pass
