@@ -1,11 +1,18 @@
-from .console import Console, ConsoleOptions, RenderResult, RenderableType
+from typing import TYPE_CHECKING
+
 from .segment import Segment
 from .style import StyleType
 from ._loop import loop_last
 
 
+if TYPE_CHECKING:
+    from .console import Console, ConsoleOptions, RenderResult, RenderableType
+
+
 class Screen:
-    def __init__(self, renderable: RenderableType, style: StyleType = None) -> None:
+    def __init__(
+        self, renderable: "RenderableType" = None, style: StyleType = None
+    ) -> None:
         """A renderable that fills the terminal screen.
 
         Args:
@@ -16,13 +23,13 @@ class Screen:
         self.style = style
 
     def __rich_console__(
-        self, console: Console, options: ConsoleOptions
-    ) -> RenderResult:
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
         width, height = console.size
         style = console.get_style(self.style) if self.style else None
         render_options = options.update(width=width, height=height)
         lines = console.render_lines(
-            self.renderable, render_options, style=style, pad=True
+            self.renderable or "", render_options, style=style, pad=True
         )
         lines = Segment.set_shape(lines, width, height, style=style)
         new_line = Segment.line()

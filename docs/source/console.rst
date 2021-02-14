@@ -301,7 +301,10 @@ Since the default pager on most platforms don't support color, Rich will strip c
 Alternate screen
 ----------------
 
-Terminals support an 'alternate screen' mode which is separate from the regular terminal and allows for full-screen applications that leave the regular stream of input and commands intact. Rich supports this mode via the :meth:`~rich.console.Console.set_alt_screen` method, although it is recommended that you use :meth:`~rich.console.Console.screen` which returns a context manager. The context manager ensures that alternate mode is disabled on exit.
+.. warning::
+    This feature is currently experimental. You might want to wait before using it in production.
+
+Terminals support an 'alternate screen' mode which is separate from the regular terminal and allows for full-screen applications that leave your stream of input and commands intact. Rich supports this mode via the :meth:`~rich.console.Console.set_alt_screen` method, although it is recommended that you use :meth:`~rich.console.Console.screen` which returns a context manager that disables alternate mode on exit.
 
 Here's an example of an alternate screen::
 
@@ -312,10 +315,35 @@ Here's an example of an alternate screen::
     with console.screen():
         console.print(locals())
         sleep(5)
-    console.print("Back to normal terminal")
+        
+The above code will display a pretty printed dictionary on the alternate screen before returning to the command prompt after 5 seconds.
 
-.. warning::
-    This feature is currently experimental. You might want to wait before using it in production.
+You can also provide a renderable to :meth:`~rich.console.Console.screen` which will be displayed in the alternate screen when you call :meth:`~rich.ScreenContext.update`. 
+
+Here's an example::
+
+    from time import sleep
+
+    from rich.console import Console
+    from rich.align import Align
+    from rich.text import Text
+    from rich.panel import Panel
+
+    console = Console()
+
+    with console.screen(style="bold white on red") as screen:
+        for count in range(5, 0, -1):
+            text = Align.center(
+                Text.from_markup(f"[blink]Don't Panic![/blink]\n{count}", justify="center"),
+                vertical="middle",
+            )
+            screen.update(Panel(text))
+            sleep(1)
+
+Updating the screen with a renderable allows Rich to crop the contents to fit the screen without scrolling.
+
+For a more powerful way of building full screen interfaces with Rich, see :ref:`live`.
+
 
 .. note::
     If you ever find yourself stuck in alternate mode after exiting Python code, type ``reset`` in the terminal

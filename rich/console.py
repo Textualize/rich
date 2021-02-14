@@ -42,6 +42,7 @@ from .measure import Measurement, measure_renderables
 from .pager import Pager, SystemPager
 from .pretty import Pretty
 from .scope import render_scope
+from .screen import Screen
 from .segment import Segment
 from .style import Style, StyleType
 from .styled import Styled
@@ -279,10 +280,29 @@ class PagerContext:
 class ScreenContext:
     """A context manager that enables an alternative screen. See :meth:`~rich.console.Console.screen` for usage."""
 
-    def __init__(self, console: "Console", hide_cursor: bool) -> None:
+    def __init__(
+        self, console: "Console", hide_cursor: bool, style: StyleType = ""
+    ) -> None:
         self.console = console
         self.hide_cursor = hide_cursor
+        self.screen = Screen(style=style)
         self._changed = False
+
+    def update(
+        self, renderable: RenderableType = None, style: StyleType = None
+    ) -> None:
+        """Update the screen.
+
+        Args:
+            renderable (RenderableType, optional): Optional renderable to replace current renderable,
+                or None for no change. Defaults to None.
+            style: (Style, optional): Replacement style, or None for no change. Defaults to None.
+        """
+        if renderable is not None:
+            self.screen.renderable = renderable
+        if style is not None:
+            self.screen.style = style
+        self.console.print(self.screen, end="")
 
     def __enter__(self) -> "ScreenContext":
         self._changed = self.console.set_alt_screen(True)
@@ -945,7 +965,7 @@ class Console:
         that handles this for you.
 
         Args:
-            enable (bool, optional): [description]. Defaults to True.
+            enable (bool, optional): Enable (True) or disable (False) alternate screen. Defaults to True.
 
         Returns:
             bool: True if the control codes were written.
@@ -957,13 +977,19 @@ class Console:
             changed = True
         return changed
 
-    def screen(self, hide_cursor: bool = True) -> "ScreenContext":
+    def screen(
+        self, hide_cursor: bool = True, style: StyleType = None
+    ) -> "ScreenContext":
         """Context manager to enable and disable 'alternative screen' mode.
+
+        Args:
+            hide_cursor (bool, optional): Also hide the cursor. Defaults to False.
+            style (Style, optional): Optional style for screen. Defaults to None.
 
         Returns:
             ~ScreenContext: Context which enables alternate screen on enter, and disables it on exit.
         """
-        return ScreenContext(self, hide_cursor=hide_cursor)
+        return ScreenContext(self, hide_cursor=hide_cursor, style=style or "")
 
     def render(
         self, renderable: RenderableType, options: ConsoleOptions = None

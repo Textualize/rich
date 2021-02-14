@@ -506,6 +506,20 @@ def test_screen():
     assert result == expected
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
+def test_screen_update():
+    console = Console(width=20, height=4, color_system="truecolor", force_terminal=True)
+    with console.capture() as capture:
+        with console.screen() as screen:
+            screen.update("foo", style="blue")
+            screen.update("bar")
+            screen.update()
+    result = capture.get()
+    print(repr(result))
+    expected = "\x1b[?1049h\x1b[H\x1b[?25l\x1b[34mfoo\x1b[0m\x1b[34m                 \x1b[0m\n\x1b[34m                    \x1b[0m\n\x1b[34m                    \x1b[0m\n\x1b[34m                    \x1b[0m\x1b[34mbar\x1b[0m\x1b[34m                 \x1b[0m\n\x1b[34m                    \x1b[0m\n\x1b[34m                    \x1b[0m\n\x1b[34m                    \x1b[0m\x1b[34mbar\x1b[0m\x1b[34m                 \x1b[0m\n\x1b[34m                    \x1b[0m\n\x1b[34m                    \x1b[0m\n\x1b[34m                    \x1b[0m\x1b[?1049l\x1b[?25h"
+    assert result == expected
+
+
 def test_height():
     console = Console(width=80, height=46)
     assert console.height == 46

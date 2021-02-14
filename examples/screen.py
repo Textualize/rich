@@ -6,15 +6,16 @@ from time import sleep
 
 from rich.console import Console
 from rich.align import Align
-from rich.screen import Screen
+from rich.text import Text
 from rich.panel import Panel
 
 console = Console()
 
-with console.screen():
-    panel = Panel(
-        Align.center("[blink]Don't Panic!", vertical="middle"),
-        style="bold white on red",
-    )
-    console.print(Screen(panel), end="")
-    sleep(5)
+with console.screen(style="bold white on red") as screen:
+    for count in range(5, 0, -1):
+        text = Align.center(
+            Text.from_markup(f"[blink]Don't Panic![/blink]\n{count}", justify="center"),
+            vertical="middle",
+        )
+        screen.update(Panel(text))
+        sleep(1)
