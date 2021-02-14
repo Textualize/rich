@@ -57,6 +57,7 @@ class Layout:
 
     Args:
         renderable (RenderableType, optional): Renderable content, or None for placeholder. Defaults to None.
+        direction (str, optional): Direction of split, one of "vertical" or "horizontal". Defaults to "vertical".
         size (int, optional): Optional fixed size of layout. Defaults to None.
         minimum_size (int, optional): Minimum size of layout. Defaults to 1.
         ratio (int, optional): Optional ratio for flexible layout. Defaults to 1.
@@ -116,6 +117,7 @@ class Layout:
 
     @property
     def tree(self) -> "Tree":
+        """Get a tree renderable to show layout structure."""
         from rich.highlighter import ReprHighlighter
         from rich.text import Text
         from rich.tree import Tree
@@ -129,8 +131,7 @@ class Layout:
                 _summary = highlighter(f"{direction} {name}(size={layout.size})")
             else:
                 _summary = highlighter(f"{direction} {name}(ratio={layout.ratio})")
-            if not layout.visible:
-                _summary.stylize("dim")
+            _summary.stylize("dim" if layout.visible else "")
             return _summary
 
         layout = self
@@ -143,30 +144,13 @@ class Layout:
         recurse(tree, self)
         return tree
 
-        # def split(
-        #     self,
-        #     renderable: RenderableType = None,
-        #     *,
-        #     size: int = None,
-        #     minimum_size: int = 1,
-        #     ratio: int = 1,
-        #     name: str = None,
-        #     visible: bool = True,
-        #     direction: Direction = "vertical",
-        # ):
-        #     layout = Layout(
-        #         renderable,
-        #         size=size,
-        #         minimum_size=minimum_size,
-        #         ratio=ratio,
-        #         name=name,
-        #         visible=visible,
-        #         direction=direction,
-        #     )
-        #     self._children.append(layout)
-        return layout
-
     def split(self, *layouts, direction: Direction = None) -> None:
+        """Split the layout in to multiple sub-layours.
+
+        Args:
+            *layouts (Layout): Positional arguments should be (sub) Layout instances.
+            direction (Direction, optional): One of "horizontal" or "vertical" or None for no change. Defaults to None.
+        """
         if direction is not None:
             self.direction = direction
         self._children.extend(layouts)

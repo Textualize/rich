@@ -10,13 +10,16 @@ from rich.panel import Panel
 def test_render():
     layout = Layout(name="root")
     repr(layout)
-    top = layout.split()
+
+    layout.split(Layout(name="top"), Layout(name="bottom"))
+    top = layout["top"]
     top.update(Panel("foo"))
+
     print(type(top._renderable))
     assert isinstance(top.renderable, Panel)
-    bottom = layout.split(direction="horizontal")
-    bottom.split(name="left")
-    bottom.split(name="right")
+    layout["bottom"].split(
+        Layout(name="left"), Layout(name="right"), direction="horizontal"
+    )
 
     assert layout["root"].name == "root"
     assert layout["left"].name == "left"
@@ -38,8 +41,7 @@ def test_render():
 
 def test_tree():
     layout = Layout(name="root")
-    layout.split("foo", size=2)
-    layout.split("bar")
+    layout.split(Layout("foo", size=2), Layout("bar"))
 
     console = Console(width=60, color_system=None)
 

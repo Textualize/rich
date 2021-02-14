@@ -1,7 +1,7 @@
 Layout
 ======
 
-Rich offers a :class:`~rich.layout.Layout` renderable which can be used to divide the screen area in to parts, where each part may contain another renderable. It is most often used with :ref:`Live` to create full-screen "applications", but may be used standalone.
+Rich offers a :class:`~rich.layout.Layout` class which can be used to divide the screen area in to parts, where each part can contain its own content. It is typically used with :ref:`Live` to create full-screen "applications", but may be used standalone.
 
 To see an example of a Layout, run the following from the command line::
 
@@ -42,7 +42,7 @@ You should now see the screen area divided in to 3 portions; An upper half and a
 Setting renderables
 -------------------
 
-The Layout class would not be that useful if it only displayed placeholders. Fortunately we can tell the layout (or sub-layout) to display text or any other renderable in it's area of the screen. To set a renderable, call :meth:`~rich.layout.Layout.update` with your renderable. Here is an example::
+The Layout class would not be that useful if it only displayed placeholders. Fortunately we can tell the layout (or sub-layout) to display text or any other renderable in it's area of the screen by calling  :meth:`~rich.layout.Layout.update`. Here is an example::
 
     layout["left"].update("The mystery of life isn't a problem to solve, but a reality to experience.")
     print(layout)
@@ -67,6 +67,10 @@ In addition to a fixed size, you can also assign a *ratio* to a Layout in the co
     print(layout)
 
 This makes the top layout take up two thirds of the space. This is because the default ratio is 1, giving the upper and lower layouts a combined total of 3. As the upper layout has a ratio of 2, it takes up two thirds of the space, leaving the remaining third for the lower layout.
+
+A layout with a ratio set may also have a minimum size to prevent it from getting too small. For instance, here's how we could set the minimum size of the lower sub-layout so that it won't shrink beyond 10 rows::
+
+    layout["lower"].minimum_size = 10
 
 Visibility
 ----------
