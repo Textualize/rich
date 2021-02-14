@@ -15,7 +15,7 @@ To define a layout, construct a Layout object and print it::
     from rich import print
     from rich.layout import Layout
 
-    layout  = Layout()
+    layout = Layout()
     print(layout)
 
 This will draw a box the size of the terminal with some information regarding the layout. The box is a "placeholder" because we have yet to add any content to it. Before we do that, we can call the :meth:`~rich.layout.Layout.split` method to divide the layout in to two sub-layouts::
@@ -50,7 +50,7 @@ The Layout class would not be that useful if it only displayed placeholders. For
 Fixed size
 ----------
 
-You can set a sub-layout to use a fixed size by setting the ``size`` argument on the Layout constructor or by setting the attribute layout. Here's an example::
+You can set a sub-layout to use a fixed size by setting the ``size`` argument on the Layout constructor or by setting the attribute. Here's an example::
 
     layout["upper"].size = 10
     print(layout)
