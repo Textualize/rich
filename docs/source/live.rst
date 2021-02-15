@@ -75,7 +75,7 @@ Alternate screen
 
 You can opt to show a Live display in the "alternate screen" by setting ``screen=False`` on the constructor. This will allow your live display to go full screen and restore the command prompt on exit. 
 
-You can use this feature in combination with :ref:`Layoout` to display sophisticated terminal "applications".
+You can use this feature in combination with :ref:`Layout` to display sophisticated terminal "applications".
 
 Transient display
 ~~~~~~~~~~~~~~~~~

@@ -135,12 +135,16 @@ class Layout:
 
         def summary(layout) -> "Text":
             name = repr(layout.name) + " " if layout.name else ""
-            direction = "➡" if layout.direction == "horizontal" else "⬇"
+            direction = (
+                ("➡" if layout.direction == "horizontal" else "⬇")
+                if layout._children
+                else "■"
+            )
             if layout.size:
                 _summary = highlighter(f"{direction} {name}(size={layout.size})")
             else:
                 _summary = highlighter(f"{direction} {name}(ratio={layout.ratio})")
-            _summary.stylize("dim" if layout.visible else "")
+            _summary.stylize("" if layout.visible else "dim")
             return _summary
 
         layout = self

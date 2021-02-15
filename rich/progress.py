@@ -892,6 +892,7 @@ class Progress(JupyterMixin):
         return table
 
     def __rich__(self) -> RenderableType:
+        """Makes the Progress class itself renderable."""
         return self.get_renderable()
 
     def add_task(
