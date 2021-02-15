@@ -9,7 +9,13 @@ import pytest
 
 from rich import errors
 from rich.color import ColorSystem
-from rich.console import CaptureError, Console, ConsoleOptions, render_group
+from rich.console import (
+    CaptureError,
+    Console,
+    ConsoleDimensions,
+    ConsoleOptions,
+    render_group,
+)
 from rich.measure import measure_renderables
 from rich.pager import SystemPager
 from rich.panel import Panel
@@ -55,6 +61,7 @@ def test_truecolor_terminal():
 
 def test_console_options_update():
     options = ConsoleOptions(
+        ConsoleDimensions(80, 25),
         legacy_windows=False,
         min_width=10,
         max_width=20,
@@ -505,3 +512,34 @@ def test_no_nested_live():
         with console.status("foo"):
             with console.status("bar"):
                 pass
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
+def test_screen():
+    console = Console(color_system=None, force_terminal=True, force_interactive=True)
+    with console.capture() as capture:
+        with console.screen():
+            console.print("Don't panic")
+    expected = "\x1b[?1049h\x1b[H\x1b[?25lDon't panic\n\x1b[?1049l\x1b[?25h"
+    result = capture.get()
+    print(repr(result))
+    assert result == expected
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
+def test_screen_update():
+    console = Console(width=20, height=4, color_system="truecolor", force_terminal=True)
+    with console.capture() as capture:
+        with console.screen() as screen:
+            screen.update("foo", style="blue")
+            screen.update("bar")
+            screen.update()
+    result = capture.get()
+    print(repr(result))
+    expected = "\x1b[?1049h\x1b[H\x1b[?25l\x1b[34mfoo\x1b[0m\x1b[34m                 \x1b[0m\n\x1b[34m                    \x1b[0m\n\x1b[34m                    \x1b[0m\n\x1b[34m                    \x1b[0m\x1b[34mbar\x1b[0m\x1b[34m                 \x1b[0m\n\x1b[34m                    \x1b[0m\n\x1b[34m                    \x1b[0m\n\x1b[34m                    \x1b[0m\x1b[34mbar\x1b[0m\x1b[34m                 \x1b[0m\n\x1b[34m                    \x1b[0m\n\x1b[34m                    \x1b[0m\n\x1b[34m                    \x1b[0m\x1b[?1049l\x1b[?25h"
+    assert result == expected
+
+
+def test_height():
+    console = Console(width=80, height=46)
+    assert console.height == 46

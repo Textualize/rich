@@ -10,6 +10,7 @@ from dataclasses import dataclass, field, replace
 from datetime import datetime
 from functools import wraps
 from getpass import getpass
+from itertools import islice
 from time import monotonic
 from typing import (
     IO,
@@ -22,6 +23,7 @@ from typing import (
     NamedTuple,
     Optional,
     TextIO,
+    Tuple,
     Union,
     cast,
 )
@@ -40,6 +42,7 @@ from .measure import Measurement, measure_renderables
 from .pager import Pager, SystemPager
 from .pretty import Pretty
 from .scope import render_scope
+from .screen import Screen
 from .segment import Segment
 from .style import Style, StyleType
 from .styled import Styled
@@ -57,6 +60,13 @@ WINDOWS = platform.system() == "Windows"
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
 OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
+
+
+class NoChange:
+    pass
+
+
+NO_CHANGE = NoChange()
 
 
 CONSOLE_HTML_FORMAT = """\
@@ -83,10 +93,21 @@ body {{
 _TERM_COLORS = {"256color": ColorSystem.EIGHT_BIT, "16color": ColorSystem.STANDARD}
 
 
+class ConsoleDimensions(NamedTuple):
+    """Size of the terminal."""
+
+    width: int
+    """The width of the console in 'cells'."""
+    height: int
+    """The height of the console in lines."""
+
+
 @dataclass
 class ConsoleOptions:
     """Options for __rich_console__ method."""
 
+    size: ConsoleDimensions
+    """Size of console."""
     legacy_windows: bool
     """legacy_windows: flag for legacy windows."""
     min_width: int
@@ -105,6 +126,8 @@ class ConsoleOptions:
     """Disable wrapping for text."""
     highlight: Optional[bool] = None
     """Highlight override for render_str."""
+    height: Optional[int] = None
+    """Height available, or None for no height limit."""
 
     @property
     def ascii_only(self) -> bool:
@@ -113,30 +136,45 @@ class ConsoleOptions:
 
     def update(
         self,
-        width: int = None,
-        min_width: int = None,
-        max_width: int = None,
-        justify: JustifyMethod = None,
-        overflow: OverflowMethod = None,
-        no_wrap: bool = None,
-        highlight: bool = None,
+        width: Union[int, NoChange] = NO_CHANGE,
+        min_width: Union[int, NoChange] = NO_CHANGE,
+        max_width: Union[int, NoChange] = NO_CHANGE,
+        justify: Union[Optional[JustifyMethod], NoChange] = NO_CHANGE,
+        overflow: Union[Optional[OverflowMethod], NoChange] = NO_CHANGE,
+        no_wrap: Union[Optional[bool], NoChange] = NO_CHANGE,
+        highlight: Union[Optional[bool], NoChange] = NO_CHANGE,
+        height: Union[Optional[int], NoChange] = NO_CHANGE,
     ) -> "ConsoleOptions":
         """Update values, return a copy."""
         options = replace(self)
-        if width is not None:
+        if not isinstance(width, NoChange):
             options.min_width = options.max_width = width
-        if min_width is not None:
+        if not isinstance(min_width, NoChange):
             options.min_width = min_width
-        if max_width is not None:
+        if not isinstance(max_width, NoChange):
             options.max_width = max_width
-        if justify is not None:
+        if not isinstance(justify, NoChange):
             options.justify = justify
-        if overflow is not None:
+        if not isinstance(overflow, NoChange):
             options.overflow = overflow
-        if no_wrap is not None:
+        if not isinstance(no_wrap, NoChange):
             options.no_wrap = no_wrap
-        if highlight is not None:
+        if not isinstance(highlight, NoChange):
             options.highlight = highlight
+        if not isinstance(height, NoChange):
+            options.height = height
+        return options
+
+    def update_width(self, width: int) -> "ConsoleOptions":
+        """Update just the width, return a copy.
+
+        Args:
+            width (int): New width (sets both min_width and max_width)
+
+        Returns:
+            ~ConsoleOptions: New console options instance
+        """
+        options = replace(self, min_width=width, max_width=width)
         return options
 
 
@@ -250,6 +288,46 @@ class PagerContext:
         self._console._exit_buffer()
 
 
+class ScreenContext:
+    """A context manager that enables an alternative screen. See :meth:`~rich.console.Console.screen` for usage."""
+
+    def __init__(
+        self, console: "Console", hide_cursor: bool, style: StyleType = ""
+    ) -> None:
+        self.console = console
+        self.hide_cursor = hide_cursor
+        self.screen = Screen(style=style)
+        self._changed = False
+
+    def update(
+        self, renderable: RenderableType = None, style: StyleType = None
+    ) -> None:
+        """Update the screen.
+
+        Args:
+            renderable (RenderableType, optional): Optional renderable to replace current renderable,
+                or None for no change. Defaults to None.
+            style: (Style, optional): Replacement style, or None for no change. Defaults to None.
+        """
+        if renderable is not None:
+            self.screen.renderable = renderable
+        if style is not None:
+            self.screen.style = style
+        self.console.print(self.screen, end="")
+
+    def __enter__(self) -> "ScreenContext":
+        self._changed = self.console.set_alt_screen(True)
+        if self._changed and self.hide_cursor:
+            self.console.show_cursor(False)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        if self._changed:
+            self.console.set_alt_screen(False)
+            if self.hide_cursor:
+                self.console.show_cursor(True)
+
+
 class RenderGroup:
     """Takes a group of renderables and returns a renderable object that renders the group.
 
@@ -299,15 +377,6 @@ def render_group(fit: bool = True) -> Callable:
         return _replace
 
     return decorator
-
-
-class ConsoleDimensions(NamedTuple):
-    """Size of the terminal."""
-
-    width: int
-    """The width of the console in 'cells'."""
-    height: int
-    """The height of the console in lines."""
 
 
 def _is_jupyter() -> bool:  # pragma: no cover
@@ -719,6 +788,7 @@ class Console:
     def options(self) -> ConsoleOptions:
         """Get default console options."""
         return ConsoleOptions(
+            size=self.size,
             legacy_windows=self.legacy_windows,
             min_width=1,
             max_width=self.width,
@@ -770,6 +840,16 @@ class Console:
         """
         width, _ = self.size
         return width
+
+    @property
+    def height(self) -> int:
+        """Get the height of the console.
+
+        Returns:
+            int: The height (in lines) of the console.
+        """
+        _, height = self.size
+        return height
 
     def bell(self) -> None:
         """Play a 'bell' sound (if supported by the terminal)."""
@@ -869,7 +949,7 @@ class Console:
         )
         return status_renderable
 
-    def show_cursor(self, show: bool = True) -> None:
+    def show_cursor(self, show: bool = True) -> bool:
         """Show or hide the cursor.
 
         Args:
@@ -877,6 +957,42 @@ class Console:
         """
         if self.is_terminal and not self.legacy_windows:
             self.control("\033[?25h" if show else "\033[?25l")
+            return True
+        return False
+
+    def set_alt_screen(self, enable: bool = True) -> bool:
+        """Enables alternative screen mode.
+
+        Note, if you enable this mode, you should ensure that is disabled before
+        the application exits. See :meth:`~rich.Console.screen` for a context manager
+        that handles this for you.
+
+        Args:
+            enable (bool, optional): Enable (True) or disable (False) alternate screen. Defaults to True.
+
+        Returns:
+            bool: True if the control codes were written.
+
+        """
+        changed = False
+        if self.is_terminal and not self.legacy_windows:
+            self.control("\033[?1049h\033[H" if enable else "\033[?1049l")
+            changed = True
+        return changed
+
+    def screen(
+        self, hide_cursor: bool = True, style: StyleType = None
+    ) -> "ScreenContext":
+        """Context manager to enable and disable 'alternative screen' mode.
+
+        Args:
+            hide_cursor (bool, optional): Also hide the cursor. Defaults to False.
+            style (Style, optional): Optional style for screen. Defaults to None.
+
+        Returns:
+            ~ScreenContext: Context which enables alternate screen on enter, and disables it on exit.
+        """
+        return ScreenContext(self, hide_cursor=hide_cursor, style=style or "")
 
     def render(
         self, renderable: RenderableType, options: ConsoleOptions = None
@@ -945,6 +1061,7 @@ class Console:
             options (Optional[ConsoleOptions], optional): Console options, or None to use self.options. Default to ``None``.
             style (Style, optional): Optional style to apply to renderables. Defaults to ``None``.
             pad (bool, optional): Pad lines shorter than render width. Defaults to ``True``.
+            range (Optional[Tuple[int, int]], optional): Range of lines to render, or ``None`` for all line. Defaults to ``None``
 
         Returns:
             List[List[Segment]]: A list of lines, where a line is a list of Segment objects.
@@ -958,6 +1075,10 @@ class Console:
                 _rendered, render_options.max_width, include_new_lines=False, pad=pad
             )
         )
+        if render_options.height is not None:
+            lines = Segment.set_shape(
+                lines, render_options.max_width, render_options.height, style=style
+            )
         return lines
 
     def render_str(
@@ -1199,6 +1320,7 @@ class Console:
         markup: bool = None,
         highlight: bool = None,
         width: int = None,
+        height: int = None,
         crop: bool = True,
         soft_wrap: bool = None,
     ) -> None:
@@ -1248,9 +1370,11 @@ class Console:
             render_options = self.options.update(
                 justify="default",
                 overflow=overflow,
-                width=min(width, self.width) if width else None,
+                width=min(width, self.width) if width else NO_CHANGE,
+                height=height,
                 no_wrap=no_wrap,
             )
+
             new_segments: List[Segment] = []
             extend = new_segments.extend
             render = self.render

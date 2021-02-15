@@ -26,6 +26,11 @@ class Control:
     def __init__(self, control_codes: str) -> None:
         self._control_codes = Segment.control(control_codes)
 
+    @classmethod
+    def home(cls) -> "Control":
+        """Move cursor to 'home' position."""
+        return cls("\033[H")
+
     def __str__(self) -> str:
         return self._control_codes.text
 

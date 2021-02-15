@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING, Iterable, List, NamedTuple, Optional, Tuple, Union
 
 from . import box, errors
@@ -68,6 +68,10 @@ class Column:
     """Index of column."""
 
     _cells: List["RenderableType"] = field(default_factory=list)
+
+    def copy(self) -> "Column":
+        """Return a copy of this Column."""
+        return replace(self, _cells=[])
 
     @property
     def cells(self) -> Iterable["RenderableType"]:
@@ -203,6 +207,7 @@ class Table(JupyterMixin):
     @classmethod
     def grid(
         cls,
+        *headers: Union[Column, str],
         padding: PaddingDimensions = 0,
         collapse_padding: bool = True,
         pad_edge: bool = False,
@@ -211,6 +216,7 @@ class Table(JupyterMixin):
         """Get a table with no lines, headers, or footer.
 
         Args:
+            *headers (Union[Column, str]): Column headers, either as a string, or :class:`~rich.table.Column` instance.
             padding (PaddingDimensions, optional): Get padding around cells. Defaults to 0.
             collapse_padding (bool, optional): Enable collapsing of padding around cells. Defaults to True.
             pad_edge (bool, optional): Enable padding around edges of table. Defaults to False.
@@ -220,6 +226,7 @@ class Table(JupyterMixin):
             Table: A table instance.
         """
         return cls(
+            *headers,
             box=None,
             padding=padding,
             collapse_padding=collapse_padding,
@@ -411,7 +418,9 @@ class Table(JupyterMixin):
         widths = self._calculate_column_widths(console, max_width - extra_width)
         table_width = sum(widths) + extra_width
 
-        render_options = options.update(width=table_width, highlight=self.highlight)
+        render_options = options.update(
+            width=table_width, highlight=self.highlight, height=None
+        )
 
         def render_annotation(
             text: TextType, style: StyleType, justify: "JustifyMethod" = "center"
@@ -721,6 +730,7 @@ class Table(JupyterMixin):
                     justify=column.justify,
                     no_wrap=column.no_wrap,
                     overflow=column.overflow,
+                    height=None,
                 )
                 cell_style = table_style + row_style + get_style(cell.style)
                 lines = console.render_lines(

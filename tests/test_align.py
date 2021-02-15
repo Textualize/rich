@@ -23,6 +23,8 @@ def test_bad_align_legal():
         Align("foo", "")
     with pytest.raises(ValueError):
         Align("foo", "LEFT")
+    with pytest.raises(ValueError):
+        Align("foo", vertical="somewhere")
 
 
 def test_repr():
@@ -47,6 +49,42 @@ def test_align_right():
     console = Console(file=io.StringIO(), width=10)
     console.print(Align("foo", "right"))
     assert console.file.getvalue() == "       foo\n"
+
+
+def test_align_top():
+    console = Console(file=io.StringIO(), width=10)
+    console.print(Align("foo", vertical="top"), height=5)
+    expected = "foo       \n          \n          \n          \n          \n"
+    result = console.file.getvalue()
+    print(repr(result))
+    assert result == expected
+
+
+def test_align_middle():
+    console = Console(file=io.StringIO(), width=10)
+    console.print(Align("foo", vertical="middle"), height=5)
+    expected = "          \n          \nfoo       \n          \n          \n"
+    result = console.file.getvalue()
+    print(repr(result))
+    assert result == expected
+
+
+def test_align_bottom():
+    console = Console(file=io.StringIO(), width=10)
+    console.print(Align("foo", vertical="bottom"), height=5)
+    expected = "          \n          \n          \n          \nfoo       \n"
+    result = console.file.getvalue()
+    print(repr(result))
+    assert result == expected
+
+
+def test_align_center_middle():
+    console = Console(file=io.StringIO(), width=10)
+    console.print(Align("foo\nbar", "center", vertical="middle"), height=5)
+    expected = "          \n   foo    \n   bar    \n          \n          \n"
+    result = console.file.getvalue()
+    print(repr(result))
+    assert result == expected
 
 
 def test_align_fit():

@@ -8,6 +8,7 @@ from .control import Control
 from .file_proxy import FileProxy
 from .jupyter import JupyterMixin
 from .live_render import LiveRender, VerticalOverflowMethod
+from .screen import Screen
 from .text import Text
 
 
@@ -36,6 +37,7 @@ class Live(JupyterMixin, RenderHook):
     Args:
         renderable (RenderableType, optional): The renderable to live display. Defaults to displaying nothing.
         console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
+        screen (bool, optional): Enable alternate screen mode. Defaults to False.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()` or `update()` with refresh flag. Defaults to True
         refresh_per_second (float, optional): Number of times per second to refresh the live display. Defaults to 1.
         transient (bool, optional): Clear the renderable on exit. Defaults to False.
@@ -50,6 +52,7 @@ class Live(JupyterMixin, RenderHook):
         renderable: RenderableType = None,
         *,
         console: Console = None,
+        screen: bool = False,
         auto_refresh: bool = True,
         refresh_per_second: float = 4,
         transient: bool = False,
@@ -61,6 +64,8 @@ class Live(JupyterMixin, RenderHook):
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self._renderable = renderable
         self.console = console if console is not None else get_console()
+        self._screen = screen
+        self._alt_screen = False
 
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
@@ -102,6 +107,8 @@ class Live(JupyterMixin, RenderHook):
                 return
             self.console.set_live(self)
             self._started = True
+            if self._screen:
+                self._alt_screen = self.console.set_alt_screen(True)
             self.console.show_cursor(False)
             self._enable_redirect_io()
             self.console.push_render_hook(self)
@@ -123,19 +130,22 @@ class Live(JupyterMixin, RenderHook):
                     self._refresh_thread.stop()
                 # allow it to fully render on the last even if overflow
                 self.vertical_overflow = "visible"
-                if not self.console.is_jupyter:
-                    self.refresh()
-                if self.console.is_terminal:
-                    self.console.line()
+                if not self._alt_screen:
+                    if not self.console.is_jupyter:
+                        self.refresh()
+                    if self.console.is_terminal:
+                        self.console.line()
             finally:
-                self.console.show_cursor(True)
                 self._disable_redirect_io()
                 self.console.pop_render_hook()
+                self.console.show_cursor(True)
+                if self._alt_screen:
+                    self.console.set_alt_screen(False)
 
         if self._refresh_thread is not None:
             self._refresh_thread.join()
             self._refresh_thread = None
-        if self.transient:
+        if self.transient and not self._screen:
             self.console.control(self._live_render.restore_cursor())
         if self.ipy_widget is not None:  # pragma: no cover
             if self.transient:
@@ -146,7 +156,7 @@ class Live(JupyterMixin, RenderHook):
                 self.refresh()
 
     def __enter__(self) -> "Live":
-        self.start()
+        self.start(refresh=self._renderable is not None)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
@@ -178,7 +188,8 @@ class Live(JupyterMixin, RenderHook):
         Returns:
             RenderableType: Displayed renderable.
         """
-        return self.get_renderable()
+        renderable = self.get_renderable()
+        return Screen(renderable) if self._alt_screen else renderable
 
     def update(self, renderable: RenderableType, *, refresh: bool = False) -> None:
         """Update the renderable that is being displayed
@@ -230,8 +241,13 @@ class Live(JupyterMixin, RenderHook):
             # lock needs acquiring as user can modify live_render renderable at any time unlike in Progress.
             with self._lock:
                 # determine the control command needed to clear previous rendering
+                reset = (
+                    Control.home()
+                    if self._alt_screen
+                    else self._live_render.position_cursor()
+                )
                 renderables = [
-                    self._live_render.position_cursor(),
+                    reset,
                     *renderables,
                     self._live_render,
                 ]

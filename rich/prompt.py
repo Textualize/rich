@@ -299,7 +299,7 @@ class IntPrompt(PromptBase[int]):
     """A prompt that returns an integer.
 
     Example:
-        >>> burrito_count = IntPrompt.ask("How many burritos do you want to order", prompt_suffix="? ")
+        >>> burrito_count = IntPrompt.ask("How many burritos do you want to order")
 
     """
 

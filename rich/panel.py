@@ -132,19 +132,22 @@ class Panel(JupyterMixin):
             if self.expand
             else Measurement.get(console, renderable, width - 2).maximum
         )
+        child_height = None if options.height is None else options.height - 2
         if title_text is not None:
             child_width = min(
                 options.max_width - 2, max(child_width, title_text.cell_len + 2)
             )
 
         width = child_width + 2
-        child_options = options.update(width=child_width, highlight=self.highlight)
+        child_options = options.update(
+            width=child_width, height=child_height, highlight=self.highlight
+        )
         lines = console.render_lines(renderable, child_options, style=style)
 
         line_start = Segment(box.mid_left, border_style)
         line_end = Segment(f"{box.mid_right}", border_style)
         new_line = Segment.line()
-        if title_text is None:
+        if title_text is None or width <= 4:
             yield Segment(box.get_top([width - 2]), border_style)
         else:
             title_text.align(self.title_align, width - 4, character=box.top)
