@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added cheeky sponsorship request to test card
 - Added `quiet` argument to Console constructor
+- Added support for a callback function to format timestamps (allows presentation of milliseconds)
 - Added Console.set_alt_screen and Console.screen
 - Added height to ConsoleOptions
 - Added `vertical` parameter to Algin
