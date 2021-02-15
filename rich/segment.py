@@ -87,13 +87,13 @@ class Segment(NamedTuple):
         Returns:
             Iterable[Segments]: A new iterable of segments (possibly the same iterable).
         """
-        if style is not None:
+        if style:
             apply = style.__add__
             segments = (
                 cls(text, None if is_control else apply(_style), is_control)
                 for text, _style, is_control in segments
             )
-        if post_style is not None:
+        if post_style:
             segments = (
                 cls(
                     text,
@@ -294,7 +294,9 @@ class Segment(NamedTuple):
         append = new_lines.append
         adjust_line_length = cls.adjust_line_length
         line: Optional[List[Segment]]
-        for line, _ in zip_longest(lines, range(height)):
+        iter_lines = iter(lines)
+        for _ in range(height):
+            line = next(iter_lines, None)
             if line is None:
                 append(pad_line)
             else:

@@ -13,19 +13,11 @@ For a demonstration of a live display, running the following command:
 
     If you see ellipsis "...", this indicates that the terminal is not tall enough to show the full table.
 
-Basic Usage
------------
+Basic usage
+~~~~~~~~~~~
 
-The basic usage can be split into two use cases.
+To create a live display, construct a :class:`~rich.live.Live` object with a renderable and use it has a context manager. The live display will persist for the duration of the context. You can update the renderable to update the display::
 
-1. Same Renderable
-~~~~~~~~~~~~~~~~~~
-
-When keeping the same renderable, pass the :class:`~rich.console.RenderableType` you would like to see updating and provide
-a ``refresh_per_second`` parameter. The Live :class:`~rich.live.Live` will automatically update the console at the provided refresh rate.
-
-
-**Example**::
 
     import time
 
@@ -44,13 +36,11 @@ a ``refresh_per_second`` parameter. The Live :class:`~rich.live.Live` will autom
             table.add_row(f"{row}", f"description {row}", "[red]ERROR")
 
 
-2. New Renderable
-~~~~~~~~~~~~~~~~~
+Updating the renderable
+~~~~~~~~~~~~~~~~~~~~~~~
 
-You can also provide a new renderable to :class:`~rich.live.Live` using the :meth:`~rich.live.Live.update` function. This allows you to
-completely change the live display.
+You can also change the renderable on-the-fly by calling the :meth:`~rich.live.Live.update` method. This may be useful if the information you wish to display is too dynamic to generate by updating a single renderable. Here is an example:
 
-**Example**::
 
     import random
     import time
@@ -60,7 +50,7 @@ completely change the live display.
 
 
     def generate_table() -> Table:
-
+        """Make a new table."""
         table = Table()
         table.add_column("ID")
         table.add_column("Value")
@@ -74,22 +64,24 @@ completely change the live display.
         return table
 
 
-    with Live(refresh_per_second=4) as live:
+    with Live(generate_table(), refresh_per_second=4) as live:
         for _ in range(40):
             time.sleep(0.4)
             live.update(generate_table())
 
-Advanced Usage
---------------
 
-Transient Display
+Alternate screen
+~~~~~~~~~~~~~~~~
+
+You can opt to show a Live display in the "alternate screen" by setting ``screen=False`` on the constructor. This will allow your live display to go full screen and restore the command prompt on exit. 
+
+You can use this feature in combination with :ref:`Layout` to display sophisticated terminal "applications".
+
+Transient display
 ~~~~~~~~~~~~~~~~~
 
 Normally when you exit live context manager (or call :meth:`~rich.live.Live.stop`) the last refreshed item remains in the terminal with the cursor on the following line.
-You can also make the live display disappear on exit by setting ``transient=True`` on the Live constructor. Here's an example::
-
-    with Live(transient=True) as live:
-        ...
+You can also make the live display disappear on exit by setting ``transient=True`` on the Live constructor. 
 
 Auto refresh
 ~~~~~~~~~~~~
@@ -100,27 +92,19 @@ You should set this to something lower than 4 if you know your updates will not 
 You might want to disable auto-refresh entirely if your updates are not very frequent, which you can do by setting ``auto_refresh=False`` on the constructor.
 If you disable auto-refresh you will need to call :meth:`~rich.live.Live.refresh` manually or :meth:`~rich.live.Live.update` with ``refresh=True``.
 
-Vertical Overflow
+Vertical overflow
 ~~~~~~~~~~~~~~~~~
 
 By default, the live display will display ellipsis if the renderable is too large for the terminal. You can adjust this by setting the
 ``vertical_overflow`` argument on the :class:`~rich.live.Live` constructor.
 
-- crop: Show renderable up to the terminal height. The rest is hidden.
-- ellipsis: Similar to crop except last line of the terminal is replaced with "...". This is the default behavior.
-- visible: Will allow the whole renderable to be shown. Note that the display cannot be properly cleared in this mode.
+- "crop" Show renderable up to the terminal height. The rest is hidden.
+- "ellipsis" Similar to crop except last line of the terminal is replaced with "...". This is the default behavior.
+- "visible" Will allow the whole renderable to be shown. Note that the display cannot be properly cleared in this mode.
 
 .. note::
 
     Once the live display stops on a non-transient renderable, the last frame will render as **visible** since it doesn't have to be cleared.
-
-Complex Renders
-~~~~~~~~~~~~~~~
-
-Refer to the :ref:`Render Groups` about combining multiple :class:`RenderableType` together so that it may be passed into the :class:`~rich.live.Live` constructor
-or :meth:`~rich.live.Live.update` method.
-
-For more powerful structuring it is also possible to use nested tables.
 
 
 Print / log
@@ -172,6 +156,7 @@ Note that only a single live context may be active at any one time. The followin
         with console.status("working"):  # Will not work
             do_work()
 
+In practice this is rarely a problem because you can display any combination of renderables in a Live context.
 
 Examples
 --------

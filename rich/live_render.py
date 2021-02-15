@@ -70,12 +70,12 @@ class LiveRender:
         shape = _Segment.get_shape(lines)
 
         _, height = shape
-        if height > console.size.height:
+        if height > options.size.height:
             if self.vertical_overflow == "crop":
-                lines = lines[: console.size.height]
+                lines = lines[: options.size.height]
                 shape = _Segment.get_shape(lines)
             elif self.vertical_overflow == "ellipsis":
-                lines = lines[: (console.size.height - 1)]
+                lines = lines[: (options.size.height - 1)]
                 overflow_text = Text(
                     "...",
                     overflow="crop",

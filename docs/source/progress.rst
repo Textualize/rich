@@ -83,13 +83,19 @@ Indeterminate progress
 
 When you add a task it is automatically *started*, which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. This may not work well if there is a long delay before you can start updating progress; you may need to wait for a response from a server or count files in a directory (for example). In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` which will display a pulsing animation that lets the user know something is working. This is know as an *indeterminate* progress bar. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
 
-
 Auto refresh
 ~~~~~~~~~~~~
 
 By default, the progress information will refresh 10 times a second. You can set the refresh rate with the ``refresh_per_second`` argument on the :class:`~rich.progress.Progress` constructor. You should set this to something lower than 10 if you know your updates will not be that frequent.
 
 You might want to disable auto-refresh entirely if your updates are not very frequent, which you can do by setting ``auto_refresh=False`` on the constructor. If you disable auto-refresh you will need to call :meth:`~rich.progress.Progress.refresh` manually after updating your task(s).
+
+
+Expand
+~~~~~~
+
+The progress bar(s) will use only as much of the width of the terminal as required to show the task information. If you set the ``expand`` argument on the Progress constructor, then Rich will stretch the progress display to the full available width.
+
 
 Columns
 ~~~~~~~
@@ -120,7 +126,28 @@ The following column objects are available:
 - :class:`~rich.progress.SpinnerColumn` Displays a "spinner" animation.
 - :class:`~rich.progress.RenderableColumn` Displays an arbitrary Rich renderable in the column.
 
-To implement your own columns, extend the :class:`~rich.progress.Progress` and use it as you would the other columns.
+To implement your own columns, extend the :class:`~rich.progress.ProgressColumn` class and use it as you would the other columns.
+
+Table Columns
+~~~~~~~~~~~~~
+
+Rich builds a :class:~rich.table.Table` for the tasks in the Progress instance. You can customize how the columns of this *tasks table* are created by specifying the `table_column` argument in the Column constructor, which should be a :class:`~rich.table.Column` instance.
+
+The following example demonstrates a progress bar where the description takes one third of the width of the terminal, and the bar takes up the remaining third.
+
+    from time import sleep
+
+    from rich.table import Column
+    from rich.progress import Progress, BarColumn, TextColumn
+
+    text_column = TextColumn("{task.description}", table_column=Column(ratio=1))
+    bar_column = BarColumn(bar_width=None, table_column=Column(ratio=2))
+    progress = Progress(text_column, bar_column, expand=True)
+
+    with progress:
+        for n in progress.track(range(100)):
+            progress.print(n)
+            sleep(0.1)
 
 
 Print / log

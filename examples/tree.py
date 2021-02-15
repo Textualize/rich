@@ -1,3 +1,7 @@
+"""
+Demonstrates how to display a tree of files / directories with the Tree renderable.
+"""
+
 import os
 import pathlib
 import sys

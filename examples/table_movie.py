@@ -1,15 +1,14 @@
 """Same as the table_movie.py but uses Live to update"""
-from contextlib import contextmanager
 import time
+from contextlib import contextmanager
 
-from rich.console import Console
-from rich.columns import Columns
-from rich.table import Table
-from rich.measure import Measurement
 from rich import box
-from rich.text import Text
-
+from rich.align import Align
+from rich.console import Console
 from rich.live import Live
+from rich.measure import Measurement
+from rich.table import Table
+from rich.text import Text
 
 TABLE_DATA = [
     [
@@ -63,21 +62,16 @@ BEAT_TIME = 0.04
 
 @contextmanager
 def beat(length: int = 1) -> None:
-    with console:
-        yield
+    yield
     time.sleep(length * BEAT_TIME)
 
 
 table = Table(show_footer=False)
-table_centered = Columns((table,), align="center", expand=True)
-
+table_centered = Align.center(table)
 
 console.clear()
 
-with Live(
-    table_centered, console=console, refresh_per_second=10, vertical_overflow="ellipsis"
-):
-
+with Live(table_centered, console=console, screen=False, refresh_per_second=20):
     with beat(10):
         table.add_column("Release Date", no_wrap=True)
 
@@ -184,19 +178,19 @@ with Live(
     original_width = Measurement.get(console, table).maximum
 
     for width in range(original_width, console.width, 2):
-        with beat(2):
+        with beat(1):
             table.width = width
 
     for width in range(console.width, original_width, -2):
-        with beat(2):
+        with beat(1):
             table.width = width
 
     for width in range(original_width, 90, -2):
-        with beat(2):
+        with beat(1):
             table.width = width
 
     for width in range(90, original_width + 1, 2):
-        with beat(2):
+        with beat(1):
             table.width = width
 
     with beat(2):

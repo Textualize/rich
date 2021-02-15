@@ -1,6 +1,13 @@
 import pytest
+from typing import NamedTuple, Optional
 
-from rich._ratio import ratio_reduce
+from rich._ratio import ratio_reduce, ratio_resolve
+
+
+class Edge(NamedTuple):
+    size: Optional[int] = None
+    ratio: int = 1
+    minimum_size: int = 1
 
 
 @pytest.mark.parametrize(
@@ -16,3 +23,28 @@ from rich._ratio import ratio_reduce
 )
 def test_ratio_reduce(total, ratios, maximums, values, result):
     assert ratio_reduce(total, ratios, maximums, values) == result
+
+
+def test_ratio_resolve():
+    assert ratio_resolve(100, []) == []
+    assert ratio_resolve(100, [Edge(size=100), Edge(ratio=1)]) == [100, 1]
+    assert ratio_resolve(100, [Edge(ratio=1)]) == [100]
+    assert ratio_resolve(100, [Edge(ratio=1), Edge(ratio=1)]) == [50, 50]
+    assert ratio_resolve(100, [Edge(size=20), Edge(ratio=1), Edge(ratio=1)]) == [
+        20,
+        40,
+        40,
+    ]
+    assert ratio_resolve(100, [Edge(size=40), Edge(ratio=2), Edge(ratio=1)]) == [
+        40,
+        40,
+        20,
+    ]
+    assert ratio_resolve(
+        100, [Edge(size=40), Edge(ratio=2), Edge(ratio=1, minimum_size=25)]
+    ) == [40, 35, 25]
+    assert ratio_resolve(100, [Edge(ratio=1), Edge(ratio=1), Edge(ratio=1)]) == [
+        33,
+        33,
+        34,
+    ]

@@ -21,8 +21,7 @@ Welcome to Rich's documentation!
    prompt.rst
 
    columns.rst
-   group.rst
-   live.rst
+   group.rst   
    markdown.rst
    padding.rst
    panel.rst
@@ -30,6 +29,8 @@ Welcome to Rich's documentation!
    syntax.rst
    tables.rst
    tree.rst
+   live.rst
+   layout.rst
 
    protocol.rst
 
