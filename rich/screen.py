@@ -10,15 +10,16 @@ if TYPE_CHECKING:
 
 
 class Screen:
+    """A renderable that fills the terminal screen and crops excess.
+
+    Args:
+        renderable (RenderableType): Child renderable.
+        style (StyleType, optional): Optional background style. Defaults to None.
+    """
+
     def __init__(
         self, renderable: "RenderableType" = None, style: StyleType = None
     ) -> None:
-        """A renderable that fills the terminal screen.
-
-        Args:
-            renderable (RenderableType): Child renderable.
-            style (StyleType, optional): Optional background style. Defaults to None.
-        """
         self.renderable = renderable
         self.style = style
 

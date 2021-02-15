@@ -49,6 +49,6 @@ def test_tree():
         console.print(layout.tree, height=10)
     result = capture.get()
     print(repr(result))
-    expected = "⬇ 'root' (ratio=1)                                          \n├── ⬇ (size=2)                                              \n└── ⬇ (ratio=1)                                             \n"
+    expected = "⬇ 'root' (ratio=1)                                          \n├── ■ (size=2)                                              \n└── ■ (ratio=1)                                             \n"
 
     assert result == expected

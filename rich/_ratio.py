@@ -12,7 +12,13 @@ class Edge(Protocol):
 
 
 def ratio_resolve(total: int, edges: Sequence[Edge]) -> List[int]:
-    """Divide total space based on size, ratio, and minimum_size, constraints.
+    """Divide total space to satisfy size, ratio, and minimum_size, constraints.
+
+    The returned list of integers should add up to total in most cases, unless it is
+    impossible to satisfy all the constraints. For instance, if there are two edges
+    with a minimum size of 20 each and `total` is 30 then the returned list will be
+    greater than total. In practice, this would mean that a Layout object would
+    clip the rows that would overflow the screen height.
 
     Args:
         total (int): Total number of characters.
@@ -25,7 +31,7 @@ def ratio_resolve(total: int, edges: Sequence[Edge]) -> List[int]:
     sizes = [(edge.size or None) for edge in edges]
 
     # While any edges haven't been calculated
-    while any(size is None for size in sizes):
+    while None in sizes:
         # Get flexible edges and index to map these back on to sizes list
         flexible_edges = [
             (index, edge)
@@ -36,8 +42,7 @@ def ratio_resolve(total: int, edges: Sequence[Edge]) -> List[int]:
         remaining = total - sum(size or 0 for size in sizes)
         if remaining <= 0:
             # No room for flexible edges
-            sizes[:] = [(size or 0) for size in sizes]
-            break
+            return [(size or 1) for size in sizes]
         # Calculate number of characters in a ratio portion
         portion = remaining / sum((edge.ratio or 1) for _, edge in flexible_edges)
 
@@ -45,6 +50,7 @@ def ratio_resolve(total: int, edges: Sequence[Edge]) -> List[int]:
         for index, edge in flexible_edges:
             if portion * edge.ratio <= edge.minimum_size:
                 sizes[index] = edge.minimum_size
+                # New fixed size will invalidate calculations, so we need to repeat the process
                 break
         else:
             # Distribute flexible space and compensate for rounding error

@@ -1,7 +1,7 @@
 Layout
 ======
 
-Rich offers a :class:`~rich.layout.Layout` class which can be used to divide the screen area in to parts, where each part may contain independent content. It is often used with :ref:`Live` to create full-screen "applications" but may be used standalone.
+Rich offers a :class:`~rich.layout.Layout` class which can be used to divide the screen area in to parts, where each part may contain independent content. It can be used with :ref:`Live` to create full-screen "applications" but may be used standalone.
 
 To see an example of a Layout, run the following from the command line::
 
@@ -40,8 +40,8 @@ The addition of the ``direction="horizontal"`` tells the Layout class to split l
 You should now see the screen area divided in to 3 portions; an upper half and a lower half that is split in to two quarters.
 
 .. raw:: html
-
-    <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080">╭─────────────────────────────── </span><span style="color: #008000">'upper'</span><span style="color: #000080"> </span><span style="color: #000080; font-weight: bold">(</span><span style="color: #000080; font-weight: bold">84</span><span style="color: #000080"> x </span><span style="color: #000080; font-weight: bold">13</span><span style="color: #000080; font-weight: bold">)</span><span style="color: #000080"> ────────────────────────────────╮</span>
+    
+    <pre style="font-size:90%;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080">╭─────────────────────────────── </span><span style="color: #008000">'upper'</span><span style="color: #000080"> </span><span style="color: #000080; font-weight: bold">(</span><span style="color: #000080; font-weight: bold">84</span><span style="color: #000080"> x </span><span style="color: #000080; font-weight: bold">13</span><span style="color: #000080; font-weight: bold">)</span><span style="color: #000080"> ────────────────────────────────╮</span>
     <span style="color: #000080">│</span>                                                                                  <span style="color: #000080">│</span>
     <span style="color: #000080">│</span>                                                                                  <span style="color: #000080">│</span>
     <span style="color: #000080">│</span>                                                                                  <span style="color: #000080">│</span>
@@ -84,7 +84,9 @@ The first position argument to ``Layout`` can be any Rich renderable, which will
 
 You can also call :meth:`~rich.layout.Layout.update` to set or replace the current renderable::
 
-    layout["left"].update("The mystery of life isn't a problem to solve, but a reality to experience.")
+    layout["left"].update(
+        "The mystery of life isn't a problem to solve, but a reality to experience."
+    )
     print(layout)
 
 Fixed size
@@ -138,4 +140,4 @@ To help visualize complex layouts you can print the ``tree`` attribute which wil
 Example
 -------
 
-See `fullscreen.py <https://github.com/willmcgugan/rich/blob/master/examples/fullscreen.py>`_ for an example that combines :class:`~rich.layout.Layout` and :class:`rich.live.Live` to create a fullscreen "application".
+See `fullscreen.py <https://github.com/willmcgugan/rich/blob/master/examples/fullscreen.py>`_ for an example that combines :class:`~rich.layout.Layout` and :class:`~rich.live.Live` to create a fullscreen "application".

@@ -27,7 +27,7 @@ def test_ratio_reduce(total, ratios, maximums, values, result):
 
 def test_ratio_resolve():
     assert ratio_resolve(100, []) == []
-    assert ratio_resolve(100, [Edge(size=100), Edge(ratio=1)]) == [100, 0]
+    assert ratio_resolve(100, [Edge(size=100), Edge(ratio=1)]) == [100, 1]
     assert ratio_resolve(100, [Edge(ratio=1)]) == [100]
     assert ratio_resolve(100, [Edge(ratio=1), Edge(ratio=1)]) == [50, 50]
     assert ratio_resolve(100, [Edge(size=20), Edge(ratio=1), Edge(ratio=1)]) == [

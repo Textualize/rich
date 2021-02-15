@@ -28,6 +28,7 @@ class Control:
 
     @classmethod
     def home(cls) -> "Control":
+        """Move cursor to 'home' position."""
         return cls("\033[H")
 
     def __str__(self) -> str:
