@@ -79,7 +79,7 @@ The first position argument to ``Layout`` can be any Rich renderable, which will
 
     layout["right"].split(
         Layout(Panel("Hello")),
-        Layout(Panel("World!))
+        Layout(Panel("World!"))
     )
 
 You can also call :meth:`~rich.layout.Layout.update` to set or replace the current renderable::
