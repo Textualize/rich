@@ -72,7 +72,7 @@ You can also change the renderable on-the-fly by calling the :meth:`~rich.live.L
 Alternate screen
 ~~~~~~~~~~~~~~~~
 
-You can opt to show a Live display in the "alternate screen" by setting ``screen=False`` on the constructor. This will allow your live display to go full screen and restore the command prompt on exit. 
+You can opt to show a Live display in the "alternate screen" by setting ``screen=True`` on the constructor. This will allow your live display to go full screen and restore the command prompt on exit. 
 
 You can use this feature in combination with :ref:`Layout` to display sophisticated terminal "applications".
 
