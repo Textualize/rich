@@ -39,8 +39,7 @@ To create a live display, construct a :class:`~rich.live.Live` object with a ren
 Updating the renderable
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-You can also change the renderable on-the-fly by calling the :meth:`~rich.live.Live.update` method. This may be useful if the information you wish to display is too dynamic to generate by updating a single renderable. Here is an example:
-
+You can also change the renderable on-the-fly by calling the :meth:`~rich.live.Live.update` method. This may be useful if the information you wish to display is too dynamic to generate by updating a single renderable. Here is an example::
 
     import random
     import time
