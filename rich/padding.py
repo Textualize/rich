@@ -122,3 +122,9 @@ class Padding(JupyterMixin):
         measurement = Measurement(measure_min + extra_width, measure_max + extra_width)
         measurement = measurement.with_maximum(max_width)
         return measurement
+
+
+if __name__ == "__main__":  #  pragma: no cover
+    from rich import print
+
+    print(Padding("Hello, World", (2, 4), style="on blue"))

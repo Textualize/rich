@@ -192,15 +192,12 @@ if __name__ == "__main__":  # pragma: no cover
     from .box import ROUNDED, DOUBLE
 
     p = Panel(
-        Panel.fit(
-            Text.from_markup("[bold magenta]Hello World!"),
-            box=ROUNDED,
-            safe_box=True,
-            style="on red",
-        ),
-        title="[b]Hello, World",
+        "Hello, World!",
+        title="rich.Panel",
+        style="white on blue",
         box=DOUBLE,
+        padding=1,
     )
 
-    print(p)
+    c.print()
     c.print(p)

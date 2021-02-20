@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.11.1] - 2021-02-20
+
+### Fixed
+
+- Fixed table with expand=False not expanding when justify="center"
+- Fixed single renderable in Layout not respecting height
+- Fixed COLUMNS and LINES env var https://github.com/willmcgugan/rich/issues/1019
+- Layout now respects minimum_size when fixes sizes are greater than available space
+- HTML export now changes link underline score to match terminal https://github.com/willmcgugan/rich/issues/1009
+
+### Changed
+
+- python -m rich.markdown and rich.syntax show usage with no file
+
+### Added
+
+- Added height parameter to Layout
+- Added python -m rich.segment
+
 ## [9.11.0] - 2021-02-15
 
 ### Fixed

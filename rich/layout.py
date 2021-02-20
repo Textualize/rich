@@ -1,6 +1,7 @@
 from .align import Align
 from .console import Console, ConsoleOptions, RenderResult, RenderableType
 from .highlighter import ReprHighlighter
+from ._loop import loop_last
 from .panel import Panel
 from .pretty import Pretty
 from ._ratio import ratio_resolve
@@ -77,6 +78,7 @@ class Layout:
         ratio: int = 1,
         name: str = None,
         visible: bool = True,
+        height: int = None,
     ) -> None:
         self._renderable = renderable or _Placeholder(self)
         self.direction = direction
@@ -85,6 +87,7 @@ class Layout:
         self.ratio = ratio
         self.name = name
         self.visible = visible
+        self.height = height
         self._children: List[Layout] = []
 
     def __repr__(self) -> str:
@@ -179,13 +182,19 @@ class Layout:
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        options = options.update(height=options.height or options.size.height)
+        render_options = options.update(
+            height=options.height or self.height or options.size.height
+        )
         if not self.children:
-            yield from console.render(self._renderable or "", options)
+            for line in console.render_lines(
+                self._renderable or "", render_options, new_lines=True
+            ):
+                yield from line
+
         elif self.direction == "vertical":
-            yield from self._render_vertical(console, options)
+            yield from self._render_vertical(console, render_options)
         elif self.direction == "horizontal":
-            yield from self._render_horizontal(console, options)
+            yield from self._render_horizontal(console, render_options)
 
     def _render_horizontal(
         self, console: Console, options: ConsoleOptions
@@ -206,14 +215,14 @@ class Layout:
     ) -> RenderResult:
         render_heights = ratio_resolve(options.height or console.height, self.children)
         renders = [
-            console.render_lines(child.renderable, options.update(height=render_height))
+            console.render_lines(
+                child.renderable, options.update(height=render_height), new_lines=True
+            )
             for child, render_height in zip(self.children, render_heights)
         ]
-        new_line = Segment.line()
         for render in renders:
             for line in render:
                 yield from line
-                yield new_line
 
 
 if __name__ == "__main__":  # type: ignore

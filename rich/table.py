@@ -851,7 +851,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     table.expand = True
     header("expand=True")
-    console.print(table, justify="center")
+    console.print(table)
 
     table.width = 50
     header("width=50")

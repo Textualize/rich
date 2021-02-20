@@ -48,3 +48,6 @@ def test_ratio_resolve():
         33,
         34,
     ]
+    assert ratio_resolve(
+        50, [Edge(size=30), Edge(ratio=1, minimum_size=10), Edge(size=30)]
+    ) == [30, 10, 30]

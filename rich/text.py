@@ -1114,20 +1114,27 @@ class Text(JupyterMixin):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from rich import print
+    from rich.console import Console
 
-    text = Text("<span>\n\tHello\n</span>")
-    text.expand_tabs(4)
-    print(text)
+    text = Text(
+        """\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n"""
+    )
+    text.highlight_words(["Lorem"], "bold")
+    text.highlight_words(["ipsum"], "italic")
 
-    code = """
-def __add__(self, other: Any) -> "Text":
-    if isinstance(other, (str, Text)):
-        result = self.copy()
-        result.append(other)
-        return result
-    return NotImplemented
-"""
-    text = Text(code)
-    text = text.with_indent_guides()
-    print(text)
+    console = Console()
+    console.rule("justify='left'")
+    console.print(text, style="red")
+    console.print()
+
+    console.rule("justify='center'")
+    console.print(text, style="green", justify="center")
+    console.print()
+
+    console.rule("justify='right'")
+    console.print(text, style="blue", justify="right")
+    console.print()
+
+    console.rule("justify='full'")
+    console.print(text, style="magenta", justify="full")
+    console.print()

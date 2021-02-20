@@ -143,3 +143,11 @@ def test_newline():
     result = console.end_capture()
     expected = "\n(\n    1,\n)\n"
     assert result == expected
+
+
+def test_empty_repr():
+    class Foo:
+        def __repr__(self):
+            return ""
+
+    assert pretty_repr(Foo()) == ""

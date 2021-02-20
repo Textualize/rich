@@ -535,8 +535,7 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument(
         "path",
         metavar="PATH",
-        nargs="?",
-        help="path to markdown file",
+        help="path to markdown file, or - for stdin",
     )
     parser.add_argument(
         "-c",
@@ -593,7 +592,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich.console import Console
 
-    if not args.path or args.path == "-":
+    if args.path == "-":
         markdown_body = sys.stdin.read()
     else:
         with open(args.path, "rt", encoding="utf-8") as markdown_file:

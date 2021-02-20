@@ -573,8 +573,7 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument(
         "path",
         metavar="PATH",
-        nargs="?",
-        help="path to file",
+        help="path to file, or - for stdin",
     )
     parser.add_argument(
         "-c",
@@ -646,7 +645,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     console = Console(force_terminal=args.force_color, width=args.width)
 
-    if not args.path or args.path == "-":
+    if args.path == "-":
         code = sys.stdin.read()
         syntax = Syntax(
             code=code,
