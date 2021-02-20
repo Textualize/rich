@@ -26,3 +26,7 @@ python -m rich.diagnose
 python -m rich._windows
 pip freeze | grep rich
 ```
+
+**Did I help?**
+
+If I was able to resolve your problem, consider [sponsoring](https://github.com/sponsors/willmcgugan) my work on Rich, or [buy me a coffee](https://ko-fi.com/willmcgugan) to say thanks.
