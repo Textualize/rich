@@ -512,6 +512,7 @@ class Style:
         if color is not None:
             theme_color = color.get_truecolor(theme)
             append(f"color: {theme_color.hex}")
+            append(f"text-decoration-color: {theme_color.hex}")
         if bgcolor is not None:
             theme_color = bgcolor.get_truecolor(theme, foreground=False)
             append(f"background-color: {theme_color.hex}")

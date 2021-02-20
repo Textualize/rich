@@ -21,13 +21,15 @@ def render_tables():
         color_system=None,
     )
 
-    table = Table(title="test table", caption="table caption", expand=True)
+    table = Table(title="test table", caption="table caption", expand=False)
     table.add_column("foo", footer=Text("total"), no_wrap=True, overflow="ellipsis")
     table.add_column("bar", justify="center")
     table.add_column("baz", justify="right")
 
     table.add_row("Averlongwordgoeshere", "banana pancakes", None)
 
+    assert Measurement.get(console, table, 80) == Measurement(41, 48)
+    table.expand = True
     assert Measurement.get(console, table, 80) == Measurement(41, 48)
 
     for width in range(10, 60, 5):
@@ -63,6 +65,9 @@ def render_tables():
 
     table.width = 20
     assert Measurement.get(console, table, 80) == Measurement(20, 20)
+    table.expand = False
+    assert Measurement.get(console, table, 80) == Measurement(20, 20)
+    table.expand = True
     console.print(table)
 
     table.columns[0].no_wrap = True

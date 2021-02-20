@@ -40,7 +40,7 @@ class Live(JupyterMixin, RenderHook):
         screen (bool, optional): Enable alternate screen mode. Defaults to False.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()` or `update()` with refresh flag. Defaults to True
         refresh_per_second (float, optional): Number of times per second to refresh the live display. Defaults to 1.
-        transient (bool, optional): Clear the renderable on exit. Defaults to False.
+        transient (bool, optional): Clear the renderable on exit (has no effect when screen=True). Defaults to False.
         redirect_stdout (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
         redirect_stderr (bool, optional): Enable redirection of stderr. Defaults to True.
         vertical_overflow (VerticalOverflowMethod, optional): How to handle renderable when it is too tall for the console. Defaults to "ellipsis".
@@ -76,7 +76,7 @@ class Live(JupyterMixin, RenderHook):
         self.ipy_widget: Optional[Any] = None
         self.auto_refresh = auto_refresh
         self._started: bool = False
-        self.transient = transient
+        self.transient = True if screen else transient
 
         self._refresh_thread: Optional[_RefreshThread] = None
         self.refresh_per_second = refresh_per_second
@@ -145,7 +145,7 @@ class Live(JupyterMixin, RenderHook):
         if self._refresh_thread is not None:
             self._refresh_thread.join()
             self._refresh_thread = None
-        if self.transient and not self._screen:
+        if self.transient and not self._alt_screen:
             self.console.control(self._live_render.restore_cursor())
         if self.ipy_widget is not None:  # pragma: no cover
             if self.transient:

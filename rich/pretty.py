@@ -192,7 +192,11 @@ class Pretty:
             no_wrap=pick_bool(self.no_wrap, options.no_wrap),
             style="pretty",
         )
-        pretty_text = self.highlighter(pretty_text)
+        pretty_text = (
+            self.highlighter(pretty_text)
+            if pretty_text
+            else Text("__repr__ return empty string", style="dim italic")
+        )
         if self.indent_guides and not options.ascii_only:
             pretty_text = pretty_text.with_indent_guides(
                 self.indent_size, style="repr.indent"
@@ -209,7 +213,9 @@ class Pretty:
             max_length=self.max_length,
             max_string=self.max_string,
         )
-        text_width = max(cell_len(line) for line in pretty_str.splitlines())
+        text_width = (
+            max(cell_len(line) for line in pretty_str.splitlines()) if pretty_str else 0
+        )
         return Measurement(text_width, text_width)
 
 

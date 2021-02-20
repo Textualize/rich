@@ -42,7 +42,10 @@ def ratio_resolve(total: int, edges: Sequence[Edge]) -> List[int]:
         remaining = total - sum(size or 0 for size in sizes)
         if remaining <= 0:
             # No room for flexible edges
-            return [(size or 1) for size in sizes]
+            return [
+                ((edge.minimum_size or 1) if size is None else size)
+                for size, edge in zip(sizes, edges)
+            ]
         # Calculate number of characters in a ratio portion
         portion = remaining / sum((edge.ratio or 1) for _, edge in flexible_edges)
 

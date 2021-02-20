@@ -299,9 +299,7 @@ class ScreenContext:
         self.screen = Screen(style=style)
         self._changed = False
 
-    def update(
-        self, renderable: RenderableType = None, style: StyleType = None
-    ) -> None:
+    def update(self, *renderables: RenderableType, style: StyleType = None) -> None:
         """Update the screen.
 
         Args:
@@ -309,8 +307,10 @@ class ScreenContext:
                 or None for no change. Defaults to None.
             style: (Style, optional): Replacement style, or None for no change. Defaults to None.
         """
-        if renderable is not None:
-            self.screen.renderable = renderable
+        if renderables:
+            self.screen.renderable = (
+                RenderGroup(*renderables) if len(renderables) > 1 else renderables[0]
+            )
         if style is not None:
             self.screen.style = style
         self.console.print(self.screen, end="")
@@ -532,6 +532,16 @@ class Console:
         if self.is_jupyter:
             width = width or 93
             height = height or 100
+
+        if width is None:
+            columns = self._environ.get("COLUMNS")
+            if columns is not None and columns.isdigit():
+                width = int(columns)
+        if height is None:
+            lines = self._environ.get("LINES")
+            if lines is not None and lines.isdigit():
+                height = int(lines)
+
         self.soft_wrap = soft_wrap
         self._width = width
         self._height = height
@@ -1050,6 +1060,7 @@ class Console:
         *,
         style: Optional[Style] = None,
         pad: bool = True,
+        new_lines: bool = False,
     ) -> List[List[Segment]]:
         """Render objects in to a list of lines.
 
@@ -1061,7 +1072,7 @@ class Console:
             options (Optional[ConsoleOptions], optional): Console options, or None to use self.options. Default to ``None``.
             style (Style, optional): Optional style to apply to renderables. Defaults to ``None``.
             pad (bool, optional): Pad lines shorter than render width. Defaults to ``True``.
-            range (Optional[Tuple[int, int]], optional): Range of lines to render, or ``None`` for all line. Defaults to ``None``
+            new_lines (bool, optional): Include "\n" characters at end of line.
 
         Returns:
             List[List[Segment]]: A list of lines, where a line is a list of Segment objects.
@@ -1072,7 +1083,10 @@ class Console:
             _rendered = Segment.apply_style(_rendered, style)
         lines = list(
             Segment.split_and_crop_lines(
-                _rendered, render_options.max_width, include_new_lines=False, pad=pad
+                _rendered,
+                render_options.max_width,
+                include_new_lines=new_lines,
+                pad=pad,
             )
         )
         if render_options.height is not None:
@@ -1368,7 +1382,7 @@ class Console:
             for hook in self._render_hooks:
                 renderables = hook.process_renderables(renderables)
             render_options = self.options.update(
-                justify="default",
+                justify=justify,
                 overflow=overflow,
                 width=min(width, self.width) if width else NO_CHANGE,
                 height=height,
@@ -1697,9 +1711,9 @@ class Console:
                     text = escape(text)
                     if style:
                         rule = style.get_html_style(_theme)
-                        text = f'<span style="{rule}">{text}</span>' if rule else text
                         if style.link:
                             text = f'<a href="{style.link}">{text}</a>'
+                        text = f'<span style="{rule}">{text}</span>' if rule else text
                     append(text)
             else:
                 styles: Dict[str, int] = {}
@@ -1709,11 +1723,11 @@ class Console:
                     text = escape(text)
                     if style:
                         rule = style.get_html_style(_theme)
-                        if rule:
-                            style_number = styles.setdefault(rule, len(styles) + 1)
-                            text = f'<span class="r{style_number}">{text}</span>'
+                        style_number = styles.setdefault(rule, len(styles) + 1)
                         if style.link:
-                            text = f'<a href="{style.link}">{text}</a>'
+                            text = f'<a class="r{style_number}" href="{style.link}">{text}</a>'
+                        else:
+                            text = f'<span class="r{style_number}">{text}</span>'
                     append(text)
                 stylesheet_rules: List[str] = []
                 stylesheet_append = stylesheet_rules.append
