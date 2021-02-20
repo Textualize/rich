@@ -599,9 +599,9 @@ if __name__ == "__main__":  # pragma: no cover
 
         zed = {
             "characters": {
-                "Paul Atriedies",
+                "Paul Atreides",
                 "Vladimir Harkonnen",
-                "Thufir Haway",
+                "Thufir Hawat",
                 "Duncan Idaho",
             },
             "atomic_types": (None, False, True),

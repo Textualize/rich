@@ -169,9 +169,9 @@ def iter_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
         "foo": [
             3.1427,
             (
-                "Paul Atriedies",
+                "Paul Atreides",
                 "Vladimir Harkonnen",
-                "Thufir Haway",
+                "Thufir Hawat",
             ),
         ],
         "atomic": (False, True, None),

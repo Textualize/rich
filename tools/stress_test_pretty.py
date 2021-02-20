@@ -7,9 +7,9 @@ DATA = {
     "bar": [None, (False, True)] * 2,
     "Dune": {
         "names": {
-            "Paul Atriedies",
+            "Paul Atreides",
             "Vladimir Harkonnen",
-            "Thufir Haway",
+            "Thufir Hawat",
             "Duncan Idaho",
         }
     },
