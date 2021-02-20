@@ -52,7 +52,7 @@ from rich.console import Console
 console = Console()
 ```
 
-Console 对象含有一个`print` 方法，它的界面与 python 内置的`print`功能界面相似。
+Console 对象含有一个`print`方法，它的界面与 python 内置的`print`功能界面相似。
 
 您可以试试：
 
@@ -170,7 +170,7 @@ console.print(table)
 
 ![表格](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
 
-请注意，控制台标记的呈现方式与`print（）`和`log（）`相同。实际上，由 Rich 渲染的任何内容都可以添加到标题/行（甚至其他表格）中。
+请注意，控制台标记的呈现方式与`print()`和`log()`相同。实际上，由 Rich 渲染的任何内容都可以添加到标题/行（甚至其他表格）中。
 
 `Table`类很聪明，可以调整列的大小以适合终端的可用宽度，并能根据需要环绕文本。下面是相同的示例，输出与比上表小的终端上：
 
@@ -222,7 +222,7 @@ print(Columns(directory))
 
 Rich 可以呈现[markdown](https://rich.readthedocs.io/en/latest/markdown.html)，并可相当不错的将其格式转移到终端。
 
-为了渲染 markdown，请导入`Markdown` 类，并使用包含 markdown 代码的字符串来构造它，然后将其打印到控制台。例子如下：
+为了渲染 markdown，请导入`Markdown`类，并使用包含 markdown 代码的字符串来构造它，然后将其打印到控制台。例子如下：
 
 ```python
 from rich.console import Console
@@ -278,30 +278,30 @@ Rich 可以渲染漂亮的回溯，比标准 Python 回溯更容易阅读，并�
 
 ![回溯](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
 
-## 使用Rich的项目
+## 使用 Rich 的项目
 
-这里是一些使用Rich的项目:
+这里是一些使用 Rich 的项目:
 
 - [BrancoLab/BrainRender](https://github.com/BrancoLab/BrainRender)
-  一个用于三维神经解剖数据可视化的python包
+  一个用于三维神经解剖数据可视化的 python 包
 - [Ciphey/Ciphey](https://github.com/Ciphey/Ciphey)
   自动解密工具
 - [emeryberger/scalene](https://github.com/emeryberger/scalene)
-  一个高性能、高精度的Python CPU和内存剖析器
+  一个高性能、高精度的 Python CPU 和内存剖析器
 - [hedythedev/StarCli](https://github.com/hedythedev/starcli)
-  通过命令行浏览GitHub热门项目
+  通过命令行浏览 GitHub 热门项目
 - [intel/cve-bin-tool](https://github.com/intel/cve-bin-tool)
   这个工具可以扫描一些常见的、有漏洞的组件（openssl、libpng、libxml2、expat和其他一些组件），让你知道你的系统是否包含有已知漏洞的常用库。
 - [nf-core/tools](https://github.com/nf)
-  包含nf-core社区帮助工具的Python包
+  包含 nf-core 社区帮助工具的 Python 包
 - [cansarigol/pdbr](https://github.com/cansarigol/pdbr)
   pdb + rich 的库，增强调试功能
 - [plant99/felicette](https://github.com/plant99/felicette)
   傻瓜式卫星图像
 - [seleniumbase/SeleniumBase](https://github.com/seleniumbase/SeleniumBase)
-  使用Selenium和pytest使自动化和测试速度提高10倍，包括电池
+  使用 Selenium 和 pytest 使自动化和测试速度提高10倍，包括电池
 - [smacke/ffsubsync](https://github.com/smacke/ffsubsync)
   自动将字幕与视频同步
 - [tryolabs/norfair](https://github.com/tryolabs/norfair)
-  轻量级Python库，用于向任何检测器添加实时2D对象跟踪
+  轻量级 Python 库，用于向任何检测器添加实时 2D 对象跟踪
 - +[还有很多](https://github.com/willmcgugan/rich/network/dependents)!
