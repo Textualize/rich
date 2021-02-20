@@ -60,15 +60,6 @@ Rich can be installed in the Python REPL, so that any data structures will be pr
 
 ![REPL](https://github.com/willmcgugan/rich/raw/master/imgs/repl.png)
 
-## Rich Inspect
-
-Rich has an [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) function which can produce a report on any Python object, such as class, instance, or builtin.
-
-```python
->>> from rich import inspect
->>> inspect(str, methods=True)
-```
-
 ## Using the Console
 
 For more control over rich terminal content, import and construct a [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console) object.
@@ -105,7 +96,16 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![Console Markup](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
 
-## Rich library
+## Rich Inspect
+
+Rich has an [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) function which can produce a report on any Python object, such as class, instance, or builtin.
+
+```python
+>>> from rich import inspect
+>>> inspect(str, methods=True)
+```
+
+# Rich library
 
 Rich contains a number of builtin _renderables_ you can use to create elegant output in your CLI and even help you debug your code.
 
@@ -145,7 +145,9 @@ Note the `log_locals` argument, which outputs a table containing the local varia
 
 The log method could be used for logging to the terminal for long running applications such as servers, but is also a very nice debugging aid.
 
-### Logging Handler
+</details>
+<details>
+<summary>Logging Handler</summary>
 
 You can also use the builtin [Handler class](https://rich.readthedocs.io/en/latest/logging.html) to format and colorize output from Python's logging module. Here's an example of the output:
 
@@ -391,7 +393,7 @@ Here's what it looks like on OSX (similar on Linux):
 
 </details>
 
-## Project using Rich
+# Project using Rich
 
 Here are a few projects using Rich:
 
