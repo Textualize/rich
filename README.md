@@ -19,7 +19,7 @@ See what [people are saying about Rich](https://www.willmcgugan.com/blog/pages/p
 
 ## Compatibility
 
-Rich works with Linux, OSX, and Windows. True color / emoji works with new Windows Terminal, classic terminal is limited to 8 colors. Rich requires Python 3.6.1 or later.
+Rich works with Linux, OSX, and Windows. True color / emoji works with new Windows Terminal, classic terminal is limited to 16 colors. Rich requires Python 3.6.1 or later.
 
 Rich works with [Jupyter notebooks](https://jupyter.org/) with no additional configuration required.
 
@@ -105,7 +105,12 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![Console Markup](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
 
-### Console logging
+## Rich library
+
+Rich contains a number of builtin _renderables_ you can use to create elegant output in your CLI and even help you debug your code.
+
+<details>
+<summary>Logging</summary>
 
 The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default Rich will do syntax highlighting for Python structures and for repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
 
@@ -146,7 +151,10 @@ You can also use the builtin [Handler class](https://rich.readthedocs.io/en/late
 
 ![Logging](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
 
-## Emoji
+</details>
+
+<details>
+<summary>Emoji</summary>
 
 To insert an emoji in to console output place the name between two colons. Here's an example:
 
@@ -157,7 +165,10 @@ To insert an emoji in to console output place the name between two colons. Here'
 
 Please use this feature wisely.
 
-## Tables
+</details>
+
+<details>
+<summary>Tables</summary>
 
 Rich can render flexible [tables](https://rich.readthedocs.io/en/latest/tables.html) with unicode box characters. There is a large variety of formatting options for borders, styles, cell alignment etc.
 
@@ -207,7 +218,10 @@ The `Table` class is smart enough to resize columns to fit the available width o
 
 ![table2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
 
-## Progress Bars
+</details>
+
+<details>
+<summary>Progress Bars</summary>
 
 Rich can render multiple flicker-free [progress](https://rich.readthedocs.io/en/latest/progress.html) bars to track long-running tasks.
 
@@ -230,7 +244,10 @@ The columns may be configured to show any details you want. Built-in columns inc
 
 To try this out yourself, see [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) which can download multiple URLs simultaneously while displaying progress.
 
-## Status
+</details>
+
+<details>
+<summary>Status</summary>
 
 For situations where it is hard to calculate progress, you can use the [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) method which will display a 'spinner' animation and message. The animation won't prevent you from using the console as normal. Here's an example:
 
@@ -262,7 +279,10 @@ The above command generate the following output in the terminal:
 
 ![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
 
-## Tree
+</details>
+
+<details>
+<summary>Tree</summary>
 
 Rich can render a [tree](https://rich.readthedocs.io/en/latest/tree.html) with guide lines. A tree is ideal for displaying a file structure, or any other hierarchical data.
 
@@ -278,7 +298,10 @@ This generates the following output:
 
 See the [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) example for a script that displays a tree view of any directory, similar to the linux `tree` command.
 
-## Columns
+</details>
+
+<details>
+<summary>Columns</summary>
 
 Rich can render content in neat [columns](https://rich.readthedocs.io/en/latest/columns.html) with equal or optimal width. Here's a very basic clone of the (MacOS / Linux) `ls` command which displays a directory listing in columns:
 
@@ -297,7 +320,10 @@ The following screenshot is the output from the [columns example](https://github
 
 ![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
 
-## Markdown
+</details>
+
+<details>
+<summary>Markdown</summary>
 
 Rich can render [markdown](https://rich.readthedocs.io/en/latest/markdown.html) and does a reasonable job of translating the formatting to the terminal.
 
@@ -317,7 +343,10 @@ This will produce output something like the following:
 
 ![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
 
-## Syntax Highlighting
+</details>
+
+<details>
+<summary>Syntax Highlighting</summary>
 
 Rich uses the [pygments](https://pygments.org/) library to implement [syntax highlighting](https://rich.readthedocs.io/en/latest/syntax.html). Usage is similar to rendering markdown; construct a `Syntax` object and print it to the console. Here's an example:
 
@@ -349,13 +378,18 @@ This will produce the following output:
 
 ![syntax](https://github.com/willmcgugan/rich/raw/master/imgs/syntax.png)
 
-## Tracebacks
+</details>
+
+<details>
+<summary>Tracebacks</summary>
 
 Rich can render [beautiful tracebacks](https://rich.readthedocs.io/en/latest/traceback.html) which are easier to read and show more code than standard Python tracebacks. You can set Rich as the default traceback handler so all uncaught exceptions will be rendered by Rich.
 
 Here's what it looks like on OSX (similar on Linux):
 
 ![traceback](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
+
+</details>
 
 ## Project using Rich
 
