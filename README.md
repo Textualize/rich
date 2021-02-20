@@ -37,7 +37,7 @@ Run the following to test Rich output on your terminal:
 python -m rich
 ```
 
-## Rich print function
+## Rich Print
 
 To effortlessly add rich output to your application, you can import the [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) method, which has the same signature as the builtin Python function. Try this:
 
@@ -101,13 +101,20 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 Rich has an [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) function which can produce a report on any Python object, such as class, instance, or builtin.
 
 ```python
+>>> my_list = ["foo", "bar"]
 >>> from rich import inspect
->>> inspect(str, methods=True)
+>>> inspect(my_list, methods=True)
 ```
 
-# Rich library
+![Log](https://github.com/willmcgugan/rich/raw/master/imgs/inspect.png)
 
-Rich contains a number of builtin _renderables_ you can use to create elegant output in your CLI and even help you debug your code.
+See the [inspect docs](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) for details.
+
+# Rich Library
+
+Rich contains a number of builtin _renderables_ you can use to create elegant output in your CLI and help you debug your code.
+
+Click the following headings for details:
 
 <details>
 <summary>Logging</summary>
