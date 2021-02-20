@@ -117,7 +117,7 @@ Rich contains a number of builtin _renderables_ you can use to create elegant ou
 Click the following headings for details:
 
 <details>
-<summary>Logging</summary>
+<summary>Log</summary>
 
 The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default Rich will do syntax highlighting for Python structures and for repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
 
