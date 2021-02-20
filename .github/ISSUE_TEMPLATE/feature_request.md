@@ -18,3 +18,7 @@ Give as much detail as you can. Example code of how you would like it to work wo
 **What problem does it solved for you?**
 
 What problem do you have that this feature would solve? I may be able to suggest an existing way of solving it.
+
+**Did I help**
+
+If I was able to resolve your problem, consider [sponsoring](https://github.com/sponsors/willmcgugan) my work on Rich, or [buy me a coffee](https://ko-fi.com/willmcgugan) to say thanks.
