@@ -29,6 +29,12 @@ Instale con `pip` o su administrador de paquetes PyPi favorito.
 pip install rich
 ```
 
+Ejecute lo siguiente para probar la salida de Rich sobre su terminal:
+
+```
+python -m rich
+```
+
 ## Función print de Rich
 
 Para agregar sin esfuerzo resultados enriquecidos a su aplicación, puede importar el método [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start), que tiene la misma firma que el método incorporado de Python. Prueba esto:
@@ -88,7 +94,30 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![Console Markup](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
 
-### Registro de consola
+Usted puede usar el objeto Console para generar salida sofisticada con mínimo esfuerzo. Ver la [API Console](https://rich.readthedocs.io/en/latest/console.html) docs para detalles.
+
+## Rich Inspector
+
+Rich tiene ua función [inspeccionar](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) cual puede producir un reporte sobre cualquier objeto Python, como clases, instancia o builtin.
+
+```python
+>>> my_list = ["foo", "bar"]
+>>> from rich import inspect
+>>> inspect(my_list, methods=True)
+```
+
+![Log](https://github.com/willmcgugan/rich/raw/master/imgs/inspect.png)
+
+Ver la [docs inspector](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) para detalles.
+
+# Paquete Rich
+
+Rich contiene un número de builtin _renderables_ que puedes usar para crear salida elegante en su CLI y ayudarle a depurar su código.
+
+Haga clic en los siguientes títulos para obtener más detalles:
+
+<details>
+<summary>Registro de consola</summary>
 
 El objeto Console tiene un método `log()` que tiene una interfaz similar a `print()`, pero también muestra una columna para la hora actual y el archivo y la línea que realizó la llamada. De forma predeterminada, Rich resaltará la sintaxis de las estructuras de Python y de las cadenas de reproducción. Si registra una colección (es decir, un diccionario o una lista), Rich la imprimirá de forma bonita para que quepa en el espacio disponible. A continuación, se muestra un ejemplo de algunas de estas funciones.
 
@@ -123,13 +152,17 @@ Tenga en cuenta el argumento `log_locals`, que genera una tabla que contiene las
 
 El método de registro podría usarse para iniciar sesión en el terminal para aplicaciones de larga ejecución, como servidores, pero también es una ayuda de depuración muy buena.
 
-### Controlador de registro
+</details>
+<details>
+<summary>Controlador de registro</summary>
 
 También puede usar la [Handler class](https://rich.readthedocs.io/en/latest/logging.html) incorporada  para formatear y colorear la salida del módulo de registro de Python. Aquí hay un ejemplo de la salida:
 
 ![Registro](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
+</details>
 
-## Emoji
+<details>
+<summary>Emoji</summary>
 
 Para insertar un emoji en la salida de la consola, coloque el nombre entre dos puntos. He aquí un ejemplo:
 
@@ -139,8 +172,10 @@ Para insertar un emoji en la salida de la consola, coloque el nombre entre dos p
 ```
 
 Utilice esta función con prudencia.
+</details>
 
-## Tablas
+<details>
+<summary>Tablas</summary>
 
 Rich puede renderizar [tablas](https://rich.readthedocs.io/en/latest/tables.html) flexibles con caracteres de cuadro Unicode. Existe una gran variedad de opciones de formato para bordes, estilos, alineación de celdas, etc.
 
@@ -190,7 +225,10 @@ La clase `Table` es lo suficientemente inteligente como para cambiar el tamaño 
 
 ![table2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
 
-## Barras de progreso
+</details>
+
+<details>
+<summary>Barras de progreso</summary>
 
 Rich puede representar varias barras de [progreso](https://rich.readthedocs.io/en/latest/progress.html) sin parpadeos para realizar un seguimiento de las tareas de larga duración.
 
@@ -213,7 +251,10 @@ Las columnas pueden configurarse para mostrar los detalles que desee. Las column
 
 Para probar esto usted mismo, consulte [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) que puede descargar varias URL simultáneamente mientras muestra el progreso.
 
-## Estado
+</details>
+
+<details>
+<summary>Estado</summary>
 
 Para situaciones en las que es difícil calcular el progreso, puede utilizar el método [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) que mostrará una animación y un mensaje de "spinner". La animación no le impedirá usar la consola con normalidad. He aquí un ejemplo:
 
@@ -245,7 +286,29 @@ El comando anterior genera la siguiente salida en la terminal:
 
 ![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
 
-## Columnas
+</details>
+
+<details>
+<summary>Árbol</summary>
+
+Rich genera un [tree](https://rich.readthedocs.io/en/latest/tree.html) con líneas de guía. Un árbol es ideal para mostrar una estructura de archivos, o cualquier otro dato jerárquico.
+
+Las etiquetas del árbol pueden ser texto simple o cualquier otra cosa que Rich pueda mostar. Ejecuta lo siguiente para una demostración:
+
+```
+python -m rich.tree
+```
+
+Esto genera la siguiente salida:
+
+![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
+
+Ver el ejemplo [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) para un script que muestra una vista de  árbol de cualquier directorio, similar a el comando de linux `tree`.
+
+</details>
+
+<details>
+<summary>Columnas</summary>
 
 Rich puede representar contenido en [columnas](https://rich.readthedocs.io/en/latest/columns.html) ordenadas con un ancho igual u óptimo. Aquí hay un clon muy básico del comando (MacOS / Linux) `ls` que muestra una lista de directorios en columnas:
 
@@ -264,7 +327,10 @@ La siguiente captura de pantalla es el resultado del [ejemplo de columnas](https
 
 ![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
 
-## Markdown
+</details>
+
+<details>
+<summary>Markdown</summary>
 
 Rich puede renderizar [markdown](https://rich.readthedocs.io/en/latest/markdown.html) y hace un trabajo razonable al traducir el formato al terminal.
 
@@ -284,7 +350,10 @@ Esto producirá una salida similar a la siguiente:
 
 ![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
 
-## Resaltado de sintaxis
+</details>
+
+<details>
+<summary>Resaltado de sintaxis</summary>
 
 Rich usa el paquete [pygments](https://pygments.org/) para implementar [resaltado de sintaxis](https://rich.readthedocs.io/en/latest/syntax.html). El uso es similar a renderizar markdown; construya un objeto `Syntax` e imprímalo en la consola. He aquí un ejemplo:
 
@@ -316,13 +385,18 @@ Esto producirá el siguiente resultado:
 
 ![syntax](https://github.com/willmcgugan/rich/raw/master/imgs/syntax.png)
 
-## Tracebacks
+</details>
+
+<details>
+<summary>Tracebacks</summary>
 
 Rich puede representar [tracebacks hermosos](https://rich.readthedocs.io/en/latest/traceback.html) que son más fáciles de leer y muestran más código que los tracebacks estándar de Python. Puede configurar Rich como el controlador tracebacks predeterminado para que todas las excepciones sin capturar sean procesadas por Rich.
 
 Así es como se ve en OSX (similar en Linux):
 
 ![traceback](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
+
+</details>
 
 ## Proyecto usando Rich
 
