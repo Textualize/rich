@@ -39,7 +39,7 @@ jupyter = ["ipywidgets"]
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
 black = "^20.8b1"
-mypy = "^0.800"
+mypy = "^0.812"
 pytest-cov = "^2.11.1"
 
 [build-system]
