@@ -402,6 +402,14 @@ Here's what it looks like on OSX (similar on Linux):
 
 </details>
 
+All Rich renderables make use of the [Console Protocol](https://rich.readthedocs.io/en/latest/protocol.html), which you can also use to implement your own Rich content.
+
+# Rich for enterprise
+
+Available as part of the Tidelift Subscription.
+
+The maintainers of Rich and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source packages you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact packages you use. [Learn more.](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
+
 # Project using Rich
 
 Here are a few projects using Rich:
