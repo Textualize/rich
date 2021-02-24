@@ -530,10 +530,11 @@ class Syntax(JupyterMixin):
             if self.word_wrap:
                 wrapped_lines = console.render_lines(
                     line,
-                    render_options,
+                    render_options.update(height=None),
                     style=background_style,
                     pad=not transparent_background,
                 )
+
             else:
                 segments = list(line.render(console, end=""))
                 if options.no_wrap:

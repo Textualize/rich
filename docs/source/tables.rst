@@ -52,7 +52,18 @@ See :ref:`appendix_box` for other box styles.
 The :class:`~rich.table.Table` class offers a number of configuration options to set the look and feel of the table, including how borders are rendered and the style and alignment of the columns.
 
 
-Adding columns
+Empty Tables
+~~~~~~~~~~~~
+
+Printing a table with no columns results in a blank line. If you are building a table dynamically and the data source has no columns, you might want to print something different. Here's how you might do that::
+
+    if table.columns:
+        print(table)
+    else:
+        print("[i]No data...[/i]")
+
+
+Adding Columns
 ~~~~~~~~~~~~~~
 
 You may also add columns by specifying them in the positional arguments of the :class:`~rich.table.Table` constructor. For example, we could construct a table with three columns like this::

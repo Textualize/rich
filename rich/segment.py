@@ -275,6 +275,7 @@ class Segment(NamedTuple):
         width: int,
         height: int = None,
         style: Style = None,
+        new_lines: bool = False,
     ) -> List[List["Segment"]]:
         """Set the shape of a list of lines (enclosing rectangle).
 
@@ -283,15 +284,21 @@ class Segment(NamedTuple):
             width (int): Desired width.
             height (int, optional): Desired height or None for no change.
             style (Style, optional): Style of any padding added. Defaults to None.
+            new_lines (bool, optional): Padded lines should include "\n". Defaults to False.
 
         Returns:
             List[List[Segment]]: New list of lines that fits width x height.
         """
         if height is None:
             height = len(lines)
-        new_lines: List[List[Segment]] = []
-        pad_line = [Segment(" " * width, style)]
-        append = new_lines.append
+        shaped_lines: List[List[Segment]] = []
+        pad_line = (
+            [Segment(" " * width, style), Segment("\n")]
+            if new_lines
+            else [Segment(" " * width, style)]
+        )
+
+        append = shaped_lines.append
         adjust_line_length = cls.adjust_line_length
         line: Optional[List[Segment]]
         iter_lines = iter(lines)
@@ -301,7 +308,7 @@ class Segment(NamedTuple):
                 append(pad_line)
             else:
                 append(adjust_line_length(line, width, style=style))
-        return new_lines
+        return shaped_lines
 
     @classmethod
     def simplify(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:

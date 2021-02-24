@@ -130,14 +130,14 @@ class Live(JupyterMixin, RenderHook):
                     self._refresh_thread.stop()
                 # allow it to fully render on the last even if overflow
                 self.vertical_overflow = "visible"
-                if not self._alt_screen:
-                    if not self.console.is_jupyter:
-                        self.refresh()
-                    if self.console.is_terminal:
-                        self.console.line()
+                if not self._alt_screen and not self.console.is_jupyter:
+                    self.refresh()
+
             finally:
                 self._disable_redirect_io()
                 self.console.pop_render_hook()
+                if not self._alt_screen and self.console.is_terminal:
+                    self.console.line()
                 self.console.show_cursor(True)
                 if self._alt_screen:
                     self.console.set_alt_screen(False)
