@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.12.0] - 2021-02-24
+
+### Fixed
+
+- Fixed issue with Syntax and missing lines in Layout https://github.com/willmcgugan/rich/issues/1050
+- Fixed issue with nested markdown elements https://github.com/willmcgugan/rich/issues/1036
+- Fixed new lines not invoking render hooks https://github.com/willmcgugan/rich/issues/1052
+
+### Changed
+
+- Printing a table with no columns now result in a blank line https://github.com/willmcgugan/rich/issues/1044
+
 ## [9.11.1] - 2021-02-20
 
 ### Fixed

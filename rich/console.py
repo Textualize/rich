@@ -23,7 +23,6 @@ from typing import (
     NamedTuple,
     Optional,
     TextIO,
-    Tuple,
     Union,
     cast,
 )
@@ -32,7 +31,7 @@ from typing_extensions import Literal, Protocol, runtime_checkable
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
-from ._log_render import LogRender, FormatTimeCallable
+from ._log_render import FormatTimeCallable, LogRender
 from .align import Align, AlignMethod
 from .color import ColorSystem
 from .control import Control
@@ -148,7 +147,7 @@ class ConsoleOptions:
         """Update values, return a copy."""
         options = replace(self)
         if not isinstance(width, NoChange):
-            options.min_width = options.max_width = width
+            options.min_width = options.max_width = max(0, width)
         if not isinstance(min_width, NoChange):
             options.min_width = min_width
         if not isinstance(max_width, NoChange):
@@ -162,7 +161,7 @@ class ConsoleOptions:
         if not isinstance(highlight, NoChange):
             options.highlight = highlight
         if not isinstance(height, NoChange):
-            options.height = height
+            options.height = None if height is None else max(0, height)
         return options
 
     def update_width(self, width: int) -> "ConsoleOptions":
@@ -174,6 +173,7 @@ class ConsoleOptions:
         Returns:
             ~ConsoleOptions: New console options instance
         """
+        width = max(0, width)
         options = replace(self, min_width=width, max_width=width)
         return options
 
@@ -208,6 +208,18 @@ _null_highlighter = NullHighlighter()
 
 class CaptureError(Exception):
     """An error in the Capture context manager."""
+
+
+class NewLine:
+    """A renderable to generate new line(s)"""
+
+    def __init__(self, count: int = 1) -> None:
+        self.count = count
+
+    def __rich_console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> Iterable[Segment]:
+        yield Segment("\n" * self.count)
 
 
 class Capture:
@@ -913,9 +925,7 @@ class Console:
         """
 
         assert count >= 0, "count must be >= 0"
-        if count:
-            self._buffer.append(Segment("\n" * count))
-            self._check_buffer()
+        self.print(NewLine(count))
 
     def clear(self, home: bool = True) -> None:
         """Clear the screen.
@@ -1072,7 +1082,7 @@ class Console:
             options (Optional[ConsoleOptions], optional): Console options, or None to use self.options. Default to ``None``.
             style (Style, optional): Optional style to apply to renderables. Defaults to ``None``.
             pad (bool, optional): Pad lines shorter than render width. Defaults to ``True``.
-            new_lines (bool, optional): Include "\n" characters at end of line.
+            new_lines (bool, optional): Include "\n" characters at end of lines.
 
         Returns:
             List[List[Segment]]: A list of lines, where a line is a list of Segment objects.
@@ -1082,17 +1092,27 @@ class Console:
         if style is not None:
             _rendered = Segment.apply_style(_rendered, style)
         lines = list(
-            Segment.split_and_crop_lines(
-                _rendered,
-                render_options.max_width,
-                include_new_lines=new_lines,
-                pad=pad,
+            islice(
+                Segment.split_and_crop_lines(
+                    _rendered,
+                    render_options.max_width,
+                    include_new_lines=new_lines,
+                    pad=pad,
+                ),
+                None,
+                render_options.height,
             )
         )
         if render_options.height is not None:
-            lines = Segment.set_shape(
-                lines, render_options.max_width, render_options.height, style=style
-            )
+            extra_lines = render_options.height - len(lines)
+            if extra_lines > 0:
+                pad_line = [
+                    [Segment(" " * render_options.max_width, style), Segment("\n")]
+                    if new_lines
+                    else [Segment(" " * render_options.max_width, style)]
+                ]
+                lines.extend(pad_line * extra_lines)
+
         return lines
 
     def render_str(
@@ -1357,8 +1377,7 @@ class Console:
                 Console default. Defaults to ``None``.
         """
         if not objects:
-            self.line()
-            return
+            objects = (NewLine(),)
 
         if soft_wrap is None:
             soft_wrap = self.soft_wrap
@@ -1470,8 +1489,8 @@ class Console:
             _stack_offset (int, optional): Offset of caller from end of call stack. Defaults to 1.
         """
         if not objects:
-            self.line()
-            return
+            objects = (NewLine(),)
+
         with self:
             renderables = self._collect_renderables(
                 objects,

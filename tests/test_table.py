@@ -141,6 +141,15 @@ def test_min_width():
     assert all(len(line) == 30 for line in output.splitlines())
 
 
+def test_no_columns():
+    console = Console(color_system=None)
+    console.begin_capture()
+    console.print(Table())
+    output = console.end_capture()
+    print(repr(output))
+    assert output == "\n"
+
+
 if __name__ == "__main__":
     render = render_tables()
     print(render)

@@ -49,7 +49,7 @@ class Clock:
 
 layout["header"].update(Clock())
 
-with Live(layout, screen=True) as live:
+with Live(layout, screen=True, redirect_stderr=False) as live:
     try:
         while True:
             sleep(1)

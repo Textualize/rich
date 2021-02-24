@@ -410,6 +410,10 @@ class Table(JupyterMixin):
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
 
+        if not self.columns:
+            yield Segment("\n")
+            return
+
         max_width = options.max_width
         if self.width is not None:
             max_width = self.width
