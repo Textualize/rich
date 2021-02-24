@@ -12,10 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed issue with Syntax and missing lines in Layout https://github.com/willmcgugan/rich/issues/1050
 - Fixed issue with nested markdown elements https://github.com/willmcgugan/rich/issues/1036
 - Fixed new lines not invoking render hooks https://github.com/willmcgugan/rich/issues/1052
+- Fixed Align setting height to child https://github.com/willmcgugan/rich/issues/1057
 
 ### Changed
 
 - Printing a table with no columns now result in a blank line https://github.com/willmcgugan/rich/issues/1044
+
+### Added
+
+- Added height to Panel
 
 ## [9.11.1] - 2021-02-20
 
