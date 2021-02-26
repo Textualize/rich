@@ -329,8 +329,30 @@ class Confirm(PromptBase[bool]):
     """
 
     response_type = bool
-    validate_error_message = "[prompt.invalid]Please enter Y or N"
     choices = ["y", "n"]
+
+    def __init__(
+        self,
+        prompt: TextType = "",
+        *,
+        console: Console = None,
+        password: bool = False,
+        choices: List[str] = None,
+        show_default: bool = True,
+        show_choices: bool = True,
+    ):
+        super().__init__(
+            prompt=prompt,
+            console=console,
+            password=password,
+            choices=choices,
+            show_default=show_default,
+            show_choices=show_choices,
+        )
+
+        self.validate_error_message = "[prompt.invalid]Please enter " + " or ".join(
+            [c.upper() for c in self.choices]
+        )
 
     def render_default(self, default: DefaultType) -> Text:
         """Render the default as (y) or (n) rather than True/False."""
