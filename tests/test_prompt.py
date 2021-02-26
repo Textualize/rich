@@ -93,3 +93,20 @@ def test_prompt_confirm_default():
     output = console.file.getvalue()
     print(repr(output))
     assert output == expected
+
+
+def test_prompt_confirm_default_with_choices():
+    INPUT = "foo\nn\nNO"
+    console = Console(file=io.StringIO())
+    answer = Confirm.ask(
+        "continue",
+        console=console,
+        stream=io.StringIO(INPUT),
+        default=True,
+        choices=["yes", "no"],
+    )
+    assert answer is False
+    expected = "continue [yes/no] (yes): Please enter YES or NO\ncontinue [yes/no] (yes): Please enter YES or NO\ncontinue [yes/no] (yes): "
+    output = console.file.getvalue()
+    print(repr(output))
+    assert output == expected
