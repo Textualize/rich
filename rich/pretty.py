@@ -2,7 +2,7 @@ import builtins
 import os
 import sys
 from array import array
-from collections import Counter, abc, defaultdict, deque
+from collections import Counter, defaultdict, deque
 from dataclasses import dataclass
 from itertools import islice
 from typing import (

@@ -471,7 +471,7 @@ class Color(NamedTuple):
     def downgrade(self, system: ColorSystem) -> "Color":
         """Downgrade a color system to a system with fewer colors."""
 
-        if self.type == ColorType.DEFAULT or self.type == system:
+        if self.type in (ColorType.DEFAULT, system):
             return self
         # Convert to 8-bit color from truecolor color
         if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:

@@ -3,7 +3,7 @@ from typing import Dict, NamedTuple, Optional
 from .cells import cell_len, set_cell_size
 from .style import Style
 
-from itertools import filterfalse, zip_longest
+from itertools import filterfalse
 from operator import attrgetter
 from typing import Iterable, List, Tuple
 
