@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.12.1] - 2021-02-27
+
+### Fixed
+
+- Fixed deadlock in Progress https://github.com/willmcgugan/rich/issues/1061
+
+### Added
+
+- Added Task.finished_speed
+
+### Changed
+
+- Froze TransferSpeedColumn speed when task is finished
+- Added SIGINT handler to downloader.py example
+- Optimization for large tables
+
 ## [9.12.0] - 2021-02-24
 
 ### Fixed

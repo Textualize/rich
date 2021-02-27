@@ -412,7 +412,7 @@ class TransferSpeedColumn(ProgressColumn):
 
     def render(self, task: "Task") -> Text:
         """Show data transfer speed."""
-        speed = task.speed
+        speed = task.finished_speed or task.speed
         if speed is None:
             return Text("?", style="progress.data.speed")
         data_speed = filesize.decimal(int(speed))
@@ -465,6 +465,9 @@ class Task:
 
     stop_time: Optional[float] = field(default=None, init=False, repr=False)
     """Optional[float]: Time this task was stopped, or None if not stopped."""
+
+    finished_speed: Optional[float] = None
+    """Optional[float]: The last speed for a finshed task."""
 
     _progress: Deque[ProgressSample] = field(
         default_factory=deque, init=False, repr=False
@@ -543,6 +546,7 @@ class Task:
         """Reset progress."""
         self._progress.clear()
         self.finished_time = None
+        self.finished_speed = None
 
 
 class Progress(JupyterMixin):
@@ -763,9 +767,6 @@ class Progress(JupyterMixin):
             task.fields.update(fields)
             update_completed = task.completed - completed_start
 
-            if refresh:
-                self.refresh()
-
             current_time = self.get_time()
             old_sample_time = current_time - self.speed_estimate_period
             _progress = task._progress
@@ -779,6 +780,9 @@ class Progress(JupyterMixin):
                 _progress.append(ProgressSample(current_time, update_completed))
             if task.completed >= task.total and task.finished_time is None:
                 task.finished_time = task.elapsed
+
+        if refresh:
+            self.refresh()
 
     def reset(
         self,
@@ -815,7 +819,7 @@ class Progress(JupyterMixin):
             if description is not None:
                 task.description = description
             task.finished_time = None
-            self.refresh()
+        self.refresh()
 
     def advance(self, task_id: TaskID, advance: float = 1) -> None:
         """Advance task by a number of steps.
@@ -841,6 +845,7 @@ class Progress(JupyterMixin):
             _progress.append(ProgressSample(current_time, update_completed))
             if task.completed >= task.total and task.finished_time is None:
                 task.finished_time = task.elapsed
+                task.finished_speed = task.speed
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
@@ -932,11 +937,10 @@ class Progress(JupyterMixin):
             self._tasks[self._task_index] = task
             if start:
                 self.start_task(self._task_index)
-            self.refresh()
-            try:
-                return self._task_index
-            finally:
-                self._task_index = TaskID(int(self._task_index) + 1)
+            new_task_index = self._task_index
+            self._task_index = TaskID(int(self._task_index) + 1)
+        self.refresh()
+        return new_task_index
 
     def remove_task(self, task_id: TaskID) -> None:
         """Delete a task if it exists.

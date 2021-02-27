@@ -1,5 +1,14 @@
 from dataclasses import dataclass, field, replace
-from typing import TYPE_CHECKING, Iterable, List, NamedTuple, Optional, Tuple, Union
+from typing import (
+    Dict,
+    TYPE_CHECKING,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from . import box, errors
 from ._loop import loop_first_last, loop_last
@@ -567,11 +576,12 @@ class Table(JupyterMixin):
         first_column = column_index == 0
         last_column = column_index == len(self.columns) - 1
 
-        def add_padding(
-            renderable: "RenderableType", first_row: bool, last_row: bool
-        ) -> "RenderableType":
-            if not any_padding:
-                return renderable
+        _padding_cache: Dict[Tuple[bool, bool], Tuple[int, int, int, int]] = {}
+
+        def get_padding(first_row: bool, last_row: bool) -> Tuple[int, int, int, int]:
+            cached = _padding_cache.get((first_row, last_row))
+            if cached:
+                return cached
             top, right, bottom, left = padding
 
             if collapse_padding:
@@ -589,7 +599,8 @@ class Table(JupyterMixin):
                     top = 0
                 if last_row:
                     bottom = 0
-            _padding = Padding(renderable, (top, right, bottom, left))
+            _padding = (top, right, bottom, left)
+            _padding_cache[(first_row, last_row)] = _padding
             return _padding
 
         raw_cells: List[Tuple[StyleType, "RenderableType"]] = []
@@ -608,8 +619,14 @@ class Table(JupyterMixin):
                 column.footer_style
             )
             _append((footer_style, column.footer))
-        for first, last, (style, renderable) in loop_first_last(raw_cells):
-            yield _Cell(style, add_padding(renderable, first, last))
+
+        if any_padding:
+            _Padding = Padding
+            for first, last, (style, renderable) in loop_first_last(raw_cells):
+                yield _Cell(style, _Padding(renderable, get_padding(first, last)))
+        else:
+            for (style, renderable) in raw_cells:
+                yield _Cell(style, renderable)
 
     def _get_padding_width(self, column_index: int) -> int:
         """Get extra width from padding."""

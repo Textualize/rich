@@ -1036,10 +1036,10 @@ class Console:
             # No space to render anything. This prevents potential recursion errors.
             return
         render_iterable: RenderResult
-        if isinstance(renderable, RichCast):
-            renderable = renderable.__rich__()
-        if isinstance(renderable, ConsoleRenderable):
-            render_iterable = renderable.__rich_console__(self, _options)
+        if hasattr(renderable, "__rich__"):
+            renderable = renderable.__rich__()  # type: ignore
+        if hasattr(renderable, "__rich_console__"):
+            render_iterable = renderable.__rich_console__(self, _options)  # type: ignore
         elif isinstance(renderable, str):
             yield from self.render(
                 self.render_str(renderable, highlight=_options.highlight), _options
