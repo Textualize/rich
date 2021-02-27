@@ -133,6 +133,16 @@ class ConsoleOptions:
         """Check if renderables should use ascii only."""
         return not self.encoding.startswith("utf")
 
+    def copy(self) -> "ConsoleOptions":
+        """Return a copy of the options.
+
+        Returns:
+            ConsoleOptions: a copy of self.
+        """
+        options = ConsoleOptions.__new__(ConsoleOptions)
+        options.__dict__ = self.__dict__.copy()
+        return options
+
     def update(
         self,
         width: Union[int, NoChange] = NO_CHANGE,
@@ -145,7 +155,7 @@ class ConsoleOptions:
         height: Union[Optional[int], NoChange] = NO_CHANGE,
     ) -> "ConsoleOptions":
         """Update values, return a copy."""
-        options = replace(self)
+        options = self.copy()
         if not isinstance(width, NoChange):
             options.min_width = options.max_width = max(0, width)
         if not isinstance(min_width, NoChange):
@@ -173,8 +183,8 @@ class ConsoleOptions:
         Returns:
             ~ConsoleOptions: New console options instance
         """
-        width = max(0, width)
-        options = replace(self, min_width=width, max_width=width)
+        options = self.copy()
+        options.min_width = options.max_width = max(0, width)
         return options
 
 
