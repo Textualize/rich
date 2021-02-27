@@ -240,7 +240,6 @@ class Live(JupyterMixin, RenderHook):
         if self.console.is_interactive:
             # lock needs acquiring as user can modify live_render renderable at any time unlike in Progress.
             with self._lock:
-                # determine the control command needed to clear previous rendering
                 reset = (
                     Control.home()
                     if self._alt_screen
