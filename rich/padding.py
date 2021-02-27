@@ -99,16 +99,24 @@ class Padding(JupyterMixin):
         _Segment = Segment
 
         left = _Segment(" " * self.left, style) if self.left else None
-        right = _Segment(f'{" " * self.right}\n', style)
+        right = (
+            [_Segment(f'{" " * self.right}', style), _Segment.line()]
+            if self.right
+            else [_Segment.line()]
+        )
         blank_line: Optional[List[Segment]] = None
         if self.top:
             blank_line = [_Segment(f'{" " * width}\n', style)]
             yield from blank_line * self.top
-        for line in lines:
-            if left is not None:
+        if left:
+            for line in lines:
                 yield left
-            yield from line
-            yield right
+                yield from line
+                yield from right
+        else:
+            for line in lines:
+                yield from line
+                yield from right
         if self.bottom:
             blank_line = blank_line or [_Segment(f'{" " * width}\n', style)]
             yield from blank_line * self.bottom
