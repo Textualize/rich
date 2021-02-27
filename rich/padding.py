@@ -99,21 +99,18 @@ class Padding(JupyterMixin):
         _Segment = Segment
 
         left = _Segment(" " * self.left, style) if self.left else None
-        right = _Segment(" " * self.right, style) if self.right else None
-        new_line = _Segment.line()
+        right = _Segment(f'{" " * self.right}\n', style)
         blank_line: Optional[List[Segment]] = None
         if self.top:
-            blank_line = [_Segment(" " * width + "\n", style)]
+            blank_line = [_Segment(f'{" " * width}\n', style)]
             yield from blank_line * self.top
         for line in lines:
             if left is not None:
                 yield left
             yield from line
-            if right is not None:
-                yield right
-            yield new_line
+            yield right
         if self.bottom:
-            blank_line = blank_line or [_Segment(" " * width + "\n", style)]
+            blank_line = blank_line or [_Segment(f'{" " * width}\n', style)]
             yield from blank_line * self.bottom
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
