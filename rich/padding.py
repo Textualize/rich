@@ -90,12 +90,13 @@ class Padding(JupyterMixin):
                 + self.right,
                 options.max_width,
             )
-        child_options = options.update_width(width - self.left - self.right)
         lines = console.render_lines(
-            self.renderable, child_options, style=style, pad=False
+            self.renderable,
+            options.update_width(width - self.left - self.right),
+            style=style,
+            pad=True,
         )
         _Segment = Segment
-        lines = _Segment.set_shape(lines, child_options.max_width, style=style)
 
         left = _Segment(" " * self.left, style) if self.left else None
         right = _Segment(" " * self.right, style) if self.right else None
