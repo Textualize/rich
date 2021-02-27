@@ -98,7 +98,7 @@ class Measurement(NamedTuple):
             renderable = console.render_str(renderable)
 
         if hasattr(renderable, "__rich__"):
-            renderable = renderable.__rich__()
+            renderable = renderable.__rich__()  # type: ignore
 
         if is_renderable(renderable):
             get_console_width = getattr(renderable, "__rich_measure__", None)
