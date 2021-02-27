@@ -1,4 +1,4 @@
-from typing import cast, Tuple, TYPE_CHECKING, Union
+from typing import cast, List, Optional, Tuple, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from .console import (
@@ -94,15 +94,16 @@ class Padding(JupyterMixin):
         lines = console.render_lines(
             self.renderable, child_options, style=style, pad=False
         )
-        lines = Segment.set_shape(lines, child_options.max_width, style=style)
+        _Segment = Segment
+        lines = _Segment.set_shape(lines, child_options.max_width, style=style)
 
-        blank_line = Segment(" " * width + "\n", style)
-        top = [blank_line] * self.top
-        bottom = [blank_line] * self.bottom
-        left = Segment(" " * self.left, style) if self.left else None
-        right = Segment(" " * self.right, style) if self.right else None
-        new_line = Segment.line()
-        yield from top
+        left = _Segment(" " * self.left, style) if self.left else None
+        right = _Segment(" " * self.right, style) if self.right else None
+        new_line = _Segment.line()
+        blank_line: Optional[List[Segment]] = None
+        if self.top:
+            blank_line = [_Segment(" " * width + "\n", style)]
+            yield from blank_line * self.top
         for line in lines:
             if left is not None:
                 yield left
@@ -110,7 +111,9 @@ class Padding(JupyterMixin):
             if right is not None:
                 yield right
             yield new_line
-        yield from bottom
+        if self.bottom:
+            blank_line = blank_line or [_Segment(" " * width + "\n", style)]
+            yield from blank_line * self.bottom
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         extra_width = self.left + self.right
