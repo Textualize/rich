@@ -79,7 +79,6 @@ class Padding(JupyterMixin):
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-
         style = console.get_style(self.style)
         if self.expand:
             width = options.max_width
