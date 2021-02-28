@@ -1,4 +1,4 @@
-from typing import cast, Tuple, TYPE_CHECKING, Union
+from typing import cast, List, Optional, Tuple, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from .console import (
@@ -79,7 +79,6 @@ class Padding(JupyterMixin):
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-
         style = console.get_style(self.style)
         if self.expand:
             width = options.max_width
@@ -90,27 +89,36 @@ class Padding(JupyterMixin):
                 + self.right,
                 options.max_width,
             )
-        child_options = options.update_width(width - self.left - self.right)
         lines = console.render_lines(
-            self.renderable, child_options, style=style, pad=False
+            self.renderable,
+            options.update_width(width - self.left - self.right),
+            style=style,
+            pad=True,
         )
-        lines = Segment.set_shape(lines, child_options.max_width, style=style)
+        _Segment = Segment
 
-        blank_line = Segment(" " * width + "\n", style)
-        top = [blank_line] * self.top
-        bottom = [blank_line] * self.bottom
-        left = Segment(" " * self.left, style) if self.left else None
-        right = Segment(" " * self.right, style) if self.right else None
-        new_line = Segment.line()
-        yield from top
-        for line in lines:
-            if left is not None:
+        left = _Segment(" " * self.left, style) if self.left else None
+        right = (
+            [_Segment(f'{" " * self.right}', style), _Segment.line()]
+            if self.right
+            else [_Segment.line()]
+        )
+        blank_line: Optional[List[Segment]] = None
+        if self.top:
+            blank_line = [_Segment(f'{" " * width}\n', style)]
+            yield from blank_line * self.top
+        if left:
+            for line in lines:
                 yield left
-            yield from line
-            if right is not None:
-                yield right
-            yield new_line
-        yield from bottom
+                yield from line
+                yield from right
+        else:
+            for line in lines:
+                yield from line
+                yield from right
+        if self.bottom:
+            blank_line = blank_line or [_Segment(f'{" " * width}\n', style)]
+            yield from blank_line * self.bottom
 
     def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
         extra_width = self.left + self.right
