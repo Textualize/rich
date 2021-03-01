@@ -154,7 +154,9 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
     text_length = len(text)
     while style_stack:
         start, tag = style_stack.pop()
-        append_span(_Span(start, text_length, str(tag)))
+        style = str(tag)
+        if style:
+            append_span(_Span(start, text_length, style))
 
     text.spans = sorted(spans)
     return text

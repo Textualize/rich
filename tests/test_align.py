@@ -95,7 +95,11 @@ def test_align_fit():
 
 def test_align_right_style():
     console = Console(
-        file=io.StringIO(), width=10, color_system="truecolor", force_terminal=True
+        file=io.StringIO(),
+        width=10,
+        color_system="truecolor",
+        force_terminal=True,
+        _environ={},
     )
     console.print(Align("foo", "right", style="on blue"))
     assert console.file.getvalue() == "\x1b[44m       \x1b[0m\x1b[44mfoo\x1b[0m\n"

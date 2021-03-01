@@ -7,7 +7,7 @@ from rich.styled import Styled
 
 def test_styled():
     styled_foo = Styled("foo", "on red")
-    console = Console(file=io.StringIO(), force_terminal=True)
+    console = Console(file=io.StringIO(), force_terminal=True, _environ={})
     assert Measurement.get(console, styled_foo, 80) == Measurement(3, 3)
     console.print(styled_foo)
     result = console.file.getvalue()

@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.12.4] - 2021-03-01
+
+### Fixed
+
+- Fixed custom formatters with rich tracebacks in RichHandler https://github.com/willmcgugan/rich/issues/1079
+
+### Changed
+
+- Allow highly compressed table cells to go to 0 width
+- Optimization to remove empty styles in various places
+
 ## [9.12.3] - 2021-02-28
 
 ### Changed

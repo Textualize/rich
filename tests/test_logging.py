@@ -1,5 +1,4 @@
 import io
-import sys
 import os
 import logging
 import pytest
@@ -9,10 +8,15 @@ from rich.logging import RichHandler
 
 handler = RichHandler(
     console=Console(
-        file=io.StringIO(), force_terminal=True, width=80, color_system="truecolor"
+        file=io.StringIO(),
+        force_terminal=True,
+        width=80,
+        color_system="truecolor",
+        _environ={},
     ),
     enable_link_path=False,
 )
+
 logging.basicConfig(
     level="NOTSET", format="%(message)s", datefmt="[DATE]", handlers=[handler]
 )
@@ -28,13 +32,19 @@ skip_win = pytest.mark.skipif(
 @skip_win
 def test_exception():
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=140, color_system="truecolor"
+        file=io.StringIO(),
+        force_terminal=True,
+        width=140,
+        color_system=None,
+        _environ={},
     )
     handler_with_tracebacks = RichHandler(
         console=console, enable_link_path=False, rich_tracebacks=True
     )
+    formatter = logging.Formatter("FORMATTER %(message)s %(asctime)s")
+    handler_with_tracebacks.setFormatter(formatter)
     log.addHandler(handler_with_tracebacks)
-
+    log.error("foo")
     try:
         1 / 0
     except ZeroDivisionError:
@@ -43,6 +53,7 @@ def test_exception():
     render = handler_with_tracebacks.console.file.getvalue()
     print(render)
 
+    assert "FORMATTER foo" in render
     assert "ZeroDivisionError" in render
     assert "message" in render
     assert "division by zero" in render
@@ -50,7 +61,11 @@ def test_exception():
 
 def test_exception_with_extra_lines():
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=140, color_system="truecolor"
+        file=io.StringIO(),
+        force_terminal=True,
+        width=140,
+        color_system=None,
+        _environ={},
     )
     handler_extra_lines = RichHandler(
         console=console,

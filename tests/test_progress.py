@@ -141,6 +141,7 @@ def make_progress() -> Progress:
         color_system="truecolor",
         width=80,
         legacy_windows=False,
+        _environ={},
     )
     progress = Progress(console=console, get_time=fake_time, auto_refresh=False)
     task1 = progress.add_task("foo")
@@ -176,6 +177,7 @@ def test_expand_bar() -> None:
         width=10,
         color_system="truecolor",
         legacy_windows=False,
+        _environ={},
     )
     progress = Progress(
         BarColumn(bar_width=None),
@@ -208,6 +210,7 @@ def test_track() -> None:
         width=60,
         color_system="truecolor",
         legacy_windows=False,
+        _environ={},
     )
     test = ["foo", "bar", "baz"]
     expected_values = iter(test)
@@ -240,6 +243,7 @@ def test_progress_track() -> None:
         width=60,
         color_system="truecolor",
         legacy_windows=False,
+        _environ={},
     )
     progress = Progress(
         console=console, auto_refresh=False, get_time=MockClock(auto=True)
@@ -275,6 +279,7 @@ def test_columns() -> None:
         color_system="truecolor",
         legacy_windows=False,
         log_path=False,
+        _environ={},
     )
     progress = Progress(
         "test",
@@ -401,7 +406,11 @@ def test_progress_max_refresh() -> None:
             time = time + 1.0
 
     console = Console(
-        color_system=None, width=80, legacy_windows=False, force_terminal=True
+        color_system=None,
+        width=80,
+        legacy_windows=False,
+        force_terminal=True,
+        _environ={},
     )
     column = TextColumn("{task.description}")
     column.max_refresh = 3

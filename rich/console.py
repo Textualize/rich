@@ -20,6 +20,7 @@ from typing import (
     Dict,
     Iterable,
     List,
+    Mapping,
     NamedTuple,
     Optional,
     TextIO,
@@ -514,6 +515,8 @@ class Console:
         get_time (Callable[[], time], optional): Callable that gets the current time in seconds, default uses time.monotonic.
     """
 
+    _environ: Mapping[str, str] = os.environ
+
     def __init__(
         self,
         *,
@@ -545,10 +548,11 @@ class Console:
         safe_box: bool = True,
         get_datetime: Callable[[], datetime] = None,
         get_time: Callable[[], float] = None,
-        _environ: Dict[str, str] = None,
+        _environ: Mapping[str, str] = None,
     ):
         # Copy of os.environ allows us to replace it for testing
-        self._environ = os.environ if _environ is None else _environ
+        if _environ is not None:
+            self._environ = _environ
 
         self.is_jupyter = _is_jupyter() if force_jupyter is None else force_jupyter
         if self.is_jupyter:
@@ -1051,10 +1055,8 @@ class Console:
         if hasattr(renderable, "__rich_console__"):
             render_iterable = renderable.__rich_console__(self, _options)  # type: ignore
         elif isinstance(renderable, str):
-            yield from self.render(
-                self.render_str(renderable, highlight=_options.highlight), _options
-            )
-            return
+            text_renderable = self.render_str(renderable, highlight=_options.highlight)
+            render_iterable = text_renderable.__rich_console__(self, _options)  # type: ignore
         else:
             raise errors.NotRenderableError(
                 f"Unable to render {renderable!r}; "
@@ -1099,7 +1101,7 @@ class Console:
         """
         render_options = options or self.options
         _rendered = self.render(renderable, render_options)
-        if style is not None:
+        if style:
             _rendered = Segment.apply_style(_rendered, style)
         lines = list(
             islice(
