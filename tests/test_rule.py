@@ -9,7 +9,11 @@ from rich.text import Text
 
 def test_rule():
     console = Console(
-        width=16, file=io.StringIO(), force_terminal=True, legacy_windows=False
+        width=16,
+        file=io.StringIO(),
+        force_terminal=True,
+        legacy_windows=False,
+        _environ={},
     )
     console.print(Rule())
     console.print(Rule("foo"))
@@ -25,13 +29,13 @@ def test_rule():
 
 
 def test_rule_error():
-    console = Console(width=16, file=io.StringIO(), legacy_windows=False)
+    console = Console(width=16, file=io.StringIO(), legacy_windows=False, _environ={})
     with pytest.raises(ValueError):
         console.rule("foo", align="foo")
 
 
 def test_rule_align():
-    console = Console(width=16, file=io.StringIO(), legacy_windows=False)
+    console = Console(width=16, file=io.StringIO(), legacy_windows=False, _environ={})
     console.rule("foo")
     console.rule("foo", align="left")
     console.rule("foo", align="center")
@@ -50,6 +54,7 @@ def test_rule_cjk():
         force_terminal=True,
         color_system=None,
         legacy_windows=False,
+        _environ={},
     )
     console.rule("欢迎！")
     expected = "──── 欢迎！ ────\n"
@@ -63,6 +68,7 @@ def test_characters():
         force_terminal=True,
         color_system=None,
         legacy_windows=False,
+        _environ={},
     )
     console.rule(characters="+*")
     console.rule("foo", characters="+*")

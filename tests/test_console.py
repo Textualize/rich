@@ -25,7 +25,7 @@ from rich.text import Text
 
 
 def test_dumb_terminal():
-    console = Console(force_terminal=True)
+    console = Console(force_terminal=True, _environ={})
     assert console.color_system is not None
 
     console = Console(force_terminal=True, _environ={"TERM": "dumb"})
@@ -119,9 +119,10 @@ def test_log():
         color_system="truecolor",
         log_time_format="TIME",
         log_path=False,
+        _environ={},
     )
     console.log("foo", style="red")
-    expected = "\x1b[2;36mTIME\x1b[0m\x1b[2;36m \x1b[0m\x1b[31mfoo\x1b[0m\x1b[31m                                                                        \x1b[0m\n"
+    expected = "\x1b[2;36mTIME\x1b[0m\x1b[2;36m \x1b[0m\x1b[31mfoo                                                                        \x1b[0m\n"
     result = console.file.getvalue()
     print(repr(result))
     assert result == expected
@@ -161,7 +162,9 @@ def test_print_style():
 
 
 def test_show_cursor():
-    console = Console(file=io.StringIO(), force_terminal=True, legacy_windows=False)
+    console = Console(
+        file=io.StringIO(), force_terminal=True, legacy_windows=False, _environ={}
+    )
     console.show_cursor(False)
     console.print("foo")
     console.show_cursor(True)
@@ -169,7 +172,7 @@ def test_show_cursor():
 
 
 def test_clear():
-    console = Console(file=io.StringIO(), force_terminal=True)
+    console = Console(file=io.StringIO(), force_terminal=True, _environ={})
     console.clear()
     console.clear(home=False)
     assert console.file.getvalue() == "\033[2J\033[H" + "\033[2J"
@@ -207,7 +210,7 @@ def test_render_error():
 
 
 def test_control():
-    console = Console(file=io.StringIO(), force_terminal=True)
+    console = Console(file=io.StringIO(), force_terminal=True, _environ={})
     console.control("FOO")
     console.print("BAR")
     assert console.file.getvalue() == "FOOBAR\n"
@@ -273,26 +276,30 @@ def test_justify_none():
 
 
 def test_justify_left():
-    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    console = Console(file=io.StringIO(), force_terminal=True, width=20, _environ={})
     console.print("FOO", justify="left")
     assert console.file.getvalue() == "FOO                 \n"
 
 
 def test_justify_center():
-    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    console = Console(file=io.StringIO(), force_terminal=True, width=20, _environ={})
     console.print("FOO", justify="center")
     assert console.file.getvalue() == "        FOO         \n"
 
 
 def test_justify_right():
-    console = Console(file=io.StringIO(), force_terminal=True, width=20)
+    console = Console(file=io.StringIO(), force_terminal=True, width=20, _environ={})
     console.print("FOO", justify="right")
     assert console.file.getvalue() == "                 FOO\n"
 
 
 def test_justify_renderable_none():
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=20, legacy_windows=False
+        file=io.StringIO(),
+        force_terminal=True,
+        width=20,
+        legacy_windows=False,
+        _environ={},
     )
     console.print(Panel("FOO", expand=False, padding=0), justify=None)
     assert console.file.getvalue() == "╭───╮\n│FOO│\n╰───╯\n"
@@ -300,7 +307,11 @@ def test_justify_renderable_none():
 
 def test_justify_renderable_left():
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=10, legacy_windows=False
+        file=io.StringIO(),
+        force_terminal=True,
+        width=10,
+        legacy_windows=False,
+        _environ={},
     )
     console.print(Panel("FOO", expand=False, padding=0), justify="left")
     assert console.file.getvalue() == "╭───╮     \n│FOO│     \n╰───╯     \n"
@@ -308,7 +319,11 @@ def test_justify_renderable_left():
 
 def test_justify_renderable_center():
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=10, legacy_windows=False
+        file=io.StringIO(),
+        force_terminal=True,
+        width=10,
+        legacy_windows=False,
+        _environ={},
     )
     console.print(Panel("FOO", expand=False, padding=0), justify="center")
     assert console.file.getvalue() == "  ╭───╮   \n  │FOO│   \n  ╰───╯   \n"
@@ -316,7 +331,11 @@ def test_justify_renderable_center():
 
 def test_justify_renderable_right():
     console = Console(
-        file=io.StringIO(), force_terminal=True, width=20, legacy_windows=False
+        file=io.StringIO(),
+        force_terminal=True,
+        width=20,
+        legacy_windows=False,
+        _environ={},
     )
     console.print(Panel("FOO", expand=False, padding=0), justify="right")
     assert (
@@ -407,14 +426,14 @@ def test_unicode_error() -> None:
 
 
 def test_bell() -> None:
-    console = Console(force_terminal=True)
+    console = Console(force_terminal=True, _environ={})
     console.begin_capture()
     console.bell()
     assert console.end_capture() == "\x07"
 
 
 def test_pager() -> None:
-    console = Console()
+    console = Console(_environ={})
 
     pager_content: Optional[str] = None
 
@@ -517,7 +536,9 @@ def test_no_nested_live():
 
 @pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 def test_screen():
-    console = Console(color_system=None, force_terminal=True, force_interactive=True)
+    console = Console(
+        color_system=None, force_terminal=True, force_interactive=True, _environ={}
+    )
     with console.capture() as capture:
         with console.screen():
             console.print("Don't panic")
@@ -529,7 +550,9 @@ def test_screen():
 
 @pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 def test_screen_update():
-    console = Console(width=20, height=4, color_system="truecolor", force_terminal=True)
+    console = Console(
+        width=20, height=4, color_system="truecolor", force_terminal=True, _environ={}
+    )
     with console.capture() as capture:
         with console.screen() as screen:
             screen.update("foo", style="blue")

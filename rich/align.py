@@ -216,7 +216,7 @@ class Align(JupyterMixin):
                 iter_segments = chain(blank_lines(top_space), generate_segments())
         else:
             iter_segments = generate_segments()
-        if self.style is not None:
+        if self.style:
             style = console.get_style(self.style)
             iter_segments = Segment.apply_style(iter_segments, style)
         yield from iter_segments

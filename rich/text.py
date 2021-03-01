@@ -366,6 +366,8 @@ class Text(JupyterMixin):
             end (Optional[int], optional): End offset (negative indexing is supported), or None for end of text. Defaults to None.
 
         """
+        if not style:
+            return
         length = len(self)
         if start < 0:
             start = length + start
@@ -541,11 +543,16 @@ class Text(JupyterMixin):
         Returns:
             Iterable[Segment]: Result of render that may be written to the console.
         """
-
         _Segment = Segment
         text = self.plain
-        enumerated_spans = list(enumerate(self._spans, 1))
+        if not self._spans:
+            yield Segment(text)
+            if end:
+                yield _Segment(end)
+            return
         get_style = partial(console.get_style, default=Style.null())
+
+        enumerated_spans = list(enumerate(self._spans, 1))
         style_map = {index: get_style(span.style) for index, span in enumerated_spans}
         style_map[0] = get_style(self.style)
 
@@ -614,7 +621,7 @@ class Text(JupyterMixin):
 
         for text in iter_text():
             extend_text(text._text)
-            if text.style is not None:
+            if text.style:
                 append_span(_Span(offset, offset + len(text), text.style))
             extend_spans(
                 _Span(offset + start, offset + end, style)

@@ -17,7 +17,8 @@ def create_capture_console(
         height=height,
         force_terminal=force_terminal,
         legacy_windows=False,
-        color_system=None,  # use no color system to reduce complexity of output
+        color_system=None,  # use no color system to reduce complexity of output,
+        _environ={},
     )
 
 

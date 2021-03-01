@@ -470,7 +470,6 @@ class Table(JupyterMixin):
         widths = [_range.maximum or 1 for _range in width_ranges]
         get_padding_width = self._get_padding_width
         extra_width = self._extra_width
-
         if self.expand:
             ratios = [col.ratio or 0 for col in columns if col.flexible]
             if any(ratios):
@@ -498,7 +497,6 @@ class Table(JupyterMixin):
                 max_width,
             )
             table_width = sum(widths)
-
             # last resort, reduce columns evenly
             if table_width > max_width:
                 excess_width = table_width - max_width
@@ -509,7 +507,7 @@ class Table(JupyterMixin):
                 self._measure_column(console, column, width)
                 for width, column in zip(widths, columns)
             ]
-            widths = [_range.maximum or 1 for _range in width_ranges]
+            widths = [_range.maximum or 0 for _range in width_ranges]
 
         if (table_width < max_width and self.expand) or (
             self.min_width is not None and table_width < (self.min_width - extra_width)
@@ -611,7 +609,7 @@ class Table(JupyterMixin):
                 column.header_style
             )
             _append((header_style, column.header))
-        cell_style = get_style(self.style or "") + get_style(column.style)
+        cell_style = get_style(self.style or "") + get_style(column.style or "")
         for cell in column.cells:
             _append((cell_style, cell))
         if self.show_footer:

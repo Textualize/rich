@@ -136,7 +136,12 @@ class RichHandler(Handler):
                 locals_max_length=self.locals_max_length,
                 locals_max_string=self.locals_max_string,
             )
-            message = record.getMessage()
+            if self.formatter:
+                record.message = record.getMessage()
+                formatter = self.formatter
+                if hasattr(formatter, "usesTime") and formatter.usesTime():  # type: ignore
+                    record.asctime = formatter.formatTime(record, formatter.datefmt)
+                message = formatter.formatMessage(record)
 
         message_renderable = self.render_message(record, message)
         log_renderable = self.render(

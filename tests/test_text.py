@@ -243,7 +243,7 @@ def test_console_width():
 def test_join():
     test = Text("bar").join([Text("foo", "red"), Text("baz", "blue")])
     assert str(test) == "foobarbaz"
-    assert test._spans == [Span(0, 3, "red"), Span(3, 6, ""), Span(6, 9, "blue")]
+    assert test._spans == [Span(0, 3, "red"), Span(6, 9, "blue")]
 
 
 def test_trim_spans():
