@@ -413,7 +413,7 @@ def _is_jupyter() -> bool:  # pragma: no cover
         return True  # Jupyter notebook or qtconsole
     elif shell == "TerminalInteractiveShell":
         return False  # Terminal running IPython
-    elif 'google.colab' in str(get_ipython()): # IPython in Google Colab
+    elif "google.colab" in str(get_ipython()):  # IPython in Google Colab
         return True
     else:
         return False  # Other type (?)
