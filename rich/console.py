@@ -409,7 +409,7 @@ def _is_jupyter() -> bool:  # pragma: no cover
     except NameError:
         return False
     shell = get_ipython().__class__.__name__  # type: ignore
-    full_class = str(get_ipython().__class__) # type: ignore 
+    full_class = str(get_ipython().__class__)  # type: ignore
     if shell == "ZMQInteractiveShell":
         return True  # Jupyter notebook or qtconsole
     elif shell == "TerminalInteractiveShell":
