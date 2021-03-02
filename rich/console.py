@@ -409,11 +409,12 @@ def _is_jupyter() -> bool:  # pragma: no cover
     except NameError:
         return False
     shell = get_ipython().__class__.__name__  # type: ignore
+    full_class = str(get_ipython().__class__) # type: ignore 
     if shell == "ZMQInteractiveShell":
         return True  # Jupyter notebook or qtconsole
     elif shell == "TerminalInteractiveShell":
         return False  # Terminal running IPython
-    elif "google.colab" in str(get_ipython()):  # IPython in Google Colab
+    elif "google.colab" in full_class:  # IPython in Google Colab
         return True
     else:
         return False  # Other type (?)
