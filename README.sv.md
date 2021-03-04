@@ -96,13 +96,16 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![Konsol märkspråk](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
 
+Du kan använda ett `Console` objekt för att generera sofistikerad utmatning med minimal ansträngning. Se [Console API](https://rich.readthedocs.io/en/latest/console.html) dokument för detaljer.
+
 ## Rich Inspektera
 
 Rich har en [inspektionsfunktion](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) som kan producera en rapport om vilket Python objekt som helst, till exempel klass, instans, eller inbyggt.
 
 ```python
+>>> my_list = ["foo", "bar"]
 >>> from rich import inspect
->>> inspect(str, methods=True)
+>>> inspect(my_list, methods=True)
 ```
 
 ![Log](https://github.com/willmcgugan/rich/raw/master/imgs/inspect.png)
