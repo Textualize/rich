@@ -155,7 +155,6 @@ Notera `log_locals` argumentet, vilket utmatar en tabell innehållandes de lokal
 Log metoden kan användas för att logga till terminal för långkörande applikationer så som servrar, men är också en väldigt bra felsökningsverktyg.
 
 </details>
-
 <details>
 <summary>Loggningshanterare</summary>
 
