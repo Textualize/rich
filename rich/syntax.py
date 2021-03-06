@@ -521,15 +521,15 @@ class Syntax(JupyterMixin):
                     text, options=options.update(width=code_width)
                 )
             else:
-                lines = console.render_lines(
+                syntax_lines = console.render_lines(
                     text,
                     options.update(width=code_width, height=None),
                     style=self.background_style,
                     pad=True,
                     new_lines=True,
                 )
-                for line in lines:
-                    yield from line
+                for syntax_line in syntax_lines:
+                    yield from syntax_line
             return
 
         lines = text.split("\n")
@@ -597,8 +597,8 @@ class Syntax(JupyterMixin):
                     yield from wrapped_line
                     yield new_line
             else:
-                for line in wrapped_lines:
-                    yield from line
+                for wrapped_line in wrapped_lines:
+                    yield from wrapped_line
                     yield new_line
 
 

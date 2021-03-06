@@ -481,7 +481,7 @@ def traverse(_object: Any, max_length: int = None, max_string: int = None) -> No
             open_brace, close_brace, empty = _BRACES[obj_type](obj)
 
             if obj:
-                children: List[Node] = []
+                children = []
                 node = Node(
                     open_brace=open_brace,
                     close_brace=close_brace,

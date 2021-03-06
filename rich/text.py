@@ -329,7 +329,7 @@ class Text(JupyterMixin):
         """Set spans."""
         self._spans = spans[:]
 
-    def blank_copy(self, plain:str="") -> "Text":
+    def blank_copy(self, plain: str = "") -> "Text":
         """Return a new Text instance with copied meta data (but not the string or spans)."""
         copy_self = Text(
             plain,
