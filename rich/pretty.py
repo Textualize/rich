@@ -439,11 +439,13 @@ def traverse(_object: Any, max_length: int = None, max_string: int = None) -> No
     def _traverse(obj: Any, root: bool = False) -> Node:
         """Walk the object depth first."""
         obj_type = type(obj)
+        print(obj.__repr__.__qualname__)
+        py_version = (sys.version_info.major, sys.version_info.minor)
         if (
             is_dataclass(obj)
             and not isinstance(obj, type)
             and (
-                "__create_fn__" in obj.__repr__.__qualname__
+                "__create_fn__" in obj.__repr__.__qualname__ or py_version == (3, 6)
             )  # Check if __repr__ wasn't overriden
         ):
             obj_id = id(obj)
