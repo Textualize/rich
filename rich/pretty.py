@@ -439,7 +439,6 @@ def traverse(_object: Any, max_length: int = None, max_string: int = None) -> No
     def _traverse(obj: Any, root: bool = False) -> Node:
         """Walk the object depth first."""
         obj_type = type(obj)
-        print(obj.__repr__.__qualname__)
         py_version = (sys.version_info.major, sys.version_info.minor)
         if (
             is_dataclass(obj)
