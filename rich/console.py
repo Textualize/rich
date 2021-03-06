@@ -408,7 +408,7 @@ def _is_jupyter() -> bool:  # pragma: no cover
         get_ipython  # type: ignore
     except NameError:
         return False
-    ipython = get_ipython()
+    ipython = get_ipython()  # type: ignore
     shell = ipython.__class__.__name__  # type: ignore
     if "google.colab" in str(ipython.__class__) or shell == "ZMQInteractiveShell":
         return True  # Jupyter notebook or qtconsole
