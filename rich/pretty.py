@@ -2,8 +2,8 @@ import builtins
 import os
 import sys
 from array import array
-from collections import Counter, abc, defaultdict, deque
-from dataclasses import dataclass
+from collections import Counter, defaultdict, deque
+from dataclasses import dataclass, fields, is_dataclass
 from itertools import islice
 from typing import (
     TYPE_CHECKING,
@@ -19,9 +19,10 @@ from typing import (
 
 from rich.highlighter import ReprHighlighter
 
-from .abc import RichRenderable
 from . import get_console
+from ._loop import loop_last
 from ._pick import pick_bool
+from .abc import RichRenderable
 from .cells import cell_len
 from .highlighter import ReprHighlighter
 from .jupyter import JupyterRenderable
@@ -61,6 +62,7 @@ def install(
         expand_all (bool, optional): Expand all containers. Defaults to False
     """
     from rich import get_console
+
     from .console import ConsoleRenderable  # needed here to prevent circular import
 
     console = console or get_console()
@@ -195,7 +197,7 @@ class Pretty:
         pretty_text = (
             self.highlighter(pretty_text)
             if pretty_text
-            else Text("__repr__ return empty string", style="dim italic")
+            else Text("__repr__ returned empty string", style="dim italic")
         )
         if self.indent_guides and not options.ascii_only:
             pretty_text = pretty_text.with_indent_guides(
@@ -247,6 +249,13 @@ _CONTAINERS = tuple(_BRACES.keys())
 _MAPPING_CONTAINERS = (dict, os._Environ)
 
 
+def is_expandable(obj: Any) -> bool:
+    """Check if an object may be expanded by pretty print."""
+    return isinstance(obj, _CONTAINERS) or (
+        is_dataclass(obj) and not isinstance(obj, type)
+    )
+
+
 @dataclass
 class Node:
     """A node in a repr tree. May be atomic or a container."""
@@ -259,6 +268,7 @@ class Node:
     last: bool = False
     is_tuple: bool = False
     children: Optional[List["Node"]] = None
+    key_separator = ": "
 
     @property
     def separator(self) -> str:
@@ -269,7 +279,7 @@ class Node:
         """Generate tokens for this node."""
         if self.key_repr:
             yield self.key_repr
-            yield ": "
+            yield self.key_separator
         if self.value_repr:
             yield self.value_repr
         elif self.children is not None:
@@ -366,7 +376,8 @@ class _Line:
         assert node.children
         if node.key_repr:
             yield _Line(
-                text=f"{node.key_repr}: {node.open_brace}", whitespace=whitespace
+                text=f"{node.key_repr}{node.key_separator}{node.open_brace}",
+                whitespace=whitespace,
             )
         else:
             yield _Line(text=node.open_brace, whitespace=whitespace)
@@ -428,17 +439,51 @@ def traverse(_object: Any, max_length: int = None, max_string: int = None) -> No
     def _traverse(obj: Any, root: bool = False) -> Node:
         """Walk the object depth first."""
         obj_type = type(obj)
-        if obj_type in _CONTAINERS:
+        print(obj.__repr__.__qualname__)
+        py_version = (sys.version_info.major, sys.version_info.minor)
+        if (
+            is_dataclass(obj)
+            and not isinstance(obj, type)
+            and (
+                "__create_fn__" in obj.__repr__.__qualname__ or py_version == (3, 6)
+            )  # Check if __repr__ wasn't overriden
+        ):
             obj_id = id(obj)
-
             if obj_id in visited_ids:
                 # Recursion detected
                 return Node(value_repr="...")
             push_visited(obj_id)
+
+            children: List[Node] = []
+            append = children.append
+            node = Node(
+                open_brace=f"{obj.__class__.__name__}(",
+                close_brace=")",
+                children=children,
+                last=root,
+            )
+
+            for last, field in loop_last(fields(obj)):
+                if field.repr:
+                    child_node = _traverse(getattr(obj, field.name))
+                    child_node.key_repr = field.name
+                    child_node.last = last
+                    child_node.key_separator = "="
+                    append(child_node)
+
+            pop_visited(obj_id)
+
+        elif obj_type in _CONTAINERS:
+            obj_id = id(obj)
+            if obj_id in visited_ids:
+                # Recursion detected
+                return Node(value_repr="...")
+            push_visited(obj_id)
+
             open_brace, close_brace, empty = _BRACES[obj_type](obj)
 
             if obj:
-                children: List[Node] = []
+                children = []
                 node = Node(
                     open_brace=open_brace,
                     close_brace=close_brace,

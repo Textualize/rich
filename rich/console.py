@@ -6,7 +6,7 @@ import sys
 import threading
 from abc import ABC, abstractmethod
 from collections import abc
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field, is_dataclass
 from datetime import datetime
 from functools import wraps
 from getpass import getpass
@@ -40,7 +40,7 @@ from .highlighter import NullHighlighter, ReprHighlighter
 from .markup import render as render_markup
 from .measure import Measurement, measure_renderables
 from .pager import Pager, SystemPager
-from .pretty import Pretty
+from .pretty import is_expandable, Pretty
 from .scope import render_scope
 from .screen import Screen
 from .segment import Segment
@@ -408,8 +408,9 @@ def _is_jupyter() -> bool:  # pragma: no cover
         get_ipython  # type: ignore
     except NameError:
         return False
-    shell = get_ipython().__class__.__name__  # type: ignore
-    if shell == "ZMQInteractiveShell":
+    ipython = get_ipython()  # type: ignore
+    shell = ipython.__class__.__name__  # type: ignore
+    if "google.colab" in str(ipython.__class__) or shell == "ZMQInteractiveShell":
         return True  # Jupyter notebook or qtconsole
     elif shell == "TerminalInteractiveShell":
         return False  # Terminal running IPython
@@ -1276,7 +1277,7 @@ class Console:
             elif isinstance(renderable, ConsoleRenderable):
                 check_text()
                 append(renderable)
-            elif isinstance(renderable, (abc.Mapping, abc.Sequence, abc.Set)):
+            elif is_expandable(renderable):
                 check_text()
                 append(Pretty(renderable, highlighter=_highlighter))
             else:

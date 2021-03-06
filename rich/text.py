@@ -329,9 +329,10 @@ class Text(JupyterMixin):
         """Set spans."""
         self._spans = spans[:]
 
-    def blank_copy(self) -> "Text":
+    def blank_copy(self, plain: str = "") -> "Text":
         """Return a new Text instance with copied meta data (but not the string or spans)."""
         copy_self = Text(
+            plain,
             style=self.style,
             justify=self.justify,
             overflow=self.overflow,
@@ -1116,7 +1117,7 @@ class Text(JupyterMixin):
         if blank_lines:
             new_lines.extend([Text("", style=style)] * blank_lines)
 
-        new_text = Text("\n").join(new_lines)
+        new_text = text.blank_copy("\n").join(new_lines)
         return new_text
 
 

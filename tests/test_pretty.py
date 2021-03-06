@@ -1,7 +1,9 @@
 from array import array
 from collections import defaultdict
+from dataclasses import dataclass, field
 import io
 import sys
+from typing import List
 
 from rich.console import Console
 from rich.pretty import install, Pretty, pprint, pretty_repr, Node
@@ -31,6 +33,34 @@ def test_pretty():
     expected = "{\n    'foo': [1, 2, 3, (4, 5, {6}, 7, 8, {9}), {}],\n    'bar': {\n        'egg': 'baz',\n        'words': [\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World'\n        ]\n    },\n    False: 'foo',\n    True: '',\n    'text': ('Hello World', 'foo bar baz egg')\n}"
     print(expected)
     assert result == expected
+
+
+@dataclass
+class ExampleDataclass:
+    foo: int
+    bar: str
+    ignore: int = field(repr=False)
+    baz: List[str] = field(default_factory=list)
+
+
+def test_pretty_dataclass():
+    dc = ExampleDataclass(1000, "Hello, World", 999, ["foo", "bar", "baz"])
+    result = pretty_repr(dc, max_width=80)
+    print(repr(result))
+    assert (
+        result
+        == "ExampleDataclass(foo=1000, bar='Hello, World', baz=['foo', 'bar', 'baz'])"
+    )
+    result = pretty_repr(dc, max_width=16)
+    print(repr(result))
+    assert (
+        result
+        == "ExampleDataclass(\n    foo=1000,\n    bar='Hello, World',\n    baz=[\n        'foo',\n        'bar',\n        'baz'\n    ]\n)"
+    )
+    dc.bar = dc
+    result = pretty_repr(dc, max_width=80)
+    print(repr(result))
+    assert result == "ExampleDataclass(foo=1000, bar=..., baz=['foo', 'bar', 'baz'])"
 
 
 def test_small_width():

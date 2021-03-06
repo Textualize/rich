@@ -249,6 +249,9 @@ class Syntax(JupyterMixin):
         self.tab_size = tab_size
         self.word_wrap = word_wrap
         self.background_color = background_color
+        self.background_style = (
+            Style(bgcolor=background_color) if background_color else Style()
+        )
         self.indent_guides = indent_guides
 
         self._theme = self.get_theme(theme)
@@ -328,11 +331,12 @@ class Syntax(JupyterMixin):
 
     def _get_base_style(self) -> Style:
         """Get the base style."""
-        default_style = (
-            Style(bgcolor=self.background_color)
-            if self.background_color is not None
-            else self._theme.get_background_style()
-        )
+        # default_style = (
+        #     Style(bgcolor=self.background_color)
+        #     if self.background_color is not None
+        #     else self._theme.get_background_style()
+        # )
+        default_style = self._theme.get_background_style() + self.background_style
         return default_style
 
     def _get_token_color(self, token_type: TokenType) -> Optional[Color]:
@@ -419,9 +423,10 @@ class Syntax(JupyterMixin):
         return text
 
     def _get_line_numbers_color(self, blend: float = 0.3) -> Color:
-        background_color = self._theme.get_background_style().bgcolor
+        background_style = self._theme.get_background_style() + self.background_style
+        background_color = background_style.bgcolor
         if background_color is None or background_color.is_system_defined:
-            return background_color or Color.default()
+            return Color.default()
         foreground_color = self._get_token_color(Token.Text)
         if foreground_color is None or foreground_color.is_system_defined:
             return foreground_color or Color.default()
@@ -450,11 +455,13 @@ class Syntax(JupyterMixin):
                 background_style,
                 self._theme.get_style_for_token(Token.Text),
                 Style(color=self._get_line_numbers_color()),
+                self.background_style,
             )
             highlight_number_style = Style.chain(
                 background_style,
                 self._theme.get_style_for_token(Token.Text),
                 Style(bold=True, color=self._get_line_numbers_color(0.9)),
+                self.background_style,
             )
         else:
             number_style = background_style + Style(dim=True)
@@ -473,7 +480,11 @@ class Syntax(JupyterMixin):
 
         transparent_background = self._get_base_style().transparent_background
         code_width = (
-            (options.max_width - self._numbers_column_width - 1)
+            (
+                (options.max_width - self._numbers_column_width - 1)
+                if self.line_numbers
+                else options.max_width
+            )
             if self.code_width is None
             else self.code_width
         )
@@ -494,9 +505,31 @@ class Syntax(JupyterMixin):
             highlight_number_style,
         ) = self._get_number_styles(console)
 
-        if not self.line_numbers:
+        if not self.line_numbers and not self.word_wrap and not self.line_range:
             # Simple case of just rendering text
-            yield from console.render(text, options=options.update(width=code_width))
+            style = (
+                self._get_base_style()
+                + self._theme.get_style_for_token(Comment)
+                + Style(dim=True)
+                + self.background_style
+            )
+            if self.indent_guides and not options.ascii_only:
+                text = text.with_indent_guides(self.tab_size, style=style)
+                text.overflow = "crop"
+            if style.transparent_background:
+                yield from console.render(
+                    text, options=options.update(width=code_width)
+                )
+            else:
+                syntax_lines = console.render_lines(
+                    text,
+                    options.update(width=code_width, height=None),
+                    style=self.background_style,
+                    pad=True,
+                    new_lines=True,
+                )
+                for syntax_line in syntax_lines:
+                    yield from syntax_line
             return
 
         lines = text.split("\n")
@@ -508,6 +541,7 @@ class Syntax(JupyterMixin):
                 self._get_base_style()
                 + self._theme.get_style_for_token(Comment)
                 + Style(dim=True)
+                + self.background_style
             )
             lines = (
                 Text("\n")
@@ -548,19 +582,24 @@ class Syntax(JupyterMixin):
                             pad=not transparent_background,
                         )
                     ]
-            for first, wrapped_line in loop_first(wrapped_lines):
-                if first:
-                    line_column = str(line_no).rjust(numbers_column_width - 2) + " "
-                    if highlight_line(line_no):
-                        yield _Segment(line_pointer, Style(color="red"))
-                        yield _Segment(line_column, highlight_number_style)
+            if self.line_numbers:
+                for first, wrapped_line in loop_first(wrapped_lines):
+                    if first:
+                        line_column = str(line_no).rjust(numbers_column_width - 2) + " "
+                        if highlight_line(line_no):
+                            yield _Segment(line_pointer, Style(color="red"))
+                            yield _Segment(line_column, highlight_number_style)
+                        else:
+                            yield _Segment("  ", highlight_number_style)
+                            yield _Segment(line_column, number_style)
                     else:
-                        yield _Segment("  ", highlight_number_style)
-                        yield _Segment(line_column, number_style)
-                else:
-                    yield padding
-                yield from wrapped_line
-                yield new_line
+                        yield padding
+                    yield from wrapped_line
+                    yield new_line
+            else:
+                for wrapped_line in wrapped_lines:
+                    yield from wrapped_line
+                    yield new_line
 
 
 if __name__ == "__main__":  # pragma: no cover
