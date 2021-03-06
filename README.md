@@ -3,7 +3,7 @@
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
-![Log](imgs/logo.svg)
+![Log](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
 
 [中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md) • [lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md) • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md) • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md)
 
