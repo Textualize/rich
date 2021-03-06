@@ -36,7 +36,7 @@ def test_pretty():
 
 
 @dataclass
-class TestDataclass:
+class ExampleDataclass:
     foo: int
     bar: str
     ignore: int = field(repr=False)
@@ -44,23 +44,23 @@ class TestDataclass:
 
 
 def test_pretty_dataclass():
-    dc = TestDataclass(1000, "Hello, World", 999, ["foo", "bar", "baz"])
+    dc = ExampleDataclass(1000, "Hello, World", 999, ["foo", "bar", "baz"])
     result = pretty_repr(dc, max_width=80)
     print(repr(result))
     assert (
         result
-        == "TestDataclass(foo=1000, bar='Hello, World', baz=['foo', 'bar', 'baz'])"
+        == "ExampleDataclass(foo=1000, bar='Hello, World', baz=['foo', 'bar', 'baz'])"
     )
     result = pretty_repr(dc, max_width=16)
     print(repr(result))
     assert (
         result
-        == "TestDataclass(\n    foo=1000,\n    bar='Hello, World',\n    baz=[\n        'foo',\n        'bar',\n        'baz'\n    ]\n)"
+        == "ExampleDataclass(\n    foo=1000,\n    bar='Hello, World',\n    baz=[\n        'foo',\n        'bar',\n        'baz'\n    ]\n)"
     )
     dc.bar = dc
     result = pretty_repr(dc, max_width=80)
     print(repr(result))
-    assert result == "TestDataclass(foo=1000, bar=..., baz=['foo', 'bar', 'baz'])"
+    assert result == "ExampleDataclass(foo=1000, bar=..., baz=['foo', 'bar', 'baz'])"
 
 
 def test_small_width():
