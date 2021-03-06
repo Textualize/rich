@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [9.13.0] - Unreleased
+## [9.13.0] - 2021-03-06
 
 ### Added
 
@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed Syntax background https://github.com/willmcgugan/rich/issues/1088
+- Fix for double tracebacks when no formatter https://github.com/willmcgugan/rich/issues/1079
 
 ### Changed
 

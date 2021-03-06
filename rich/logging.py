@@ -114,7 +114,6 @@ class RichHandler(Handler):
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
         message = self.format(record)
-
         traceback = None
         if (
             self.rich_tracebacks
@@ -136,6 +135,7 @@ class RichHandler(Handler):
                 locals_max_length=self.locals_max_length,
                 locals_max_string=self.locals_max_string,
             )
+            message = record.getMessage()
             if self.formatter:
                 record.message = record.getMessage()
                 formatter = self.formatter
