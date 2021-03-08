@@ -1,3 +1,5 @@
+from enum import IntEnm
+
 from typing import Dict, NamedTuple, Optional
 
 from .cells import cell_len, set_cell_size
@@ -6,6 +8,36 @@ from .style import Style
 from itertools import filterfalse, zip_longest
 from operator import attrgetter
 from typing import Iterable, List, Tuple
+
+
+class ControlCodeEnum(IntEnum):
+    HOME = 1
+    CURSOR_UP = 2
+    CURSOR_DOWN = 3
+    CURSOR_FORWARD = 4
+    CURSOR_BACKWARD = 5
+    ERASE_IN_LINE = 5
+
+
+class ControlCode(NamedTuple):
+    code: ControlCodeEnum
+    param: int
+
+
+CONTROL_CODES_FORMAT = {
+    ControlCodeEnum.HOME: lambda param: "\x1b[H",
+    ControlCodeEnum.CURSOR_UP: lambda param: f"\x1b[{param}A",
+    ControlCodeEnum.CURSOR_DOWN: lambda param: f"\x1b[{param}B",
+    ControlCodeEnum.CURSOR_FORWARD: lambda param: "\x1b[{param}C",
+    ControlCodeEnum.CURSOR_BACKWARD: lambda param: "\x1b[{param}D",
+    ControlCodeEnum.ERASE_IN_LINE: lambda param: "\x1b[{param}K",
+}
+
+
+def render_control_codes(codes: Iterable[ControlCode]) -> str:
+    _format_map = CONTROL_CODES_FORMAT
+    ansi_codes = "".join(_format_map[code](param) for code, param in codes)
+    return ansi_codes
 
 
 class Segment(NamedTuple):

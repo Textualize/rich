@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING
+from enum import IntEnum
+from typing import NamedTuple, TYPE_CHECKING
+
 
 from .segment import Segment
 
@@ -12,6 +14,20 @@ STRIP_CONTROL_CODES = [
     13,  # Carriage return
 ]
 _CONTROL_TRANSLATE = {_codepoint: None for _codepoint in STRIP_CONTROL_CODES}
+
+
+class ControlCodeEnum(IntEnum):
+    HOME = 1
+    CURSOR_UP = 2
+    CURSOR_DOWN = 3
+    CURSOR_FORWARD = 4
+    CURSOR_BACKWARD = 5
+    ERASE_IN_LINE = 5
+
+
+class ControlCode(NamedTuple):
+    code: ControlCodeEnum
+    param: int
 
 
 class Control:
