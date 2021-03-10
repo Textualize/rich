@@ -9,7 +9,7 @@ Rich ist eine Python-Bibliothek für _rich_ Text und schöne Formatierung im Ter
 
 Die [Rich API](https://rich.readthedocs.io/en/latest/) erleichtert das Hinzufügen von Farbe und Stil zur Terminalausgabe. Rich kann auch schöne Tabellen, Fortschrittsbalken, Markdowns, durch Syntax hervorgehobenen Quellcode, Tracebacks und mehr sofort rendern.
 
-! [Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
+![Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
 
 Eine Video-Einführung in Rich findest du unter [quietcode.io](https://calmcode.io/rich/introduction.html) von [@ fishnets88](https://twitter.com/fishnets88).
 
