@@ -11,6 +11,32 @@ from .highlighter import Highlighter, ReprHighlighter
 from .text import Text
 from .traceback import Traceback
 
+# natural LogRecord attributes
+# http://docs.python.org/library/logging.html#logrecord-attributes
+RESERVED_ATTRS = (
+    "args",
+    "asctime",
+    "created",
+    "exc_info",
+    "exc_text",
+    "filename",
+    "funcName",
+    "levelname",
+    "levelno",
+    "lineno",
+    "module",
+    "msecs",
+    "message",
+    "msg",
+    "name",
+    "pathname",
+    "process",
+    "processName",
+    "relativeCreated",
+    "stack_info",
+    "thread",
+    "threadName",
+)
 
 class RichHandler(Handler):
     """A logging handler that renders output with Rich. The time / level / message and file are displayed in columns.
@@ -74,6 +100,7 @@ class RichHandler(Handler):
         locals_max_length: int = 10,
         locals_max_string: int = 80,
         log_time_format: Union[str, FormatTimeCallable] = "[%x %X]",
+        include_extras: bool = False,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
@@ -95,6 +122,7 @@ class RichHandler(Handler):
         self.tracebacks_show_locals = tracebacks_show_locals
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
+        self.include_extras = include_extras
 
     def get_level_text(self, record: LogRecord) -> Text:
         """Get the level name from the record.
@@ -189,10 +217,17 @@ class RichHandler(Handler):
         level = self.get_level_text(record)
         time_format = None if self.formatter is None else self.formatter.datefmt
         log_time = datetime.fromtimestamp(record.created)
+        renderables = [message_renderable]
+        if self.include_extras:
+            extras = self._render_extras(record)
+            if extras:
+                renderables.append(extras)
+        if traceback:
+            renderables.append(traceback)
 
         log_renderable = self._log_render(
             self.console,
-            [message_renderable] if not traceback else [message_renderable, traceback],
+            renderables,
             log_time=log_time,
             time_format=time_format,
             level=level,
@@ -201,6 +236,17 @@ class RichHandler(Handler):
             link_path=record.pathname if self.enable_link_path else None,
         )
         return log_renderable
+
+    def _render_extras(self, record: logging.LogRecord) -> Optional["ConsoleRendereable"]:
+        from rich.pretty import Pretty
+        obj = {}
+        for k, v in record.__dict__.items():
+            if k not in RESERVED_ATTRS and not (hasattr(k, "startswith") and k.startswith("_")):
+                obj[k] = v
+        if obj:
+            return Pretty(obj)
+        else:
+            return None
 
 
 if __name__ == "__main__":  # pragma: no cover

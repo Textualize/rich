@@ -89,6 +89,31 @@ def test_exception_with_extra_lines():
     assert "division by zero" in render
 
 
+def test_handler_with_extras():
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=140,
+        color_system=None,
+        _environ={},
+    )
+    handler_with_extras = RichHandler(
+        console=console,
+        enable_link_path=False,
+        markup=True,
+        include_extras=True,
+    )
+    log.addHandler(handler_with_extras)
+    log.warning("Message", extra={"extra_key": "extra_value"})
+
+
+    render = handler_with_extras.console.file.getvalue()
+    print(render)
+
+    assert "extra_key" in render
+    assert "extra_value" in render
+
+
 if __name__ == "__main__":
     render = make_log()
     print(render)
