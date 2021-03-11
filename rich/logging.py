@@ -8,6 +8,7 @@ from . import get_console
 from ._log_render import LogRender, FormatTimeCallable
 from .console import Console, ConsoleRenderable
 from .highlighter import Highlighter, ReprHighlighter
+from .pretty import Pretty
 from .text import Text
 from .traceback import Traceback
 
@@ -37,6 +38,7 @@ RESERVED_ATTRS = (
     "thread",
     "threadName",
 )
+
 
 class RichHandler(Handler):
     """A logging handler that renders output with Rich. The time / level / message and file are displayed in columns.
@@ -237,11 +239,14 @@ class RichHandler(Handler):
         )
         return log_renderable
 
-    def _render_extras(self, record: logging.LogRecord) -> Optional["ConsoleRendereable"]:
-        from rich.pretty import Pretty
+    def _render_extras(
+        self, record: logging.LogRecord
+    ) -> Optional["ConsoleRenderable"]:
         obj = {}
         for k, v in record.__dict__.items():
-            if k not in RESERVED_ATTRS and not (hasattr(k, "startswith") and k.startswith("_")):
+            if k not in RESERVED_ATTRS and not (
+                hasattr(k, "startswith") and k.startswith("_")
+            ):
                 obj[k] = v
         if obj:
             return Pretty(obj)

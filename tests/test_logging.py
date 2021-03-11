@@ -106,7 +106,6 @@ def test_handler_with_extras():
     log.addHandler(handler_with_extras)
     log.warning("Message", extra={"extra_key": "extra_value"})
 
-
     render = handler_with_extras.console.file.getvalue()
     print(render)
 
