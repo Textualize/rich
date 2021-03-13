@@ -18,12 +18,14 @@ class LogRender:
         show_level: bool = False,
         show_path: bool = True,
         time_format: Union[str, FormatTimeCallable] = "[%x %X]",
+        repeat_same_time: bool = False,
         level_width: Optional[int] = 8,
     ) -> None:
         self.show_time = show_time
         self.show_level = show_level
         self.show_path = show_path
         self.time_format = time_format
+        self.repeat_same_time = repeat_same_time
         self.level_width = level_width
         self._last_time: Optional[Text] = None
 
@@ -58,7 +60,7 @@ class LogRender:
                 log_time_display = time_format(log_time)
             else:
                 log_time_display = Text(log_time.strftime(time_format))
-            if log_time_display == self._last_time:
+            if log_time_display == self._last_time and not self.repeat_same_time:
                 row.append(Text(" " * len(log_time_display)))
             else:
                 row.append(log_time_display)
