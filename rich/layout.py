@@ -2,6 +2,7 @@ from .align import Align
 from .console import Console, ConsoleOptions, RenderResult, RenderableType
 from .highlighter import ReprHighlighter
 from ._loop import loop_last
+from operator import itemgetter
 from .panel import Panel
 from .pretty import Pretty
 from ._ratio import ratio_resolve
@@ -9,8 +10,16 @@ from .segment import Segment
 from .style import StyleType
 
 
-from typing import List, Optional, TYPE_CHECKING
+from typing import Dict, List, Iterable, NamedTuple, Optional, Tuple, TYPE_CHECKING
 from typing_extensions import Literal
+
+
+class Region(NamedTuple):
+    x: int
+    y: int
+    width: int
+    height: int
+
 
 Direction = Literal["horizontal", "vertical"]
 
@@ -179,22 +188,83 @@ class Layout:
         """
         self._renderable = renderable
 
+    def _make_render_map(self, width: int, height: int) -> Dict["Layout", Region]:
+
+        render_map: Dict[Layout, Region] = {}
+
+        stack: List[Tuple[Layout, Region]] = [
+            (self, Region(0, 0, width, height or console.height))
+        ]
+        push = stack.append
+        pop = stack.pop
+
+        layout_regions = []
+
+        while stack:
+            layout, region = pop()
+            layout_regions.append((layout, region))
+            if layout.children:
+                for child_and_region in layout.divide(region):
+                    push(child_and_region)
+
+        def layout_region_key(layout_region) -> Tuple[int, int]:
+            return (layout_region[1].y, layout_region[1].y)
+
+        render_map = {
+            layout: region
+            for layout, region in sorted(layout_regions, key=layout_region_key)
+        }
+        return render_map
+
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        render_options = options.update(
-            height=options.height or self.height or options.size.height
-        )
-        if not self.children:
-            for line in console.render_lines(
-                self._renderable or "", render_options, new_lines=True
-            ):
-                yield from line
+        width = options.max_width or console.width
+        height = options.height or console.height
+        render_map = self._make_render_map(width, height)
+        renders: Dict[Layout, List[List[Segment]]] = {}
 
-        elif self.direction == "vertical":
-            yield from self._render_vertical(console, render_options)
+        layout_regions = {
+            layout: region
+            for layout, region in render_map.items()
+            if not layout.children
+        }
+
+        for layout, region in layout_regions.items():
+            lines = console.render_lines(
+                layout.renderable,
+                options.update(width=region.width, height=region.height),
+            )
+            renders[layout] = lines
+
+        render_lines = {layout: iter(lines) for layout, lines in renders.items()}
+        new_line = Segment.line()
+
+        layout_lines = [[] for _ in range(height)]
+
+        for layout, (x, y, width, height) in layout_regions.items():
+            for line_no in range(y, y + height):
+                layout_lines[line_no].append((x, layout))
+
+        for row_layouts in layout_lines:
+            for _x, layout in sorted(row_layouts, key=itemgetter(0)):
+                yield from next(render_lines[layout])
+            yield new_line
+
+    def divide(self, region: Region) -> Iterable[Tuple["Layout", Region]]:
+        x, y, width, height = region
+        if self.direction == "vertical":
+            render_heights = ratio_resolve(height, self.children)
+            offset = 0
+            for child, child_height in zip(self.children, render_heights):
+                yield child, Region(x, y + offset, width, child_height)
+                offset += child_height
         elif self.direction == "horizontal":
-            yield from self._render_horizontal(console, render_options)
+            render_widths = ratio_resolve(width, self.children)
+            offset = 0
+            for child, child_width in zip(self.children, render_widths):
+                yield child, Region(x + offset, y, child_width, height)
+                offset += child_width
 
     def _render_horizontal(
         self, console: Console, options: ConsoleOptions
