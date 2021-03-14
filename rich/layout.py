@@ -98,6 +98,7 @@ class Layout:
         self.visible = visible
         self.height = height
         self._children: List[Layout] = []
+        self._render_map: Dict["Layout", Region] = {}
 
     def __repr__(self) -> str:
         return f"Layout(size={self.size!r}, minimum_size={self.size!r}, ratio={self.ratio!r}, name={self.name!r}, visible={self.visible!r})"
@@ -170,7 +171,7 @@ class Layout:
         return tree
 
     def split(self, *layouts, direction: Direction = None) -> None:
-        """Split the layout in to multiple sub-layours.
+        """Split the layout in to multiple sub-layouts.
 
         Args:
             *layouts (Layout): Positional arguments should be (sub) Layout instances.
@@ -179,6 +180,11 @@ class Layout:
         if direction is not None:
             self.direction = direction
         self._children.extend(layouts)
+
+    def unsplit(self) -> None:
+        """Reset splits to initial state."""
+        del self._children[:]
+        self.direction = None
 
     def update(self, renderable: RenderableType) -> None:
         """Update renderable.
@@ -189,17 +195,13 @@ class Layout:
         self._renderable = renderable
 
     def _make_render_map(self, width: int, height: int) -> Dict["Layout", Region]:
-
-        render_map: Dict[Layout, Region] = {}
-
+        """Create a dict that maps layout on to Region."""
         stack: List[Tuple[Layout, Region]] = [
             (self, Region(0, 0, width, height or console.height))
         ]
         push = stack.append
         pop = stack.pop
-
-        layout_regions = []
-
+        layout_regions: List[Tuple[Layout, Region]] = []
         while stack:
             layout, region = pop()
             layout_regions.append((layout, region))
@@ -207,12 +209,9 @@ class Layout:
                 for child_and_region in layout.divide(region):
                     push(child_and_region)
 
-        def layout_region_key(layout_region) -> Tuple[int, int]:
-            return (layout_region[1].y, layout_region[1].y)
-
         render_map = {
             layout: region
-            for layout, region in sorted(layout_regions, key=layout_region_key)
+            for layout, region in sorted(layout_regions, key=itemgetter(1))
         }
         return render_map
 
@@ -221,8 +220,7 @@ class Layout:
     ) -> RenderResult:
         width = options.max_width or console.width
         height = options.height or console.height
-        render_map = self._make_render_map(width, height)
-        renders: Dict[Layout, List[List[Segment]]] = {}
+        render_map = self._render_map = self._make_render_map(width, height)
 
         layout_regions = {
             layout: region
@@ -230,6 +228,7 @@ class Layout:
             if not layout.children
         }
 
+        renders: Dict[Layout, List[List[Segment]]] = {}
         for layout, region in layout_regions.items():
             lines = console.render_lines(
                 layout.renderable,
@@ -240,59 +239,37 @@ class Layout:
         render_lines = {layout: iter(lines) for layout, lines in renders.items()}
         new_line = Segment.line()
 
-        layout_lines = [[] for _ in range(height)]
+        layout_lines: List[List[Layout]] = [[] for _ in range(height)]
 
-        for layout, (x, y, width, height) in layout_regions.items():
+        for layout, (_x, y, _width, height) in layout_regions.items():
             for line_no in range(y, y + height):
-                layout_lines[line_no].append((x, layout))
+                layout_lines[line_no].append(layout)
 
         for row_layouts in layout_lines:
-            for _x, layout in sorted(row_layouts, key=itemgetter(0)):
+            for layout in row_layouts:
                 yield from next(render_lines[layout])
             yield new_line
 
     def divide(self, region: Region) -> Iterable[Tuple["Layout", Region]]:
+        """Divide a region in to sub regions containing the Layout children.
+
+        Yields:
+            Tuple[Layout, Region]: Layout and region.
+        """
+        _Region = Region
         x, y, width, height = region
         if self.direction == "vertical":
             render_heights = ratio_resolve(height, self.children)
             offset = 0
             for child, child_height in zip(self.children, render_heights):
-                yield child, Region(x, y + offset, width, child_height)
+                yield child, _Region(x, y + offset, width, child_height)
                 offset += child_height
         elif self.direction == "horizontal":
             render_widths = ratio_resolve(width, self.children)
             offset = 0
             for child, child_width in zip(self.children, render_widths):
-                yield child, Region(x + offset, y, child_width, height)
+                yield child, _Region(x + offset, y, child_width, height)
                 offset += child_width
-
-    def _render_horizontal(
-        self, console: Console, options: ConsoleOptions
-    ) -> RenderResult:
-        render_widths = ratio_resolve(options.max_width, self.children)
-        renders = [
-            console.render_lines(child, options.update(width=render_width))
-            for child, render_width in zip(self.children, render_widths)
-        ]
-        new_line = Segment.line()
-        for lines in zip(*renders):
-            for line in lines:
-                yield from line
-            yield new_line
-
-    def _render_vertical(
-        self, console: Console, options: ConsoleOptions
-    ) -> RenderResult:
-        render_heights = ratio_resolve(options.height or console.height, self.children)
-        renders = [
-            console.render_lines(
-                child.renderable, options.update(height=render_height), new_lines=True
-            )
-            for child, render_height in zip(self.children, render_heights)
-        ]
-        for render in renders:
-            for line in render:
-                yield from line
 
 
 if __name__ == "__main__":  # type: ignore
@@ -311,6 +288,12 @@ if __name__ == "__main__":  # type: ignore
     layout["main"].split(
         Layout(name="side"), Layout(name="body", ratio=2), direction="horizontal"
     )
+
+    layout["body"].split(
+        Layout(name="s1"), Layout(name="s2"), Layout(), direction="horizontal"
+    )
+
+    layout["s2"].split(Layout(name="top"), Layout(), Layout())
 
     layout["side"].split(Layout(), Layout())
 
