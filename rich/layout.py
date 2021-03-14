@@ -1,7 +1,6 @@
 from .align import Align
 from .console import Console, ConsoleOptions, RenderResult, RenderableType
 from .highlighter import ReprHighlighter
-from ._loop import loop_last
 from operator import itemgetter
 from .panel import Panel
 from .pretty import Pretty
@@ -15,6 +14,8 @@ from typing_extensions import Literal
 
 
 class Region(NamedTuple):
+    """Defines a rectangular region of the screen."""
+
     x: int
     y: int
     width: int
