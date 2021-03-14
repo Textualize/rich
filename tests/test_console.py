@@ -16,6 +16,7 @@ from rich.console import (
     ConsoleOptions,
     render_group,
 )
+from rich.control import Control
 from rich.measure import measure_renderables
 from rich.pager import SystemPager
 from rich.panel import Panel
@@ -211,9 +212,9 @@ def test_render_error():
 
 def test_control():
     console = Console(file=io.StringIO(), force_terminal=True, _environ={})
-    console.control("FOO")
+    console.control(Control.clear())
     console.print("BAR")
-    assert console.file.getvalue() == "FOOBAR\n"
+    assert console.file.getvalue() == "\x1b[2JBAR\n"
 
 
 def test_capture():

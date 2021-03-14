@@ -1,9 +1,10 @@
 from rich.control import Control, strip_control_codes
+from rich.segment import ControlType
 
 
 def test_control():
-    control = Control("FOO")
-    assert str(control) == "FOO"
+    control = Control(ControlType.BELL)
+    assert str(control) == "\x07"
 
 
 def test_strip_control_codes():

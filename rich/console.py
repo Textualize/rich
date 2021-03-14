@@ -890,7 +890,7 @@ class Console:
 
     def bell(self) -> None:
         """Play a 'bell' sound (if supported by the terminal)."""
-        self.control("\x07")
+        self.control(Control.bell())
 
     def capture(self) -> Capture:
         """A context manager to *capture* the result of print() or log() in a string,
@@ -948,7 +948,10 @@ class Console:
         Args:
             home (bool, optional): Also move the cursor to 'home' position. Defaults to True.
         """
-        self.control("\033[2J\033[H" if home else "\033[2J")
+        if home:
+            self.control(Control.clear(), Control.home())
+        else:
+            self.control(Control.clear())
 
     def status(
         self,
@@ -991,7 +994,7 @@ class Console:
             show (bool, optional): Set visibility of the cursor.
         """
         if self.is_terminal and not self.legacy_windows:
-            self.control("\033[?25h" if show else "\033[?25l")
+            self.control(Control.show_cursor(show))
             return True
         return False
 
@@ -1011,7 +1014,7 @@ class Console:
         """
         changed = False
         if self.is_terminal and not self.legacy_windows:
-            self.control("\033[?1049h\033[H" if enable else "\033[?1049l")
+            self.control(Control.alt_screen(enable))
             changed = True
         return changed
 
@@ -1312,14 +1315,15 @@ class Console:
         rule = Rule(title=title, characters=characters, style=style, align=align)
         self.print(rule)
 
-    def control(self, control_codes: Union["Control", str]) -> None:
+    def control(self, *control: Control) -> None:
         """Insert non-printing control codes.
 
         Args:
             control_codes (str): Control codes, such as those that may move the cursor.
         """
         if not self.is_dumb_terminal:
-            self._buffer.append(Segment.control(str(control_codes)))
+            for _control in control:
+                self._buffer.append(_control.segment)
             self._check_buffer()
 
     def out(
@@ -1598,7 +1602,7 @@ class Console:
         not_terminal = not self.is_terminal
         if self.no_color and color_system:
             buffer = Segment.remove_color(buffer)
-        for text, style, is_control in buffer:
+        for text, style, control in buffer:
             if style:
                 append(
                     style.render(
@@ -1607,7 +1611,7 @@ class Console:
                         legacy_windows=legacy_windows,
                     )
                 )
-            elif not (not_terminal and is_control):
+            elif not (not_terminal and control):
                 append(text)
 
         rendered = "".join(output)
@@ -1679,7 +1683,7 @@ class Console:
                 text = "".join(
                     segment.text
                     for segment in self._record_buffer
-                    if not segment.is_control
+                    if not segment.control
                 )
             if clear:
                 del self._record_buffer[:]

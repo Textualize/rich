@@ -70,6 +70,7 @@ highlight_tests = [
     ('"hello"', [Span(0, 7, "repr.str")]),
     ('"""hello"""', [Span(0, 11, "repr.str")]),
     ("\\'foo'", []),
+    ("it's no 'string'", [Span(8, 16, "repr.str")]),
 ]
 
 
