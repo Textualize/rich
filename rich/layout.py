@@ -185,7 +185,6 @@ class Layout:
     def unsplit(self) -> None:
         """Reset splits to initial state."""
         del self._children[:]
-        self.direction = None
 
     def update(self, renderable: RenderableType) -> None:
         """Update renderable.
@@ -294,7 +293,7 @@ if __name__ == "__main__":  # type: ignore
         Layout(name="s1"), Layout(name="s2"), Layout(), direction="horizontal"
     )
 
-    layout["s2"].split(Layout(name="top"), Layout(), Layout())
+    # layout["s2"].split(Layout(name="top"), Layout(), Layout())
 
     layout["side"].split(Layout(), Layout())
 
