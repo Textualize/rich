@@ -25,7 +25,7 @@ class RichHandler(Handler):
         console (:class:`~rich.console.Console`, optional): Optional console instance to write logs.
             Default will use a global console instance writing to stdout.
         show_time (bool, optional): Show a column for the time. Defaults to True.
-        repeat_same_time (bool, optional): Do not omit repetition of the same time. Defaults to False.
+        omit_repeated_times (bool, optional): Omit repetition of the same time. Defaults to True.
         show_level (bool, optional): Show a column for the level. Defaults to True.
         show_path (bool, optional): Show the path to the original log call. Defaults to True.
         enable_link_path (bool, optional): Enable terminal link of path column to file. Defaults to True.
@@ -61,7 +61,7 @@ class RichHandler(Handler):
         console: Console = None,
         *,
         show_time: bool = True,
-        repeat_same_time: bool = False,
+        omit_repeated_times: bool = True,
         show_level: bool = True,
         show_path: bool = True,
         enable_link_path: bool = True,
@@ -85,7 +85,7 @@ class RichHandler(Handler):
             show_level=show_level,
             show_path=show_path,
             time_format=log_time_format,
-            repeat_same_time=repeat_same_time,
+            omit_repeated_times=omit_repeated_times,
             level_width=None,
         )
         self.enable_link_path = enable_link_path
