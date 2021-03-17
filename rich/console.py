@@ -1402,6 +1402,9 @@ class Console:
             crop = False
 
         with self:
+            if markup is not None:
+                self._markup = markup
+
             renderables = self._collect_renderables(
                 objects,
                 sep,

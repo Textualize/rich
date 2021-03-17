@@ -152,6 +152,19 @@ def test_no_columns():
     assert output == "\n"
 
 
+def test_print_markup_false():
+    no_markup = "Do not [/] attempt to markup this text"
+    console = Console()
+    table = Table()
+    table.add_column("test_print_markup_false")
+    table.add_row(no_markup)
+    console.begin_capture()
+    console.print(table, markup=False)
+    output = console.end_capture()
+    print(repr(output))
+    assert no_markup in output
+
+
 if __name__ == "__main__":
     render = render_tables()
     print(render)
