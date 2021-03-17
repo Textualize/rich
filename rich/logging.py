@@ -200,7 +200,7 @@ class RichHandler(Handler):
             time_format=time_format,
             level=level,
             path=path,
-            line_no=record.lineno,
+            line_no=f'{record.funcName}:{record.lineno}',
             link_path=record.pathname if self.enable_link_path else None,
         )
         return log_renderable
