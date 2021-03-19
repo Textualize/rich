@@ -1,6 +1,6 @@
-from typing import Callable, Dict, TYPE_CHECKING, Union, Tuple
+from typing import Callable, Dict, Iterable, List, TYPE_CHECKING, Union
 
-from .segment import ControlType, Segment
+from .segment import ControlCode, ControlType, Segment
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult
@@ -14,20 +14,21 @@ STRIP_CONTROL_CODES = [
 _CONTROL_TRANSLATE = {_codepoint: None for _codepoint in STRIP_CONTROL_CODES}
 
 
-CONTROL_CODES_FORMAT: Dict[ControlType, Callable[[int], str]] = {
-    ControlType.BELL: lambda _: "\x07",
-    ControlType.CARRIAGE_RETURN: lambda _: "\r",
-    ControlType.HOME: lambda _: "\x1b[H",
-    ControlType.CLEAR: lambda _: "\x1b[2J",
-    ControlType.ENABLE_ALT_SCREEN: lambda _: "\x1b[?1049h",
-    ControlType.DISABLE_ALT_SCREEN: lambda _: "\x1b[?1049l",
-    ControlType.SHOW_CURSOR: lambda _: "\x1b[?25h",
-    ControlType.HIDE_CURSOR: lambda _: "\x1b[?25l",
+CONTROL_CODES_FORMAT: Dict[int, Callable] = {
+    ControlType.BELL: lambda: "\x07",
+    ControlType.CARRIAGE_RETURN: lambda: "\r",
+    ControlType.HOME: lambda: "\x1b[H",
+    ControlType.CLEAR: lambda: "\x1b[2J",
+    ControlType.ENABLE_ALT_SCREEN: lambda: "\x1b[?1049h",
+    ControlType.DISABLE_ALT_SCREEN: lambda: "\x1b[?1049l",
+    ControlType.SHOW_CURSOR: lambda: "\x1b[?25h",
+    ControlType.HIDE_CURSOR: lambda: "\x1b[?25l",
     ControlType.CURSOR_UP: lambda param: f"\x1b[{param}A",
     ControlType.CURSOR_DOWN: lambda param: f"\x1b[{param}B",
     ControlType.CURSOR_FORWARD: lambda param: f"\x1b[{param}C",
     ControlType.CURSOR_BACKWARD: lambda param: f"\x1b[{param}D",
     ControlType.ERASE_IN_LINE: lambda param: f"\x1b[{param}K",
+    ControlType.CURSOR_MOVE_TO: lambda x, y: f"\x1b[{y};{x}H",
 }
 
 
@@ -41,16 +42,15 @@ class Control:
 
     __slots__ = ["_segment"]
 
-    def __init__(self, *codes: Union[ControlType, Tuple[ControlType, int]]) -> None:
-        control_codes = [
-            code if isinstance(code, tuple) else (code, 0) for code in codes
+    def __init__(self, *codes: Union[ControlType, ControlCode]) -> None:
+        control_codes: List[ControlCode] = [
+            (code,) if isinstance(code, ControlType) else code for code in codes
         ]
         _format_map = CONTROL_CODES_FORMAT
-        self._segment = Segment(
-            "".join(_format_map[code](param) for code, param in control_codes),
-            None,
-            control_codes,
+        rendered_codes = "".join(
+            _format_map[code](*parameters) for code, *parameters in control_codes
         )
+        self._segment = Segment(rendered_codes, None, control_codes)
 
     @property
     def segment(self) -> "Segment":
@@ -65,6 +65,19 @@ class Control:
     def home(cls) -> "Control":
         """Move cursor to 'home' position."""
         return cls(ControlType.HOME)
+
+    @classmethod
+    def move_to(cls, x: int, y: int) -> "Control":
+        """Move cursor to absolute position.
+
+        Args:
+            x (int): x offset (column)
+            y (int): y offset (row)
+
+        Returns:
+            ~Control: Control object.
+        """
+        return Control((ControlType.CURSOR_MOVE_TO, x, y))
 
     @classmethod
     def clear(cls) -> "Control":

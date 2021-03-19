@@ -5,12 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [9.13.1] - Unreleased
+## [10.0.0] - Unreleased
 
 ### Changed
 
 - Made pydoc import lazy as at least one use found it slow to import https://github.com/willmcgugan/rich/issues/1104
 - Modified string highlighting to not match in the middle of a word, so that apostrophes are not considered strings
+
+### Added
+
+- Added `__rich_repr__` protocol method to Pretty
 
 ## [9.13.0] - 2021-03-06
 

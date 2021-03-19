@@ -1,16 +1,18 @@
 from enum import IntEnum
 
-from typing import Callable, Dict, NamedTuple, Optional
+from typing import Dict, NamedTuple, Optional
 
 from .cells import cell_len, set_cell_size
 from .style import Style
 
 from itertools import filterfalse
 from operator import attrgetter
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Sequence, Union, Tuple
 
 
 class ControlType(IntEnum):
+    """Non-printable control codes which typically translate to ANSI codes."""
+
     BELL = 1
     CARRIAGE_RETURN = 2
     HOME = 3
@@ -23,10 +25,12 @@ class ControlType(IntEnum):
     CURSOR_DOWN = 10
     CURSOR_FORWARD = 11
     CURSOR_BACKWARD = 12
-    ERASE_IN_LINE = 13
+    CURSOR_MOVE_TO = 13
+    ERASE_IN_LINE = 14
 
 
-ControlCode = Tuple[ControlType, int]
+ControlParameters = Tuple[int, ...]
+ControlCode = Tuple[int, ...]
 
 
 class Segment(NamedTuple):
@@ -43,7 +47,7 @@ class Segment(NamedTuple):
     """Raw text."""
     style: Optional[Style] = None
     """An optional style."""
-    control: Optional[List[ControlCode]] = None
+    control: Optional[Sequence[ControlCode]] = None
     """True if the segment contains control codes, otherwise False."""
 
     def __repr__(self) -> str:

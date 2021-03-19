@@ -440,7 +440,30 @@ def traverse(_object: Any, max_length: int = None, max_string: int = None) -> No
         """Walk the object depth first."""
         obj_type = type(obj)
         py_version = (sys.version_info.major, sys.version_info.minor)
-        if (
+        children: List[Node]
+        if hasattr(obj, "__rich_repr__"):
+            tokens = list(obj.__rich_repr__())
+            if len(tokens) <= 2:
+                node = Node(value_repr="".join(tokens), children=[], last=root)
+            else:
+                children = []
+                append = children.append
+                node = Node(
+                    open_brace=tokens[0],
+                    close_brace=tokens[-1],
+                    children=children,
+                    last=root,
+                )
+                for last, (key, child) in loop_last(tokens[1:-1]):
+                    child_node = _traverse(child)
+                    child_node.last = last
+                    if key is not None:
+                        child_node.key_repr = key
+                        child_node.last = last
+                        child_node.key_separator = "="
+                    append(child_node)
+
+        elif (
             is_dataclass(obj)
             and not isinstance(obj, type)
             and (
@@ -453,7 +476,7 @@ def traverse(_object: Any, max_length: int = None, max_string: int = None) -> No
                 return Node(value_repr="...")
             push_visited(obj_id)
 
-            children: List[Node] = []
+            children = []
             append = children.append
             node = Node(
                 open_brace=f"{obj.__class__.__name__}(",

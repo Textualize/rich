@@ -1,32 +1,55 @@
-from .align import Align
-from .console import Console, ConsoleOptions, RenderResult, RenderableType
-from .highlighter import ReprHighlighter
+from abc import ABC, abstractmethod
+from itertools import islice
 from operator import itemgetter
+from threading import RLock
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
+
+from typing_extensions import Literal
+
+from ._loop import loop_last
+from ._ratio import ratio_resolve
+from .align import Align
+from .console import Console, ConsoleOptions, RenderableType, RenderResult
+from .control import Control
+from .highlighter import ReprHighlighter
 from .panel import Panel
 from .pretty import Pretty
-from ._ratio import ratio_resolve
+from .region import Region
 from .segment import Segment
 from .style import StyleType
 
-
-from typing import Dict, List, Iterable, NamedTuple, Optional, Tuple, TYPE_CHECKING
-from typing_extensions import Literal
-
-
-class Region(NamedTuple):
-    """Defines a rectangular region of the screen."""
-
-    x: int
-    y: int
-    width: int
-    height: int
+if TYPE_CHECKING:
+    from rich.tree import Tree
 
 
+class LayoutRender(NamedTuple):
+    """An individual layout render."""
+
+    region: Region
+    render: List[List[Segment]]
+
+
+RenderMap = Dict["Layout", Region]
 Direction = Literal["horizontal", "vertical"]
 
 
-if TYPE_CHECKING:
-    from rich.tree import Tree
+class LayoutError(Exception):
+    """Layout related error."""
+
+
+class NoSplitter(LayoutError):
+    """Requested splitter does not exist."""
 
 
 class _Placeholder:
@@ -44,25 +67,78 @@ class _Placeholder:
         width = options.max_width
         height = options.height or options.size.height
         layout = self.layout
-
-        layout_info = {
-            "size": layout.size,
-            "minimum_size": layout.minimum_size,
-            "ratio": layout.ratio,
-            "name": layout.name,
-        }
-
         title = (
             f"{layout.name!r} ({width} x {height})"
             if layout.name
             else f"({width} x {height})"
         )
         yield Panel(
-            Align.center(Pretty(layout_info), vertical="middle"),
+            Align.center(Pretty(layout), vertical="middle"),
             style=self.style,
             title=self.highlighter(title),
             border_style="blue",
         )
+
+
+class Splitter(ABC):
+    """Base class for a splitter."""
+
+    name: str = ""
+
+    @abstractmethod
+    def get_tree_icon(self) -> str:
+        """Get the icon (emoji) used in layout.tree"""
+
+    @abstractmethod
+    def divide(
+        self, children: Sequence["Layout"], region: Region
+    ) -> Iterable[Tuple["Layout", Region]]:
+        """Divide a region amongst several child layouts.
+
+        Args:
+            children (Sequence(Layout)): A number of child layouts.
+            region (Region): A rectangular region to divide.
+        """
+
+
+class RowSplitter(Splitter):
+    """Split a layout region in to rows."""
+
+    name = "row"
+
+    def get_tree_icon(self) -> str:
+        return "[layout.tree.row]⬌"
+
+    def divide(
+        self, children: Sequence["Layout"], region: Region
+    ) -> Iterable[Tuple["Layout", Region]]:
+        x, y, width, height = region
+        render_widths = ratio_resolve(width, children)
+        offset = 0
+        _Region = Region
+        for child, child_width in zip(children, render_widths):
+            yield child, _Region(x + offset, y, child_width, height)
+            offset += child_width
+
+
+class ColumnSplitter(Splitter):
+    """Split a layout region in to columns."""
+
+    name = "column"
+
+    def get_tree_icon(self) -> str:
+        return "[layout.tree.column]⬍"
+
+    def divide(
+        self, children: Sequence["Layout"], region: Region
+    ) -> Iterable[Tuple["Layout", Region]]:
+        x, y, width, height = region
+        render_heights = ratio_resolve(height, children)
+        offset = 0
+        _Region = Region
+        for child, child_height in zip(children, render_heights):
+            yield child, _Region(x, y + offset, width, child_height)
+            offset += child_height
 
 
 class Layout:
@@ -70,39 +146,52 @@ class Layout:
 
     Args:
         renderable (RenderableType, optional): Renderable content, or None for placeholder. Defaults to None.
-        direction (str, optional): Direction of split, one of "vertical" or "horizontal". Defaults to "vertical".
+        name (str, optional): Optional identifier for Layout. Defaults to None.
         size (int, optional): Optional fixed size of layout. Defaults to None.
         minimum_size (int, optional): Minimum size of layout. Defaults to 1.
         ratio (int, optional): Optional ratio for flexible layout. Defaults to 1.
-        name (str, optional): Optional identifier for Layout. Defaults to None.
         visible (bool, optional): Visibility of layout. Defaults to True.
     """
+
+    splitters = {"row": RowSplitter, "column": ColumnSplitter}
 
     def __init__(
         self,
         renderable: RenderableType = None,
         *,
-        direction: str = "vertical",
+        name: str = None,
         size: int = None,
         minimum_size: int = 1,
         ratio: int = 1,
-        name: str = None,
         visible: bool = True,
         height: int = None,
     ) -> None:
         self._renderable = renderable or _Placeholder(self)
-        self.direction = direction
         self.size = size
         self.minimum_size = minimum_size
         self.ratio = ratio
         self.name = name
         self.visible = visible
         self.height = height
+        self.splitter: Splitter = self.splitters["column"]()
         self._children: List[Layout] = []
-        self._render_map: Dict["Layout", Region] = {}
+        self._render: Dict["Layout", LayoutRender] = {}
+        self._lock = RLock()
 
     def __repr__(self) -> str:
-        return f"Layout(size={self.size!r}, minimum_size={self.size!r}, ratio={self.ratio!r}, name={self.name!r}, visible={self.visible!r})"
+        return f"Layout(size={self.size!r}, minimum_size={self.minimum_size!r}, ratio={self.ratio!r}, name={self.name!r}, visible={self.visible!r})"
+
+    def __rich_repr__(self) -> Iterable[Union[str, Tuple[Optional[str], Any]]]:
+        yield "Layout("
+        if self.name is not None:
+            yield "name", self.name
+        if self.size is not None:
+            yield "size", self.size
+        if self.minimum_size != 1:
+            yield "minimum_size", self.size
+        if self.ratio != 1:
+            yield "ratio", self.ratio
+        yield ")"
 
     @property
     def renderable(self) -> RenderableType:
@@ -141,46 +230,94 @@ class Layout:
     @property
     def tree(self) -> "Tree":
         """Get a tree renderable to show layout structure."""
-        from rich.highlighter import ReprHighlighter
-        from rich.text import Text
+        from rich.styled import Styled
+        from rich.table import Table
         from rich.tree import Tree
 
-        highlighter = ReprHighlighter()
+        def summary(layout) -> Table:
+            icon = layout.splitter.get_tree_icon()
 
-        def summary(layout) -> "Text":
-            name = repr(layout.name) + " " if layout.name else ""
-            direction = (
-                ("➡" if layout.direction == "horizontal" else "⬇")
-                if layout._children
-                else "■"
+            table = Table.grid(padding=(0, 1, 0, 0))
+            text: RenderableType = (
+                Pretty(layout) if layout.visible else Styled(Pretty(layout), "dim")
             )
-            if layout.size:
-                _summary = highlighter(f"{direction} {name}(size={layout.size})")
-            else:
-                _summary = highlighter(f"{direction} {name}(ratio={layout.ratio})")
-            _summary.stylize("" if layout.visible else "dim")
+            table.add_row(icon, text)
+            _summary = table
             return _summary
 
         layout = self
-        tree = Tree(summary(layout), highlight=True)
+        tree = Tree(
+            summary(layout),
+            guide_style=f"layout.tree.{layout.splitter.name}",
+            highlight=True,
+        )
 
         def recurse(tree, layout):
             for child in layout._children:
-                recurse(tree.add(summary(child)), child)
+                recurse(
+                    tree.add(
+                        summary(child),
+                        guide_style=f"layout.tree.{child.splitter.name}",
+                    ),
+                    child,
+                )
 
         recurse(tree, self)
         return tree
 
-    def split(self, *layouts, direction: Direction = None) -> None:
+    def split(
+        self,
+        *layouts: Union["Layout", RenderableType],
+        splitter: Union[Splitter, str] = "column",
+    ) -> None:
         """Split the layout in to multiple sub-layouts.
 
         Args:
             *layouts (Layout): Positional arguments should be (sub) Layout instances.
-            direction (Direction, optional): One of "horizontal" or "vertical" or None for no change. Defaults to None.
+            splitter (Union[Splitter, str]): Splitter instance or name of splitter.
         """
-        if direction is not None:
-            self.direction = direction
-        self._children.extend(layouts)
+        _layouts = [
+            layout if isinstance(layout, Layout) else Layout(layout)
+            for layout in layouts
+        ]
+        try:
+            self.splitter = (
+                splitter
+                if isinstance(splitter, Splitter)
+                else self.splitters[splitter]()
+            )
+        except KeyError:
+            raise NoSplitter(f"No splitter called {splitter!r}")
+        self._children[:] = _layouts
+
+    def add_split(self, *layouts: Union["Layout", RenderableType]) -> None:
+        """Add a new layout(s) to existing split.
+
+        Args:
+            *layouts (Union[Layout, RenderableType]): Positional arguments should be renderables or (sub) Layout instances.
+
+        """
+        _layouts = (
+            layout if isinstance(layout, Layout) else Layout(layout)
+            for layout in layouts
+        )
+        self._children.extend(_layouts)
+
+    def split_row(self, *layouts: Union["Layout", RenderableType]) -> None:
+        """Split the layout in tow a row.
+
+        Args:
+            *layouts (Layout): Positional arguments should be (sub) Layout instances.
+        """
+        self.split(*layouts, splitter="row")
+
+    def split_column(self, *layouts: Union["Layout", RenderableType]) -> None:
+        """Split the layout in to a column.
+
+        Args:
+            *layouts (Layout): Positional arguments should be (sub) Layout instances.
+        """
+        self.split(*layouts, splitter="column")
 
     def unsplit(self) -> None:
         """Reset splits to initial state."""
@@ -192,21 +329,39 @@ class Layout:
         Args:
             renderable (RenderableType): New renderable object.
         """
-        self._renderable = renderable
+        with self._lock:
+            self._renderable = renderable
+
+    def refresh(self, console: "Console", layout_name: str) -> None:
+        """Refresh a sub-layout.
+
+        Args:
+            console (Console): Console instance where Layout is to be rendered.
+            layout_name (str): Name of layout.
+        """
+        with self._lock:
+            layout = self[layout_name]
+            region, _lines = self._render[layout]
+            (x, y, width, height) = region
+            lines = console.render_lines(
+                layout, console.options.update_dimensions(width, height)
+            )
+            self._render[layout] = LayoutRender(region, lines)
+            console.update_screen_lines(lines, x, y)
 
     def _make_render_map(self, width: int, height: int) -> Dict["Layout", Region]:
         """Create a dict that maps layout on to Region."""
-        stack: List[Tuple[Layout, Region]] = [
-            (self, Region(0, 0, width, height or console.height))
-        ]
+        stack: List[Tuple[Layout, Region]] = [(self, Region(0, 0, width, height))]
         push = stack.append
         pop = stack.pop
         layout_regions: List[Tuple[Layout, Region]] = []
+        append_layout_region = layout_regions.append
         while stack:
-            layout, region = pop()
-            layout_regions.append((layout, region))
-            if layout.children:
-                for child_and_region in layout.divide(region):
+            append_layout_region(pop())
+            layout, region = layout_regions[-1]
+            children = layout.children
+            if children:
+                for child_and_region in layout.splitter.divide(children, region):
                     push(child_and_region)
 
         render_map = {
@@ -215,61 +370,51 @@ class Layout:
         }
         return render_map
 
+    def render(
+        self, console: Console, options: ConsoleOptions
+    ) -> Dict["Layout", LayoutRender]:
+        render_width = options.max_width
+        render_height = options.height or 1
+        render_map = self._make_render_map(render_width, render_height)
+        layout_regions = [
+            (layout, region)
+            for layout, region in render_map.items()
+            if not layout.children
+        ]
+        layout_render: Dict["Layout", "LayoutRender"] = {}
+        render_lines = console.render_lines
+        update_dimensions = options.update_dimensions
+
+        for layout, region in layout_regions:
+            lines = render_lines(
+                layout.renderable, update_dimensions(region.width, region.height)
+            )
+            layout_render[layout] = LayoutRender(region, lines)
+        return layout_render
+
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        width = options.max_width or console.width
-        height = options.height or console.height
-        render_map = self._render_map = self._make_render_map(width, height)
-
-        layout_regions = {
-            layout: region
-            for layout, region in render_map.items()
-            if not layout.children
-        }
-
-        renders: Dict[Layout, List[List[Segment]]] = {}
-        for layout, region in layout_regions.items():
-            lines = console.render_lines(
-                layout.renderable,
-                options.update(width=region.width, height=region.height),
+        with self._lock:
+            width = options.max_width or console.width
+            height = options.height or console.height
+            layout_render = self.render(
+                console, options.update_dimensions(width, height)
             )
-            renders[layout] = lines
+            self._render = layout_render
+            layout_lines: List[List[Segment]] = [[] for _ in range(options.height or 1)]
+            _islice = islice
+            for (region, lines) in layout_render.values():
+                _x, y, _layout_width, layout_height = region
+                for row, line in zip(
+                    _islice(layout_lines, y, y + layout_height), lines
+                ):
+                    row.extend(line)
 
-        render_lines = {layout: iter(lines) for layout, lines in renders.items()}
-        new_line = Segment.line()
-
-        layout_lines: List[List[Layout]] = [[] for _ in range(height)]
-
-        for layout, (_x, y, _width, height) in layout_regions.items():
-            for line_no in range(y, y + height):
-                layout_lines[line_no].append(layout)
-
-        for row_layouts in layout_lines:
-            for layout in row_layouts:
-                yield from next(render_lines[layout])
-            yield new_line
-
-    def divide(self, region: Region) -> Iterable[Tuple["Layout", Region]]:
-        """Divide a region in to sub regions containing the Layout children.
-
-        Yields:
-            Tuple[Layout, Region]: Layout and region.
-        """
-        _Region = Region
-        x, y, width, height = region
-        if self.direction == "vertical":
-            render_heights = ratio_resolve(height, self.children)
-            offset = 0
-            for child, child_height in zip(self.children, render_heights):
-                yield child, _Region(x, y + offset, width, child_height)
-                offset += child_height
-        elif self.direction == "horizontal":
-            render_widths = ratio_resolve(width, self.children)
-            offset = 0
-            for child, child_width in zip(self.children, render_widths):
-                yield child, _Region(x + offset, y, child_width, height)
-                offset += child_width
+            new_line = Segment.line()
+            for layout_row in layout_lines:
+                yield from layout_row
+                yield new_line
 
 
 if __name__ == "__main__":  # type: ignore
@@ -279,22 +424,29 @@ if __name__ == "__main__":  # type: ignore
     console = Console()
     layout = Layout()
 
-    layout.split(
+    layout.split_column(
         Layout(name="header", size=3),
         Layout(ratio=1, name="main"),
         Layout(size=10, name="footer"),
     )
 
-    layout["main"].split(
-        Layout(name="side"), Layout(name="body", ratio=2), direction="horizontal"
+    layout["main"].split_row(Layout(name="side"), Layout(name="body", ratio=2))
+
+    layout["body"].split_row(Layout(name="content", ratio=2), Layout(name="s2"))
+
+    layout["s2"].split_column(
+        Layout(name="top"), Layout(name="middle"), Layout(name="bottom")
     )
 
-    layout["body"].split(
-        Layout(name="s1"), Layout(name="s2"), Layout(), direction="horizontal"
-    )
+    layout["side"].split_column(Layout(layout.tree, name="left1"), Layout(name="left2"))
 
-    # layout["s2"].split(Layout(name="top"), Layout(), Layout())
+    layout["content"].update("foo")
 
-    layout["side"].split(Layout(), Layout())
+    from rich.live import Live
+    from time import sleep
 
-    console.print(layout)
+    with Live(layout, console=console, screen=True, refresh_per_second=1) as live:
+        for n in range(100):
+            layout["top"].update("[on red]" + str(n))
+            sleep(0.1)
+            layout.refresh(console, "top")

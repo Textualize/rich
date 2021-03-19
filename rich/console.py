@@ -41,6 +41,7 @@ from .markup import render as render_markup
 from .measure import Measurement, measure_renderables
 from .pager import Pager, SystemPager
 from .pretty import is_expandable, Pretty
+from .region import Region
 from .scope import render_scope
 from .screen import Screen
 from .segment import Segment
@@ -146,6 +147,7 @@ class ConsoleOptions:
 
     def update(
         self,
+        *,
         width: Union[int, NoChange] = NO_CHANGE,
         min_width: Union[int, NoChange] = NO_CHANGE,
         max_width: Union[int, NoChange] = NO_CHANGE,
@@ -182,10 +184,25 @@ class ConsoleOptions:
             width (int): New width (sets both min_width and max_width)
 
         Returns:
-            ~ConsoleOptions: New console options instance
+            ~ConsoleOptions: New console options instance.
         """
         options = self.copy()
         options.min_width = options.max_width = max(0, width)
+        return options
+
+    def update_dimensions(self, width: int, height: int) -> "ConsoleOptions":
+        """Update the width and height, and return a copy.
+
+        Args:
+            width (int): New width (sets both min_width and max_width).
+            height (int): New height.
+
+        Returns:
+            ~ConsoleOptions: New console options instance.
+        """
+        options = self.copy()
+        options.min_width = options.max_width = max(0, width)
+        options.height = height
         return options
 
 
@@ -231,6 +248,24 @@ class NewLine:
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
         yield Segment("\n" * self.count)
+
+
+class ScreenUpdate:
+    """Render a list of lines at a given offset."""
+
+    def __init__(self, lines: List[List[Segment]], x: int, y: int) -> None:
+        self._lines = lines
+        self.x = x
+        self.y = y
+
+    def __rich_console__(
+        self, console: "Console", options: ConsoleOptions
+    ) -> RenderResult:
+        x = self.x + 1
+        move_to = Control.move_to
+        for offset, line in enumerate(self._lines, self.y + 1):
+            yield move_to(x, offset)
+            yield from line
 
 
 class Capture:
@@ -623,6 +658,7 @@ class Console:
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
         self._live: Optional["Live"] = None
+        self._is_alt_screen = False
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
@@ -1016,7 +1052,16 @@ class Console:
         if self.is_terminal and not self.legacy_windows:
             self.control(Control.alt_screen(enable))
             changed = True
+            self._is_alt_screen = enable
         return changed
+
+    def is_alt_screen(self) -> bool:
+        """Check if the alt screen was enabled.
+
+        Returns:
+            bool: True if the alt screen was enabled, otherwise False.
+        """
+        return self._is_alt_screen
 
     def screen(
         self, hide_cursor: bool = True, style: StyleType = None
@@ -1073,8 +1118,9 @@ class Console:
             raise errors.NotRenderableError(
                 f"object {render_iterable!r} is not renderable"
             )
+        _Segment = Segment
         for render_output in iter_render:
-            if isinstance(render_output, Segment):
+            if isinstance(render_output, _Segment):
                 yield render_output
             else:
                 yield from self.render(render_output, _options)
@@ -1446,6 +1492,54 @@ class Console:
                     buffer_extend(line)
             else:
                 self._buffer.extend(new_segments)
+
+    def update_screen(
+        self, renderable, *, region: Region = None, options: ConsoleOptions = None
+    ) -> None:
+        """Update the screen at a given offset.
+
+        Args:
+            renderable (RenderableType): A Rich renderable.
+            region (Region, optional): Region of screen to update, or None for entire screen. Defaults to None.
+            x (int, optional): x offset. Defaults to 0.
+            y (int, optional): y offset. Defaults to 0.
+
+        Raises:
+            errors.NoAltScreen: If the Console isn't in alt screen mode.
+
+        """
+        if not self.is_alt_screen:
+            raise errors.NoAltScreen("Alt screen must be enabled to call update_screen")
+        render_options = options or self.options
+        if region is None:
+            x = y = 0
+            render_options = render_options.update_dimensions(
+                render_options.max_width, render_options.height or self.height
+            )
+        else:
+            x, y, width, height = region
+            render_options = render_options.update_dimensions(width, height)
+
+        lines = self.render_lines(renderable, options=render_options)
+        self.update_screen_lines(lines, x, y)
+
+    def update_screen_lines(self, lines: List[List[Segment]], x: int = 0, y: int = 0):
+        """Update lines of the screen at a given offset.
+
+        Args:
+            lines (List[List[Segment]]): Rendered lines (as produced by :meth:`~rich.Console.render_lines`).
+            x (int, optional): x offset (column no). Defaults to 0.
+            y (int, optional): y offset (column no). Defaults to 0.
+
+        Raises:
+            errors.NoAltScreen: If the Console isn't in alt screen mode.
+        """
+        if not self.is_alt_screen:
+            raise errors.NoAltScreen("Alt screen must be enabled to call update_screen")
+        screen_update = ScreenUpdate(lines, x, y)
+        segments = self.render(screen_update)
+        self._buffer.extend(segments)
+        self._check_buffer()
 
     def print_exception(
         self,

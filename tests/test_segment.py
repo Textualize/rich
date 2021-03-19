@@ -1,4 +1,4 @@
-from rich.segment import ControlCode, ControlType
+from rich.segment import ControlType
 from rich.segment import Segment
 from rich.style import Style
 
@@ -113,3 +113,9 @@ def test_remove_color():
         Segment("foo", Style(bold=True)),
         Segment("bar", None),
     ]
+
+
+def test_is_control():
+    assert Segment("foo", Style(bold=True)).is_control == False
+    assert Segment("foo", Style(bold=True), []).is_control == True
+    assert Segment("foo", Style(bold=True), [(ControlType.HOME, 0)]).is_control == True
