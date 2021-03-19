@@ -11,12 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Made pydoc import lazy as at least one use found it slow to import https://github.com/willmcgugan/rich/issues/1104
 - Modified string highlighting to not match in the middle of a word, so that apostrophes are not considered strings
+- New way of encoding control codes in Segment
+- New signature for Control class
+- Changed Layout.split to use new Splitter class
+- Improved layout.tree
 
 ### Added
 
 - Added `__rich_repr__` protocol method to Pretty
 - Added rich.region.Region
 - Added ConsoleOptions.update_dimensions
+- Added rich.console.ScreenUpdate
+- Added Console.is_alt_screen
+- Added Control.segment, Control.bell, Control.home, Control.move_to, Control.clear, Control.show_cursor, Control.alt_screen
+- Added Console.update_screen and Console.update_screen_lines
+- Added Layout.add_split, Layout.split_column, Layout.split_row, layout.refresh
+- Added new Rich repr protocol `__rich_repr__`
 
 ## [9.13.0] - 2021-03-06
 

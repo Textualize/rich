@@ -305,7 +305,7 @@ class Layout:
         self._children.extend(_layouts)
 
     def split_row(self, *layouts: Union["Layout", RenderableType]) -> None:
-        """Split the layout in tow a row.
+        """Split the layout in tow a row (Layouts side by side).
 
         Args:
             *layouts (Layout): Positional arguments should be (sub) Layout instances.
@@ -313,7 +313,7 @@ class Layout:
         self.split(*layouts, splitter="row")
 
     def split_column(self, *layouts: Union["Layout", RenderableType]) -> None:
-        """Split the layout in to a column.
+        """Split the layout in to a column (layouts stacked on top of each other).
 
         Args:
             *layouts (Layout): Positional arguments should be (sub) Layout instances.
@@ -372,6 +372,15 @@ class Layout:
         return region_map
 
     def render(self, console: Console, options: ConsoleOptions) -> RenderMap:
+        """Render the sub_layouts.
+
+        Args:
+            console (Console): Console instance.
+            options (ConsoleOptions): Console options.
+
+        Returns:
+            RenderMap: A dict that maps Layout on to a tuple of Region, lines
+        """
         render_width = options.max_width
         render_height = options.height or 1
         region_map = self._make_region_map(render_width, render_height)
