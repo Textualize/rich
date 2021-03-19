@@ -40,7 +40,8 @@ class LayoutRender(NamedTuple):
     render: List[List[Segment]]
 
 
-RenderMap = Dict["Layout", Region]
+RegionMap = Dict["Layout", Region]
+RenderMap = Dict["Layout", LayoutRender]
 Direction = Literal["horizontal", "vertical"]
 
 
@@ -175,7 +176,7 @@ class Layout:
         self.height = height
         self.splitter: Splitter = self.splitters["column"]()
         self._children: List[Layout] = []
-        self._render: Dict["Layout", LayoutRender] = {}
+        self._render_map: RenderMap = {}
         self._lock = RLock()
 
     def __repr__(self) -> str:
@@ -341,15 +342,15 @@ class Layout:
         """
         with self._lock:
             layout = self[layout_name]
-            region, _lines = self._render[layout]
+            region, _lines = self._render_map[layout]
             (x, y, width, height) = region
             lines = console.render_lines(
                 layout, console.options.update_dimensions(width, height)
             )
-            self._render[layout] = LayoutRender(region, lines)
+            self._render_map[layout] = LayoutRender(region, lines)
             console.update_screen_lines(lines, x, y)
 
-    def _make_render_map(self, width: int, height: int) -> Dict["Layout", Region]:
+    def _make_region_map(self, width: int, height: int) -> RegionMap:
         """Create a dict that maps layout on to Region."""
         stack: List[Tuple[Layout, Region]] = [(self, Region(0, 0, width, height))]
         push = stack.append
@@ -364,24 +365,22 @@ class Layout:
                 for child_and_region in layout.splitter.divide(children, region):
                     push(child_and_region)
 
-        render_map = {
+        region_map = {
             layout: region
             for layout, region in sorted(layout_regions, key=itemgetter(1))
         }
-        return render_map
+        return region_map
 
-    def render(
-        self, console: Console, options: ConsoleOptions
-    ) -> Dict["Layout", LayoutRender]:
+    def render(self, console: Console, options: ConsoleOptions) -> RenderMap:
         render_width = options.max_width
         render_height = options.height or 1
-        render_map = self._make_render_map(render_width, render_height)
+        region_map = self._make_region_map(render_width, render_height)
         layout_regions = [
             (layout, region)
-            for layout, region in render_map.items()
+            for layout, region in region_map.items()
             if not layout.children
         ]
-        layout_render: Dict["Layout", "LayoutRender"] = {}
+        render_map: Dict["Layout", "LayoutRender"] = {}
         render_lines = console.render_lines
         update_dimensions = options.update_dimensions
 
@@ -389,8 +388,8 @@ class Layout:
             lines = render_lines(
                 layout.renderable, update_dimensions(region.width, region.height)
             )
-            layout_render[layout] = LayoutRender(region, lines)
-        return layout_render
+            render_map[layout] = LayoutRender(region, lines)
+        return render_map
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
@@ -398,13 +397,11 @@ class Layout:
         with self._lock:
             width = options.max_width or console.width
             height = options.height or console.height
-            layout_render = self.render(
-                console, options.update_dimensions(width, height)
-            )
-            self._render = layout_render
+            render_map = self.render(console, options.update_dimensions(width, height))
+            self._render_map = render_map
             layout_lines: List[List[Segment]] = [[] for _ in range(options.height or 1)]
             _islice = islice
-            for (region, lines) in layout_render.values():
+            for (region, lines) in render_map.values():
                 _x, y, _layout_width, layout_height = region
                 for row, line in zip(
                     _islice(layout_lines, y, y + layout_height), lines
