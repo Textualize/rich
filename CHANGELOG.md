@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added `__rich_repr__` protocol method to Pretty
+- Added rich.region.Region
+- Added ConsoleOptions.update_dimensions
 
 ## [9.13.0] - 2021-03-06
 
