@@ -434,6 +434,20 @@ def test_progress_max_refresh() -> None:
     )
 
 
+def test_live_is_started_if_progress_is_enabled() -> None:
+    progress = Progress(auto_refresh=False, disable=False)
+
+    with progress:
+        assert progress.live._started
+
+
+def test_live_is_not_started_if_progress_is_disabled() -> None:
+    progress = Progress(auto_refresh=False, disable=True)
+
+    with progress:
+        assert not progress.live._started
+
+
 if __name__ == "__main__":
     _render = render_progress()
     print(_render)

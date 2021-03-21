@@ -634,7 +634,8 @@ class Progress(JupyterMixin):
 
     def start(self) -> None:
         """Start the progress display."""
-        self.live.start(refresh=True)
+        if not self.disable:
+            self.live.start(refresh=True)
 
     def stop(self) -> None:
         """Stop the progress display."""
