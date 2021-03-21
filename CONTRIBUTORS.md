@@ -6,6 +6,7 @@ The following people have contributed to the development of Rich:
 
 - [Oleksis Fraga](https://github.com/oleksis)
 - [Finn Hughes](https://github.com/finnhughes)
+- [Josh Karpel](https://github.com/JoshKarpel)
 - [Hedy Li](https://github.com/hedythedev)
 - [Alexander Mancevice](https://github.com/amancevice)
 - [Will McGugan](https://github.com/willmcgugan)
