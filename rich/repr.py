@@ -24,6 +24,6 @@ def rich_repr(cls: Type[T]) -> Type[T]:
         return f"{self.__class__.__name__}({', '.join(repr_str)})"
 
     auto_repr.__doc__ = "Return repr(self)"
-    cls.__repr__ = auto_repr
+    cls.__repr__ = auto_repr  # type: ignore
 
     return cls

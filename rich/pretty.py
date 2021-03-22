@@ -4,6 +4,7 @@ import sys
 from array import array
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, fields, is_dataclass
+import inspect
 from itertools import islice
 from typing import (
     TYPE_CHECKING,
