@@ -72,7 +72,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     print()
 
-    def test(foo, bar):
+    def test(foo: float, bar: float) -> None:
         list_of_things = [1, 2, 3, None, 4, True, False, "Hello World"]
         dict_of_things = {
             "version": "1.1",

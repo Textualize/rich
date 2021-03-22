@@ -29,8 +29,9 @@ class ControlType(IntEnum):
     ERASE_IN_LINE = 14
 
 
-ControlParameters = Tuple[int, ...]
-ControlCode = Tuple[int, ...]
+ControlCode = Union[
+    Tuple[ControlType], Tuple[ControlType, int], Tuple[ControlType, int, int]
+]
 
 
 class Segment(NamedTuple):

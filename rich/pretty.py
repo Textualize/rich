@@ -14,6 +14,7 @@ from typing import (
     List,
     Optional,
     Set,
+    Union,
     Tuple,
 )
 
@@ -197,7 +198,10 @@ class Pretty:
         pretty_text = (
             self.highlighter(pretty_text)
             if pretty_text
-            else Text("__repr__ returned empty string", style="dim italic")
+            else Text(
+                f"{type(self._object)}.__repr__ returned empty string",
+                style="dim italic",
+            )
         )
         if self.indent_guides and not options.ascii_only:
             pretty_text = pretty_text.with_indent_guides(
@@ -251,8 +255,10 @@ _MAPPING_CONTAINERS = (dict, os._Environ)
 
 def is_expandable(obj: Any) -> bool:
     """Check if an object may be expanded by pretty print."""
-    return isinstance(obj, _CONTAINERS) or (
-        is_dataclass(obj) and not isinstance(obj, type)
+    return (
+        isinstance(obj, _CONTAINERS)
+        or (is_dataclass(obj) and not isinstance(obj, type))
+        or hasattr(obj, "__rich_repr__")
     )
 
 
@@ -441,27 +447,50 @@ def traverse(_object: Any, max_length: int = None, max_string: int = None) -> No
         obj_type = type(obj)
         py_version = (sys.version_info.major, sys.version_info.minor)
         children: List[Node]
+
+        def iter_tokens(tokens) -> Iterable[Union[Any, Tuple[str, Any]]]:
+            for token in tokens:
+                if isinstance(token, tuple):
+                    if len(token) == 3:
+                        key, child, default = token
+                        if default == child:
+                            continue
+                        yield key, child
+                    elif len(token) == 2:
+                        key, child = token
+                        yield key, child
+                else:
+                    yield token
+
         if hasattr(obj, "__rich_repr__"):
-            tokens = list(obj.__rich_repr__())
-            if len(tokens) <= 2:
-                node = Node(value_repr="".join(tokens), children=[], last=root)
-            else:
+            tokens = list(iter_tokens(obj.__rich_repr__()))
+
+            if tokens:
                 children = []
                 append = children.append
                 node = Node(
-                    open_brace=tokens[0],
-                    close_brace=tokens[-1],
+                    open_brace=f"{obj.__class__.__name__}(",
+                    close_brace=")",
                     children=children,
                     last=root,
                 )
-                for last, (key, child) in loop_last(tokens[1:-1]):
-                    child_node = _traverse(child)
-                    child_node.last = last
-                    if key is not None:
+                for last, token in loop_last(tokens):
+                    if isinstance(token, tuple):
+                        key, child = token
+                        child_node = _traverse(child)
+                        child_node.last = last
                         child_node.key_repr = key
                         child_node.last = last
                         child_node.key_separator = "="
-                    append(child_node)
+                        append(child_node)
+                    else:
+                        child_node = _traverse(token)
+                        child_node.last = last
+                        append(child_node)
+            else:
+                node = Node(
+                    value_repr=f"{obj.__class__.__name__}()", children=[], last=root
+                )
 
         elif (
             is_dataclass(obj)

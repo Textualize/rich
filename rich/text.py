@@ -367,19 +367,18 @@ class Text(JupyterMixin):
             end (Optional[int], optional): End offset (negative indexing is supported), or None for end of text. Defaults to None.
 
         """
-        if not style:
-            return
-        length = len(self)
-        if start < 0:
-            start = length + start
-        if end is None:
-            end = length
-        if end < 0:
-            end = length + end
-        if start >= length or end <= start:
-            # Span not in text or not valid
-            return
-        self._spans.append(Span(start, min(length, end), style))
+        if style:
+            length = len(self)
+            if start < 0:
+                start = length + start
+            if end is None:
+                end = length
+            if end < 0:
+                end = length + end
+            if start >= length or end <= start:
+                # Span not in text or not valid
+                return
+            self._spans.append(Span(start, min(length, end), style))
 
     def remove_suffix(self, suffix: str) -> None:
         """Remove a suffix if it exists.

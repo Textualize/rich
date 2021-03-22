@@ -67,6 +67,36 @@ class Control:
         return cls(ControlType.HOME)
 
     @classmethod
+    def move(cls, x: int, y: int) -> "Control":
+        """Move cursor relative to current position.
+
+        Args:
+            x (int): X offset.
+            y (int): Y offset.
+
+        Returns:
+            ~Control: Control object.
+
+        """
+
+        def get_codes() -> Iterable[ControlCode]:
+            control = ControlType
+            if x:
+                yield (
+                    control.CURSOR_FORWARD if x > 0 else control.CURSOR_BACKWARD,
+                    x,
+                )
+
+            if y:
+                yield (
+                    control.CURSOR_DOWN if y > 0 else control.CURSOR_UP,
+                    y,
+                )
+
+        control = cls(*get_codes())
+        return control
+
+    @classmethod
     def move_to(cls, x: int, y: int) -> "Control":
         """Move cursor to absolute position.
 
@@ -77,7 +107,7 @@ class Control:
         Returns:
             ~Control: Control object.
         """
-        return Control((ControlType.CURSOR_MOVE_TO, x, y))
+        return cls((ControlType.CURSOR_MOVE_TO, x + 1, y + 1))
 
     @classmethod
     def clear(cls) -> "Control":

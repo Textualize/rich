@@ -6,22 +6,6 @@ from rich.layout import Layout, NoSplitter
 from rich.panel import Panel
 
 
-def test_rich_laylout():
-    rich_repr = list(
-        Layout(name="foo", size=2, minimum_size=10, ratio=2).__rich_repr__()
-    )
-    print(rich_repr)
-    expected = [
-        "Layout(",
-        ("name", "foo"),
-        ("size", 2),
-        ("minimum_size", 2),
-        ("ratio", 2),
-        ")",
-    ]
-    assert rich_repr == expected
-
-
 def test_no_layout():
     layout = Layout()
     with pytest.raises(NoSplitter):

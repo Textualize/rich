@@ -15,11 +15,14 @@ from rich.console import (
     ConsoleDimensions,
     ConsoleOptions,
     render_group,
+    ScreenUpdate,
 )
 from rich.control import Control
 from rich.measure import measure_renderables
 from rich.pager import SystemPager
 from rich.panel import Panel
+from rich.region import Region
+from rich.segment import Segment
 from rich.status import Status
 from rich.style import Style
 from rich.text import Text
@@ -588,3 +591,45 @@ def test_lines_env():
     assert console.height == 40
     # Should not fail
     console = Console(width=40, _environ={"LINES": "broken"})
+
+
+def test_screen_update_class():
+    screen_update = ScreenUpdate([[Segment("foo")], [Segment("bar")]], 5, 10)
+    assert screen_update.x == 5
+    assert screen_update.y == 10
+
+    console = Console(force_terminal=True)
+    console.begin_capture()
+    console.print(screen_update)
+    result = console.end_capture()
+    print(repr(result))
+    expected = "\x1b[11;6Hfoo\x1b[12;6Hbar"
+    assert result == expected
+
+
+def test_is_alt_screen():
+    console = Console(force_terminal=True)
+    assert not console.is_alt_screen
+    with console.screen():
+        assert console.is_alt_screen
+    assert not console.is_alt_screen
+
+
+def test_update_screen():
+    console = Console(force_terminal=True, width=20, height=5)
+    with pytest.raises(errors.NoAltScreen):
+        console.update_screen("foo")
+    console.begin_capture()
+    with console.screen():
+        console.update_screen("foo")
+        console.update_screen("bar", region=Region(2, 3, 8, 4))
+    result = console.end_capture()
+    print(repr(result))
+    expected = "\x1b[?1049h\x1b[H\x1b[?25l\x1b[1;1Hfoo                 \x1b[2;1H                    \x1b[3;1H                    \x1b[4;1H                    \x1b[5;1H                    \x1b[4;3Hbar     \x1b[5;3H        \x1b[6;3H        \x1b[7;3H        \x1b[?1049l\x1b[?25h"
+    assert result == expected
+
+
+def test_update_screen_lines():
+    console = Console(force_terminal=True, width=20, height=5)
+    with pytest.raises(errors.NoAltScreen):
+        console.update_screen_lines([])

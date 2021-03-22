@@ -21,10 +21,10 @@ from ._loop import loop_last
 from ._ratio import ratio_resolve
 from .align import Align
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
-from .control import Control
 from .highlighter import ReprHighlighter
 from .panel import Panel
 from .pretty import Pretty
+from .repr import rich_repr, RichReprResult
 from .region import Region
 from .segment import Segment
 from .style import StyleType
@@ -142,6 +142,7 @@ class ColumnSplitter(Splitter):
             offset += child_height
 
 
+@rich_repr
 class Layout:
     """A renderable to divide a fixed height in to rows or columns.
 
@@ -179,20 +180,11 @@ class Layout:
         self._render_map: RenderMap = {}
         self._lock = RLock()
 
-    def __repr__(self) -> str:
-        return f"Layout(size={self.size!r}, minimum_size={self.minimum_size!r}, ratio={self.ratio!r}, name={self.name!r}, visible={self.visible!r})"
-
-    def __rich_repr__(self) -> Iterable[Union[str, Tuple[Optional[str], Any]]]:
-        yield "Layout("
-        if self.name is not None:
-            yield "name", self.name
-        if self.size is not None:
-            yield "size", self.size
-        if self.minimum_size != 1:
-            yield "minimum_size", self.size
-        if self.ratio != 1:
-            yield "ratio", self.ratio
-        yield ")"
+    def __rich_repr__(self) -> RichReprResult:
+        yield "name", self.name, None
+        yield "size", self.size, None
+        yield "minimum_size", self.minimum_size, 1
+        yield "ratio", self.ratio, 1
 
     @property
     def renderable(self) -> RenderableType:
@@ -236,9 +228,11 @@ class Layout:
         from rich.tree import Tree
 
         def summary(layout) -> Table:
+
             icon = layout.splitter.get_tree_icon()
 
             table = Table.grid(padding=(0, 1, 0, 0))
+
             text: RenderableType = (
                 Pretty(layout) if layout.visible else Styled(Pretty(layout), "dim")
             )
@@ -253,7 +247,7 @@ class Layout:
             highlight=True,
         )
 
-        def recurse(tree, layout):
+        def recurse(tree: "Tree", layout: "Layout") -> None:
             for child in layout._children:
                 recurse(
                     tree.add(
@@ -450,6 +444,14 @@ if __name__ == "__main__":  # type: ignore
 
     from rich.live import Live
     from time import sleep
+
+    from rich import print
+
+    from rich.pretty import Pretty
+
+    # l = Layout()
+    # # l.split(Layout(), Layout())
+    # print(l.tree)
 
     with Live(layout, console=console, screen=True, refresh_per_second=1) as live:
         for n in range(100):

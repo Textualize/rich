@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New signature for Control class
 - Changed Layout.split to use new Splitter class
 - Improved layout.tree
+- Changed default theme color for repr.number to cyan
 
 ### Added
 

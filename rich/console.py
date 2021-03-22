@@ -6,7 +6,7 @@ import sys
 import threading
 from abc import ABC, abstractmethod
 from collections import abc
-from dataclasses import dataclass, field, is_dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from functools import wraps
 from getpass import getpass
@@ -261,9 +261,9 @@ class ScreenUpdate:
     def __rich_console__(
         self, console: "Console", options: ConsoleOptions
     ) -> RenderResult:
-        x = self.x + 1
+        x = self.x
         move_to = Control.move_to
-        for offset, line in enumerate(self._lines, self.y + 1):
+        for offset, line in enumerate(self._lines, self.y):
             yield move_to(x, offset)
             yield from line
 
@@ -1055,6 +1055,7 @@ class Console:
             self._is_alt_screen = enable
         return changed
 
+    @property
     def is_alt_screen(self) -> bool:
         """Check if the alt screen was enabled.
 
@@ -1494,7 +1495,11 @@ class Console:
                 self._buffer.extend(new_segments)
 
     def update_screen(
-        self, renderable, *, region: Region = None, options: ConsoleOptions = None
+        self,
+        renderable: RenderableType,
+        *,
+        region: Region = None,
+        options: ConsoleOptions = None,
     ) -> None:
         """Update the screen at a given offset.
 
