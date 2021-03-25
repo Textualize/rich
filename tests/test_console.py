@@ -609,6 +609,8 @@ def test_screen_update_class():
 
 def test_is_alt_screen():
     console = Console(force_terminal=True)
+    if console.legacy_windows:
+        return
     assert not console.is_alt_screen
     with console.screen():
         assert console.is_alt_screen
@@ -617,6 +619,8 @@ def test_is_alt_screen():
 
 def test_update_screen():
     console = Console(force_terminal=True, width=20, height=5)
+    if console.legacy_windows:
+        return
     with pytest.raises(errors.NoAltScreen):
         console.update_screen("foo")
     console.begin_capture()
@@ -631,6 +635,8 @@ def test_update_screen():
 
 def test_update_screen_lines():
     console = Console(force_terminal=True, width=20, height=5)
+    if console.legacy_windows:
+        return
     with pytest.raises(errors.NoAltScreen):
         console.update_screen_lines([])
 
