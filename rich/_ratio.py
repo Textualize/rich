@@ -1,4 +1,5 @@
-from math import ceil, modf
+from fractions import Fraction
+from math import ceil, floor, modf
 from typing import cast, List, Optional, Sequence
 from typing_extensions import Protocol
 
@@ -30,6 +31,8 @@ def ratio_resolve(total: int, edges: Sequence[Edge]) -> List[int]:
     # Size of edge or None for yet to be determined
     sizes = [(edge.size or None) for edge in edges]
 
+    _Fraction = Fraction
+
     # While any edges haven't been calculated
     while None in sizes:
         # Get flexible edges and index to map these back on to sizes list
@@ -47,7 +50,9 @@ def ratio_resolve(total: int, edges: Sequence[Edge]) -> List[int]:
                 for size, edge in zip(sizes, edges)
             ]
         # Calculate number of characters in a ratio portion
-        portion = remaining / sum((edge.ratio or 1) for _, edge in flexible_edges)
+        portion = _Fraction(
+            remaining, sum((edge.ratio or 1) for _, edge in flexible_edges)
+        )
 
         # If any edges will be less than their minimum, replace size with the minimum
         for index, edge in flexible_edges:
@@ -59,11 +64,10 @@ def ratio_resolve(total: int, edges: Sequence[Edge]) -> List[int]:
             # Distribute flexible space and compensate for rounding error
             # Since edge sizes can only be integers we need to add the remainder
             # to the following line
-            _modf = modf
-            remainder = 0.0
+            remainder = _Fraction(0)
             for index, edge in flexible_edges:
-                remainder, size = _modf(portion * edge.ratio + remainder)
-                sizes[index] = int(size)
+                size, remainder = divmod(portion * edge.ratio + remainder, 1)
+                sizes[index] = size
             break
     # Sizes now contains integers only
     return cast(List[int], sizes)
@@ -135,3 +139,17 @@ def ratio_distribute(
         total_ratio -= ratio
         total_remaining -= distributed
     return distributed_total
+
+
+if __name__ == "__main__":  # type: ignore
+    from dataclasses import dataclass
+
+    @dataclass
+    class E:
+
+        size: Optional[int] = None
+        ratio: int = 1
+        minimum_size: int = 1
+
+    resolved = ratio_resolve(110, [E(None, 1, 1), E(None, 1, 1), E(None, 1, 1)])
+    print(sum(resolved))

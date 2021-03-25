@@ -281,18 +281,26 @@ class Table(JupyterMixin):
             style += console.get_style(row_style)
         return style
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> Measurement:
+        max_width = options.max_width
         if self.width is not None:
             max_width = self.width
         if max_width < 0:
             return Measurement(0, 0)
 
         extra_width = self._extra_width
-        max_width = sum(self._calculate_column_widths(console, max_width - extra_width))
+        max_width = sum(
+            self._calculate_column_widths(
+                console, options.update_width(max_width - extra_width)
+            )
+        )
         _measure_column = self._measure_column
 
         measurements = [
-            _measure_column(console, column, max_width) for column in self.columns
+            _measure_column(console, options.update_width(max_width), column)
+            for column in self.columns
         ]
         minimum_width = (
             sum(measurement.minimum for measurement in measurements) + extra_width
@@ -428,7 +436,9 @@ class Table(JupyterMixin):
             max_width = self.width
 
         extra_width = self._extra_width
-        widths = self._calculate_column_widths(console, max_width - extra_width)
+        widths = self._calculate_column_widths(
+            console, options.update_width(max_width - extra_width)
+        )
         table_width = sum(widths) + extra_width
 
         render_options = options.update(
@@ -461,11 +471,14 @@ class Table(JupyterMixin):
                 justify=self.caption_justify,
             )
 
-    def _calculate_column_widths(self, console: "Console", max_width: int) -> List[int]:
+    def _calculate_column_widths(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> List[int]:
         """Calculate the widths of each column, including padding, not including borders."""
+        max_width = options.max_width
         columns = self.columns
         width_ranges = [
-            self._measure_column(console, column, max_width) for column in columns
+            self._measure_column(console, options, column) for column in columns
         ]
         widths = [_range.maximum or 1 for _range in width_ranges]
         get_padding_width = self._get_padding_width
@@ -504,7 +517,7 @@ class Table(JupyterMixin):
                 table_width = sum(widths)
 
             width_ranges = [
-                self._measure_column(console, column, width)
+                self._measure_column(console, options.update_width(width), column)
                 for width, column in zip(widths, columns)
             ]
             widths = [_range.maximum or 0 for _range in width_ranges]
@@ -609,7 +622,7 @@ class Table(JupyterMixin):
                 column.header_style
             )
             _append((header_style, column.header))
-        cell_style = get_style(self.style or "") + get_style(column.style or "")
+        cell_style = get_style(column.style or "")
         for cell in column.cells:
             _append((cell_style, cell))
         if self.show_footer:
@@ -635,10 +648,14 @@ class Table(JupyterMixin):
         return pad_left + pad_right
 
     def _measure_column(
-        self, console: "Console", column: Column, max_width: int
+        self,
+        console: "Console",
+        options: "ConsoleOptions",
+        column: Column,
     ) -> Measurement:
         """Get the minimum and maximum width of the column."""
 
+        max_width = options.max_width
         if max_width < 1:
             return Measurement(0, 0)
 
@@ -656,7 +673,7 @@ class Table(JupyterMixin):
         append_max = max_widths.append
         get_render_width = Measurement.get
         for cell in self._get_cells(console, column._index, column):
-            _min, _max = get_render_width(console, cell.renderable, max_width)
+            _min, _max = get_render_width(console, options, cell.renderable)
             append_min(_min)
             append_max(_max)
 

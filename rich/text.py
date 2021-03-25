@@ -367,19 +367,18 @@ class Text(JupyterMixin):
             end (Optional[int], optional): End offset (negative indexing is supported), or None for end of text. Defaults to None.
 
         """
-        if not style:
-            return
-        length = len(self)
-        if start < 0:
-            start = length + start
-        if end is None:
-            end = length
-        if end < 0:
-            end = length + end
-        if start >= length or end <= start:
-            # Span not in text or not valid
-            return
-        self._spans.append(Span(start, min(length, end), style))
+        if style:
+            length = len(self)
+            if start < 0:
+                start = length + start
+            if end is None:
+                end = length
+            if end < 0:
+                end = length + end
+            if start >= length or end <= start:
+                # Span not in text or not valid
+                return
+            self._spans.append(Span(start, min(length, end), style))
 
     def remove_suffix(self, suffix: str) -> None:
         """Remove a suffix if it exists.
@@ -526,12 +525,16 @@ class Text(JupyterMixin):
         all_lines = Text("\n").join(lines)
         yield from all_lines.render(console, end=self.end)
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> Measurement:
         text = self.plain
-        if not text.strip():
-            return Measurement(cell_len(text), cell_len(text))
-        max_text_width = max(cell_len(line) for line in text.splitlines())
-        min_text_width = max(cell_len(word) for word in text.split())
+        lines = text.splitlines()
+        max_text_width = max(cell_len(line) for line in lines) if lines else 0
+        words = text.split()
+        min_text_width = (
+            max(cell_len(word) for word in words) if words else max_text_width
+        )
         return Measurement(min_text_width, max_text_width)
 
     def render(self, console: "Console", end: str = "") -> Iterable["Segment"]:

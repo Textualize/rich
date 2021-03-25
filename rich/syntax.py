@@ -468,11 +468,13 @@ class Syntax(JupyterMixin):
             highlight_number_style = background_style + Style(dim=False)
         return background_style, number_style, highlight_number_style
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "Measurement":
         if self.code_width is not None:
             width = self.code_width + self._numbers_column_width
             return Measurement(self._numbers_column_width, width)
-        return Measurement(self._numbers_column_width, max_width)
+        return Measurement(self._numbers_column_width, options.max_width)
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions

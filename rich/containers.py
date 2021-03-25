@@ -39,9 +39,11 @@ class Renderables:
         """Console render method to insert line-breaks."""
         yield from self._renderables
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "Measurement":
         dimensions = [
-            Measurement.get(console, renderable, max_width)
+            Measurement.get(console, options, renderable)
             for renderable in self._renderables
         ]
         if not dimensions:

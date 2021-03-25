@@ -47,29 +47,3 @@ def tabulate_mapping(
             Pretty(key, highlighter=highlighter), Pretty(value, highlighter=highlighter)
         )
     return table
-
-
-if __name__ == "__main__":  # pragma: no cover
-    from rich import print
-
-    def test(foo, bar, tjustify=None, cjustify=None):
-        list_of_things = [1, 2, 3, None, 4, True, False, "Hello World"]
-        dict_of_things = {
-            "version": "1.1",
-            "method": "confirmFruitPurchase",
-            "params": [["apple", "orange", "mangoes", "pomelo"], 1.123],
-            "id": "194521489",
-        }
-        print(
-            tabulate_mapping(
-                locals(),
-                title="locals()",
-                title_justify=tjustify,
-                caption="__main__.test",
-                caption_justify=cjustify,
-            )
-        )
-
-    print()
-    test(20.3423, 3.1427, cjustify="right")
-    print()

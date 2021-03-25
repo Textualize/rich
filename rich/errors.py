@@ -28,3 +28,7 @@ class MarkupError(ConsoleError):
 
 class LiveError(ConsoleError):
     """Error related to Live display."""
+
+
+class NoAltScreen(ConsoleError):
+    """Alt screen mode was required."""

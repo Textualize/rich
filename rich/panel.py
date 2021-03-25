@@ -133,7 +133,9 @@ class Panel(JupyterMixin):
         child_width = (
             width - 2
             if self.expand
-            else Measurement.get(console, renderable, width - 2).maximum
+            else Measurement.get(
+                console, options.update_width(width - 2), renderable
+            ).maximum
         )
         child_height = self.height or options.height or None
         if child_height:
@@ -169,7 +171,9 @@ class Panel(JupyterMixin):
         yield Segment(box.get_bottom([width - 2]), border_style)
         yield new_line
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "Measurement":
         _title = self._title
         _, right, _, left = Padding.unpack(self.padding)
         padding = left + right
@@ -178,7 +182,9 @@ class Panel(JupyterMixin):
         if self.width is None:
             width = (
                 measure_renderables(
-                    console, renderables, max_width - padding - 2
+                    console,
+                    options.update_width(options.max_width - padding - 2),
+                    renderables,
                 ).maximum
                 + padding
                 + 2

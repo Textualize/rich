@@ -6,7 +6,7 @@ import sys
 import threading
 from abc import ABC, abstractmethod
 from collections import abc
-from dataclasses import dataclass, field, is_dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from functools import wraps
 from getpass import getpass
@@ -41,6 +41,7 @@ from .markup import render as render_markup
 from .measure import Measurement, measure_renderables
 from .pager import Pager, SystemPager
 from .pretty import is_expandable, Pretty
+from .region import Region
 from .scope import render_scope
 from .screen import Screen
 from .segment import Segment
@@ -126,6 +127,8 @@ class ConsoleOptions:
     """Disable wrapping for text."""
     highlight: Optional[bool] = None
     """Highlight override for render_str."""
+    markup: Optional[bool] = None
+    """Enable markup when rendering strings."""
     height: Optional[int] = None
     """Height available, or None for no height limit."""
 
@@ -146,6 +149,7 @@ class ConsoleOptions:
 
     def update(
         self,
+        *,
         width: Union[int, NoChange] = NO_CHANGE,
         min_width: Union[int, NoChange] = NO_CHANGE,
         max_width: Union[int, NoChange] = NO_CHANGE,
@@ -153,6 +157,7 @@ class ConsoleOptions:
         overflow: Union[Optional[OverflowMethod], NoChange] = NO_CHANGE,
         no_wrap: Union[Optional[bool], NoChange] = NO_CHANGE,
         highlight: Union[Optional[bool], NoChange] = NO_CHANGE,
+        markup: Union[Optional[bool], NoChange] = NO_CHANGE,
         height: Union[Optional[int], NoChange] = NO_CHANGE,
     ) -> "ConsoleOptions":
         """Update values, return a copy."""
@@ -171,6 +176,8 @@ class ConsoleOptions:
             options.no_wrap = no_wrap
         if not isinstance(highlight, NoChange):
             options.highlight = highlight
+        if not isinstance(markup, NoChange):
+            options.markup = markup
         if not isinstance(height, NoChange):
             options.height = None if height is None else max(0, height)
         return options
@@ -182,10 +189,25 @@ class ConsoleOptions:
             width (int): New width (sets both min_width and max_width)
 
         Returns:
-            ~ConsoleOptions: New console options instance
+            ~ConsoleOptions: New console options instance.
         """
         options = self.copy()
         options.min_width = options.max_width = max(0, width)
+        return options
+
+    def update_dimensions(self, width: int, height: int) -> "ConsoleOptions":
+        """Update the width and height, and return a copy.
+
+        Args:
+            width (int): New width (sets both min_width and max_width).
+            height (int): New height.
+
+        Returns:
+            ~ConsoleOptions: New console options instance.
+        """
+        options = self.copy()
+        options.min_width = options.max_width = max(0, width)
+        options.height = height
         return options
 
 
@@ -231,6 +253,24 @@ class NewLine:
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
         yield Segment("\n" * self.count)
+
+
+class ScreenUpdate:
+    """Render a list of lines at a given offset."""
+
+    def __init__(self, lines: List[List[Segment]], x: int, y: int) -> None:
+        self._lines = lines
+        self.x = x
+        self.y = y
+
+    def __rich_console__(
+        self, console: "Console", options: ConsoleOptions
+    ) -> RenderResult:
+        x = self.x
+        move_to = Control.move_to
+        for offset, line in enumerate(self._lines, self.y):
+            yield move_to(x, offset)
+            yield from line
 
 
 class Capture:
@@ -370,11 +410,13 @@ class RenderGroup:
             self._render = list(self._renderables)
         return self._render
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "Measurement":
         if self.fit:
-            return measure_renderables(console, self.renderables, max_width)
+            return measure_renderables(console, options, self.renderables)
         else:
-            return Measurement(max_width, max_width)
+            return Measurement(options.max_width, options.max_width)
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -623,6 +665,7 @@ class Console:
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
         self._live: Optional["Live"] = None
+        self._is_alt_screen = False
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {str(self._color_system)}>"
@@ -890,7 +933,7 @@ class Console:
 
     def bell(self) -> None:
         """Play a 'bell' sound (if supported by the terminal)."""
-        self.control("\x07")
+        self.control(Control.bell())
 
     def capture(self) -> Capture:
         """A context manager to *capture* the result of print() or log() in a string,
@@ -948,7 +991,10 @@ class Console:
         Args:
             home (bool, optional): Also move the cursor to 'home' position. Defaults to True.
         """
-        self.control("\033[2J\033[H" if home else "\033[2J")
+        if home:
+            self.control(Control.clear(), Control.home())
+        else:
+            self.control(Control.clear())
 
     def status(
         self,
@@ -991,7 +1037,7 @@ class Console:
             show (bool, optional): Set visibility of the cursor.
         """
         if self.is_terminal and not self.legacy_windows:
-            self.control("\033[?25h" if show else "\033[?25l")
+            self.control(Control.show_cursor(show))
             return True
         return False
 
@@ -1011,9 +1057,19 @@ class Console:
         """
         changed = False
         if self.is_terminal and not self.legacy_windows:
-            self.control("\033[?1049h\033[H" if enable else "\033[?1049l")
+            self.control(Control.alt_screen(enable))
             changed = True
+            self._is_alt_screen = enable
         return changed
+
+    @property
+    def is_alt_screen(self) -> bool:
+        """Check if the alt screen was enabled.
+
+        Returns:
+            bool: True if the alt screen was enabled, otherwise False.
+        """
+        return self._is_alt_screen
 
     def screen(
         self, hide_cursor: bool = True, style: StyleType = None
@@ -1056,7 +1112,9 @@ class Console:
         if hasattr(renderable, "__rich_console__"):
             render_iterable = renderable.__rich_console__(self, _options)  # type: ignore
         elif isinstance(renderable, str):
-            text_renderable = self.render_str(renderable, highlight=_options.highlight)
+            text_renderable = self.render_str(
+                renderable, highlight=_options.highlight, markup=_options.markup
+            )
             render_iterable = text_renderable.__rich_console__(self, _options)  # type: ignore
         else:
             raise errors.NotRenderableError(
@@ -1070,8 +1128,9 @@ class Console:
             raise errors.NotRenderableError(
                 f"object {render_iterable!r} is not renderable"
             )
+        _Segment = Segment
         for render_output in iter_render:
-            if isinstance(render_output, Segment):
+            if isinstance(render_output, _Segment):
                 yield render_output
             else:
                 yield from self.render(render_output, _options)
@@ -1312,14 +1371,15 @@ class Console:
         rule = Rule(title=title, characters=characters, style=style, align=align)
         self.print(rule)
 
-    def control(self, control_codes: Union["Control", str]) -> None:
+    def control(self, *control: Control) -> None:
         """Insert non-printing control codes.
 
         Args:
             control_codes (str): Control codes, such as those that may move the cursor.
         """
         if not self.is_dumb_terminal:
-            self._buffer.append(Segment.control(str(control_codes)))
+            for _control in control:
+                self._buffer.append(_control.segment)
             self._check_buffer()
 
     def out(
@@ -1416,9 +1476,10 @@ class Console:
             render_options = self.options.update(
                 justify=justify,
                 overflow=overflow,
-                width=min(width, self.width) if width else NO_CHANGE,
+                width=min(width, self.width) if width is not None else NO_CHANGE,
                 height=height,
                 no_wrap=no_wrap,
+                markup=markup,
             )
 
             new_segments: List[Segment] = []
@@ -1442,6 +1503,58 @@ class Console:
                     buffer_extend(line)
             else:
                 self._buffer.extend(new_segments)
+
+    def update_screen(
+        self,
+        renderable: RenderableType,
+        *,
+        region: Region = None,
+        options: ConsoleOptions = None,
+    ) -> None:
+        """Update the screen at a given offset.
+
+        Args:
+            renderable (RenderableType): A Rich renderable.
+            region (Region, optional): Region of screen to update, or None for entire screen. Defaults to None.
+            x (int, optional): x offset. Defaults to 0.
+            y (int, optional): y offset. Defaults to 0.
+
+        Raises:
+            errors.NoAltScreen: If the Console isn't in alt screen mode.
+
+        """
+        if not self.is_alt_screen:
+            raise errors.NoAltScreen("Alt screen must be enabled to call update_screen")
+        render_options = options or self.options
+        if region is None:
+            x = y = 0
+            render_options = render_options.update_dimensions(
+                render_options.max_width, render_options.height or self.height
+            )
+        else:
+            x, y, width, height = region
+            render_options = render_options.update_dimensions(width, height)
+
+        lines = self.render_lines(renderable, options=render_options)
+        self.update_screen_lines(lines, x, y)
+
+    def update_screen_lines(self, lines: List[List[Segment]], x: int = 0, y: int = 0):
+        """Update lines of the screen at a given offset.
+
+        Args:
+            lines (List[List[Segment]]): Rendered lines (as produced by :meth:`~rich.Console.render_lines`).
+            x (int, optional): x offset (column no). Defaults to 0.
+            y (int, optional): y offset (column no). Defaults to 0.
+
+        Raises:
+            errors.NoAltScreen: If the Console isn't in alt screen mode.
+        """
+        if not self.is_alt_screen:
+            raise errors.NoAltScreen("Alt screen must be enabled to call update_screen")
+        screen_update = ScreenUpdate(lines, x, y)
+        segments = self.render(screen_update)
+        self._buffer.extend(segments)
+        self._check_buffer()
 
     def print_exception(
         self,
@@ -1598,7 +1711,7 @@ class Console:
         not_terminal = not self.is_terminal
         if self.no_color and color_system:
             buffer = Segment.remove_color(buffer)
-        for text, style, is_control in buffer:
+        for text, style, control in buffer:
             if style:
                 append(
                     style.render(
@@ -1607,7 +1720,7 @@ class Console:
                         legacy_windows=legacy_windows,
                     )
                 )
-            elif not (not_terminal and is_control):
+            elif not (not_terminal and control):
                 append(text)
 
         rendered = "".join(output)
@@ -1679,7 +1792,7 @@ class Console:
                 text = "".join(
                     segment.text
                     for segment in self._record_buffer
-                    if not segment.is_control
+                    if not segment.control
                 )
             if clear:
                 del self._record_buffer[:]

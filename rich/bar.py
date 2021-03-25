@@ -49,7 +49,10 @@ class Bar(JupyterMixin):
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
 
-        width = min(self.width or options.max_width, options.max_width)
+        width = min(
+            self.width if self.width is not None else options.max_width,
+            options.max_width,
+        )
 
         if self.begin >= self.end:
             yield Segment(" " * width, self.style)
@@ -81,9 +84,11 @@ class Bar(JupyterMixin):
         yield Segment(prefix + body[len(prefix) :] + suffix, self.style)
         yield Segment.line()
 
-    def __rich_measure__(self, console: Console, max_width: int) -> Measurement:
+    def __rich_measure__(
+        self, console: Console, options: ConsoleOptions
+    ) -> Measurement:
         return (
             Measurement(self.width, self.width)
             if self.width is not None
-            else Measurement(4, max_width)
+            else Measurement(4, options.max_width)
         )

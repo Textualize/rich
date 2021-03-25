@@ -9,7 +9,7 @@ def test_renderables_measure():
     text = Text("foo")
     renderables = Renderables([text])
 
-    result = renderables.__rich_measure__(console, console.width)
+    result = renderables.__rich_measure__(console, console.options)
     _min, _max = result
     assert _min == 3
     assert _max == 3
@@ -21,7 +21,7 @@ def test_renderables_empty():
     console = Console()
     renderables = Renderables()
 
-    result = renderables.__rich_measure__(console, console.width)
+    result = renderables.__rich_measure__(console, console.options)
     _min, _max = result
     assert _min == 1
     assert _max == 1

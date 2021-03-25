@@ -51,3 +51,8 @@ def test_ratio_resolve():
     assert ratio_resolve(
         50, [Edge(size=30), Edge(ratio=1, minimum_size=10), Edge(size=30)]
     ) == [30, 10, 30]
+    assert ratio_resolve(110, [Edge(ratio=1), Edge(ratio=1), Edge(ratio=1)]) == [
+        36,
+        37,
+        37,
+    ]

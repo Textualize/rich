@@ -47,8 +47,8 @@ def _render_segments(segments: Iterable[Segment]) -> str:
     fragments: List[str] = []
     append_fragment = fragments.append
     theme = DEFAULT_TERMINAL_THEME
-    for text, style, is_control in Segment.simplify(segments):
-        if is_control:
+    for text, style, control in Segment.simplify(segments):
+        if control:
             continue
         text = escape(text)
         if style:
