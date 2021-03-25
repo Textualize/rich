@@ -78,6 +78,7 @@ def test_tree():
     assert result == expected
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 def test_refresh_screen():
     layout = Layout()
     layout.split_row(Layout(name="foo"), Layout(name="bar"))
