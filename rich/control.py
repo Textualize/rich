@@ -1,6 +1,6 @@
-from typing import TYPE_CHECKING
+from typing import Callable, Dict, Iterable, List, TYPE_CHECKING, Union
 
-from .segment import Segment
+from .segment import ControlCode, ControlType, Segment
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult
@@ -14,30 +14,146 @@ STRIP_CONTROL_CODES = [
 _CONTROL_TRANSLATE = {_codepoint: None for _codepoint in STRIP_CONTROL_CODES}
 
 
+CONTROL_CODES_FORMAT: Dict[int, Callable] = {
+    ControlType.BELL: lambda: "\x07",
+    ControlType.CARRIAGE_RETURN: lambda: "\r",
+    ControlType.HOME: lambda: "\x1b[H",
+    ControlType.CLEAR: lambda: "\x1b[2J",
+    ControlType.ENABLE_ALT_SCREEN: lambda: "\x1b[?1049h",
+    ControlType.DISABLE_ALT_SCREEN: lambda: "\x1b[?1049l",
+    ControlType.SHOW_CURSOR: lambda: "\x1b[?25h",
+    ControlType.HIDE_CURSOR: lambda: "\x1b[?25l",
+    ControlType.CURSOR_UP: lambda param: f"\x1b[{param}A",
+    ControlType.CURSOR_DOWN: lambda param: f"\x1b[{param}B",
+    ControlType.CURSOR_FORWARD: lambda param: f"\x1b[{param}C",
+    ControlType.CURSOR_BACKWARD: lambda param: f"\x1b[{param}D",
+    ControlType.CURSOR_MOVE_TO_ROW: lambda param: f"\x1b[{param+1}G",
+    ControlType.ERASE_IN_LINE: lambda param: f"\x1b[{param}K",
+    ControlType.CURSOR_MOVE_TO: lambda x, y: f"\x1b[{y+1};{x+1}H",
+}
+
+
 class Control:
     """A renderable that inserts a control code (non printable but may move cursor).
 
     Args:
-        control_codes (str): A string containing control codes.
+        *codes (str): Positional arguments are either a :class:`~rich.segment.ControlType` enum or a
+            tuple of ControlType and an integer parameter
     """
 
-    __slots__ = ["_control_codes"]
+    __slots__ = ["segment"]
 
-    def __init__(self, control_codes: str) -> None:
-        self._control_codes = Segment.control(control_codes)
+    def __init__(self, *codes: Union[ControlType, ControlCode]) -> None:
+        control_codes: List[ControlCode] = [
+            (code,) if isinstance(code, ControlType) else code for code in codes
+        ]
+        _format_map = CONTROL_CODES_FORMAT
+        rendered_codes = "".join(
+            _format_map[code](*parameters) for code, *parameters in control_codes
+        )
+        self.segment = Segment(rendered_codes, None, control_codes)
+
+    @classmethod
+    def bell(cls) -> "Control":
+        """Ring the 'bell'."""
+        return cls(ControlType.BELL)
 
     @classmethod
     def home(cls) -> "Control":
         """Move cursor to 'home' position."""
-        return cls("\033[H")
+        return cls(ControlType.HOME)
+
+    @classmethod
+    def move(cls, x: int = 0, y: int = 0) -> "Control":
+        """Move cursor relative to current position.
+
+        Args:
+            x (int): X offset.
+            y (int): Y offset.
+
+        Returns:
+            ~Control: Control object.
+
+        """
+
+        def get_codes() -> Iterable[ControlCode]:
+            control = ControlType
+            if x:
+                yield (
+                    control.CURSOR_FORWARD if x > 0 else control.CURSOR_BACKWARD,
+                    abs(x),
+                )
+            if y:
+                yield (
+                    control.CURSOR_DOWN if y > 0 else control.CURSOR_UP,
+                    abs(y),
+                )
+
+        control = cls(*get_codes())
+        return control
+
+    @classmethod
+    def move_to_row(cls, x: int, y: int = 0) -> "Control":
+        """Move to the given row, optionally add offset to column.
+
+        Returns:
+            x (int): absolute x (column)
+            y (int): optional y offset (row)
+
+        Returns:
+            ~Control: Control object.
+        """
+
+        return (
+            cls(
+                (ControlType.CURSOR_MOVE_TO_ROW, x + 1),
+                (
+                    ControlType.CURSOR_DOWN if y > 0 else ControlType.CURSOR_UP,
+                    abs(y),
+                ),
+            )
+            if y
+            else cls((ControlType.CURSOR_MOVE_TO_ROW, x))
+        )
+
+    @classmethod
+    def move_to(cls, x: int, y: int) -> "Control":
+        """Move cursor to absolute position.
+
+        Args:
+            x (int): x offset (column)
+            y (int): y offset (row)
+
+        Returns:
+            ~Control: Control object.
+        """
+        return cls((ControlType.CURSOR_MOVE_TO, x, y))
+
+    @classmethod
+    def clear(cls) -> "Control":
+        """Clear the screen."""
+        return cls(ControlType.CLEAR)
+
+    @classmethod
+    def show_cursor(cls, show: bool) -> "Control":
+        """Show or hide the cursor."""
+        return cls(ControlType.SHOW_CURSOR if show else ControlType.HIDE_CURSOR)
+
+    @classmethod
+    def alt_screen(cls, enable: bool) -> "Control":
+        """Enable or disable alt screen."""
+        if enable:
+            return cls(ControlType.ENABLE_ALT_SCREEN, ControlType.HOME)
+        else:
+            return cls(ControlType.DISABLE_ALT_SCREEN)
 
     def __str__(self) -> str:
-        return self._control_codes.text
+        return self.segment.text
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-        yield self._control_codes
+        yield self.segment
 
 
 def strip_control_codes(text: str, _translate_table=_CONTROL_TRANSLATE) -> str:
@@ -53,5 +169,4 @@ def strip_control_codes(text: str, _translate_table=_CONTROL_TRANSLATE) -> str:
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     print(strip_control_codes("hello\rWorld"))

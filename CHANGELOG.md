@@ -5,10 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [9.13.1] - 2021-03-21
+## [10.0.0] - Unreleased
+
+### Changed
+
+- Made pydoc import lazy as at least one use found it slow to import https://github.com/willmcgugan/rich/issues/1104
+- Modified string highlighting to not match in the middle of a word, so that apostrophes are not considered strings
+- New way of encoding control codes in Segment
+- New signature for Control class
+- Changed Layout.split to use new Splitter class
+- Improved layout.tree
+- Changed default theme color for repr.number to cyan
+- `__rich_measure__` signature changed to accept ConsoleOptions rather than max_width
+
+### Added
+
+- Added `__rich_repr__` protocol method to Pretty
+- Added rich.region.Region
+- Added ConsoleOptions.update_dimensions
+- Added rich.console.ScreenUpdate
+- Added Console.is_alt_screen
+- Added Control.segment, Control.bell, Control.home, Control.move_to, Control.clear, Control.show_cursor, Control.alt_screen
+- Added Console.update_screen and Console.update_screen_lines
+- Added Layout.add_split, Layout.split_column, Layout.split_row, layout.refresh
+- Added new Rich repr protocol `__rich_repr__`
 
 ### Fixed
 
+- Fixed table style taking precedence over row style https://github.com/willmcgugan/rich/issues/1129
+- Fixed incorrect measurement of Text with new lines and whitespace https://github.com/willmcgugan/rich/issues/1133
+- Made type annotations consistent for various `total` keyword arguments in `rich.progress` and rich.`progress_bar`
 - Disabled Progress no longer displays itself when starting https://github.com/willmcgugan/rich/pull/1125
 
 ## [9.13.0] - 2021-03-06

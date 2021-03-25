@@ -238,6 +238,7 @@ def test_console_width():
     test = Text("Hello World!\nfoobarbaz")
     assert test.__rich_measure__(console, 80) == Measurement(9, 12)
     assert Text(" " * 4).__rich_measure__(console, 80) == Measurement(4, 4)
+    assert Text(" \n  \n   ").__rich_measure__(console, 80) == Measurement(3, 3)
 
 
 def test_join():

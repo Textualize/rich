@@ -133,7 +133,7 @@ class Align(JupyterMixin):
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         align = self.align
-        width = Measurement.get(console, self.renderable).maximum
+        width = Measurement.get(console, options, self.renderable).maximum
         rendered = console.render(
             Constrain(
                 self.renderable, width if self.width is None else min(width, self.width)
@@ -221,8 +221,10 @@ class Align(JupyterMixin):
             iter_segments = Segment.apply_style(iter_segments, style)
         yield from iter_segments
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
-        measurement = Measurement.get(console, self.renderable, max_width)
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> Measurement:
+        measurement = Measurement.get(console, options, self.renderable)
         return measurement
 
 
@@ -275,8 +277,10 @@ class VerticalCenter(JupyterMixin):
         if bottom_space > 0:
             yield from blank_lines(bottom_space)
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
-        measurement = Measurement.get(console, self.renderable, max_width)
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> Measurement:
+        measurement = Measurement.get(console, options, self.renderable)
         return measurement
 
 

@@ -86,8 +86,8 @@ You can also use this feature to try out Rich *renderables*. Here's an example::
 Read on to learn more about Rich renderables.
 
 
-Rich Inspector
---------------
+Rich Inspect
+------------
 
 Rich has an :meth:`~rich.inspect` function which can generate a report on any Python object. It is a fantastic debug aid, and a good example of the output that Rich can generate. Here is a simple example::
 

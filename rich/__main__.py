@@ -30,8 +30,10 @@ class ColorBox:
                 yield Segment("▄", Style(color=color, bgcolor=bgcolor))
             yield Segment.line()
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
-        return Measurement(1, max_width)
+    def __rich_measure__(
+        self, console: "Console", options: ConsoleOptions
+    ) -> Measurement:
+        return Measurement(1, options.max_width)
 
 
 def make_test_card() -> Table:

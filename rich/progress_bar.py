@@ -32,7 +32,7 @@ class ProgressBar(JupyterMixin):
 
     def __init__(
         self,
-        total: float = 100,
+        total: float = 100.0,
         completed: float = 0,
         width: int = None,
         pulse: bool = False,
@@ -190,11 +190,13 @@ class ProgressBar(JupyterMixin):
                 if remaining_bars:
                     yield _Segment(bar * remaining_bars, style)
 
-    def __rich_measure__(self, console: Console, max_width: int) -> Measurement:
+    def __rich_measure__(
+        self, console: Console, options: ConsoleOptions
+    ) -> Measurement:
         return (
             Measurement(self.width, self.width)
             if self.width is not None
-            else Measurement(4, max_width)
+            else Measurement(4, options.max_width)
         )
 
 

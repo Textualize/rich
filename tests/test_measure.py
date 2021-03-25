@@ -16,21 +16,15 @@ def test_no_renderable():
     text = Text()
 
     with pytest.raises(NotRenderableError):
-        Measurement.get(console, None, console.width)
-
-
-def test_null_get():
-    # Test negative console.width passed into get method
-    assert Measurement.get(Console(width=-1), None) == Measurement(0, 0)
-    # Test negative max_width passed into get method
-    assert Measurement.get(Console(), None, -1) == Measurement(0, 0)
+        Measurement.get(console, console.options, None)
 
 
 def test_measure_renderables():
-    # Test measure_renderables returning a null Measurement object
-    assert measure_renderables(Console(), None, None) == Measurement(0, 0)
-    # Test measure_renderables returning a valid Measurement object
-    assert measure_renderables(Console(width=1), ["test"], 1) == Measurement(1, 1)
+    console = Console()
+    assert measure_renderables(console, console.options, "") == Measurement(0, 0)
+    assert measure_renderables(
+        console, console.options.update_width(0), "hello"
+    ) == Measurement(0, 0)
 
 
 def test_clamp():

@@ -1,11 +1,38 @@
+from enum import IntEnum
+
 from typing import Dict, NamedTuple, Optional
 
 from .cells import cell_len, set_cell_size
 from .style import Style
 
-from itertools import filterfalse, zip_longest
+from itertools import filterfalse
 from operator import attrgetter
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Sequence, Union, Tuple
+
+
+class ControlType(IntEnum):
+    """Non-printable control codes which typically translate to ANSI codes."""
+
+    BELL = 1
+    CARRIAGE_RETURN = 2
+    HOME = 3
+    CLEAR = 4
+    SHOW_CURSOR = 5
+    HIDE_CURSOR = 6
+    ENABLE_ALT_SCREEN = 7
+    DISABLE_ALT_SCREEN = 8
+    CURSOR_UP = 9
+    CURSOR_DOWN = 10
+    CURSOR_FORWARD = 11
+    CURSOR_BACKWARD = 12
+    CURSOR_MOVE_TO_ROW = 13
+    CURSOR_MOVE_TO = 14
+    ERASE_IN_LINE = 15
+
+
+ControlCode = Union[
+    Tuple[ControlType], Tuple[ControlType, int], Tuple[ControlType, int, int]
+]
 
 
 class Segment(NamedTuple):
@@ -15,20 +42,20 @@ class Segment(NamedTuple):
     Args:
         text (str): A piece of text.
         style (:class:`~rich.style.Style`, optional): An optional style to apply to the text.
-        is_control (bool, optional): Boolean that marks segment as containing non-printable control codes.
+        control (Tuple[ControlCode..], optional): Optional tuple of control codes.
     """
 
     text: str = ""
     """Raw text."""
     style: Optional[Style] = None
     """An optional style."""
-    is_control: bool = False
+    control: Optional[Sequence[ControlCode]] = None
     """True if the segment contains control codes, otherwise False."""
 
     def __repr__(self) -> str:
         """Simplified repr."""
-        if self.is_control:
-            return f"Segment.control({self.text!r}, {self.style!r})"
+        if self.control:
+            return f"Segment({self.text!r}, {self.style!r}, {self.control!r})"
         else:
             return f"Segment({self.text!r}, {self.style!r})"
 
@@ -39,34 +66,17 @@ class Segment(NamedTuple):
     @property
     def cell_length(self) -> int:
         """Get cell length of segment."""
-        return 0 if self.is_control else cell_len(self.text)
+        return 0 if self.control else cell_len(self.text)
+
+    @property
+    def is_control(self) -> bool:
+        """Check if the segment contains control codes."""
+        return self.control is not None
 
     @classmethod
-    def control(cls, text: str, style: Optional[Style] = None) -> "Segment":
-        """Create a Segment with control codes.
-
-        Args:
-            text (str): Text containing non-printable control codes.
-            style (Optional[style]): Optional style.
-
-        Returns:
-            Segment: A Segment instance with ``is_control=True``.
-        """
-        return cls(text, style, is_control=True)
-
-    @classmethod
-    def make_control(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
-        """Convert all segments in to control segments.
-
-        Returns:
-            Iterable[Segments]: Segments with is_control=True
-        """
-        return [cls(text, style, True) for text, style, _ in segments]
-
-    @classmethod
-    def line(cls, is_control: bool = False) -> "Segment":
+    def line(cls) -> "Segment":
         """Make a new line segment."""
-        return cls("\n", is_control=is_control)
+        return cls("\n")
 
     @classmethod
     def apply_style(
@@ -90,19 +100,19 @@ class Segment(NamedTuple):
         if style:
             apply = style.__add__
             segments = (
-                cls(text, None if is_control else apply(_style), is_control)
-                for text, _style, is_control in segments
+                cls(text, None if control else apply(_style), control)
+                for text, _style, control in segments
             )
         if post_style:
             segments = (
                 cls(
                     text,
                     None
-                    if is_control
+                    if control
                     else (_style + post_style if _style else post_style),
-                    is_control,
+                    control,
                 )
-                for text, _style, is_control in segments
+                for text, _style, control in segments
             )
         return segments
 
@@ -121,9 +131,9 @@ class Segment(NamedTuple):
 
         """
         if is_control:
-            return filter(attrgetter("is_control"), segments)
+            return filter(attrgetter("control"), segments)
         else:
-            return filterfalse(attrgetter("is_control"), segments)
+            return filterfalse(attrgetter("control"), segments)
 
     @classmethod
     def split_lines(cls, segments: Iterable["Segment"]) -> Iterable[List["Segment"]]:
@@ -139,7 +149,7 @@ class Segment(NamedTuple):
         append = line.append
 
         for segment in segments:
-            if "\n" in segment.text and not segment.is_control:
+            if "\n" in segment.text and not segment.control:
                 text, style, _ = segment
                 while text:
                     _text, new_line, text = text.partition("\n")
@@ -182,7 +192,7 @@ class Segment(NamedTuple):
         new_line_segment = cls("\n")
 
         for segment in segments:
-            if "\n" in segment.text and not segment.is_control:
+            if "\n" in segment.text and not segment.control:
                 text, style, _ = segment
                 while text:
                     _text, new_line, text = text.partition("\n")
@@ -230,7 +240,7 @@ class Segment(NamedTuple):
             line_length = 0
             for segment in line:
                 segment_length = segment.cell_length
-                if line_length + segment_length < length or segment.is_control:
+                if line_length + segment_length < length or segment.control:
                     append(segment)
                     line_length += segment_length
                 else:
@@ -328,7 +338,7 @@ class Segment(NamedTuple):
 
         _Segment = Segment
         for segment in iter_segments:
-            if last_segment.style == segment.style and not segment.is_control:
+            if last_segment.style == segment.style and not segment.control:
                 last_segment = _Segment(
                     last_segment.text + segment.text, last_segment.style
                 )
@@ -348,10 +358,10 @@ class Segment(NamedTuple):
             Segment: Segments with link removed.
         """
         for segment in segments:
-            if segment.is_control or segment.style is None:
+            if segment.control or segment.style is None:
                 yield segment
             else:
-                text, style, _is_control = segment
+                text, style, _control = segment
                 yield cls(text, style.update_link(None) if style else None)
 
     @classmethod
@@ -364,8 +374,8 @@ class Segment(NamedTuple):
         Yields:
             Segment: Segments with styles replace with None
         """
-        for text, _style, is_control in segments:
-            yield cls(text, None, is_control)
+        for text, _style, control in segments:
+            yield cls(text, None, control)
 
     @classmethod
     def remove_color(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
@@ -379,15 +389,15 @@ class Segment(NamedTuple):
         """
 
         cache: Dict[Style, Style] = {}
-        for text, style, is_control in segments:
+        for text, style, control in segments:
             if style:
                 colorless_style = cache.get(style)
                 if colorless_style is None:
                     colorless_style = style.without_color
                     cache[style] = colorless_style
-                yield cls(text, colorless_style, is_control)
+                yield cls(text, colorless_style, control)
             else:
-                yield cls(text, None, is_control)
+                yield cls(text, None, control)
 
 
 if __name__ == "__main__":  # pragma: no cover

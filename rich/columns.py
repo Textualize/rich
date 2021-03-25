@@ -77,7 +77,7 @@ class Columns(JupyterMixin):
 
         get_measurement = Measurement.get
         renderable_widths = [
-            get_measurement(console, renderable, max_width).maximum
+            get_measurement(console, options, renderable).maximum
             for renderable in renderables
         ]
         if self.equal:

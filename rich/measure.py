@@ -5,7 +5,7 @@ from . import errors
 from .protocol import is_renderable
 
 if TYPE_CHECKING:
-    from .console import Console, RenderableType
+    from .console import Console, ConsoleOptions, RenderableType
 
 
 class Measurement(NamedTuple):
@@ -75,15 +75,14 @@ class Measurement(NamedTuple):
 
     @classmethod
     def get(
-        cls, console: "Console", renderable: "RenderableType", max_width: int = None
+        cls, console: "Console", options: "ConsoleOptions", renderable: "RenderableType"
     ) -> "Measurement":
         """Get a measurement for a renderable.
 
         Args:
             console (~rich.console.Console): Console instance.
+            options (~rich.console.ConsoleOptions): Console options.
             renderable (RenderableType): An object that may be rendered with Rich.
-            max_width (int, optional): The maximum width available, or None to use console.width.
-                Defaults to None.
 
         Raises:
             errors.NotRenderableError: If the object is not renderable.
@@ -91,20 +90,18 @@ class Measurement(NamedTuple):
         Returns:
             Measurement: Measurement object containing range of character widths required to render the object.
         """
-        _max_width = console.width if max_width is None else max_width
+        _max_width = options.max_width
         if _max_width < 1:
             return Measurement(0, 0)
         if isinstance(renderable, str):
-            renderable = console.render_str(renderable)
-
+            renderable = console.render_str(renderable, markup=options.markup)
         if hasattr(renderable, "__rich__"):
             renderable = renderable.__rich__()  # type: ignore
-
         if is_renderable(renderable):
             get_console_width = getattr(renderable, "__rich_measure__", None)
             if get_console_width is not None:
                 render_width = (
-                    get_console_width(console, _max_width)
+                    get_console_width(console, options)
                     .normalize()
                     .with_maximum(_max_width)
                 )
@@ -121,7 +118,9 @@ class Measurement(NamedTuple):
 
 
 def measure_renderables(
-    console: "Console", renderables: Iterable["RenderableType"], max_width: int
+    console: "Console",
+    options: "ConsoleOptions",
+    renderables: Iterable["RenderableType"],
 ) -> "Measurement":
     """Get a measurement that would fit a number of renderables.
 
@@ -138,7 +137,7 @@ def measure_renderables(
         return Measurement(0, 0)
     get_measurement = Measurement.get
     measurements = [
-        get_measurement(console, renderable, max_width) for renderable in renderables
+        get_measurement(console, options, renderable) for renderable in renderables
     ]
     measured_width = Measurement(
         max(measurements, key=itemgetter(0)).minimum,
