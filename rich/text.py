@@ -525,12 +525,16 @@ class Text(JupyterMixin):
         all_lines = Text("\n").join(lines)
         yield from all_lines.render(console, end=self.end)
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> Measurement:
         text = self.plain
-        if not text.strip():
-            return Measurement(cell_len(text), cell_len(text))
-        max_text_width = max(cell_len(line) for line in text.splitlines())
-        min_text_width = max(cell_len(word) for word in text.split())
+        lines = text.splitlines()
+        max_text_width = max(cell_len(line) for line in lines) if lines else 0
+        words = text.split()
+        min_text_width = (
+            max(cell_len(word) for word in words) if words else max_text_width
+        )
         return Measurement(min_text_width, max_text_width)
 
     def render(self, console: "Console", end: str = "") -> Iterable["Segment"]:

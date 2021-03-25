@@ -27,8 +27,9 @@ CONTROL_CODES_FORMAT: Dict[int, Callable] = {
     ControlType.CURSOR_DOWN: lambda param: f"\x1b[{param}B",
     ControlType.CURSOR_FORWARD: lambda param: f"\x1b[{param}C",
     ControlType.CURSOR_BACKWARD: lambda param: f"\x1b[{param}D",
+    ControlType.CURSOR_MOVE_TO_ROW: lambda param: f"\x1b[{param+1}G",
     ControlType.ERASE_IN_LINE: lambda param: f"\x1b[{param}K",
-    ControlType.CURSOR_MOVE_TO: lambda x, y: f"\x1b[{y};{x}H",
+    ControlType.CURSOR_MOVE_TO: lambda x, y: f"\x1b[{y+1};{x+1}H",
 }
 
 
@@ -40,7 +41,7 @@ class Control:
             tuple of ControlType and an integer parameter
     """
 
-    __slots__ = ["_segment"]
+    __slots__ = ["segment"]
 
     def __init__(self, *codes: Union[ControlType, ControlCode]) -> None:
         control_codes: List[ControlCode] = [
@@ -50,11 +51,7 @@ class Control:
         rendered_codes = "".join(
             _format_map[code](*parameters) for code, *parameters in control_codes
         )
-        self._segment = Segment(rendered_codes, None, control_codes)
-
-    @property
-    def segment(self) -> "Segment":
-        return self._segment
+        self.segment = Segment(rendered_codes, None, control_codes)
 
     @classmethod
     def bell(cls) -> "Control":
@@ -67,7 +64,7 @@ class Control:
         return cls(ControlType.HOME)
 
     @classmethod
-    def move(cls, x: int, y: int) -> "Control":
+    def move(cls, x: int = 0, y: int = 0) -> "Control":
         """Move cursor relative to current position.
 
         Args:
@@ -84,17 +81,40 @@ class Control:
             if x:
                 yield (
                     control.CURSOR_FORWARD if x > 0 else control.CURSOR_BACKWARD,
-                    x,
+                    abs(x),
                 )
-
             if y:
                 yield (
                     control.CURSOR_DOWN if y > 0 else control.CURSOR_UP,
-                    y,
+                    abs(y),
                 )
 
         control = cls(*get_codes())
         return control
+
+    @classmethod
+    def move_to_row(cls, x: int, y: int = 0) -> "Control":
+        """Move to the given row, optionally add offset to column.
+
+        Returns:
+            x (int): absolute x (column)
+            y (int): optional y offset (row)
+
+        Returns:
+            ~Control: Control object.
+        """
+
+        return (
+            cls(
+                (ControlType.CURSOR_MOVE_TO_ROW, x + 1),
+                (
+                    ControlType.CURSOR_DOWN if y > 0 else ControlType.CURSOR_UP,
+                    abs(y),
+                ),
+            )
+            if y
+            else cls((ControlType.CURSOR_MOVE_TO_ROW, x))
+        )
 
     @classmethod
     def move_to(cls, x: int, y: int) -> "Control":
@@ -107,7 +127,7 @@ class Control:
         Returns:
             ~Control: Control object.
         """
-        return cls((ControlType.CURSOR_MOVE_TO, x + 1, y + 1))
+        return cls((ControlType.CURSOR_MOVE_TO, x, y))
 
     @classmethod
     def clear(cls) -> "Control":
@@ -128,12 +148,12 @@ class Control:
             return cls(ControlType.DISABLE_ALT_SCREEN)
 
     def __str__(self) -> str:
-        return self._segment.text
+        return self.segment.text
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-        yield self._segment
+        yield self.segment
 
 
 def strip_control_codes(text: str, _translate_table=_CONTROL_TRANSLATE) -> str:

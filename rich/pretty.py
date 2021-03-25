@@ -212,10 +212,12 @@ class Pretty:
             yield ""
         yield pretty_text
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "Measurement":
         pretty_str = pretty_repr(
             self._object,
-            max_width=max_width,
+            max_width=options.max_width,
             indent_size=self.indent_size,
             max_length=self.max_length,
             max_string=self.max_string,
@@ -449,24 +451,26 @@ def traverse(_object: Any, max_length: int = None, max_string: int = None) -> No
         py_version = (sys.version_info.major, sys.version_info.minor)
         children: List[Node]
 
-        def iter_tokens(tokens) -> Iterable[Union[Any, Tuple[str, Any]]]:
-            for token in tokens:
-                if isinstance(token, tuple):
-                    if len(token) == 3:
-                        key, child, default = token
+        def iter_rich_args(rich_args) -> Iterable[Union[Any, Tuple[str, Any]]]:
+            for arg in rich_args:
+                if isinstance(arg, tuple):
+                    if len(arg) == 3:
+                        key, child, default = arg
                         if default == child:
                             continue
                         yield key, child
-                    elif len(token) == 2:
-                        key, child = token
+                    elif len(arg) == 2:
+                        key, child = arg
                         yield key, child
+                    elif len(arg) == 1:
+                        yield arg[0]
                 else:
-                    yield token
+                    yield arg
 
         if hasattr(obj, "__rich_repr__"):
-            tokens = list(iter_tokens(obj.__rich_repr__()))
+            args = list(iter_rich_args(obj.__rich_repr__()))
 
-            if tokens:
+            if args:
                 children = []
                 append = children.append
                 node = Node(
@@ -475,9 +479,9 @@ def traverse(_object: Any, max_length: int = None, max_string: int = None) -> No
                     children=children,
                     last=root,
                 )
-                for last, token in loop_last(tokens):
-                    if isinstance(token, tuple):
-                        key, child = token
+                for last, arg in loop_last(args):
+                    if isinstance(arg, tuple):
+                        key, child = arg
                         child_node = _traverse(child)
                         child_node.last = last
                         child_node.key_repr = key
@@ -485,7 +489,7 @@ def traverse(_object: Any, max_length: int = None, max_string: int = None) -> No
                         child_node.key_separator = "="
                         append(child_node)
                     else:
-                        child_node = _traverse(token)
+                        child_node = _traverse(arg)
                         child_node.last = last
                         append(child_node)
             else:

@@ -25,8 +25,9 @@ class ControlType(IntEnum):
     CURSOR_DOWN = 10
     CURSOR_FORWARD = 11
     CURSOR_BACKWARD = 12
-    CURSOR_MOVE_TO = 13
-    ERASE_IN_LINE = 14
+    CURSOR_MOVE_TO_ROW = 13
+    CURSOR_MOVE_TO = 14
+    ERASE_IN_LINE = 15
 
 
 ControlCode = Union[

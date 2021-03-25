@@ -127,6 +127,8 @@ class ConsoleOptions:
     """Disable wrapping for text."""
     highlight: Optional[bool] = None
     """Highlight override for render_str."""
+    markup: Optional[bool] = None
+    """Enable markup when rendering strings."""
     height: Optional[int] = None
     """Height available, or None for no height limit."""
 
@@ -155,6 +157,7 @@ class ConsoleOptions:
         overflow: Union[Optional[OverflowMethod], NoChange] = NO_CHANGE,
         no_wrap: Union[Optional[bool], NoChange] = NO_CHANGE,
         highlight: Union[Optional[bool], NoChange] = NO_CHANGE,
+        markup: Union[Optional[bool], NoChange] = NO_CHANGE,
         height: Union[Optional[int], NoChange] = NO_CHANGE,
     ) -> "ConsoleOptions":
         """Update values, return a copy."""
@@ -173,6 +176,8 @@ class ConsoleOptions:
             options.no_wrap = no_wrap
         if not isinstance(highlight, NoChange):
             options.highlight = highlight
+        if not isinstance(markup, NoChange):
+            options.markup = markup
         if not isinstance(height, NoChange):
             options.height = None if height is None else max(0, height)
         return options
@@ -405,11 +410,13 @@ class RenderGroup:
             self._render = list(self._renderables)
         return self._render
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "Measurement":
         if self.fit:
-            return measure_renderables(console, self.renderables, max_width)
+            return measure_renderables(console, options, self.renderables)
         else:
-            return Measurement(max_width, max_width)
+            return Measurement(options.max_width, options.max_width)
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -1105,7 +1112,9 @@ class Console:
         if hasattr(renderable, "__rich_console__"):
             render_iterable = renderable.__rich_console__(self, _options)  # type: ignore
         elif isinstance(renderable, str):
-            text_renderable = self.render_str(renderable, highlight=_options.highlight)
+            text_renderable = self.render_str(
+                renderable, highlight=_options.highlight, markup=_options.markup
+            )
             render_iterable = text_renderable.__rich_console__(self, _options)  # type: ignore
         else:
             raise errors.NotRenderableError(
@@ -1467,9 +1476,10 @@ class Console:
             render_options = self.options.update(
                 justify=justify,
                 overflow=overflow,
-                width=min(width, self.width) if width else NO_CHANGE,
+                width=min(width, self.width) if width is not None else NO_CHANGE,
                 height=height,
                 no_wrap=no_wrap,
+                markup=markup,
             )
 
             new_segments: List[Segment] = []

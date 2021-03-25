@@ -13,14 +13,17 @@ def rich_repr(cls: Type[T]) -> Type[T]:
     def auto_repr(self) -> str:
         repr_str: List[str] = []
         append = repr_str.append
-        for token in self.__rich_repr__():
-            if isinstance(token, tuple):
-                key, value, *default = token
-                if len(default) and default[0] == value:
-                    continue
-                append(f"{key}={value!r}")
+        for arg in self.__rich_repr__():
+            if isinstance(arg, tuple):
+                if len(arg) == 1:
+                    append(repr(arg[0]))
+                else:
+                    key, value, *default = arg
+                    if len(default) and default[0] == value:
+                        continue
+                    append(f"{key}={value!r}")
             else:
-                append(repr(token))
+                append(repr(arg))
         return f"{self.__class__.__name__}({', '.join(repr_str)})"
 
     auto_repr.__doc__ = "Return repr(self)"

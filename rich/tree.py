@@ -158,7 +158,9 @@ class Tree(JupyterMixin):
                 guide_style_stack.push(get_style(node.guide_style))
                 push(iter(loop_last(node.children)))
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "Measurement":
         stack: List[Iterator[Tree]] = [iter([self])]
         pop = stack.pop
         push = stack.append
@@ -174,7 +176,7 @@ class Tree(JupyterMixin):
                 level -= 1
                 continue
             push(iter_tree)
-            min_measure, max_measure = measure(console, tree.label, max_width)
+            min_measure, max_measure = measure(console, options, tree.label)
             indent = level * 4
             minimum = max(min_measure + indent, minimum)
             maximum = max(max_measure + indent, maximum)

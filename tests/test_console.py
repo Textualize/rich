@@ -475,7 +475,7 @@ def test_render_group() -> None:
 
     renderables = [renderable() for _ in range(4)]
     console = Console(width=42)
-    min_width, _ = measure_renderables(console, renderables, 42)
+    min_width, _ = measure_renderables(console, console.options, renderables)
     assert min_width == 42
 
 
@@ -491,7 +491,7 @@ def test_render_group_fit() -> None:
 
     console = Console(width=42)
 
-    min_width, _ = measure_renderables(console, renderables, 42)
+    min_width, _ = measure_renderables(console, console.options, renderables)
     assert min_width == 5
 
 
@@ -633,3 +633,17 @@ def test_update_screen_lines():
     console = Console(force_terminal=True, width=20, height=5)
     with pytest.raises(errors.NoAltScreen):
         console.update_screen_lines([])
+
+
+def test_update_options_markup():
+    console = Console()
+    options = console.options
+    assert options.update(markup=False).markup == False
+    assert options.update(markup=True).markup == True
+
+
+def test_print_width_zero():
+    console = Console()
+    with console.capture() as capture:
+        console.print("Hello", width=0)
+    assert capture.get() == ""

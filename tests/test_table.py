@@ -28,9 +28,9 @@ def render_tables():
 
     table.add_row("Averlongwordgoeshere", "banana pancakes", None)
 
-    assert Measurement.get(console, table, 80) == Measurement(41, 48)
+    assert Measurement.get(console, console.options, table) == Measurement(41, 48)
     table.expand = True
-    assert Measurement.get(console, table, 80) == Measurement(41, 48)
+    assert Measurement.get(console, console.options, table) == Measurement(41, 48)
 
     for width in range(10, 60, 5):
         console.print(table, width=width)
@@ -64,9 +64,9 @@ def render_tables():
     console.print(table)
 
     table.width = 20
-    assert Measurement.get(console, table, 80) == Measurement(20, 20)
+    assert Measurement.get(console, console.options, table) == Measurement(20, 20)
     table.expand = False
-    assert Measurement.get(console, table, 80) == Measurement(20, 20)
+    assert Measurement.get(console, console.options, table) == Measurement(20, 20)
     table.expand = True
     console.print(table)
 
@@ -113,28 +113,24 @@ def test_init_append_column():
 
 
 def test_rich_measure():
-    # Check __rich_measure__() for a negative width passed as an argument
-    assert Table("test_header", width=None).__rich_measure__(
-        Console(), -1
+
+    console = Console()
+    assert Table("test_header", width=-1).__rich_measure__(
+        console, console.options
     ) == Measurement(0, 0)
-    # Check __rich_measure__() for a negative Table.width attribute
-    assert Table("test_header", width=-1).__rich_measure__(Console(), 1) == Measurement(
-        0, 0
-    )
     # Check __rich_measure__() for a positive width passed as an argument
     assert Table("test_header", width=None).__rich_measure__(
-        Console(), 10
-    ) == Measurement(10, 10)
-    # Check __rich_measure__() for a positive Table.width attribute
-    assert Table("test_header", width=10).__rich_measure__(
-        Console(), -1
+        console, console.options.update_width(10)
     ) == Measurement(10, 10)
 
 
 def test_min_width():
     table = Table("foo", min_width=30)
     table.add_row("bar")
-    assert table.__rich_measure__(Console(), 100) == Measurement(30, 30)
+    console = Console()
+    assert table.__rich_measure__(
+        console, console.options.update_width(100)
+    ) == Measurement(30, 30)
     console = Console(color_system=None)
     console.begin_capture()
     console.print(table)

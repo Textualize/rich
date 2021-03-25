@@ -1,4 +1,5 @@
 from rich.bar import Bar
+from rich.console import Console
 
 from .render import render
 
@@ -29,8 +30,9 @@ def test_render():
 
 
 def test_measure():
+    console = Console(width=120)
     bar = Bar(size=100, begin=11, end=62)
-    measurement = bar.__rich_measure__(None, 120)
+    measurement = bar.__rich_measure__(console, console.options)
     assert measurement.minimum == 4
     assert measurement.maximum == 120
 

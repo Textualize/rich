@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed Layout.split to use new Splitter class
 - Improved layout.tree
 - Changed default theme color for repr.number to cyan
+- `__rich_measure__` signature changed to accept ConsoleOptions rather than max_width
 
 ### Added
 
@@ -28,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Console.update_screen and Console.update_screen_lines
 - Added Layout.add_split, Layout.split_column, Layout.split_row, layout.refresh
 - Added new Rich repr protocol `__rich_repr__`
+
+### Fixed
+
+- Fixed table style taking precedence over row style https://github.com/willmcgugan/rich/issues/1129
+- Fixed incorrect measurement of Text with new lines and whitespace https://github.com/willmcgugan/rich/issues/1133
 
 ## [9.13.0] - 2021-03-06
 

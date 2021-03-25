@@ -1,3 +1,4 @@
+from rich.console import Console
 from rich.progress_bar import ProgressBar
 from rich.segment import Segment
 from rich.style import Style
@@ -39,8 +40,9 @@ def test_render():
 
 
 def test_measure():
+    console = Console(width=120)
     bar = ProgressBar()
-    measurement = bar.__rich_measure__(None, 120)
+    measurement = bar.__rich_measure__(console, console.options)
     assert measurement.minimum == 4
     assert measurement.maximum == 120
 

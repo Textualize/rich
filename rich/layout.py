@@ -4,7 +4,6 @@ from operator import itemgetter
 from threading import RLock
 from typing import (
     TYPE_CHECKING,
-    Any,
     Dict,
     Iterable,
     List,
@@ -17,7 +16,6 @@ from typing import (
 
 from typing_extensions import Literal
 
-from ._loop import loop_last
 from ._ratio import ratio_resolve
 from .align import Align
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
@@ -327,7 +325,7 @@ class Layout:
         with self._lock:
             self._renderable = renderable
 
-    def refresh(self, console: "Console", layout_name: str) -> None:
+    def refresh_screen(self, console: "Console", layout_name: str) -> None:
         """Refresh a sub-layout.
 
         Args:
@@ -376,7 +374,7 @@ class Layout:
             RenderMap: A dict that maps Layout on to a tuple of Region, lines
         """
         render_width = options.max_width
-        render_height = options.height or 1
+        render_height = options.height or console.height
         region_map = self._make_region_map(render_width, render_height)
         layout_regions = [
             (layout, region)
@@ -402,7 +400,7 @@ class Layout:
             height = options.height or console.height
             render_map = self.render(console, options.update_dimensions(width, height))
             self._render_map = render_map
-            layout_lines: List[List[Segment]] = [[] for _ in range(options.height or 1)]
+            layout_lines: List[List[Segment]] = [[] for _ in range(height)]
             _islice = islice
             for (region, lines) in render_map.values():
                 _x, y, _layout_width, layout_height = region
@@ -442,19 +440,4 @@ if __name__ == "__main__":  # type: ignore
 
     layout["content"].update("foo")
 
-    from rich.live import Live
-    from time import sleep
-
-    from rich import print
-
-    from rich.pretty import Pretty
-
-    # l = Layout()
-    # # l.split(Layout(), Layout())
-    # print(l.tree)
-
-    with Live(layout, console=console, screen=True, refresh_per_second=1) as live:
-        for n in range(100):
-            layout["top"].update("[on red]" + str(n))
-            sleep(0.1)
-            layout.refresh(console, "top")
+    console.print(layout)

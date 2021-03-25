@@ -17,7 +17,7 @@ def test_control_move_to():
     control = Control.move_to(5, 10)
     print(control.segment)
     assert control.segment == Segment(
-        "\x1b[11;6H", None, [(ControlType.CURSOR_MOVE_TO, 6, 11)]
+        "\x1b[11;6H", None, [(ControlType.CURSOR_MOVE_TO, 5, 10)]
     )
 
 
@@ -29,4 +29,13 @@ def test_control_move():
         "\x1b[3C\x1b[4B",
         None,
         [(ControlType.CURSOR_FORWARD, 3), (ControlType.CURSOR_DOWN, 4)],
+    )
+
+
+def test_move_to_row():
+    print(repr(Control.move_to_row(10, 20).segment))
+    assert Control.move_to_row(10, 20).segment == Segment(
+        "\x1b[12G\x1b[20B",
+        None,
+        [(ControlType.CURSOR_MOVE_TO_ROW, 11), (ControlType.CURSOR_DOWN, 20)],
     )
