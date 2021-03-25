@@ -107,7 +107,7 @@ def test_align_right_style():
 
 def test_measure():
     console = Console(file=io.StringIO(), width=20)
-    _min, _max = Measurement.get(console, Align("foo bar", "left"), 20)
+    _min, _max = Measurement.get(console, console.options, Align("foo bar", "left"))
     assert _min == 3
     assert _max == 7
 
@@ -147,4 +147,6 @@ def test_vertical_center():
     print(repr(result))
     expected = "   \n   \nfoo\n   \n   \n   \n"
     assert result == expected
-    assert Measurement.get(console, vertical_center) == Measurement(3, 3)
+    assert Measurement.get(console, console.options, vertical_center) == Measurement(
+        3, 3
+    )

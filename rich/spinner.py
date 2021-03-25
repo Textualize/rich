@@ -46,9 +46,11 @@ class Spinner:
         text = self.render(time - self.start_time)
         yield text
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> Measurement:
         text = self.render(0)
-        return Measurement.get(console, text, max_width)
+        return Measurement.get(console, options, text)
 
     def render(self, time: float) -> Text:
         """Render the spinner for a given time.

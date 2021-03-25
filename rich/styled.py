@@ -28,8 +28,10 @@ class Styled:
         segments = Segment.apply_style(rendered_segments, style)
         return segments
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> Measurement:
-        return Measurement.get(console, self.renderable, max_width)
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> Measurement:
+        return Measurement.get(console, options, self.renderable)
 
 
 if __name__ == "__main__":  # pragma: no cover

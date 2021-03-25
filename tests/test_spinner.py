@@ -37,6 +37,6 @@ def test_spinner_render():
 def test_rich_measure():
     console = Console(width=80, color_system=None, force_terminal=True)
     spinner = Spinner("dots", "Foo")
-    min_width, max_width = Measurement.get(console, spinner, 80)
+    min_width, max_width = Measurement.get(console, console.options, spinner)
     assert min_width == 3
     assert max_width == 5

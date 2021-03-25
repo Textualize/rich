@@ -18,24 +18,21 @@ To define a layout, construct a Layout object and print it::
     layout = Layout()
     print(layout)
 
-This will draw a box the size of the terminal with some information regarding the layout. The box is a "placeholder" because we have yet to add any content to it. Before we do that, let's create a more interesting layout by calling the :meth:`~rich.layout.Layout.split` method to divide the layout in to two sub-layouts::
+This will draw a box the size of the terminal with some information regarding the layout. The box is a "placeholder" because we have yet to add any content to it. Before we do that, let's create a more interesting layout by calling the :meth:`~rich.layout.Layout.split_column` method to divide the layout in to two sub-layouts::
 
-    layout.split(
+    layout.split_column(
         Layout(name="upper"),
         Layout(name="lower")
     )    
     print(layout)
 
-This will divide the terminal screen in to two equal sized portions, one on top of the other. The ``name`` attribute is an internal identifier we can use to look up the sub-layout later. Let's use that to create another split::
+This will divide the terminal screen in to two equal sized portions, one on top of the other. The ``name`` attribute is an internal identifier we can use to look up the sub-layout later. Let's use that to create another split, this time we will call :meth:`~rich.layout.Layout.split_row` to split the lower layout in to a row of two sub-layouts.
 
-    layout["lower"].split(
+    layout["lower"].split_row(
         Layout(name="left"),
-        Layout(name="right"),
-        direction="horizontal"
+        Layout(name="right"),       
     )    
     print(layout)
-
-The addition of the ``direction="horizontal"`` tells the Layout class to split left-to-right, rather than the default of top-to-bottom.
 
 You should now see the screen area divided in to 3 portions; an upper half and a lower half that is split in to two quarters.
 

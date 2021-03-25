@@ -84,7 +84,7 @@ class Padding(JupyterMixin):
             width = options.max_width
         else:
             width = min(
-                Measurement.get(console, self.renderable, options.max_width).maximum
+                Measurement.get(console, options, self.renderable).maximum
                 + self.left
                 + self.right,
                 options.max_width,
@@ -120,13 +120,14 @@ class Padding(JupyterMixin):
             blank_line = blank_line or [_Segment(f'{" " * width}\n', style)]
             yield from blank_line * self.bottom
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "Measurement":
+        max_width = options.max_width
         extra_width = self.left + self.right
         if max_width - extra_width < 1:
             return Measurement(max_width, max_width)
-        measure_min, measure_max = Measurement.get(
-            console, self.renderable, max(0, max_width - extra_width)
-        )
+        measure_min, measure_max = Measurement.get(console, options, self.renderable)
         measurement = Measurement(measure_min + extra_width, measure_max + extra_width)
         measurement = measurement.with_maximum(max_width)
         return measurement

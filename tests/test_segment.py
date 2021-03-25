@@ -1,10 +1,15 @@
+from rich.segment import ControlType
 from rich.segment import Segment
 from rich.style import Style
 
 
 def test_repr():
     assert repr(Segment("foo")) == "Segment('foo', None)"
-    assert repr(Segment.control("foo")) == "Segment.control('foo', None)"
+    home = (ControlType.HOME, 0)
+    assert (
+        repr(Segment("foo", None, [home]))
+        == "Segment('foo', None, [(<ControlType.HOME: 3>, 0)])"
+    )
 
 
 def test_line():
@@ -81,10 +86,11 @@ def test_simplify():
 
 
 def test_filter_control():
-    segments = [Segment("foo"), Segment("bar", is_control=True)]
+    control_code = (ControlType.HOME, 0)
+    segments = [Segment("foo"), Segment("bar", None, (control_code,))]
     assert list(Segment.filter_control(segments)) == [Segment("foo")]
     assert list(Segment.filter_control(segments, is_control=True)) == [
-        Segment("bar", is_control=True)
+        Segment("bar", None, (control_code,))
     ]
 
 
@@ -109,9 +115,7 @@ def test_remove_color():
     ]
 
 
-def test_make_control():
-    segments = [Segment("foo"), Segment("bar")]
-    assert Segment.make_control(segments) == [
-        Segment.control("foo"),
-        Segment.control("bar"),
-    ]
+def test_is_control():
+    assert Segment("foo", Style(bold=True)).is_control == False
+    assert Segment("foo", Style(bold=True), []).is_control == True
+    assert Segment("foo", Style(bold=True), [(ControlType.HOME, 0)]).is_control == True

@@ -4,6 +4,7 @@ import sys
 from array import array
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, fields, is_dataclass
+import inspect
 from itertools import islice
 from typing import (
     TYPE_CHECKING,
@@ -14,6 +15,7 @@ from typing import (
     List,
     Optional,
     Set,
+    Union,
     Tuple,
 )
 
@@ -197,7 +199,10 @@ class Pretty:
         pretty_text = (
             self.highlighter(pretty_text)
             if pretty_text
-            else Text("__repr__ returned empty string", style="dim italic")
+            else Text(
+                f"{type(self._object)}.__repr__ returned empty string",
+                style="dim italic",
+            )
         )
         if self.indent_guides and not options.ascii_only:
             pretty_text = pretty_text.with_indent_guides(
@@ -207,10 +212,12 @@ class Pretty:
             yield ""
         yield pretty_text
 
-    def __rich_measure__(self, console: "Console", max_width: int) -> "Measurement":
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "Measurement":
         pretty_str = pretty_repr(
             self._object,
-            max_width=max_width,
+            max_width=options.max_width,
             indent_size=self.indent_size,
             max_length=self.max_length,
             max_string=self.max_string,
@@ -251,8 +258,10 @@ _MAPPING_CONTAINERS = (dict, os._Environ)
 
 def is_expandable(obj: Any) -> bool:
     """Check if an object may be expanded by pretty print."""
-    return isinstance(obj, _CONTAINERS) or (
-        is_dataclass(obj) and not isinstance(obj, type)
+    return (
+        isinstance(obj, _CONTAINERS)
+        or (is_dataclass(obj) and not isinstance(obj, type))
+        or hasattr(obj, "__rich_repr__")
     )
 
 
@@ -440,7 +449,55 @@ def traverse(_object: Any, max_length: int = None, max_string: int = None) -> No
         """Walk the object depth first."""
         obj_type = type(obj)
         py_version = (sys.version_info.major, sys.version_info.minor)
-        if (
+        children: List[Node]
+
+        def iter_rich_args(rich_args) -> Iterable[Union[Any, Tuple[str, Any]]]:
+            for arg in rich_args:
+                if isinstance(arg, tuple):
+                    if len(arg) == 3:
+                        key, child, default = arg
+                        if default == child:
+                            continue
+                        yield key, child
+                    elif len(arg) == 2:
+                        key, child = arg
+                        yield key, child
+                    elif len(arg) == 1:
+                        yield arg[0]
+                else:
+                    yield arg
+
+        if hasattr(obj, "__rich_repr__"):
+            args = list(iter_rich_args(obj.__rich_repr__()))
+
+            if args:
+                children = []
+                append = children.append
+                node = Node(
+                    open_brace=f"{obj.__class__.__name__}(",
+                    close_brace=")",
+                    children=children,
+                    last=root,
+                )
+                for last, arg in loop_last(args):
+                    if isinstance(arg, tuple):
+                        key, child = arg
+                        child_node = _traverse(child)
+                        child_node.last = last
+                        child_node.key_repr = key
+                        child_node.last = last
+                        child_node.key_separator = "="
+                        append(child_node)
+                    else:
+                        child_node = _traverse(arg)
+                        child_node.last = last
+                        append(child_node)
+            else:
+                node = Node(
+                    value_repr=f"{obj.__class__.__name__}()", children=[], last=root
+                )
+
+        elif (
             is_dataclass(obj)
             and not isinstance(obj, type)
             and (
@@ -453,7 +510,7 @@ def traverse(_object: Any, max_length: int = None, max_string: int = None) -> No
                 return Node(value_repr="...")
             push_visited(obj_id)
 
-            children: List[Node] = []
+            children = []
             append = children.append
             node = Node(
                 open_brace=f"{obj.__class__.__name__}(",
