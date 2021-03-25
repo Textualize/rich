@@ -10,3 +10,4 @@ The following people have contributed to the development of Rich:
 - [Alexander Mancevice](https://github.com/amancevice)
 - [Will McGugan](https://github.com/willmcgugan)
 - [Nathan Page](https://github.com/nathanrpage97)
+- [Clément Robert](https://github.com/neutrinoceros)

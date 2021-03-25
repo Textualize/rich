@@ -32,7 +32,7 @@ class ProgressBar(JupyterMixin):
 
     def __init__(
         self,
-        total: float = 100,
+        total: float = 100.0,
         completed: float = 0,
         width: int = None,
         pulse: bool = False,

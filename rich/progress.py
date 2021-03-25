@@ -83,7 +83,7 @@ class _TrackThread(Thread):
 def track(
     sequence: Union[Sequence[ProgressType], Iterable[ProgressType]],
     description="Working...",
-    total: int = None,
+    total: Optional[float] = None,
     auto_refresh=True,
     console: Optional[Console] = None,
     transient: bool = False,
@@ -101,7 +101,7 @@ def track(
     Args:
         sequence (Iterable[ProgressType]): A sequence (must support "len") you wish to iterate over.
         description (str, optional): Description of task show next to progress bar. Defaults to "Working".
-        total: (int, optional): Total number of steps. Default is len(sequence).
+        total: (float, optional): Total number of steps. Default is len(sequence).
         auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         console (Console, optional): Console to write to. Default creates internal Console instance.
@@ -650,7 +650,7 @@ class Progress(JupyterMixin):
     def track(
         self,
         sequence: Union[Iterable[ProgressType], Sequence[ProgressType]],
-        total: int = None,
+        total: Optional[float] = None,
         task_id: Optional[TaskID] = None,
         description="Working...",
         update_period: float = 0.1,
@@ -659,7 +659,7 @@ class Progress(JupyterMixin):
 
         Args:
             sequence (Sequence[ProgressType]): A sequence of values you want to iterate over and track progress.
-            total: (int, optional): Total number of steps. Default is len(sequence).
+            total: (float, optional): Total number of steps. Default is len(sequence).
             task_id: (TaskID): Task to track. Default is new task.
             description: (str, optional): Description of task, if new task is created.
             update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
@@ -670,7 +670,7 @@ class Progress(JupyterMixin):
 
         if total is None:
             if isinstance(sequence, Sized):
-                task_total = len(sequence)
+                task_total = float(len(sequence))
             else:
                 raise ValueError(
                     f"unable to get size of {sequence!r}, please specify 'total'"
@@ -729,7 +729,7 @@ class Progress(JupyterMixin):
         self,
         task_id: TaskID,
         *,
-        total: float = None,
+        total: Optional[float] = None,
         completed: float = None,
         advance: float = None,
         description: str = None,
@@ -789,7 +789,7 @@ class Progress(JupyterMixin):
         task_id: TaskID,
         *,
         start: bool = True,
-        total: Optional[int] = None,
+        total: Optional[float] = None,
         completed: int = 0,
         visible: Optional[bool] = None,
         description: Optional[str] = None,
@@ -800,7 +800,7 @@ class Progress(JupyterMixin):
         Args:
             task_id (TaskID): ID of task.
             start (bool, optional): Start the task after reset. Defaults to True.
-            total (int, optional): New total steps in task, or None to use current total. Defaults to None.
+            total (float, optional): New total steps in task, or None to use current total. Defaults to None.
             completed (int, optional): Number of steps completed. Defaults to 0.
             **fields (str): Additional data fields required for rendering.
         """
@@ -904,7 +904,7 @@ class Progress(JupyterMixin):
         self,
         description: str,
         start: bool = True,
-        total: int = 100,
+        total: float = 100.0,
         completed: int = 0,
         visible: bool = True,
         **fields: Any,
@@ -915,7 +915,7 @@ class Progress(JupyterMixin):
             description (str): A description of the task.
             start (bool, optional): Start the task immediately (to calculate elapsed time). If set to False,
                 you will need to call `start` manually. Defaults to True.
-            total (int, optional): Number of total steps in the progress if know. Defaults to 100.
+            total (float, optional): Number of total steps in the progress if know. Defaults to 100.
             completed (int, optional): Number of steps completed so far.. Defaults to 0.
             visible (bool, optional): Enable display of the task. Defaults to True.
             **fields (str): Additional data fields required for rendering.

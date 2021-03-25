@@ -34,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed table style taking precedence over row style https://github.com/willmcgugan/rich/issues/1129
 - Fixed incorrect measurement of Text with new lines and whitespace https://github.com/willmcgugan/rich/issues/1133
+- Made type annotations consistent for various `total` keyword arguments in `rich.progress` and rich.`progress_bar`
+
 
 ## [9.13.0] - 2021-03-06
 
