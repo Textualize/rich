@@ -434,6 +434,44 @@ def test_progress_max_refresh() -> None:
     )
 
 
+def test_live_is_started_if_progress_is_enabled() -> None:
+    progress = Progress(auto_refresh=False, disable=False)
+
+    with progress:
+        assert progress.live._started
+
+
+def test_live_is_not_started_if_progress_is_disabled() -> None:
+    progress = Progress(auto_refresh=False, disable=True)
+
+    with progress:
+        assert not progress.live._started
+
+
+def test_no_output_if_progress_is_disabled() -> None:
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=60,
+        color_system="truecolor",
+        legacy_windows=False,
+        _environ={},
+    )
+    progress = Progress(
+        console=console,
+        disable=True,
+    )
+    test = ["foo", "bar", "baz"]
+    expected_values = iter(test)
+    with progress:
+        for value in progress.track(test, description="test"):
+            assert value == next(expected_values)
+    result = console.file.getvalue()
+    print(repr(result))
+    expected = ""
+    assert result == expected
+
+
 if __name__ == "__main__":
     _render = render_progress()
     print(_render)
