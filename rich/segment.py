@@ -42,7 +42,7 @@ class Segment(NamedTuple):
     Args:
         text (str): A piece of text.
         style (:class:`~rich.style.Style`, optional): An optional style to apply to the text.
-        control (Tuple[ControlCode..], optional): Optional tuple of control codes.
+        control (Tuple[ControlCode..], optional): Optional sequence of control codes.
     """
 
     text: str = ""
@@ -50,7 +50,7 @@ class Segment(NamedTuple):
     style: Optional[Style] = None
     """An optional style."""
     control: Optional[Sequence[ControlCode]] = None
-    """True if the segment contains control codes, otherwise False."""
+    """Optional sequence of control codes."""
 
     def __repr__(self) -> str:
         """Simplified repr."""
