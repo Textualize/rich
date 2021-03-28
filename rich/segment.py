@@ -416,7 +416,7 @@ console.print(text)"""
 
     console.rule("rich.Segment")
     console.print(
-        "A Segment is the last step in the Rich render process before gemerating text with ANSI codes."
+        "A Segment is the last step in the Rich render process before generating text with ANSI codes."
     )
     console.print("\nConsider the following code:\n")
     console.print(Syntax(code, "python", line_numbers=True))
