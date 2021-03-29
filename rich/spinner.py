@@ -82,7 +82,11 @@ class Spinner:
             return table
 
     def update(
-        self, *, text: "RenderableType" = "", style: "StyleType" = None, speed: float = None
+        self,
+        *,
+        text: "RenderableType" = "",
+        style: "StyleType" = None,
+        speed: float = None,
     ) -> None:
         """Updates attributes of a spinner after it has been started.
 
