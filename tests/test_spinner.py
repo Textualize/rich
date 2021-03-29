@@ -2,6 +2,7 @@ import pytest
 
 from rich.console import Console
 from rich.measure import Measurement
+from rich.panel import Panel
 from rich.spinner import Spinner
 
 
@@ -41,16 +42,24 @@ def test_spinner_update():
 
     console = Console(width=80, force_terminal=True, get_time=get_time)
     console.begin_capture()
-    spinner = Spinner("dots", "Foo")
+    spinner = Spinner("dots")
     console.print(spinner)
+
     spinner.update(text="Bar", style="green", speed=2)
     time += 80 / 1000
     console.print(spinner)
+
+    spinner.update(text=Panel("Bar"))
     time += 80 / 1000
     console.print(spinner)
+
     result = console.end_capture()
     print(repr(result))
-    expected = f"⠋ Foo\n\x1b[32m⠙\x1b[0m Bar\n\x1b[32m⠸\x1b[0m Bar\n"
+    expected = (
+        f"⠋\n"
+        f"\x1b[32m⠙\x1b[0m Bar\n"
+        f"\x1b[32m⠸\x1b[0m ╭─────╮\n  │ Bar │\n  ╰─────╯\n"
+    )
     assert result == expected
 
 
