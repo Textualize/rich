@@ -23,7 +23,7 @@ class Spinner:
 
         Args:
             name (str): Name of spinner (run python -m rich.spinner).
-            text (TextType, optional): A renderable to display at the right of the spinner (str or Text typically). Defaults to "".
+            text (RenderableType, optional): A renderable to display at the right of the spinner (str or Text typically). Defaults to "".
             style (StyleType, optional): Style for spinner animation. Defaults to None.
             speed (float, optional): Speed factor for animation. Defaults to 1.0.
 
@@ -82,12 +82,12 @@ class Spinner:
             return table
 
     def update(
-        self, *, text: TextType = "", style: "StyleType" = None, speed: float = None
+        self, *, text: "RenderableType" = "", style: "StyleType" = None, speed: float = None
     ) -> None:
         """Updates attributes of a spinner after it has been started.
 
         Args:
-            text (TextType, optional): A renderable to display at the right of the spinner (str or Text typically). Defaults to "".
+            text (RenderableType, optional): A renderable to display at the right of the spinner (str or Text typically). Defaults to "".
             style (StyleType, optional): Style for spinner animation. Defaults to None.
             speed (float, optional): Speed factor for animation. Defaults to None.
         """
