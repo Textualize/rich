@@ -1,4 +1,4 @@
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
 from .console import Console, RenderableType
 from .jupyter import JupyterMixin
@@ -6,15 +6,12 @@ from .live import Live
 from .spinner import Spinner
 from .style import StyleType
 
-if TYPE_CHECKING:
-    from .text import TextType
-
 
 class Status(JupyterMixin):
     """Displays a status indicator with a 'spinner' animation.
 
     Args:
-        status (TextType): Text for a given status.
+        status (RenderableType): A status renderable (str or Text typically).
         console (Console, optional): Console instance to use, or None for global console. Defaults to None.
         spinner (str, optional): Name of spinner animation (see python -m rich.spinner). Defaults to "dots".
         spinner_style (StyleType, optional): Style of spinner. Defaults to "status.spinner".
@@ -24,7 +21,7 @@ class Status(JupyterMixin):
 
     def __init__(
         self,
-        status: "TextType",
+        status: RenderableType,
         *,
         console: Console = None,
         spinner: str = "dots",
@@ -54,7 +51,7 @@ class Status(JupyterMixin):
 
     def update(
         self,
-        status: Optional["TextType"] = None,
+        status: Optional[RenderableType] = None,
         *,
         spinner: Optional[str] = None,
         spinner_style: Optional[StyleType] = None,
@@ -63,7 +60,7 @@ class Status(JupyterMixin):
         """Update status.
 
         Args:
-            status (Optional[TextType], optional): New status text or None for no change. Defaults to None.
+            status (Optional[RenderableType], optional): New status renderable or None for no change. Defaults to None.
             spinner (Optional[str], optional): New spinner or None for no change. Defaults to None.
             spinner_style (Optional[StyleType], optional): New spinner style or None for no change. Defaults to None.
             speed (Optional[float], optional): Speed factor for spinner animation or None for no change. Defaults to None.

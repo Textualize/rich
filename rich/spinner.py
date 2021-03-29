@@ -2,22 +2,28 @@ from typing import cast, List, Optional, TYPE_CHECKING
 
 from ._spinners import SPINNERS
 from .measure import Measurement
+from .table import Table
 from .text import Text, TextType
 
 if TYPE_CHECKING:
-    from .console import Console, ConsoleOptions, RenderResult
+    from .console import Console, ConsoleOptions, RenderResult, RenderableType
     from .style import StyleType
 
 
 class Spinner:
     def __init__(
-        self, name: str, text: TextType = "", *, style: "StyleType" = None, speed=1.0
+        self,
+        name: str,
+        text: "RenderableType" = "",
+        *,
+        style: "StyleType" = None,
+        speed=1.0,
     ) -> None:
         """A spinner animation.
 
         Args:
             name (str): Name of spinner (run python -m rich.spinner).
-            text (TextType, optional): Text to display at the right of the spinner. Defaults to "".
+            text (TextType, optional): A renderable to display at the right of the spinner (str or Text typically). Defaults to "".
             style (StyleType, optional): Style for spinner animation. Defaults to None.
             speed (float, optional): Speed factor for animation. Defaults to 1.0.
 
@@ -51,14 +57,14 @@ class Spinner:
         text = self.render(0)
         return Measurement.get(console, options, text)
 
-    def render(self, time: float) -> Text:
+    def render(self, time: float) -> "RenderableType":
         """Render the spinner for a given time.
 
         Args:
             time (float): Time in seconds.
 
         Returns:
-            Text: A Text instance containing animation frame.
+            RenderableType: A renderable containing animation frame.
         """
         frame_no = int((time * self.speed) / (self.interval / 1000.0))
         if self._update_speed:
@@ -66,7 +72,14 @@ class Spinner:
             self.speed = self._update_speed
             self._update_speed = 0.0
         frame = Text(self.frames[frame_no % len(self.frames)], style=self.style or "")
-        return Text.assemble(frame, " ", self.text) if self.text else frame
+        if not self.text:
+            return frame
+        elif isinstance(self.text, (str, Text)):
+            return Text.assemble(frame, " ", self.text)
+        else:
+            table = Table.grid(padding=1)
+            table.add_row(frame, self.text)
+            return table
 
     def update(
         self, *, text: TextType = "", style: "StyleType" = None, speed: float = None
@@ -74,7 +87,7 @@ class Spinner:
         """Updates attributes of a spinner after it has been started.
 
         Args:
-            text (TextType, optional): Text to display at the right of the spinner. Defaults to "".
+            text (TextType, optional): A renderable to display at the right of the spinner (str or Text typically). Defaults to "".
             style (StyleType, optional): Style for spinner animation. Defaults to None.
             speed (float, optional): Speed factor for animation. Defaults to None.
         """

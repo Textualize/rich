@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved layout.tree
 - Changed default theme color for repr.number to cyan
 - `__rich_measure__` signature changed to accept ConsoleOptions rather than max_width
-- `status` parameter to rich.status.Status changed to TextType
+- `text` parameter to rich.spinner.Spinner changed to RenderableType
 
 ### Added
 
