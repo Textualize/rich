@@ -2,7 +2,7 @@ import pytest
 
 from rich.console import Console
 from rich.measure import Measurement
-from rich.panel import Panel
+from rich.rule import Rule
 from rich.spinner import Spinner
 
 
@@ -40,7 +40,7 @@ def test_spinner_update():
         nonlocal time
         return time
 
-    console = Console(width=80, force_terminal=True, get_time=get_time)
+    console = Console(width=20, force_terminal=True, get_time=get_time)
     console.begin_capture()
     spinner = Spinner("dots")
     console.print(spinner)
@@ -49,17 +49,13 @@ def test_spinner_update():
     time += 80 / 1000
     console.print(spinner)
 
-    spinner.update(text=Panel("Bar"))
+    spinner.update(text=Rule("Bar"))
     time += 80 / 1000
     console.print(spinner)
 
     result = console.end_capture()
     print(repr(result))
-    expected = (
-        f"⠋\n"
-        f"\x1b[32m⠙\x1b[0m Bar\n"
-        f"\x1b[32m⠸\x1b[0m ╭─────╮\n  │ Bar │\n  ╰─────╯\n"
-    )
+    expected = f"⠋\n\x1b[32m⠙\x1b[0m Bar\n\x1b[32m⠸\x1b[0m \x1b[92m────── \x1b[0mBar\x1b[92m ───────\x1b[0m\n"
     assert result == expected
 
 
