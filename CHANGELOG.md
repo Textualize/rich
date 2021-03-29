@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved layout.tree
 - Changed default theme color for repr.number to cyan
 - `__rich_measure__` signature changed to accept ConsoleOptions rather than max_width
+- `status` parameter to rich.status.Status changed to TextType
 
 ### Added
 
@@ -36,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed incorrect measurement of Text with new lines and whitespace https://github.com/willmcgugan/rich/issues/1133
 - Made type annotations consistent for various `total` keyword arguments in `rich.progress` and rich.`progress_bar`
 - Disabled Progress no longer displays itself when starting https://github.com/willmcgugan/rich/pull/1125
+- Animations no longer reset when updating rich.status.Status
 
 ## [9.13.0] - 2021-03-06
 

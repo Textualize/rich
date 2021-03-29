@@ -5,7 +5,6 @@ import shutil
 import sys
 import threading
 from abc import ABC, abstractmethod
-from collections import abc
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import wraps
@@ -998,7 +997,7 @@ class Console:
 
     def status(
         self,
-        status: RenderableType,
+        status: TextType,
         *,
         spinner: str = "dots",
         spinner_style: str = "status.spinner",
@@ -1008,7 +1007,7 @@ class Console:
         """Display a status and spinner.
 
         Args:
-            status (RenderableType): A status renderable (str or Text typically).
+            status (TextType): Text for a given status.
             console (Console, optional): Console instance to use, or None for global console. Defaults to None.
             spinner (str, optional): Name of spinner animation (see python -m rich.spinner). Defaults to "dots".
             spinner_style (StyleType, optional): Style of spinner. Defaults to "status.spinner".

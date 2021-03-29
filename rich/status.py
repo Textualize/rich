@@ -1,18 +1,20 @@
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from .console import Console, RenderableType
 from .jupyter import JupyterMixin
 from .live import Live
 from .spinner import Spinner
 from .style import StyleType
-from .table import Table
+
+if TYPE_CHECKING:
+    from .text import TextType
 
 
 class Status(JupyterMixin):
     """Displays a status indicator with a 'spinner' animation.
 
     Args:
-        status (RenderableType): A status renderable (str or Text typically).
+        status (TextType): Text for a given status.
         console (Console, optional): Console instance to use, or None for global console. Defaults to None.
         spinner (str, optional): Name of spinner animation (see python -m rich.spinner). Defaults to "dots".
         spinner_style (StyleType, optional): Style of spinner. Defaults to "status.spinner".
@@ -22,7 +24,7 @@ class Status(JupyterMixin):
 
     def __init__(
         self,
-        status: RenderableType,
+        status: "TextType",
         *,
         console: Console = None,
         spinner: str = "dots",
@@ -31,26 +33,19 @@ class Status(JupyterMixin):
         refresh_per_second: float = 12.5,
     ):
         self.status = status
-        self.spinner = spinner
         self.spinner_style = spinner_style
         self.speed = speed
-        self._spinner = Spinner(spinner, style=spinner_style, speed=speed)
+        self._spinner = Spinner(spinner, text=status, style=spinner_style, speed=speed)
         self._live = Live(
             self.renderable,
             console=console,
             refresh_per_second=refresh_per_second,
             transient=True,
         )
-        self.update(
-            status=status, spinner=spinner, spinner_style=spinner_style, speed=speed
-        )
 
     @property
-    def renderable(self) -> Table:
-        """Get the renderable for the status (a table with spinner and status)."""
-        table = Table.grid(padding=1)
-        table.add_row(self._spinner, self.status)
-        return table
+    def renderable(self) -> Spinner:
+        return self._spinner
 
     @property
     def console(self) -> "Console":
@@ -59,7 +54,7 @@ class Status(JupyterMixin):
 
     def update(
         self,
-        status: Optional[RenderableType] = None,
+        status: Optional["TextType"] = None,
         *,
         spinner: Optional[str] = None,
         spinner_style: Optional[StyleType] = None,
@@ -68,23 +63,26 @@ class Status(JupyterMixin):
         """Update status.
 
         Args:
-            status (Optional[RenderableType], optional): New status renderable or None for no change. Defaults to None.
+            status (Optional[TextType], optional): New status text or None for no change. Defaults to None.
             spinner (Optional[str], optional): New spinner or None for no change. Defaults to None.
             spinner_style (Optional[StyleType], optional): New spinner style or None for no change. Defaults to None.
             speed (Optional[float], optional): Speed factor for spinner animation or None for no change. Defaults to None.
         """
         if status is not None:
             self.status = status
-        if spinner is not None:
-            self.spinner = spinner
         if spinner_style is not None:
             self.spinner_style = spinner_style
         if speed is not None:
             self.speed = speed
-        self._spinner = Spinner(
-            self.spinner, style=self.spinner_style, speed=self.speed
-        )
-        self._live.update(self.renderable, refresh=True)
+        if spinner is not None:
+            self._spinner = Spinner(
+                spinner, text=self.status, style=self.spinner_style, speed=self.speed
+            )
+            self._live.update(self.renderable, refresh=True)
+        else:
+            self._spinner.update(
+                text=self.status, style=self.spinner_style, speed=self.speed
+            )
 
     def start(self) -> None:
         """Start the status animation."""
