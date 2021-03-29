@@ -12,9 +12,13 @@ def test_status():
     )
     status = Status("foo", console=console)
     assert status.console == console
-    status.update(status="bar", spinner="dots2", spinner_style="red", speed=2.0)
+    previous_status_renderable = status.renderable
+    status.update(status="bar", spinner_style="red", speed=2.0)
 
+    assert previous_status_renderable == status.renderable
     assert isinstance(status.renderable, Spinner)
+    status.update(spinner="dots2")
+    assert previous_status_renderable != status.renderable
 
     # TODO: Testing output is tricky with threads
     with status:
