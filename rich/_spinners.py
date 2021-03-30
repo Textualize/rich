@@ -845,4 +845,12 @@ SPINNERS = {
             "▰▱▱▱▱▱▱",
         ],
     },
+    "checkMark": {
+        "interval": 1000,
+        "frames": ["✅"],
+    },
+    "crossMark": {
+        "interval": 1000,
+        "frames": ["❌"],
+    },
 }
