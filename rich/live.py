@@ -39,7 +39,7 @@ class Live(JupyterMixin, RenderHook):
         console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
         screen (bool, optional): Enable alternate screen mode. Defaults to False.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()` or `update()` with refresh flag. Defaults to True
-        refresh_per_second (float, optional): Number of times per second to refresh the live display. Defaults to 1.
+        refresh_per_second (float, optional): Number of times per second to refresh the live display. Defaults to 4.
         transient (bool, optional): Clear the renderable on exit (has no effect when screen=True). Defaults to False.
         redirect_stdout (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
         redirect_stderr (bool, optional): Enable redirection of stderr. Defaults to True.
