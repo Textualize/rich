@@ -1159,33 +1159,34 @@ class Console:
         Returns:
             List[List[Segment]]: A list of lines, where a line is a list of Segment objects.
         """
-        render_options = options or self.options
-        _rendered = self.render(renderable, render_options)
-        if style:
-            _rendered = Segment.apply_style(_rendered, style)
-        lines = list(
-            islice(
-                Segment.split_and_crop_lines(
-                    _rendered,
-                    render_options.max_width,
-                    include_new_lines=new_lines,
-                    pad=pad,
-                ),
-                None,
-                render_options.height,
+        with self._lock:
+            render_options = options or self.options
+            _rendered = self.render(renderable, render_options)
+            if style:
+                _rendered = Segment.apply_style(_rendered, style)
+            lines = list(
+                islice(
+                    Segment.split_and_crop_lines(
+                        _rendered,
+                        render_options.max_width,
+                        include_new_lines=new_lines,
+                        pad=pad,
+                    ),
+                    None,
+                    render_options.height,
+                )
             )
-        )
-        if render_options.height is not None:
-            extra_lines = render_options.height - len(lines)
-            if extra_lines > 0:
-                pad_line = [
-                    [Segment(" " * render_options.max_width, style), Segment("\n")]
-                    if new_lines
-                    else [Segment(" " * render_options.max_width, style)]
-                ]
-                lines.extend(pad_line * extra_lines)
+            if render_options.height is not None:
+                extra_lines = render_options.height - len(lines)
+                if extra_lines > 0:
+                    pad_line = [
+                        [Segment(" " * render_options.max_width, style), Segment("\n")]
+                        if new_lines
+                        else [Segment(" " * render_options.max_width, style)]
+                    ]
+                    lines.extend(pad_line * extra_lines)
 
-        return lines
+            return lines
 
     def render_str(
         self,

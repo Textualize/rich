@@ -850,7 +850,7 @@ class Progress(JupyterMixin):
 
     def refresh(self) -> None:
         """Refresh (render) the progress information."""
-        if not self.disable:
+        if not self.disable and self.live.is_started:
             self.live.refresh()
 
     def get_renderable(self) -> RenderableType:
@@ -872,7 +872,6 @@ class Progress(JupyterMixin):
         Returns:
             Table: A table instance.
         """
-
         table_columns = (
             (
                 Column(no_wrap=True)
@@ -899,7 +898,8 @@ class Progress(JupyterMixin):
 
     def __rich__(self) -> RenderableType:
         """Makes the Progress class itself renderable."""
-        return self.get_renderable()
+        with self._lock:
+            return self.get_renderable()
 
     def add_task(
         self,
