@@ -40,7 +40,6 @@ class LayoutRender(NamedTuple):
 
 RegionMap = Dict["Layout", Region]
 RenderMap = Dict["Layout", LayoutRender]
-Direction = Literal["horizontal", "vertical"]
 
 
 class LayoutError(Exception):
