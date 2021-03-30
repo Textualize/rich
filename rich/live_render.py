@@ -1,3 +1,4 @@
+from threading import RLock
 from typing import Optional, Tuple
 
 from typing_extensions import Literal
@@ -5,7 +6,7 @@ from typing_extensions import Literal
 from ._loop import loop_last
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .control import Control
-from .segment import ControlCode, ControlType, Segment
+from .segment import ControlType, Segment
 from .style import StyleType
 from .text import Text
 
@@ -77,9 +78,11 @@ class LiveRender:
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
+
+        renderable = self.renderable
         _Segment = Segment
         style = console.get_style(self.style)
-        lines = console.render_lines(self.renderable, options, style=style, pad=False)
+        lines = console.render_lines(renderable, options, style=style, pad=False)
         shape = _Segment.get_shape(lines)
 
         _, height = shape

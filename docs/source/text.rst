@@ -44,7 +44,7 @@ The Text class has a number of parameters you can set on the constructor to modi
 - ``no_wrap`` prevents wrapping if the text is longer then the available width.
 - ``tab_size`` Sets the number of characters in a tab.
 
-A Text instance may be used in place of a plain string virtually everywhere in the Rich API, which gives you a lot of control in how text renders within other Rich renderables. For instance, the following example right aligns text within a :class:`rich.panel.Panel`::
+A Text instance may be used in place of a plain string virtually everywhere in the Rich API, which gives you a lot of control in how text renders within other Rich renderables. For instance, the following example right aligns text within a :class:`~rich.panel.Panel`::
 
     from rich import print
     from rich.panel import Panel

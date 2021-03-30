@@ -86,7 +86,11 @@ class Live(JupyterMixin, RenderHook):
         self._live_render = LiveRender(
             self.get_renderable(), vertical_overflow=vertical_overflow
         )
-        # cant store just clear_control as the live_render shape is lazily computed on render
+
+    @property
+    def is_started(self) -> bool:
+        """Check if live display has been started."""
+        return self._started
 
     def get_renderable(self) -> RenderableType:
         renderable = (
@@ -205,17 +209,17 @@ class Live(JupyterMixin, RenderHook):
 
     def refresh(self) -> None:
         """Update the display of the Live Render."""
-        self._live_render.set_renderable(self.renderable)
-        if self.console.is_jupyter:  # pragma: no cover
-            try:
-                from IPython.display import display
-                from ipywidgets import Output
-            except ImportError:
-                import warnings
+        with self._lock:
+            self._live_render.set_renderable(self.renderable)
+            if self.console.is_jupyter:  # pragma: no cover
+                try:
+                    from IPython.display import display
+                    from ipywidgets import Output
+                except ImportError:
+                    import warnings
 
-                warnings.warn('install "ipywidgets" for Jupyter support')
-            else:
-                with self._lock:
+                    warnings.warn('install "ipywidgets" for Jupyter support')
+                else:
                     if self.ipy_widget is None:
                         self.ipy_widget = Output()
                         display(self.ipy_widget)
@@ -223,14 +227,14 @@ class Live(JupyterMixin, RenderHook):
                     with self.ipy_widget:
                         self.ipy_widget.clear_output(wait=True)
                         self.console.print(self._live_render.renderable)
-        elif self.console.is_terminal and not self.console.is_dumb_terminal:
-            with self._lock, self.console:
-                self.console.print(Control())
-        elif (
-            not self._started and not self.transient
-        ):  # if it is finished allow files or dumb-terminals to see final result
-            with self.console:
-                self.console.print(Control())
+            elif self.console.is_terminal and not self.console.is_dumb_terminal:
+                with self.console:
+                    self.console.print(Control())
+            elif (
+                not self._started and not self.transient
+            ):  # if it is finished allow files or dumb-terminals to see final result
+                with self.console:
+                    self.console.print(Control())
 
     def process_renderables(
         self, renderables: List[ConsoleRenderable]

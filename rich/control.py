@@ -153,7 +153,8 @@ class Control:
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-        yield self.segment
+        if self.segment.text:
+            yield self.segment
 
 
 def strip_control_codes(text: str, _translate_table=_CONTROL_TRANSLATE) -> str:
