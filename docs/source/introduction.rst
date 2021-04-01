@@ -10,7 +10,7 @@ Requirements
 
 Rich works with OSX, Linux and Windows.
 
-On Windows both the (ancient) cmd.exe terminal is supported and the new `Windows Terminal <https://github.com/microsoft/terminal/releases>`_. The later has much improved support for color and style.
+On Windows both the classic console and the new `Windows Terminal <https://github.com/microsoft/terminal>`_ are supported. When they're available (and if Windows Terminal works, they are), rich can use `virtual terminal sequences <https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences>`_ for improved support for color and style. Unfortunately, the classic console doesn't (yet?) support emoji (`issue <https://github.com/Microsoft/Terminal/issues/190>`_).
 
 Rich requires Python 3.6.1 and above. Note that Python 3.6.0 is *not* supported due to lack of support for methods on NamedTuples.
 
