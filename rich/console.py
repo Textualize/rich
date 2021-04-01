@@ -452,7 +452,7 @@ def _is_jupyter() -> bool:  # pragma: no cover
         return False
     ipython = get_ipython()  # type: ignore
     shell = ipython.__class__.__name__  # type: ignore
-    if "SpyderKernelApp" in ipython.config:
+    if ipython.config.get("SpyderKernelApp"):
         return False
     elif "google.colab" in str(ipython.__class__) or shell == "ZMQInteractiveShell":
         return True  # Jupyter notebook or qtconsole
