@@ -40,7 +40,7 @@ from .highlighter import NullHighlighter, ReprHighlighter
 from .markup import render as render_markup
 from .measure import Measurement, measure_renderables
 from .pager import Pager, SystemPager
-from .pretty import is_expandable, Pretty
+from .pretty import Pretty, is_expandable
 from .region import Region
 from .scope import render_scope
 from .screen import Screen
@@ -452,7 +452,9 @@ def _is_jupyter() -> bool:  # pragma: no cover
         return False
     ipython = get_ipython()  # type: ignore
     shell = ipython.__class__.__name__  # type: ignore
-    if "google.colab" in str(ipython.__class__) or shell == "ZMQInteractiveShell":
+    if "SpyderKernelApp" in ipython.config:
+        return False
+    elif "google.colab" in str(ipython.__class__) or shell == "ZMQInteractiveShell":
         return True  # Jupyter notebook or qtconsole
     elif shell == "TerminalInteractiveShell":
         return False  # Terminal running IPython
