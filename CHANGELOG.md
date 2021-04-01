@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed race condition that duplicated lines in progress https://github.com/willmcgugan/rich/issues/1144
+- Fixed Spyder Ipython session detection https://github.com/willmcgugan/rich/pull/1150
 
 ## [10.0.0] - 2021-03-27
 
