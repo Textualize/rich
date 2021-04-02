@@ -1681,7 +1681,7 @@ class Console:
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
 
-                    display(self._buffer)
+                    display(self._buffer, self._render_buffer(self._buffer[:]))
                     del self._buffer[:]
                 else:
                     text = self._render_buffer(self._buffer[:])

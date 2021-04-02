@@ -4,7 +4,6 @@ import sys
 from array import array
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, fields, is_dataclass
-import inspect
 from itertools import islice
 from typing import (
     TYPE_CHECKING,
@@ -27,7 +26,7 @@ from ._pick import pick_bool
 from .abc import RichRenderable
 from .cells import cell_len
 from .highlighter import ReprHighlighter
-from .jupyter import JupyterRenderable
+from .jupyter import JupyterMixin, JupyterRenderable
 from .measure import Measurement
 from .text import Text
 
@@ -99,6 +98,9 @@ def install(
         if console.is_jupyter and any(attr.startswith("_repr_") for attr in dir(value)):
             return
 
+        if hasattr(value, "_repr_mimebundle_"):
+            return
+
         # certain renderables should start on a new line
         if isinstance(value, ConsoleRenderable):
             console.line()
@@ -130,7 +132,7 @@ def install(
         sys.displayhook = display_hook
 
 
-class Pretty:
+class Pretty(JupyterMixin):
     """A rich renderable that pretty prints an object.
 
     Args:

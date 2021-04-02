@@ -14,8 +14,6 @@ from typing import (
     Union,
 )
 
-from typing_extensions import Literal
-
 from ._ratio import ratio_resolve
 from .align import Align
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
