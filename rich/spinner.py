@@ -40,6 +40,7 @@ class Spinner:
         self.start_time: Optional[float] = None
         self.style = style
         self.speed = speed
+        self.frame_no_offset: float = 0.0
         self._update_speed = 0.0
 
     def __rich_console__(
@@ -66,12 +67,14 @@ class Spinner:
         Returns:
             RenderableType: A renderable containing animation frame.
         """
-        frame_no = int((time * self.speed) / (self.interval / 1000.0))
+        frame_no = (time * self.speed) / (self.interval / 1000.0) + self.frame_no_offset
         if self._update_speed:
-            self.start_time += time - (time * self.speed / self._update_speed)
+            self.frame_no_offset = frame_no
+            self.start_time += time
             self.speed = self._update_speed
             self._update_speed = 0.0
-        frame = Text(self.frames[frame_no % len(self.frames)], style=self.style or "")
+        frame = Text(self.frames[int(frame_no) % len(self.frames)], style=self.style or "")
+
         if not self.text:
             return frame
         elif isinstance(self.text, (str, Text)):
