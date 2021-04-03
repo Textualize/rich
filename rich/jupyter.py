@@ -1,11 +1,9 @@
-from typing import Iterable, List, TYPE_CHECKING
+from typing import Iterable, List
 
 from . import get_console
 from .segment import Segment
 from .terminal_theme import DEFAULT_TERMINAL_THEME
 
-if TYPE_CHECKING:
-    from .console import RenderableType
 
 JUPYTER_HTML_FORMAT = """\
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">{code}</pre>
@@ -15,28 +13,33 @@ JUPYTER_HTML_FORMAT = """\
 class JupyterRenderable:
     """A shim to write html to Jupyter notebook."""
 
-    def __init__(self, html: str) -> None:
+    def __init__(self, html: str, text: str) -> None:
         self.html = html
+        self.text = text
 
-    @classmethod
-    def render(cls, rich_renderable: "RenderableType") -> str:
-        console = get_console()
-        segments = console.render(rich_renderable, console.options)
-        html = _render_segments(segments)
-        return html
-
-    def _repr_html_(self) -> str:
-        return self.html
+    def _repr_mimebundle_(self, include, exclude, **kwargs):
+        data = {"text/plain": self.text, "text/html": self.html}
+        if include:
+            data = {k: v for (k, v) in data.items() if k in include}
+        if exclude:
+            data = {k: v for (k, v) in data.items() if k not in exclude}
+        return data
 
 
 class JupyterMixin:
     """Add to an Rich renderable to make it render in Jupyter notebook."""
 
-    def _repr_html_(self) -> str:
+    def _repr_mimebundle_(self, include, exclude, **kwargs):
         console = get_console()
         segments = list(console.render(self, console.options))  # type: ignore
         html = _render_segments(segments)
-        return html
+        text = console._render_buffer(segments)
+        data = {"text/plain": text, "text/html": html}
+        if include:
+            data = {k: v for (k, v) in data.items() if k in include}
+        if exclude:
+            data = {k: v for (k, v) in data.items() if k not in exclude}
+        return data
 
 
 def _render_segments(segments: Iterable[Segment]) -> str:
@@ -64,12 +67,12 @@ def _render_segments(segments: Iterable[Segment]) -> str:
     return html
 
 
-def display(segments: Iterable[Segment]) -> None:
+def display(segments: Iterable[Segment], text: str) -> None:
     """Render segments to Jupyter."""
     from IPython.display import display as ipython_display
 
     html = _render_segments(segments)
-    jupyter_renderable = JupyterRenderable(html)
+    jupyter_renderable = JupyterRenderable(html, text)
     ipython_display(jupyter_renderable)
 
 
