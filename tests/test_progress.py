@@ -103,6 +103,7 @@ def test_spinner_column():
     assert str(result) == expected
 
     time += 1.0
+    column.spinner.update(speed=0.5)
     result = column.render(task)
     print(repr(result))
     expected = "⡿"
