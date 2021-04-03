@@ -46,11 +46,7 @@ class Spinner:
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-        time = console.get_time()
-        if self.start_time is None:
-            self.start_time = time
-        text = self.render(time - self.start_time)
-        yield text
+        yield self.render(console.get_time())
 
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
@@ -67,13 +63,21 @@ class Spinner:
         Returns:
             RenderableType: A renderable containing animation frame.
         """
-        frame_no = (time * self.speed) / (self.interval / 1000.0) + self.frame_no_offset
+        if self.start_time is None:
+            self.start_time = time
+
+        frame_no = ((time - self.start_time) * self.speed) / (
+            self.interval / 1000.0
+        ) + self.frame_no_offset
+        frame = Text(
+            self.frames[int(frame_no) % len(self.frames)], style=self.style or ""
+        )
+
         if self._update_speed:
             self.frame_no_offset = frame_no
-            self.start_time += time
+            self.start_time = time
             self.speed = self._update_speed
             self._update_speed = 0.0
-        frame = Text(self.frames[int(frame_no) % len(self.frames)], style=self.style or "")
 
         if not self.text:
             return frame

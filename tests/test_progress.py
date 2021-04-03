@@ -93,7 +93,7 @@ def test_spinner_column():
     task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
     result = column.render(task)
     print(repr(result))
-    expected = "⡿"
+    expected = "⣾"
     assert str(result) == expected
 
 
