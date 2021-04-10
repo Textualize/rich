@@ -444,11 +444,13 @@ class Traceback:
                     (f"{stack.exc_type}: ", "traceback.exc_type"),
                     highlighter(stack.syntax_error.msg),
                 )
-            else:
+            elif stack.exc_value:
                 yield Text.assemble(
                     (f"{stack.exc_type}: ", "traceback.exc_type"),
                     highlighter(stack.exc_value),
                 )
+            else:
+                yield Text.assemble((f"{stack.exc_type}", "traceback.exc_type"))
 
             if not last:
                 if stack.is_cause:
