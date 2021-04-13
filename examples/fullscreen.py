@@ -30,7 +30,7 @@ def make_layout() -> Layout:
     layout["main"].split(
         Layout(name="side"),
         Layout(name="body", ratio=2, minimum_size=60),
-        direction='horizontal'
+        direction="horizontal",
     )
     layout["side"].split(Layout(name="box1"), Layout(name="box2"))
     return layout
