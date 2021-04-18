@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Send notification to README Authors
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         BODY='🤓 @willmcgugan @oleksis @Adilius README.md changed.'
         DISCUSSIONID='MDEwOkRpc2N1c3Npb24zMzI2MjEw'
