@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: Send notification to README Authors
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GHP_README_WORKFLOW }}
       run: |
         BODY='🤓 @willmcgugan @oleksis @Adilius README.md changed.'
         DISCUSSIONID='MDEwOkRpc2N1c3Npb24zMzI2MjEw'
