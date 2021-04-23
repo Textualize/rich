@@ -43,7 +43,7 @@ def install(
     console: Optional[Console] = None,
     width: Optional[int] = 100,
     extra_lines: int = 3,
-    theme: Optional[Optional[str]] = None,
+    theme: Optional[str] = None,
     word_wrap: bool = False,
     show_locals: bool = False,
     indent_guides: bool = True,
@@ -104,7 +104,7 @@ def install(
             exc_tuple = ip._get_exc_info()
 
             # do not display trace on syntax error
-            tb: Optional[Optional[TracebackType]] = None if is_syntax else exc_tuple[2]
+            tb: Optional[TracebackType] = None if is_syntax else exc_tuple[2]
 
             # determine correct tb_offset
             compiled = tb_data.get("running_compiled_code", False)
@@ -161,7 +161,7 @@ class _SyntaxError:
 class Stack:
     exc_type: str
     exc_value: str
-    syntax_error: Optional[Optional[_SyntaxError]] = None
+    syntax_error: Optional[_SyntaxError] = None
     is_cause: bool = False
     frames: List[Frame] = field(default_factory=list)
 
@@ -205,7 +205,7 @@ class Traceback:
         trace: Optional[Trace] = None,
         width: Optional[int] = 100,
         extra_lines: int = 3,
-        theme: Optional[Optional[str]] = None,
+        theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
         indent_guides: bool = True,
@@ -239,7 +239,7 @@ class Traceback:
         traceback: Optional[TracebackType],
         width: Optional[int] = 100,
         extra_lines: int = 3,
-        theme: Optional[Optional[str]] = None,
+        theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
         indent_guides: bool = True,

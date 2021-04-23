@@ -94,7 +94,7 @@ class Inspect(JupyterMixin):
         except TypeError:
             return None
 
-        source_filename: Optional[Optional[str]] = None
+        source_filename: Optional[str] = None
         try:
             source_filename = getfile(obj)
         except TypeError:

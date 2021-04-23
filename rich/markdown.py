@@ -322,7 +322,7 @@ class ImageItem(TextElement):
     def __init__(self, destination: str, hyperlinks: bool) -> None:
         self.destination = destination
         self.hyperlinks = hyperlinks
-        self.link: Optional[Optional[str]] = None
+        self.link: Optional[str] = None
         super().__init__()
 
     def on_enter(self, context: "MarkdownContext") -> None:
@@ -356,7 +356,7 @@ class MarkdownContext:
         self.style_stack: StyleStack = StyleStack(style)
         self.stack: Stack[MarkdownElement] = Stack()
 
-        self._syntax: Optional[Optional[Syntax]] = None
+        self._syntax: Optional[Syntax] = None
         if inline_code_lexer is not None:
             self._syntax = Syntax("", inline_code_lexer, theme=inline_code_theme)
 

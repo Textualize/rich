@@ -59,11 +59,11 @@ class Status(JupyterMixin):
 
     def update(
         self,
-        status: Optional[Optional[RenderableType]] = None,
+        status: Optional[RenderableType] = None,
         *,
-        spinner: Optional[Optional[str]] = None,
-        spinner_style: Optional[Optional[StyleType]] = None,
-        speed: Optional[Optional[float]] = None,
+        spinner: Optional[str] = None,
+        spinner_style: Optional[StyleType] = None,
+        speed: Optional[float] = None,
     ):
         """Update status.
 

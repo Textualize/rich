@@ -13,8 +13,8 @@ def tabulate_mapping(
     mapping: Mapping,
     title: Optional[str] = None,
     caption: Optional[str] = None,
-    title_justify: Optional[Optional[JustifyMethod]] = None,
-    caption_justify: Optional[Optional[JustifyMethod]] = None,
+    title_justify: Optional[JustifyMethod] = None,
+    caption_justify: Optional[JustifyMethod] = None,
 ) -> Table:
     """Generate a simple table from a mapping.
 

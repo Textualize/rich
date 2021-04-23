@@ -42,12 +42,12 @@ class Panel(JupyterMixin):
         *,
         title: Optional[TextType] = None,
         title_align: AlignMethod = "center",
-        safe_box: Optional[Optional[bool]] = None,
+        safe_box: Optional[bool] = None,
         expand: bool = True,
         style: StyleType = "none",
         border_style: StyleType = "none",
-        width: Optional[Optional[int]] = None,
-        height: Optional[Optional[int]] = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
         padding: PaddingDimensions = (0, 1),
         highlight: bool = False,
     ) -> None:
@@ -72,10 +72,10 @@ class Panel(JupyterMixin):
         *,
         title: Optional[TextType] = None,
         title_align: AlignMethod = "center",
-        safe_box: Optional[Optional[bool]] = None,
+        safe_box: Optional[bool] = None,
         style: StyleType = "none",
         border_style: StyleType = "none",
-        width: Optional[Optional[int]] = None,
+        width: Optional[int] = None,
         padding: PaddingDimensions = (0, 1),
     ):
         """An alternative constructor that sets expand=False."""

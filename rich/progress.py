@@ -83,9 +83,9 @@ class _TrackThread(Thread):
 def track(
     sequence: Union[Sequence[ProgressType], Iterable[ProgressType]],
     description="Working...",
-    total: Optional[Optional[float]] = None,
+    total: Optional[float] = None,
     auto_refresh=True,
-    console: Optional[Optional[Console]] = None,
+    console: Optional[Console] = None,
     transient: bool = False,
     get_time: Optional[Callable[[], float]] = None,
     refresh_per_second: float = 10,
@@ -151,12 +151,12 @@ def track(
 class ProgressColumn(ABC):
     """Base class for a widget to use in progress display."""
 
-    max_refresh: Optional[Optional[float]] = None
+    max_refresh: Optional[float] = None
 
     def __init__(self, table_column: Optional[Column] = None) -> None:
         self._table_column = table_column
         self._renderable_cache: Dict[TaskID, Tuple[float, RenderableType]] = {}
-        self._update_time: Optional[Optional[float]] = None
+        self._update_time: Optional[float] = None
 
     def get_table_column(self) -> Column:
         """Get a table column, used to build tasks table."""
@@ -455,7 +455,7 @@ class Task:
     _get_time: GetTimeCallable
     """Callable to get the current time."""
 
-    finished_time: Optional[Optional[float]] = None
+    finished_time: Optional[float] = None
     """float: Time task was finished."""
 
     visible: bool = True
@@ -470,7 +470,7 @@ class Task:
     stop_time: Optional[float] = field(default=None, init=False, repr=False)
     """Optional[float]: Time this task was stopped, or None if not stopped."""
 
-    finished_speed: Optional[Optional[float]] = None
+    finished_speed: Optional[float] = None
     """Optional[float]: The last speed for a finshed task."""
 
     _progress: Deque[ProgressSample] = field(
@@ -655,8 +655,8 @@ class Progress(JupyterMixin):
     def track(
         self,
         sequence: Union[Iterable[ProgressType], Sequence[ProgressType]],
-        total: Optional[Optional[float]] = None,
-        task_id: Optional[Optional[TaskID]] = None,
+        total: Optional[float] = None,
+        task_id: Optional[TaskID] = None,
         description="Working...",
         update_period: float = 0.1,
     ) -> Iterable[ProgressType]:
@@ -734,7 +734,7 @@ class Progress(JupyterMixin):
         self,
         task_id: TaskID,
         *,
-        total: Optional[Optional[float]] = None,
+        total: Optional[float] = None,
         completed: Optional[float] = None,
         advance: Optional[float] = None,
         description: Optional[str] = None,
@@ -794,10 +794,10 @@ class Progress(JupyterMixin):
         task_id: TaskID,
         *,
         start: bool = True,
-        total: Optional[Optional[float]] = None,
+        total: Optional[float] = None,
         completed: int = 0,
-        visible: Optional[Optional[bool]] = None,
-        description: Optional[Optional[str]] = None,
+        visible: Optional[bool] = None,
+        description: Optional[str] = None,
         **fields: Any,
     ) -> None:
         """Reset a task so completed is 0 and the clock is reset.

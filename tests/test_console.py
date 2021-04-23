@@ -439,7 +439,7 @@ def test_bell() -> None:
 def test_pager() -> None:
     console = Console(_environ={})
 
-    pager_content: Optional[Optional[str]] = None
+    pager_content: Optional[str] = None
 
     def mock_pager(content: str) -> None:
         nonlocal pager_content

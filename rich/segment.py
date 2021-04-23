@@ -47,9 +47,9 @@ class Segment(NamedTuple):
 
     text: str = ""
     """Raw text."""
-    style: Optional[Optional[Style]] = None
+    style: Optional[Style] = None
     """An optional style."""
-    control: Optional[Optional[Sequence[ControlCode]]] = None
+    control: Optional[Sequence[ControlCode]] = None
     """Optional sequence of control codes."""
 
     def __repr__(self) -> str:

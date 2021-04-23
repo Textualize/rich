@@ -5,7 +5,7 @@ from rich._ratio import ratio_reduce, ratio_resolve
 
 
 class Edge(NamedTuple):
-    size: Optional[Optional[int]] = None
+    size: Optional[int] = None
     ratio: int = 1
     minimum_size: int = 1
 

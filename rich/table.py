@@ -58,16 +58,16 @@ class Column:
     overflow: "OverflowMethod" = "ellipsis"
     """str: Overflow method."""
 
-    width: Optional[Optional[int]] = None
+    width: Optional[int] = None
     """Optional[int]: Width of the column, or ``None`` (default) to auto calculate width."""
 
-    min_width: Optional[Optional[int]] = None
+    min_width: Optional[int] = None
     """Optional[int]: Minimum width of column, or ``None`` for no minimum. Defaults to None."""
 
-    max_width: Optional[Optional[int]] = None
+    max_width: Optional[int] = None
     """Optional[int]: Maximum width of column, or ``None`` for no maximum. Defaults to None."""
 
-    ratio: Optional[Optional[int]] = None
+    ratio: Optional[int] = None
     """Optional[int]: Ratio to use when calculating column width, or ``None`` (default) to adapt to column contents."""
 
     no_wrap: bool = False
@@ -97,7 +97,7 @@ class Column:
 class Row:
     """Information regarding a row."""
 
-    style: Optional[Optional[StyleType]] = None
+    style: Optional[StyleType] = None
     """Style to apply to row."""
 
     end_section: bool = False
@@ -156,7 +156,7 @@ class Table(JupyterMixin):
         width: Optional[int] = None,
         min_width: Optional[int] = None,
         box: Optional[box.Box] = box.HEAVY_HEAD,
-        safe_box: Optional[Optional[bool]] = None,
+        safe_box: Optional[bool] = None,
         padding: PaddingDimensions = (0, 1),
         collapse_padding: bool = False,
         pad_edge: bool = True,

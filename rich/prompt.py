@@ -48,7 +48,7 @@ class PromptBase(Generic[PromptType]):
     )
     prompt_suffix = ": "
 
-    choices: Optional[Optional[List[str]]] = None
+    choices: Optional[List[str]] = None
 
     def __init__(
         self,

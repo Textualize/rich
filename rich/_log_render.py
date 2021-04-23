@@ -27,7 +27,7 @@ class LogRender:
         self.time_format = time_format
         self.omit_repeated_times = omit_repeated_times
         self.level_width = level_width
-        self._last_time: Optional[Optional[Text]] = None
+        self._last_time: Optional[Text] = None
 
     def __call__(
         self,

@@ -110,8 +110,8 @@ class Style:
         overline: Optional[bool] = None,
         link: Optional[str] = None,
     ):
-        self._ansi: Optional[Optional[str]] = None
-        self._style_definition: Optional[Optional[str]] = None
+        self._ansi: Optional[str] = None
+        self._style_definition: Optional[str] = None
 
         def _make_color(color: Union[Color, str]) -> Color:
             return color if isinstance(color, Color) else Color.parse(color)
@@ -444,10 +444,10 @@ class Style:
             "overline": "overline",
             "o": "overline",
         }
-        color: Optional[Optional[str]] = None
-        bgcolor: Optional[Optional[str]] = None
+        color: Optional[str] = None
+        bgcolor: Optional[str] = None
         attributes: Dict[str, Optional[bool]] = {}
-        link: Optional[Optional[str]] = None
+        link: Optional[str] = None
 
         words = iter(style_definition.split())
         for original_word in words:
@@ -625,7 +625,7 @@ class Style:
             )
         return rendered
 
-    def test(self, text: Optional[Optional[str]] = None) -> None:
+    def test(self, text: Optional[str] = None) -> None:
         """Write text with style directly to terminal.
 
         This method is for testing purposes only.

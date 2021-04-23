@@ -119,17 +119,17 @@ class ConsoleOptions:
     """True if the target is a terminal, otherwise False."""
     encoding: str
     """Encoding of terminal."""
-    justify: Optional[Optional[JustifyMethod]] = None
+    justify: Optional[JustifyMethod] = None
     """Justify value override for renderable."""
-    overflow: Optional[Optional[OverflowMethod]] = None
+    overflow: Optional[OverflowMethod] = None
     """Overflow value override for renderable."""
     no_wrap: Optional[bool] = False
     """Disable wrapping for text."""
-    highlight: Optional[Optional[bool]] = None
+    highlight: Optional[bool] = None
     """Highlight override for render_str."""
-    markup: Optional[Optional[bool]] = None
+    markup: Optional[bool] = None
     """Enable markup when rendering strings."""
-    height: Optional[Optional[int]] = None
+    height: Optional[int] = None
     """Height available, or None for no height limit."""
 
     @property
@@ -283,7 +283,7 @@ class Capture:
 
     def __init__(self, console: "Console") -> None:
         self._console = console
-        self._result: Optional[Optional[str]] = None
+        self._result: Optional[str] = None
 
     def __enter__(self) -> "Capture":
         self._console.begin_capture()
@@ -404,7 +404,7 @@ class RenderGroup:
     def __init__(self, *renderables: "RenderableType", fit: bool = True) -> None:
         self._renderables = renderables
         self.fit = fit
-        self._render: Optional[Optional[List[RenderableType]]] = None
+        self._render: Optional[List[RenderableType]] = None
 
     @property
     def renderables(self) -> List["RenderableType"]:
@@ -501,7 +501,7 @@ class RenderHook(ABC):
         """
 
 
-_windows_console_features: Optional[Optional["WindowsConsoleFeatures"]] = None
+_windows_console_features: Optional["WindowsConsoleFeatures"] = None
 
 
 def get_windows_console_features() -> "WindowsConsoleFeatures":  # pragma: no cover
@@ -666,7 +666,7 @@ class Console:
         )
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
-        self._live: Optional[Optional["Live"]] = None
+        self._live: Optional["Live"] = None
         self._is_alt_screen = False
 
     def __repr__(self) -> str:
@@ -892,8 +892,8 @@ class Console:
         if self.is_dumb_terminal:
             return ConsoleDimensions(80, 25)
 
-        width: Optional[Optional[int]] = None
-        height: Optional[Optional[int]] = None
+        width: Optional[int] = None
+        height: Optional[int] = None
         if WINDOWS:  # pragma: no cover
             width, height = shutil.get_terminal_size()
         else:
@@ -1140,9 +1140,9 @@ class Console:
     def render_lines(
         self,
         renderable: RenderableType,
-        options: Optional[Optional[ConsoleOptions]] = None,
+        options: Optional[ConsoleOptions] = None,
         *,
-        style: Optional[Optional[Style]] = None,
+        style: Optional[Style] = None,
         pad: bool = True,
         new_lines: bool = False,
     ) -> List[List[Segment]]:
@@ -1564,7 +1564,7 @@ class Console:
         *,
         width: Optional[int] = 100,
         extra_lines: int = 3,
-        theme: Optional[Optional[str]] = None,
+        theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
     ) -> None:

@@ -7,7 +7,7 @@ from typing_extensions import Protocol
 class Edge(Protocol):
     """Any object that defines an edge (such as Layout)."""
 
-    size: Optional[Optional[int]] = None
+    size: Optional[int] = None
     ratio: int = 1
     minimum_size: int = 1
 
@@ -147,7 +147,7 @@ if __name__ == "__main__":  # type: ignore
     @dataclass
     class E:
 
-        size: Optional[Optional[int]] = None
+        size: Optional[int] = None
         ratio: int = 1
         minimum_size: int = 1
 

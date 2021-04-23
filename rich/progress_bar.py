@@ -52,7 +52,7 @@ class ProgressBar(JupyterMixin):
         self.pulse_style = pulse_style
         self.animation_time = animation_time
 
-        self._pulse_segments: Optional[Optional[List[Segment]]] = None
+        self._pulse_segments: Optional[List[Segment]] = None
 
     def __repr__(self) -> str:
         return f"<Bar {self.completed!r} of {self.total!r}>"

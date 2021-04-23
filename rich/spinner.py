@@ -37,7 +37,7 @@ class Spinner:
         self.text = text
         self.frames = cast(List[str], spinner["frames"])[:]
         self.interval = cast(float, spinner["interval"])
-        self.start_time: Optional[Optional[float]] = None
+        self.start_time: Optional[float] = None
         self.style = style
         self.speed = speed
         self.time = 0.0

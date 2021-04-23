@@ -69,16 +69,16 @@ class Live(JupyterMixin, RenderHook):
 
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
-        self._restore_stdout: Optional[Optional[IO[str]]] = None
-        self._restore_stderr: Optional[Optional[IO[str]]] = None
+        self._restore_stdout: Optional[IO[str]] = None
+        self._restore_stderr: Optional[IO[str]] = None
 
         self._lock = RLock()
-        self.ipy_widget: Optional[Optional[Any]] = None
+        self.ipy_widget: Optional[Any] = None
         self.auto_refresh = auto_refresh
         self._started: bool = False
         self.transient = True if screen else transient
 
-        self._refresh_thread: Optional[Optional[_RefreshThread]] = None
+        self._refresh_thread: Optional[_RefreshThread] = None
         self.refresh_per_second = refresh_per_second
 
         self.vertical_overflow = vertical_overflow

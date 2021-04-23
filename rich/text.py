@@ -360,7 +360,7 @@ class Text(JupyterMixin):
         self,
         style: Union[str, Style],
         start: int = 0,
-        end: Optional[Optional[int]] = None,
+        end: Optional[int] = None,
     ) -> None:
         """Apply a style to the text, or a portion of the text.
 
@@ -676,7 +676,7 @@ class Text(JupyterMixin):
         self,
         max_width: int,
         *,
-        overflow: Optional[Optional["OverflowMethod"]] = None,
+        overflow: Optional["OverflowMethod"] = None,
         pad: bool = False,
     ) -> None:
         """Truncate text if it is longer that a given width.

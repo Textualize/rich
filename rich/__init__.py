@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from .console import Console
 
 # Global console used by alternative print
-_console: Optional[Optional["Console"]] = None
+_console: Optional["Console"] = None
 
 _IMPORT_CWD = os.path.abspath(os.getcwd())
 

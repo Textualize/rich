@@ -158,7 +158,7 @@ class Pretty(JupyterMixin):
         *,
         indent_size: int = 4,
         justify: Optional["JustifyMethod"] = None,
-        overflow: Optional[Optional["OverflowMethod"]] = None,
+        overflow: Optional["OverflowMethod"] = None,
         no_wrap: Optional[bool] = False,
         indent_guides: bool = False,
         max_length: Optional[int] = None,
@@ -278,7 +278,7 @@ class Node:
     empty: str = ""
     last: bool = False
     is_tuple: bool = False
-    children: Optional[Optional[List["Node"]]] = None
+    children: Optional[List["Node"]] = None
     key_separator = ": "
 
     @property
@@ -360,7 +360,7 @@ class _Line:
     """A line in repr output."""
 
     is_root: bool = False
-    node: Optional[Optional[Node]] = None
+    node: Optional[Node] = None
     text: str = ""
     suffix: str = ""
     whitespace: str = ""

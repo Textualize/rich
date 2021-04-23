@@ -264,9 +264,9 @@ class Color(NamedTuple):
     """The name of the color (typically the input to Color.parse)."""
     type: ColorType
     """The type of the color."""
-    number: Optional[Optional[int]] = None
+    number: Optional[int] = None
     """The color number, if a standard color, or None."""
-    triplet: Optional[Optional[ColorTriplet]] = None
+    triplet: Optional[ColorTriplet] = None
     """A triplet of color components, if an RGB color."""
 
     def __repr__(self) -> str:
