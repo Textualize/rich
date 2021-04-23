@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, Tuple
+from typing import TYPE_CHECKING, Any, Optional, Tuple
 
 from .highlighter import ReprHighlighter
 from .panel import Panel
@@ -14,11 +14,11 @@ if TYPE_CHECKING:
 def render_scope(
     scope: Mapping,
     *,
-    title: TextType = None,
+    title: Optional[TextType] = None,
     sort_keys: bool = True,
     indent_guides: bool = False,
-    max_length: int = None,
-    max_string: int = None,
+    max_length: Optional[int] = None,
+    max_string: Optional[int] = None,
 ) -> "ConsoleRenderable":
     """Render python variables in a given scope.
 

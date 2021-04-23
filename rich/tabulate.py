@@ -11,8 +11,8 @@ from .table import Table
 
 def tabulate_mapping(
     mapping: Mapping,
-    title: str = None,
-    caption: str = None,
+    title: Optional[str] = None,
+    caption: Optional[str] = None,
     title_justify: Optional[JustifyMethod] = None,
     caption_justify: Optional[JustifyMethod] = None,
 ) -> Table:

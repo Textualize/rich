@@ -87,7 +87,7 @@ def track(
     auto_refresh=True,
     console: Optional[Console] = None,
     transient: bool = False,
-    get_time: Callable[[], float] = None,
+    get_time: Optional[Callable[[], float]] = None,
     refresh_per_second: float = 10,
     style: StyleType = "bar.back",
     complete_style: StyleType = "bar.complete",
@@ -153,7 +153,7 @@ class ProgressColumn(ABC):
 
     max_refresh: Optional[float] = None
 
-    def __init__(self, table_column: Column = None) -> None:
+    def __init__(self, table_column: Optional[Column] = None) -> None:
         self._table_column = table_column
         self._renderable_cache: Dict[TaskID, Tuple[float, RenderableType]] = {}
         self._update_time: Optional[float] = None
@@ -197,7 +197,9 @@ class RenderableColumn(ProgressColumn):
         renderable (RenderableType, optional): Any renderable. Defaults to empty string.
     """
 
-    def __init__(self, renderable: RenderableType = "", *, table_column: Column = None):
+    def __init__(
+        self, renderable: RenderableType = "", *, table_column: Optional[Column] = None
+    ):
         self.renderable = renderable
         super().__init__(table_column=table_column)
 
@@ -221,7 +223,7 @@ class SpinnerColumn(ProgressColumn):
         style: Optional[StyleType] = "progress.spinner",
         speed: float = 1.0,
         finished_text: TextType = " ",
-        table_column: Column = None,
+        table_column: Optional[Column] = None,
     ):
         self.spinner = Spinner(spinner_name, style=style, speed=speed)
         self.finished_text = (
@@ -264,8 +266,8 @@ class TextColumn(ProgressColumn):
         style: StyleType = "none",
         justify: JustifyMethod = "left",
         markup: bool = True,
-        highlighter: Highlighter = None,
-        table_column: Column = None,
+        highlighter: Optional[Highlighter] = None,
+        table_column: Optional[Column] = None,
     ) -> None:
         self.text_format = text_format
         self.justify = justify
@@ -303,7 +305,7 @@ class BarColumn(ProgressColumn):
         complete_style: StyleType = "bar.complete",
         finished_style: StyleType = "bar.finished",
         pulse_style: StyleType = "bar.pulse",
-        table_column: Column = None,
+        table_column: Optional[Column] = None,
     ) -> None:
         self.bar_width = bar_width
         self.style = style
@@ -379,7 +381,9 @@ class DownloadColumn(ProgressColumn):
         binary_units (bool, optional): Use binary units, KiB, MiB etc. Defaults to False.
     """
 
-    def __init__(self, binary_units: bool = False, table_column: Column = None) -> None:
+    def __init__(
+        self, binary_units: bool = False, table_column: Optional[Column] = None
+    ) -> None:
         self.binary_units = binary_units
         super().__init__(table_column=table_column)
 
@@ -568,14 +572,14 @@ class Progress(JupyterMixin):
     def __init__(
         self,
         *columns: Union[str, ProgressColumn],
-        console: Console = None,
+        console: Optional[Console] = None,
         auto_refresh: bool = True,
         refresh_per_second: float = 10,
         speed_estimate_period: float = 30.0,
         transient: bool = False,
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
-        get_time: GetTimeCallable = None,
+        get_time: Optional[GetTimeCallable] = None,
         disable: bool = False,
         expand: bool = False,
     ) -> None:
@@ -731,10 +735,10 @@ class Progress(JupyterMixin):
         task_id: TaskID,
         *,
         total: Optional[float] = None,
-        completed: float = None,
-        advance: float = None,
-        description: str = None,
-        visible: bool = None,
+        completed: Optional[float] = None,
+        advance: Optional[float] = None,
+        description: Optional[str] = None,
+        visible: Optional[bool] = None,
         refresh: bool = False,
         **fields: Any,
     ) -> None:

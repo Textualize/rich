@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from .color_triplet import ColorTriplet
 from .palette import Palette
@@ -22,7 +22,7 @@ class TerminalTheme:
         background: _ColorTuple,
         foreground: _ColorTuple,
         normal: List[_ColorTuple],
-        bright: List[_ColorTuple] = None,
+        bright: Optional[List[_ColorTuple]] = None,
     ) -> None:
         self.background_color = ColorTriplet(*background)
         self.foreground_color = ColorTriplet(*foreground)

@@ -93,22 +93,22 @@ class Style:
     def __init__(
         self,
         *,
-        color: Union[Color, str] = None,
-        bgcolor: Union[Color, str] = None,
-        bold: bool = None,
-        dim: bool = None,
-        italic: bool = None,
-        underline: bool = None,
-        blink: bool = None,
-        blink2: bool = None,
-        reverse: bool = None,
-        conceal: bool = None,
-        strike: bool = None,
-        underline2: bool = None,
-        frame: bool = None,
-        encircle: bool = None,
-        overline: bool = None,
-        link: str = None,
+        color: Optional[Union[Color, str]] = None,
+        bgcolor: Optional[Union[Color, str]] = None,
+        bold: Optional[bool] = None,
+        dim: Optional[bool] = None,
+        italic: Optional[bool] = None,
+        underline: Optional[bool] = None,
+        blink: Optional[bool] = None,
+        blink2: Optional[bool] = None,
+        reverse: Optional[bool] = None,
+        conceal: Optional[bool] = None,
+        strike: Optional[bool] = None,
+        underline2: Optional[bool] = None,
+        frame: Optional[bool] = None,
+        encircle: Optional[bool] = None,
+        overline: Optional[bool] = None,
+        link: Optional[str] = None,
     ):
         self._ansi: Optional[str] = None
         self._style_definition: Optional[str] = None
@@ -176,7 +176,9 @@ class Style:
         return NULL_STYLE
 
     @classmethod
-    def from_color(cls, color: Color = None, bgcolor: Color = None) -> "Style":
+    def from_color(
+        cls, color: Optional[Color] = None, bgcolor: Optional[Color] = None
+    ) -> "Style":
         """Create a new style with colors and no attributes.
 
         Returns:
@@ -492,7 +494,7 @@ class Style:
         return style
 
     @lru_cache(maxsize=1024)
-    def get_html_style(self, theme: TerminalTheme = None) -> str:
+    def get_html_style(self, theme: Optional[TerminalTheme] = None) -> str:
         """Get a CSS style rule."""
         theme = theme or DEFAULT_TERMINAL_THEME
         css: List[str] = []
@@ -575,7 +577,7 @@ class Style:
         style._null = False
         return style
 
-    def update_link(self, link: str = None) -> "Style":
+    def update_link(self, link: Optional[str] = None) -> "Style":
         """Get a copy with a different value for link.
 
         Args:

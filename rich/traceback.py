@@ -40,7 +40,7 @@ LOCALS_MAX_STRING = 80
 
 def install(
     *,
-    console: Console = None,
+    console: Optional[Console] = None,
     width: Optional[int] = 100,
     extra_lines: int = 3,
     theme: Optional[str] = None,
@@ -202,7 +202,7 @@ class Traceback:
 
     def __init__(
         self,
-        trace: Trace = None,
+        trace: Optional[Trace] = None,
         width: Optional[int] = 100,
         extra_lines: int = 3,
         theme: Optional[str] = None,

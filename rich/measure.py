@@ -1,5 +1,5 @@
 from operator import itemgetter
-from typing import Iterable, NamedTuple, TYPE_CHECKING
+from typing import Iterable, NamedTuple, Optional, TYPE_CHECKING
 
 from . import errors
 from .protocol import is_renderable
@@ -56,7 +56,9 @@ class Measurement(NamedTuple):
         width = max(0, width)
         return Measurement(max(minimum, width), max(maximum, width))
 
-    def clamp(self, min_width: int = None, max_width: int = None) -> "Measurement":
+    def clamp(
+        self, min_width: Optional[int] = None, max_width: Optional[int] = None
+    ) -> "Measurement":
         """Clamp a measurement within the specified range.
 
         Args:

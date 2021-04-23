@@ -50,7 +50,7 @@ make typecheck
 Or if you don't have `make`:
 
 ```
-mypy -p rich --ignore-missing-imports --warn-unreachable
+mypy -p rich --config-file= --ignore-missing-imports --no-implicit-optional --warn-unreachable
 ```
 
 Please add type annotations for all new code.

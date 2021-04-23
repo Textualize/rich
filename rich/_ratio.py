@@ -106,7 +106,7 @@ def ratio_reduce(
 
 
 def ratio_distribute(
-    total: int, ratios: List[int], minimums: List[int] = None
+    total: int, ratios: List[int], minimums: Optional[List[int]] = None
 ) -> List[int]:
     """Distribute an integer total in to parts based on ratios.
 

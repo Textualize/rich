@@ -30,16 +30,16 @@ class Columns(JupyterMixin):
 
     def __init__(
         self,
-        renderables: Iterable[RenderableType] = None,
+        renderables: Optional[Iterable[RenderableType]] = None,
         padding: PaddingDimensions = (0, 1),
         *,
-        width: int = None,
+        width: Optional[int] = None,
         expand: bool = False,
         equal: bool = False,
         column_first: bool = False,
         right_to_left: bool = False,
-        align: AlignMethod = None,
-        title: TextType = None,
+        align: Optional[AlignMethod] = None,
+        title: Optional[TextType] = None,
     ) -> None:
         self.renderables = list(renderables or [])
         self.width = width

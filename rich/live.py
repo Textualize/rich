@@ -49,9 +49,9 @@ class Live(JupyterMixin, RenderHook):
 
     def __init__(
         self,
-        renderable: RenderableType = None,
+        renderable: Optional[RenderableType] = None,
         *,
-        console: Console = None,
+        console: Optional[Console] = None,
         screen: bool = False,
         auto_refresh: bool = True,
         refresh_per_second: float = 4,
@@ -59,7 +59,7 @@ class Live(JupyterMixin, RenderHook):
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
         vertical_overflow: VerticalOverflowMethod = "ellipsis",
-        get_renderable: Callable[[], RenderableType] = None,
+        get_renderable: Optional[Callable[[], RenderableType]] = None,
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self._renderable = renderable

@@ -12,7 +12,12 @@ if TYPE_CHECKING:
 
 class Spinner:
     def __init__(
-        self, name: str, text: TextType = "", *, style: StyleType = None, speed=1.0
+        self,
+        name: str,
+        text: TextType = "",
+        *,
+        style: Optional[StyleType] = None,
+        speed=1.0,
     ) -> None:
         """A spinner animation.
 
