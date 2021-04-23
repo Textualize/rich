@@ -27,18 +27,18 @@ class LogRender:
         self.time_format = time_format
         self.omit_repeated_times = omit_repeated_times
         self.level_width = level_width
-        self._last_time: Optional[Text] = None
+        self._last_time: Optional[Optional[Text]] = None
 
     def __call__(
         self,
         console: "Console",
         renderables: Iterable["ConsoleRenderable"],
-        log_time: datetime = None,
-        time_format: Union[str, FormatTimeCallable] = None,
+        log_time: Optional[datetime] = None,
+        time_format: Optional[Union[str, FormatTimeCallable]] = None,
         level: TextType = "",
-        path: str = None,
-        line_no: int = None,
-        link_path: str = None,
+        path: Optional[str] = None,
+        line_no: Optional[int] = None,
+        link_path: Optional[str] = None,
     ) -> "Table":
         from .containers import Renderables
         from .table import Table

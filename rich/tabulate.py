@@ -11,10 +11,10 @@ from .table import Table
 
 def tabulate_mapping(
     mapping: Mapping,
-    title: str = None,
-    caption: str = None,
-    title_justify: Optional[JustifyMethod] = None,
-    caption_justify: Optional[JustifyMethod] = None,
+    title: Optional[str] = None,
+    caption: Optional[str] = None,
+    title_justify: Optional[Optional[JustifyMethod]] = None,
+    caption_justify: Optional[Optional[JustifyMethod]] = None,
 ) -> Table:
     """Generate a simple table from a mapping.
 

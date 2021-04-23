@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from .color import Color
 from .console import Console, ConsoleOptions, RenderResult
@@ -32,7 +32,7 @@ class Bar(JupyterMixin):
         begin: float,
         end: float,
         *,
-        width: int = None,
+        width: Optional[int] = None,
         color: Union[Color, str] = "default",
         bgcolor: Union[Color, str] = "default",
     ):

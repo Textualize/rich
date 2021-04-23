@@ -264,9 +264,9 @@ class Color(NamedTuple):
     """The name of the color (typically the input to Color.parse)."""
     type: ColorType
     """The type of the color."""
-    number: Optional[int] = None
+    number: Optional[Optional[int]] = None
     """The color number, if a standard color, or None."""
-    triplet: Optional[ColorTriplet] = None
+    triplet: Optional[Optional[ColorTriplet]] = None
     """A triplet of color components, if an RGB color."""
 
     def __repr__(self) -> str:
@@ -305,7 +305,7 @@ class Color(NamedTuple):
         return self.type == ColorType.DEFAULT
 
     def get_truecolor(
-        self, theme: "TerminalTheme" = None, foreground=True
+        self, theme: Optional["TerminalTheme"] = None, foreground=True
     ) -> ColorTriplet:
         """Get an equivalent color triplet for this color.
 

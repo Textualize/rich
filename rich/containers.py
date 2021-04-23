@@ -3,6 +3,7 @@ from typing import (
     Iterator,
     Iterable,
     List,
+    Optional,
     overload,
     TypeVar,
     TYPE_CHECKING,
@@ -28,7 +29,9 @@ T = TypeVar("T")
 class Renderables:
     """A list subclass which renders its contents to the console."""
 
-    def __init__(self, renderables: Iterable["RenderableType"] = None) -> None:
+    def __init__(
+        self, renderables: Optional[Iterable["RenderableType"]] = None
+    ) -> None:
         self._renderables: List["RenderableType"] = (
             list(renderables) if renderables is not None else []
         )

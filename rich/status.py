@@ -24,7 +24,7 @@ class Status(JupyterMixin):
         self,
         status: RenderableType,
         *,
-        console: Console = None,
+        console: Optional[Console] = None,
         spinner: str = "dots",
         spinner_style: StyleType = "status.spinner",
         speed: float = 1.0,
@@ -59,11 +59,11 @@ class Status(JupyterMixin):
 
     def update(
         self,
-        status: Optional[RenderableType] = None,
+        status: Optional[Optional[RenderableType]] = None,
         *,
-        spinner: Optional[str] = None,
-        spinner_style: Optional[StyleType] = None,
-        speed: Optional[float] = None,
+        spinner: Optional[Optional[str]] = None,
+        spinner_style: Optional[Optional[StyleType]] = None,
+        speed: Optional[Optional[float]] = None,
     ):
         """Update status.
 

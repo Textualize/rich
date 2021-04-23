@@ -129,12 +129,12 @@ class Text(JupyterMixin):
         text: str = "",
         style: Union[str, Style] = "",
         *,
-        justify: "JustifyMethod" = None,
-        overflow: "OverflowMethod" = None,
-        no_wrap: bool = None,
+        justify: Optional["JustifyMethod"] = None,
+        overflow: Optional["OverflowMethod"] = None,
+        no_wrap: Optional[bool] = None,
         end: str = "\n",
         tab_size: Optional[int] = 8,
-        spans: List[Span] = None,
+        spans: Optional[List[Span]] = None,
     ) -> None:
         self._text = [strip_control_codes(text)]
         self.style = style
@@ -215,8 +215,8 @@ class Text(JupyterMixin):
         *,
         style: Union[str, Style] = "",
         emoji: bool = True,
-        justify: "JustifyMethod" = None,
-        overflow: "OverflowMethod" = None,
+        justify: Optional["JustifyMethod"] = None,
+        overflow: Optional["OverflowMethod"] = None,
     ) -> "Text":
         """Create Text instance from markup.
 
@@ -242,8 +242,8 @@ class Text(JupyterMixin):
         text: str,
         style: StyleType = "",
         *,
-        justify: "JustifyMethod" = None,
-        overflow: "OverflowMethod" = None,
+        justify: Optional["JustifyMethod"] = None,
+        overflow: Optional["OverflowMethod"] = None,
     ) -> "Text":
         """Construct a Text instance with a pre-applied styled. A style applied in this way won't be used
         to pad the text when it is justified.
@@ -266,9 +266,9 @@ class Text(JupyterMixin):
         cls,
         *parts: Union[str, "Text", Tuple[str, StyleType]],
         style: Union[str, Style] = "",
-        justify: "JustifyMethod" = None,
-        overflow: "OverflowMethod" = None,
-        no_wrap: bool = None,
+        justify: Optional["JustifyMethod"] = None,
+        overflow: Optional["OverflowMethod"] = None,
+        no_wrap: Optional[bool] = None,
         end: str = "\n",
         tab_size: int = 8,
     ) -> "Text":
@@ -357,7 +357,10 @@ class Text(JupyterMixin):
         return copy_self
 
     def stylize(
-        self, style: Union[str, Style], start: int = 0, end: Optional[int] = None
+        self,
+        style: Union[str, Style],
+        start: int = 0,
+        end: Optional[Optional[int]] = None,
     ) -> None:
         """Apply a style to the text, or a portion of the text.
 
@@ -412,7 +415,7 @@ class Text(JupyterMixin):
     def highlight_regex(
         self,
         re_highlight: str,
-        style: Union[GetStyleCallable, StyleType] = None,
+        style: Optional[Union[GetStyleCallable, StyleType]] = None,
         *,
         style_prefix: str = "",
     ) -> int:
@@ -635,7 +638,7 @@ class Text(JupyterMixin):
         new_text._length = offset
         return new_text
 
-    def expand_tabs(self, tab_size: int = None) -> None:
+    def expand_tabs(self, tab_size: Optional[int] = None) -> None:
         """Converts tabs to spaces.
 
         Args:
@@ -673,7 +676,7 @@ class Text(JupyterMixin):
         self,
         max_width: int,
         *,
-        overflow: Optional["OverflowMethod"] = None,
+        overflow: Optional[Optional["OverflowMethod"]] = None,
         pad: bool = False,
     ) -> None:
         """Truncate text if it is longer that a given width.
@@ -774,7 +777,7 @@ class Text(JupyterMixin):
                 self.pad_left(excess_space, character)
 
     def append(
-        self, text: Union["Text", str], style: Union[str, "Style"] = None
+        self, text: Union["Text", str], style: Optional[Union[str, "Style"]] = None
     ) -> "Text":
         """Add text with an optional style.
 
@@ -993,10 +996,10 @@ class Text(JupyterMixin):
         console: "Console",
         width: int,
         *,
-        justify: "JustifyMethod" = None,
-        overflow: "OverflowMethod" = None,
+        justify: Optional["JustifyMethod"] = None,
+        overflow: Optional["OverflowMethod"] = None,
         tab_size: int = 8,
-        no_wrap: bool = None,
+        no_wrap: Optional[bool] = None,
     ) -> Lines:
         """Word wrap the text.
 
@@ -1077,7 +1080,7 @@ class Text(JupyterMixin):
 
     def with_indent_guides(
         self,
-        indent_size: int = None,
+        indent_size: Optional[int] = None,
         *,
         character: str = "│",
         style: StyleType = "dim green",

@@ -49,9 +49,9 @@ class Live(JupyterMixin, RenderHook):
 
     def __init__(
         self,
-        renderable: RenderableType = None,
+        renderable: Optional[RenderableType] = None,
         *,
-        console: Console = None,
+        console: Optional[Console] = None,
         screen: bool = False,
         auto_refresh: bool = True,
         refresh_per_second: float = 4,
@@ -59,7 +59,7 @@ class Live(JupyterMixin, RenderHook):
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
         vertical_overflow: VerticalOverflowMethod = "ellipsis",
-        get_renderable: Callable[[], RenderableType] = None,
+        get_renderable: Optional[Callable[[], RenderableType]] = None,
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self._renderable = renderable
@@ -69,16 +69,16 @@ class Live(JupyterMixin, RenderHook):
 
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
-        self._restore_stdout: Optional[IO[str]] = None
-        self._restore_stderr: Optional[IO[str]] = None
+        self._restore_stdout: Optional[Optional[IO[str]]] = None
+        self._restore_stderr: Optional[Optional[IO[str]]] = None
 
         self._lock = RLock()
-        self.ipy_widget: Optional[Any] = None
+        self.ipy_widget: Optional[Optional[Any]] = None
         self.auto_refresh = auto_refresh
         self._started: bool = False
         self.transient = True if screen else transient
 
-        self._refresh_thread: Optional[_RefreshThread] = None
+        self._refresh_thread: Optional[Optional[_RefreshThread]] = None
         self.refresh_per_second = refresh_per_second
 
         self.vertical_overflow = vertical_overflow

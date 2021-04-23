@@ -12,7 +12,12 @@ if TYPE_CHECKING:
 
 class Spinner:
     def __init__(
-        self, name: str, text: TextType = "", *, style: StyleType = None, speed=1.0
+        self,
+        name: str,
+        text: TextType = "",
+        *,
+        style: Optional[StyleType] = None,
+        speed=1.0,
     ) -> None:
         """A spinner animation.
 
@@ -32,7 +37,7 @@ class Spinner:
         self.text = text
         self.frames = cast(List[str], spinner["frames"])[:]
         self.interval = cast(float, spinner["interval"])
-        self.start_time: Optional[float] = None
+        self.start_time: Optional[Optional[float]] = None
         self.style = style
         self.speed = speed
         self.time = 0.0

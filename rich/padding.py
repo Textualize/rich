@@ -103,7 +103,7 @@ class Padding(JupyterMixin):
             if self.right
             else [_Segment.line()]
         )
-        blank_line: Optional[List[Segment]] = None
+        blank_line: Optional[Optional[List[Segment]]] = None
         if self.top:
             blank_line = [_Segment(f'{" " * width}\n', style)]
             yield from blank_line * self.top

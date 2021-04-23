@@ -322,7 +322,7 @@ class ImageItem(TextElement):
     def __init__(self, destination: str, hyperlinks: bool) -> None:
         self.destination = destination
         self.hyperlinks = hyperlinks
-        self.link: Optional[str] = None
+        self.link: Optional[Optional[str]] = None
         super().__init__()
 
     def on_enter(self, context: "MarkdownContext") -> None:
@@ -348,7 +348,7 @@ class MarkdownContext:
         console: Console,
         options: ConsoleOptions,
         style: Style,
-        inline_code_lexer: str = None,
+        inline_code_lexer: Optional[str] = None,
         inline_code_theme: str = "monokai",
     ) -> None:
         self.console = console
@@ -356,7 +356,7 @@ class MarkdownContext:
         self.style_stack: StyleStack = StyleStack(style)
         self.stack: Stack[MarkdownElement] = Stack()
 
-        self._syntax: Optional[Syntax] = None
+        self._syntax: Optional[Optional[Syntax]] = None
         if inline_code_lexer is not None:
             self._syntax = Syntax("", inline_code_lexer, theme=inline_code_theme)
 
@@ -419,11 +419,11 @@ class Markdown(JupyterMixin):
         self,
         markup: str,
         code_theme: str = "monokai",
-        justify: JustifyMethod = None,
+        justify: Optional[JustifyMethod] = None,
         style: Union[str, Style] = "none",
         hyperlinks: bool = True,
-        inline_code_lexer: str = None,
-        inline_code_theme: str = None,
+        inline_code_lexer: Optional[str] = None,
+        inline_code_theme: Optional[str] = None,
     ) -> None:
         self.markup = markup
         parser = Parser()

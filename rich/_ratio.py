@@ -7,7 +7,7 @@ from typing_extensions import Protocol
 class Edge(Protocol):
     """Any object that defines an edge (such as Layout)."""
 
-    size: Optional[int] = None
+    size: Optional[Optional[int]] = None
     ratio: int = 1
     minimum_size: int = 1
 
@@ -106,7 +106,7 @@ def ratio_reduce(
 
 
 def ratio_distribute(
-    total: int, ratios: List[int], minimums: List[int] = None
+    total: int, ratios: List[int], minimums: Optional[List[int]] = None
 ) -> List[int]:
     """Distribute an integer total in to parts based on ratios.
 
@@ -147,7 +147,7 @@ if __name__ == "__main__":  # type: ignore
     @dataclass
     class E:
 
-        size: Optional[int] = None
+        size: Optional[Optional[int]] = None
         ratio: int = 1
         minimum_size: int = 1
 

@@ -42,12 +42,12 @@ if TYPE_CHECKING:
 
 
 def install(
-    console: "Console" = None,
+    console: Optional["Console"] = None,
     overflow: "OverflowMethod" = "ignore",
     crop: bool = False,
     indent_guides: bool = False,
-    max_length: int = None,
-    max_string: int = None,
+    max_length: Optional[int] = None,
+    max_string: Optional[int] = None,
     expand_all: bool = False,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
@@ -154,15 +154,15 @@ class Pretty(JupyterMixin):
     def __init__(
         self,
         _object: Any,
-        highlighter: "HighlighterType" = None,
+        highlighter: Optional["HighlighterType"] = None,
         *,
         indent_size: int = 4,
-        justify: "JustifyMethod" = None,
-        overflow: Optional["OverflowMethod"] = None,
+        justify: Optional["JustifyMethod"] = None,
+        overflow: Optional[Optional["OverflowMethod"]] = None,
         no_wrap: Optional[bool] = False,
         indent_guides: bool = False,
-        max_length: int = None,
-        max_string: int = None,
+        max_length: Optional[int] = None,
+        max_string: Optional[int] = None,
         expand_all: bool = False,
         margin: int = 0,
         insert_line: bool = False,
@@ -278,7 +278,7 @@ class Node:
     empty: str = ""
     last: bool = False
     is_tuple: bool = False
-    children: Optional[List["Node"]] = None
+    children: Optional[Optional[List["Node"]]] = None
     key_separator = ": "
 
     @property
@@ -360,7 +360,7 @@ class _Line:
     """A line in repr output."""
 
     is_root: bool = False
-    node: Optional[Node] = None
+    node: Optional[Optional[Node]] = None
     text: str = ""
     suffix: str = ""
     whitespace: str = ""
@@ -413,7 +413,9 @@ class _Line:
         return f"{self.whitespace}{self.text}{self.node or ''}{self.suffix}"
 
 
-def traverse(_object: Any, max_length: int = None, max_string: int = None) -> Node:
+def traverse(
+    _object: Any, max_length: Optional[int] = None, max_string: Optional[int] = None
+) -> Node:
     """Traverse object and generate a tree.
 
     Args:
@@ -589,8 +591,8 @@ def pretty_repr(
     *,
     max_width: int = 80,
     indent_size: int = 4,
-    max_length: int = None,
-    max_string: int = None,
+    max_length: Optional[int] = None,
+    max_string: Optional[int] = None,
     expand_all: bool = False,
 ) -> str:
     """Prettify repr string by expanding on to new lines to fit within a given width.
@@ -622,10 +624,10 @@ def pretty_repr(
 def pprint(
     _object: Any,
     *,
-    console: "Console" = None,
+    console: Optional["Console"] = None,
     indent_guides: bool = True,
-    max_length: int = None,
-    max_string: int = None,
+    max_length: Optional[int] = None,
+    max_string: Optional[int] = None,
     expand_all: bool = False,
 ):
     """A convenience function for pretty printing.

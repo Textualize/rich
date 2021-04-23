@@ -44,7 +44,7 @@ class Inspect(JupyterMixin):
         self,
         obj: Any,
         *,
-        title: TextType = None,
+        title: Optional[TextType] = None,
         help: bool = False,
         methods: bool = False,
         docs: bool = True,
@@ -94,7 +94,7 @@ class Inspect(JupyterMixin):
         except TypeError:
             return None
 
-        source_filename: Optional[str] = None
+        source_filename: Optional[Optional[str]] = None
         try:
             source_filename = getfile(obj)
         except TypeError:

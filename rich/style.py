@@ -93,25 +93,25 @@ class Style:
     def __init__(
         self,
         *,
-        color: Union[Color, str] = None,
-        bgcolor: Union[Color, str] = None,
-        bold: bool = None,
-        dim: bool = None,
-        italic: bool = None,
-        underline: bool = None,
-        blink: bool = None,
-        blink2: bool = None,
-        reverse: bool = None,
-        conceal: bool = None,
-        strike: bool = None,
-        underline2: bool = None,
-        frame: bool = None,
-        encircle: bool = None,
-        overline: bool = None,
-        link: str = None,
+        color: Optional[Union[Color, str]] = None,
+        bgcolor: Optional[Union[Color, str]] = None,
+        bold: Optional[bool] = None,
+        dim: Optional[bool] = None,
+        italic: Optional[bool] = None,
+        underline: Optional[bool] = None,
+        blink: Optional[bool] = None,
+        blink2: Optional[bool] = None,
+        reverse: Optional[bool] = None,
+        conceal: Optional[bool] = None,
+        strike: Optional[bool] = None,
+        underline2: Optional[bool] = None,
+        frame: Optional[bool] = None,
+        encircle: Optional[bool] = None,
+        overline: Optional[bool] = None,
+        link: Optional[str] = None,
     ):
-        self._ansi: Optional[str] = None
-        self._style_definition: Optional[str] = None
+        self._ansi: Optional[Optional[str]] = None
+        self._style_definition: Optional[Optional[str]] = None
 
         def _make_color(color: Union[Color, str]) -> Color:
             return color if isinstance(color, Color) else Color.parse(color)
@@ -176,7 +176,9 @@ class Style:
         return NULL_STYLE
 
     @classmethod
-    def from_color(cls, color: Color = None, bgcolor: Color = None) -> "Style":
+    def from_color(
+        cls, color: Optional[Color] = None, bgcolor: Optional[Color] = None
+    ) -> "Style":
         """Create a new style with colors and no attributes.
 
         Returns:
@@ -442,10 +444,10 @@ class Style:
             "overline": "overline",
             "o": "overline",
         }
-        color: Optional[str] = None
-        bgcolor: Optional[str] = None
+        color: Optional[Optional[str]] = None
+        bgcolor: Optional[Optional[str]] = None
         attributes: Dict[str, Optional[bool]] = {}
-        link: Optional[str] = None
+        link: Optional[Optional[str]] = None
 
         words = iter(style_definition.split())
         for original_word in words:
@@ -492,7 +494,7 @@ class Style:
         return style
 
     @lru_cache(maxsize=1024)
-    def get_html_style(self, theme: TerminalTheme = None) -> str:
+    def get_html_style(self, theme: Optional[TerminalTheme] = None) -> str:
         """Get a CSS style rule."""
         theme = theme or DEFAULT_TERMINAL_THEME
         css: List[str] = []
@@ -575,7 +577,7 @@ class Style:
         style._null = False
         return style
 
-    def update_link(self, link: str = None) -> "Style":
+    def update_link(self, link: Optional[str] = None) -> "Style":
         """Get a copy with a different value for link.
 
         Args:
@@ -623,7 +625,7 @@ class Style:
             )
         return rendered
 
-    def test(self, text: Optional[str] = None) -> None:
+    def test(self, text: Optional[Optional[str]] = None) -> None:
         """Write text with style directly to terminal.
 
         This method is for testing purposes only.

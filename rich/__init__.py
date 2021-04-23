@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from .console import Console
 
 # Global console used by alternative print
-_console: Optional["Console"] = None
+_console: Optional[Optional["Console"]] = None
 
 _IMPORT_CWD = os.path.abspath(os.getcwd())
 
@@ -42,7 +42,13 @@ def reconfigure(*args, **kwargs) -> None:
     _console.__dict__ = new_console.__dict__
 
 
-def print(*objects: Any, sep=" ", end="\n", file: IO[str] = None, flush: bool = False):
+def print(
+    *objects: Any,
+    sep=" ",
+    end="\n",
+    file: Optional[IO[str]] = None,
+    flush: bool = False
+):
     r"""Print object(s) supplied via positional arguments.
     This function has an identical signature to the built-in print.
     For more advanced features, see the :class:`~rich.console.Console` class.
@@ -63,8 +69,8 @@ def print(*objects: Any, sep=" ", end="\n", file: IO[str] = None, flush: bool = 
 def inspect(
     obj: Any,
     *,
-    console: "Console" = None,
-    title: str = None,
+    console: Optional["Console"] = None,
+    title: Optional[str] = None,
     help: bool = False,
     methods: bool = False,
     docs: bool = True,

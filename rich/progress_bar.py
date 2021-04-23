@@ -34,13 +34,13 @@ class ProgressBar(JupyterMixin):
         self,
         total: float = 100.0,
         completed: float = 0,
-        width: int = None,
+        width: Optional[int] = None,
         pulse: bool = False,
         style: StyleType = "bar.back",
         complete_style: StyleType = "bar.complete",
         finished_style: StyleType = "bar.finished",
         pulse_style: StyleType = "bar.pulse",
-        animation_time: float = None,
+        animation_time: Optional[float] = None,
     ):
         self.total = total
         self.completed = completed
@@ -52,7 +52,7 @@ class ProgressBar(JupyterMixin):
         self.pulse_style = pulse_style
         self.animation_time = animation_time
 
-        self._pulse_segments: Optional[List[Segment]] = None
+        self._pulse_segments: Optional[Optional[List[Segment]]] = None
 
     def __repr__(self) -> str:
         return f"<Bar {self.completed!r} of {self.total!r}>"
@@ -111,7 +111,7 @@ class ProgressBar(JupyterMixin):
             append(_Segment(bar, _Style(color=from_triplet(color))))
         return segments
 
-    def update(self, completed: float, total: float = None) -> None:
+    def update(self, completed: float, total: Optional[float] = None) -> None:
         """Update progress with new values.
 
         Args:

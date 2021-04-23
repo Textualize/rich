@@ -83,11 +83,11 @@ class _TrackThread(Thread):
 def track(
     sequence: Union[Sequence[ProgressType], Iterable[ProgressType]],
     description="Working...",
-    total: Optional[float] = None,
+    total: Optional[Optional[float]] = None,
     auto_refresh=True,
-    console: Optional[Console] = None,
+    console: Optional[Optional[Console]] = None,
     transient: bool = False,
-    get_time: Callable[[], float] = None,
+    get_time: Optional[Callable[[], float]] = None,
     refresh_per_second: float = 10,
     style: StyleType = "bar.back",
     complete_style: StyleType = "bar.complete",
@@ -151,12 +151,12 @@ def track(
 class ProgressColumn(ABC):
     """Base class for a widget to use in progress display."""
 
-    max_refresh: Optional[float] = None
+    max_refresh: Optional[Optional[float]] = None
 
-    def __init__(self, table_column: Column = None) -> None:
+    def __init__(self, table_column: Optional[Column] = None) -> None:
         self._table_column = table_column
         self._renderable_cache: Dict[TaskID, Tuple[float, RenderableType]] = {}
-        self._update_time: Optional[float] = None
+        self._update_time: Optional[Optional[float]] = None
 
     def get_table_column(self) -> Column:
         """Get a table column, used to build tasks table."""
@@ -197,7 +197,9 @@ class RenderableColumn(ProgressColumn):
         renderable (RenderableType, optional): Any renderable. Defaults to empty string.
     """
 
-    def __init__(self, renderable: RenderableType = "", *, table_column: Column = None):
+    def __init__(
+        self, renderable: RenderableType = "", *, table_column: Optional[Column] = None
+    ):
         self.renderable = renderable
         super().__init__(table_column=table_column)
 
@@ -221,7 +223,7 @@ class SpinnerColumn(ProgressColumn):
         style: Optional[StyleType] = "progress.spinner",
         speed: float = 1.0,
         finished_text: TextType = " ",
-        table_column: Column = None,
+        table_column: Optional[Column] = None,
     ):
         self.spinner = Spinner(spinner_name, style=style, speed=speed)
         self.finished_text = (
@@ -264,8 +266,8 @@ class TextColumn(ProgressColumn):
         style: StyleType = "none",
         justify: JustifyMethod = "left",
         markup: bool = True,
-        highlighter: Highlighter = None,
-        table_column: Column = None,
+        highlighter: Optional[Highlighter] = None,
+        table_column: Optional[Column] = None,
     ) -> None:
         self.text_format = text_format
         self.justify = justify
@@ -303,7 +305,7 @@ class BarColumn(ProgressColumn):
         complete_style: StyleType = "bar.complete",
         finished_style: StyleType = "bar.finished",
         pulse_style: StyleType = "bar.pulse",
-        table_column: Column = None,
+        table_column: Optional[Column] = None,
     ) -> None:
         self.bar_width = bar_width
         self.style = style
@@ -379,7 +381,9 @@ class DownloadColumn(ProgressColumn):
         binary_units (bool, optional): Use binary units, KiB, MiB etc. Defaults to False.
     """
 
-    def __init__(self, binary_units: bool = False, table_column: Column = None) -> None:
+    def __init__(
+        self, binary_units: bool = False, table_column: Optional[Column] = None
+    ) -> None:
         self.binary_units = binary_units
         super().__init__(table_column=table_column)
 
@@ -451,7 +455,7 @@ class Task:
     _get_time: GetTimeCallable
     """Callable to get the current time."""
 
-    finished_time: Optional[float] = None
+    finished_time: Optional[Optional[float]] = None
     """float: Time task was finished."""
 
     visible: bool = True
@@ -466,7 +470,7 @@ class Task:
     stop_time: Optional[float] = field(default=None, init=False, repr=False)
     """Optional[float]: Time this task was stopped, or None if not stopped."""
 
-    finished_speed: Optional[float] = None
+    finished_speed: Optional[Optional[float]] = None
     """Optional[float]: The last speed for a finshed task."""
 
     _progress: Deque[ProgressSample] = field(
@@ -568,14 +572,14 @@ class Progress(JupyterMixin):
     def __init__(
         self,
         *columns: Union[str, ProgressColumn],
-        console: Console = None,
+        console: Optional[Console] = None,
         auto_refresh: bool = True,
         refresh_per_second: float = 10,
         speed_estimate_period: float = 30.0,
         transient: bool = False,
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
-        get_time: GetTimeCallable = None,
+        get_time: Optional[GetTimeCallable] = None,
         disable: bool = False,
         expand: bool = False,
     ) -> None:
@@ -651,8 +655,8 @@ class Progress(JupyterMixin):
     def track(
         self,
         sequence: Union[Iterable[ProgressType], Sequence[ProgressType]],
-        total: Optional[float] = None,
-        task_id: Optional[TaskID] = None,
+        total: Optional[Optional[float]] = None,
+        task_id: Optional[Optional[TaskID]] = None,
         description="Working...",
         update_period: float = 0.1,
     ) -> Iterable[ProgressType]:
@@ -730,11 +734,11 @@ class Progress(JupyterMixin):
         self,
         task_id: TaskID,
         *,
-        total: Optional[float] = None,
-        completed: float = None,
-        advance: float = None,
-        description: str = None,
-        visible: bool = None,
+        total: Optional[Optional[float]] = None,
+        completed: Optional[float] = None,
+        advance: Optional[float] = None,
+        description: Optional[str] = None,
+        visible: Optional[bool] = None,
         refresh: bool = False,
         **fields: Any,
     ) -> None:
@@ -790,10 +794,10 @@ class Progress(JupyterMixin):
         task_id: TaskID,
         *,
         start: bool = True,
-        total: Optional[float] = None,
+        total: Optional[Optional[float]] = None,
         completed: int = 0,
-        visible: Optional[bool] = None,
-        description: Optional[str] = None,
+        visible: Optional[Optional[bool]] = None,
+        description: Optional[Optional[str]] = None,
         **fields: Any,
     ) -> None:
         """Reset a task so completed is 0 and the clock is reset.

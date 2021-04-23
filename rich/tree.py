@@ -1,4 +1,4 @@
-from typing import Iterator, List, Tuple
+from typing import Iterator, List, Optional, Tuple
 
 from ._loop import loop_first, loop_last
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
@@ -40,8 +40,8 @@ class Tree(JupyterMixin):
         self,
         label: RenderableType,
         *,
-        style: StyleType = None,
-        guide_style: StyleType = None,
+        style: Optional[StyleType] = None,
+        guide_style: Optional[StyleType] = None,
         expanded=True,
         highlight=False,
     ) -> "Tree":
@@ -208,7 +208,7 @@ if __name__ == "__main__":  # pragma: no cover
     code = """\
 class Segment(NamedTuple):
     text: str = ""    
-    style: Optional[Style] = None    
+    style: Optional[Optional[Style]] = None    
     is_control: bool = False    
 """
     syntax = Syntax(code, "python", theme="monokai", line_numbers=True)

@@ -230,12 +230,12 @@ class Syntax(JupyterMixin):
         dedent: bool = False,
         line_numbers: bool = False,
         start_line: int = 1,
-        line_range: Tuple[int, int] = None,
-        highlight_lines: Set[int] = None,
-        code_width: Optional[int] = None,
+        line_range: Optional[Tuple[int, int]] = None,
+        highlight_lines: Optional[Set[int]] = None,
+        code_width: Optional[Optional[int]] = None,
         tab_size: int = 4,
         word_wrap: bool = False,
-        background_color: str = None,
+        background_color: Optional[str] = None,
         indent_guides: bool = False,
     ) -> None:
         self.code = code
@@ -264,13 +264,13 @@ class Syntax(JupyterMixin):
         theme: Union[str, SyntaxTheme] = DEFAULT_THEME,
         dedent: bool = False,
         line_numbers: bool = False,
-        line_range: Tuple[int, int] = None,
+        line_range: Optional[Tuple[int, int]] = None,
         start_line: int = 1,
-        highlight_lines: Set[int] = None,
-        code_width: Optional[int] = None,
+        highlight_lines: Optional[Set[int]] = None,
+        code_width: Optional[Optional[int]] = None,
         tab_size: int = 4,
         word_wrap: bool = False,
-        background_color: str = None,
+        background_color: Optional[str] = None,
         indent_guides: bool = False,
     ) -> "Syntax":
         """Construct a Syntax object from a file.
@@ -351,7 +351,9 @@ class Syntax(JupyterMixin):
         style = self._theme.get_style_for_token(token_type)
         return style.color
 
-    def highlight(self, code: str, line_range: Tuple[int, int] = None) -> Text:
+    def highlight(
+        self, code: str, line_range: Optional[Tuple[int, int]] = None
+    ) -> Text:
         """Highlight code and return a Text instance.
 
         Args:
