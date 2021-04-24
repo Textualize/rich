@@ -2,9 +2,9 @@ from itertools import chain
 from typing import Iterable, Optional, TYPE_CHECKING
 
 try:
-    from typing import Literal
+    from typing_extensions import Literal
 except ImportError:  # pragma: no cover
-    from typing_extensions import Literal  # type: ignore
+    from typing import Literal  # type: ignore
 
 from .constrain import Constrain
 from .jupyter import JupyterMixin

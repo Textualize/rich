@@ -29,9 +29,10 @@ from typing import (
 )
 
 try:
-    from typing import Literal, Protocol, runtime_checkable
+    from typing_extensions import Literal, Protocol, runtime_checkable
 except ImportError:  # pragma: no cover
-    from typing_extensions import Literal, Protocol, runtime_checkable  # type: ignore
+    from typing import Literal, Protocol, runtime_checkable  # type: ignore
+
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
@@ -63,6 +64,7 @@ WINDOWS = platform.system() == "Windows"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
+
 OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
 
 
