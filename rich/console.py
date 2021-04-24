@@ -30,8 +30,8 @@ from typing import (
 
 try:
     from typing import Literal, Protocol, runtime_checkable
-except ImportError:
-    from typing_extensions import Literal, Protocol, runtime_checkable
+except ImportError:  # pragma: no cover
+    from typing_extensions import Literal, Protocol, runtime_checkable  # type: ignore
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
