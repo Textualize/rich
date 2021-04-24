@@ -1,7 +1,11 @@
 from itertools import chain
 from typing import Iterable, Optional, TYPE_CHECKING
 
-from typing_extensions import Literal
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+
 from .constrain import Constrain
 from .jupyter import JupyterMixin
 from .measure import Measurement
