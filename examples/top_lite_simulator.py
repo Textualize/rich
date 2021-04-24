@@ -11,9 +11,9 @@ from rich.live import Live
 from rich.table import Table
 
 try:
-    from typing import Literal
-except ImportError:
     from typing_extensions import Literal
+except ImportError:
+    from typing import Literal
 
 
 @dataclass

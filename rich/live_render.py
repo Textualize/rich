@@ -2,9 +2,10 @@ from threading import RLock
 from typing import Optional, Tuple
 
 try:
-    from typing import Literal
-except ImportError:
     from typing_extensions import Literal
+except ImportError:  # pragma: no cover
+    from typing import Literal  # type: ignore
+
 
 from ._loop import loop_last
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
