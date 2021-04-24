@@ -1,7 +1,11 @@
 from fractions import Fraction
 from math import ceil, floor, modf
 from typing import cast, List, Optional, Sequence
-from typing_extensions import Protocol
+
+try:
+    from typing import Protocol
+except ImportError:
+    from typing_extensions import Protocol
 
 
 class Edge(Protocol):

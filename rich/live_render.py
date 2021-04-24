@@ -1,7 +1,10 @@
 from threading import RLock
 from typing import Optional, Tuple
 
-from typing_extensions import Literal
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from ._loop import loop_last
 from .console import Console, ConsoleOptions, RenderableType, RenderResult

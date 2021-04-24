@@ -9,7 +9,11 @@ from rich import box
 from rich.console import Console
 from rich.live import Live
 from rich.table import Table
-from typing_extensions import Literal
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 
 @dataclass

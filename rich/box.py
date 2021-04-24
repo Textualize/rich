@@ -1,6 +1,9 @@
 from typing import TYPE_CHECKING, Iterable, List
 
-from typing_extensions import Literal
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from ._loop import loop_last
 
