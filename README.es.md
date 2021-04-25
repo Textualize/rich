@@ -1,9 +1,12 @@
-# Rich
-
+[![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich)
 [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
 [![codecov](https://codecov.io/gh/willmcgugan/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/willmcgugan/rich)
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
+
+![Logo](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
+
+[中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md) • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md) • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md) • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md) • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md)
 
 Rich es un paquete de Python para texto _enriquecido_ y un hermoso formato en la terminal.
 
@@ -398,7 +401,15 @@ Así es como se ve en OSX (similar en Linux):
 
 </details>
 
-## Proyecto usando Rich
+Todos los renderizables enriquecidos utilizan el [Console Protocol](https://rich.readthedocs.io/en/latest/protocol.html), que también puede utilizar para implementar su propio contenido Rich.
+
+# Rich para empresas
+
+Disponible como parte de la suscripción a Tidelift.
+
+Los mantenedores de Rich y miles de otros paquetes están trabajando con Tidelift para brindar soporte comercial y mantenimiento para los paquetes de código abierto que usa para construir sus aplicaciones. Ahorre tiempo, reduzca el riesgo y mejore el estado del código, mientras paga a los mantenedores de los paquetes exactos que utiliza. [Más información](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
+
+# Proyecto usando Rich
 
 Aquí hay algunos proyectos que usan Rich:
 
