@@ -17,7 +17,7 @@ For example, the following displays 2 blank lines above and below the text, and 
     test = Padding("Hello", (2, 4))
     print(test)
 
-The Padding class can also accept a ``style`` argument which applies a style to the padding and contents, and an ``expand`` switch which can be set to False to prevent the padding from extending to the full with of the terminal. Here's an example which demonstrates both these arguments::
+The Padding class can also accept a ``style`` argument which applies a style to the padding and contents, and an ``expand`` switch which can be set to False to prevent the padding from extending to the full width of the terminal. Here's an example which demonstrates both these arguments::
 
     from rich import print
     from rich.padding import Padding
