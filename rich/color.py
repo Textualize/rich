@@ -305,7 +305,7 @@ class Color(NamedTuple):
         return self.type == ColorType.DEFAULT
 
     def get_truecolor(
-        self, theme: "TerminalTheme" = None, foreground=True
+        self, theme: Optional["TerminalTheme"] = None, foreground=True
     ) -> ColorTriplet:
         """Get an equivalent color triplet for this color.
 

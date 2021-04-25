@@ -1,6 +1,10 @@
 from typing import TYPE_CHECKING, Iterable, List
 
-from typing_extensions import Literal
+try:
+    from typing_extensions import Literal
+except ImportError:  # pragma: no cover
+    from typing import Literal  # type: ignore
+
 
 from ._loop import loop_last
 

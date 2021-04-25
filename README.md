@@ -1,3 +1,4 @@
+[![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich)
 [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
 [![codecov](https://codecov.io/gh/willmcgugan/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/willmcgugan/rich)
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
@@ -439,3 +440,5 @@ Here are a few projects using Rich:
 - [ansible/ansible-lint](https://github.com/ansible/ansible-lint) Ansible-lint checks playbooks for practices and behaviour that could potentially be improved
 - [ansible-community/molecule](https://github.com/ansible-community/molecule) Ansible Molecule testing framework
 - +[Many more](https://github.com/willmcgugan/rich/network/dependents)!
+
+<!-- This is a test, no need to translate -->

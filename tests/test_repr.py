@@ -1,10 +1,12 @@
+from typing import Optional
+
 from rich.console import Console
 from rich.repr import rich_repr
 
 
 @rich_repr
 class Foo:
-    def __init__(self, foo: str, bar: int = None, egg: int = 1):
+    def __init__(self, foo: str, bar: Optional[int] = None, egg: int = 1):
         self.foo = foo
         self.bar = bar
         self.egg = egg

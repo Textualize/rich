@@ -44,7 +44,7 @@ class Inspect(JupyterMixin):
         self,
         obj: Any,
         *,
-        title: TextType = None,
+        title: Optional[TextType] = None,
         help: bool = False,
         methods: bool = False,
         docs: bool = True,

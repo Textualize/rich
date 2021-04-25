@@ -348,7 +348,7 @@ class MarkdownContext:
         console: Console,
         options: ConsoleOptions,
         style: Style,
-        inline_code_lexer: str = None,
+        inline_code_lexer: Optional[str] = None,
         inline_code_theme: str = "monokai",
     ) -> None:
         self.console = console
@@ -419,11 +419,11 @@ class Markdown(JupyterMixin):
         self,
         markup: str,
         code_theme: str = "monokai",
-        justify: JustifyMethod = None,
+        justify: Optional[JustifyMethod] = None,
         style: Union[str, Style] = "none",
         hyperlinks: bool = True,
-        inline_code_lexer: str = None,
-        inline_code_theme: str = None,
+        inline_code_lexer: Optional[str] = None,
+        inline_code_theme: Optional[str] = None,
     ) -> None:
         self.markup = markup
         parser = Parser()
