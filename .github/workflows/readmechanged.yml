@@ -2,6 +2,8 @@ name: README.md Changed
 
 on: 
   push:
+    branches:
+      - master
     paths:
       - 'README.md'
 
@@ -17,6 +19,6 @@ jobs:
       run: |
         COMMIT=$(git rev-parse --short "$GIT_SHA")
         AUTHORS='@willmcgugan @oleksis @Adilius'
-        BODY="🤓 $AUTHORS README.md changed 📝. Check the [commit $COMMIT](https://github.com/oleksis/rich/commit/$GIT_SHA) 👀"
-        DISCUSSIONID='MDEwOkRpc2N1c3Npb24zMzI2MjEw'
+        BODY="🤓 $AUTHORS README.md changed 📝. Check the [commit $COMMIT](https://github.com/willmcgugan/rich/commit/$GIT_SHA) 👀"
+        DISCUSSIONID='MDEwOkRpc2N1c3Npb24zMzI2NzM0'
         gh api graphql -H 'GraphQL-Features: discussions_api' -f body="$BODY" -F discussionId="$DISCUSSIONID" -f query='mutation($body: String!, $discussionId: ID!){addDiscussionComment(input:{body: $body , discussionId: $discussionId}){comment{id}}}'
