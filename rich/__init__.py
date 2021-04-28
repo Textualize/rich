@@ -31,7 +31,7 @@ def get_console() -> "Console":
 
 
 def reconfigure(*args, **kwargs) -> None:
-    """Reconfigures the global console bu replacing it with another.
+    """Reconfigures the global console by replacing it with another.
 
     Args:
         console (Console): Replacement console instance.
