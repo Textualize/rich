@@ -1425,8 +1425,8 @@ class Console:
     def print(
         self,
         *objects: Any,
-        sep=" ",
-        end="\n",
+        sep: str=" ",
+        end: str="\n",
         style: Optional[Union[str, Style]] = None,
         justify: Optional[JustifyMethod] = None,
         overflow: Optional[OverflowMethod] = None,
