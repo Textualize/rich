@@ -1,6 +1,7 @@
 import sys
 
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
@@ -18,7 +19,10 @@ try:
     from ctypes import wintypes
     from ctypes import LibraryLoader
 
-    windll = LibraryLoader(ctypes.WinDLL)
+    if sys.platform == "win32":
+        windll = LibraryLoader(ctypes.WinDLL)
+    else:
+        windll: Any = None
 except (AttributeError, ImportError, ValueError):
 
     # Fallback if we can't load the Windows DLL
@@ -52,7 +56,7 @@ else:
         result = _GetConsoleMode(handle, console_mode)
         vt = bool(result and console_mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING)
         truecolor = False
-        if vt:
+        if sys.platform == "win32" and vt:
             win_version = sys.getwindowsversion()
             truecolor = win_version.major > 10 or (
                 win_version.major == 10 and win_version.build >= 15063
