@@ -145,7 +145,7 @@ def ratio_distribute(
     return distributed_total
 
 
-if __name__ == "__main__":  # type: ignore
+if __name__ == "__main__":
     from dataclasses import dataclass
 
     @dataclass

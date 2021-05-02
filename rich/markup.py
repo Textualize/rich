@@ -1,5 +1,5 @@
 import re
-from typing import Iterable, List, Match, NamedTuple, Optional, Tuple, Union
+from typing import Callable, Iterable, List, Match, NamedTuple, Optional, Tuple, Union
 
 from .errors import MarkupError
 from .style import Style
@@ -36,7 +36,12 @@ class Tag(NamedTuple):
         )
 
 
-def escape(markup: str, _escape=re.compile(r"(\\*)(\[[a-z#\/].*?\])").sub) -> str:
+_EscapeSub = Callable[[Callable[[Match[str]], str], str], str]
+
+
+def escape(
+    markup: str, _escape: _EscapeSub = re.compile(r"(\\*)(\[[a-z#\/].*?\])").sub
+) -> str:
     """Escapes text so that it won't be interpreted as markup.
 
     Args:

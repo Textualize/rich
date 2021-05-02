@@ -6,6 +6,7 @@ from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, fields, is_dataclass
 from itertools import islice
 from typing import (
+    DefaultDict,
     TYPE_CHECKING,
     Any,
     Callable,
@@ -230,7 +231,7 @@ class Pretty(JupyterMixin):
         return Measurement(text_width, text_width)
 
 
-def _get_braces_for_defaultdict(_object: defaultdict) -> Tuple[str, str, str]:
+def _get_braces_for_defaultdict(_object: DefaultDict[Any, Any]) -> Tuple[str, str, str]:
     return (
         f"defaultdict({_object.default_factory!r}, {{",
         "})",
@@ -238,7 +239,7 @@ def _get_braces_for_defaultdict(_object: defaultdict) -> Tuple[str, str, str]:
     )
 
 
-def _get_braces_for_array(_object: array) -> Tuple[str, str, str]:
+def _get_braces_for_array(_object: "array[Any]") -> Tuple[str, str, str]:
     return (f"array({_object.typecode!r}, [", "])", "array({_object.typecode!r})")
 
 
@@ -455,7 +456,7 @@ def traverse(
         py_version = (sys.version_info.major, sys.version_info.minor)
         children: List[Node]
 
-        def iter_rich_args(rich_args) -> Iterable[Union[Any, Tuple[str, Any]]]:
+        def iter_rich_args(rich_args: Any) -> Iterable[Union[Any, Tuple[str, Any]]]:
             for arg in rich_args:
                 if isinstance(arg, tuple):
                     if len(arg) == 3:
@@ -629,7 +630,7 @@ def pprint(
     max_length: Optional[int] = None,
     max_string: Optional[int] = None,
     expand_all: bool = False,
-):
+) -> None:
     """A convenience function for pretty printing.
 
     Args:
@@ -658,8 +659,9 @@ def pprint(
 if __name__ == "__main__":  # pragma: no cover
 
     class BrokenRepr:
-        def __repr__(self):
+        def __repr__(self) -> str:
             1 / 0
+            return "this will fail"
 
     d = defaultdict(int)
     d["foo"] = 5

@@ -47,7 +47,7 @@ def install(
     word_wrap: bool = False,
     show_locals: bool = False,
     indent_guides: bool = True,
-) -> Callable:
+) -> Callable[..., Any]:
     """Install a rich traceback handler.
 
     Once installed, any tracebacks will be printed with syntax highlighting and rich formatting.
@@ -88,17 +88,19 @@ def install(
             )
         )
 
-    def ipy_excepthook_closure(ip) -> None:  # pragma: no cover
+    def ipy_excepthook_closure(ip: Any) -> None:  # pragma: no cover
         tb_data = {}  # store information about showtraceback call
         default_showtraceback = ip.showtraceback  # keep reference of default traceback
 
-        def ipy_show_traceback(*args, **kwargs) -> None:
+        def ipy_show_traceback(*args: Any, **kwargs: Any) -> None:
             """wrap the default ip.showtraceback to store info for ip._showtraceback"""
             nonlocal tb_data
             tb_data = kwargs
             default_showtraceback(*args, **kwargs)
 
-        def ipy_display_traceback(*args, is_syntax: bool = False, **kwargs) -> None:
+        def ipy_display_traceback(
+            *args: Any, is_syntax: bool = False, **kwargs: Any
+        ) -> None:
             """Internally called traceback from ip._showtraceback"""
             nonlocal tb_data
             exc_tuple = ip._get_exc_info()
@@ -234,7 +236,7 @@ class Traceback:
     @classmethod
     def from_exception(
         cls,
-        exc_type: Type,
+        exc_type: Type[Any],
         exc_value: BaseException,
         traceback: Optional[TracebackType],
         width: Optional[int] = 100,
@@ -593,11 +595,11 @@ if __name__ == "__main__":  # pragma: no cover
     console = Console()
     import sys
 
-    def bar(a):  # 这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑
+    def bar(a: Any) -> None:  # 这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑
         one = 1
         print(one / a)
 
-    def foo(a):
+    def foo(a: Any) -> None:
 
         zed = {
             "characters": {
@@ -610,7 +612,7 @@ if __name__ == "__main__":  # pragma: no cover
         }
         bar(a)
 
-    def error():
+    def error() -> None:
 
         try:
             try:

@@ -4,6 +4,8 @@ from typing import (
     Iterable,
     List,
     Optional,
+    Union,
+    cast,
     overload,
     TypeVar,
     TYPE_CHECKING,
@@ -82,8 +84,8 @@ class Lines:
     def __getitem__(self, index: slice) -> "Lines":
         ...
 
-    def __getitem__(self, index):
-        return self._lines[index]
+    def __getitem__(self, index: Union[slice, int]) -> Union["Text", "Lines"]:
+        return self._lines[index]  # type: ignore
 
     def __setitem__(self, index: int, value: "Text") -> "Lines":
         self._lines[index] = value
@@ -104,7 +106,7 @@ class Lines:
     def extend(self, lines: Iterable["Text"]) -> None:
         self._lines.extend(lines)
 
-    def pop(self, index=-1) -> "Text":
+    def pop(self, index: int = -1) -> "Text":
         return self._lines.pop(index)
 
     def justify(

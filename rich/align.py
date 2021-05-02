@@ -196,7 +196,7 @@ class Align(JupyterMixin):
             else Segment("\n")
         )
 
-        def blank_lines(count) -> Iterable[Segment]:
+        def blank_lines(count: int) -> Iterable[Segment]:
             if count > 0:
                 for _ in range(count):
                     yield blank_line
@@ -268,7 +268,7 @@ class VerticalCenter(JupyterMixin):
         bottom_space = height - top_space - len(lines)
         blank_line = Segment(f"{' ' * width}", style)
 
-        def blank_lines(count) -> Iterable[Segment]:
+        def blank_lines(count: int) -> Iterable[Segment]:
             for _ in range(count):
                 yield blank_line
                 yield new_line

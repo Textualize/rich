@@ -1,4 +1,4 @@
-from typing import Iterable, List
+from typing import Any, Dict, Iterable, List
 
 from . import get_console
 from .segment import Segment
@@ -17,7 +17,9 @@ class JupyterRenderable:
         self.html = html
         self.text = text
 
-    def _repr_mimebundle_(self, include, exclude, **kwargs):
+    def _repr_mimebundle_(
+        self, include: Iterable[str], exclude: Iterable[str], **kwargs: Any
+    ) -> Dict[str, str]:
         data = {"text/plain": self.text, "text/html": self.html}
         if include:
             data = {k: v for (k, v) in data.items() if k in include}
@@ -29,7 +31,9 @@ class JupyterRenderable:
 class JupyterMixin:
     """Add to an Rich renderable to make it render in Jupyter notebook."""
 
-    def _repr_mimebundle_(self, include, exclude, **kwargs):
+    def _repr_mimebundle_(
+        self, include: Iterable[str], exclude: Iterable[str], **kwargs: Any
+    ) -> Dict[str, str]:
         console = get_console()
         segments = list(console.render(self, console.options))  # type: ignore
         html = _render_segments(segments)
@@ -76,7 +80,7 @@ def display(segments: Iterable[Segment], text: str) -> None:
     ipython_display(jupyter_renderable)
 
 
-def print(*args, **kwargs) -> None:
+def print(*args: Any, **kwargs: Any) -> None:
     """Proxy for Console print."""
     console = get_console()
     return console.print(*args, **kwargs)

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 
 from .console import Console, RenderableType
 from .jupyter import JupyterMixin
@@ -64,7 +64,7 @@ class Status(JupyterMixin):
         spinner: Optional[str] = None,
         spinner_style: Optional[StyleType] = None,
         speed: Optional[float] = None,
-    ):
+    ) -> None:
         """Update status.
 
         Args:
@@ -101,7 +101,7 @@ class Status(JupyterMixin):
         self.start()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         self.stop()
 
 
