@@ -12,9 +12,12 @@ from .types import Callback
 class EventType(Enum):
     """Event type enumeration."""
 
+    CUSTOM = auto()
     LOAD = auto()
     STARTUP = auto()
-    SHUTDOWN_REQUEST = auto
+    MOUNT = auto()
+    UNMOUNT = auto()
+    SHUTDOWN_REQUEST = auto()
     SHUTDOWN = auto()
     EXIT = auto()
     REFRESH = auto()
@@ -25,13 +28,23 @@ class EventType(Enum):
 
 class Event:
     type: ClassVar[EventType]
+    bubble: bool = False
 
     def __init__(self) -> None:
         self.time = time()
+        self._suppressed = False
 
     def __rich_repr__(self) -> RichReprResult:
         return
         yield
+
+    def __init_subclass__(cls, type: EventType) -> None:
+        super().__init_subclass__()
+        cls.type = type
+
+    @property
+    def is_suppressed(self) -> bool:
+        return self._suppressed
 
     @property
     def name(self) -> str:
@@ -54,29 +67,36 @@ class Event:
         self._suppressed = suppress
 
 
-class ShutdownRequestEvent(Event):
-    type: EventType = EventType.SHUTDOWN_REQUEST
-
-
-class LoadEvent(Event):
-    type: EventType = EventType.SHUTDOWN_REQUEST
-
-
-class StartupEvent(Event):
-    type: EventType = EventType.SHUTDOWN_REQUEST
-
-
-class ShutdownEvent(Event):
+class ShutdownRequestEvent(Event, type=EventType.SHUTDOWN_REQUEST):
     pass
 
 
-class RefreshEvent(Event):
+class LoadEvent(Event, type=EventType.SHUTDOWN_REQUEST):
+    pass
+
+
+class StartupEvent(Event, type=EventType.SHUTDOWN_REQUEST):
+    pass
+
+
+class MountEvent(Event, type=EventType.MOUNT):
+    pass
+
+
+class UnmountEvent(Event, type=EventType.UNMOUNT):
+    pass
+
+
+class ShutdownEvent(Event, type=EventType.SHUTDOWN):
+    pass
+
+
+class RefreshEvent(Event, type=EventType.REFRESH):
     pass
 
 
 @rich_repr
-class KeyEvent(Event):
-    type: EventType = EventType.KEY
+class KeyEvent(Event, type=EventType.KEY):
     code: int = 0
 
     def __init__(self, code: int) -> None:
@@ -92,9 +112,9 @@ class KeyEvent(Event):
         return chr(self.code)
 
 
-class TimerEvent(Event):
-    type: EventType = EventType.TIMER
+class TimerEvent(Event, type=EventType.TIMER):
+    pass
 
 
-class IntervalEvent(Event):
-    type: EventType = EventType.INTERVAL
+class IntervalEvent(Event, type=EventType.INTERVAL):
+    pass

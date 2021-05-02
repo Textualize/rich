@@ -20,7 +20,8 @@ class QueueItem(NamedTuple):
 
 
 class EventPump:
-    def __init__(self) -> None:
+    def __init__(self, parent: Optional["EventPump"] = None) -> None:
+        self.parent = parent
         self.queue: "PriorityQueue[Optional[QueueItem]]" = PriorityQueue()
         self._closing = False
         self._closed = False
@@ -76,3 +77,7 @@ class EventPump:
             if event is None:
                 break
             yield event
+            if event.is_suppressed:
+                continue
+            if event.bubble and self.parent:
+                self.parent.post(event, priority=10)

@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from dis import dis
 import logging
 import signal
-from typing import AsyncGenerator, ClassVar, Iterable, Optional
+from typing import AsyncGenerator, ClassVar, Dict, Iterable, Optional
 
 from .events import Event, KeyEvent, ShutdownRequestEvent
 from .. import get_console
@@ -11,6 +11,7 @@ from ..console import Console
 from .driver import Driver, CursesDriver
 from .event_pump import EventPump
 from .types import Callback
+from .widget import Widget
 
 
 log = logging.getLogger("rich")
@@ -33,6 +34,8 @@ class App:
         self._screen = screen
         self._events: Optional[EventPump] = None
 
+        self._mounts: Dict[Widget, List[Widget]]
+
     @property
     def events(self) -> EventPump:
         assert self._events is not None
@@ -42,6 +45,9 @@ class App:
     def on_keyboard_interupt(cls) -> None:
         if App._active_app is not None:
             App._active_app.events.post(ShutdownRequestEvent())
+
+    def mount(self, widget: Widget, parent: Optional[Widget] = None) -> None:
+        pass
 
     async def __aiter__(self) -> AsyncGenerator[Event, None]:
         loop = asyncio.get_event_loop()
