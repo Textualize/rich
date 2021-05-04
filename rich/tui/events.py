@@ -5,6 +5,7 @@ from time import time
 from typing import ClassVar, Optional
 
 from rich.repr import rich_repr, RichReprResult
+from .bus import Bus
 from .case import camel_to_snake
 from .types import Callback
 
@@ -24,6 +25,9 @@ class EventType(Enum):
     TIMER = auto()
     INTERVAL = auto()
     KEY = auto()
+
+
+EventBus = Bus["Event"]
 
 
 class Event:

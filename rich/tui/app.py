@@ -3,13 +3,13 @@ from contextlib import contextmanager
 from dis import dis
 import logging
 import signal
-from typing import AsyncGenerator, ClassVar, Dict, Iterable, Optional
+from typing import AsyncGenerator, ClassVar, Dict, Iterable, List, Optional
 
 from .events import Event, KeyEvent, ShutdownRequestEvent
 from .. import get_console
 from ..console import Console
 from .driver import Driver, CursesDriver
-from .event_pump import EventPump
+from .events import EventBus
 from .types import Callback
 from .widget import Widget
 
@@ -32,12 +32,12 @@ class App:
     def __init__(self, console: Console = None, screen: bool = True):
         self.console = console or get_console()
         self._screen = screen
-        self._events: Optional[EventPump] = None
-
+        self._events: Optional[EventBus] = None
+        self._widget: Optional[Widget] = None
         self._mounts: Dict[Widget, List[Widget]]
 
     @property
-    def events(self) -> EventPump:
+    def events(self) -> EventBus:
         assert self._events is not None
         return self._events
 
@@ -46,12 +46,15 @@ class App:
         if App._active_app is not None:
             App._active_app.events.post(ShutdownRequestEvent())
 
+    def mount(self, widget: Widget) -> None:
+        self._widget = widget
+
     def mount(self, widget: Widget, parent: Optional[Widget] = None) -> None:
         pass
 
     async def __aiter__(self) -> AsyncGenerator[Event, None]:
         loop = asyncio.get_event_loop()
-        self._events = EventPump()
+        self._events = EventBus()
         driver = CursesDriver(self.console, self.events)
         driver.start_application_mode()
         loop.add_signal_handler(signal.SIGINT, self.on_keyboard_interupt)

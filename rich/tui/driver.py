@@ -8,12 +8,12 @@ from typing import Optional, TYPE_CHECKING
 from .events import KeyEvent
 
 if TYPE_CHECKING:
-    from .event_pump import EventPump
+    from .events import EventBus
     from ..console import Console
 
 
 class Driver(ABC):
-    def __init__(self, console: "Console", events: "EventPump") -> None:
+    def __init__(self, console: "Console", events: "EventBus") -> None:
         self.console = console
         self.events = events
 
@@ -27,7 +27,7 @@ class Driver(ABC):
 
 
 class CursesDriver(Driver):
-    def __init__(self, console: "Console", events: "EventPump") -> None:
+    def __init__(self, console: "Console", events: "EventBus") -> None:
         super().__init__(console, events)
         self._stdscr = None
         self._exit_event = Event()

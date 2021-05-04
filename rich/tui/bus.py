@@ -1,28 +1,23 @@
 from asyncio import PriorityQueue
+from dataclasses import dataclass
 from functools import total_ordering
-from typing import AsyncGenerator, NamedTuple, Optional
-
-from .events import Event
+from typing import AsyncGenerator, Generic, NamedTuple, Optional, TypeVar
 
 
-@total_ordering
-class QueueItem(NamedTuple):
+BusType = TypeVar("BusType")
+
+
+@dataclass(order=True, frozen=True)
+class QueueItem(Generic[BusType]):
     """An item and meta data on the event queue."""
 
-    event: Event
+    event: BusType
     priority: int
 
-    def __eq__(self, other: "QueueItem") -> bool:
-        return self.priority == other.priority
 
-    def __lt__(self, other: "QueueItem") -> bool:
-        return self.priority < other.priority
-
-
-class EventPump:
-    def __init__(self, parent: Optional["EventPump"] = None) -> None:
-        self.parent = parent
-        self.queue: "PriorityQueue[Optional[QueueItem]]" = PriorityQueue()
+class Bus(Generic[BusType]):
+    def __init__(self) -> None:
+        self.queue: "PriorityQueue[Optional[QueueItem[BusType]]]" = PriorityQueue()
         self._closing = False
         self._closed = False
 
@@ -34,8 +29,8 @@ class EventPump:
     def is_closed(self) -> bool:
         return self._closed
 
-    def post(self, event: Event, priority: int = 0) -> bool:
-        """Post an event on the queue.
+    def post(self, event: BusType, priority: int = 0) -> bool:
+        """Post an item on the bus.
 
         If the event pump is closing or closed, the event will not be posted, and the method
         will return ``False``.
@@ -49,7 +44,8 @@ class EventPump:
         """
         if self._closing or self._closed:
             return False
-        self.queue.put_nowait(QueueItem(event, priority=-priority))
+        item: QueueItem[BusType] = QueueItem(event, priority=-priority)
+        self.queue.put_nowait(item)
         return True
 
     def close(self) -> None:
@@ -57,7 +53,7 @@ class EventPump:
         self._closing = True
         self.queue.put_nowait(None)
 
-    async def get(self) -> Optional[Event]:
+    async def get(self) -> Optional[BusType]:
         """Get the next event on the queue, or None if queue is closed.
 
         Returns:
@@ -71,13 +67,9 @@ class EventPump:
             return None
         return queue_item.event
 
-    async def __aiter__(self) -> AsyncGenerator[Event, None]:
+    async def __aiter__(self) -> AsyncGenerator[BusType, None]:
         while not self._closed:
             event = await self.get()
             if event is None:
                 break
             yield event
-            if event.is_suppressed:
-                continue
-            if event.bubble and self.parent:
-                self.parent.post(event, priority=10)
