@@ -248,7 +248,7 @@ class SpinnerColumn(ProgressColumn):
         """
         self.spinner = Spinner(spinner_name, style=spinner_style, speed=speed)
 
-    def render(self, task: "Task") -> Text:
+    def render(self, task: "Task") -> RenderableType:
         text = (
             self.finished_text
             if task.finished
