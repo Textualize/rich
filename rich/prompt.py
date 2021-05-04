@@ -54,9 +54,9 @@ class PromptBase(Generic[PromptType]):
         self,
         prompt: TextType = "",
         *,
-        console: Console = None,
+        console: Optional[Console] = None,
         password: bool = False,
-        choices: List[str] = None,
+        choices: Optional[List[str]] = None,
         show_default: bool = True,
         show_choices: bool = True,
     ) -> None:
@@ -78,13 +78,13 @@ class PromptBase(Generic[PromptType]):
         cls,
         prompt: TextType = "",
         *,
-        console: Console = None,
+        console: Optional[Console] = None,
         password: bool = False,
-        choices: List[str] = None,
+        choices: Optional[List[str]] = None,
         show_default: bool = True,
         show_choices: bool = True,
         default: DefaultType,
-        stream: TextIO = None,
+        stream: Optional[TextIO] = None,
     ) -> Union[DefaultType, PromptType]:
         ...
 
@@ -94,12 +94,12 @@ class PromptBase(Generic[PromptType]):
         cls,
         prompt: TextType = "",
         *,
-        console: Console = None,
+        console: Optional[Console] = None,
         password: bool = False,
-        choices: List[str] = None,
+        choices: Optional[List[str]] = None,
         show_default: bool = True,
         show_choices: bool = True,
-        stream: TextIO = None,
+        stream: Optional[TextIO] = None,
     ) -> PromptType:
         ...
 
@@ -108,13 +108,13 @@ class PromptBase(Generic[PromptType]):
         cls,
         prompt: TextType = "",
         *,
-        console: Console = None,
+        console: Optional[Console] = None,
         password: bool = False,
-        choices: List[str] = None,
+        choices: Optional[List[str]] = None,
         show_default: bool = True,
         show_choices: bool = True,
         default: Any = ...,
-        stream: TextIO = None,
+        stream: Optional[TextIO] = None,
     ) -> Any:
         """Shortcut to construct and run a prompt loop and return the result.
 
@@ -188,7 +188,7 @@ class PromptBase(Generic[PromptType]):
         console: Console,
         prompt: TextType,
         password: bool,
-        stream: TextIO = None,
+        stream: Optional[TextIO] = None,
     ) -> str:
         """Get input from user.
 
@@ -250,16 +250,16 @@ class PromptBase(Generic[PromptType]):
         """Hook to display something before the prompt."""
 
     @overload
-    def __call__(self, *, stream: TextIO = None) -> PromptType:
+    def __call__(self, *, stream: Optional[TextIO] = None) -> PromptType:
         ...
 
     @overload
     def __call__(
-        self, *, default: DefaultType, stream: TextIO = None
+        self, *, default: DefaultType, stream: Optional[TextIO] = None
     ) -> Union[PromptType, DefaultType]:
         ...
 
-    def __call__(self, *, default: Any = ..., stream: TextIO = None) -> Any:
+    def __call__(self, *, default: Any = ..., stream: Optional[TextIO] = None) -> Any:
         """Run the prompt loop.
 
         Args:

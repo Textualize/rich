@@ -42,7 +42,7 @@ class Segment(NamedTuple):
     Args:
         text (str): A piece of text.
         style (:class:`~rich.style.Style`, optional): An optional style to apply to the text.
-        control (Tuple[ControlCode..], optional): Optional tuple of control codes.
+        control (Tuple[ControlCode..], optional): Optional sequence of control codes.
     """
 
     text: str = ""
@@ -50,7 +50,7 @@ class Segment(NamedTuple):
     style: Optional[Style] = None
     """An optional style."""
     control: Optional[Sequence[ControlCode]] = None
-    """True if the segment contains control codes, otherwise False."""
+    """Optional sequence of control codes."""
 
     def __repr__(self) -> str:
         """Simplified repr."""
@@ -82,8 +82,8 @@ class Segment(NamedTuple):
     def apply_style(
         cls,
         segments: Iterable["Segment"],
-        style: Style = None,
-        post_style: Style = None,
+        style: Optional[Style] = None,
+        post_style: Optional[Style] = None,
     ) -> Iterable["Segment"]:
         """Apply style(s) to an iterable of segments.
 
@@ -169,7 +169,7 @@ class Segment(NamedTuple):
         cls,
         segments: Iterable["Segment"],
         length: int,
-        style: Style = None,
+        style: Optional[Style] = None,
         pad: bool = True,
         include_new_lines: bool = True,
     ) -> Iterable[List["Segment"]]:
@@ -213,7 +213,11 @@ class Segment(NamedTuple):
 
     @classmethod
     def adjust_line_length(
-        cls, line: List["Segment"], length: int, style: Style = None, pad: bool = True
+        cls,
+        line: List["Segment"],
+        length: int,
+        style: Optional[Style] = None,
+        pad: bool = True,
     ) -> List["Segment"]:
         """Adjust a line to a given width (cropping or padding as required).
 
@@ -283,8 +287,8 @@ class Segment(NamedTuple):
         cls,
         lines: List[List["Segment"]],
         width: int,
-        height: int = None,
-        style: Style = None,
+        height: Optional[int] = None,
+        style: Optional[Style] = None,
         new_lines: bool = False,
     ) -> List[List["Segment"]]:
         """Set the shape of a list of lines (enclosing rectangle).
@@ -416,7 +420,7 @@ console.print(text)"""
 
     console.rule("rich.Segment")
     console.print(
-        "A Segment is the last step in the Rich render process before gemerating text with ANSI codes."
+        "A Segment is the last step in the Rich render process before generating text with ANSI codes."
     )
     console.print("\nConsider the following code:\n")
     console.print(Syntax(code, "python", line_numbers=True))

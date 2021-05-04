@@ -28,7 +28,11 @@ from typing import (
     cast,
 )
 
-from typing_extensions import Literal, Protocol, runtime_checkable
+try:
+    from typing_extensions import Literal, Protocol, runtime_checkable
+except ImportError:  # pragma: no cover
+    from typing import Literal, Protocol, runtime_checkable  # type: ignore
+
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
@@ -60,6 +64,7 @@ WINDOWS = platform.system() == "Windows"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
+
 OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
 
 
@@ -323,7 +328,7 @@ class PagerContext:
     def __init__(
         self,
         console: "Console",
-        pager: Pager = None,
+        pager: Optional[Pager] = None,
         styles: bool = False,
         links: bool = False,
     ) -> None:
@@ -362,7 +367,9 @@ class ScreenContext:
         self.screen = Screen(style=style)
         self._changed = False
 
-    def update(self, *renderables: RenderableType, style: StyleType = None) -> None:
+    def update(
+        self, *renderables: RenderableType, style: Optional[StyleType] = None
+    ) -> None:
         """Update the screen.
 
         Args:
@@ -566,18 +573,18 @@ class Console:
         color_system: Optional[
             Literal["auto", "standard", "256", "truecolor", "windows"]
         ] = "auto",
-        force_terminal: bool = None,
-        force_jupyter: bool = None,
-        force_interactive: bool = None,
+        force_terminal: Optional[bool] = None,
+        force_jupyter: Optional[bool] = None,
+        force_interactive: Optional[bool] = None,
         soft_wrap: bool = False,
-        theme: Theme = None,
+        theme: Optional[Theme] = None,
         stderr: bool = False,
-        file: IO[str] = None,
+        file: Optional[IO[str]] = None,
         quiet: bool = False,
-        width: int = None,
-        height: int = None,
-        style: StyleType = None,
-        no_color: bool = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        style: Optional[StyleType] = None,
+        no_color: Optional[bool] = None,
         tab_size: int = 8,
         record: bool = False,
         markup: bool = True,
@@ -587,11 +594,11 @@ class Console:
         log_path: bool = True,
         log_time_format: Union[str, FormatTimeCallable] = "[%X]",
         highlighter: Optional["HighlighterType"] = ReprHighlighter(),
-        legacy_windows: bool = None,
+        legacy_windows: Optional[bool] = None,
         safe_box: bool = True,
-        get_datetime: Callable[[], datetime] = None,
-        get_time: Callable[[], float] = None,
-        _environ: Mapping[str, str] = None,
+        get_datetime: Optional[Callable[[], datetime]] = None,
+        get_time: Optional[Callable[[], float]] = None,
+        _environ: Optional[Mapping[str, str]] = None,
     ):
         # Copy of os.environ allows us to replace it for testing
         if _environ is not None:
@@ -953,7 +960,7 @@ class Console:
         return capture
 
     def pager(
-        self, pager: Pager = None, styles: bool = False, links: bool = False
+        self, pager: Optional[Pager] = None, styles: bool = False, links: bool = False
     ) -> PagerContext:
         """A context manager to display anything printed within a "pager". The pager application
         is defined by the system and will typically support at least pressing a key to scroll.
@@ -1072,7 +1079,7 @@ class Console:
         return self._is_alt_screen
 
     def screen(
-        self, hide_cursor: bool = True, style: StyleType = None
+        self, hide_cursor: bool = True, style: Optional[StyleType] = None
     ) -> "ScreenContext":
         """Context manager to enable and disable 'alternative screen' mode.
 
@@ -1086,7 +1093,7 @@ class Console:
         return ScreenContext(self, hide_cursor=hide_cursor, style=style or "")
 
     def render(
-        self, renderable: RenderableType, options: ConsoleOptions = None
+        self, renderable: RenderableType, options: Optional[ConsoleOptions] = None
     ) -> Iterable[Segment]:
         """Render an object in to an iterable of `Segment` instances.
 
@@ -1159,45 +1166,46 @@ class Console:
         Returns:
             List[List[Segment]]: A list of lines, where a line is a list of Segment objects.
         """
-        render_options = options or self.options
-        _rendered = self.render(renderable, render_options)
-        if style:
-            _rendered = Segment.apply_style(_rendered, style)
-        lines = list(
-            islice(
-                Segment.split_and_crop_lines(
-                    _rendered,
-                    render_options.max_width,
-                    include_new_lines=new_lines,
-                    pad=pad,
-                ),
-                None,
-                render_options.height,
+        with self._lock:
+            render_options = options or self.options
+            _rendered = self.render(renderable, render_options)
+            if style:
+                _rendered = Segment.apply_style(_rendered, style)
+            lines = list(
+                islice(
+                    Segment.split_and_crop_lines(
+                        _rendered,
+                        render_options.max_width,
+                        include_new_lines=new_lines,
+                        pad=pad,
+                    ),
+                    None,
+                    render_options.height,
+                )
             )
-        )
-        if render_options.height is not None:
-            extra_lines = render_options.height - len(lines)
-            if extra_lines > 0:
-                pad_line = [
-                    [Segment(" " * render_options.max_width, style), Segment("\n")]
-                    if new_lines
-                    else [Segment(" " * render_options.max_width, style)]
-                ]
-                lines.extend(pad_line * extra_lines)
+            if render_options.height is not None:
+                extra_lines = render_options.height - len(lines)
+                if extra_lines > 0:
+                    pad_line = [
+                        [Segment(" " * render_options.max_width, style), Segment("\n")]
+                        if new_lines
+                        else [Segment(" " * render_options.max_width, style)]
+                    ]
+                    lines.extend(pad_line * extra_lines)
 
-        return lines
+            return lines
 
     def render_str(
         self,
         text: str,
         *,
         style: Union[str, Style] = "",
-        justify: JustifyMethod = None,
-        overflow: OverflowMethod = None,
-        emoji: bool = None,
-        markup: bool = None,
-        highlight: bool = None,
-        highlighter: HighlighterType = None,
+        justify: Optional[JustifyMethod] = None,
+        overflow: Optional[OverflowMethod] = None,
+        emoji: Optional[bool] = None,
+        markup: Optional[bool] = None,
+        highlight: Optional[bool] = None,
+        highlighter: Optional[HighlighterType] = None,
     ) -> "Text":
         """Convert a string to a Text instance. This is is called automatically if
         you print or log a string.
@@ -1240,7 +1248,7 @@ class Console:
         return rich_text
 
     def get_style(
-        self, name: Union[str, Style], *, default: Union[Style, str] = None
+        self, name: Union[str, Style], *, default: Optional[Union[Style, str]] = None
     ) -> Style:
         """Get a Style instance by it's theme name or parse a definition.
 
@@ -1275,10 +1283,10 @@ class Console:
         sep: str,
         end: str,
         *,
-        justify: JustifyMethod = None,
-        emoji: bool = None,
-        markup: bool = None,
-        highlight: bool = None,
+        justify: Optional[JustifyMethod] = None,
+        emoji: Optional[bool] = None,
+        markup: Optional[bool] = None,
+        highlight: Optional[bool] = None,
     ) -> List[ConsoleRenderable]:
         """Combine a number of renderables and text into one renderable.
 
@@ -1387,8 +1395,8 @@ class Console:
         *objects: Any,
         sep=" ",
         end="\n",
-        style: Union[str, Style] = None,
-        highlight: bool = None,
+        style: Optional[Union[str, Style]] = None,
+        highlight: Optional[bool] = None,
     ) -> None:
         """Output to the terminal. This is a low-level way of writing to the terminal which unlike
         :meth:`~rich.console.Console.print` won't pretty print, wrap text, or apply markup, but will
@@ -1419,17 +1427,17 @@ class Console:
         *objects: Any,
         sep=" ",
         end="\n",
-        style: Union[str, Style] = None,
-        justify: JustifyMethod = None,
-        overflow: OverflowMethod = None,
-        no_wrap: bool = None,
-        emoji: bool = None,
-        markup: bool = None,
-        highlight: bool = None,
-        width: int = None,
-        height: int = None,
+        style: Optional[Union[str, Style]] = None,
+        justify: Optional[JustifyMethod] = None,
+        overflow: Optional[OverflowMethod] = None,
+        no_wrap: Optional[bool] = None,
+        emoji: Optional[bool] = None,
+        markup: Optional[bool] = None,
+        highlight: Optional[bool] = None,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
         crop: bool = True,
-        soft_wrap: bool = None,
+        soft_wrap: Optional[bool] = None,
     ) -> None:
         """Print to the console.
 
@@ -1508,8 +1516,8 @@ class Console:
         self,
         renderable: RenderableType,
         *,
-        region: Region = None,
-        options: ConsoleOptions = None,
+        region: Optional[Region] = None,
+        options: Optional[ConsoleOptions] = None,
     ) -> None:
         """Update the screen at a given offset.
 
@@ -1590,11 +1598,11 @@ class Console:
         *objects: Any,
         sep=" ",
         end="\n",
-        style: Union[str, Style] = None,
-        justify: JustifyMethod = None,
-        emoji: bool = None,
-        markup: bool = None,
-        highlight: bool = None,
+        style: Optional[Union[str, Style]] = None,
+        justify: Optional[JustifyMethod] = None,
+        emoji: Optional[bool] = None,
+        markup: Optional[bool] = None,
+        highlight: Optional[bool] = None,
         log_locals: bool = False,
         _stack_offset=1,
     ) -> None:
@@ -1680,7 +1688,7 @@ class Console:
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
 
-                    display(self._buffer)
+                    display(self._buffer, self._render_buffer(self._buffer[:]))
                     del self._buffer[:]
                 else:
                     text = self._render_buffer(self._buffer[:])
@@ -1733,7 +1741,7 @@ class Console:
         markup: bool = True,
         emoji: bool = True,
         password: bool = False,
-        stream: TextIO = None,
+        stream: Optional[TextIO] = None,
     ) -> str:
         """Displays a prompt and waits for input from the user. The prompt may contain color / style.
 
@@ -1815,9 +1823,9 @@ class Console:
     def export_html(
         self,
         *,
-        theme: TerminalTheme = None,
+        theme: Optional[TerminalTheme] = None,
         clear: bool = True,
-        code_format: str = None,
+        code_format: Optional[str] = None,
         inline_styles: bool = False,
     ) -> str:
         """Generate HTML from console contents (requires record=True argument in constructor).
@@ -1895,7 +1903,7 @@ class Console:
         self,
         path: str,
         *,
-        theme: TerminalTheme = None,
+        theme: Optional[TerminalTheme] = None,
         clear: bool = True,
         code_format=CONSOLE_HTML_FORMAT,
         inline_styles: bool = False,

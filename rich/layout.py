@@ -14,8 +14,6 @@ from typing import (
     Union,
 )
 
-from typing_extensions import Literal
-
 from ._ratio import ratio_resolve
 from .align import Align
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
@@ -40,7 +38,6 @@ class LayoutRender(NamedTuple):
 
 RegionMap = Dict["Layout", Region]
 RenderMap = Dict["Layout", LayoutRender]
-Direction = Literal["horizontal", "vertical"]
 
 
 class LayoutError(Exception):
@@ -157,14 +154,14 @@ class Layout:
 
     def __init__(
         self,
-        renderable: RenderableType = None,
+        renderable: Optional[RenderableType] = None,
         *,
-        name: str = None,
-        size: int = None,
+        name: Optional[str] = None,
+        size: Optional[int] = None,
         minimum_size: int = 1,
         ratio: int = 1,
         visible: bool = True,
-        height: int = None,
+        height: Optional[int] = None,
     ) -> None:
         self._renderable = renderable or _Placeholder(self)
         self.size = size

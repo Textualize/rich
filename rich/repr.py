@@ -4,7 +4,7 @@ from typing import Any, Iterable, List, Union, Tuple, Type, TypeVar
 T = TypeVar("T")
 
 
-RichReprResult = Iterable[Union[Any, Tuple[str, Any], Tuple[str, Any, Any]]]
+RichReprResult = Iterable[Union[Any, Tuple[Any], Tuple[str, Any], Tuple[str, Any, Any]]]
 
 
 def rich_repr(cls: Type[T]) -> Type[T]:

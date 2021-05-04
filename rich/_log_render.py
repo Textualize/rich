@@ -33,12 +33,12 @@ class LogRender:
         self,
         console: "Console",
         renderables: Iterable["ConsoleRenderable"],
-        log_time: datetime = None,
-        time_format: Union[str, FormatTimeCallable] = None,
+        log_time: Optional[datetime] = None,
+        time_format: Optional[Union[str, FormatTimeCallable]] = None,
         level: TextType = "",
-        path: str = None,
-        line_no: int = None,
-        link_path: str = None,
+        path: Optional[str] = None,
+        line_no: Optional[int] = None,
+        link_path: Optional[str] = None,
     ) -> "Table":
         from .containers import Renderables
         from .table import Table

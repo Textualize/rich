@@ -23,9 +23,7 @@ layout.split(
     Layout(size=10, name="footer"),
 )
 
-layout["main"].split(
-    Layout(name="side"), Layout(name="body", ratio=2), direction="horizontal"
-)
+layout["main"].split_row(Layout(name="side"), Layout(name="body", ratio=2))
 
 layout["side"].split(Layout(), Layout())
 

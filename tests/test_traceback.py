@@ -81,6 +81,17 @@ def test_print_exception():
     assert "ZeroDivisionError" in exception_text
 
 
+def test_print_exception_no_msg():
+    console = Console(width=100, file=io.StringIO())
+    try:
+        raise RuntimeError
+    except Exception:
+        console.print_exception()
+    exception_text = console.file.getvalue()
+    assert "RuntimeError" in exception_text
+    assert "RuntimeError:" not in exception_text
+
+
 def test_print_exception_locals():
     console = Console(width=100, file=io.StringIO())
     try:

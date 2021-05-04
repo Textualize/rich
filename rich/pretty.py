@@ -4,7 +4,6 @@ import sys
 from array import array
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, fields, is_dataclass
-import inspect
 from itertools import islice
 from typing import (
     TYPE_CHECKING,
@@ -27,7 +26,7 @@ from ._pick import pick_bool
 from .abc import RichRenderable
 from .cells import cell_len
 from .highlighter import ReprHighlighter
-from .jupyter import JupyterRenderable
+from .jupyter import JupyterMixin, JupyterRenderable
 from .measure import Measurement
 from .text import Text
 
@@ -43,12 +42,12 @@ if TYPE_CHECKING:
 
 
 def install(
-    console: "Console" = None,
+    console: Optional["Console"] = None,
     overflow: "OverflowMethod" = "ignore",
     crop: bool = False,
     indent_guides: bool = False,
-    max_length: int = None,
-    max_string: int = None,
+    max_length: Optional[int] = None,
+    max_string: Optional[int] = None,
     expand_all: bool = False,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
@@ -99,6 +98,9 @@ def install(
         if console.is_jupyter and any(attr.startswith("_repr_") for attr in dir(value)):
             return
 
+        if hasattr(value, "_repr_mimebundle_"):
+            return
+
         # certain renderables should start on a new line
         if isinstance(value, ConsoleRenderable):
             console.line()
@@ -130,7 +132,7 @@ def install(
         sys.displayhook = display_hook
 
 
-class Pretty:
+class Pretty(JupyterMixin):
     """A rich renderable that pretty prints an object.
 
     Args:
@@ -152,15 +154,15 @@ class Pretty:
     def __init__(
         self,
         _object: Any,
-        highlighter: "HighlighterType" = None,
+        highlighter: Optional["HighlighterType"] = None,
         *,
         indent_size: int = 4,
-        justify: "JustifyMethod" = None,
+        justify: Optional["JustifyMethod"] = None,
         overflow: Optional["OverflowMethod"] = None,
         no_wrap: Optional[bool] = False,
         indent_guides: bool = False,
-        max_length: int = None,
-        max_string: int = None,
+        max_length: Optional[int] = None,
+        max_string: Optional[int] = None,
         expand_all: bool = False,
         margin: int = 0,
         insert_line: bool = False,
@@ -411,7 +413,9 @@ class _Line:
         return f"{self.whitespace}{self.text}{self.node or ''}{self.suffix}"
 
 
-def traverse(_object: Any, max_length: int = None, max_string: int = None) -> Node:
+def traverse(
+    _object: Any, max_length: Optional[int] = None, max_string: Optional[int] = None
+) -> Node:
     """Traverse object and generate a tree.
 
     Args:
@@ -587,8 +591,8 @@ def pretty_repr(
     *,
     max_width: int = 80,
     indent_size: int = 4,
-    max_length: int = None,
-    max_string: int = None,
+    max_length: Optional[int] = None,
+    max_string: Optional[int] = None,
     expand_all: bool = False,
 ) -> str:
     """Prettify repr string by expanding on to new lines to fit within a given width.
@@ -620,10 +624,10 @@ def pretty_repr(
 def pprint(
     _object: Any,
     *,
-    console: "Console" = None,
+    console: Optional["Console"] = None,
     indent_guides: bool = True,
-    max_length: int = None,
-    max_string: int = None,
+    max_length: Optional[int] = None,
+    max_string: Optional[int] = None,
     expand_all: bool = False,
 ):
     """A convenience function for pretty printing.

@@ -23,7 +23,7 @@ class Status(JupyterMixin):
         self,
         status: RenderableType,
         *,
-        console: Console = None,
+        console: Optional[Console] = None,
         spinner: str = "dots",
         spinner_style: StyleType = "status.spinner",
         speed: float = 1.0,

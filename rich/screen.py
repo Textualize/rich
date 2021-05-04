@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 from .measure import Measurement
 from .segment import Segment
@@ -19,7 +19,9 @@ class Screen:
     """
 
     def __init__(
-        self, renderable: "RenderableType" = None, style: StyleType = None
+        self,
+        renderable: Optional["RenderableType"] = None,
+        style: Optional[StyleType] = None,
     ) -> None:
         self.renderable = renderable
         self.style = style
