@@ -92,8 +92,8 @@ class Spinner:
         self,
         *,
         text: "RenderableType" = "",
-        style: "StyleType" = None,
-        speed: float = None,
+        style: Optional["StyleType"] = None,
+        speed: Optional[float] = None,
     ) -> None:
         """Updates attributes of a spinner after it has been started.
 
