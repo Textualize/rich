@@ -37,7 +37,7 @@ ipywidgets = {version = "^7.5.1", optional = true}
 jupyter = ["ipywidgets"]
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2.3"
+pytest = "^6.2.4"
 black = "^20.8b1"
 mypy = "^0.812"
 pytest-cov = "^2.11.1"
