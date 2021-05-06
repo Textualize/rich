@@ -2,6 +2,7 @@ from typing import Dict
 
 from .style import Style
 
+
 DEFAULT_STYLES: Dict[str, Style] = {
     "none": Style.null(),
     "reset": Style(
@@ -82,7 +83,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.none": Style(color="magenta", italic=True),
     "repr.url": Style(underline=True, color="bright_blue", italic=False, bold=False),
     "repr.uuid": Style(color="bright_yellow", bold=False),
-    "repr.call": Style(color="bright_magenta"),
+    "repr.call": Style(color="magenta", bold=True),
     "repr.path": Style(color="magenta"),
     "repr.filename": Style(color="bright_magenta"),
     "rule.line": Style(color="bright_green"),
@@ -126,9 +127,6 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "status.spinner": Style(color="green"),
     "tree": Style(),
     "tree.line": Style(),
-}
-
-MARKDOWN_STYLES = {
     "markdown.paragraph": Style(),
     "markdown.text": Style(),
     "markdown.emph": Style(italic=True),
@@ -152,6 +150,3 @@ MARKDOWN_STYLES = {
     "markdown.link": Style(color="bright_blue"),
     "markdown.link_url": Style(color="blue"),
 }
-
-
-DEFAULT_STYLES.update(MARKDOWN_STYLES)
