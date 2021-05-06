@@ -1,23 +1,40 @@
-from asyncio import PriorityQueue
+from asyncio import Queue, PriorityQueue
 from dataclasses import dataclass
-from functools import total_ordering
-from typing import AsyncGenerator, Generic, NamedTuple, Optional, TypeVar
+
+from typing import (
+    AsyncGenerator,
+    Generic,
+    NamedTuple,
+    Optional,
+    Protocol,
+    TypeVar,
+    TYPE_CHECKING,
+)
+
+from .events import Event
+from .actions import Action
+
+if TYPE_CHECKING:
+    from .widget import Widget
 
 
-BusType = TypeVar("BusType")
+class Actionable:
+    def post_action(self, sender: Widget, action: Action):
+        ...
 
 
 @dataclass(order=True, frozen=True)
-class QueueItem(Generic[BusType]):
+class EventQueueItem:
     """An item and meta data on the event queue."""
 
-    event: BusType
+    event: Event
     priority: int
 
 
-class Bus(Generic[BusType]):
-    def __init__(self) -> None:
-        self.queue: "PriorityQueue[Optional[QueueItem[BusType]]]" = PriorityQueue()
+class Bus:
+    def __init__(self, actions_queue: Queue[Action]) -> None:
+        self.action_queue: "Queue[Action]" = actions_queue
+        self.event_queue: "PriorityQueue[Optional[EventQueueItem]]" = PriorityQueue()
         self._closing = False
         self._closed = False
 
@@ -29,7 +46,7 @@ class Bus(Generic[BusType]):
     def is_closed(self) -> bool:
         return self._closed
 
-    def post(self, event: BusType, priority: int = 0) -> bool:
+    def post_event(self, event: Event, priority: int = 0) -> bool:
         """Post an item on the bus.
 
         If the event pump is closing or closed, the event will not be posted, and the method
@@ -44,16 +61,16 @@ class Bus(Generic[BusType]):
         """
         if self._closing or self._closed:
             return False
-        item: QueueItem[BusType] = QueueItem(event, priority=-priority)
+        item = EventQueueItem(event, priority=-priority)
         self.queue.put_nowait(item)
         return True
 
     def close(self) -> None:
         """Close the event pump after processing remaining events."""
         self._closing = True
-        self.queue.put_nowait(None)
+        self.event_queue.put_nowait(None)
 
-    async def get(self) -> Optional[BusType]:
+    async def get(self) -> Optional[Event]:
         """Get the next event on the queue, or None if queue is closed.
 
         Returns:
@@ -61,13 +78,13 @@ class Bus(Generic[BusType]):
         """
         if self._closed:
             return None
-        queue_item = await self.queue.get()
+        queue_item = await self.event_queue.get()
         if queue_item is None:
             self._closed = True
             return None
         return queue_item.event
 
-    async def __aiter__(self) -> AsyncGenerator[BusType, None]:
+    async def __aiter__(self) -> AsyncGenerator[Event, None]:
         while not self._closed:
             event = await self.get()
             if event is None:

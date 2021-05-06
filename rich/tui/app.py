@@ -34,7 +34,6 @@ class App:
         self._screen = screen
         self._events: Optional[EventBus] = None
         self._widget: Optional[Widget] = None
-        self._mounts: Dict[Widget, List[Widget]]
 
     @property
     def events(self) -> EventBus:
@@ -44,9 +43,10 @@ class App:
     @classmethod
     def on_keyboard_interupt(cls) -> None:
         if App._active_app is not None:
-            App._active_app.events.post(ShutdownRequestEvent())
+            App._active_app.events.post_event(ShutdownRequestEvent())
 
     def mount(self, widget: Widget) -> None:
+        Bus()
         self._widget = widget
 
     def mount(self, widget: Widget, parent: Optional[Widget] = None) -> None:
