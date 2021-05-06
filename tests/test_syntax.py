@@ -11,7 +11,7 @@ from rich.style import Style
 from rich.syntax import Syntax, ANSISyntaxTheme, PygmentsSyntaxTheme, Color, Console
 
 
-CODE = '''
+CODE = '''\
 def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
     """Iterate and generate a tuple with a flag for first and last value."""
     iter_values = iter(values)
@@ -24,8 +24,20 @@ def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
         yield first, False, previous_value
         first = False
         previous_value = value
-    yield first, True, previous_value
-'''
+    yield first, True, previous_value'''
+
+
+def test_blank_lines():
+    code = "\n\nimport this\n\n"
+    syntax = Syntax(
+        code, lexer_name="python", theme="ascii_light", code_width=30, line_numbers=True
+    )
+    result = render(syntax)
+    print(repr(result))
+    assert (
+        result
+        == "\x1b[1;38;2;24;24;24;48;2;248;248;248m  \x1b[0m\x1b[38;2;173;173;173;48;2;248;248;248m1 \x1b[0m\x1b[48;2;248;248;248m                              \x1b[0m\n\x1b[1;38;2;24;24;24;48;2;248;248;248m  \x1b[0m\x1b[38;2;173;173;173;48;2;248;248;248m2 \x1b[0m\x1b[48;2;248;248;248m                              \x1b[0m\n\x1b[1;38;2;24;24;24;48;2;248;248;248m  \x1b[0m\x1b[38;2;173;173;173;48;2;248;248;248m3 \x1b[0m\x1b[1;38;2;0;128;0;48;2;248;248;248mimport\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[1;38;2;0;0;255;48;2;248;248;248mthis\x1b[0m\x1b[48;2;248;248;248m                   \x1b[0m\n\x1b[1;38;2;24;24;24;48;2;248;248;248m  \x1b[0m\x1b[38;2;173;173;173;48;2;248;248;248m4 \x1b[0m\x1b[48;2;248;248;248m                              \x1b[0m\n\x1b[1;38;2;24;24;24;48;2;248;248;248m  \x1b[0m\x1b[38;2;173;173;173;48;2;248;248;248m5 \x1b[0m\x1b[48;2;248;248;248m                              \x1b[0m\n"
+    )
 
 
 def test_python_render():

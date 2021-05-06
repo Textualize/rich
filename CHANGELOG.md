@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added syntax for call, i.e. "Foo(bar)"
+- Fixed initial blank lines removed from Syntax https://github.com/willmcgugan/rich/issues/1214
 - Added Console.measure as a convenient alias for Measurement.get
 
 ## [10.1.0] - 2020-04-03
