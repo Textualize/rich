@@ -652,7 +652,7 @@ foo = [
     result = test.with_indent_guides()
     print(result.plain)
     print(repr(result.plain))
-    expected = "for a in range(10):\n│   print(a)\n\nfoo = [\n│   1,\n│   {\n│   │   2\n│   }\n]\n"
+    expected = "for a in range(10):\n│   print(a)\n\nfoo = [\n│   1,\n│   {\n│   │   2\n│   }\n]\n\n"
     assert result.plain == expected
 
 
