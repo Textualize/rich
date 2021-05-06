@@ -137,7 +137,7 @@ class Align(JupyterMixin):
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         align = self.align
-        width = Measurement.get(console, options, self.renderable).maximum
+        width = console.measure(self.renderable, options=options).maximum
         rendered = console.render(
             Constrain(
                 self.renderable, width if self.width is None else min(width, self.width)
