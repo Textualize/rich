@@ -523,9 +523,11 @@ def detect_legacy_windows() -> bool:
     """Detect legacy Windows."""
     return WINDOWS and not get_windows_console_features().vt
 
+
 def detect_spyder_environment() -> bool:
-    """  Return True if running in the Spyder environment """
-    return 'SPY_PYTHONPATH' in os.environ
+    """Return True if running in the Spyder environment"""
+    return "SPY_PYTHONPATH" in os.environ
+
 
 if detect_legacy_windows():  # pragma: no cover
     from colorama import init
