@@ -1106,7 +1106,7 @@ class Text(JupyterMixin):
         new_lines: List[Text] = []
         add_line = new_lines.append
         blank_lines = 0
-        for line in text.split():
+        for line in text.split(allow_blank=True):
             match = re_indent.match(line.plain)
             if not match or not match.group(2):
                 blank_lines += 1
