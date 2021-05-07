@@ -11,7 +11,7 @@ from typing import (
     Callable,
     Dict,
     Iterable,
-    List,
+    List,    
     Optional,
     Set,
     Union,
@@ -21,7 +21,7 @@ from typing import (
 try:
     import attr as _attr_module
 except ImportError:  # pragma: no cover
-    _attr_module = None
+    _attr_module = None  # type: ignore
 
 
 def _is_attr_object(obj: Any) -> bool:

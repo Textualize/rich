@@ -186,7 +186,7 @@ def test_empty_repr():
     assert pretty_repr(Foo()) == ""
 
 
-def test_attrs():    
+def test_attrs():
     @attr.define
     class Point:
         x: int
@@ -198,20 +198,22 @@ def test_attrs():
     expected = "Point(x=1, y=2, z=0)"
     assert result == expected
 
-def test_attrs_empty():    
+
+def test_attrs_empty():
     @attr.define
     class Nada:
         pass
-        
+
     result = pretty_repr(Nada())
     print(repr(result))
     expected = "Nada()"
     assert result == expected
 
-def test_attrs_broken():    
+
+def test_attrs_broken():
     @attr.define
     class Foo:
-        bar:int
+        bar: int
 
     foo = Foo(1)
     del foo.bar
