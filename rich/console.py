@@ -864,6 +864,9 @@ class Console:
         """
         if self._force_terminal is not None:
             return self._force_terminal
+        if detect_spyder_environment():
+            # not sure why in spyder the normal checks returns False
+            return True
         isatty = getattr(self.file, "isatty", None)
         return False if isatty is None else isatty()
 
