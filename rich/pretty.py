@@ -538,12 +538,13 @@ def traverse(
                                 value = getattr(obj, attr.name)
                             except Exception as error:
                                 # Can happen, albeit rarely
-                                value = error
-                            yield (
-                                attr.name,
-                                value,
-                                attr.repr if callable(attr.repr) else None,
-                            )
+                                yield (attr.name, error, None)
+                            else:
+                                yield (
+                                    attr.name,
+                                    value,
+                                    attr.repr if callable(attr.repr) else None,
+                                )
 
                 for last, (name, value, repr_callable) in loop_last(iter_attrs()):
                     if repr_callable:
