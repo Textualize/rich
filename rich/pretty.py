@@ -529,7 +529,7 @@ def traverse(
                 )
 
                 def iter_attrs_attrs() -> Tuple[str, Any]:
-                    """Iterate over attr fields and values in repr."""
+                    """Iterate over attr fields and values."""
                     for attr in fields:
                         if attr.repr:
                             try:
