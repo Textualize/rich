@@ -11,7 +11,7 @@ from typing import (
     Callable,
     Dict,
     Iterable,
-    List,    
+    List,
     Optional,
     Set,
     Union,
