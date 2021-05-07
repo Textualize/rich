@@ -19,8 +19,8 @@ from typing import (
 )
 
 try:
-    from attrs import attr as _attr_module
-except ImportError:
+    import attr as _attr_module
+except ImportError:  # pragma: no cover
     _attr_module = None
 
 
@@ -528,7 +528,7 @@ def traverse(
                     last=root,
                 )
 
-                def iter_attrs_attrs() -> Tuple[str, Any]:
+                def iter_attrs_attrs() -> Iterable[Tuple[str, Any]]:
                     """Iterate over attr fields and values."""
                     for attr in attr_fields:
                         if attr.repr:
@@ -678,7 +678,7 @@ def pprint(
     max_length: Optional[int] = None,
     max_string: Optional[int] = None,
     expand_all: bool = False,
-):
+) -> None:
     """A convenience function for pretty printing.
 
     Args:

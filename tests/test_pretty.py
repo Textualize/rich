@@ -5,6 +5,9 @@ import io
 import sys
 from typing import List
 
+import attr
+
+
 from rich.console import Console
 from rich.pretty import install, Pretty, pprint, pretty_repr, Node
 
@@ -181,3 +184,38 @@ def test_empty_repr():
             return ""
 
     assert pretty_repr(Foo()) == ""
+
+
+def test_attrs():    
+    @attr.define
+    class Point:
+        x: int
+        y: int
+        z: int = 0
+
+    result = pretty_repr(Point(1, 2))
+    print(repr(result))
+    expected = "Point(x=1, y=2, z=0)"
+    assert result == expected
+
+def test_attrs_empty():    
+    @attr.define
+    class Nada:
+        pass
+        
+    result = pretty_repr(Nada())
+    print(repr(result))
+    expected = "Nada()"
+    assert result == expected
+
+def test_attrs_broken():    
+    @attr.define
+    class Foo:
+        bar:int
+
+    foo = Foo(1)
+    del foo.bar
+    result = pretty_repr(foo)
+    print(repr(result))
+    expected = "Foo(bar=AttributeError('bar'))"
+    assert result == expected
