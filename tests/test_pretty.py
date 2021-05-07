@@ -6,7 +6,7 @@ import sys
 from typing import List
 
 import attr
-
+import pytest
 
 from rich.console import Console
 from rich.pretty import install, Pretty, pprint, pretty_repr, Node
