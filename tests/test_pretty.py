@@ -12,6 +12,12 @@ from rich.console import Console
 from rich.pretty import install, Pretty, pprint, pretty_repr, Node
 
 
+skip_py36 = pytest.mark.skipif(
+    sys.version_info.minor == 6 and sys.version_info.major == 3,
+    reason="rendered differently on py3.6",
+)
+
+
 def test_install():
     console = Console(file=io.StringIO())
     dh = sys.displayhook
@@ -210,6 +216,7 @@ def test_attrs_empty():
     assert result == expected
 
 
+@skip_py36
 def test_attrs_broken():
     @attr.define
     class Foo:
