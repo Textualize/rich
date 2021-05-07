@@ -537,7 +537,9 @@ def traverse(
                             except Exception as error:
                                 # Can happen, albeit rarely
                                 value = error
-                            yield attr.name, value
+                            yield attr.name, (
+                                attr.repr(value) if callable(attr.repr) else value
+                            )
 
                 for last, (name, value) in loop_last(iter_attrs_attrs()):
                     child_node = _traverse(value)
