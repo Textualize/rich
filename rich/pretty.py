@@ -18,8 +18,23 @@ from typing import (
     Tuple,
 )
 
-from rich.highlighter import ReprHighlighter
+try:
+    from attrs import attr as _attr_module
+except ImportError:
+    _attr_module = None
 
+
+def _is_attr_object(obj: Any) -> bool:
+    """Check if an object was created with attrs module."""
+    return _attr_module is not None and _attr_module.has(type(obj))
+
+
+def _get_attr_fields(obj: Any) -> Iterable["_attr_module.Attribute"]:
+    """Get fields for an attrs object."""
+    return _attr_module.fields(type(obj)) if _attr_module else []
+
+
+from .highlighter import ReprHighlighter
 from . import get_console
 from ._loop import loop_last
 from ._pick import pick_bool
@@ -264,6 +279,7 @@ def is_expandable(obj: Any) -> bool:
         isinstance(obj, _CONTAINERS)
         or (is_dataclass(obj) and not isinstance(obj, type))
         or hasattr(obj, "__rich_repr__")
+        or _is_attr_object(obj)
     )
 
 
@@ -489,13 +505,46 @@ def traverse(
                         child_node = _traverse(child)
                         child_node.last = last
                         child_node.key_repr = key
-                        child_node.last = last
                         child_node.key_separator = "="
                         append(child_node)
                     else:
                         child_node = _traverse(arg)
                         child_node.last = last
                         append(child_node)
+            else:
+                node = Node(
+                    value_repr=f"{obj.__class__.__name__}()", children=[], last=root
+                )
+        elif _is_attr_object(obj):
+            children = []
+            append = children.append
+
+            fields = _get_attr_fields(obj)
+            if fields:
+                node = Node(
+                    open_brace=f"{obj.__class__.__name__}(",
+                    close_brace=")",
+                    children=children,
+                    last=root,
+                )
+
+                def iter_attrs_attrs() -> Tuple[str, Any]:
+                    """Iterate over attr fields and values in repr."""
+                    for attr in fields:
+                        if attr.repr:
+                            try:
+                                value = getattr(obj, attr.name)
+                            except Exception as error:
+                                # Can happen, albeit rarely
+                                value = error
+                            yield attr.name, value
+
+                for last, (name, value) in loop_last(iter_attrs_attrs()):
+                    child_node = _traverse(value)
+                    child_node.last = last
+                    child_node.key_repr = name
+                    child_node.key_separator = "="
+                    append(child_node)
             else:
                 node = Node(
                     value_repr=f"{obj.__class__.__name__}()", children=[], last=root
