@@ -519,8 +519,8 @@ def traverse(
             children = []
             append = children.append
 
-            fields = _get_attr_fields(obj)
-            if fields:
+            attr_fields = _get_attr_fields(obj)
+            if attr_fields:
                 node = Node(
                     open_brace=f"{obj.__class__.__name__}(",
                     close_brace=")",
@@ -530,7 +530,7 @@ def traverse(
 
                 def iter_attrs_attrs() -> Tuple[str, Any]:
                     """Iterate over attr fields and values."""
-                    for attr in fields:
+                    for attr in attr_fields:
                         if attr.repr:
                             try:
                                 value = getattr(obj, attr.name)
