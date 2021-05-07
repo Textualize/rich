@@ -548,7 +548,7 @@ def traverse(
 
                 for last, (name, value, repr_callable) in loop_last(iter_attrs()):
                     if repr_callable:
-                        child_node = Node(value_repr=repr_callable(value))
+                        child_node = Node(value_repr=str(repr_callable(value)))
                     else:
                         child_node = _traverse(value)
                     child_node.last = last
