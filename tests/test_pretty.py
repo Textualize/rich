@@ -197,11 +197,12 @@ def test_attrs():
     class Point:
         x: int
         y: int
+        foo: str = attr.field(repr=str.upper)
         z: int = 0
 
-    result = pretty_repr(Point(1, 2))
+    result = pretty_repr(Point(1, 2, foo="bar"))
     print(repr(result))
-    expected = "Point(x=1, y=2, z=0)"
+    expected = "Point(x=1, y=2, foo=BAR, z=0)"
     assert result == expected
 
 

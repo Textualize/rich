@@ -528,7 +528,9 @@ def traverse(
                     last=root,
                 )
 
-                def iter_attrs_attrs() -> Iterable[Tuple[str, Any]]:
+                def iter_attrs_attrs() -> Iterable[
+                    Tuple[str, Any, Optional[Callable[[Any], str]]]
+                ]:
                     """Iterate over attr fields and values."""
                     for attr in attr_fields:
                         if attr.repr:
@@ -537,12 +539,15 @@ def traverse(
                             except Exception as error:
                                 # Can happen, albeit rarely
                                 value = error
-                            yield attr.name, (
-                                attr.repr(value) if callable(attr.repr) else value
+                            yield attr.name, value, (
+                                attr.repr if callable(attr.repr) else None
                             )
 
-                for last, (name, value) in loop_last(iter_attrs_attrs()):
-                    child_node = _traverse(value)
+                for last, (name, value, repr_callable) in loop_last(iter_attrs_attrs()):
+                    if repr_callable:
+                        child_node = Node(value_repr=repr_callable(value))
+                    else:
+                        child_node = _traverse(value)
                     child_node.last = last
                     child_node.key_repr = name
                     child_node.key_separator = "="
