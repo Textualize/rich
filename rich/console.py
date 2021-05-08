@@ -459,8 +459,11 @@ def _is_jupyter() -> bool:  # pragma: no cover
         return False
     ipython = get_ipython()  # type: ignore
     shell = ipython.__class__.__name__  # type: ignore
-    if "google.colab" in str(ipython.__class__) or shell == "ZMQInteractiveShell":
-        return True  # Jupyter notebook or qtconsole
+    if "google.colab" in str(ipython.__class__) or shell in [
+        "ZMQInteractiveShell",
+        "SpyderShell",
+    ]:
+        return True  # Jupyter notebook, qtconsole or Spyder
     elif shell == "TerminalInteractiveShell":
         return False  # Terminal running IPython
     else:
