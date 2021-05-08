@@ -2,12 +2,15 @@ from dataclasses import dataclass, field
 import re
 from enum import auto, Enum
 from time import time
-from typing import ClassVar, Optional
+from typing import ClassVar, Optional, TYPE_CHECKING
 
-from rich.repr import rich_repr, RichReprResult
-from .bus import Bus
+from ..repr import rich_repr, RichReprResult
 from .case import camel_to_snake
 from .types import Callback
+
+
+if TYPE_CHECKING:
+    from .timer import Timer, TimerCallback
 
 
 class EventType(Enum):
@@ -27,12 +30,10 @@ class EventType(Enum):
     KEY = auto()
 
 
-EventBus = Bus["Event"]
-
-
 class Event:
     type: ClassVar[EventType]
     bubble: bool = False
+    default_priority: Optional[int] = None
 
     def __init__(self) -> None:
         self.time = time()
@@ -42,9 +43,10 @@ class Event:
         return
         yield
 
-    def __init_subclass__(cls, type: EventType) -> None:
+    def __init_subclass__(cls, type: EventType, priority: Optional[int] = None) -> None:
         super().__init_subclass__()
         cls.type = type
+        cls.default_priority = priority
 
     @property
     def is_suppressed(self) -> bool:
@@ -116,9 +118,7 @@ class KeyEvent(Event, type=EventType.KEY):
         return chr(self.code)
 
 
-class TimerEvent(Event, type=EventType.TIMER):
-    pass
-
-
-class IntervalEvent(Event, type=EventType.INTERVAL):
-    pass
+@dataclass
+class TimerEvent(Event, type=EventType.TIMER, priority=10):
+    timer: "Timer"
+    callback: Optional["TimerCallback"] = None
