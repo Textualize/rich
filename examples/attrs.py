@@ -44,6 +44,11 @@ if __name__ == "__main__":
 
     console = Console()
 
+    console.print(
+        "\nRich can pretty print [b]attrs[/b] objects ( https://www.attrs.org/en/stable/ )\n",
+        justify="center",
+    )
+
     console.rule("attrs without Rich")
 
     print(model)
