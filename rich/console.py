@@ -879,7 +879,7 @@ class Console:
         """
         if self._force_terminal is not None:
             return self._force_terminal
-        isatty: Optional[Callable[..., bool]] = getattr(self.file, "isatty", None)
+        isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
         return False if isatty is None else isatty()
 
     @property
