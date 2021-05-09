@@ -36,11 +36,13 @@ class Tag(NamedTuple):
         )
 
 
-_EscapeSub = Callable[[Callable[[Match[str]], str], str], str]
+_ReStringMatch = Match[str]  # regex match object
+_ReSubCallable = Callable[[_ReStringMatch], str]  # Callable invoked by re.sub
+_EscapeSubMethod = Callable[[_ReSubCallable, str], str]  # Sub method of a compiled re
 
 
 def escape(
-    markup: str, _escape: _EscapeSub = re.compile(r"(\\*)(\[[a-z#\/].*?\])").sub
+    markup: str, _escape: _EscapeSubMethod = re.compile(r"(\\*)(\[[a-z#\/].*?\])").sub
 ) -> str:
     """Escapes text so that it won't be interpreted as markup.
 

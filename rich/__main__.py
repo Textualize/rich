@@ -11,6 +11,7 @@ from rich.console import (
     ConsoleRenderable,
     RenderGroup,
     RenderResult,
+    RenderableType,
 )
 from rich.markdown import Markdown
 from rich.measure import Measurement
@@ -95,7 +96,7 @@ def make_test_card() -> Table:
         ),
     )
 
-    def comparison(renderable1: Any, renderable2: Any) -> Table:
+    def comparison(renderable1: RenderableType, renderable2: RenderableType) -> Table:
         table = Table(show_header=False, pad_edge=False, box=None, expand=True)
         table.add_column("1", ratio=1)
         table.add_column("2", ratio=1)

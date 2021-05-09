@@ -5,11 +5,13 @@ import re
 from ._emoji_codes import EMOJI
 
 
-_EmojiSub = Callable[[Callable[[Match[str]], str], str], str]
+_ReStringMatch = Match[str]  # regex match object
+_ReSubCallable = Callable[[_ReStringMatch], str]  # Callable invoked by re.sub
+_EmojiSubMethod = Callable[[_ReSubCallable, str], str]  # Sub method of a compiled re
 
 
 def _emoji_replace(
-    text: str, _emoji_sub: _EmojiSub = re.compile(r"(:(\S*?):)").sub
+    text: str, _emoji_sub: _EmojiSubMethod = re.compile(r"(:(\S*?):)").sub
 ) -> str:
     """Replace emoji code in text."""
     get_emoji = EMOJI.get
