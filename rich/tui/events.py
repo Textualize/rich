@@ -1,22 +1,22 @@
 from dataclasses import dataclass, field
 import re
 from enum import auto, Enum
-from time import time
+from time import monotonic
 from typing import ClassVar, Optional, TYPE_CHECKING
 
 from ..repr import rich_repr, RichReprResult
-from .case import camel_to_snake
-from .types import Callback
+
+from .message import Message
+from .types import Callback, MessageTarget
 
 
 if TYPE_CHECKING:
-    from .timer import Timer, TimerCallback
+    from ._timer import Timer, TimerCallback
 
 
 class EventType(Enum):
     """Event type enumeration."""
 
-    CUSTOM = auto()
     LOAD = auto()
     STARTUP = auto()
     MOUNT = auto()
@@ -26,24 +26,27 @@ class EventType(Enum):
     EXIT = auto()
     REFRESH = auto()
     TIMER = auto()
-    INTERVAL = auto()
+    FOCUS = auto()
+    BLUR = auto()
     KEY = auto()
 
+    CUSTOM = 1000
 
-class Event:
+
+class Event(Message):
     type: ClassVar[EventType]
-    bubble: bool = False
-    default_priority: Optional[int] = None
 
-    def __init__(self) -> None:
-        self.time = time()
+    def __init__(self, sender: MessageTarget) -> None:
+        super().__init__(sender)
+        self.sender = sender
+        self.time = monotonic()
         self._suppressed = False
 
     def __rich_repr__(self) -> RichReprResult:
         return
         yield
 
-    def __init_subclass__(cls, type: EventType, priority: Optional[int] = None) -> None:
+    def __init_subclass__(cls, type: EventType, priority: int = 0) -> None:
         super().__init_subclass__()
         cls.type = type
         cls.default_priority = priority
@@ -51,15 +54,6 @@ class Event:
     @property
     def is_suppressed(self) -> bool:
         return self._suppressed
-
-    @property
-    def name(self) -> str:
-        if not hasattr(self, "_name"):
-            _name = camel_to_snake(self.__class__.__name__)
-            if _name.endswith("_event"):
-                _name = _name[:-6]
-            self._name = _name
-        return self._name
 
     def __enter__(self) -> "Event":
         return self
@@ -73,40 +67,40 @@ class Event:
         self._suppressed = suppress
 
 
-class ShutdownRequestEvent(Event, type=EventType.SHUTDOWN_REQUEST):
+class ShutdownRequest(Event, type=EventType.SHUTDOWN_REQUEST):
     pass
 
 
-class LoadEvent(Event, type=EventType.SHUTDOWN_REQUEST):
+class Load(Event, type=EventType.SHUTDOWN_REQUEST):
     pass
 
 
-class StartupEvent(Event, type=EventType.SHUTDOWN_REQUEST):
+class Startup(Event, type=EventType.SHUTDOWN_REQUEST):
     pass
 
 
-class MountEvent(Event, type=EventType.MOUNT):
+class Mount(Event, type=EventType.MOUNT):
     pass
 
 
-class UnmountEvent(Event, type=EventType.UNMOUNT):
+class Unmount(Event, type=EventType.UNMOUNT):
     pass
 
 
-class ShutdownEvent(Event, type=EventType.SHUTDOWN):
+class Shutdown(Event, type=EventType.SHUTDOWN):
     pass
 
 
-class RefreshEvent(Event, type=EventType.REFRESH):
+class Refresh(Event, type=EventType.REFRESH):
     pass
 
 
 @rich_repr
-class KeyEvent(Event, type=EventType.KEY):
+class Key(Event, type=EventType.KEY):
     code: int = 0
 
-    def __init__(self, code: int) -> None:
-        super().__init__()
+    def __init__(self, sender: MessageTarget, code: int) -> None:
+        super().__init__(sender)
         self.code = code
 
     def __rich_repr__(self) -> RichReprResult:
@@ -118,7 +112,27 @@ class KeyEvent(Event, type=EventType.KEY):
         return chr(self.code)
 
 
-@dataclass
-class TimerEvent(Event, type=EventType.TIMER, priority=10):
-    timer: "Timer"
-    callback: Optional["TimerCallback"] = None
+@rich_repr
+class Timer(Event, type=EventType.TIMER, priority=10):
+    def __init__(
+        self,
+        sender: MessageTarget,
+        timer: "Timer",
+        count: int = 0,
+        callback: Optional["TimerCallback"] = None,
+    ) -> None:
+        super().__init__(sender)
+        self.timer = timer
+        self.count = count
+        self.callback = callback
+
+    def __rich_repr__(self) -> RichReprResult:
+        yield "timer", self.timer
+
+
+class Focus(Event, type=EventType.FOCUS):
+    pass
+
+
+class Blur(Event, type=EventType.BLUR):
+    pass

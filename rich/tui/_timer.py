@@ -1,14 +1,14 @@
-from time import time
+from time import monotonic
 from typing import Optional, Callable
 
 from asyncio import Event, wait_for, TimeoutError
 import weakref
 
-from .events import TimerEvent
-from .types import Callback, EventTarget
+from . import events
+from .types import Callback, EventTarget, MessageTarget
 
 
-TimerCallback = Callable[["Timer"], None]
+TimerCallback = Callable[[events.Timer], None]
 
 
 class EventTargetGone(Exception):
@@ -22,6 +22,7 @@ class Timer:
         self,
         event_target: EventTarget,
         interval: float,
+        sender: MessageTarget,
         *,
         name: Optional[str] = None,
         callback: Optional[TimerCallback] = None,
@@ -30,11 +31,12 @@ class Timer:
         self._target_repr = repr(event_target)
         self._target = weakref.ref(event_target)
         self._interval = interval
+        self.sender = sender
         self.name = f"Timer#{self._timer_count}" if name is None else name
+        self._timer_count += 1
         self._callback = callback
         self._repeat = repeat
         self._stop_event = Event()
-        self.count = 0
 
     def __repr__(self) -> str:
         return f"Timer({self._target_repr}, {self._interval}, name={self.name!r}, repeat={self._repeat})"
@@ -50,19 +52,23 @@ class Timer:
         self._stop_event.set()
 
     async def run(self) -> None:
-        self.count = 0
-        start = time()
-        while self._repeat is None or self.count <= self._repeat:
-            next_timer = start + (self.count * self._interval)
-            sleep_time = max(0, next_timer - time())
+        count = 0
+        _repeat = self._repeat
+        _interval = self._interval
+        _wait = self._stop_event.wait
+        start = monotonic()
+        while _repeat is None or count <= _repeat:
+            next_timer = start + (count * _interval)
             try:
-                if await wait_for(self._stop_event.wait(), sleep_time):
+                if await wait_for(_wait(), max(0, next_timer - monotonic())):
                     break
             except TimeoutError:
                 pass
-            event = TimerEvent(callback=self._callback, timer=self)
+            event = events.Timer(
+                self.sender, timer=self, count=count, callback=self._callback
+            )
             try:
-                self.target.post_event(event)
+                await self.target.post_message(event)
             except EventTargetGone:
                 break
-            self.count += 1
+            count += 1

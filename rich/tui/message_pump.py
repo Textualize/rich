@@ -4,23 +4,26 @@ from asyncio import Event as AIOEvent
 from dataclasses import dataclass
 
 from . import events
+from .message import Message
 from ._timer import Timer, TimerCallback
 
 
 @dataclass(order=True, frozen=True)
-class EventQueueItem:
-    event: events.Event
+class MessageQueueItem:
+    message: Message
     priority: int
 
 
-class EventLoop:
-    def __init__(self) -> None:
-        self._event_queue: "PriorityQueue[Optional[EventQueueItem]]" = PriorityQueue()
+class MessagePump:
+    def __init__(self, queue_size: int = 10) -> None:
+        self._message_queue: "PriorityQueue[Optional[MessageQueueItem]]" = (
+            PriorityQueue(maxsize=queue_size)
+        )
         self._closing: bool = False
         self._closed: bool = False
         self._done_event = AIOEvent()
 
-    async def get_event(self) -> Optional[events.Event]:
+    async def get_message(self) -> Optional[Message]:
         """Get the next event on the queue, or None if queue is closed.
 
         Returns:
@@ -28,11 +31,11 @@ class EventLoop:
         """
         if self._closed:
             return None
-        queue_item = await self._event_queue.get()
+        queue_item = await self._message_queue.get()
         if queue_item is None:
             self._closed = True
             return None
-        return queue_item.event
+        return queue_item.message
 
     def set_timer(
         self,
@@ -54,50 +57,65 @@ class EventLoop:
         repeat: int = 0,
     ):
         timer = Timer(
-            self, interval, name=name, callback=callback, repeat=repeat or None
+            self, interval, self, name=name, callback=callback, repeat=repeat or None
         )
         asyncio.get_event_loop().create_task(timer.run())
         return timer
 
-    def close_events(self) -> None:
+    async def close_messages(self, wait: bool = True) -> None:
         self._closing = True
-        self._event_queue.put_nowait(None)
-
-    async def wait_for_events(self) -> None:
-        await self._done_event.wait()
+        await self._message_queue.put(None)
+        if wait:
+            await self._done_event.wait()
 
     async def run(self) -> None:
-        async def stuff(timer: Timer):
-            print("TIMER", timer)
+        from time import time
 
-        self.set_interval(1, callback=stuff, repeat=1)
+        start = time()
+
+        async def stuff(event: events.Timer):
+            print("TIMER", event)
+            print(time() - start)
+
+        self.set_interval(0.1, callback=stuff)
         try:
             while not self._closed:
-                event = await self.get_event()
-                if event is None:
+                message = await self.get_message()
+                if message is None:
                     break
-                dispatch_function = getattr(self, f"on_{event.name}", None)
-                if dispatch_function is not None:
-                    await dispatch_function(event)
+                await self.dispatch_message(message)
         finally:
             self._done_event.set()
 
-    def post_event(self, event: events.Event, priority: Optional[int] = None) -> bool:
+    async def dispatch_messageage(self, message: Message) -> None:
+        if isinstance(message, events.Event):
+            dispatch_function = getattr(self, f"on_{message.name}", None)
+            if dispatch_function is not None:
+                await dispatch_function(message)
+        else:
+            await self.on_message(message)
+
+    async def on_message(self, message: Message) -> None:
+        pass
+
+    async def post_message(
+        self, event: Message, priority: Optional[int] = None
+    ) -> bool:
         if self._closing or self._closed:
             return False
         event_priority = priority if priority is not None else event.default_priority
-        item = EventQueueItem(event, priority=event_priority or 0)
-        self._event_queue.put_nowait(item)
+        item = MessageQueueItem(event, priority=event_priority)
+        await self._message_queue.put(item)
         return True
 
-    async def on_timer(self, event: events.TimerEvent) -> None:
+    async def on_timer(self, event: events.Timer) -> None:
         if event.callback is not None:
-            await event.callback(event.timer)
+            await event.callback(event)
 
 
 if __name__ == "__main__":
 
-    class Widget(EventLoop):
+    class Widget(MessagePump):
         pass
 
     widget1 = Widget()

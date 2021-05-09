@@ -1,17 +1,15 @@
 from typing import TYPE_CHECKING
 
 from . import events
+from .message_pump import MessagePump
 
 if TYPE_CHECKING:
     from .app import App
 
 
 class Widget:
-    async def run(self, events: events.EventBus) -> None:
-        async for event in events:
-            dispatch_function = getattr(self, f"on_{event.name}", None)
-            if dispatch_function is not None:
-                await dispatch_function(event)
+    def __init__(self, app: App) -> None:
+        self.app = app
 
     def focus(self):
         pass
