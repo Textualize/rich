@@ -81,11 +81,11 @@ class Lines:
         ...
 
     @overload
-    def __getitem__(self, index: slice) -> "Lines":
+    def __getitem__(self, index: slice) -> List["Text"]:
         ...
 
-    def __getitem__(self, index: Union[slice, int]) -> Union["Text", "Lines"]:
-        return self._lines[index]  # type: ignore
+    def __getitem__(self, index: Union[slice, int]) -> Union["Text", List["Text"]]:
+        return self._lines[index]
 
     def __setitem__(self, index: int, value: "Text") -> "Lines":
         self._lines[index] = value
