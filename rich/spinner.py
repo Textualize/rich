@@ -17,7 +17,7 @@ class Spinner:
         text: "RenderableType" = "",
         *,
         style: Optional["StyleType"] = None,
-        speed=1.0,
+        speed: float = 1.0,
     ) -> None:
         """A spinner animation.
 

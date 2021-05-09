@@ -30,7 +30,7 @@ def _is_attr_object(obj: Any) -> bool:
     return _attr_module is not None and _attr_module.has(type(obj))
 
 
-def _get_attr_fields(obj: Any) -> Iterable["_attr_module.Attribute"]:
+def _get_attr_fields(obj: Any) -> Iterable["_attr_module.Attribute[Any]"]:
     """Get fields for an attrs object."""
     return _attr_module.fields(type(obj)) if _attr_module is not None else []
 
