@@ -30,10 +30,12 @@ from typing import (
     cast,
 )
 
-try:
+
+if sys.version_info >= (3, 8):
+    from typing import Literal, Protocol, runtime_checkable
+else:
     from typing_extensions import Literal, Protocol, runtime_checkable
-except ImportError:  # pragma: no cover
-    from typing import Literal, Protocol, runtime_checkable  # type: ignore
+
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
