@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 from math import ceil
 from threading import Event, RLock, Thread
+from types import TracebackType
 from typing import (
     Any,
     Callable,
@@ -18,19 +19,15 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    Type,
     TypeVar,
     Union,
 )
 
 from . import filesize, get_console
-from .console import (
-    Console,
-    JustifyMethod,
-    RenderableType,
-    RenderGroup,
-)
-from .jupyter import JupyterMixin
+from .console import Console, JustifyMethod, RenderableType, RenderGroup
 from .highlighter import Highlighter
+from .jupyter import JupyterMixin
 from .live import Live
 from .progress_bar import ProgressBar
 from .spinner import Spinner
@@ -75,7 +72,12 @@ class _TrackThread(Thread):
         self.start()
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         self.done.set()
         self.join()
 
@@ -649,7 +651,12 @@ class Progress(JupyterMixin):
         self.start()
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         self.stop()
 
     def track(

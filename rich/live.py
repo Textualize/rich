@@ -1,6 +1,7 @@
 import sys
 from threading import Event, RLock, Thread
-from typing import IO, Any, Callable, List, Optional, TextIO, cast
+from types import TracebackType
+from typing import IO, Any, Callable, List, Optional, TextIO, Type, cast
 
 from . import get_console
 from .console import Console, ConsoleRenderable, RenderableType, RenderHook
@@ -163,7 +164,12 @@ class Live(JupyterMixin, RenderHook):
         self.start(refresh=self._renderable is not None)
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         self.stop()
 
     def _enable_redirect_io(self) -> None:

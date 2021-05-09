@@ -12,6 +12,7 @@ from functools import wraps
 from getpass import getpass
 from itertools import islice
 from time import monotonic
+from types import TracebackType
 from typing import (
     IO,
     TYPE_CHECKING,
@@ -24,6 +25,7 @@ from typing import (
     NamedTuple,
     Optional,
     TextIO,
+    Type,
     Union,
     cast,
 )
@@ -32,7 +34,6 @@ try:
     from typing_extensions import Literal, Protocol, runtime_checkable
 except ImportError:  # pragma: no cover
     from typing import Literal, Protocol, runtime_checkable  # type: ignore
-
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
@@ -44,7 +45,7 @@ from .highlighter import NullHighlighter, ReprHighlighter
 from .markup import render as render_markup
 from .measure import Measurement, measure_renderables
 from .pager import Pager, SystemPager
-from .pretty import is_expandable, Pretty
+from .pretty import Pretty, is_expandable
 from .region import Region
 from .scope import render_scope
 from .screen import Screen
@@ -294,7 +295,12 @@ class Capture:
         self._console.begin_capture()
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         self._result = self._console.end_capture()
 
     def get(self) -> str:
@@ -318,7 +324,12 @@ class ThemeContext:
         self.console.push_theme(self.theme)
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         self.console.pop_theme()
 
 
@@ -341,7 +352,12 @@ class PagerContext:
         self._console._enter_buffer()
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         if exc_type is None:
             with self._console._lock:
                 buffer: List[Segment] = self._console._buffer[:]
@@ -391,7 +407,12 @@ class ScreenContext:
             self.console.show_cursor(False)
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         if self._changed:
             self.console.set_alt_screen(False)
             if self.hide_cursor:
