@@ -19,10 +19,7 @@ try:
     from ctypes import wintypes
     from ctypes import LibraryLoader
 
-    if sys.platform == "win32":
-        windll = LibraryLoader(ctypes.WinDLL)
-    else:
-        windll: Any = None
+    windll = LibraryLoader(ctypes.WinDLL)  # type: ignore # expected to only work on windows
 except (AttributeError, ImportError, ValueError):
 
     # Fallback if we can't load the Windows DLL
@@ -56,11 +53,10 @@ else:
         result = _GetConsoleMode(handle, console_mode)
         vt = bool(result and console_mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING)
         truecolor = False
-        if sys.platform == "win32" and vt:
-            win_version = sys.getwindowsversion()
-            truecolor = win_version.major > 10 or (
-                win_version.major == 10 and win_version.build >= 15063
-            )
+        win_version = sys.getwindowsversion()  # type: ignore # expected to only work on windows
+        truecolor = win_version.major > 10 or (
+            win_version.major == 10 and win_version.build >= 15063
+        )
         features = WindowsConsoleFeatures(vt=vt, truecolor=truecolor)
         return features
 
