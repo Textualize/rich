@@ -108,7 +108,7 @@ class Paragraph(TextElement):
     justify: JustifyMethod
 
     @classmethod
-    def create(cls, markdown: "Markdown", node: Any) -> "Paragraph":
+    def create(cls, markdown: "Markdown", node: MarkdownElement) -> "Paragraph":
         return cls(justify=markdown.justify or "left")
 
     def __init__(self, justify: JustifyMethod) -> None:

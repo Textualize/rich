@@ -47,7 +47,7 @@ def install(
     word_wrap: bool = False,
     show_locals: bool = False,
     indent_guides: bool = True,
-) -> Callable[..., Any]:
+) -> Callable[[Type[BaseException], BaseException, Optional[TracebackType]], Any]:
     """Install a rich traceback handler.
 
     Once installed, any tracebacks will be printed with syntax highlighting and rich formatting.
@@ -133,12 +133,12 @@ def install(
         # if wihin ipython, use customized traceback
         ip = get_ipython()  # type: ignore
         ipy_excepthook_closure(ip)
-        return sys.excepthook
+        return sys.excepthook  # type: ignore # more strict signature that mypy cant interpret
     except Exception:
         # otherwise use default system hook
         old_excepthook = sys.excepthook
         sys.excepthook = excepthook
-        return old_excepthook
+        return old_excepthook  # type: ignore # more strict signature that mypy cant interpret
 
 
 @dataclass

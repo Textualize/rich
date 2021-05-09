@@ -157,7 +157,9 @@ class Control:
             yield self.segment
 
 
-def strip_control_codes(text: str, _translate_table: Any = _CONTROL_TRANSLATE) -> str:
+def strip_control_codes(
+    text: str, _translate_table: Dict[int, None] = _CONTROL_TRANSLATE
+) -> str:
     """Remove control codes from text.
 
     Args:
