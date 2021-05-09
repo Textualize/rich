@@ -133,8 +133,8 @@ class Panel(JupyterMixin):
         child_width = (
             width - 2
             if self.expand
-            else Measurement.get(
-                console, options.update_width(width - 2), renderable
+            else console.measure(
+                renderable, options=options.update_width(width - 2)
             ).maximum
         )
         child_height = self.height or options.height or None

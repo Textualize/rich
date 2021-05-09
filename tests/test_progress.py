@@ -88,9 +88,22 @@ def test_renderable_column():
 
 
 def test_spinner_column():
+    time = 1.0
+
+    def get_time():
+        nonlocal time
+        return time
+
     column = SpinnerColumn()
     column.set_spinner("dots2")
-    task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
+    task = Task(1, "test", 100, 20, _get_time=get_time)
+    result = column.render(task)
+    print(repr(result))
+    expected = "⣾"
+    assert str(result) == expected
+
+    time += 1.0
+    column.spinner.update(speed=0.5)
     result = column.render(task)
     print(repr(result))
     expected = "⡿"

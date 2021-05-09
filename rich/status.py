@@ -5,7 +5,6 @@ from .jupyter import JupyterMixin
 from .live import Live
 from .spinner import Spinner
 from .style import StyleType
-from .table import Table
 
 
 class Status(JupyterMixin):
@@ -31,26 +30,19 @@ class Status(JupyterMixin):
         refresh_per_second: float = 12.5,
     ):
         self.status = status
-        self.spinner = spinner
         self.spinner_style = spinner_style
         self.speed = speed
-        self._spinner = Spinner(spinner, style=spinner_style, speed=speed)
+        self._spinner = Spinner(spinner, text=status, style=spinner_style, speed=speed)
         self._live = Live(
             self.renderable,
             console=console,
             refresh_per_second=refresh_per_second,
             transient=True,
         )
-        self.update(
-            status=status, spinner=spinner, spinner_style=spinner_style, speed=speed
-        )
 
     @property
-    def renderable(self) -> Table:
-        """Get the renderable for the status (a table with spinner and status)."""
-        table = Table.grid(padding=1)
-        table.add_row(self._spinner, self.status)
-        return table
+    def renderable(self) -> Spinner:
+        return self._spinner
 
     @property
     def console(self) -> "Console":
@@ -75,16 +67,19 @@ class Status(JupyterMixin):
         """
         if status is not None:
             self.status = status
-        if spinner is not None:
-            self.spinner = spinner
         if spinner_style is not None:
             self.spinner_style = spinner_style
         if speed is not None:
             self.speed = speed
-        self._spinner = Spinner(
-            self.spinner, style=self.spinner_style, speed=self.speed
-        )
-        self._live.update(self.renderable, refresh=True)
+        if spinner is not None:
+            self._spinner = Spinner(
+                spinner, text=self.status, style=self.spinner_style, speed=self.speed
+            )
+            self._live.update(self.renderable, refresh=True)
+        else:
+            self._spinner.update(
+                text=self.status, style=self.spinner_style, speed=self.speed
+            )
 
     def start(self) -> None:
         """Start the status animation."""

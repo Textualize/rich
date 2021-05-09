@@ -1094,6 +1094,23 @@ class Console:
         """
         return ScreenContext(self, hide_cursor=hide_cursor, style=style or "")
 
+    def measure(
+        self, renderable: RenderableType, *, options: Optional[ConsoleOptions] = None
+    ) -> Measurement:
+        """Measure a renderable. Returns a :class:`~rich.measure.Measurement` object which contains
+        information regarding the number of characters required to print the renderable.
+
+        Args:
+            renderable (RenderableType): Any renderable or string.
+            options (Optional[ConsoleOptions], optional): Options to use when measuring, or None
+                to use default options. Defaults to None.
+
+        Returns:
+            Measurement: A measurement of the renderable.
+        """
+        measurement = Measurement.get(self, options or self.options, renderable)
+        return measurement
+
     def render(
         self, renderable: RenderableType, options: Optional[ConsoleOptions] = None
     ) -> Iterable[Segment]:

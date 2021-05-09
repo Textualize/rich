@@ -5,11 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [10.1.1] - Unreleased
+## [10.2.0] - Unreleased
 
 ### Added
 
-- Added syntax for call, i.e. "Foo(bar)" will highlight Foo.pyth
+- Added syntax for call, i.e. "Foo(bar)"
+- Fixed initial blank lines removed from Syntax https://github.com/willmcgugan/rich/issues/1214
+- Added Console.measure as a convenient alias for Measurement.get
+- Added support for pretty printing attrs objects
 
 ## [10.1.0] - 2020-04-03
 
@@ -35,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved layout.tree
 - Changed default theme color for repr.number to cyan
 - `__rich_measure__` signature changed to accept ConsoleOptions rather than max_width
+- `text` parameter to rich.spinner.Spinner changed to RenderableType
 
 ### Added
 
@@ -54,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed incorrect measurement of Text with new lines and whitespace https://github.com/willmcgugan/rich/issues/1133
 - Made type annotations consistent for various `total` keyword arguments in `rich.progress` and rich.`progress_bar`
 - Disabled Progress no longer displays itself when starting https://github.com/willmcgugan/rich/pull/1125
+- Animations no longer reset when updating rich.status.Status
 
 ## [9.13.0] - 2021-03-06
 
