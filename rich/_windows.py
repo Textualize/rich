@@ -53,10 +53,11 @@ else:
         result = _GetConsoleMode(handle, console_mode)
         vt = bool(result and console_mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING)
         truecolor = False
-        win_version = sys.getwindowsversion()  # type: ignore # expected to only work on windows
-        truecolor = win_version.major > 10 or (
-            win_version.major == 10 and win_version.build >= 15063
-        )
+        if vt:
+            win_version = sys.getwindowsversion()  # type: ignore # expected to only work on windows
+            truecolor = win_version.major > 10 or (
+                win_version.major == 10 and win_version.build >= 15063
+            )
         features = WindowsConsoleFeatures(vt=vt, truecolor=truecolor)
         return features
 
