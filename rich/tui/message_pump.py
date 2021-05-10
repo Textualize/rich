@@ -87,7 +87,7 @@ class MessagePump:
         finally:
             self._done_event.set()
 
-    async def dispatch_messageage(self, message: Message) -> None:
+    async def dispatch_message(self, message: Message) -> None:
         if isinstance(message, events.Event):
             dispatch_function = getattr(self, f"on_{message.name}", None)
             if dispatch_function is not None:
