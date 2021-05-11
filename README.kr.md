@@ -404,14 +404,12 @@ OSX에서는 이렇게 출력됩니다 (리눅스도 유사함):
 
 </details>
 
-All Rich renderables make use of the [Console Protocol](https://rich.readthedocs.io/en/latest/protocol.html), which you can also use to implement your own Rich content.  
 모든 Rich로 표현 가능한 것들은 [Console Protocol](https://rich.readthedocs.io/en/latest/protocol.html)를 사용합니다. 이것을 사용해서 자신의 Rich 컨텐츠를 렌더링할 수도 있습니다.
 
 # 엔터프라이즈를 위한 Rich
 
 Tidelift 구독의 일환으로 가능합니다.
 
-The maintainers of Rich and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source packages you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact packages you use. [Learn more.](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)  
 Rich를 포함한 수천가지 다른 패키지들의 메인테이너들은 당신이 앱을 만들기 위해 사용하는 오픈소스 패키지의 상업적인 지원과 유지보수를 위해 Tidelift와 함께 일하고 있습니다. 당신이 사용하는 패키지의 메인테이너에게 비용을 지불하는 대신 시간을 절약하고, 리스크를 줄이고, 코드의 품질을 향상시킬 수 있습니다. [더 자세한 정보는 여기를 참고바랍니다.](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)  
 
 # Rich를 사용하는 프로젝트들
