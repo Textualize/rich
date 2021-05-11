@@ -6,7 +6,7 @@
 
 ![Logo](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
 
-[中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md) • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md) • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md) • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md) • [日本語 readme ](https://github.com/willmcgugan/rich/blob/master/README.ja.md)• [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md)
+[中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md) • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md) • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md) • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md) • [日本語 readme ](https://github.com/willmcgugan/rich/blob/master/README.ja.md) • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md)
 
 Rich는 터미널에서 _풍부한(rich)_ 텍스트와 아름다운 서식을 지원하기 위한 파이썬 라이브러리입니다.
 
@@ -419,29 +419,31 @@ Rich를 포함한 수천가지 다른 패키지들의 메인테이너들은 당�
 Rich를 사용하는 몇가지 프로젝트들입니다:
 
 - [BrancoLab/BrainRender](https://github.com/BrancoLab/BrainRender)
-  a python package for the visualization of three dimensional neuro-anatomical data
+  신경해부학 데이터의 3차원 시각화를 위한 파이썬 패키지
 - [Ciphey/Ciphey](https://github.com/Ciphey/Ciphey)
-  Automated decryption tool
+  자동 암호해독 툴
 - [emeryberger/scalene](https://github.com/emeryberger/scalene)
-  a high-performance, high-precision CPU and memory profiler for Python
+  파이썬을 위한 고성능, 높은 정밀도의 CPU / Memory 프로파일러
 - [hedythedev/StarCli](https://github.com/hedythedev/starcli)
-  Browse GitHub trending projects from your command line
+  당신의 커맨드라인에서 GitHub 트렌딩 프로젝트들을 검색해보세요
 - [intel/cve-bin-tool](https://github.com/intel/cve-bin-tool)
-  This tool scans for a number of common, vulnerable components (openssl, libpng, libxml2, expat and a few others) to let you know if your system includes common libraries with known vulnerabilities.
+  이 툴은 여러 공통적이고 취약한 컴포넨트들(openssl, libpng, libxml2, expat 과 몇가지 더)을 스캔해, 이미 알려진 취약점을 가진 일반 라이브러리가 당신의 시스템에 있는지 알려줍니다.
 - [nf-core/tools](https://github.com/nf-core/tools)
-  Python package with helper tools for the nf-core community.
+  nf-core 커뮤니티를 위한 도우미 도구를 포함한 파이썬 패키지.
 - [cansarigol/pdbr](https://github.com/cansarigol/pdbr)
-  pdb + Rich library for enhanced debugging
+  개선된 디버깅을 위한 pdb + Rich 라이브러리
 - [plant99/felicette](https://github.com/plant99/felicette)
-  Satellite imagery for dummies.
+  더미 위성 이미지
 - [seleniumbase/SeleniumBase](https://github.com/seleniumbase/SeleniumBase)
-  Automate & test 10x faster with Selenium & pytest. Batteries included.
+  Selenium & pytest로 10배 더 빠르게 자동화 & 테스트하세요. 배터리도 포함되어 있습니다.
 - [smacke/ffsubsync](https://github.com/smacke/ffsubsync)
-  Automagically synchronize subtitles with video.
+  자동으로 자막과 영상의 싱크를 맞추세요.
 - [tryolabs/norfair](https://github.com/tryolabs/norfair)
-  Lightweight Python library for adding real-time 2D object tracking to any detector.
-- [ansible/ansible-lint](https://github.com/ansible/ansible-lint) Ansible-lint checks playbooks for practices and behaviour that could potentially be improved
-- [ansible-community/molecule](https://github.com/ansible-community/molecule) Ansible Molecule testing framework
+  모든 탐지된 것에 실시간으로 2D 오브젝트 트래킹을 추가하는 경량화된 파이썬 라이브러리.
+- [ansible/ansible-lint](https://github.com/ansible/ansible-lint) 
+  Ansible-lint가 playbooks를 확인해 잠재적으로 개선될 수 있는 practices나 동작을 확인합니다.
+- [ansible-community/molecule](https://github.com/ansible-community/molecule)
+  Ansible Molecule의 테스트 프레임워크
 - +[Many more](https://github.com/willmcgugan/rich/network/dependents)!
 
 <!-- This is a test, no need to translate -->
