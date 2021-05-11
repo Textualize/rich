@@ -394,7 +394,7 @@ console.print(syntax)
 </details>
 
 <details>
-<summary>Tracebacks(</summary>
+<summary>Tracebacks</summary>
   
 Rich는 [예쁜 tracebacks](https://rich.readthedocs.io/en/latest/traceback.html)을 표현할 수 있습니다. 이것은 읽기도 더 쉽고 일반적인 파이썬 tracebacks 보다 더 많은 코드를 보여줍니다. uncaught exceptions가 Rich로 출력되도록 Rich를 기본 Traceback 핸들러로 설정할 수도 있습니다. 
 
