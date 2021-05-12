@@ -41,18 +41,13 @@ if __name__ == "__main__":
     )
 
     from rich.console import Console
+    from rich.pretty import Pretty
+    from rich.table import Column, Table
+    from rich.text import Text
 
     console = Console()
 
-    console.print(
-        "\nRich can pretty print [b]attrs[/b] objects ( https://www.attrs.org/en/stable/ )\n",
-        justify="center",
-    )
+    table = Table("attrs *with* Rich", Column(Text.from_markup("attrs *without* Rich")))
 
-    console.rule("attrs without Rich")
-
-    print(model)
-
-    console.rule("attrs with Rich")
-
-    console.print(model)
+    table.add_row(Pretty(model), repr(model))
+    console.print(table)
