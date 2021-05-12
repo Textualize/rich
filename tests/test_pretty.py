@@ -1,5 +1,5 @@
 from array import array
-from collections import defaultdict
+from collections import defaultdict, UserDict, UserList
 from dataclasses import dataclass, field
 import io
 import sys
@@ -229,3 +229,21 @@ def test_attrs_broken():
     print(repr(result))
     expected = "Foo(bar=AttributeError('bar'))"
     assert result == expected
+
+
+def test_user_dict():
+    class D1(UserDict):
+        pass
+
+    class D2(UserDict):
+        def __repr__(self):
+            return "FOO"
+
+    d1 = D1({"foo": "bar"})
+    d2 = D2({"foo": "bar"})
+    result = pretty_repr(d1, expand_all=True)
+    print(repr(result))
+    assert result == "{\n    'foo': 'bar'\n}"
+    result = pretty_repr(d2, expand_all=True)
+    print(repr(result))
+    assert result == "FOO"

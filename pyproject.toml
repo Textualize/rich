@@ -41,7 +41,7 @@ pytest = "^6.2.3"
 black = "^20.8b1"
 mypy = "^0.812"
 pytest-cov = "^2.11.1"
-attrs = "^20.1.0"
+attrs = "^21.2.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
