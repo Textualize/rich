@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 from math import ceil
 from threading import Event, RLock, Thread
+from types import TracebackType
 from typing import (
     Any,
     Callable,
@@ -18,19 +19,15 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    Type,
     TypeVar,
     Union,
 )
 
 from . import filesize, get_console
-from .console import (
-    Console,
-    JustifyMethod,
-    RenderableType,
-    RenderGroup,
-)
-from .jupyter import JupyterMixin
+from .console import Console, JustifyMethod, RenderableType, RenderGroup
 from .highlighter import Highlighter
+from .jupyter import JupyterMixin
 from .live import Live
 from .progress_bar import ProgressBar
 from .spinner import Spinner
@@ -75,16 +72,21 @@ class _TrackThread(Thread):
         self.start()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         self.done.set()
         self.join()
 
 
 def track(
     sequence: Union[Sequence[ProgressType], Iterable[ProgressType]],
-    description="Working...",
+    description: str = "Working...",
     total: Optional[float] = None,
-    auto_refresh=True,
+    auto_refresh: bool = True,
     console: Optional[Console] = None,
     transient: bool = False,
     get_time: Optional[Callable[[], float]] = None,
@@ -171,7 +173,7 @@ class ProgressColumn(ABC):
         Returns:
             RenderableType: Anything renderable (including str).
         """
-        current_time = task.get_time()  # type: ignore
+        current_time = task.get_time()
         if self.max_refresh is not None and not task.completed:
             try:
                 timestamp, renderable = self._renderable_cache[task.id]
@@ -238,7 +240,7 @@ class SpinnerColumn(ProgressColumn):
         spinner_name: str,
         spinner_style: Optional[StyleType] = "progress.spinner",
         speed: float = 1.0,
-    ):
+    ) -> None:
         """Set a new spinner.
 
         Args:
@@ -584,7 +586,7 @@ class Progress(JupyterMixin):
         expand: bool = False,
     ) -> None:
         assert (
-            refresh_per_second is None or refresh_per_second > 0  # type: ignore
+            refresh_per_second is None or refresh_per_second > 0
         ), "refresh_per_second must be > 0"
         self._lock = RLock()
         self.columns = columns or (
@@ -649,7 +651,12 @@ class Progress(JupyterMixin):
         self.start()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         self.stop()
 
     def track(
@@ -657,7 +664,7 @@ class Progress(JupyterMixin):
         sequence: Union[Iterable[ProgressType], Sequence[ProgressType]],
         total: Optional[float] = None,
         task_id: Optional[TaskID] = None,
-        description="Working...",
+        description: str = "Working...",
         update_period: float = 0.1,
     ) -> Iterable[ProgressType]:
         """Track progress by iterating over a sequence.

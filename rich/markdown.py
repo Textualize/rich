@@ -5,11 +5,12 @@ from commonmark.blocks import Parser
 from . import box
 from ._loop import loop_first
 from ._stack import Stack
-from .console import Console, ConsoleOptions, JustifyMethod, RenderResult, Segment
+from .console import Console, ConsoleOptions, JustifyMethod, RenderResult
 from .containers import Renderables
 from .jupyter import JupyterMixin
 from .panel import Panel
 from .rule import Rule
+from .segment import Segment
 from .style import Style, StyleStack
 from .syntax import Syntax
 from .text import Text, TextType
@@ -32,7 +33,7 @@ class MarkdownElement:
         """
         return cls()
 
-    def on_enter(self, context: "MarkdownContext"):
+    def on_enter(self, context: "MarkdownContext") -> None:
         """Called when the node is entered.
 
         Args:
@@ -107,7 +108,7 @@ class Paragraph(TextElement):
     justify: JustifyMethod
 
     @classmethod
-    def create(cls, markdown: "Markdown", node) -> "Paragraph":
+    def create(cls, markdown: "Markdown", node: MarkdownElement) -> "Paragraph":
         return cls(justify=markdown.justify or "left")
 
     def __init__(self, justify: JustifyMethod) -> None:
@@ -429,7 +430,7 @@ class Markdown(JupyterMixin):
         parser = Parser()
         self.parsed = parser.parse(markup)
         self.code_theme = code_theme
-        self.justify = justify
+        self.justify: Optional[JustifyMethod] = justify
         self.style = style
         self.hyperlinks = hyperlinks
         self.inline_code_lexer = inline_code_lexer

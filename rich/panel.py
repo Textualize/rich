@@ -77,7 +77,7 @@ class Panel(JupyterMixin):
         border_style: StyleType = "none",
         width: Optional[int] = None,
         padding: PaddingDimensions = (0, 1),
-    ):
+    ) -> "Panel":
         """An alternative constructor that sets expand=False."""
         return cls(
             renderable,
@@ -123,7 +123,7 @@ class Panel(JupyterMixin):
             else min(options.max_width, self.width)
         )
 
-        safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box  # type: ignore
+        safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box
         box = self.box.substitute(options, safe=safe_box)
 
         title_text = self._title

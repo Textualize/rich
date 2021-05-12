@@ -10,7 +10,7 @@ RichReprResult = Iterable[Union[Any, Tuple[Any], Tuple[str, Any], Tuple[str, Any
 def rich_repr(cls: Type[T]) -> Type[T]:
     """Class decorator to create __repr__ from __rich_repr__"""
 
-    def auto_repr(self) -> str:
+    def auto_repr(self: Any) -> str:
         repr_str: List[str] = []
         append = repr_str.append
         for arg in self.__rich_repr__():

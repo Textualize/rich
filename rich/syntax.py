@@ -1,8 +1,9 @@
 import os.path
 import platform
+from rich.containers import Lines
 import textwrap
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Iterable, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
 
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
 from pygments.style import Style as PygmentsStyle
@@ -23,9 +24,10 @@ from pygments.util import ClassNotFound
 
 from ._loop import loop_first
 from .color import Color, blend_rgb
-from .console import Console, ConsoleOptions, JustifyMethod, RenderResult, Segment
+from .console import Console, ConsoleOptions, JustifyMethod, RenderResult
 from .jupyter import JupyterMixin
 from .measure import Measurement
+from .segment import Segment
 from .style import Style
 from .text import Text
 
@@ -539,7 +541,7 @@ class Syntax(JupyterMixin):
                     yield from syntax_line
             return
 
-        lines = text.split("\n", allow_blank=ends_on_nl)
+        lines: Union[List[Text], Lines] = text.split("\n", allow_blank=ends_on_nl)
         if self.line_range:
             lines = lines[line_offset:end_line]
 

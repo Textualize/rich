@@ -1,10 +1,18 @@
 import colorsys
 import io
 from time import process_time
+from typing import Any
 
 from rich import box
 from rich.color import Color
-from rich.console import Console, ConsoleOptions, RenderGroup, RenderResult
+from rich.console import (
+    Console,
+    ConsoleOptions,
+    ConsoleRenderable,
+    RenderGroup,
+    RenderResult,
+    RenderableType,
+)
 from rich.markdown import Markdown
 from rich.measure import Measurement
 from rich.pretty import Pretty
@@ -88,7 +96,7 @@ def make_test_card() -> Table:
         ),
     )
 
-    def comparison(renderable1, renderable2) -> Table:
+    def comparison(renderable1: RenderableType, renderable2: RenderableType) -> Table:
         table = Table(show_header=False, pad_edge=False, box=None, expand=True)
         table.add_column("1", ratio=1)
         table.add_column("2", ratio=1)

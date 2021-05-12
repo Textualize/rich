@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 def render_scope(
-    scope: Mapping,
+    scope: "Mapping[str, Any]",
     *,
     title: Optional[TextType] = None,
     sort_keys: bool = True,

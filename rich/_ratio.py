@@ -1,11 +1,12 @@
+import sys
 from fractions import Fraction
 from math import ceil, floor, modf
 from typing import cast, List, Optional, Sequence
 
-try:
+if sys.version_info >= (3, 8):
     from typing import Protocol
-except ImportError:  # pragma: no cover
-    from typing_extensions import Protocol  # type: ignore
+else:
+    from typing_extensions import Protocol
 
 
 class Edge(Protocol):
@@ -145,7 +146,7 @@ def ratio_distribute(
     return distributed_total
 
 
-if __name__ == "__main__":  # type: ignore
+if __name__ == "__main__":
     from dataclasses import dataclass
 
     @dataclass

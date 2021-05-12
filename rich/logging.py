@@ -247,7 +247,7 @@ if __name__ == "__main__":  # pragma: no cover
     log.info("POST /admin/ 401 42234")
     log.warning("password was rejected for admin site.")
 
-    def divide():
+    def divide() -> None:
         number = 1
         divisor = 0
         foos = ["foo"] * 100

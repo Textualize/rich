@@ -6,7 +6,7 @@ from collections import Counter, defaultdict, deque, UserDict, UserList
 from dataclasses import dataclass, fields, is_dataclass
 from itertools import islice
 from typing import (
-    Mapping,
+    DefaultDict,
     TYPE_CHECKING,
     Any,
     Callable,
@@ -31,7 +31,7 @@ def _is_attr_object(obj: Any) -> bool:
     return _attr_module is not None and _attr_module.has(type(obj))
 
 
-def _get_attr_fields(obj: Any) -> Iterable["_attr_module.Attribute"]:
+def _get_attr_fields(obj: Any) -> Iterable["_attr_module.Attribute[Any]"]:
     """Get fields for an attrs object."""
     return _attr_module.fields(type(obj)) if _attr_module is not None else []
 
@@ -247,7 +247,7 @@ class Pretty(JupyterMixin):
         return Measurement(text_width, text_width)
 
 
-def _get_braces_for_defaultdict(_object: defaultdict) -> Tuple[str, str, str]:
+def _get_braces_for_defaultdict(_object: DefaultDict[Any, Any]) -> Tuple[str, str, str]:
     return (
         f"defaultdict({_object.default_factory!r}, {{",
         "})",
@@ -255,7 +255,7 @@ def _get_braces_for_defaultdict(_object: defaultdict) -> Tuple[str, str, str]:
     )
 
 
-def _get_braces_for_array(_object: array) -> Tuple[str, str, str]:
+def _get_braces_for_array(_object: "array[Any]") -> Tuple[str, str, str]:
     return (f"array({_object.typecode!r}, [", "])", "array({_object.typecode!r})")
 
 
@@ -476,7 +476,7 @@ def traverse(
         py_version = (sys.version_info.major, sys.version_info.minor)
         children: List[Node]
 
-        def iter_rich_args(rich_args) -> Iterable[Union[Any, Tuple[str, Any]]]:
+        def iter_rich_args(rich_args: Any) -> Iterable[Union[Any, Tuple[str, Any]]]:
             for arg in rich_args:
                 if isinstance(arg, tuple):
                     if len(arg) == 3:
@@ -729,8 +729,9 @@ def pprint(
 if __name__ == "__main__":  # pragma: no cover
 
     class BrokenRepr:
-        def __repr__(self):
+        def __repr__(self) -> str:
             1 / 0
+            return "this will fail"
 
     d = defaultdict(int)
     d["foo"] = 5

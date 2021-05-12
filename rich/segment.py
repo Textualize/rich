@@ -118,7 +118,7 @@ class Segment(NamedTuple):
 
     @classmethod
     def filter_control(
-        cls, segments: Iterable["Segment"], is_control=False
+        cls, segments: Iterable["Segment"], is_control: bool = False
     ) -> Iterable["Segment"]:
         """Filter segments by ``is_control`` attribute.
 

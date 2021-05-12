@@ -1,10 +1,11 @@
+import sys
 from itertools import chain
-from typing import Iterable, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable, Optional
 
-try:
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
     from typing_extensions import Literal
-except ImportError:  # pragma: no cover
-    from typing import Literal  # type: ignore
 
 from .constrain import Constrain
 from .jupyter import JupyterMixin
@@ -12,9 +13,8 @@ from .measure import Measurement
 from .segment import Segment
 from .style import StyleType
 
-
 if TYPE_CHECKING:
-    from .console import Console, ConsoleOptions, RenderResult, RenderableType
+    from .console import Console, ConsoleOptions, RenderableType, RenderResult
 
 AlignMethod = Literal["left", "center", "right"]
 VerticalAlignMethod = Literal["top", "middle", "bottom"]
@@ -196,7 +196,7 @@ class Align(JupyterMixin):
             else Segment("\n")
         )
 
-        def blank_lines(count) -> Iterable[Segment]:
+        def blank_lines(count: int) -> Iterable[Segment]:
             if count > 0:
                 for _ in range(count):
                     yield blank_line
@@ -268,7 +268,7 @@ class VerticalCenter(JupyterMixin):
         bottom_space = height - top_space - len(lines)
         blank_line = Segment(f"{' ' * width}", style)
 
-        def blank_lines(count) -> Iterable[Segment]:
+        def blank_lines(count: int) -> Iterable[Segment]:
             for _ in range(count):
                 yield blank_line
                 yield new_line

@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Iterable, List, TYPE_CHECKING, Union
+from typing import Any, Callable, Dict, Iterable, List, TYPE_CHECKING, Union
 
 from .segment import ControlCode, ControlType, Segment
 
@@ -14,7 +14,7 @@ STRIP_CONTROL_CODES = [
 _CONTROL_TRANSLATE = {_codepoint: None for _codepoint in STRIP_CONTROL_CODES}
 
 
-CONTROL_CODES_FORMAT: Dict[int, Callable] = {
+CONTROL_CODES_FORMAT: Dict[int, Callable[..., str]] = {
     ControlType.BELL: lambda: "\x07",
     ControlType.CARRIAGE_RETURN: lambda: "\r",
     ControlType.HOME: lambda: "\x1b[H",
@@ -157,7 +157,9 @@ class Control:
             yield self.segment
 
 
-def strip_control_codes(text: str, _translate_table=_CONTROL_TRANSLATE) -> str:
+def strip_control_codes(
+    text: str, _translate_table: Dict[int, None] = _CONTROL_TRANSLATE
+) -> str:
     """Remove control codes from text.
 
     Args:
