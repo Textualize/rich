@@ -2,10 +2,11 @@ import builtins
 import os
 import sys
 from array import array
-from collections import Counter, defaultdict, deque
+from collections import Counter, defaultdict, deque, UserDict, UserList
 from dataclasses import dataclass, fields, is_dataclass
 from itertools import islice
 from typing import (
+    Mapping,
     TYPE_CHECKING,
     Any,
     Callable,
@@ -17,6 +18,7 @@ from typing import (
     Union,
     Tuple,
 )
+from types import MappingProxyType
 
 try:
     import attr as _attr_module
@@ -264,13 +266,16 @@ _BRACES: Dict[type, Callable[[Any], Tuple[str, str, str]]] = {
     Counter: lambda _object: ("Counter({", "})", "Counter()"),
     deque: lambda _object: ("deque([", "])", "deque()"),
     dict: lambda _object: ("{", "}", "{}"),
+    UserDict: lambda _object: ("{", "}", "{}"),
     frozenset: lambda _object: ("frozenset({", "})", "frozenset()"),
     list: lambda _object: ("[", "]", "[]"),
+    UserList: lambda _object: ("[", "]", "[]"),
     set: lambda _object: ("{", "}", "set()"),
     tuple: lambda _object: ("(", ")", "()"),
+    MappingProxyType: lambda _object: ("mappingproxy({", "})", "mappingproxy({})"),
 }
 _CONTAINERS = tuple(_BRACES.keys())
-_MAPPING_CONTAINERS = (dict, os._Environ)
+_MAPPING_CONTAINERS = (dict, os._Environ, MappingProxyType, UserDict)
 
 
 def is_expandable(obj: Any) -> bool:
@@ -592,7 +597,12 @@ def traverse(
 
             pop_visited(obj_id)
 
-        elif obj_type in _CONTAINERS:
+        elif isinstance(obj, _CONTAINERS):
+            for container_type in _CONTAINERS:
+                if isinstance(obj, container_type):
+                    obj_type = container_type
+                    break
+
             obj_id = id(obj)
             if obj_id in visited_ids:
                 # Recursion detected
@@ -601,7 +611,9 @@ def traverse(
 
             open_brace, close_brace, empty = _BRACES[obj_type](obj)
 
-            if obj:
+            if obj_type.__repr__ != type(obj).__repr__:
+                node = Node(value_repr=to_repr(obj), last=root)
+            elif obj:
                 children = []
                 node = Node(
                     open_brace=open_brace,

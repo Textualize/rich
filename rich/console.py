@@ -527,7 +527,7 @@ def detect_legacy_windows() -> bool:
 if detect_legacy_windows():  # pragma: no cover
     from colorama import init
 
-    init()
+    init(strip=False)
 
 
 class Console:
