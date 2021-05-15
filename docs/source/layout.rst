@@ -26,7 +26,7 @@ This will draw a box the size of the terminal with some information regarding th
     )    
     print(layout)
 
-This will divide the terminal screen in to two equal sized portions, one on top of the other. The ``name`` attribute is an internal identifier we can use to look up the sub-layout later. Let's use that to create another split, this time we will call :meth:`~rich.layout.Layout.split_row` to split the lower layout in to a row of two sub-layouts.
+This will divide the terminal screen in to two equal sized portions, one on top of the other. The ``name`` attribute is an internal identifier we can use to look up the sub-layout later. Let's use that to create another split, this time we will call :meth:`~rich.layout.Layout.split_row` to split the lower layout in to a row of two sub-layouts::
 
     layout["lower"].split_row(
         Layout(name="left"),
