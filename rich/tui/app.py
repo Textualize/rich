@@ -1,96 +1,59 @@
 import asyncio
-from contextlib import contextmanager
-from dis import dis
+from contextvars import ContextVar
 import logging
 import signal
-from typing import AsyncGenerator, ClassVar, Dict, Iterable, List, Optional
+from typing import AsyncGenerator, ClassVar, Optional
 
-from .events import Event, KeyEvent, ShutdownRequestEvent
+from . import events
 from .. import get_console
 from ..console import Console
 from .driver import Driver, CursesDriver
-from .events import EventBus
+from .message_pump import MessagePump
 from .types import Callback
-from .widget import Widget
 
 
 log = logging.getLogger("rich")
 
 
-# def signal_handler(sig, frame):
-#     print("You pressed Ctrl+C!")
-#     App.on_keyboard_interupt()
+active_app: ContextVar["App"] = ContextVar("active_app")
 
 
-# signal.signal(signal.SIGINT, signal_handler)
-
-
-class App:
-
-    _active_app: ClassVar[Optional["App"]] = None
-
+class App(MessagePump):
     def __init__(self, console: Console = None, screen: bool = True):
+        super().__init__()
         self.console = console or get_console()
         self._screen = screen
-        self._events: Optional[EventBus] = None
-        self._widget: Optional[Widget] = None
-
-    @property
-    def events(self) -> EventBus:
-        assert self._events is not None
-        return self._events
 
     @classmethod
-    def on_keyboard_interupt(cls) -> None:
-        if App._active_app is not None:
-            App._active_app.events.post_event(ShutdownRequestEvent())
+    def run(cls, console: Console = None, screen: bool = True):
+        async def run_app() -> None:
+            app = cls(console=console, screen=screen)
+            await app.process_messages()
 
-    def mount(self, widget: Widget) -> None:
-        Bus()
-        self._widget = widget
+        asyncio.run(run_app())
 
-    def mount(self, widget: Widget, parent: Optional[Widget] = None) -> None:
-        pass
-
-    async def __aiter__(self) -> AsyncGenerator[Event, None]:
+    def on_keyboard_interupt(self) -> None:
         loop = asyncio.get_event_loop()
-        self._events = EventBus()
-        driver = CursesDriver(self.console, self.events)
+        event = events.ShutdownRequest(sender=self)
+        asyncio.run_coroutine_threadsafe(self.post_message(event), loop=loop)
+
+    async def process_messages(self) -> None:
+        loop = asyncio.get_event_loop()
+        driver = CursesDriver(self.console, self)
         driver.start_application_mode()
         loop.add_signal_handler(signal.SIGINT, self.on_keyboard_interupt)
-        App._active_app = self
+        active_app.set(self)
+
         try:
-            while True:
-                event = await self.events.get()
-                if event is None:
-                    break
-                yield event
+            await super().process_messages()
+            log.debug("Message loop exited")
         finally:
-            App._active_app = None
             loop.remove_signal_handler(signal.SIGINT)
             driver.stop_application_mode()
 
-    def run(self) -> None:
-        asyncio.run(self._run())
-
-    async def _run(self) -> None:
-        async for event in self:
-            log.debug(event)
-            dispatch_function = getattr(self, f"on_{event.name}", None)
-            if dispatch_function is not None:
-                log.debug(await dispatch_function(event))
-            else:
-                log.debug("No handler for %r", event)
-
-    async def on_shutdown_request(self, event: ShutdownRequestEvent) -> None:
+    async def on_shutdown_request(self, event: events.ShutdownRequest) -> None:
         log.debug("%r shutting down", self)
-        self.events.close()
-
-    # def add_interval(self, delay: float, callback: Callback = None) -> IntervalID:
-    #     pass
-
-    # def add_timer(self, period: float, callback: Callback = None) -> TimerID:
-    #     pass
+        await self.close_messages()
 
 
 if __name__ == "__main__":
@@ -105,9 +68,9 @@ if __name__ == "__main__":
     )
 
     class MyApp(App):
-        async def on_key(self, event: KeyEvent) -> None:
-            if event.key == ord("q"):
-                raise ValueError()
+        async def on_key(self, event: events.Key) -> None:
+            log.debug("on_key %r", event)
+            if event.key == "q":
+                await self.close_messages()
 
-    app = MyApp()
-    app.run()
+    MyApp.run()

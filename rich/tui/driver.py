@@ -1,21 +1,25 @@
 from abc import ABC, abstractmethod
 import asyncio
+import logging
 import curses
-from functools import partial
 from threading import Event, Thread
 from typing import Optional, TYPE_CHECKING
 
-from .events import KeyEvent
+from . import events
+from .types import MessageTarget
 
 if TYPE_CHECKING:
-    from .events import EventBus
+
     from ..console import Console
 
 
+log = logging.getLogger("rich")
+
+
 class Driver(ABC):
-    def __init__(self, console: "Console", events: "EventBus") -> None:
+    def __init__(self, console: "Console", target: "MessageTarget") -> None:
         self.console = console
-        self.events = events
+        self._target = target
 
     @abstractmethod
     def start_application_mode(self):
@@ -27,8 +31,8 @@ class Driver(ABC):
 
 
 class CursesDriver(Driver):
-    def __init__(self, console: "Console", events: "EventBus") -> None:
-        super().__init__(console, events)
+    def __init__(self, console: "Console", target: "MessageTarget") -> None:
+        super().__init__(console, target)
         self._stdscr = None
         self._exit_event = Event()
 
@@ -62,6 +66,9 @@ class CursesDriver(Driver):
         while not exit_event.is_set():
             code = stdscr.getch()
             if code != -1:
-                loop.call_soon_threadsafe(
-                    partial(self.events.post, KeyEvent(code=code))
+                key_event = events.Key(sender=self._target, code=code)
+                log.debug("KEY=%r", key_event)
+                asyncio.run_coroutine_threadsafe(
+                    self._target.post_message(key_event),
+                    loop=loop,
                 )

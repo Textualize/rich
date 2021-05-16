@@ -5,7 +5,7 @@ from asyncio import Event, wait_for, TimeoutError
 import weakref
 
 from . import events
-from .types import Callback, EventTarget, MessageTarget
+from .types import MessageTarget
 
 
 TimerCallback = Callable[[events.Timer], None]
@@ -20,7 +20,7 @@ class Timer:
 
     def __init__(
         self,
-        event_target: EventTarget,
+        event_target: MessageTarget,
         interval: float,
         sender: MessageTarget,
         *,
@@ -42,7 +42,7 @@ class Timer:
         return f"Timer({self._target_repr}, {self._interval}, name={self.name!r}, repeat={self._repeat})"
 
     @property
-    def target(self) -> EventTarget:
+    def target(self) -> MessageTarget:
         target = self._target()
         if target is None:
             raise EventTargetGone()

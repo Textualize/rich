@@ -11,7 +11,8 @@ from .types import Callback, MessageTarget
 
 
 if TYPE_CHECKING:
-    from ._timer import Timer, TimerCallback
+    from ._timer import Timer as TimerClass
+    from ._timer import TimerCallback
 
 
 class EventType(Enum):
@@ -117,7 +118,7 @@ class Timer(Event, type=EventType.TIMER, priority=10):
     def __init__(
         self,
         sender: MessageTarget,
-        timer: "Timer",
+        timer: "TimerClass",
         count: int = 0,
         callback: Optional["TimerCallback"] = None,
     ) -> None:
