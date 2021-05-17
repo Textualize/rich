@@ -414,7 +414,6 @@ class Layout:
 
 if __name__ == "__main__":
     from rich.console import Console
-    from rich.panel import Panel
 
     console = Console()
     layout = Layout()
