@@ -40,21 +40,15 @@ class Event(Message):
     def __init__(self, sender: MessageTarget) -> None:
         super().__init__(sender)
         self.sender = sender
-        self.time = monotonic()
-        self._suppressed = False
 
     def __rich_repr__(self) -> RichReprResult:
         return
         yield
 
-    def __init_subclass__(cls, type: EventType, priority: int = 0) -> None:
-        super().__init_subclass__()
-        cls.type = type
-        cls.default_priority = priority
-
-    @property
-    def is_suppressed(self) -> bool:
-        return self._suppressed
+    def __init_subclass__(
+        cls, type: EventType, priority: int = 0, bubble: bool = False
+    ) -> None:
+        super().__init_subclass__(priority=priority, bubble=bubble)
 
     def __enter__(self) -> "Event":
         return self
@@ -63,9 +57,6 @@ class Event(Message):
         if exc_type is not None:
             # Log and suppress exception
             return True
-
-    def suppress(self, suppress: bool = True) -> None:
-        self._suppressed = suppress
 
 
 class ShutdownRequest(Event, type=EventType.SHUTDOWN_REQUEST):
@@ -97,7 +88,7 @@ class Refresh(Event, type=EventType.REFRESH):
 
 
 @rich_repr
-class Key(Event, type=EventType.KEY):
+class Key(Event, type=EventType.KEY, bubble=True):
     code: int = 0
 
     def __init__(self, sender: MessageTarget, code: int) -> None:

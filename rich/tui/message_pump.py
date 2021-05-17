@@ -1,4 +1,4 @@
-from typing import AsyncIterable, Optional, TYPE_CHECKING
+from typing import AsyncIterable, Optional, Tuple, TYPE_CHECKING
 from asyncio import ensure_future, Task, PriorityQueue
 from asyncio import Event as AIOEvent
 from dataclasses import dataclass
@@ -17,28 +17,34 @@ class MessageQueueItem:
     priority: int
 
 
+class MessagePumpClosed(Exception):
+    pass
+
+
 class MessagePump:
-    def __init__(self, queue_size: int = 10) -> None:
-        self._queue_size = queue_size
+    def __init__(
+        self, queue_size: int = 10, parent: Optional["MessagePump"] = None
+    ) -> None:
         self._message_queue: "PriorityQueue[Optional[MessageQueueItem]]" = (
             PriorityQueue(queue_size)
         )
+        self._parent = parent
         self._closing: bool = False
         self._closed: bool = False
 
-    async def get_message(self) -> Optional[Message]:
+    async def get_message(self) -> Tuple[Message, int]:
         """Get the next event on the queue, or None if queue is closed.
 
         Returns:
             Optional[Event]: Event object or None.
         """
         if self._closed:
-            return None
+            raise MessagePumpClosed("The message pump is closed")
         queue_item = await self._message_queue.get()
         if queue_item is None:
             self._closed = True
-            return None
-        return queue_item.message
+            raise MessagePumpClosed("The message pump is now closed")
+        return queue_item.message, queue_item.priority
 
     def set_timer(
         self,
@@ -47,7 +53,7 @@ class MessagePump:
         name: Optional[str] = None,
         callback: TimerCallback = None,
     ) -> Timer:
-        timer = Timer(self, delay, name=name, callback=callback, repeat=0)
+        timer = Timer(self, delay, self, name=name, callback=callback, repeat=0)
         asyncio.get_event_loop().create_task(timer.run())
         return timer
 
@@ -73,25 +79,24 @@ class MessagePump:
 
         while not self._closed:
             try:
-                message = await self.get_message()
-            except Exception as error:
+                message, priority = await self.get_message()
+            except MessagePumpClosed:
                 log.exception("error getting message")
-                raise
-            log.debug("message=%r", message)
-            if message is None:
                 break
-            await self.dispatch_message(message)
+            log.debug("message=%r", message)
+            await self.dispatch_message(message, priority)
 
-    async def dispatch_message(self, message: Message) -> None:
+    async def dispatch_message(self, message: Message, priority: int) -> Optional[bool]:
         if isinstance(message, events.Event):
             method_name = f"on_{message.name}"
-            log.debug("method=%s", method_name)
             dispatch_function = getattr(self, method_name, None)
-            log.debug("dispatch=%r", dispatch_function)
             if dispatch_function is not None:
                 await dispatch_function(message)
+            if message.bubble and self._parent:
+                await self._parent.post_message(message, priority=priority)
         else:
-            await self.on_message(message)
+            return await self.on_message(message)
+        return False
 
     async def on_message(self, message: Message) -> None:
         pass
