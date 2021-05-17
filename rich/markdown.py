@@ -441,6 +441,7 @@ class Markdown(JupyterMixin):
     ) -> RenderResult:
         """Render markdown to the console."""
         style = console.get_style(self.style, default="none")
+        options = options.update(height=None)
         context = MarkdownContext(
             console,
             options,
