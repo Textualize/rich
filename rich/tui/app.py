@@ -2,7 +2,8 @@ import asyncio
 from contextvars import ContextVar
 import logging
 import signal
-from typing import AsyncGenerator, ClassVar, Optional
+from typing import Any, Dict
+
 
 from . import events
 from .. import get_console
@@ -15,6 +16,9 @@ log = logging.getLogger("rich")
 
 
 active_app: ContextVar["App"] = ContextVar("active_app")
+
+
+LayoutDefinition = Dict[str, Any]
 
 
 class App(MessagePump):
@@ -50,6 +54,9 @@ class App(MessagePump):
         finally:
             loop.remove_signal_handler(signal.SIGINT)
             driver.stop_application_mode()
+
+    def set_layout(self, layout: LayoutDefinition) -> None:
+        pass
 
     async def on_startup(self, event: events.Startup) -> None:
         pass
@@ -98,26 +105,29 @@ if __name__ == "__main__":
     """
 
     class MyApp(App):
-        def get_layout(self) -> Layout:
-            return Layout.from_xml(
-                """
-                <column>
-                    <slot name="title" height="3"/>
-                    <row name="main">
-                        <slot name="left" ratio="1" visible="false"/>
-                        <slot name="right" ratio="2"/>
-                    </row>
-                    <slot name="footer" height="1"/>
-                </column> 
-            """
-            )
-            # layout = Layout()
-            # layout.split_column(Layout(name="title", height=3), Layout(name="body"))
-            # return layout
-
         async def on_key(self, event: events.Key) -> None:
             log.debug("on_key %r", event)
             if event.key == "q":
                 await self.close_messages()
+
+        async def on_startup(self) -> None:
+
+            self.set_layout(
+                {
+                    "split": "column",
+                    "children": [
+                        {"name": "header", "height": 3, "mount": TitleBar()},
+                        {
+                            "name": "main",
+                            "children": [
+                                {"name": "left", "ratio": 1, "visible": False},
+                                {"name": "right", "ratio": 2},
+                            ],
+                        },
+                        {"name": "footer", "height": 1},
+                    ],
+                }
+            )
+            # self.mount(TitleBar(clock=True), slot="header")
 
     MyApp.run()
