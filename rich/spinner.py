@@ -34,7 +34,7 @@ class Spinner:
             spinner = SPINNERS[name]
         except KeyError:
             raise KeyError(f"no spinner called {name!r}")
-        self.text = text
+        self.text = Text.from_markup(text) if isinstance(text, str) else text
         self.frames = cast(List[str], spinner["frames"])[:]
         self.interval = cast(float, spinner["interval"])
         self.start_time: Optional[float] = None
@@ -103,7 +103,7 @@ class Spinner:
             speed (float, optional): Speed factor for animation. Defaults to None.
         """
         if text:
-            self.text = text
+            self.text = Text.from_markup(text) if isinstance(text, str) else text
         if style:
             self.style = style
         if speed:
