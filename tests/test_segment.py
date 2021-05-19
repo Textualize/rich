@@ -1,3 +1,5 @@
+import sys
+
 from rich.segment import ControlType
 from rich.segment import Segment
 from rich.style import Style
@@ -6,10 +8,16 @@ from rich.style import Style
 def test_repr():
     assert repr(Segment("foo")) == "Segment('foo', None)"
     home = (ControlType.HOME, 0)
-    assert (
-        repr(Segment("foo", None, [home]))
-        == "Segment('foo', None, [(<ControlType.HOME: 3>, 0)])"
-    )
+    if sys.version_info >= (3, 10):
+        assert (
+            repr(Segment("foo", None, [home]))
+            == "Segment('foo', None, [(ControlType.HOME, 0)])"
+        )
+    else:
+        assert (
+            repr(Segment("foo", None, [home]))
+            == "Segment('foo', None, [(<ControlType.HOME: 3>, 0)])"
+        )
 
 
 def test_line():
