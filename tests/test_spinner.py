@@ -4,6 +4,7 @@ from rich.console import Console
 from rich.measure import Measurement
 from rich.rule import Rule
 from rich.spinner import Spinner
+from rich.text import Text
 
 
 def test_spinner_create():
@@ -65,3 +66,9 @@ def test_rich_measure():
     min_width, max_width = Measurement.get(console, console.options, spinner)
     assert min_width == 3
     assert max_width == 5
+
+
+def test_spinner_markup():
+    spinner = Spinner("dots", "[bold]spinning[/bold]")
+    assert isinstance(spinner.text, Text)
+    assert str(spinner.text) == "spinning"
