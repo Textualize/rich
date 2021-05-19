@@ -110,24 +110,24 @@ if __name__ == "__main__":
             if event.key == "q":
                 await self.close_messages()
 
-        async def on_startup(self) -> None:
+        # async def on_startup(self, event: events.Startup) -> None:
 
-            self.set_layout(
-                {
-                    "split": "column",
-                    "children": [
-                        {"name": "header", "height": 3, "mount": TitleBar()},
-                        {
-                            "name": "main",
-                            "children": [
-                                {"name": "left", "ratio": 1, "visible": False},
-                                {"name": "right", "ratio": 2},
-                            ],
-                        },
-                        {"name": "footer", "height": 1},
-                    ],
-                }
-            )
-            # self.mount(TitleBar(clock=True), slot="header")
+        #     self.set_layout(
+        #         {
+        #             "split": "column",
+        #             "children": [
+        #                 {"name": "header", "height": 3, "mount": TitleBar()},
+        #                 {
+        #                     "name": "main",
+        #                     "children": [
+        #                         {"name": "left", "ratio": 1, "visible": False},
+        #                         {"name": "right", "ratio": 2},
+        #                     ],
+        #                 },
+        #                 {"name": "footer", "height": 1},
+        #             ],
+        #         }
+        #     )
+        # self.mount(TitleBar(clock=True), slot="header")
 
     MyApp.run()

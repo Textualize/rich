@@ -7,12 +7,6 @@ if TYPE_CHECKING:
     from .app import App
 
 
-class Widget:
-    def __init__(self, app: App) -> None:
-        self.app = app
-
-    def focus(self):
-        pass
-
-    def blur(self):
-        pass
+class Widget(MessagePump):
+    async def refresh(self) -> None:
+        await self.emit(events.Refresh(self))

@@ -1,4 +1,4 @@
-from typing import Callable, Protocol, TYPE_CHECKING
+from typing import Awaitable, Callable, Optional, Protocol, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .events import Event
@@ -9,10 +9,21 @@ Callback = Callable[[], None]
 
 
 class MessageTarget(Protocol):
-    async def post_message(self, message: "Message", priority: int = 0) -> bool:
+    async def post_message(
+        self,
+        message: "Message",
+        priority: Optional[int] = None,
+    ) -> bool:
         ...
 
 
 class EventTarget(Protocol):
-    async def post_message(self, event: "Event", priority: int = 0) -> bool:
+    async def post_message(
+        self,
+        message: "Message",
+        priority: Optional[int] = None,
+    ) -> bool:
         ...
+
+
+MessageHandler = Callable[["Message"], Awaitable]

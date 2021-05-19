@@ -1,20 +1,30 @@
-from typing import AsyncIterable, Optional, Tuple, TYPE_CHECKING
+from functools import total_ordering
+from typing import AsyncIterable, Optional, NamedTuple, Tuple, TYPE_CHECKING
+import asyncio
 from asyncio import ensure_future, Task, PriorityQueue
 from asyncio import Event as AIOEvent
 from dataclasses import dataclass
+from functools import total_ordering
 import logging
 
 from . import events
 from .message import Message
 from ._timer import Timer, TimerCallback
+from .types import MessageTarget, MessageHandler
 
 log = logging.getLogger("rich")
 
 
-@dataclass(order=True, frozen=True)
-class MessageQueueItem:
-    message: Message
+@total_ordering
+class MessageQueueItem(NamedTuple):
     priority: int
+    message: Message
+
+    def __gt__(self, other: "MessageQueueItem") -> bool:
+        return self.priority > other.priority
+
+    def __eq__(self, other: "MessageQueueItem") -> bool:
+        return self.priority == other.priority
 
 
 class MessagePumpClosed(Exception):
@@ -32,7 +42,7 @@ class MessagePump:
         self._closing: bool = False
         self._closed: bool = False
 
-    async def get_message(self) -> Tuple[Message, int]:
+    async def get_message(self) -> MessageQueueItem:
         """Get the next event on the queue, or None if queue is closed.
 
         Returns:
@@ -44,7 +54,7 @@ class MessagePump:
         if queue_item is None:
             self._closed = True
             raise MessagePumpClosed("The message pump is now closed")
-        return queue_item.message, queue_item.priority
+        return queue_item
 
     def set_timer(
         self,
@@ -79,7 +89,7 @@ class MessagePump:
 
         while not self._closed:
             try:
-                message, priority = await self.get_message()
+                priority, message = await self.get_message()
             except MessagePumpClosed:
                 log.exception("error getting message")
                 break
@@ -89,11 +99,11 @@ class MessagePump:
     async def dispatch_message(self, message: Message, priority: int) -> Optional[bool]:
         if isinstance(message, events.Event):
             method_name = f"on_{message.name}"
-            dispatch_function = getattr(self, method_name, None)
+            dispatch_function: MessageHandler = getattr(self, method_name, None)
             if dispatch_function is not None:
                 await dispatch_function(message)
             if message.bubble and self._parent:
-                await self._parent.post_message(message, priority=priority)
+                await self._parent.post_message(message, priority)
         else:
             return await self.on_message(message)
         return False
@@ -102,14 +112,20 @@ class MessagePump:
         pass
 
     async def post_message(
-        self, message: Message, priority: Optional[int] = None
+        self,
+        message: Message,
+        priority: Optional[int] = None,
     ) -> bool:
         if self._closing or self._closed:
             return False
         event_priority = priority if priority is not None else message.default_priority
-        item = MessageQueueItem(message, priority=event_priority)
+        item = MessageQueueItem(event_priority, message)
         await self._message_queue.put(item)
         return True
+
+    async def emit(self, message: Message, priority: Optional[int] = None) -> None:
+        if self._parent:
+            await self._parent.post_message(message, priority=priority)
 
     async def on_timer(self, event: events.Timer) -> None:
         if event.callback is not None:

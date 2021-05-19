@@ -37,10 +37,6 @@ class EventType(Enum):
 class Event(Message):
     type: ClassVar[EventType]
 
-    def __init__(self, sender: MessageTarget) -> None:
-        super().__init__(sender)
-        self.sender = sender
-
     def __rich_repr__(self) -> RichReprResult:
         return
         yield
