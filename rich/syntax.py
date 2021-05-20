@@ -1,8 +1,9 @@
 import os.path
 import platform
+from rich.containers import Lines
 import textwrap
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Iterable, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
 
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
 from pygments.style import Style as PygmentsStyle
@@ -23,9 +24,10 @@ from pygments.util import ClassNotFound
 
 from ._loop import loop_first
 from .color import Color, blend_rgb
-from .console import Console, ConsoleOptions, JustifyMethod, RenderResult, Segment
+from .console import Console, ConsoleOptions, JustifyMethod, RenderResult
 from .jupyter import JupyterMixin
 from .measure import Measurement
+from .segment import Segment
 from .style import Style
 from .text import Text
 
@@ -331,11 +333,6 @@ class Syntax(JupyterMixin):
 
     def _get_base_style(self) -> Style:
         """Get the base style."""
-        # default_style = (
-        #     Style(bgcolor=self.background_color)
-        #     if self.background_color is not None
-        #     else self._theme.get_background_style()
-        # )
         default_style = self._theme.get_background_style() + self.background_style
         return default_style
 
@@ -377,7 +374,12 @@ class Syntax(JupyterMixin):
         )
         _get_theme_style = self._theme.get_style_for_token
         try:
-            lexer = get_lexer_by_name(self.lexer_name)
+            lexer = get_lexer_by_name(
+                self.lexer_name,
+                stripnl=False,
+                ensurenl=True,
+                tabsize=self.tab_size,
+            )
         except ClassNotFound:
             text.append(code)
         else:
@@ -498,10 +500,11 @@ class Syntax(JupyterMixin):
             start_line, end_line = self.line_range
             line_offset = max(0, start_line - 1)
 
-        code = textwrap.dedent(self.code) if self.dedent else self.code
+        ends_on_nl = self.code.endswith("\n")
+        code = self.code if ends_on_nl else self.code + "\n"
+        code = textwrap.dedent(code) if self.dedent else code
         code = code.expandtabs(self.tab_size)
         text = self.highlight(code, self.line_range)
-        text.remove_suffix("\n")
 
         (
             background_style,
@@ -510,6 +513,8 @@ class Syntax(JupyterMixin):
         ) = self._get_number_styles(console)
 
         if not self.line_numbers and not self.word_wrap and not self.line_range:
+            if not ends_on_nl:
+                text.remove_suffix("\n")
             # Simple case of just rendering text
             style = (
                 self._get_base_style()
@@ -536,7 +541,7 @@ class Syntax(JupyterMixin):
                     yield from syntax_line
             return
 
-        lines = text.split("\n")
+        lines: Union[List[Text], Lines] = text.split("\n", allow_blank=ends_on_nl)
         if self.line_range:
             lines = lines[line_offset:end_line]
 
@@ -551,7 +556,7 @@ class Syntax(JupyterMixin):
                 Text("\n")
                 .join(lines)
                 .with_indent_guides(self.tab_size, style=style)
-                .split("\n")
+                .split("\n", allow_blank=True)
             )
 
         numbers_column_width = self._numbers_column_width

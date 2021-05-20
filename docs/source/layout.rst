@@ -23,21 +23,21 @@ This will draw a box the size of the terminal with some information regarding th
     layout.split_column(
         Layout(name="upper"),
         Layout(name="lower")
-    )    
+    )
     print(layout)
 
-This will divide the terminal screen in to two equal sized portions, one on top of the other. The ``name`` attribute is an internal identifier we can use to look up the sub-layout later. Let's use that to create another split, this time we will call :meth:`~rich.layout.Layout.split_row` to split the lower layout in to a row of two sub-layouts.
+This will divide the terminal screen in to two equal sized portions, one on top of the other. The ``name`` attribute is an internal identifier we can use to look up the sub-layout later. Let's use that to create another split, this time we will call :meth:`~rich.layout.Layout.split_row` to split the lower layout in to a row of two sub-layouts::
 
     layout["lower"].split_row(
         Layout(name="left"),
-        Layout(name="right"),       
-    )    
+        Layout(name="right"),
+    )
     print(layout)
 
 You should now see the screen area divided in to 3 portions; an upper half and a lower half that is split in to two quarters.
 
 .. raw:: html
-    
+
     <pre style="font-size:90%;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080">╭─────────────────────────────── </span><span style="color: #008000">'upper'</span><span style="color: #000080"> </span><span style="color: #000080; font-weight: bold">(</span><span style="color: #000080; font-weight: bold">84</span><span style="color: #000080"> x </span><span style="color: #000080; font-weight: bold">13</span><span style="color: #000080; font-weight: bold">)</span><span style="color: #000080"> ────────────────────────────────╮</span>
     <span style="color: #000080">│</span>                                                                                  <span style="color: #000080">│</span>
     <span style="color: #000080">│</span>                                                                                  <span style="color: #000080">│</span>

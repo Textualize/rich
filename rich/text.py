@@ -178,7 +178,7 @@ class Text(JupyterMixin):
         return False
 
     def __getitem__(self, slice: Union[int, slice]) -> "Text":
-        def get_text_at(offset) -> "Text":
+        def get_text_at(offset: int) -> "Text":
             _Span = Span
             text = Text(
                 self.plain[offset],
@@ -509,12 +509,15 @@ class Text(JupyterMixin):
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
-        tab_size: int = console.tab_size or self.tab_size or 8  # type: ignore
-        justify = cast(
-            "JustifyMethod", self.justify or options.justify or DEFAULT_OVERFLOW
+        tab_size: int = console.tab_size or self.tab_size or 8
+        justify = (
+            cast("JustifyMethod", self.justify) or options.justify or DEFAULT_OVERFLOW
         )
-        overflow = cast(
-            "OverflowMethod", self.overflow or options.overflow or DEFAULT_OVERFLOW
+
+        overflow = (
+            cast("OverflowMethod", self.overflow)
+            or options.overflow
+            or DEFAULT_OVERFLOW
         )
 
         lines = self.wrap(
@@ -839,7 +842,9 @@ class Text(JupyterMixin):
         self._length += len(text)
         return self
 
-    def append_tokens(self, tokens: Iterable[Tuple[str, Optional[StyleType]]]):
+    def append_tokens(
+        self, tokens: Iterable[Tuple[str, Optional[StyleType]]]
+    ) -> "Text":
         """Append iterable of str and style. Style may be a Style instance or a str style definition.
 
         Args:
@@ -870,7 +875,7 @@ class Text(JupyterMixin):
 
     def split(
         self,
-        separator="\n",
+        separator: str = "\n",
         *,
         include_separator: bool = False,
         allow_blank: bool = False,
@@ -1015,10 +1020,11 @@ class Text(JupyterMixin):
         Returns:
             Lines: Number of lines.
         """
-        wrap_justify = cast("JustifyMethod", justify or self.justify or DEFAULT_JUSTIFY)
-        wrap_overflow = cast(
-            "OverflowMethod", overflow or self.overflow or DEFAULT_OVERFLOW
+        wrap_justify = cast("JustifyMethod", justify or self.justify) or DEFAULT_JUSTIFY
+        wrap_overflow = (
+            cast("OverflowMethod", overflow or self.overflow) or DEFAULT_OVERFLOW
         )
+
         no_wrap = pick_bool(no_wrap, self.no_wrap, False) or overflow == "ignore"
 
         lines = Lines()
@@ -1106,7 +1112,7 @@ class Text(JupyterMixin):
         new_lines: List[Text] = []
         add_line = new_lines.append
         blank_lines = 0
-        for line in text.split():
+        for line in text.split(allow_blank=True):
             match = re_indent.match(line.plain)
             if not match or not match.group(2):
                 blank_lines += 1

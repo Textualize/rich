@@ -30,7 +30,7 @@ def get_console() -> "Console":
     return _console
 
 
-def reconfigure(*args, **kwargs) -> None:
+def reconfigure(*args: Any, **kwargs: Any) -> None:
     """Reconfigures the global console by replacing it with another.
 
     Args:
@@ -44,11 +44,11 @@ def reconfigure(*args, **kwargs) -> None:
 
 def print(
     *objects: Any,
-    sep=" ",
-    end="\n",
+    sep: str = " ",
+    end: str = "\n",
     file: Optional[IO[str]] = None,
     flush: bool = False
-):
+) -> None:
     r"""Print object(s) supplied via positional arguments.
     This function has an identical signature to the built-in print.
     For more advanced features, see the :class:`~rich.console.Console` class.
@@ -79,7 +79,7 @@ def inspect(
     sort: bool = True,
     all: bool = False,
     value: bool = True
-):
+) -> None:
     """Inspect any Python object.
 
     * inspect(<OBJECT>) to see summarized info.

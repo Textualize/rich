@@ -222,7 +222,7 @@ class Layout:
         from rich.table import Table
         from rich.tree import Tree
 
-        def summary(layout) -> Table:
+        def summary(layout: "Layout") -> Table:
 
             icon = layout.splitter.get_tree_icon()
 
@@ -412,9 +412,8 @@ class Layout:
                 yield new_line
 
 
-if __name__ == "__main__":  # type: ignore
+if __name__ == "__main__":
     from rich.console import Console
-    from rich.panel import Panel
 
     console = Console()
     layout = Layout()

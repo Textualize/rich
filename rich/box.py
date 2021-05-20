@@ -1,9 +1,10 @@
+import sys
 from typing import TYPE_CHECKING, Iterable, List
 
-try:
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
     from typing_extensions import Literal
-except ImportError:  # pragma: no cover
-    from typing import Literal  # type: ignore
 
 
 from ._loop import loop_last

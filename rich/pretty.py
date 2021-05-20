@@ -2,10 +2,11 @@ import builtins
 import os
 import sys
 from array import array
-from collections import Counter, defaultdict, deque
+from collections import Counter, defaultdict, deque, UserDict, UserList
 from dataclasses import dataclass, fields, is_dataclass
 from itertools import islice
 from typing import (
+    DefaultDict,
     TYPE_CHECKING,
     Any,
     Callable,
@@ -17,9 +18,25 @@ from typing import (
     Union,
     Tuple,
 )
+from types import MappingProxyType
 
-from rich.highlighter import ReprHighlighter
+try:
+    import attr as _attr_module
+except ImportError:  # pragma: no cover
+    _attr_module = None  # type: ignore
 
+
+def _is_attr_object(obj: Any) -> bool:
+    """Check if an object was created with attrs module."""
+    return _attr_module is not None and _attr_module.has(type(obj))
+
+
+def _get_attr_fields(obj: Any) -> Iterable["_attr_module.Attribute[Any]"]:
+    """Get fields for an attrs object."""
+    return _attr_module.fields(type(obj)) if _attr_module is not None else []
+
+
+from .highlighter import ReprHighlighter
 from . import get_console
 from ._loop import loop_last
 from ._pick import pick_bool
@@ -230,7 +247,7 @@ class Pretty(JupyterMixin):
         return Measurement(text_width, text_width)
 
 
-def _get_braces_for_defaultdict(_object: defaultdict) -> Tuple[str, str, str]:
+def _get_braces_for_defaultdict(_object: DefaultDict[Any, Any]) -> Tuple[str, str, str]:
     return (
         f"defaultdict({_object.default_factory!r}, {{",
         "})",
@@ -238,7 +255,7 @@ def _get_braces_for_defaultdict(_object: defaultdict) -> Tuple[str, str, str]:
     )
 
 
-def _get_braces_for_array(_object: array) -> Tuple[str, str, str]:
+def _get_braces_for_array(_object: "array[Any]") -> Tuple[str, str, str]:
     return (f"array({_object.typecode!r}, [", "])", "array({_object.typecode!r})")
 
 
@@ -249,13 +266,16 @@ _BRACES: Dict[type, Callable[[Any], Tuple[str, str, str]]] = {
     Counter: lambda _object: ("Counter({", "})", "Counter()"),
     deque: lambda _object: ("deque([", "])", "deque()"),
     dict: lambda _object: ("{", "}", "{}"),
+    UserDict: lambda _object: ("{", "}", "{}"),
     frozenset: lambda _object: ("frozenset({", "})", "frozenset()"),
     list: lambda _object: ("[", "]", "[]"),
+    UserList: lambda _object: ("[", "]", "[]"),
     set: lambda _object: ("{", "}", "set()"),
     tuple: lambda _object: ("(", ")", "()"),
+    MappingProxyType: lambda _object: ("mappingproxy({", "})", "mappingproxy({})"),
 }
 _CONTAINERS = tuple(_BRACES.keys())
-_MAPPING_CONTAINERS = (dict, os._Environ)
+_MAPPING_CONTAINERS = (dict, os._Environ, MappingProxyType, UserDict)
 
 
 def is_expandable(obj: Any) -> bool:
@@ -264,6 +284,7 @@ def is_expandable(obj: Any) -> bool:
         isinstance(obj, _CONTAINERS)
         or (is_dataclass(obj) and not isinstance(obj, type))
         or hasattr(obj, "__rich_repr__")
+        or _is_attr_object(obj)
     )
 
 
@@ -455,7 +476,7 @@ def traverse(
         py_version = (sys.version_info.major, sys.version_info.minor)
         children: List[Node]
 
-        def iter_rich_args(rich_args) -> Iterable[Union[Any, Tuple[str, Any]]]:
+        def iter_rich_args(rich_args: Any) -> Iterable[Union[Any, Tuple[str, Any]]]:
             for arg in rich_args:
                 if isinstance(arg, tuple):
                     if len(arg) == 3:
@@ -489,13 +510,56 @@ def traverse(
                         child_node = _traverse(child)
                         child_node.last = last
                         child_node.key_repr = key
-                        child_node.last = last
                         child_node.key_separator = "="
                         append(child_node)
                     else:
                         child_node = _traverse(arg)
                         child_node.last = last
                         append(child_node)
+            else:
+                node = Node(
+                    value_repr=f"{obj.__class__.__name__}()", children=[], last=root
+                )
+        elif _is_attr_object(obj):
+            children = []
+            append = children.append
+
+            attr_fields = _get_attr_fields(obj)
+            if attr_fields:
+                node = Node(
+                    open_brace=f"{obj.__class__.__name__}(",
+                    close_brace=")",
+                    children=children,
+                    last=root,
+                )
+
+                def iter_attrs() -> Iterable[
+                    Tuple[str, Any, Optional[Callable[[Any], str]]]
+                ]:
+                    """Iterate over attr fields and values."""
+                    for attr in attr_fields:
+                        if attr.repr:
+                            try:
+                                value = getattr(obj, attr.name)
+                            except Exception as error:
+                                # Can happen, albeit rarely
+                                yield (attr.name, error, None)
+                            else:
+                                yield (
+                                    attr.name,
+                                    value,
+                                    attr.repr if callable(attr.repr) else None,
+                                )
+
+                for last, (name, value, repr_callable) in loop_last(iter_attrs()):
+                    if repr_callable:
+                        child_node = Node(value_repr=str(repr_callable(value)))
+                    else:
+                        child_node = _traverse(value)
+                    child_node.last = last
+                    child_node.key_repr = name
+                    child_node.key_separator = "="
+                    append(child_node)
             else:
                 node = Node(
                     value_repr=f"{obj.__class__.__name__}()", children=[], last=root
@@ -533,7 +597,12 @@ def traverse(
 
             pop_visited(obj_id)
 
-        elif obj_type in _CONTAINERS:
+        elif isinstance(obj, _CONTAINERS):
+            for container_type in _CONTAINERS:
+                if isinstance(obj, container_type):
+                    obj_type = container_type
+                    break
+
             obj_id = id(obj)
             if obj_id in visited_ids:
                 # Recursion detected
@@ -542,7 +611,9 @@ def traverse(
 
             open_brace, close_brace, empty = _BRACES[obj_type](obj)
 
-            if obj:
+            if obj_type.__repr__ != type(obj).__repr__:
+                node = Node(value_repr=to_repr(obj), last=root)
+            elif obj:
                 children = []
                 node = Node(
                     open_brace=open_brace,
@@ -629,7 +700,7 @@ def pprint(
     max_length: Optional[int] = None,
     max_string: Optional[int] = None,
     expand_all: bool = False,
-):
+) -> None:
     """A convenience function for pretty printing.
 
     Args:
@@ -658,8 +729,9 @@ def pprint(
 if __name__ == "__main__":  # pragma: no cover
 
     class BrokenRepr:
-        def __repr__(self):
+        def __repr__(self) -> str:
             1 / 0
+            return "this will fail"
 
     d = defaultdict(int)
     d["foo"] = 5

@@ -235,7 +235,7 @@ class PromptBase(Generic[PromptType]):
         if self.choices is not None and not self.check_choice(value):
             raise InvalidResponse(self.illegal_choice_message)
 
-        return return_value
+        return return_value  # type: ignore
 
     def on_validate_error(self, value: str, error: InvalidResponse) -> None:
         """Called to handle validation error.

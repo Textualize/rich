@@ -5,11 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [10.1.1] - Unreleased
+## [10.2.2] - 2021-05-19
+
+### Fixed
+
+- Fixed status not rendering console markup https://github.com/willmcgugan/rich/issues/1244
+
+## [10.2.1] - 2021-05-17
+
+### Fixed
+
+- Fixed panel in Markdown exploding https://github.com/willmcgugan/rich/issues/1234
+
+## [10.2.0] - 2021-05-12
 
 ### Added
 
-- Added syntax for call, i.e. "Foo(bar)" will highlight Foo.pyth
+- Added syntax for call, i.e. "Foo(bar)"
+- Added Console.measure as a convenient alias for Measurement.get
+- Added support for pretty printing attrs objects
+- Added mappingproxy to pretty print
+- Added UserDict and UserList support to pretty printer
+
+### Changed
+
+- Changed colorama init to set strip=False
+- Changed highlighter for False, True, None to not match in the middle of a word. i.e. NoneType is no longer highlighted as None
+
+### Fixed
+
+- Fixed initial blank lines removed from Syntax https://github.com/willmcgugan/rich/issues/1214
 
 ## [10.1.0] - 2020-04-03
 

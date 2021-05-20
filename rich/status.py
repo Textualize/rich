@@ -1,4 +1,5 @@
-from typing import Optional
+from types import TracebackType
+from typing import Optional, Type
 
 from .console import Console, RenderableType
 from .jupyter import JupyterMixin
@@ -56,7 +57,7 @@ class Status(JupyterMixin):
         spinner: Optional[str] = None,
         spinner_style: Optional[StyleType] = None,
         speed: Optional[float] = None,
-    ):
+    ) -> None:
         """Update status.
 
         Args:
@@ -96,7 +97,12 @@ class Status(JupyterMixin):
         self.start()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         self.stop()
 
 

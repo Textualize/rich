@@ -1,12 +1,21 @@
 from array import array
-from collections import defaultdict
+from collections import defaultdict, UserDict, UserList
 from dataclasses import dataclass, field
 import io
 import sys
 from typing import List
 
+import attr
+import pytest
+
 from rich.console import Console
 from rich.pretty import install, Pretty, pprint, pretty_repr, Node
+
+
+skip_py36 = pytest.mark.skipif(
+    sys.version_info.minor == 6 and sys.version_info.major == 3,
+    reason="rendered differently on py3.6",
+)
 
 
 def test_install():
@@ -181,3 +190,60 @@ def test_empty_repr():
             return ""
 
     assert pretty_repr(Foo()) == ""
+
+
+def test_attrs():
+    @attr.define
+    class Point:
+        x: int
+        y: int
+        foo: str = attr.field(repr=str.upper)
+        z: int = 0
+
+    result = pretty_repr(Point(1, 2, foo="bar"))
+    print(repr(result))
+    expected = "Point(x=1, y=2, foo=BAR, z=0)"
+    assert result == expected
+
+
+def test_attrs_empty():
+    @attr.define
+    class Nada:
+        pass
+
+    result = pretty_repr(Nada())
+    print(repr(result))
+    expected = "Nada()"
+    assert result == expected
+
+
+@skip_py36
+def test_attrs_broken():
+    @attr.define
+    class Foo:
+        bar: int
+
+    foo = Foo(1)
+    del foo.bar
+    result = pretty_repr(foo)
+    print(repr(result))
+    expected = "Foo(bar=AttributeError('bar'))"
+    assert result == expected
+
+
+def test_user_dict():
+    class D1(UserDict):
+        pass
+
+    class D2(UserDict):
+        def __repr__(self):
+            return "FOO"
+
+    d1 = D1({"foo": "bar"})
+    d2 = D2({"foo": "bar"})
+    result = pretty_repr(d1, expand_all=True)
+    print(repr(result))
+    assert result == "{\n    'foo': 'bar'\n}"
+    result = pretty_repr(d2, expand_all=True)
+    print(repr(result))
+    assert result == "FOO"
