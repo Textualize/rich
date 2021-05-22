@@ -4,6 +4,8 @@ from typing import Optional, Callable
 from asyncio import Event, wait_for, TimeoutError
 import weakref
 
+from rich.repr import rich_repr, RichReprResult
+
 from . import events
 from .types import MessageTarget
 
@@ -15,6 +17,7 @@ class EventTargetGone(Exception):
     pass
 
 
+@rich_repr
 class Timer:
     _timer_count: int = 1
 
@@ -38,8 +41,10 @@ class Timer:
         self._repeat = repeat
         self._stop_event = Event()
 
-    def __repr__(self) -> str:
-        return f"Timer({self._target_repr}, {self._interval}, name={self.name!r}, repeat={self._repeat})"
+    def __rich_repr__(self) -> RichReprResult:
+        yield self._interval
+        yield "name", self.name
+        yield "repeat", self._repeat, None
 
     @property
     def target(self) -> MessageTarget:

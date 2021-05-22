@@ -19,9 +19,12 @@ def rich_repr(cls: Type[T]) -> Type[T]:
                     append(repr(arg[0]))
                 else:
                     key, value, *default = arg
-                    if len(default) and default[0] == value:
-                        continue
-                    append(f"{key}={value!r}")
+                    if key is None:
+                        append(value)
+                    else:
+                        if len(default) and default[0] == value:
+                            continue
+                        append(f"{key}={value!r}")
             else:
                 append(repr(arg))
         return f"{self.__class__.__name__}({', '.join(repr_str)})"

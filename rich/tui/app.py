@@ -1,31 +1,43 @@
 import asyncio
-from contextvars import ContextVar
+
 import logging
 import signal
-from typing import Any, Dict
+from typing import Any, Dict, Set
 
+from rich.live import Live
+from rich.control import Control
+from rich.screen import Screen
 
 from . import events
+from ._context import active_app
 from .. import get_console
 from ..console import Console
 from .driver import Driver, CursesDriver
 from .message_pump import MessagePump
-
+from .view import View, LayoutView
 
 log = logging.getLogger("rich")
-
-
-active_app: ContextVar["App"] = ContextVar("active_app")
 
 
 LayoutDefinition = Dict[str, Any]
 
 
 class App(MessagePump):
-    def __init__(self, console: Console = None, screen: bool = True):
+    def __init__(
+        self,
+        console: Console = None,
+        view: View = None,
+        screen: bool = True,
+        auto_refresh=4,
+        title: str = "Megasoma Application",
+    ):
         super().__init__()
         self.console = console or get_console()
         self._screen = screen
+        self._auto_refresh = auto_refresh
+        self.title = title
+        self.view = view or LayoutView()
+        self.children: Set[MessagePump] = set()
 
     @classmethod
     def run(cls, console: Console = None, screen: bool = True):
@@ -47,16 +59,30 @@ class App(MessagePump):
         loop.add_signal_handler(signal.SIGINT, self.on_keyboard_interupt)
         active_app.set(self)
 
-        await self.post_message(events.Startup(sender=self))
+        await self.add(self.view)
 
+        await self.post_message(events.Startup(sender=self))
+        self.refresh()
         try:
             await super().process_messages()
         finally:
             loop.remove_signal_handler(signal.SIGINT)
             driver.stop_application_mode()
 
-    def set_layout(self, layout: LayoutDefinition) -> None:
-        pass
+        await asyncio.gather(*(child.close_messages() for child in self.children))
+        self.children.clear()
+
+    async def add(self, child: MessagePump) -> None:
+        self.children.add(child)
+        asyncio.create_task(child.process_messages())
+        await child.post_message(events.Created(sender=self))
+
+    def refresh(self) -> None:
+        console = self.console
+        with console:
+            console.print(
+                Screen(Control.home(), self.view, Control.home(), application_mode=True)
+            )
 
     async def on_startup(self, event: events.Startup) -> None:
         pass
@@ -71,6 +97,8 @@ if __name__ == "__main__":
     from rich.layout import Layout
     from rich.panel import Panel
 
+    from .widgets.header import Header
+
     logging.basicConfig(
         level="NOTSET",
         format="%(message)s",
@@ -78,56 +106,14 @@ if __name__ == "__main__":
         handlers=[FileHandler("richtui.log")],
     )
 
-    layout = {
-        "split": "column",
-        "children": [
-            {"name": "title", "height": 3},
-            {
-                "name": "main",
-                "children": [
-                    {"name": "left", "ratio": 1, "visible": False},
-                    {"name": "right", "ratio": 2},
-                ],
-            },
-            {"name": "footer", "height": "1"},
-        ],
-    }
-
-    layout = """
-        <column>
-            <slot name="title" height="3"/>
-            <row name="main">
-                <slot name="left" ratio="1" visible="false"/>
-                <slot name="right" ratio="2"/>
-            </row>
-            <slot name="footer" height="1"/>
-        </column>
-    """
-
     class MyApp(App):
         async def on_key(self, event: events.Key) -> None:
             log.debug("on_key %r", event)
             if event.key == "q":
                 await self.close_messages()
 
-        # async def on_startup(self, event: events.Startup) -> None:
-
-        #     self.set_layout(
-        #         {
-        #             "split": "column",
-        #             "children": [
-        #                 {"name": "header", "height": 3, "mount": TitleBar()},
-        #                 {
-        #                     "name": "main",
-        #                     "children": [
-        #                         {"name": "left", "ratio": 1, "visible": False},
-        #                         {"name": "right", "ratio": 2},
-        #                     ],
-        #                 },
-        #                 {"name": "footer", "height": 1},
-        #             ],
-        #         }
-        #     )
-        # self.mount(TitleBar(clock=True), slot="header")
+        async def on_startup(self, event: events.Startup) -> None:
+            await self.view.mount(Header(self.title), slot="header")
+            self.refresh()
 
     MyApp.run()

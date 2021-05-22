@@ -43,6 +43,7 @@ class CursesDriver(Driver):
         curses.noecho()
         curses.cbreak()
         curses.halfdelay(1)
+
         self._stdscr.keypad(True)
         self.console.show_cursor(False)
         self._key_thread = Thread(

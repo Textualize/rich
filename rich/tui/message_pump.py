@@ -1,30 +1,40 @@
 from functools import total_ordering
 from typing import AsyncIterable, Optional, NamedTuple, Tuple, TYPE_CHECKING
 import asyncio
-from asyncio import ensure_future, Task, PriorityQueue
-from asyncio import Event as AIOEvent
-from dataclasses import dataclass
+from asyncio import PriorityQueue
+
 from functools import total_ordering
 import logging
 
 from . import events
 from .message import Message
 from ._timer import Timer, TimerCallback
-from .types import MessageTarget, MessageHandler
+from .types import MessageHandler
 
 log = logging.getLogger("rich")
 
 
-@total_ordering
 class MessageQueueItem(NamedTuple):
     priority: int
     message: Message
 
+    def __lt__(self, other: "MessageQueueItem") -> bool:
+        return self.priority < other.priority
+
+    def __le__(self, other: "MessageQueueItem") -> bool:
+        return self.priority <= other.priority
+
     def __gt__(self, other: "MessageQueueItem") -> bool:
         return self.priority > other.priority
 
+    def __ge__(self, other: "MessageQueueItem") -> bool:
+        return self.priority >= other.priority
+
     def __eq__(self, other: "MessageQueueItem") -> bool:
         return self.priority == other.priority
+
+    def __ne__(self, other: "MessageQueueItem") -> bool:
+        return self.priority != other.priority
 
 
 class MessagePumpClosed(Exception):
@@ -86,11 +96,13 @@ class MessagePump:
         await self._message_queue.put(None)
 
     async def process_messages(self) -> None:
-
+        """Process messages until the queue is closed."""
         while not self._closed:
             try:
                 priority, message = await self.get_message()
             except MessagePumpClosed:
+                break
+            except Exception:
                 log.exception("error getting message")
                 break
             log.debug("message=%r", message)
@@ -123,13 +135,21 @@ class MessagePump:
         await self._message_queue.put(item)
         return True
 
-    async def emit(self, message: Message, priority: Optional[int] = None) -> None:
+    async def post_message_from_child(
+        self, message: Message, priority: Optional[int] = None
+    ) -> None:
+        await self.post_message(message, priority=priority)
+
+    async def emit(self, message: Message, priority: Optional[int] = None) -> bool:
         if self._parent:
-            await self._parent.post_message(message, priority=priority)
+            await self._parent.post_message_from_child(message, priority=priority)
+            return True
+        else:
+            return False
 
     async def on_timer(self, event: events.Timer) -> None:
         if event.callback is not None:
-            await event.callback(event)
+            await event.callback()
 
 
 if __name__ == "__main__":

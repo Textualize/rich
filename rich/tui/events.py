@@ -20,6 +20,7 @@ class EventType(Enum):
 
     LOAD = auto()
     STARTUP = auto()
+    CREATED = auto()
     MOUNT = auto()
     UNMOUNT = auto()
     SHUTDOWN_REQUEST = auto()
@@ -34,6 +35,7 @@ class EventType(Enum):
     CUSTOM = 1000
 
 
+@rich_repr
 class Event(Message):
     type: ClassVar[EventType]
 
@@ -64,6 +66,10 @@ class Load(Event, type=EventType.SHUTDOWN_REQUEST):
 
 
 class Startup(Event, type=EventType.SHUTDOWN_REQUEST):
+    pass
+
+
+class Created(Event, type=EventType.CREATED):
     pass
 
 
