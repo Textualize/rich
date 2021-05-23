@@ -1,3 +1,8 @@
+from typing import TYPE_CHECKING
+
 from contextvars import ContextVar
 
-active_app = ContextVar("active_app")
+if TYPE_CHECKING:
+    from .app import App
+
+active_app: ContextVar["App"] = ContextVar("active_app")

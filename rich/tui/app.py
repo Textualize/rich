@@ -90,6 +90,11 @@ class App(MessagePump):
     async def on_shutdown_request(self, event: events.ShutdownRequest) -> None:
         await self.close_messages()
 
+    async def on_resize(self, event: events.Resize) -> None:
+        await self.view.post_message(event)
+        if not event.suppressed:
+            self.refresh()
+
 
 if __name__ == "__main__":
     import asyncio

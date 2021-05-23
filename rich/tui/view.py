@@ -15,7 +15,16 @@ if TYPE_CHECKING:
 
 
 class View(MessagePump):
-    pass
+    @property
+    def app(self) -> "App":
+        return active_app.get()
+
+    @property
+    def console(self) -> Console:
+        return active_app.get().console
+
+    async def on_resize(self, event: events.Resize) -> None:
+        pass
 
 
 class LayoutView(View):
@@ -42,14 +51,6 @@ class LayoutView(View):
 
     def __rich__(self) -> RenderableType:
         return self.layout
-
-    @property
-    def app(self) -> "App":
-        return active_app.get()
-
-    @property
-    def console(self) -> Console:
-        return active_app.get().console
 
     async def on_create(self, event: events.Created) -> None:
         await self.mount(Header(self.title))

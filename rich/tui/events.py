@@ -21,6 +21,7 @@ class EventType(Enum):
     LOAD = auto()
     STARTUP = auto()
     CREATED = auto()
+    RESIZE = auto()
     MOUNT = auto()
     UNMOUNT = auto()
     SHUTDOWN_REQUEST = auto()
@@ -71,6 +72,20 @@ class Startup(Event, type=EventType.SHUTDOWN_REQUEST):
 
 class Created(Event, type=EventType.CREATED):
     pass
+
+
+class Resize(Event, type=EventType.RESIZE):
+    width: int
+    height: int
+
+    def __init__(self, sender: MessageTarget, width: int, height: int) -> None:
+        self.width = width
+        self.height = height
+        super().__init__(sender)
+
+    def __rich_repr__(self) -> RichReprResult:
+        yield self.width
+        yield self.height
 
 
 class Mount(Event, type=EventType.MOUNT):

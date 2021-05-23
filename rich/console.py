@@ -26,6 +26,7 @@ from typing import (
     Optional,
     TextIO,
     Type,
+    Tuple,
     Union,
     cast,
 )
@@ -942,6 +943,17 @@ class Console:
             (width - self.legacy_windows) if self._width is None else self._width,
             height if self._height is None else self._height,
         )
+
+    @size.setter
+    def size(self, new_size: Tuple[int, int]) -> None:
+        """Set a new size for the terminal.
+
+        Args:
+            new_size (Tuple[int, int]): New width and height.
+        """
+        width, height = new_size
+        self._width = width
+        self._height = height
 
     @property
     def width(self) -> int:

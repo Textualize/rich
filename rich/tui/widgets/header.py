@@ -11,7 +11,6 @@ from .. import events
 from ..widget import Widget
 
 
-@rich_repr
 class Header(Widget):
     def __init__(
         self,

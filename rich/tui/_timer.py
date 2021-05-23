@@ -1,5 +1,5 @@
 from time import monotonic
-from typing import Optional, Callable
+from typing import Awaitable, Optional, Callable
 
 from asyncio import Event, wait_for, TimeoutError
 import weakref
@@ -10,7 +10,7 @@ from . import events
 from .types import MessageTarget
 
 
-TimerCallback = Callable[[events.Timer], None]
+TimerCallback = Callable[[], Awaitable[None]]
 
 
 class EventTargetGone(Exception):

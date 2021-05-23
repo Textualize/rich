@@ -105,7 +105,7 @@ class MessagePump:
             except Exception:
                 log.exception("error getting message")
                 break
-            log.debug("message=%r", message)
+            log.debug(repr(message))
             await self.dispatch_message(message, priority)
 
     async def dispatch_message(self, message: Message, priority: int) -> Optional[bool]:
