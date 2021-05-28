@@ -105,7 +105,7 @@ class MessagePump:
             except Exception:
                 log.exception("error getting message")
                 break
-            log.debug(repr(message))
+            log.debug("%r -> %r", message, self)
             await self.dispatch_message(message, priority)
 
     async def dispatch_message(self, message: Message, priority: int) -> Optional[bool]:
@@ -150,16 +150,3 @@ class MessagePump:
     async def on_timer(self, event: events.Timer) -> None:
         if event.callback is not None:
             await event.callback()
-
-
-if __name__ == "__main__":
-
-    class Widget(MessagePump):
-        pass
-
-    widget1 = Widget()
-    widget2 = Widget()
-
-    import asyncio
-
-    asyncio.get_event_loop().run_until_complete(widget1.run_message_loop())

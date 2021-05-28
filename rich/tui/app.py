@@ -4,8 +4,8 @@ import logging
 import signal
 from typing import Any, Dict, Set
 
-from rich.live import Live
 from rich.control import Control
+from rich.repr import rich_repr, RichReprResult
 from rich.screen import Screen
 
 from . import events
@@ -22,22 +22,26 @@ log = logging.getLogger("rich")
 LayoutDefinition = Dict[str, Any]
 
 
+@rich_repr
 class App(MessagePump):
+    view: View
+
     def __init__(
         self,
         console: Console = None,
         view: View = None,
         screen: bool = True,
-        auto_refresh=4,
         title: str = "Megasoma Application",
     ):
         super().__init__()
         self.console = console or get_console()
         self._screen = screen
-        self._auto_refresh = auto_refresh
         self.title = title
         self.view = view or LayoutView()
         self.children: Set[MessagePump] = set()
+
+    def __rich_repr__(self) -> RichReprResult:
+        yield "title", self.title
 
     @classmethod
     def run(cls, console: Console = None, screen: bool = True):
@@ -99,8 +103,6 @@ class App(MessagePump):
 if __name__ == "__main__":
     import asyncio
     from logging import FileHandler
-    from rich.layout import Layout
-    from rich.panel import Panel
 
     from .widgets.header import Header
 

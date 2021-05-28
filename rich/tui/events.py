@@ -136,7 +136,7 @@ class Timer(Event, type=EventType.TIMER, priority=10):
         self.callback = callback
 
     def __rich_repr__(self) -> RichReprResult:
-        yield "timer", self.timer
+        yield self.timer.name
 
 
 class Focus(Event, type=EventType.FOCUS):

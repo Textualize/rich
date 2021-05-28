@@ -7,7 +7,11 @@ from .style import Style
 
 from itertools import filterfalse
 from operator import attrgetter
-from typing import Iterable, List, Sequence, Union, Tuple
+from typing import Iterable, List, Sequence, Union, Tuple, TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from .console import Console, ConsoleOptions, RenderResult
 
 
 class ControlType(IntEnum):
@@ -402,6 +406,30 @@ class Segment(NamedTuple):
                 yield cls(text, colorless_style, control)
             else:
                 yield cls(text, None, control)
+
+
+class Segments:
+    """A simple renderable to render an iterable of segments.
+
+    Args:
+        segments (Iterable[Segment]): An iterable of segments.
+        new_lines (bool, optional): Add new lines between segments. Defaults to False.
+    """
+
+    def __init__(self, segments: Iterable[Segment], new_lines: bool = False) -> None:
+        self.segments = list(segments)
+        self.new_lines = new_lines
+
+    def __rich_console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
+        if self.new_lines:
+            line = Segment.line()
+            for segment in self.segments:
+                yield segment
+                yield line
+        else:
+            yield from self.segments
 
 
 if __name__ == "__main__":  # pragma: no cover

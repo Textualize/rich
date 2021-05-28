@@ -962,8 +962,16 @@ class Console:
         Returns:
             int: The width (in characters) of the console.
         """
-        width, _ = self.size
-        return width
+        return self.size.width
+
+    @width.setter
+    def width(self, width: int) -> None:
+        """Set width.
+
+        Args:
+            width (int): New width.
+        """
+        self._width = width
 
     @property
     def height(self) -> int:
@@ -972,8 +980,16 @@ class Console:
         Returns:
             int: The height (in lines) of the console.
         """
-        _, height = self.size
-        return height
+        return self.size.height
+
+    @height.setter
+    def height(self, height: int) -> None:
+        """Set height.
+
+        Args:
+            height (int): new height.
+        """
+        self._height = height
 
     def bell(self) -> None:
         """Play a 'bell' sound (if supported by the terminal)."""

@@ -1,8 +1,9 @@
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from rich.console import Console, RenderableType
+from rich.console import Console, ConsoleOptions, RenderResult, RenderableType
 from rich.layout import Layout
-from rich.live import Live
+from rich.repr import rich_repr, RichReprResult
 
 from . import events
 from ._context import active_app
@@ -14,7 +15,8 @@ if TYPE_CHECKING:
     from .app import App
 
 
-class View(MessagePump):
+@rich_repr
+class View(ABC, MessagePump):
     @property
     def app(self) -> "App":
         return active_app.get()
@@ -23,16 +25,34 @@ class View(MessagePump):
     def console(self) -> Console:
         return active_app.get().console
 
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
+        return
+        yield
+
+    def __rich_repr__(self) -> RichReprResult:
+        return
+        yield
+
     async def on_resize(self, event: events.Resize) -> None:
         pass
+
+    @abstractmethod
+    async def mount(self, widget: Widget, *, slot: str = "main") -> None:
+        ...
 
 
 class LayoutView(View):
     layout: Layout
 
     def __init__(
-        self, layout: Layout = None, title: str = "Layout Application"
+        self,
+        layout: Layout = None,
+        name: str = "default",
+        title: str = "Layout Application",
     ) -> None:
+        self.name = name
         self.title = title
         if layout is None:
             layout = Layout()
@@ -48,6 +68,9 @@ class LayoutView(View):
             )
         self.layout = layout
         super().__init__()
+
+    def __rich_repr__(self) -> RichReprResult:
+        yield "name", self.name
 
     def __rich__(self) -> RenderableType:
         return self.layout

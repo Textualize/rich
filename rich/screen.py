@@ -24,6 +24,8 @@ class Screen:
         style (StyleType, optional): Optional background style. Defaults to None.
     """
 
+    renderable: "RenderableType"
+
     def __init__(
         self,
         *renderables: "RenderableType",
