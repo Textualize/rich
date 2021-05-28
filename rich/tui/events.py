@@ -32,6 +32,7 @@ class EventType(Enum):
     FOCUS = auto()
     BLUR = auto()
     KEY = auto()
+    MOUSE_MOVE = auto()
     MOUSE_PRESSED = auto()
     MOUSE_RELEASED = auto()
     MOUSE_CLICKED = auto()
@@ -122,6 +123,18 @@ class Key(Event, type=EventType.KEY, bubble=True):
     @property
     def key(self) -> str:
         return chr(self.code)
+
+
+@rich_repr
+class MouseMove(Event, type=EventType.MOUSE_MOVE):
+    def __init__(self, sender: MessageTarget, x: int, y: int) -> None:
+        super().__init__(sender)
+        self.x = x
+        self.y = y
+
+    def __rich_repr__(self) -> RichReprResult:
+        yield "x", self.x
+        yield "y", self.y
 
 
 @rich_repr

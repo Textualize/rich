@@ -114,10 +114,12 @@ class CursesDriver(Driver):
         curses.noecho()
         curses.cbreak()
         curses.halfdelay(1)
-        curses.mousemask(-1)
+        curses.mousemask(curses.REPORT_MOUSE_POSITION | curses.ALL_MOUSE_EVENTS)
+        # curses.mousemask(-1)
 
         self._stdscr.keypad(True)
         self.console.show_cursor(False)
+        self.console.file.write("\033[?1003h\n")
         self._key_thread = Thread(
             target=self.run_key_thread, args=(asyncio.get_event_loop(),)
         )
@@ -159,12 +161,28 @@ class CursesDriver(Driver):
 
                 try:
                     _id, x, y, _z, button_state = curses.getmouse()
+                    log.debug("%s %s", _id, curses.REPORT_MOUSE_POSITION)
                 except Exception:
                     log.exception("getmouse")
                 else:
+                    if button_state & curses.REPORT_MOUSE_POSITION:
+                        send_event(events.MouseMove(self._target, x, y))
+                    alt = bool(button_state & curses.BUTTON_ALT)
+                    ctrl = bool(button_state & curses.BUTTON_CTRL)
+                    shift = bool(button_state & curses.BUTTON_SHIFT)
                     for event_type, masks in self._MOUSE:
                         for button, mask in enumerate(masks, 1):
                             if button_state & mask:
-                                send_event(event_type(self._target, x, y, button))
+                                send_event(
+                                    event_type(
+                                        self._target,
+                                        x,
+                                        y,
+                                        button,
+                                        alt=alt,
+                                        ctrl=ctrl,
+                                        shift=shift,
+                                    )
+                                )
             else:
                 send_event(events.Key(self._target, code=code))
