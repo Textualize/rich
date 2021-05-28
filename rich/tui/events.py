@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 import re
 from enum import auto, Enum
 from time import monotonic
-from typing import ClassVar, Optional, TYPE_CHECKING
+from typing import ClassVar, Optional, Set, TYPE_CHECKING
 
 from ..repr import rich_repr, RichReprResult
 
@@ -32,7 +32,10 @@ class EventType(Enum):
     FOCUS = auto()
     BLUR = auto()
     KEY = auto()
-
+    MOUSE_PRESSED = auto()
+    MOUSE_RELEASED = auto()
+    MOUSE_CLICKED = auto()
+    MOUSE_DOUBLE_CLICKED = auto()
     CUSTOM = 1000
 
 
@@ -119,6 +122,47 @@ class Key(Event, type=EventType.KEY, bubble=True):
     @property
     def key(self) -> str:
         return chr(self.code)
+
+
+@rich_repr
+class MousePressed(Event, type=EventType.MOUSE_PRESSED):
+    def __init__(
+        self,
+        sender: MessageTarget,
+        x: int,
+        y: int,
+        button: int,
+        alt: bool = False,
+        ctrl: bool = False,
+        shift: bool = False,
+    ) -> None:
+        super().__init__(sender)
+        self.x = x
+        self.y = y
+        self.button = button
+        self.alt = alt
+        self.ctrl = ctrl
+        self.shift = shift
+
+    def __rich_repr__(self) -> RichReprResult:
+        yield "x", self.x
+        yield "y", self.y
+        yield "button", self.button,
+        yield "alt", self.alt, False
+        yield "ctrl", self.ctrl, False
+        yield "shift", self.shift, False
+
+
+class MouseReleased(MousePressed, type=EventType.MOUSE_RELEASED):
+    pass
+
+
+class MouseClicked(MousePressed, type=EventType.MOUSE_CLICKED):
+    pass
+
+
+class MouseDoubleClicked(MousePressed, type=EventType.MOUSE_DOUBLE_CLICKED):
+    pass
 
 
 @rich_repr

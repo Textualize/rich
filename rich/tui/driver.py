@@ -37,6 +37,42 @@ class Driver(ABC):
 
 
 class CursesDriver(Driver):
+
+    _MOUSE_PRESSED = [
+        curses.BUTTON1_PRESSED,
+        curses.BUTTON2_PRESSED,
+        curses.BUTTON3_PRESSED,
+        curses.BUTTON4_PRESSED,
+    ]
+
+    _MOUSE_RELEASED = [
+        curses.BUTTON1_RELEASED,
+        curses.BUTTON2_RELEASED,
+        curses.BUTTON3_RELEASED,
+        curses.BUTTON4_RELEASED,
+    ]
+
+    _MOUSE_CLICKED = [
+        curses.BUTTON1_CLICKED,
+        curses.BUTTON2_CLICKED,
+        curses.BUTTON3_CLICKED,
+        curses.BUTTON4_CLICKED,
+    ]
+
+    _MOUSE_DOUBLE_CLICKED = [
+        curses.BUTTON1_DOUBLE_CLICKED,
+        curses.BUTTON2_DOUBLE_CLICKED,
+        curses.BUTTON3_DOUBLE_CLICKED,
+        curses.BUTTON4_DOUBLE_CLICKED,
+    ]
+
+    _MOUSE = [
+        (events.MousePressed, _MOUSE_PRESSED),
+        (events.MouseReleased, _MOUSE_RELEASED),
+        (events.MouseClicked, _MOUSE_CLICKED),
+        (events.MouseDoubleClicked, _MOUSE_DOUBLE_CLICKED),
+    ]
+
     def __init__(self, console: "Console", target: "MessageTarget") -> None:
         super().__init__(console, target)
         self._stdscr = None
@@ -78,6 +114,7 @@ class CursesDriver(Driver):
         curses.noecho()
         curses.cbreak()
         curses.halfdelay(1)
+        curses.mousemask(-1)
 
         self._stdscr.keypad(True)
         self.console.show_cursor(False)
@@ -105,12 +142,29 @@ class CursesDriver(Driver):
         stdscr = self._stdscr
         assert stdscr is not None
         exit_event = self._exit_event
+
+        def send_event(event: events.Event) -> None:
+            log.debug(event)
+            asyncio.run_coroutine_threadsafe(
+                self._target.post_message(event),
+                loop=loop,
+            )
+
         while not exit_event.is_set():
             code = stdscr.getch()
-            if code != -1:
-                key_event = events.Key(sender=self._target, code=code)
-                log.debug("KEY=%r", key_event)
-                asyncio.run_coroutine_threadsafe(
-                    self._target.post_message(key_event),
-                    loop=loop,
-                )
+            if code == -1:
+                continue
+
+            if code == curses.KEY_MOUSE:
+
+                try:
+                    _id, x, y, _z, button_state = curses.getmouse()
+                except Exception:
+                    log.exception("getmouse")
+                else:
+                    for event_type, masks in self._MOUSE:
+                        for button, mask in enumerate(masks, 1):
+                            if button_state & mask:
+                                send_event(event_type(self._target, x, y, button))
+            else:
+                send_event(events.Key(self._target, code=code))
