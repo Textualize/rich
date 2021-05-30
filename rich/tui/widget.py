@@ -50,7 +50,6 @@ class Widget(MessagePump):
 
     async def refresh(self) -> None:
         self.app.refresh()
-        # await self.emit(events.Refresh(self))
 
     def __rich_repr__(self) -> RichReprResult:
         yield "name", self.name

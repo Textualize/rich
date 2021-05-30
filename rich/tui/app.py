@@ -99,6 +99,9 @@ class App(MessagePump):
         if not event.suppressed:
             self.refresh()
 
+    async def on_mouse_move(self, event: events.MouseMove) -> None:
+        await self.view.post_message(event)
+
 
 if __name__ == "__main__":
     import asyncio

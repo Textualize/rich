@@ -181,6 +181,8 @@ class Layout:
         yield "minimum_size", self.minimum_size, 1
         yield "ratio", self.ratio, 1
 
+    __rich_repr__.meta = {"angular": True}
+
     @property
     def renderable(self) -> RenderableType:
         """Layout renderable."""
@@ -190,6 +192,11 @@ class Layout:
     def children(self) -> List["Layout"]:
         """Gets (visible) layout children."""
         return [child for child in self._children if child.visible]
+
+    @property
+    def map(self) -> RenderMap:
+        """Get a map of the last render."""
+        return self._render_map
 
     def get(self, name: str) -> Optional["Layout"]:
         """Get a named layout, or None if it doesn't exist.

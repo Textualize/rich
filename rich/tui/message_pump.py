@@ -107,8 +107,12 @@ class MessagePump:
                 break
             log.debug("%r -> %r", message, self)
             await self.dispatch_message(message, priority)
+            if self._message_queue.empty():
+                await self.dispatch_message(events.Idle(self))
 
-    async def dispatch_message(self, message: Message, priority: int) -> Optional[bool]:
+    async def dispatch_message(
+        self, message: Message, priority: int = 0
+    ) -> Optional[bool]:
         if isinstance(message, events.Event):
             method_name = f"on_{message.name}"
             dispatch_function: MessageHandler = getattr(self, method_name, None)

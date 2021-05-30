@@ -21,6 +21,7 @@ class EventType(Enum):
     LOAD = auto()
     STARTUP = auto()
     CREATED = auto()
+    IDLE = auto()
     RESIZE = auto()
     MOUNT = auto()
     UNMOUNT = auto()
@@ -37,6 +38,8 @@ class EventType(Enum):
     MOUSE_RELEASED = auto()
     MOUSE_CLICKED = auto()
     MOUSE_DOUBLE_CLICKED = auto()
+    MOUSE_ENTER = auto()
+    MOUSE_LEAVE = auto()
     CUSTOM = 1000
 
 
@@ -76,6 +79,10 @@ class Startup(Event, type=EventType.SHUTDOWN_REQUEST):
 
 class Created(Event, type=EventType.CREATED):
     pass
+
+
+class Idle(Event, type=EventType.IDLE):
+    """Sent when there are no more items in the message queue."""
 
 
 class Resize(Event, type=EventType.RESIZE):
@@ -194,6 +201,23 @@ class Timer(Event, type=EventType.TIMER, priority=10):
 
     def __rich_repr__(self) -> RichReprResult:
         yield self.timer.name
+
+
+@rich_repr
+class MouseEnter(Event, type=EventType.MOUSE_ENTER):
+    def __init__(self, sender: MessageTarget, x: int, y: int) -> None:
+        super().__init__(sender)
+        self.x = x
+        self.y = y
+
+    def __rich_repr__(self) -> RichReprResult:
+        yield "x", self.x
+        yield "y", self.y
+
+
+@rich_repr
+class MouseLeave(Event, type=EventType.MOUSE_LEAVE):
+    pass
 
 
 class Focus(Event, type=EventType.FOCUS):

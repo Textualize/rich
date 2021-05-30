@@ -146,7 +146,6 @@ class CursesDriver(Driver):
         exit_event = self._exit_event
 
         def send_event(event: events.Event) -> None:
-            log.debug(event)
             asyncio.run_coroutine_threadsafe(
                 self._target.post_message(event),
                 loop=loop,
@@ -161,9 +160,8 @@ class CursesDriver(Driver):
 
                 try:
                     _id, x, y, _z, button_state = curses.getmouse()
-                    log.debug("%s %s", _id, curses.REPORT_MOUSE_POSITION)
                 except Exception:
-                    log.exception("getmouse")
+                    log.exception("error in curses.getmouse")
                 else:
                     if button_state & curses.REPORT_MOUSE_POSITION:
                         send_event(events.MouseMove(self._target, x, y))
