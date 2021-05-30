@@ -108,6 +108,7 @@ if __name__ == "__main__":
     from logging import FileHandler
 
     from .widgets.header import Header
+    from .widgets.placeholder import Placeholder
 
     logging.basicConfig(
         level="NOTSET",
@@ -124,6 +125,7 @@ if __name__ == "__main__":
 
         async def on_startup(self, event: events.Startup) -> None:
             await self.view.mount(Header(self.title), slot="header")
+            await self.view.mount(Placeholder(), slot="body")
             self.refresh()
 
     MyApp.run()

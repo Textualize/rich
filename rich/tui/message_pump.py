@@ -126,15 +126,18 @@ class MessagePump:
         self, message: Message, priority: int = 0
     ) -> Optional[bool]:
         if isinstance(message, events.Event):
-            method_name = f"on_{message.name}"
-            dispatch_function: MessageHandler = getattr(self, method_name, None)
-            if dispatch_function is not None:
-                await dispatch_function(message)
-            if message.bubble and self._parent:
-                await self._parent.post_message(message, priority)
+            await self.on_event(message, priority)
         else:
             return await self.on_message(message)
         return False
+
+    async def on_event(self, event: events.Event, priority: int) -> None:
+        method_name = f"on_{event.name}"
+        dispatch_function: MessageHandler = getattr(self, method_name, None)
+        if dispatch_function is not None:
+            await dispatch_function(event)
+        if event.bubble and self._parent:
+            await self._parent.post_message(event, priority)
 
     async def on_message(self, message: Message) -> None:
         pass

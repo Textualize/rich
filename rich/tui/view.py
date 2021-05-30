@@ -127,5 +127,5 @@ class LayoutView(View):
                 finally:
                     self.mouse_over = widget
             await widget.post_message(
-                events.MouseMove(self, event.x - region.x, event.y - region.x)
+                events.MouseMove(self, event.x - region.x, event.y - region.y)
             )

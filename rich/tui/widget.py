@@ -1,10 +1,12 @@
+from logging import getLogger
+from typing import ClassVar, NamedTuple, Optional, TYPE_CHECKING
+
+
 from rich.align import Align
 from rich.console import Console, ConsoleOptions, RenderResult, RenderableType
 from rich.pretty import Pretty
 from rich.panel import Panel
 from rich.repr import rich_repr, RichReprResult
-
-from typing import ClassVar, NamedTuple, Optional, TYPE_CHECKING
 
 from . import events
 from ._context import active_app
@@ -13,20 +15,12 @@ from .message_pump import MessagePump
 if TYPE_CHECKING:
     from .app import App
 
+log = getLogger("rich")
+
 
 class WidgetDimensions(NamedTuple):
     width: int
     height: int
-
-
-class WidgetPlaceholder:
-    def __init__(self, widget: "Widget") -> None:
-        self.widget = widget
-
-    def __rich__(self) -> Panel:
-        return Panel(
-            Align.center(Pretty(self.widget), vertical="middle"), title="Widget"
-        )
 
 
 @rich_repr
@@ -41,6 +35,7 @@ class Widget(MessagePump):
         Widget._count += 1
         self.size = WidgetDimensions(0, 0)
         self.size_changed = False
+        self.mouse_over = False
         super().__init__()
         if not self.mouse_events:
             self.disable_messages(events.MouseMove)
@@ -64,7 +59,11 @@ class Widget(MessagePump):
     def render(
         self, console: Console, options: ConsoleOptions, new_size: WidgetDimensions
     ) -> RenderableType:
-        return WidgetPlaceholder(self)
+        return Panel(
+            Align.center(Pretty(self), vertical="middle"),
+            title=self.__class__.__name__,
+            border_style="green" if self.mouse_over else "blue",
+        )
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
@@ -73,3 +72,10 @@ class Widget(MessagePump):
         renderable = self.render(console, options, new_size)
         self.size = new_size
         yield renderable
+
+    async def on_event(self, event: events.Event, priority: int) -> None:
+        if isinstance(event, (events.MouseEnter, events.MouseLeave)):
+            self.mouse_over = isinstance(event, events.MouseEnter)
+            log.debug("%r", self.mouse_over)
+            await self.refresh()
+        await super().on_event(event, priority)
