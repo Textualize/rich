@@ -34,6 +34,7 @@ class Widget(MessagePump):
     _count: ClassVar[int] = 0
     can_focus: bool = False
     mouse_events: bool = False
+    idle_events: bool = False
 
     def __init__(self, name: Optional[str] = None) -> None:
         self.name = name or f"Widget#{self._count}"
@@ -43,6 +44,8 @@ class Widget(MessagePump):
         super().__init__()
         if not self.mouse_events:
             self.disable_messages(events.MouseMove)
+        if not self.idle_events:
+            self.disable_messages(events.Idle)
 
     @property
     def app(self) -> "App":
