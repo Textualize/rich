@@ -3,6 +3,7 @@ from typing import ClassVar, NamedTuple, Optional, TYPE_CHECKING
 
 
 from rich.align import Align
+from rich import box
 from rich.console import Console, ConsoleOptions, RenderResult, RenderableType
 from rich.pretty import Pretty
 from rich.panel import Panel
@@ -63,6 +64,7 @@ class Widget(MessagePump):
             Align.center(Pretty(self), vertical="middle"),
             title=self.__class__.__name__,
             border_style="green" if self.mouse_over else "blue",
+            box=box.HEAVY if self.mouse_over else box.ROUNDED,
         )
 
     def __rich_console__(
