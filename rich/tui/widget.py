@@ -32,6 +32,8 @@ class WidgetPlaceholder:
 @rich_repr
 class Widget(MessagePump):
     _count: ClassVar[int] = 0
+    can_focus: bool = False
+    mouse_events: bool = False
 
     def __init__(self, name: Optional[str] = None) -> None:
         self.name = name or f"Widget#{self._count}"
@@ -39,6 +41,8 @@ class Widget(MessagePump):
         self.size = WidgetDimensions(0, 0)
         self.size_changed = False
         super().__init__()
+        if not self.mouse_events:
+            self.disable_messages(events.MouseMove)
 
     @property
     def app(self) -> "App":

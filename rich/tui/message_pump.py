@@ -1,5 +1,5 @@
 from functools import total_ordering
-from typing import AsyncIterable, Optional, NamedTuple, Tuple, TYPE_CHECKING
+from typing import AsyncIterable, Optional, NamedTuple, Set, Type, Tuple, TYPE_CHECKING
 import asyncio
 from asyncio import PriorityQueue
 
@@ -51,6 +51,18 @@ class MessagePump:
         self._parent = parent
         self._closing: bool = False
         self._closed: bool = False
+        self._disabled_messages: Set[Message] = set()
+
+    def check_message_enabled(self, message: Message) -> bool:
+        return type(message) not in self._disabled_messages
+
+    def disable_messages(self, *messages: Type[Message]) -> None:
+        """Disable message types from being proccessed."""
+        self._disabled_messages.intersection_update(messages)
+
+    def enable_messages(self, *messages: Type[Message]) -> None:
+        """Enable processing of messages types."""
+        self._disabled_messages.difference_update(messages)
 
     async def get_message(self) -> MessageQueueItem:
         """Get the next event on the queue, or None if queue is closed.
@@ -134,6 +146,8 @@ class MessagePump:
     ) -> bool:
         if self._closing or self._closed:
             return False
+        if not self.check_message_enabled(message):
+            return True
         event_priority = priority if priority is not None else message.default_priority
         item = MessageQueueItem(event_priority, message)
         await self._message_queue.put(item)
