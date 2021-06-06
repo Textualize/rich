@@ -1,9 +1,10 @@
 from typing import Any
 
+from rich.pretty import install
+from rich.traceback import install as tr_install
+
 
 def load_ipython_extension(ip: Any) -> None:
-    from rich.pretty import install
-    from rich.traceback import install as tr_install
 
     install()
     tr_install()
