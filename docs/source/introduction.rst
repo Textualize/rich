@@ -69,8 +69,8 @@ If you would rather not shadow Python's builtin print, you can import ``rich.pri
 
 Continue reading to learn about the more advanced features of Rich.
 
-Python in the REPL
-------------------
+Rich in the REPL
+----------------
 
 Rich may be installed in the REPL so that Python data structures are automatically pretty printed with syntax highlighting. Here's how::
 
@@ -85,6 +85,15 @@ You can also use this feature to try out Rich *renderables*. Here's an example::
 
 Read on to learn more about Rich renderables.
 
+IPython Extension
+~~~~~~~~~~~~~~~~~
+
+Rich also includes an IPython extension that will do this same pretty install + pretty tracebacks. Here's how to load it::
+
+    In [1]: %load_ext rich
+    
+You can also have it load by default by adding `"rich"` to the ``c.InteractiveShellApp.extension`` variable in 
+`IPython Configuration <https://ipython.readthedocs.io/en/stable/config/intro.html>`_.
 
 Rich Inspect
 ------------
