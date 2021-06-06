@@ -10,6 +10,7 @@ readme = "README.md"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
+    "Framework :: IPython",
     "Intended Audience :: Developers",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: MacOS",
