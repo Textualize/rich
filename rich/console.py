@@ -12,7 +12,7 @@ from functools import wraps
 from getpass import getpass
 from itertools import islice
 from time import monotonic
-from types import TracebackType
+from types import FrameType, TracebackType
 from typing import (
     IO,
     TYPE_CHECKING,
@@ -25,6 +25,7 @@ from typing import (
     NamedTuple,
     Optional,
     TextIO,
+    Tuple,
     Type,
     Union,
     cast,
@@ -1637,6 +1638,41 @@ class Console:
         )
         self.print(traceback)
 
+    @staticmethod
+    def _caller_frame_info(
+        offset: int,
+        currentframe: Callable[[], Optional[FrameType]] = inspect.currentframe,
+    ) -> Tuple[str, int, Dict[str, Any]]:
+        """Get caller frame information.
+
+        Args:
+            offset (int): the caller offset within the current frame stack.
+            currentframe (Callable[[], Optional[FrameType]], optional): the callable to use to
+                retrieve the current frame. Defaults to ``inspect.currentframe``.
+
+        Returns:
+            Tuple[str, int, Dict[str, Any]]: A tuple containing the filename, the line number and
+                the dictionary of local variables associated with the caller frame.
+
+        Raises:
+            RuntimeError: If the stack offset is invalid.
+        """
+        # Ignore the frame of this local helper
+        offset += 1
+
+        frame = currentframe()
+        if frame is not None:
+            # Use the faster currentframe where implemented
+            while offset and frame:
+                frame = frame.f_back
+                offset -= 1
+            assert frame is not None
+            return frame.f_code.co_filename, frame.f_lineno, frame.f_locals
+        else:
+            # Fallback to the slower stack
+            frame_info = inspect.stack()[offset]
+            return frame_info.filename, frame_info.lineno, frame_info.frame.f_locals
+
     def log(
         self,
         *objects: Any,
@@ -1682,18 +1718,13 @@ class Console:
             if style is not None:
                 renderables = [Styled(renderable, style) for renderable in renderables]
 
-            caller = inspect.stack()[_stack_offset]
-            link_path = (
-                None
-                if caller.filename.startswith("<")
-                else os.path.abspath(caller.filename)
-            )
-            path = caller.filename.rpartition(os.sep)[-1]
-            line_no = caller.lineno
+            filename, line_no, locals = self._caller_frame_info(_stack_offset)
+            link_path = None if filename.startswith("<") else os.path.abspath(filename)
+            path = filename.rpartition(os.sep)[-1]
             if log_locals:
                 locals_map = {
                     key: value
-                    for key, value in caller.frame.f_locals.items()
+                    for key, value in locals.items()
                     if not key.startswith("__")
                 }
                 renderables.append(render_scope(locals_map, title="[i]locals"))
