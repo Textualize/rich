@@ -49,7 +49,7 @@ if __name__ == "__main__":
             yield "bar", {"shopping": ["eggs", "ham", "pineapple"]}
             yield "buy", "hand sanitizer"
 
-        __rich_repr__.angular = False
+        __rich_repr__.angular = False  # type: ignore
 
     foo = Foo()
     from rich.console import Console
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     console.print(foo, width=30)
 
     console.rule("Angular repr")
-    Foo.__rich_repr__.angular = True
+    Foo.__rich_repr__.angular = True  # type: ignore
 
     console.print(foo)
 
