@@ -45,6 +45,13 @@ def test_log():
     assert rendered == expected
 
 
+def test_log_caller_frame_info():
+    for i in range(2):
+        assert Console._caller_frame_info(i) == Console._caller_frame_info(
+            i, lambda: None
+        )
+
+
 def test_justify():
     console = Console(width=20, log_path=False, log_time=False, color_system=None)
     console.begin_capture()

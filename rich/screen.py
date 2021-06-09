@@ -7,7 +7,13 @@ from ._loop import loop_last
 
 
 if TYPE_CHECKING:
-    from .console import Console, ConsoleOptions, RenderResult, RenderableType
+    from .console import (
+        Console,
+        ConsoleOptions,
+        RenderResult,
+        RenderableType,
+        RenderGroup,
+    )
 
 
 class Screen:
@@ -18,13 +24,19 @@ class Screen:
         style (StyleType, optional): Optional background style. Defaults to None.
     """
 
+    renderable: "RenderableType"
+
     def __init__(
         self,
-        renderable: Optional["RenderableType"] = None,
+        *renderables: "RenderableType",
         style: Optional[StyleType] = None,
+        application_mode: bool = False,
     ) -> None:
-        self.renderable = renderable
+        from rich.console import RenderGroup
+
+        self.renderable = RenderGroup(*renderables)
         self.style = style
+        self.application_mode = application_mode
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -36,7 +48,7 @@ class Screen:
             self.renderable or "", render_options, style=style, pad=True
         )
         lines = Segment.set_shape(lines, width, height, style=style)
-        new_line = Segment.line()
+        new_line = Segment("\n\r") if self.application_mode else Segment.line()
         for last, line in loop_last(lines):
             yield from line
             if not last:

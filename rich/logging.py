@@ -142,7 +142,7 @@ class RichHandler(Handler):
             if self.formatter:
                 record.message = record.getMessage()
                 formatter = self.formatter
-                if hasattr(formatter, "usesTime") and formatter.usesTime():  # type: ignore
+                if hasattr(formatter, "usesTime") and formatter.usesTime():
                     record.asctime = formatter.formatTime(record, formatter.datefmt)
                 message = formatter.formatMessage(record)
 

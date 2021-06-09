@@ -1,7 +1,7 @@
 import sys
 
 from rich.segment import ControlType
-from rich.segment import Segment
+from rich.segment import Segment, Segments
 from rich.style import Style
 
 
@@ -127,3 +127,14 @@ def test_is_control():
     assert Segment("foo", Style(bold=True)).is_control == False
     assert Segment("foo", Style(bold=True), []).is_control == True
     assert Segment("foo", Style(bold=True), [(ControlType.HOME, 0)]).is_control == True
+
+
+def test_segments_renderable():
+    segments = Segments([Segment("foo")])
+    assert list(segments.__rich_console__(None, None)) == [Segment("foo")]
+
+    segments = Segments([Segment("foo")], new_lines=True)
+    assert list(segments.__rich_console__(None, None)) == [
+        Segment("foo"),
+        Segment.line(),
+    ]

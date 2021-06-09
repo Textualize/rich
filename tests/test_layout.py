@@ -59,6 +59,7 @@ def test_render():
     result = capture.get()
     print(repr(result))
     expected = "╭──────────────────────────────────────────────────────────╮\n│ foo                                                      │\n│                                                          │\n│                                                          │\n╰──────────────────────────────────────────────────────────╯\nfoobar                        ╭───── 'right' (30 x 5) ─────╮\n                              │                            │\n                              │    Layout(name='right')    │\n                              │                            │\n                              ╰────────────────────────────╯\n"
+
     assert result == expected
 
 
@@ -74,7 +75,7 @@ def test_tree():
     result = capture.get()
     print(repr(result))
     expected = "⬍ Layout(name='root')                                       \n├── ⬍ Layout(size=2)                                        \n└── ⬌ Layout(name='bar')                                    \n    ├── ⬍ Layout()                                          \n    └── ⬍ Layout()                                          \n"
-
+    print(result, "\n", expected)
     assert result == expected
 
 
@@ -92,5 +93,4 @@ def test_refresh_screen():
     print()
     print(repr(result))
     expected = "\x1b[1;1H\x1b[34m╭─\x1b[0m\x1b[34m \x1b[0m\x1b[32m'foo'\x1b[0m\x1b[34m─╮\x1b[0m\x1b[2;1H\x1b[34m│\x1b[0m \x1b[1;35mLayout\x1b[0m \x1b[34m│\x1b[0m\x1b[3;1H\x1b[34m│\x1b[0m \x1b[1m(\x1b[0m      \x1b[34m│\x1b[0m\x1b[4;1H\x1b[34m│\x1b[0m     \x1b[33mna\x1b[0m \x1b[34m│\x1b[0m\x1b[5;1H\x1b[34m╰────────╯\x1b[0m"
-
     assert result == expected

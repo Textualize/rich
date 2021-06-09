@@ -25,6 +25,7 @@ def cell_len(text: str, _cache: Dict[str, int] = LRUCache(1024 * 4)) -> int:
     return total_size
 
 
+@lru_cache(maxsize=4096)
 def get_character_cell_size(character: str) -> int:
     """Get the cell size of a character.
 
