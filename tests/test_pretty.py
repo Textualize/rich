@@ -38,7 +38,7 @@ def test_pretty():
 
     result = pretty_repr(test, max_width=80)
     print(result)
-    print(repr(result))
+    # print(repr(result))
     expected = "{\n    'foo': [1, 2, 3, (4, 5, {6}, 7, 8, {9}), {}],\n    'bar': {\n        'egg': 'baz',\n        'words': [\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World'\n        ]\n    },\n    False: 'foo',\n    True: '',\n    'text': ('Hello World', 'foo bar baz egg')\n}"
     print(expected)
     assert result == expected
@@ -172,6 +172,9 @@ def test_tuples():
     result = console.end_capture()
     print(repr(result))
     expected = "(1,)\n(\n│   1,\n)\n(\n│   (\n│   │   1,\n│   ),\n)\n"
+    print(result)
+    print("--")
+    print(expected)
     assert result == expected
 
 

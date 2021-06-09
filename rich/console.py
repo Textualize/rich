@@ -27,6 +27,7 @@ from typing import (
     TextIO,
     Tuple,
     Type,
+    Tuple,
     Union,
     cast,
 )
@@ -944,6 +945,17 @@ class Console:
             height if self._height is None else self._height,
         )
 
+    @size.setter
+    def size(self, new_size: Tuple[int, int]) -> None:
+        """Set a new size for the terminal.
+
+        Args:
+            new_size (Tuple[int, int]): New width and height.
+        """
+        width, height = new_size
+        self._width = width
+        self._height = height
+
     @property
     def width(self) -> int:
         """Get the width of the console.
@@ -951,8 +963,16 @@ class Console:
         Returns:
             int: The width (in characters) of the console.
         """
-        width, _ = self.size
-        return width
+        return self.size.width
+
+    @width.setter
+    def width(self, width: int) -> None:
+        """Set width.
+
+        Args:
+            width (int): New width.
+        """
+        self._width = width
 
     @property
     def height(self) -> int:
@@ -961,8 +981,16 @@ class Console:
         Returns:
             int: The height (in lines) of the console.
         """
-        _, height = self.size
-        return height
+        return self.size.height
+
+    @height.setter
+    def height(self, height: int) -> None:
+        """Set height.
+
+        Args:
+            height (int): new height.
+        """
+        self._height = height
 
     def bell(self) -> None:
         """Play a 'bell' sound (if supported by the terminal)."""

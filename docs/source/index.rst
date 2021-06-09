@@ -16,6 +16,7 @@ Welcome to Rich's documentation!
    markup.rst
    text.rst
    highlighting.rst
+   pretty.rst
    logging.rst
    traceback.rst
    prompt.rst
