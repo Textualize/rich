@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Console.height setter
 - Added angular style Rich reprs
 
+### Changed
+
+- Changed the logic for retrieving the calling frame in console logs to a faster one for the Python implementations that support it.
+
 ## [10.2.2] - 2021-05-19
 
 ### Fixed
