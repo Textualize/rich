@@ -15,8 +15,6 @@ class Bird:
         yield "fly", self.fly, True
         yield "extinct", self.extinct, False
 
-    __rich_repr__.angular = True
-
 
 from rich import print
 
