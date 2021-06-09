@@ -1,13 +1,13 @@
 Pretty
 ======
 
-In addition to syntax highlighting, Rich will automatically format any containers (lists, dicts, sets etc) you print to the console. The formatting method used by Rich follows well established conventions in the Python world to present data in a more readable way. 
+In addition to syntax highlighting, Rich will format (i.e. *pretty print*) any containers (lists, dicts, sets etc) you print to the console.
 
 Run the following command to see an example of pretty printed output::
 
     python -m rich.pretty
 
-Note how the output will change if you change the width of the terminal.
+Note how the output is formatted to fit within the width of the terminal.
 
 pprint method
 -------------
@@ -20,7 +20,7 @@ The :func:`~rich.pretty.pprint` method offers a few more argument you can use to
 Indent guides
 ~~~~~~~~~~~~~
 
-Rich can draw *intent guides* which are vertical lines to highlight the indent level of a data structure. These can make it easier to read more deeply nested output. The pprint method enables indent guides by default, but you can set ``indent_guides=False`` to disable this feature. 
+Rich can draw *intent guides* to highlight the indent level of a data structure. These can make it easier to read more deeply nested output. The pprint method enables indent guides by default, but you can set ``indent_guides=False`` to disable this feature. 
 
 Expand all
 ~~~~~~~~~~
