@@ -1,7 +1,9 @@
 """Rich text and beautiful formatting in the terminal."""
 
 import os
-from typing import Any, IO, Optional, TYPE_CHECKING
+from typing import IO, TYPE_CHECKING, Any, Optional
+
+from ._extension import load_ipython_extension
 
 __all__ = ["get_console", "reconfigure", "print", "inspect"]
 
