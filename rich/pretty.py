@@ -301,11 +301,7 @@ class Node:
     is_tuple: bool = False
     children: Optional[List["Node"]] = None
     key_separator = ": "
-
-    @property
-    def separator(self) -> str:
-        """Get separator between items."""
-        return "" if self.last else ","
+    separator: str = ", "
 
     def iter_tokens(self) -> Iterable[str]:
         """Generate tokens for this node."""
@@ -324,7 +320,7 @@ class Node:
                     for child in self.children:
                         yield from child.iter_tokens()
                         if not child.last:
-                            yield ", "
+                            yield self.separator
                 yield self.close_brace
             else:
                 yield self.empty
@@ -380,12 +376,14 @@ class Node:
 class _Line:
     """A line in repr output."""
 
+    parent: Optional["_Line"] = None
     is_root: bool = False
     node: Optional[Node] = None
     text: str = ""
     suffix: str = ""
     whitespace: str = ""
     expanded: bool = False
+    last: bool = False
 
     @property
     def expandable(self) -> bool:
@@ -407,31 +405,39 @@ class _Line:
         whitespace = self.whitespace
         assert node.children
         if node.key_repr:
-            yield _Line(
+            new_line = yield _Line(
                 text=f"{node.key_repr}{node.key_separator}{node.open_brace}",
                 whitespace=whitespace,
             )
         else:
-            yield _Line(text=node.open_brace, whitespace=whitespace)
+            new_line = yield _Line(text=node.open_brace, whitespace=whitespace)
         child_whitespace = self.whitespace + " " * indent_size
         tuple_of_one = node.is_tuple and len(node.children) == 1
-        for child in node.children:
-            separator = "," if tuple_of_one else child.separator
+        for last, child in loop_last(node.children):
+            separator = "," if tuple_of_one else node.separator
             line = _Line(
+                parent=new_line,
                 node=child,
                 whitespace=child_whitespace,
                 suffix=separator,
+                last=last and not tuple_of_one,
             )
             yield line
 
         yield _Line(
             text=node.close_brace,
             whitespace=whitespace,
-            suffix="," if (tuple_of_one and not self.is_root) else node.separator,
+            suffix=self.suffix,
+            last=self.last,
         )
 
     def __str__(self) -> str:
-        return f"{self.whitespace}{self.text}{self.node or ''}{self.suffix}"
+        if self.last:
+            return f"{self.whitespace}{self.text}{self.node or ''}"
+        else:
+            return (
+                f"{self.whitespace}{self.text}{self.node or ''}{self.suffix.rstrip()}"
+            )
 
 
 def traverse(
@@ -493,17 +499,28 @@ def traverse(
                     yield arg
 
         if hasattr(obj, "__rich_repr__"):
+            angular = getattr(obj.__rich_repr__, "angular", False)
             args = list(iter_rich_args(obj.__rich_repr__()))
+            class_name = obj.__class__.__name__
 
             if args:
                 children = []
                 append = children.append
-                node = Node(
-                    open_brace=f"{obj.__class__.__name__}(",
-                    close_brace=")",
-                    children=children,
-                    last=root,
-                )
+                if angular:
+                    node = Node(
+                        open_brace=f"<{class_name} ",
+                        close_brace=">",
+                        children=children,
+                        last=root,
+                        separator=" ",
+                    )
+                else:
+                    node = Node(
+                        open_brace=f"{class_name}(",
+                        close_brace=")",
+                        children=children,
+                        last=root,
+                    )
                 for last, arg in loop_last(args):
                     if isinstance(arg, tuple):
                         key, child = arg
@@ -518,7 +535,9 @@ def traverse(
                         append(child_node)
             else:
                 node = Node(
-                    value_repr=f"{obj.__class__.__name__}()", children=[], last=root
+                    value_repr=f"<{class_name}>" if angular else f"{class_name}()",
+                    children=[],
+                    last=root,
                 )
         elif _is_attr_object(obj):
             children = []

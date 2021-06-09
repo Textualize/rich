@@ -181,8 +181,6 @@ class Layout:
         yield "minimum_size", self.minimum_size, 1
         yield "ratio", self.ratio, 1
 
-    __rich_repr__.meta = {"angular": True}
-
     @property
     def renderable(self) -> RenderableType:
         """Layout renderable."""

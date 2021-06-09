@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Console.size setter
 - Added Console.width setter
 - Added Console.height setter
+- Added angular style Rich reprs
 
 ## [10.2.2] - 2021-05-19
 

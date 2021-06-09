@@ -409,7 +409,8 @@ class Segment(NamedTuple):
 
 
 class Segments:
-    """A simple renderable to render an iterable of segments.
+    """A simple renderable to render an iterable of segments. This class may be useful if
+    you want to print segments outside of a __rich_console__ method.
 
     Args:
         segments (Iterable[Segment]): An iterable of segments.
