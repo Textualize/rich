@@ -484,7 +484,7 @@ class Task:
 
     def get_time(self) -> float:
         """float: Get the current time, in seconds."""
-        return self._get_time()  # type: ignore
+        return self._get_time()
 
     @property
     def started(self) -> bool:
