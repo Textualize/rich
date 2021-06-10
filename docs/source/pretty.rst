@@ -1,5 +1,5 @@
-Pretty
-======
+Pretty Printing
+===============
 
 In addition to syntax highlighting, Rich will format (i.e. *pretty print*) containers such as lists, dicts, and sets.
 
