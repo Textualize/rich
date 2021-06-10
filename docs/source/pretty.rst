@@ -157,4 +157,13 @@ You can also tell Rich to generate the *angular bracket* style of repr, which te
 
     __rich_repr__.angular = True
 
+This will change the output of the Rich repr example to the following::
+
+    {
+        'gull': <Bird 'gull' eats=['fish', 'chips', 'ice cream', 'sausage rolls']>,
+        'penguin': <Bird 'penguin' eats=['fish'] fly=False>,
+        'dodo': <Bird 'dodo' eats=['fruit'] fly=False extinct=True>
+    }
+
+
 Note that you can add ``__rich_repr__`` methods to third-party libraries *without* including Rich as a dependency. If Rich is not installed, then nothing will break. Hopefully more third-party libraries will adopt Rich repr methods in the future.
