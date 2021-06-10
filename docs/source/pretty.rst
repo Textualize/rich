@@ -153,7 +153,7 @@ Each tuple specifies an element in the output.
 - ``yield name, value`` will generate a keyword argument.
 - ``yield name, value, default`` will generate a keyword argument *if* ``value`` is not equal to ``default``. 
 
-You can also tell Rich to generate the *angular bracket* style of repr, which tend to be used where there is no easy way to recreate the object's constructor. To do this set the function attribute ``"angluar"`` to ``True`` immediately after your ``__rich_repr__`` method. For example::
+You can also tell Rich to generate the *angular bracket* style of repr, which tend to be used where there is no easy way to recreate the object's constructor. To do this set the function attribute ``"angular"`` to ``True`` immediately after your ``__rich_repr__`` method. For example::
 
     __rich_repr__.angular = True
 
