@@ -210,7 +210,7 @@ if __name__ == "__main__":  # pragma: no cover
     from time import sleep
 
     FORMAT = "%(message)s"
-    # FORMAT = "%(asctime)-15s - %(level) - %(message)s"
+    # FORMAT = "%(asctime)-15s - %(levelname)s - %(message)s"
     logging.basicConfig(
         level="NOTSET",
         format=FORMAT,
