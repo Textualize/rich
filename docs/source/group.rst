@@ -16,7 +16,7 @@ To render two panels within a third panel, you would construct a RenderGroup wit
     print(Panel(panel_group))
 
 
-This pattern is nice when you know in advance what renderables will be in a group, put can get awkward if you have a larger number of renderables, especially if they are dynamic. Rich provides a :func:`~rich.console.render_group` decorator to help with these situations. The decorator builds a render group from an iterator of renderables. The following is the equivalent of the previous example using the decorator::
+This pattern is nice when you know in advance what renderables will be in a group, but can get awkward if you have a larger number of renderables, especially if they are dynamic. Rich provides a :func:`~rich.console.render_group` decorator to help with these situations. The decorator builds a render group from an iterator of renderables. The following is the equivalent of the previous example using the decorator::
 
     from rich import print
     from rich.console import render_group
