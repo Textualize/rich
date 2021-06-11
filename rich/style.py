@@ -67,7 +67,7 @@ class Style:
         "_null",
         "_tag",
         "_xml_attr",
-        "_xml_attr_data"
+        "_xml_attr_data",
     ]
 
     # maps bits on to SGR parameter
@@ -107,7 +107,7 @@ class Style:
         overline: Optional[bool] = None,
         link: Optional[str] = None,
         tag: Optional[str] = None,
-        xml_attr: Optional[Dict] = None
+        xml_attr: Optional[Dict] = None,
     ):
         self._ansi: Optional[str] = None
         self._style_definition: Optional[str] = None
@@ -115,9 +115,13 @@ class Style:
         self._tag = tag
         self._xml_attr = xml_attr
         if self._xml_attr:
-            self._xml_attr_data = ' '.join(f'{k}="{html.escape(v)}"' for k, v in xml_attr.items()) if xml_attr else ''
+            self._xml_attr_data = (
+                " ".join(f'{k}="{html.escape(v)}"' for k, v in xml_attr.items())
+                if xml_attr
+                else ""
+            )
         else:
-            self._xml_attr_data = ''
+            self._xml_attr_data = ""
 
         def _make_color(color: Union[Color, str]) -> Color:
             return color if isinstance(color, Color) else Color.parse(color)
@@ -615,7 +619,7 @@ class Style:
         legacy_windows: bool = False,
         mxp: bool = False,
         pueblo: bool = False,
-        links: bool = True
+        links: bool = True,
     ) -> str:
         """Render the ANSI codes for the style.
 
@@ -635,7 +639,9 @@ class Style:
         else:
             rendered = out_text
         if links and self._link and not legacy_windows:
-            rendered = f"\x1b]8;id={self._link_id};{self._link}\x1b\\{rendered}\x1b]8;;\x1b\\"
+            rendered = (
+                f"\x1b]8;id={self._link_id};{self._link}\x1b\\{rendered}\x1b]8;;\x1b\\"
+            )
         if (pueblo or mxp) and self._tag:
             if mxp:
                 if self._xml_attr:
@@ -644,7 +650,9 @@ class Style:
                     rendered = f"\x1b[4z<{self._tag}>{rendered}\x1b[4z</{self._tag}>"
             else:
                 if self._xml_attr:
-                    rendered = f"{self._tag} {self._xml_attr_data}>{rendered}</{self._tag}>"
+                    rendered = (
+                        f"{self._tag} {self._xml_attr_data}>{rendered}</{self._tag}>"
+                    )
                 else:
                     rendered = f"<{self._tag}>{rendered}</{self._tag}>"
         return rendered
@@ -688,8 +696,26 @@ class Style:
         return new_style
 
     def serialize(self) -> dict:
-        attrs = ('color', 'bgcolor', 'bold', 'dim', 'italic', 'underline', 'blink', 'blink2', 'reverse', 'conceal',
-                 'strike', 'underline2', 'frame', 'encircle', 'overline', 'link', 'tag', 'xml_attr')
+        attrs = (
+            "color",
+            "bgcolor",
+            "bold",
+            "dim",
+            "italic",
+            "underline",
+            "blink",
+            "blink2",
+            "reverse",
+            "conceal",
+            "strike",
+            "underline2",
+            "frame",
+            "encircle",
+            "overline",
+            "link",
+            "tag",
+            "xml_attr",
+        )
 
         out = dict()
 

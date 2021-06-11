@@ -189,7 +189,7 @@ class Text(JupyterMixin):
             return self.copy()
         if other > 1:
             out = self.copy()
-            for i in range(other-1):
+            for i in range(other - 1):
                 out.append(self)
             return out
 
@@ -1224,11 +1224,11 @@ class Text(JupyterMixin):
     def isupper(self):
         return self.plain.isupper()
 
-    def center(self, width, fillchar=' '):
+    def center(self, width, fillchar=" "):
         changed = self.plain.center(width, fillchar)
         start = changed.find(self.plain)
         lside = changed[:start]
-        rside = changed[len(lside)+len(self.plain):]
+        rside = changed[len(lside) + len(self.plain) :]
         idx = self.disassemble_bits()
         new_idx = list()
         for c in lside:
@@ -1238,7 +1238,7 @@ class Text(JupyterMixin):
             new_idx.append((None, c))
         return self.__class__.assemble_bits(new_idx)
 
-    def ljust(self, width: int, fillchar: Union[str, "MudText"] = ' '):
+    def ljust(self, width: int, fillchar: Union[str, "MudText"] = " "):
         diff = width - len(self)
         out = self.copy()
         if diff <= 0:
@@ -1249,7 +1249,7 @@ class Text(JupyterMixin):
             out.append(fillchar * diff)
             return out
 
-    def rjust(self, width: int, fillchar: Union[str, "MudText"] = ' '):
+    def rjust(self, width: int, fillchar: Union[str, "MudText"] = " "):
         diff = width - len(self)
         if diff <= 0:
             return self.copy()
@@ -1265,7 +1265,7 @@ class Text(JupyterMixin):
         strip_count = len(self.plain) - len(lstripped)
         return self[strip_count:]
 
-    def strip(self, chars: str = ' '):
+    def strip(self, chars: str = " "):
         out_map = self.disassemble_bits()
         for i, e in enumerate(out_map):
             if e[1] != chars:
@@ -1306,7 +1306,9 @@ class Text(JupyterMixin):
             elif new_len > old_len:
                 # slightly complex. insert new characters.
                 for i in range(diff):
-                    other_map.insert(idx + old_len + i, (final_markup, new[old_len + i]))
+                    other_map.insert(
+                        idx + old_len + i, (final_markup, new[old_len + i])
+                    )
 
         return self.__class__.assemble_bits(other_map)
 
@@ -1365,22 +1367,20 @@ class Text(JupyterMixin):
             if not span.style:
                 return None
             return {
-                'start': span.start,
-                'end': span.end,
-                'style': ser_style(span.style)
+                "start": span.start,
+                "end": span.end,
+                "style": ser_style(span.style),
             }
 
-        out = {
-            "text": self.plain
-        }
+        out = {"text": self.plain}
 
         if self.style:
-            out['style'] = ser_style(self.style)
+            out["style"] = ser_style(self.style)
 
         out_spans = [s for span in self.spans if (s := ser_span(span))]
 
         if out_spans:
-            out['spans'] = out_spans
+            out["spans"] = out_spans
 
         return out
 
@@ -1396,7 +1396,7 @@ class Text(JupyterMixin):
         spans = data.get("spans", None)
 
         if spans:
-            spans = [Span(s['start'], s['end'], Style(**s['style'])) for s in spans]
+            spans = [Span(s["start"], s["end"], Style(**s["style"])) for s in spans]
 
         return cls(text=text, style=style, spans=spans)
 
@@ -1408,7 +1408,7 @@ class Text(JupyterMixin):
         out = list()
         matches = _RE_SQUISH.finditer(self.plain)
         for match in matches:
-            out.append(self[match.start():match.end()])
+            out.append(self[match.start() : match.end()])
         return self.__class__(" ").join(out)
 
     def squish_spaces(self) -> "MudText":
@@ -1418,8 +1418,9 @@ class Text(JupyterMixin):
         out = list()
         matches = _RE_NOTSPACE.finditer(self.plain)
         for match in matches:
-            out.append(self[match.start():match.end()])
+            out.append(self[match.start() : match.end()])
         return self.__class__(" ").join(out)
+
 
 if __name__ == "__main__":  # pragma: no cover
     from rich.console import Console

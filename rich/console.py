@@ -1591,7 +1591,7 @@ class Console:
                 markup=markup,
                 mxp=mxp,
                 pueblo=pueblo,
-                links=links
+                links=links,
             )
 
             new_segments: List[Segment] = []
@@ -1864,7 +1864,7 @@ class Console:
                         legacy_windows=legacy_windows,
                         mxp=self._mxp,
                         pueblo=self._pueblo,
-                        links=self._links
+                        links=self._links,
                     )
                 )
             elif not (not_terminal and control):
