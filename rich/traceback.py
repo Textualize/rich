@@ -31,6 +31,7 @@ from .style import Style
 from .syntax import Syntax
 from .text import Text
 from .theme import Theme
+from .box import Box, ROUNDED
 
 WINDOWS = platform.system() == "Windows"
 
@@ -211,6 +212,7 @@ class Traceback:
         word_wrap: bool = False,
         show_locals: bool = False,
         indent_guides: bool = True,
+        box: Box = ROUNDED,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
     ):
@@ -232,6 +234,7 @@ class Traceback:
         self.indent_guides = indent_guides
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
+        self.box = box
 
     @classmethod
     def from_exception(
@@ -245,6 +248,7 @@ class Traceback:
         word_wrap: bool = False,
         show_locals: bool = False,
         indent_guides: bool = True,
+        box: Box = ROUNDED,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
     ) -> "Traceback":
@@ -278,6 +282,7 @@ class Traceback:
             word_wrap=word_wrap,
             show_locals=show_locals,
             indent_guides=indent_guides,
+            box=box,
             locals_max_length=locals_max_length,
             locals_max_string=locals_max_string,
         )
@@ -420,6 +425,7 @@ class Traceback:
             if stack.frames:
                 stack_renderable: ConsoleRenderable = Panel(
                     self._render_stack(stack),
+                    box=self.box,
                     title="[traceback.title]Traceback [dim](most recent call last)",
                     style=background_style,
                     border_style="traceback.border.syntax_error",

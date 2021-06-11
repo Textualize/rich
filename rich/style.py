@@ -1,4 +1,5 @@
 import sys
+import html
 from functools import lru_cache
 from random import randint
 from time import time
@@ -53,13 +54,6 @@ class Style:
 
     """
 
-    _color: Optional[Color]
-    _bgcolor: Optional[Color]
-    _attributes: int
-    _set_attributes: int
-    _hash: int
-    _null: bool
-
     __slots__ = [
         "_color",
         "_bgcolor",
@@ -71,6 +65,9 @@ class Style:
         "_style_definition",
         "_hash",
         "_null",
+        "_tag",
+        "_xml_attr",
+        "_xml_attr_data"
     ]
 
     # maps bits on to SGR parameter
@@ -109,9 +106,18 @@ class Style:
         encircle: Optional[bool] = None,
         overline: Optional[bool] = None,
         link: Optional[str] = None,
+        tag: Optional[str] = None,
+        xml_attr: Optional[Dict] = None
     ):
         self._ansi: Optional[str] = None
         self._style_definition: Optional[str] = None
+
+        self._tag = tag
+        self._xml_attr = xml_attr
+        if self._xml_attr:
+            self._xml_attr_data = ' '.join(f'{k}="{html.escape(v)}"' for k, v in xml_attr.items()) if xml_attr else ''
+        else:
+            self._xml_attr_data = ''
 
         def _make_color(color: Union[Color, str]) -> Color:
             return color if isinstance(color, Color) else Color.parse(color)
@@ -165,10 +171,12 @@ class Style:
                 self._bgcolor,
                 self._attributes,
                 self._set_attributes,
-                link,
+                self._tag,
+                self._xml_attr_data,
+                self._link,
             )
         )
-        self._null = not (self._set_attributes or color or bgcolor or link)
+        self._null = not (self._set_attributes or color or bgcolor or link or tag)
 
     @classmethod
     def null(cls) -> "Style":
@@ -605,6 +613,9 @@ class Style:
         *,
         color_system: Optional[ColorSystem] = ColorSystem.TRUECOLOR,
         legacy_windows: bool = False,
+        mxp: bool = False,
+        pueblo: bool = False,
+        links: bool = True
     ) -> str:
         """Render the ANSI codes for the style.
 
@@ -615,14 +626,27 @@ class Style:
         Returns:
             str: A string containing ANSI style codes.
         """
-        if not text or color_system is None:
-            return text
-        attrs = self._make_ansi_codes(color_system)
-        rendered = f"\x1b[{attrs}m{text}\x1b[0m" if attrs else text
-        if self._link and not legacy_windows:
-            rendered = (
-                f"\x1b]8;id={self._link_id};{self._link}\x1b\\{rendered}\x1b]8;;\x1b\\"
-            )
+        out_text = html.escape(text) if mxp or pueblo else text
+        if not out_text:
+            return out_text
+        if color_system is not None:
+            attrs = self._make_ansi_codes(color_system)
+            rendered = f"\x1b[{attrs}m{out_text}\x1b[0m" if attrs else out_text
+        else:
+            rendered = out_text
+        if links and self._link and not legacy_windows:
+            rendered = f"\x1b]8;id={self._link_id};{self._link}\x1b\\{rendered}\x1b]8;;\x1b\\"
+        if (pueblo or mxp) and self._tag:
+            if mxp:
+                if self._xml_attr:
+                    rendered = f"\x1b[4z<{self._tag} {self._xml_attr_data}>{rendered}\x1b[4z</{self._tag}>"
+                else:
+                    rendered = f"\x1b[4z<{self._tag}>{rendered}\x1b[4z</{self._tag}>"
+            else:
+                if self._xml_attr:
+                    rendered = f"{self._tag} {self._xml_attr_data}>{rendered}</{self._tag}>"
+                else:
+                    rendered = f"<{self._tag}>{rendered}</{self._tag}>"
         return rendered
 
     def test(self, text: Optional[str] = None) -> None:
@@ -655,9 +679,29 @@ class Style:
         new_style._set_attributes = self._set_attributes | style._set_attributes
         new_style._link = style._link or self._link
         new_style._link_id = style._link_id or self._link_id
+        new_style._tag = style._tag or self._tag
+        new_style._xml_attr = style._xml_attr or self._xml_attr
+        new_style._xml_attr_data = style._xml_attr_data or self._xml_attr_data
         new_style._hash = style._hash
         new_style._null = self._null or style._null
+
         return new_style
+
+    def serialize(self) -> dict:
+        attrs = ('color', 'bgcolor', 'bold', 'dim', 'italic', 'underline', 'blink', 'blink2', 'reverse', 'conceal',
+                 'strike', 'underline2', 'frame', 'encircle', 'overline', 'link', 'tag', 'xml_attr')
+
+        out = dict()
+
+        for attr in attrs:
+            found = getattr(self, attr, None)
+            if found is not None:
+                if isinstance(found, Color):
+                    out[attr] = found.name
+                else:
+                    out[attr] = found
+
+        return out
 
 
 NULL_STYLE = Style()
