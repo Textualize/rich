@@ -151,6 +151,13 @@ class ConsoleOptions:
     markup: Optional[bool] = None
     """Enable markup when rendering strings."""
     height: Optional[int] = None
+    """Height available, or None for no height limit."""
+    mxp: Optional[bool] = False
+    """Enable MXP/MUD HTML when printing. For MUDs only."""
+    pueblo: Optional[bool] = False
+    """Enable Pueblo/MUD HTML when printing. For MUDs only."""
+    links: Optional[bool] = True
+    """Enable ANSI Links when printing. Turn off if MXP/Pueblo is on."""
 
     @property
     def ascii_only(self) -> bool:
@@ -179,6 +186,9 @@ class ConsoleOptions:
         highlight: Union[Optional[bool], NoChange] = NO_CHANGE,
         markup: Union[Optional[bool], NoChange] = NO_CHANGE,
         height: Union[Optional[int], NoChange] = NO_CHANGE,
+        mxp: Union[Optional[bool], NoChange] = NO_CHANGE,
+        pueblo: Union[Optional[bool], NoChange] = NO_CHANGE,
+        links: Union[Optional[bool], NoChange] = NO_CHANGE,
     ) -> "ConsoleOptions":
         """Update values, return a copy."""
         options = self.copy()
@@ -202,6 +212,12 @@ class ConsoleOptions:
             if height is not None:
                 options.max_height = height
             options.height = None if height is None else max(0, height)
+        if not isinstance(mxp, NoChange):
+            options.mxp = mxp
+        if not isinstance(pueblo, NoChange):
+            options.pueblo = pueblo
+        if not isinstance(links, NoChange):
+            options.links = links
         return options
 
     def update_width(self, width: int) -> "ConsoleOptions":
@@ -616,6 +632,9 @@ class Console:
         emoji (bool, optional): Enable emoji code. Defaults to True.
         emoji_variant (str, optional): Optional emoji variant, either "text" or "emoji". Defaults to None.
         highlight (bool, optional): Enable automatic highlighting. Defaults to True.
+        mxp (bool, optional): Enable MXP mode for MUDs. Defaults to False.
+        pueblo (bool, optional): Enable Pueblo mode for MUDs. Defaults to False.
+        links (bool, optional): Enable Console Links. Defaults to True.
         log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
         log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
         log_time_format (Union[str, TimeFormatterCallable], optional): If ``log_time`` is enabled, either string for strftime or callable that formats the time. Defaults to "[%X] ".
@@ -653,6 +672,9 @@ class Console:
         emoji: bool = True,
         emoji_variant: Optional[EmojiVariant] = None,
         highlight: bool = True,
+        mxp: bool = False,
+        pueblo: bool = False,
+        links: bool = True,
         log_time: bool = True,
         log_path: bool = True,
         log_time_format: Union[str, FormatTimeCallable] = "[%X]",
@@ -688,6 +710,9 @@ class Console:
         self._emoji = emoji
         self._emoji_variant: Optional[EmojiVariant] = emoji_variant
         self._highlight = highlight
+        self._mxp = mxp
+        self._pueblo = pueblo
+        self._links = links
         self.legacy_windows: bool = (
             (detect_legacy_windows() and not self.is_jupyter)
             if legacy_windows is None
@@ -1633,6 +1658,9 @@ class Console:
         emoji: Optional[bool] = None,
         markup: Optional[bool] = None,
         highlight: Optional[bool] = None,
+        mxp: Optional[bool] = None,
+        pueblo: Optional[bool] = None,
+        links: Optional[bool] = None,
         width: Optional[int] = None,
         height: Optional[int] = None,
         crop: bool = True,
@@ -1652,6 +1680,9 @@ class Console:
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to ``None``.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to ``None``.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
+            mxp (Optional[bool], optional): Enable MXP, or ``None`` to use console default. Defaults to ``None``.
+            pueblo (Optional[bool], optional): Enable Pueblo, or ``None`` to use console default. Defaults to ``None``.
+            links (Optional[bool], optional): Enable terminal links, or ``None`` to use console default. Defaults to ``None``.
             width (Optional[int], optional): Width of output, or ``None`` to auto-detect. Defaults to ``None``.
             crop (Optional[bool], optional): Crop output to width of terminal. Defaults to True.
             soft_wrap (bool, optional): Enable soft wrap mode which disables word wrapping and cropping of text or ``None`` for
@@ -1690,6 +1721,9 @@ class Console:
                 no_wrap=no_wrap,
                 markup=markup,
                 highlight=highlight,
+                mxp=mxp,
+                pueblo=pueblo,
+                links=links,
             )
 
             new_segments: List[Segment] = []
@@ -2072,19 +2106,21 @@ class Console:
         color_system = self._color_system
         legacy_windows = self.legacy_windows
         not_terminal = not self.is_terminal
+        mxp = self._mxp
         if self.no_color and color_system:
             buffer = Segment.remove_color(buffer)
         for text, style, control in buffer:
             if style:
-                append(
-                    style.render(
+                out = style.render(
                         text,
                         color_system=color_system,
                         legacy_windows=legacy_windows,
+                        mxp=mxp,
+                        links=self._links,
                     )
-                )
-            elif not (not_terminal and control):
-                append(text)
+            else:
+                out = text if not mxp else escape(text)
+            append(out)
 
         rendered = "".join(output)
         return rendered
@@ -2142,12 +2178,18 @@ class Console:
         with self._record_buffer_lock:
             if styles:
                 text = "".join(
-                    (style.render(text) if style else text)
+                    (style.render(
+                        text,
+                        color_system=self.color_system,
+                        legacy_windows=self.legacy_windows,
+                        mxp=self._mxp,
+                        links=self._links,
+                    ) if style else text if not self._mxp else escape(text))
                     for text, style, _ in self._record_buffer
                 )
             else:
                 text = "".join(
-                    segment.text
+                    segment.text if not self._mxp else escape(segment.text)
                     for segment in self._record_buffer
                     if not segment.control
                 )

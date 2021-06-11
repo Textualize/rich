@@ -2,7 +2,7 @@ import pytest
 
 from rich import errors
 from rich.color import Color, ColorSystem, ColorType
-from rich.style import Style, StyleStack
+from rich.style import Style, StyleStack, MXP
 
 
 def test_str():
@@ -251,3 +251,13 @@ def test_clear_meta_and_links():
     assert clear_style.bgcolor == Color.parse("black")
     assert clear_style.bold
     assert not clear_style.italic
+
+
+def test_mxp():
+    m = MXP("send", "command1|command2", {"hint": "First Command|Second Command"})
+    rendered = m.render("This text is MXP.")
+
+    assert (
+        rendered
+        == '\x1b[4z<send "command1|command2" hint="First Command|Second Command">This text is MXP.\x1b[4z</send>'
+    )

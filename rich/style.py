@@ -1,4 +1,5 @@
 import sys
+import html
 from functools import lru_cache
 from marshal import dumps, loads
 from random import randint
@@ -27,6 +28,33 @@ class _Bit:
         return None
 
 
+class MXP:
+    """A MXP tag, for MUD support."""
+    _esc = "\x1b[4z"
+
+    def __init__(self, tag: str, args: str = "", attrs: dict[str, str] = None):
+        self.tag = tag
+        self.args = args
+        self.attrs = attrs or dict()
+
+    def render(self, text: str):
+        """
+        Renders this MXP tag around the given text.
+        """
+
+        out_sections = list()
+        if self.args:
+            out_sections.append(f'"{html.escape(self.args)}"')
+
+        for k, v in self.attrs.items():
+            out_sections.append(f'{html.escape(k)}="{html.escape(v)}"')
+
+        out_innards = " ".join(out_sections)
+        out_innards = f" {out_innards}" if out_innards else ""
+
+        return f"{self._esc}<{self.tag}{out_innards}>{text}{self._esc}</{self.tag}>"
+
+
 @rich_repr
 class Style:
     """A terminal style.
@@ -51,8 +79,8 @@ class Style:
         frame (bool, optional): Enable framed text. Defaults to None.
         encircle (bool, optional): Enable encircled text. Defaults to None.
         overline (bool, optional): Enable overlined text. Defaults to None.
-        link (str, link): Link URL. Defaults to None.
-
+        link (str, link): Link URL. Defaults to None. Incompatible with MXP.
+        mxp (MXP, optional): MXP tag. Defaults to None. Incompatible with link.
     """
 
     _color: Optional[Color]
@@ -75,6 +103,7 @@ class Style:
         "_hash",
         "_null",
         "_meta",
+        "_mxp"
     ]
 
     # maps bits on to SGR parameter
@@ -139,6 +168,7 @@ class Style:
         overline: Optional[bool] = None,
         link: Optional[str] = None,
         meta: Optional[Dict[str, Any]] = None,
+        mxp: Optional[MXP] = None,
     ):
         self._ansi: Optional[str] = None
         self._style_definition: Optional[str] = None
@@ -189,6 +219,7 @@ class Style:
 
         self._link = link
         self._meta = None if meta is None else dumps(meta)
+        self._mxp = mxp
         self._link_id = (
             f"{randint(0, 999999)}{hash(self._meta)}" if (link or meta) else ""
         )
@@ -475,6 +506,16 @@ class Style:
         return {} if self._meta is None else cast(Dict[str, Any], loads(self._meta))
 
     @property
+    def mxp(self) -> Optional[MXP]:
+        """Get MXP tag."""
+        return self._mxp
+
+    @mxp.setter
+    def mxp(self, value: Optional[MXP]):
+        """Set MXP tag."""
+        self._mxp = value
+
+    @property
     def without_color(self) -> "Style":
         """Get a copy of the style with color removed."""
         if self._null:
@@ -643,6 +684,7 @@ class Style:
         style._hash = self._hash
         style._null = False
         style._meta = self._meta
+        style._mxp = self._mxp
         return style
 
     @lru_cache(maxsize=128)
@@ -666,6 +708,7 @@ class Style:
         style._hash = self._hash
         style._null = False
         style._meta = None
+        style._mxp = None
         return style
 
     def update_link(self, link: Optional[str] = None) -> "Style":
@@ -697,24 +740,38 @@ class Style:
         *,
         color_system: Optional[ColorSystem] = ColorSystem.TRUECOLOR,
         legacy_windows: bool = False,
+        links: bool = True,
+        mxp: bool = False
     ) -> str:
         """Render the ANSI codes for the style.
 
         Args:
             text (str, optional): A string to style. Defaults to "".
             color_system (Optional[ColorSystem], optional): Color system to render to. Defaults to ColorSystem.TRUECOLOR.
-
+            legacy_windows (bool, optional): Enable legacy windows support. Defaults to False.
+            links (bool, optional): Enable links. Defaults to True. Incompatible with mxp.
+            mxp (bool, optional): Enable MXP. Defaults to False. Incompatible with links.
         Returns:
             str: A string containing ANSI style codes.
         """
-        if not text or color_system is None:
-            return text
-        attrs = self._ansi or self._make_ansi_codes(color_system)
-        rendered = f"\x1b[{attrs}m{text}\x1b[0m" if attrs else text
-        if self._link and not legacy_windows:
+        if mxp:
+            links = False
+        out_text = text
+        if mxp:
+            out_text = html.escape(out_text)
+        if not out_text:
+            return out_text
+        if color_system is not None:
+            attrs = self._make_ansi_codes(color_system)
+            rendered = f"\x1b[{attrs}m{out_text}\x1b[0m" if attrs else out_text
+        else:
+            rendered = out_text
+        if links and self._link and not legacy_windows:
             rendered = (
                 f"\x1b]8;id={self._link_id};{self._link}\x1b\\{rendered}\x1b]8;;\x1b\\"
             )
+        if mxp and self._mxp:
+            rendered = self._mxp.render(rendered)
         return rendered
 
     def test(self, text: Optional[str] = None) -> None:
@@ -746,6 +803,7 @@ class Style:
         new_style._set_attributes = self._set_attributes | style._set_attributes
         new_style._link = style._link or self._link
         new_style._link_id = style._link_id or self._link_id
+        new_style._mxp = style._mxp or self._mxp
         new_style._null = style._null
         if self._meta and style._meta:
             new_style._meta = dumps({**self.meta, **style.meta})

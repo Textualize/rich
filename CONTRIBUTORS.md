@@ -5,6 +5,7 @@ The following people have contributed to the development of Rich:
 <!-- Add your name below, sort alphabetically by surname. Link to GitHub profile / your home page. -->
 
 - [Patrick Arminio](https://github.com/patrick91)
+- [Andrew Bastien](https://github.com/volundmush)
 - [Gregory Beauregard](https://github.com/GBeauregard/pyffstream)
 - [Artur Borecki](https://github.com/pufereq)
 - [Pedro Aaron](https://github.com/paaaron)
