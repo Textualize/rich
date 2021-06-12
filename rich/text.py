@@ -1174,7 +1174,7 @@ class Text(JupyterMixin):
     # Begin implementing Python String Api below...
 
     def capitalize(self):
-        return self.__class__(text=self.plain.capitalize(), spans=list(self.spans))
+        return self.__class__(text=self.plain.capitalize(), style=self.style, spans=list(self.spans))
 
     def count(self, *args, **kwargs):
         return self.plain.count(*args, **kwargs)

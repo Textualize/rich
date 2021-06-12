@@ -669,7 +669,9 @@ class Style:
         text = text or str(self)
         sys.stdout.write(f"{self.render(text)}\n")
 
-    def __add__(self, style: Optional["Style"]) -> "Style":
+    def __add__(self, style: Union["Style", str]) -> "Style":
+        if isinstance(style, str):
+            style = self.__class__.parse(style)
         if not (isinstance(style, Style) or style is None):
             return NotImplemented
         if style is None or style._null:
@@ -694,6 +696,12 @@ class Style:
         new_style._null = self._null or style._null
 
         return new_style
+
+    def __radd__(self, other):
+        if isinstance(other, str):
+            other = self.__class__.parse(other)
+            return other + self
+        return NotImplemented
 
     def serialize(self) -> dict:
         attrs = (
