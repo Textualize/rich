@@ -115,7 +115,7 @@ class SyntaxTheme(ABC):
 
 
 class PygmentsSyntaxTheme(SyntaxTheme):
-    """Syntax theme that delagates to Pygments theme."""
+    """Syntax theme that delegates to Pygments theme."""
 
     def __init__(self, theme: Union[str, Type[PygmentsStyle]]) -> None:
         self._style_cache: Dict[TokenType, Style] = {}
@@ -679,7 +679,7 @@ if __name__ == "__main__":  # pragma: no cover
         "--background-color",
         dest="background_color",
         default=None,
-        help="Overide background color",
+        help="Override background color",
     )
     parser.add_argument(
         "-x",

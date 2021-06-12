@@ -589,7 +589,7 @@ def traverse(
             and not isinstance(obj, type)
             and (
                 "__create_fn__" in obj.__repr__.__qualname__ or py_version == (3, 6)
-            )  # Check if __repr__ wasn't overriden
+            )  # Check if __repr__ wasn't overridden
         ):
             obj_id = id(obj)
             if obj_id in visited_ids:

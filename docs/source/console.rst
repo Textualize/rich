@@ -284,7 +284,7 @@ Paging
 
 If you have some long output to present to the user you can use a *pager* to display it. A pager is typically an application on your operating system which will at least support pressing a key to scroll, but will often support scrolling up and down through the text and other features.
 
-You can page output from a Console by calling :meth:`~rich.console.Console.pager` which returns a context manger. When the pager exits, anything that was printed will be sent to the pager. Here's an example::
+You can page output from a Console by calling :meth:`~rich.console.Console.pager` which returns a context manager. When the pager exits, anything that was printed will be sent to the pager. Here's an example::
 
     from rich.__main__ import make_test_card
     from rich.console import Console

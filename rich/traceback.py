@@ -133,12 +133,12 @@ def install(
         # if wihin ipython, use customized traceback
         ip = get_ipython()  # type: ignore
         ipy_excepthook_closure(ip)
-        return sys.excepthook  # type: ignore # more strict signature that mypy cant interpret
+        return sys.excepthook  # type: ignore # more strict signature that mypy can't interpret
     except Exception:
         # otherwise use default system hook
         old_excepthook = sys.excepthook
         sys.excepthook = excepthook
-        return old_excepthook  # type: ignore # more strict signature that mypy cant interpret
+        return old_excepthook  # type: ignore # more strict signature that mypy can't interpret
 
 
 @dataclass
