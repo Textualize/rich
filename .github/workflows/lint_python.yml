@@ -8,7 +8,8 @@ jobs:
       - uses: actions/setup-python@v2
       - run: pip install black codespell flake8 isort mypy pytest pyupgrade safety
       - run: black --check .
-      - run: codespell --ignore-words-list="ba,hel,womens" --skip="./README.de.md,./README.es.md,./README.sv.md,*.svg" || true
+      - run: codespell --ignore-words-list="ba,fo,hel,revered,womens"
+          --skip="./README.de.md,./README.es.md,./README.sv.md,*.svg" || true
       - run: flake8 . --count --select=E9,F63,F7 --show-source --statistics
       - run: isort --check-only --profile black . || true
       - run: pip install colorama commonmark pygments types-emoji types-pkg_resources
