@@ -13,7 +13,6 @@ jobs:
       - run: isort --check-only --profile black . || true
       - run: pip install colorama commonmark pygments types-emoji types-pkg_resources
       - run: mypy --ignore-missing-imports . || true
-      - run: pytest . || true
-      - run: pytest --doctest-modules . || true
+      - run: pytest .
       - run: shopt -s globstar && pyupgrade --py36-plus **/*.py || true
       - run: safety check
