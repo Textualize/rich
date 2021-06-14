@@ -1,4 +1,3 @@
-# encoding=utf-8
 import io
 import time
 from typing import Optional

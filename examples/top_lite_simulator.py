@@ -55,7 +55,7 @@ def generate_process(pid: int) -> Process:
 def create_process_table(height: int) -> Table:
 
     processes = sorted(
-        [generate_process(pid) for pid in range(height)],
+        (generate_process(pid) for pid in range(height)),
         key=lambda p: p.cpu_percent,
         reverse=True,
     )

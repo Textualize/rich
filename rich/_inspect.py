@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
 from typing import Any, Iterable, Optional, Tuple
 

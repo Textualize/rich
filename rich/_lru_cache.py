@@ -17,7 +17,7 @@ class LRUCache(Generic[CacheKey, CacheValue], OrderedDict):  # type: ignore # ht
 
     def __init__(self, cache_size: int) -> None:
         self.cache_size = cache_size
-        super(LRUCache, self).__init__()
+        super().__init__()
 
     def __setitem__(self, key: CacheKey, value: CacheValue) -> None:
         """Store a new views, potentially discarding an old value."""

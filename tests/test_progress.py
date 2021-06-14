@@ -1,5 +1,3 @@
-# encoding=utf-8
-
 import io
 from time import sleep
 
