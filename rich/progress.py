@@ -473,7 +473,7 @@ class Task:
     """Optional[float]: Time this task was stopped, or None if not stopped."""
 
     finished_speed: Optional[float] = None
-    """Optional[float]: The last speed for a finshed task."""
+    """Optional[float]: The last speed for a finished task."""
 
     _progress: Deque[ProgressSample] = field(
         default_factory=deque, init=False, repr=False

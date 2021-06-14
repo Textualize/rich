@@ -407,7 +407,7 @@ def test_reset() -> None:
 
 
 def test_progress_max_refresh() -> None:
-    """Test max_refresh argment."""
+    """Test max_refresh argument."""
     time = 0.0
 
     def get_time() -> float:

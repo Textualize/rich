@@ -29,7 +29,7 @@ class ColorTriplet(NamedTuple):
 
     @property
     def normalized(self) -> Tuple[float, float, float]:
-        """Covert components in to floats between 0 and 1.
+        """Convert components into floats between 0 and 1.
 
         Returns:
             Tuple[float, float, float]: A tuple of three normalized colour components.
