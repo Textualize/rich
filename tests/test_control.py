@@ -37,5 +37,5 @@ def test_move_to_row():
     assert Control.move_to_row(10, 20).segment == Segment(
         "\x1b[12G\x1b[20B",
         None,
-        [(ControlType.CURSOR_MOVE_TO_ROW, 11), (ControlType.CURSOR_DOWN, 20)],
+        [(ControlType.CURSOR_MOVE_TO_COLUMN, 11), (ControlType.CURSOR_DOWN, 20)],
     )

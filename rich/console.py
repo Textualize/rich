@@ -13,6 +13,7 @@ from getpass import getpass
 from itertools import islice
 from time import monotonic
 from types import FrameType, TracebackType
+from inspect import isclass
 from typing import (
     IO,
     TYPE_CHECKING,
@@ -1185,9 +1186,9 @@ class Console:
             # No space to render anything. This prevents potential recursion errors.
             return
         render_iterable: RenderResult
-        if hasattr(renderable, "__rich__"):
+        if hasattr(renderable, "__rich__") and not isclass(renderable):
             renderable = renderable.__rich__()  # type: ignore
-        if hasattr(renderable, "__rich_console__"):
+        if hasattr(renderable, "__rich_console__") and not isclass(renderable):
             render_iterable = renderable.__rich_console__(self, _options)  # type: ignore
         elif isinstance(renderable, str):
             text_renderable = self.render_str(
