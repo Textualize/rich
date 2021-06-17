@@ -6,7 +6,7 @@ from typing import cast, List, Optional, Sequence
 if sys.version_info >= (3, 8):
     from typing import Protocol
 else:
-    from typing_extensions import Protocol
+    from typing_extensions import Protocol  # pragma: no cover
 
 
 class Edge(Protocol):

@@ -7,7 +7,7 @@ from .style import Style
 
 from itertools import filterfalse
 from operator import attrgetter
-from typing import Iterable, List, Sequence, Union, Tuple, TYPE_CHECKING
+from typing import cast, Iterable, List, Sequence, Union, Tuple, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -417,7 +417,7 @@ class Segments:
         new_lines (bool, optional): Add new lines between segments. Defaults to False.
     """
 
-    def __init__(self, segments: Iterable[Segment], new_lines: bool = False) -> None:
+    def __init__(self, segments: Sequence[Segment], new_lines: bool = False) -> None:
         self.segments = list(segments)
         self.new_lines = new_lines
 
@@ -425,10 +425,16 @@ class Segments:
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         if self.new_lines:
-            line = Segment.line()
-            for segment in self.segments:
-                yield segment
-                yield line
+            segments = self.segments
+            splice_segments: list["Segment | None"] = [None] * (len(segments) * 2)
+            splice_segments[::2] = segments
+            splice_segments[1::2] = [Segment.line()] * len(segments)
+
+            yield from cast("list[Segment]", splice_segments)
+
+            # for segment in self.segments:
+            #     yield segment
+            #     yield line
         else:
             yield from self.segments
 

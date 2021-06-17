@@ -93,8 +93,8 @@ class Control:
         return control
 
     @classmethod
-    def move_to_row(cls, x: int, y: int = 0) -> "Control":
-        """Move to the given row, optionally add offset to column.
+    def move_to_column(cls, x: int, y: int = 0) -> "Control":
+        """Move to the given column, optionally add offset to row.
 
         Returns:
             x (int): absolute x (column)

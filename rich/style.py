@@ -1,5 +1,6 @@
 import sys
 from functools import lru_cache
+import marshal
 from random import randint
 from time import time
 from typing import Any, Dict, Iterable, List, Optional, Type, Union
@@ -59,6 +60,7 @@ class Style:
     _set_attributes: int
     _hash: int
     _null: bool
+    _meta: Optional[bytes]
 
     __slots__ = [
         "_color",
@@ -71,6 +73,7 @@ class Style:
         "_style_definition",
         "_hash",
         "_null",
+        "_meta",
     ]
 
     # maps bits on to SGR parameter
@@ -109,6 +112,7 @@ class Style:
         encircle: Optional[bool] = None,
         overline: Optional[bool] = None,
         link: Optional[str] = None,
+        meta: Optional[Dict[str, str]] = None,
     ):
         self._ansi: Optional[str] = None
         self._style_definition: Optional[str] = None
@@ -159,6 +163,7 @@ class Style:
 
         self._link = link
         self._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
+        self._meta = None if meta is None else marshal.dumps(meta)
         self._hash = hash(
             (
                 self._color,
@@ -166,9 +171,10 @@ class Style:
                 self._attributes,
                 self._set_attributes,
                 link,
+                self._meta,
             )
         )
-        self._null = not (self._set_attributes or color or bgcolor or link)
+        self._null = not (self._set_attributes or color or bgcolor or link or meta)
 
     @classmethod
     def null(cls) -> "Style":
@@ -194,6 +200,7 @@ class Style:
         style._attributes = 0
         style._link = None
         style._link_id = ""
+        style._meta = None
         style._hash = hash(
             (
                 color,
@@ -355,6 +362,7 @@ class Style:
             and self._set_attributes == other._set_attributes
             and self._attributes == other._attributes
             and self._link == other._link
+            and self._meta == other._meta
         )
 
     def __hash__(self) -> int:
@@ -386,6 +394,11 @@ class Style:
         return Style(bgcolor=self.bgcolor)
 
     @property
+    def meta(self) -> Dict[str, str]:
+        """Get meta information (can not be changed after construction)."""
+        return {} if self._meta is None else marshal.loads(self._meta)
+
+    @property
     def without_color(self) -> "Style":
         """Get a copy of the style with color removed."""
         if self._null:
@@ -401,6 +414,7 @@ class Style:
         style._link_id = f"{time()}-{randint(0, 999999)}" if self._link else ""
         style._hash = self._hash
         style._null = False
+        style._meta = None
         return style
 
     @classmethod
@@ -575,6 +589,7 @@ class Style:
         style._link_id = f"{time()}-{randint(0, 999999)}" if self._link else ""
         style._hash = self._hash
         style._null = False
+        self._meta = self._meta
         return style
 
     def update_link(self, link: Optional[str] = None) -> "Style":
@@ -597,6 +612,7 @@ class Style:
         style._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
         style._hash = self._hash
         style._null = False
+        style._meta = self._meta
         return style
 
     def render(
@@ -657,6 +673,12 @@ class Style:
         new_style._link_id = style._link_id or self._link_id
         new_style._hash = style._hash
         new_style._null = self._null or style._null
+        if self._meta and style._meta:
+            new_style._meta = marshal.dumps({**self.meta, **style.meta})
+        elif self._meta or style._meta:
+            new_style._meta = self._meta or style._meta
+        else:
+            new_style._meta = None
         return new_style
 
 

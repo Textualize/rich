@@ -653,3 +653,14 @@ def test_print_width_zero():
     with console.capture() as capture:
         console.print("Hello", width=0)
     assert capture.get() == ""
+
+
+def test_size_properties():
+    console = Console(width=80, height=25)
+    assert console.size == ConsoleDimensions(80, 25)
+    console.size = (10, 20)
+    assert console.size == ConsoleDimensions(10, 20)
+    console.width = 5
+    assert console.size == ConsoleDimensions(5, 20)
+    console.height = 10
+    assert console.size == ConsoleDimensions(5, 10)

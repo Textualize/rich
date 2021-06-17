@@ -37,7 +37,11 @@ from typing import (
 if sys.version_info >= (3, 8):
     from typing import Literal, Protocol, runtime_checkable
 else:
-    from typing_extensions import Literal, Protocol, runtime_checkable
+    from typing_extensions import (
+        Literal,
+        Protocol,
+        runtime_checkable,
+    )  # pragma: no cover
 
 
 from . import errors, themes
