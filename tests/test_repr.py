@@ -1,10 +1,11 @@
+import pytest
 from typing import Optional
 
 from rich.console import Console
-from rich.repr import rich_repr
+import rich.repr
 
 
-@rich_repr
+@rich.repr.auto
 class Foo:
     def __init__(self, foo: str, bar: Optional[int] = None, egg: int = 1):
         self.foo = foo
@@ -18,7 +19,31 @@ class Foo:
         yield "egg", self.egg
 
 
-@rich_repr
+@rich.repr.auto
+class Egg:
+    def __init__(self, foo: str, /, bar: Optional[int] = None, egg: int = 1):
+        self.foo = foo
+        self.bar = bar
+        self.egg = egg
+
+
+@rich.repr.auto
+class BrokenEgg:
+    def __init__(self, foo: str, *, bar: Optional[int] = None, egg: int = 1):
+        self.foo = foo
+        self.fubar = bar
+        self.egg = egg
+
+
+@rich.repr.auto(angular=True)
+class AngularEgg:
+    def __init__(self, foo: str, *, bar: Optional[int] = None, egg: int = 1):
+        self.foo = foo
+        self.bar = bar
+        self.egg = egg
+
+
+@rich.repr.auto
 class Bar(Foo):
     def __rich_repr__(self):
         yield (self.foo,)
@@ -37,6 +62,19 @@ def test_rich_repr() -> None:
 def test_rich_angular() -> None:
     assert (repr(Bar("hello"))) == "<Bar 'hello' 'hello' egg=1>"
     assert (repr(Bar("hello", bar=3))) == "<Bar 'hello' 'hello' bar=3 egg=1>"
+
+
+def test_rich_repr_auto() -> None:
+    assert repr(Egg("hello", egg=2)) == "Egg('hello', egg=2)"
+
+
+def test_rich_repr_auto_angular() -> None:
+    assert repr(AngularEgg("hello", egg=2)) == "<AngularEgg 'hello' egg=2>"
+
+
+def test_broken_egg() -> None:
+    with pytest.raises(rich.repr.ReprError):
+        repr(BrokenEgg("foo"))
 
 
 def test_rich_pretty() -> None:

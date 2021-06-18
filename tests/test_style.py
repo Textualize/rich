@@ -58,7 +58,10 @@ def test_ansi_codes():
 
 
 def test_repr():
-    assert repr(Style(bold=True, color="red")) == 'Style.parse("bold red")'
+    assert (
+        repr(Style(bold=True, color="red"))
+        == "Style(color=Color('red', ColorType.STANDARD, number=1), bold=True)"
+    )
 
 
 def test_eq():
@@ -205,3 +208,14 @@ def test_without_color():
     assert colorless_style.bold == True
     null_style = Style.null()
     assert null_style.without_color == null_style
+
+
+def test_meta():
+    style = Style(bold=True, meta={"foo": "bar"})
+    assert style.meta["foo"] == "bar"
+
+    style += Style(meta={"egg": "baz"})
+
+    assert style.meta == {"foo": "bar", "egg": "baz"}
+
+    assert repr(style) == "Style(bold=True, meta={'foo': 'bar', 'egg': 'baz'})"

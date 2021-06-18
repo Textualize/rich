@@ -1,13 +1,15 @@
 import sys
 from functools import lru_cache
-import marshal
+from marshal import loads as marshal_loads, dumps as marshal_dumps
 from random import randint
 from time import time
-from typing import Any, Dict, Iterable, List, Optional, Type, Union
+from typing import Any, cast, Dict, Iterable, List, Optional, Type, Union
 
 from . import errors
 from .color import Color, ColorParseError, ColorSystem, blend_rgb
+from .repr import rich_repr, RichReprResult
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
+
 
 # Style instances and style definitions are often interchangeable
 StyleType = Union[str, "Style"]
@@ -27,6 +29,7 @@ class _Bit:
         return None
 
 
+@rich_repr
 class Style:
     """A terminal style.
 
@@ -112,7 +115,7 @@ class Style:
         encircle: Optional[bool] = None,
         overline: Optional[bool] = None,
         link: Optional[str] = None,
-        meta: Optional[Dict[str, str]] = None,
+        meta: Optional[Dict[str, Any]] = None,
     ):
         self._ansi: Optional[str] = None
         self._style_definition: Optional[str] = None
@@ -163,7 +166,7 @@ class Style:
 
         self._link = link
         self._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
-        self._meta = None if meta is None else marshal.dumps(meta)
+        self._meta = None if meta is None else marshal_dumps(meta)
         self._hash = hash(
             (
                 self._color,
@@ -349,9 +352,24 @@ class Style:
                 return value
         raise ValueError("expected at least one non-None style")
 
-    def __repr__(self) -> str:
-        """Render a named style differently from an anonymous style."""
-        return f'Style.parse("{self}")'
+    def __rich_repr__(self) -> RichReprResult:
+        yield "color", self.color, None
+        yield "bgcolor", self.bgcolor, None
+        yield "bold", self.bold, None,
+        yield "dim", self.dim, None,
+        yield "italic", self.italic, None
+        yield "underline", self.underline, None,
+        yield "blink", self.blink, None
+        yield "blink2", self.blink2, None
+        yield "reverse", self.reverse, None
+        yield "conceal", self.conceal, None
+        yield "strike", self.strike, None
+        yield "underline2", self.underline2, None
+        yield "frame", self.frame, None
+        yield "encircle", self.encircle, None
+        yield "link", self.link, None
+        if self._meta:
+            yield "meta", self.meta
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Style):
@@ -394,9 +412,13 @@ class Style:
         return Style(bgcolor=self.bgcolor)
 
     @property
-    def meta(self) -> Dict[str, str]:
+    def meta(self) -> Dict[str, Any]:
         """Get meta information (can not be changed after construction)."""
-        return {} if self._meta is None else marshal.loads(self._meta)
+        return (
+            {}
+            if self._meta is None
+            else cast(Dict[str, Any], marshal_loads(self._meta))
+        )
 
     @property
     def without_color(self) -> "Style":
@@ -460,7 +482,7 @@ class Style:
         }
         color: Optional[str] = None
         bgcolor: Optional[str] = None
-        attributes: Dict[str, Optional[bool]] = {}
+        attributes: Dict[str, Optional[Any]] = {}
         link: Optional[str] = None
 
         words = iter(style_definition.split())
@@ -589,7 +611,7 @@ class Style:
         style._link_id = f"{time()}-{randint(0, 999999)}" if self._link else ""
         style._hash = self._hash
         style._null = False
-        self._meta = self._meta
+        style._meta = self._meta
         return style
 
     def update_link(self, link: Optional[str] = None) -> "Style":
@@ -674,11 +696,9 @@ class Style:
         new_style._hash = style._hash
         new_style._null = self._null or style._null
         if self._meta and style._meta:
-            new_style._meta = marshal.dumps({**self.meta, **style.meta})
-        elif self._meta or style._meta:
-            new_style._meta = self._meta or style._meta
+            new_style._meta = marshal_dumps({**self.meta, **style.meta})
         else:
-            new_style._meta = None
+            new_style._meta = self._meta or style._meta
         return new_style
 
 

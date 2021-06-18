@@ -425,16 +425,10 @@ class Segments:
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         if self.new_lines:
-            segments = self.segments
-            splice_segments: list["Segment | None"] = [None] * (len(segments) * 2)
-            splice_segments[::2] = segments
-            splice_segments[1::2] = [Segment.line()] * len(segments)
-
-            yield from cast("list[Segment]", splice_segments)
-
-            # for segment in self.segments:
-            #     yield segment
-            #     yield line
+            line = Segment.line()
+            for segment in self.segments:
+                yield segment
+                yield line
         else:
             yield from self.segments
 
