@@ -21,6 +21,10 @@ def test_repr() -> None:
     assert repr(Color.parse("red")) == "Color('red', ColorType.STANDARD, number=1)"
 
 
+def test_color_system_repr() -> None:
+    assert repr(ColorSystem.EIGHT_BIT) == "ColorSystem.EIGHT_BIT"
+
+
 def test_rich() -> None:
     color = Color.parse("red")
     as_text = color.__rich__()

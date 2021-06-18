@@ -21,7 +21,7 @@ class Foo:
 
 @rich.repr.auto
 class Egg:
-    def __init__(self, foo: str, /, bar: Optional[int] = None, egg: int = 1):
+    def __init__(self, foo: str, bar: Optional[int] = None, egg: int = 1):
         self.foo = foo
         self.bar = bar
         self.egg = egg
