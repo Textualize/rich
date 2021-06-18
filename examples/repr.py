@@ -10,8 +10,8 @@ class Bird:
         self.extinct = extinct
 
 
-# Note that the repr is still generate without Rich
-# Try commenting  out the following lin
+# Note that the repr is still generated without Rich
+# Try commenting out the following line
 
 from rich import print
 
