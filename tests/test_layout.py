@@ -45,6 +45,9 @@ def test_render():
 
     assert layout["root"].name == "root"
     assert layout["left"].name == "left"
+
+    assert isinstance(layout.map, dict)
+
     with pytest.raises(KeyError):
         top["asdasd"]
 

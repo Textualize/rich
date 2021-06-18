@@ -7,7 +7,7 @@ from .style import Style
 
 from itertools import filterfalse
 from operator import attrgetter
-from typing import Iterable, List, Sequence, Union, Tuple, TYPE_CHECKING
+from typing import cast, Iterable, List, Sequence, Union, Tuple, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -29,7 +29,7 @@ class ControlType(IntEnum):
     CURSOR_DOWN = 10
     CURSOR_FORWARD = 11
     CURSOR_BACKWARD = 12
-    CURSOR_MOVE_TO_ROW = 13
+    CURSOR_MOVE_TO_COLUMN = 13
     CURSOR_MOVE_TO = 14
     ERASE_IN_LINE = 15
 
@@ -417,7 +417,7 @@ class Segments:
         new_lines (bool, optional): Add new lines between segments. Defaults to False.
     """
 
-    def __init__(self, segments: Iterable[Segment], new_lines: bool = False) -> None:
+    def __init__(self, segments: Sequence[Segment], new_lines: bool = False) -> None:
         self.segments = list(segments)
         self.new_lines = new_lines
 

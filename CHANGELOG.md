@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [10.4.0] - 2021-06-18
+
+### Added
+
+- Added Style.meta
+- Added rich.repr.auto decorator
+
+### Fixed
+
+- Fixed error pretty printing classes with special **rich_repr** method
+
 ## [10.3.0] - 2021-06-09
 
 ### Added
@@ -20,7 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed the logic for retrieving the calling frame in console logs to a faster one for the Python implementations that support it.
 
 ## [10.2.2] - 2021-05-19
-
 
 ### Fixed
 

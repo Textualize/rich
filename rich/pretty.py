@@ -4,6 +4,7 @@ import sys
 from array import array
 from collections import Counter, defaultdict, deque, UserDict, UserList
 from dataclasses import dataclass, fields, is_dataclass
+from inspect import isclass
 from itertools import islice
 from typing import (
     DefaultDict,
@@ -282,10 +283,10 @@ def is_expandable(obj: Any) -> bool:
     """Check if an object may be expanded by pretty print."""
     return (
         isinstance(obj, _CONTAINERS)
-        or (is_dataclass(obj) and not isinstance(obj, type))
-        or hasattr(obj, "__rich_repr__")
+        or (is_dataclass(obj))
+        or (hasattr(obj, "__rich_repr__"))
         or _is_attr_object(obj)
-    )
+    ) and not isclass(obj)
 
 
 @dataclass
@@ -498,7 +499,7 @@ def traverse(
                 else:
                     yield arg
 
-        if hasattr(obj, "__rich_repr__"):
+        if hasattr(obj, "__rich_repr__") and not isclass(obj):
             angular = getattr(obj.__rich_repr__, "angular", False)
             args = list(iter_rich_args(obj.__rich_repr__()))
             class_name = obj.__class__.__name__

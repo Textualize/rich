@@ -27,7 +27,7 @@ CONTROL_CODES_FORMAT: Dict[int, Callable[..., str]] = {
     ControlType.CURSOR_DOWN: lambda param: f"\x1b[{param}B",
     ControlType.CURSOR_FORWARD: lambda param: f"\x1b[{param}C",
     ControlType.CURSOR_BACKWARD: lambda param: f"\x1b[{param}D",
-    ControlType.CURSOR_MOVE_TO_ROW: lambda param: f"\x1b[{param+1}G",
+    ControlType.CURSOR_MOVE_TO_COLUMN: lambda param: f"\x1b[{param+1}G",
     ControlType.ERASE_IN_LINE: lambda param: f"\x1b[{param}K",
     ControlType.CURSOR_MOVE_TO: lambda x, y: f"\x1b[{y+1};{x+1}H",
 }
@@ -93,8 +93,8 @@ class Control:
         return control
 
     @classmethod
-    def move_to_row(cls, x: int, y: int = 0) -> "Control":
-        """Move to the given row, optionally add offset to column.
+    def move_to_column(cls, x: int, y: int = 0) -> "Control":
+        """Move to the given column, optionally add offset to row.
 
         Returns:
             x (int): absolute x (column)
@@ -106,14 +106,14 @@ class Control:
 
         return (
             cls(
-                (ControlType.CURSOR_MOVE_TO_ROW, x + 1),
+                (ControlType.CURSOR_MOVE_TO_COLUMN, x),
                 (
                     ControlType.CURSOR_DOWN if y > 0 else ControlType.CURSOR_UP,
                     abs(y),
                 ),
             )
             if y
-            else cls((ControlType.CURSOR_MOVE_TO_ROW, x))
+            else cls((ControlType.CURSOR_MOVE_TO_COLUMN, x))
         )
 
     @classmethod

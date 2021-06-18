@@ -7,6 +7,7 @@ import pytest
 from rich import errors
 from rich.console import Console
 from rich.measure import Measurement
+from rich.style import Style
 from rich.table import Table, Column
 from rich.text import Text
 
@@ -146,6 +147,15 @@ def test_no_columns():
     output = console.end_capture()
     print(repr(output))
     assert output == "\n"
+
+
+def test_get_row_style():
+    console = Console()
+    table = Table()
+    table.add_row("foo")
+    table.add_row("bar", style="on red")
+    assert table.get_row_style(console, 0) == Style.parse("")
+    assert table.get_row_style(console, 1) == Style.parse("on red")
 
 
 if __name__ == "__main__":

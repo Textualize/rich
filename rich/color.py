@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, NamedTuple, Optional, Tuple
 
 from ._palettes import EIGHT_BIT_PALETTE, STANDARD_PALETTE, WINDOWS_PALETTE
 from .color_triplet import ColorTriplet
+from .repr import rich_repr, RichReprResult
 from .terminal_theme import DEFAULT_TERMINAL_THEME
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -25,6 +26,9 @@ class ColorSystem(IntEnum):
     TRUECOLOR = 3
     WINDOWS = 4
 
+    def __repr__(self) -> str:
+        return f"ColorSystem.{self.name}"
+
 
 class ColorType(IntEnum):
     """Type of color stored in Color class."""
@@ -34,6 +38,9 @@ class ColorType(IntEnum):
     EIGHT_BIT = 2
     TRUECOLOR = 3
     WINDOWS = 4
+
+    def __repr__(self) -> str:
+        return f"ColorType.{self.name}"
 
 
 ANSI_COLOR_NAMES = {
@@ -257,6 +264,7 @@ rgb\(([\d\s,]+)\)$
 )
 
 
+@rich_repr
 class Color(NamedTuple):
     """Terminal color definition."""
 
@@ -269,13 +277,6 @@ class Color(NamedTuple):
     triplet: Optional[ColorTriplet] = None
     """A triplet of color components, if an RGB color."""
 
-    def __repr__(self) -> str:
-        return (
-            f"<color {self.name!r} ({self.type.name.lower()})>"
-            if self.number is None
-            else f"<color {self.name!r} {self.number} ({self.type.name.lower()})>"
-        )
-
     def __rich__(self) -> "Text":
         """Dispays the actual color if Rich printed."""
         from .text import Text
@@ -286,6 +287,12 @@ class Color(NamedTuple):
             ("⬤", Style(color=self)),
             " >",
         )
+
+    def __rich_repr__(self) -> RichReprResult:
+        yield self.name
+        yield self.type
+        yield "number", self.number, None
+        yield "triplet", self.triplet, None
 
     @property
     def system(self) -> ColorSystem:

@@ -1,7 +1,7 @@
-from rich.repr import rich_repr
+import rich.repr
 
 
-@rich_repr
+@rich.repr.auto
 class Bird:
     def __init__(self, name, eats=None, fly=True, extinct=False):
         self.name = name
@@ -9,14 +9,9 @@ class Bird:
         self.fly = fly
         self.extinct = extinct
 
-    def __rich_repr__(self):
-        yield self.name
-        yield "eats", self.eats
-        yield "fly", self.fly, True
-        yield "extinct", self.extinct, False
 
-    # __rich_repr__.angular = True
-
+# Note that the repr is still generate without Rich
+# Try commenting  out the following lin
 
 from rich import print
 

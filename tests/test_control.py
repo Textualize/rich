@@ -32,10 +32,16 @@ def test_control_move():
     )
 
 
-def test_move_to_row():
-    print(repr(Control.move_to_row(10, 20).segment))
-    assert Control.move_to_row(10, 20).segment == Segment(
-        "\x1b[12G\x1b[20B",
+def test_move_to_column():
+    print(repr(Control.move_to_column(10, 20).segment))
+    assert Control.move_to_column(10, 20).segment == Segment(
+        "\x1b[11G\x1b[20B",
         None,
-        [(ControlType.CURSOR_MOVE_TO_ROW, 11), (ControlType.CURSOR_DOWN, 20)],
+        [(ControlType.CURSOR_MOVE_TO_COLUMN, 10), (ControlType.CURSOR_DOWN, 20)],
+    )
+
+    assert Control.move_to_column(10, -20).segment == Segment(
+        "\x1b[11G\x1b[20A",
+        None,
+        [(ControlType.CURSOR_MOVE_TO_COLUMN, 10), (ControlType.CURSOR_UP, 20)],
     )

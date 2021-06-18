@@ -1,3 +1,5 @@
+from ast import literal_eval
+from operator import attrgetter
 import re
 from typing import Callable, Iterable, List, Match, NamedTuple, Optional, Tuple, Union
 
@@ -8,7 +10,7 @@ from ._emoji_replace import _emoji_replace
 
 
 RE_TAGS = re.compile(
-    r"""((\\*)\[([a-z#\/].*?)\])""",
+    r"""((\\*)\[([a-z#\/@].*?)\])""",
     re.VERBOSE,
 )
 
@@ -137,6 +139,7 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
         elif tag is not None:
             if tag.name.startswith("/"):  # Closing tag
                 style_name = tag.name[1:].strip()
+
                 if style_name:  # explicit close
                     style_name = normalize(style_name)
                     try:
@@ -153,7 +156,30 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
                             f"closing tag '[/]' at position {position} has nothing to close"
                         ) from None
 
-                append_span(_Span(start, len(text), str(open_tag)))
+                if open_tag.name.startswith("@"):
+                    if open_tag.parameters:
+                        try:
+                            meta_params = literal_eval(open_tag.parameters)
+                        except SyntaxError as error:
+                            raise MarkupError(
+                                f"error parsing {open_tag.parameters!r}; {error.msg}"
+                            )
+                        except Exception as error:
+                            raise MarkupError(
+                                f"error parsing {open_tag.parameters!r}; {error}"
+                            ) from None
+
+                    else:
+                        meta_params = ()
+
+                    append_span(
+                        _Span(
+                            start, len(text), Style(meta={open_tag.name: meta_params})
+                        )
+                    )
+                else:
+                    append_span(_Span(start, len(text), str(open_tag)))
+
             else:  # Opening tag
                 normalized_tag = _Tag(normalize(tag.name), tag.parameters)
                 style_stack.append((len(text), normalized_tag))
@@ -165,7 +191,7 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
         if style:
             append_span(_Span(start, text_length, style))
 
-    text.spans = sorted(spans)
+    text.spans = sorted(spans, key=attrgetter("start", "end"))
     return text
 
 
@@ -174,7 +200,11 @@ if __name__ == "__main__":  # pragma: no cover
     from rich.console import Console
     from rich.text import Text
 
-    console = Console(highlight=False)
+    console = Console(highlight=True)
+
+    t = render("[b]Hello[/b] [@click='view.toggle', 'left']World[/]")
+    console.print(t)
+    console.print(t._spans)
 
     console.print("Hello [1], [1,2,3] ['hello']")
     console.print("foo")
