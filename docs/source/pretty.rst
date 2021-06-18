@@ -73,22 +73,22 @@ Run the following command to see an example of what the Rich repr protocol can g
 
 First, let's look at a class that might benefit from a Rich repr::
 
-class Bird:
-    def __init__(self, name, eats=None, fly=True, extinct=False):
-        self.name = name
-        self.eats = list(eats) if eats else []
-        self.fly = fly
-        self.extinct = extinct
+    class Bird:
+        def __init__(self, name, eats=None, fly=True, extinct=False):
+            self.name = name
+            self.eats = list(eats) if eats else []
+            self.fly = fly
+            self.extinct = extinct
 
-    def __repr__(self):
-        return f"Bird({self.name!r}, eats={self.eats!r}, fly={self.fly!r}, extinct={self.extinct!r})"
+        def __repr__(self):
+            return f"Bird({self.name!r}, eats={self.eats!r}, fly={self.fly!r}, extinct={self.extinct!r})"
 
-BIRDS = {
-    "gull": Bird("gull", eats=["fish", "chips", "ice cream", "sausage rolls"]),
-    "penguin": Bird("penguin", eats=["fish"], fly=False),
-    "dodo": Bird("dodo", eats=["fruit"], fly=False, extinct=True)
-}
-print(BIRDS)
+    BIRDS = {
+        "gull": Bird("gull", eats=["fish", "chips", "ice cream", "sausage rolls"]),
+        "penguin": Bird("penguin", eats=["fish"], fly=False),
+        "dodo": Bird("dodo", eats=["fruit"], fly=False, extinct=True)
+    }
+    print(BIRDS)
 
 The result of this script would be::
 
@@ -177,7 +177,7 @@ Automatic Rich Repr
 
 Rich can generate a rich repr automatically if the parameters are named the same as your attributes. 
 
-To automatically build a rich repr, use the :meth:`~rich.repr.auto` class decorator. The Bird example above follows the above rule, so we wouldn't even need to implement our own `__rich_repr__`::
+To automatically build a rich repr, use the :meth:`~rich.repr.auto` class decorator. The Bird example above follows the above rule, so we don't strictly need to implement our own ``__rich_repr__``. The following code would generate the same repr::
 
     import rich.repr
 
