@@ -3,8 +3,6 @@ from operator import attrgetter
 import re
 from typing import Callable, Iterable, List, Match, NamedTuple, Optional, Tuple, Union
 
-from black import E
-
 from .errors import MarkupError
 from .style import Style
 from .text import Span, Text
