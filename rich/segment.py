@@ -40,7 +40,7 @@ ControlCode = Union[
 ]
 
 
-@rich_repr
+@rich_repr()
 class Segment(NamedTuple):
     """A piece of text with associated style. Segments are produced by the Console render process and
     are ultimately converted in to strings to be written to the terminal.
@@ -410,6 +410,87 @@ class Segment(NamedTuple):
             else:
                 yield cls(text, None, control)
 
+    @classmethod
+    def divide(
+        cls, segments: Iterable["Segment"], cuts: Iterable[int]
+    ) -> Iterable[List["Segment"]]:
+        """Divides an iterable of segments in to portions.
+
+        Args:
+            cuts (Iterable[int]): Cell positions where to divide.
+
+        Yields:
+            [Iterable[List[Segment]]]: An iterable of Segments in List.
+        """
+        split_segments: List["Segment"] = []
+        add_segment = split_segments.append
+
+        _cuts = list(cuts)
+        total_length = sum(segment.cell_length for segment in segments)
+        if _cuts[-1] != total_length:
+            _cuts.append(total_length)
+
+        iter_cuts = iter(_cuts)
+        iter_segments = iter(segments)
+
+        try:
+            cut = next(iter_cuts)
+        except StopIteration:
+            return
+        pos = 0
+
+        while True:
+            try:
+                segment = next(iter_segments)
+            except StopIteration:
+                if split_segments:
+                    yield split_segments[:]
+                return
+
+            while segment.text:
+                end_pos = pos + segment.cell_length
+                if end_pos <= cut:
+                    add_segment(segment)
+                    pos = end_pos
+                    break
+
+                text, style, control = segment
+                text: str
+                style: Style
+                control: Optional[Sequence[ControlCode]]
+
+                lower = 0
+                upper = len(text)
+                target_len = cut - pos
+
+                while upper > lower:
+                    divide_pos = (upper + lower) // 2
+                    before = text[:divide_pos]
+                    after = text[divide_pos:]
+
+                    before_len = cell_len(before)
+                    if before_len == target_len + 1 and cell_len(before[-1]) == 2:
+                        # Split a 2 width character in to two spaces
+                        before = f"{before[:-1]} "
+                        after = f" {after}"
+                        before_len -= 1
+                    if before_len == target_len:
+                        add_segment(cls(before, style, control))
+                        yield split_segments[:]
+                        del split_segments[:]
+                        segment = cls(after, style, control)
+                        pos = cut
+                        break
+                    elif before_len > target_len:
+                        upper = divide_pos
+                    else:
+                        lower = divide_pos
+
+                try:
+                    cut = next(iter_cuts)
+                except StopIteration:
+                    break
+
 
 class Segments:
     """A simple renderable to render an iterable of segments. This class may be useful if
@@ -436,35 +517,49 @@ class Segments:
             yield from self.segments
 
 
-if __name__ == "__main__":  # pragma: no cover
-    from rich.syntax import Syntax
-    from rich.text import Text
-    from rich.console import Console
+# if __name__ == "__main__":  # pragma: no cover
+#     from rich.syntax import Syntax
+#     from rich.text import Text
+#     from rich.console import Console
 
-    code = """from rich.console import Console
-console = Console()
-text = Text.from_markup("Hello, [bold magenta]World[/]!")
-console.print(text)"""
+#     code = """from rich.console import Console
+# console = Console()
+# text = Text.from_markup("Hello, [bold magenta]World[/]!")
+# console.print(text)"""
 
-    text = Text.from_markup("Hello, [bold magenta]World[/]!")
+#     text = Text.from_markup("Hello, [bold magenta]World[/]!")
 
-    console = Console()
+#     console = Console()
 
-    console.rule("rich.Segment")
-    console.print(
-        "A Segment is the last step in the Rich render process before generating text with ANSI codes."
-    )
-    console.print("\nConsider the following code:\n")
-    console.print(Syntax(code, "python", line_numbers=True))
-    console.print()
-    console.print(
-        "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
-    )
-    fragments = list(console.render(text))
-    console.print(fragments)
-    console.print()
-    console.print("The Segments are then processed to produce the following output:\n")
-    console.print(text)
-    console.print(
-        "\nYou will only need to know this if you are implementing your own Rich renderables."
-    )
+#     console.rule("rich.Segment")
+#     console.print(
+#         "A Segment is the last step in the Rich render process before generating text with ANSI codes."
+#     )
+#     console.print("\nConsider the following code:\n")
+#     console.print(Syntax(code, "python", line_numbers=True))
+#     console.print()
+#     console.print(
+#         "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
+#     )
+#     fragments = list(console.render(text))
+#     console.print(fragments)
+#     console.print()
+#     console.print("The Segments are then processed to produce the following output:\n")
+#     console.print(text)
+#     console.print(
+#         "\nYou will only need to know this if you are implementing your own Rich renderables."
+#     )
+
+
+if __name__ == "__main__":
+
+    from rich.segment import Segment
+
+    segments = [Segment("a💩💩he💩llo ", Style()), Segment("World!", Style.parse("bold"))]
+
+    from rich import print
+
+    for segments in Segment.divide(segments, [4, 8, 12]):
+        render_segments = Segments(segments)
+
+        print(render_segments)
