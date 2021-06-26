@@ -517,7 +517,7 @@ class Segments:
             yield from self.segments
 
 
-class LineSegments:
+class SegmentLines:
     def __init__(self, lines: List[List[Segment]], new_lines: bool = False) -> None:
         self.lines = lines
         self.new_lines = new_lines
