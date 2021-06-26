@@ -517,6 +517,24 @@ class Segments:
             yield from self.segments
 
 
+class LineSegments:
+    def __init__(self, lines: List[List[Segment]], new_lines: bool = False) -> None:
+        self.lines = lines
+        self.new_lines = new_lines
+
+    def __rich_console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
+        if self.new_lines:
+            new_line = Segment.line()
+            for line in self.lines:
+                yield from line
+                yield new_line
+        else:
+            for line in self.lines:
+                yield from line
+
+
 # if __name__ == "__main__":  # pragma: no cover
 #     from rich.syntax import Syntax
 #     from rich.text import Text
