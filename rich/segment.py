@@ -2,6 +2,7 @@ from enum import IntEnum
 
 from typing import Dict, NamedTuple, Optional
 
+from .repr import rich_repr, RichReprResult
 from .cells import cell_len, set_cell_size
 from .style import Style
 
@@ -39,6 +40,7 @@ ControlCode = Union[
 ]
 
 
+@rich_repr
 class Segment(NamedTuple):
     """A piece of text with associated style. Segments are produced by the Console render process and
     are ultimately converted in to strings to be written to the terminal.
@@ -56,12 +58,10 @@ class Segment(NamedTuple):
     control: Optional[Sequence[ControlCode]] = None
     """Optional sequence of control codes."""
 
-    def __repr__(self) -> str:
-        """Simplified repr."""
-        if self.control:
-            return f"Segment({self.text!r}, {self.style!r}, {self.control!r})"
-        else:
-            return f"Segment({self.text!r}, {self.style!r})"
+    def __rich_repr__(self) -> RichReprResult:
+        yield self.text
+        yield "style", self.style, None
+        yield "control", self.control, None
 
     def __bool__(self) -> bool:
         """Check if the segment contains text."""
@@ -101,24 +101,27 @@ class Segment(NamedTuple):
         Returns:
             Iterable[Segments]: A new iterable of segments (possibly the same iterable).
         """
+        result_segments = segments
         if style:
             apply = style.__add__
-            segments = (
+            result_segments = (
                 cls(text, None if control else apply(_style), control)
                 for text, _style, control in segments
             )
         if post_style:
-            segments = (
+            result_segments = (
                 cls(
                     text,
-                    None
-                    if control
-                    else (_style + post_style if _style else post_style),
+                    (
+                        None
+                        if control
+                        else (_style + post_style if _style else post_style)
+                    ),
                     control,
                 )
                 for text, _style, control in segments
             )
-        return segments
+        return result_segments
 
     @classmethod
     def filter_control(
@@ -417,7 +420,7 @@ class Segments:
         new_lines (bool, optional): Add new lines between segments. Defaults to False.
     """
 
-    def __init__(self, segments: Sequence[Segment], new_lines: bool = False) -> None:
+    def __init__(self, segments: Iterable[Segment], new_lines: bool = False) -> None:
         self.segments = list(segments)
         self.new_lines = new_lines
 
