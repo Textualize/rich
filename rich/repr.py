@@ -94,8 +94,8 @@ def auto(
         cls.__repr__ = auto_repr  # type: ignore
         return cls
 
+    angular = angular
     if cls is None:
-        angular = angular
         return do_replace  # type: ignore
     else:
         return do_replace(cls)  # type: ignore

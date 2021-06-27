@@ -60,8 +60,12 @@ class Segment(NamedTuple):
 
     def __rich_repr__(self) -> RichReprResult:
         yield self.text
-        yield "style", self.style, None
-        yield "control", self.control, None
+        if self.control is None:
+            if self.style is not None:
+                yield self.style
+        else:
+            yield self.style
+            yield self.control
 
     def __bool__(self) -> bool:
         """Check if the segment contains text."""

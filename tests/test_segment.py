@@ -6,7 +6,7 @@ from rich.style import Style
 
 
 def test_repr():
-    assert repr(Segment("foo")) == "Segment('foo', None)"
+    assert repr(Segment("foo")) == "Segment('foo')"
     home = (ControlType.HOME, 0)
     if sys.version_info >= (3, 10):
         assert (
