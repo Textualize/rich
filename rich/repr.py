@@ -1,3 +1,4 @@
+from functools import partial
 import inspect
 
 from typing import (
@@ -35,11 +36,11 @@ def auto(*, angular: bool = False) -> Callable[[T], T]:
 
 
 def auto(
-    cls: Optional[T] = None, *, angular: bool = False
+    cls: Optional[T] = None, *, angular: Optional[bool] = None
 ) -> Union[T, Callable[[T], T]]:
     """Class decorator to create __repr__ from __rich_repr__"""
 
-    def do_replace(cls: Type[T]) -> Type[T]:
+    def do_replace(cls: Type[T], angular: Optional[bool] = None) -> Type[T]:
         def auto_repr(self: Type[T]) -> str:
             """Create repr string from __rich_repr__"""
             repr_str: List[str] = []
@@ -88,17 +89,17 @@ def auto(
         if not hasattr(cls, "__rich_repr__"):
             auto_rich_repr.__doc__ = "Build a rich repr"
             cls.__rich_repr__ = auto_rich_repr  # type: ignore
-            cls.__rich_repr__.angular = angular  # type: ignore
 
         auto_repr.__doc__ = "Return repr(self)"
         cls.__repr__ = auto_repr  # type: ignore
+        if angular is not None:
+            cls.__rich_repr__.angular = angular  # type: ignore
         return cls
 
-    angular = angular
     if cls is None:
-        return do_replace  # type: ignore
+        return partial(do_replace, angular=angular)  # type: ignore
     else:
-        return do_replace(cls)  # type: ignore
+        return do_replace(cls, angular=angular)  # type: ignore
 
 
 @overload
