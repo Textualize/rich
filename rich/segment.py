@@ -448,9 +448,10 @@ class Segment(NamedTuple):
                     break
 
                 text, style, control = segment
-                text: str
-                style: Style
-                control: Optional[Sequence[ControlCode]]
+                # The following typing required for PyLance and not Mypy
+                text: str  # type: ignore
+                style: Style  # type: ignore
+                control: Optional[Sequence[ControlCode]]  # type: ignore
 
                 lower = 0
                 upper = len(text)
