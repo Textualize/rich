@@ -426,27 +426,16 @@ class Segment(NamedTuple):
         add_segment = split_segments.append
 
         _cuts = list(cuts)
-        total_length = sum(segment.cell_length for segment in segments)
-        if _cuts[-1] != total_length:
-            _cuts.append(total_length)
 
         iter_cuts = iter(_cuts)
-        iter_segments = iter(segments)
 
         try:
             cut = next(iter_cuts)
         except StopIteration:
-            return
+            return segments
         pos = 0
 
-        while True:
-            try:
-                segment = next(iter_segments)
-            except StopIteration:
-                if split_segments:
-                    yield split_segments[:]
-                return
-
+        for segment in segments:
             while segment.text:
                 end_pos = pos + segment.cell_length
                 if end_pos <= cut:
@@ -490,6 +479,9 @@ class Segment(NamedTuple):
                     cut = next(iter_cuts)
                 except StopIteration:
                     break
+
+        if split_segments:
+            yield split_segments[:]
 
 
 class Segments:
@@ -573,11 +565,15 @@ if __name__ == "__main__":
 
     from rich.segment import Segment
 
-    segments = [Segment("a💩💩he💩llo ", Style()), Segment("World!", Style.parse("bold"))]
+    segments = [
+        Segment("1234567890123456789", Style()),
+        Segment("World!", Style.parse("bold")),
+    ]
 
     from rich import print
 
-    for segments in Segment.divide(segments, [4, 8, 12]):
+    for segments in Segment.divide(segments, [3, 8, 12]):
         render_segments = Segments(segments)
 
         print(render_segments)
+        print()
