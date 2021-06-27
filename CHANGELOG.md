@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added new_line_start argument to Console.print
+- Added Segment.divide method
+- Added segment.SegmentLines class
 
 ## [10.4.0] - 2021-06-18
 

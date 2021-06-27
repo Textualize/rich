@@ -436,7 +436,7 @@ class Segment(NamedTuple):
         try:
             cut = next(iter_cuts)
         except StopIteration:
-            return segments
+            return []
         pos = 0
 
         for segment in segments:
@@ -469,8 +469,9 @@ class Segment(NamedTuple):
                         after = f" {after}"
                         before_len -= 1
                     if before_len == target_len:
-                        add_segment(cls(before, style, control))
-                        yield split_segments[:]
+                        if before:
+                            add_segment(cls(before, style, control))
+                            yield split_segments[:]
                         del split_segments[:]
                         segment = cls(after, style, control)
                         pos = cut

@@ -1,6 +1,6 @@
 import sys
 from fractions import Fraction
-from math import ceil, floor, modf
+from math import ceil
 from typing import cast, List, Optional, Sequence
 
 if sys.version_info >= (3, 8):

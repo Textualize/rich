@@ -1,7 +1,7 @@
 import sys
 
 from rich.segment import ControlType
-from rich.segment import Segment, Segments
+from rich.segment import Segment, Segments, SegmentLines
 from rich.style import Style
 
 
@@ -137,4 +137,77 @@ def test_segments_renderable():
     assert list(segments.__rich_console__(None, None)) == [
         Segment("foo"),
         Segment.line(),
+    ]
+
+
+def test_divide():
+    bold = Style(bold=True)
+    italic = Style(italic=True)
+    segments = [
+        Segment("Hello", bold),
+        Segment(" World!", italic),
+    ]
+
+    assert list(Segment.divide(segments, [])) == []
+    assert list(Segment.divide([], [1])) == []
+
+    assert list(Segment.divide(segments, [1])) == [[Segment("H", bold)]]
+
+    assert list(Segment.divide(segments, [1, 2])) == [
+        [Segment("H", bold)],
+        [Segment("e", bold)],
+    ]
+
+    assert list(Segment.divide(segments, [1, 2, 12])) == [
+        [Segment("H", bold)],
+        [Segment("e", bold)],
+        [Segment("llo", bold), Segment(" World!", italic)],
+    ]
+
+
+def test_divide_emoji():
+    bold = Style(bold=True)
+    italic = Style(italic=True)
+    segments = [
+        Segment("Hello", bold),
+        Segment("💩💩💩", italic),
+    ]
+
+    assert list(Segment.divide(segments, [7])) == [
+        [Segment("Hello", bold), Segment("💩", italic)],
+    ]
+    assert list(Segment.divide(segments, [8])) == [
+        [Segment("Hello", bold), Segment("💩 ", italic)],
+    ]
+    assert list(Segment.divide(segments, [9])) == [
+        [Segment("Hello", bold), Segment("💩💩", italic)],
+    ]
+    assert list(Segment.divide(segments, [8, 11])) == [
+        [Segment("Hello", bold), Segment("💩 ", italic)],
+        [Segment(" 💩", italic)],
+    ]
+    assert list(Segment.divide(segments, [9, 11])) == [
+        [Segment("Hello", bold), Segment("💩💩", italic)],
+        [Segment("💩", italic)],
+    ]
+
+
+def test_segment_lines_renderable():
+    lines = [[Segment("hello"), Segment(" "), Segment("world")], [Segment("foo")]]
+    segment_lines = SegmentLines(lines)
+    assert list(segment_lines.__rich_console__(None, None)) == [
+        Segment("hello"),
+        Segment(" "),
+        Segment("world"),
+        Segment("foo"),
+    ]
+
+    segment_lines = SegmentLines(lines, new_lines=True)
+    assert list(segment_lines.__rich_console__(None, None)) == [
+        Segment("hello"),
+        Segment(" "),
+        Segment("world"),
+        Segment("\n"),
+        Segment("foo"),
+        Segment("\n"),
     ]

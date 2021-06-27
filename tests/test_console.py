@@ -664,3 +664,13 @@ def test_size_properties():
     assert console.size == ConsoleDimensions(5, 20)
     console.height = 10
     assert console.size == ConsoleDimensions(5, 10)
+
+
+def test_print_newline_start():
+    console = Console(width=80, height=25)
+    console.begin_capture()
+    console.print("Foo", new_line_start=True)
+    console.print("Foo\nbar\n", new_line_start=True)
+    result = console.end_capture()
+
+    assert result == "Foo\n\nFoo\nbar\n\n"
