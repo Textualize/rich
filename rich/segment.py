@@ -1,5 +1,5 @@
 from enum import IntEnum
-
+from logging import getLogger
 from typing import Dict, NamedTuple, Optional
 
 from .repr import rich_repr, RichReprResult
@@ -13,6 +13,8 @@ from typing import cast, Iterable, List, Sequence, Union, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult
+
+log = getLogger("rich")
 
 
 class ControlType(IntEnum):
@@ -512,11 +514,11 @@ class Segment(NamedTuple):
                     del split_segments[:]
                     pos = end_pos
                 else:
-                    before, after = segment.split_cells(cut - pos)
+                    log.debug("%r %r %r", segment, cut, pos)
+                    before, segment = segment.split_cells(cut - pos)
                     add_segment(before)
                     yield split_segments[:]
                     del split_segments[:]
-                    segment = after
                     pos = cut
 
                 try:
