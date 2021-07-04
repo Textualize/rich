@@ -81,6 +81,59 @@ class Segment(NamedTuple):
         """Check if the segment contains control codes."""
         return self.control is not None
 
+    def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
+        """Split segment in to two segments at the specified column.
+
+        If the cut point falls in the middle of a 2-cell wide character then it is replaced
+        by two spaces, to preserve the display width of the parent segment.
+
+        Returns:
+            Tuple[Segment, Segment]: Two segments.
+        """
+        text, style, control = self
+        if cut >= self.cell_length:
+            return self, Segment("", style, control)
+
+        pos = cut
+        before = text[:pos]
+        cell_pos = cell_len(before)
+        if cell_pos == cut:
+            return (
+                Segment(before, style, control),
+                Segment(text[pos:], style, control),
+            )
+        if cell_pos < cut:
+            while pos:
+                pos += 1
+                before = text[:pos]
+                cell_pos = cell_len(before)
+                if cell_pos == cut:
+                    return (
+                        Segment(before, style, control),
+                        Segment(text[pos:], style, control),
+                    )
+                if cell_pos > cut:
+                    return (
+                        Segment(before[:-1] + " ", style, control),
+                        Segment(" " + text[pos:], style, control),
+                    )
+        elif cell_pos > cut:
+            while pos:
+                pos -= 1
+                before = text[:pos]
+                cell_pos = cell_len(before)
+                if cell_pos == cut:
+                    return (
+                        Segment(before, style, control),
+                        Segment(text[pos:], style, control),
+                    )
+                if cell_pos < cut:
+                    return (
+                        Segment(before[:pos] + " ", style, control),
+                        Segment(" " + text[pos + 1 :], style, control),
+                    )
+        return (Segment("", style, control), self)
+
     @classmethod
     def line(cls) -> "Segment":
         """Make a new line segment."""
@@ -433,58 +486,35 @@ class Segment(NamedTuple):
 
         iter_cuts = iter(_cuts)
 
-        try:
-            cut = next(iter_cuts)
-        except StopIteration:
-            return []
+        while True:
+            try:
+                cut = next(iter_cuts)
+            except StopIteration:
+                return []
+            if cut != 0:
+                break
+            yield []
         pos = 0
 
         for segment in segments:
             while segment.text:
                 end_pos = pos + segment.cell_length
-                if end_pos <= cut:
+                if end_pos < cut:
                     add_segment(segment)
                     pos = end_pos
                     break
 
-                if pos == cut:
+                if end_pos == cut:
                     add_segment(segment)
                     yield split_segments[:]
                     del split_segments[:]
-
-                text, style, control = segment
-                # The following typing required for PyLance and not Mypy
-                text: str  # type: ignore
-                style: Style  # type: ignore
-                control: Optional[Sequence[ControlCode]]  # type: ignore
-
-                lower = 0
-                upper = len(text)
-                target_len = cut - pos
-
-                while upper > lower:
-                    divide_pos = (upper + lower) // 2
-                    before = text[:divide_pos]
-                    after = text[divide_pos:]
-
-                    before_len = cell_len(before)
-                    if before_len == target_len + 1 and cell_len(before[-1]) == 2:
-                        # Split a 2 width character in to two spaces
-                        before = f"{before[:-1]} "
-                        after = f" {after}"
-                        before_len -= 1
-                    if before_len == target_len:
-                        if before:
-                            add_segment(cls(before, style, control))
-                            yield split_segments[:]
-                        del split_segments[:]
-                        segment = cls(after, style, control)
-                        pos = cut
-                        break
-                    elif before_len > target_len:
-                        upper = divide_pos
-                    else:
-                        lower = divide_pos
+                    pos = end_pos
+                else:
+                    before, after = Segment.split_cells(cut - end_pos)
+                    add_segment(before)
+                    yield split_segments[:]
+                    del split_segments[:]
+                    segment = after
 
                 try:
                     cut = next(iter_cuts)
@@ -545,35 +575,57 @@ class SegmentLines:
                 yield from line
 
 
-if __name__ == "__main__":  # pragma: no cover
-    from rich.syntax import Syntax
-    from rich.text import Text
-    from rich.console import Console
+if __name__ == "__main__":
 
-    code = """from rich.console import Console
-console = Console()
-text = Text.from_markup("Hello, [bold magenta]World[/]!")
-console.print(text)"""
+    from rich import print
 
-    text = Text.from_markup("Hello, [bold magenta]World[/]!")
+    print(Segment("foo").split_cells(0))
+    print(Segment("foo").split_cells(1))
+    print(Segment("foo").split_cells(2))
+    print(Segment("foo").split_cells(3))
+    print(Segment("foo").split_cells(4))
 
-    console = Console()
+    print()
+    print(Segment("💩").split_cells(0))
+    print(Segment("💩").split_cells(1))
+    print(Segment("💩").split_cells(2))
 
-    console.rule("rich.Segment")
-    console.print(
-        "A Segment is the last step in the Rich render process before generating text with ANSI codes."
-    )
-    console.print("\nConsider the following code:\n")
-    console.print(Syntax(code, "python", line_numbers=True))
-    console.print()
-    console.print(
-        "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
-    )
-    fragments = list(console.render(text))
-    console.print(fragments)
-    console.print()
-    console.print("The Segments are then processed to produce the following output:\n")
-    console.print(text)
-    console.print(
-        "\nYou will only need to know this if you are implementing your own Rich renderables."
-    )
+    print()
+    print(Segment("💩💩").split_cells(0))
+    print(Segment("💩💩").split_cells(1))
+    print(Segment("💩💩").split_cells(2))
+    print(Segment("💩💩").split_cells(3))
+    print(Segment("💩💩").split_cells(4))
+
+# if __name__ == "__main__":  # pragma: no cover
+#     from rich.syntax import Syntax
+#     from rich.text import Text
+#     from rich.console import Console
+
+#     code = """from rich.console import Console
+# console = Console()
+# text = Text.from_markup("Hello, [bold magenta]World[/]!")
+# console.print(text)"""
+
+#     text = Text.from_markup("Hello, [bold magenta]World[/]!")
+
+#     console = Console()
+
+#     console.rule("rich.Segment")
+#     console.print(
+#         "A Segment is the last step in the Rich render process before generating text with ANSI codes."
+#     )
+#     console.print("\nConsider the following code:\n")
+#     console.print(Syntax(code, "python", line_numbers=True))
+#     console.print()
+#     console.print(
+#         "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
+#     )
+#     fragments = list(console.render(text))
+#     console.print(fragments)
+#     console.print()
+#     console.print("The Segments are then processed to produce the following output:\n")
+#     console.print(text)
+#     console.print(
+#         "\nYou will only need to know this if you are implementing your own Rich renderables."
+#     )
