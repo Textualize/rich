@@ -216,6 +216,9 @@ def test_divide_emoji():
         ("XYZABC💩💩", 10, (Segment("XYZABC💩💩"), Segment(""))),
         ("💩💩💩💩💩", 3, (Segment("💩 "), Segment(" 💩💩💩"))),
         ("💩💩💩💩💩", 4, (Segment("💩💩"), Segment("💩💩💩"))),
+        ("💩X💩Y💩Z💩A💩", 4, (Segment("💩X "), Segment(" Y💩Z💩A💩"))),
+        ("XYZABC", 4, (Segment("XYZA"), Segment("BC"))),
+        ("XYZABC", 5, (Segment("XYZAB"), Segment("C"))),
     ],
 )
 def test_split_cells_emoji(text, split, result):

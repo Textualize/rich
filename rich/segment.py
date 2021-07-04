@@ -513,13 +513,11 @@ class Segment(NamedTuple):
                     del split_segments[:]
                     pos = end_pos
                 else:
-                    log.debug("%r %r %r", segment, cut, pos)
                     before, segment = segment.split_cells(cut - pos)
                     add_segment(before)
                     yield split_segments[:]
                     del split_segments[:]
-                    pos = cut
-
+                    pos += before.cell_length
                 try:
                     cut = next(iter_cuts)
                 except StopIteration:
@@ -600,6 +598,11 @@ if __name__ == "__main__":
     print(Segment("💩💩").split_cells(2))
     print(Segment("💩💩").split_cells(3))
     print(Segment("💩💩").split_cells(4))
+
+    segment = Segment("💩X" * 10)
+
+    for n in range(30):
+        print(segment.split_cells(n))
 
 # if __name__ == "__main__":  # pragma: no cover
 #     from rich.syntax import Syntax
