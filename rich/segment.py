@@ -517,7 +517,9 @@ class Segment(NamedTuple):
                     add_segment(before)
                     yield split_segments[:]
                     del split_segments[:]
-                    pos += before.cell_length
+                    pos = cut
+                    if not segment:
+                        break
                 try:
                     cut = next(iter_cuts)
                 except StopIteration:
