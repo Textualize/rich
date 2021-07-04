@@ -3,7 +3,7 @@ from enum import IntEnum
 from typing import Dict, NamedTuple, Optional
 
 from .repr import rich_repr, RichReprResult
-from .cells import cell_len, set_cell_size
+from .cells import cell_len, set_cell_size, get_character_cell_size
 from .style import Style
 
 from itertools import filterfalse
@@ -94,7 +94,9 @@ class Segment(NamedTuple):
         if cut >= self.cell_length:
             return self, Segment("", style, control)
 
-        pos = cut
+        cell_size = get_character_cell_size
+
+        pos = int((cut / self.cell_length) * len(text))
         before = text[:pos]
         cell_pos = cell_len(before)
         if cell_pos == cut:
@@ -103,10 +105,13 @@ class Segment(NamedTuple):
                 Segment(text[pos:], style, control),
             )
         if cell_pos < cut:
-            while pos:
+            while True:
+
                 pos += 1
+                char = text[pos]
+                cell_pos += cell_size(char)
                 before = text[:pos]
-                cell_pos = cell_len(before)
+
                 if cell_pos == cut:
                     return (
                         Segment(before, style, control),
@@ -120,8 +125,10 @@ class Segment(NamedTuple):
         elif cell_pos > cut:
             while pos:
                 pos -= 1
+                print(repr(text), pos)
+                char = text[pos]
+                cell_pos -= cell_size(char)
                 before = text[:pos]
-                cell_pos = cell_len(before)
                 if cell_pos == cut:
                     return (
                         Segment(before, style, control),
@@ -132,7 +139,6 @@ class Segment(NamedTuple):
                         Segment(before[:pos] + " ", style, control),
                         Segment(" " + text[pos + 1 :], style, control),
                     )
-        return (Segment("", style, control), self)
 
     @classmethod
     def line(cls) -> "Segment":
