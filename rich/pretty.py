@@ -474,7 +474,7 @@ def traverse(
             try:
                 obj_repr = repr(obj)
             except Exception as error:
-                obj_repr = f"<repr-error {error!r}>"
+                obj_repr = f"<repr-error {str(error)!r}>"
         return obj_repr
 
     visited_ids: Set[int] = set()

@@ -481,10 +481,7 @@ class Segment(NamedTuple):
         """
         split_segments: List["Segment"] = []
         add_segment = split_segments.append
-
-        _cuts = list(cuts)
-
-        iter_cuts = iter(_cuts)
+        iter_cuts = iter(cuts)
 
         while True:
             try:
@@ -510,11 +507,13 @@ class Segment(NamedTuple):
                     del split_segments[:]
                     pos = end_pos
                 else:
-                    before, after = Segment.split_cells(cut - end_pos)
-                    add_segment(before)
-                    yield split_segments[:]
-                    del split_segments[:]
+                    before, after = segment.split_cells(cut - pos)
+                    if before.text:
+                        add_segment(before)
+                        yield split_segments[:]
+                    del split_segments[:] 
                     segment = after
+                    pos = cut
 
                 try:
                     cut = next(iter_cuts)
