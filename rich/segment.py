@@ -528,8 +528,9 @@ class Segment(NamedTuple):
                             yield split_segments[:]
                         return
 
-        if split_segments:
-            yield split_segments[:]
+        yield []
+        # if split_segments:
+        #     yield split_segments[:]
 
 
 class Segments:

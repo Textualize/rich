@@ -205,6 +205,22 @@ def test_divide_edge():
     ]
 
 
+def test_divide_edge_2():
+    segments = [
+        Segment("╭─"),
+        Segment(
+            "────── Placeholder ───────",
+        ),
+        Segment(
+            "─╮",
+        ),
+    ]
+    result = list(Segment.divide(segments, [30, 60]))
+    expected = [segments, []]
+    print(repr(result))
+    assert result == expected
+
+
 @pytest.mark.parametrize(
     "text,split,result",
     [
