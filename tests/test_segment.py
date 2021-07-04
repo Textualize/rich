@@ -1,5 +1,7 @@
 import sys
 
+import pytest
+
 from rich.segment import ControlType
 from rich.segment import Segment, Segments, SegmentLines
 from rich.style import Style
@@ -190,6 +192,34 @@ def test_divide_emoji():
         [Segment("Hello", bold), Segment("💩💩", italic)],
         [Segment("💩", italic)],
     ]
+
+
+@pytest.mark.parametrize(
+    "text,split,result",
+    [
+        ("X", 1, (Segment("X"), Segment(""))),
+        ("💩", 1, (Segment(" "), Segment(" "))),
+        ("XY", 1, (Segment("X"), Segment("Y"))),
+        ("💩X", 1, (Segment(" "), Segment(" X"))),
+        ("💩💩", 1, (Segment(" "), Segment(" 💩"))),
+        ("X💩Y", 2, (Segment("X "), Segment(" Y"))),
+        ("X💩YZ", 2, (Segment("X "), Segment(" YZ"))),
+        ("X💩💩Z", 2, (Segment("X "), Segment(" 💩Z"))),
+        ("X💩💩Z", 3, (Segment("X💩"), Segment("💩Z"))),
+        ("X💩💩Z", 4, (Segment("X💩 "), Segment(" Z"))),
+        ("X💩💩Z", 5, (Segment("X💩💩"), Segment("Z"))),
+        ("X💩💩Z", 6, (Segment("X💩💩Z"), Segment(""))),
+        ("XYZABC💩💩", 6, (Segment("XYZABC"), Segment("💩💩"))),
+        ("XYZABC💩💩", 7, (Segment("XYZABC "), Segment(" 💩"))),
+        ("XYZABC💩💩", 8, (Segment("XYZABC💩"), Segment("💩"))),
+        ("XYZABC💩💩", 9, (Segment("XYZABC💩 "), Segment(" "))),
+        ("XYZABC💩💩", 10, (Segment("XYZABC💩💩"), Segment(""))),
+        ("💩💩💩💩💩", 3, (Segment("💩 "), Segment(" 💩💩💩"))),
+        ("💩💩💩💩💩", 4, (Segment("💩💩"), Segment("💩💩💩"))),
+    ],
+)
+def test_split_cells_emoji(text, split, result):
+    assert Segment(text).split_cells(split) == result
 
 
 def test_segment_lines_renderable():
