@@ -510,15 +510,15 @@ class Segment(NamedTuple):
                     before, after = segment.split_cells(cut - pos)
                     if before.text:
                         add_segment(before)
-                        yield split_segments[:]
-                    del split_segments[:] 
+                    yield split_segments[:]
+                    del split_segments[:]
                     segment = after
                     pos = cut
 
                 try:
                     cut = next(iter_cuts)
                 except StopIteration:
-                    break
+                    return
 
         if split_segments:
             yield split_segments[:]
