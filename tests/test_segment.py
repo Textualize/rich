@@ -194,6 +194,17 @@ def test_divide_emoji():
     ]
 
 
+def test_divide_edge():
+    segments = [Segment("foo"), Segment("bar"), Segment("baz")]
+    result = list(Segment.divide(segments, [1, 3, 9]))
+    print(result)
+    assert result == [
+        [Segment("f")],
+        [Segment("oo")],
+        [Segment("bar"), Segment("baz")],
+    ]
+
+
 @pytest.mark.parametrize(
     "text,split,result",
     [

@@ -507,23 +507,24 @@ class Segment(NamedTuple):
                     pos = end_pos
                     break
 
-                if end_pos == cut:
-                    add_segment(segment)
-                    yield split_segments[:]
-                    del split_segments[:]
-                    pos = end_pos
-                else:
-                    before, segment = segment.split_cells(cut - pos)
-                    add_segment(before)
-                    yield split_segments[:]
-                    del split_segments[:]
-                    pos = cut
-                    if not segment:
-                        break
                 try:
-                    cut = next(iter_cuts)
-                except StopIteration:
-                    return
+                    if end_pos == cut:
+                        add_segment(segment)
+                        yield split_segments[:]
+                        del split_segments[:]
+                        pos = end_pos
+                        break
+                    else:
+                        before, segment = segment.split_cells(cut - pos)
+                        add_segment(before)
+                        yield split_segments[:]
+                        del split_segments[:]
+                        pos = cut
+                finally:
+                    try:
+                        cut = next(iter_cuts)
+                    except StopIteration:
+                        return
 
         if split_segments:
             yield split_segments[:]
