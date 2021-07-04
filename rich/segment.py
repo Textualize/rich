@@ -114,7 +114,7 @@ class Segment(NamedTuple):
                     )
                 if cell_pos > cut:
                     return (
-                        Segment(before[:-1] + " ", style, control),
+                        Segment(before[: pos - 1] + " ", style, control),
                         Segment(" " + text[pos:], style, control),
                     )
         elif cell_pos > cut:
@@ -508,8 +508,7 @@ class Segment(NamedTuple):
                     pos = end_pos
                 else:
                     before, after = segment.split_cells(cut - pos)
-                    if before.text:
-                        add_segment(before)
+                    add_segment(before)
                     yield split_segments[:]
                     del split_segments[:]
                     segment = after
