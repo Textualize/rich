@@ -934,11 +934,15 @@ class Console:
         if WINDOWS:  # pragma: no cover
             width, height = shutil.get_terminal_size()
         else:
+
             try:
                 width, height = os.get_terminal_size(sys.stdin.fileno())
+
             except (AttributeError, ValueError, OSError):
                 try:
+
                     width, height = os.get_terminal_size(sys.stdout.fileno())
+
                 except (AttributeError, ValueError, OSError):
                     pass
 

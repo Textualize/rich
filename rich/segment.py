@@ -447,6 +447,11 @@ class Segment(NamedTuple):
                     pos = end_pos
                     break
 
+                if pos == cut:
+                    add_segment(segment)
+                    yield split_segments[:]
+                    del split_segments[:]
+
                 text, style, control = segment
                 # The following typing required for PyLance and not Mypy
                 text: str  # type: ignore
@@ -516,8 +521,15 @@ class Segments:
 
 
 class SegmentLines:
-    def __init__(self, lines: List[List[Segment]], new_lines: bool = False) -> None:
-        self.lines = lines
+    def __init__(self, lines: Iterable[List[Segment]], new_lines: bool = False) -> None:
+        """A simple renderable containing a number of lines of segments. May be used as an intermediate
+        in rendering process.
+
+        Args:
+            lines (Iterable[List[Segment]]): Lists of segments forming lines.
+            new_lines (bool, optional): Insert new lines after each line. Defaults to False.
+        """
+        self.lines = list(lines)
         self.new_lines = new_lines
 
     def __rich_console__(
@@ -533,53 +545,35 @@ class SegmentLines:
                 yield from line
 
 
-# if __name__ == "__main__":  # pragma: no cover
-#     from rich.syntax import Syntax
-#     from rich.text import Text
-#     from rich.console import Console
+if __name__ == "__main__":  # pragma: no cover
+    from rich.syntax import Syntax
+    from rich.text import Text
+    from rich.console import Console
 
-#     code = """from rich.console import Console
-# console = Console()
-# text = Text.from_markup("Hello, [bold magenta]World[/]!")
-# console.print(text)"""
+    code = """from rich.console import Console
+console = Console()
+text = Text.from_markup("Hello, [bold magenta]World[/]!")
+console.print(text)"""
 
-#     text = Text.from_markup("Hello, [bold magenta]World[/]!")
+    text = Text.from_markup("Hello, [bold magenta]World[/]!")
 
-#     console = Console()
+    console = Console()
 
-#     console.rule("rich.Segment")
-#     console.print(
-#         "A Segment is the last step in the Rich render process before generating text with ANSI codes."
-#     )
-#     console.print("\nConsider the following code:\n")
-#     console.print(Syntax(code, "python", line_numbers=True))
-#     console.print()
-#     console.print(
-#         "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
-#     )
-#     fragments = list(console.render(text))
-#     console.print(fragments)
-#     console.print()
-#     console.print("The Segments are then processed to produce the following output:\n")
-#     console.print(text)
-#     console.print(
-#         "\nYou will only need to know this if you are implementing your own Rich renderables."
-#     )
-
-
-if __name__ == "__main__":
-
-    from rich.segment import Segment
-
-    segments = [
-        Segment("1234567890123456789", Style()),
-        Segment("World!", Style.parse("bold")),
-    ]
-
-    from rich import print
-
-    for segments in Segment.divide(segments, [3, 8, 12]):
-        render_segments = Segments(segments)
-
-        print(render_segments)
-        print()
+    console.rule("rich.Segment")
+    console.print(
+        "A Segment is the last step in the Rich render process before generating text with ANSI codes."
+    )
+    console.print("\nConsider the following code:\n")
+    console.print(Syntax(code, "python", line_numbers=True))
+    console.print()
+    console.print(
+        "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
+    )
+    fragments = list(console.render(text))
+    console.print(fragments)
+    console.print()
+    console.print("The Segments are then processed to produce the following output:\n")
+    console.print(text)
+    console.print(
+        "\nYou will only need to know this if you are implementing your own Rich renderables."
+    )
