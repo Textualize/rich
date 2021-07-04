@@ -524,6 +524,8 @@ class Segment(NamedTuple):
                     try:
                         cut = next(iter_cuts)
                     except StopIteration:
+                        if split_segments:
+                            yield split_segments[:]
                         return
 
         if split_segments:
