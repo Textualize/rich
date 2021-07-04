@@ -91,8 +91,10 @@ class Segment(NamedTuple):
             Tuple[Segment, Segment]: Two segments.
         """
         text, style, control = self
+        assert cut >= 0
+        _Segment = Segment
         if cut >= self.cell_length:
-            return self, Segment("", style, control)
+            return self, _Segment("", style, control)
 
         cell_size = get_character_cell_size
 
@@ -101,43 +103,40 @@ class Segment(NamedTuple):
         cell_pos = cell_len(before)
         if cell_pos == cut:
             return (
-                Segment(before, style, control),
-                Segment(text[pos:], style, control),
+                _Segment(before, style, control),
+                _Segment(text[pos:], style, control),
             )
         if cell_pos < cut:
-            while True:
 
+            while True:
                 pos += 1
                 char = text[pos]
                 cell_pos += cell_size(char)
                 before = text[:pos]
-
                 if cell_pos == cut:
                     return (
-                        Segment(before, style, control),
-                        Segment(text[pos:], style, control),
+                        _Segment(before, style, control),
+                        _Segment(text[pos:], style, control),
                     )
                 if cell_pos > cut:
                     return (
-                        Segment(before[: pos - 1] + " ", style, control),
-                        Segment(" " + text[pos:], style, control),
+                        _Segment(before[: pos - 1] + " ", style, control),
+                        _Segment(" " + text[pos:], style, control),
                     )
         elif cell_pos > cut:
-            while pos:
+            while True:
+                cell_pos -= cell_size(text[pos])
                 pos -= 1
-                print(repr(text), pos)
-                char = text[pos]
-                cell_pos -= cell_size(char)
-                before = text[:pos]
+                before = before[:-1]
                 if cell_pos == cut:
                     return (
-                        Segment(before, style, control),
-                        Segment(text[pos:], style, control),
+                        _Segment(before, style, control),
+                        _Segment(text[pos:], style, control),
                     )
                 if cell_pos < cut:
                     return (
-                        Segment(before[:pos] + " ", style, control),
-                        Segment(" " + text[pos + 1 :], style, control),
+                        _Segment(before[:pos] + " ", style, control),
+                        _Segment(" " + text[pos + 1 :], style, control),
                     )
 
     @classmethod
