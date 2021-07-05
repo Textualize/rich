@@ -151,7 +151,7 @@ def test_divide():
     ]
 
     assert list(Segment.divide(segments, [])) == []
-    assert list(Segment.divide([], [1])) == []
+    assert list(Segment.divide([], [1])) == [[]]
 
     assert list(Segment.divide(segments, [1])) == [[Segment("H", bold)]]
 

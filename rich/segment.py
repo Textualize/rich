@@ -124,6 +124,7 @@ class Segment(NamedTuple):
                     _Segment(before[: pos - 1] + " ", style, control),
                     _Segment(" " + text[pos:], style, control),
                 )
+
         # elif cell_pos > cut:
         #     while True:
         #         cell_pos -= cell_size(text[pos])
@@ -527,10 +528,7 @@ class Segment(NamedTuple):
                         if split_segments:
                             yield split_segments[:]
                         return
-
         yield []
-        # if split_segments:
-        #     yield split_segments[:]
 
 
 class Segments:
