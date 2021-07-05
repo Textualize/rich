@@ -83,7 +83,7 @@ class Segment(NamedTuple):
         """Check if the segment contains control codes."""
         return self.control is not None
 
-    def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
+    def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:  # type: ignore
         """Split segment in to two segments at the specified column.
 
         If the cut point falls in the middle of a 2-cell wide character then it is replaced
@@ -124,22 +124,6 @@ class Segment(NamedTuple):
                     _Segment(before[: pos - 1] + " ", style, control),
                     _Segment(" " + text[pos:], style, control),
                 )
-
-        # elif cell_pos > cut:
-        #     while True:
-        #         cell_pos -= cell_size(text[pos])
-        #         pos -= 1
-        #         before = before[:-1]
-        #         if cell_pos == cut:
-        #             return (
-        #                 _Segment(before, style, control),
-        #                 _Segment(text[pos:], style, control),
-        #             )
-        #         if cell_pos < cut:
-        #             return (
-        #                 _Segment(before[:pos] + " ", style, control),
-        #                 _Segment(" " + text[pos + 1 :], style, control),
-        #             )
 
     @classmethod
     def line(cls) -> "Segment":
