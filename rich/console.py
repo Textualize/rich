@@ -934,11 +934,15 @@ class Console:
         if WINDOWS:  # pragma: no cover
             width, height = shutil.get_terminal_size()
         else:
+
             try:
                 width, height = os.get_terminal_size(sys.stdin.fileno())
+
             except (AttributeError, ValueError, OSError):
                 try:
+
                     width, height = os.get_terminal_size(sys.stdout.fileno())
+
                 except (AttributeError, ValueError, OSError):
                     pass
 
@@ -1514,6 +1518,7 @@ class Console:
         height: Optional[int] = None,
         crop: bool = True,
         soft_wrap: Optional[bool] = None,
+        new_line_start: bool = False,
     ) -> None:
         """Print to the console.
 
@@ -1530,8 +1535,9 @@ class Console:
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
             width (Optional[int], optional): Width of output, or ``None`` to auto-detect. Defaults to ``None``.
             crop (Optional[bool], optional): Crop output to width of terminal. Defaults to True.
-            soft_wrap (bool, optional): Enable soft wrap mode which disables word wrapping and cropping of text or None for
+            soft_wrap (bool, optional): Enable soft wrap mode which disables word wrapping and cropping of text or ``None`` for
                 Console default. Defaults to ``None``.
+            new_line_start (bool, False): Insert a new line at the start if the output contains more than one line. Defaults to ``False``.
         """
         if not objects:
             objects = (NewLine(),)
@@ -1579,6 +1585,12 @@ class Console:
                             render(renderable, render_options), self.get_style(style)
                         )
                     )
+            if new_line_start:
+                if (
+                    len("".join(segment.text for segment in new_segments).splitlines())
+                    > 1
+                ):
+                    new_segments.insert(0, Segment.line())
             if crop:
                 buffer_extend = self._buffer.extend
                 for line in Segment.split_and_crop_lines(

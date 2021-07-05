@@ -6,6 +6,7 @@ from collections import Counter, defaultdict, deque, UserDict, UserList
 from dataclasses import dataclass, fields, is_dataclass
 from inspect import isclass
 from itertools import islice
+import re
 from typing import (
     DefaultDict,
     TYPE_CHECKING,
@@ -57,6 +58,9 @@ if TYPE_CHECKING:
         OverflowMethod,
         RenderResult,
     )
+
+# Matches Jupyter's special methods
+_re_jupyter_repr = re.compile(f"^_repr_.+_$")
 
 
 def install(
@@ -112,11 +116,10 @@ def install(
         # always skip rich generated jupyter renderables or None values
         if isinstance(value, JupyterRenderable) or value is None:
             return
-        # on jupyter rich display, if using one of the special representations dont use rich
-        if console.is_jupyter and any(attr.startswith("_repr_") for attr in dir(value)):
-            return
-
-        if hasattr(value, "_repr_mimebundle_"):
+        # on jupyter rich display, if using one of the special representations don't use rich
+        if console.is_jupyter and any(
+            _re_jupyter_repr.match(attr) for attr in dir(value)
+        ):
             return
 
         # certain renderables should start on a new line
@@ -136,6 +139,7 @@ def install(
                 margin=12,
             ),
             crop=crop,
+            new_line_start=True,
         )
 
     try:  # pragma: no cover
@@ -470,7 +474,7 @@ def traverse(
             try:
                 obj_repr = repr(obj)
             except Exception as error:
-                obj_repr = f"<repr-error '{error}'>"
+                obj_repr = f"<repr-error {str(error)!r}>"
         return obj_repr
 
     visited_ids: Set[int] = set()

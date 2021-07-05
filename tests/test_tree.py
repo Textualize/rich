@@ -59,7 +59,7 @@ def test_render_ascii():
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="different on Windows")
-def test_render():
+def test_render_tree_non_win32():
     tree = Tree("foo")
     tree.add("bar", style="italic")
     baz_tree = tree.add("baz", guide_style="bold red", style="on blue")
@@ -77,7 +77,7 @@ def test_render():
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows specific")
-def test_render():
+def test_render_tree_win32():
     tree = Tree("foo")
     tree.add("bar", style="italic")
     baz_tree = tree.add("baz", guide_style="bold red", style="on blue")
