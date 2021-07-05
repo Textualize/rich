@@ -154,7 +154,7 @@ class Segment(NamedTuple):
             apply = style.__add__
             result_segments = (
                 cls(text, None if control else apply(_style), control)
-                for text, _style, control in segments
+                for text, _style, control in result_segments
             )
         if post_style:
             result_segments = (
@@ -167,7 +167,7 @@ class Segment(NamedTuple):
                     ),
                     control,
                 )
-                for text, _style, control in segments
+                for text, _style, control in result_segments
             )
         return result_segments
 
@@ -567,60 +567,37 @@ class SegmentLines:
 
 if __name__ == "__main__":
 
-    from rich import print
+    if __name__ == "__main__":  # pragma: no cover
+        from rich.syntax import Syntax
+        from rich.text import Text
+        from rich.console import Console
 
-    print(Segment("foo").split_cells(0))
-    print(Segment("foo").split_cells(1))
-    print(Segment("foo").split_cells(2))
-    print(Segment("foo").split_cells(3))
-    print(Segment("foo").split_cells(4))
+        code = """from rich.console import Console
+    console = Console()
+    text = Text.from_markup("Hello, [bold magenta]World[/]!")
+    console.print(text)"""
 
-    print()
-    print(Segment("💩").split_cells(0))
-    print(Segment("💩").split_cells(1))
-    print(Segment("💩").split_cells(2))
+        text = Text.from_markup("Hello, [bold magenta]World[/]!")
 
-    print()
-    print(Segment("💩💩").split_cells(0))
-    print(Segment("💩💩").split_cells(1))
-    print(Segment("💩💩").split_cells(2))
-    print(Segment("💩💩").split_cells(3))
-    print(Segment("💩💩").split_cells(4))
+        console = Console()
 
-    segment = Segment("💩X" * 10)
-
-    for n in range(30):
-        print(segment.split_cells(n))
-
-# if __name__ == "__main__":  # pragma: no cover
-#     from rich.syntax import Syntax
-#     from rich.text import Text
-#     from rich.console import Console
-
-#     code = """from rich.console import Console
-# console = Console()
-# text = Text.from_markup("Hello, [bold magenta]World[/]!")
-# console.print(text)"""
-
-#     text = Text.from_markup("Hello, [bold magenta]World[/]!")
-
-#     console = Console()
-
-#     console.rule("rich.Segment")
-#     console.print(
-#         "A Segment is the last step in the Rich render process before generating text with ANSI codes."
-#     )
-#     console.print("\nConsider the following code:\n")
-#     console.print(Syntax(code, "python", line_numbers=True))
-#     console.print()
-#     console.print(
-#         "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
-#     )
-#     fragments = list(console.render(text))
-#     console.print(fragments)
-#     console.print()
-#     console.print("The Segments are then processed to produce the following output:\n")
-#     console.print(text)
-#     console.print(
-#         "\nYou will only need to know this if you are implementing your own Rich renderables."
-#     )
+        console.rule("rich.Segment")
+        console.print(
+            "A Segment is the last step in the Rich render process before generating text with ANSI codes."
+        )
+        console.print("\nConsider the following code:\n")
+        console.print(Syntax(code, "python", line_numbers=True))
+        console.print()
+        console.print(
+            "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
+        )
+        fragments = list(console.render(text))
+        console.print(fragments)
+        console.print()
+        console.print(
+            "The Segments are then processed to produce the following output:\n"
+        )
+        console.print(text)
+        console.print(
+            "\nYou will only need to know this if you are implementing your own Rich renderables."
+        )
