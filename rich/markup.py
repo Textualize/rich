@@ -134,6 +134,7 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
         raise KeyError(style_name)
 
     for position, plain_text, tag in _parse(markup):
+
         if plain_text is not None:
             append(emoji_replace(plain_text) if emoji else plain_text)
         elif tag is not None:
@@ -191,7 +192,7 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
         if style:
             append_span(_Span(start, text_length, style))
 
-    text.spans = sorted(spans, key=attrgetter("start", "end"))
+    text.spans = sorted(spans[::-1], key=attrgetter("start"))
     return text
 
 

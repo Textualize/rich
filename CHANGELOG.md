@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added precision argument to filesize.decimal
 - Added separator argument to filesize.decimal
 
+### Fixed
+
+- Fixed issue with adjoining color tags https://github.com/willmcgugan/rich/issues/1334
+
 ## [10.5.0] - 2021-05-07
 
 ### Fixed

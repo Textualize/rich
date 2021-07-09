@@ -105,6 +105,12 @@ def test_render_overlap():
     ]
 
 
+def test_adjoint():
+    result = render("[red][blue]B[/blue]R[/red]")
+    print(repr(result))
+    assert result.spans == [Span(0, 2, "red"), Span(0, 1, "blue")]
+
+
 def test_render_close():
     result = render("[bold]X[/]Y")
     assert str(result) == "XY"
