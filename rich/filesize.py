@@ -13,15 +13,15 @@ See Also:
 
 __all__ = ["decimal"]
 
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Tuple, Optional
 
 
 def _to_str(
     size: int,
     suffixes: Iterable[str],
     base: int,
-    precision: int = 1,
-    separator: str = " ",
+    precision: Optional[int] = 1,
+    separator: Optional[str] = " ",
 ) -> str:
     if size == 1:
         return "1 byte"
@@ -49,7 +49,7 @@ def pick_unit_and_suffix(size: int, suffixes: List[str], base: int) -> Tuple[int
     return unit, suffix
 
 
-def decimal(size: int, precision: int = 1, separator: str = " ") -> str:
+def decimal(size: int, precision: Optional[int] = 1, separator: Optional[str] = " ") -> str:
     """Convert a filesize in to a string (powers of 1000, SI prefixes).
 
     In this convention, ``1000 B = 1 kB``.
