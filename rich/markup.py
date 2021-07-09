@@ -191,7 +191,7 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
         if style:
             append_span(_Span(start, text_length, style))
 
-    text.spans = sorted(spans, key=attrgetter("start", "end"))
+    text.spans = sorted(spans[::-1], key=attrgetter("start"))
     return text
 
 
