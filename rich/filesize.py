@@ -49,7 +49,11 @@ def pick_unit_and_suffix(size: int, suffixes: List[str], base: int) -> Tuple[int
     return unit, suffix
 
 
-def decimal(size: int, precision: Optional[int] = 1, separator: Optional[str] = " ") -> str:
+def decimal(
+    size: int,
+    precision: Optional[int] = 1,
+    separator: Optional[str] = " ",
+) -> str:
     """Convert a filesize in to a string (powers of 1000, SI prefixes).
 
     In this convention, ``1000 B = 1 kB``.
