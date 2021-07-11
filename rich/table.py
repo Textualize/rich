@@ -352,6 +352,7 @@ class Table(JupyterMixin):
             footer_style (Union[str, Style], optional): Style for the footer, or None for default. Defaults to None.
             style (Union[str, Style], optional): Style for the column cells, or None for default. Defaults to None.
             justify (JustifyMethod, optional): Alignment for cells. Defaults to "left".
+            overflow (OverflowMethod): Overflow method: "crop", "fold", "ellipsis". Defaults to "ellipsis".
             width (int, optional): Desired width of column in characters, or None to fit to contents. Defaults to None.
             min_width (Optional[int], optional): Minimum width of column, or ``None`` for no minimum. Defaults to None.
             max_width (Optional[int], optional): Maximum width of column, or ``None`` for no maximum. Defaults to None.
