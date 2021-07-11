@@ -359,6 +359,8 @@ class Traceback:
                     else None,
                 )
                 append(frame)
+                if "_rich_traceback_guard" in frame_summary.f_locals:
+                    del stack.frames[:]
 
             cause = getattr(exc_value, "__cause__", None)
             if cause and cause.__traceback__:
@@ -600,7 +602,7 @@ if __name__ == "__main__":  # pragma: no cover
         print(one / a)
 
     def foo(a: Any) -> None:
-
+        _rich_traceback_guard = True
         zed = {
             "characters": {
                 "Paul Atreides",
