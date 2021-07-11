@@ -40,6 +40,7 @@ def test_rich_console():
     style = Style(color="red")
     options = ConsoleOptions(
         ConsoleDimensions(80, 25),
+        max_height=25,
         legacy_windows=False,
         min_width=10,
         max_width=20,

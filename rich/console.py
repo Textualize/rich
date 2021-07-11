@@ -134,6 +134,8 @@ class ConsoleOptions:
     """True if the target is a terminal, otherwise False."""
     encoding: str
     """Encoding of terminal."""
+    max_height: int
+    """Height of container (starts as terminal)"""
     justify: Optional[JustifyMethod] = None
     """Justify value override for renderable."""
     overflow: Optional[OverflowMethod] = None
@@ -145,7 +147,6 @@ class ConsoleOptions:
     markup: Optional[bool] = None
     """Enable markup when rendering strings."""
     height: Optional[int] = None
-    """Height available, or None for no height limit."""
 
     @property
     def ascii_only(self) -> bool:
@@ -194,6 +195,8 @@ class ConsoleOptions:
         if not isinstance(markup, NoChange):
             options.markup = markup
         if not isinstance(height, NoChange):
+            if height is not None:
+                options.max_height = height
             options.height = None if height is None else max(0, height)
         return options
 
@@ -223,6 +226,7 @@ class ConsoleOptions:
         options = self.copy()
         options.min_width = options.max_width = max(0, width)
         options.height = height
+        options.max_height = height
         return options
 
 
@@ -907,6 +911,7 @@ class Console:
     def options(self) -> ConsoleOptions:
         """Get default console options."""
         return ConsoleOptions(
+            max_height=self.size.height,
             size=self.size,
             legacy_windows=self.legacy_windows,
             min_width=1,
