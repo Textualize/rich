@@ -142,7 +142,8 @@ class Align(JupyterMixin):
             Constrain(
                 self.renderable, width if self.width is None else min(width, self.width)
             ),
-            options.update(height=self.height or options.height or 1),
+            options
+            # options.update(height=self.height or options.height or 1),
         )
         lines = list(Segment.split_lines(rendered))
         width, height = Segment.get_shape(lines)
