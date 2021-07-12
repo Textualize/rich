@@ -156,7 +156,7 @@ class RichHandler(Handler):
         """Render message text in to Text.
 
         record (LogRecord): logging Record.
-        message (str): String cotaining log message.
+        message (str): String containing log message.
 
         Returns:
             ConsoleRenderable: Renderable to display log message.
