@@ -1,5 +1,6 @@
 from collections.abc import Mapping
 from typing import Any, Optional
+import warnings
 
 from rich.console import JustifyMethod
 
@@ -28,6 +29,7 @@ def tabulate_mapping(
     Returns:
         Table: A table instance which may be rendered by the Console.
     """
+    warnings.warn("tabulate_mapping will be deprecated in Rich v11", DeprecationWarning)
     table = Table(
         show_header=False,
         title=title,

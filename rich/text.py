@@ -2,6 +2,7 @@ import re
 from functools import partial, reduce
 from math import gcd
 from operator import attrgetter, itemgetter
+from rich.emoji import EmojiVariant
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -23,6 +24,7 @@ from .align import AlignMethod
 from .cells import cell_len, set_cell_size
 from .containers import Lines
 from .control import strip_control_codes
+from .emoji import EmojiVariant
 from .jupyter import JupyterMixin
 from .measure import Measurement
 from .segment import Segment
@@ -53,10 +55,11 @@ class Span(NamedTuple):
     """Style associated with the span."""
 
     def __repr__(self) -> str:
-        if isinstance(self.style, Style) and self.style._meta:
-            return f"Span({self.start}, {self.end}, {self.style!r})"
-        else:
-            return f"Span({self.start}, {self.end}, {str(self.style)!r})"
+        return (
+            f"Span({self.start}, {self.end}, {self.style!r})"
+            if (isinstance(self.style, Style) and self.style._meta)
+            else f"Span({self.start}, {self.end}, {str(self.style)!r})"
+        )
 
     def __bool__(self) -> bool:
         return self.end > self.start
@@ -218,6 +221,7 @@ class Text(JupyterMixin):
         *,
         style: Union[str, Style] = "",
         emoji: bool = True,
+        emoji_variant: Optional[EmojiVariant] = None,
         justify: Optional["JustifyMethod"] = None,
         overflow: Optional["OverflowMethod"] = None,
     ) -> "Text":
@@ -234,7 +238,7 @@ class Text(JupyterMixin):
         """
         from .markup import render
 
-        rendered_text = render(text, style, emoji=emoji)
+        rendered_text = render(text, style, emoji=emoji, emoji_variant=emoji_variant)
         rendered_text.justify = justify
         rendered_text.overflow = overflow
         return rendered_text

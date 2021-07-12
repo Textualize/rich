@@ -1,11 +1,23 @@
-from typing import Union
+import sys
+from typing import TYPE_CHECKING, Optional, Union
 
-from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin
 from .segment import Segment
 from .style import Style
 from ._emoji_codes import EMOJI
 from ._emoji_replace import _emoji_replace
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal  # pragma: no cover
+
+
+if TYPE_CHECKING:
+    from .console import Console, ConsoleOptions, RenderResult
+
+
+EmojiVariant = Literal["emoji", "text"]
 
 
 class NoEmoji(Exception):
@@ -15,7 +27,14 @@ class NoEmoji(Exception):
 class Emoji(JupyterMixin):
     __slots__ = ["name", "style", "_char"]
 
-    def __init__(self, name: str, style: Union[str, Style] = "none") -> None:
+    VARIANTS = {"text": "\uFE0E", "emoji": "\uFE0F"}
+
+    def __init__(
+        self,
+        name: str,
+        style: Union[str, Style] = "none",
+        variant: Optional[EmojiVariant] = None,
+    ) -> None:
         """A single emoji character.
 
         Args:
@@ -27,10 +46,13 @@ class Emoji(JupyterMixin):
         """
         self.name = name
         self.style = style
+        self.variant = variant
         try:
             self._char = EMOJI[name]
         except KeyError:
             raise NoEmoji(f"No emoji called {name!r}")
+        if variant is not None:
+            self._char += self.VARIANTS.get(variant, "")
 
     @classmethod
     def replace(cls, text: str) -> str:
@@ -51,8 +73,8 @@ class Emoji(JupyterMixin):
         return self._char
 
     def __rich_console__(
-        self, console: Console, options: ConsoleOptions
-    ) -> RenderResult:
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
         yield Segment(self._char, console.get_style(self.style))
 
 

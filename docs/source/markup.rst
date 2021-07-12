@@ -74,6 +74,26 @@ Calling ``greet("Will")`` will print a greeting, but if you were to call ``greet
     def greet(name):
         console.print(f"Hello {escape(name)}!")
 
+Emoji
+~~~~~
+
+If you add an *emoji code* to markup it will be replaced with the equivalent unicode character. An emoji code consists of th name of the emoji surrounded be colons (:). Here's an example::
+
+    >>> from rich import print
+    >>> print(":warning:")
+    ⚠️
+
+Some emojis have two variants, the "emoji" variant displays in full color, and the "text" variant displays in monochrome (whatever your default colors are set to). You can specify the variant you want by adding either `"-emoji"` or  `"-text"` to the emoji code. Here's an example:
+
+    >>> from rich import print
+    >>> print(":red_heart-emoji:")
+    >>> print(":red_heart-text:")
+
+To see a list of all the emojis available, run the following command::
+
+    python -m rich.emoji
+
+
 Rendering Markup
 ----------------
 

@@ -5,18 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [10.6.0] - Unreleased
+## [10.6.0] - 2021-07-12
+
+### Deprecated
+
+- Added deprecation warning for tabulate_mapping which will be removed in v11.0.0
 
 ### Added
 
 - Added precision argument to filesize.decimal
 - Added separator argument to filesize.decimal
+- Added \_rich_traceback_guard to Traceback
+- Added emoji_variant to Console
+- Added -emoji and -text variant selectors to emoji code
 
 ### Fixed
 
 - Fixed issue with adjoining color tags https://github.com/willmcgugan/rich/issues/1334
 
-## [10.5.0] - 2021-05-07
+### Changed
+
+- Changed Console.size to use unproxied stdin and stdout
+
+## [10.5.0] - 2021-07-05
 
 ### Fixed
 
