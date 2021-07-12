@@ -44,6 +44,7 @@ def test_box_substitute():
         max_width=100,
         is_terminal=True,
         encoding="utf-8",
+        max_height=25,
     )
     assert HEAVY.substitute(options) == SQUARE
 

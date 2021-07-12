@@ -166,6 +166,11 @@ def test_divide():
         [Segment("llo", bold), Segment(" World!", italic)],
     ]
 
+    assert list(Segment.divide(segments, [4, 20])) == [
+        [Segment("Hell", bold)],
+        [Segment("o", bold), Segment(" World!", italic)],
+    ]
+
 
 def test_divide_emoji():
     bold = Style(bold=True)

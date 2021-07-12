@@ -1,4 +1,5 @@
 from functools import lru_cache
+from logging import StrFormatStyle
 from typing import Dict, List
 
 from ._cell_widths import CELL_WIDTHS
@@ -80,18 +81,26 @@ def set_cell_size(text: str, total: int) -> str:
     if cell_size < total:
         return text + " " * (total - cell_size)
 
-    _get_character_cell_size = get_character_cell_size
-    character_sizes = [_get_character_cell_size(character) for character in text]
-    excess = cell_size - total
-    pop = character_sizes.pop
-    while excess > 0 and character_sizes:
-        excess -= pop()
-    text = text[: len(character_sizes)]
-    if excess == -1:
-        text += " "
-    return text
+    start = 0
+    end = cell_size
+
+    # Binary search until we find the right size
+    while True:
+        pos = (start + end) // 2
+        before = text[:pos]
+        before_len = cell_len(before)
+        if before_len == total + 1 and cell_len(before[-1]) == 2:
+            return before[:-1] + " "
+        if before_len == total:
+            return before
+        if before_len > total:
+            end = pos
+        else:
+            start = pos
 
 
+# TODO: This is inefficient
+# TODO: This might not work with CWJ type characters
 def chop_cells(text: str, max_size: int, position: int = 0) -> List[str]:
     """Break text in to equal (cell) length strings."""
     _get_character_cell_size = get_character_cell_size

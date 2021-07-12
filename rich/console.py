@@ -50,6 +50,7 @@ from ._log_render import FormatTimeCallable, LogRender
 from .align import Align, AlignMethod
 from .color import ColorSystem
 from .control import Control
+from .emoji import EmojiVariant
 from .highlighter import NullHighlighter, ReprHighlighter
 from .markup import render as render_markup
 from .measure import Measurement, measure_renderables
@@ -74,7 +75,6 @@ WINDOWS = platform.system() == "Windows"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
-
 OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
 
 
@@ -134,6 +134,8 @@ class ConsoleOptions:
     """True if the target is a terminal, otherwise False."""
     encoding: str
     """Encoding of terminal."""
+    max_height: int
+    """Height of container (starts as terminal)"""
     justify: Optional[JustifyMethod] = None
     """Justify value override for renderable."""
     overflow: Optional[OverflowMethod] = None
@@ -145,7 +147,6 @@ class ConsoleOptions:
     markup: Optional[bool] = None
     """Enable markup when rendering strings."""
     height: Optional[int] = None
-    """Height available, or None for no height limit."""
 
     @property
     def ascii_only(self) -> bool:
@@ -194,6 +195,8 @@ class ConsoleOptions:
         if not isinstance(markup, NoChange):
             options.markup = markup
         if not isinstance(height, NoChange):
+            if height is not None:
+                options.max_height = height
             options.height = None if height is None else max(0, height)
         return options
 
@@ -223,6 +226,7 @@ class ConsoleOptions:
         options = self.copy()
         options.min_width = options.max_width = max(0, width)
         options.height = height
+        options.max_height = height
         return options
 
 
@@ -585,6 +589,7 @@ class Console:
             required to call :meth:`export_html` and :meth:`export_text`. Defaults to False.
         markup (bool, optional): Boolean to enable :ref:`console_markup`. Defaults to True.
         emoji (bool, optional): Enable emoji code. Defaults to True.
+        emoji_variant (str, optional): Optional emoji variant, either "text" or "emoji". Defaults to None.
         highlight (bool, optional): Enable automatic highlighting. Defaults to True.
         log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
         log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
@@ -621,6 +626,7 @@ class Console:
         record: bool = False,
         markup: bool = True,
         emoji: bool = True,
+        emoji_variant: Optional[EmojiVariant] = None,
         highlight: bool = True,
         log_time: bool = True,
         log_path: bool = True,
@@ -657,6 +663,7 @@ class Console:
         self.record = record
         self._markup = markup
         self._emoji = emoji
+        self._emoji_variant = emoji_variant
         self._highlight = highlight
         self.legacy_windows: bool = (
             (detect_legacy_windows() and not self.is_jupyter)
@@ -907,6 +914,7 @@ class Console:
     def options(self) -> ConsoleOptions:
         """Get default console options."""
         return ConsoleOptions(
+            max_height=self.size.height,
             size=self.size,
             legacy_windows=self.legacy_windows,
             min_width=1,
@@ -934,15 +942,11 @@ class Console:
         if WINDOWS:  # pragma: no cover
             width, height = shutil.get_terminal_size()
         else:
-
             try:
-                width, height = os.get_terminal_size(sys.stdin.fileno())
-
+                width, height = os.get_terminal_size(sys.__stdin__.fileno())
             except (AttributeError, ValueError, OSError):
                 try:
-
-                    width, height = os.get_terminal_size(sys.stdout.fileno())
-
+                    width, height = os.get_terminal_size(sys.__stdout__.fileno())
                 except (AttributeError, ValueError, OSError):
                     pass
 
@@ -1308,12 +1312,19 @@ class Console:
         highlight_enabled = highlight or (highlight is None and self._highlight)
 
         if markup_enabled:
-            rich_text = render_markup(text, style=style, emoji=emoji_enabled)
+            rich_text = render_markup(
+                text,
+                style=style,
+                emoji=emoji_enabled,
+                emoji_variant=self._emoji_variant,
+            )
             rich_text.justify = justify
             rich_text.overflow = overflow
         else:
             rich_text = Text(
-                _emoji_replace(text) if emoji_enabled else text,
+                _emoji_replace(text, default_variant=self._emoji_variant)
+                if emoji_enabled
+                else text,
                 justify=justify,
                 overflow=overflow,
                 style=style,

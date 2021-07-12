@@ -6,6 +6,7 @@ from typing import Callable, Iterable, List, Match, NamedTuple, Optional, Tuple,
 from .errors import MarkupError
 from .style import Style
 from .text import Span, Text
+from .emoji import EmojiVariant
 from ._emoji_replace import _emoji_replace
 
 
@@ -97,7 +98,12 @@ def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
         yield position, markup[position:], None
 
 
-def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Text:
+def render(
+    markup: str,
+    style: Union[str, Style] = "",
+    emoji: bool = True,
+    emoji_variant: Optional[EmojiVariant] = None,
+) -> Text:
     """Render console markup in to a Text instance.
 
     Args:
@@ -112,7 +118,10 @@ def render(markup: str, style: Union[str, Style] = "", emoji: bool = True) -> Te
     """
     emoji_replace = _emoji_replace
     if "[" not in markup:
-        return Text(emoji_replace(markup) if emoji else markup, style=style)
+        return Text(
+            emoji_replace(markup, default_variant=emoji_variant) if emoji else markup,
+            style=style,
+        )
     text = Text(style=style)
     append = text.append
     normalize = Style.normalize

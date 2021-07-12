@@ -22,3 +22,16 @@ def test_replace():
 def test_render():
     render_result = render(Emoji("pile_of_poo"))
     assert render_result == "💩"
+
+
+def test_variant():
+    print(repr(Emoji.replace(":warning:")))
+    assert Emoji.replace(":warning:") == "⚠"
+    assert Emoji.replace(":warning-text:") == "⚠" + "\uFE0E"
+    assert Emoji.replace(":warning-emoji:") == "⚠" + "\uFE0F"
+    assert Emoji.replace(":warning-foo:") == ":warning-foo:"
+
+
+def test_variant_non_default():
+    render_result = render(Emoji("warning", variant="emoji"))
+    assert render_result == "⚠" + "\uFE0F"

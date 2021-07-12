@@ -1,6 +1,14 @@
+import sys
 from typing import Callable, Match, Optional
 
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal  # pragma: no cover
+
+
 import re
+
 
 from ._emoji_codes import EMOJI
 
@@ -12,15 +20,22 @@ _EmojiSubMethod = Callable[[_ReSubCallable, str], str]  # Sub method of a compil
 
 def _emoji_replace(
     text: str,
-    variant: Optional[str] = None,
-    _emoji_sub: _EmojiSubMethod = re.compile(r"(:(\S*?):)").sub,
+    default_variant: Optional[str] = None,
+    _emoji_sub: _EmojiSubMethod = re.compile(r"(:(\S*?)(?:(?:\-)(emoji|text))?:)").sub,
 ) -> str:
     """Replace emoji code in text."""
-    get_emoji = EMOJI.get
-    variant_code = ("\uFE0E" if variant == "emoji_" else "\uFE0F") if variant else ""
+    get_emoji = EMOJI.__getitem__
+    variants = {"text": "\uFE0E", "emoji": "\uFE0F"}
+    get_variant = variants.get
+    default_variant_code = variants.get(default_variant, "") if default_variant else ""
 
     def do_replace(match: Match[str]) -> str:
-        emoji_code, emoji_name = match.groups()
-        return get_emoji(emoji_name.lower(), emoji_code) + variant_code
+        emoji_code, emoji_name, variant = match.groups()
+        try:
+            return get_emoji(emoji_name.lower()) + get_variant(
+                variant, default_variant_code
+            )
+        except KeyError:
+            return emoji_code
 
     return _emoji_sub(do_replace, text)
