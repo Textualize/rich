@@ -423,6 +423,11 @@ class Style:
         )
 
     @property
+    def meta_id(self) -> Optional[int]:
+        """Get an integer id for meta information associated with this style."""
+        return self.meta.get("id", None) if self._meta else None
+
+    @property
     def without_color(self) -> "Style":
         """Get a copy of the style with color removed."""
         if self._null:
