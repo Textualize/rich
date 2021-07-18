@@ -166,7 +166,9 @@ class Style:
 
         self._link = link
         self._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
-        self._meta = None if meta is None else marshal_dumps(meta)
+        self._meta = (
+            None if meta is None else marshal_dumps({"id": randint(0, 2 ** 32), **meta})
+        )
         self._hash = hash(
             (
                 self._color,
