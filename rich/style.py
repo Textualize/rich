@@ -241,7 +241,7 @@ class Style:
                 None,
                 None,
                 None,
-                self._meta,
+                style._meta,
             )
         )
         style._null = not (meta)
