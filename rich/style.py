@@ -165,7 +165,7 @@ class Style:
         )
 
         self._link = link
-        self._link_id = f"{time()}-{randint(0, 999999)}"
+        self._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
         self._meta = None if meta is None else marshal_dumps(meta)
         self._hash = hash(
             (
@@ -202,7 +202,7 @@ class Style:
         style._set_attributes = 0
         style._attributes = 0
         style._link = None
-        style._link_id = f"{time()}-{randint(0, 999999)}"
+        style._link_id = ""
         style._meta = None
         style._hash = hash(
             (
@@ -433,7 +433,7 @@ class Style:
         style._attributes = self._attributes
         style._set_attributes = self._set_attributes
         style._link = self._link
-        style._link_id = f"{time()}-{randint(0, 999999)}"
+        style._link_id = f"{time()}-{randint(0, 999999)}" if self._link else ""
         style._hash = self._hash
         style._null = False
         style._meta = None
@@ -608,7 +608,7 @@ class Style:
         style._attributes = self._attributes
         style._set_attributes = self._set_attributes
         style._link = self._link
-        style._link_id = f"{time()}-{randint(0, 999999)}"
+        style._link_id = f"{time()}-{randint(0, 999999)}" if self._link else ""
         style._hash = self._hash
         style._null = False
         style._meta = self._meta
@@ -631,7 +631,7 @@ class Style:
         style._attributes = self._attributes
         style._set_attributes = self._set_attributes
         style._link = link
-        style._link_id = f"{time()}-{randint(0, 999999)}"
+        style._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
         style._hash = self._hash
         style._null = False
         style._meta = self._meta
