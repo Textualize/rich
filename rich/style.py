@@ -166,9 +166,7 @@ class Style:
 
         self._link = link
         self._link_id = f"{time()}-{randint(0, 999999)}" if link else ""
-        self._meta = (
-            None if meta is None else marshal_dumps({"id": randint(0, 2 ** 32), **meta})
-        )
+        self._meta = None if meta is None else marshal_dumps(meta)
         self._hash = hash(
             (
                 self._color,
@@ -213,9 +211,40 @@ class Style:
                 None,
                 None,
                 None,
+                None,
             )
         )
         style._null = not (color or bgcolor)
+        return style
+
+    @classmethod
+    def from_meta(cls, meta: Optional[Dict[str, Any]]) -> "Style":
+        """Create a new style with meta data.
+
+        Returns:
+            meta (Optional[Dict[str, Any]]): A dictionary of meta data. Defaults to None.
+        """
+        style: Style = cls.__new__(Style)
+        style._ansi = None
+        style._style_definition = None
+        style._color = None
+        style._bgcolor = None
+        style._set_attributes = 0
+        style._attributes = 0
+        style._link = None
+        style._link_id = ""
+        style._meta = marshal_dumps(meta)
+        style._hash = hash(
+            (
+                None,
+                None,
+                None,
+                None,
+                None,
+                meta,
+            )
+        )
+        style._null = not (meta)
         return style
 
     bold = _Bit(0)
@@ -421,11 +450,6 @@ class Style:
             if self._meta is None
             else cast(Dict[str, Any], marshal_loads(self._meta))
         )
-
-    @property
-    def meta_id(self) -> Optional[int]:
-        """Get an integer id for meta information associated with this style."""
-        return self.meta.get("id", None) if self._meta else None
 
     @property
     def without_color(self) -> "Style":

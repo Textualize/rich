@@ -278,6 +278,7 @@ class Text(JupyterMixin):
         no_wrap: Optional[bool] = None,
         end: str = "\n",
         tab_size: int = 8,
+        meta: Optional[Dict[str, Any]] = None,
     ) -> "Text":
         """Construct a text instance by combining a sequence of strings with optional styles.
         The positional arguments should be either strings, or a tuple of string + style.
@@ -307,6 +308,8 @@ class Text(JupyterMixin):
                 append(part)
             else:
                 append(*part)
+        if meta:
+            text.apply_meta(meta)
         return text
 
     @property
@@ -389,6 +392,20 @@ class Text(JupyterMixin):
                 # Span not in text or not valid
                 return
             self._spans.append(Span(start, min(length, end), style))
+
+    def apply_meta(
+        self, meta: Dict[str, Any], start: int = 0, end: Optional[int] = None
+    ) -> None:
+        """Apply metadata to the text, or a portion of the text.
+
+        Args:
+            meta (Dict[str, Any]): A dict of meta information.
+            start (int): Start offset (negative indexing is supported). Defaults to 0.
+            end (Optional[int], optional): End offset (negative indexing is supported), or None for end of text. Defaults to None.
+
+        """
+        style = Style.from_meta(meta)
+        self.stylize(style, start=start, end=end)
 
     def remove_suffix(self, suffix: str) -> None:
         """Remove a suffix if it exists.
