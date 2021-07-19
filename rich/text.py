@@ -289,6 +289,7 @@ class Text(JupyterMixin):
             overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
             end (str, optional): Character to end text with. Defaults to "\\\\n".
             tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
+            meta (Dict[str, Any], optional). Meta data to apply to text, or None for no meta data. Default to None
 
         Returns:
             Text: A new text instance.
@@ -396,7 +397,7 @@ class Text(JupyterMixin):
     def apply_meta(
         self, meta: Dict[str, Any], start: int = 0, end: Optional[int] = None
     ) -> None:
-        """Apply metadata to the text, or a portion of the text.
+        """Apply meta data to the text, or a portion of the text.
 
         Args:
             meta (Dict[str, Any]): A dict of meta information.
