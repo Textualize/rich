@@ -542,6 +542,14 @@ def test_assemble():
     assert text._spans == [Span(3, 6, "bold")]
 
 
+def test_assemble_meta():
+    text = Text.assemble("foo", ("bar", "bold"), meta={"foo": "bar"})
+    assert str(text) == "foobar"
+    assert text._spans == [Span(3, 6, "bold"), Span(0, 6, Style(meta={"foo": "bar"}))]
+    console = Console()
+    assert text.get_style_at_offset(console, 0).meta == {"foo": "bar"}
+
+
 def test_styled():
     text = Text.styled("foo", "bold red")
     assert text.style == ""
@@ -676,3 +684,14 @@ def test_wrap_invalid_style():
     console = Console(width=100, color_system="truecolor")
     a = "[#######.................] xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx [#######.................]"
     console.print(a, justify="full")
+
+
+def test_apply_meta():
+    text = Text("foobar")
+    text.apply_meta({"foo": "bar"}, 1, 3)
+
+    console = Console()
+    assert text.get_style_at_offset(console, 0).meta == {}
+    assert text.get_style_at_offset(console, 1).meta == {"foo": "bar"}
+    assert text.get_style_at_offset(console, 2).meta == {"foo": "bar"}
+    assert text.get_style_at_offset(console, 3).meta == {}
