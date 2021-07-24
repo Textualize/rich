@@ -25,7 +25,7 @@ class NoEmoji(Exception):
 
 
 class Emoji(JupyterMixin):
-    __slots__ = ["name", "style", "_char"]
+    __slots__ = ["name", "style", "_char", "variant"]
 
     VARIANTS = {"text": "\uFE0E", "emoji": "\uFE0F"}
 
