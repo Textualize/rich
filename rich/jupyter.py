@@ -31,7 +31,7 @@ class JupyterRenderable:
 class JupyterMixin:
     """Add to an Rich renderable to make it render in Jupyter notebook."""
 
-    __slots__ = []
+    __slots__ = ()
 
     def _repr_mimebundle_(
         self, include: Iterable[str], exclude: Iterable[str], **kwargs: Any
