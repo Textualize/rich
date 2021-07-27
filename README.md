@@ -287,7 +287,7 @@ The spinner animations were borrowed from [cli-spinners](https://www.npmjs.com/p
 python -m rich.spinner
 ```
 
-The above command generate the following output in the terminal:
+The above command generates the following output in the terminal:
 
 ![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
 
