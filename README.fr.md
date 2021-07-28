@@ -1,3 +1,4 @@
+[![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich)
 [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
 [![codecov](https://codecov.io/gh/willmcgugan/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/willmcgugan/rich)
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
@@ -5,8 +6,7 @@
 
 ![Logo](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
 
-[中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md) • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md) • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md) • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md) • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md) • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md)
-
+[中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md) • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md) • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md) • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md) • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md) • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md) • [Français readme](https://github.com/willmcgugan/rich/blob/master/README.fr.md) • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md)
 
 Rich est une bibliothèque Python pour le _rich_ texte et la mise en forme dans le terminal.
 
