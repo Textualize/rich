@@ -2,7 +2,7 @@ from enum import IntEnum
 from logging import getLogger
 from typing import Dict, NamedTuple, Optional
 
-from .repr import rich_repr, RichReprResult
+from .repr import rich_repr, Result
 from .cells import cell_len, set_cell_size, get_character_cell_size
 from .style import Style
 
@@ -60,7 +60,7 @@ class Segment(NamedTuple):
     control: Optional[Sequence[ControlCode]] = None
     """Optional sequence of control codes."""
 
-    def __rich_repr__(self) -> RichReprResult:
+    def __rich_repr__(self) -> Result:
         yield self.text
         if self.control is None:
             if self.style is not None:

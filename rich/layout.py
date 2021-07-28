@@ -20,7 +20,7 @@ from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .highlighter import ReprHighlighter
 from .panel import Panel
 from .pretty import Pretty
-from .repr import rich_repr, RichReprResult
+from .repr import rich_repr, Result
 from .region import Region
 from .segment import Segment
 from .style import StyleType
@@ -175,7 +175,7 @@ class Layout:
         self._render_map: RenderMap = {}
         self._lock = RLock()
 
-    def __rich_repr__(self) -> RichReprResult:
+    def __rich_repr__(self) -> Result:
         yield "name", self.name, None
         yield "size", self.size, None
         yield "minimum_size", self.minimum_size, 1

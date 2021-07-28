@@ -6,7 +6,7 @@ from typing import Any, cast, Dict, Iterable, List, Optional, Type, Union
 
 from . import errors
 from .color import Color, ColorParseError, ColorSystem, blend_rgb
-from .repr import rich_repr, RichReprResult
+from .repr import rich_repr, Result
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
 
 
@@ -247,7 +247,7 @@ class Style:
         return style
 
     @classmethod
-    def on(cls, meta: Optional[Dict[str, Any]] = None, **handlers) -> "Style":
+    def on(cls, meta: Optional[Dict[str, Any]] = None, **handlers: Any) -> "Style":
         """Create a blank style with meta information.
 
         Example:
@@ -400,7 +400,7 @@ class Style:
                 return value
         raise ValueError("expected at least one non-None style")
 
-    def __rich_repr__(self) -> RichReprResult:
+    def __rich_repr__(self) -> Result:
         yield "color", self.color, None
         yield "bgcolor", self.bgcolor, None
         yield "bold", self.bold, None,

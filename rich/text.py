@@ -408,7 +408,7 @@ class Text(JupyterMixin):
         style = Style.from_meta(meta)
         self.stylize(style, start=start, end=end)
 
-    def on(self, meta: Optional[Dict[str, Any]] = None, **handlers) -> "Text":
+    def on(self, meta: Optional[Dict[str, Any]] = None, **handlers: Any) -> "Text":
         """Apply event handlers (used by Textual project).
 
         Example:
