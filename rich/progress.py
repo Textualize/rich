@@ -25,7 +25,7 @@ from typing import (
 )
 
 from . import filesize, get_console
-from .console import Console, JustifyMethod, RenderableType, RenderGroup
+from .console import Console, JustifyMethod, RenderableType, Group
 from .highlighter import Highlighter
 from .jupyter import JupyterMixin
 from .live import Live
@@ -866,7 +866,7 @@ class Progress(JupyterMixin):
 
     def get_renderable(self) -> RenderableType:
         """Get a renderable for the progress display."""
-        renderable = RenderGroup(*self.get_renderables())
+        renderable = Group(*self.get_renderables())
         return renderable
 
     def get_renderables(self) -> Iterable[RenderableType]:

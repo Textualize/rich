@@ -1,8 +1,7 @@
 import sys
 from functools import lru_cache
-from marshal import loads as marshal_loads, dumps as marshal_dumps
+from marshal import loads, dumps
 from random import randint
-from time import time
 from typing import Any, cast, Dict, Iterable, List, Optional, Type, Union
 
 from . import errors
@@ -166,7 +165,7 @@ class Style:
 
         self._link = link
         self._link_id = f"{randint(0, 999999)}" if link else ""
-        self._meta = None if meta is None else marshal_dumps(meta)
+        self._meta = None if meta is None else dumps(meta)
         self._hash = hash(
             (
                 self._color,
@@ -233,7 +232,7 @@ class Style:
         style._attributes = 0
         style._link = None
         style._link_id = ""
-        style._meta = marshal_dumps(meta)
+        style._meta = dumps(meta)
         style._hash = hash(
             (
                 None,
@@ -246,6 +245,24 @@ class Style:
         )
         style._null = not (meta)
         return style
+
+    @classmethod
+    def on(cls, meta: Optional[Dict[str, Any]] = None, **handlers) -> "Style":
+        """Create a blank style with meta information.
+
+        Example:
+            style = Style.on(click=self.on_click)
+
+        Args:
+            meta (Optiona[Dict[str, Any]], optional): An optional dict of meta information.
+            **handlers (Any): Keyword arguments are translated in to handlers.
+
+        Returns:
+            [type]: [description]
+        """
+        meta = {} if meta is None else meta
+        meta.update({f"@{key}": value for key, value in handlers.items()})
+        return cls.from_meta(meta)
 
     bold = _Bit(0)
     dim = _Bit(1)
@@ -445,11 +462,7 @@ class Style:
     @property
     def meta(self) -> Dict[str, Any]:
         """Get meta information (can not be changed after construction)."""
-        return (
-            {}
-            if self._meta is None
-            else cast(Dict[str, Any], marshal_loads(self._meta))
-        )
+        return {} if self._meta is None else cast(Dict[str, Any], loads(self._meta))
 
     @property
     def without_color(self) -> "Style":
@@ -727,7 +740,7 @@ class Style:
         new_style._hash = style._hash
         new_style._null = self._null or style._null
         if self._meta and style._meta:
-            new_style._meta = marshal_dumps({**self.meta, **style.meta})
+            new_style._meta = dumps({**self.meta, **style.meta})
         else:
             new_style._meta = self._meta or style._meta
         return new_style

@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
 from typing import Any, Iterable, Optional, Tuple
 
-from .console import RenderableType, RenderGroup
+from .console import RenderableType, Group
 from .highlighter import ReprHighlighter
 from .jupyter import JupyterMixin
 from .panel import Panel
@@ -79,7 +79,7 @@ class Inspect(JupyterMixin):
 
     def __rich__(self) -> Panel:
         return Panel.fit(
-            RenderGroup(*self._render()),
+            Group(*self._render()),
             title=self.title,
             border_style="scope.border",
             padding=(0, 1),

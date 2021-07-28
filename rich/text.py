@@ -408,6 +408,26 @@ class Text(JupyterMixin):
         style = Style.from_meta(meta)
         self.stylize(style, start=start, end=end)
 
+    def on(self, meta: Optional[Dict[str, Any]] = None, **handlers) -> "Text":
+        """Apply event handlers (used by Textual project).
+
+        Example:
+            >>> from rich.text import Text
+            >>> text = Text("hello world")
+            >>> text.on(click="view.toggle('world')")
+
+        Args:
+            meta (Dict[str, Any]): Mapping of meta information.
+            **handlers: Keyword args are prefixed with "@" to defined handlers.
+
+        Returns:
+            Text: Self is returned to method may be chained.
+        """
+        meta = {} if meta is None else meta
+        meta.update({f"@{key}": value for key, value in handlers.items()})
+        self.stylize(Style.from_meta(meta))
+        return self
+
     def remove_suffix(self, suffix: str) -> None:
         """Remove a suffix if it exists.
 

@@ -21,7 +21,7 @@ from .console import (
     ConsoleOptions,
     ConsoleRenderable,
     RenderResult,
-    render_group,
+    group,
 )
 from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
@@ -466,7 +466,7 @@ class Traceback:
                         "\n[i]During handling of the above exception, another exception occurred:\n",
                     )
 
-    @render_group()
+    @group()
     def _render_syntax_error(self, syntax_error: _SyntaxError) -> RenderResult:
         highlighter = ReprHighlighter()
         path_highlighter = PathHighlighter()
@@ -504,7 +504,7 @@ class Traceback:
         )
         return lexer_name
 
-    @render_group()
+    @group()
     def _render_stack(self, stack: Stack) -> RenderResult:
         path_highlighter = PathHighlighter()
         theme = self.theme

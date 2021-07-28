@@ -9,7 +9,7 @@ from rich.console import (
     Console,
     ConsoleOptions,
     ConsoleRenderable,
-    RenderGroup,
+    Group,
     RenderResult,
     RenderableType,
 )
@@ -88,7 +88,7 @@ def make_test_card() -> Table:
     )
     table.add_row(
         "Text",
-        RenderGroup(
+        Group(
             Text.from_markup(
                 """Word wrap text. Justify [green]left[/], [yellow]center[/], [blue]right[/] or [red]full[/].\n"""
             ),

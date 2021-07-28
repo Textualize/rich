@@ -18,7 +18,8 @@ from typing import (
 T = TypeVar("T")
 
 
-RichReprResult = Iterable[Union[Any, Tuple[Any], Tuple[str, Any], Tuple[str, Any, Any]]]
+Result = Iterable[Union[Any, Tuple[Any], Tuple[str, Any], Tuple[str, Any, Any]]]
+RichReprResult = Result
 
 
 class ReprError(Exception):

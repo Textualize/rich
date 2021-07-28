@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Text.apply_meta
 - Added meta argument to Text.assemble
 - Added Style.from_meta
+- Added Style.on
+- Added Text.on
+
+### Changed
+
+- Changed `RenderGroup` to `Group` and `render_group` to `group` (old names still work for compatibility but will be deprecated in the future)
+- Changed rich.repr.RichReprResult to rich.repr.Result
+- Changed meta serialization to use pickle rather than marshal to permit callables
 
 ## [10.6.0] - 2021-07-12
 

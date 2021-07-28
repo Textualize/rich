@@ -695,3 +695,13 @@ def test_apply_meta():
     assert text.get_style_at_offset(console, 1).meta == {"foo": "bar"}
     assert text.get_style_at_offset(console, 2).meta == {"foo": "bar"}
     assert text.get_style_at_offset(console, 3).meta == {}
+
+
+def test_on():
+    console = Console()
+    text = Text("foo")
+    text.on({"foo": "bar"}, click="CLICK")
+    expected = {"foo": "bar", "@click": "CLICK"}
+    assert text.get_style_at_offset(console, 0).meta == expected
+    assert text.get_style_at_offset(console, 1).meta == expected
+    assert text.get_style_at_offset(console, 2).meta == expected
