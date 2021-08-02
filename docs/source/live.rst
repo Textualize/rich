@@ -5,7 +5,7 @@ Live Display
 
 Progress bars and status indicators use a *live* display to animate parts of the terminal. You can build custom live displays with the :class:`~rich.live.Live` class. 
 
-For a demonstration of a live display, running the following command:
+For a demonstration of a live display, run the following command:
 
     python -m rich.live
 
@@ -16,7 +16,7 @@ For a demonstration of a live display, running the following command:
 Basic usage
 ~~~~~~~~~~~
 
-To create a live display, construct a :class:`~rich.live.Live` object with a renderable and use it has a context manager. The live display will persist for the duration of the context. You can update the renderable to update the display::
+To create a live display, construct a :class:`~rich.live.Live` object with a renderable and use it as a context manager. The live display will persist for the duration of the context. You can update the renderable to update the display::
 
 
     import time
