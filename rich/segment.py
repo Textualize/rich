@@ -98,6 +98,12 @@ class Segment(NamedTuple):
         if cut >= self.cell_length:
             return self, _Segment("", style, control)
 
+        if len(text) == self.cell_length:
+            return (
+                _Segment(text[:cut], style, control),
+                _Segment(text[cut:], style, control),
+            )
+
         cell_size = get_character_cell_size
 
         pos = int((cut / self.cell_length) * len(text))
