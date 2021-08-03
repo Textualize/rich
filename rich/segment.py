@@ -84,25 +84,19 @@ class Segment(NamedTuple):
         """Check if the segment contains control codes."""
         return self.control is not None
 
+    @classmethod
     @lru_cache(1024 * 16)
-    def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:  # type: ignore
-        """Split segment in to two segments at the specified column.
+    def _split_cells(cls, segment: "Segment", cut: int) -> Tuple["Segment", "Segment"]:  # type: ignore
 
-        If the cut point falls in the middle of a 2-cell wide character then it is replaced
-        by two spaces, to preserve the display width of the parent segment.
-
-        Returns:
-            Tuple[Segment, Segment]: Two segments.
-        """
-        text, style, control = self
+        text, style, control = segment
         assert cut >= 0
         _Segment = Segment
-        if cut >= self.cell_length:
-            return self, _Segment("", style, control)
+        if cut >= segment.cell_length:
+            return segment, _Segment("", style, control)
 
         cell_size = get_character_cell_size
 
-        pos = int((cut / self.cell_length) * len(text))
+        pos = int((cut / segment.cell_length) * len(text))
 
         before = text[:pos]
         cell_pos = cell_len(before)
@@ -126,6 +120,17 @@ class Segment(NamedTuple):
                     _Segment(before[: pos - 1] + " ", style, control),
                     _Segment(" " + text[pos:], style, control),
                 )
+
+    def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
+        """Split segment in to two segments at the specified column.
+
+        If the cut point falls in the middle of a 2-cell wide character then it is replaced
+        by two spaces, to preserve the display width of the parent segment.
+
+        Returns:
+            Tuple[Segment, Segment]: Two segments.
+        """
+        return self._split_cells(self, cut)
 
     @classmethod
     def line(cls) -> "Segment":
