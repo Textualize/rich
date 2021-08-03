@@ -1,4 +1,5 @@
 from enum import IntEnum
+from functools import lru_cache
 from logging import getLogger
 from typing import Dict, NamedTuple, Optional
 
@@ -83,6 +84,7 @@ class Segment(NamedTuple):
         """Check if the segment contains control codes."""
         return self.control is not None
 
+    @lru_cache(1024 * 16)
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:  # type: ignore
         """Split segment in to two segments at the specified column.
 

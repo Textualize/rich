@@ -6,7 +6,7 @@ The :class:`~rich.console.Group` class allows you to group several renderables t
 To render two panels within a third panel, you would construct a Group with the *child* renderables as positional arguments then wrap the result in another Panel::
 
     from rich import print
-    from rich.console import RenderGroup
+    from rich.console import Group
     from rich.panel import Panel
 
     panel_group = Group(

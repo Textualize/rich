@@ -481,7 +481,7 @@ class Traceback:
         syntax_error_text = highlighter(syntax_error.line.rstrip())
         syntax_error_text.no_wrap = True
         offset = min(syntax_error.offset - 1, len(syntax_error_text))
-        syntax_error_text.stylize("bold underline", offset, offset + 1)
+        syntax_error_text.stylize("bold underline", offset, offset)
         syntax_error_text += Text.from_markup(
             "\n" + " " * offset + "[traceback.offset]▲[/]",
             style="pygments.text",

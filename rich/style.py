@@ -95,6 +95,31 @@ class Style:
         12: "53",
     }
 
+    STYLE_ATTRIBUTES = {
+        "dim": "dim",
+        "d": "dim",
+        "bold": "bold",
+        "b": "bold",
+        "italic": "italic",
+        "i": "italic",
+        "underline": "underline",
+        "u": "underline",
+        "blink": "blink",
+        "blink2": "blink2",
+        "reverse": "reverse",
+        "r": "reverse",
+        "conceal": "conceal",
+        "c": "conceal",
+        "strike": "strike",
+        "s": "strike",
+        "underline2": "underline2",
+        "uu": "underline2",
+        "frame": "frame",
+        "encircle": "encircle",
+        "overline": "overline",
+        "o": "overline",
+    }
+
     def __init__(
         self,
         *,
@@ -258,7 +283,7 @@ class Style:
             **handlers (Any): Keyword arguments are translated in to handlers.
 
         Returns:
-            [type]: [description]
+            Style: A Style with meta information attached.
         """
         meta = {} if meta is None else meta
         meta.update({f"@{key}": value for key, value in handlers.items()})
@@ -500,30 +525,7 @@ class Style:
         if style_definition.strip() == "none" or not style_definition:
             return cls.null()
 
-        style_attributes = {
-            "dim": "dim",
-            "d": "dim",
-            "bold": "bold",
-            "b": "bold",
-            "italic": "italic",
-            "i": "italic",
-            "underline": "underline",
-            "u": "underline",
-            "blink": "blink",
-            "blink2": "blink2",
-            "reverse": "reverse",
-            "r": "reverse",
-            "conceal": "conceal",
-            "c": "conceal",
-            "strike": "strike",
-            "s": "strike",
-            "underline2": "underline2",
-            "uu": "underline2",
-            "frame": "frame",
-            "encircle": "encircle",
-            "overline": "overline",
-            "o": "overline",
-        }
+        STYLE_ATTRIBUTES = cls.STYLE_ATTRIBUTES
         color: Optional[str] = None
         bgcolor: Optional[str] = None
         attributes: Dict[str, Optional[Any]] = {}
@@ -546,7 +548,7 @@ class Style:
 
             elif word == "not":
                 word = next(words, "")
-                attribute = style_attributes.get(word)
+                attribute = STYLE_ATTRIBUTES.get(word)
                 if attribute is None:
                     raise errors.StyleSyntaxError(
                         f"expected style attribute after 'not', found {word!r}"
@@ -559,8 +561,8 @@ class Style:
                     raise errors.StyleSyntaxError("URL expected after 'link'")
                 link = word
 
-            elif word in style_attributes:
-                attributes[style_attributes[word]] = True
+            elif word in STYLE_ATTRIBUTES:
+                attributes[STYLE_ATTRIBUTES[word]] = True
 
             else:
                 try:
