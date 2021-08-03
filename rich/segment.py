@@ -89,10 +89,16 @@ class Segment(NamedTuple):
     def _split_cells(cls, segment: "Segment", cut: int) -> Tuple["Segment", "Segment"]:  # type: ignore
 
         text, style, control = segment
-        assert cut >= 0
         _Segment = Segment
         if cut >= segment.cell_length:
             return segment, _Segment("", style, control)
+
+        if len(text) == segment.cell_length:
+            # Fast path with all 1 cell characters
+            return (
+                _Segment(text[:cut], style, control),
+                _Segment(text[cut:], style, control),
+            )
 
         cell_size = get_character_cell_size
 
