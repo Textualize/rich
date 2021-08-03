@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import IntEnum
 from logging import getLogger
 from typing import Dict, NamedTuple, Optional
@@ -472,16 +474,17 @@ class Segment(NamedTuple):
         """
         split_segments: List["Segment"] = []
         add_segment = split_segments.append
-        iter_cuts = iter(cuts)
+        next_cut = iter(cuts).__next__
+        
+        try:
+            while True:
+                cut = next_cut()
+                if cut != 0:
+                    break
+                yield []
+        except StopIteration:
+            return []
 
-        while True:
-            try:
-                cut = next(iter_cuts)
-            except StopIteration:
-                return []
-            if cut != 0:
-                break
-            yield []
         pos = 0
 
         for segment in segments:
@@ -507,7 +510,7 @@ class Segment(NamedTuple):
                         pos = cut
                 finally:
                     try:
-                        cut = next(iter_cuts)
+                        cut = next_cut()
                     except StopIteration:
                         if split_segments:
                             yield split_segments[:]
