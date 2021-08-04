@@ -6,10 +6,19 @@
 
 ![Logo](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
 
-[中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md) • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md) • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md) • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md) • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md) • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md) • [Français readme](https://github.com/willmcgugan/rich/blob/master/README.fr.md) • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md) • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
+[English readme](https://github.com/willmcgugan/rich/blob/master/README.md)
+ • [中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md)
+ • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md)
+ • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md)
+ • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md)
+ • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md)
+ • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md)
+ • [Français readme](https://github.com/willmcgugan/rich/blob/master/README.fr.md)
+ • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md)
+ • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
+ • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
 
 Rich es un paquete de Python para texto _enriquecido_ y un hermoso formato en la terminal.
- • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
 
 La [API Rich](https://rich.readthedocs.io/en/latest/) facilita la adición de color y estilo a la salida del terminal. Rich también puede representar tablas bonitas, barras de progreso, markdown, código fuente resaltado por sintaxis, trazas y más — listo para usar.
 

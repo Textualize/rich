@@ -6,7 +6,16 @@
 
 ![Logo](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
 
-[中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md) • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md) • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md) • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md) • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md) • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md) • [Français readme](https://github.com/willmcgugan/rich/blob/master/README.fr.md) • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md) • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
+[English readme](https://github.com/willmcgugan/rich/blob/master/README.md)
+ • [中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md)
+ • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md)
+ • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md)
+ • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md)
+ • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md)
+ • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md)
+ • [Français readme](https://github.com/willmcgugan/rich/blob/master/README.fr.md)
+ • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md)
+ • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
 
 Rich isch ä Python Library för _rich_ Text ond ganz schöni formatiärig im Törminäl
