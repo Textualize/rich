@@ -175,7 +175,7 @@ Note that you can add ``__rich_repr__`` methods to third-party libraries *withou
 Typing
 ~~~~~~
 
-If you want to type the Rich repr method you can import and return the type `rich.repr.Result`, which will help catch logical errors::
+If you want to type the Rich repr method you can import and return ``rich.repr.Result``, which will help catch logical errors::
 
 
     import rich.repr
