@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [10.6.1] - Unreleased
+## [10.7.0] - 2021-08-05
 
 ### Added
 
@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Changed `RenderGroup` to `Group` and `render_group` to `group` (old names still work for compatibility but will be deprecated in the future)
-- Changed rich.repr.RichReprResult to rich.repr.Result
+- Changed `rich.repr.RichReprResult` to `rich.repr.Result` (old names remain for compatibility but will be deprecated in the future)
 - Changed meta serialization to use pickle rather than marshal to permit callables
 
 ## [10.6.0] - 2021-07-12

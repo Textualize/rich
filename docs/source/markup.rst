@@ -5,6 +5,9 @@ Console Markup
 
 Rich supports a simple markup which you can use to insert color and styles virtually everywhere Rich would accept a string (e.g. :meth:`~rich.console.Console.print` and :meth:`~rich.console.Console.log`).
 
+Run the following command to see some examples::
+
+    python -m rich.markup
 
 Syntax
 ------

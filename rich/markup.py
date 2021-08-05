@@ -225,24 +225,20 @@ def render(
 
 if __name__ == "__main__":  # pragma: no cover
 
-    print(render("[@click=foo]Foo[/]"))
+    MARKUP = [
+        "[red]Hello World[/red]",
+        "[magenta]Hello [b]World[/b]",
+        "[bold]Bold[italic] bold and italic [/bold]italic[/italic]",
+        "Click [link=https://www.willmcgugan.com]here[/link] to visit my Blog",
+        ":warning-emoji: [bold red blink] DANGER![/]",
+    ]
 
-    # from rich.console import Console
-    # from rich.text import Text
+    from rich.table import Table
+    from rich import print
 
-    # console = Console(highlight=True)
+    grid = Table("Markup", "Result", padding=(0, 1))
 
-    # t = render("[b]Hello[/b] [@click='view.toggle', 'left']World[/]")
-    # console.print(t)
-    # console.print(t._spans)
+    for markup in MARKUP:
+        grid.add_row(Text(markup), markup)
 
-    # console.print("Hello [1], [1,2,3] ['hello']")
-    # console.print("foo")
-    # console.print("Hello [link=https://www.willmcgugan.com]W[b red]o[/]rld[/]!")
-
-    # from rich import print
-
-    # print(escape("[red]"))
-    # print(escape(r"\[red]"))
-    # print(escape(r"\\[red]"))
-    # print(escape(r"\\\[red]"))
+    print(grid)
