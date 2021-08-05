@@ -1,16 +1,23 @@
 from enum import IntEnum
 from functools import lru_cache
-from logging import getLogger
-from typing import Dict, NamedTuple, Optional
-
-from .repr import rich_repr, Result
-from .cells import cell_len, set_cell_size, get_character_cell_size
-from .style import Style
-
 from itertools import filterfalse
+from logging import getLogger
 from operator import attrgetter
-from typing import cast, Iterable, List, Sequence, Union, Tuple, TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
+from .cells import cell_len, get_character_cell_size, set_cell_size
+from .repr import Result, rich_repr
+from .style import Style
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult
@@ -581,9 +588,9 @@ class SegmentLines:
 if __name__ == "__main__":
 
     if __name__ == "__main__":  # pragma: no cover
+        from rich.console import Console
         from rich.syntax import Syntax
         from rich.text import Text
-        from rich.console import Console
 
         code = """from rich.console import Console
     console = Console()
