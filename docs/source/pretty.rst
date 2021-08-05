@@ -172,6 +172,29 @@ This will change the output of the Rich repr example to the following::
 
 Note that you can add ``__rich_repr__`` methods to third-party libraries *without* including Rich as a dependency. If Rich is not installed, then nothing will break. Hopefully more third-party libraries will adopt Rich repr methods in the future.
 
+Typing
+~~~~~~
+
+If you want to type the Rich repr method you can import and return the type `rich.repr.Result`, which will help catch logical errors::
+
+
+    import rich.repr
+
+
+    class Bird:
+        def __init__(self, name, eats=None, fly=True, extinct=False):
+            self.name = name
+            self.eats = list(eats) if eats else []
+            self.fly = fly
+            self.extinct = extinct
+
+        def __rich_repr__(self) -> rich.repr.Result:
+            yield self.name
+            yield "eats", self.eats
+            yield "fly", self.fly, True
+            yield "extinct", self.extinct, False
+ 
+
 Automatic Rich Repr
 ~~~~~~~~~~~~~~~~~~~
 
