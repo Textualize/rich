@@ -10,10 +10,10 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from functools import wraps
 from getpass import getpass
+from inspect import isclass
 from itertools import islice
 from time import monotonic
 from types import FrameType, TracebackType
-from inspect import isclass
 from typing import (
     IO,
     TYPE_CHECKING,
@@ -28,11 +28,9 @@ from typing import (
     TextIO,
     Tuple,
     Type,
-    Tuple,
     Union,
     cast,
 )
-
 
 if sys.version_info >= (3, 8):
     from typing import Literal, Protocol, runtime_checkable
@@ -42,7 +40,6 @@ else:
         Protocol,
         runtime_checkable,
     )  # pragma: no cover
-
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
