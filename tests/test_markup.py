@@ -165,7 +165,28 @@ def test_events():
 
 def test_events_broken():
     with pytest.raises(MarkupError):
-        render("[@click=sdfwer]foo[/]")
+        render("[@click=sdfwer(sfs)]foo[/]")
 
     with pytest.raises(MarkupError):
         render("[@click='view.toggle]foo[/]")
+
+
+def test_render_meta():
+    console = Console()
+    text = render("foo[@click=close]bar[/]baz")
+    assert text.get_style_at_offset(console, 3).meta == {"@click": ("close", ())}
+
+    text = render("foo[@click=close()]bar[/]baz")
+    assert text.get_style_at_offset(console, 3).meta == {"@click": ("close", ())}
+
+    text = render("foo[@click=close('dialog')]bar[/]baz")
+    assert text.get_style_at_offset(console, 3).meta == {
+        "@click": ("close", ("dialog",))
+    }
+    text = render("foo[@click=close('dialog', 3)]bar[/]baz")
+    assert text.get_style_at_offset(console, 3).meta == {
+        "@click": ("close", ("dialog", 3))
+    }
+
+    text = render("foo[@click=(1, 2, 3)]bar[/]baz")
+    assert text.get_style_at_offset(console, 3).meta == {"@click": (1, 2, 3)}

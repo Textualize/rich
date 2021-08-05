@@ -18,7 +18,8 @@ from typing import (
 T = TypeVar("T")
 
 
-RichReprResult = Iterable[Union[Any, Tuple[Any], Tuple[str, Any], Tuple[str, Any, Any]]]
+Result = Iterable[Union[Any, Tuple[Any], Tuple[str, Any], Tuple[str, Any, Any]]]
+RichReprResult = Result
 
 
 class ReprError(Exception):
@@ -66,7 +67,7 @@ def auto(
             else:
                 return f"{self.__class__.__name__}({', '.join(repr_str)})"
 
-        def auto_rich_repr(self: Type[T]) -> RichReprResult:
+        def auto_rich_repr(self: Type[T]) -> Result:
             """Auto generate __rich_rep__ from signature of __init__"""
             try:
                 signature = inspect.signature(self.__init__)  ## type: ignore
@@ -125,7 +126,7 @@ if __name__ == "__main__":
 
     @auto
     class Foo:
-        def __rich_repr__(self) -> RichReprResult:
+        def __rich_repr__(self) -> Result:
             yield "foo"
             yield "bar", {"shopping": ["eggs", "ham", "pineapple"]}
             yield "buy", "hand sanitizer"

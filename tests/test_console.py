@@ -14,7 +14,7 @@ from rich.console import (
     Console,
     ConsoleDimensions,
     ConsoleOptions,
-    render_group,
+    group,
     ScreenUpdate,
 )
 from rich.control import Control
@@ -467,7 +467,7 @@ def test_out() -> None:
 
 
 def test_render_group() -> None:
-    @render_group(fit=False)
+    @group(fit=False)
     def renderable():
         yield "one"
         yield "two"
@@ -481,7 +481,7 @@ def test_render_group() -> None:
 
 
 def test_render_group_fit() -> None:
-    @render_group()
+    @group()
     def renderable():
         yield "one"
         yield "two"

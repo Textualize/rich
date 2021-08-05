@@ -12,7 +12,7 @@ if TYPE_CHECKING:
         ConsoleOptions,
         RenderResult,
         RenderableType,
-        RenderGroup,
+        Group,
     )
 
 
@@ -32,9 +32,9 @@ class Screen:
         style: Optional[StyleType] = None,
         application_mode: bool = False,
     ) -> None:
-        from rich.console import RenderGroup
+        from rich.console import Group
 
-        self.renderable = RenderGroup(*renderables)
+        self.renderable = Group(*renderables)
         self.style = style
         self.application_mode = application_mode
 

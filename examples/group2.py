@@ -1,9 +1,9 @@
 from rich import print
-from rich.console import render_group
+from rich.console import group
 from rich.panel import Panel
 
 
-@render_group()
+@group()
 def get_panels():
     yield Panel("Hello", style="on blue")
     yield Panel("World", style="on red")

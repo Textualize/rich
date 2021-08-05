@@ -219,3 +219,14 @@ def test_meta():
     assert style.meta == {"foo": "bar", "egg": "baz"}
 
     assert repr(style) == "Style(bold=True, meta={'foo': 'bar', 'egg': 'baz'})"
+
+
+def test_from_meta():
+    style = Style.from_meta({"foo": "bar"})
+    assert style.color is None
+    assert style.bold is None
+
+
+def test_on():
+    style = Style.on({"foo": "bar"}, click="CLICK") + Style(color="red")
+    assert style.meta == {"foo": "bar", "@click": "CLICK"}

@@ -10,10 +10,10 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from functools import wraps
 from getpass import getpass
+from inspect import isclass
 from itertools import islice
 from time import monotonic
 from types import FrameType, TracebackType
-from inspect import isclass
 from typing import (
     IO,
     TYPE_CHECKING,
@@ -28,11 +28,9 @@ from typing import (
     TextIO,
     Tuple,
     Type,
-    Tuple,
     Union,
     cast,
 )
-
 
 if sys.version_info >= (3, 8):
     from typing import Literal, Protocol, runtime_checkable
@@ -42,7 +40,6 @@ else:
         Protocol,
         runtime_checkable,
     )  # pragma: no cover
-
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
@@ -408,7 +405,7 @@ class ScreenContext:
         """
         if renderables:
             self.screen.renderable = (
-                RenderGroup(*renderables) if len(renderables) > 1 else renderables[0]
+                Group(*renderables) if len(renderables) > 1 else renderables[0]
             )
         if style is not None:
             self.screen.style = style
@@ -432,7 +429,7 @@ class ScreenContext:
                 self.console.show_cursor(True)
 
 
-class RenderGroup:
+class Group:
     """Takes a group of renderables and returns a renderable object that renders the group.
 
     Args:
@@ -465,7 +462,10 @@ class RenderGroup:
         yield from self.renderables
 
 
-def render_group(fit: bool = True) -> Callable[..., Callable[..., RenderGroup]]:
+RenderGroup = Group  # TODO: deprecate at some point
+
+
+def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
     """A decorator that turns an iterable of renderables in to a group.
 
     Args:
@@ -474,17 +474,20 @@ def render_group(fit: bool = True) -> Callable[..., Callable[..., RenderGroup]]:
 
     def decorator(
         method: Callable[..., Iterable[RenderableType]]
-    ) -> Callable[..., RenderGroup]:
+    ) -> Callable[..., Group]:
         """Convert a method that returns an iterable of renderables in to a RenderGroup."""
 
         @wraps(method)
-        def _replace(*args: Any, **kwargs: Any) -> RenderGroup:
+        def _replace(*args: Any, **kwargs: Any) -> Group:
             renderables = method(*args, **kwargs)
-            return RenderGroup(*renderables, fit=fit)
+            return Group(*renderables, fit=fit)
 
         return _replace
 
     return decorator
+
+
+render_group = group
 
 
 def _is_jupyter() -> bool:  # pragma: no cover

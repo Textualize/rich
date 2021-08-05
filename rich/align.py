@@ -289,7 +289,7 @@ class VerticalCenter(JupyterMixin):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from rich.console import Console, RenderGroup
+    from rich.console import Console, Group
     from rich.highlighter import ReprHighlighter
     from rich.panel import Panel
 
@@ -297,7 +297,7 @@ if __name__ == "__main__":  # pragma: no cover
     console = Console()
 
     panel = Panel(
-        RenderGroup(
+        Group(
             Align.left(highlighter("align='left'")),
             Align.center(highlighter("align='center'")),
             Align.right(highlighter("align='right'")),

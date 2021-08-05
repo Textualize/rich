@@ -7,7 +7,7 @@ from datetime import datetime
 
 from rich import box
 from rich.align import Align
-from rich.console import Console, RenderGroup
+from rich.console import Console, Group
 from rich.layout import Layout
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
@@ -67,7 +67,7 @@ def make_sponsor_message() -> Panel:
 
     message_panel = Panel(
         Align.center(
-            RenderGroup(intro_message, "\n", Align.center(sponsor_message)),
+            Group(intro_message, "\n", Align.center(sponsor_message)),
             vertical="middle",
         ),
         box=box.ROUNDED,

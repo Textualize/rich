@@ -21,7 +21,7 @@ from .console import (
     ConsoleOptions,
     ConsoleRenderable,
     RenderResult,
-    render_group,
+    group,
 )
 from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
@@ -466,7 +466,7 @@ class Traceback:
                         "\n[i]During handling of the above exception, another exception occurred:\n",
                     )
 
-    @render_group()
+    @group()
     def _render_syntax_error(self, syntax_error: _SyntaxError) -> RenderResult:
         highlighter = ReprHighlighter()
         path_highlighter = PathHighlighter()
@@ -481,7 +481,7 @@ class Traceback:
         syntax_error_text = highlighter(syntax_error.line.rstrip())
         syntax_error_text.no_wrap = True
         offset = min(syntax_error.offset - 1, len(syntax_error_text))
-        syntax_error_text.stylize("bold underline", offset, offset + 1)
+        syntax_error_text.stylize("bold underline", offset, offset)
         syntax_error_text += Text.from_markup(
             "\n" + " " * offset + "[traceback.offset]▲[/]",
             style="pygments.text",
@@ -504,7 +504,7 @@ class Traceback:
         )
         return lexer_name
 
-    @render_group()
+    @group()
     def _render_stack(self, stack: Stack) -> RenderResult:
         path_highlighter = PathHighlighter()
         theme = self.theme

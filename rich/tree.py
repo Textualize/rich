@@ -188,7 +188,7 @@ class Tree(JupyterMixin):
 
 if __name__ == "__main__":  # pragma: no cover
 
-    from rich.console import RenderGroup
+    from rich.console import Group
     from rich.markdown import Markdown
     from rich.panel import Panel
     from rich.syntax import Syntax
@@ -226,17 +226,17 @@ class Segment(NamedTuple):
 
     node = root.add(":file_folder: Renderables", guide_style="red")
     simple_node = node.add(":file_folder: [bold yellow]Atomic", guide_style="uu green")
-    simple_node.add(RenderGroup("📄 Syntax", syntax))
-    simple_node.add(RenderGroup("📄 Markdown", Panel(markdown, border_style="green")))
+    simple_node.add(Group("📄 Syntax", syntax))
+    simple_node.add(Group("📄 Markdown", Panel(markdown, border_style="green")))
 
     containers_node = node.add(
         ":file_folder: [bold magenta]Containers", guide_style="bold magenta"
     )
     containers_node.expanded = True
     panel = Panel.fit("Just a panel", border_style="red")
-    containers_node.add(RenderGroup("📄 Panels", panel))
+    containers_node.add(Group("📄 Panels", panel))
 
-    containers_node.add(RenderGroup("📄 [b magenta]Table", table))
+    containers_node.add(Group("📄 [b magenta]Table", table))
 
     console = Console()
     console.print(root)

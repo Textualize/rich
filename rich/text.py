@@ -278,6 +278,7 @@ class Text(JupyterMixin):
         no_wrap: Optional[bool] = None,
         end: str = "\n",
         tab_size: int = 8,
+        meta: Optional[Dict[str, Any]] = None,
     ) -> "Text":
         """Construct a text instance by combining a sequence of strings with optional styles.
         The positional arguments should be either strings, or a tuple of string + style.
@@ -288,6 +289,7 @@ class Text(JupyterMixin):
             overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
             end (str, optional): Character to end text with. Defaults to "\\\\n".
             tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
+            meta (Dict[str, Any], optional). Meta data to apply to text, or None for no meta data. Default to None
 
         Returns:
             Text: A new text instance.
@@ -307,6 +309,8 @@ class Text(JupyterMixin):
                 append(part)
             else:
                 append(*part)
+        if meta:
+            text.apply_meta(meta)
         return text
 
     @property
@@ -389,6 +393,40 @@ class Text(JupyterMixin):
                 # Span not in text or not valid
                 return
             self._spans.append(Span(start, min(length, end), style))
+
+    def apply_meta(
+        self, meta: Dict[str, Any], start: int = 0, end: Optional[int] = None
+    ) -> None:
+        """Apply meta data to the text, or a portion of the text.
+
+        Args:
+            meta (Dict[str, Any]): A dict of meta information.
+            start (int): Start offset (negative indexing is supported). Defaults to 0.
+            end (Optional[int], optional): End offset (negative indexing is supported), or None for end of text. Defaults to None.
+
+        """
+        style = Style.from_meta(meta)
+        self.stylize(style, start=start, end=end)
+
+    def on(self, meta: Optional[Dict[str, Any]] = None, **handlers: Any) -> "Text":
+        """Apply event handlers (used by Textual project).
+
+        Example:
+            >>> from rich.text import Text
+            >>> text = Text("hello world")
+            >>> text.on(click="view.toggle('world')")
+
+        Args:
+            meta (Dict[str, Any]): Mapping of meta information.
+            **handlers: Keyword args are prefixed with "@" to defined handlers.
+
+        Returns:
+            Text: Self is returned to method may be chained.
+        """
+        meta = {} if meta is None else meta
+        meta.update({f"@{key}": value for key, value in handlers.items()})
+        self.stylize(Style.from_meta(meta))
+        return self
 
     def remove_suffix(self, suffix: str) -> None:
         """Remove a suffix if it exists.

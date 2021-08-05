@@ -1,5 +1,4 @@
 from functools import lru_cache
-from logging import StrFormatStyle
 from typing import Dict, List
 
 from ._cell_widths import CELL_WIDTHS

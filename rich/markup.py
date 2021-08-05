@@ -15,6 +15,8 @@ RE_TAGS = re.compile(
     re.VERBOSE,
 )
 
+RE_HANDLER = re.compile(r"^([\w\.]*?)(\(.*?\))?$")
+
 
 class Tag(NamedTuple):
     """A tag in console markup."""
@@ -167,16 +169,33 @@ def render(
 
                 if open_tag.name.startswith("@"):
                     if open_tag.parameters:
+                        handler_name = ""
+                        parameters = open_tag.parameters.strip()
+                        handler_match = RE_HANDLER.match(parameters)
+                        if handler_match is not None:
+                            handler_name, match_parameters = handler_match.groups()
+                            parameters = (
+                                "()" if match_parameters is None else match_parameters
+                            )
+
                         try:
-                            meta_params = literal_eval(open_tag.parameters)
+                            meta_params = literal_eval(parameters)
                         except SyntaxError as error:
                             raise MarkupError(
-                                f"error parsing {open_tag.parameters!r}; {error.msg}"
+                                f"error parsing {parameters!r} in {open_tag.parameters!r}; {error.msg}"
                             )
                         except Exception as error:
                             raise MarkupError(
                                 f"error parsing {open_tag.parameters!r}; {error}"
                             ) from None
+
+                        if handler_name:
+                            meta_params = (
+                                handler_name,
+                                meta_params
+                                if isinstance(meta_params, tuple)
+                                else (meta_params,),
+                            )
 
                     else:
                         meta_params = ()
@@ -206,22 +225,20 @@ def render(
 
 if __name__ == "__main__":  # pragma: no cover
 
-    from rich.console import Console
-    from rich.text import Text
+    MARKUP = [
+        "[red]Hello World[/red]",
+        "[magenta]Hello [b]World[/b]",
+        "[bold]Bold[italic] bold and italic [/bold]italic[/italic]",
+        "Click [link=https://www.willmcgugan.com]here[/link] to visit my Blog",
+        ":warning-emoji: [bold red blink] DANGER![/]",
+    ]
 
-    console = Console(highlight=True)
-
-    t = render("[b]Hello[/b] [@click='view.toggle', 'left']World[/]")
-    console.print(t)
-    console.print(t._spans)
-
-    console.print("Hello [1], [1,2,3] ['hello']")
-    console.print("foo")
-    console.print("Hello [link=https://www.willmcgugan.com]W[b red]o[/]rld[/]!")
-
+    from rich.table import Table
     from rich import print
 
-    print(escape("[red]"))
-    print(escape(r"\[red]"))
-    print(escape(r"\\[red]"))
-    print(escape(r"\\\[red]"))
+    grid = Table("Markup", "Result", padding=(0, 1))
+
+    for markup in MARKUP:
+        grid.add_row(Text(markup), markup)
+
+    print(grid)

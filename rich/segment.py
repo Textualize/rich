@@ -1,15 +1,23 @@
 from enum import IntEnum
-from logging import getLogger
-from typing import Dict, NamedTuple, Optional
-
-from .repr import rich_repr, RichReprResult
-from .cells import cell_len, set_cell_size, get_character_cell_size
-from .style import Style
-
+from functools import lru_cache
 from itertools import filterfalse
+from logging import getLogger
 from operator import attrgetter
-from typing import cast, Iterable, List, Sequence, Union, Tuple, TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
+from .cells import cell_len, get_character_cell_size, set_cell_size
+from .repr import Result, rich_repr
+from .style import Style
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult
@@ -60,7 +68,7 @@ class Segment(NamedTuple):
     control: Optional[Sequence[ControlCode]] = None
     """Optional sequence of control codes."""
 
-    def __rich_repr__(self) -> RichReprResult:
+    def __rich_repr__(self) -> Result:
         yield self.text
         if self.control is None:
             if self.style is not None:
@@ -83,22 +91,17 @@ class Segment(NamedTuple):
         """Check if the segment contains control codes."""
         return self.control is not None
 
-    def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:  # type: ignore
-        """Split segment in to two segments at the specified column.
+    @classmethod
+    @lru_cache(1024 * 16)
+    def _split_cells(cls, segment: "Segment", cut: int) -> Tuple["Segment", "Segment"]:  # type: ignore
 
-        If the cut point falls in the middle of a 2-cell wide character then it is replaced
-        by two spaces, to preserve the display width of the parent segment.
-
-        Returns:
-            Tuple[Segment, Segment]: Two segments.
-        """
-        text, style, control = self
-        assert cut >= 0
+        text, style, control = segment
         _Segment = Segment
-        if cut >= self.cell_length:
-            return self, _Segment("", style, control)
+        if cut >= segment.cell_length:
+            return segment, _Segment("", style, control)
 
-        if len(text) == self.cell_length:
+        if len(text) == segment.cell_length:
+            # Fast path with all 1 cell characters
             return (
                 _Segment(text[:cut], style, control),
                 _Segment(text[cut:], style, control),
@@ -106,7 +109,7 @@ class Segment(NamedTuple):
 
         cell_size = get_character_cell_size
 
-        pos = int((cut / self.cell_length) * len(text))
+        pos = int((cut / segment.cell_length) * len(text))
 
         before = text[:pos]
         cell_pos = cell_len(before)
@@ -130,6 +133,17 @@ class Segment(NamedTuple):
                     _Segment(before[: pos - 1] + " ", style, control),
                     _Segment(" " + text[pos:], style, control),
                 )
+
+    def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
+        """Split segment in to two segments at the specified column.
+
+        If the cut point falls in the middle of a 2-cell wide character then it is replaced
+        by two spaces, to preserve the display width of the parent segment.
+
+        Returns:
+            Tuple[Segment, Segment]: Two segments.
+        """
+        return self._split_cells(self, cut)
 
     @classmethod
     def line(cls) -> "Segment":
@@ -574,9 +588,9 @@ class SegmentLines:
 if __name__ == "__main__":
 
     if __name__ == "__main__":  # pragma: no cover
+        from rich.console import Console
         from rich.syntax import Syntax
         from rich.text import Text
-        from rich.console import Console
 
         code = """from rich.console import Console
     console = Console()
