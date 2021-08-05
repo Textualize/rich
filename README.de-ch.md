@@ -9,31 +9,31 @@
 [中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md) • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md) • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md) • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md) • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md) • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md) • [Français readme](https://github.com/willmcgugan/rich/blob/master/README.fr.md) • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md) • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
 
-Rich is a Python library for _rich_ text and beautiful formatting in the terminal.
+Rich isch ä Python Library för _rich_ Text ond ganz schöni formatiärig im Törminäl
 
-The [Rich API](https://rich.readthedocs.io/en/latest/) makes it easy to add color and style to terminal output. Rich can also render pretty tables, progress bars, markdown, syntax highlighted source code, tracebacks, and more — out of the box.
+D [Rich API](https://rich.readthedocs.io/en/latest/) machts ganz eifach zom Farbä ond Stiil zu de Törminälusgob hinzu z füäge. Rich cha au schöni Tabelle, Progressbare, Markdown, Syntax hervorhebe, Tracebäcks und meh darstelle — fix fertig usem Böxli.
 
 ![Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
 
-For a video introduction to Rich see [calmcode.io](https://calmcode.io/rich/introduction.html) by [@fishnets88](https://twitter.com/fishnets88).
+E Video Iifüärig öber Rich geds onder [calmcode.io](https://calmcode.io/rich/introduction.html) vo [@fishnets88](https://twitter.com/fishnets88).
 
-See what [people are saying about Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
+Lueg was [anderi öber Rich säged](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
-## Compatibility
+## Kompatibilität
 
-Rich works with Linux, OSX, and Windows. True color / emoji works with new Windows Terminal, classic terminal is limited to 16 colors. Rich requires Python 3.6.1 or later.
+Rich funktioniert mit Linux, OSX ond Windows. True color / emoji funktioniert mit em neue Windows Törminäl, s klassische Törminäl isch of 16 Farbe limitiärt. Rich brucht Pzthon 3.6.1 oder neuer.
 
-Rich works with [Jupyter notebooks](https://jupyter.org/) with no additional configuration required.
+Rich funktioniert mit [Jupyter notebooks](https://jupyter.org/) ohni irgendwelchä zuäsätzloche konfiguration.
 
-## Installing
+## Installation
 
-Install with `pip` or your favorite PyPi package manager.
+Installation mit `pip` oder mit dim liäblings PyPi Päckli-Mangager.
 
 ```
 pip install rich
 ```
 
-Run the following to test Rich output on your terminal:
+Für das do us zum d Rich usgob im Törminäl z teste:
 
 ```
 python -m rich
@@ -41,7 +41,7 @@ python -m rich
 
 ## Rich Print
 
-To effortlessly add rich output to your application, you can import the [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) method, which has the same signature as the builtin Python function. Try this:
+Zom ohni Ufwand Rich Usgob zu dinnere Applikation hinzuäfüäge, chasch eifach d [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) Methodä importiäre, weli di glich Signatuur hed wiä d Builtin Python Funktion. Versuech das:
 
 ```python
 from rich import print
@@ -53,7 +53,7 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ## Rich REPL
 
-Rich can be installed in the Python REPL, so that any data structures will be pretty printed and highlighted.
+Rich cha i de Python REPL installiert werde so dass irgend e Datestruktuur hübsch usgeh ond Highlighted wird.
 
 ```python
 >>> from rich import pretty
@@ -62,9 +62,9 @@ Rich can be installed in the Python REPL, so that any data structures will be pr
 
 ![REPL](https://github.com/willmcgugan/rich/raw/master/imgs/repl.png)
 
-## Using the Console
+## Console bruchä
 
-For more control over rich terminal content, import and construct a [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console) object.
+Für meh kontrolle öber de Törminäl inhalt, importiär und instanziär e [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console) Objekt. 
 
 ```python
 from rich.console import Console
@@ -72,25 +72,25 @@ from rich.console import Console
 console = Console()
 ```
 
-The Console object has a `print` method which has an intentionally similar interface to the builtin `print` function. Here's an example of use:
+S Console Objekt hät e `print` Methode mitäre absichtloch gliche Schnittstell wiä d Builtin `print` Funktion. Do es Bispiil wiä mos brucht:
 
 ```python
 console.print("Hello", "World!")
 ```
 
-As you might expect, this will print `"Hello World!"` to the terminal. Note that unlike the builtin `print` function, Rich will word-wrap your text to fit within the terminal width.
+Wiä erwartet wird `"Hello World!"` im Törminäl usgeh. Beach das im gägesatz zu de Builtin `print` Funktion, Rich de text so ombricht das es id Törminäl breiti ine passt.
 
-There are a few ways of adding color and style to your output. You can set a style for the entire output by adding a `style` keyword argument. Here's an example:
+Es ged es paar Wäg zom Farb und Stiil zu de Usgob hinzuä z füäge. Me cha en stiil a de ganze Usgob zuäwiise i dem mo s Schlösselwortargument `style` verwendet. Do es Bispiil:
 
 ```python
 console.print("Hello", "World!", style="bold red")
 ```
 
-The output will be something like the following:
+D Usgob gsiät öppe ä so us:
 
 ![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/hello_world.png)
 
-That's fine for styling a line of text at a time. For more finely grained styling, Rich renders a special markup which is similar in syntax to [bbcode](https://en.wikipedia.org/wiki/BBCode). Here's an example:
+Da isch guät für d Gstalltig vom Text pro Liniä. Vör ä granularäri Gstalltig hed Rich e spezielli Markup mitäre ähnloche Befehlsufbau wiä [bbcode](https://en.wikipedia.org/wiki/BBCode). Do es Bispiil:
 
 ```python
 console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i]way[/i].")
@@ -98,11 +98,11 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![Console Markup](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
 
-You can use a Console object to generate sophisticated output with minimal effort. See the [Console API](https://rich.readthedocs.io/en/latest/console.html) docs for details.
+Du chasch mitmäne Console Objekt mit wenig Ufwand aasprechendi Usgob erziile. Lueg do d [Console API](https://rich.readthedocs.io/en/latest/console.html) Dokumentation für d Details a.
 
 ## Rich Inspect
 
-Rich has an [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) function which can produce a report on any Python object, such as class, instance, or builtin.
+Rich hät e [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) Funktion wo cha Bricht öber jeglochi Python Objekt, wie Class, Instanz oder Builtin erstelle.
 
 ```python
 >>> my_list = ["foo", "bar"]
@@ -112,18 +112,18 @@ Rich has an [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?
 
 ![Log](https://github.com/willmcgugan/rich/raw/master/imgs/inspect.png)
 
-See the [inspect docs](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) for details.
+Lueg do d [inspect Dokumentation](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) für d Details a.
 
 # Rich Library
 
-Rich contains a number of builtin _renderables_ you can use to create elegant output in your CLI and help you debug your code.
+Rich häd ä Aazahl vo integriäte _renderables_ wo du chasch verwende zum eleganti Usgobe i dinner e CLI generiäre ond der hälfed bim debugge vo dim Code.
 
-Click the following headings for details:
+Drock of di folgende Öberschrifte für d Details:
 
 <details>
 <summary>Log</summary>
 
-The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default Rich will do syntax highlighting for Python structures and for repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
+S Console Objekt hät e `log()` Methode wo verglichbar zu de `print()` Schnittstell isch aber zuäsätzloch no e Spaltä för di aktuäll Zitt und d Datai mit de Zille wo de Ufruäf macht us git. Standartmässig tuät Rich es Syntax Highlighting für Python Strukturä sowiä repr Text machä. Went e Collection (wiä zum Bispiil dict oder list) loggsch wird Rich das hübsch Usgeh so dass es i de verfüägbari Platz ine passt. Do es Bispiil für e paar vo dene Funktionä.
 
 ```python
 from rich.console import Console
@@ -148,19 +148,19 @@ def test_log():
 test_log()
 ```
 
-The above produces the following output:
+Das do obe gid di folgend Usgob:
 
 ![Log](https://github.com/willmcgugan/rich/raw/master/imgs/log.png)
 
-Note the `log_locals` argument, which outputs a table containing the local variables where the log method was called.
+Beachte s Argument `log_locals` wo innere Tabelle di lokalä Variable us gid zur Zitt wo d Methodä ufgruäfä worde isch.
 
-The log method could be used for logging to the terminal for long running applications such as servers, but is also a very nice debugging aid.
+D log Methodä cha zum is Törminäl inne z Logge für langläbige Applikationä wie Server brucht werde isch aber au fürs Debuggä ganz e netti Hilf.
 
 </details>
 <details>
 <summary>Logging Handler</summary>
 
-You can also use the builtin [Handler class](https://rich.readthedocs.io/en/latest/logging.html) to format and colorize output from Python's logging module. Here's an example of the output:
+Du chasch au d Builtin [Handler Class](https://rich.readthedocs.io/en/latest/logging.html) verwende zum d Usgob vom Python logging Module z formatiäre und iifärbe. Do es Bispiil vo de Usgob:
 
 ![Logging](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
 
@@ -169,27 +169,27 @@ You can also use the builtin [Handler class](https://rich.readthedocs.io/en/late
 <details>
 <summary>Emoji</summary>
 
-To insert an emoji in to console output place the name between two colons. Here's an example:
+Zom e Emoji i de Konsoleusgob iizfüäge tuä de name züschet zwei Doppelpünkt. Do es Bispiil:
 
 ```python
 >>> console.print(":smiley: :vampire: :pile_of_poo: :thumbs_up: :raccoon:")
 😃 🧛 💩 👍 🦝
 ```
 
-Please use this feature wisely.
+Bitte verwend diä Funktion gschiid.
 
 </details>
 
 <details>
-<summary>Tables</summary>
+<summary>Tabelle</summary>
 
-Rich can render flexible [tables](https://rich.readthedocs.io/en/latest/tables.html) with unicode box characters. There is a large variety of formatting options for borders, styles, cell alignment etc.
+Rich cha flexiibäl [Tabelle](https://rich.readthedocs.io/en/latest/tables.html) mit Boxä us Unicodezeiche generiäre. Es gid e Viilzahl vo Formatiärigsoptionä für Ränder, Stiil, Zelleusrichtig ond so witter.
 
 ![table movie](https://github.com/willmcgugan/rich/raw/master/imgs/table_movie.gif)
 
-The animation above was generated with [table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py) in the examples directory.
+D Animation obe isch mit [table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py) us em Bispiil Ordner erstellt worde.
 
-Here's a simpler table example:
+Do es eifachs Tabelle Bispiil:
 
 ```python
 from rich.console import Console
@@ -221,13 +221,13 @@ table.add_row(
 console.print(table)
 ```
 
-This produces the following output:
+Das gid di folgend Usgob:
 
 ![table](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
 
-Note that console markup is rendered in the same way as `print()` and `log()`. In fact, anything that is renderable by Rich may be included in the headers / rows (even other tables).
+Beacht das d Konsole Markup glich wie bi `print()` ond `log()` generiärt wird. Ond zwor cha alles wo vo Rich generiert werde cha au im Chopf / Zille iigfüägt werde (sogar anderi Tabellene).
 
-The `Table` class is smart enough to resize columns to fit the available width of the terminal, wrapping text as required. Here's the same example, with the terminal made smaller than the table above:
+D Klass `Table` isch gschiid gnuäg yum d Spaltebreite am verfüägbare Platz im Törminäl aazpasse und de Text gegäbenefalls umzbreche. Do isch s gliche Bispiil mit em Törminäl chlinner als d Tabelle vo obe:
 
 ![table2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
 
@@ -236,9 +236,9 @@ The `Table` class is smart enough to resize columns to fit the available width o
 <details>
 <summary>Progress Bars</summary>
 
-Rich can render multiple flicker-free [progress](https://rich.readthedocs.io/en/latest/progress.html) bars to track long-running tasks.
+Rich cha meereri flackerfreii [Progress](https://rich.readthedocs.io/en/latest/progress.html) Bars darstelle zum langläbigi Tasks verfolgä.
 
-For basic usage, wrap any sequence in the `track` function and iterate over the result. Here's an example:
+Zur eifache Benutzig irgend e Sequenz id `track` Funktion ine packe und über s Resultat iteriäre. Do es Bispiil:
 
 ```python
 from rich.progress import track
@@ -247,22 +247,22 @@ for step in track(range(100)):
     do_step(step)
 ```
 
-It's not much harder to add multiple progress bars. Here's an example taken from the docs:
+Es isch nöd vill schwiriger zum mehräri Progress Bars hinzuä zfüäge. Do es Bispiil us de Doku:
 
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
 
-The columns may be configured to show any details you want. Built-in columns include percentage complete, file size, file speed, and time remaining. Here's another example showing a download in progress:
+D Spaltä cha so konfiguriärt werde das alli gwünschte Details aazeigt werded. D Built-in Spalte beinhaltät Prozentsatz, Dateigrössi, Dateigschwindikeit ond öbrigi Zitt. Do isch e andos Bispiil wo en laufände Download zeigt:
 
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/downloader.gif)
 
-To try this out yourself, see [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) which can download multiple URLs simultaneously while displaying progress.
+Zums selber usprobiäre lueg [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) a, wo cha glichzittig mehräri URLs abelade und de Fortschritt aazeige.
 
 </details>
 
 <details>
 <summary>Status</summary>
 
-For situations where it is hard to calculate progress, you can use the [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) method which will display a 'spinner' animation and message. The animation won't prevent you from using the console as normal. Here's an example:
+För Situatione wos schwär isch zum de Fortschritt z berechne, chasch d [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) Methode verwende wo en 'spinner' animiärt und e Nochricht darstellt. D Animation haltet di nöd ab d Konsole witter normal z bruche. Do es Bispiil:
 
 ```python
 from time import sleep
@@ -278,17 +278,17 @@ with console.status("[bold green]Working on tasks...") as status:
         console.log(f"{task} complete")
 ```
 
-This generates the following output in the terminal.
+Das gid di folgendi Usgob im Törminäl.
 
 ![status](https://github.com/willmcgugan/rich/raw/master/imgs/status.gif)
 
-The spinner animations were borrowed from [cli-spinners](https://www.npmjs.com/package/cli-spinners). You can select a spinner by specifying the `spinner` parameter. Run the following command to see the available values:
+D Spinner Animatione sind vo [cli-spinners](https://www.npmjs.com/package/cli-spinners) usglehnt. Du chasch en speziifischä Spinner mit em `spinner` Parameter uswähle. Start de folgend Befehl zom die verfüägbare Wert z gsiä:
 
 ```
 python -m rich.spinner
 ```
 
-The above command generates the following output in the terminal:
+De Befehlt obe generiärt di folgändi Usgob im Törminäl:
 
 ![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
 
@@ -297,19 +297,19 @@ The above command generates the following output in the terminal:
 <details>
 <summary>Tree</summary>
 
-Rich can render a [tree](https://rich.readthedocs.io/en/latest/tree.html) with guide lines. A tree is ideal for displaying a file structure, or any other hierarchical data.
+Rich cha en [tree](https://rich.readthedocs.io/en/latest/tree.html) mit Hilfsliniä generiäre. En Tree isch ideal zom darstelle vo Dateistruktuure oder anderi hirarchischi Date.
 
-The labels of the tree can be simple text or anything else Rich can render. Run the following for a demonstration:
+S Label vom Tree cha en eifache Text or alles andere wo Rich cha rendere. Start das Folgendi für e Demonstation:
 
 ```
 python -m rich.tree
 ```
 
-This generates the following output:
+Das generiärt di folgend Usgob:
 
 ![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
 
-See the [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) example for a script that displays a tree view of any directory, similar to the linux `tree` command.
+Lueg s Bispiil Script [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) für e Darstellig vo irgend eim Ordner als Tree, glich wie de Linux Befehl `tree`.
 
 </details>
 
@@ -329,7 +329,7 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-The following screenshot is the output from the [columns example](https://github.com/willmcgugan/rich/blob/master/examples/columns.py) which displays data pulled from an API in columns:
+De folgend Screenshot isch d Usgob vom [columns example](https://github.com/willmcgugan/rich/blob/master/examples/columns.py) Bispiil, wo Date vonnere API hollt ond in Colums darstellt:
 
 ![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
 
@@ -338,9 +338,9 @@ The following screenshot is the output from the [columns example](https://github
 <details>
 <summary>Markdown</summary>
 
-Rich can render [markdown](https://rich.readthedocs.io/en/latest/markdown.html) and does a reasonable job of translating the formatting to the terminal.
+Rich cha [markdown](https://rich.readthedocs.io/en/latest/markdown.html) übersetze ond leistet vernünftigi Ärbät bim formatiärige is Törminäl z übersetze.
 
-To render markdown import the `Markdown` class and construct it with a string containing markdown code. Then print it to the console. Here's an example:
+Zum Markdonw z übersetze importier d Klass `Markdown` und instanzier es mitem Markdown Text. Nocher gid mos uf de Konsolä us. Do es Bispiil:
 
 ```python
 from rich.console import Console
@@ -352,7 +352,7 @@ with open("README.md") as readme:
 console.print(markdown)
 ```
 
-This will produce output something like the following:
+Das wird d Usgob ungefär wie s Folgende geh:
 
 ![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
 
@@ -361,7 +361,7 @@ This will produce output something like the following:
 <details>
 <summary>Syntax Highlighting</summary>
 
-Rich uses the [pygments](https://pygments.org/) library to implement [syntax highlighting](https://rich.readthedocs.io/en/latest/syntax.html). Usage is similar to rendering markdown; construct a `Syntax` object and print it to the console. Here's an example:
+Rich brucht d [pygments](https://pygments.org/) Library für d [Syntax Highlighting](https://rich.readthedocs.io/en/latest/syntax.html). S Bruche isch ähnloch zum Markdown übersetze; instanziär e `Syntax` Objekt ond gibs uf de Konsolä us. Do es Bispiil:
 
 ```python
 from rich.console import Console
@@ -387,7 +387,7 @@ console = Console()
 console.print(syntax)
 ```
 
-This will produce the following output:
+Das wird d Usgob ungefär wie s Folgende geh:
 
 ![syntax](https://github.com/willmcgugan/rich/raw/master/imgs/syntax.png)
 
@@ -396,25 +396,25 @@ This will produce the following output:
 <details>
 <summary>Tracebacks</summary>
 
-Rich can render [beautiful tracebacks](https://rich.readthedocs.io/en/latest/traceback.html) which are easier to read and show more code than standard Python tracebacks. You can set Rich as the default traceback handler so all uncaught exceptions will be rendered by Rich.
+Rich cha [wunderschöni Tracebacks](https://rich.readthedocs.io/en/latest/traceback.html) generiäre wo eifach zum läse sind und meh Code als de standart Python Traceback darstellt. Du chasch Rich als default Traceback Handler setzä ond alli nöd abfangene Exceptions werded mit Rich dargstellt.
 
-Here's what it looks like on OSX (similar on Linux):
+So gsiets ungefär ufemen OSX (ähnloch uf Linux) us:
 
 ![traceback](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
 
 </details>
 
-All Rich renderables make use of the [Console Protocol](https://rich.readthedocs.io/en/latest/protocol.html), which you can also use to implement your own Rich content.
+Alli Rich Renderables bruched s [Console Protokoll](https://rich.readthedocs.io/en/latest/protocol.html), wo mo au für d eige entwicklig vo Rich Inhalt cha bruche.
 
-# Rich for enterprise
+# Rich für Ondernemä
 
-Available as part of the Tidelift Subscription.
+Verfüägbar als Tidelift Abo.
 
-The maintainers of Rich and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source packages you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact packages you use. [Learn more.](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
+De Betreue vo Rich ond tuusigi anderi Päkli schaffed mit Tidelift zum komerziälle Support und Wartig für Open Source Päkli wo du zum Baue vo dinnere Applikation bruchsch. Spar Zit, reduziär s Risiko ond verbessere d Code Health mit em bezahle vo de Wartig für gnau die Päkli wo mo brucht. [Lärn meh.](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
 
-# Project using Rich
+# Projekt wo Rich bruched
 
-Here are a few projects using Rich:
+Do es paar Projekt wo Rich verwended:
 
 - [BrancoLab/BrainRender](https://github.com/BrancoLab/BrainRender)
   a python package for the visualization of three dimensional neuro-anatomical data

@@ -1,9 +1,13 @@
-# Rich
-
+[![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich)
 [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
 [![codecov](https://codecov.io/gh/willmcgugan/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/willmcgugan/rich)
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
+
+![Logo](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
+
+[中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md) • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md) • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md) • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md) • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md) • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md) • [Français readme](https://github.com/willmcgugan/rich/blob/master/README.fr.md) • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md) • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
+ • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
 
 Richは、_リッチ_なテキストや美しい書式設定をターミナルで行うためのPythonライブラリです。
 

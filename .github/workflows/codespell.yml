@@ -7,4 +7,4 @@ jobs:
       - uses: actions/checkout@v2
       - run: python3 -m pip install codespell
       - run: codespell --ignore-words-list="ba,fo,hel,revered,womens"
-          --skip="./README.de.md,./README.es.md,./README.sv.md,*.svg"
+          --skip="./README.de.md,./README.es.md,./README.sv.md,./README.fr.md,./README.de-ch.md,./README.hi.md,./README.pt-br.md,*.svg"
