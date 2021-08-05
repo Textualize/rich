@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Changed `RenderGroup` to `Group` and `render_group` to `group` (old names still work for compatibility but will be deprecated in the future)
+- Changed `RenderGroup` to `Group` and `render_group` to `group` (old names remain for compatibility but will be deprecated in the future)
 - Changed `rich.repr.RichReprResult` to `rich.repr.Result` (old names remain for compatibility but will be deprecated in the future)
 - Changed meta serialization to use pickle rather than marshal to permit callables
 
