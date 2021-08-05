@@ -19,7 +19,7 @@ T = TypeVar("T")
 
 
 Result = Iterable[Union[Any, Tuple[Any], Tuple[str, Any], Tuple[str, Any, Any]]]
-Result = Result
+RichReprResult = Result
 
 
 class ReprError(Exception):
