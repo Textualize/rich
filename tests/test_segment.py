@@ -10,16 +10,10 @@ from rich.style import Style
 def test_repr():
     assert repr(Segment("foo")) == "Segment('foo')"
     home = (ControlType.HOME, 0)
-    if sys.version_info >= (3, 10):
-        assert (
-            repr(Segment("foo", None, [home]))
-            == "Segment('foo', None, [(ControlType.HOME, 0)])"
-        )
-    else:
-        assert (
-            repr(Segment("foo", None, [home]))
-            == "Segment('foo', None, [(<ControlType.HOME: 3>, 0)])"
-        )
+    assert (
+        repr(Segment("foo", None, [home]))
+        == "Segment('foo', None, [(<ControlType.HOME: 3>, 0)])"
+    )
 
 
 def test_line():
