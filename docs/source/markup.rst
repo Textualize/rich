@@ -80,7 +80,7 @@ Calling ``greet("Will")`` will print a greeting, but if you were to call ``greet
 Emoji
 ~~~~~
 
-If you add an *emoji code* to markup it will be replaced with the equivalent unicode character. An emoji code consists of th name of the emoji surrounded be colons (:). Here's an example::
+If you add an *emoji code* to markup it will be replaced with the equivalent unicode character. An emoji code consists of the name of the emoji surrounded be colons (:). Here's an example::
 
     >>> from rich import print
     >>> print(":warning:")
