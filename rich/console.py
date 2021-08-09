@@ -1086,7 +1086,6 @@ class Console:
 
         Args:
             status (RenderableType): A status renderable (str or Text typically).
-            console (Console, optional): Console instance to use, or None for global console. Defaults to None.
             spinner (str, optional): Name of spinner animation (see python -m rich.spinner). Defaults to "dots".
             spinner_style (StyleType, optional): Style of spinner. Defaults to "status.spinner".
             speed (float, optional): Speed factor for spinner animation. Defaults to 1.0.
