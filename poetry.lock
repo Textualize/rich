@@ -851,7 +851,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-dataclasses"
-version = "0.1.5"
+version = "0.1.7"
 description = "Typing stubs for dataclasses"
 category = "dev"
 optional = false
@@ -910,7 +910,7 @@ jupyter = ["ipywidgets"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "506997b889b3532dee624e0588cccf4b0cbe5c2d7d3d9f9fb00606c72ee497d8"
+content-hash = "7eefd97f3f1236733932f168718a2eb9ca7fc58b56ca5da986fc41ba6d2234be"
 
 [metadata.files]
 appdirs = [
@@ -1514,8 +1514,8 @@ typed-ast = [
     {file = "typed_ast-1.4.3.tar.gz", hash = "sha256:fb1bbeac803adea29cedd70781399c99138358c26d05fcbd23c13016b7f5ec65"},
 ]
 types-dataclasses = [
-    {file = "types-dataclasses-0.1.5.tar.gz", hash = "sha256:7b5f4099fb21c209f2df3a83c2b64308c29955769d610a457244dc0eebe1cafc"},
-    {file = "types_dataclasses-0.1.5-py2.py3-none-any.whl", hash = "sha256:c19491cfb981bff9cafd9c113c291a7a54adccc6298ded8ca3de0d7abe211984"},
+    {file = "types-dataclasses-0.1.7.tar.gz", hash = "sha256:248075d093d8f7c1541ce515594df7ae40233d1340afde11ce7125368c5209b8"},
+    {file = "types_dataclasses-0.1.7-py3-none-any.whl", hash = "sha256:fc372bb68b878ac7a68fd04230d923d4a6303a137ecb0b9700b90630bdfcbfc9"},
 ]
 typing-extensions = [
     {file = "typing_extensions-3.10.0.0-py2-none-any.whl", hash = "sha256:0ac0f89795dd19de6b97debb0c6af1c70987fd80a2d62d1958f7e56fcc31b497"},
