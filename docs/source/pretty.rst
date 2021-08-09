@@ -20,7 +20,7 @@ The :func:`~rich.pretty.pprint` method offers a few more arguments you can use t
 Indent guides
 ~~~~~~~~~~~~~
 
-Rich can draw *intent guides* to highlight the indent level of a data structure. These can make it easier to read more deeply nested output. The pprint method enables indent guides by default. You can set ``indent_guides=False`` to disable this feature. 
+Rich can draw *intent guides* to highlight the indent level of a data structure. These can make it easier to read more deeply nested output. The pprint method enables indent guides by default. You can set ``indent_guides=False`` to disable this feature.
 
 Expand all
 ~~~~~~~~~~
@@ -48,7 +48,7 @@ If you set the ``max_string`` argument to an integer, Rich will truncate strings
 Pretty renderable
 -----------------
 
-Rich offers a :class:`~rich.pretty.Pretty` class which you can user to insert pretty printed data in to another renderable.
+Rich offers a :class:`~rich.pretty.Pretty` class which you can use to insert pretty printed data in to another renderable.
 
 The following example displays pretty printed data within a simple panel::
 
@@ -155,7 +155,7 @@ Each tuple specifies an element in the output.
 
 - ``yield value`` will generate a positional argument.
 - ``yield name, value`` will generate a keyword argument.
-- ``yield name, value, default`` will generate a keyword argument *if* ``value`` is not equal to ``default``. 
+- ``yield name, value, default`` will generate a keyword argument *if* ``value`` is not equal to ``default``.
 
 You can also tell Rich to generate the *angular bracket* style of repr, which tend to be used where there is no easy way to recreate the object's constructor. To do this set the function attribute ``"angular"`` to ``True`` immediately after your ``__rich_repr__`` method. For example::
 
@@ -193,12 +193,12 @@ If you want to type the Rich repr method you can import and return ``rich.repr.R
             yield "eats", self.eats
             yield "fly", self.fly, True
             yield "extinct", self.extinct, False
- 
+
 
 Automatic Rich Repr
 ~~~~~~~~~~~~~~~~~~~
 
-Rich can generate a rich repr automatically if the parameters are named the same as your attributes. 
+Rich can generate a rich repr automatically if the parameters are named the same as your attributes.
 
 To automatically build a rich repr, use the :meth:`~rich.repr.auto` class decorator. The Bird example above follows the above rule, so we don't strictly need to implement our own ``__rich_repr__``. The following code would generate the same repr::
 
