@@ -48,7 +48,7 @@ If you set the ``max_string`` argument to an integer, Rich will truncate strings
 Pretty renderable
 -----------------
 
-Rich offers a :class:`~rich.pretty.Pretty` class which you can user to insert pretty printed data in to another renderable.
+Rich offers a :class:`~rich.pretty.Pretty` class which you can use to insert pretty printed data in to another renderable.
 
 The following example displays pretty printed data within a simple panel::
 
