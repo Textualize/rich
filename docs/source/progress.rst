@@ -133,7 +133,7 @@ Table Columns
 
 Rich builds a :class:`~rich.table.Table` for the tasks in the Progress instance. You can customize how the columns of this *tasks table* are created by specifying the ``table_column`` argument in the Column constructor, which should be a :class:`~rich.table.Column` instance.
 
-The following example demonstrates a progress bar where the description takes one third of the width of the terminal, and the bar takes up the remaining third::
+The following example demonstrates a progress bar where the description takes one third of the width of the terminal, and the bar takes up the remaining two thirds::
 
     from time import sleep
 
