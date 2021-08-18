@@ -444,6 +444,22 @@ class _Line:
                 f"{self.whitespace}{self.text}{self.node or ''}{self.suffix.rstrip()}"
             )
 
+def to_repr(obj: Any, max_string: Optional[int] = None) -> str:
+    """Get repr string for an object, but catch errors."""
+    if (
+        max_string is not None
+        and isinstance(obj, (bytes, str))
+        and len(obj) > max_string
+    ):
+        truncated = len(obj) - max_string
+        obj_repr = f"{obj[:max_string]!r}+{truncated}"
+    else:
+        try:
+            obj_repr = repr(obj)
+        except Exception as error:
+            obj_repr = f"<repr-error {str(error)!r}>"
+    return obj_repr
+
 
 def traverse(
     _object: Any, max_length: Optional[int] = None, max_string: Optional[int] = None
@@ -460,22 +476,6 @@ def traverse(
     Returns:
         Node: The root of a tree structure which can be used to render a pretty repr.
     """
-
-    def to_repr(obj: Any) -> str:
-        """Get repr string for an object, but catch errors."""
-        if (
-            max_string is not None
-            and isinstance(obj, (bytes, str))
-            and len(obj) > max_string
-        ):
-            truncated = len(obj) - max_string
-            obj_repr = f"{obj[:max_string]!r}+{truncated}"
-        else:
-            try:
-                obj_repr = repr(obj)
-            except Exception as error:
-                obj_repr = f"<repr-error {str(error)!r}>"
-        return obj_repr
 
     visited_ids: Set[int] = set()
     push_visited = visited_ids.add
@@ -636,7 +636,7 @@ def traverse(
             open_brace, close_brace, empty = _BRACES[obj_type](obj)
 
             if obj_type.__repr__ != type(obj).__repr__:
-                node = Node(value_repr=to_repr(obj), last=root)
+                node = Node(value_repr=to_repr(obj, max_string=max_string), last=root)
             elif obj:
                 children = []
                 node = Node(
@@ -655,7 +655,7 @@ def traverse(
                         iter_items = islice(iter_items, max_length)
                     for index, (key, child) in enumerate(iter_items):
                         child_node = _traverse(child)
-                        child_node.key_repr = to_repr(key)
+                        child_node.key_repr = to_repr(key, max_string=max_string)
                         child_node.last = index == last_item_index
                         append(child_node)
                 else:
@@ -673,7 +673,7 @@ def traverse(
 
             pop_visited(obj_id)
         else:
-            node = Node(value_repr=to_repr(obj), last=root)
+            node = Node(value_repr=to_repr(obj, max_string=max_string), last=root)
         node.is_tuple = isinstance(obj, tuple)
         return node
 
