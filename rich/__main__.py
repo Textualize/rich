@@ -109,7 +109,7 @@ def make_test_card() -> Table:
     )
 
     markup_example = (
-        "[bold magenta]Rich[/] supports a simple [i]bbcode[/i] like [b]markup[/b] for [yellow]color[/], [underline]style[/], and emoji! "
+        "[bold magenta]Rich[/] supports a simple [i]bbcode[/i]-like [b]markup[/b] for [yellow]color[/], [underline]style[/], and emoji! "
         ":+1: :apple: :ant: :bear: :baguette_bread: :bus: "
     )
     table.add_row("Markup", markup_example)
