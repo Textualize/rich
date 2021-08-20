@@ -20,7 +20,7 @@ The :func:`~rich.pretty.pprint` method offers a few more arguments you can use t
 Indent guides
 ~~~~~~~~~~~~~
 
-Rich can draw *intent guides* to highlight the indent level of a data structure. These can make it easier to read more deeply nested output. The pprint method enables indent guides by default. You can set ``indent_guides=False`` to disable this feature.
+Rich can draw *indent guides* to highlight the indent level of a data structure. These can make it easier to read more deeply nested output. The pprint method enables indent guides by default. You can set ``indent_guides=False`` to disable this feature.
 
 Expand all
 ~~~~~~~~~~
