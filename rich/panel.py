@@ -205,7 +205,6 @@ class Panel(JupyterMixin):
             yield from console.render(footer_text)
             yield Segment(box.bottom + box.bottom_right, border_style)
 
-        yield Segment(box.get_bottom([width - 2]), border_style)
         yield new_line
 
     def __rich_measure__(
