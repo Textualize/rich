@@ -13,5 +13,6 @@ The following people have contributed to the development of Rich:
 - [Will McGugan](https://github.com/willmcgugan)
 - [Nathan Page](https://github.com/nathanrpage97)
 - [Kylian Point](https://github.com/p0lux)
+- [Kyle Pollina](https://github.com/kylepollina)
 - [Clément Robert](https://github.com/neutrinoceros)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
