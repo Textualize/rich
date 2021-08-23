@@ -12,7 +12,7 @@ tests = [
     Panel("Hello, World", width=8, padding=0),
     Panel(Panel("Hello, World", padding=0), padding=0),
     Panel("Hello, World", title="FOO", padding=0),
-    Panel("Hello, World", footer="FOO", padding=0),
+    Panel("Hello, World", subtitle="FOO", padding=0),
 ]
 
 expected = [

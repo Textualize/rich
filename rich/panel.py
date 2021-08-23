@@ -42,8 +42,8 @@ class Panel(JupyterMixin):
         *,
         title: Optional[TextType] = None,
         title_align: AlignMethod = "center",
-        footer: Optional[TextType] = None,
-        footer_align: AlignMethod = "center",
+        subtitle: Optional[TextType] = None,
+        subtitle_align: AlignMethod = "center",
         safe_box: Optional[bool] = None,
         expand: bool = True,
         style: StyleType = "none",
@@ -57,8 +57,8 @@ class Panel(JupyterMixin):
         self.box = box
         self.title = title
         self.title_align = title_align
-        self.footer = footer
-        self.footer_align = footer_align
+        self.subtitle = subtitle
+        self.subtitle_align = subtitle_align
         self.safe_box = safe_box
         self.expand = expand
         self.style = style
@@ -76,8 +76,8 @@ class Panel(JupyterMixin):
         *,
         title: Optional[TextType] = None,
         title_align: AlignMethod = "center",
-        footer: Optional[TextType] = None,
-        footer_align: AlignMethod = "center",
+        subtitle: Optional[TextType] = None,
+        subtitle_align: AlignMethod = "center",
         safe_box: Optional[bool] = None,
         style: StyleType = "none",
         border_style: StyleType = "none",
@@ -90,8 +90,8 @@ class Panel(JupyterMixin):
             box,
             title=title,
             title_align=title_align,
-            footer=footer,
-            footer_align=footer,
+            subtitle=subtitle,
+            subtitle_align=subtitle,
             safe_box=safe_box,
             style=style,
             border_style=border_style,
@@ -117,19 +117,19 @@ class Panel(JupyterMixin):
         return None
 
     @property
-    def _footer(self) -> Optional[Text]:
-        if self.footer:
-            footer_text = (
-                Text.from_markup(self.footer)
-                if isinstance(self.footer, str)
-                else self.footer.copy()
+    def _subtitle(self) -> Optional[Text]:
+        if self.subtitle:
+            subtitle_text = (
+                Text.from_markup(self.subtitle)
+                if isinstance(self.subtitle, str)
+                else self.subtitle.copy()
             )
-            footer_text.end = ""
-            footer_text.plain = footer_text.plain.replace("\n", " ")
-            footer_text.no_wrap = True
-            footer_text.expand_tabs()
-            footer_text.pad(1)
-            return footer_text
+            subtitle_text.end = ""
+            subtitle_text.plain = subtitle_text.plain.replace("\n", " ")
+            subtitle_text.no_wrap = True
+            subtitle_text.expand_tabs()
+            subtitle_text.pad(1)
+            return subtitle_text
         return None
 
     def __rich_console__(
@@ -193,16 +193,16 @@ class Panel(JupyterMixin):
             yield line_end
             yield new_line
 
-        footer_text = self._footer
-        if footer_text is not None:
-            footer_text.style = border_style
+        subtitle_text = self._subtitle
+        if subtitle_text is not None:
+            subtitle_text.style = border_style
 
-        if footer_text is None or width <= 4:
+        if subtitle_text is None or width <= 4:
             yield Segment(box.get_bottom([width - 2]), border_style)
         else:
-            footer_text.align(self.footer_align, width - 4, character=box.bottom)
+            subtitle_text.align(self.subtitle_align, width - 4, character=box.bottom)
             yield Segment(box.bottom_left + box.bottom, border_style)
-            yield from console.render(footer_text)
+            yield from console.render(subtitle_text)
             yield Segment(box.bottom + box.bottom_right, border_style)
 
         yield new_line
