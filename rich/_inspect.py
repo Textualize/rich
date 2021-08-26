@@ -149,14 +149,15 @@ class Inspect(JupyterMixin):
                 yield signature
                 yield ""
 
-        _doc = getdoc(obj)
-        if _doc is not None:
-            if not self.help:
-                _doc = _first_paragraph(_doc)
-            doc_text = Text(_reformat_doc(_doc), style="inspect.help")
-            doc_text = highlighter(doc_text)
-            yield doc_text
-            yield ""
+        if self.docs:
+            _doc = getdoc(obj)
+            if _doc is not None:
+                if not self.help:
+                    _doc = _first_paragraph(_doc)
+                doc_text = Text(_reformat_doc(_doc), style="inspect.help")
+                doc_text = highlighter(doc_text)
+                yield doc_text
+                yield ""
 
         if self.value and not (isclass(obj) or callable(obj) or ismodule(obj)):
             yield Panel(
