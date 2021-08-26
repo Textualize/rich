@@ -91,7 +91,7 @@ class Panel(JupyterMixin):
             title=title,
             title_align=title_align,
             subtitle=subtitle,
-            subtitle_align=subtitle,
+            subtitle_align=subtitle_align,
             safe_box=safe_box,
             style=style,
             border_style=border_style,

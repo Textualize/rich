@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Added Panel.footer
-- Added Panel.footer_align
+- Added Panel.subtitle
+- Added Panel.subtitle_align
 
 ## [10.7.0] - 2021-08-05
 

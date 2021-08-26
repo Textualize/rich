@@ -15,7 +15,6 @@ Panels will extend to the full width of the terminal. You can make panel *fit* t
     from rich.panel import Panel
     print(Panel.fit("Hello, [red]World!"))
 
-.. The Panel constructor accepts a ``title`` argument which will draw a title within the panel::
 The Panel constructor accepts a ``title`` argument which will draw a title on the top of the panel, as well as a ``subtitle`` argument which will draw a subtitle on the bottom of the panel::
 
     from rich import print
