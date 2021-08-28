@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added Panel.subtitle
 - Added Panel.subtitle_align
+- Fixed a bug where calling `rich.reconfigure` within a `pytest_configure` hook would lead to a crash
 
 ## [10.7.0] - 2021-08-05
 
