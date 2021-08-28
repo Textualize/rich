@@ -101,6 +101,20 @@ class ReprHighlighter(RegexHighlighter):
     ]
 
 
+class JSONHighlighter(RegexHighlighter):
+    """Highlights JSON"""
+
+    base_style = "json."
+    highlights = [
+        _combine_regex(
+            r"(?P<brace>[\{\[\(\)\]\}])",
+            r"\b(?P<bool_true>true)\b|\b(?P<bool_false>false)\b|\b(?P<null>null)\b",
+            r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[\-\+]?\d+?)?\b|0x[0-9a-fA-F]*)",
+            r"(?<![\\\w])(?P<str>b?\".*?(?<!\\)\")",
+        ),
+    ]
+
+
 if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
