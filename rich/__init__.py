@@ -41,6 +41,7 @@ def reconfigure(*args: Any, **kwargs: Any) -> None:
     from rich.console import Console
 
     new_console = Console(*args, **kwargs)
+    _console = get_console()
     _console.__dict__ = new_console.__dict__
 
 
