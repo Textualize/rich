@@ -42,6 +42,8 @@ class Panel(JupyterMixin):
         *,
         title: Optional[TextType] = None,
         title_align: AlignMethod = "center",
+        subtitle: Optional[TextType] = None,
+        subtitle_align: AlignMethod = "center",
         safe_box: Optional[bool] = None,
         expand: bool = True,
         style: StyleType = "none",
@@ -55,6 +57,8 @@ class Panel(JupyterMixin):
         self.box = box
         self.title = title
         self.title_align = title_align
+        self.subtitle = subtitle
+        self.subtitle_align = subtitle_align
         self.safe_box = safe_box
         self.expand = expand
         self.style = style
@@ -72,6 +76,8 @@ class Panel(JupyterMixin):
         *,
         title: Optional[TextType] = None,
         title_align: AlignMethod = "center",
+        subtitle: Optional[TextType] = None,
+        subtitle_align: AlignMethod = "center",
         safe_box: Optional[bool] = None,
         style: StyleType = "none",
         border_style: StyleType = "none",
@@ -84,6 +90,8 @@ class Panel(JupyterMixin):
             box,
             title=title,
             title_align=title_align,
+            subtitle=subtitle,
+            subtitle_align=subtitle_align,
             safe_box=safe_box,
             style=style,
             border_style=border_style,
@@ -106,6 +114,22 @@ class Panel(JupyterMixin):
             title_text.expand_tabs()
             title_text.pad(1)
             return title_text
+        return None
+
+    @property
+    def _subtitle(self) -> Optional[Text]:
+        if self.subtitle:
+            subtitle_text = (
+                Text.from_markup(self.subtitle)
+                if isinstance(self.subtitle, str)
+                else self.subtitle.copy()
+            )
+            subtitle_text.end = ""
+            subtitle_text.plain = subtitle_text.plain.replace("\n", " ")
+            subtitle_text.no_wrap = True
+            subtitle_text.expand_tabs()
+            subtitle_text.pad(1)
+            return subtitle_text
         return None
 
     def __rich_console__(
@@ -168,7 +192,19 @@ class Panel(JupyterMixin):
             yield from line
             yield line_end
             yield new_line
-        yield Segment(box.get_bottom([width - 2]), border_style)
+
+        subtitle_text = self._subtitle
+        if subtitle_text is not None:
+            subtitle_text.style = border_style
+
+        if subtitle_text is None or width <= 4:
+            yield Segment(box.get_bottom([width - 2]), border_style)
+        else:
+            subtitle_text.align(self.subtitle_align, width - 4, character=box.bottom)
+            yield Segment(box.bottom_left + box.bottom, border_style)
+            yield from console.render(subtitle_text)
+            yield Segment(box.bottom + box.bottom_right, border_style)
+
         yield new_line
 
     def __rich_measure__(
