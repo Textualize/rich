@@ -5,7 +5,7 @@ from .highlighter import JSONHighlighter, NullHighlighter
 
 
 class JSON:
-    """A rebderable which pretty prints JSON.
+    """A renderable which pretty prints JSON.
 
     Args:
         json (str): JSON encoded data.
