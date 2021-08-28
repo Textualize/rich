@@ -26,39 +26,28 @@ class JSON:
 
 
 if __name__ == "__main__":
-    j = """
-{ "atomic": [false, true, null],
-    "widget": {
-    "debug": true,
-    "window": {
-        "title": "Sample Konfabulator Widget",
-        "name": "main_window",
-        "width": 500,
-        "height": 500
-    },
-    "image": { 
-        "src": "Images/Sun.png",
-        "name": "sun1",
-        "hOffset": 250,
-        "vOffset": 250,
-        "alignment": "center"
-    },
-    "text": {
-        "data": "Click Here",
-        "size": 36,
-        "style": "bold",
-        "name": "text1",
-        "hOffset": 250,
-        "vOffset": 100,
-        "alignment": "center",
-        "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
-    }
-}} 
-    """
+
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser(description="Pretty print json")
+    parser.add_argument(
+        "path",
+        metavar="PATH",
+        help="path to file, or - for stdin",
+    )
+    args = parser.parse_args()
+
     from rich.console import Console
 
     console = Console()
+    error_console = Console(stderr=True)
 
-    print(dumps(loads(j)))
+    try:
+        with open(args.path, "rt") as json_file:
+            json_data = json_file.read()
+    except Exception as error:
+        error_console.print(f"Unable to read {args.path!r}; {error}")
+        sys.exit(-1)
 
-    console.print(JSON(j), soft_wrap=True)
+    console.print(JSON(json_data), soft_wrap=True)

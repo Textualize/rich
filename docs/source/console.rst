@@ -86,6 +86,10 @@ Because printing JSON is a common requirement, you may import ``print_json`` fro
 
     from rich import print_json
 
+You can also pretty print JSON via the command line with the following::
+
+    python -m rich.json cats.json
+
 
 Low level output
 ----------------
