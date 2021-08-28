@@ -77,10 +77,10 @@ The :meth:`~rich.console.Console.print_json` method will pretty print (format an
 
     console.print_json('[false, true, null, "foo"]')
 
-You can also *log* json by printing a :class:`~rich.json.JSON` object::
+You can also *log* json by logging a :class:`~rich.json.JSON` object::
 
     from rich.json import JSON
-    console.print_json(JSON('["foo", "bar"]'))
+    console.log(JSON('["foo", "bar"]'))
 
 Because printing JSON is a common requirement, you may import ``print_json`` from the main namespace::
 
