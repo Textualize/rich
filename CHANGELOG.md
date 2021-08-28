@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Panel.subtitle
 - Added Panel.subtitle_align
+- Added rich.json.JSON
+- Added rich.print_json and Console.print_json
 
 ### Fixed
 
