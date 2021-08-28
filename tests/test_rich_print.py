@@ -28,6 +28,16 @@ def test_rich_print():
         console.file = backup_file
 
 
+def test_rich_print_json():
+    console = rich.get_console()
+    with console.capture() as capture:
+        rich.print_json('[false, true, null, "foo"]')
+    result = capture.get()
+    print(repr(result))
+    expected = '[\n    false,\n    true,\n    null,\n    "foo"\n]\n'
+    assert result == expected
+
+
 def test_rich_print_X():
     console = rich.get_console()
     output = io.StringIO()

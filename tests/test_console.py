@@ -117,6 +117,15 @@ def test_print():
     assert console.file.getvalue() == "foo\n"
 
 
+def test_print_json():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print_json('[false, true, null, "foo"]')
+    result = console.file.getvalue()
+    print(repr(result))
+    expected = '\x1b[1m[\x1b[0m\n    \x1b[3;91mfalse\x1b[0m,\n    \x1b[3;92mtrue\x1b[0m,\n    \x1b[3;35mnull\x1b[0m,\n    \x1b[32m"foo"\x1b[0m\n\x1b[1m]\x1b[0m\n'
+    assert result == expected
+
+
 def test_log():
     console = Console(
         file=io.StringIO(),

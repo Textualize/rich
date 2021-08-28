@@ -69,6 +69,24 @@ The :meth:`~rich.console.Console.log` methods offers the same capabilities as pr
 
 To help with debugging, the log() method has a ``log_locals`` parameter. If you set this to ``True``, Rich will display a table of local variables where the method was called.
 
+
+Printing JSON
+-------------
+
+The :meth:`~rich.console.Console.print_json` method will pretty print (format and style) a string containing JSON. Here's a short example::
+
+    console.print_json('[false, true, null, "foo"]')
+
+You can also *log* json by printing a :class:`~rich.json.JSON` object::
+
+    from rich.json import JSON
+    console.print_json(JSON('["foo", "bar"]'))
+
+Because printing JSON is a common requirement, you may import ``print_json`` from the main namespace::
+
+    from rich import print_json
+
+
 Low level output
 ----------------
 
@@ -77,6 +95,7 @@ In additional to :meth:`~rich.console.Console.print` and :meth:`~rich.console.Co
 Here's an example::
 
     >>> console.out("Locals", locals())
+
 
 Rules
 -----

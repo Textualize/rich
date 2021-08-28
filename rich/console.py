@@ -1583,6 +1583,7 @@ class Console:
                 height=height,
                 no_wrap=no_wrap,
                 markup=markup,
+                highlight=highlight,
             )
 
             new_segments: List[Segment] = []
@@ -1612,6 +1613,17 @@ class Console:
                     buffer_extend(line)
             else:
                 self._buffer.extend(new_segments)
+
+    def print_json(self, json:str, indent:int=4, highlight:bool=True) -> None:
+        """Pretty prints JSON. Output will be valid JSON.
+
+        Args:
+            json (str): A string containing JSON.
+            indent (int, optional): Number of spaces to indent. Defaults to 4.
+        """
+        from rich.json import JSON
+        json_renderable = JSON(json, indent=indent, highlight=highlight)
+        self.print(json_renderable)
 
     def update_screen(
         self,

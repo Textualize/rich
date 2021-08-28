@@ -69,6 +69,17 @@ def print(
     return write_console.print(*objects, sep=sep, end=end)
 
 
+def print_json(json: str, indent: int = 4, highlight: bool = True) -> None:
+    """Pretty prints JSON. Output will be valid JSON.
+
+    Args:
+        json (str): A string containing JSON.
+        indent (int, optional): Number of spaces to indent. Defaults to 4.
+    """
+
+    get_console().print_json(json, indent=indent, highlight=highlight)
+
+
 def inspect(
     obj: Any,
     *,
