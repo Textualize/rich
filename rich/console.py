@@ -1614,7 +1614,7 @@ class Console:
             else:
                 self._buffer.extend(new_segments)
 
-    def print_json(self, json: str, indent: int = 4, highlight: bool = True) -> None:
+    def print_json(self, json: str, *, indent: int = 4, highlight: bool = True) -> None:
         """Pretty prints JSON. Output will be valid JSON.
 
         Args:
