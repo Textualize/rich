@@ -54,6 +54,7 @@ if __name__ == "__main__":
         "path",
         metavar="PATH",
         help="path to file, or - for stdin",
+        nargs='?',
     )
     parser.add_argument(
         "-i",
@@ -69,10 +70,13 @@ if __name__ == "__main__":
 
     console = Console()
     error_console = Console(stderr=True)
-
+        
     try:
-        with open(args.path, "rt") as json_file:
-            json_data = json_file.read()
+        if args.path is None:
+            json_data = sys.stdin.read()
+        else:
+            with open(args.path, "rt") as json_file:
+                json_data = json_file.read()
     except Exception as error:
         error_console.print(f"Unable to read {args.path!r}; {error}")
         sys.exit(-1)
