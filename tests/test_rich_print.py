@@ -38,6 +38,32 @@ def test_rich_print_json():
     assert result == expected
 
 
+def test_rich_print_json_with_key():
+    console = rich.get_console()
+    with console.capture() as capture:
+        rich.print_json(
+            """{"user":"suresh","skill":{"languages":["python","javascript","golang"],"cloud":["google cloud","aws"]}}""",
+            key="skill",
+        )
+    result = capture.get()
+    print(repr(result))
+    expected = '{\n  "languages": [\n    "python",\n    "javascript",\n    "golang"\n  ],\n  "cloud": [\n    "google cloud",\n    "aws"\n  ]\n}\n'
+    assert result == expected
+
+
+def test_rich_print_json_without_key():
+    console = rich.get_console()
+    with console.capture() as capture:
+        rich.print_json(
+            """{"user":"suresh","skill":{"languages":["python","javascript","golang"],"cloud":["google cloud","aws"]}}""",
+            key="invalid",
+        )
+    result = capture.get()
+    print(repr(result))
+    expected = "null\n"
+    assert result == expected
+
+
 def test_rich_print_X():
     console = rich.get_console()
     output = io.StringIO()
