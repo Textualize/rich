@@ -1621,6 +1621,7 @@ class Console:
         data: Any = None,
         indent: int = 2,
         highlight: bool = True,
+        key: Any = None,
     ) -> None:
         """Pretty prints JSON. Output will be valid JSON.
 
@@ -1633,13 +1634,15 @@ class Console:
         from rich.json import JSON
 
         if json is None:
-            json_renderable = JSON.from_data(data, indent=indent, highlight=highlight)
+            json_renderable = JSON.from_data(
+                data, indent=indent, highlight=highlight, key=key
+            )
         else:
             if not isinstance(json, str):
                 raise TypeError(
                     f"json must be str. Did you mean print_json(data={json!r}) ?"
                 )
-            json_renderable = JSON(json, indent=indent, highlight=highlight)
+            json_renderable = JSON(json, indent=indent, highlight=highlight, key=key)
         self.print(json_renderable)
 
     def update_screen(

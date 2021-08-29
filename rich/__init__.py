@@ -75,6 +75,7 @@ def print_json(
     data: Any = None,
     indent: int = 2,
     highlight: bool = True,
+    key: Any = None,
 ) -> None:
     """Pretty prints JSON. Output will be valid JSON.
 
@@ -85,7 +86,9 @@ def print_json(
         highlight (bool, optional): Enable highlighting of output: Defaults to True.
     """
 
-    get_console().print_json(json, data=data, indent=indent, highlight=highlight)
+    get_console().print_json(
+        json, data=data, indent=indent, highlight=highlight, key=key
+    )
 
 
 def inspect(

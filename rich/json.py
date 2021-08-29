@@ -14,8 +14,12 @@ class JSON:
         highlight (bool, optional): Enable highlighting. Defaults to 2.
     """
 
-    def __init__(self, json: str, indent: int = 2, highlight: bool = True) -> None:
+    def __init__(
+        self, json: str, indent: int = 2, highlight: bool = True, key: Any = None
+    ) -> None:
         data = loads(json)
+        if key and isinstance(data, dict):
+            data = data.get(key)
         json = dumps(data, indent=indent)
         highlighter = JSONHighlighter() if highlight else NullHighlighter()
         self.text = highlighter(json)
@@ -23,7 +27,9 @@ class JSON:
         self.text.overflow = None
 
     @classmethod
-    def from_data(cls, data: Any, indent: int = 2, highlight: bool = True) -> "JSON":
+    def from_data(
+        cls, data: Any, indent: int = 2, highlight: bool = True, key: Any = None
+    ) -> "JSON":
         """Encodes a JSON object from arbitrary data.
 
         Returns:
@@ -33,6 +39,8 @@ class JSON:
                 highlight (bool, optional): Enable highlighting. Defaults to True.
         """
         json_instance: "JSON" = cls.__new__(cls)
+        if key and isinstance(data, dict):
+            data = data.get(key)
         json = dumps(data, indent=indent)
         highlighter = JSONHighlighter() if highlight else NullHighlighter()
         json_instance.text = highlighter(json)
