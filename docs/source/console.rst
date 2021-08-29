@@ -82,6 +82,11 @@ You can also *log* json by logging a :class:`~rich.json.JSON` object::
     from rich.json import JSON
     console.log(JSON('["foo", "bar"]'))
 
+You can also pretty print a specific key in the json by passing a key as kwarg to print_json, if the key does not exist it will return null::
+
+    console.print_json("""{"user":"alex","skill":{"languages":["python","javascript","golang"],"cloud":["google cloud","aws"]}}""",
+    key="skill")
+
 Because printing JSON is a common requirement, you may import ``print_json`` from the main namespace::
 
     from rich import print_json
@@ -89,6 +94,7 @@ Because printing JSON is a common requirement, you may import ``print_json`` fro
 You can also pretty print JSON via the command line with the following::
 
     python -m rich.json cats.json
+    python -m rich.json cats.json --k key
 
 
 Low level output
