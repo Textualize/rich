@@ -53,7 +53,6 @@ class JSON:
 
 
 if __name__ == "__main__":
-    # Todo fix
     import argparse
     import sys
 
