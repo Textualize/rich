@@ -1614,17 +1614,32 @@ class Console:
             else:
                 self._buffer.extend(new_segments)
 
-    def print_json(self, json: str, *, indent: int = 4, highlight: bool = True) -> None:
+    def print_json(
+        self,
+        json: Optional[str] = None,
+        *,
+        data: Any = None,
+        indent: int = 2,
+        highlight: bool = True,
+    ) -> None:
         """Pretty prints JSON. Output will be valid JSON.
 
         Args:
-            json (str): A string containing JSON.
+            json (Optional[str]): A string containing JSON.
+            data (Any): If not json is supplied, then encode this data.
             indent (int, optional): Number of spaces to indent. Defaults to 4.
             highlight (bool, optional): Enable highlighting of output: Defaults to True.
         """
         from rich.json import JSON
 
-        json_renderable = JSON(json, indent=indent, highlight=highlight)
+        if json is None:
+            json_renderable = JSON.from_data(data, indent=indent, highlight=highlight)
+        else:
+            if not isinstance(json, str):
+                raise TypeError(
+                    f"json must be str. Did you mean print_json(data={json!r}) ?"
+                )
+            json_renderable = JSON(json, indent=indent, highlight=highlight)
         self.print(json_renderable)
 
     def update_screen(

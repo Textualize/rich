@@ -94,6 +94,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "json.null": Style(color="magenta", italic=True),
     "json.number": Style(color="cyan", bold=True, italic=False),
     "json.str": Style(color="green", italic=False, bold=False),
+    "json.key": Style(color="blue", bold=True),
     "prompt": Style.null(),
     "prompt.choices": Style(color="magenta", bold=True),
     "prompt.default": Style(color="cyan", bold=True),

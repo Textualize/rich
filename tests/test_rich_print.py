@@ -31,7 +31,7 @@ def test_rich_print():
 def test_rich_print_json():
     console = rich.get_console()
     with console.capture() as capture:
-        rich.print_json('[false, true, null, "foo"]')
+        rich.print_json('[false, true, null, "foo"]', indent=4)
     result = capture.get()
     print(repr(result))
     expected = '[\n    false,\n    true,\n    null,\n    "foo"\n]\n'
