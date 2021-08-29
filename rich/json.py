@@ -11,7 +11,7 @@ class JSON:
     Args:
         json (str): JSON encoded data.
         indent (int, optional): Number of characters to indent by. Defaults to True.
-        highlight (bool, optional): Enable highlighting. Defaults to True.
+        highlight (bool, optional): Enable highlighting. Defaults to 2.
     """
 
     def __init__(self, json: str, indent: int = 2, highlight: bool = True) -> None:
@@ -29,7 +29,7 @@ class JSON:
         Returns:
             Args:
                 data (Any): An object that may be encoded in to JSON
-                indent (int, optional): Number of characters to indent by. Defaults to True.
+                indent (int, optional): Number of characters to indent by. Defaults to 2.
                 highlight (bool, optional): Enable highlighting. Defaults to True.
         """
         json_instance: "JSON" = cls.__new__(cls)

@@ -1626,8 +1626,8 @@ class Console:
 
         Args:
             json (Optional[str]): A string containing JSON.
-            data (Any): If not json is supplied, then encode this data.
-            indent (int, optional): Number of spaces to indent. Defaults to 4.
+            data (Any): If json is not supplied, then encode this data.
+            indent (int, optional): Number of spaces to indent. Defaults to 2.
             highlight (bool, optional): Enable highlighting of output: Defaults to True.
         """
         from rich.json import JSON
