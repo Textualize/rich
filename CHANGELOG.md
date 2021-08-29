@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added data parameter to print_json method / function
+- Added an --indent parameter to python -m rich.json
 
 ### Changed
 
