@@ -50,7 +50,7 @@ def print(
     sep: str = " ",
     end: str = "\n",
     file: Optional[IO[str]] = None,
-    flush: bool = False
+    flush: bool = False,
 ) -> None:
     r"""Print object(s) supplied via positional arguments.
     This function has an identical signature to the built-in print.
@@ -69,16 +69,23 @@ def print(
     return write_console.print(*objects, sep=sep, end=end)
 
 
-def print_json(json: str, *, indent: int = 4, highlight: bool = True) -> None:
+def print_json(
+    json: Optional[str] = None,
+    *,
+    data: Any = None,
+    indent: int = 2,
+    highlight: bool = True,
+) -> None:
     """Pretty prints JSON. Output will be valid JSON.
 
     Args:
         json (str): A string containing JSON.
+        data (Any): If not json is supplied, then encode this data.
         indent (int, optional): Number of spaces to indent. Defaults to 4.
         highlight (bool, optional): Enable highlighting of output: Defaults to True.
     """
 
-    get_console().print_json(json, indent=indent, highlight=highlight)
+    get_console().print_json(json, data=data, indent=indent, highlight=highlight)
 
 
 def inspect(
@@ -93,7 +100,7 @@ def inspect(
     dunder: bool = False,
     sort: bool = True,
     all: bool = False,
-    value: bool = True
+    value: bool = True,
 ) -> None:
     """Inspect any Python object.
 

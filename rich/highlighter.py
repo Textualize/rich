@@ -112,6 +112,7 @@ class JSONHighlighter(RegexHighlighter):
             r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[\-\+]?\d+?)?\b|0x[0-9a-fA-F]*)",
             r"(?<![\\\w])(?P<str>b?\".*?(?<!\\)\")",
         ),
+        r"(?<![\\\w])(?P<key>b?\".*?(?<!\\)\")\:",
     ]
 
 
