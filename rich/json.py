@@ -54,7 +54,7 @@ if __name__ == "__main__":
         "path",
         metavar="PATH",
         help="path to file, or - for stdin",
-        nargs='?',
+        nargs="?",
     )
     parser.add_argument(
         "-i",
@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
     console = Console()
     error_console = Console(stderr=True)
-        
+
     try:
         if args.path is None:
             json_data = sys.stdin.read()
