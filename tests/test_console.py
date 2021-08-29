@@ -126,6 +126,12 @@ def test_print_json():
     assert result == expected
 
 
+def test_print_json_error():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    with pytest.raises(TypeError):
+        console.print_json(["foo"], indent=4)
+
+
 def test_print_json_data():
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print_json(data=[False, True, None, "foo"], indent=4)

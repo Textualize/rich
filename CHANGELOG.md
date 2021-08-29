@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Changed default indent of JSON to 2 (down from 4)
 - Changed highlighting of JSON keys to new style (bold blue)
 
 ## [10.8.0] - 2020-08-28
