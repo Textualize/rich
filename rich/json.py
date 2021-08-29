@@ -53,7 +53,7 @@ class JSON:
 
 
 if __name__ == "__main__":
-
+    # Todo fix
     import argparse
     import sys
 
@@ -71,8 +71,15 @@ if __name__ == "__main__":
         help="Number of spaces in an indent",
         default=2,
     )
+    parser.add_argument(
+        "-k",
+        "--key",
+        metavar="SPACES",
+        type=str,
+        help="print value(s) of a key from the json",
+        default=None,
+    )
     args = parser.parse_args()
-
     from rich.console import Console
 
     console = Console()
@@ -85,4 +92,4 @@ if __name__ == "__main__":
         error_console.print(f"Unable to read {args.path!r}; {error}")
         sys.exit(-1)
 
-    console.print(JSON(json_data, indent=args.indent), soft_wrap=True)
+    console.print(JSON(json_data, indent=args.indent, key=args.key), soft_wrap=True)
