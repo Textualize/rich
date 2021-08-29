@@ -32,7 +32,7 @@ class JSON:
                 indent (int, optional): Number of characters to indent by. Defaults to True.
                 highlight (bool, optional): Enable highlighting. Defaults to True.
         """
-        json_instance = cls.__new__(cls)
+        json_instance: "JSON" = cls.__new__(cls)
         json = dumps(data, indent=indent)
         highlighter = JSONHighlighter() if highlight else NullHighlighter()
         json_instance.text = highlighter(json)
