@@ -23,7 +23,7 @@ class JSON:
         self.text.overflow = None
 
     @classmethod
-    def from_data(cls, data: Any, indent: int = 4, highlight: bool = True) -> "JSON":
+    def from_data(cls, data: Any, indent: int = 2, highlight: bool = True) -> "JSON":
         """Encodes a JSON object from arbitrary data.
 
         Returns:
@@ -61,6 +61,7 @@ if __name__ == "__main__":
         metavar="SPACES",
         type=int,
         help="Number of spaces in an indent",
+        default=2,
     )
     args = parser.parse_args()
 
