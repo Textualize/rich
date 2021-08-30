@@ -71,8 +71,11 @@ if __name__ == "__main__":
     error_console = Console(stderr=True)
 
     try:
-        with open(args.path, "rt") as json_file:
-            json_data = json_file.read()
+        if args.path == "-":
+            json_data = sys.stdin.read()
+        else:
+            with open(args.path, "rt") as json_file:
+                json_data = json_file.read()
     except Exception as error:
         error_console.print(f"Unable to read {args.path!r}; {error}")
         sys.exit(-1)
