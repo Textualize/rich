@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added stdin support to `rich.json`
 
-## [10.9.0] - 2020-08-29
+## [10.9.0] - 2021-08-29
 
 ### Added
 
@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed default indent of JSON to 2 (down from 4)
 - Changed highlighting of JSON keys to new style (bold blue)
 
-## [10.8.0] - 2020-08-28
+## [10.8.0] - 2021-08-28
 
 ### Added
 
@@ -147,7 +147,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed initial blank lines removed from Syntax https://github.com/willmcgugan/rich/issues/1214
 
-## [10.1.0] - 2020-04-03
+## [10.1.0] - 2021-04-03
 
 ### Fixed
 
