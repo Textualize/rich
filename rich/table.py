@@ -134,7 +134,7 @@ class Table(JupyterMixin):
         show_lines (bool, optional): Draw lines between every row. Defaults to False.
         leading (bool, optional): Number of blank lines between rows (precludes ``show_lines``). Defaults to 0.
         style (Union[str, Style], optional): Default style for the table. Defaults to "none".
-        row_styles (List[Union, str], optional): Optional list of row styles, if more that one style is give then the styles will alternate. Defaults to None.
+        row_styles (List[Union, str], optional): Optional list of row styles, if more than one style is given then the styles will alternate. Defaults to None.
         header_style (Union[str, Style], optional): Style of the header. Defaults to "table.header".
         footer_style (Union[str, Style], optional): Style of the footer. Defaults to "table.footer".
         border_style (Union[str, Style], optional): Style of the border. Defaults to None.
