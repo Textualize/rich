@@ -1,14 +1,12 @@
 import colorsys
 import io
 from time import process_time
-from typing import Any
 
 from rich import box
 from rich.color import Color
 from rich.console import (
     Console,
     ConsoleOptions,
-    ConsoleRenderable,
     Group,
     RenderResult,
     RenderableType,

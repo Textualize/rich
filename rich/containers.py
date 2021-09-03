@@ -5,7 +5,6 @@ from typing import (
     List,
     Optional,
     Union,
-    cast,
     overload,
     TypeVar,
     TYPE_CHECKING,

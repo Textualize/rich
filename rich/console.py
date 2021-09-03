@@ -5,7 +5,6 @@ import shutil
 import sys
 import threading
 from abc import ABC, abstractmethod
-from collections import abc
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import wraps
