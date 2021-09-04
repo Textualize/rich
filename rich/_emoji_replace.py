@@ -1,14 +1,5 @@
-import sys
 from typing import Callable, Match, Optional
-
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal  # pragma: no cover
-
-
 import re
-
 
 from ._emoji_codes import EMOJI
 

@@ -1,4 +1,3 @@
-import sys
 from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Sized
