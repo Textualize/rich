@@ -395,9 +395,9 @@ def test_export_text():
 
 def test_export_html():
     console = Console(record=True, width=100)
-    console.print("[b]foo [link=https://example.org]Click[/link]")
+    console.print("[b]foo <script> 'test' [link=https://example.org]Click[/link]")
     html = console.export_html()
-    expected = '<!DOCTYPE html>\n<head>\n<meta charset="UTF-8">\n<style>\n.r1 {font-weight: bold}\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><span class="r1">foo </span><a class="r1" href="https://example.org">Click</a>\n</pre>\n    </code>\n</body>\n</html>\n'
+    expected = '<!DOCTYPE html>\n<head>\n<meta charset="UTF-8">\n<style>\n.r1 {font-weight: bold}\n.r2 {color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold}\n.r3 {color: #008000; text-decoration-color: #008000; font-weight: bold}\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><span class="r1">foo &lt;</span><span class="r2">script</span><span class="r1">&gt; </span><span class="r3">&#x27;test&#x27;</span><span class="r1"> </span><a class="r1" href="https://example.org">Click</a>\n</pre>\n    </code>\n</body>\n</html>\n'
     assert html == expected
 
 
@@ -405,7 +405,6 @@ def test_export_html_inline():
     console = Console(record=True, width=100)
     console.print("[b]foo [link=https://example.org]Click[/link]")
     html = console.export_html(inline_styles=True)
-    print(repr(html))
     expected = '<!DOCTYPE html>\n<head>\n<meta charset="UTF-8">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><span style="font-weight: bold">foo </span><span style="font-weight: bold"><a href="https://example.org">Click</a></span>\n</pre>\n    </code>\n</body>\n</html>\n'
     assert html == expected
 
