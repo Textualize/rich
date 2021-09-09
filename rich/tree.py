@@ -18,6 +18,7 @@ class Tree(JupyterMixin):
         guide_style (StyleType, optional): Style of the guide lines. Defaults to "tree.line".
         expanded (bool, optional): Also display children. Defaults to True.
         highlight (bool, optional): Highlight renderable (if str). Defaults to False.
+        arrows (Optional[bool], optional): Show arrows at the end of guide lines. Defaults to False.
     """
 
     def __init__(
@@ -28,6 +29,7 @@ class Tree(JupyterMixin):
         guide_style: StyleType = "tree.line",
         expanded: bool = True,
         highlight: bool = False,
+        arrows: bool = False,
     ) -> None:
         self.label = label
         self.style = style
@@ -35,6 +37,7 @@ class Tree(JupyterMixin):
         self.children: List[Tree] = []
         self.expanded = expanded
         self.highlight = highlight
+        self.arrows = arrows
 
     def add(
         self,
@@ -44,6 +47,7 @@ class Tree(JupyterMixin):
         guide_style: Optional[StyleType] = None,
         expanded: bool = True,
         highlight: bool = False,
+        arrows: bool = False,
     ) -> "Tree":
         """Add a child tree.
 
@@ -53,6 +57,7 @@ class Tree(JupyterMixin):
             guide_style (StyleType, optional): Style of the guide lines. Defaults to "tree.line".
             expanded (bool, optional): Also display children. Defaults to True.
             highlight (Optional[bool], optional): Highlight renderable (if str). Defaults to False.
+            arrows (Optional[bool], optional): Show arrows at the end of guide lines. Defaults to False.
 
         Returns:
             Tree: A new child Tree, which may be further modified.
@@ -63,6 +68,7 @@ class Tree(JupyterMixin):
             guide_style=self.guide_style if guide_style is None else guide_style,
             expanded=expanded,
             highlight=self.highlight if highlight is None else highlight,
+            arrows=self.arrows if arrows is None else arrows,
         )
         self.children.append(node)
         return node
@@ -79,13 +85,13 @@ class Tree(JupyterMixin):
         get_style = console.get_style
         null_style = Style.null()
         guide_style = get_style(self.guide_style, default="") or null_style
-        SPACE, CONTINUE, FORK, END = range(4)
+        SPACE, CONTINUE, FORK, FORKARROW, END, ENDARROW = range(6)
 
-        ASCII_GUIDES = ("    ", "|   ", "+-- ", "`-- ")
+        ASCII_GUIDES = ("    ", "|   ", "+-- ", "`-- ", "+-> ", "`-> ")
         TREE_GUIDES = [
-            ("    ", "│   ", "├── ", "└── "),
-            ("    ", "┃   ", "┣━━ ", "┗━━ "),
-            ("    ", "║   ", "╠══ ", "╚══ "),
+            ("    ", "│   ", "├── ", "├─🞂 ", "└── ", "└─🞂 "),
+            ("    ", "┃   ", "┣━━ ", "┣━🞂 ", "┗━━ ", "┗━🞂 "),
+            ("    ", "║   ", "╠══ ", "╠═🞂 ", "╚══ ", "╚═🞂 "),
         ]
         _Segment = Segment
 
@@ -113,13 +119,17 @@ class Tree(JupyterMixin):
                 levels.pop()
                 if levels:
                     guide_style = levels[-1].style or null_style
-                    levels[-1] = make_guide(FORK, guide_style)
+                    levels[-1] = make_guide(
+                        FORKARROW if self.arrows else FORK, guide_style
+                    )
                     guide_style_stack.pop()
                     style_stack.pop()
                 continue
             push(stack_node)
             if last:
-                levels[-1] = make_guide(END, levels[-1].style or null_style)
+                levels[-1] = make_guide(
+                    ENDARROW if self.arrows else END, levels[-1].style or null_style
+                )
 
             guide_style = guide_style_stack.current + get_style(node.guide_style)
             style = style_stack.current + get_style(node.style)
@@ -151,9 +161,19 @@ class Tree(JupyterMixin):
                 levels[-1] = make_guide(
                     SPACE if last else CONTINUE, levels[-1].style or null_style
                 )
-                levels.append(
-                    make_guide(END if len(node.children) == 1 else FORK, guide_style)
-                )
+                if self.arrows:
+                    levels.append(
+                        make_guide(
+                            ENDARROW if len(node.children) == 1 else FORKARROW,
+                            guide_style,
+                        )
+                    )
+                else:
+                    levels.append(
+                        make_guide(
+                            END if len(node.children) == 1 else FORK, guide_style
+                        )
+                    )
                 style_stack.push(get_style(node.style))
                 guide_style_stack.push(get_style(node.guide_style))
                 push(iter(loop_last(node.children)))
