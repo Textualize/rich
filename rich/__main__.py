@@ -153,7 +153,7 @@ def make_test_card() -> Table:
     )
     example_table.add_row(
         "May 19, 1999",
-        "Star Wars Ep. [b]I[/b]: [i]The phantom Menace",
+        "Star Wars Ep. [b]I[/b]: [i]The Phantom Menace",
         "$115,000,000",
         "$1,027,044,677",
     )
