@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added stdin support to `rich.json`
 
+### Fixed
+
+- Fixed pretty.traverse, for some edge cases when `__getattr__` forces casting, leading to a exception.
+
 ## [10.9.0] - 2021-08-29
 
 ### Added
