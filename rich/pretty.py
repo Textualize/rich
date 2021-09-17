@@ -503,6 +503,25 @@ def traverse(
                 else:
                     yield arg
 
+        original_getattr_method = None
+
+        if (
+            hasattr(obj, "__rich_repr__")
+            and hasattr(obj, "__getattr__")
+            and not isclass(obj)
+        ):
+            original_getattr_method = obj.__getattr__
+
+            def patch(self, name):
+                if name == "__rich_repr__":
+                    # __getattr__ is rich
+                    return self.__getattribute__(name)
+                else:
+                    # __getattr__ is original
+                    return original_getattr_method(name)
+
+            obj.__class__.__getattr__ = patch
+
         if hasattr(obj, "__rich_repr__") and not isclass(obj):
             angular = getattr(obj.__rich_repr__, "angular", False)
             args = list(iter_rich_args(obj.__rich_repr__()))
@@ -675,6 +694,9 @@ def traverse(
         else:
             node = Node(value_repr=to_repr(obj), last=root)
         node.is_tuple = isinstance(obj, tuple)
+
+        if original_getattr_method is not None:
+            obj.__class__.__getattr__ = original_getattr_method
         return node
 
     node = _traverse(_object, root=True)
