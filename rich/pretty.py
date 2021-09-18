@@ -504,12 +504,20 @@ def traverse(
                 else:
                     yield arg
 
-        rich_repr_result: Optional[RichReprResult] = None
         try:
-            if hasattr(obj, "__rich_repr__") and not isclass(obj):
-                rich_repr_result = obj.__rich_repr__()
+            fake_attributes = hasattr(
+                obj, "awehoi234_wdfjwljet234_234wdfoijsdfmmnxpi492", False
+            )
         except Exception:
-            pass
+            fake_attributes = False
+
+        rich_repr_result: Optional[RichReprResult] = None
+        if not fake_attributes:
+            try:
+                if hasattr(obj, "__rich_repr__") and not isclass(obj):
+                    rich_repr_result = obj.__rich_repr__()
+            except Exception:
+                pass
 
         if rich_repr_result is not None:
             angular = getattr(obj.__rich_repr__, "angular", False)
@@ -552,7 +560,7 @@ def traverse(
                     children=[],
                     last=root,
                 )
-        elif _is_attr_object(obj):
+        elif _is_attr_object(obj) and not fake_attributes:
             children = []
             append = children.append
 
@@ -600,6 +608,7 @@ def traverse(
         elif (
             is_dataclass(obj)
             and not isinstance(obj, type)
+            and not fake_attributes
             and (
                 "__create_fn__" in obj.__repr__.__qualname__ or py_version == (3, 6)
             )  # Check if __repr__ wasn't overridden
