@@ -506,7 +506,7 @@ def traverse(
 
         try:
             fake_attributes = hasattr(
-                obj, "awehoi234_wdfjwljet234_234wdfoijsdfmmnxpi492", False
+                obj, "awehoi234_wdfjwljet234_234wdfoijsdfmmnxpi492"
             )
         except Exception:
             fake_attributes = False
