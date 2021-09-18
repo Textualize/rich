@@ -1,5 +1,6 @@
 import builtins
 import os
+from rich.repr import RichReprResult
 import sys
 from array import array
 from collections import Counter, defaultdict, deque, UserDict, UserList
@@ -503,9 +504,16 @@ def traverse(
                 else:
                     yield arg
 
-        if hasattr(obj, "__rich_repr__") and not isclass(obj):
+        rich_repr_result: Optional[RichReprResult] = None
+        try:
+            if hasattr(obj, "__rich_repr__") and not isclass(obj):
+                rich_repr_result: Optional[RichReprResult] = obj.__rich_repr__()
+        except Exception:
+            pass
+
+        if rich_repr_result is not None:
             angular = getattr(obj.__rich_repr__, "angular", False)
-            args = list(iter_rich_args(obj.__rich_repr__()))
+            args = list(iter_rich_args(rich_repr_result))
             class_name = obj.__class__.__name__
 
             if args:

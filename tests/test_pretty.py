@@ -250,3 +250,15 @@ def test_user_dict():
     result = pretty_repr(d2, expand_all=True)
     print(repr(result))
     assert result == "FOO"
+
+
+def test_lying_attribute():
+    """Test getattr doesn't break rich repr protocol"""
+
+    class Foo:
+        def __getattr__(self, attr):
+            return "foo"
+
+    foo = Foo()
+    result = pretty_repr(foo)
+    assert "Foo" in result
