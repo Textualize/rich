@@ -23,6 +23,10 @@ class _Bit:
         self.bit = 1 << bit_no
 
     def __get__(self, obj: "Style", objtype: Type["Style"]) -> Optional[bool]:
+        # If Style object has not been instantiated `obj` will be `None`
+        if obj is None:
+            return None
+
         if obj._set_attributes & self.bit:
             return obj._attributes & self.bit != 0
         return None
