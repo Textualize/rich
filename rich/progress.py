@@ -664,6 +664,7 @@ class Progress(JupyterMixin):
         total: Optional[float] = None,
         task_id: Optional[TaskID] = None,
         description: str = "Working...",
+        transient: bool = False,
         update_period: float = 0.1,
     ) -> Iterable[ProgressType]:
         """Track progress by iterating over a sequence.
@@ -693,19 +694,23 @@ class Progress(JupyterMixin):
             task_id = self.add_task(description, total=task_total)
         else:
             self.update(task_id, total=task_total)
-
-        if self.live.auto_refresh:
-            with _TrackThread(self, task_id, update_period) as track_thread:
+        try:
+            if self.live.auto_refresh:
+                with _TrackThread(self, task_id, update_period) as track_thread:
+                    for value in sequence:
+                        yield value
+                        track_thread.completed += 1
+            else:
+                advance = self.advance
+                refresh = self.refresh
                 for value in sequence:
                     yield value
-                    track_thread.completed += 1
-        else:
-            advance = self.advance
-            refresh = self.refresh
-            for value in sequence:
-                yield value
-                advance(task_id, 1)
-                refresh()
+                    advance(task_id, 1)
+                    refresh()
+        finally:
+            if transient:
+                self.update(task_id, visible=False)
+            
 
     def start_task(self, task_id: TaskID) -> None:
         """Start a task.
