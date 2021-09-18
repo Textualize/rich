@@ -507,7 +507,7 @@ def traverse(
         rich_repr_result: Optional[RichReprResult] = None
         try:
             if hasattr(obj, "__rich_repr__") and not isclass(obj):
-                rich_repr_result: Optional[RichReprResult] = obj.__rich_repr__()
+                rich_repr_result = obj.__rich_repr__()
         except Exception:
             pass
 
