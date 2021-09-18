@@ -24,7 +24,7 @@ class _Bit:
 
     def __get__(self, obj: "Style", objtype: Type["Style"]) -> Optional[bool]:
         # If Style object has not been instantiated `obj` will be `None`
-        if obj is None:
+        if obj is None:  # noqa
             return None
 
         if obj._set_attributes & self.bit:
