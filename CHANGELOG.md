@@ -5,11 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [10.10.0] - Unreleased
 
 ### Added
 
 - Added stdin support to `rich.json`
+
+### Fixed
+
+- Fixed pretty printing of objects with fo magic with **getattr** https://github.com/willmcgugan/rich/issues/1492
 
 ## [10.9.0] - 2021-08-29
 
