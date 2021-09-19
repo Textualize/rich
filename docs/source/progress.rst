@@ -192,7 +192,7 @@ If the :class:`~rich.progress.Progress` class doesn't offer exactly what you nee
 Multiple Progress
 -----------------
 
-You can't have different columns per task with a single Progress instance. However, you can have as many Progress instance as you like in a :ref:`live`. See `live_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/live_progress.py>`_ for an example of using multiple Progress instances.
+You can't have different columns per task with a single Progress instance. However, you can have as many Progress instance as you like in a :ref:`live`. See `live_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/live_progress.py>`_ and `dynamic_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/dynamic_progress.py>`_ for examples of using multiple Progress instances.
 
 Example
 -------
