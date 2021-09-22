@@ -195,7 +195,7 @@ def iter_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
     markdown_example = """\
 # Markdown
 
-Supports much of the *markdown*, __syntax__!
+Supports much of the *markdown* __syntax__!
 
 - Headers
 - Basic formatting: **bold**, *italic*, `code`
