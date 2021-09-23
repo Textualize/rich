@@ -24,4 +24,6 @@ def logtree(console: Console, start: Path, rate: int = 50):
 
 
 if __name__ == "__main__":
-    logtree(Console(), Path.cwd() if len(sys.argv) < 2 else Path(sys.argv[1]))
+    logtree(
+        Console(log_path=False), Path.cwd() if len(sys.argv) < 2 else Path(sys.argv[1])
+    )
