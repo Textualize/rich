@@ -62,7 +62,6 @@ def test_justify():
 
 def test_log_limit_omissions():
     """Barebones, doesn't test specifics only that some are omitted and that omissions are limited"""
-    import time
 
     console = Console(
         file=io.StringIO(),
@@ -72,14 +71,11 @@ def test_log_limit_omissions():
         legacy_windows=False,
     )
 
-    def get_time(log_line):
-        return log_line[7:17]  # Indices of the log time using default style.
-
     for i in range(200):
         console.log(f"Hello from iteration {i}")
     output = replace_link_ids(console.file.getvalue()).split("\n")
-    all_times = [get_time(l) for l in output]
-    non_omitted = [t for t in all_times if " " not in t]
+    all_times = [l[7:17] for l in output] # Extract just the timestamp
+    non_omitted = [t for t in all_times if " " not in t] # Filter items that have been omitted
     assert len(all_times) > len(
         non_omitted
     )  # Test that at least some values are omitted.
