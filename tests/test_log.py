@@ -60,6 +60,34 @@ def test_justify():
     assert result == "                 foo\n"
 
 
+def test_log_limit_omissions():
+    """Barebones, doesn't test specifics only that some are omitted and that omissions are limited"""
+    import time
+
+    console = Console(
+        file=io.StringIO(),
+        width=80,
+        force_terminal=True,
+        color_system="truecolor",
+        legacy_windows=False,
+    )
+
+    def get_time(log_line):
+        return log_line[7:17]  # Indices of the log time using default style.
+
+    for i in range(200):
+        console.log(f"Hello from iteration {i}")
+    output = replace_link_ids(console.file.getvalue()).split("\n")
+    all_times = [get_time(l) for l in output]
+    non_omitted = [t for t in all_times if " " not in t]
+    assert len(all_times) > len(
+        non_omitted
+    )  # Test that at least some values are omitted.
+    assert len(non_omitted) > len(
+        set(non_omitted)
+    )  # Test that omissions are limited, to some degree.
+
+
 if __name__ == "__main__":
     render = render_log()
     print(render)
