@@ -19,6 +19,7 @@ class LogRender:
         show_path: bool = True,
         time_format: Union[str, FormatTimeCallable] = "[%x %X]",
         omit_repeated_times: bool = True,
+        limit_time_omissions: Optional[Union[int, float]] = 1 / 2,
         level_width: Optional[int] = 8,
     ) -> None:
         self.show_time = show_time
@@ -26,8 +27,10 @@ class LogRender:
         self.show_path = show_path
         self.time_format = time_format
         self.omit_repeated_times = omit_repeated_times
+        self.limit_time_omissions = limit_time_omissions
         self.level_width = level_width
         self._last_time: Optional[Text] = None
+        self._time_omissions: int = 0
 
     def __call__(
         self,
@@ -60,11 +63,29 @@ class LogRender:
                 log_time_display = time_format(log_time)
             else:
                 log_time_display = Text(log_time.strftime(time_format))
-            if log_time_display == self._last_time and self.omit_repeated_times:
-                row.append(Text(" " * len(log_time_display)))
-            else:
-                row.append(log_time_display)
-                self._last_time = log_time_display
+
+            if self.omit_repeated_times:
+                if log_time_display == self._last_time:
+                    if self.limit_time_omissions:
+                        _max = (
+                            self.limit_time_omissions
+                            if isinstance(self.limit_time_omissions, int)
+                            else int(console.size.height * self.limit_time_omissions)
+                        )
+                        if self._time_omissions >= _max:
+                            log_time_display.stylize(style="log.limit_time_omissions")
+                            row.append(log_time_display)
+                            self._time_omissions = 0
+                        else:
+                            row.append(Text(" " * len(log_time_display)))
+                            self._time_omissions += 1
+                    else:
+                        row.append(Text(" " * len(log_time_display)))
+                else:
+                    row.append(log_time_display)
+                    self._time_omissions = 0
+                    self._last_time = log_time_display
+
         if self.show_level:
             row.append(level)
 
