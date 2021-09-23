@@ -5,8 +5,8 @@ import platform
 import sys
 from dataclasses import dataclass, field
 from traceback import walk_tb
-from types import TracebackType
-from typing import Any, Callable, Dict, Iterable, List, Optional, Type
+from types import ModuleType, TracebackType
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Type, Union
 
 from pygments.lexers import guess_lexer_for_filename
 from pygments.token import Comment, Keyword, Name, Number, Operator, String
@@ -47,6 +47,7 @@ def install(
     word_wrap: bool = False,
     show_locals: bool = False,
     indent_guides: bool = True,
+    suppress: Iterable[Union[str, ModuleType]] = (),
 ) -> Callable[[Type[BaseException], BaseException, Optional[TracebackType]], Any]:
     """Install a rich traceback handler.
 
@@ -62,6 +63,8 @@ def install(
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
+        suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traeback.
+
 
     Returns:
         Callable: The previous exception handler that was replaced.
@@ -85,6 +88,7 @@ def install(
                 word_wrap=word_wrap,
                 show_locals=show_locals,
                 indent_guides=indent_guides,
+                suppress=suppress,
             )
         )
 
@@ -192,6 +196,8 @@ class Traceback:
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to 10.
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
+        suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traeback.
+
     """
 
     LEXERS = {
@@ -213,6 +219,7 @@ class Traceback:
         indent_guides: bool = True,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
+        suppress: Iterable[Union[str, ModuleType]] = (),
     ):
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
@@ -233,6 +240,15 @@ class Traceback:
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
 
+        self.suppress: Sequence[str] = []
+        for suppress_entity in suppress:
+            if not isinstance(suppress_entity, str):
+                path = os.path.dirname(suppress_entity.__file__)
+            else:
+                path = suppress_entity
+            path = os.path.normpath(os.path.abspath(path))
+            self.suppress.append(path)
+
     @classmethod
     def from_exception(
         cls,
@@ -247,6 +263,7 @@ class Traceback:
         indent_guides: bool = True,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
+        suppress: Iterable[Union[str, ModuleType]] = (),
     ) -> "Traceback":
         """Create a traceback from exception info
 
@@ -263,6 +280,7 @@ class Traceback:
             locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
                 Defaults to 10.
             locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
+            suppress (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traeback.
 
         Returns:
             Traceback: A Traceback instance that may be printed.
@@ -280,6 +298,7 @@ class Traceback:
             indent_guides=indent_guides,
             locals_max_length=locals_max_length,
             locals_max_string=locals_max_string,
+            suppress=suppress,
         )
 
     @classmethod
@@ -539,6 +558,9 @@ class Traceback:
                 )
 
         for first, frame in loop_first(stack.frames):
+            frame_filename = frame.filename
+            suppressed = any(frame_filename.startswith(path) for path in self.suppress)
+
             text = Text.assemble(
                 path_highlighter(Text(frame.filename, style="pygments.string")),
                 (":", "pygments.text"),
@@ -552,6 +574,8 @@ class Traceback:
             yield text
             if frame.filename.startswith("<"):
                 yield from render_locals(frame)
+                continue
+            if suppressed:
                 continue
             try:
                 code = read_code(frame.filename)
@@ -592,6 +616,7 @@ class Traceback:
 
 if __name__ == "__main__":  # pragma: no cover
 
+    import rich
     from .console import Console
 
     console = Console()
@@ -622,6 +647,6 @@ if __name__ == "__main__":  # pragma: no cover
             except:
                 slfkjsldkfj  # type: ignore
         except:
-            console.print_exception(show_locals=True)
+            console.print_exception(show_locals=True, suppress=[rich])
 
     error()

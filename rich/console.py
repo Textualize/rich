@@ -13,7 +13,7 @@ from html import escape
 from inspect import isclass
 from itertools import islice
 from time import monotonic
-from types import FrameType, TracebackType
+from types import FrameType, TracebackType, ModuleType
 from typing import (
     IO,
     TYPE_CHECKING,
@@ -1704,6 +1704,7 @@ class Console:
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
+        suppress: Iterable[Union[str, ModuleType]] = (),
     ) -> None:
         """Prints a rich render of the last exception and traceback.
 
@@ -1722,6 +1723,7 @@ class Console:
             theme=theme,
             word_wrap=word_wrap,
             show_locals=show_locals,
+            suppress=suppress,
         )
         self.print(traceback)
 
