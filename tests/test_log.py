@@ -74,8 +74,10 @@ def test_log_limit_omissions():
     for i in range(200):
         console.log(f"Hello from iteration {i}")
     output = replace_link_ids(console.file.getvalue()).split("\n")
-    all_times = [l[7:17] for l in output] # Extract just the timestamp
-    non_omitted = [t for t in all_times if " " not in t] # Filter items that have been omitted
+    all_times = [l[7:17] for l in output]  # Extract just the timestamp
+    non_omitted = [
+        t for t in all_times if " " not in t
+    ]  # Filter items that have been omitted
     assert len(all_times) > len(
         non_omitted
     )  # Test that at least some values are omitted.
