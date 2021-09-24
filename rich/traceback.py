@@ -48,6 +48,7 @@ def install(
     show_locals: bool = False,
     indent_guides: bool = True,
     suppress: Iterable[Union[str, ModuleType]] = (),
+    max_frames: int = 100,
 ) -> Callable[[Type[BaseException], BaseException, Optional[TracebackType]], Any]:
     """Install a rich traceback handler.
 
@@ -63,8 +64,7 @@ def install(
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
-        suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traeback.
-
+        suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
 
     Returns:
         Callable: The previous exception handler that was replaced.
@@ -89,6 +89,7 @@ def install(
                 show_locals=show_locals,
                 indent_guides=indent_guides,
                 suppress=suppress,
+                max_frames=max_frames,
             )
         )
 
@@ -196,7 +197,8 @@ class Traceback:
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to 10.
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
-        suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traeback.
+        suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+        max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
 
     """
 
@@ -220,6 +222,7 @@ class Traceback:
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
         suppress: Iterable[Union[str, ModuleType]] = (),
+        max_frames: int = 100,
     ):
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
@@ -248,6 +251,7 @@ class Traceback:
                 path = suppress_entity
             path = os.path.normpath(os.path.abspath(path))
             self.suppress.append(path)
+        self.max_frames = max(4, max_frames) if max_frames > 0 else 0
 
     @classmethod
     def from_exception(
@@ -264,6 +268,7 @@ class Traceback:
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
         suppress: Iterable[Union[str, ModuleType]] = (),
+        max_frames: int = 100,
     ) -> "Traceback":
         """Create a traceback from exception info
 
@@ -280,7 +285,8 @@ class Traceback:
             locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
                 Defaults to 10.
             locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
-            suppress (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traeback.
+            suppress (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+            max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
 
         Returns:
             Traceback: A Traceback instance that may be printed.
@@ -299,6 +305,7 @@ class Traceback:
             locals_max_length=locals_max_length,
             locals_max_string=locals_max_string,
             suppress=suppress,
+            max_frames=max_frames,
         )
 
     @classmethod
@@ -557,7 +564,30 @@ class Traceback:
                     max_string=self.locals_max_string,
                 )
 
-        for first, frame in loop_first(stack.frames):
+        exclude_frames: Optional[range] = None
+        if self.max_frames != 0:
+            exclude_frames = range(
+                self.max_frames // 2,
+                len(stack.frames) - self.max_frames // 2,
+            )
+
+        excluded = False
+        for frame_index, frame in enumerate(stack.frames):
+
+            if exclude_frames and frame_index in exclude_frames:
+                excluded = True
+                continue
+
+            if excluded:
+                assert exclude_frames is not None
+                yield Text(
+                    f"\n... {len(exclude_frames)} frames hidden ...",
+                    justify="center",
+                    style="traceback.error",
+                )
+                excluded = False
+
+            first = frame_index == 1
             frame_filename = frame.filename
             suppressed = any(frame_filename.startswith(path) for path in self.suppress)
 
@@ -575,43 +605,42 @@ class Traceback:
             if frame.filename.startswith("<"):
                 yield from render_locals(frame)
                 continue
-            if suppressed:
-                continue
-            try:
-                code = read_code(frame.filename)
-                lexer_name = self._guess_lexer(frame.filename, code)
-                syntax = Syntax(
-                    code,
-                    lexer_name,
-                    theme=theme,
-                    line_numbers=True,
-                    line_range=(
-                        frame.lineno - self.extra_lines,
-                        frame.lineno + self.extra_lines,
-                    ),
-                    highlight_lines={frame.lineno},
-                    word_wrap=self.word_wrap,
-                    code_width=88,
-                    indent_guides=self.indent_guides,
-                    dedent=False,
-                )
-                yield ""
-            except Exception as error:
-                yield Text.assemble(
-                    (f"\n{error}", "traceback.error"),
-                )
-            else:
-                yield (
-                    Columns(
-                        [
-                            syntax,
-                            *render_locals(frame),
-                        ],
-                        padding=1,
+            if not suppressed:
+                try:
+                    code = read_code(frame.filename)
+                    lexer_name = self._guess_lexer(frame.filename, code)
+                    syntax = Syntax(
+                        code,
+                        lexer_name,
+                        theme=theme,
+                        line_numbers=True,
+                        line_range=(
+                            frame.lineno - self.extra_lines,
+                            frame.lineno + self.extra_lines,
+                        ),
+                        highlight_lines={frame.lineno},
+                        word_wrap=self.word_wrap,
+                        code_width=88,
+                        indent_guides=self.indent_guides,
+                        dedent=False,
                     )
-                    if frame.locals
-                    else syntax
-                )
+                    yield ""
+                except Exception as error:
+                    yield Text.assemble(
+                        (f"\n{error}", "traceback.error"),
+                    )
+                else:
+                    yield (
+                        Columns(
+                            [
+                                syntax,
+                                *render_locals(frame),
+                            ],
+                            padding=1,
+                        )
+                        if frame.locals
+                        else syntax
+                    )
 
 
 if __name__ == "__main__":  # pragma: no cover

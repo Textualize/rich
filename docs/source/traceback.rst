@@ -35,3 +35,42 @@ Rich can be installed as the default traceback handler so that all uncaught exce
     install(show_locals=True)
 
 There are a few options to configure the traceback handler, see :func:`~rich.traceback.install` for details.
+
+
+Suppressing Frames
+------------------
+
+If you are working with a framework (click, django etc), you may only be interested in displaying code in your own application. You can exclude frameworks by setting the `suppress` argument on `Traceback`, `install`, and `print_exception`, which may be a iterable of modules or str paths.
+
+Here's how you would exclude [click](https://click.palletsprojects.com/en/8.0.x/) from Rich exceptions:: 
+
+    import click
+    from rich.traceback import install
+    install(suppress=[click])
+
+Suppressed frames will show the line and file only, without any code.
+
+Max Frames
+----------
+
+A recursion error can generate very large tracebacks that take a while to render and contain a lot of repetitive frames. Rich guards against this with a `max_frames` argument, which defaults to 100. If a traceback contains more than 100 frames then only the first 50, and last 50 will be shown. You can disable this feature by setting `max_frames` to 0.
+
+Here's an example of printing an recursive error::
+
+    from rich.console import Console
+
+
+    def foo(n):
+        return bar(n)
+
+
+    def bar(n):
+        return foo(n)
+
+
+    console = Console()
+
+    try:
+        foo(1)
+    except Exception:
+        console.print_exception(max_frames=20)
