@@ -645,7 +645,6 @@ class Traceback:
 
 if __name__ == "__main__":  # pragma: no cover
 
-    import rich
     from .console import Console
 
     console = Console()
@@ -676,6 +675,6 @@ if __name__ == "__main__":  # pragma: no cover
             except:
                 slfkjsldkfj  # type: ignore
         except:
-            console.print_exception(show_locals=True, suppress=[rich])
+            console.print_exception(show_locals=True)
 
     error()
