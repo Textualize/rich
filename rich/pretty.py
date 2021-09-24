@@ -83,7 +83,8 @@ def install(
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
-        expand_all (bool, optional): Expand all containers. Defaults to False
+        expand_all (bool, optional): Expand all containers. Defaults to False.
+        max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
     """
     from rich import get_console
 
