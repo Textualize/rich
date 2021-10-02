@@ -10,8 +10,8 @@ class JSON:
 
     Args:
         json (str): JSON encoded data.
-        indent (int, optional): Number of characters to indent by. Defaults to True.
-        highlight (bool, optional): Enable highlighting. Defaults to 2.
+        indent (int, optional): Number of characters to indent by. Defaults to 2.
+        highlight (bool, optional): Enable highlighting. Defaults to True.
     """
 
     def __init__(self, json: str, indent: int = 2, highlight: bool = True) -> None:
