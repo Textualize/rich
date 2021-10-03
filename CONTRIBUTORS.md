@@ -12,6 +12,7 @@ The following people have contributed to the development of Rich:
 - [Alexander Mancevice](https://github.com/amancevice)
 - [Will McGugan](https://github.com/willmcgugan)
 - [Nathan Page](https://github.com/nathanrpage97)
+- [Avi Perl](https://github.com/avi-perl)
 - [Kylian Point](https://github.com/p0lux)
 - [Kyle Pollina](https://github.com/kylepollina)
 - [Clément Robert](https://github.com/neutrinoceros)
