@@ -15,10 +15,10 @@ from rich.columns import Columns
 from rich import print
 
 
-def display_calendar(year=None):
+def display_calendar(year):
 
     today = datetime.today()
-    year = int(year or today.year)
+    year = int(year)
     cal = calendar.Calendar()
 
     tables = []
@@ -50,7 +50,7 @@ def display_calendar(year=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Rich calendar")
-    parser.add_argument("year", metavar="year", type=int, default=None)
+    parser.add_argument("year", metavar="year", type=int)
     args = parser.parse_args()
 
     display_calendar(args.year)
