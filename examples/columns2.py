@@ -16,13 +16,13 @@ from rich import print
 
 
 def display_calendar(year=None):
-    
+
     today = datetime.today()
     year = int(year or today.year)
     cal = calendar.Calendar()
 
     tables = []
-    for month in range(1,13):
+    for month in range(1, 13):
 
         table = Table(title=f"""{calendar.month_name[month]} {year}""", style="green")
 
@@ -34,11 +34,11 @@ def display_calendar(year=None):
             days = []
             for day in weekdays:
                 today_tuple = today.day, today.month, today.year
-                
-                if day and (day, month, year) == today_tuple :
-                    _day = "[bold underline red]%s[/]" % day   
+
+                if day and (day, month, year) == today_tuple:
+                    _day = "[bold underline red]%s[/]" % day
                 else:
-                    _day = "%s" % ('' if day == 0 else day) 
+                    _day = "%s" % ("" if day == 0 else day)
                 days.append(_day)
             table.add_row(*days)
 
@@ -48,9 +48,9 @@ def display_calendar(year=None):
     print(columns)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Rich calendar')
-    parser.add_argument('year', metavar='year', type=int, default=None)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Rich calendar")
+    parser.add_argument("year", metavar="year", type=int, default=None)
     args = parser.parse_args()
 
     display_calendar(args.year)
