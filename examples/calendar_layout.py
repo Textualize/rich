@@ -1,9 +1,9 @@
 """
 Builds calendar layout using Columns and Tables.
 Usage:
-python columns2.py [YEAR]
+python calendar.py [YEAR]
 Example:
-python columns2.py 2021
+python calendar.py 2021
 """
 import argparse
 
@@ -24,10 +24,10 @@ def display_calendar(year):
     tables = []
     for month in range(1, 13):
 
-        table = Table(title=f"""{calendar.month_name[month]} {year}""", style="green")
+        table = Table(title=f"{calendar.month_name[month]} {year}", style="green")
 
-        for wd in cal.iterweekdays():
-            table.add_column("{:.3}".format(calendar.day_name[wd]))
+        for week_day in cal.iterweekdays():
+            table.add_column("{:.3}".format(calendar.day_name[week_day]))
 
         month_days = cal.monthdayscalendar(year, month)
         for weekdays in month_days:
@@ -36,9 +36,9 @@ def display_calendar(year):
                 today_tuple = today.day, today.month, today.year
 
                 if day and (day, month, year) == today_tuple:
-                    _day = "[bold underline red]%s[/]" % day
+                    _day = f"[bold underline red]{day}"
                 else:
-                    _day = "%s" % ("" if day == 0 else day)
+                    _day = "" if day == 0 else str(day)
                 days.append(_day)
             table.add_row(*days)
 
