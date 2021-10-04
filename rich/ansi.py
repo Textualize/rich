@@ -1,6 +1,6 @@
 from contextlib import suppress
 import re
-from typing import Iterable, NamedTuple
+from typing import Iterable, Iterator, NamedTuple
 
 from .color import Color
 from .style import Style
@@ -18,7 +18,7 @@ class _AnsiToken(NamedTuple):
     osc: str = ""
 
 
-def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
+def _ansi_tokenize(ansi_text: str) -> Iterator[_AnsiToken]:
     """Tokenize a string in to plain text and ANSI codes.
 
     Args:
@@ -111,7 +111,7 @@ class AnsiDecoder:
     def __init__(self) -> None:
         self.style = Style.null()
 
-    def decode(self, terminal_text: str) -> Iterable[Text]:
+    def decode(self, terminal_text: str) -> Iterator[Text]:
         """Decode ANSI codes in an interable of lines.
 
         Args:

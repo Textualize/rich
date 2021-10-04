@@ -15,6 +15,7 @@ from typing import (
     Callable,
     Dict,
     Iterable,
+    Iterator,
     List,
     Optional,
     Set,
@@ -310,7 +311,7 @@ class Node:
     key_separator = ": "
     separator: str = ", "
 
-    def iter_tokens(self) -> Iterable[str]:
+    def iter_tokens(self) -> Iterator[str]:
         """Generate tokens for this node."""
         if self.key_repr:
             yield self.key_repr
@@ -405,7 +406,7 @@ class _Line:
         assert self.node is not None
         return self.node.check_length(start_length, max_length)
 
-    def expand(self, indent_size: int) -> Iterable["_Line"]:
+    def expand(self, indent_size: int) -> Iterator["_Line"]:
         """Expand this line by adding children on their own line."""
         node = self.node
         assert node is not None
@@ -489,7 +490,9 @@ def traverse(
         py_version = (sys.version_info.major, sys.version_info.minor)
         children: List[Node]
 
-        def iter_rich_args(rich_args: Any) -> Iterable[Union[Any, Tuple[str, Any]]]:
+        def iter_rich_args(
+            rich_args: Iterable[Any],
+        ) -> Iterator[Union[Any, Tuple[str, Any]]]:
             for arg in rich_args:
                 if isinstance(arg, tuple):
                     if len(arg) == 3:
@@ -574,7 +577,7 @@ def traverse(
                     last=root,
                 )
 
-                def iter_attrs() -> Iterable[
+                def iter_attrs() -> Iterator[
                     Tuple[str, Any, Optional[Callable[[Any], str]]]
                 ]:
                     """Iterate over attr fields and values."""

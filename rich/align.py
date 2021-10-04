@@ -1,6 +1,6 @@
 import sys
 from itertools import chain
-from typing import TYPE_CHECKING, Iterable, Optional
+from typing import TYPE_CHECKING, Iterable, Iterator, Optional
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -151,7 +151,7 @@ class Align(JupyterMixin):
         excess_space = options.max_width - width
         style = console.get_style(self.style) if self.style is not None else None
 
-        def generate_segments() -> Iterable[Segment]:
+        def generate_segments() -> Iterator[Segment]:
             if excess_space <= 0:
                 # Exact fit
                 for line in lines:
@@ -196,7 +196,7 @@ class Align(JupyterMixin):
             else Segment("\n")
         )
 
-        def blank_lines(count: int) -> Iterable[Segment]:
+        def blank_lines(count: int) -> Iterator[Segment]:
             if count > 0:
                 for _ in range(count):
                     yield blank_line
@@ -268,7 +268,7 @@ class VerticalCenter(JupyterMixin):
         bottom_space = height - top_space - len(lines)
         blank_line = Segment(f"{' ' * width}", style)
 
-        def blank_lines(count: int) -> Iterable[Segment]:
+        def blank_lines(count: int) -> Iterator[Segment]:
             for _ in range(count):
                 yield blank_line
                 yield new_line

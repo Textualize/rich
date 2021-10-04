@@ -3,7 +3,18 @@ import platform
 from rich.containers import Lines
 import textwrap
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
 from pygments.style import Style as PygmentsStyle
@@ -388,14 +399,14 @@ class Syntax(JupyterMixin):
                 # This speeds up further operations as there are less spans to process
                 line_start, line_end = line_range
 
-                def line_tokenize() -> Iterable[Tuple[Any, str]]:
+                def line_tokenize() -> Iterator[Tuple[Any, str]]:
                     """Split tokens to one per line."""
                     for token_type, token in lexer.get_tokens(code):
                         while token:
                             line_token, new_line, token = token.partition("\n")
                             yield token_type, line_token + new_line
 
-                def tokens_to_spans() -> Iterable[Tuple[str, Optional[Style]]]:
+                def tokens_to_spans() -> Iterator[Tuple[str, Optional[Style]]]:
                     """Convert tokens to spans."""
                     tokens = iter(line_tokenize())
                     line_no = 0

@@ -1,9 +1,9 @@
-from typing import Iterable, Tuple, TypeVar
+from typing import Iterable, Iterator, Tuple, TypeVar
 
 T = TypeVar("T")
 
 
-def loop_first(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
+def loop_first(values: Iterable[T]) -> Iterator[Tuple[bool, T]]:
     """Iterate and generate a tuple with a flag for first value."""
     iter_values = iter(values)
     try:
@@ -15,7 +15,7 @@ def loop_first(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
         yield False, value
 
 
-def loop_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
+def loop_last(values: Iterable[T]) -> Iterator[Tuple[bool, T]]:
     """Iterate and generate a tuple with a flag for last value."""
     iter_values = iter(values)
     try:
@@ -28,7 +28,7 @@ def loop_last(values: Iterable[T]) -> Iterable[Tuple[bool, T]]:
     yield True, previous_value
 
 
-def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
+def loop_first_last(values: Iterable[T]) -> Iterator[Tuple[bool, bool, T]]:
     """Iterate and generate a tuple with a flag for first and last value."""
     iter_values = iter(values)
     try:
