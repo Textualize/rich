@@ -1,9 +1,9 @@
 """
 Builds calendar layout using Columns and Tables.
 Usage:
-python calendar.py [YEAR]
+python calendar_layout.py [YEAR]
 Example:
-python calendar.py 2021
+python calendar_layout.py 2021
 """
 import argparse
 
