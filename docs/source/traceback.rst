@@ -42,7 +42,7 @@ Suppressing Frames
 
 If you are working with a framework (click, django etc), you may only be interested in seeing the code from your own application within the traceback. You can exclude framework code by setting the `suppress` argument on `Traceback`, `install`, and `Console.print_exception`, which should be a list of modules or str paths.
 
-Here's how you would exclude [click](https://click.palletsprojects.com/en/8.0.x/) from Rich exceptions:: 
+Here's how you would exclude `click <https://click.palletsprojects.com/en/8.0.x/>`_ from Rich exceptions:: 
 
     import click
     from rich.traceback import install
