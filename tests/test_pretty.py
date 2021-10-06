@@ -265,7 +265,7 @@ def test_attrs_broken_310():
     del foo.bar
     result = pretty_repr(foo)
     print(repr(result))
-    expected = "'Foo' object has no attribute 'bar'"
+    expected = "Foo(bar=AttributeError(\"'Foo' object has no attribute 'bar'\"))"
     assert result == expected
 
 
