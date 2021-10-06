@@ -221,6 +221,7 @@ def test_attrs_empty():
 
 
 @skip_py36
+@skip_py310
 def test_attrs_broken():
     @attr.define
     class Foo:
@@ -231,6 +232,23 @@ def test_attrs_broken():
     result = pretty_repr(foo)
     print(repr(result))
     expected = "Foo(bar=AttributeError('bar'))"
+    assert result == expected
+
+
+@skip_py36
+@skip_py37
+@skip_py38
+@skip_py39
+def test_attrs_broken_310():
+    @attr.define
+    class Foo:
+        bar: int
+
+    foo = Foo(1)
+    del foo.bar
+    result = pretty_repr(foo)
+    print(repr(result))
+    expected = "'Foo' object has no attribute 'bar'"
     assert result == expected
 
 
