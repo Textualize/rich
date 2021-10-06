@@ -628,7 +628,7 @@ def traverse(
             is_dataclass(obj)
             and not isinstance(obj, type)
             and not fake_attributes
-            and _is_dataclass_repr(obj)
+            and (_is_dataclass_repr(obj) or py_version == (3, 6))
         ):
             obj_id = id(obj)
             if obj_id in visited_ids:
