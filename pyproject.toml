@@ -42,7 +42,7 @@ jupyter = ["ipywidgets"]
 pytest = "^6.2.5"
 black = "^21.9b0"
 mypy = "^0.910"
-pytest-cov = "^2.12.1"
+pytest-cov = "^3.0.0"
 attrs = "^21.2.0"
 types-dataclasses = "^0.1.7"
 
