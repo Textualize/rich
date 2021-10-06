@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Official Py3.10 release
 
+### Fixed
+
+- Fixed detection of custom repr when pretty printing dataclasses
+
 ## [10.11.0] - 2021-09-24
 
 ### Added
