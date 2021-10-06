@@ -17,6 +17,23 @@ skip_py36 = pytest.mark.skipif(
     reason="rendered differently on py3.6",
 )
 
+skip_py37 = pytest.mark.skipif(
+    sys.version_info.minor == 7 and sys.version_info.major == 3,
+    reason="rendered differently on py3.7",
+)
+skip_py38 = pytest.mark.skipif(
+    sys.version_info.minor == 8 and sys.version_info.major == 3,
+    reason="rendered differently on py3.8",
+)
+skip_py39 = pytest.mark.skipif(
+    sys.version_info.minor == 9 and sys.version_info.major == 3,
+    reason="rendered differently on py3.9",
+)
+skip_py310 = pytest.mark.skipif(
+    sys.version_info.minor == 10 and sys.version_info.major == 3,
+    reason="rendered differently on py3.10",
+)
+
 
 def test_install():
     console = Console(file=io.StringIO())
@@ -221,6 +238,7 @@ def test_attrs_empty():
 
 
 @skip_py36
+@skip_py310
 def test_attrs_broken():
     @attr.define
     class Foo:
@@ -231,6 +249,23 @@ def test_attrs_broken():
     result = pretty_repr(foo)
     print(repr(result))
     expected = "Foo(bar=AttributeError('bar'))"
+    assert result == expected
+
+
+@skip_py36
+@skip_py37
+@skip_py38
+@skip_py39
+def test_attrs_broken_310():
+    @attr.define
+    class Foo:
+        bar: int
+
+    foo = Foo(1)
+    del foo.bar
+    result = pretty_repr(foo)
+    print(repr(result))
+    expected = "Foo(bar=AttributeError(\"'Foo' object has no attribute 'bar'\"))"
     assert result == expected
 
 

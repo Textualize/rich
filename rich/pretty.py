@@ -4,6 +4,7 @@ from rich.repr import RichReprResult
 import sys
 from array import array
 from collections import Counter, defaultdict, deque, UserDict, UserList
+import dataclasses
 from dataclasses import dataclass, fields, is_dataclass
 from inspect import isclass
 from itertools import islice
@@ -29,16 +30,6 @@ except ImportError:  # pragma: no cover
     _attr_module = None  # type: ignore
 
 
-def _is_attr_object(obj: Any) -> bool:
-    """Check if an object was created with attrs module."""
-    return _attr_module is not None and _attr_module.has(type(obj))
-
-
-def _get_attr_fields(obj: Any) -> Iterable["_attr_module.Attribute[Any]"]:
-    """Get fields for an attrs object."""
-    return _attr_module.fields(type(obj)) if _attr_module is not None else []
-
-
 from .highlighter import ReprHighlighter
 from . import get_console
 from ._loop import loop_last
@@ -62,6 +53,33 @@ if TYPE_CHECKING:
 
 # Matches Jupyter's special methods
 _re_jupyter_repr = re.compile(f"^_repr_.+_$")
+
+
+def _is_attr_object(obj: Any) -> bool:
+    """Check if an object was created with attrs module."""
+    return _attr_module is not None and _attr_module.has(type(obj))
+
+
+def _get_attr_fields(obj: Any) -> Iterable["_attr_module.Attribute[Any]"]:
+    """Get fields for an attrs object."""
+    return _attr_module.fields(type(obj)) if _attr_module is not None else []
+
+
+def _is_dataclass_repr(obj: object) -> bool:
+    """Check if an instance of a dataclass contains the default repr.
+
+    Args:
+        obj (object): A dataclass instance.
+
+    Returns:
+        bool: True if the default repr is used, False if there is a custom repr.
+    """
+    # Digging in to a lot of internals here
+    # Catching all exceptions in case something is missing on a non CPython implementation
+    try:
+        return obj.__repr__.__code__.co_filename == dataclasses.__file__
+    except Exception:
+        return False
 
 
 def install(
@@ -610,9 +628,7 @@ def traverse(
             is_dataclass(obj)
             and not isinstance(obj, type)
             and not fake_attributes
-            and (
-                "__create_fn__" in obj.__repr__.__qualname__ or py_version == (3, 6)
-            )  # Check if __repr__ wasn't overridden
+            and (_is_dataclass_repr(obj) or py_version == (3, 6))
         ):
             obj_id = id(obj)
             if obj_id in visited_ids:
