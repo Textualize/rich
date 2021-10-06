@@ -12,10 +12,24 @@ skip_py36 = pytest.mark.skipif(
     reason="rendered differently on py3.6",
 )
 
-
 skip_py37 = pytest.mark.skipif(
     sys.version_info.minor == 7 and sys.version_info.major == 3,
     reason="rendered differently on py3.7",
+)
+
+skip_py38 = pytest.mark.skipif(
+    sys.version_info.minor == 8 and sys.version_info.major == 3,
+    reason="rendered differently on py3.8",
+)
+
+skip_py39 = pytest.mark.skipif(
+    sys.version_info.minor == 9 and sys.version_info.major == 3,
+    reason="rendered differently on py3.9",
+)
+
+skip_py310 = pytest.mark.skipif(
+    sys.version_info.minor == 10 and sys.version_info.major == 3,
+    reason="rendered differently on py3.10",
 )
 
 
@@ -151,6 +165,7 @@ def test_inspect_integer_with_value():
 
 @skip_py36
 @skip_py37
+@skip_py310
 def test_inspect_integer_with_methods():
 
     expected = (
@@ -164,6 +179,48 @@ def test_inspect_integer_with_methods():
         "│             real = 1                           │\n"
         "│ as_integer_ratio = def as_integer_ratio():     │\n"
         "│                    Return integer ratio.       │\n"
+        "│       bit_length = def bit_length(): Number of │\n"
+        "│                    bits necessary to represent │\n"
+        "│                    self in binary.             │\n"
+        "│        conjugate = def conjugate(...) Returns  │\n"
+        "│                    self, the complex conjugate │\n"
+        "│                    of any int.                 │\n"
+        "│       from_bytes = def from_bytes(bytes,       │\n"
+        "│                    byteorder, *,               │\n"
+        "│                    signed=False): Return the   │\n"
+        "│                    integer represented by the  │\n"
+        "│                    given array of bytes.       │\n"
+        "│         to_bytes = def to_bytes(length,        │\n"
+        "│                    byteorder, *,               │\n"
+        "│                    signed=False): Return an    │\n"
+        "│                    array of bytes representing │\n"
+        "│                    an integer.                 │\n"
+        "╰────────────────────────────────────────────────╯\n"
+    )
+    assert expected == render(1, methods=True)
+
+
+@skip_py36
+@skip_py37
+@skip_py38
+@skip_py39
+def test_inspect_integer_with_methods():
+
+    expected = (
+        "╭──────────────── <class 'int'> ─────────────────╮\n"
+        "│ int([x]) -> integer                            │\n"
+        "│ int(x, base=10) -> integer                     │\n"
+        "│                                                │\n"
+        "│      denominator = 1                           │\n"
+        "│             imag = 0                           │\n"
+        "│        numerator = 1                           │\n"
+        "│             real = 1                           │\n"
+        "│ as_integer_ratio = def as_integer_ratio():     │\n"
+        "│                    Return integer ratio.       │\n"
+        "│        bit_count = def bit_count(): Number of  │\n"
+        "│                    ones in the binary          │\n"
+        "│                    representation of the       │\n"
+        "│                    absolute value of self.     │\n"
         "│       bit_length = def bit_length(): Number of │\n"
         "│                    bits necessary to represent │\n"
         "│                    self in binary.             │\n"
