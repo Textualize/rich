@@ -842,7 +842,7 @@ class Table(JupyterMixin):
             yield new_line
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__" and not TYPE_CHECKING:  # pragma: no cover
     from rich.console import Console
     from rich.highlighter import ReprHighlighter
     from rich.table import Table

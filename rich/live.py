@@ -1,7 +1,7 @@
 import sys
 from threading import Event, RLock, Thread
 from types import TracebackType
-from typing import IO, Any, Callable, List, Optional, TextIO, Type, cast
+from typing import IO, Any, Callable, List, Optional, TextIO, Type, cast, TYPE_CHECKING
 
 from . import get_console
 from .console import Console, ConsoleRenderable, RenderableType, RenderHook
@@ -268,7 +268,7 @@ class Live(JupyterMixin, RenderHook):
         return renderables
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__" and not TYPE_CHECKING:  # pragma: no cover
     import random
     import time
     from itertools import cycle
