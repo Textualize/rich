@@ -11,7 +11,6 @@ from .jupyter import JupyterMixin
 from .live_render import LiveRender, VerticalOverflowMethod
 from .screen import Screen
 from .text import Text
-import time
 
 class _RefreshThread(Thread):
     """A thread that calls refresh() at regular intervals."""
@@ -73,7 +72,7 @@ class Live(JupyterMixin, RenderHook):
         self._restore_stdout: Optional[IO[str]] = None
         self._restore_stderr: Optional[IO[str]] = None
 
-        self._lock = self.console._lock #RLock()
+        self._lock = self.console._lock
         self.ipy_widget: Optional[Any] = None
         self.auto_refresh = auto_refresh
         self._started: bool = False
@@ -249,16 +248,17 @@ class Live(JupyterMixin, RenderHook):
         self._live_render.vertical_overflow = self.vertical_overflow
         if self.console.is_interactive:
             # lock needs acquiring as user can modify live_render renderable at any time unlike in Progress.
-            reset = (
-                Control.home()
-                if self._alt_screen
-                else self._live_render.position_cursor()
-            )
-            renderables = [
-                reset,
-                *renderables,
-                self._live_render,
-            ]
+            with self._lock:
+                reset = (
+                    Control.home()
+                    if self._alt_screen
+                    else self._live_render.position_cursor()
+                )
+                renderables = [
+                    reset,
+                    *renderables,
+                    self._live_render,
+                ]
         elif (
             not self._started and not self.transient
         ):  # if it is finished render the final output for files or dumb_terminals
