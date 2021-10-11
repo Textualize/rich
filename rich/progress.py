@@ -321,7 +321,7 @@ class BarColumn(ProgressColumn):
             total=max(0, task.total),
             completed=max(0, task.completed),
             width=None if self.bar_width is None else max(1, self.bar_width),
-            pulse=not task.started,
+            pulse=(not task.started) or (task.total == float("inf")),
             animation_time=task.get_time(),
             style=self.style,
             complete_style=self.complete_style,
@@ -544,7 +544,10 @@ class Task:
         speed = self.speed
         if not speed:
             return None
-        estimate = ceil(self.remaining / speed)
+        try:
+            estimate = ceil(self.remaining / speed)
+        except OverflowError:
+            return None
         return estimate
 
     def _reset(self) -> None:
@@ -684,7 +687,7 @@ class Progress(JupyterMixin):
                 task_total = float(len(sequence))
             else:
                 raise ValueError(
-                    f"unable to get size of {sequence!r}, please specify 'total'"
+                    f"unable to get size of {sequence!r}, please specify 'total'. If the total is undertermined use 'float(\"inf\")'"
                 )
         else:
             task_total = total
@@ -1016,6 +1019,7 @@ if __name__ == "__main__":  # pragma: no coverage
         TextColumn("[progress.description]{task.description}"),
         BarColumn(),
         TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        TextColumn("[progress.completed]{task.completed:>.0f}"),
         TimeRemainingColumn(),
         TimeElapsedColumn(),
         console=console,
@@ -1025,10 +1029,12 @@ if __name__ == "__main__":  # pragma: no coverage
         task1 = progress.add_task("[red]Downloading", total=1000)
         task2 = progress.add_task("[green]Processing", total=1000)
         task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
+        task4 = progress.add_task("[blue]Receiving", total=float("inf"))
 
         while not progress.finished:
             progress.update(task1, advance=0.5)
             progress.update(task2, advance=0.3)
+            progress.update(task4, advance=1)
             time.sleep(0.01)
             if random.randint(0, 100) < 1:
                 progress.log(next(examples))
