@@ -818,11 +818,13 @@ class Console:
     def __enter__(self) -> "Console":
         """Own context manager to enter buffer context."""
         self._enter_buffer()
+        self._lock.__enter__()
         return self
 
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
         """Exit buffer context."""
         self._exit_buffer()
+        self._lock.__exit__()
 
     def begin_capture(self) -> None:
         """Begin capturing console output. Call :meth:`end_capture` to exit capture mode and return output."""
