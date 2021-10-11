@@ -448,7 +448,7 @@ class Task:
     """str: Description of the task."""
 
     total: float
-    """str: Total number of steps in this task."""
+    """float: Total number of steps in this task."""
 
     completed: float
     """float: Number of steps completed"""
@@ -457,7 +457,7 @@ class Task:
     """Callable to get the current time."""
 
     finished_time: Optional[float] = None
-    """float: Time task was finished."""
+    """Optional[float]: Time task was finished."""
 
     visible: bool = True
     """bool: Indicates if this task is visible in the progress display."""
