@@ -371,7 +371,10 @@ class TotalFileSizeColumn(ProgressColumn):
 
     def render(self, task: "Task") -> Text:
         """Show data completed."""
-        data_size = filesize.decimal(int(task.total))
+        try:
+            data_size = filesize.decimal(int(task.total))
+        except OverflowError:
+            data_size = "?"
         return Text(data_size, style="progress.filesize.total")
 
 
@@ -391,7 +394,10 @@ class DownloadColumn(ProgressColumn):
     def render(self, task: "Task") -> Text:
         """Calculate common unit for completed and total."""
         completed = int(task.completed)
-        total = int(task.total)
+        try:
+            total = int(task.total)
+        except OverflowError:
+            total = completed
         if self.binary_units:
             unit, suffix = filesize.pick_unit_and_suffix(
                 total,
@@ -406,7 +412,7 @@ class DownloadColumn(ProgressColumn):
         total_ratio = total / unit
         precision = 0 if unit == 1 else 1
         completed_str = f"{completed_ratio:,.{precision}f}"
-        total_str = f"{total_ratio:,.{precision}f}"
+        total_str = f"{total_ratio:,.{precision}f}" if task.total != float("inf") else "?"
         download_status = f"{completed_str}/{total_str} {suffix}"
         download_text = Text(download_status, style="progress.download")
         return download_text
