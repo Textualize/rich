@@ -29,8 +29,8 @@ print_table()
 # Get console output as text
 text = console.export_text()
 
-# Calling print_table again because export_text()
-# by default console output buffer is flushed once export function is called
+# Calling print_table again because console output buffer
+# is flushed once export function is called
 print_table()
 
 # Get console output as html
