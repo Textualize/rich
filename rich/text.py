@@ -555,9 +555,7 @@ class Text(JupyterMixin):
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
         tab_size: int = console.tab_size or self.tab_size or 8
-        justify = (
-            cast("JustifyMethod", self.justify) or options.justify or DEFAULT_OVERFLOW
-        )
+        justify = self.justify or options.justify or DEFAULT_JUSTIFY
 
         overflow = (
             cast("OverflowMethod", self.overflow)
