@@ -6,6 +6,7 @@ from typing import (
     List,
     NamedTuple,
     Optional,
+    Sequence,
     Tuple,
     Union,
 )
@@ -201,10 +202,10 @@ class Table(JupyterMixin):
         self.border_style = border_style
         self.title_style = title_style
         self.caption_style = caption_style
-        self.title_justify = title_justify
-        self.caption_justify = caption_justify
+        self.title_justify: "JustifyMethod" = title_justify
+        self.caption_justify: "JustifyMethod" = caption_justify
         self.highlight = highlight
-        self.row_styles = list(row_styles or [])
+        self.row_styles: Sequence[StyleType] = list(row_styles or [])
         append_column = self.columns.append
         for header in headers:
             if isinstance(header, str):

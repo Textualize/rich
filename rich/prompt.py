@@ -330,11 +330,10 @@ class Confirm(PromptBase[bool]):
 
     response_type = bool
     validate_error_message = "[prompt.invalid]Please enter Y or N"
-    choices = ["y", "n"]
+    choices: List[str] = ["y", "n"]
 
     def render_default(self, default: DefaultType) -> Text:
         """Render the default as (y) or (n) rather than True/False."""
-        assert self.choices is not None
         yes, no = self.choices
         return Text(f"({yes})" if default else f"({no})", style="prompt.default")
 
@@ -343,7 +342,6 @@ class Confirm(PromptBase[bool]):
         value = value.strip().lower()
         if value not in self.choices:
             raise InvalidResponse(self.validate_error_message)
-        assert self.choices is not None
         return value == self.choices[0]
 
 
