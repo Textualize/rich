@@ -435,7 +435,7 @@ if __name__ == "__main__":  # pragma: no cover
     from rich.columns import Columns
     from rich.panel import Panel
 
-    from . import box
+    from . import box as box
     from .console import Console
     from .table import Table
     from .text import Text
