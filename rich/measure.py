@@ -100,8 +100,8 @@ class Measurement(NamedTuple):
         if hasattr(renderable, "__rich__"):
             renderable = renderable.__rich__()  # type: ignore
         if is_renderable(renderable):
-            get_console_width: Callable[
-                ["Console", "ConsoleOptions"], "Measurement"
+            get_console_width: Optional[
+                Callable[["Console", "ConsoleOptions"], "Measurement"]
             ] = getattr(renderable, "__rich_measure__", None)
             if get_console_width is not None:
                 render_width = (

@@ -26,7 +26,7 @@ The ``show_locals=True`` parameter causes Rich to display the value of local var
 See `exception.py <https://github.com/willmcgugan/rich/blob/master/examples/exception.py>`_ for a larger example.
 
 
-Traceback handler
+Traceback Handler
 -----------------
 
 Rich can be installed as the default traceback handler so that all uncaught exceptions will be rendered with highlighting. Here's how::
@@ -35,6 +35,27 @@ Rich can be installed as the default traceback handler so that all uncaught exce
     install(show_locals=True)
 
 There are a few options to configure the traceback handler, see :func:`~rich.traceback.install` for details.
+
+Automatic Traceback Handler
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In some cases you may want to have the traceback handler installed automatically without having to worry about importing the code in your module. You can do that by modifying the `sitecustomize.py` in your virtual environment. Typically it would be located in your virtual environment path, underneath the `site-packages` folder, something like this::
+
+    ./.venv/lib/python3.9/site-packages/sitecustomize.py
+
+In most cases this file will not exist. If it doesn't exist, you can create it by::
+
+    $ touch .venv/lib/python3.9/site-packages/sitecustomize.py
+
+Add the following code to the file::
+
+    from rich.traceback import install
+    install(show_locals=True)
+
+At this point, the traceback will be installed for any code that is run within the virtual environment.
+
+.. note::
+    If you plan on sharing your code, it is probably best to include the traceback install in your main entry point module.
 
 
 Suppressing Frames
@@ -74,3 +95,4 @@ Here's an example of printing an recursive error::
         foo(1)
     except Exception:
         console.print_exception(max_frames=20)
+
