@@ -127,7 +127,7 @@ class Tree(JupyterMixin):
 
             guide_style = guide_style_stack.current + get_style(node.guide_style)
             style = style_stack.current + get_style(node.style)
-            prefix = levels[(1 if self.hide_root == False else 2) :]
+            prefix = levels[(2 if self.hide_root else 2) :]
             renderable_lines = console.render_lines(
                 Styled(node.label, style),
                 options.update(
@@ -138,7 +138,7 @@ class Tree(JupyterMixin):
                 ),
             )
 
-            if not (depth == 0 and self.hide_root == True):
+            if not (depth == 0 and self.hide_root):
                 for first, line in loop_first(renderable_lines):
                     if prefix:
                         yield from _Segment.apply_style(
