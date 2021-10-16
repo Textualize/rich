@@ -248,7 +248,7 @@ class Table(JupyterMixin):
         )
 
     @property
-    def expand(self) -> int:
+    def expand(self) -> bool:
         """Setting a non-None self.width implies expand."""
         return self._expand or self.width is not None
 
