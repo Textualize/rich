@@ -9,6 +9,7 @@ each of which consisting of multiple steps.
 import time
 
 from rich.console import Group
+from rich.panel import Panel
 from rich.live import Live
 from rich.progress import (
     BarColumn,
@@ -29,7 +30,7 @@ def run_steps(name, step_times, app_steps_task_id):
 
         # run steps, update progress
         for _ in range(step_time):
-            time.sleep(1)
+            time.sleep(0.5)
             step_progress.update(step_task_id, advance=1)
 
         # stop and hide progress bar for this step when done
@@ -69,15 +70,15 @@ overall_progress = Progress(
 # group of progress bars;
 # some are always visible, others will disappear when progress is complete
 progress_group = Group(
-    current_app_progress, step_progress, app_steps_progress, overall_progress
+    Panel(Group(current_app_progress, step_progress, app_steps_progress)), overall_progress
 )
 
 # tuple specifies how long each step takes for that app
 step_actions = ("downloading", "configuring", "building", "installing")
 apps = [
-    ("one", (3, 2, 5, 3)),
-    ("two", (2, 5, 10, 6)),
-    ("three", (5, 1, 5, 3)),
+    ("one", (2, 1, 4, 2)),
+    ("two", (1, 3, 8, 4)),
+    ("three", (2, 1, 3, 2)),
 ]
 
 # create overall progress bar
