@@ -33,7 +33,6 @@ from .spinner import Spinner
 from .style import StyleType
 from .table import Column, Table
 from .text import Text, TextType
-from rich import progress_bar
 
 TaskID = NewType("TaskID", int)
 
@@ -1042,7 +1041,7 @@ if __name__ == "__main__":  # pragma: no coverage
 
         task1 = progress.add_task("[red]Downloading", total=1000)
         task2 = progress.add_task("[green]Processing", total=1000)
-        # task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
+        task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
 
         test = 0
 
@@ -1058,5 +1057,5 @@ if __name__ == "__main__":  # pragma: no coverage
 
             test += 1
             time.sleep(0.01)
-            # if random.randint(0, 100) < 1:
-            #     progress.log(next(examples))
+            if random.randint(0, 100) < 1:
+                progress.log(next(examples))
