@@ -28,7 +28,7 @@ print("print table to the console")
 print_table()
 
 # Get console output as text
-print("geting console output as text")
+print("getting console output as text")
 text = console.export_text()
 
 # Calling print_table again because console output buffer
@@ -38,7 +38,7 @@ print_table()
 
 # Get console output as html
 # use clear=False so output is not flushed after export
-print("geting console output as html")
+print("getting console output as html")
 html = console.export_html(clear=False)
 
 # Export text output to table_export.txt
