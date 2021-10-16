@@ -19,7 +19,7 @@
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
  • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
 
-Richは、_リッチ_なテキストや美しい書式設定をターミナルで行うためのPythonライブラリです。
+Richは、 _リッチ_ なテキストや美しい書式設定をターミナルで行うためのPythonライブラリです。
 
 [Rich API](https://rich.readthedocs.io/en/latest/)を使用すると、ターミナルの出力に色やスタイルを簡単に追加することができます。 Richはきれいなテーブル、プログレスバー、マークダウン、シンタックスハイライトされたソースコード、トレースバックなどをすぐに生成・表示することもできます。
 
