@@ -51,8 +51,8 @@ class ProgressBar(JupyterMixin):
         self.finished_style = finished_style
         self.pulse_style = pulse_style
         self.animation_time = animation_time
-        self.paused = False
-        self.paused_time = 0
+        self.paused: bool = False
+        self.paused_time: float = 0
         self._pulse_segments: Optional[List[Segment]] = None
 
     def __repr__(self) -> str:
@@ -127,10 +127,10 @@ class ProgressBar(JupyterMixin):
 
         self.total = total if total is not None else self.total
 
-    def pause(self):
+    def pause(self) -> None:
         self.paused = True
 
-    def resume(self):
+    def resume(self) -> None:
         self.paused = False
 
     def _render_pulse(

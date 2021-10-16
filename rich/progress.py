@@ -802,13 +802,13 @@ class Progress(JupyterMixin):
         if refresh:
             self.refresh()
 
-    def pause(self, task_id: TaskID):
+    def pause(self, task_id: TaskID) -> None:
         with self._lock:
             task = self._tasks[task_id]
             task._progress.clear()
             task.paused = True
 
-    def resume(self, task_id: TaskID):
+    def resume(self, task_id: TaskID) -> None:
         with self._lock:
             task = self._tasks[task_id]
             task.paused = False
@@ -1042,13 +1042,13 @@ if __name__ == "__main__":  # pragma: no coverage
 
         task1 = progress.add_task("[red]Downloading", total=1000)
         task2 = progress.add_task("[green]Processing", total=1000)
-        task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
+        # task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
 
         test = 0
 
         while not progress.finished:
-            progress.update(task1, advance=0.5)
-            progress.update(task2, advance=0.3)
+            progress.update(task1, advance=1)
+            progress.update(task2, advance=1)
 
             if test == 200:
                 progress.pause(task1)
@@ -1058,5 +1058,5 @@ if __name__ == "__main__":  # pragma: no coverage
 
             test += 1
             time.sleep(0.01)
-            if random.randint(0, 100) < 1:
-                progress.log(next(examples))
+            # if random.randint(0, 100) < 1:
+            #     progress.log(next(examples))
