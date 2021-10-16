@@ -51,7 +51,8 @@ class ProgressBar(JupyterMixin):
         self.finished_style = finished_style
         self.pulse_style = pulse_style
         self.animation_time = animation_time
-
+        self.paused = False
+        self.paused_time = 0
         self._pulse_segments: Optional[List[Segment]] = None
 
     def __repr__(self) -> str:
@@ -118,8 +119,19 @@ class ProgressBar(JupyterMixin):
             completed (float): Number of steps completed.
             total (float, optional): Total number of steps, or ``None`` to not change. Defaults to None.
         """
-        self.completed = completed
+        if not self.paused:
+            self.completed = completed - self.paused_time
+
+        else:
+            self.paused_time = completed - self.completed
+
         self.total = total if total is not None else self.total
+
+    def pause(self):
+        self.paused = True
+
+    def resume(self):
+        self.paused = False
 
     def _render_pulse(
         self, console: Console, width: int, ascii: bool = False
@@ -207,7 +219,13 @@ if __name__ == "__main__":  # pragma: no cover
     import time
 
     console.show_cursor(False)
-    for n in range(0, 101, 1):
+    for n in range(0, 121, 1):
+        if n == 80:
+            bar.pause()
+
+        if n == 100:
+            bar.resume()
+
         bar.update(n)
         console.print(bar)
         console.file.write("\r")
