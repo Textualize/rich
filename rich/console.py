@@ -1805,7 +1805,7 @@ class Console:
             objects = (NewLine(),)
 
         with self:
-            renderables = self._collect_renderables(
+            renderables: List[ConsoleRenderable] = self._collect_renderables(
                 objects,
                 sep,
                 end,
