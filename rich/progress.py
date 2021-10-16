@@ -271,7 +271,7 @@ class TextColumn(ProgressColumn):
         table_column: Optional[Column] = None,
     ) -> None:
         self.text_format = text_format
-        self.justify = justify
+        self.justify: JustifyMethod = justify
         self.style = style
         self.markup = markup
         self.highlighter = highlighter

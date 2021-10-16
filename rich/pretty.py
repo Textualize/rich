@@ -212,8 +212,8 @@ class Pretty(JupyterMixin):
         self._object = _object
         self.highlighter = highlighter or ReprHighlighter()
         self.indent_size = indent_size
-        self.justify = justify
-        self.overflow = overflow
+        self.justify: Optional["JustifyMethod"] = justify
+        self.overflow: Optional["OverflowMethod"] = overflow
         self.no_wrap = no_wrap
         self.indent_guides = indent_guides
         self.max_length = max_length

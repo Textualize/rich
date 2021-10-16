@@ -666,7 +666,7 @@ class Console:
         self.record = record
         self._markup = markup
         self._emoji = emoji
-        self._emoji_variant = emoji_variant
+        self._emoji_variant: Optional[EmojiVariant] = emoji_variant
         self._highlight = highlight
         self.legacy_windows: bool = (
             (detect_legacy_windows() and not self.is_jupyter)
