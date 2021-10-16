@@ -14,7 +14,6 @@ from typing import (
     Optional,
     Tuple,
     Union,
-    cast,
 )
 
 from ._loop import loop_last
@@ -144,8 +143,8 @@ class Text(JupyterMixin):
     ) -> None:
         self._text = [strip_control_codes(text)]
         self.style = style
-        self.justify = justify
-        self.overflow = overflow
+        self.justify: Optional["JustifyMethod"] = justify
+        self.overflow: Optional["OverflowMethod"] = overflow
         self.no_wrap = no_wrap
         self.end = end
         self.tab_size = tab_size
@@ -555,15 +554,9 @@ class Text(JupyterMixin):
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
         tab_size: int = console.tab_size or self.tab_size or 8
-        justify = (
-            cast("JustifyMethod", self.justify) or options.justify or DEFAULT_OVERFLOW
-        )
+        justify = self.justify or options.justify or DEFAULT_JUSTIFY
 
-        overflow = (
-            cast("OverflowMethod", self.overflow)
-            or options.overflow
-            or DEFAULT_OVERFLOW
-        )
+        overflow = self.overflow or options.overflow or DEFAULT_OVERFLOW
 
         lines = self.wrap(
             console,
@@ -1065,10 +1058,8 @@ class Text(JupyterMixin):
         Returns:
             Lines: Number of lines.
         """
-        wrap_justify = cast("JustifyMethod", justify or self.justify) or DEFAULT_JUSTIFY
-        wrap_overflow = (
-            cast("OverflowMethod", overflow or self.overflow) or DEFAULT_OVERFLOW
-        )
+        wrap_justify = justify or self.justify or DEFAULT_JUSTIFY
+        wrap_overflow = overflow or self.overflow or DEFAULT_OVERFLOW
 
         no_wrap = pick_bool(no_wrap, self.no_wrap, False) or overflow == "ignore"
 
