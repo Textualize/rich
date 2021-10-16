@@ -24,21 +24,27 @@ def print_table():
 
 
 # Prints table
+print("print table to the console")
 print_table()
 
 # Get console output as text
+print("geting console output as text")
 text = console.export_text()
 
 # Calling print_table again because console output buffer
 # is flushed once export function is called
+print("print table to the console")
 print_table()
 
 # Get console output as html
 # use clear=False so output is not flushed after export
+print("geting console output as html")
 html = console.export_html(clear=False)
 
 # Export text output to table_export.txt
+print("exporting console output to table_export.txt")
 console.save_text("table_export.txt", clear=False)
 
 # Export html output to table_export.html
+print("exporting console output to table_export.html")
 console.save_html("table_export.html")
