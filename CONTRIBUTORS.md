@@ -21,3 +21,4 @@ The following people have contributed to the development of Rich:
 - [Clément Robert](https://github.com/neutrinoceros)
 - [Tushar Sadhwani](https://github.com/tusharsadhwani)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
+- [Andrea Maugeri](https://github.com/v0lp3)

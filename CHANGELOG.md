@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [10.12.1] - unreleased
 
+- Added pause and resume methods to progress bars
+
 ### Fixed
 
 - Fixed an edge case bug when console module try to detect if they are in a tty at the end of a pytest run
