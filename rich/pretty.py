@@ -27,7 +27,8 @@ from types import MappingProxyType
 try:
     import attr as _attr_module
 except ImportError:  # pragma: no cover
-    _attr_module = None  # type: ignore
+    if not TYPE_CHECKING:
+        _attr_module = None
 
 
 from .highlighter import ReprHighlighter
