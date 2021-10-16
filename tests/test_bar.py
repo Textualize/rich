@@ -91,12 +91,14 @@ def test_get_pulse_segments():
     ]
     assert segments == expected
 
+
 def test_pause():
     bar = ProgressBar(width=50, total=100)
     bar.update(20)
     bar.pause()
     bar.update(21)
-    assert bar.completed == 20    
+    assert bar.completed == 20
+
 
 def test_resume():
     bar = ProgressBar(width=50, total=100)
@@ -107,10 +109,12 @@ def test_resume():
     bar.update(23)
     bar.resume()
     bar.update(24)
-    assert bar.completed == 21    
+    assert bar.completed == 21
+
 
 def test_resume():
     """todo"""
+
 
 if __name__ == "__main__":
     bar = ProgressBar(completed=11, width=50)
