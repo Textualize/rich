@@ -846,7 +846,7 @@ class Table(JupyterMixin):
 if __name__ == "__main__":  # pragma: no cover
     from rich.console import Console
     from rich.highlighter import ReprHighlighter
-    from rich.table import Table
+    from rich.table import Table as Table
 
     table = Table(
         title="Star Wars Movies",
