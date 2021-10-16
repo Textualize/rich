@@ -406,6 +406,32 @@ def test_reset() -> None:
     assert not task._progress
 
 
+def test_pause() -> None:
+    progress = Progress()
+    task_id = progress.add_task("foo")
+    progress.update(task_id, advance=1)
+    progress.update(task_id, advance=1)
+    task = progress.tasks[task_id]
+    progress.pause(task_id)
+    progress.update(task_id, advance=1)
+    progress.update(task_id, advance=7)
+    assert task.completed == 2
+
+
+def test_resume() -> None:
+    progress = Progress()
+    task_id = progress.add_task("foo")
+    progress.update(task_id, advance=1)
+    progress.update(task_id, advance=1)
+    task = progress.tasks[task_id]
+    progress.pause(task_id)
+    progress.update(task_id, advance=1)
+    progress.update(task_id, advance=7)
+    progress.resume(task_id)
+    progress.update(task_id, advance=5)
+    assert task.completed == 7
+
+
 def test_progress_max_refresh() -> None:
     """Test max_refresh argument."""
     time = 0.0
@@ -439,7 +465,7 @@ def test_progress_max_refresh() -> None:
             progress.update(task_id, description=f"tick {tick}")
             progress.refresh()
     result = console.end_capture()
-    print(repr(result))
+    # print(repr(result))
     assert (
         result
         == "\x1b[?25l\r\x1b[2Kstart\r\x1b[2Kstart\r\x1b[2Ktick 1\r\x1b[2Ktick 1\r\x1b[2Ktick 3\r\x1b[2Ktick 3\r\x1b[2Ktick 5\r\x1b[2Ktick 5\n\x1b[?25h"
