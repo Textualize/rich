@@ -58,7 +58,7 @@ class Panel(JupyterMixin):
         self.title = title
         self.title_align: AlignMethod = title_align
         self.subtitle = subtitle
-        self.subtitle_align = subtitle_align
+        self.subtitle_align: AlignMethod = subtitle_align
         self.safe_box = safe_box
         self.expand = expand
         self.style = style
