@@ -8,7 +8,7 @@ each of which consisting of multiple steps.
 
 import time
 
-from rich.console import RenderGroup
+from rich.console import Group
 from rich.live import Live
 from rich.progress import (
     BarColumn,
@@ -68,7 +68,7 @@ overall_progress = Progress(
 )
 # group of progress bars;
 # some are always visible, others will disappear when progress is complete
-group = RenderGroup(
+progress_group = Group(
     current_app_progress, step_progress, app_steps_progress, overall_progress
 )
 
@@ -86,7 +86,7 @@ overall_task_id = overall_progress.add_task("", total=len(apps))
 # use own live instance as context manager with group of progress bars,
 # which allows for running multiple different progress bars in parallel,
 # and dynamically showing/hiding them
-with Live(group):
+with Live(progress_group):
 
     for idx, (name, step_times) in enumerate(apps):
         # update message on overall progress bar
