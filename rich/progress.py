@@ -33,6 +33,7 @@ from .spinner import Spinner
 from .style import StyleType
 from .table import Column, Table
 from .text import Text, TextType
+from rich import progress_bar
 
 TaskID = NewType("TaskID", int)
 
@@ -474,6 +475,9 @@ class Task:
     finished_speed: Optional[float] = None
     """Optional[float]: The last speed for a finished task."""
 
+    paused: bool = False
+    """bool: Indicates if this task is paused."""
+
     _progress: Deque[ProgressSample] = field(
         default_factory=deque, init=False, repr=False
     )
@@ -612,6 +616,7 @@ class Progress(JupyterMixin):
         self.get_time = get_time or self.console.get_time
         self.print = self.console.print
         self.log = self.console.log
+        self.paused = False
 
     @property
     def console(self) -> Console:
@@ -767,8 +772,10 @@ class Progress(JupyterMixin):
             if total is not None:
                 task.total = total
                 task._reset()
-            if advance is not None:
+
+            if advance is not None and not task.paused:
                 task.completed += advance
+
             if completed is not None:
                 task.completed = completed
             if description is not None:
@@ -794,6 +801,17 @@ class Progress(JupyterMixin):
 
         if refresh:
             self.refresh()
+
+    def pause(self, task_id: TaskID):
+        with self._lock:
+            task = self._tasks[task_id]
+            task._progress.clear()
+            task.paused = True
+
+    def resume(self, task_id: TaskID):
+        with self._lock:
+            task = self._tasks[task_id]
+            task.paused = False
 
     def reset(
         self,
@@ -1026,9 +1044,19 @@ if __name__ == "__main__":  # pragma: no coverage
         task2 = progress.add_task("[green]Processing", total=1000)
         task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
 
+        test = 0
+
         while not progress.finished:
             progress.update(task1, advance=0.5)
             progress.update(task2, advance=0.3)
+
+            if test == 200:
+                progress.pause(task1)
+
+            if test == 1000:
+                progress.resume(task1)
+
+            test += 1
             time.sleep(0.01)
             if random.randint(0, 100) < 1:
                 progress.log(next(examples))
