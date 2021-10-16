@@ -17,6 +17,8 @@
  • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md)
  • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
+ • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
+
 
 Rich är ett Python bibliotek för _rich_ text och vacker formattering i terminalen.
 
@@ -62,7 +64,7 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ## Rich REPL
 
-Rich kan installeras i Python REPL, så att varje datastruktur kommer att skrivas ut fint och markeras. 
+Rich kan installeras i Python REPL, så att varje datastruktur kommer att skrivas ut fint och markeras.
 
 ```python
 >>> from rich import pretty
