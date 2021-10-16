@@ -70,7 +70,8 @@ overall_progress = Progress(
 # group of progress bars;
 # some are always visible, others will disappear when progress is complete
 progress_group = Group(
-    Panel(Group(current_app_progress, step_progress, app_steps_progress)), overall_progress
+    Panel(Group(current_app_progress, step_progress, app_steps_progress)),
+    overall_progress,
 )
 
 # tuple specifies how long each step takes for that app
