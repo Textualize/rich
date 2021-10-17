@@ -26,7 +26,7 @@ class RichHandler(Handler):
             Default will use a global console instance writing to stdout.
         show_time (bool, optional): Show a column for the time. Defaults to True.
         omit_repeated_times (bool, optional): Omit repetition of the same time. Defaults to True.
-        limit_time_omissions (Union[int, float], optional: Limit repeated time omissions to an integer number of rows or a float portion/multiple of the console height. None to disable. Defaults to 1/2.
+        limit_repeat_omissions (Union[int, float], optional: Limit repeated time omissions to an integer number of rows or a float portion/multiple of the console height. None to disable. Defaults to 1/2.
         show_level (bool, optional): Show a column for the level. Defaults to True.
         show_path (bool, optional): Show the path to the original log call. Defaults to True.
         enable_link_path (bool, optional): Enable terminal link of path column to file. Defaults to True.
@@ -63,7 +63,7 @@ class RichHandler(Handler):
         *,
         show_time: bool = True,
         omit_repeated_times: bool = True,
-        limit_time_omissions: Union[int, float] = 1 / 2,
+        limit_repeat_omissions: Union[int, float] = 1 / 2,
         show_level: bool = True,
         show_path: bool = True,
         enable_link_path: bool = True,
@@ -88,7 +88,7 @@ class RichHandler(Handler):
             show_path=show_path,
             time_format=log_time_format,
             omit_repeated_times=omit_repeated_times,
-            limit_time_omissions=limit_time_omissions,
+            limit_repeat_omissions=limit_repeat_omissions,
             level_width=None,
         )
         self.enable_link_path = enable_link_path

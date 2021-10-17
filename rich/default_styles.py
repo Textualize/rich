@@ -60,7 +60,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "log.time": Style(color="cyan", dim=True),
     "log.message": Style.null(),
     "log.path": Style(dim=True),
-    "log.limit_time_omissions": Style(color="white", dim=True),
+    "log.limit_repeat_omissions": Style(color="white", dim=True),
     "repr.ellipsis": Style(color="yellow"),
     "repr.indent": Style(color="green", dim=True),
     "repr.error": Style(color="red", bold=True),
