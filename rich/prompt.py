@@ -1,4 +1,4 @@
-from typing import Any, Generic, List, Optional, TextIO, TypeVar, Union, overload
+from typing import Generic, List, Optional, TextIO, TypeVar, Union, overload
 
 from . import get_console
 from .console import Console
@@ -25,6 +25,13 @@ class InvalidResponse(PromptError):
 
     def __rich__(self) -> TextType:
         return self.message
+
+
+class _Sentinel(object):
+    ...
+
+
+_DEFAULT_VAL = _Sentinel()
 
 
 class PromptBase(Generic[PromptType]):
@@ -113,9 +120,9 @@ class PromptBase(Generic[PromptType]):
         choices: Optional[List[str]] = None,
         show_default: bool = True,
         show_choices: bool = True,
-        default: Any = ...,
+        default: Union[DefaultType, _Sentinel] = _DEFAULT_VAL,
         stream: Optional[TextIO] = None,
-    ) -> Any:
+    ) -> Union[DefaultType, PromptType]:
         """Shortcut to construct and run a prompt loop and return the result.
 
         Example:
@@ -140,22 +147,22 @@ class PromptBase(Generic[PromptType]):
         )
         return _prompt(default=default, stream=stream)
 
-    def render_default(self, default: DefaultType) -> Text:
+    def render_default(self, default: object) -> Text:
         """Turn the supplied default in to a Text instance.
 
         Args:
-            default (DefaultType): Default value.
+            default (object): Default value.
 
         Returns:
             Text: Text containing rendering of default value.
         """
         return Text(f"({default})", "prompt.default")
 
-    def make_prompt(self, default: DefaultType) -> Text:
+    def make_prompt(self, default: Union[object, _Sentinel]) -> Text:
         """Make prompt text.
 
         Args:
-            default (DefaultType): Default value.
+            default (object): Default value.
 
         Returns:
             Text: Text to display in prompt.
@@ -170,7 +177,7 @@ class PromptBase(Generic[PromptType]):
             prompt.append(choices, "prompt.choices")
 
         if (
-            default != ...
+            not isinstance(default, _Sentinel)
             and self.show_default
             and isinstance(default, (str, self.response_type))
         ):
@@ -255,11 +262,16 @@ class PromptBase(Generic[PromptType]):
 
     @overload
     def __call__(
-        self, *, default: DefaultType, stream: Optional[TextIO] = None
+        self, *, default: Union[DefaultType, _Sentinel], stream: Optional[TextIO] = None
     ) -> Union[PromptType, DefaultType]:
         ...
 
-    def __call__(self, *, default: Any = ..., stream: Optional[TextIO] = None) -> Any:
+    def __call__(
+        self,
+        *,
+        default: Union[DefaultType, _Sentinel] = _DEFAULT_VAL,
+        stream: Optional[TextIO] = None,
+    ) -> Union[PromptType, DefaultType]:
         """Run the prompt loop.
 
         Args:
@@ -272,7 +284,7 @@ class PromptBase(Generic[PromptType]):
             self.pre_prompt()
             prompt = self.make_prompt(default)
             value = self.get_input(self.console, prompt, self.password, stream=stream)
-            if value == "" and default != ...:
+            if value == "" and not isinstance(default, _Sentinel):
                 return default
             try:
                 return_value = self.process_response(value)
@@ -332,7 +344,7 @@ class Confirm(PromptBase[bool]):
     validate_error_message = "[prompt.invalid]Please enter Y or N"
     choices: List[str] = ["y", "n"]
 
-    def render_default(self, default: DefaultType) -> Text:
+    def render_default(self, default: object) -> Text:
         """Render the default as (y) or (n) rather than True/False."""
         yes, no = self.choices
         return Text(f"({yes})" if default else f"({no})", style="prompt.default")
