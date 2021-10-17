@@ -71,6 +71,10 @@ def test_justify():
         ({}, itertools.cycle(["TIME"] + (["    "] * 40))),
         ({"limit_repeat_omissions": 1.5}, itertools.cycle(["TIME"] + (["    "] * 120))),
         ({"limit_repeat_omissions": 20}, itertools.cycle(["TIME"] + (["    "] * 20))),
+        (
+            {"limit_repeat_omissions": None},
+            itertools.chain(["TIME"], itertools.repeat("    ")),
+        ),
     ],
 )
 def test_log_limit_omissions(handler_kwargs, exp_times):
