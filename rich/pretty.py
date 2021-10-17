@@ -1,3 +1,4 @@
+import argparse
 import builtins
 import os
 from rich.repr import RichReprResult
@@ -821,6 +822,10 @@ if __name__ == "__main__":  # pragma: no cover
     }
     data["foo"].append(data)  # type: ignore
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--depth", type=int, default=4)
+    parsed = parser.parse_args(sys.argv[1:])
+
     from rich import print
 
-    print(Pretty(data, indent_guides=True, max_string=20))
+    print(Pretty(data, indent_guides=True, max_string=20, indent_size=parsed.depth))
