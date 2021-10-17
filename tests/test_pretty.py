@@ -152,6 +152,40 @@ def test_indent_lines():
     assert result == expected
 
 
+def test_custom_depth():
+    custom_indent = 16
+
+    data = {
+        "key": "value",
+        "list": ["el1", "el2"],
+        "dict": {"list": ["sub-el1", "sub-el2"]},
+    }
+    expected = """{
+│               'key': 'value',
+│               'list': [
+│               │               'el1',
+│               │               'el2'
+│               ],
+│               'dict': {
+│               │               'list': [
+│               │               │               'sub-el1',
+│               │               │               'sub-el2'
+│               │               ]
+│               }
+}
+"""
+
+    console = Console(width=100, color_system=None)
+    console.begin_capture()
+    console.print(
+        Pretty(data, indent_guides=True, expand_all=True, indent_size=custom_indent)
+    )
+    result = console.end_capture()
+    print(repr(result))
+    print(result)
+    assert result == expected
+
+
 def test_pprint():
     console = Console(color_system=None)
     console.begin_capture()

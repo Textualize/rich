@@ -4,6 +4,7 @@ The following people have contributed to the development of Rich:
 
 <!-- Add your name below, sort alphabetically by surname. Link to Github profile / your home page. -->
 
+- [Meysam Azad](https://github.com/meysam81)
 - [Gregory Beauregard](https://github.com/GBeauregard/pyffstream)
 - [Pete Davison](https://github.com/pd93)
 - [Oleksis Fraga](https://github.com/oleksis)
