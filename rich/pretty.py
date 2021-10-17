@@ -657,6 +657,7 @@ def traverse(
             pop_visited(obj_id)
 
         elif isinstance(obj, _CONTAINERS):
+            assert not isinstance(obj, type)
             for container_type in _CONTAINERS:
                 if isinstance(obj, container_type):
                     obj_type = container_type
