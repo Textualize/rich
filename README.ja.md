@@ -17,8 +17,9 @@
  • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md)
  • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
+ • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
 
-Richは、_リッチ_なテキストや美しい書式設定をターミナルで行うためのPythonライブラリです。
+Richは、 _リッチ_ なテキストや美しい書式設定をターミナルで行うためのPythonライブラリです。
 
 [Rich API](https://rich.readthedocs.io/en/latest/)を使用すると、ターミナルの出力に色やスタイルを簡単に追加することができます。 Richはきれいなテーブル、プログレスバー、マークダウン、シンタックスハイライトされたソースコード、トレースバックなどをすぐに生成・表示することもできます。
 
@@ -194,7 +195,7 @@ table.add_column("Title")
 table.add_column("Production Budget", justify="right")
 table.add_column("Box Office", justify="right")
 table.add_row(
-    "Dev 20, 2019", "Star Wars: The Rise of Skywalker", "$275,000,000", "$375,126,118"
+    "Dec 20, 2019", "Star Wars: The Rise of Skywalker", "$275,000,000", "$375,126,118"
 )
 table.add_row(
     "May 25, 2018",

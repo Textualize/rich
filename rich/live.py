@@ -276,7 +276,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     from .align import Align
     from .console import Console
-    from .live import Live
+    from .live import Live as Live
     from .panel import Panel
     from .rule import Rule
     from .syntax import Syntax

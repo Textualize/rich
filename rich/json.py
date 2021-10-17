@@ -1,5 +1,5 @@
 from json import loads, dumps
-from typing import Any
+from typing import Any, Callable, Optional
 
 from .text import Text
 from .highlighter import JSONHighlighter, NullHighlighter
@@ -10,8 +10,8 @@ class JSON:
 
     Args:
         json (str): JSON encoded data.
-        indent (int, optional): Number of characters to indent by. Defaults to True.
-        highlight (bool, optional): Enable highlighting. Defaults to 2.
+        indent (int, optional): Number of characters to indent by. Defaults to 2.
+        highlight (bool, optional): Enable highlighting. Defaults to True.
     """
 
     def __init__(self, json: str, indent: int = 2, highlight: bool = True) -> None:
@@ -23,17 +23,26 @@ class JSON:
         self.text.overflow = None
 
     @classmethod
-    def from_data(cls, data: Any, indent: int = 2, highlight: bool = True) -> "JSON":
+    def from_data(
+        cls,
+        data: Any,
+        indent: int = 2,
+        highlight: bool = True,
+        default: Optional[Callable[[Any], Any]] = None,
+    ) -> "JSON":
         """Encodes a JSON object from arbitrary data.
 
+        Args:
+            data (Any): An object that may be encoded in to JSON
+            indent (int, optional): Number of characters to indent by. Defaults to 2.
+            highlight (bool, optional): Enable highlighting. Defaults to True.
+            default (Callable, optional): Optional callable which will be called for objects that cannot be serialized. Defaults to None.
+
         Returns:
-            Args:
-                data (Any): An object that may be encoded in to JSON
-                indent (int, optional): Number of characters to indent by. Defaults to 2.
-                highlight (bool, optional): Enable highlighting. Defaults to True.
+            JSON: New JSON object from the given data.
         """
         json_instance: "JSON" = cls.__new__(cls)
-        json = dumps(data, indent=indent)
+        json = dumps(data, indent=indent, default=default)
         highlighter = JSONHighlighter() if highlight else NullHighlighter()
         json_instance.text = highlighter(json)
         json_instance.text.no_wrap = True

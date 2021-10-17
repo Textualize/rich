@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [10.12.1] - unreleased
+
+### Fixed
+
+- Fixed an edge case bug when console module try to detect if they are in a tty at the end of a pytest run
+
+## [10.12.0] - 2021-10-06
+
+### Updated
+
+- Official Py3.10 release
+
+### Fixed
+
+- Fixed detection of custom repr when pretty printing dataclasses
+
+## [10.11.0] - 2021-09-24
+
+### Added
+
+- Added `suppress` parameter to tracebacks
+- Added `max_frames` parameter to tracebacks
+
 ## [10.10.0] - 2021-09-18
 
 ### Added

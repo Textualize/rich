@@ -6,6 +6,7 @@ from typing import (
     List,
     NamedTuple,
     Optional,
+    Sequence,
     Tuple,
     Union,
 )
@@ -201,10 +202,10 @@ class Table(JupyterMixin):
         self.border_style = border_style
         self.title_style = title_style
         self.caption_style = caption_style
-        self.title_justify = title_justify
-        self.caption_justify = caption_justify
+        self.title_justify: "JustifyMethod" = title_justify
+        self.caption_justify: "JustifyMethod" = caption_justify
         self.highlight = highlight
-        self.row_styles = list(row_styles or [])
+        self.row_styles: Sequence[StyleType] = list(row_styles or [])
         append_column = self.columns.append
         for header in headers:
             if isinstance(header, str):
@@ -247,7 +248,7 @@ class Table(JupyterMixin):
         )
 
     @property
-    def expand(self) -> int:
+    def expand(self) -> bool:
         """Setting a non-None self.width implies expand."""
         return self._expand or self.width is not None
 
@@ -845,7 +846,7 @@ class Table(JupyterMixin):
 if __name__ == "__main__":  # pragma: no cover
     from rich.console import Console
     from rich.highlighter import ReprHighlighter
-    from rich.table import Table
+    from rich.table import Table as Table
 
     table = Table(
         title="Star Wars Movies",

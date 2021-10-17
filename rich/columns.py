@@ -48,7 +48,7 @@ class Columns(JupyterMixin):
         self.equal = equal
         self.column_first = column_first
         self.right_to_left = right_to_left
-        self.align = align
+        self.align: Optional[AlignMethod] = align
         self.title = title
 
     def add_renderable(self, renderable: RenderableType) -> None:

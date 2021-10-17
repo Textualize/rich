@@ -17,6 +17,7 @@
  • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md)
  • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
+ • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
 
 Rich est une bibliothèque Python pour le _rich_ texte et la mise en forme dans le terminal.
 
@@ -209,7 +210,7 @@ table.add_column("Title")
 table.add_column("Production Budget", justify="right")
 table.add_column("Box Office", justify="right")
 table.add_row(
-    "Dev 20, 2019", "Star Wars: The Rise of Skywalker", "$275,000,000", "$375,126,118"
+    "Dec 20, 2019", "Star Wars: The Rise of Skywalker", "$275,000,000", "$375,126,118"
 )
 table.add_row(
     "May 25, 2018",

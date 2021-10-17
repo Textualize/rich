@@ -212,6 +212,34 @@ def test_guess_lexer():
     assert Traceback._guess_lexer("foo", "foo\nbnar") == "text"
 
 
+def test_recursive():
+    def foo(n):
+        return bar(n)
+
+    def bar(n):
+        return foo(n)
+
+    console = Console(width=100, file=io.StringIO())
+    try:
+        foo(1)
+    except Exception:
+        console.print_exception(max_frames=6)
+    result = console.file.getvalue()
+    print(result)
+    assert "frames hidden" in result
+    assert result.count("in foo") < 4
+
+
+def test_suppress():
+    try:
+        1 / 0
+    except Exception:
+        traceback = Traceback(suppress=[pytest, "foo"])
+        assert len(traceback.suppress) == 2
+        assert "pytest" in traceback.suppress[0]
+        assert "foo" in traceback.suppress[1]
+
+
 if __name__ == "__main__":  # pragma: no cover
 
     expected = render(get_exception())

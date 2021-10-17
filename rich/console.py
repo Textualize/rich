@@ -13,7 +13,7 @@ from html import escape
 from inspect import isclass
 from itertools import islice
 from time import monotonic
-from types import FrameType, TracebackType
+from types import FrameType, TracebackType, ModuleType
 from typing import (
     IO,
     TYPE_CHECKING,
@@ -666,7 +666,7 @@ class Console:
         self.record = record
         self._markup = markup
         self._emoji = emoji
-        self._emoji_variant = emoji_variant
+        self._emoji_variant: Optional[EmojiVariant] = emoji_variant
         self._highlight = highlight
         self.legacy_windows: bool = (
             (detect_legacy_windows() and not self.is_jupyter)
@@ -899,7 +899,13 @@ class Console:
         if self._force_terminal is not None:
             return self._force_terminal
         isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
-        return False if isatty is None else isatty()
+        try:
+            return False if isatty is None else isatty()
+        except ValueError:
+            # in some situation (at the end of a pytest run for example) isatty() can raise
+            # ValueError: I/O operation on closed file
+            # return False because we aren't in a terminal anymore
+            return False
 
     @property
     def is_dumb_terminal(self) -> bool:
@@ -1704,6 +1710,8 @@ class Console:
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
+        suppress: Iterable[Union[str, ModuleType]] = (),
+        max_frames: int = 100,
     ) -> None:
         """Prints a rich render of the last exception and traceback.
 
@@ -1713,6 +1721,8 @@ class Console:
             theme (str, optional): Override pygments theme used in traceback
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
+            suppress (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+            max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
         """
         from .traceback import Traceback
 
@@ -1722,6 +1732,8 @@ class Console:
             theme=theme,
             word_wrap=word_wrap,
             show_locals=show_locals,
+            suppress=suppress,
+            max_frames=max_frames,
         )
         self.print(traceback)
 

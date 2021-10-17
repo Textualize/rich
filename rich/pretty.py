@@ -4,6 +4,7 @@ from rich.repr import RichReprResult
 import sys
 from array import array
 from collections import Counter, defaultdict, deque, UserDict, UserList
+import dataclasses
 from dataclasses import dataclass, fields, is_dataclass
 from inspect import isclass
 from itertools import islice
@@ -27,16 +28,6 @@ try:
     import attr as _attr_module
 except ImportError:  # pragma: no cover
     _attr_module = None  # type: ignore
-
-
-def _is_attr_object(obj: Any) -> bool:
-    """Check if an object was created with attrs module."""
-    return _attr_module is not None and _attr_module.has(type(obj))
-
-
-def _get_attr_fields(obj: Any) -> Iterable["_attr_module.Attribute[Any]"]:
-    """Get fields for an attrs object."""
-    return _attr_module.fields(type(obj)) if _attr_module is not None else []
 
 
 from .highlighter import ReprHighlighter
@@ -64,6 +55,33 @@ if TYPE_CHECKING:
 _re_jupyter_repr = re.compile(f"^_repr_.+_$")
 
 
+def _is_attr_object(obj: Any) -> bool:
+    """Check if an object was created with attrs module."""
+    return _attr_module is not None and _attr_module.has(type(obj))
+
+
+def _get_attr_fields(obj: Any) -> Iterable["_attr_module.Attribute[Any]"]:
+    """Get fields for an attrs object."""
+    return _attr_module.fields(type(obj)) if _attr_module is not None else []
+
+
+def _is_dataclass_repr(obj: object) -> bool:
+    """Check if an instance of a dataclass contains the default repr.
+
+    Args:
+        obj (object): A dataclass instance.
+
+    Returns:
+        bool: True if the default repr is used, False if there is a custom repr.
+    """
+    # Digging in to a lot of internals here
+    # Catching all exceptions in case something is missing on a non CPython implementation
+    try:
+        return obj.__repr__.__code__.co_filename == dataclasses.__file__
+    except Exception:
+        return False
+
+
 def install(
     console: Optional["Console"] = None,
     overflow: "OverflowMethod" = "ignore",
@@ -83,7 +101,8 @@ def install(
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
-        expand_all (bool, optional): Expand all containers. Defaults to False
+        expand_all (bool, optional): Expand all containers. Defaults to False.
+        max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
     """
     from rich import get_console
 
@@ -193,8 +212,8 @@ class Pretty(JupyterMixin):
         self._object = _object
         self.highlighter = highlighter or ReprHighlighter()
         self.indent_size = indent_size
-        self.justify = justify
-        self.overflow = overflow
+        self.justify: Optional["JustifyMethod"] = justify
+        self.overflow: Optional["OverflowMethod"] = overflow
         self.no_wrap = no_wrap
         self.indent_guides = indent_guides
         self.max_length = max_length
@@ -609,9 +628,7 @@ def traverse(
             is_dataclass(obj)
             and not isinstance(obj, type)
             and not fake_attributes
-            and (
-                "__create_fn__" in obj.__repr__.__qualname__ or py_version == (3, 6)
-            )  # Check if __repr__ wasn't overridden
+            and (_is_dataclass_repr(obj) or py_version == (3, 6))
         ):
             obj_id = id(obj)
             if obj_id in visited_ids:
