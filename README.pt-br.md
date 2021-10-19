@@ -18,19 +18,19 @@
  • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
 
-Rich é uma biblioteca Python para _rich_ text e formatação de estilos no termial.
+Rich é uma biblioteca Python para _rich_ text e formatação de estilos no terminal.
 
-A [API do Rich](https://rich.readthedocs.io/en/latest/) permite adicionar cores e estilos no output do termial de forma fácil. Rich também permite formataçao de tabelas, barra de progresso, markdown, highlight de sintaxe de código fonte, rastreio de erros (traceback), e muito mais.
+A [API do Rich](https://rich.readthedocs.io/en/latest/) permite adicionar cores e estilos no output do terminal de forma fácil. Rich também permite formataçao de tabelas, barra de progresso, markdown, highlight de sintaxe de código fonte, rastreio de erros (traceback) e muito mais.
 
 ![Funcões](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
 
-Para mais detalhes, veja um vídeo de introdução so Rick em [calmcode.io](https://calmcode.io/rich/introduction.html) por [@fishnets88](https://twitter.com/fishnets88).
+Para mais detalhes, veja um vídeo de introdução so Rich em [calmcode.io](https://calmcode.io/rich/introduction.html) por [@fishnets88](https://twitter.com/fishnets88).
 
 Veja aqui [o que estão falando sobre o Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
 ## Compatibilidade
 
-Rich funciona no Linux, OSX e Windows. True color / emoji funciona no novo Terminal do Windows, o terminal classico é limitado a 16 cores. Rich requer Python 3.6.1 or later.
+Rich funciona no Linux, OSX e Windows. True color / emoji funciona no novo Terminal do Windows, o terminal classico é limitado a 16 cores. Rich requer Python 3.6.1 ou superior.
 
 Rich funciona com [Jupyter notebooks](https://jupyter.org/) sem a necessidade de configurações adicionais.
 
@@ -111,7 +111,7 @@ Voce pode usar o objeto do Console para gerar facilmente uma saída para o termi
 
 ## Inspect do Rich
 
-O Rich tem uma função [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) que gera um relatório de qualquer objeto no Python, como classes, instancias ou funções nativas.
+O Rich tem uma função [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) que gera um relatório de qualquer objeto no Python, como classes, instâncias ou funções nativas.
 
 ```python
 >>> my_list = ["foo", "bar"]
@@ -185,18 +185,18 @@ Para imprimir um emoji no console, coloque o nome do emoji entre dois ":" (dois 
 😃 🧛 💩 👍 🦝
 ```
 
-Please use this feature wisely.
+Por favor use esse recurso com sabedoria.
 
 </details>
 
 <details>
 <summary>Tabelas</summary>
 
-O Rich pode imprimir [tables](https://rich.readthedocs.io/en/latest/tables.html) flexiveis usando caracteres unicode como bordas. Existem várias opções de formatação de bordas, estilos, alinhamento das celulas etc.
+O Rich pode imprimir [tables](https://rich.readthedocs.io/en/latest/tables.html) flexíveis usando caracteres unicode como bordas. Existem várias opções de formatação de bordas, estilos, alinhamento das celulas, etc.
 
 ![table movie](https://github.com/willmcgugan/rich/raw/master/imgs/table_movie.gif)
 
-A animação acima foi gerada com o arquivo [table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py) da pasta de exeplos.
+A animação acima foi gerada com o arquivo [table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py) da pasta de exemplos.
 
 Veja um exemplo mais simple:
 
@@ -236,7 +236,7 @@ Que gera o seguinte resultado:
 
 Observe que o markup é renderizado da mesma for que em `print()` e `log()`. De fato, tudo que é renderizável pelo Rich pode ser incluído nos cabeçalhos ou linhas (até mesmo outras tabelas).
 
-A class `Table` é inteligente o suficiente para ajustar o tamanho das colunas para caber na largura do terminal, quebrando o texto em novas linhas como necessário. Veja a seguir o mesmo exemplo, só que desta vez com um terminal menor do que o tamanho original da tabela:
+A classe `Table` é inteligente o suficiente para ajustar o tamanho das colunas para caber na largura do terminal, quebrando o texto em novas linhas quando necessário. Veja a seguir o mesmo exemplo, só que desta vez com um terminal menor do que o tamanho original da tabela:
 
 ![table2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
 
@@ -256,7 +256,6 @@ for step in track(range(100)):
     do_step(step)
 ```
 
-It's not much harder to add multiple progress bars. Here's an example taken from the docs:
 Adicionar multiplas barras de progresso também é simples. Veja outro exemplo que existe na documentação:
 
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
@@ -265,7 +264,7 @@ As colunas podem ser configuradas pra mostrar qualquer detalho necessário. As c
 
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/downloader.gif)
 
-Para testar isso no seu terminal, use o arquivo [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) para fazer o download de multiplas URLs simultaneamente, exibindo o progress de cada download.
+Para testar isso no seu terminal, use o arquivo [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) para fazer o download de multiplas URLs simultaneamente, exibindo o progresso de cada download.
 
 </details>
 
@@ -319,7 +318,6 @@ Isso gera o seguinte resultado:
 
 ![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
 
-Veja o exemplo em [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) de um script that displays a tree view of any directory, similar to the linux `tree` command.
 Veja o exemplo em [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) de um código que gera uma árvore de exibição de um dicionário, semelhante ao comando `tree` do linux.
 
 </details>
@@ -340,7 +338,6 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-The following screenshot is the output from the [columns example](https://github.com/willmcgugan/rich/blob/master/examples/columns.py) which displays data pulled from an API in columns:
 O screenshot a seguir é do resultado do [exemplo de colunas](https://github.com/willmcgugan/rich/blob/master/examples/columns.py) formatando em colunas os dados extraidos de uma API:
 
 ![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
@@ -444,14 +441,14 @@ Aqui estão alguns projetos que usam o Rich:
 - [cansarigol/pdbr](https://github.com/cansarigol/pdbr)
   pdb + Rich para auxiliar no debug
 - [plant99/felicette](https://github.com/plant99/felicette)
-  Imagem de satélites para tolos.
+  Imagem de satélites para iniciantes.
 - [seleniumbase/SeleniumBase](https://github.com/seleniumbase/SeleniumBase)
   Automatize & teste 10x mais rápido com Selenium & pytest. Baterias inclusas.
 - [smacke/ffsubsync](https://github.com/smacke/ffsubsync)
   Automagicamente sincronize legendas com vídeos.
 - [tryolabs/norfair](https://github.com/tryolabs/norfair)
   Biblioteca Python para adicionar rastreio em tempo real de objetos 2D em qualquer detector.
-- [ansible/ansible-lint](https://github.com/ansible/ansible-lint) Ansible-lint verifica boas praticas e comportamento que podem ser melhorados.
+- [ansible/ansible-lint](https://github.com/ansible/ansible-lint) Ansible-lint verifica boas práticas e comportamento que podem ser melhorados.
 - [ansible-community/molecule](https://github.com/ansible-community/molecule) Framework de test para Ansible Molecule
 - +[Muitos outros](https://github.com/willmcgugan/rich/network/dependents)!
 

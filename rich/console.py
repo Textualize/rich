@@ -666,7 +666,7 @@ class Console:
         self.record = record
         self._markup = markup
         self._emoji = emoji
-        self._emoji_variant = emoji_variant
+        self._emoji_variant: Optional[EmojiVariant] = emoji_variant
         self._highlight = highlight
         self.legacy_windows: bool = (
             (detect_legacy_windows() and not self.is_jupyter)
@@ -899,7 +899,13 @@ class Console:
         if self._force_terminal is not None:
             return self._force_terminal
         isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
-        return False if isatty is None else isatty()
+        try:
+            return False if isatty is None else isatty()
+        except ValueError:
+            # in some situation (at the end of a pytest run for example) isatty() can raise
+            # ValueError: I/O operation on closed file
+            # return False because we aren't in a terminal anymore
+            return False
 
     @property
     def is_dumb_terminal(self) -> bool:

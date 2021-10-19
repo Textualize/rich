@@ -698,3 +698,14 @@ def test_print_newline_start():
     result = console.end_capture()
 
     assert result == "Foo\n\nFoo\nbar\n\n"
+
+
+def test_is_terminal_broken_file():
+    console = Console()
+
+    def _mock_isatty():
+        raise ValueError()
+
+    console.file.isatty = _mock_isatty
+
+    assert console.is_terminal == False
