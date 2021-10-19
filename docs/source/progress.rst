@@ -34,9 +34,9 @@ If you require multiple tasks in the display, or wish to configure the columns i
 The Progress class is designed to be used as a *context manager* which will start and stop the progress display automatically.
 
 Here's a simple example::
-    
+
     import time
-    
+
     from rich.progress import Progress
 
     with Progress() as progress:
@@ -82,6 +82,8 @@ Indeterminate progress
 ~~~~~~~~~~~~~~~~~~~~~~
 
 When you add a task it is automatically *started*, which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. This may not work well if there is a long delay before you can start updating progress; you may need to wait for a response from a server or count files in a directory (for example). In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` which will display a pulsing animation that lets the user know something is working. This is know as an *indeterminate* progress bar. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
+
+If you have a task for which the total count cannot be calculated, it is possible to track the work being done. In that case you can call :meth:`~rich.progress.Progress.add_task` with ``total=float("inf")`` which will display a pulsing animation which will track the work being done. The calls to :meth:`~rich.progress.Progress.update` can be done as normal and the completed count will be displayed. The value shown for the total in a column will be ``?`` for this task and any progress calculation will return 0%.
 
 Auto refresh
 ~~~~~~~~~~~~
@@ -169,7 +171,7 @@ If you have another Console object you want to use, pass it in to the :class:`~r
     with Progress(console=my_console) as progress:
         my_console.print("[bold blue]Starting work!")
         do_work(progress)
-        
+
 
 Redirecting stdout / stderr
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -187,7 +189,7 @@ If the :class:`~rich.progress.Progress` class doesn't offer exactly what you nee
 
     class MyProgress(Progress):
         def get_renderables(self):
-            yield Panel(self.make_tasks_table(self.tasks))            
+            yield Panel(self.make_tasks_table(self.tasks))
 
 Multiple Progress
 -----------------
