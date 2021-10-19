@@ -30,6 +30,7 @@ from typing import (
     Type,
     Union,
     cast,
+    overload,
 )
 
 if sys.version_info >= (3, 8):
@@ -569,6 +570,26 @@ if detect_legacy_windows():  # pragma: no cover
     init(strip=False)
 
 
+class ConsoleSize:
+    @overload
+    def __get__(self, obj: None, objtype: None) -> "ConsoleSize":
+        ...
+
+    @overload
+    def __get__(self, obj: "Console", objtype: Type["Console"]) -> ConsoleDimensions:
+        ...
+
+    def __get__(
+        self, obj: Union["Console", None], objtype: Union[Type["Console"], None] = None
+    ) -> Union["ConsoleSize", ConsoleDimensions]:
+        return self if obj is None else obj._size_getter()
+
+    def __set__(
+        self, obj: "Console", value: Union[ConsoleDimensions, Tuple[int, int]]
+    ) -> None:
+        obj._size_setter(value)
+
+
 class Console:
     """A high level console interface.
 
@@ -606,6 +627,13 @@ class Console:
     """
 
     _environ: Mapping[str, str] = os.environ
+
+    size = ConsoleSize()
+    """Get the size of the console.
+
+    Returns:
+        ConsoleDimensions: A named tuple containing the dimensions.
+    """
 
     def __init__(
         self,
@@ -932,8 +960,7 @@ class Console:
             is_terminal=self.is_terminal,
         )
 
-    @property
-    def size(self) -> ConsoleDimensions:
+    def _size_getter(self) -> ConsoleDimensions:
         """Get the size of the console.
 
         Returns:
@@ -967,8 +994,7 @@ class Console:
             height if self._height is None else self._height,
         )
 
-    @size.setter
-    def size(self, new_size: Tuple[int, int]) -> None:
+    def _size_setter(self, new_size: Union[ConsoleDimensions, Tuple[int, int]]) -> None:
         """Set a new size for the terminal.
 
         Args:

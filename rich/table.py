@@ -8,7 +8,9 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    Type,
     Union,
+    overload,
 )
 
 from . import box, errors
@@ -114,6 +116,26 @@ class _Cell(NamedTuple):
     """Cell renderable."""
 
 
+class TablePadding:
+    @overload
+    def __get__(self, obj: None, objtype: None) -> "TablePadding":
+        ...
+
+    @overload
+    def __get__(
+        self, obj: "Table", objtype: Type["Table"]
+    ) -> Tuple[int, int, int, int]:
+        ...
+
+    def __get__(
+        self, obj: Union["Table", None], objtype: Union[Type["Table"], None] = None
+    ) -> Union["TablePadding", Tuple[int, int, int, int]]:
+        return self if obj is None else obj._padding_getter()
+
+    def __set__(self, obj: "Table", value: PaddingDimensions) -> None:
+        obj._padding_setter(value)
+
+
 class Table(JupyterMixin):
     """A console renderable to draw a table.
 
@@ -148,6 +170,8 @@ class Table(JupyterMixin):
 
     columns: List[Column]
     rows: List[Row]
+    padding = TablePadding()
+    """Get cell padding."""
 
     def __init__(
         self,
@@ -315,16 +339,13 @@ class Table(JupyterMixin):
         measurement = measurement.clamp(self.min_width)
         return measurement
 
-    @property
-    def padding(self) -> Tuple[int, int, int, int]:
+    def _padding_getter(self) -> Tuple[int, int, int, int]:
         """Get cell padding."""
         return self._padding
 
-    @padding.setter
-    def padding(self, padding: PaddingDimensions) -> "Table":
+    def _padding_setter(self, padding: PaddingDimensions) -> None:
         """Set cell padding."""
         self._padding = Padding.unpack(padding)
-        return self
 
     def add_column(
         self,
