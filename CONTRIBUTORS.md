@@ -19,5 +19,6 @@ The following people have contributed to the development of Rich:
 - [Kylian Point](https://github.com/p0lux)
 - [Kyle Pollina](https://github.com/kylepollina)
 - [Clément Robert](https://github.com/neutrinoceros)
+- [Michel Rogers-Vallee](https://github.com/mrvkino)
 - [Tushar Sadhwani](https://github.com/tusharsadhwani)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
