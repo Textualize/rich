@@ -112,10 +112,6 @@ def test_resume():
     assert bar.completed == 21
 
 
-def test_resume():
-    """todo"""
-
-
 if __name__ == "__main__":
     bar = ProgressBar(completed=11, width=50)
     bar_render = render(bar)
