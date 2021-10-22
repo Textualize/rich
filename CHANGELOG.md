@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed an edge case bug when console module try to detect if they are in a tty at the end of a pytest run
+- Fixed a bug where logging handler raises an exception when running with pythonw (related to https://bugs.python.org/issue13807)
 
 ## [10.12.0] - 2021-10-06
 

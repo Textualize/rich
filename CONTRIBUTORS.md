@@ -20,4 +20,5 @@ The following people have contributed to the development of Rich:
 - [Kyle Pollina](https://github.com/kylepollina)
 - [Clément Robert](https://github.com/neutrinoceros)
 - [Tushar Sadhwani](https://github.com/tusharsadhwani)
+- [Tim Savage](https://github.com/timsavage)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
