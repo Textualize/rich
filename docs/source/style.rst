@@ -115,7 +115,7 @@ To use a style theme, construct a :class:`~rich.theme.Theme` instance and pass i
     from rich.console import Console
     from rich.theme import Theme
     custom_theme = Theme({
-        "info" : "dim cyan",
+        "info": "dim cyan",
         "warning": "magenta",
         "danger": "bold red"
     })
