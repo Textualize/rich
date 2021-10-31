@@ -244,6 +244,8 @@ The console class has an :meth:`~rich.console.Console.input` method which works 
     console = Console()
     console.input("What is [i]your[/i] [bold red]name[/]? :smiley: ")
 
+If Python's builtin :mod:`readline` module is previously loaded, elaborate line editing and history features will be available.
+
 Exporting
 ---------
 
