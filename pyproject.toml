@@ -24,6 +24,8 @@ classifiers = [
 ]
 include = ["rich/py.typed"]
 
+[tool.poetry.scripts]
+rich-markdown = "rich.markdown:main"
 
 [tool.poetry.dependencies]
 python = "^3.6.2"

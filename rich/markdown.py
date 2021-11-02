@@ -529,8 +529,7 @@ class Markdown(JupyterMixin):
                     new_line = element.new_line
 
 
-if __name__ == "__main__":  # pragma: no cover
-
+def main():
     import argparse
     import sys
 
@@ -622,3 +621,7 @@ if __name__ == "__main__":  # pragma: no cover
     else:
         console = Console(force_terminal=args.force_color, width=args.width)
         console.print(markdown)
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()
