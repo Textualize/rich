@@ -1631,7 +1631,7 @@ class Console:
         ensure_ascii: bool = True,
         check_circular: bool = True,
         allow_nan: bool = True,
-        default: Optional[Callable] = None,
+        default: Optional[Callable[[Any], Any]] = None,
         sort_keys: bool = False,
     ) -> None:
         """Pretty prints JSON. Output will be valid JSON.
