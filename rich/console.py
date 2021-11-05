@@ -941,7 +941,7 @@ class Console:
         """
 
         if self._width is not None and self._height is not None:
-            return ConsoleDimensions(self._width, self._height)
+            return ConsoleDimensions(self._width - self.legacy_windows, self._height)
 
         if self.is_dumb_terminal:
             return ConsoleDimensions(80, 25)
@@ -963,7 +963,7 @@ class Console:
         width = width or 80
         height = height or 25
         return ConsoleDimensions(
-            (width - self.legacy_windows) if self._width is None else self._width,
+            (width if self._width is None else self._width) - self.legacy_windows,
             height if self._height is None else self._height,
         )
 
@@ -1904,9 +1904,7 @@ class Console:
                         try:
                             if WINDOWS:  # pragma: no cover
                                 # https://bugs.python.org/issue37871
-                                write = self.file.write
-                                for line in text.splitlines(True):
-                                    write(line)
+                                self.file.writelines(text.splitlines(True))
                             else:
                                 self.file.write(text)
                             self.file.flush()
