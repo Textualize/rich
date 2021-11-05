@@ -770,7 +770,7 @@ class Console:
             if color_term in ("truecolor", "24bit"):
                 return ColorSystem.TRUECOLOR
             term = self._environ.get("TERM", "").strip().lower()
-            _term_name, _hyphen, colors = term.partition("-")
+            _term_name, _hyphen, colors = term.rpartition("-")
             color_system = _TERM_COLORS.get(colors, ColorSystem.STANDARD)
             return color_system
 

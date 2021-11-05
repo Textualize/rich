@@ -709,3 +709,9 @@ def test_is_terminal_broken_file():
     console.file.isatty = _mock_isatty
 
     assert console.is_terminal == False
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="not relevant on Windows")
+def test_detect_color_system():
+    console = Console(_environ={"TERM": "rxvt-unicode-256color"}, force_terminal=True)
+    assert console._detect_color_system() == ColorSystem.EIGHT_BIT
