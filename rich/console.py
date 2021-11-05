@@ -1668,7 +1668,17 @@ class Console:
                 raise TypeError(
                     f"json must be str. Did you mean print_json(data={json!r}) ?"
                 )
-            json_renderable = JSON(json, indent=indent, highlight=highlight)
+            json_renderable = JSON(
+                json,
+                indent=indent,
+                highlight=highlight,
+                skip_keys=skip_keys,
+                ensure_ascii=ensure_ascii,
+                check_circular=check_circular,
+                allow_nan=allow_nan,
+                default=default,
+                sort_keys=sort_keys,
+            )
         self.print(json_renderable)
 
     def update_screen(
