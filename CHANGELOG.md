@@ -5,11 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [10.12.1] - unreleased
+## [10.13.0] - unreleased
+
+### Added
+
+- Added json.dumps parameters to print_json https://github.com/willmcgugan/rich/issues/1638
 
 ### Fixed
 
 - Fixed an edge case bug when console module try to detect if they are in a tty at the end of a pytest run
+- Fixed issue with TERM env vars that have more than one hyphen https://github.com/willmcgugan/rich/issues/1640
 
 ## [10.12.0] - 2021-10-06
 

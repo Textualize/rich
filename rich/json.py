@@ -12,11 +12,38 @@ class JSON:
         json (str): JSON encoded data.
         indent (int, optional): Number of characters to indent by. Defaults to 2.
         highlight (bool, optional): Enable highlighting. Defaults to True.
+        skip_keys (bool, optional): Skip keys not of a basic type. Defaults to False.
+        ensure_ascii (bool, optional): Escape all non-ascii characters. Defaults to False.
+        check_circular (bool, optional): Check for circular references. Defaults to True.
+        allow_nan (bool, optional): Allow NaN and Infinity values. Defaults to True.
+        default (Callable, optional): A callable that converts values that can not be encoded
+            in to something that can be JSON encoded. Defaults to None.
+        sort_keys (bool, optional): Sort dictionary keys. Defaults to False.
     """
 
-    def __init__(self, json: str, indent: int = 2, highlight: bool = True) -> None:
+    def __init__(
+        self,
+        json: str,
+        indent: int = 2,
+        highlight: bool = True,
+        skip_keys: bool = False,
+        ensure_ascii: bool = True,
+        check_circular: bool = True,
+        allow_nan: bool = True,
+        default: Optional[Callable[[Any], Any]] = None,
+        sort_keys: bool = False,
+    ) -> None:
         data = loads(json)
-        json = dumps(data, indent=indent)
+        json = dumps(
+            data,
+            indent=indent,
+            skipkeys=skip_keys,
+            ensure_ascii=ensure_ascii,
+            check_circular=check_circular,
+            allow_nan=allow_nan,
+            default=default,
+            sort_keys=sort_keys,
+        )
         highlighter = JSONHighlighter() if highlight else NullHighlighter()
         self.text = highlighter(json)
         self.text.no_wrap = True
@@ -28,7 +55,12 @@ class JSON:
         data: Any,
         indent: int = 2,
         highlight: bool = True,
+        skip_keys: bool = False,
+        ensure_ascii: bool = True,
+        check_circular: bool = True,
+        allow_nan: bool = True,
         default: Optional[Callable[[Any], Any]] = None,
+        sort_keys: bool = False,
     ) -> "JSON":
         """Encodes a JSON object from arbitrary data.
 
@@ -37,12 +69,28 @@ class JSON:
             indent (int, optional): Number of characters to indent by. Defaults to 2.
             highlight (bool, optional): Enable highlighting. Defaults to True.
             default (Callable, optional): Optional callable which will be called for objects that cannot be serialized. Defaults to None.
+            skip_keys (bool, optional): Skip keys not of a basic type. Defaults to False.
+            ensure_ascii (bool, optional): Escape all non-ascii characters. Defaults to False.
+            check_circular (bool, optional): Check for circular references. Defaults to True.
+            allow_nan (bool, optional): Allow NaN and Infinity values. Defaults to True.
+            default (Callable, optional): A callable that converts values that can not be encoded
+                in to something that can be JSON encoded. Defaults to None.
+            sort_keys (bool, optional): Sort dictionary keys. Defaults to False.
 
         Returns:
             JSON: New JSON object from the given data.
         """
         json_instance: "JSON" = cls.__new__(cls)
-        json = dumps(data, indent=indent, default=default)
+        json = dumps(
+            data,
+            indent=indent,
+            skipkeys=skip_keys,
+            ensure_ascii=ensure_ascii,
+            check_circular=check_circular,
+            allow_nan=allow_nan,
+            default=default,
+            sort_keys=sort_keys,
+        )
         highlighter = JSONHighlighter() if highlight else NullHighlighter()
         json_instance.text = highlighter(json)
         json_instance.text.no_wrap = True
