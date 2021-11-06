@@ -166,9 +166,17 @@ def install(
         ip = get_ipython()  # type: ignore
         from IPython.core.formatters import BaseFormatter
 
+        class RichFormatter(BaseFormatter):  # type: ignore
+            pprint: bool = True
+
+            def __call__(self, value: Any) -> Any:
+                if self.pprint:
+                    return ipy_display_hook(value)
+                else:
+                    return repr(value)
+
         # replace plain text formatter with rich formatter
-        rich_formatter = BaseFormatter()
-        rich_formatter.for_type(object, func=ipy_display_hook)
+        rich_formatter = RichFormatter()
         ip.display_formatter.formatters["text/plain"] = rich_formatter
     except Exception:
         sys.displayhook = display_hook
