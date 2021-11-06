@@ -158,7 +158,7 @@ def test_growing_display_file_console() -> None:
     output = console.end_capture()
     assert (
         output
-        == "Step 0\nStep 1\nStep 2\nStep 3\nStep 4\nStep 5\nStep 6\nStep 7\nStep 8\nStep 9\n"
+        == "Step 0\nStep 1\nStep 2\nStep 3\nStep 4\nStep 5\nStep 6\nStep 7\nStep 8\nStep 9\n\n"
     )
 
 

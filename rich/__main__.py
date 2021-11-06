@@ -231,8 +231,8 @@ if __name__ == "__main__":  # pragma: no cover
 
     text = console.file.getvalue()
     # https://bugs.python.org/issue37871
-    for line in text.splitlines():
-        print(line)
+    for line in text.splitlines(True):
+        print(line, end="")
 
     print(f"rendered in {taken}ms")
 
