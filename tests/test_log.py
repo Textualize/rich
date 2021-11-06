@@ -6,8 +6,7 @@ import re
 
 from rich.console import Console
 
-
-re_link_ids = re.compile(r"id=[\d\.\-]*?;.*?\x1b")
+re_link_ids = re.compile(r"id=((\d+);(file:///(\w+\/)+(\w+\.py)(#\d+)?))\x1b")
 
 
 def replace_link_ids(render: str) -> str:
@@ -15,7 +14,7 @@ def replace_link_ids(render: str) -> str:
     reproducible tests.
 
     """
-    return re_link_ids.sub("id=0;foo\x1b", render)
+    return re_link_ids.sub("id=0;file:///path/to/source.py#00\x1b", render)
 
 
 test_data = [1, 2, 3]
@@ -33,13 +32,11 @@ def render_log():
     console.log()
     console.log("Hello from", console, "!")
     console.log(test_data, log_locals=True)
-    return replace_link_ids(console.file.getvalue())
+    return replace_link_ids(console.file.getvalue()).replace('test_log.py','source.py')
 
 
 def test_log():
-    expected = replace_link_ids(
-        "\x1b[2;36m[TIME]\x1b[0m\x1b[2;36m \x1b[0m                                                           \x1b]8;id=0;foo\x1b\\\x1b[2mtest_log.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:33\x1b[0m\n\x1b[2;36m      \x1b[0m\x1b[2;36m \x1b[0mHello from \x1b[1m<\x1b[0m\x1b[1;95mconsole\x1b[0m\x1b[39m \x1b[0m\x1b[33mwidth\x1b[0m\x1b[39m=\x1b[0m\x1b[1;36m80\x1b[0m\x1b[39m ColorSystem.TRUECOLOR\x1b[0m\x1b[1m>\x1b[0m !      \x1b]8;id=0;foo\x1b\\\x1b[2mtest_log.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:34\x1b[0m\n\x1b[2;36m      \x1b[0m\x1b[2;36m \x1b[0m\x1b[1m[\x1b[0m\x1b[1;36m1\x1b[0m, \x1b[1;36m2\x1b[0m, \x1b[1;36m3\x1b[0m\x1b[1m]\x1b[0m                                                  \x1b]8;id=0;foo\x1b\\\x1b[2mtest_log.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:35\x1b[0m\n       \x1b[34m╭─\x1b[0m\x1b[34m───────────────────── \x1b[0m\x1b[3;34mlocals\x1b[0m\x1b[34m ─────────────────────\x1b[0m\x1b[34m─╮\x1b[0m                   \n       \x1b[34m│\x1b[0m \x1b[3;33mconsole\x1b[0m\x1b[31m =\x1b[0m \x1b[1m<\x1b[0m\x1b[1;95mconsole\x1b[0m\x1b[39m \x1b[0m\x1b[33mwidth\x1b[0m\x1b[39m=\x1b[0m\x1b[1;36m80\x1b[0m\x1b[39m ColorSystem.TRUECOLOR\x1b[0m\x1b[1m>\x1b[0m \x1b[34m│\x1b[0m                   \n       \x1b[34m╰────────────────────────────────────────────────────╯\x1b[0m                   \n"
-    )
+    expected = replace_link_ids('\x1b[2;36m[TIME]\x1b[0m\x1b[2;36m \x1b[0m                                                           \x1b]8;id=0;file:///path/to/foo.py#00\x1b\\\x1b[2msource.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:\x1b[0m\x1b]8;id=0;file:///path/to/foo.py#00\x1b\\\x1b[2m32\x1b[0m\x1b]8;;\x1b\\\n\x1b[2;36m      \x1b[0m\x1b[2;36m \x1b[0mHello from \x1b[1m<\x1b[0m\x1b[1;95mconsole\x1b[0m\x1b[39m \x1b[0m\x1b[33mwidth\x1b[0m\x1b[39m=\x1b[0m\x1b[1;36m80\x1b[0m\x1b[39m ColorSystem.TRUECOLOR\x1b[0m\x1b[1m>\x1b[0m !      \x1b]8;id=0;file:///path/to/foo.py#00\x1b\\\x1b[2msource.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:\x1b[0m\x1b]8;id=0;file:///path/to/foo.py#00\x1b\\\x1b[2m33\x1b[0m\x1b]8;;\x1b\\\n\x1b[2;36m      \x1b[0m\x1b[2;36m \x1b[0m\x1b[1m[\x1b[0m\x1b[1;36m1\x1b[0m, \x1b[1;36m2\x1b[0m, \x1b[1;36m3\x1b[0m\x1b[1m]\x1b[0m                                                  \x1b]8;id=0;file:///path/to/foo.py#00\x1b\\\x1b[2msource.py\x1b[0m\x1b]8;;\x1b\\\x1b[2m:\x1b[0m\x1b]8;id=0;file:///path/to/foo.py#00\x1b\\\x1b[2m34\x1b[0m\x1b]8;;\x1b\\\n       \x1b[34m╭─\x1b[0m\x1b[34m───────────────────── \x1b[0m\x1b[3;34mlocals\x1b[0m\x1b[34m ─────────────────────\x1b[0m\x1b[34m─╮\x1b[0m                   \n       \x1b[34m│\x1b[0m \x1b[3;33mconsole\x1b[0m\x1b[31m =\x1b[0m \x1b[1m<\x1b[0m\x1b[1;95mconsole\x1b[0m\x1b[39m \x1b[0m\x1b[33mwidth\x1b[0m\x1b[39m=\x1b[0m\x1b[1;36m80\x1b[0m\x1b[39m ColorSystem.TRUECOLOR\x1b[0m\x1b[1m>\x1b[0m \x1b[34m│\x1b[0m                   \n       \x1b[34m╰────────────────────────────────────────────────────╯\x1b[0m                   \n')
     rendered = render_log()
     print(repr(rendered))
     assert rendered == expected
