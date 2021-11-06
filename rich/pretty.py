@@ -166,7 +166,7 @@ def install(
         ip = get_ipython()  # type: ignore
         from IPython.core.formatters import BaseFormatter
 
-        class RichFormatter(BaseFormatter):
+        class RichFormatter(BaseFormatter):  # type: ignore
             pprint: bool = True
 
             def __call__(self, value: Any) -> Any:
