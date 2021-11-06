@@ -6,6 +6,7 @@ The following people have contributed to the development of Rich:
 
 - [Gregory Beauregard](https://github.com/GBeauregard/pyffstream)
 - [Pete Davison](https://github.com/pd93)
+- [James Estevez](https://github.com/jstvz)
 - [Oleksis Fraga](https://github.com/oleksis)
 - [Finn Hughes](https://github.com/finnhughes)
 - [Josh Karpel](https://github.com/JoshKarpel)
