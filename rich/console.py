@@ -1679,7 +1679,7 @@ class Console:
                 default=default,
                 sort_keys=sort_keys,
             )
-        self.print(json_renderable)
+        self.print(json_renderable, soft_wrap=True)
 
     def update_screen(
         self,
