@@ -1950,6 +1950,8 @@ class Console:
     ) -> str:
         """Displays a prompt and waits for input from the user. The prompt may contain color / style.
 
+        It works in the same way as Python's builtin :func:`input` function and provides elaborate line editing and history features if Python's builtin :mod:`readline` module is previously loaded.
+
         Args:
             prompt (Union[str, Text]): Text to render in the prompt.
             markup (bool, optional): Enable console markup (requires a str prompt). Defaults to True.
