@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed issue with TERM env vars that have more than one hyphen https://github.com/willmcgugan/rich/issues/1640
 - Fixed missing new line after progress bar when terminal is not interactive https://github.com/willmcgugan/rich/issues/1606
 - Fixed exception in IPython when disabling pprint with %pprint https://github.com/willmcgugan/rich/issues/1646
+- Fixed issue where values longer than the console width produced invalid JSON https://github.com/willmcgugan/rich/issues/1653
 
 ## [10.12.0] - 2021-10-06
 
