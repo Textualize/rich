@@ -67,6 +67,7 @@ class ExampleDataclass:
     bar: str
     ignore: int = field(repr=False)
     baz: List[str] = field(default_factory=list)
+    last: int = field(default=1, repr=False)
 
 
 def test_pretty_dataclass():
