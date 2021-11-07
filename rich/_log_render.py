@@ -75,7 +75,11 @@ class LogRender:
                 path, style=f"link file://{link_path}" if link_path else ""
             )
             if line_no:
-                path_text.append(f":{line_no}")
+                path_text.append(":")
+                path_text.append(
+                    f"{line_no}",
+                    style=f"link file://{link_path}#{line_no}" if link_path else "",
+                )
             row.append(path_text)
 
         output.add_row(*row)
