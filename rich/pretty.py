@@ -654,12 +654,11 @@ def traverse(
             )
 
             for last, field in loop_last(field for field in fields(obj) if field.repr):
-                if field.repr:
-                    child_node = _traverse(getattr(obj, field.name))
-                    child_node.key_repr = field.name
-                    child_node.last = last
-                    child_node.key_separator = "="
-                    append(child_node)
+                child_node = _traverse(getattr(obj, field.name))
+                child_node.key_repr = field.name
+                child_node.last = last
+                child_node.key_separator = "="
+                append(child_node)
 
             pop_visited(obj_id)
 
