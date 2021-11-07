@@ -1,6 +1,8 @@
 import io
 import os
 import logging
+from typing import Optional
+
 import pytest
 
 from rich.console import Console
@@ -87,6 +89,37 @@ def test_exception_with_extra_lines():
     assert "ZeroDivisionError" in render
     assert "message" in render
     assert "division by zero" in render
+
+
+def test_stderr_and_stdout_are_none(monkeypatch):
+    # This test is specifically to handle cases when using pythonw on
+    # windows an stderr and stdout are set to None.
+    # See https://bugs.python.org/issue13807
+
+    monkeypatch.setattr("sys.stdout", None)
+    monkeypatch.setattr("sys.stderr", None)
+
+    console = Console(_environ={})
+    target_handler = RichHandler(console=console)
+    actual_record: Optional[logging.LogRecord] = None
+
+    def mock_handle_error(record):
+        nonlocal actual_record
+        actual_record = record
+
+    target_handler.handleError = mock_handle_error
+    log.addHandler(target_handler)
+
+    try:
+        1 / 0
+    except ZeroDivisionError:
+        log.exception("message")
+
+    finally:
+        log.removeHandler(target_handler)
+
+    assert actual_record is not None
+    assert "message" in actual_record.msg
 
 
 if __name__ == "__main__":

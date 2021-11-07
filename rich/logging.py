@@ -150,7 +150,10 @@ class RichHandler(Handler):
         log_renderable = self.render(
             record=record, traceback=traceback, message_renderable=message_renderable
         )
-        self.console.print(log_renderable)
+        try:
+            self.console.print(log_renderable)
+        except Exception:
+            self.handleError(record)
 
     def render_message(self, record: LogRecord, message: str) -> "ConsoleRenderable":
         """Render message text in to Text.

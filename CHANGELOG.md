@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed an edge case bug when console module try to detect if they are in a tty at the end of a pytest run
+- Fixed a bug where logging handler raises an exception when running with pythonw (related to https://bugs.python.org/issue13807)
 - Fixed issue with TERM env vars that have more than one hyphen https://github.com/willmcgugan/rich/issues/1640
 - Fixed missing new line after progress bar when terminal is not interactive https://github.com/willmcgugan/rich/issues/1606
 - Fixed exception in IPython when disabling pprint with %pprint https://github.com/willmcgugan/rich/issues/1646
