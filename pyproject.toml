@@ -44,7 +44,7 @@ black = "^21.10b0"
 mypy = "^0.910"
 pytest-cov = "^3.0.0"
 attrs = "^21.2.0"
-types-dataclasses = "^0.1.7"
+types-dataclasses = "^0.6.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
