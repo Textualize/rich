@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed exception in IPython when disabling pprint with %pprint https://github.com/willmcgugan/rich/issues/1646
 - Fixed issue where values longer than the console width produced invalid JSON https://github.com/willmcgugan/rich/issues/1653
 
+## Changed
+
+- Markdown codeblocks now word-wrap https://github.com/willmcgugan/rich/issues/1515
+
 ## [10.12.0] - 2021-10-06
 
 ### Updated
