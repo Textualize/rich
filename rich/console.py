@@ -1625,7 +1625,7 @@ class Console:
         json: Optional[str] = None,
         *,
         data: Any = None,
-        indent: int = 2,
+        indent: Union[None, int, str] = 2,
         highlight: bool = True,
         skip_keys: bool = False,
         ensure_ascii: bool = True,
@@ -1639,7 +1639,7 @@ class Console:
         Args:
             json (Optional[str]): A string containing JSON.
             data (Any): If json is not supplied, then encode this data.
-            indent (int, optional): Number of spaces to indent. Defaults to 2.
+            indent (Union[None, int, str], optional): Number of spaces to indent. Defaults to 2.
             highlight (bool, optional): Enable highlighting of output: Defaults to True.
             skip_keys (bool, optional): Skip keys not of a basic type. Defaults to False.
             ensure_ascii (bool, optional): Escape all non-ascii characters. Defaults to False.

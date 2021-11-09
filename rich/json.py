@@ -1,5 +1,5 @@
 from json import loads, dumps
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Union
 
 from .text import Text
 from .highlighter import JSONHighlighter, NullHighlighter
@@ -10,7 +10,7 @@ class JSON:
 
     Args:
         json (str): JSON encoded data.
-        indent (int, optional): Number of characters to indent by. Defaults to 2.
+        indent (Union[None, int, str], optional): Number of characters to indent by. Defaults to 2.
         highlight (bool, optional): Enable highlighting. Defaults to True.
         skip_keys (bool, optional): Skip keys not of a basic type. Defaults to False.
         ensure_ascii (bool, optional): Escape all non-ascii characters. Defaults to False.
@@ -24,7 +24,7 @@ class JSON:
     def __init__(
         self,
         json: str,
-        indent: int = 2,
+        indent: Union[None, int, str] = 2,
         highlight: bool = True,
         skip_keys: bool = False,
         ensure_ascii: bool = True,
@@ -53,7 +53,7 @@ class JSON:
     def from_data(
         cls,
         data: Any,
-        indent: int = 2,
+        indent: Union[None, int, str] = 2,
         highlight: bool = True,
         skip_keys: bool = False,
         ensure_ascii: bool = True,
@@ -66,7 +66,7 @@ class JSON:
 
         Args:
             data (Any): An object that may be encoded in to JSON
-            indent (int, optional): Number of characters to indent by. Defaults to 2.
+            indent (Union[None, int, str], optional): Number of characters to indent by. Defaults to 2.
             highlight (bool, optional): Enable highlighting. Defaults to True.
             default (Callable, optional): Optional callable which will be called for objects that cannot be serialized. Defaults to None.
             skip_keys (bool, optional): Skip keys not of a basic type. Defaults to False.
