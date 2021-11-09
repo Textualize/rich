@@ -650,18 +650,6 @@ class Console:
             width = width or 93
             height = height or 100
 
-        if width is None:
-            columns = self._environ.get("COLUMNS")
-            if columns is not None and columns.isdigit():
-                width = int(columns)
-        if height is None:
-            lines = self._environ.get("LINES")
-            if lines is not None and lines.isdigit():
-                height = int(lines)
-
-        self.soft_wrap = soft_wrap
-        self._width = width
-        self._height = height
         self.tab_size = tab_size
         self.record = record
         self._markup = markup
@@ -673,6 +661,18 @@ class Console:
             if legacy_windows is None
             else legacy_windows
         )
+        if width is None:
+            columns = self._environ.get("COLUMNS")
+            if columns is not None and columns.isdigit():
+                width = int(columns) - self.legacy_windows
+        if height is None:
+            lines = self._environ.get("LINES")
+            if lines is not None and lines.isdigit():
+                height = int(lines)
+
+        self.soft_wrap = soft_wrap
+        self._width = width
+        self._height = height
 
         self._color_system: Optional[ColorSystem]
         self._force_terminal = force_terminal
@@ -941,7 +941,7 @@ class Console:
         """
 
         if self._width is not None and self._height is not None:
-            return ConsoleDimensions(self._width - self.legacy_windows, self._height)
+            return ConsoleDimensions(self._width, self._height)
 
         if self.is_dumb_terminal:
             return ConsoleDimensions(80, 25)
@@ -964,7 +964,7 @@ class Console:
         width = width or 80
         height = height or 25
         return ConsoleDimensions(
-            (width if self._width is None else self._width) - self.legacy_windows,
+            width - self.legacy_windows if self._width is None else self._width,
             height if self._height is None else self._height,
         )
 
