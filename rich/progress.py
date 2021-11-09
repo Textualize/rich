@@ -645,6 +645,8 @@ class Progress(JupyterMixin):
     def stop(self) -> None:
         """Stop the progress display."""
         self.live.stop()
+        if not self.console.is_interactive:
+            self.console.print()
 
     def __enter__(self) -> "Progress":
         self.start()
@@ -764,7 +766,7 @@ class Progress(JupyterMixin):
             task = self._tasks[task_id]
             completed_start = task.completed
 
-            if total is not None:
+            if total is not None and total != task.total:
                 task.total = total
                 task._reset()
             if advance is not None:
