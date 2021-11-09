@@ -941,13 +941,14 @@ class Console:
         """
 
         if self._width is not None and self._height is not None:
-            return ConsoleDimensions(self._width, self._height)
+            return ConsoleDimensions(self._width - self.legacy_windows, self._height)
 
         if self.is_dumb_terminal:
             return ConsoleDimensions(80, 25)
 
         width: Optional[int] = None
         height: Optional[int] = None
+
         if WINDOWS:  # pragma: no cover
             width, height = shutil.get_terminal_size()
         else:
@@ -963,7 +964,7 @@ class Console:
         width = width or 80
         height = height or 25
         return ConsoleDimensions(
-            ((width - self.legacy_windows) if self._width is None else self._width),
+            (width if self._width is None else self._width) - self.legacy_windows,
             height if self._height is None else self._height,
         )
 
