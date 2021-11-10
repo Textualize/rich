@@ -57,7 +57,7 @@ class Span(NamedTuple):
         return (
             f"Span({self.start}, {self.end}, {self.style!r})"
             if (isinstance(self.style, Style) and self.style._meta)
-            else f"Span({self.start}, {self.end}, {str(self.style)!r})"
+            else f"Span({self.start}, {self.end}, {repr(self.style)})"
         )
 
     def __bool__(self) -> bool:
