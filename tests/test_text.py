@@ -95,6 +95,12 @@ def test_from_markup():
     assert text._spans == [Span(7, 13, "bold")]
 
 
+def test_from_ansi():
+    text = Text.from_ansi("Hello, \033[1mWorld!\033[0m")
+    assert str(text) == "Hello, World!"
+    assert text._spans == [Span(7, 13, Style(bold=True))]
+
+
 def test_copy():
     test = Text()
     test.append("Hello", "bold")

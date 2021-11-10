@@ -243,6 +243,28 @@ class Text(JupyterMixin):
         return rendered_text
 
     @classmethod
+    def from_ansi(
+        cls,
+        text: str,
+        *,
+        justify: Optional["JustifyMethod"] = None,
+        overflow: Optional["OverflowMethod"] = None,
+    ) -> "Text":
+        """Create a Text object from pre-formatted ANSI.
+
+        Args:
+            text (str): A string containing ANSI color codes.
+            justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
+            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
+        """
+        from .ansi import AnsiDecoder
+
+        decoded_text = AnsiDecoder().decode_line(text)
+        decoded_text.justify = justify
+        decoded_text.overflow = overflow
+        return decoded_text
+
+    @classmethod
     def styled(
         cls,
         text: str,

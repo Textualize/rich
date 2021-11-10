@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed progress speed not updating when total doesn't change
 - Fixed superfluous new line in Status https://github.com/willmcgugan/rich/issues/1662
 
+### Added
+
+- Added a `rich.text.Text.from_ansi` helper method for handling pre-formatted input strings https://github.com/willmcgugan/rich/issues/1670
+
 ## [10.13.0] - 2021-11-07
 
 ### Added
