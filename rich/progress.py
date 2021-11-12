@@ -118,6 +118,9 @@ def track(
 
     """
 
+    determinate = isinstance(sequence, Sized) or (
+        (total is not None) and (total != float("inf"))
+    )
     columns: List["ProgressColumn"] = (
         [TextColumn("[progress.description]{task.description}")] if description else []
     )
@@ -129,8 +132,17 @@ def track(
                 finished_style=finished_style,
                 pulse_style=pulse_style,
             ),
-            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-            TimeRemainingColumn(),
+            *(
+                [
+                    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+                    TimeRemainingColumn(),
+                ]
+                if determinate
+                else [
+                    TextColumn("[progress.completed]{task.completed:>.0f}"),
+                    TimeElapsedColumn(),
+                ]
+            ),
         )
     )
     progress = Progress(
@@ -694,9 +706,14 @@ class Progress(JupyterMixin):
             if isinstance(sequence, Sized):
                 task_total = float(len(sequence))
             else:
-                raise ValueError(
-                    f"unable to get size of {sequence!r}, please specify 'total'. If the total is undertermined use 'float(\"inf\")'"
-                )
+                try:
+                    iter(sequence)
+                except TypeError as e:
+                    raise ValueError(
+                        f"unable to get an iterator from {sequence!r}, please provide an iterable."
+                    ) from e
+                else:
+                    task_total = float("inf")
         else:
             task_total = total
 
