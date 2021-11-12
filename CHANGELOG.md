@@ -18,10 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added json.dumps parameters to print_json https://github.com/willmcgugan/rich/issues/1638
 
-### Added
-
-- Added the ability to track an indeterminate task using `float("inf")` for the total.
-
 ### Fixed
 
 - Fixed an edge case bug when console module try to detect if they are in a tty at the end of a pytest run
