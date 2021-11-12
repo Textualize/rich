@@ -238,11 +238,13 @@ The :meth:`~rich.console.Console.print` method has a boolean ``crop`` argument. 
 Input
 -----
 
-The console class has an :meth:`~rich.console.Console.input` which works in the same way as Python's builtin ``input()`` method, but can use anything that Rich can print as a prompt. For example, here's a colorful prompt with an emoji::
+The console class has an :meth:`~rich.console.Console.input` method which works in the same way as Python's builtin :func:`input` function, but can use anything that Rich can print as a prompt. For example, here's a colorful prompt with an emoji::
 
     from rich.console import Console
     console = Console()
     console.input("What is [i]your[/i] [bold red]name[/]? :smiley: ")
+
+If Python's builtin :mod:`readline` module is previously loaded, elaborate line editing and history features will be available.
 
 Exporting
 ---------

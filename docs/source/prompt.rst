@@ -1,7 +1,7 @@
 Prompt
 ======
 
-Rich has a number of :class:`~rich.prompt.Prompt` classes which ask a user for input and loop until a valid response is received. Here's a simple example::
+Rich has a number of :class:`~rich.prompt.Prompt` classes which ask a user for input and loop until a valid response is received (they all use the :ref:`Console API<Input>` internally). Here's a simple example::
 
     >>> from rich.prompt import Prompt
     >>> name = Prompt.ask("Enter your name")

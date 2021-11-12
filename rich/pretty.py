@@ -166,9 +166,17 @@ def install(
         ip = get_ipython()  # type: ignore
         from IPython.core.formatters import BaseFormatter
 
+        class RichFormatter(BaseFormatter):  # type: ignore
+            pprint: bool = True
+
+            def __call__(self, value: Any) -> Any:
+                if self.pprint:
+                    return ipy_display_hook(value)
+                else:
+                    return repr(value)
+
         # replace plain text formatter with rich formatter
-        rich_formatter = BaseFormatter()
-        rich_formatter.for_type(object, func=ipy_display_hook)
+        rich_formatter = RichFormatter()
         ip.display_formatter.formatters["text/plain"] = rich_formatter
     except Exception:
         sys.displayhook = display_hook
@@ -645,13 +653,12 @@ def traverse(
                 last=root,
             )
 
-            for last, field in loop_last(fields(obj)):
-                if field.repr:
-                    child_node = _traverse(getattr(obj, field.name))
-                    child_node.key_repr = field.name
-                    child_node.last = last
-                    child_node.key_separator = "="
-                    append(child_node)
+            for last, field in loop_last(field for field in fields(obj) if field.repr):
+                child_node = _traverse(getattr(obj, field.name))
+                child_node.key_repr = field.name
+                child_node.last = last
+                child_node.key_separator = "="
+                append(child_node)
 
             pop_visited(obj_id)
 
