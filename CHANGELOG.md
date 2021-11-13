@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed superfluous new line in Status https://github.com/willmcgugan/rich/issues/1662
 - Fixed infinite loop in set_cell_size https://github.com/willmcgugan/rich/issues/1682
 
+### Added
+
+- Added file protocol to URL highlighter https://github.com/willmcgugan/rich/issues/1681
+
 ## [10.13.0] - 2021-11-07
 
 ### Added
