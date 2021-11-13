@@ -74,6 +74,8 @@ def _get_codepoint_cell_size(codepoint: int) -> int:
 
 def set_cell_size(text: str, total: int) -> str:
     """Set the length of a string to fit within given number of cells."""
+    if not total:
+        return ""
     cell_size = cell_len(text)
     if cell_size == total:
         return text
@@ -81,12 +83,12 @@ def set_cell_size(text: str, total: int) -> str:
         return text + " " * (total - cell_size)
 
     start = 0
-    end = cell_size
+    end = len(text)
 
     # Binary search until we find the right size
     while True:
         pos = (start + end) // 2
-        before = text[:pos]
+        before = text[: pos + 1]
         before_len = cell_len(before)
         if before_len == total + 1 and cell_len(before[-1]) == 2:
             return before[:-1] + " "
