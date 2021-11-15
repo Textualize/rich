@@ -130,12 +130,12 @@ def measure_renderables(
 
     Args:
         console (~rich.console.Console): Console instance.
+        options (~rich.console.ConsoleOptions): Console options.
         renderables (Iterable[RenderableType]): One or more renderable objects.
-        max_width (int): The maximum width available.
 
     Returns:
         Measurement: Measurement object containing range of character widths required to
-        contain all given renderables.
+            contain all given renderables.
     """
     if not renderables:
         return Measurement(0, 0)
