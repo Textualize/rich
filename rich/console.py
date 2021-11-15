@@ -953,7 +953,10 @@ class Console:
         height: Optional[int] = None
 
         if WINDOWS:  # pragma: no cover
-            width, height = os.get_terminal_size()
+            try:
+                width, height = os.get_terminal_size()
+            except OSError:  # Probably not a terminal
+                pass
         else:
             try:
                 width, height = os.get_terminal_size(sys.__stdin__.fileno())
