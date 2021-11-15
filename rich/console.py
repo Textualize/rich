@@ -650,14 +650,14 @@ class Console:
             width = width or 93
             height = height or 100
 
-        if width is None:
-            columns = self._environ.get("COLUMNS")
-            if columns is not None and columns.isdigit():
-                width = int(columns)
-        if height is None:
-            lines = self._environ.get("LINES")
-            if lines is not None and lines.isdigit():
-                height = int(lines)
+        # if width is None:
+        #     columns = self._environ.get("COLUMNS")
+        #     if columns is not None and columns.isdigit():
+        #         width = int(columns)
+        # if height is None:
+        #     lines = self._environ.get("LINES")
+        #     if lines is not None and lines.isdigit():
+        #         height = int(lines)
 
         self.soft_wrap = soft_wrap
         self._width = width
@@ -949,7 +949,7 @@ class Console:
         width: Optional[int] = None
         height: Optional[int] = None
         if WINDOWS:  # pragma: no cover
-            width, height = shutil.get_terminal_size()
+            width, height = os.get_terminal_size()
         else:
             try:
                 width, height = os.get_terminal_size(sys.__stdin__.fileno())
@@ -958,6 +958,13 @@ class Console:
                     width, height = os.get_terminal_size(sys.__stdout__.fileno())
                 except (AttributeError, ValueError, OSError):
                     pass
+
+        columns = self._environ.get("COLUMNS")
+        if columns is not None and columns.isdigit():
+            width = int(columns)
+        lines = self._environ.get("LINES")
+        if lines is not None and lines.isdigit():
+            height = int(lines)
 
         # get_terminal_size can report 0, 0 if run from pseudo-terminal
         width = width or 80
@@ -1904,7 +1911,9 @@ class Console:
                         try:
                             if WINDOWS:  # pragma: no cover
                                 # https://bugs.python.org/issue37871
-                                self.file.writelines(text.splitlines(True))
+                                write = self.file.write
+                                for line in text.splitlines(True):
+                                    write(line)
                             else:
                                 self.file.write(text)
                             self.file.flush()
