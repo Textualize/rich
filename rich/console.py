@@ -650,15 +650,6 @@ class Console:
             width = width or 93
             height = height or 100
 
-        if width is None:
-            columns = self._environ.get("COLUMNS")
-            if columns is not None and columns.isdigit():
-                width = int(columns)
-        if height is None:
-            lines = self._environ.get("LINES")
-            if lines is not None and lines.isdigit():
-                height = int(lines)
-
         self.soft_wrap = soft_wrap
         self._width = width
         self._height = height
@@ -673,6 +664,18 @@ class Console:
             if legacy_windows is None
             else legacy_windows
         )
+        if width is None:
+            columns = self._environ.get("COLUMNS")
+            if columns is not None and columns.isdigit():
+                width = int(columns) - self.legacy_windows
+        if height is None:
+            lines = self._environ.get("LINES")
+            if lines is not None and lines.isdigit():
+                height = int(lines)
+
+        self.soft_wrap = soft_wrap
+        self._width = width
+        self._height = height
 
         self._color_system: Optional[ColorSystem]
         self._force_terminal = force_terminal
@@ -948,8 +951,12 @@ class Console:
 
         width: Optional[int] = None
         height: Optional[int] = None
+
         if WINDOWS:  # pragma: no cover
-            width, height = shutil.get_terminal_size()
+            try:
+                width, height = os.get_terminal_size()
+            except OSError:  # Probably not a terminal
+                pass
         else:
             try:
                 width, height = os.get_terminal_size(sys.__stdin__.fileno())
@@ -959,11 +966,18 @@ class Console:
                 except (AttributeError, ValueError, OSError):
                     pass
 
+        columns = self._environ.get("COLUMNS")
+        if columns is not None and columns.isdigit():
+            width = int(columns)
+        lines = self._environ.get("LINES")
+        if lines is not None and lines.isdigit():
+            height = int(lines)
+
         # get_terminal_size can report 0, 0 if run from pseudo-terminal
         width = width or 80
         height = height or 25
         return ConsoleDimensions(
-            ((width - self.legacy_windows) if self._width is None else self._width),
+            width - self.legacy_windows if self._width is None else self._width,
             height if self._height is None else self._height,
         )
 
@@ -1904,7 +1918,9 @@ class Console:
                         try:
                             if WINDOWS:  # pragma: no cover
                                 # https://bugs.python.org/issue37871
-                                self.file.writelines(text.splitlines(True))
+                                write = self.file.write
+                                for line in text.splitlines(True):
+                                    write(line)
                             else:
                                 self.file.write(text)
                             self.file.flush()
