@@ -484,6 +484,14 @@ def test_no_output_if_progress_is_disabled() -> None:
     assert result == expected
 
 
+def test_no_newline_with_transient_progress(capsys):
+    # see https://github.com/willmcgugan/rich/issues/1691
+    with Progress(transient=True) as progress:
+        pass
+    out, err = capsys.readouterr()
+    assert out == ""
+
+
 if __name__ == "__main__":
     _render = render_progress()
     print(_render)
