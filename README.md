@@ -38,7 +38,7 @@ Rich works with [Jupyter notebooks](https://jupyter.org/) with no additional con
 
 ## Installing
 
-Install with `pip` or your favorite PyPi package manager.
+Install with `pip` or your favorite PyPI package manager.
 
 ```
 pip install rich

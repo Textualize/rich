@@ -37,7 +37,7 @@ Rich funktioniert mit [Jupyter notebooks](https://jupyter.org/) ohni irgendwelch
 
 ## Installation
 
-Installation mit `pip` oder mit dim liäblings PyPi Päckli-Mangager.
+Installation mit `pip` oder mit dim liäblings PyPI Päckli-Mangager.
 
 ```
 pip install rich

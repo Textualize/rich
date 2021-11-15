@@ -1482,7 +1482,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 ### Fixed
 
-- Readme links in Pypi
+- Readme links in PyPI
 
 ## [0.4.0] - 2020-02-22
 
