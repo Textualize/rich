@@ -1448,6 +1448,8 @@ class Console:
                         renderable, emoji=emoji, markup=markup, highlighter=_highlighter
                     )
                 )
+            elif isinstance(renderable, Text):
+                append_text(renderable)
             elif isinstance(renderable, ConsoleRenderable):
                 check_text()
                 append(renderable)

@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Allowed `__rich__` to work recursively
+- Allowed Text classes to work with sep in print https://github.com/willmcgugan/rich/issues/1689
 
 ## [10.13.0] - 2021-11-07
 
