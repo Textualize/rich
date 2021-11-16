@@ -117,6 +117,24 @@ def test_print():
     assert console.file.getvalue() == "foo\n"
 
 
+def test_print_multiple():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print("foo", "bar")
+    assert console.file.getvalue() == "foo bar\n"
+
+
+def test_print_text():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print(Text("foo", style="bold"))
+    assert console.file.getvalue() == "\x1B[1mfoo\x1B[0m\n"
+
+
+def test_print_text_multiple():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print(Text("foo", style="bold"), Text("bar"), "baz")
+    assert console.file.getvalue() == "\x1B[1mfoo\x1B[0m bar baz\n"
+
+
 def test_print_json():
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print_json('[false, true, null, "foo"]', indent=4)
