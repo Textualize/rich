@@ -33,3 +33,37 @@ def test_abc():
     assert not isinstance(foo, str)
     assert not isinstance("foo", RichRenderable)
     assert not isinstance([], RichRenderable)
+
+
+def test_cast_deep():
+    class B:
+        def __rich__(self) -> Foo:
+            return Foo()
+
+    class A:
+        def __rich__(self) -> B:
+            return B()
+
+    console = Console(file=io.StringIO())
+    console.print(A())
+    assert console.file.getvalue() == "Foo\n"
+
+
+def test_cast_recursive():
+    class B:
+        def __rich__(self) -> "A":
+            return A()
+
+        def __repr__(self) -> str:
+            return "<B>"
+
+    class A:
+        def __rich__(self) -> B:
+            return B()
+
+        def __repr__(self) -> str:
+            return "<A>"
+
+    console = Console(file=io.StringIO())
+    console.print(A())
+    assert console.file.getvalue() == "<B>\n"

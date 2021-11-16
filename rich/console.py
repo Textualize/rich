@@ -25,6 +25,7 @@ from typing import (
     Mapping,
     NamedTuple,
     Optional,
+    Set,
     TextIO,
     Tuple,
     Type,
@@ -53,6 +54,7 @@ from .markup import render as render_markup
 from .measure import Measurement, measure_renderables
 from .pager import Pager, SystemPager
 from .pretty import Pretty, is_expandable
+from .protocol import rich_cast
 from .region import Region
 from .scope import render_scope
 from .screen import Screen
@@ -1220,8 +1222,8 @@ class Console:
             # No space to render anything. This prevents potential recursion errors.
             return
         render_iterable: RenderResult
-        if hasattr(renderable, "__rich__") and not isclass(renderable):
-            renderable = renderable.__rich__()  # type: ignore
+
+        renderable = rich_cast(renderable)
         if hasattr(renderable, "__rich_console__") and not isclass(renderable):
             render_iterable = renderable.__rich_console__(self, _options)  # type: ignore
         elif isinstance(renderable, str):
@@ -1439,15 +1441,7 @@ class Console:
                 del text[:]
 
         for renderable in objects:
-            # I promise this is sane
-            # This detects an object which claims to have all attributes, such as MagicMock.mock_calls
-            if hasattr(
-                renderable, "jwevpw_eors4dfo6mwo345ermk7kdnfnwerwer"
-            ):  # pragma: no cover
-                renderable = repr(renderable)
-            rich_cast = getattr(renderable, "__rich__", None)
-            if rich_cast:
-                renderable = rich_cast()
+            renderable = rich_cast(renderable)
             if isinstance(renderable, str):
                 append_text(
                     self.render_str(

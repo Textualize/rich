@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [10.13.1] - 2021-11-09
+## [10.14.0] - Unreleased
 
 ### Fixed
 
@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added file protocol to URL highlighter https://github.com/willmcgugan/rich/issues/1681
+- Added rich.protocol.rich_cast
+
+### Changed
+
+- Allowed `__rich__` to work recursively
 
 ## [10.13.0] - 2021-11-07
 
