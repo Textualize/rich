@@ -28,6 +28,8 @@ class RichHandler(Handler):
         omit_repeated_times (bool, optional): Omit repetition of the same time. Defaults to True.
         show_level (bool, optional): Show a column for the level. Defaults to True.
         show_path (bool, optional): Show the path to the original log call. Defaults to True.
+        show_thread (bool, optional): Show the name of the thread in log entry. Defaults to False.
+        thread_width (int, optional): The number of characters to show for thread name. Defaults to 10.
         enable_link_path (bool, optional): Enable terminal link of path column to file. Defaults to True.
         highlighter (Highlighter, optional): Highlighter to style log messages, or None to use ReprHighlighter. Defaults to None.
         markup (bool, optional): Enable console markup in log messages. Defaults to False.
@@ -64,6 +66,8 @@ class RichHandler(Handler):
         omit_repeated_times: bool = True,
         show_level: bool = True,
         show_path: bool = True,
+        show_thread: bool = False,
+        thread_width: Optional[int] = 10,
         enable_link_path: bool = True,
         highlighter: Optional[Highlighter] = None,
         markup: bool = False,
@@ -87,6 +91,8 @@ class RichHandler(Handler):
             time_format=log_time_format,
             omit_repeated_times=omit_repeated_times,
             level_width=None,
+            show_thread=show_thread,
+            thread_width=thread_width,
         )
         self.enable_link_path = enable_link_path
         self.markup = markup
@@ -195,6 +201,7 @@ class RichHandler(Handler):
         level = self.get_level_text(record)
         time_format = None if self.formatter is None else self.formatter.datefmt
         log_time = datetime.fromtimestamp(record.created)
+        thread_name = record.threadName
 
         log_renderable = self._log_render(
             self.console,
@@ -205,6 +212,7 @@ class RichHandler(Handler):
             path=path,
             line_no=record.lineno,
             link_path=record.pathname if self.enable_link_path else None,
+            thread_name=thread_name,
         )
         return log_renderable
 

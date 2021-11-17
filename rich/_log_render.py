@@ -20,6 +20,8 @@ class LogRender:
         time_format: Union[str, FormatTimeCallable] = "[%x %X]",
         omit_repeated_times: bool = True,
         level_width: Optional[int] = 8,
+        show_thread: bool = False,
+        thread_width: Optional[int] = 10,
     ) -> None:
         self.show_time = show_time
         self.show_level = show_level
@@ -28,6 +30,8 @@ class LogRender:
         self.omit_repeated_times = omit_repeated_times
         self.level_width = level_width
         self._last_time: Optional[Text] = None
+        self.show_thread = show_thread
+        self.thread_width = thread_width
 
     def __call__(
         self,
@@ -39,6 +43,7 @@ class LogRender:
         path: Optional[str] = None,
         line_no: Optional[int] = None,
         link_path: Optional[str] = None,
+        thread_name: Optional[str] = None,
     ) -> "Table":
         from .containers import Renderables
         from .table import Table
@@ -47,6 +52,8 @@ class LogRender:
         output.expand = True
         if self.show_time:
             output.add_column(style="log.time")
+        if self.show_thread:
+            output.add_column(style="log.thread_name", width=self.thread_width)
         if self.show_level:
             output.add_column(style="log.level", width=self.level_width)
         output.add_column(ratio=1, style="log.message", overflow="fold")
@@ -65,6 +72,8 @@ class LogRender:
             else:
                 row.append(log_time_display)
                 self._last_time = log_time_display
+        if self.show_thread:
+            row.append(thread_name)
         if self.show_level:
             row.append(level)
 

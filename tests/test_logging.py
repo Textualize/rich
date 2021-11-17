@@ -122,6 +122,56 @@ def test_stderr_and_stdout_are_none(monkeypatch):
     assert "message" in actual_record.msg
 
 
+def test_thread_in_message():
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=140,
+        color_system=None,
+        _environ={},
+    )
+    handler_with_threads = RichHandler(
+        console=console, enable_link_path=False, show_thread=True
+    )
+    formatter = logging.Formatter("FORMATTER %(message)s %(asctime)s")
+    handler_with_threads.setFormatter(formatter)
+    log.addHandler(handler_with_threads)
+    log.setLevel(logging.DEBUG)
+    log.debug("foo")
+
+    render = handler_with_threads.console.file.getvalue()
+    print(f"RENDER = '{render}'")
+    log.setLevel(logging.NOTSET)
+
+    assert "MainThread DEBUG" in render
+    assert "FORMATTER foo" in render
+
+
+def test_thread_in_message_thread_width():
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=140,
+        color_system=None,
+        _environ={},
+    )
+    handler_with_threads = RichHandler(
+        console=console, enable_link_path=False, show_thread=True,
+        thread_width=6
+    )
+    formatter = logging.Formatter("FORMATTER %(message)s %(asctime)s")
+    handler_with_threads.setFormatter(formatter)
+    log.addHandler(handler_with_threads)
+    log.setLevel(logging.DEBUG)
+    log.debug("foo")
+
+    render = handler_with_threads.console.file.getvalue()
+    print(f"RENDER = '{render}'")
+    log.setLevel(logging.NOTSET)
+
+    assert "MainT… DEBUG" in render
+
+
 if __name__ == "__main__":
     render = make_log()
     print(render)

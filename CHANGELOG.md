@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added file protocol to URL highlighter https://github.com/willmcgugan/rich/issues/1681
 - Added rich.protocol.rich_cast
+- Added show_thread to RichHandler to enable showing thread names in logs
 
 ### Changed
 
