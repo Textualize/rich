@@ -100,7 +100,7 @@ def test_size():
     w, h = console.size
     assert console.width == w
 
-    console = Console(width=99, height=101)
+    console = Console(width=99, height=101, legacy_windows=False)
     w, h = console.size
     assert w == 99 and h == 101
 
@@ -115,6 +115,24 @@ def test_print():
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print("foo")
     assert console.file.getvalue() == "foo\n"
+
+
+def test_print_multiple():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print("foo", "bar")
+    assert console.file.getvalue() == "foo bar\n"
+
+
+def test_print_text():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print(Text("foo", style="bold"))
+    assert console.file.getvalue() == "\x1B[1mfoo\x1B[0m\n"
+
+
+def test_print_text_multiple():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print(Text("foo", style="bold"), Text("bar"), "baz")
+    assert console.file.getvalue() == "\x1B[1mfoo\x1B[0m bar baz\n"
 
 
 def test_print_json():
@@ -607,13 +625,13 @@ def test_height():
 
 
 def test_columns_env():
-    console = Console(_environ={"COLUMNS": "314"})
+    console = Console(_environ={"COLUMNS": "314"}, legacy_windows=False)
     assert console.width == 314
     # width take precedence
-    console = Console(width=40, _environ={"COLUMNS": "314"})
+    console = Console(width=40, _environ={"COLUMNS": "314"}, legacy_windows=False)
     assert console.width == 40
     # Should not fail
-    console = Console(width=40, _environ={"COLUMNS": "broken"})
+    console = Console(width=40, _environ={"COLUMNS": "broken"}, legacy_windows=False)
 
 
 def test_lines_env():
@@ -689,7 +707,7 @@ def test_print_width_zero():
 
 
 def test_size_properties():
-    console = Console(width=80, height=25)
+    console = Console(width=80, height=25, legacy_windows=False)
     assert console.size == ConsoleDimensions(80, 25)
     console.size = (10, 20)
     assert console.size == ConsoleDimensions(10, 20)

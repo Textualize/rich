@@ -5,12 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [10.13.1] - Unreleased
+## [10.14.0] - 2021-11-16
 
 ### Fixed
 
 - Fixed progress speed not updating when total doesn't change
 - Fixed superfluous new line in Status https://github.com/willmcgugan/rich/issues/1662
+- Fixed Windows legacy width again
+- Fixed infinite loop in set_cell_size https://github.com/willmcgugan/rich/issues/1682
+
+### Added
+
+- Added file protocol to URL highlighter https://github.com/willmcgugan/rich/issues/1681
+- Added rich.protocol.rich_cast
+
+### Changed
+
+- Allowed `__rich__` to work recursively
+- Allowed Text classes to work with sep in print https://github.com/willmcgugan/rich/issues/1689
 
 ## [10.13.0] - 2021-11-07
 
@@ -1476,7 +1488,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 ### Fixed
 
-- Readme links in Pypi
+- Readme links in PyPI
 
 ## [0.4.0] - 2020-02-22
 

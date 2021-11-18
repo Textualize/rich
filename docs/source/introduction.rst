@@ -20,7 +20,7 @@ Rich requires Python 3.6.1 and above. Note that Python 3.6.0 is *not* supported 
 Installation
 ------------
 
-You can install Rich from PyPi with `pip` or your favorite package manager::
+You can install Rich from PyPI with `pip` or your favorite package manager::
 
     pip install rich
 

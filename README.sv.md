@@ -36,7 +36,7 @@ Rich funkar med [Jupyter notebooks](https://jupyter.org/) utan någon ytterligar
 
 ## Installering
 
-Installera med `pip` eller din favorita PyPi packet hanterare.
+Installera med `pip` eller din favorita PyPI packet hanterare.
 
 ```
 pip install rich

@@ -37,7 +37,7 @@ Rich funktioniert ohne zusätzliche Konfiguration mit [Jupyter Notebooks](https:
 
 ## Installation
 
-Installation mit `pip` oder deinem bevorzugten PyPi-Paketmanager.
+Installation mit `pip` oder deinem bevorzugten PyPI-Paketmanager.
 
 ```
 python -m rich

@@ -2,7 +2,7 @@ from operator import itemgetter
 from typing import Callable, Iterable, NamedTuple, Optional, TYPE_CHECKING
 
 from . import errors
-from .protocol import is_renderable
+from .protocol import is_renderable, rich_cast
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderableType
@@ -97,8 +97,7 @@ class Measurement(NamedTuple):
             return Measurement(0, 0)
         if isinstance(renderable, str):
             renderable = console.render_str(renderable, markup=options.markup)
-        if hasattr(renderable, "__rich__"):
-            renderable = renderable.__rich__()  # type: ignore
+        renderable = rich_cast(renderable)
         if is_renderable(renderable):
             get_console_width: Optional[
                 Callable[["Console", "ConsoleOptions"], "Measurement"]
@@ -130,12 +129,12 @@ def measure_renderables(
 
     Args:
         console (~rich.console.Console): Console instance.
+        options (~rich.console.ConsoleOptions): Console options.
         renderables (Iterable[RenderableType]): One or more renderable objects.
-        max_width (int): The maximum width available.
 
     Returns:
         Measurement: Measurement object containing range of character widths required to
-        contain all given renderables.
+            contain all given renderables.
     """
     if not renderables:
         return Measurement(0, 0)

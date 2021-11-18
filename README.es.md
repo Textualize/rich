@@ -37,7 +37,7 @@ Rich funciona con [Jupyter notebooks](https://jupyter.org/) sin necesidad de con
 
 ## Instalación
 
-Instale con `pip` o su administrador de paquetes PyPi favorito.
+Instale con `pip` o su administrador de paquetes PyPI favorito.
 
 ```
 pip install rich

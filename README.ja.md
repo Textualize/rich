@@ -37,7 +37,7 @@ Richは追加の設定を行わずとも、[Jupyter notebooks](https://jupyter.o
 
 ## インストール
 
-`pip` や、あなたのお気に入りのPyPiパッケージマネージャを使ってインストールしてください。
+`pip` や、あなたのお気に入りのPyPIパッケージマネージャを使ってインストールしてください。
 
 ```
 pip install rich
