@@ -37,7 +37,7 @@ Rich funktioniert mit [Jupyter notebooks](https://jupyter.org/) ohni irgendwelch
 
 ## Installation
 
-Installation mit `pip` oder mit dim liäblings PyPI Päckli-Mangager.
+Installation mit `pip` oder mit dim liäblings PyPI Päckli-Manager.
 
 ```
 pip install rich
@@ -326,7 +326,7 @@ Lueg s Bispiil Script [tree.py](https://github.com/willmcgugan/rich/blob/master/
 <details>
 <summary>Spaltene</summary>
 
-Rich cha Inhalt i hübsche [Spaltene](https://rich.readthedocs.io/en/latest/columns.html) darstelle mit glichä oder optimale Breiti. Do isch e ganz eifachi kopii vom (MacOS / Linux) `ls` Befehl wo Ordner in Columns darstellt
+Rich cha Inhalt i hübsche [Spaltene](https://rich.readthedocs.io/en/latest/columns.html) darstelle mit glichä oder optimale Breiti. Do isch e ganz eifachi kopii vom (MacOS / Linux) `ls` Befehl wo Ordner in Spaltene darstellt
 
 ```python
 import os
@@ -339,7 +339,7 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-De folgend Screenshot isch d Usgob vom [Spalte-Bispiil](https://github.com/willmcgugan/rich/blob/master/examples/columns.py), wo Date vonnere API hollt ond in Colums darstellt:
+De folgend Screenshot isch d Usgob vom [Spalte-Bispiil](https://github.com/willmcgugan/rich/blob/master/examples/columns.py), wo Date vonnere API hollt ond in Spaltene darstellt:
 
 ![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
 
@@ -406,7 +406,7 @@ Das wird d Usgob ungefär wie s Folgende geh:
 <details>
 <summary>Tracebacks</summary>
 
-Rich cha [wunderschöni Tracebacks](https://rich.readthedocs.io/en/latest/traceback.html) generiäre wo eifach zum läse sind und meh Code als de Standard Python-Traceback darstellt. Du chasch Rich als default Traceback Handler setzä ond alli nöd abfangene Exceptions werded mit Rich dargstellt.
+Rich cha [wunderschöni Tracebacks](https://rich.readthedocs.io/en/latest/traceback.html) generiäre wo eifach zum läse sind und meh Code als de Standard-Python-Traceback darstellt. Du chasch Rich als default Traceback Handler setzä ond alli nöd abfangene Exceptions werded mit Rich dargstellt.
 
 So gsiets ungefär ufemen OSX (ähnloch uf Linux) us:
 
