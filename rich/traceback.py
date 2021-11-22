@@ -243,8 +243,11 @@ class Traceback:
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
 
-        self.suppress: Sequence[str] = []
+        self.suppress: Sequence[str, callable] = []
         for suppress_entity in suppress:
+            if callable(suppress_entity):
+                self.suppress.append(suppress_entity)
+                continue
             if not isinstance(suppress_entity, str):
                 path = os.path.dirname(suppress_entity.__file__)
             else:
@@ -285,7 +288,8 @@ class Traceback:
             locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
                 Defaults to 10.
             locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
-            suppress (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+            suppress (Iterable[Union[str, callable, ModuleType]]): Optional
+            sequence of modules or paths to exclude from traceback. If given, callables should return True to suppress a frame (given a filename).
             max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
 
         Returns:
@@ -589,7 +593,12 @@ class Traceback:
 
             first = frame_index == 1
             frame_filename = frame.filename
-            suppressed = any(frame_filename.startswith(path) for path in self.suppress)
+            suppressed = any(
+                path(frame_filename)
+                if callable(path)
+                else frame_filename.startswith(path)
+                for path in self.suppress
+            )
 
             text = Text.assemble(
                 path_highlighter(Text(frame.filename, style="pygments.string")),

@@ -239,6 +239,16 @@ def test_suppress():
         assert "pytest" in traceback.suppress[0]
         assert "foo" in traceback.suppress[1]
 
+def test_callable_suppress():
+    try:
+        1 / 0
+    except Exception:
+        sups = lambda x: 'test_traceback' not in x
+        traceback = Traceback(suppress=[sups])
+        assert len(traceback.suppress) == 1
+        for item in traceback.suppress:
+            traceback.suppress is sups
+
 
 if __name__ == "__main__":  # pragma: no cover
 

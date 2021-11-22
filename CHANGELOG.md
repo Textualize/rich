@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Changed
 
 - Markdown codeblocks now word-wrap https://github.com/willmcgugan/rich/issues/1515
+- Tweak rich.traceback(suppress=[...]) to allow for callables (e.g.  lambda fname: '/mything/' not in fname)
 
 ## [10.12.0] - 2021-10-06
 
