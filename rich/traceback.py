@@ -243,7 +243,7 @@ class Traceback:
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
 
-        self.suppress: Sequence[str, callable] = []
+        self.suppress: Sequence[str, Callable] = []
         for suppress_entity in suppress:
             if callable(suppress_entity):
                 self.suppress.append(suppress_entity)
