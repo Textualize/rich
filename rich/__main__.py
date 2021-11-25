@@ -222,7 +222,10 @@ if __name__ == "__main__":  # pragma: no cover
     test_card = make_test_card()
 
     # Print once to warm cache
+    start = process_time()
     console.print(test_card)
+    pre_cache_taken = round((process_time() - start) * 1000.0, 1)
+
     console.file = io.StringIO()
 
     start = process_time()
@@ -234,7 +237,8 @@ if __name__ == "__main__":  # pragma: no cover
     for line in text.splitlines(True):
         print(line, end="")
 
-    print(f"rendered in {taken}ms")
+    print(f"rendered in {pre_cache_taken}ms (cold cache)")
+    print(f"rendered in {taken}ms (warm cache)")
 
     from rich.panel import Panel
 

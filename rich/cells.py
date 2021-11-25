@@ -1,8 +1,12 @@
 from functools import lru_cache
+import re
 from typing import Dict, List
 
 from ._cell_widths import CELL_WIDTHS
 from ._lru_cache import LRUCache
+
+# Regex to match sequece of the most common character ranges
+_is_single_cell_widths = re.compile("^[\u0020-\u006f\u00a0\u02ff\u0370-\u0482]*$").match
 
 
 def cell_len(text: str, _cache: Dict[str, int] = LRUCache(1024 * 4)) -> int:
@@ -12,16 +16,19 @@ def cell_len(text: str, _cache: Dict[str, int] = LRUCache(1024 * 4)) -> int:
         text (str): Text to display.
 
     Returns:
-        int: Number of cells required to display the text.
+        int: Get the number of cells required to display text.
     """
-    cached_result = _cache.get(text, None)
-    if cached_result is not None:
-        return cached_result
 
-    _get_size = get_character_cell_size
-    total_size = sum(_get_size(character) for character in text)
-    if len(text) <= 64:
-        _cache[text] = total_size
+    if _is_single_cell_widths(text):
+        return len(text)
+    else:
+        cached_result = _cache.get(text, None)
+        if cached_result is not None:
+            return cached_result
+        _get_size = get_character_cell_size
+        total_size = sum(_get_size(character) for character in text)
+        if len(text) <= 64:
+            _cache[text] = total_size
     return total_size
 
 
@@ -35,12 +42,10 @@ def get_character_cell_size(character: str) -> int:
     Returns:
         int: Number of cells (0, 1 or 2) occupied by that character.
     """
-
-    codepoint = ord(character)
-    if 127 > codepoint > 31:
-        # Shortcut for ascii
+    if _is_single_cell_widths(character):
         return 1
-    return _get_codepoint_cell_size(codepoint)
+
+    return _get_codepoint_cell_size(ord(character))
 
 
 @lru_cache(maxsize=4096)
@@ -74,6 +79,13 @@ def _get_codepoint_cell_size(codepoint: int) -> int:
 
 def set_cell_size(text: str, total: int) -> str:
     """Set the length of a string to fit within given number of cells."""
+
+    if _is_single_cell_widths(text):
+        size = len(text)
+        if size < total:
+            return text + " " * (total - size)
+        return text[:total]
+
     if not total:
         return ""
     cell_size = cell_len(text)

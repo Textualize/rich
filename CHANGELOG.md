@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added dynamic_progress.py to examples
+- Added ConsoleOptions.update_height
+
+### Changed
+
+- Some optimizations for simple strings (with only single cell widths)
 
 ## [10.14.0] - 2021-11-16
 

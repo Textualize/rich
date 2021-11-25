@@ -212,6 +212,19 @@ class ConsoleOptions:
         options.min_width = options.max_width = max(0, width)
         return options
 
+    def update_height(self, height: int) -> "ConsoleOptions":
+        """Update the height, and return a copy.
+
+        Args:
+            height (int): New height
+
+        Returns:
+            ~ConsoleOptions: New Console options instance.
+        """
+        options = self.copy()
+        options.max_height = options.height = height
+        return options
+
     def update_dimensions(self, width: int, height: int) -> "ConsoleOptions":
         """Update the width and height, and return a copy.
 
@@ -224,8 +237,7 @@ class ConsoleOptions:
         """
         options = self.copy()
         options.min_width = options.max_width = max(0, width)
-        options.height = height
-        options.max_height = height
+        options.height = options.max_height = height
         return options
 
 

@@ -15,7 +15,12 @@ from typing import (
     Union,
 )
 
-from .cells import cell_len, get_character_cell_size, set_cell_size
+from .cells import (
+    _is_single_cell_widths,
+    cell_len,
+    get_character_cell_size,
+    set_cell_size,
+)
 from .repr import Result, rich_repr
 from .style import Style
 
@@ -97,19 +102,14 @@ class Segment(NamedTuple):
 
         text, style, control = segment
         _Segment = Segment
-        if cut >= segment.cell_length:
-            return segment, _Segment("", style, control)
 
-        if len(text) == segment.cell_length:
-            # Fast path with all 1 cell characters
-            return (
-                _Segment(text[:cut], style, control),
-                _Segment(text[cut:], style, control),
-            )
+        cell_length = segment.cell_length
+        if cut >= cell_length:
+            return segment, _Segment("", style, control)
 
         cell_size = get_character_cell_size
 
-        pos = int((cut / segment.cell_length) * len(text))
+        pos = int((cut / cell_length) * len(text))
 
         before = text[:pos]
         cell_pos = cell_len(before)
@@ -143,6 +143,17 @@ class Segment(NamedTuple):
         Returns:
             Tuple[Segment, Segment]: Two segments.
         """
+        text, style, control = self
+
+        if _is_single_cell_widths(text):
+            # Fast path with all 1 cell characters
+            if cut >= len(text):
+                return self, Segment("", style, control)
+            return (
+                Segment(text[:cut], style, control),
+                Segment(text[cut:], style, control),
+            )
+
         return self._split_cells(self, cut)
 
     @classmethod
@@ -341,7 +352,8 @@ class Segment(NamedTuple):
         Returns:
             int: The length of the line.
         """
-        return sum(segment.cell_length for segment in line)
+        _cell_len = cell_len
+        return sum(_cell_len(segment.text) for segment in line)
 
     @classmethod
     def get_shape(cls, lines: List[List["Segment"]]) -> Tuple[int, int]:
@@ -492,6 +504,7 @@ class Segment(NamedTuple):
         """
         split_segments: List["Segment"] = []
         add_segment = split_segments.append
+
         iter_cuts = iter(cuts)
 
         while True:

@@ -87,6 +87,23 @@ def test_console_options_update():
     assert options_copy == options and options_copy is not options
 
 
+def test_console_options_update_height():
+    options = ConsoleOptions(
+        ConsoleDimensions(80, 25),
+        max_height=25,
+        legacy_windows=False,
+        min_width=10,
+        max_width=20,
+        is_terminal=False,
+        encoding="utf-8",
+    )
+    assert options.height is None
+    render_options = options.update_height(12)
+    assert options.height is None
+    assert render_options.height == 12
+    assert render_options.max_height == 12
+
+
 def test_init():
     console = Console(color_system=None)
     assert console._color_system == None
