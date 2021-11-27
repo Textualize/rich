@@ -825,20 +825,25 @@ class Console:
         Args:
             hook (RenderHook): Render hook instance.
         """
-
-        self._render_hooks.append(hook)
+        with self._lock:
+            self._render_hooks.append(hook)
 
     def pop_render_hook(self) -> None:
         """Pop the last renderhook from the stack."""
-        self._render_hooks.pop()
+        with self._lock:
+            self._render_hooks.pop()
 
     def __enter__(self) -> "Console":
         """Own context manager to enter buffer context."""
         self._enter_buffer()
+        if self._live:
+            self._live._lock.acquire()
         return self
 
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
         """Exit buffer context."""
+        if self._live:
+            self._live._lock.release()
         self._exit_buffer()
 
     def begin_capture(self) -> None:

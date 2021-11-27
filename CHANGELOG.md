@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Some optimizations for simple strings (with only single cell widths)
 
+### Fixed
+
+- Fixed issue with progress bar not rendering markup https://github.com/willmcgugan/rich/issues/1721
+- Fixed race condition when exiting Live https://github.com/willmcgugan/rich/issues/1530
+
 ## [10.14.0] - 2021-11-16
 
 ### Fixed

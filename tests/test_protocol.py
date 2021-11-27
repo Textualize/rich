@@ -18,6 +18,21 @@ def test_rich_cast():
     assert console.file.getvalue() == "Foo\n"
 
 
+class Fake:
+    def __getattr__(self, name):
+        return 12
+
+    def __repr__(self) -> str:
+        return "Fake()"
+
+
+def test_rich_cast_fake():
+    fake = Fake()
+    console = Console(file=io.StringIO())
+    console.print(fake)
+    assert console.file.getvalue() == "Fake()\n"
+
+
 def test_rich_cast_container():
     foo = Foo()
     console = Console(file=io.StringIO(), legacy_windows=False)

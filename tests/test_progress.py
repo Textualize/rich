@@ -68,6 +68,13 @@ def test_text_column():
     assert text == Text("[b]bar")
 
 
+def test_time_elapsed_column():
+    column = TimeElapsedColumn()
+    task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
+    text = column.render(task)
+    assert str(text) == "-:--:--"
+
+
 def test_time_remaining_column():
     class FakeTask(Task):
         time_remaining = 60

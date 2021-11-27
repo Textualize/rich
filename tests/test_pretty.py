@@ -108,6 +108,19 @@ def test_broken_repr():
     assert result == expected
 
 
+def test_broken_getattr():
+    class BrokenAttr:
+        def __getattr__(self, name):
+            1 / 0
+
+        def __repr__(self):
+            return "BrokenAttr()"
+
+    test = BrokenAttr()
+    result = pretty_repr(test)
+    assert result == "BrokenAttr()"
+
+
 def test_recursive():
     test = []
     test.append(test)

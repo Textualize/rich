@@ -59,6 +59,16 @@ def test_rich_repr() -> None:
     assert (repr(Foo("hello", bar=3))) == "Foo('hello', 'hello', bar=3, egg=1)"
 
 
+def test_rich_repr_positional_only() -> None:
+    @rich.repr.auto
+    class PosOnly:
+        def __init__(self, foo, /):
+            self.foo = 1
+
+    p = PosOnly(1)
+    assert repr(p) == "PosOnly(1)"
+
+
 def test_rich_angular() -> None:
     assert (repr(Bar("hello"))) == "<Bar 'hello' 'hello' egg=1>"
     assert (repr(Bar("hello", bar=3))) == "<Bar 'hello' 'hello' bar=3 egg=1>"

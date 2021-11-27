@@ -44,7 +44,7 @@ class FileProxy(io.TextIOBase):
                 output = Text("\n").join(
                     self.__ansi_decoder.decode_line(line) for line in lines
                 )
-                console.print(output, markup=False, emoji=False, highlight=False)
+                console.print(output)
         return len(text)
 
     def flush(self) -> None:

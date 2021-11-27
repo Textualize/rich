@@ -13,6 +13,7 @@ def test_set_cell_size():
     assert cells.set_cell_size("😽😽", 3) == "😽 "
     assert cells.set_cell_size("😽😽", 2) == "😽"
     assert cells.set_cell_size("😽😽", 1) == " "
+    assert cells.set_cell_size("😽😽", 5) == "😽😽 "
 
 
 def test_set_cell_size_infinite():
