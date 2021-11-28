@@ -243,6 +243,40 @@ class Text(JupyterMixin):
         return rendered_text
 
     @classmethod
+    def from_ansi(
+        cls,
+        text: str,
+        *,
+        style: Union[str, Style] = "",
+        justify: Optional["JustifyMethod"] = None,
+        overflow: Optional["OverflowMethod"] = None,
+        no_wrap: Optional[bool] = None,
+        end: str = "\n",
+        tab_size: Optional[int] = 8,
+    ) -> "Text":
+        """Create a Text object from pre-formatted ANSI.
+
+        Args:
+            text (str): A string containing ANSI color codes.
+            style (Union[str, Style], optional): Base style for text. Defaults to "".
+            justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
+            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
+            no_wrap (bool, optional): Disable text wrapping, or None for default. Defaults to None.
+            end (str, optional): Character to end text with. Defaults to "\\\\n".
+            tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
+        """
+        from .ansi import AnsiDecoder
+
+        decoded_text = AnsiDecoder().decode_line(text)
+        decoded_text.justify = justify
+        decoded_text.overflow = overflow
+        decoded_text.no_wrap = no_wrap
+        decoded_text.end = end
+        decoded_text.tab_size = tab_size
+        decoded_text.stylize(style)
+        return decoded_text
+
+    @classmethod
     def styled(
         cls,
         text: str,
