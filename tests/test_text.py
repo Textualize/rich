@@ -97,11 +97,12 @@ def test_from_markup():
 
 def test_from_ansi():
     text = Text.from_ansi("Hello, \033[1mWorld!\033[0m")
-    text2 = Text.from_ansi("Hello, \033[1mWorld!\033[0m", style="red")
     assert str(text) == "Hello, World!"
     assert text._spans == [Span(7, 13, Style(bold=True))]
-    assert str(text2) == "Hello, World!"
-    assert text2._spans == [Span(7, 13, Style(bold=True)), Span(0, 13, "red")]
+
+    text = Text.from_ansi("Hello, \033[1m\nWorld!\033[0m")
+    assert str(text) == "Hello, \nWorld!"
+    assert text._spans == [Span(8, 14, Style(bold=True))]
 
 
 def test_copy():

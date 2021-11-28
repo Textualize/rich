@@ -97,6 +97,7 @@ def test_small_width():
     assert result == expected
 
 
+@skip_py36
 def test_broken_repr():
     class BrokenRepr:
         def __repr__(self):
@@ -108,6 +109,7 @@ def test_broken_repr():
     assert result == expected
 
 
+@skip_py36
 def test_broken_getattr():
     class BrokenAttr:
         def __getattr__(self, name):
