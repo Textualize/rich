@@ -1,7 +1,6 @@
 import inspect
 import os
 import platform
-import shutil
 import sys
 import threading
 from abc import ABC, abstractmethod
@@ -13,6 +12,7 @@ from html import escape
 from inspect import isclass
 from itertools import islice
 from time import monotonic
+from threading import RLock
 from types import FrameType, TracebackType, ModuleType
 from typing import (
     IO,
@@ -25,7 +25,6 @@ from typing import (
     Mapping,
     NamedTuple,
     Optional,
-    Set,
     TextIO,
     Tuple,
     Type,
@@ -836,14 +835,10 @@ class Console:
     def __enter__(self) -> "Console":
         """Own context manager to enter buffer context."""
         self._enter_buffer()
-        if self._live:
-            self._live._lock.acquire()
         return self
 
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
         """Exit buffer context."""
-        if self._live:
-            self._live._lock.release()
         self._exit_buffer()
 
     def begin_capture(self) -> None:
@@ -1512,9 +1507,8 @@ class Console:
             control_codes (str): Control codes, such as those that may move the cursor.
         """
         if not self.is_dumb_terminal:
-            for _control in control:
-                self._buffer.append(_control.segment)
-            self._check_buffer()
+            with self:
+                self._buffer.extend(_control.segment for _control in control)
 
     def out(
         self,
@@ -1596,7 +1590,7 @@ class Console:
             if overflow is None:
                 overflow = "ignore"
             crop = False
-
+        render_hooks = self._render_hooks[:]
         with self:
             renderables = self._collect_renderables(
                 objects,
@@ -1607,7 +1601,7 @@ class Console:
                 markup=markup,
                 highlight=highlight,
             )
-            for hook in self._render_hooks:
+            for hook in render_hooks:
                 renderables = hook.process_renderables(renderables)
             render_options = self.options.update(
                 justify=justify,
@@ -1864,6 +1858,8 @@ class Console:
         if not objects:
             objects = (NewLine(),)
 
+        render_hooks = self._render_hooks[:]
+
         with self:
             renderables = self._collect_renderables(
                 objects,
@@ -1898,7 +1894,7 @@ class Console:
                     link_path=link_path,
                 )
             ]
-            for hook in self._render_hooks:
+            for hook in render_hooks:
                 renderables = hook.process_renderables(renderables)
             new_segments: List[Segment] = []
             extend = new_segments.extend

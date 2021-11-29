@@ -128,38 +128,37 @@ class Live(JupyterMixin, RenderHook):
         with self._lock:
             if not self._started:
                 return
-            self.console.clear_live()
             self._started = False
-            try:
-                if self.auto_refresh and self._refresh_thread is not None:
-                    self._refresh_thread.stop()
-                    self._refresh_thread.join()
-                # allow it to fully render on the last even if overflow
-                self.vertical_overflow = "visible"
-                if not self._alt_screen and not self.console.is_jupyter:
-                    self.refresh()
 
-            finally:
-                if self._refresh_thread is not None:
-                    self._refresh_thread = None
-
-                self._disable_redirect_io()
-                self.console.pop_render_hook()
-                if not self._alt_screen and self.console.is_terminal:
-                    self.console.line()
-                self.console.show_cursor(True)
-                if self._alt_screen:
-                    self.console.set_alt_screen(False)
-
-                if self.transient and not self._alt_screen:
-                    self.console.control(self._live_render.restore_cursor())
-                if self.ipy_widget is not None:  # pragma: no cover
-                    if self.transient:
-                        self.ipy_widget.close()
-                    else:
-                        # jupyter last refresh must occur after console pop render hook
-                        # i am not sure why this is needed
+            if self.auto_refresh and self._refresh_thread is not None:
+                self._refresh_thread.stop()
+                self._refresh_thread.join()
+                self._refresh_thread = None
+            # allow it to fully render on the last even if overflow
+            self.vertical_overflow = "visible"
+            with self.console:
+                try:
+                    if not self._alt_screen and not self.console.is_jupyter:
                         self.refresh()
+                finally:
+                    self._disable_redirect_io()
+                    self.console.pop_render_hook()
+                    if not self._alt_screen and self.console.is_terminal:
+                        self.console.line()
+                    self.console.show_cursor(True)
+                    if self._alt_screen:
+                        self.console.set_alt_screen(False)
+
+                    if self.transient and not self._alt_screen:
+                        self.console.control(self._live_render.restore_cursor())
+                    if self.ipy_widget is not None:  # pragma: no cover
+                        if self.transient:
+                            self.ipy_widget.close()
+                        else:
+                            # jupyter last refresh must occur after console pop render hook
+                            # i am not sure why this is needed
+                            self.refresh()
+        self.console.clear_live()
 
     def __enter__(self) -> "Live":
         self.start(refresh=self._renderable is not None)
