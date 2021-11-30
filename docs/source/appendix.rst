@@ -6,4 +6,5 @@ Appendix
 
    appendix/box.rst
    appendix/colors.rst
+   appendix/default_styles.rst
    
