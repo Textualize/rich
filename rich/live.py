@@ -128,11 +128,11 @@ class Live(JupyterMixin, RenderHook):
         with self._lock:
             if not self._started:
                 return
+            self.console.clear_live()
             self._started = False
 
             if self.auto_refresh and self._refresh_thread is not None:
                 self._refresh_thread.stop()
-                self._refresh_thread.join()
                 self._refresh_thread = None
             # allow it to fully render on the last even if overflow
             self.vertical_overflow = "visible"
@@ -158,7 +158,6 @@ class Live(JupyterMixin, RenderHook):
                             # jupyter last refresh must occur after console pop render hook
                             # i am not sure why this is needed
                             self.refresh()
-        self.console.clear_live()
 
     def __enter__(self) -> "Live":
         self.start(refresh=self._renderable is not None)
