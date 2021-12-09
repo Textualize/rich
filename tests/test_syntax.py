@@ -10,6 +10,8 @@ from rich.panel import Panel
 from rich.style import Style
 from rich.syntax import Syntax, ANSISyntaxTheme, PygmentsSyntaxTheme, Color, Console
 
+from pygments.lexers import PythonLexer
+
 
 CODE = '''\
 def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
@@ -25,6 +27,19 @@ def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
         first = False
         previous_value = value
     yield first, True, previous_value'''
+
+
+def test_cannot_pass_both_lexer_name_and_lexer():
+    code = "\n\nimport this\n\n"
+    with pytest.raises(ValueError, match="Cannot pass both lexer_name and lexer"):
+        Syntax(
+            code,
+            lexer_name="python",
+            lexer=PythonLexer,
+            theme="ascii_light",
+            code_width=30,
+            line_numbers=True,
+        )
 
 
 def test_blank_lines():
@@ -63,6 +78,21 @@ def test_python_render_simple():
     syntax = Syntax(
         CODE,
         lexer_name="python",
+        line_numbers=False,
+        theme="foo",
+        code_width=60,
+        word_wrap=False,
+    )
+    rendered_syntax = render(syntax)
+    print(repr(rendered_syntax))
+    expected = '\x1b[1;38;2;0;128;0;48;2;248;248;248mdef\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;0;0;255;48;2;248;248;248mloop_first_last\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m(\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mvalues\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m:\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mIterable\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m[\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mT\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m]\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m)\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;102;102;102;48;2;248;248;248m-\x1b[0m\x1b[38;2;102;102;102;48;2;248;248;248m>\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mIterable\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m[\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mTuple\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m[\x1b[0m\x1b[38;2;0;128;0;48;2;248;248;248mb\x1b[0m\n\x1b[38;2;0;0;0;48;2;248;248;248m    \x1b[0m\x1b[3;38;2;186;33;33;48;2;248;248;248m"""Iterate and generate a tuple with a flag for first an\x1b[0m\n\x1b[38;2;0;0;0;48;2;248;248;248m    \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248miter_values\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;102;102;102;48;2;248;248;248m=\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;0;128;0;48;2;248;248;248miter\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m(\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mvalues\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m)\x1b[0m\x1b[48;2;248;248;248m                              \x1b[0m\n\x1b[38;2;0;0;0;48;2;248;248;248m    \x1b[0m\x1b[1;38;2;0;128;0;48;2;248;248;248mtry\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m:\x1b[0m\x1b[48;2;248;248;248m                                                    \x1b[0m\n\x1b[38;2;0;0;0;48;2;248;248;248m        \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mprevious_value\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;102;102;102;48;2;248;248;248m=\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;0;128;0;48;2;248;248;248mnext\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m(\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248miter_values\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m)\x1b[0m\x1b[48;2;248;248;248m                  \x1b[0m\n\x1b[38;2;0;0;0;48;2;248;248;248m    \x1b[0m\x1b[1;38;2;0;128;0;48;2;248;248;248mexcept\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[1;38;2;210;65;58;48;2;248;248;248mStopIteration\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m:\x1b[0m\x1b[48;2;248;248;248m                                   \x1b[0m\n\x1b[38;2;0;0;0;48;2;248;248;248m        \x1b[0m\x1b[1;38;2;0;128;0;48;2;248;248;248mreturn\x1b[0m\x1b[48;2;248;248;248m                                              \x1b[0m\n\x1b[38;2;0;0;0;48;2;248;248;248m    \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mfirst\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;102;102;102;48;2;248;248;248m=\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[1;38;2;0;128;0;48;2;248;248;248mTrue\x1b[0m\x1b[48;2;248;248;248m                                            \x1b[0m\n\x1b[38;2;0;0;0;48;2;248;248;248m    \x1b[0m\x1b[1;38;2;0;128;0;48;2;248;248;248mfor\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mvalue\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[1;38;2;170;34;255;48;2;248;248;248min\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248miter_values\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m:\x1b[0m\x1b[48;2;248;248;248m                               \x1b[0m\n\x1b[38;2;0;0;0;48;2;248;248;248m        \x1b[0m\x1b[1;38;2;0;128;0;48;2;248;248;248myield\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mfirst\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m,\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[1;38;2;0;128;0;48;2;248;248;248mFalse\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m,\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mprevious_value\x1b[0m\x1b[48;2;248;248;248m                  \x1b[0m\n\x1b[38;2;0;0;0;48;2;248;248;248m        \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mfirst\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;102;102;102;48;2;248;248;248m=\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[1;38;2;0;128;0;48;2;248;248;248mFalse\x1b[0m\x1b[48;2;248;248;248m                                       \x1b[0m\n\x1b[38;2;0;0;0;48;2;248;248;248m        \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mprevious_value\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;102;102;102;48;2;248;248;248m=\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mvalue\x1b[0m\x1b[48;2;248;248;248m                              \x1b[0m\n\x1b[38;2;0;0;0;48;2;248;248;248m    \x1b[0m\x1b[1;38;2;0;128;0;48;2;248;248;248myield\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mfirst\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m,\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[1;38;2;0;128;0;48;2;248;248;248mTrue\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m,\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248mprevious_value\x1b[0m\x1b[48;2;248;248;248m                       \x1b[0m\n'
+    assert rendered_syntax == expected
+
+
+def test_python_render_simple_passing_lexer_instance():
+    syntax = Syntax(
+        CODE,
+        lexer=PythonLexer(),
         line_numbers=False,
         theme="foo",
         code_width=60,

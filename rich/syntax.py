@@ -5,6 +5,7 @@ import textwrap
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
 
+from pygments.lexer import Lexer
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
 from pygments.style import Style as PygmentsStyle
 from pygments.styles import get_style_by_name
@@ -195,6 +196,7 @@ class Syntax(JupyterMixin):
     Args:
         code (str): Code to highlight.
         lexer_name (str): Lexer to use (see https://pygments.org/docs/lexers/)
+        lexer (Lexer): Lexer instance to use (see https://pygments.org/docs/lexers/)
         theme (str, optional): Color theme, aka Pygments style (see https://pygments.org/docs/styles/#getting-a-list-of-available-styles). Defaults to "monokai".
         dedent (bool, optional): Enable stripping of initial whitespace. Defaults to False.
         line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
@@ -226,8 +228,9 @@ class Syntax(JupyterMixin):
     def __init__(
         self,
         code: str,
-        lexer_name: str,
+        lexer_name: Optional[str] = None,
         *,
+        lexer: Optional[Lexer] = None,
         theme: Union[str, SyntaxTheme] = DEFAULT_THEME,
         dedent: bool = False,
         line_numbers: bool = False,
@@ -240,8 +243,12 @@ class Syntax(JupyterMixin):
         background_color: Optional[str] = None,
         indent_guides: bool = False,
     ) -> None:
+        if all((lexer_name, lexer)):
+            raise ValueError("Cannot pass both lexer_name and lexer")
+
         self.code = code
         self.lexer_name = lexer_name
+        self.lexer = lexer
         self.dedent = dedent
         self.line_numbers = line_numbers
         self.start_line = start_line
@@ -374,7 +381,7 @@ class Syntax(JupyterMixin):
         )
         _get_theme_style = self._theme.get_style_for_token
         try:
-            lexer = get_lexer_by_name(
+            lexer = self.lexer or get_lexer_by_name(
                 self.lexer_name,
                 stripnl=False,
                 ensurenl=True,
