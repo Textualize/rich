@@ -3,7 +3,7 @@ import platform
 from rich.containers import Lines
 import textwrap
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union, cast
 
 from pygments.lexer import Lexer
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
@@ -382,7 +382,7 @@ class Syntax(JupyterMixin):
         _get_theme_style = self._theme.get_style_for_token
         try:
             lexer = self.lexer or get_lexer_by_name(
-                self.lexer_name,
+                cast(str, self.lexer_name),
                 stripnl=False,
                 ensurenl=True,
                 tabsize=self.tab_size,
