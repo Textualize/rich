@@ -243,7 +243,7 @@ class Syntax(JupyterMixin):
         background_color: Optional[str] = None,
         indent_guides: bool = False,
     ) -> None:
-        if all((lexer_name, lexer)):
+        if lexer_name and lexer:
             raise ValueError("Cannot pass both lexer_name and lexer")
 
         self.code = code
