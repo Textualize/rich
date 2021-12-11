@@ -381,12 +381,17 @@ class Syntax(JupyterMixin):
         )
         _get_theme_style = self._theme.get_style_for_token
         try:
-            lexer = self.lexer or get_lexer_by_name(
-                cast(str, self.lexer_name),
-                stripnl=False,
-                ensurenl=True,
-                tabsize=self.tab_size,
-            )
+            if self.lexer_name:
+                lexer = get_lexer_by_name(
+                    self.lexer_name,
+                    stripnl=False,
+                    ensurenl=True,
+                    tabsize=self.tab_size,
+                )
+            else:
+                assert self.lexer
+
+                lexer = self.lexer
         except ClassNotFound:
             text.append(code)
         else:
