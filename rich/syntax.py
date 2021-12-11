@@ -3,7 +3,7 @@ import platform
 from rich.containers import Lines
 import textwrap
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
 
 from pygments.lexer import Lexer
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
