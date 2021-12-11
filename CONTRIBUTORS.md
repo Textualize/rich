@@ -25,3 +25,4 @@ The following people have contributed to the development of Rich:
 - [Tim Savage](https://github.com/timsavage)
 - [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
+- [Patrick Arminio](https://github.com/patrick91)
