@@ -231,7 +231,7 @@ class Text(JupyterMixin):
             *((span.end, True, span.style) for span in self._spans),
             (len(plain), True, self.style),
         ]
-        markup_spans = sorted(markup_spans, key=itemgetter(0, 1))
+        markup_spans.sort(key=itemgetter(0, 1))
         position = 0
         append = output.append
         for offset, closing, style in markup_spans:
@@ -1250,7 +1250,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     print(text.markup)
     console.print(text.markup)
-    
+
     console.rule("justify='left'")
     console.print(text, style="red")
     console.print()
