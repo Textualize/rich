@@ -152,7 +152,7 @@ class Live(JupyterMixin, RenderHook):
                     if self.transient and not self._alt_screen:
                         self.console.control(self._live_render.restore_cursor())
                     if self.ipy_widget is not None and self.transient:
-                        self.ipy_widget.close()
+                        self.ipy_widget.close()  # pragma: no cover
 
     def __enter__(self) -> "Live":
         self.start(refresh=self._renderable is not None)
