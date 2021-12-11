@@ -213,6 +213,36 @@ class Text(JupyterMixin):
         """Get the number of cells required to render this text."""
         return cell_len(self.plain)
 
+    @property
+    def markup(self) -> str:
+        """Get console markup to render this Text.
+
+        Returns:
+            str: A string potentially creating markup tags.
+        """
+        from .markup import escape
+
+        output: List[str] = []
+
+        plain = self.plain
+        markup_spans = [
+            (0, False, self.style),
+            *((span.start, False, span.style) for span in self._spans),
+            *((span.end, True, span.style) for span in self._spans),
+            (len(plain), True, self.style),
+        ]
+        markup_spans = sorted(markup_spans, key=itemgetter(0, 1))
+        position = 0
+        append = output.append
+        for offset, closing, style in markup_spans:
+            if offset > position:
+                append(escape(plain[position:offset]))
+                position = offset
+            if style:
+                append(f"[/{style}]" if closing else f"[{style}]")
+        markup = "".join(output)
+        return markup
+
     @classmethod
     def from_markup(
         cls,
@@ -1217,6 +1247,10 @@ if __name__ == "__main__":  # pragma: no cover
     text.highlight_words(["ipsum"], "italic")
 
     console = Console()
+
+    print(text.markup)
+    console.print(text.markup)
+    
     console.rule("justify='left'")
     console.print(text, style="red")
     console.print()
