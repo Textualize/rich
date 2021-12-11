@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Double print of progress bar in Jupyter
+- Double print of progress bar in Jupyter https://github.com/willmcgugan/rich/issues/1737
+
+### Added
+
+- Added Text.markup property https://github.com/willmcgugan/rich/issues/1751
 
 ## [10.15.2] - 2021-12-02
 

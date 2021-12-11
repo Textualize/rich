@@ -715,3 +715,19 @@ def test_on():
     assert text.get_style_at_offset(console, 0).meta == expected
     assert text.get_style_at_offset(console, 1).meta == expected
     assert text.get_style_at_offset(console, 2).meta == expected
+
+
+def test_markup_property():
+    assert Text("").markup == ""
+    assert Text("foo").markup == "foo"
+    assert Text("foo", style="bold").markup == "[bold]foo[/bold]"
+    assert Text.from_markup("foo [red]bar[/red]").markup == "foo [red]bar[/red]"
+    assert (
+        Text.from_markup("foo [red]bar[/red]", style="bold").markup
+        == "[bold]foo [red]bar[/red][/bold]"
+    )
+    assert (
+        Text.from_markup("[bold]foo [italic]bar[/bold] baz[/italic]").markup
+        == "[bold]foo [italic]bar[/bold] baz[/italic]"
+    )
+    assert Text("[bold]foo").markup == "\\[bold]foo"
