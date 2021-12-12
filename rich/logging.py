@@ -10,7 +10,6 @@ from .console import Console, ConsoleRenderable
 from .highlighter import Highlighter, ReprHighlighter
 from .text import Text
 from .traceback import Traceback
-from rich import highlighter
 
 
 class RichHandler(Handler):
