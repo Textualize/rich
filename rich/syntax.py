@@ -195,8 +195,7 @@ class Syntax(JupyterMixin):
 
     Args:
         code (str): Code to highlight.
-        lexer_name (str): Lexer to use (see https://pygments.org/docs/lexers/)
-        lexer (Lexer): Lexer instance to use (see https://pygments.org/docs/lexers/)
+        lexer (Lexer | str): Lexer to use (see https://pygments.org/docs/lexers/)
         theme (str, optional): Color theme, aka Pygments style (see https://pygments.org/docs/styles/#getting-a-list-of-available-styles). Defaults to "monokai".
         dedent (bool, optional): Enable stripping of initial whitespace. Defaults to False.
         line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
@@ -228,9 +227,8 @@ class Syntax(JupyterMixin):
     def __init__(
         self,
         code: str,
-        lexer_name: Optional[str] = None,
+        lexer: Union[Lexer, str],
         *,
-        lexer: Optional[Lexer] = None,
         theme: Union[str, SyntaxTheme] = DEFAULT_THEME,
         dedent: bool = False,
         line_numbers: bool = False,
@@ -243,12 +241,8 @@ class Syntax(JupyterMixin):
         background_color: Optional[str] = None,
         indent_guides: bool = False,
     ) -> None:
-        if lexer_name and lexer:
-            raise ValueError("Cannot pass both lexer_name and lexer")
-
         self.code = code
-        self.lexer_name = lexer_name
-        self.lexer = lexer
+        self._lexer = lexer
         self.dedent = dedent
         self.line_numbers = line_numbers
         self.start_line = start_line
@@ -355,6 +349,20 @@ class Syntax(JupyterMixin):
         style = self._theme.get_style_for_token(token_type)
         return style.color
 
+    @property
+    def lexer(self) -> Optional[Lexer]:
+        if isinstance(self._lexer, Lexer):
+            return self._lexer
+        try:
+            return get_lexer_by_name(
+                self._lexer,
+                stripnl=False,
+                ensurenl=True,
+                tabsize=self.tab_size,
+            )
+        except ClassNotFound:
+            return None
+
     def highlight(
         self, code: str, line_range: Optional[Tuple[int, int]] = None
     ) -> Text:
@@ -380,19 +388,10 @@ class Syntax(JupyterMixin):
             no_wrap=not self.word_wrap,
         )
         _get_theme_style = self._theme.get_style_for_token
-        try:
-            if self.lexer_name:
-                lexer = get_lexer_by_name(
-                    self.lexer_name,
-                    stripnl=False,
-                    ensurenl=True,
-                    tabsize=self.tab_size,
-                )
-            else:
-                assert self.lexer
 
-                lexer = self.lexer
-        except ClassNotFound:
+        lexer = self.lexer
+
+        if lexer is None:
             text.append(code)
         else:
             if line_range:

@@ -29,23 +29,10 @@ def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
     yield first, True, previous_value'''
 
 
-def test_cannot_pass_both_lexer_name_and_lexer():
-    code = "\n\nimport this\n\n"
-    with pytest.raises(ValueError, match="Cannot pass both lexer_name and lexer"):
-        Syntax(
-            code,
-            lexer_name="python",
-            lexer=PythonLexer,
-            theme="ascii_light",
-            code_width=30,
-            line_numbers=True,
-        )
-
-
 def test_blank_lines():
     code = "\n\nimport this\n\n"
     syntax = Syntax(
-        code, lexer_name="python", theme="ascii_light", code_width=30, line_numbers=True
+        code, lexer="python", theme="ascii_light", code_width=30, line_numbers=True
     )
     result = render(syntax)
     print(repr(result))
@@ -59,7 +46,7 @@ def test_python_render():
     syntax = Panel.fit(
         Syntax(
             CODE,
-            lexer_name="python",
+            lexer="python",
             line_numbers=True,
             line_range=(2, 10),
             theme="foo",
@@ -77,7 +64,7 @@ def test_python_render():
 def test_python_render_simple():
     syntax = Syntax(
         CODE,
-        lexer_name="python",
+        lexer="python",
         line_numbers=False,
         theme="foo",
         code_width=60,
@@ -107,7 +94,7 @@ def test_python_render_simple_passing_lexer_instance():
 def test_python_render_simple_indent_guides():
     syntax = Syntax(
         CODE,
-        lexer_name="python",
+        lexer="python",
         line_numbers=False,
         theme="ansi_light",
         code_width=60,
@@ -123,7 +110,7 @@ def test_python_render_simple_indent_guides():
 def test_python_render_line_range_indent_guides():
     syntax = Syntax(
         CODE,
-        lexer_name="python",
+        lexer="python",
         line_numbers=False,
         theme="ansi_light",
         code_width=60,
@@ -141,7 +128,7 @@ def test_python_render_indent_guides():
     syntax = Panel.fit(
         Syntax(
             CODE,
-            lexer_name="python",
+            lexer="python",
             line_numbers=True,
             line_range=(2, 10),
             theme="foo",
@@ -174,7 +161,7 @@ def test_get_line_color_none():
     style._background_style = Style(bgcolor=None)
     syntax = Syntax(
         CODE,
-        lexer_name="python",
+        lexer="python",
         line_numbers=True,
         line_range=(2, 10),
         theme=style,
@@ -188,7 +175,7 @@ def test_get_line_color_none():
 def test_highlight_background_color():
     syntax = Syntax(
         CODE,
-        lexer_name="python",
+        lexer="python",
         line_numbers=True,
         line_range=(2, 10),
         theme="foo",
@@ -219,7 +206,7 @@ def test_get_style_for_token():
     style._style_cache = style_dict
     syntax = Syntax(
         CODE,
-        lexer_name="python",
+        lexer="python",
         line_numbers=True,
         line_range=(2, 10),
         theme=style,
@@ -233,7 +220,7 @@ def test_get_style_for_token():
 def test_option_no_wrap():
     syntax = Syntax(
         CODE,
-        lexer_name="python",
+        lexer="python",
         line_numbers=True,
         line_range=(2, 10),
         code_width=60,
@@ -260,7 +247,8 @@ def test_from_file():
     try:
         os.write(fh, b"import this\n")
         syntax = Syntax.from_path(path)
-        assert syntax.lexer_name == "Python"
+        assert syntax.lexer
+        assert syntax.lexer.name == "Python"
         assert syntax.code == "import this\n"
     finally:
         os.remove(path)
@@ -272,7 +260,7 @@ def test_from_file_unknown_lexer():
     try:
         os.write(fh, b"import this\n")
         syntax = Syntax.from_path(path)
-        assert syntax.lexer_name == "default"
+        assert syntax.lexer is None
         assert syntax.code == "import this\n"
     finally:
         os.remove(path)
@@ -282,7 +270,7 @@ if __name__ == "__main__":
     syntax = Panel.fit(
         Syntax(
             CODE,
-            lexer_name="python",
+            lexer="python",
             line_numbers=True,
             line_range=(2, 10),
             theme="foo",
