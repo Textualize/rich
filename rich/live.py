@@ -151,13 +151,8 @@ class Live(JupyterMixin, RenderHook):
 
                     if self.transient and not self._alt_screen:
                         self.console.control(self._live_render.restore_cursor())
-                    if self.ipy_widget is not None:  # pragma: no cover
-                        if self.transient:
-                            self.ipy_widget.close()
-                        else:
-                            # jupyter last refresh must occur after console pop render hook
-                            # i am not sure why this is needed
-                            self.refresh()
+                    if self.ipy_widget is not None and self.transient:
+                        self.ipy_widget.close()  # pragma: no cover
 
     def __enter__(self) -> "Live":
         self.start(refresh=self._renderable is not None)
@@ -173,7 +168,7 @@ class Live(JupyterMixin, RenderHook):
 
     def _enable_redirect_io(self) -> None:
         """Enable redirecting of stdout / stderr."""
-        if self.console.is_terminal:
+        if self.console.is_terminal or self.console.is_jupyter:
             if self._redirect_stdout and not isinstance(sys.stdout, FileProxy):
                 self._restore_stdout = sys.stdout
                 sys.stdout = cast("TextIO", FileProxy(self.console, sys.stdout))

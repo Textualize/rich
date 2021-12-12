@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [10.16.0] - Unreleased
+
+### Fixed
+
+- Double print of progress bar in Jupyter https://github.com/willmcgugan/rich/issues/1737
+
+### Added
+
+- Added Text.markup property https://github.com/willmcgugan/rich/issues/1751
+
 ## [10.15.2] - 2021-12-02
 
 ### Fixed
@@ -1563,6 +1573,8 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[10.16.0]: https://github.com/willmcgugan/rich/compare/v10.15.2...v10.16.0
+[10.15.2]: https://github.com/willmcgugan/rich/compare/v10.15.1...v10.15.2
 [10.15.1]: https://github.com/willmcgugan/rich/compare/v10.15.0...v10.15.1
 [10.14.0]: https://github.com/willmcgugan/rich/compare/v10.14.0...v10.15.0
 [10.13.0]: https://github.com/willmcgugan/rich/compare/v10.13.0...v10.14.0

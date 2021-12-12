@@ -30,7 +30,6 @@ except (AttributeError, ImportError, ValueError):
         features = WindowsConsoleFeatures()
         return features
 
-
 else:
 
     STDOUT = -11
