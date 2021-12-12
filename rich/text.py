@@ -1248,9 +1248,6 @@ if __name__ == "__main__":  # pragma: no cover
 
     console = Console()
 
-    print(text.markup)
-    console.print(text.markup)
-
     console.rule("justify='left'")
     console.print(text, style="red")
     console.print()
