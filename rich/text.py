@@ -1033,6 +1033,7 @@ class Text(JupyterMixin):
             Lines: New RichText instances between offsets.
         """
         _offsets = list(offsets)
+
         if not _offsets:
             return Lines([self.copy()])
 
@@ -1056,33 +1057,16 @@ class Text(JupyterMixin):
         )
         if not self._spans:
             return new_lines
-        order = {span: span_index for span_index, span in enumerate(self._spans)}
-        span_stack = sorted(self._spans, key=attrgetter("start"), reverse=True)
 
-        pop = span_stack.pop
-        push = span_stack.append
         _Span = Span
-        get_order = order.__getitem__
 
-        for line, (start, end) in zip(new_lines, line_ranges):
-            if not span_stack:
-                break
-            append_span = line._spans.append
-            position = len(span_stack) - 1
-            while span_stack[position].start < end:
-                span = pop(position)
-                add_span, remaining_span = span.split(end)
-                if remaining_span:
-                    push(remaining_span)
-                    order[remaining_span] = order[span]
-                span_start, span_end, span_style = add_span
-                line_span = _Span(span_start - start, span_end - start, span_style)
-                order[line_span] = order[span]
-                append_span(line_span)
-                position -= 1
-                if position < 0 or not span_stack:
-                    break  # pragma: no cover
-            line._spans.sort(key=get_order)
+        for line, (line_start, line_end) in zip(new_lines._lines, line_ranges):
+            for span_start, span_end, style in self._spans:
+                if span_end > line_start:
+                    new_start = max(0, span_start - line_start)
+                    new_end = min(span_end - line_start, line_end - line_start)
+                    if new_end > new_start:
+                        line._spans.append(_Span(new_start, new_end, style))
 
         return new_lines
 
