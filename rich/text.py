@@ -1078,9 +1078,8 @@ class Text(JupyterMixin):
                     break
                 start_line_no = (lower_bound + upper_bound) // 2
 
-            lower_bound = 0
-            upper_bound = line_count
-            end_line_no = start_line_no
+            end_line_no = lower_bound = start_line_no
+            upper_bound = line_count            
 
             while True:
                 line_start, line_end = line_ranges[end_line_no]
