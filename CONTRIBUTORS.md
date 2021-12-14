@@ -8,6 +8,7 @@ The following people have contributed to the development of Rich:
 - [Pete Davison](https://github.com/pd93)
 - [James Estevez](https://github.com/jstvz)
 - [Oleksis Fraga](https://github.com/oleksis)
+- [Kenneth Hoste](https://github.com/boegel)
 - [Finn Hughes](https://github.com/finnhughes)
 - [Josh Karpel](https://github.com/JoshKarpel)
 - [Andrew Kettmann](https://github.com/akettmann)
@@ -23,4 +24,5 @@ The following people have contributed to the development of Rich:
 - [Michel Rogers-Vallee](https://github.com/mrvkino)
 - [Tushar Sadhwani](https://github.com/tusharsadhwani)
 - [Tim Savage](https://github.com/timsavage)
+- [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)

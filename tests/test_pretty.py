@@ -97,6 +97,7 @@ def test_small_width():
     assert result == expected
 
 
+@skip_py36
 def test_broken_repr():
     class BrokenRepr:
         def __repr__(self):
@@ -106,6 +107,20 @@ def test_broken_repr():
     result = pretty_repr(test)
     expected = "[<repr-error 'division by zero'>]"
     assert result == expected
+
+
+@skip_py36
+def test_broken_getattr():
+    class BrokenAttr:
+        def __getattr__(self, name):
+            1 / 0
+
+        def __repr__(self):
+            return "BrokenAttr()"
+
+    test = BrokenAttr()
+    result = pretty_repr(test)
+    assert result == "BrokenAttr()"
 
 
 def test_recursive():

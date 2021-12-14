@@ -95,6 +95,16 @@ def test_from_markup():
     assert text._spans == [Span(7, 13, "bold")]
 
 
+def test_from_ansi():
+    text = Text.from_ansi("Hello, \033[1mWorld!\033[0m")
+    assert str(text) == "Hello, World!"
+    assert text._spans == [Span(7, 13, Style(bold=True))]
+
+    text = Text.from_ansi("Hello, \033[1m\nWorld!\033[0m")
+    assert str(text) == "Hello, \nWorld!"
+    assert text._spans == [Span(8, 14, Style(bold=True))]
+
+
 def test_copy():
     test = Text()
     test.append("Hello", "bold")
@@ -705,3 +715,19 @@ def test_on():
     assert text.get_style_at_offset(console, 0).meta == expected
     assert text.get_style_at_offset(console, 1).meta == expected
     assert text.get_style_at_offset(console, 2).meta == expected
+
+
+def test_markup_property():
+    assert Text("").markup == ""
+    assert Text("foo").markup == "foo"
+    assert Text("foo", style="bold").markup == "[bold]foo[/bold]"
+    assert Text.from_markup("foo [red]bar[/red]").markup == "foo [red]bar[/red]"
+    assert (
+        Text.from_markup("foo [red]bar[/red]", style="bold").markup
+        == "[bold]foo [red]bar[/red][/bold]"
+    )
+    assert (
+        Text.from_markup("[bold]foo [italic]bar[/bold] baz[/italic]").markup
+        == "[bold]foo [italic]bar[/bold] baz[/italic]"
+    )
+    assert Text("[bold]foo").markup == "\\[bold]foo"

@@ -1,7 +1,6 @@
 import inspect
 import os
 import platform
-import shutil
 import sys
 import threading
 from abc import ABC, abstractmethod
@@ -13,6 +12,7 @@ from html import escape
 from inspect import isclass
 from itertools import islice
 from time import monotonic
+from threading import RLock
 from types import FrameType, TracebackType, ModuleType
 from typing import (
     IO,
@@ -53,6 +53,7 @@ from .markup import render as render_markup
 from .measure import Measurement, measure_renderables
 from .pager import Pager, SystemPager
 from .pretty import Pretty, is_expandable
+from .protocol import rich_cast
 from .region import Region
 from .scope import render_scope
 from .screen import Screen
@@ -210,6 +211,19 @@ class ConsoleOptions:
         options.min_width = options.max_width = max(0, width)
         return options
 
+    def update_height(self, height: int) -> "ConsoleOptions":
+        """Update the height, and return a copy.
+
+        Args:
+            height (int): New height
+
+        Returns:
+            ~ConsoleOptions: New Console options instance.
+        """
+        options = self.copy()
+        options.max_height = options.height = height
+        return options
+
     def update_dimensions(self, width: int, height: int) -> "ConsoleOptions":
         """Update the width and height, and return a copy.
 
@@ -222,8 +236,7 @@ class ConsoleOptions:
         """
         options = self.copy()
         options.min_width = options.max_width = max(0, width)
-        options.height = height
-        options.max_height = height
+        options.height = options.max_height = height
         return options
 
 
@@ -650,15 +663,6 @@ class Console:
             width = width or 93
             height = height or 100
 
-        if width is None:
-            columns = self._environ.get("COLUMNS")
-            if columns is not None and columns.isdigit():
-                width = int(columns)
-        if height is None:
-            lines = self._environ.get("LINES")
-            if lines is not None and lines.isdigit():
-                height = int(lines)
-
         self.soft_wrap = soft_wrap
         self._width = width
         self._height = height
@@ -673,6 +677,18 @@ class Console:
             if legacy_windows is None
             else legacy_windows
         )
+        if width is None:
+            columns = self._environ.get("COLUMNS")
+            if columns is not None and columns.isdigit():
+                width = int(columns) - self.legacy_windows
+        if height is None:
+            lines = self._environ.get("LINES")
+            if lines is not None and lines.isdigit():
+                height = int(lines)
+
+        self.soft_wrap = soft_wrap
+        self._width = width
+        self._height = height
 
         self._color_system: Optional[ColorSystem]
         self._force_terminal = force_terminal
@@ -808,12 +824,13 @@ class Console:
         Args:
             hook (RenderHook): Render hook instance.
         """
-
-        self._render_hooks.append(hook)
+        with self._lock:
+            self._render_hooks.append(hook)
 
     def pop_render_hook(self) -> None:
         """Pop the last renderhook from the stack."""
-        self._render_hooks.pop()
+        with self._lock:
+            self._render_hooks.pop()
 
     def __enter__(self) -> "Console":
         """Own context manager to enter buffer context."""
@@ -948,8 +965,12 @@ class Console:
 
         width: Optional[int] = None
         height: Optional[int] = None
+
         if WINDOWS:  # pragma: no cover
-            width, height = shutil.get_terminal_size()
+            try:
+                width, height = os.get_terminal_size()
+            except OSError:  # Probably not a terminal
+                pass
         else:
             try:
                 width, height = os.get_terminal_size(sys.__stdin__.fileno())
@@ -959,11 +980,18 @@ class Console:
                 except (AttributeError, ValueError, OSError):
                     pass
 
+        columns = self._environ.get("COLUMNS")
+        if columns is not None and columns.isdigit():
+            width = int(columns)
+        lines = self._environ.get("LINES")
+        if lines is not None and lines.isdigit():
+            height = int(lines)
+
         # get_terminal_size can report 0, 0 if run from pseudo-terminal
         width = width or 80
         height = height or 25
         return ConsoleDimensions(
-            ((width - self.legacy_windows) if self._width is None else self._width),
+            width - self.legacy_windows if self._width is None else self._width,
             height if self._height is None else self._height,
         )
 
@@ -1042,7 +1070,7 @@ class Console:
         is defined by the system and will typically support at least pressing a key to scroll.
 
         Args:
-            pager (Pager, optional): A pager object, or None to use :class:~rich.pager.SystemPager`. Defaults to None.
+            pager (Pager, optional): A pager object, or None to use :class:`~rich.pager.SystemPager`. Defaults to None.
             styles (bool, optional): Show styles in pager. Defaults to False.
             links (bool, optional): Show links in pager. Defaults to False.
 
@@ -1206,8 +1234,8 @@ class Console:
             # No space to render anything. This prevents potential recursion errors.
             return
         render_iterable: RenderResult
-        if hasattr(renderable, "__rich__") and not isclass(renderable):
-            renderable = renderable.__rich__()  # type: ignore
+
+        renderable = rich_cast(renderable)
         if hasattr(renderable, "__rich_console__") and not isclass(renderable):
             render_iterable = renderable.__rich_console__(self, _options)  # type: ignore
         elif isinstance(renderable, str):
@@ -1425,21 +1453,15 @@ class Console:
                 del text[:]
 
         for renderable in objects:
-            # I promise this is sane
-            # This detects an object which claims to have all attributes, such as MagicMock.mock_calls
-            if hasattr(
-                renderable, "jwevpw_eors4dfo6mwo345ermk7kdnfnwerwer"
-            ):  # pragma: no cover
-                renderable = repr(renderable)
-            rich_cast = getattr(renderable, "__rich__", None)
-            if rich_cast:
-                renderable = rich_cast()
+            renderable = rich_cast(renderable)
             if isinstance(renderable, str):
                 append_text(
                     self.render_str(
                         renderable, emoji=emoji, markup=markup, highlighter=_highlighter
                     )
                 )
+            elif isinstance(renderable, Text):
+                append_text(renderable)
             elif isinstance(renderable, ConsoleRenderable):
                 check_text()
                 append(renderable)
@@ -1485,9 +1507,8 @@ class Console:
             control_codes (str): Control codes, such as those that may move the cursor.
         """
         if not self.is_dumb_terminal:
-            for _control in control:
-                self._buffer.append(_control.segment)
-            self._check_buffer()
+            with self:
+                self._buffer.extend(_control.segment for _control in control)
 
     def out(
         self,
@@ -1569,7 +1590,7 @@ class Console:
             if overflow is None:
                 overflow = "ignore"
             crop = False
-
+        render_hooks = self._render_hooks[:]
         with self:
             renderables = self._collect_renderables(
                 objects,
@@ -1580,7 +1601,7 @@ class Console:
                 markup=markup,
                 highlight=highlight,
             )
-            for hook in self._render_hooks:
+            for hook in render_hooks:
                 renderables = hook.process_renderables(renderables)
             render_options = self.options.update(
                 justify=justify,
@@ -1837,6 +1858,8 @@ class Console:
         if not objects:
             objects = (NewLine(),)
 
+        render_hooks = self._render_hooks[:]
+
         with self:
             renderables = self._collect_renderables(
                 objects,
@@ -1871,7 +1894,7 @@ class Console:
                     link_path=link_path,
                 )
             ]
-            for hook in self._render_hooks:
+            for hook in render_hooks:
                 renderables = hook.process_renderables(renderables)
             new_segments: List[Segment] = []
             extend = new_segments.extend
@@ -1904,7 +1927,9 @@ class Console:
                         try:
                             if WINDOWS:  # pragma: no cover
                                 # https://bugs.python.org/issue37871
-                                self.file.writelines(text.splitlines(True))
+                                write = self.file.write
+                                for line in text.splitlines(True):
+                                    write(line)
                             else:
                                 self.file.write(text)
                             self.file.flush()

@@ -78,7 +78,7 @@ def _is_dataclass_repr(obj: object) -> bool:
     # Catching all exceptions in case something is missing on a non CPython implementation
     try:
         return obj.__repr__.__code__.co_filename == dataclasses.__file__
-    except Exception:
+    except Exception:  # pragma: no coverage
         return False
 
 

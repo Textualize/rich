@@ -31,13 +31,13 @@ Lueg was [anderi öber Rich säged](https://www.willmcgugan.com/blog/pages/post/
 
 ## Kompatibilität
 
-Rich funktioniert mit Linux, OSX ond Windows. True color / emoji funktioniert mit em neue Windows Törminäl, s klassische Törminäl isch of 16 Farbe limitiärt. Rich brucht Pzthon 3.6.1 oder neuer.
+Rich funktioniert mit Linux, OSX ond Windows. True color / emoji funktioniert mit em neue Windows Törminäl, s klassische Törminäl isch of 16 Farbe limitiärt. Rich brucht Python 3.6.1 oder neuer.
 
 Rich funktioniert mit [Jupyter notebooks](https://jupyter.org/) ohni irgendwelchä zuäsätzloche konfiguration.
 
 ## Installation
 
-Installation mit `pip` oder mit dim liäblings PyPi Päckli-Mangager.
+Installation mit `pip` oder mit dim liäblings PyPI Päckli-Manager.
 
 ```
 pip install rich
@@ -124,7 +124,7 @@ Rich hät e [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?
 
 Lueg do d [inspect Dokumentation](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) für d Details a.
 
-# Rich Library
+# Rich-Bibliothek
 
 Rich häd ä Aazahl vo integriäte _renderables_ wo du chasch verwende zum eleganti Usgobe i dinner e CLI generiäre ond der hälfed bim debugge vo dim Code.
 
@@ -133,7 +133,7 @@ Drock of di folgende Öberschrifte für d Details:
 <details>
 <summary>Log</summary>
 
-S Console Objekt hät e `log()` Methode wo verglichbar zu de `print()` Schnittstell isch aber zuäsätzloch no e Spaltä för di aktuäll Zitt und d Datai mit de Zille wo de Ufruäf macht us git. Standartmässig tuät Rich es Syntax Highlighting für Python Strukturä sowiä repr Text machä. Went e Collection (wiä zum Bispiil dict oder list) loggsch wird Rich das hübsch Usgeh so dass es i de verfüägbari Platz ine passt. Do es Bispiil für e paar vo dene Funktionä.
+S Console Objekt hät e `log()` Methode wo verglichbar zu de `print()` Schnittstell isch aber zuäsätzloch no e Spaltä för di aktuäll Zitt und d Datai mit de Zille wo de Ufruäf macht us git. Standardmässig tuät Rich es Syntax Highlighting für Python Strukturä sowiä repr Text machä. Went e Collection (wiä zum Bispiil dict oder list) loggsch wird Rich das hübsch Usgeh so dass es i de verfüägbari Platz ine passt. Do es Bispiil für e paar vo dene Funktionä.
 
 ```python
 from rich.console import Console
@@ -197,9 +197,9 @@ Rich cha flexiibäl [Tabelle](https://rich.readthedocs.io/en/latest/tables.html)
 
 ![table movie](https://github.com/willmcgugan/rich/raw/master/imgs/table_movie.gif)
 
-D Animation obe isch mit [table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py) us em Bispiil Ordner erstellt worde.
+D Animation obe isch mit [table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py) us em Bispiil-Ordner erstellt worde.
 
-Do es eifachs Tabelle Bispiil:
+Do es eifachs Tabelle-Bispiil:
 
 ```python
 from rich.console import Console
@@ -298,7 +298,7 @@ D Spinner Animatione sind vo [cli-spinners](https://www.npmjs.com/package/cli-sp
 python -m rich.spinner
 ```
 
-De Befehlt obe generiärt di folgändi Usgob im Törminäl:
+De Befehl obe generiärt di folgändi Usgob im Törminäl:
 
 ![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
 
@@ -324,9 +324,9 @@ Lueg s Bispiil Script [tree.py](https://github.com/willmcgugan/rich/blob/master/
 </details>
 
 <details>
-<summary>Columns</summary>
+<summary>Spaltene</summary>
 
-Rich can render content in neat [columns](https://rich.readthedocs.io/en/latest/columns.html) with equal or optimal width. Here's a very basic clone of the (MacOS / Linux) `ls` command which displays a directory listing in columns:
+Rich cha Inhalt i hübsche [Spaltene](https://rich.readthedocs.io/en/latest/columns.html) darstelle mit glichä oder optimale Breiti. Do isch e ganz eifachi kopii vom (MacOS / Linux) `ls` Befehl wo Ordner in Spaltene darstellt
 
 ```python
 import os
@@ -339,7 +339,7 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-De folgend Screenshot isch d Usgob vom [columns example](https://github.com/willmcgugan/rich/blob/master/examples/columns.py) Bispiil, wo Date vonnere API hollt ond in Colums darstellt:
+De folgend Screenshot isch d Usgob vom [Spalte-Bispiil](https://github.com/willmcgugan/rich/blob/master/examples/columns.py), wo Date vonnere API hollt ond in Spaltene darstellt:
 
 ![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
 
@@ -350,7 +350,7 @@ De folgend Screenshot isch d Usgob vom [columns example](https://github.com/will
 
 Rich cha [markdown](https://rich.readthedocs.io/en/latest/markdown.html) übersetze ond leistet vernünftigi Ärbät bim formatiärige is Törminäl z übersetze.
 
-Zum Markdonw z übersetze importier d Klass `Markdown` und instanzier es mitem Markdown Text. Nocher gid mos uf de Konsolä us. Do es Bispiil:
+Zum Markdown z übersetze importier d Klass `Markdown` und instanzier es mitem Markdown Text. Nocher gid mos uf de Konsolä us. Do es Bispiil:
 
 ```python
 from rich.console import Console
@@ -406,7 +406,7 @@ Das wird d Usgob ungefär wie s Folgende geh:
 <details>
 <summary>Tracebacks</summary>
 
-Rich cha [wunderschöni Tracebacks](https://rich.readthedocs.io/en/latest/traceback.html) generiäre wo eifach zum läse sind und meh Code als de standart Python Traceback darstellt. Du chasch Rich als default Traceback Handler setzä ond alli nöd abfangene Exceptions werded mit Rich dargstellt.
+Rich cha [wunderschöni Tracebacks](https://rich.readthedocs.io/en/latest/traceback.html) generiäre wo eifach zum läse sind und meh Code als de Standard-Python-Traceback darstellt. Du chasch Rich als default Traceback Handler setzä ond alli nöd abfangene Exceptions werded mit Rich dargstellt.
 
 So gsiets ungefär ufemen OSX (ähnloch uf Linux) us:
 
@@ -414,7 +414,7 @@ So gsiets ungefär ufemen OSX (ähnloch uf Linux) us:
 
 </details>
 
-Alli Rich Renderables bruched s [Console Protokoll](https://rich.readthedocs.io/en/latest/protocol.html), wo mo au für d eige entwicklig vo Rich Inhalt cha bruche.
+Alli Rich Renderables bruched s [Console-Protokoll](https://rich.readthedocs.io/en/latest/protocol.html), wo mo au für d eige Entwicklig vo Rich-Inhalt cha bruche.
 
 # Rich für Ondernemä
 
@@ -450,6 +450,6 @@ Do es paar Projekt wo Rich verwended:
   Lightweight Python library for adding real-time 2D object tracking to any detector.
 - [ansible/ansible-lint](https://github.com/ansible/ansible-lint) Ansible-lint checks playbooks for practices and behaviour that could potentially be improved
 - [ansible-community/molecule](https://github.com/ansible-community/molecule) Ansible Molecule testing framework
-- +[Many more](https://github.com/willmcgugan/rich/network/dependents)!
+- +[Vieli meh](https://github.com/willmcgugan/rich/network/dependents)!
 
 <!-- This is a test, no need to translate -->

@@ -223,6 +223,7 @@ def test_divide_edge_2():
 @pytest.mark.parametrize(
     "text,split,result",
     [
+        ("XX", 4, (Segment("XX"), Segment(""))),
         ("X", 1, (Segment("X"), Segment(""))),
         ("💩", 1, (Segment(" "), Segment(" "))),
         ("XY", 1, (Segment("X"), Segment("Y"))),

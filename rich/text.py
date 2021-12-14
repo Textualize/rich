@@ -57,7 +57,7 @@ class Span(NamedTuple):
         return (
             f"Span({self.start}, {self.end}, {self.style!r})"
             if (isinstance(self.style, Style) and self.style._meta)
-            else f"Span({self.start}, {self.end}, {str(self.style)!r})"
+            else f"Span({self.start}, {self.end}, {repr(self.style)})"
         )
 
     def __bool__(self) -> bool:
@@ -213,6 +213,36 @@ class Text(JupyterMixin):
         """Get the number of cells required to render this text."""
         return cell_len(self.plain)
 
+    @property
+    def markup(self) -> str:
+        """Get console markup to render this Text.
+
+        Returns:
+            str: A string potentially creating markup tags.
+        """
+        from .markup import escape
+
+        output: List[str] = []
+
+        plain = self.plain
+        markup_spans = [
+            (0, False, self.style),
+            *((span.start, False, span.style) for span in self._spans),
+            *((span.end, True, span.style) for span in self._spans),
+            (len(plain), True, self.style),
+        ]
+        markup_spans.sort(key=itemgetter(0, 1))
+        position = 0
+        append = output.append
+        for offset, closing, style in markup_spans:
+            if offset > position:
+                append(escape(plain[position:offset]))
+                position = offset
+            if style:
+                append(f"[/{style}]" if closing else f"[{style}]")
+        markup = "".join(output)
+        return markup
+
     @classmethod
     def from_markup(
         cls,
@@ -241,6 +271,44 @@ class Text(JupyterMixin):
         rendered_text.justify = justify
         rendered_text.overflow = overflow
         return rendered_text
+
+    @classmethod
+    def from_ansi(
+        cls,
+        text: str,
+        *,
+        style: Union[str, Style] = "",
+        justify: Optional["JustifyMethod"] = None,
+        overflow: Optional["OverflowMethod"] = None,
+        no_wrap: Optional[bool] = None,
+        end: str = "\n",
+        tab_size: Optional[int] = 8,
+    ) -> "Text":
+        """Create a Text object from a string containing ANSI escape codes.
+
+        Args:
+            text (str): A string containing escape codes.
+            style (Union[str, Style], optional): Base style for text. Defaults to "".
+            justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
+            overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
+            no_wrap (bool, optional): Disable text wrapping, or None for default. Defaults to None.
+            end (str, optional): Character to end text with. Defaults to "\\\\n".
+            tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
+        """
+        from .ansi import AnsiDecoder
+
+        joiner = Text(
+            "\n",
+            justify=justify,
+            overflow=overflow,
+            no_wrap=no_wrap,
+            end=end,
+            tab_size=tab_size,
+            style=style,
+        )
+        decoder = AnsiDecoder()
+        result = joiner.join(line for line in decoder.decode(text))
+        return result
 
     @classmethod
     def styled(
@@ -1179,6 +1247,7 @@ if __name__ == "__main__":  # pragma: no cover
     text.highlight_words(["ipsum"], "italic")
 
     console = Console()
+
     console.rule("justify='left'")
     console.print(text, style="red")
     console.print()

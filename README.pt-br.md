@@ -36,7 +36,7 @@ Rich funciona com [Jupyter notebooks](https://jupyter.org/) sem a necessidade de
 
 ## Instalação
 
-Instale usando `pip` ou seu gerenciador de pacotes PyPi favorito.
+Instale usando `pip` ou seu gerenciador de pacotes PyPI favorito.
 
 ```
 pip install rich
@@ -125,7 +125,7 @@ Confira a [documentação do inspect](https://rich.readthedocs.io/en/latest/refe
 
 # A biblioteca Rich
 
-O Rich possui vários _renderizaveis_ nativos que podem ser usados para criar outputs elegantes no seu CLI e ajudar a debugar o código.
+O Rich possui vários _renderizáveis_ nativos que podem ser usados para criar outputs elegantes no seu CLI e ajudar a debugar o código.
 
 Clique nos itens a seguir para expandir os detalhes:
 

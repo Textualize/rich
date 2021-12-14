@@ -1,8 +1,20 @@
 import pytest
+import sys
 from typing import Optional
 
 from rich.console import Console
 import rich.repr
+
+
+skip_py36 = pytest.mark.skipif(
+    sys.version_info.minor == 6 and sys.version_info.major == 3,
+    reason="rendered differently on py3.6",
+)
+
+skip_py37 = pytest.mark.skipif(
+    sys.version_info.minor == 7 and sys.version_info.major == 3,
+    reason="rendered differently on py3.7",
+)
 
 
 @rich.repr.auto
@@ -57,6 +69,24 @@ class Bar(Foo):
 def test_rich_repr() -> None:
     assert (repr(Foo("hello"))) == "Foo('hello', 'hello', egg=1)"
     assert (repr(Foo("hello", bar=3))) == "Foo('hello', 'hello', bar=3, egg=1)"
+
+
+@skip_py36
+@skip_py37
+def test_rich_repr_positional_only() -> None:
+    _locals = locals().copy()
+    exec(
+        """\
+@rich.repr.auto
+class PosOnly:
+    def __init__(self, foo, /):
+        self.foo = 1
+    """,
+        globals(),
+        _locals,
+    )
+    p = _locals["PosOnly"](1)
+    assert repr(p) == "PosOnly(1)"
 
 
 def test_rich_angular() -> None:

@@ -17,7 +17,7 @@ class Pager(ABC):
 class SystemPager(Pager):
     """Uses the pager installed on the system."""
 
-    def _pager(self, content: str) -> Any:
+    def _pager(self, content: str) -> Any:  #  pragma: no cover
         return __import__("pydoc").pager(content)
 
     def show(self, content: str) -> None:
