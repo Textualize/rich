@@ -1,7 +1,7 @@
 import re
 from functools import partial, reduce
 from math import gcd
-from operator import attrgetter, itemgetter
+from operator import itemgetter
 from rich.emoji import EmojiVariant
 from typing import (
     TYPE_CHECKING,
@@ -1058,15 +1058,48 @@ class Text(JupyterMixin):
         if not self._spans:
             return new_lines
 
+        _lines = new_lines._lines
+        line_count = len(line_ranges)
         _Span = Span
 
-        for line, (line_start, line_end) in zip(new_lines._lines, line_ranges):
-            for span_start, span_end, style in self._spans:
-                if span_end > line_start and span_start < line_end:
-                    new_start = max(0, span_start - line_start)
-                    new_end = min(span_end - line_start, line_end - line_start)
-                    if new_end > new_start:
-                        line._spans.append(_Span(new_start, new_end, style))
+        for span_start, span_end, style in self._spans:
+
+            lower_bound = 0
+            upper_bound = line_count
+            start_line_no = (lower_bound + upper_bound) // 2
+
+            while True:
+                line_start, line_end = line_ranges[start_line_no]
+                if span_start < line_start:
+                    upper_bound = start_line_no - 1
+                elif span_start > line_end:
+                    lower_bound = start_line_no + 1
+                else:
+                    break
+                start_line_no = (lower_bound + upper_bound) // 2
+
+            lower_bound = 0
+            upper_bound = line_count
+            end_line_no = start_line_no
+
+            while True:
+                line_start, line_end = line_ranges[end_line_no]
+                if span_end < line_start:
+                    upper_bound = end_line_no - 1
+                elif span_end > line_end:
+                    lower_bound = end_line_no + 1
+                else:
+                    break
+                end_line_no = (lower_bound + upper_bound) // 2
+
+            for line, (line_start, line_end) in zip(
+                _lines[start_line_no : end_line_no + 1],
+                line_ranges[start_line_no : end_line_no + 1],
+            ):
+                new_start = max(0, span_start - line_start)
+                new_end = min(span_end - line_start, line_end - line_start)
+                if new_end > new_start:
+                    line._spans.append(_Span(new_start, new_end, style))
 
         return new_lines
 
