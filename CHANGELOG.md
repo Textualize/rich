@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed issues with overlaping tags https://github.com/willmcgugan/rich/issues/1755
+- Fixed issues with overlapping tags https://github.com/willmcgugan/rich/issues/1755
 
 ## [10.16.0] - 2021-12-12
 
