@@ -1058,7 +1058,7 @@ class Text(JupyterMixin):
         if not self._spans:
             return new_lines
 
-        _lines = [line._spans.append for line in new_lines._lines]
+        _line_appends = [line._spans.append for line in new_lines._lines]
         line_count = len(line_ranges)
         _Span = Span
 
@@ -1091,14 +1091,12 @@ class Text(JupyterMixin):
                     break
                 end_line_no = (lower_bound + upper_bound) // 2
 
-            for line, (line_start, line_end) in zip(
-                _lines[start_line_no : end_line_no + 1],
-                line_ranges[start_line_no : end_line_no + 1],
-            ):
+            for line_no in range(start_line_no, end_line_no + 1):
+                line_start, line_end = line_ranges[line_no]
                 new_start = max(0, span_start - line_start)
                 new_end = min(span_end - line_start, line_end - line_start)
                 if new_end > new_start:
-                    line(_Span(new_start, new_end, style))
+                    _line_appends[line_no](_Span(new_start, new_end, style))
 
         return new_lines
 
