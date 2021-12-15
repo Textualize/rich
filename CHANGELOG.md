@@ -1579,6 +1579,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[10.16.1]: https://github.com/willmcgugan/rich/compare/v10.16.0...v10.16.1
 [10.16.0]: https://github.com/willmcgugan/rich/compare/v10.15.2...v10.16.0
 [10.15.2]: https://github.com/willmcgugan/rich/compare/v10.15.1...v10.15.2
 [10.15.1]: https://github.com/willmcgugan/rich/compare/v10.15.0...v10.15.1
