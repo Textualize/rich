@@ -1,13 +1,17 @@
 from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Sized
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import timedelta
+from io import RawIOBase
 from math import ceil
+from os import PathLike, stat
 from threading import Event, RLock, Thread
 from types import TracebackType
 from typing import (
     Any,
+    BinaryIO,
     Callable,
     Deque,
     Dict,
@@ -147,6 +151,149 @@ def track(
         yield from progress.track(
             sequence, total=total, description=description, update_period=update_period
         )
+
+
+class _Reader(RawIOBase):
+    """A reader that tracks progress while it's being read from."""
+
+    def __init__(self, handle: BinaryIO, progress: "Progress", task: TaskID):
+        self.handle = handle
+        self.progress = progress
+        self.task = task
+
+    def __enter__(self):
+        self.handle.__enter__()
+        return self
+
+    def __exit__(self, exc_val, exc_ty, tb):
+        return self.handle.__exit__(exc_val, exc_ty, tb)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        line = next(self.handle)
+        self.progress.advance(self.task, advance=len(line))
+        return line
+
+    @property
+    def closed(self):
+        return self.closed
+
+    def isatty(self):
+        return self.handle.isatty()
+
+    def readable(self):
+        return self.handle.readable()
+
+    def seekable(self):
+        return self.handle.seekable()
+
+    def writable(self):
+        return False
+
+    def read(self, size=-1):
+        block = self.handle.read(size)
+        self.progress.advance(self.task, advance=len(block))
+        return block
+
+    def readall(self):
+        block = self.handle.readall()
+        self.progress.advance(self.task, advance=len(block))
+        return block
+
+    def readinto(self, b):
+        n = self.handle.readinto(b)
+        self.progress.advance(self.task, advance=n)
+        return n
+
+    def readline(self, size=-1):
+        line = self.handle.readline(size)
+        self.progress.advance(self.task, advance=len(line))
+        return line
+
+    def readlines(self, hint=-1):
+        lines = self.handle.readlines(hint)
+        self.progress.advance(self.task, advance=sum(map(len, lines)))
+        return lines
+
+    def close(self):
+        self.handle.close()
+
+    def seek(self, offset, whence=0):
+        pos = self.handle.seek(offset, whence)
+        self.progress.update(self.task, completed=pos)
+        return pos
+
+    def tell(self):
+        return self.handle.tell()
+
+
+@contextmanager
+def read(
+    file: Union[str, PathLike, BinaryIO],
+    description: str = "Read...",
+    total: Optional[int] = None,
+    auto_refresh: bool = True,
+    console: Optional[Console] = None,
+    transient: bool = False,
+    get_time: Optional[Callable[[], float]] = None,
+    refresh_per_second: float = 10,
+    style: StyleType = "bar.back",
+    complete_style: StyleType = "bar.complete",
+    finished_style: StyleType = "bar.finished",
+    pulse_style: StyleType = "bar.pulse",
+    update_period: float = 0.1,
+    disable: bool = False,
+) -> ContextManager[BinaryIO]:
+    """Read bytes from a file while tracking progress.
+
+    Args:
+        sequence (Iterable[ProgressType]): A sequence (must support "len") you wish to iterate over.
+        description (str, optional): Description of task show next to progress bar. Defaults to "Working".
+        total: (int, optional): Total number of steps. Default is len(sequence).
+        auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
+        transient: (bool, optional): Clear the progress on exit. Defaults to False.
+        console (Console, optional): Console to write to. Default creates internal Console instance.
+        refresh_per_second (float): Number of times per second to refresh the progress information. Defaults to 10.
+        style (StyleType, optional): Style for the bar background. Defaults to "bar.back".
+        complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
+        finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
+        pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
+        update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
+        disable (bool, optional): Disable display of progress.
+    Returns:
+        ContextManager[BinaryIO]: An iterable of the values in the sequence.
+
+    """
+
+    columns: List["ProgressColumn"] = (
+        [TextColumn("[progress.description]{task.description}")] if description else []
+    )
+    columns.extend(
+        (
+            BarColumn(
+                style=style,
+                complete_style=complete_style,
+                finished_style=finished_style,
+                pulse_style=pulse_style,
+            ),
+            DownloadColumn(),
+            TimeRemainingColumn(),
+        )
+    )
+    progress = Progress(
+        *columns,
+        auto_refresh=auto_refresh,
+        console=console,
+        transient=transient,
+        get_time=get_time,
+        refresh_per_second=refresh_per_second or 10,
+        disable=disable,
+    )
+
+    with progress:
+        yield progress.read(file, total=total, description=description)
 
 
 class ProgressColumn(ABC):
@@ -793,6 +940,49 @@ class Progress(JupyterMixin):
                 yield value
                 advance(task_id, 1)
                 refresh()
+
+    def read(
+        self,
+        file: Union[str, PathLike, BinaryIO],
+        total: Optional[int] = None,
+        task_id: Optional[TaskID] = None,
+        description: str = "Reading...",
+    ) -> BinaryIO:
+        """Track progress by iterating over a sequence.
+
+        Args:
+            file (Sequence[ProgressType]): A sequence of values you want to iterate over and track progress.
+            total: (int, optional): Total number of bytes to read. Must be provided if reading from a file handle. Default for a path is os.stat(file).st_size.
+            task_id: (TaskID): Task to track. Default is new task.
+            description: (str, optional): Description of task, if new task is created.
+
+        Returns:
+            BinaryIO: A readable file-like object in binary mode.
+        """
+
+        if total is None:
+            if isinstance(file, (str, PathLike)):
+                task_total = stat(file).st_size
+            else:
+                raise ValueError(
+                    f"unable to get size of {file!r}, please specify 'total'"
+                )
+        else:
+            task_total = total
+
+        if task_id is None:
+            task_id = self.add_task(description, total=task_total)
+        else:
+            self.update(task_id, total=task_total)
+
+        if isinstance(file, (str, PathLike)):
+            handle = open(file, "rb")
+        else:
+            if not isinstance(file.read(0), bytes):
+                raise ValueError("expected file open in binary mode")
+            handle = file
+
+        return _Reader(handle, self, task_id)
 
     def start_task(self, task_id: TaskID) -> None:
         """Start a task.
