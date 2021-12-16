@@ -4,8 +4,9 @@ from collections.abc import Sized
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import timedelta
-from io import RawIOBase
+from io import RawIOBase, UnsupportedOperation
 from math import ceil
+from mmap import mmap
 from os import PathLike, stat
 from threading import Event, RLock, Thread
 from types import TracebackType
@@ -154,10 +155,10 @@ def track(
         )
 
 
-class _Reader(RawIOBase):
+class _Reader(RawIOBase, BinaryIO):
     """A reader that tracks progress while it's being read from."""
 
-    def __init__(self, handle: BinaryIO, progress: "Progress", task: TaskID, close_handle: bool = True):
+    def __init__(self, handle: BinaryIO, progress: "Progress", task: TaskID, close_handle: bool = True) -> None:
         self.handle = handle
         self.progress = progress
         self.task = task
@@ -176,77 +177,83 @@ class _Reader(RawIOBase):
     ) -> None:
         self.close()
 
-    def __iter__(self):
+    def __iter__(self) -> BinaryIO:
         return self
 
-    def __next__(self):
+    def __next__(self) -> bytes:
         line = next(self.handle)
         self.progress.advance(self.task, advance=len(line))
         return line
 
     @property
-    def closed(self):
+    def closed(self) -> bool:
         return self._closed
 
-    def isatty(self):
+    def fileno(self) -> int:
+        return self.handle.fileno()
+
+    def isatty(self) -> bool:
         return self.handle.isatty()
 
-    def readable(self):
+    def readable(self) -> bool:
         return self.handle.readable()
 
-    def seekable(self):
+    def seekable(self) -> bool:
         return self.handle.seekable()
 
-    def writable(self):
+    def writable(self) -> bool:
         return False
 
-    def read(self, size=-1):
+    def read(self, size: int = -1) -> bytes:
         block = self.handle.read(size)
         self.progress.advance(self.task, advance=len(block))
         return block
 
-    def readall(self):
+    def readall(self) -> bytes:
         block = self.handle.readall()
         self.progress.advance(self.task, advance=len(block))
         return block
 
-    def readinto(self, b):
-        n = self.handle.readinto(b)
+    def readinto(self, b: Union[bytearray, memoryview, mmap]):  # type: ignore
+        n = self.handle.readinto(b)  # type: ignore
         self.progress.advance(self.task, advance=n)
         return n
 
-    def readline(self, size=-1):
+    def readline(self, size: int = -1) -> bytes:  # type: ignore
         line = self.handle.readline(size)
         self.progress.advance(self.task, advance=len(line))
         return line
 
-    def readlines(self, hint=-1):
+    def readlines(self, hint: int = -1) -> List[bytes]:
         lines = self.handle.readlines(hint)
         self.progress.advance(self.task, advance=sum(map(len, lines)))
         return lines
 
-    def close(self):
+    def close(self) -> None:
         if self.close_handle:
             self.handle.close()
         self._closed = True
 
-    def seek(self, offset, whence=0):
+    def seek(self, offset: int, whence: int = 0):
         pos = self.handle.seek(offset, whence)
         self.progress.update(self.task, completed=pos)
         return pos
 
-    def tell(self):
+    def tell(self) -> int:
         return self.handle.tell()
 
+    def write(self, s: Any) -> int:
+        raise UnsupportedOperation("write")
 
-class _ReadContext(ContextManager[_Reader]):
+
+class _ReadContext(ContextManager[BinaryIO]):
     """A utility class to handle a context for both a reader and a progress."""
 
-    def __init__(self, progress: "Progress", reader: _Reader) -> None:
+    def __init__(self, progress: "Progress", reader: BinaryIO) -> None:
         self.progress = progress
         self.reader = reader
 
-    def __enter__(self) -> _Reader:
+    def __enter__(self) -> BinaryIO:
         self.progress.start()
         return self.reader.__enter__()
 
@@ -255,9 +262,9 @@ class _ReadContext(ContextManager[_Reader]):
         exc_type: Optional[Type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
-    ) -> bool:
+    ) -> None:
         self.progress.stop()
-        return self.reader.__exit__(exc_type, exc_val, exc_tb)
+        self.reader.__exit__(exc_type, exc_val, exc_tb)
 
 
 def read(
