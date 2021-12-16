@@ -218,7 +218,7 @@ class _Reader(RawIOBase, BinaryIO):
     def readall(self) -> bytes:
         block = self.handle.readall()  # type: ignore
         self.progress.advance(self.task, advance=len(block))
-        return block # type: ignore
+        return block  # type: ignore
 
     def readinto(self, b: Union[bytearray, memoryview, mmap]):  # type: ignore
         n = self.handle.readinto(b)  # type: ignore

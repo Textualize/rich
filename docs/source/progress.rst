@@ -26,6 +26,16 @@ For basic usage call the :func:`~rich.progress.track` function, which accepts a 
     for n in track(range(n), description="Processing..."):
         do_work(n)
 
+
+To get a progress bar while reading from a file, you may consider using the :func:`~rich.progress.read` function, which accepts a path, or a *file-like* object. It will return a *file-like* object in *binary mode* that will update the progress information as it's being read from. Here's an example, tracking the progresses made by :func:`json.load` to load a file::
+
+    import json
+    from rich.progress import read
+
+    with read("data.json", description="Loading data...") as f:
+        data = json.load(f)
+
+
 Advanced usage
 --------------
 
@@ -34,9 +44,9 @@ If you require multiple tasks in the display, or wish to configure the columns i
 The Progress class is designed to be used as a *context manager* which will start and stop the progress display automatically.
 
 Here's a simple example::
-    
+
     import time
-    
+
     from rich.progress import Progress
 
     with Progress() as progress:
@@ -179,7 +189,7 @@ If you have another Console object you want to use, pass it in to the :class:`~r
     with Progress(console=my_console) as progress:
         my_console.print("[bold blue]Starting work!")
         do_work(progress)
-        
+
 
 Redirecting stdout / stderr
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -199,6 +209,35 @@ If the :class:`~rich.progress.Progress` class doesn't offer exactly what you nee
         def get_renderables(self):
             yield Panel(self.make_tasks_table(self.tasks))
 
+Reading from a file
+~~~~~~~~~~~~~~~~~~~
+
+You can obtain a progress-tracking reader using the :meth:`~rich.progress.Progress.read` method by giving either a path or a *file-like* object. When a path is given, :meth:`~rich.progress.Progress.read` will query the size of the file with :func:`os.stat`, and take care of opening the file for you, but you are still responsible for closing it. For this, you should consider using a *context*::
+
+    from rich.progress import Progress
+
+    with Progress() as progress:
+        with progress.read("file.bin") as file:
+            do_work(file)
+
+If a file-like object is provided, it must be in *binary mode*, and the total size must be provided to :meth:`~rich.progress.Progress.read` with the ``total`` argument. In that case :meth:`~rich.progress.Progress.read` will not close the file-like object, so you need to take care of that yourself::
+
+    from rich.progress import Progress
+
+    with Progress() as progress:
+        with open("file.bin", "rb") as file:
+            do_work(progress.read(file, total=2048))
+
+If the API consuming the file is expecting an object in *text mode* (for instance, :func:`csv.reader`), you can always wrap the object returned by :meth:`~rich.progress.Progress.read` in an :class:`io.TextIOWrapper`::
+
+    import io
+    from rich.progress import Progress
+
+    with Progress() as progress:
+        with progress.read("file.bin") as file:
+            do_work_txt(io.TextIOWrapper(file))
+
+
 Multiple Progress
 -----------------
 
@@ -208,4 +247,3 @@ Example
 -------
 
 See `downloader.py <https://github.com/willmcgugan/rich/blob/master/examples/downloader.py>`_ for a realistic application of a progress display. This script can download multiple concurrent files with a progress bar, transfer speed and file size.
-
