@@ -171,7 +171,7 @@ class _Reader(RawIOBase, BinaryIO):
         self.close_handle = close_handle
         self._closed = False
 
-    def __enter__(self):
+    def __enter__(self) -> "_Reader":
         self.handle.__enter__()
         return self
 
@@ -218,7 +218,7 @@ class _Reader(RawIOBase, BinaryIO):
     def readall(self) -> bytes:
         block = self.handle.readall()  # type: ignore
         self.progress.advance(self.task, advance=len(block))
-        return block
+        return block # type: ignore
 
     def readinto(self, b: Union[bytearray, memoryview, mmap]):  # type: ignore
         n = self.handle.readinto(b)  # type: ignore
@@ -240,7 +240,7 @@ class _Reader(RawIOBase, BinaryIO):
             self.handle.close()
         self._closed = True
 
-    def seek(self, offset: int, whence: int = 0):
+    def seek(self, offset: int, whence: int = 0) -> int:
         pos = self.handle.seek(offset, whence)
         self.progress.update(self.task, completed=pos)
         return pos
@@ -274,7 +274,7 @@ class _ReadContext(ContextManager[BinaryIO]):
 
 
 def read(
-    file: Union[str, PathLike, BinaryIO],
+    file: Union[str, PathLike[str], BinaryIO],
     description: str = "Reading...",
     total: Optional[int] = None,
     auto_refresh: bool = True,
@@ -986,7 +986,7 @@ class Progress(JupyterMixin):
 
     def read(
         self,
-        file: Union[str, PathLike, BinaryIO],
+        file: Union[str, PathLike[str], BinaryIO],
         total: Optional[int] = None,
         task_id: Optional[TaskID] = None,
         description: str = "Reading...",
@@ -994,7 +994,7 @@ class Progress(JupyterMixin):
         """Track progress while reading from a binary file.
 
         Args:
-            file (Union[str, PathLike, BinaryIO]): The path to the file to read, or a file-like object in binary mode.
+            file (Union[str, PathLike[str], BinaryIO]): The path to the file to read, or a file-like object in binary mode.
             total: (int, optional): Total number of bytes to read. Must be provided if reading from a file handle. Default for a path is os.stat(file).st_size.
             task_id: (TaskID): Task to track. Default is new task.
             description: (str, optional): Description of task, if new task is created.

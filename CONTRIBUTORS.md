@@ -18,6 +18,7 @@ The following people have contributed to the development of Rich:
 - [Finn Hughes](https://github.com/finnhughes)
 - [Josh Karpel](https://github.com/JoshKarpel)
 - [Andrew Kettmann](https://github.com/akettmann)
+- [Martin Larralde](https://github.com/althonos)
 - [Hedy Li](https://github.com/hedythedev)
 - [Alexander Mancevice](https://github.com/amancevice)
 - [Will McGugan](https://github.com/willmcgugan)
