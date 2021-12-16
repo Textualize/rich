@@ -1,6 +1,8 @@
 # encoding=utf-8
 
 import io
+import os
+import tempfile
 from time import sleep
 from types import SimpleNamespace
 
@@ -15,6 +17,7 @@ from rich.progress import (
     TotalFileSizeColumn,
     DownloadColumn,
     TransferSpeedColumn,
+    read,
     RenderableColumn,
     SpinnerColumn,
     MofNCompleteColumn,
@@ -547,6 +550,58 @@ def test_no_output_if_progress_is_disabled() -> None:
     print(repr(result))
     expected = ""
     assert result == expected
+
+
+def test_read_file_closed() -> None:
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=60,
+        color_system="truecolor",
+        legacy_windows=False,
+        _environ={},
+    )
+    progress = Progress(
+        console=console,
+    )
+
+    fd, filename = tempfile.mkstemp()
+    with os.fdopen(fd, "wb") as f:
+        f.write(b"Hello, World!")
+    try:
+        with read(filename) as f:
+            assert f.read() == b"Hello, World!"
+        assert f.closed
+        assert f.handle.closed
+    finally:
+        os.remove(filename)
+
+def test_read_filehandle_not_closed() -> None:
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=60,
+        color_system="truecolor",
+        legacy_windows=False,
+        _environ={},
+    )
+    progress = Progress(
+        console=console,
+    )
+
+    fd, filename = tempfile.mkstemp()
+    with os.fdopen(fd, "wb") as f:
+        total = f.write(b"Hello, World!")
+    try:
+        with open(filename, "rb") as file:
+            with read(file, total=total) as f:
+                assert f.read() == b"Hello, World!"
+            assert f.closed
+            assert not f.handle.closed
+            assert not file.closed
+        assert file.closed
+    finally:
+        os.remove(filename)
 
 
 if __name__ == "__main__":
