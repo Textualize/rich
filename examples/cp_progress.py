@@ -31,7 +31,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 3:
 
         with progress:
-            desc=os.path.basename(sys.argv[1])
+            desc = os.path.basename(sys.argv[1])
             with progress.read(sys.argv[1], description=desc) as src:
                 with open(sys.argv[2], "wb") as dst:
                     shutil.copyfileobj(src, dst)

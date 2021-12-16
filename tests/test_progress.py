@@ -576,6 +576,7 @@ def test_read_file_closed() -> None:
     finally:
         os.remove(filename)
 
+
 def test_read_filehandle_not_closed() -> None:
     console = Console(
         file=io.StringIO(),

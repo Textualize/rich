@@ -158,7 +158,13 @@ def track(
 class _Reader(RawIOBase, BinaryIO):
     """A reader that tracks progress while it's being read from."""
 
-    def __init__(self, handle: BinaryIO, progress: "Progress", task: TaskID, close_handle: bool = True) -> None:
+    def __init__(
+        self,
+        handle: BinaryIO,
+        progress: "Progress",
+        task: TaskID,
+        close_handle: bool = True,
+    ) -> None:
         self.handle = handle
         self.progress = progress
         self.task = task
