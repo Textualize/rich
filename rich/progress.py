@@ -232,7 +232,7 @@ class _Reader(RawIOBase):
 @contextmanager
 def read(
     file: Union[str, PathLike, BinaryIO],
-    description: str = "Read...",
+    description: str = "Reading...",
     total: Optional[int] = None,
     auto_refresh: bool = True,
     console: Optional[Console] = None,
@@ -249,9 +249,9 @@ def read(
     """Read bytes from a file while tracking progress.
 
     Args:
-        sequence (Iterable[ProgressType]): A sequence (must support "len") you wish to iterate over.
-        description (str, optional): Description of task show next to progress bar. Defaults to "Working".
-        total: (int, optional): Total number of steps. Default is len(sequence).
+        file (Union[str, PathLike, BinaryIO]): The path to the file to read, or a file-like object in binary mode.
+        description (str, optional): Description of task show next to progress bar. Defaults to "Reading".
+        total: (int, optional): Total number of bytes to read. Must be provided if reading from a file handle. Default for a path is os.stat(file).st_size.
         auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         console (Console, optional): Console to write to. Default creates internal Console instance.
@@ -948,10 +948,10 @@ class Progress(JupyterMixin):
         task_id: Optional[TaskID] = None,
         description: str = "Reading...",
     ) -> BinaryIO:
-        """Track progress by iterating over a sequence.
+        """Track progress while reading from a binary file.
 
         Args:
-            file (Sequence[ProgressType]): A sequence of values you want to iterate over and track progress.
+            file (Union[str, PathLike, BinaryIO]): The path to the file to read, or a file-like object in binary mode.
             total: (int, optional): Total number of bytes to read. Must be provided if reading from a file handle. Default for a path is os.stat(file).st_size.
             task_id: (TaskID): Task to track. Default is new task.
             description: (str, optional): Description of task, if new task is created.
