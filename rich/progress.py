@@ -274,7 +274,7 @@ class _ReadContext(ContextManager[BinaryIO]):
 
 
 def read(
-    file: Union[str, PathLike[str], BinaryIO],
+    file: Union[str, "PathLike[str]", BinaryIO],
     description: str = "Reading...",
     total: Optional[int] = None,
     auto_refresh: bool = True,
@@ -292,7 +292,7 @@ def read(
     """Read bytes from a file while tracking progress.
 
     Args:
-        file (Union[str, PathLike, BinaryIO]): The path to the file to read, or a file-like object in binary mode.
+        file (Union[str, PathLike[str], BinaryIO]): The path to the file to read, or a file-like object in binary mode.
         description (str, optional): Description of task show next to progress bar. Defaults to "Reading".
         total: (int, optional): Total number of bytes to read. Must be provided if reading from a file handle. Default for a path is os.stat(file).st_size.
         auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
@@ -986,7 +986,7 @@ class Progress(JupyterMixin):
 
     def read(
         self,
-        file: Union[str, PathLike[str], BinaryIO],
+        file: Union[str, "PathLike[str]", BinaryIO],
         total: Optional[int] = None,
         task_id: Optional[TaskID] = None,
         description: str = "Reading...",
