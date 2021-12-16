@@ -210,7 +210,7 @@ class _Reader(RawIOBase, BinaryIO):
         return block
 
     def readall(self) -> bytes:
-        block = self.handle.readall()
+        block = self.handle.readall()  # type: ignore
         self.progress.advance(self.task, advance=len(block))
         return block
 
