@@ -13,6 +13,7 @@ from typing import (
     Any,
     BinaryIO,
     Callable,
+    ContextManager,
     Deque,
     Dict,
     Iterable,
@@ -156,17 +157,24 @@ def track(
 class _Reader(RawIOBase):
     """A reader that tracks progress while it's being read from."""
 
-    def __init__(self, handle: BinaryIO, progress: "Progress", task: TaskID):
+    def __init__(self, handle: BinaryIO, progress: "Progress", task: TaskID, close_handle: bool = True):
         self.handle = handle
         self.progress = progress
         self.task = task
+        self.close_handle = close_handle
+        self._closed = False
 
     def __enter__(self):
         self.handle.__enter__()
         return self
 
-    def __exit__(self, exc_val, exc_ty, tb):
-        return self.handle.__exit__(exc_val, exc_ty, tb)
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        self.close()
 
     def __iter__(self):
         return self
@@ -178,7 +186,7 @@ class _Reader(RawIOBase):
 
     @property
     def closed(self):
-        return self.closed
+        return self._closed
 
     def isatty(self):
         return self.handle.isatty()
@@ -218,7 +226,9 @@ class _Reader(RawIOBase):
         return lines
 
     def close(self):
-        self.handle.close()
+        if self.close_handle:
+            self.handle.close()
+        self._closed = True
 
     def seek(self, offset, whence=0):
         pos = self.handle.seek(offset, whence)
@@ -229,7 +239,27 @@ class _Reader(RawIOBase):
         return self.handle.tell()
 
 
-@contextmanager
+class _ReadContext(ContextManager[_Reader]):
+    """A utility class to handle a context for both a reader and a progress."""
+
+    def __init__(self, progress: "Progress", reader: _Reader) -> None:
+        self.progress = progress
+        self.reader = reader
+
+    def __enter__(self) -> _Reader:
+        self.progress.start()
+        return self.reader.__enter__()
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> bool:
+        self.progress.stop()
+        return self.reader.__exit__(exc_type, exc_val, exc_tb)
+
+
 def read(
     file: Union[str, PathLike, BinaryIO],
     description: str = "Reading...",
@@ -263,7 +293,7 @@ def read(
         update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
         disable (bool, optional): Disable display of progress.
     Returns:
-        ContextManager[BinaryIO]: An iterable of the values in the sequence.
+        ContextManager[BinaryIO]: A context manager yielding a progress reader.
 
     """
 
@@ -292,8 +322,8 @@ def read(
         disable=disable,
     )
 
-    with progress:
-        yield progress.read(file, total=total, description=description)
+    reader = progress.read(file, total=total, description=description)
+    return _ReadContext(progress, reader)
 
 
 class ProgressColumn(ABC):
@@ -977,12 +1007,14 @@ class Progress(JupyterMixin):
 
         if isinstance(file, (str, PathLike)):
             handle = open(file, "rb")
+            close_handle = True
         else:
             if not isinstance(file.read(0), bytes):
                 raise ValueError("expected file open in binary mode")
             handle = file
+            close_handle = False
 
-        return _Reader(handle, self, task_id)
+        return _Reader(handle, self, task_id, close_handle=close_handle)
 
     def start_task(self, task_id: TaskID) -> None:
         """Start a task.
