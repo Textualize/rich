@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Sized
-from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import timedelta
 from io import RawIOBase, UnsupportedOperation
