@@ -1,4 +1,4 @@
-import sys
+from io import StringIO
 
 import pytest
 
@@ -164,6 +164,34 @@ def test_divide():
         [Segment("Hell", bold)],
         [Segment("o", bold), Segment(" World!", italic)],
     ]
+
+
+# https://github.com/willmcgugan/rich/issues/1755
+def test_divide_complex():
+    MAP = (
+        "[on orange4]          [on green]XX[on orange4]          \n"
+        "                        \n"
+        "                        \n"
+        "                        \n"
+        "              [bright_red on black]Y[on orange4]        \n"
+        "[on green]X[on orange4]                  [on green]X[on orange4]  \n"
+        " [on green]X[on orange4]                   [on green]X\n"
+        "[on orange4]                        \n"
+        "          [on green]XX[on orange4]          \n"
+    )
+    from rich.text import Text
+    from rich.console import Console
+
+    text = Text.from_markup(MAP)
+    console = Console(
+        color_system="truecolor", width=30, force_terminal=True, file=StringIO()
+    )
+    console.print(text)
+    result = console.file.getvalue()
+
+    print(repr(result))
+    expected = "\x1b[48;5;94m          \x1b[0m\x1b[42mXX\x1b[0m\x1b[48;5;94m          \x1b[0m\n\x1b[48;5;94m                        \x1b[0m\n\x1b[48;5;94m                        \x1b[0m\n\x1b[48;5;94m                        \x1b[0m\n\x1b[48;5;94m              \x1b[0m\x1b[91;40mY\x1b[0m\x1b[91;48;5;94m        \x1b[0m\n\x1b[91;42mX\x1b[0m\x1b[91;48;5;94m                  \x1b[0m\x1b[91;42mX\x1b[0m\x1b[91;48;5;94m  \x1b[0m\n\x1b[91;48;5;94m \x1b[0m\x1b[91;42mX\x1b[0m\x1b[91;48;5;94m                   \x1b[0m\x1b[91;42mX\x1b[0m\n\x1b[91;48;5;94m                        \x1b[0m\n\x1b[91;48;5;94m          \x1b[0m\x1b[91;42mXX\x1b[0m\x1b[91;48;5;94m          \x1b[0m\n\n"
+    assert result == expected
 
 
 def test_divide_emoji():
