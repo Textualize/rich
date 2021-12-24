@@ -160,7 +160,6 @@ class PromptBase(Generic[PromptType]):
         return Text(f"({default})", "prompt.default")
 
     def make_prompt(self, default: DefaultType) -> Text:
-        # print('ok')
         """Make prompt text.
 
         Args:
@@ -184,7 +183,7 @@ class PromptBase(Generic[PromptType]):
                 _choices_list.append(f"[{index+1}] {choice}")
             choices = "\n".join(_choices_list)
             prompt.append(choices, "prompt.choices")
-            prompt.append('\n')
+            prompt.append("\n")
             prompt.append(self.prompt.copy())
         if (
             default != ...
