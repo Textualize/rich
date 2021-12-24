@@ -38,6 +38,7 @@ class PromptBase(Generic[PromptType]):
         choices (List[str], optional): A list of valid choices. Defaults to None.
         show_default (bool, optional): Show default in prompt. Defaults to True.
         show_choices (bool, optional): Show choices in prompt. Defaults to True.
+        show_digits (bool, optional): Select the choice by its index. Defaults to False.
     """
 
     response_type: type = str
@@ -59,6 +60,7 @@ class PromptBase(Generic[PromptType]):
         choices: Optional[List[str]] = None,
         show_default: bool = True,
         show_choices: bool = True,
+        show_digits: bool = False,
     ) -> None:
         self.console = console or get_console()
         self.prompt = (
@@ -71,6 +73,7 @@ class PromptBase(Generic[PromptType]):
             self.choices = choices
         self.show_default = show_default
         self.show_choices = show_choices
+        self.show_digits = show_digits
 
     @classmethod
     @overload
@@ -83,6 +86,7 @@ class PromptBase(Generic[PromptType]):
         choices: Optional[List[str]] = None,
         show_default: bool = True,
         show_choices: bool = True,
+        show_digits: bool = False,
         default: DefaultType,
         stream: Optional[TextIO] = None,
     ) -> Union[DefaultType, PromptType]:
@@ -99,6 +103,7 @@ class PromptBase(Generic[PromptType]):
         choices: Optional[List[str]] = None,
         show_default: bool = True,
         show_choices: bool = True,
+        show_digits: bool = False,
         stream: Optional[TextIO] = None,
     ) -> PromptType:
         ...
@@ -113,6 +118,7 @@ class PromptBase(Generic[PromptType]):
         choices: Optional[List[str]] = None,
         show_default: bool = True,
         show_choices: bool = True,
+        show_digits: bool = False,
         default: Any = ...,
         stream: Optional[TextIO] = None,
     ) -> Any:
@@ -128,6 +134,7 @@ class PromptBase(Generic[PromptType]):
             choices (List[str], optional): A list of valid choices. Defaults to None.
             show_default (bool, optional): Show default in prompt. Defaults to True.
             show_choices (bool, optional): Show choices in prompt. Defaults to True.
+            show_digits (bool, optional): Select the choice by its index. Defaults to False.
             stream (TextIO, optional): Optional text file open for reading to get input. Defaults to None.
         """
         _prompt = cls(
@@ -137,6 +144,7 @@ class PromptBase(Generic[PromptType]):
             choices=choices,
             show_default=show_default,
             show_choices=show_choices,
+            show_digits=show_digits,
         )
         return _prompt(default=default, stream=stream)
 
@@ -152,6 +160,7 @@ class PromptBase(Generic[PromptType]):
         return Text(f"({default})", "prompt.default")
 
     def make_prompt(self, default: DefaultType) -> Text:
+        # print('ok')
         """Make prompt text.
 
         Args:
@@ -163,19 +172,30 @@ class PromptBase(Generic[PromptType]):
         prompt = self.prompt.copy()
         prompt.end = ""
 
-        if self.show_choices and self.choices:
+        if self.show_choices and self.choices and not self.show_digits:
             _choices = "/".join(self.choices)
             choices = f"[{_choices}]"
             prompt.append(" ")
             prompt.append(choices, "prompt.choices")
-
+        elif self.show_choices and self.choices and self.show_digits:
+            prompt = Text()
+            _choices_list = []
+            for index, choice in enumerate(self.choices):
+                _choices_list.append(f"[{index+1}] {choice}")
+            choices = "\n".join(_choices_list)
+            prompt.append(choices, "prompt.choices")
+            prompt.append('\n')
+            prompt.append(self.prompt.copy())
         if (
             default != ...
             and self.show_default
             and isinstance(default, (str, self.response_type))
         ):
             prompt.append(" ")
-            _default = self.render_default(default)
+            if not self.show_digits:
+                _default = self.render_default(default)
+            else:
+                _default = self.render_default(self.choices.index(default) + 1)
             prompt.append(_default)
 
         prompt.append(self.prompt_suffix)
@@ -212,7 +232,13 @@ class PromptBase(Generic[PromptType]):
             bool: True if choice was valid, otherwise False.
         """
         assert self.choices is not None
-        return value.strip() in self.choices
+        if not self.show_digits:
+            return value.strip() in self.choices
+        else:
+            try:
+                return 1 <= int(value.strip()) <= len(self.choices)
+            except ValueError:
+                return False
 
     def process_response(self, value: str) -> PromptType:
         """Process response from user, convert to prompt type.
@@ -234,8 +260,10 @@ class PromptBase(Generic[PromptType]):
 
         if self.choices is not None and not self.check_choice(value):
             raise InvalidResponse(self.illegal_choice_message)
-
-        return return_value  # type: ignore
+        if not self.show_digits:
+            return return_value  # type: ignore
+        else:
+            return self.choices[int(value) - 1]  # type: ignore
 
     def on_validate_error(self, value: str, error: InvalidResponse) -> None:
         """Called to handle validation error.
