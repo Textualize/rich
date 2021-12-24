@@ -178,7 +178,7 @@ class PromptBase(Generic[PromptType]):
             prompt.append(choices, "prompt.choices")
         elif self.show_choices and self.choices and self.show_digits:
             prompt = Text()
-            _choices_list = []
+            _choices_list: List[str] = []
             for index, choice in enumerate(self.choices):
                 _choices_list.append(f"[{index+1}] {choice}")
             choices = "\n".join(_choices_list)
@@ -191,9 +191,10 @@ class PromptBase(Generic[PromptType]):
             and isinstance(default, (str, self.response_type))
         ):
             prompt.append(" ")
+            _default = ""
             if not self.show_digits:
                 _default = self.render_default(default)
-            else:
+            elif self.choices is not None:
                 _default = self.render_default(self.choices.index(default) + 1)
             prompt.append(_default)
 
@@ -261,8 +262,10 @@ class PromptBase(Generic[PromptType]):
             raise InvalidResponse(self.illegal_choice_message)
         if not self.show_digits:
             return return_value  # type: ignore
-        else:
+        elif self.choices is not None:
             return self.choices[int(value) - 1]  # type: ignore
+        else:
+            return ""  # type: ignore
 
     def on_validate_error(self, value: str, error: InvalidResponse) -> None:
         """Called to handle validation error.
