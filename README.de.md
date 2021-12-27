@@ -40,7 +40,7 @@ Rich funktioniert ohne zusätzliche Konfiguration mit [Jupyter Notebooks](https:
 Installation mit `pip` oder deinem bevorzugten PyPI-Paketmanager.
 
 ```
-python -m rich
+python -m pip install rich
 ```
 
 Führe die folgenden Schritte aus, um die Rich-Ausgabe auf deinem Terminal zu testen:
