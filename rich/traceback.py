@@ -450,7 +450,7 @@ class Traceback:
                     self._render_stack(stack),
                     title="[traceback.title]Traceback [dim](most recent call last)",
                     style=background_style,
-                    border_style="traceback.border.syntax_error",
+                    border_style="traceback.border",
                     expand=True,
                     padding=(0, 1),
                 )
@@ -463,7 +463,7 @@ class Traceback:
                         Panel(
                             self._render_syntax_error(stack.syntax_error),
                             style=background_style,
-                            border_style="traceback.border",
+                            border_style="traceback.border.syntax_error",
                             expand=True,
                             padding=(0, 1),
                             width=self.width,
