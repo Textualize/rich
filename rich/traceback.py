@@ -138,12 +138,12 @@ def install(
         # if wihin ipython, use customized traceback
         ip = get_ipython()  # type: ignore
         ipy_excepthook_closure(ip)
-        return sys.excepthook  # type: ignore # more strict signature that mypy can't interpret
+        return sys.excepthook
     except Exception:
         # otherwise use default system hook
         old_excepthook = sys.excepthook
         sys.excepthook = excepthook
-        return old_excepthook  # type: ignore # more strict signature that mypy can't interpret
+        return old_excepthook
 
 
 @dataclass
@@ -246,6 +246,9 @@ class Traceback:
         self.suppress: Sequence[str] = []
         for suppress_entity in suppress:
             if not isinstance(suppress_entity, str):
+                assert (
+                    suppress_entity.__file__ is not None
+                ), f"{suppress_entity!r} must be a module with '__file__' attribute"
                 path = os.path.dirname(suppress_entity.__file__)
             else:
                 path = suppress_entity
