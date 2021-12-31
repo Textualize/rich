@@ -351,6 +351,11 @@ class Syntax(JupyterMixin):
 
     @property
     def lexer(self) -> Optional[Lexer]:
+        """The lexer for this syntax, or None if no lexer was found.
+
+        Tries to find the lexer by name if a string was passed to the constructor.
+        """
+
         if isinstance(self._lexer, Lexer):
             return self._lexer
         try:
