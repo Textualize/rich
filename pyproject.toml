@@ -43,7 +43,7 @@ pytest = "^6.2.5"
 black = "^21.11b1"
 mypy = "^0.930"
 pytest-cov = "^3.0.0"
-attrs = "^21.2.0"
+attrs = "^21.4.0"
 types-dataclasses = "^0.6.2"
 
 [build-system]
