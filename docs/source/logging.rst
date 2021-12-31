@@ -16,9 +16,13 @@ Here's an example of how to set up a rich logger::
     log = logging.getLogger("rich")
     log.info("Hello, World!")
 
-Rich logs won't render :ref:`console_markup` in logging by default as most libraries won't be aware of the need to escape literal square brackets, but you can enable it by setting ``markup=True`` on the handler. Alternatively you can enable it per log message by supplying the ``extra`` argument as follows::  
+Rich logs won't render :ref:`console_markup` in logging by default as most libraries won't be aware of the need to escape literal square brackets, but you can enable it by setting ``markup=True`` on the handler. Alternatively you can enable it per log message by supplying the ``extra`` argument as follows::
 
     log.error("[bold red blink]Server is shutting down![/]", extra={"markup": True})
+
+Similarly, the highlighter may be overridden per log message::
+
+    log.error("123 will not be highlighted", extra={"highlighter": None})
 
 
 Handle exceptions
