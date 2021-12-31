@@ -401,6 +401,8 @@ class Syntax(JupyterMixin):
 
                 def line_tokenize() -> Iterable[Tuple[Any, str]]:
                     """Split tokens to one per line."""
+                    assert lexer
+
                     for token_type, token in lexer.get_tokens(code):
                         while token:
                             line_token, new_line, token = token.partition("\n")
@@ -709,7 +711,7 @@ if __name__ == "__main__":  # pragma: no cover
         code = sys.stdin.read()
         syntax = Syntax(
             code=code,
-            lexer_name=args.lexer_name,
+            lexer=args.lexer_name,
             line_numbers=args.line_numbers,
             word_wrap=args.word_wrap,
             theme=args.theme,
