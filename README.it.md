@@ -39,13 +39,13 @@ Rich funziona con i [Jupyter notebooks](https://jupyter.org/) senza configurazio
 
 Installa con `pip` o il tuo PyPI package manager preferito.
 
-```shell
-pip install rich
+```sh
+python -m pip install rich
 ```
 
 Esegui il seguente comando per testare l'output di Rich sul tuo terminale:
 
-```shell
+```sh
 python -m rich
 ```
 

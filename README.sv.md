@@ -38,13 +38,13 @@ Rich funkar med [Jupyter notebooks](https://jupyter.org/) utan någon ytterligar
 
 Installera med `pip` eller din favorita PyPI packet hanterare.
 
-```
-pip install rich
+```sh
+python -m pip install rich
 ```
 
 Kör följade följande för att testa Rich utmatning i din terminal:
 
-```
+```sh
 python -m rich
 ```
 

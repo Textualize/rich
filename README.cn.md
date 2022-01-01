@@ -39,8 +39,8 @@ Rich 还可以与[Jupyter 笔记本](https://jupyter.org/)一起使用，而无�
 
 使用`pip`或其他 PyPI 软件包管理器进行安装。
 
-```
-pip install rich
+```sh
+python -m pip install rich
 ```
 
 ## Rich 的打印功能

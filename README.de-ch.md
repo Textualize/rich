@@ -39,13 +39,13 @@ Rich funktioniert mit [Jupyter notebooks](https://jupyter.org/) ohni irgendwelch
 
 Installation mit `pip` oder mit dim liäblings PyPI Päckli-Manager.
 
-```
-pip install rich
+```sh
+python -m pip install rich
 ```
 
 Für das do us zum d Rich usgob im Törminäl z teste:
 
-```
+```sh
 python -m rich
 ```
 

@@ -39,13 +39,13 @@ Richは追加の設定を行わずとも、[Jupyter notebooks](https://jupyter.o
 
 `pip` や、あなたのお気に入りのPyPIパッケージマネージャを使ってインストールしてください。
 
-```
-pip install rich
+```sh
+python -m pip install rich
 ```
 
 以下のコマンドを実行して、ターミナルでリッチの出力をテストできます:
 
-```
+```sh
 python -m rich
 ```
 
