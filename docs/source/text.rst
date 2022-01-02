@@ -26,7 +26,7 @@ Alternatively, you can construct styled text by calling :meth:`~rich.text.Text.a
     text.append(" World!")
     console.print(text)
 
-If you would like to use text that is already formatted with ANSI codes, call :meth:`~rich.text.Text.from_ansi` to convert it to a ``Text`` object:
+If you would like to use text that is already formatted with ANSI codes, call :meth:`~rich.text.Text.from_ansi` to convert it to a ``Text`` object::
 
     text = Text.from_ansi("\033[1mHello, World!\033[0m")
     console.print(text.spans)
