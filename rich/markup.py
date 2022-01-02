@@ -47,7 +47,7 @@ _EscapeSubMethod = Callable[[_ReSubCallable, str], str]  # Sub method of a compi
 
 
 def escape(
-    markup: str, _escape: _EscapeSubMethod = re.compile(r"(\\*)(\[[a-z#\/].*?\])").sub
+    markup: str, _escape: _EscapeSubMethod = re.compile(r"(\\*)(\[[a-z#\/@].*?\])").sub
 ) -> str:
     """Escapes text so that it won't be interpreted as markup.
 

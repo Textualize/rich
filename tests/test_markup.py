@@ -32,6 +32,10 @@ def test_escape():
     assert escape("[5]") == "[5]"
     assert escape("\\[5]") == "\\[5]"
 
+    # Test @ escape
+    assert escape("[@foo]") == "\\[@foo]"
+    assert escape("[@]") == "\\[@]"
+
 
 def test_render_escape():
     console = Console(width=80, color_system=None)
