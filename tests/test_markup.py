@@ -21,6 +21,9 @@ def test_re_match():
     assert RE_TAGS.match("[color(1)]")
     assert RE_TAGS.match("[#ff00ff]")
     assert RE_TAGS.match("[/]")
+    assert RE_TAGS.match("[@]")
+    assert RE_TAGS.match("[@foo]")
+    assert RE_TAGS.match("[@foo=bar]")
 
 
 def test_escape():
