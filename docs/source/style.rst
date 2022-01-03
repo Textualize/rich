@@ -141,7 +141,7 @@ The Theme class will inherit the default styles builtin to Rich. If your custom 
 
 You can disable inheriting the default theme by setting ``inherit=False`` on the :class:`rich.theme.Theme` constructor.
 
-To see the default theme run the following commands::
+To see the default theme, run the following commands::
 
     python -m rich.theme
     python -m rich.default_styles

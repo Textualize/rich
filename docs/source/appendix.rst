@@ -6,3 +6,4 @@ Appendix
 
    appendix/box.rst
    appendix/colors.rst
+   
