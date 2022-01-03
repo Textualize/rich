@@ -1,7 +1,7 @@
 Console API
 ===========
 
-For complete control over terminal formatting, Rich offers a :class:`~rich.console.Console` class. Most applications will require a single Console instance, so you may want to create one at the module level or as an attribute of your top-level object. For example, you  could add a file called "console.py" to your project::
+For complete control over terminal formatting, Rich offers a :class:`~rich.console.Console` class. Most applications will require a single Console instance, so you may want to create one at the module level or as an attribute of your top-level object. For example, you could add a file called "console.py" to your project::
 
     from rich.console import Console
     console = Console()
@@ -52,7 +52,7 @@ To write rich content to the terminal use the :meth:`~rich.console.Console.print
     console.print(locals())
     console.print("FOO", style="white on blue")
 
-You can also use :meth:`~rich.console.Console.print` to render objects that support the :ref:`protocol`, which includes Rich's built in objects such as :class:`~rich.text.Text`, :class:`~rich.table.Table`, and :class:`~rich.syntax.Syntax` -- or other custom objects.
+You can also use :meth:`~rich.console.Console.print` to render objects that support the :ref:`protocol`, which includes Rich's built-in objects such as :class:`~rich.text.Text`, :class:`~rich.table.Table`, and :class:`~rich.syntax.Syntax` -- or other custom objects.
 
 
 Logging
@@ -170,7 +170,7 @@ Overflow
 
 Overflow is what happens when text you print is larger than the available space. Overflow may occur if you print long 'words' such as URLs for instance, or if you have text inside a panel or table cell with restricted space.
 
-You can specify how Rich should handle overflow with the ``overflow`` argument to  :meth:`~rich.console.Console.print` which should be one of the following strings: "fold", "crop", "ellipsis", or "ignore". The default is "fold" which will put any excess characters on the following line, creating as many new lines as required to fit the text.
+You can specify how Rich should handle overflow with the ``overflow`` argument to :meth:`~rich.console.Console.print` which should be one of the following strings: "fold", "crop", "ellipsis", or "ignore". The default is "fold" which will put any excess characters on the following line, creating as many new lines as required to fit the text.
 
 The "crop" method truncates the text at the end of the line, discarding any characters that would overflow.
 
@@ -223,7 +223,7 @@ The Console has a ``style`` attribute which you can use to apply a style to ever
 Soft Wrapping
 -------------
 
-Rich word wraps text you print by inserting line breaks. You can disable this behavior by setting ``soft_wrap=True`` when calling :meth:`~rich.console.Console.print`. With *soft wrapping* enabled any text that doesn't fit will run on to the following line(s), just like the builtin ``print``.
+Rich word wraps text you print by inserting line breaks. You can disable this behavior by setting ``soft_wrap=True`` when calling :meth:`~rich.console.Console.print`. With *soft wrapping* enabled any text that doesn't fit will run on to the following line(s), just like the built-in ``print``.
 
 
 Cropping
@@ -238,7 +238,7 @@ The :meth:`~rich.console.Console.print` method has a boolean ``crop`` argument. 
 Input
 -----
 
-The console class has an :meth:`~rich.console.Console.input` method which works in the same way as Python's builtin :func:`input` function, but can use anything that Rich can print as a prompt. For example, here's a colorful prompt with an emoji::
+The console class has an :meth:`~rich.console.Console.input` method which works in the same way as Python's built-in :func:`input` function, but can use anything that Rich can print as a prompt. For example, here's a colorful prompt with an emoji::
 
     from rich.console import Console
     console = Console()
@@ -263,7 +263,7 @@ Error console
 
 The Console object will write to ``sys.stdout`` by default (so that you see output in the terminal). If you construct the Console with ``stderr=True`` Rich will write to ``sys.stderr``. You may want to use this to create an *error console* so you can split error messages from regular output. Here's an example::
 
-    from rich.console import Console    
+    from rich.console import Console
     error_console = Console(stderr=True)
 
 You might also want to set the ``style`` parameter on the Console to make error messages visually distinct. Here's how you might do that::

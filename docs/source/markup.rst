@@ -27,7 +27,7 @@ There is a shorthand for closing a style. If you omit the style name from the cl
 
     print("[bold red]Bold and red[/] not bold or red")
 
-These markup tags may be use in combination with each other and don't need to be strictly nested. The following examples demonstrates overlapping of markup tags:: 
+These markup tags may be use in combination with each other and don't need to be strictly nested. The following example demonstrates overlapping of markup tags:: 
 
     print("[bold]Bold[italic] bold and italic [/bold]italic[/italic]")
 
@@ -86,7 +86,7 @@ If you add an *emoji code* to markup it will be replaced with the equivalent uni
     >>> print(":warning:")
     ⚠️
 
-Some emojis have two variants, the "emoji" variant displays in full color, and the "text" variant displays in monochrome (whatever your default colors are set to). You can specify the variant you want by adding either `"-emoji"` or  `"-text"` to the emoji code. Here's an example:
+Some emojis have two variants, the "emoji" variant displays in full color, and the "text" variant displays in monochrome (whatever your default colors are set to). You can specify the variant you want by adding either `"-emoji"` or `"-text"` to the emoji code. Here's an example:
 
     >>> from rich import print
     >>> print(":red_heart-emoji:")

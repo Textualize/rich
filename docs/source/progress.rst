@@ -59,12 +59,12 @@ Updating tasks
 
 When you call :meth:`~rich.progress.Progress.add_task` you get back a `Task ID`. Use this ID to call :meth:`~rich.progress.Progress.update` whenever you have completed some work, or any information has changed. Typically you will need to update ``completed`` every time you have completed a step. You can do this by updated ``completed`` directly or by setting ``advance`` which will add to the current ``completed`` value.
 
-The :meth:`~rich.progress.Progress.update` method collects keyword arguments which are also associated with the task. Use this to supply any additional information you would like to render in the progress display. The additional arguments are stored in ``task.fields`` and  may be referenced in :ref:`Column classes<Columns>`.
+The :meth:`~rich.progress.Progress.update` method collects keyword arguments which are also associated with the task. Use this to supply any additional information you would like to render in the progress display. The additional arguments are stored in ``task.fields`` and may be referenced in :ref:`Column classes<Columns>`.
 
 Hiding tasks
 ~~~~~~~~~~~~
 
-You can show or hide tasks by updating the tasks ``visible`` value. Tasks are visible by default, but you can also add a invisible task by calling :meth:`~rich.progress.Progress.add_task` with ``visible=False``.
+You can show or hide tasks by updating the tasks ``visible`` value. Tasks are visible by default, but you can also add an invisible task by calling :meth:`~rich.progress.Progress.add_task` with ``visible=False``.
 
 
 Transient progress
@@ -174,7 +174,7 @@ If you have another Console object you want to use, pass it in to the :class:`~r
 Redirecting stdout / stderr
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To avoid breaking the progress display visuals, Rich will redirect ``stdout`` and ``stderr`` so that you can use the builtin ``print`` statement. This feature is enabled by default, but you can disable by setting ``redirect_stdout`` or ``redirect_stderr`` to ``False``
+To avoid breaking the progress display visuals, Rich will redirect ``stdout`` and ``stderr`` so that you can use the built-in ``print`` statement. This feature is enabled by default, but you can disable by setting ``redirect_stdout`` or ``redirect_stderr`` to ``False``
 
 
 Customizing
@@ -187,12 +187,12 @@ If the :class:`~rich.progress.Progress` class doesn't offer exactly what you nee
 
     class MyProgress(Progress):
         def get_renderables(self):
-            yield Panel(self.make_tasks_table(self.tasks))            
+            yield Panel(self.make_tasks_table(self.tasks))
 
 Multiple Progress
 -----------------
 
-You can't have different columns per task with a single Progress instance. However, you can have as many Progress instance as you like in a :ref:`live`. See `live_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/live_progress.py>`_ and `dynamic_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/dynamic_progress.py>`_ for examples of using multiple Progress instances.
+You can't have different columns per task with a single Progress instance. However, you can have as many Progress instances as you like in a :ref:`live`. See `live_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/live_progress.py>`_ and `dynamic_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/dynamic_progress.py>`_ for examples of using multiple Progress instances.
 
 Example
 -------
