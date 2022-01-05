@@ -686,7 +686,7 @@ def test_is_alt_screen():
 
 
 def test_update_screen():
-    console = Console(force_terminal=True, width=20, height=5)
+    console = Console(force_terminal=True, width=20, height=5, _environ={})
     if console.legacy_windows:
         return
     with pytest.raises(errors.NoAltScreen):

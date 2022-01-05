@@ -41,7 +41,7 @@ def test_spinner_update():
         nonlocal time
         return time
 
-    console = Console(width=20, force_terminal=True, get_time=get_time)
+    console = Console(width=20, force_terminal=True, get_time=get_time, _environ={})
     console.begin_capture()
     spinner = Spinner("dots")
     console.print(spinner)
