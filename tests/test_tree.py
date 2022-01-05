@@ -67,7 +67,9 @@ def test_render_tree_non_win32():
     baz_tree.add("2")
     tree.add("egg")
 
-    console = Console(width=20, force_terminal=True, color_system="standard")
+    console = Console(
+        width=20, force_terminal=True, color_system="standard", _environ={}
+    )
     console.begin_capture()
     console.print(tree)
     result = console.end_capture()
@@ -103,7 +105,9 @@ def test_render_tree_hide_root_non_win32():
     baz_tree.add("2")
     tree.add("egg")
 
-    console = Console(width=20, force_terminal=True, color_system="standard")
+    console = Console(
+        width=20, force_terminal=True, color_system="standard", _environ={}
+    )
     console.begin_capture()
     console.print(tree)
     result = console.end_capture()
