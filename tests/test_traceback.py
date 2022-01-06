@@ -191,6 +191,7 @@ def test_filename_not_a_file():
     assert "string" in exception_text
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="renders different on windows")
 def test_traceback_console_theme_applies():
     """
     Ensure that themes supplied via Console init work on Tracebacks.
