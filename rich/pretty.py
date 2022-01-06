@@ -1,4 +1,5 @@
 import builtins
+import inspect
 import os
 from rich.repr import RichReprResult
 import sys
@@ -137,10 +138,32 @@ def install(
         if isinstance(value, JupyterRenderable) or value is None:
             return
         # on jupyter rich display, if using one of the special representations don't use rich
-        if console.is_jupyter and any(
-            _re_jupyter_repr.match(attr) for attr in dir(value)
-        ):
-            return
+
+        if console.is_jupyter:
+            # Delegate rendering to IPython if the object (and IPython) supports it
+            # https://ipython.readthedocs.io/en/stable/config/integrating.html#rich-display
+            ipython_repr_methods = [
+                "_repr_html_",
+                "_repr_markdown_",
+                "_repr_json_",
+                "_repr_latex_",
+                "_repr_jpeg_",
+                "_repr_png_",
+                "_repr_svg_",
+                "_repr_mimebundle_",
+            ]
+            for repr_method in ipython_repr_methods:
+                method = getattr(value, repr_method, None)
+                if inspect.ismethod(method):
+                    # Calling this isn't ideal. The interface for the `_repr_*_` methods
+                    #  specifies that if they return None, then they should not be rendered
+                    #  by the notebook.
+                    try:
+                        repr_result = method()
+                    except Exception:
+                        continue  # If the method fails, treat it as if it doesn't exist
+                    if repr_result is not None:
+                        return  # Delegate rendering to IPython
 
         # certain renderables should start on a new line
         if isinstance(value, ConsoleRenderable):
