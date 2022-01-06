@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import builtins
 import inspect
 import os
@@ -52,9 +54,6 @@ if TYPE_CHECKING:
         RenderResult,
     )
 
-# Matches Jupyter's special methods
-_re_jupyter_repr = re.compile(f"^_repr_.+_$")
-
 
 def _is_attr_object(obj: Any) -> bool:
     """Check if an object was created with attrs module."""
@@ -83,6 +82,70 @@ def _is_dataclass_repr(obj: object) -> bool:
         return False
 
 
+def _ipy_display_hook(
+    value: Any,
+    console: Console | None = None,
+    overflow: "OverflowMethod" = "ignore",
+    crop: bool = False,
+    indent_guides: bool = False,
+    max_length: Optional[int] = None,
+    max_string: Optional[int] = None,
+    expand_all: bool = False,
+) -> None:
+    from .console import ConsoleRenderable  # needed here to prevent circular import
+
+    # always skip rich generated jupyter renderables or None values
+    if isinstance(value, JupyterRenderable) or value is None:
+        return
+
+    console = console or get_console()
+    if console.is_jupyter:
+        # Delegate rendering to IPython if the object (and IPython) supports it
+        #  https://ipython.readthedocs.io/en/stable/config/integrating.html#rich-display
+        ipython_repr_methods = [
+            "_repr_html_",
+            "_repr_markdown_",
+            "_repr_json_",
+            "_repr_latex_",
+            "_repr_jpeg_",
+            "_repr_png_",
+            "_repr_svg_",
+            "_repr_mimebundle_",
+        ]
+        for repr_method in ipython_repr_methods:
+            method = getattr(value, repr_method, None)
+            if inspect.ismethod(method):
+                # Calling the method ourselves isn't ideal. The interface for the `_repr_*_` methods
+                #  specifies that if they return None, then they should not be rendered
+                #  by the notebook.
+                try:
+                    repr_result = method()
+                except Exception:
+                    continue  # If the method raises, treat it as if it doesn't exist, try any others
+                if repr_result is not None:
+                    return  # Delegate rendering to IPython
+
+    # certain renderables should start on a new line
+    if isinstance(value, ConsoleRenderable):
+        console.line()
+
+    console.print(
+        value
+        if isinstance(value, RichRenderable)
+        else Pretty(
+            value,
+            overflow=overflow,
+            indent_guides=indent_guides,
+            max_length=max_length,
+            max_string=max_string,
+            expand_all=expand_all,
+            margin=12,
+        ),
+        crop=crop,
+        new_line_start=True,
+    )
+
+
 def install(
     console: Optional["Console"] = None,
     overflow: "OverflowMethod" = "ignore",
@@ -107,8 +170,6 @@ def install(
     """
     from rich import get_console
 
-    from .console import ConsoleRenderable  # needed here to prevent circular import
-
     console = console or get_console()
     assert console is not None
 
@@ -132,59 +193,6 @@ def install(
             )
             builtins._ = value  # type: ignore
 
-    def ipy_display_hook(value: Any) -> None:  # pragma: no cover
-        assert console is not None
-        # always skip rich generated jupyter renderables or None values
-        if isinstance(value, JupyterRenderable) or value is None:
-            return
-        # on jupyter rich display, if using one of the special representations don't use rich
-
-        if console.is_jupyter:
-            # Delegate rendering to IPython if the object (and IPython) supports it
-            #  https://ipython.readthedocs.io/en/stable/config/integrating.html#rich-display
-            ipython_repr_methods = [
-                "_repr_html_",
-                "_repr_markdown_",
-                "_repr_json_",
-                "_repr_latex_",
-                "_repr_jpeg_",
-                "_repr_png_",
-                "_repr_svg_",
-                "_repr_mimebundle_",
-            ]
-            for repr_method in ipython_repr_methods:
-                method = getattr(value, repr_method, None)
-                if inspect.ismethod(method):
-                    # Calling the method ourselves isn't ideal. The interface for the `_repr_*_` methods
-                    #  specifies that if they return None, then they should not be rendered
-                    #  by the notebook.
-                    try:
-                        repr_result = method()
-                    except Exception:
-                        continue  # If the method raises, treat it as if it doesn't exist, try any others
-                    if repr_result is not None:
-                        return  # Delegate rendering to IPython
-
-        # certain renderables should start on a new line
-        if isinstance(value, ConsoleRenderable):
-            console.line()
-
-        console.print(
-            value
-            if isinstance(value, RichRenderable)
-            else Pretty(
-                value,
-                overflow=overflow,
-                indent_guides=indent_guides,
-                max_length=max_length,
-                max_string=max_string,
-                expand_all=expand_all,
-                margin=12,
-            ),
-            crop=crop,
-            new_line_start=True,
-        )
-
     try:  # pragma: no cover
         ip = get_ipython()  # type: ignore
         from IPython.core.formatters import BaseFormatter
@@ -194,7 +202,15 @@ def install(
 
             def __call__(self, value: Any) -> Any:
                 if self.pprint:
-                    return ipy_display_hook(value)
+                    return _ipy_display_hook(
+                        value,
+                        console=get_console(),
+                        overflow=overflow,
+                        indent_guides=indent_guides,
+                        max_length=max_length,
+                        max_string=max_string,
+                        expand_all=expand_all,
+                    )
                 else:
                     return repr(value)
 
