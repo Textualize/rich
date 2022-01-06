@@ -4,7 +4,6 @@ from . import get_console
 from .segment import Segment
 from .terminal_theme import DEFAULT_TERMINAL_THEME
 
-
 JUPYTER_HTML_FORMAT = """\
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">{code}</pre>
 """
@@ -75,11 +74,16 @@ def _render_segments(segments: Iterable[Segment]) -> str:
 
 def display(segments: Iterable[Segment], text: str) -> None:
     """Render segments to Jupyter."""
-    from IPython.display import display as ipython_display
-
     html = _render_segments(segments)
     jupyter_renderable = JupyterRenderable(html, text)
-    ipython_display(jupyter_renderable)
+    try:
+        from IPython.display import display as ipython_display
+
+        ipython_display(jupyter_renderable)
+    except ModuleNotFoundError:
+        # Handle the case where the Console has force_jupyter=True,
+        # but IPython is not installed.
+        pass
 
 
 def print(*args: Any, **kwargs: Any) -> None:
