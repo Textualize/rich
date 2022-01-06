@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added max_depth arg to pretty printing
+- Fix Traceback theme defaults override user supplied styles https://github.com/Textualize/rich/issues/1786
 
 ## [10.16.2] - 2021-01-02
 
