@@ -1,31 +1,30 @@
-from __future__ import annotations
-
 import builtins
+import dataclasses
 import inspect
 import os
-from rich.repr import RichReprResult
+import re
 import sys
 from array import array
-from collections import Counter, defaultdict, deque, UserDict, UserList
-import dataclasses
+from collections import Counter, UserDict, UserList, defaultdict, deque
 from dataclasses import dataclass, fields, is_dataclass
 from inspect import isclass
 from itertools import islice
-import re
+from types import MappingProxyType
 from typing import (
-    DefaultDict,
     TYPE_CHECKING,
     Any,
     Callable,
+    DefaultDict,
     Dict,
     Iterable,
     List,
     Optional,
     Set,
-    Union,
     Tuple,
+    Union,
 )
-from types import MappingProxyType
+
+from rich.repr import RichReprResult
 
 try:
     import attr as _attr_module
@@ -33,7 +32,6 @@ except ImportError:  # pragma: no cover
     _attr_module = None  # type: ignore
 
 
-from .highlighter import ReprHighlighter
 from . import get_console
 from ._loop import loop_last
 from ._pick import pick_bool
@@ -84,7 +82,7 @@ def _is_dataclass_repr(obj: object) -> bool:
 
 def _ipy_display_hook(
     value: Any,
-    console: Console | None = None,
+    console: Optional[Console] = None,
     overflow: "OverflowMethod" = "ignore",
     crop: bool = False,
     indent_guides: bool = False,
