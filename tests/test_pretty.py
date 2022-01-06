@@ -209,6 +209,79 @@ def test_recursive():
     assert result == expected
 
 
+def test_max_depth():
+    d = {}
+    d["foo"] = {"fob": {"a": [1, 2, 3], "b": {"z": "x", "y": ["a", "b", "c"]}}}
+
+    assert pretty_repr(d, max_depth=0) == "..."
+    assert pretty_repr(d, max_depth=1) == "{'foo': ...}"
+    assert pretty_repr(d, max_depth=2) == "{'foo': {'fob': ...}}"
+    assert pretty_repr(d, max_depth=3) == "{'foo': {'fob': {'a': ..., 'b': ...}}}"
+    assert (
+        pretty_repr(d, max_width=100, max_depth=4)
+        == "{'foo': {'fob': {'a': [1, 2, 3], 'b': {'z': 'x', 'y': ...}}}}"
+    )
+    assert (
+        pretty_repr(d, max_width=100, max_depth=5)
+        == "{'foo': {'fob': {'a': [1, 2, 3], 'b': {'z': 'x', 'y': ['a', 'b', 'c']}}}}"
+    )
+    assert (
+        pretty_repr(d, max_width=100, max_depth=None)
+        == "{'foo': {'fob': {'a': [1, 2, 3], 'b': {'z': 'x', 'y': ['a', 'b', 'c']}}}}"
+    )
+
+
+def test_max_depth_rich_repr():
+    class Foo:
+        def __init__(self, foo):
+            self.foo = foo
+
+        def __rich_repr__(self):
+            yield "foo", self.foo
+
+    class Bar:
+        def __init__(self, bar):
+            self.bar = bar
+
+        def __rich_repr__(self):
+            yield "bar", self.bar
+
+    assert (
+        pretty_repr(Foo(foo=Bar(bar=Foo(foo=[]))), max_depth=2)
+        == "Foo(foo=Bar(bar=...))"
+    )
+
+
+def test_max_depth_attrs():
+    @attr.define
+    class Foo:
+        foo = attr.field()
+
+    @attr.define
+    class Bar:
+        bar = attr.field()
+
+    assert (
+        pretty_repr(Foo(foo=Bar(bar=Foo(foo=[]))), max_depth=2)
+        == "Foo(foo=Bar(bar=...))"
+    )
+
+
+def test_max_depth_dataclass():
+    @dataclass
+    class Foo:
+        foo: object
+
+    @dataclass
+    class Bar:
+        bar: object
+
+    assert (
+        pretty_repr(Foo(foo=Bar(bar=Foo(foo=[]))), max_depth=2)
+        == "Foo(foo=Bar(bar=...))"
+    )
+
+
 def test_defaultdict():
     test_dict = defaultdict(int, {"foo": 2})
     result = pretty_repr(test_dict)

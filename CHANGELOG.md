@@ -5,13 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [11.0.0] - 2022-01-06
 
-### Fixed
+## [11.0.0] - Unreleased
+
+### Added
 
 - Fixed issue with pretty repr in jupyter notebook https://github.com/Textualize/rich/issues/1717
+- Added max_depth arg to pretty printing
 
-## [10.16.2] - 2022-01-02
+## [10.16.2] - 2021-01-02
 
 ### Fixed
 
