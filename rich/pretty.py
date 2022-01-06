@@ -141,7 +141,7 @@ def install(
 
         if console.is_jupyter:
             # Delegate rendering to IPython if the object (and IPython) supports it
-            # https://ipython.readthedocs.io/en/stable/config/integrating.html#rich-display
+            #  https://ipython.readthedocs.io/en/stable/config/integrating.html#rich-display
             ipython_repr_methods = [
                 "_repr_html_",
                 "_repr_markdown_",
@@ -155,13 +155,13 @@ def install(
             for repr_method in ipython_repr_methods:
                 method = getattr(value, repr_method, None)
                 if inspect.ismethod(method):
-                    # Calling this isn't ideal. The interface for the `_repr_*_` methods
+                    # Calling the method ourselves isn't ideal. The interface for the `_repr_*_` methods
                     #  specifies that if they return None, then they should not be rendered
                     #  by the notebook.
                     try:
                         repr_result = method()
                     except Exception:
-                        continue  # If the method fails, treat it as if it doesn't exist
+                        continue  # If the method raises, treat it as if it doesn't exist, try any others
                     if repr_result is not None:
                         return  # Delegate rendering to IPython
 
