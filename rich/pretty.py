@@ -196,6 +196,7 @@ class Pretty(JupyterMixin):
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
+        max_depth (int, optional): Maximum depth of nested data structures, or None for no maximum. Defaults to None.
         expand_all (bool, optional): Expand all containers. Defaults to False.
         margin (int, optional): Subtrace a margin from width to force containers to expand earlier. Defaults to 0.
         insert_line (bool, optional): Insert a new line if the output has multiple new lines. Defaults to False.
@@ -213,6 +214,7 @@ class Pretty(JupyterMixin):
         indent_guides: bool = False,
         max_length: Optional[int] = None,
         max_string: Optional[int] = None,
+        max_depth: Optional[int] = None,
         expand_all: bool = False,
         margin: int = 0,
         insert_line: bool = False,
@@ -226,6 +228,7 @@ class Pretty(JupyterMixin):
         self.indent_guides = indent_guides
         self.max_length = max_length
         self.max_string = max_string
+        self.max_depth = max_depth
         self.expand_all = expand_all
         self.margin = margin
         self.insert_line = insert_line
@@ -239,6 +242,7 @@ class Pretty(JupyterMixin):
             indent_size=self.indent_size,
             max_length=self.max_length,
             max_string=self.max_string,
+            max_depth=self.max_depth,
             expand_all=self.expand_all,
         )
         pretty_text = Text(
@@ -474,7 +478,10 @@ class _Line:
 
 
 def traverse(
-    _object: Any, max_length: Optional[int] = None, max_string: Optional[int] = None
+    _object: Any,
+    max_length: Optional[int] = None,
+    max_string: Optional[int] = None,
+    max_depth: Optional[int] = None,
 ) -> Node:
     """Traverse object and generate a tree.
 
@@ -483,6 +490,8 @@ def traverse(
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable truncating.
+            Defaults to None.
+        max_depth (int, optional): Maximum depth of data structures, or None for no maximum.
             Defaults to None.
 
     Returns:
@@ -509,11 +518,13 @@ def traverse(
     push_visited = visited_ids.add
     pop_visited = visited_ids.remove
 
-    def _traverse(obj: Any, root: bool = False) -> Node:
+    def _traverse(obj: Any, root: bool = False, depth: int = 0) -> Node:
         """Walk the object depth first."""
+
         obj_type = type(obj)
         py_version = (sys.version_info.major, sys.version_info.minor)
         children: List[Node]
+        reached_max_depth = max_depth is not None and depth >= max_depth
 
         def iter_rich_args(rich_args: Any) -> Iterable[Union[Any, Tuple[str, Any]]]:
             for arg in rich_args:
@@ -554,33 +565,37 @@ def traverse(
             if args:
                 children = []
                 append = children.append
-                if angular:
-                    node = Node(
-                        open_brace=f"<{class_name} ",
-                        close_brace=">",
-                        children=children,
-                        last=root,
-                        separator=" ",
-                    )
+
+                if reached_max_depth:
+                    node = Node(value_repr=f"...")
                 else:
-                    node = Node(
-                        open_brace=f"{class_name}(",
-                        close_brace=")",
-                        children=children,
-                        last=root,
-                    )
-                for last, arg in loop_last(args):
-                    if isinstance(arg, tuple):
-                        key, child = arg
-                        child_node = _traverse(child)
-                        child_node.last = last
-                        child_node.key_repr = key
-                        child_node.key_separator = "="
-                        append(child_node)
+                    if angular:
+                        node = Node(
+                            open_brace=f"<{class_name} ",
+                            close_brace=">",
+                            children=children,
+                            last=root,
+                            separator=" ",
+                        )
                     else:
-                        child_node = _traverse(arg)
-                        child_node.last = last
-                        append(child_node)
+                        node = Node(
+                            open_brace=f"{class_name}(",
+                            close_brace=")",
+                            children=children,
+                            last=root,
+                        )
+                    for last, arg in loop_last(args):
+                        if isinstance(arg, tuple):
+                            key, child = arg
+                            child_node = _traverse(child, depth=depth + 1)
+                            child_node.last = last
+                            child_node.key_repr = key
+                            child_node.key_separator = "="
+                            append(child_node)
+                        else:
+                            child_node = _traverse(arg, depth=depth + 1)
+                            child_node.last = last
+                            append(child_node)
             else:
                 node = Node(
                     value_repr=f"<{class_name}>" if angular else f"{class_name}()",
@@ -593,40 +608,43 @@ def traverse(
 
             attr_fields = _get_attr_fields(obj)
             if attr_fields:
-                node = Node(
-                    open_brace=f"{obj.__class__.__name__}(",
-                    close_brace=")",
-                    children=children,
-                    last=root,
-                )
+                if reached_max_depth:
+                    node = Node(value_repr=f"...")
+                else:
+                    node = Node(
+                        open_brace=f"{obj.__class__.__name__}(",
+                        close_brace=")",
+                        children=children,
+                        last=root,
+                    )
 
-                def iter_attrs() -> Iterable[
-                    Tuple[str, Any, Optional[Callable[[Any], str]]]
-                ]:
-                    """Iterate over attr fields and values."""
-                    for attr in attr_fields:
-                        if attr.repr:
-                            try:
-                                value = getattr(obj, attr.name)
-                            except Exception as error:
-                                # Can happen, albeit rarely
-                                yield (attr.name, error, None)
-                            else:
-                                yield (
-                                    attr.name,
-                                    value,
-                                    attr.repr if callable(attr.repr) else None,
-                                )
+                    def iter_attrs() -> Iterable[
+                        Tuple[str, Any, Optional[Callable[[Any], str]]]
+                    ]:
+                        """Iterate over attr fields and values."""
+                        for attr in attr_fields:
+                            if attr.repr:
+                                try:
+                                    value = getattr(obj, attr.name)
+                                except Exception as error:
+                                    # Can happen, albeit rarely
+                                    yield (attr.name, error, None)
+                                else:
+                                    yield (
+                                        attr.name,
+                                        value,
+                                        attr.repr if callable(attr.repr) else None,
+                                    )
 
-                for last, (name, value, repr_callable) in loop_last(iter_attrs()):
-                    if repr_callable:
-                        child_node = Node(value_repr=str(repr_callable(value)))
-                    else:
-                        child_node = _traverse(value)
-                    child_node.last = last
-                    child_node.key_repr = name
-                    child_node.key_separator = "="
-                    append(child_node)
+                    for last, (name, value, repr_callable) in loop_last(iter_attrs()):
+                        if repr_callable:
+                            child_node = Node(value_repr=str(repr_callable(value)))
+                        else:
+                            child_node = _traverse(value, depth=depth + 1)
+                        child_node.last = last
+                        child_node.key_repr = name
+                        child_node.key_separator = "="
+                        append(child_node)
             else:
                 node = Node(
                     value_repr=f"{obj.__class__.__name__}()", children=[], last=root
@@ -646,21 +664,26 @@ def traverse(
 
             children = []
             append = children.append
-            node = Node(
-                open_brace=f"{obj.__class__.__name__}(",
-                close_brace=")",
-                children=children,
-                last=root,
-            )
+            if reached_max_depth:
+                node = Node(value_repr=f"...")
+            else:
+                node = Node(
+                    open_brace=f"{obj.__class__.__name__}(",
+                    close_brace=")",
+                    children=children,
+                    last=root,
+                )
 
-            for last, field in loop_last(field for field in fields(obj) if field.repr):
-                child_node = _traverse(getattr(obj, field.name))
-                child_node.key_repr = field.name
-                child_node.last = last
-                child_node.key_separator = "="
-                append(child_node)
+                for last, field in loop_last(
+                    field for field in fields(obj) if field.repr
+                ):
+                    child_node = _traverse(getattr(obj, field.name), depth=depth + 1)
+                    child_node.key_repr = field.name
+                    child_node.last = last
+                    child_node.key_separator = "="
+                    append(child_node)
 
-            pop_visited(obj_id)
+                pop_visited(obj_id)
 
         elif isinstance(obj, _CONTAINERS):
             for container_type in _CONTAINERS:
@@ -676,7 +699,9 @@ def traverse(
 
             open_brace, close_brace, empty = _BRACES[obj_type](obj)
 
-            if obj_type.__repr__ != type(obj).__repr__:
+            if reached_max_depth:
+                node = Node(value_repr=f"...", last=root)
+            elif obj_type.__repr__ != type(obj).__repr__:
                 node = Node(value_repr=to_repr(obj), last=root)
             elif obj:
                 children = []
@@ -695,7 +720,7 @@ def traverse(
                     if max_length is not None:
                         iter_items = islice(iter_items, max_length)
                     for index, (key, child) in enumerate(iter_items):
-                        child_node = _traverse(child)
+                        child_node = _traverse(child, depth=depth + 1)
                         child_node.key_repr = to_repr(key)
                         child_node.last = index == last_item_index
                         append(child_node)
@@ -704,7 +729,7 @@ def traverse(
                     if max_length is not None:
                         iter_values = islice(iter_values, max_length)
                     for index, child in enumerate(iter_values):
-                        child_node = _traverse(child)
+                        child_node = _traverse(child, depth=depth + 1)
                         child_node.last = index == last_item_index
                         append(child_node)
                 if max_length is not None and num_items > max_length:
@@ -729,6 +754,7 @@ def pretty_repr(
     indent_size: int = 4,
     max_length: Optional[int] = None,
     max_string: Optional[int] = None,
+    max_depth: Optional[int] = None,
     expand_all: bool = False,
 ) -> str:
     """Prettify repr string by expanding on to new lines to fit within a given width.
@@ -741,6 +767,8 @@ def pretty_repr(
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable truncating.
             Defaults to None.
+        max_depth (int, optional): Maximum depth of nested data structure, or None for no depth.
+            Defaults to None.
         expand_all (bool, optional): Expand all containers regardless of available width. Defaults to False.
 
     Returns:
@@ -750,7 +778,9 @@ def pretty_repr(
     if isinstance(_object, Node):
         node = _object
     else:
-        node = traverse(_object, max_length=max_length, max_string=max_string)
+        node = traverse(
+            _object, max_length=max_length, max_string=max_string, max_depth=max_depth
+        )
     repr_str = node.render(
         max_width=max_width, indent_size=indent_size, expand_all=expand_all
     )
@@ -764,6 +794,7 @@ def pprint(
     indent_guides: bool = True,
     max_length: Optional[int] = None,
     max_string: Optional[int] = None,
+    max_depth: Optional[int] = None,
     expand_all: bool = False,
 ) -> None:
     """A convenience function for pretty printing.
@@ -774,6 +805,7 @@ def pprint(
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
         max_string (int, optional): Maximum length of strings before truncating, or None to disable. Defaults to None.
+        max_depth (int, optional): Maximum depth for nested data structures, or None for no maximum. Defaults to None.
         indent_guides (bool, optional): Enable indentation guides. Defaults to True.
         expand_all (bool, optional): Expand all containers. Defaults to False.
     """
@@ -783,6 +815,7 @@ def pprint(
             _object,
             max_length=max_length,
             max_string=max_string,
+            max_depth=max_depth,
             indent_guides=indent_guides,
             expand_all=expand_all,
             overflow="ignore",
