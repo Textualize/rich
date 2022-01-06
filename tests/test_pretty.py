@@ -147,6 +147,10 @@ def test_max_depth():
         pretty_repr(d, max_width=100, max_depth=5)
         == "{'foo': {'fob': {'a': [1, 2, 3], 'b': {'z': 'x', 'y': ['a', 'b', 'c']}}}}"
     )
+    assert (
+        pretty_repr(d, max_width=100, max_depth=None)
+        == "{'foo': {'fob': {'a': [1, 2, 3], 'b': {'z': 'x', 'y': ['a', 'b', 'c']}}}}"
+    )
 
 
 def test_max_depth_rich_repr():
