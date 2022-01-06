@@ -805,7 +805,7 @@ def pprint(
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
         max_string (int, optional): Maximum length of strings before truncating, or None to disable. Defaults to None.
-        max_depth (int, optional): Maximum depth for nested data structures, or None for no maximum. Defaults to None.
+        max_depth (int, optional): Maximum depth for nested data structures, or None for unlimited depth. Defaults to None.
         indent_guides (bool, optional): Enable indentation guides. Defaults to True.
         expand_all (bool, optional): Expand all containers. Defaults to False.
     """
