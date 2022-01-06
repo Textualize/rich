@@ -86,7 +86,7 @@ def test_tree():
 def test_refresh_screen():
     layout = Layout()
     layout.split_row(Layout(name="foo"), Layout(name="bar"))
-    console = Console(force_terminal=True, width=20, height=5)
+    console = Console(force_terminal=True, width=20, height=5, _environ={})
     with console.capture():
         console.print(layout)
     with console.screen():

@@ -4,7 +4,7 @@
 Console Protocol
 ================
 
-Rich supports a simple protocol to add rich formatting capabilities to custom objects, so you can  :meth:`~rich.console.Console.print` your object with color, styles and formatting.
+Rich supports a simple protocol to add rich formatting capabilities to custom objects, so you can :meth:`~rich.console.Console.print` your object with color, styles and formatting.
 
 Use this for presentation or to display additional debugging information that might be hard to parse from a typical ``__repr__`` string.
 

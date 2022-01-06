@@ -18,7 +18,7 @@ The :meth:`~rich.console.Console.print_exception` method will print a traceback 
 
     try:
         do_something()
-    except Exception:        
+    except Exception:
         console.print_exception(show_locals=True)
 
 The ``show_locals=True`` parameter causes Rich to display the value of local variables for each frame of the traceback.
@@ -76,7 +76,7 @@ Max Frames
 
 A recursion error can generate very large tracebacks that take a while to render and contain a lot of repetitive frames. Rich guards against this with a `max_frames` argument, which defaults to 100. If a traceback contains more than 100 frames then only the first 50, and last 50 will be shown. You can disable this feature by setting `max_frames` to 0.
 
-Here's an example of printing an recursive error::
+Here's an example of printing a recursive error::
 
     from rich.console import Console
 

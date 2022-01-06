@@ -10,7 +10,7 @@ To syntax highlight code, construct a :class:`~rich.syntax.Syntax` object and pr
 
     console = Console()
     with open("syntax.py", "rt") as code_file:
-        syntax = Syntax(code_file.read(), "python")     
+        syntax = Syntax(code_file.read(), "python")
     console.print(syntax)
 
 You may also use the :meth:`~rich.syntax.Syntax.from_path` alternative constructor which will load the code from disk and auto-detect the file type. The example above could be re-written as follows::
