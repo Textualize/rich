@@ -82,7 +82,7 @@ def _is_dataclass_repr(obj: object) -> bool:
 
 def _ipy_display_hook(
     value: Any,
-    console: Optional[Console] = None,
+    console: Optional["Console"] = None,
     overflow: "OverflowMethod" = "ignore",
     crop: bool = False,
     indent_guides: bool = False,
