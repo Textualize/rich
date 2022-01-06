@@ -131,7 +131,7 @@ def test_python_render_indent_guides():
             lexer="python",
             line_numbers=True,
             line_range=(2, 10),
-            theme="foo",
+            theme="default",
             code_width=60,
             word_wrap=True,
             indent_guides=True,
