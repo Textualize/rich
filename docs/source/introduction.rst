@@ -10,7 +10,7 @@ Requirements
 
 Rich works with OSX, Linux and Windows.
 
-On Windows both the (ancient) cmd.exe terminal is supported and the new `Windows Terminal <https://github.com/microsoft/terminal/releases>`_. The later has much improved support for color and style.
+On Windows both the (ancient) cmd.exe terminal is supported and the new `Windows Terminal <https://github.com/microsoft/terminal/releases>`_. The latter has much improved support for color and style.
 
 Rich requires Python 3.6.1 and above. Note that Python 3.6.0 is *not* supported due to lack of support for methods on NamedTuples.
 
@@ -63,7 +63,7 @@ This writes the following output to the terminal (including all the colors and s
     <span style="font-weight: bold">}</span> </pre>
 
 
-If you would rather not shadow Python's builtin print, you can import ``rich.print`` as ``rprint`` (for example)::
+If you would rather not shadow Python's built-in print, you can import ``rich.print`` as ``rprint`` (for example)::
 
     from rich import print as rprint
 

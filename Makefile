@@ -1,5 +1,5 @@
 test:
-	pytest --cov-report term-missing --cov=rich tests/ -vv
+	TERM=unknown pytest --cov-report term-missing --cov=rich tests/ -vv
 format-check:
 	black --check .
 format:
