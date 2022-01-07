@@ -129,7 +129,7 @@ def install(
         )
 
     try:  # pragma: no cover
-        # if wihin ipython, use customized traceback
+        # if within ipython, use customized traceback
         ip = get_ipython()  # type: ignore
         ipy_excepthook_closure(ip)
         return sys.excepthook

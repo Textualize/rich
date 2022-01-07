@@ -1,4 +1,4 @@
-"""Tests for the higlighter classes."""
+"""Tests for the highlighter classes."""
 import pytest
 from typing import List
 

@@ -93,7 +93,7 @@ def test_exception_with_extra_lines():
 
 def test_stderr_and_stdout_are_none(monkeypatch):
     # This test is specifically to handle cases when using pythonw on
-    # windows an stderr and stdout are set to None.
+    # windows and stderr and stdout are set to None.
     # See https://bugs.python.org/issue13807
 
     monkeypatch.setattr("sys.stdout", None)
