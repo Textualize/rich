@@ -421,7 +421,7 @@ class Segment(NamedTuple):
             lines (List[List[Segment]]): A list of lines.
             width (int): Desired width.
             height (int, optional): Desired height or None for no change.
-            style (Style, optional): Style of any padding added.
+            style (Style): Style of any padding added.
             new_lines (bool, optional): Padded lines should include "\n". Defaults to False.
 
         Returns:
@@ -450,7 +450,7 @@ class Segment(NamedTuple):
             lines (List[List[Segment]]): A list of lines.
             width (int): Desired width.
             height (int, optional): Desired height or None for no change.
-            style (Style, optional): Style of any padding added. Defaults to None.
+            style (Style): Style of any padding added. Defaults to None.
             new_lines (bool, optional): Padded lines should include "\n". Defaults to False.
 
         Returns:
@@ -479,7 +479,7 @@ class Segment(NamedTuple):
             lines (List[List[Segment]]): A list of lines.
             width (int): Desired width.
             height (int, optional): Desired height or None for no change.
-            style (Style, optional): Style of any padding added.
+            style (Style): Style of any padding added.
             new_lines (bool, optional): Padded lines should include "\n". Defaults to False.
 
         Returns:

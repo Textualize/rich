@@ -57,7 +57,7 @@ class Column:
     justify: "JustifyMethod" = "left"
     """str: How to justify text within the column ("left", "center", "right", or "full")"""
 
-    vertical_align: "VerticalAlignMethod" = "top"
+    vertical: "VerticalAlignMethod" = "top"
     """str: How to vertically align content ("top", "middle", or "bottom")"""
 
     overflow: "OverflowMethod" = "ellipsis"
@@ -116,7 +116,7 @@ class _Cell(NamedTuple):
     """Style to apply to cell."""
     renderable: "RenderableType"
     """Cell renderable."""
-    vertical_align: VerticalAlignMethod
+    vertical: VerticalAlignMethod
     """Cell vertical alignment."""
 
 
@@ -341,7 +341,7 @@ class Table(JupyterMixin):
         footer_style: Optional[StyleType] = None,
         style: Optional[StyleType] = None,
         justify: "JustifyMethod" = "left",
-        vertical_align: "VerticalAlignMethod" = "top",
+        vertical: "VerticalAlignMethod" = "top",
         overflow: "OverflowMethod" = "ellipsis",
         width: Optional[int] = None,
         min_width: Optional[int] = None,
@@ -360,7 +360,7 @@ class Table(JupyterMixin):
             footer_style (Union[str, Style], optional): Style for the footer, or None for default. Defaults to None.
             style (Union[str, Style], optional): Style for the column cells, or None for default. Defaults to None.
             justify (JustifyMethod, optional): Alignment for cells. Defaults to "left".
-            vertical_align (VerticalAlignMethod, optional): Vertical alignment, one of "top", "middle", or "bottom". Defaults to "top".
+            vertical (VerticalAlignMethod, optional): Vertical alignment, one of "top", "middle", or "bottom". Defaults to "top".
             overflow (OverflowMethod): Overflow method: "crop", "fold", "ellipsis". Defaults to "ellipsis".
             width (int, optional): Desired width of column in characters, or None to fit to contents. Defaults to None.
             min_width (Optional[int], optional): Minimum width of column, or ``None`` for no minimum. Defaults to None.
@@ -377,7 +377,7 @@ class Table(JupyterMixin):
             footer_style=footer_style or "",
             style=style or "",
             justify=justify,
-            vertical_align=vertical_align,
+            vertical=vertical,
             overflow=overflow,
             width=width,
             min_width=min_width,
@@ -648,11 +648,15 @@ class Table(JupyterMixin):
                 yield _Cell(
                     style,
                     _Padding(renderable, get_padding(first, last)),
-                    column.vertical_align,
+                    getattr(renderable, "vertical", None) or column.vertical,
                 )
         else:
             for (style, renderable) in raw_cells:
-                yield _Cell(style, renderable, column.vertical_align)
+                yield _Cell(
+                    style,
+                    renderable,
+                    getattr(renderable, "vertical", None) or column.vertical,
+                )
 
     def _get_padding_width(self, column_index: int) -> int:
         """Get extra width from padding."""
@@ -795,20 +799,26 @@ class Table(JupyterMixin):
 
             def align_cell(
                 cell: List[List[Segment]],
-                vertical_align: "VerticalAlignMethod",
+                vertical: "VerticalAlignMethod",
                 style: Style,
             ) -> List[List[Segment]]:
+                if header_row:
+                    vertical = "bottom"
+                elif footer_row:
+                    vertical = "top"
 
-                if vertical_align == "top":
+                if vertical == "top":
                     return _Segment.align_top(cell, width, row_height, style)
-                elif vertical_align == "middle":
+                elif vertical == "middle":
                     return _Segment.align_middle(cell, width, row_height, style)
                 return _Segment.align_bottom(cell, width, row_height, style)
 
             cells[:] = [
                 _Segment.set_shape(
                     align_cell(
-                        cell, column.vertical_align, get_style(_cell.style) + row_style
+                        cell,
+                        _cell.vertical,
+                        get_style(_cell.style) + row_style,
                     ),
                     width,
                     max_height,

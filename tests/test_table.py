@@ -164,7 +164,7 @@ def test_vertical_align_top():
 
     def make_table(vertical_align):
         table = Table(show_header=False, box=box.SQUARE)
-        table.add_column(vertical_align=vertical_align)
+        table.add_column(vertical=vertical_align)
         table.add_row("foo", "\n".join(["bar"] * 5))
 
         return table
