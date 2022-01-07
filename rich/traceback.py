@@ -16,13 +16,7 @@ from pygments.token import Token
 from . import pretty
 from ._loop import loop_first, loop_last
 from .columns import Columns
-from .console import (
-    Console,
-    ConsoleOptions,
-    ConsoleRenderable,
-    RenderResult,
-    group,
-)
+from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, group
 from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
 from .panel import Panel
@@ -443,7 +437,8 @@ class Traceback:
                 "scope.equals": token_style(Operator),
                 "scope.key": token_style(Name),
                 "scope.key.special": token_style(Name.Constant) + Style(dim=True),
-            }
+            },
+            inherit=False,
         )
 
         highlighter = ReprHighlighter()

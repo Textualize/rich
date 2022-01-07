@@ -1,5 +1,4 @@
 import sys
-
 from dataclasses import dataclass
 
 
@@ -15,8 +14,7 @@ class WindowsConsoleFeatures:
 
 try:
     import ctypes
-    from ctypes import wintypes
-    from ctypes import LibraryLoader
+    from ctypes import LibraryLoader, wintypes
 
     if sys.platform == "win32":
         windll = LibraryLoader(ctypes.WinDLL)
