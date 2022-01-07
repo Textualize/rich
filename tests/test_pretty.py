@@ -1,16 +1,16 @@
-from array import array
-from collections import defaultdict, UserDict, UserList
-from dataclasses import dataclass, field
 import io
 import sys
+from array import array
+from collections import defaultdict, UserDict
 from typing import List
 
 import attr
 import pytest
+from dataclasses import dataclass, field
 
 from rich.console import Console
-from rich.pretty import install, Pretty, pprint, pretty_repr, Node
-
+from rich.pretty import install, Pretty, pprint, pretty_repr, Node, _ipy_display_hook
+from rich.text import Text
 
 skip_py36 = pytest.mark.skipif(
     sys.version_info.minor == 6 and sys.version_info.major == 3,
@@ -44,6 +44,85 @@ def test_install():
     assert sys.displayhook is not dh
 
 
+def test_ipy_display_hook__repr_html():
+    console = Console(file=io.StringIO(), force_jupyter=True)
+
+    class Thing:
+        def _repr_html_(self):
+            return "hello"
+
+    console.begin_capture()
+    _ipy_display_hook(Thing(), console=console)
+
+    # Rendering delegated to notebook because _repr_html_ method exists
+    assert console.end_capture() == ""
+
+
+def test_ipy_display_hook__multiple_special_reprs():
+    """
+    The case where there are multiple IPython special _repr_*_
+    methods on the object, and one of them returns None but another
+    one does not.
+    """
+    console = Console(file=io.StringIO(), force_jupyter=True)
+
+    class Thing:
+        def _repr_latex_(self):
+            return None
+
+        def _repr_html_(self):
+            return "hello"
+
+    console.begin_capture()
+    _ipy_display_hook(Thing(), console=console)
+
+    assert console.end_capture() == ""
+
+
+def test_ipy_display_hook__no_special_repr_methods():
+    console = Console(file=io.StringIO(), force_jupyter=True)
+
+    class Thing:
+        def __repr__(self) -> str:
+            return "hello"
+
+    console.begin_capture()
+    _ipy_display_hook(Thing(), console=console)
+
+    # No IPython special repr methods, so printed by Rich
+    assert console.end_capture() == "hello\n"
+
+
+def test_ipy_display_hook__special_repr_raises_exception():
+    """
+    When an IPython special repr method raises an exception,
+    we treat it as if it doesn't exist and look for the next.
+    """
+    console = Console(file=io.StringIO(), force_jupyter=True)
+
+    class Thing:
+        def _repr_markdown_(self):
+            raise Exception()
+
+        def _repr_latex_(self):
+            return None
+
+        def _repr_html_(self):
+            return "hello"
+
+    console.begin_capture()
+    _ipy_display_hook(Thing(), console=console)
+
+    assert console.end_capture() == ""
+
+
+def test_ipy_display_hook__console_renderables_on_newline():
+    console = Console(file=io.StringIO(), force_jupyter=True)
+    console.begin_capture()
+    _ipy_display_hook(Text("hello"), console=console)
+    assert console.end_capture() == "\nhello\n"
+
+
 def test_pretty():
     test = {
         "foo": [1, 2, 3, (4, 5, {6}, 7, 8, {9}), {}],
@@ -55,7 +134,6 @@ def test_pretty():
 
     result = pretty_repr(test, max_width=80)
     print(result)
-    # print(repr(result))
     expected = "{\n    'foo': [1, 2, 3, (4, 5, {6}, 7, 8, {9}), {}],\n    'bar': {\n        'egg': 'baz',\n        'words': [\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World',\n            'Hello World'\n        ]\n    },\n    False: 'foo',\n    True: '',\n    'text': ('Hello World', 'foo bar baz egg')\n}"
     print(expected)
     assert result == expected
