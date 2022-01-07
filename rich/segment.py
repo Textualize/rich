@@ -391,32 +391,19 @@ class Segment(NamedTuple):
         Returns:
             List[List[Segment]]: New list of lines.
         """
-        if height is None:
-            height = len(lines)
+        _height = height or len(lines)
+
         blank = (
-            [Segment(" " * width, style), Segment("\n")]
-            if new_lines
-            else [Segment(" " * width, style)]
+            [cls(" " * width + "\n", style)] if new_lines else [cls(" " * width, style)]
         )
 
         adjust_line_length = cls.adjust_line_length
-        shaped_lines = [
-            adjust_line_length(line, width, style=style) for line in lines[:height]
+        shaped_lines = lines[:_height]
+        shaped_lines[:] = [
+            adjust_line_length(line, width, style=style) for line in lines
         ]
-        if len(shaped_lines) < height:
-            shaped_lines.extend([blank] * (height - len(shaped_lines)))
-        return shaped_lines
-
-        append = shaped_lines.append
-        adjust_line_length = cls.adjust_line_length
-        line: Optional[List[Segment]]
-        iter_lines = iter(lines)
-        for _ in range(height):
-            line = next(iter_lines, None)
-            if line is None:
-                append(pad_line)
-            else:
-                append(adjust_line_length(line, width, style=style))
+        if len(shaped_lines) < _height:
+            shaped_lines.extend([blank] * (_height - len(shaped_lines)))
         return shaped_lines
 
     @classmethod
