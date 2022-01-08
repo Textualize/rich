@@ -498,9 +498,6 @@ def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
     return decorator
 
 
-render_group = group
-
-
 def _is_jupyter() -> bool:  # pragma: no cover
     """Check if we're running in a Jupyter notebook."""
     try:
