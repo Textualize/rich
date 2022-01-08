@@ -800,6 +800,7 @@ class Table(JupyterMixin):
             def align_cell(
                 cell: List[List[Segment]],
                 vertical: "VerticalAlignMethod",
+                width: int,
                 style: Style,
             ) -> List[List[Segment]]:
                 if header_row:
@@ -818,6 +819,7 @@ class Table(JupyterMixin):
                     align_cell(
                         cell,
                         _cell.vertical,
+                        width,
                         get_style(_cell.style) + row_style,
                     ),
                     width,
