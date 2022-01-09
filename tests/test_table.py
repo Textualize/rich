@@ -4,11 +4,12 @@ import io
 
 import pytest
 
-from rich import errors
+from rich import box, errors
+from rich.align import VerticalAlignMethod
 from rich.console import Console
 from rich.measure import Measurement
 from rich.style import Style
-from rich.table import Table, Column
+from rich.table import Column, Table
 from rich.text import Text
 
 
@@ -156,6 +157,29 @@ def test_get_row_style():
     table.add_row("bar", style="on red")
     assert table.get_row_style(console, 0) == Style.parse("")
     assert table.get_row_style(console, 1) == Style.parse("on red")
+
+
+def test_vertical_align_top():
+    console = Console(_environ={})
+
+    def make_table(vertical_align):
+        table = Table(show_header=False, box=box.SQUARE)
+        table.add_column(vertical=vertical_align)
+        table.add_row("foo", "\n".join(["bar"] * 5))
+
+        return table
+
+    with console.capture() as capture:
+        console.print(make_table("top"))
+        console.print()
+        console.print(make_table("middle"))
+        console.print()
+        console.print(make_table("bottom"))
+        console.print()
+    result = capture.get()
+    print(repr(result))
+    expected = "┌─────┬─────┐\n│ foo │ bar │\n│     │ bar │\n│     │ bar │\n│     │ bar │\n│     │ bar │\n└─────┴─────┘\n\n┌─────┬─────┐\n│     │ bar │\n│     │ bar │\n│ foo │ bar │\n│     │ bar │\n│     │ bar │\n└─────┴─────┘\n\n┌─────┬─────┐\n│     │ bar │\n│     │ bar │\n│     │ bar │\n│     │ bar │\n│ foo │ bar │\n└─────┴─────┘\n\n"
+    assert result == expected
 
 
 if __name__ == "__main__":

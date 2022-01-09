@@ -4,13 +4,7 @@ from time import process_time
 
 from rich import box
 from rich.color import Color
-from rich.console import (
-    Console,
-    ConsoleOptions,
-    Group,
-    RenderResult,
-    RenderableType,
-)
+from rich.console import Console, ConsoleOptions, Group, RenderableType, RenderResult
 from rich.markdown import Markdown
 from rich.measure import Measurement
 from rich.pretty import Pretty
@@ -247,13 +241,10 @@ if __name__ == "__main__":  # pragma: no cover
     sponsor_message = Table.grid(padding=1)
     sponsor_message.add_column(style="green", justify="right")
     sponsor_message.add_column(no_wrap=True)
+
     sponsor_message.add_row(
-        "Sponsor me",
-        "[u blue link=https://github.com/sponsors/willmcgugan]https://github.com/sponsors/willmcgugan",
-    )
-    sponsor_message.add_row(
-        "Buy me a :coffee:",
-        "[u blue link=https://ko-fi.com/willmcgugan]https://ko-fi.com/willmcgugan",
+        "Buy devs a :coffee:",
+        "[u blue link=https://ko-fi.com/textualize]https://ko-fi.com/textualize",
     )
     sponsor_message.add_row(
         "Twitter",
@@ -265,9 +256,9 @@ if __name__ == "__main__":  # pragma: no cover
 
     intro_message = Text.from_markup(
         """\
-It takes a lot of time to develop Rich and to provide support.
+We hope you enjoy using Rich!
 
-Consider supporting my work via Github Sponsors (ask your company / organization), or buy me a coffee to say thanks.
+Rich is maintained with :heart: by [link=https://www.textualize.io]Textualize.io[/]
 
 - Will McGugan"""
     )

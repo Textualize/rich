@@ -2,8 +2,7 @@ from io import StringIO
 
 import pytest
 
-from rich.segment import ControlType
-from rich.segment import Segment, Segments, SegmentLines
+from rich.segment import ControlType, Segment, SegmentLines, Segments
 from rich.style import Style
 
 
@@ -179,8 +178,8 @@ def test_divide_complex():
         "[on orange4]                        \n"
         "          [on green]XX[on orange4]          \n"
     )
-    from rich.text import Text
     from rich.console import Console
+    from rich.text import Text
 
     text = Text.from_markup(MAP)
     console = Console(
@@ -298,4 +297,34 @@ def test_segment_lines_renderable():
         Segment("\n"),
         Segment("foo"),
         Segment("\n"),
+    ]
+
+
+def test_align_top():
+    lines = [[Segment("X")]]
+    assert Segment.align_top(lines, 3, 1, Style()) == lines
+    assert Segment.align_top(lines, 3, 3, Style()) == [
+        [Segment("X")],
+        [Segment("   ", Style())],
+        [Segment("   ", Style())],
+    ]
+
+
+def test_align_middle():
+    lines = [[Segment("X")]]
+    assert Segment.align_middle(lines, 3, 1, Style()) == lines
+    assert Segment.align_middle(lines, 3, 3, Style()) == [
+        [Segment("   ", Style())],
+        [Segment("X")],
+        [Segment("   ", Style())],
+    ]
+
+
+def test_align_bottom():
+    lines = [[Segment("X")]]
+    assert Segment.align_bottom(lines, 3, 1, Style()) == lines
+    assert Segment.align_bottom(lines, 3, 3, Style()) == [
+        [Segment("   ", Style())],
+        [Segment("   ", Style())],
+        [Segment("X")],
     ]

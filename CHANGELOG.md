@@ -9,8 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Fixed issue with pretty repr in jupyter notebook https://github.com/Textualize/rich/issues/1717
 - Added max_depth arg to pretty printing
+- Added `vertical_align` to Table.add_row
+
+### Fixed
+
+- Fixed issue with pretty repr in jupyter notebook https://github.com/Textualize/rich/issues/1717
 - Fix Traceback theme defaults override user supplied styles https://github.com/Textualize/rich/issues/1786
 
 ### Changed
