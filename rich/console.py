@@ -11,9 +11,9 @@ from getpass import getpass
 from html import escape
 from inspect import isclass
 from itertools import islice
-from time import monotonic
 from threading import RLock
-from types import FrameType, TracebackType, ModuleType
+from time import monotonic
+from types import FrameType, ModuleType, TracebackType
 from typing import (
     IO,
     TYPE_CHECKING,
@@ -258,11 +258,12 @@ class ConsoleRenderable(Protocol):
         ...
 
 
+# A type that may be rendered by Console.
 RenderableType = Union[ConsoleRenderable, RichCast, str]
-"""A type that may be rendered by Console."""
 
+
+# The result of calling a __rich_console__ method.
 RenderResult = Iterable[Union[RenderableType, Segment]]
-"""The result of calling a __rich_console__ method."""
 
 
 _null_highlighter = NullHighlighter()
@@ -475,9 +476,6 @@ class Group:
         yield from self.renderables
 
 
-RenderGroup = Group  # TODO: deprecate at some point
-
-
 def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
     """A decorator that turns an iterable of renderables in to a group.
 
@@ -488,7 +486,7 @@ def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
     def decorator(
         method: Callable[..., Iterable[RenderableType]]
     ) -> Callable[..., Group]:
-        """Convert a method that returns an iterable of renderables in to a RenderGroup."""
+        """Convert a method that returns an iterable of renderables in to a Group."""
 
         @wraps(method)
         def _replace(*args: Any, **kwargs: Any) -> Group:
@@ -498,9 +496,6 @@ def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
         return _replace
 
     return decorator
-
-
-render_group = group
 
 
 def _is_jupyter() -> bool:  # pragma: no cover
