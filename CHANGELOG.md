@@ -5,12 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [11.0.0] - Unreleased
+## [11.0.0] - 2022-01-09
 
 ### Added
 
-- Added max_depth arg to pretty printing
-- Added `vertical_align` to Table.add_row
+- Added max_depth arg to pretty printing https://github.com/Textualize/rich/issues/1585
+- Added `vertical_align` to Table.add_row https://github.com/Textualize/rich/issues/1590
 
 ### Fixed
 
@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **breaking** Deprecated rich.console.RenderGroup, now named rich.console.Group
+- **breaking** `Syntax.__init__` parameter `lexer_name` renamed to `lexer`
+- Syntax constructor accepts both str and now a pygments lexer https://github.com/Textualize/rich/pull/1748
 
 ## [10.16.2] - 2021-01-02
 
