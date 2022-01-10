@@ -12,8 +12,8 @@ If the default highlighting doesn't fit your needs, you can define a custom high
 
 Here's an example which highlights text that looks like an email address::
 
-    from rich.console import Console  
-    from rich.highlighter import RegexHighlighter      
+    from rich.console import Console
+    from rich.highlighter import RegexHighlighter
     from rich.theme import Theme
 
     class EmailHighlighter(RegexHighlighter):

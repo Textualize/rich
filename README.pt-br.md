@@ -17,6 +17,7 @@
  • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md)
  • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
+ • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
 
 Rich é uma biblioteca Python para _rich_ text e formatação de estilos no terminal.
 
@@ -38,13 +39,13 @@ Rich funciona com [Jupyter notebooks](https://jupyter.org/) sem a necessidade de
 
 Instale usando `pip` ou seu gerenciador de pacotes PyPI favorito.
 
-```
-pip install rich
+```sh
+python -m pip install rich
 ```
 
 Execute o seguinte comando para testar o output do Rich no seu terminal:
 
-```
+```sh
 python -m rich
 ```
 

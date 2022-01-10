@@ -18,6 +18,7 @@
  • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
  • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
+ • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
 
 Rich टर्मिनल में _समृद्ध_ पाठ और सुंदर स्वरूपण के लिए एक Python संग्रह है। 
 
@@ -41,12 +42,12 @@ Rich बिना किसी अतिरिक्त विन्यास �
 
 `pip` या अपने पसंदीदा PyPI संकुल प्रबंधक (package manager) के द्वारा आप इसे स्थापित कर सकते हैं। 
 
-```
-pip install rich
+```sh
+python -m pip install rich
 ```
 
 आपके टर्मिनल पर Rich उत्पादन का परीक्षण करने के लिए यह चलाएं:
-```
+```sh
 python -m rich
 ```
 

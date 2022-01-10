@@ -106,7 +106,7 @@ You can parse a style definition explicitly with the :meth:`~rich.style.Style.pa
 Style Themes
 ------------
 
-If you re-use styles it can be a maintenance headache if you ever want to modify an attribute or color -- you would have to change every line where the style is used. Rich provides a :class:`~rich.theme.Theme` class which you can use to define custom styles that you can refer to by name. That way you only need update your styles in one place.
+If you re-use styles it can be a maintenance headache if you ever want to modify an attribute or color -- you would have to change every line where the style is used. Rich provides a :class:`~rich.theme.Theme` class which you can use to define custom styles that you can refer to by name. That way you only need to update your styles in one place.
 
 Style themes can make your code more semantic, for instance a style called ``"warning"`` better expresses intent that ``"italic magenta underline"``.
 
@@ -132,7 +132,7 @@ To use a style theme, construct a :class:`~rich.theme.Theme` instance and pass i
 Customizing Defaults
 ~~~~~~~~~~~~~~~~~~~~
 
-The Theme class will inherit the default styles builtin to Rich. If your custom theme contains the name of an existing style, it will replace it. This allows you to customize the defaults as easily as you can create your own styles. For instance, here's how you can change how Rich highlights numbers::
+The Theme class will inherit the default styles built-in to Rich. If your custom theme contains the name of an existing style, it will replace it. This allows you to customize the defaults as easily as you can create your own styles. For instance, here's how you can change how Rich highlights numbers::
 
     from rich.console import Console
     from rich.theme import Theme
@@ -141,9 +141,10 @@ The Theme class will inherit the default styles builtin to Rich. If your custom 
 
 You can disable inheriting the default theme by setting ``inherit=False`` on the :class:`rich.theme.Theme` constructor.
 
-To see the default theme, run the following command::
+To see the default theme, run the following commands::
 
     python -m rich.theme
+    python -m rich.default_styles
 
 
 Loading Themes

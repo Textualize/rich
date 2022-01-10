@@ -18,6 +18,7 @@
  • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
  • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
+ • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
 
 Rich는 터미널에서 _풍부한(rich)_ 텍스트와 아름다운 서식을 지원하기 위한 파이썬 라이브러리입니다.
 
@@ -39,13 +40,13 @@ Rich는 [Jupyter notebooks](https://jupyter.org/)에서 별도의 설정없이 �
 
 `pip` 또는 좋아하는 PyPI 패키지 매니저로 설치하세요.
 
-```
-pip install rich
+```sh
+python -m pip install rich
 ```
 
 아래 명령어를 통해 터미널에서 Rich 출력을 테스트해보세요.
 
-```
+```sh
 python -m rich
 ```
 

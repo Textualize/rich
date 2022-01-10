@@ -18,6 +18,7 @@
  • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
  • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
+ • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
 
 Rich isch ä Python Library för _rich_ Text ond ganz schöni formatiärig im Törminäl
 
@@ -39,13 +40,13 @@ Rich funktioniert mit [Jupyter notebooks](https://jupyter.org/) ohni irgendwelch
 
 Installation mit `pip` oder mit dim liäblings PyPI Päckli-Manager.
 
-```
-pip install rich
+```sh
+python -m pip install rich
 ```
 
 Für das do us zum d Rich usgob im Törminäl z teste:
 
-```
+```sh
 python -m rich
 ```
 

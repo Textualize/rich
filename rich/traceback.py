@@ -16,13 +16,7 @@ from pygments.token import Token
 from . import pretty
 from ._loop import loop_first, loop_last
 from .columns import Columns
-from .console import (
-    Console,
-    ConsoleOptions,
-    ConsoleRenderable,
-    RenderResult,
-    group,
-)
+from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, group
 from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
 from .panel import Panel
@@ -135,15 +129,15 @@ def install(
         )
 
     try:  # pragma: no cover
-        # if wihin ipython, use customized traceback
+        # if within ipython, use customized traceback
         ip = get_ipython()  # type: ignore
         ipy_excepthook_closure(ip)
-        return sys.excepthook  # type: ignore # more strict signature that mypy can't interpret
+        return sys.excepthook
     except Exception:
         # otherwise use default system hook
         old_excepthook = sys.excepthook
         sys.excepthook = excepthook
-        return old_excepthook  # type: ignore # more strict signature that mypy can't interpret
+        return old_excepthook
 
 
 @dataclass
@@ -246,6 +240,9 @@ class Traceback:
         self.suppress: Sequence[str] = []
         for suppress_entity in suppress:
             if not isinstance(suppress_entity, str):
+                assert (
+                    suppress_entity.__file__ is not None
+                ), f"{suppress_entity!r} must be a module with '__file__' attribute"
                 path = os.path.dirname(suppress_entity.__file__)
             else:
                 path = suppress_entity
@@ -440,7 +437,8 @@ class Traceback:
                 "scope.equals": token_style(Operator),
                 "scope.key": token_style(Name),
                 "scope.key.special": token_style(Name.Constant) + Style(dim=True),
-            }
+            },
+            inherit=False,
         )
 
         highlighter = ReprHighlighter()
@@ -450,7 +448,7 @@ class Traceback:
                     self._render_stack(stack),
                     title="[traceback.title]Traceback [dim](most recent call last)",
                     style=background_style,
-                    border_style="traceback.border.syntax_error",
+                    border_style="traceback.border",
                     expand=True,
                     padding=(0, 1),
                 )
@@ -463,7 +461,7 @@ class Traceback:
                         Panel(
                             self._render_syntax_error(stack.syntax_error),
                             style=background_style,
-                            border_style="traceback.border",
+                            border_style="traceback.border.syntax_error",
                             expand=True,
                             padding=(0, 1),
                             width=self.width,

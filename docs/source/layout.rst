@@ -99,7 +99,7 @@ This will set the upper portion to be exactly 10 rows, no matter the size of the
 Ratio
 -----
 
-In addition to a fixed size, you can also make a flexible layout setting the ``ratio`` argument on the constructor or by assigning to the attribute. The ratio defines how much of the screen the layout should occupy in relation to other layouts. For example, lets reset the size and set the ratio of the upper layout to 2::
+In addition to a fixed size, you can also make a flexible layout setting the ``ratio`` argument on the constructor or by assigning to the attribute. The ratio defines how much of the screen the layout should occupy in relation to other layouts. For example, let's reset the size and set the ratio of the upper layout to 2::
 
     layout["upper"].size = None
     layout["upper"].ratio = 2
@@ -124,7 +124,7 @@ The top layout is now invisible, and the "lower" layout will expand to fill the 
     layout["upper"].visible = True
     print(layout)
 
-You could use this to toggle parts of your interface based on your applications configuration.
+You could use this to toggle parts of your interface based on your application's configuration.
 
 Tree
 ----

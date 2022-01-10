@@ -18,6 +18,7 @@
  • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
  • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
+ • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
 
 Rich es un paquete de Python para texto _enriquecido_ y un hermoso formato en la terminal.
 
@@ -39,13 +40,13 @@ Rich funciona con [Jupyter notebooks](https://jupyter.org/) sin necesidad de con
 
 Instale con `pip` o su administrador de paquetes PyPI favorito.
 
-```
-pip install rich
+```sh
+python -m pip install rich
 ```
 
 Ejecute lo siguiente para probar la salida de Rich sobre su terminal:
 
-```
+```sh
 python -m rich
 ```
 

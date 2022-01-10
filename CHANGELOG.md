@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [11.0.0] - 2022-01-09
+
+### Added
+
+- Added max_depth arg to pretty printing https://github.com/Textualize/rich/issues/1585
+- Added `vertical_align` to Table.add_row https://github.com/Textualize/rich/issues/1590
+
+### Fixed
+
+- Fixed issue with pretty repr in jupyter notebook https://github.com/Textualize/rich/issues/1717
+- Fix Traceback theme defaults override user supplied styles https://github.com/Textualize/rich/issues/1786
+
+### Changed
+
+- **breaking** Deprecated rich.console.RenderGroup, now named rich.console.Group
+- **breaking** `Syntax.__init__` parameter `lexer_name` renamed to `lexer`
+- Syntax constructor accepts both str and now a pygments lexer https://github.com/Textualize/rich/pull/1748
+
+## [10.16.2] - 2021-01-02
+
+### Fixed
+
+- Fixed @ not being escaped in markup
+
 ## [10.16.1] - 2021-12-15
 
 ### Fixed
@@ -1579,6 +1603,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[11.0.0]: https://github.com/willmcgugan/rich/compare/v10.16.1...v11.0.0
 [10.16.1]: https://github.com/willmcgugan/rich/compare/v10.16.0...v10.16.1
 [10.16.0]: https://github.com/willmcgugan/rich/compare/v10.15.2...v10.16.0
 [10.15.2]: https://github.com/willmcgugan/rich/compare/v10.15.1...v10.15.2

@@ -18,6 +18,7 @@
  • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
  • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
+ • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
 
 Richは、 _リッチ_ なテキストや美しい書式設定をターミナルで行うためのPythonライブラリです。
 
@@ -39,13 +40,13 @@ Richは追加の設定を行わずとも、[Jupyter notebooks](https://jupyter.o
 
 `pip` や、あなたのお気に入りのPyPIパッケージマネージャを使ってインストールしてください。
 
-```
-pip install rich
+```sh
+python -m pip install rich
 ```
 
 以下のコマンドを実行して、ターミナルでリッチの出力をテストできます:
 
-```
+```sh
 python -m rich
 ```
 

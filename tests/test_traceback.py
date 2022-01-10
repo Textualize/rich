@@ -4,7 +4,8 @@ import sys
 import pytest
 
 from rich.console import Console
-from rich.traceback import install, Traceback
+from rich.theme import Theme
+from rich.traceback import Traceback, install
 
 # from .render import render
 
@@ -109,7 +110,7 @@ def test_syntax_error():
     console = Console(width=100, file=io.StringIO())
     try:
         # raises SyntaxError: unexpected EOF while parsing
-        eval("(2 + 2")
+        compile("(2+2")
     except Exception:
         console.print_exception()
     exception_text = console.file.getvalue()
@@ -188,6 +189,30 @@ def test_filename_not_a_file():
         console.print_exception()
     exception_text = console.file.getvalue()
     assert "string" in exception_text
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="renders different on windows")
+def test_traceback_console_theme_applies():
+    """
+    Ensure that themes supplied via Console init work on Tracebacks.
+    Regression test for https://github.com/Textualize/rich/issues/1786
+    """
+    r, g, b = 123, 234, 123
+    console = Console(
+        force_terminal=True,
+        _environ={"COLORTERM": "truecolor"},
+        theme=Theme({"traceback.title": f"rgb({r},{g},{b})"}),
+    )
+
+    console.begin_capture()
+    try:
+        1 / 0
+    except Exception:
+        console.print_exception()
+
+    result = console.end_capture()
+
+    assert f"\\x1b[38;2;{r};{g};{b}mTraceback \\x1b[0m" in repr(result)
 
 
 def test_broken_str():

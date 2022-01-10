@@ -40,7 +40,44 @@ This produces the following output:
     </pre>
 
 
-Rich is quite smart about rendering the table. It will adjust the column widths to fit the contents and will wrap text if it doesn't fit. You can also add anything that Rich knows how to render as a title or row cell (even another table)!
+Rich will calculate the optimal column sizes to fit your content, and will wrap text to fit if the terminal is not wide enough to fit the contents.
+
+.. note::
+    You are not limited to adding text in the ``add_row`` method. You can add anything that Rich knows how to render (including another table).
+
+Table Options
+~~~~~~~~~~~~~
+
+There are a number of keyword arguments on the Table constructor you can use to define how a table should look.
+
+- ``title`` Sets the title of the table (text show above the table).
+- ``caption`` Sets the table caption (text show below the table).
+- ``width`` Sets the desired width of the table (disables automatic width calculation).
+- ``min_width`` Sets a minimum width for the table.
+- ``box`` Sets one of the :ref:`appendix_box` styles for the table grid, or ``None`` for no grid.
+- ``safe_box`` Set to ``True`` to force the table to generate ASCII characters rather than unicode.
+- ``padding`` A integer, or tuple of 1, 2, or 4 values to set the padding on cells.
+- ``collapse_padding`` If True the padding of neighboring cells will be merged.
+- ``pad_edge`` Set to False to remove padding around the edge of the table.
+- ``expand`` Set to True to expand the table to the full available size.
+- ``show_header`` Set to True to show a header, False to disable it.
+- ``show_footer`` Set to True to show a footer, False to disable it.
+- ``show edge`` Set to False to disable the edge line around the table.
+- ``show_lines`` Set to True to show lines between rows as well as header / footer.
+- ``leading`` Additional space between rows.
+- ``style`` A Style to apply to the entire table, e.g. "on blue"
+- ``row_styles`` Set to a list of styles to style alternating rows. e.g. ``["dim", ""]`` to create *zebra stripes*
+- ``header_style`` Set the default style for the header.
+- ``footer_style`` Set the default style for the footer.
+- ``border style`` Set a style for border characters.
+- ``title_style`` Set a style for the title.
+- ``caption_style`` Set a style for the caption.
+- ``title_justify`` Set the title justify method ("left", "right", "center", or "full")
+- ``caption_justify`` Set the caption justify method ("left", "right", "center", or "full")
+- ``highlight`` Set to True to enable automatic highlighting of cell contents.
+
+Border Styles
+~~~~~~~~~~~~~
 
 You can set the border style by importing one of the preset :class:`~rich.box.Box` objects and setting the ``box`` argument in the table constructor. Here's an example that modifies the look of the Star Wars table::
 
@@ -49,7 +86,15 @@ You can set the border style by importing one of the preset :class:`~rich.box.Bo
 
 See :ref:`appendix_box` for other box styles.
 
+You can also set ``box=None`` to remove borders entirely.
+
 The :class:`~rich.table.Table` class offers a number of configuration options to set the look and feel of the table, including how borders are rendered and the style and alignment of the columns.
+
+
+Lines
+~~~~~
+
+By default, Tables will show a line under the header only. If you want to show lines between all rows add ``show_lines=True`` to the constructor.
 
 
 Empty Tables
@@ -70,7 +115,7 @@ You may also add columns by specifying them in the positional arguments of the :
 
     table = Table("Released", "Title", "Box Office", title="Star Wars Movies")
 
-This allows you to specify the text of the column only. If you want to set other attributes, such as width and style, you can add an :class:`~rich.table.Column` class. Here's an example::
+This allows you to specify the text of the column only. If you want to set other attributes, such as width and style, you can add a :class:`~rich.table.Column` class. Here's an example::
 
     from rich.table import Column
     table = Table(
@@ -80,10 +125,29 @@ This allows you to specify the text of the column only. If you want to set other
         title="Star Wars Movies"
     )
 
-Lines
-~~~~~
+Column Options
+~~~~~~~~~~~~~~
 
-By default, Tables will show a line under the header only. If you want to show lines between all rows add ``show_lines=True`` to the constructor.
+There are a number of options you can set on a column to modify how it will look.
+
+- ``header_style`` Sets the style of the header, e.g. "bold magenta".
+- ``footer_style`` Sets the style of the footer.
+- ``style`` Sets a style that applies to the column. You could use this to highlight a column by setting the background with "on green" for example.
+- ``justify`` Sets the text justify to one of "left", "center", "right", or "full".
+- ``vertical`` Sets the vertical alignment of the cells in a column, to one of "top", "middle", or "bottom".
+- ``width`` Explicitly set the width of a row to a given number of characters (disables automatic calculation).
+- ``min_width`` When set to an integer will prevent the column from shrinking below this amount.
+- ``max_width`` When set to an integer will prevent the column from growing beyond this amount.
+- ``ratio`` Defines a ratio to set the column width. For instance, if there are 3 columns with a total of 6 ratio, and ``ratio=2`` then the column will be a third of the available size.
+- ``no_wrap`` Set to False to prevent this column from wrapping.
+
+Vertical Alignment
+~~~~~~~~~~~~~~~~~~
+
+You can define the vertical alignment of a column by setting the ``vertical`` parameter of the column. You can also do this per-cell by wrapping your text or renderable with a :class:`~rich.align.Align` class::
+
+
+    table.add_row(Align("Title", vertical="middle"))
 
 Grids
 ~~~~~

@@ -5,6 +5,7 @@ The following people have contributed to the development of Rich:
 <!-- Add your name below, sort alphabetically by surname. Link to Github profile / your home page. -->
 
 - [Gregory Beauregard](https://github.com/GBeauregard/pyffstream)
+- [Darren Burns](https://github.com/darrenburns)
 - [Pete Davison](https://github.com/pd93)
 - [James Estevez](https://github.com/jstvz)
 - [Oleksis Fraga](https://github.com/oleksis)
@@ -26,3 +27,4 @@ The following people have contributed to the development of Rich:
 - [Tim Savage](https://github.com/timsavage)
 - [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
+- [Patrick Arminio](https://github.com/patrick91)

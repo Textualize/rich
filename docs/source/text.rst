@@ -5,7 +5,7 @@ Rich Text
 
 Rich has a :class:`~rich.text.Text` class you can use to mark up strings with color and style attributes. You can use a Text instance anywhere a string is accepted, which gives you a lot of control over presentation.
 
-You can consider this class to be like a string with marked up regions of text. Unlike a builtin ``str``, a Text instance is mutable, and most methods operate in-place rather than returning a new instance. 
+You can consider this class to be like a string with marked up regions of text. Unlike a built-in ``str``, a Text instance is mutable, and most methods operate in-place rather than returning a new instance. 
 
 One way to add a style to Text is the :meth:`~rich.text.Text.stylize` method which applies a style to a start and end offset. Here is an example::
 
@@ -26,7 +26,7 @@ Alternatively, you can construct styled text by calling :meth:`~rich.text.Text.a
     text.append(" World!")
     console.print(text)
 
-If you would like to use text that is already formatted with ANSI codes, call :meth:`~rich.text.Text.from_ansi` to convert it to a ``Text`` object:
+If you would like to use text that is already formatted with ANSI codes, call :meth:`~rich.text.Text.from_ansi` to convert it to a ``Text`` object::
 
     text = Text.from_ansi("\033[1mHello, World!\033[0m")
     console.print(text.spans)
