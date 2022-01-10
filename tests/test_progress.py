@@ -363,7 +363,7 @@ def test_columns_with_undetermined_total() -> None:
         auto_refresh=False,
         get_time=MockClock(),
     )
-    task1 = progress.add_task("foo", total=float("inf"))
+    task1 = progress.add_task("foo", total=None)
     with progress:
         for n in range(4):
             progress.advance(task1, 3)

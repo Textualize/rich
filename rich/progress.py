@@ -118,9 +118,7 @@ def track(
 
     """
 
-    determinate = isinstance(sequence, Sized) or (
-        (total is not None) and (total != float("inf"))
-    )
+    determinate = isinstance(sequence, Sized) or (total is not None)
     columns: List["ProgressColumn"] = (
         [TextColumn("[progress.description]{task.description}")] if description else []
     )
@@ -715,7 +713,7 @@ class Progress(JupyterMixin):
                         f"unable to get an iterator from {sequence!r}, please provide an iterable."
                     ) from e
                 else:
-                    task_total = float("inf")
+                    task_total = total
         else:
             task_total = total
 
@@ -945,7 +943,7 @@ class Progress(JupyterMixin):
         self,
         description: str,
         start: bool = True,
-        total: float = 100.0,
+        total: Optional[float] = 100.0,
         completed: int = 0,
         visible: bool = True,
         **fields: Any,
@@ -968,7 +966,7 @@ class Progress(JupyterMixin):
             task = Task(
                 self._task_index,
                 description,
-                total,
+                float("inf") if total is None else total,
                 completed,
                 visible=visible,
                 fields=fields,
@@ -1056,7 +1054,7 @@ if __name__ == "__main__":  # pragma: no coverage
         task1 = progress.add_task("[red]Downloading", total=1000)
         task2 = progress.add_task("[green]Processing", total=1000)
         task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
-        task4 = progress.add_task("[blue]Receiving", total=float("inf"))
+        task4 = progress.add_task("[blue]Receiving", total=None)
 
         while not progress.finished:
             progress.update(task1, advance=0.5)
