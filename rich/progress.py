@@ -328,10 +328,10 @@ class BarColumn(ProgressColumn):
     def render(self, task: "Task") -> ProgressBar:
         """Gets a progress bar widget for a task."""
         return ProgressBar(
-            total=max(0, task.total),
+            total=max(0, float("inf") if task.total is None else task.total),
             completed=max(0, task.completed),
             width=None if self.bar_width is None else max(1, self.bar_width),
-            pulse=(not task.started) or (task.total == float("inf")),
+            pulse=(not task.started) or (task.total is None),
             animation_time=task.get_time(),
             style=self.style,
             complete_style=self.complete_style,
@@ -381,10 +381,7 @@ class TotalFileSizeColumn(ProgressColumn):
 
     def render(self, task: "Task") -> Text:
         """Show data completed."""
-        try:
-            data_size = filesize.decimal(int(task.total))
-        except OverflowError:
-            data_size = "?"
+        data_size = "?" if task.total is None else filesize.decimal(int(task.total))
         return Text(data_size, style="progress.filesize.total")
 
 
@@ -404,10 +401,7 @@ class DownloadColumn(ProgressColumn):
     def render(self, task: "Task") -> Text:
         """Calculate common unit for completed and total."""
         completed = int(task.completed)
-        try:
-            total = int(task.total)
-        except OverflowError:
-            total = completed
+        total = completed if task.total is None else int(task.total)
         if self.binary_units:
             unit, suffix = filesize.pick_unit_and_suffix(
                 total,
@@ -423,7 +417,7 @@ class DownloadColumn(ProgressColumn):
         precision = 0 if unit == 1 else 1
         completed_str = f"{completed_ratio:,.{precision}f}"
         total_str = (
-            f"{total_ratio:,.{precision}f}" if task.total != float("inf") else "?"
+            "?" if task.total is None else f"{total_ratio:,.{precision}f}"
         )
         download_status = f"{completed_str}/{total_str} {suffix}"
         download_text = Text(download_status, style="progress.download")
@@ -511,7 +505,7 @@ class Task:
     @property
     def remaining(self) -> float:
         """float: Get the number of steps remaining."""
-        return self.total - self.completed
+        return float("inf") if self.total is None else (self.total - self.completed)
 
     @property
     def elapsed(self) -> Optional[float]:
@@ -817,7 +811,8 @@ class Progress(JupyterMixin):
                 popleft()
             if update_completed > 0:
                 _progress.append(ProgressSample(current_time, update_completed))
-            if task.completed >= task.total and task.finished_time is None:
+            total = float("inf") if task.total is None else task.total
+            if task.completed >= total and task.finished_time is None:
                 task.finished_time = task.elapsed
 
         if refresh:
@@ -882,7 +877,8 @@ class Progress(JupyterMixin):
             while len(_progress) > 1000:
                 popleft()
             _progress.append(ProgressSample(current_time, update_completed))
-            if task.completed >= task.total and task.finished_time is None:
+            total = float("inf") if task.total is None else task.total
+            if task.completed >= total and task.finished_time is None:
                 task.finished_time = task.elapsed
                 task.finished_speed = task.speed
 
@@ -966,7 +962,7 @@ class Progress(JupyterMixin):
             task = Task(
                 self._task_index,
                 description,
-                float("inf") if total is None else total,
+                total,
                 completed,
                 visible=visible,
                 fields=fields,
