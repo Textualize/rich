@@ -1,13 +1,13 @@
 from itertools import zip_longest
 from typing import (
-    Iterator,
+    TYPE_CHECKING,
     Iterable,
+    Iterator,
     List,
     Optional,
+    TypeVar,
     Union,
     overload,
-    TypeVar,
-    TYPE_CHECKING,
 )
 
 if TYPE_CHECKING:
@@ -21,7 +21,6 @@ if TYPE_CHECKING:
     )
     from .text import Text
 
-from .cells import cell_len
 from .measure import Measurement
 
 T = TypeVar("T")
@@ -126,6 +125,7 @@ class Lines:
         """
         from .text import Text
 
+        _cell_width = console.cells.measure
         if justify == "left":
             for line in self._lines:
                 line.truncate(width, overflow=overflow, pad=True)
@@ -133,19 +133,19 @@ class Lines:
             for line in self._lines:
                 line.rstrip()
                 line.truncate(width, overflow=overflow)
-                line.pad_left((width - cell_len(line.plain)) // 2)
-                line.pad_right(width - cell_len(line.plain))
+                line.pad_left((width - _cell_width(line.plain)) // 2)
+                line.pad_right(width - _cell_width(line.plain))
         elif justify == "right":
             for line in self._lines:
                 line.rstrip()
                 line.truncate(width, overflow=overflow)
-                line.pad_left(width - cell_len(line.plain))
+                line.pad_left(width - _cell_width(line.plain))
         elif justify == "full":
             for line_index, line in enumerate(self._lines):
                 if line_index == len(self._lines) - 1:
                     break
                 words = line.split(" ")
-                words_size = sum(cell_len(word.plain) for word in words)
+                words_size = sum(_cell_width(word.plain) for word in words)
                 num_spaces = len(words) - 1
                 spaces = [1 for _ in range(num_spaces)]
                 index = 0

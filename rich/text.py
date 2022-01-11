@@ -2,7 +2,6 @@ import re
 from functools import partial, reduce
 from math import gcd
 from operator import itemgetter
-from rich.emoji import EmojiVariant
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -15,6 +14,8 @@ from typing import (
     Tuple,
     Union,
 )
+
+from rich.emoji import EmojiVariant
 
 from ._loop import loop_last
 from ._pick import pick_bool
@@ -1148,6 +1149,7 @@ class Text(JupyterMixin):
 
         no_wrap = pick_bool(no_wrap, self.no_wrap, False) or overflow == "ignore"
 
+        cells = console.cells
         lines = Lines()
         for line in self.split(allow_blank=True):
             if "\t" in line:
@@ -1155,7 +1157,9 @@ class Text(JupyterMixin):
             if no_wrap:
                 new_lines = Lines([line])
             else:
-                offsets = divide_line(str(line), width, fold=wrap_overflow == "fold")
+                offsets = divide_line(
+                    str(line), width, cells, fold=wrap_overflow == "fold"
+                )
                 new_lines = line.divide(offsets)
             for line in new_lines:
                 line.rstrip_end(width)

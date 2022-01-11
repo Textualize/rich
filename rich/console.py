@@ -11,9 +11,9 @@ from getpass import getpass
 from html import escape
 from inspect import isclass
 from itertools import islice
-from time import monotonic
 from threading import RLock
-from types import FrameType, TracebackType, ModuleType
+from time import monotonic
+from types import FrameType, ModuleType, TracebackType
 from typing import (
     IO,
     TYPE_CHECKING,
@@ -31,6 +31,8 @@ from typing import (
     Union,
     cast,
 )
+
+from cells.core import Cells
 
 if sys.version_info >= (3, 8):
     from typing import Literal, Protocol, runtime_checkable
@@ -71,6 +73,25 @@ if TYPE_CHECKING:
 
 WINDOWS = platform.system() == "Windows"
 
+DEFAULT_UNICODE_VERSION = "9.0.0"
+UnicodeVersion = Literal[
+    "4.1.0",
+    "5.0.0",
+    "5.1.0",
+    "5.2.0",
+    "6.0.0",
+    "6.1.0",
+    "6.2.0",
+    "6.3.0",
+    "7.0.0",
+    "8.0.0",
+    "9.0.0",
+    "10.0.0",
+    "11.0.0",
+    "12.0.0",
+    "12.1.0",
+    "13.0.0",
+]
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
 OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
@@ -616,6 +637,10 @@ class Console:
         get_datetime (Callable[[], datetime], optional): Callable that gets the current time as a datetime.datetime object (used by Console.log),
             or None for datetime.now.
         get_time (Callable[[], time], optional): Callable that gets the current time in seconds, default uses time.monotonic.
+        unicode_version (UnicodeVersion, optional): Version of the Unicode database to use.
+            If ``None``, the default ``"9.0.0"`` will be used.
+        cells (Cells, optional): ``Cells`` instance to use for character cell width measurement. If ``None``, Rich will instantiate
+            ``Cell`` internally using the specified ``unicode_version``.
     """
 
     _environ: Mapping[str, str] = os.environ
@@ -652,6 +677,8 @@ class Console:
         safe_box: bool = True,
         get_datetime: Optional[Callable[[], datetime]] = None,
         get_time: Optional[Callable[[], float]] = None,
+        unicode_version: Optional[UnicodeVersion] = DEFAULT_UNICODE_VERSION,
+        cells: Optional[Cells] = None,
         _environ: Optional[Mapping[str, str]] = None,
     ):
         # Copy of os.environ allows us to replace it for testing
@@ -713,6 +740,7 @@ class Console:
         self.safe_box = safe_box
         self.get_datetime = get_datetime or datetime.now
         self.get_time = get_time or monotonic
+        self.cells = cells or Cells(unicode_version or DEFAULT_UNICODE_VERSION)
         self.style = style
         self.no_color = (
             no_color if no_color is not None else "NO_COLOR" in self._environ

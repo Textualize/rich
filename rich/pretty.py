@@ -1,28 +1,31 @@
 import builtins
+import dataclasses
 import os
-from rich.repr import RichReprResult
+import re
 import sys
 from array import array
-from collections import Counter, defaultdict, deque, UserDict, UserList
-import dataclasses
+from collections import Counter, UserDict, UserList, defaultdict, deque
 from dataclasses import dataclass, fields, is_dataclass
 from inspect import isclass
 from itertools import islice
-import re
+from types import MappingProxyType
 from typing import (
-    DefaultDict,
     TYPE_CHECKING,
     Any,
     Callable,
+    DefaultDict,
     Dict,
     Iterable,
     List,
     Optional,
     Set,
-    Union,
     Tuple,
+    Union,
 )
-from types import MappingProxyType
+
+from cells.core import Cells
+
+from rich.repr import RichReprResult
 
 try:
     import attr as _attr_module
@@ -30,12 +33,10 @@ except ImportError:  # pragma: no cover
     _attr_module = None  # type: ignore
 
 
-from .highlighter import ReprHighlighter
 from . import get_console
 from ._loop import loop_last
 from ._pick import pick_bool
 from .abc import RichRenderable
-from .cells import cell_len
 from .highlighter import ReprHighlighter
 from .jupyter import JupyterMixin, JupyterRenderable
 from .measure import Measurement
@@ -278,8 +279,11 @@ class Pretty(JupyterMixin):
             max_length=self.max_length,
             max_string=self.max_string,
         )
+        _cell_width = console.cells.measure
         text_width = (
-            max(cell_len(line) for line in pretty_str.splitlines()) if pretty_str else 0
+            max(_cell_width(line) for line in pretty_str.splitlines())
+            if pretty_str
+            else 0
         )
         return Measurement(text_width, text_width)
 
@@ -339,6 +343,10 @@ class Node:
     children: Optional[List["Node"]] = None
     key_separator = ": "
     separator: str = ", "
+    cells: Optional[Cells] = None
+
+    def __post_init__(self):
+        self.cells = self.cells or Cells()
 
     def iter_tokens(self) -> Iterable[str]:
         """Generate tokens for this node."""
@@ -373,8 +381,9 @@ class Node:
             bool: True if the node can be rendered within max length, otherwise False.
         """
         total_length = start_length
+        _cell_width = self.cells.measure
         for token in self.iter_tokens():
-            total_length += cell_len(token)
+            total_length += _cell_width(token)
             if total_length > max_length:
                 return False
         return True
@@ -401,7 +410,7 @@ class Node:
         while line_no < len(lines):
             line = lines[line_no]
             if line.expandable and not line.expanded:
-                if expand_all or not line.check_length(max_width):
+                if expand_all or not line.check_length(max_width, self.cells):
                     lines[line_no : line_no + 1] = line.expand(indent_size)
             line_no += 1
 
@@ -427,10 +436,11 @@ class _Line:
         """Check if the line may be expanded."""
         return bool(self.node is not None and self.node.children)
 
-    def check_length(self, max_length: int) -> bool:
+    def check_length(self, max_length: int, cells: Cells) -> bool:
         """Check this line fits within a given number of cells."""
+        _cell_width = cells.measure
         start_length = (
-            len(self.whitespace) + cell_len(self.text) + cell_len(self.suffix)
+            len(self.whitespace) + _cell_width(self.text) + _cell_width(self.suffix)
         )
         assert self.node is not None
         return self.node.check_length(start_length, max_length)

@@ -1,8 +1,10 @@
 import re
 from typing import Iterable, List, Tuple
 
-from .cells import cell_len, chop_cells
+from cells.core import Cells
+
 from ._loop import loop_last
+from .cells import cell_len, chop_cells
 
 re_word = re.compile(r"\s*\S+\s*")
 
@@ -17,13 +19,13 @@ def words(text: str) -> Iterable[Tuple[int, int, str]]:
         word_match = re_word.match(text, end)
 
 
-def divide_line(text: str, width: int, fold: bool = True) -> List[int]:
+def divide_line(text: str, width: int, cells: Cells, fold: bool = True) -> List[int]:
     divides: List[int] = []
     append = divides.append
     line_position = 0
-    _cell_len = cell_len
+    _cell_width = cells.measure
     for start, _end, word in words(text):
-        word_length = _cell_len(word.rstrip())
+        word_length = _cell_width(word.rstrip())
         if line_position + word_length > width:
             if word_length > width:
                 if fold:
@@ -31,19 +33,19 @@ def divide_line(text: str, width: int, fold: bool = True) -> List[int]:
                         chop_cells(word, width, position=line_position)
                     ):
                         if last:
-                            line_position = _cell_len(line)
+                            line_position = _cell_width(line)
                         else:
                             start += len(line)
                             append(start)
                 else:
                     if start:
                         append(start)
-                    line_position = _cell_len(word)
+                    line_position = _cell_width(word)
             elif line_position and start:
                 append(start)
-                line_position = _cell_len(word)
+                line_position = _cell_width(word)
         else:
-            line_position += _cell_len(word)
+            line_position += _cell_width(word)
     return divides
 
 
