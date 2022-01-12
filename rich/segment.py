@@ -16,12 +16,7 @@ from typing import (
     Union,
 )
 
-from .cells import (
-    _is_single_cell_widths,
-    cell_len,
-    get_character_cell_size,
-    set_cell_size,
-)
+from .cells import _is_single_cell_widths, cell_len, set_cell_size
 from .repr import Result, rich_repr
 from .style import Style
 
@@ -108,8 +103,6 @@ class Segment(NamedTuple):
         if cut >= cell_length:
             return segment, _Segment("", style, control)
 
-        cell_size = get_character_cell_size
-
         pos = int((cut / cell_length) * len(text))
 
         before = text[:pos]
@@ -122,7 +115,7 @@ class Segment(NamedTuple):
         while pos < len(text):
             char = text[pos]
             pos += 1
-            cell_pos += cell_size(char)
+            cell_pos += cell_len(char)
             before = text[:pos]
             if cell_pos == cut:
                 return (

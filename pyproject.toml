@@ -33,6 +33,7 @@ pygments = "^2.6.0"
 commonmark = "^0.9.0"
 colorama = "^0.4.0"
 ipywidgets = { version = "^7.5.1", optional = true }
+cells = {version = "^0.1.0", allow-prereleases = true}
 
 
 [tool.poetry.extras]
