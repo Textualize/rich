@@ -70,9 +70,11 @@ def test(widths_table):
         character = chr(codepoint)
         width1 = get_cell_size(widths_table, character)
         width2 = wcwidth(character)
-        if width1 != width2:
+        if width1 != width2 and character not in EMOJI_VARIATION_SEQUENCES:
             print(f"{width1} != {width2}")
-            break
+            raise Exception(
+                f"Width mismatch between Rich and wcwidth for character '{character}'"
+            )
 
 
 def run():
