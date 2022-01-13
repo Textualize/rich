@@ -1,3 +1,4 @@
+import string
 import subprocess
 import sys
 from typing import List, Tuple
@@ -21,7 +22,13 @@ def make_widths_table() -> List[Tuple[int, int, int]]:
         # Emoji presentation sequences behave as though they were East Asian Wide,
         # regardless of their assigned East_Asian_Width property value:
         # http://www.unicode.org/reports/tr41/tr41-26.html#UTS51
-        if chr(codepoint) in EMOJI_VARIATION_SEQUENCES:
+        # Codepoints representing digits can appear at the start of EPSQs, but they
+        # are captured by a regex inside Rich which targets the most common codepoint ranges,
+        # so we don't need them in our lookup table.
+        if (
+            chr(codepoint) in EMOJI_VARIATION_SEQUENCES
+            and chr(codepoint) not in string.digits
+        ):
             widths.append((codepoint, 2))
         else:
             widths.append((codepoint, wcwidth(chr(codepoint))))
