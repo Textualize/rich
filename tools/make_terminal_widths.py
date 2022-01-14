@@ -1,11 +1,12 @@
+import string
 import subprocess
-from typing import List, Tuple
 import sys
-
-from rich.progress import Progress
+from typing import List, Tuple
 
 from wcwidth import wcwidth
 
+from rich.progress import Progress
+from tools.emoji_variation_sequences import EMOJI_VARIATION_SEQUENCES
 
 progress = Progress()
 
@@ -16,10 +17,21 @@ def make_widths_table() -> List[Tuple[int, int, int]]:
 
     make_table_task = progress.add_task("Calculating table...")
 
-    widths = (
-        (codepoint, wcwidth(chr(codepoint)))
-        for codepoint in range(0, sys.maxunicode + 1)
-    )
+    widths = []
+    for codepoint in range(0, sys.maxunicode + 1):
+        # Emoji presentation sequences behave as though they were East Asian Wide,
+        # regardless of their assigned East_Asian_Width property value:
+        # http://www.unicode.org/reports/tr41/tr41-26.html#UTS51
+        # Codepoints representing digits can appear at the start of EPSQs, but they
+        # are captured by a regex inside Rich which targets the most common codepoint ranges,
+        # so we don't need them in our lookup table.
+        if (
+            chr(codepoint) in EMOJI_VARIATION_SEQUENCES
+            and chr(codepoint) not in string.digits
+        ):
+            widths.append((codepoint, 2))
+        else:
+            widths.append((codepoint, wcwidth(chr(codepoint))))
 
     _widths = [(codepoint, width) for codepoint, width in widths if width != 1]
     iter_widths = iter(_widths)
@@ -40,7 +52,6 @@ def make_widths_table() -> List[Tuple[int, int, int]]:
 
 
 def get_cell_size(table: List[Tuple[int, int, int]], character: str) -> int:
-
     codepoint = ord(character)
     lower_bound = 0
     upper_bound = len(table) - 1
@@ -66,9 +77,11 @@ def test(widths_table):
         character = chr(codepoint)
         width1 = get_cell_size(widths_table, character)
         width2 = wcwidth(character)
-        if width1 != width2:
+        if width1 != width2 and character not in EMOJI_VARIATION_SEQUENCES:
             print(f"{width1} != {width2}")
-            break
+            raise Exception(
+                f"Width mismatch between Rich and wcwidth for character '{character}'"
+            )
 
 
 def run():
