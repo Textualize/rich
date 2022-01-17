@@ -15,6 +15,8 @@ Edit this with a clear and concise description of what the bug.
 Provide a minimal code example that demonstrates the issue if you can. If the issue is visual in nature, consider posting a screenshot.
 
 **Platform**
+<details>
+<summary>Click to expand</summary>
 
 What platform (Win/Linux/Mac) are you running on? What terminal software are you using?
 
@@ -25,3 +27,5 @@ python -m rich.diagnose
 python -m rich._windows
 pip freeze | grep rich
 ```
+  
+</details>
