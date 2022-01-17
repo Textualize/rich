@@ -722,7 +722,7 @@ def traverse(
 
                 pop_visited(obj_id)
 
-        elif isinstance(obj, _CONTAINERS):
+        elif hasattr(obj, "__class__") and isinstance(obj, _CONTAINERS):
             for container_type in _CONTAINERS:
                 if isinstance(obj, container_type):
                     obj_type = container_type

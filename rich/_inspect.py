@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
 from typing import Any, Iterable, Optional, Tuple
 
-from .console import RenderableType, Group
+from .console import Group, RenderableType
 from .highlighter import ReprHighlighter
 from .jupyter import JupyterMixin
 from .panel import Panel
@@ -206,5 +206,6 @@ class Inspect(JupyterMixin):
             yield items_table
         else:
             yield Text.from_markup(
-                f"[b cyan]{not_shown_count}[/][i] attribute(s) not shown.[/i] Run [b][magenta]inspect[/]([not b]inspect[/])[/b] for options."
+                f"[b cyan]{not_shown_count}[/][i] attribute(s) not shown.[/i] "
+                f"Run [b][magenta]inspect[/]([not b]inspect[/])[/b] for options."
             )
