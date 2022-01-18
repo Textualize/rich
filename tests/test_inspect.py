@@ -1,11 +1,11 @@
 import io
 import sys
+from unittest import mock
 
 import pytest
 
 from rich import inspect
 from rich.console import Console
-
 
 skip_py36 = pytest.mark.skipif(
     sys.version_info.minor == 6 and sys.version_info.major == 3,
@@ -260,3 +260,18 @@ def test_broken_call_attr():
     result = render(foo, methods=True, width=100)
     print(repr(result))
     assert expected == result
+
+
+def test_inspect_swig_edge_case():
+    """Issue #1838 - Edge case with Faiss library - object with empty dir()"""
+
+    class Thing:
+        @property
+        def __class__(self):
+            raise AttributeError
+
+    thing = Thing()
+    try:
+        inspect(thing)
+    except Exception as e:
+        assert False, f"Object with no __class__ shouldn't raise {e}"
