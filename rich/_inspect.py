@@ -204,7 +204,7 @@ class Inspect(JupyterMixin):
                 add_row(key_text, Pretty(value, highlighter=highlighter))
         if items_table.row_count:
             yield items_table
-        else:
+        elif not_shown_count:
             yield Text.from_markup(
                 f"[b cyan]{not_shown_count}[/][i] attribute(s) not shown.[/i] "
                 f"Run [b][magenta]inspect[/]([not b]inspect[/])[/b] for options."
