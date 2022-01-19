@@ -1,5 +1,5 @@
 from rich.console import Console
-from rich.progress_bar import ProgressBar, _get_pulse_segments
+from rich.progress_bar import ProgressBar
 from rich.segment import Segment
 from rich.style import Style
 
@@ -63,7 +63,7 @@ def test_pulse():
 
 def test_get_pulse_segments():
     bar = ProgressBar()
-    segments = _get_pulse_segments(
+    segments = bar._get_pulse_segments(
         Style.parse("red"), Style.parse("yellow"), None, False, False
     )
     print(repr(segments))

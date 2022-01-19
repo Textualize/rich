@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Stop using `functools.lru_cache` decorator on instance methods
+
 - Fix width measurement of 353 emoji variation sequences https://github.com/Textualize/rich/pull/1832
 
 ## [11.0.0] - 2022-01-09
