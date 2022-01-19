@@ -66,6 +66,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.str": Style(color="green", italic=False, bold=False),
     "repr.brace": Style(bold=True),
     "repr.comma": Style(bold=True),
+    "repr.datetime": Style(bold=True, color="bright_yellow"),
     "repr.ipv4": Style(bold=True, color="bright_green"),
     "repr.ipv6": Style(bold=True, color="bright_green"),
     "repr.eui48": Style(bold=True, color="bright_green"),

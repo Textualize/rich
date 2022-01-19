@@ -71,6 +71,7 @@ highlight_tests = [
     ('"""hello"""', [Span(0, 11, "repr.str")]),
     ("\\'foo'", []),
     ("it's no 'string'", [Span(8, 16, "repr.str")]),
+    ("2022-01-20 02:08:04.658106", [Span(0, 26, "repr.datetime")]),
 ]
 
 
