@@ -2,7 +2,6 @@ import builtins
 import dataclasses
 import inspect
 import os
-import re
 import sys
 from array import array
 from collections import Counter, UserDict, UserList, defaultdict, deque
@@ -93,7 +92,7 @@ def _ipy_display_hook(
     from .console import ConsoleRenderable  # needed here to prevent circular import
 
     # always skip rich generated jupyter renderables or None values
-    if isinstance(value, JupyterRenderable) or value is None:
+    if _safe_isinstance(value, JupyterRenderable) or value is None:
         return
 
     console = console or get_console()
@@ -124,12 +123,12 @@ def _ipy_display_hook(
                     return  # Delegate rendering to IPython
 
     # certain renderables should start on a new line
-    if isinstance(value, ConsoleRenderable):
+    if _safe_isinstance(value, ConsoleRenderable):
         console.line()
 
     console.print(
         value
-        if isinstance(value, RichRenderable)
+        if _safe_isinstance(value, RichRenderable)
         else Pretty(
             value,
             overflow=overflow,
@@ -142,6 +141,16 @@ def _ipy_display_hook(
         crop=crop,
         new_line_start=True,
     )
+
+
+def _safe_isinstance(
+    obj: object, class_or_tuple: Union[type, Tuple[type, ...]]
+) -> bool:
+    """isinstance can fail in rare cases, for example types with no __class__"""
+    try:
+        return isinstance(obj, class_or_tuple)
+    except Exception:
+        return False
 
 
 def install(
@@ -178,7 +187,7 @@ def install(
             builtins._ = None  # type: ignore
             console.print(
                 value
-                if isinstance(value, RichRenderable)
+                if _safe_isinstance(value, RichRenderable)
                 else Pretty(
                     value,
                     overflow=overflow,
@@ -355,7 +364,7 @@ _MAPPING_CONTAINERS = (dict, os._Environ, MappingProxyType, UserDict)
 def is_expandable(obj: Any) -> bool:
     """Check if an object may be expanded by pretty print."""
     return (
-        isinstance(obj, _CONTAINERS)
+        _safe_isinstance(obj, _CONTAINERS)
         or (is_dataclass(obj))
         or (hasattr(obj, "__rich_repr__"))
         or _is_attr_object(obj)
@@ -539,7 +548,7 @@ def traverse(
         """Get repr string for an object, but catch errors."""
         if (
             max_string is not None
-            and isinstance(obj, (bytes, str))
+            and _safe_isinstance(obj, (bytes, str))
             and len(obj) > max_string
         ):
             truncated = len(obj) - max_string
@@ -565,7 +574,7 @@ def traverse(
 
         def iter_rich_args(rich_args: Any) -> Iterable[Union[Any, Tuple[str, Any]]]:
             for arg in rich_args:
-                if isinstance(arg, tuple):
+                if _safe_isinstance(arg, tuple):
                     if len(arg) == 3:
                         key, child, default = arg
                         if default == child:
@@ -622,7 +631,7 @@ def traverse(
                             last=root,
                         )
                     for last, arg in loop_last(args):
-                        if isinstance(arg, tuple):
+                        if _safe_isinstance(arg, tuple):
                             key, child = arg
                             child_node = _traverse(child, depth=depth + 1)
                             child_node.last = last
@@ -689,7 +698,7 @@ def traverse(
 
         elif (
             is_dataclass(obj)
-            and not isinstance(obj, type)
+            and not _safe_isinstance(obj, type)
             and not fake_attributes
             and (_is_dataclass_repr(obj) or py_version == (3, 6))
         ):
@@ -722,9 +731,9 @@ def traverse(
 
                 pop_visited(obj_id)
 
-        elif isinstance(obj, _CONTAINERS):
+        elif _safe_isinstance(obj, _CONTAINERS):
             for container_type in _CONTAINERS:
-                if isinstance(obj, container_type):
+                if _safe_isinstance(obj, container_type):
                     obj_type = container_type
                     break
 
@@ -752,7 +761,7 @@ def traverse(
                 num_items = len(obj)
                 last_item_index = num_items - 1
 
-                if isinstance(obj, _MAPPING_CONTAINERS):
+                if _safe_isinstance(obj, _MAPPING_CONTAINERS):
                     iter_items = iter(obj.items())
                     if max_length is not None:
                         iter_items = islice(iter_items, max_length)
@@ -777,7 +786,7 @@ def traverse(
             pop_visited(obj_id)
         else:
             node = Node(value_repr=to_repr(obj), last=root)
-        node.is_tuple = isinstance(obj, tuple)
+        node.is_tuple = _safe_isinstance(obj, tuple)
         return node
 
     node = _traverse(_object, root=True)
@@ -812,13 +821,13 @@ def pretty_repr(
         str: A possibly multi-line representation of the object.
     """
 
-    if isinstance(_object, Node):
+    if _safe_isinstance(_object, Node):
         node = _object
     else:
         node = traverse(
             _object, max_length=max_length, max_string=max_string, max_depth=max_depth
         )
-    repr_str = node.render(
+    repr_str: str = node.render(
         max_width=max_width, indent_size=indent_size, expand_all=expand_all
     )
     return repr_str
