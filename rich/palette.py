@@ -1,6 +1,6 @@
-from math import sqrt
 from functools import lru_cache
-from typing import Sequence, Tuple, TYPE_CHECKING
+from math import sqrt
+from typing import TYPE_CHECKING, Sequence, Tuple
 
 from .color_triplet import ColorTriplet
 
@@ -20,8 +20,8 @@ class Palette:
     def __rich__(self) -> "Table":
         from rich.color import Color
         from rich.style import Style
-        from rich.text import Text
         from rich.table import Table
+        from rich.text import Text
 
         table = Table(
             "index",
@@ -40,8 +40,6 @@ class Palette:
             )
         return table
 
-    # This is somewhat inefficient and needs caching
-    @lru_cache(maxsize=1024)
     def match(self, color: Tuple[int, int, int]) -> int:
         """Find a color from a palette that most closely matches a given color.
 
@@ -51,30 +49,38 @@ class Palette:
         Returns:
             int: Index of closes matching color.
         """
-        red1, green1, blue1 = color
-        _sqrt = sqrt
-        get_color = self._colors.__getitem__
+        return _match_palette_cached(color=color, available_colors=tuple(self._colors))
 
-        def get_color_distance(index: int) -> float:
-            """Get the distance to a color."""
-            red2, green2, blue2 = get_color(index)
-            red_mean = (red1 + red2) // 2
-            red = red1 - red2
-            green = green1 - green2
-            blue = blue1 - blue2
-            return _sqrt(
-                (((512 + red_mean) * red * red) >> 8)
-                + 4 * green * green
-                + (((767 - red_mean) * blue * blue) >> 8)
-            )
 
-        min_index = min(range(len(self._colors)), key=get_color_distance)
-        return min_index
+@lru_cache(maxsize=1024)
+def _match_palette_cached(
+    color: Tuple[int, int, int], available_colors: Tuple[Tuple[int, int, int]]
+) -> int:
+    red1, green1, blue1 = color
+    _sqrt = sqrt
+    get_color = available_colors.__getitem__
+
+    def get_color_distance(index: int) -> float:
+        """Get the distance to a color."""
+        red2, green2, blue2 = get_color(index)
+        red_mean = (red1 + red2) // 2
+        red = red1 - red2
+        green = green1 - green2
+        blue = blue1 - blue2
+        return _sqrt(
+            (((512 + red_mean) * red * red) >> 8)
+            + 4 * green * green
+            + (((767 - red_mean) * blue * blue) >> 8)
+        )
+
+    min_index = min(range(len(available_colors)), key=get_color_distance)
+    return min_index
 
 
 if __name__ == "__main__":  # pragma: no cover
     import colorsys
     from typing import Iterable
+
     from rich.color import Color
     from rich.console import Console, ConsoleOptions
     from rich.segment import Segment

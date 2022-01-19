@@ -1,5 +1,5 @@
+import functools
 import math
-from functools import lru_cache
 from time import monotonic
 from typing import Iterable, List, Optional
 
@@ -13,6 +13,51 @@ from .style import Style, StyleType
 
 # Number of characters before 'pulse' animation repeats
 PULSE_SIZE = 20
+
+
+@functools.lru_cache(maxsize=16)
+def _get_pulse_segments(
+    fore_style: Style,
+    back_style: Style,
+    color_system: str,
+    no_color: bool,
+    ascii: bool = False,
+) -> List[Segment]:
+    """Get a list of segments to render a pulse animation.
+
+    Returns:
+        List[Segment]: A list of segments, one segment per character.
+    """
+    bar = "-" if ascii else "━"
+    segments: List[Segment] = []
+    if color_system not in ("standard", "eight_bit", "truecolor") or no_color:
+        segments += [Segment(bar, fore_style)] * (PULSE_SIZE // 2)
+        segments += [Segment(" " if no_color else bar, back_style)] * (
+            PULSE_SIZE - (PULSE_SIZE // 2)
+        )
+        return segments
+
+    append = segments.append
+    fore_color = (
+        fore_style.color.get_truecolor()
+        if fore_style.color
+        else ColorTriplet(255, 0, 255)
+    )
+    back_color = (
+        back_style.color.get_truecolor() if back_style.color else ColorTriplet(0, 0, 0)
+    )
+    cos = math.cos
+    pi = math.pi
+    _Segment = Segment
+    _Style = Style
+    from_triplet = Color.from_triplet
+
+    for index in range(PULSE_SIZE):
+        position = index / PULSE_SIZE
+        fade = 0.5 + cos((position * pi * 2)) / 2.0
+        color = blend_rgb(fore_color, back_color, cross_fade=fade)
+        append(_Segment(bar, _Style(color=from_triplet(color))))
+    return segments
 
 
 class ProgressBar(JupyterMixin):
@@ -64,53 +109,6 @@ class ProgressBar(JupyterMixin):
         completed = min(100, max(0.0, completed))
         return completed
 
-    @lru_cache(maxsize=16)
-    def _get_pulse_segments(
-        self,
-        fore_style: Style,
-        back_style: Style,
-        color_system: str,
-        no_color: bool,
-        ascii: bool = False,
-    ) -> List[Segment]:
-        """Get a list of segments to render a pulse animation.
-
-        Returns:
-            List[Segment]: A list of segments, one segment per character.
-        """
-        bar = "-" if ascii else "━"
-        segments: List[Segment] = []
-        if color_system not in ("standard", "eight_bit", "truecolor") or no_color:
-            segments += [Segment(bar, fore_style)] * (PULSE_SIZE // 2)
-            segments += [Segment(" " if no_color else bar, back_style)] * (
-                PULSE_SIZE - (PULSE_SIZE // 2)
-            )
-            return segments
-
-        append = segments.append
-        fore_color = (
-            fore_style.color.get_truecolor()
-            if fore_style.color
-            else ColorTriplet(255, 0, 255)
-        )
-        back_color = (
-            back_style.color.get_truecolor()
-            if back_style.color
-            else ColorTriplet(0, 0, 0)
-        )
-        cos = math.cos
-        pi = math.pi
-        _Segment = Segment
-        _Style = Style
-        from_triplet = Color.from_triplet
-
-        for index in range(PULSE_SIZE):
-            position = index / PULSE_SIZE
-            fade = 0.5 + cos((position * pi * 2)) / 2.0
-            color = blend_rgb(fore_color, back_color, cross_fade=fade)
-            append(_Segment(bar, _Style(color=from_triplet(color))))
-        return segments
-
     def update(self, completed: float, total: Optional[float] = None) -> None:
         """Update progress with new values.
 
@@ -139,7 +137,7 @@ class ProgressBar(JupyterMixin):
         fore_style = console.get_style(self.pulse_style, default="white")
         back_style = console.get_style(self.style, default="black")
 
-        pulse_segments = self._get_pulse_segments(
+        pulse_segments = _get_pulse_segments(
             fore_style, back_style, console.color_system, console.no_color, ascii=ascii
         )
         segment_count = len(pulse_segments)

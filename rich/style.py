@@ -1,14 +1,13 @@
 import sys
 from functools import lru_cache
-from marshal import loads, dumps
+from marshal import dumps, loads
 from random import randint
-from typing import Any, cast, Dict, Iterable, List, Optional, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
 
 from . import errors
 from .color import Color, ColorParseError, ColorSystem, blend_rgb
-from .repr import rich_repr, Result
+from .repr import Result, rich_repr
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
-
 
 # Style instances and style definitions are often interchangeable
 StyleType = Union[str, "Style"]
@@ -575,42 +574,9 @@ class Style:
         style = Style(color=color, bgcolor=bgcolor, link=link, **attributes)
         return style
 
-    @lru_cache(maxsize=1024)
     def get_html_style(self, theme: Optional[TerminalTheme] = None) -> str:
         """Get a CSS style rule."""
-        theme = theme or DEFAULT_TERMINAL_THEME
-        css: List[str] = []
-        append = css.append
-
-        color = self.color
-        bgcolor = self.bgcolor
-        if self.reverse:
-            color, bgcolor = bgcolor, color
-        if self.dim:
-            foreground_color = (
-                theme.foreground_color if color is None else color.get_truecolor(theme)
-            )
-            color = Color.from_triplet(
-                blend_rgb(foreground_color, theme.background_color, 0.5)
-            )
-        if color is not None:
-            theme_color = color.get_truecolor(theme)
-            append(f"color: {theme_color.hex}")
-            append(f"text-decoration-color: {theme_color.hex}")
-        if bgcolor is not None:
-            theme_color = bgcolor.get_truecolor(theme, foreground=False)
-            append(f"background-color: {theme_color.hex}")
-        if self.bold:
-            append("font-weight: bold")
-        if self.italic:
-            append("font-style: italic")
-        if self.underline:
-            append("text-decoration: underline")
-        if self.strike:
-            append("text-decoration: line-through")
-        if self.overline:
-            append("text-decoration: overline")
-        return "; ".join(css)
+        return _get_html_style_cached(self, theme)
 
     @classmethod
     def combine(cls, styles: Iterable["Style"]) -> "Style":
@@ -749,6 +715,43 @@ class Style:
 
 
 NULL_STYLE = Style()
+
+
+@lru_cache(maxsize=1024)
+def _get_html_style_cached(style: Style, theme: Optional[TerminalTheme] = None) -> str:
+    theme = theme or DEFAULT_TERMINAL_THEME
+    css: List[str] = []
+    append = css.append
+
+    color = style.color
+    bgcolor = style.bgcolor
+    if style.reverse:
+        color, bgcolor = bgcolor, color
+    if style.dim:
+        foreground_color = (
+            theme.foreground_color if color is None else color.get_truecolor(theme)
+        )
+        color = Color.from_triplet(
+            blend_rgb(foreground_color, theme.background_color, 0.5)
+        )
+    if color is not None:
+        theme_color = color.get_truecolor(theme)
+        append(f"color: {theme_color.hex}")
+        append(f"text-decoration-color: {theme_color.hex}")
+    if bgcolor is not None:
+        theme_color = bgcolor.get_truecolor(theme, foreground=False)
+        append(f"background-color: {theme_color.hex}")
+    if style.bold:
+        append("font-weight: bold")
+    if style.italic:
+        append("font-style: italic")
+    if style.underline:
+        append("text-decoration: underline")
+    if style.strike:
+        append("text-decoration: line-through")
+    if style.overline:
+        append("text-decoration: overline")
+    return "; ".join(css)
 
 
 class StyleStack:
