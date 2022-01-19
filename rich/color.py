@@ -1,4 +1,3 @@
-import functools
 import platform
 import re
 from colorsys import rgb_to_hls
@@ -8,12 +7,13 @@ from typing import TYPE_CHECKING, NamedTuple, Optional, Tuple
 
 from ._palettes import EIGHT_BIT_PALETTE, STANDARD_PALETTE, WINDOWS_PALETTE
 from .color_triplet import ColorTriplet
-from .repr import Result, rich_repr
+from .repr import rich_repr, Result
 from .terminal_theme import DEFAULT_TERMINAL_THEME
 
 if TYPE_CHECKING:  # pragma: no cover
     from .terminal_theme import TerminalTheme
     from .text import Text
+
 
 WINDOWS = platform.system() == "Windows"
 
@@ -279,8 +279,8 @@ class Color(NamedTuple):
 
     def __rich__(self) -> "Text":
         """Dispays the actual color if Rich printed."""
-        from .style import Style
         from .text import Text
+        from .style import Style
 
         return Text.assemble(
             f"<color {self.name!r} ({self.type.name.lower()})",
@@ -432,7 +432,7 @@ class Color(NamedTuple):
                 number=number,
             )
 
-        else:  # color_rgb:
+        else:  #  color_rgb:
             components = color_rgb.split(",")
             if len(components) != 3:
                 raise ColorParseError(
@@ -446,94 +446,87 @@ class Color(NamedTuple):
                 )
             return cls(color, ColorType.TRUECOLOR, triplet=triplet)
 
+    @lru_cache(maxsize=1024)
     def get_ansi_codes(self, foreground: bool = True) -> Tuple[str, ...]:
         """Get the ANSI escape codes for this color."""
-        return _get_ansi_codes_cached(color=self, foreground=foreground)
+        _type = self.type
+        if _type == ColorType.DEFAULT:
+            return ("39" if foreground else "49",)
 
+        elif _type == ColorType.WINDOWS:
+            number = self.number
+            assert number is not None
+            fore, back = (30, 40) if number < 8 else (82, 92)
+            return (str(fore + number if foreground else back + number),)
+
+        elif _type == ColorType.STANDARD:
+            number = self.number
+            assert number is not None
+            fore, back = (30, 40) if number < 8 else (82, 92)
+            return (str(fore + number if foreground else back + number),)
+
+        elif _type == ColorType.EIGHT_BIT:
+            assert self.number is not None
+            return ("38" if foreground else "48", "5", str(self.number))
+
+        else:  # self.standard == ColorStandard.TRUECOLOR:
+            assert self.triplet is not None
+            red, green, blue = self.triplet
+            return ("38" if foreground else "48", "2", str(red), str(green), str(blue))
+
+    @lru_cache(maxsize=1024)
     def downgrade(self, system: ColorSystem) -> "Color":
         """Downgrade a color system to a system with fewer colors."""
-        return _downgrade_cached(color=self, system=system)
 
+        if self.type in [ColorType.DEFAULT, system]:
+            return self
+        # Convert to 8-bit color from truecolor color
+        if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:
+            assert self.triplet is not None
+            red, green, blue = self.triplet.normalized
+            _h, l, s = rgb_to_hls(red, green, blue)
+            # If saturation is under 10% assume it is grayscale
+            if s < 0.1:
+                gray = round(l * 25.0)
+                if gray == 0:
+                    color_number = 16
+                elif gray == 25:
+                    color_number = 231
+                else:
+                    color_number = 231 + gray
+                return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
 
-@functools.lru_cache(maxsize=1024)
-def _get_ansi_codes_cached(color: Color, foreground: bool) -> Tuple[str, ...]:
-    _type = color.type
-    if _type == ColorType.DEFAULT:
-        return ("39" if foreground else "49",)
+            color_number = (
+                16 + 36 * round(red * 5.0) + 6 * round(green * 5.0) + round(blue * 5.0)
+            )
+            return Color(self.name, ColorType.EIGHT_BIT, number=color_number)
 
-    elif _type == ColorType.WINDOWS:
-        number = color.number
-        assert number is not None
-        fore, back = (30, 40) if number < 8 else (82, 92)
-        return (str(fore + number if foreground else back + number),)
+        # Convert to standard from truecolor or 8-bit
+        elif system == ColorSystem.STANDARD:
+            if self.system == ColorSystem.TRUECOLOR:
+                assert self.triplet is not None
+                triplet = self.triplet
+            else:  # self.system == ColorSystem.EIGHT_BIT
+                assert self.number is not None
+                triplet = ColorTriplet(*EIGHT_BIT_PALETTE[self.number])
 
-    elif _type == ColorType.STANDARD:
-        number = color.number
-        assert number is not None
-        fore, back = (30, 40) if number < 8 else (82, 92)
-        return (str(fore + number if foreground else back + number),)
+            color_number = STANDARD_PALETTE.match(triplet)
+            return Color(self.name, ColorType.STANDARD, number=color_number)
 
-    elif _type == ColorType.EIGHT_BIT:
-        assert color.number is not None
-        return ("38" if foreground else "48", "5", str(color.number))
+        elif system == ColorSystem.WINDOWS:
+            if self.system == ColorSystem.TRUECOLOR:
+                assert self.triplet is not None
+                triplet = self.triplet
+            else:  # self.system == ColorSystem.EIGHT_BIT
+                assert self.number is not None
+                if self.number < 16:
+                    return Color(self.name, ColorType.WINDOWS, number=self.number)
+                triplet = ColorTriplet(*EIGHT_BIT_PALETTE[self.number])
 
-    else:  # color.standard == ColorStandard.TRUECOLOR:
-        assert color.triplet is not None
-        red, green, blue = color.triplet
-        return ("38" if foreground else "48", "2", str(red), str(green), str(blue))
+            color_number = WINDOWS_PALETTE.match(triplet)
+            return Color(self.name, ColorType.WINDOWS, number=color_number)
 
-
-@lru_cache(maxsize=1024)
-def _downgrade_cached(color: Color, system: ColorSystem) -> Color:
-    if color.type in [ColorType.DEFAULT, system]:
-        return color
-    # Convert to 8-bit color from truecolor color
-    if system == ColorSystem.EIGHT_BIT and color.system == ColorSystem.TRUECOLOR:
-        assert color.triplet is not None
-        red, green, blue = color.triplet.normalized
-        _h, l, s = rgb_to_hls(red, green, blue)
-        # If saturation is under 10% assume it is grayscale
-        if s < 0.1:
-            gray = round(l * 25.0)
-            if gray == 0:
-                color_number = 16
-            elif gray == 25:
-                color_number = 231
-            else:
-                color_number = 231 + gray
-            return Color(color.name, ColorType.EIGHT_BIT, number=color_number)
-
-        color_number = (
-            16 + 36 * round(red * 5.0) + 6 * round(green * 5.0) + round(blue * 5.0)
-        )
-        return Color(color.name, ColorType.EIGHT_BIT, number=color_number)
-
-    # Convert to standard from truecolor or 8-bit
-    elif system == ColorSystem.STANDARD:
-        if color.system == ColorSystem.TRUECOLOR:
-            assert color.triplet is not None
-            triplet = color.triplet
-        else:  # color.system == ColorSystem.EIGHT_BIT
-            assert color.number is not None
-            triplet = ColorTriplet(*EIGHT_BIT_PALETTE[color.number])
-
-        color_number = STANDARD_PALETTE.match(triplet)
-        return Color(color.name, ColorType.STANDARD, number=color_number)
-
-    elif system == ColorSystem.WINDOWS:
-        if color.system == ColorSystem.TRUECOLOR:
-            assert color.triplet is not None
-            triplet = color.triplet
-        else:  # color.system == ColorSystem.EIGHT_BIT
-            assert color.number is not None
-            if color.number < 16:
-                return Color(color.name, ColorType.WINDOWS, number=color.number)
-            triplet = ColorTriplet(*EIGHT_BIT_PALETTE[color.number])
-
-        color_number = WINDOWS_PALETTE.match(triplet)
-        return Color(color.name, ColorType.WINDOWS, number=color_number)
-
-    return color
+        return self
 
 
 def parse_rgb_hex(hex_color: str) -> ColorTriplet:
