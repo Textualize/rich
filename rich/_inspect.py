@@ -206,7 +206,7 @@ class Inspect(JupyterMixin):
                 add_row(warning, highlighter(repr(error)))
                 continue
 
-            if isinstance(value):
+            if isinstance(value, dict):
                 value = self._recursive_unmangle(value)
 
             if callable(value):
