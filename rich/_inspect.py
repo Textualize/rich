@@ -208,6 +208,16 @@ class Inspect(JupyterMixin):
 
             if isinstance(value, dict):
                 value = self._recursive_unmangle(value)
+            elif isinstance(value, str):
+                pass
+            else:
+                if hylang_installed:
+                    try:
+                        iter(value)
+                    except TypeError:
+                        pass
+                    else:
+                        value = type(value)(unmangle(item) for item in value)
 
             if callable(value):
                 if not self.methods:
