@@ -1,7 +1,15 @@
 from __future__ import absolute_import
 
 from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
-from typing import Any, Iterable, Optional, Tuple
+from typing import Any, Dict, Iterable, Optional, Tuple
+
+try:
+    from hy import unmangle
+except ModuleNotFoundError:
+    hylang_installed = False
+else:
+    from itertools import chain
+    hylang_installed = True
 
 from .console import Group, RenderableType
 from .highlighter import ReprHighlighter
@@ -93,6 +101,13 @@ class Inspect(JupyterMixin):
             _signature = "(...)"
         except TypeError:
             return None
+        else:
+            if hylang_installed:
+                _signature_split_equals = chain(*(item.split("=") for item in _signature.split(" ")))
+                _signature_split_left_paren = chain(*(item.split("(") for item in _signature_split_equals))
+                _unmangled_names = { item : unmangle(item) for item in _signature_split_left_paren if item != unmangle(item) }
+                for key, value in _unmangled_names.items():
+                    _signature = _signature.replace(key, value)
 
         source_filename: Optional[str] = None
         try:
@@ -106,11 +121,22 @@ class Inspect(JupyterMixin):
         signature_text = self.highlighter(_signature)
 
         qualname = name or getattr(obj, "__qualname__", name)
+
+        if hylang_installed:
+            qualname = unmangle(qualname)
+
         qual_signature = Text.assemble(
             ("def ", "inspect.def"), (qualname, "inspect.callable"), signature_text
         )
 
         return qual_signature
+
+    def _recursive_unmangle(self, dct: Dict[Any, Any]) -> Dict[str, Any]:
+        """Recursively unmangle hylang key names"""
+        if hylang_installed:
+            return { unmangle(key) : (self._recursive_unmangle(value) if isinstance(value, dict) else value) for key, value in dct.items() }
+        else:
+            return dct
 
     def _render(self) -> Iterable[RenderableType]:
         """Render object."""
@@ -169,7 +195,7 @@ class Inspect(JupyterMixin):
         for key, (error, value) in items:
             key_text = Text.assemble(
                 (
-                    key,
+                    unmangle(key) if hylang_installed else key,
                     "inspect.attr.dunder" if key.startswith("__") else "inspect.attr",
                 ),
                 (" =", "inspect.equals"),
@@ -179,6 +205,9 @@ class Inspect(JupyterMixin):
                 warning.stylize("inspect.error")
                 add_row(warning, highlighter(repr(error)))
                 continue
+
+            if isinstance(value):
+                value = self._recursive_unmangle(value)
 
             if callable(value):
                 if not self.methods:
