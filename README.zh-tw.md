@@ -21,31 +21,31 @@
  • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
  • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
 
-Rich is a Python library for _rich_ text and beautiful formatting in the terminal.
+Rich 是一款 Python 函式庫，提供終端機介面中 _豐富的_ 文字效果及精美的格式設定。
 
-The [Rich API](https://rich.readthedocs.io/en/latest/) makes it easy to add color and style to terminal output. Rich can also render pretty tables, progress bars, markdown, syntax highlighted source code, tracebacks, and more — out of the box.
+[Rich API](https://rich.readthedocs.io/en/latest/) 讓終端機介面加上色彩及樣式變得易如反掌。Rich 也可以繪製漂亮的表格、進度條、Markdown、語法突顯的程式碼、Traceback（追溯）……。
 
 ![Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
 
-For a video introduction to Rich see [calmcode.io](https://calmcode.io/rich/introduction.html) by [@fishnets88](https://twitter.com/fishnets88).
+關於 Rich 的介紹，請參見 [@fishnets88](https://twitter.com/fishnets88) 在 [calmcode.io](https://calmcode.io/rich/introduction.html) 錄製的影片。
 
-See what [people are saying about Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
+[看看其他人對於 Rich 的討論](https://www.willmcgugan.com/blog/pages/post/rich-tweets/)。
 
-## Compatibility
+## 相容性
 
-Rich works with Linux, OSX, and Windows. True color / emoji works with new Windows Terminal, classic terminal is limited to 16 colors. Rich requires Python 3.6.1 or later.
+Rich 可在 Linux、macOS、Windows 上運作。在新的 Windows Terminal 中可支援顯示全彩及 Emoji，但傳統的終端機中僅支援 16 色。Rich 需要的 Python 最低版本為 3.6.1。
 
-Rich works with [Jupyter notebooks](https://jupyter.org/) with no additional configuration required.
+Rich 可在 [Jupyter notebooks](https://jupyter.org/) 上使用，無須額外設定。
 
-## Installing
+## 安裝
 
-Install with `pip` or your favorite PyPI package manager.
+以 `pip` 或 PyPI 套件管理器安裝。
 
 ```sh
 python -m pip install rich
 ```
 
-Run the following to test Rich output on your terminal:
+以此命令測試 Rich 在終端機的輸出效果：
 
 ```sh
 python -m rich
@@ -53,7 +53,7 @@ python -m rich
 
 ## Rich Print
 
-To effortlessly add rich output to your application, you can import the [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) method, which has the same signature as the builtin Python function. Try this:
+匯入 [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) 方法就可以輕鬆地讓程式進行 rich 輸出，rich print 與 Python 內建的函式用法相似。試試：
 
 ```python
 from rich import print
@@ -65,7 +65,7 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ## Rich REPL
 
-Rich can be installed in the Python REPL, so that any data structures will be pretty printed and highlighted.
+Rich 可以安裝在 Python REPL 中，如此一來任何資料結構都能被漂亮的輸出及突顯標示。
 
 ```python
 >>> from rich import pretty
@@ -74,9 +74,9 @@ Rich can be installed in the Python REPL, so that any data structures will be pr
 
 ![REPL](https://github.com/willmcgugan/rich/raw/master/imgs/repl.png)
 
-## Using the Console
+## 使用 Console
 
-For more control over rich terminal content, import and construct a [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console) object.
+匯入並建構 [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console) 物件，以更全面地控制 rich 終端機內容。
 
 ```python
 from rich.console import Console
@@ -84,25 +84,25 @@ from rich.console import Console
 console = Console()
 ```
 
-The Console object has a `print` method which has an intentionally similar interface to the builtin `print` function. Here's an example of use:
+Console 物件有個 `print` 方法，且刻意設計的與內建 `print` 函式相似。參考此範例：
 
 ```python
 console.print("Hello", "World!")
 ```
 
-As you might expect, this will print `"Hello World!"` to the terminal. Note that unlike the builtin `print` function, Rich will word-wrap your text to fit within the terminal width.
+如同預期的，這會將 `"Hello World!"` 印在終端機。須注意不同於內建的 `print` 函式，Rich 會自動將過長的文字換行，以符合終端機的寬度。
 
-There are a few ways of adding color and style to your output. You can set a style for the entire output by adding a `style` keyword argument. Here's an example:
+有幾種加上顏色及樣式的方式。您可以用 `style` 引數設定輸出內容的樣式，參考此範例：
 
 ```python
 console.print("Hello", "World!", style="bold red")
 ```
 
-The output will be something like the following:
+輸出結果如下圖：
 
 ![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/hello_world.png)
 
-That's fine for styling a line of text at a time. For more finely grained styling, Rich renders a special markup which is similar in syntax to [bbcode](https://en.wikipedia.org/wiki/BBCode). Here's an example:
+介紹完了如何對整行文字設定樣式，接著來看看更細部的使用。Rich 可以接受類似 [bbcode](https://en.wikipedia.org/wiki/BBCode) 的語法，對個別文字設定樣式。參考此範例：
 
 ```python
 console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i]way[/i].")
@@ -110,11 +110,11 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![Console Markup](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
 
-You can use a Console object to generate sophisticated output with minimal effort. See the [Console API](https://rich.readthedocs.io/en/latest/console.html) docs for details.
+您可以用 Console 物件不費吹灰之力地達成細膩的輸出效果。參閱 [Console API](https://rich.readthedocs.io/en/latest/console.html) 說明文件以了解細節。
 
 ## Rich Inspect
 
-Rich has an [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) function which can produce a report on any Python object, such as class, instance, or builtin.
+Rich 提供了 [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) 函式，可以對任何 Python 物件，如 class、instance 或 builtin ，為其產生一份報告。
 
 ```python
 >>> my_list = ["foo", "bar"]
@@ -124,18 +124,18 @@ Rich has an [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?
 
 ![Log](https://github.com/willmcgugan/rich/raw/master/imgs/inspect.png)
 
-See the [inspect docs](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) for details.
+參閱 [inspect 說明文件](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) 以了解細節。
 
-# Rich Library
+# Rich 函式庫
 
 Rich contains a number of builtin _renderables_ you can use to create elegant output in your CLI and help you debug your code.
 
-Click the following headings for details:
+按一下子標題以了解細節：
 
 <details>
 <summary>Log</summary>
 
-The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default Rich will do syntax highlighting for Python structures and for repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
+Console 物件提供了 `log()` 方法，使用方式與 `print()` 類似，但還多了一欄來顯示目前時間、進行呼叫的檔案及行號。預設情況下 Rich 會語法突顯標示 Python 的結構及 repr 字串。若使用於字典或串列這類集合性物件，Rich 會將其漂亮地印出來，以符合可用空間。此範例示範了這些功能。
 
 ```python
 from rich.console import Console
@@ -160,19 +160,19 @@ def test_log():
 test_log()
 ```
 
-The above produces the following output:
+上面的程式碼會產生下圖結果：
 
 ![Log](https://github.com/willmcgugan/rich/raw/master/imgs/log.png)
 
-Note the `log_locals` argument, which outputs a table containing the local variables where the log method was called.
+注意到 `log_locals` 引數，可用來輸出一張表格，用來顯示 log 方法被呼叫時，區域變數的內容。
 
-The log method could be used for logging to the terminal for long running applications such as servers, but is also a very nice debugging aid.
+log 方法可用於伺服器上長時間運作的程式，也很適合一般程式偵錯用途。
 
 </details>
 <details>
 <summary>Logging Handler</summary>
 
-You can also use the builtin [Handler class](https://rich.readthedocs.io/en/latest/logging.html) to format and colorize output from Python's logging module. Here's an example of the output:
+您也可以使用內建的 [Handler 類別](https://rich.readthedocs.io/en/latest/logging.html) 來將 Python logging 模組的輸出內容格式化並賦予色彩：
 
 ![Logging](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
 
@@ -181,27 +181,27 @@ You can also use the builtin [Handler class](https://rich.readthedocs.io/en/late
 <details>
 <summary>Emoji</summary>
 
-To insert an emoji in to console output place the name between two colons. Here's an example:
+以一對冒號包住表情符號的名稱，來透過 console 插入 Emoji。參考範例：
 
 ```python
 >>> console.print(":smiley: :vampire: :pile_of_poo: :thumbs_up: :raccoon:")
 😃 🧛 💩 👍 🦝
 ```
 
-Please use this feature wisely.
+請謹慎使用此功能。
 
 </details>
 
 <details>
-<summary>Tables</summary>
+<summary>表格</summary>
 
-Rich can render flexible [tables](https://rich.readthedocs.io/en/latest/tables.html) with unicode box characters. There is a large variety of formatting options for borders, styles, cell alignment etc.
+Rich 可以用 unicode box 字元繪製彈性的 [表格](https://rich.readthedocs.io/en/latest/tables.html)。格式設定十分多元，包含框線、樣式、儲存格對齊……。 
 
 ![table movie](https://github.com/willmcgugan/rich/raw/master/imgs/table_movie.gif)
 
-The animation above was generated with [table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py) in the examples directory.
+上圖的動畫效果是以 [table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py) 產生的，該檔案位於 examples 資料夾。
 
-Here's a simpler table example:
+參考這個簡單的表格範例：
 
 ```python
 from rich.console import Console
@@ -233,24 +233,24 @@ table.add_row(
 console.print(table)
 ```
 
-This produces the following output:
+執行結果如圖：
 
 ![table](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
 
-Note that console markup is rendered in the same way as `print()` and `log()`. In fact, anything that is renderable by Rich may be included in the headers / rows (even other tables).
+請留意，主控台標記的呈現方式與 `print()`、`log()` 相同。事實上，由 Rich 繪製的任何東西都可以被放在任何標題、列，甚至其他表格裡。
 
-The `Table` class is smart enough to resize columns to fit the available width of the terminal, wrapping text as required. Here's the same example, with the terminal made smaller than the table above:
+`Table` 類別很聰明，能夠自動調整欄寬來配合終端機的大小，也會在需要時自動將文字換行。此範例的程式碼與上一個相同，然而終端機變小了一點：
 
 ![table2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
 
 </details>
 
 <details>
-<summary>Progress Bars</summary>
+<summary>進度條</summary>
 
-Rich can render multiple flicker-free [progress](https://rich.readthedocs.io/en/latest/progress.html) bars to track long-running tasks.
+Rich 可繪製多個不閃爍的 [進度條](https://rich.readthedocs.io/en/latest/progress.html)，以追蹤需時較久的工作。
 
-For basic usage, wrap any sequence in the `track` function and iterate over the result. Here's an example:
+基本的使用方式，是將序列放在 `track` 函式中，再對其結果疊代。參考此範例：
 
 ```python
 from rich.progress import track
@@ -259,22 +259,22 @@ for step in track(range(100)):
     do_step(step)
 ```
 
-It's not much harder to add multiple progress bars. Here's an example taken from the docs:
+新增多個進度條也不是難事，來看看說明文件中的範例：
 
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
 
-The columns may be configured to show any details you want. Built-in columns include percentage complete, file size, file speed, and time remaining. Here's another example showing a download in progress:
+您可以調整要顯示的狀態欄位。內建的欄位包含完成百分比、檔案大小、讀寫速度及剩餘時間。來看看另一個用來顯示下載進度的範例：
 
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/downloader.gif)
 
-To try this out yourself, see [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) which can download multiple URLs simultaneously while displaying progress.
+想嘗試看看嗎？您可以在 [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) 取得此範例程式。此程式可以在下載多個檔案時顯示各自的進度。
 
 </details>
 
 <details>
-<summary>Status</summary>
+<summary>狀態</summary>
 
-For situations where it is hard to calculate progress, you can use the [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) method which will display a 'spinner' animation and message. The animation won't prevent you from using the console as normal. Here's an example:
+有些狀況下很難估計進度，就可以使用 [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) 方法，此方法會顯示「spinner」動畫及訊息。該動畫播放時，仍可正常操作主控台。參考此範例：
 
 ```python
 from time import sleep
@@ -290,45 +290,45 @@ with console.status("[bold green]Working on tasks...") as status:
         console.log(f"{task} complete")
 ```
 
-This generates the following output in the terminal.
+終端機的顯示效果如下：
 
 ![status](https://github.com/willmcgugan/rich/raw/master/imgs/status.gif)
 
-The spinner animations were borrowed from [cli-spinners](https://www.npmjs.com/package/cli-spinners). You can select a spinner by specifying the `spinner` parameter. Run the following command to see the available values:
+該 spinner 動畫乃借用自 [cli-spinners](https://www.npmjs.com/package/cli-spinners)。可以用 `spinner` 參數指定 spinner 樣式。執行此命令以顯示可用的值：
 
 ```
 python -m rich.spinner
 ```
 
-The above command generates the following output in the terminal:
+此命令在終端機的輸出結果如下圖：
 
 ![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
 
 </details>
 
 <details>
-<summary>Tree</summary>
+<summary>樹</summary>
 
-Rich can render a [tree](https://rich.readthedocs.io/en/latest/tree.html) with guide lines. A tree is ideal for displaying a file structure, or any other hierarchical data.
+Rich 可以用導引線繪製一棵 [樹](https://rich.readthedocs.io/en/latest/tree.html)。樹很適合用來顯示檔案結構，或其他繼承性的資料。
 
-The labels of the tree can be simple text or anything else Rich can render. Run the following for a demonstration:
+可以用文字或其他 Rich 能繪製的元素作為樹的標籤。執行下列程式碼來看看效果：
 
 ```
 python -m rich.tree
 ```
 
-This generates the following output:
+這會產生下圖的結果：
 
 ![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
 
-See the [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) example for a script that displays a tree view of any directory, similar to the linux `tree` command.
+您可以參考 [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) 範例程式，此程式可以樹狀圖展示目錄結構，如同 Linux 的 `tree` 命令。
 
 </details>
 
 <details>
-<summary>Columns</summary>
+<summary>資料欄</summary>
 
-Rich can render content in neat [columns](https://rich.readthedocs.io/en/latest/columns.html) with equal or optimal width. Here's a very basic clone of the (MacOS / Linux) `ls` command which displays a directory listing in columns:
+Rich 可以將內容呈現於整齊的 [資料欄](https://rich.readthedocs.io/en/latest/columns.html) 中，其欄寬可為等寬或最適寬度。此範例仿作了 macOS / Linux 系統中 `ls` 命令的基本功能，可以用資料欄列出目錄：
 
 ```python
 import os
@@ -341,7 +341,7 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-The following screenshot is the output from the [columns example](https://github.com/willmcgugan/rich/blob/master/examples/columns.py) which displays data pulled from an API in columns:
+此螢幕截圖為 [資料欄範例](https://github.com/willmcgugan/rich/blob/master/examples/columns.py) 的輸出結果。此程式從某 API 取得資料，並以資料欄呈現：
 
 ![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
 
@@ -350,9 +350,9 @@ The following screenshot is the output from the [columns example](https://github
 <details>
 <summary>Markdown</summary>
 
-Rich can render [markdown](https://rich.readthedocs.io/en/latest/markdown.html) and does a reasonable job of translating the formatting to the terminal.
+Rich 可以繪製 [Markdown](https://rich.readthedocs.io/en/latest/markdown.html) 並處理了將其轉換為終端機格式的大量工作。
 
-To render markdown import the `Markdown` class and construct it with a string containing markdown code. Then print it to the console. Here's an example:
+先匯入 `Markdown` 類別，再以內容為 Markdown 語言的字串建構一個物件，接著將其印到 console。參考此範例：
 
 ```python
 from rich.console import Console
@@ -364,16 +364,16 @@ with open("README.md") as readme:
 console.print(markdown)
 ```
 
-This will produce output something like the following:
+執行結果如下圖：
 
 ![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
 
 </details>
 
 <details>
-<summary>Syntax Highlighting</summary>
+<summary>語法突顯</summary>
 
-Rich uses the [pygments](https://pygments.org/) library to implement [syntax highlighting](https://rich.readthedocs.io/en/latest/syntax.html). Usage is similar to rendering markdown; construct a `Syntax` object and print it to the console. Here's an example:
+Rich 使用了 [pygments](https://pygments.org/) 函式庫來實作 [語法突顯](https://rich.readthedocs.io/en/latest/syntax.html) 功能。使用方式與繪製 Markdown 相似，先建構 `Syntax` 物件並將其印到 console。參考此範例：
 
 ```python
 from rich.console import Console
@@ -399,34 +399,34 @@ console = Console()
 console.print(syntax)
 ```
 
-This will produce the following output:
+執行結果如下圖：
 
 ![syntax](https://github.com/willmcgugan/rich/raw/master/imgs/syntax.png)
 
 </details>
 
 <details>
-<summary>Tracebacks</summary>
+<summary>Tracebacks（追溯）</summary>
 
-Rich can render [beautiful tracebacks](https://rich.readthedocs.io/en/latest/traceback.html) which are easier to read and show more code than standard Python tracebacks. You can set Rich as the default traceback handler so all uncaught exceptions will be rendered by Rich.
+Rich 可以繪製 [漂亮的 tracebacks](https://rich.readthedocs.io/en/latest/traceback.html)，相較標準的 Python traceback 顯示了更多程式碼且更好懂。您可以將 Rich 設為預設的 traceback handler（處理常式），如此一來所有未接住的例外都由 Rich 呈現。
 
-Here's what it looks like on OSX (similar on Linux):
+它在 macOS 上執行的效果如圖（Linux 上差異不大）：
 
 ![traceback](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
 
 </details>
 
-All Rich renderables make use of the [Console Protocol](https://rich.readthedocs.io/en/latest/protocol.html), which you can also use to implement your own Rich content.
+所有可由 Rich 繪製的物件都用到了 [Console 協定](https://rich.readthedocs.io/en/latest/protocol.html)，您也可以依此實作自訂的 Rich 內容。
 
-# Rich for enterprise
+# Rich 企業版
 
-Available as part of the Tidelift Subscription.
+可在 Tidelift 訂閱方案取得。
 
-The maintainers of Rich and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source packages you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact packages you use. [Learn more.](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
+Rich 及其他數以千計的套件維護者正與 Tidelift 合作，以提供開放原始碼套件的商業性支援。此計畫能協助您節省時間、避開風險，同時也讓套件的維護者獲得報酬。[了解更多。](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
 
-# Projects using Rich
+# 使用 Rich 的專案
 
-Here are a few projects using Rich:
+以下列出幾個使用 Rich 的專案：
 
 - [BrancoLab/BrainRender](https://github.com/BrancoLab/BrainRender)
   a python package for the visualization of three dimensional neuro-anatomical data
