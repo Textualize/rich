@@ -128,7 +128,7 @@ Rich 提供了 [inspect](https://rich.readthedocs.io/en/latest/reference/init.ht
 
 # Rich 函式庫
 
-Rich contains a number of builtin _renderables_ you can use to create elegant output in your CLI and help you debug your code.
+Rich 包含了一系列可繪製的物件，您可以使用它們來印出精美的畫面，或者協助偵錯程式碼。
 
 按一下子標題以了解細節：
 
