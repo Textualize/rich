@@ -206,7 +206,9 @@ class Inspect(JupyterMixin):
                 add_row(warning, highlighter(repr(error)))
                 continue
 
-            if isinstance(value, dict):
+            if key == "__slots__":
+                value = self._recursive_unmangle({ item : getattr(obj, item) for item in value if item != "__dict__" })
+            elif isinstance(value, dict):
                 value = self._recursive_unmangle(value)
             elif isinstance(value, str):
                 pass
