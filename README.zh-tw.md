@@ -21,9 +21,9 @@
  • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
  • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
 
-Rich 是一款 Python 函式庫，提供終端機介面中 _豐富的_ 文字效果及精美的格式設定。
+Rich 是一款提供終端機介面中 _豐富的_ 文字效果及精美的格式設定的 Python 函式庫。
 
-[Rich API](https://rich.readthedocs.io/en/latest/) 讓終端機介面加上色彩及樣式變得易如反掌。Rich 也可以繪製漂亮的表格、進度條、Markdown、語法突顯的程式碼、Traceback（追溯）……。
+[Rich API](https://rich.readthedocs.io/en/latest/) 讓終端機介面加上色彩及樣式變得易如反掌。Rich 也可以繪製漂亮的表格、進度條、Markdown、語法醒目標示的程式碼、Traceback（追溯）……。
 
 ![Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
 
@@ -33,7 +33,7 @@ Rich 是一款 Python 函式庫，提供終端機介面中 _豐富的_ 文字效
 
 ## 相容性
 
-Rich 可在 Linux、macOS、Windows 上運作。在新的 Windows Terminal 中可支援顯示全彩及 Emoji，但傳統的終端機中僅支援 16 色。Rich 需要的 Python 最低版本為 3.6.1。
+Rich 可在 Linux、macOS、Windows 上運作。在新的 Windows Terminal 中可支援顯示全彩及 Emoji，但傳統的終端機中僅支援 16 色。Rich 最低需要的 Python 版本為 3.6.1。
 
 Rich 可在 [Jupyter notebooks](https://jupyter.org/) 上使用，無須額外設定。
 
@@ -65,7 +65,7 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ## Rich REPL
 
-Rich 可以安裝在 Python REPL 中，如此一來任何資料結構都能被漂亮的輸出及突顯標示。
+Rich 可以安裝在 Python REPL 中，如此一來就可以漂亮的輸出與突顯標示任何資料結構。
 
 ```python
 >>> from rich import pretty
@@ -135,7 +135,7 @@ Rich 包含了一系列可繪製的物件，您可以使用它們來印出精美
 <details>
 <summary>Log</summary>
 
-Console 物件提供了 `log()` 方法，使用方式與 `print()` 類似，但還多了一欄來顯示目前時間、進行呼叫的檔案及行號。預設情況下 Rich 會語法突顯標示 Python 的結構及 repr 字串。若使用於字典或串列這類集合性物件，Rich 會將其漂亮地印出來，以符合可用空間。此範例示範了這些功能。
+Console 物件提供了 `log()` 方法，使用方式與 `print()` 類似，但還多了一欄來顯示目前時間、進行呼叫的檔案及行號。預設情況下 Rich 會語法醒目標示 Python 的結構及 repr 字串。若使用於字典或串列這類集合性物件，Rich 會將其漂亮地印出來，以符合可用空間。此範例示範了這些功能。
 
 ```python
 from rich.console import Console
@@ -371,9 +371,9 @@ console.print(markdown)
 </details>
 
 <details>
-<summary>語法突顯</summary>
+<summary>語法醒目標示</summary>
 
-Rich 使用了 [pygments](https://pygments.org/) 函式庫來實作 [語法突顯](https://rich.readthedocs.io/en/latest/syntax.html) 功能。使用方式與繪製 Markdown 相似，先建構 `Syntax` 物件並將其印到 console。參考此範例：
+Rich 使用了 [pygments](https://pygments.org/) 函式庫來實作 [語法醒目標示](https://rich.readthedocs.io/en/latest/syntax.html) 功能。使用方式與繪製 Markdown 相似，先建構 `Syntax` 物件並將其印到 console。參考此範例：
 
 ```python
 from rich.console import Console
