@@ -1,17 +1,17 @@
 # coding=utf-8
 
+import os
 import sys
-import os, tempfile
+import tempfile
 
 import pytest
-from .render import render
+from pygments.lexers import PythonLexer
 
 from rich.panel import Panel
 from rich.style import Style
-from rich.syntax import Syntax, ANSISyntaxTheme, PygmentsSyntaxTheme, Color, Console
+from rich.syntax import ANSISyntaxTheme, Color, Console, PygmentsSyntaxTheme, Syntax
 
-from pygments.lexers import PythonLexer
-
+from .render import render
 
 CODE = '''\
 def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
@@ -264,6 +264,14 @@ def test_from_file_unknown_lexer():
         assert syntax.code == "import this\n"
     finally:
         os.remove(path)
+
+
+def test_syntax_guess_lexer():
+    assert Syntax.guess_lexer("banana.py") == "python"
+    assert Syntax.guess_lexer("banana.py", "import this") == "python"
+    assert Syntax.guess_lexer("banana.html", "<a href='#'>hello</a>") == "html"
+    assert Syntax.guess_lexer("banana.html", "<%= @foo %>") == "rhtml"
+    assert Syntax.guess_lexer("banana.html", "{{something|filter:3}}") == "html+django"
 
 
 if __name__ == "__main__":
