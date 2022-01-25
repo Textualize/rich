@@ -1,11 +1,11 @@
 import sys
 from typing import TYPE_CHECKING, Optional, Union
 
-from ._emoji_codes import EMOJI
-from ._emoji_replace import _emoji_replace
 from .jupyter import JupyterMixin
 from .segment import Segment
 from .style import Style
+from ._emoji_codes import EMOJI
+from ._emoji_replace import _emoji_replace
 
 if sys.version_info >= (3, 8):
     from typing import Literal
@@ -86,15 +86,11 @@ if __name__ == "__main__":  # pragma: no cover
 
     console = Console(record=True)
 
-    data = list(
-        f":{name}: {name}" for name, value in sorted(EMOJI.items()) if len(value) == 1
-    )
     columns = Columns(
-        data,
+        (f":{name}: {name}" for name in sorted(EMOJI.keys()) if "\u200D" not in name),
         column_first=True,
     )
 
     console.print(columns)
-    console.print(len(data))
     if len(sys.argv) > 1:
         console.save_html(sys.argv[1])

@@ -9,10 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Fix width measurement of 353 emoji variation sequences https://github.com/Textualize/rich/pull/1832
 - Workaround for edge case of object from Faiss with no `__class__` https://github.com/Textualize/rich/issues/1838
 
-## [11.0.0] - 2022-01-09
 
 ### Added
 
