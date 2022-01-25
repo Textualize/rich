@@ -1,9 +1,9 @@
 import os.path
 import platform
-from rich.containers import Lines
 import textwrap
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
+from os import PathLike
+from typing import Any, AnyStr, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
 
 from pygments.lexer import Lexer
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
@@ -22,6 +22,8 @@ from pygments.token import (
     Whitespace,
 )
 from pygments.util import ClassNotFound
+
+from rich.containers import Lines
 
 from ._loop import loop_first
 from .color import Color, blend_rgb
@@ -200,7 +202,8 @@ class Syntax(JupyterMixin):
         dedent (bool, optional): Enable stripping of initial whitespace. Defaults to False.
         line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
         start_line (int, optional): Starting number for line numbers. Defaults to 1.
-        line_range (Tuple[int, int], optional): If given should be a tuple of the start and end line to render.
+        line_range (Tuple[int | None, int | None], optional): If given should be a tuple of the start and end line to render.
+            A value of None in the tuple indicates the range is open in that direction.
         highlight_lines (Set[int]): A set of line numbers to highlight.
         code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
         tab_size (int, optional): Size of tabs. Defaults to 4.
@@ -233,7 +236,7 @@ class Syntax(JupyterMixin):
         dedent: bool = False,
         line_numbers: bool = False,
         start_line: int = 1,
-        line_range: Optional[Tuple[int, int]] = None,
+        line_range: Optional[Tuple[Optional[int], Optional[int]]] = None,
         highlight_lines: Optional[Set[int]] = None,
         code_width: Optional[int] = None,
         tab_size: int = 4,
@@ -299,22 +302,7 @@ class Syntax(JupyterMixin):
         with open(path, "rt", encoding=encoding) as code_file:
             code = code_file.read()
 
-        lexer = None
-        lexer_name = "default"
-        try:
-            _, ext = os.path.splitext(path)
-            if ext:
-                extension = ext.lstrip(".").lower()
-                lexer = get_lexer_by_name(extension)
-                lexer_name = lexer.name
-        except ClassNotFound:
-            pass
-
-        if lexer is None:
-            try:
-                lexer_name = guess_lexer_for_filename(path, code).name
-            except ClassNotFound:
-                pass
+        lexer_name = cls.guess_lexer(path, code=code)
 
         return cls(
             code,
@@ -331,6 +319,36 @@ class Syntax(JupyterMixin):
             background_color=background_color,
             indent_guides=indent_guides,
         )
+
+    @classmethod
+    def guess_lexer(cls, path: AnyStr, code: Optional[str] = None) -> str:
+        """Guess the name of the Pygments lexer to use based on path and optional string of code.
+        Initially looks at file extension and falls back to analysing the code, if supplied.
+
+        Args:
+             path (AnyStr): The path to the file containing the code you wish to know the lexer for.
+             code (str, optional): Optional string of code that will be used as a fallback if no lexer
+                is found for the supplied path.
+
+        Returns:
+            str: The name of the Pygments lexer that best matches the supplied path/code.
+        """
+        lexer = None
+        lexer_name = "default"
+        try:
+            _, ext = os.path.splitext(path)
+            if ext:
+                extension = ext.lstrip(".").lower()
+                lexer = get_lexer_by_name(extension)
+                lexer_name = lexer.name
+        except ClassNotFound:
+            pass
+        if code and lexer is None:
+            try:
+                lexer_name = guess_lexer_for_filename(path, code).name
+            except ClassNotFound:
+                pass
+        return lexer_name
 
     def _get_base_style(self) -> Style:
         """Get the base style."""
