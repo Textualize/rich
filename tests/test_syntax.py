@@ -267,6 +267,7 @@ def test_from_file_unknown_lexer():
 
 
 def test_syntax_guess_lexer():
+    assert Syntax.guess_lexer("banana.py") == "python"
     assert Syntax.guess_lexer("banana.py", "import this") == "python"
     assert Syntax.guess_lexer("banana.html", "<a href='#'>hello</a>") == "html"
     assert Syntax.guess_lexer("banana.html", "<%= @foo %>") == "rhtml"
