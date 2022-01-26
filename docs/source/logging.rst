@@ -65,7 +65,7 @@ Here's how you would exclude `click <https://click.palletsprojects.com/en/8.0.x/
         level="NOTSET",
         format="%(message)s",
         datefmt="[%X]",
-        handlers=[RichHandler(rich_tracebacks=True, tracebacks_suppress)]
+        handlers=[RichHandler(rich_tracebacks=True, tracebacks_suppress=[click])]
     )
 
 Suppressed frames will show the line and file only, without any code.
