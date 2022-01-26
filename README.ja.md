@@ -7,7 +7,7 @@
 ![Logo](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
 
 [English readme](https://github.com/willmcgugan/rich/blob/master/README.md)
- • [简体中文 readme](https://github.com/willmcgugan/rich/blob/master/README.zh-cn.md)
+ • [简体中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md)
  • [正體中文 readme](https://github.com/willmcgugan/rich/blob/master/README.zh-tw.md)
  • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md)
  • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md)

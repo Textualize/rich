@@ -29,7 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **breaking** Deprecated rich.console.RenderGroup, now named rich.console.Group
 - **breaking** `Syntax.__init__` parameter `lexer_name` renamed to `lexer`
 - Syntax constructor accepts both str and now a pygments lexer https://github.com/Textualize/rich/pull/1748
-- Rename the file name of Simplified Chinese readme to `README.zh-cn.md` (original `README.cn.md`) to reflect the variants of Chinese.
 
 ## [10.16.2] - 2021-01-02
 
