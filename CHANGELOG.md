@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `Syntax.guess_lexer`, add support for more lexers (e.g. Django templates etc.) https://github.com/Textualize/rich/pull/1869
 - Add `lexer` parameter to `Syntax.from_path` to allow for overrides https://github.com/Textualize/rich/pull/1873
 - Ensure `Syntax` always justifies left https://github.com/Textualize/rich/pull/1872
-
+- Handle classes in inspect when methods=True https://github.com/Textualize/rich/pull/1874
 
 ### Added
 
