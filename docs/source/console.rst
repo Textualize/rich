@@ -140,7 +140,7 @@ Run the following command to see the available choices for ``spinner``::
 Justify / Alignment
 -------------------
 
-Both print and log support a ``justify`` argument which if set must be one of "default", "left", "right", "center", or "full".  If "left", any text printed (or logged) will be left aligned, if "right" text will be aligned to the right of the terminal, if "center" the text will be centered, and if "full" the text will be lined up with both the left and right edges of the terminal (like printed text in a book). 
+Both print and log support a ``justify`` argument which if set must be one of "default", "left", "right", "center", or "full".  If "left", any text printed (or logged) will be left aligned, if "right" text will be aligned to the right of the terminal, if "center" the text will be centered, and if "full" the text will be lined up with both the left and right edges of the terminal (like printed text in a book).
 
 The default for ``justify`` is ``"default"`` which will generally look the same as ``"left"`` but with a subtle difference. Left justify will pad the right of the text with spaces, while a default justify will not. You will only notice the difference if you set a background color with the ``style`` argument. The following example demonstrates the difference::
 
@@ -161,7 +161,7 @@ This produces the following output:
 
     <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #c0c0c0; background-color: #000080; font-weight: bold">Rich
     Rich               &nbsp;
-            Rich       &nbsp; 
+            Rich       &nbsp;
                     Rich
     </span></pre>
 
@@ -282,7 +282,7 @@ You can also tell the Console object to write to a file by setting the ``file`` 
     with open("report.txt", "wt") as report_file:
         console = Console(file=report_file)
         console.rule(f"Report Generated {datetime.now().ctime()}")
-        
+
 Note that when writing to a file you may want to explicitly the ``width`` argument if you don't want to wrap the output to the current console width.
 
 Capturing output
@@ -321,7 +321,7 @@ You can page output from a Console by calling :meth:`~rich.console.Console.pager
 Since the default pager on most platforms don't support color, Rich will strip color from the output. If you know that your pager supports color, you can set ``styles=True`` when calling the :meth:`~rich.console.Console.pager` method.
 
 .. note::
-    Rich will use the ``PAGER`` environment variable to get the pager command. On Linux and macOS you can set this to ``less -r`` to enable paging with ANSI styles.
+    Rich will look at ``MANPAGER`` then the ``PAGER`` environment variables (``MANPAGER`` takes priority) to get the pager command. On Linux and macOS you can set one of these to ``less -r`` to enable paging with ANSI styles.
 
 Alternate screen
 ----------------
@@ -340,10 +340,10 @@ Here's an example of an alternate screen::
     with console.screen():
         console.print(locals())
         sleep(5)
-        
+
 The above code will display a pretty printed dictionary on the alternate screen before returning to the command prompt after 5 seconds.
 
-You can also provide a renderable to :meth:`~rich.console.Console.screen` which will be displayed in the alternate screen when you call :meth:`~rich.ScreenContext.update`. 
+You can also provide a renderable to :meth:`~rich.console.Console.screen` which will be displayed in the alternate screen when you call :meth:`~rich.ScreenContext.update`.
 
 Here's an example::
 
