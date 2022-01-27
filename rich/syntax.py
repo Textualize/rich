@@ -2,8 +2,7 @@ import os.path
 import platform
 import textwrap
 from abc import ABC, abstractmethod
-from os import PathLike
-from typing import Any, AnyStr, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
 
 from pygments.lexer import Lexer
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
@@ -580,7 +579,7 @@ class Syntax(JupyterMixin):
             else:
                 syntax_lines = console.render_lines(
                     text,
-                    options.update(width=code_width, height=None),
+                    options.update(width=code_width, height=None, justify="left"),
                     style=self.background_style,
                     pad=True,
                     new_lines=True,
@@ -625,7 +624,7 @@ class Syntax(JupyterMixin):
             if self.word_wrap:
                 wrapped_lines = console.render_lines(
                     line,
-                    render_options.update(height=None),
+                    render_options.update(height=None, justify="left"),
                     style=background_style,
                     pad=not transparent_background,
                 )
