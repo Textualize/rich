@@ -267,6 +267,7 @@ class Syntax(JupyterMixin):
         cls,
         path: str,
         encoding: str = "utf-8",
+        lexer: Optional[Union[Lexer, str]] = None,
         theme: Union[str, SyntaxTheme] = DEFAULT_THEME,
         dedent: bool = False,
         line_numbers: bool = False,
@@ -283,6 +284,7 @@ class Syntax(JupyterMixin):
 
         Args:
             path (str): Path to file to highlight.
+            lexer (str | Lexer, optional): Lexer to use. If None, lexer will be auto-detected from path/file content.
             encoding (str): Encoding of file.
             theme (str, optional): Color theme, aka Pygments style (see https://pygments.org/docs/styles/#getting-a-list-of-available-styles). Defaults to "emacs".
             dedent (bool, optional): Enable stripping of initial whitespace. Defaults to True.
@@ -302,11 +304,12 @@ class Syntax(JupyterMixin):
         with open(path, "rt", encoding=encoding) as code_file:
             code = code_file.read()
 
-        lexer_name = cls.guess_lexer(path, code=code)
+        if not lexer:
+            lexer = cls.guess_lexer(path, code=code)
 
         return cls(
             code,
-            lexer_name,
+            lexer,
             theme=theme,
             dedent=dedent,
             line_numbers=line_numbers,
@@ -757,6 +760,7 @@ if __name__ == "__main__":  # pragma: no cover
     else:
         syntax = Syntax.from_path(
             args.path,
+            lexer=args.lexer_name,
             line_numbers=args.line_numbers,
             word_wrap=args.word_wrap,
             theme=args.theme,
