@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Workaround for edge case of object from Faiss with no `__class__` https://github.com/Textualize/rich/issues/1838
 - Add Traditional Chinese readme
 - Add `Syntax.guess_lexer`, add support for more lexers (e.g. Django templates etc.) https://github.com/Textualize/rich/pull/1869
+- Ensure `Syntax` always justifies left https://github.com/Textualize/rich/pull/1872
 
 
 ### Added
