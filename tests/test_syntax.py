@@ -241,8 +241,13 @@ def test_ansi_theme():
     assert theme.get_background_style() == Style()
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="permissions error on Windows")
-def test_from_file():
+skip_windows_permission_error = pytest.mark.skipif(
+    sys.platform == "win32", reason="permissions error on Windows"
+)
+
+
+@skip_windows_permission_error
+def test_from_path():
     fh, path = tempfile.mkstemp("example.py")
     try:
         os.write(fh, b"import this\n")
@@ -254,12 +259,36 @@ def test_from_file():
         os.remove(path)
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="permissions error on Windows")
-def test_from_file_unknown_lexer():
+@skip_windows_permission_error
+def test_from_path_unknown_lexer():
     fh, path = tempfile.mkstemp("example.nosuchtype")
     try:
         os.write(fh, b"import this\n")
         syntax = Syntax.from_path(path)
+        assert syntax.lexer is None
+        assert syntax.code == "import this\n"
+    finally:
+        os.remove(path)
+
+
+@skip_windows_permission_error
+def test_from_path_lexer_override():
+    fh, path = tempfile.mkstemp("example.nosuchtype")
+    try:
+        os.write(fh, b"import this\n")
+        syntax = Syntax.from_path(path, lexer="rust")
+        assert syntax.lexer.name is "Rust"
+        assert syntax.code == "import this\n"
+    finally:
+        os.remove(path)
+
+
+@skip_windows_permission_error
+def test_from_path_lexer_override_invalid_lexer():
+    fh, path = tempfile.mkstemp("example.nosuchtype")
+    try:
+        os.write(fh, b"import this\n")
+        syntax = Syntax.from_path(path, lexer="blah")
         assert syntax.lexer is None
         assert syntax.code == "import this\n"
     finally:
