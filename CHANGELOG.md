@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure `Syntax` always justifies left https://github.com/Textualize/rich/pull/1872
 - Handle classes in inspect when methods=True https://github.com/Textualize/rich/pull/1874
 
-[11.0.0] - 2022-01-09
+## [11.0.0] - 2022-01-09
 
 ### Added
 
@@ -1616,6 +1616,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[11.1.0]: https://github.com/willmcgugan/rich/compare/v11.0.0...v11.1.0
 [11.0.0]: https://github.com/willmcgugan/rich/compare/v10.16.1...v11.0.0
 [10.16.1]: https://github.com/willmcgugan/rich/compare/v10.16.0...v10.16.1
 [10.16.0]: https://github.com/willmcgugan/rich/compare/v10.15.2...v10.16.0
