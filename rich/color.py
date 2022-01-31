@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, NamedTuple, Optional, Tuple
 
 from ._palettes import EIGHT_BIT_PALETTE, STANDARD_PALETTE, WINDOWS_PALETTE
 from .color_triplet import ColorTriplet
-from .repr import rich_repr, Result
+from .repr import Result, rich_repr
 from .terminal_theme import DEFAULT_TERMINAL_THEME
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -61,6 +61,7 @@ ANSI_COLOR_NAMES = {
     "bright_cyan": 14,
     "bright_white": 15,
     "grey0": 16,
+    "gray0": 16,
     "navy_blue": 17,
     "dark_blue": 18,
     "blue3": 20,
@@ -96,6 +97,7 @@ ANSI_COLOR_NAMES = {
     "blue_violet": 57,
     "orange4": 94,
     "grey37": 59,
+    "gray37": 59,
     "medium_purple4": 60,
     "slate_blue3": 62,
     "royal_blue1": 63,
@@ -128,7 +130,9 @@ ANSI_COLOR_NAMES = {
     "yellow4": 106,
     "wheat4": 101,
     "grey53": 102,
+    "gray53": 102,
     "light_slate_grey": 103,
+    "light_slate_gray": 103,
     "medium_purple": 104,
     "light_slate_blue": 105,
     "dark_olive_green3": 149,
@@ -155,11 +159,13 @@ ANSI_COLOR_NAMES = {
     "light_salmon3": 173,
     "rosy_brown": 138,
     "grey63": 139,
+    "gray63": 139,
     "medium_purple1": 141,
     "gold3": 178,
     "dark_khaki": 143,
     "navajo_white3": 144,
     "grey69": 145,
+    "gray69": 145,
     "light_steel_blue3": 146,
     "light_steel_blue": 147,
     "yellow3": 184,
@@ -189,6 +195,7 @@ ANSI_COLOR_NAMES = {
     "light_goldenrod2": 222,
     "light_yellow3": 187,
     "grey84": 188,
+    "gray84": 188,
     "light_steel_blue1": 189,
     "yellow2": 190,
     "dark_olive_green1": 192,
@@ -223,30 +230,55 @@ ANSI_COLOR_NAMES = {
     "wheat1": 229,
     "cornsilk1": 230,
     "grey100": 231,
+    "gray100": 231,
     "grey3": 232,
+    "gray3": 232,
     "grey7": 233,
+    "gray7": 233,
     "grey11": 234,
+    "gray11": 234,
     "grey15": 235,
+    "gray15": 235,
     "grey19": 236,
+    "gray19": 236,
     "grey23": 237,
+    "gray23": 237,
     "grey27": 238,
+    "gray27": 238,
     "grey30": 239,
+    "gray30": 239,
     "grey35": 240,
+    "gray35": 240,
     "grey39": 241,
+    "gray39": 241,
     "grey42": 242,
+    "gray42": 242,
     "grey46": 243,
+    "gray46": 243,
     "grey50": 244,
+    "gray50": 244,
     "grey54": 245,
+    "gray54": 245,
     "grey58": 246,
+    "gray58": 246,
     "grey62": 247,
+    "gray62": 247,
     "grey66": 248,
+    "gray66": 248,
     "grey70": 249,
+    "gray70": 249,
     "grey74": 250,
+    "gray74": 250,
     "grey78": 251,
+    "gray78": 251,
     "grey82": 252,
+    "gray82": 252,
     "grey85": 253,
+    "gray85": 253,
     "grey89": 254,
+    "gray89": 254,
     "grey93": 255,
+    "gray93": 255,
 }
 
 
@@ -279,8 +311,8 @@ class Color(NamedTuple):
 
     def __rich__(self) -> "Text":
         """Dispays the actual color if Rich printed."""
-        from .text import Text
         from .style import Style
+        from .text import Text
 
         return Text.assemble(
             f"<color {self.name!r} ({self.type.name.lower()})",
@@ -569,6 +601,8 @@ if __name__ == "__main__":  # pragma: no cover
 
     colors = sorted((v, k) for k, v in ANSI_COLOR_NAMES.items())
     for color_number, name in colors:
+        if "grey" in name:
+            continue
         color_cell = Text(" " * 10, style=f"on {name}")
         if color_number < 16:
             table.add_row(color_cell, f"{color_number}", Text(f'"{name}"'))
