@@ -348,7 +348,7 @@ def test_using_default_columns() -> None:
 
     progress = Progress(
         SpinnerColumn(),
-        *Progress.default_columns(),
+        *Progress.get_default_columns(),
         "Elapsed:",
         TimeElapsedColumn(),
     )
