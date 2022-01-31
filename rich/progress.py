@@ -588,12 +588,7 @@ class Progress(JupyterMixin):
             refresh_per_second is None or refresh_per_second > 0
         ), "refresh_per_second must be > 0"
         self._lock = RLock()
-        self.columns = columns or (
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-            TimeRemainingColumn(),
-        )
+        self.columns = columns or self.default_columns()
         self.speed_estimate_period = speed_estimate_period
 
         self.disable = disable
@@ -612,6 +607,15 @@ class Progress(JupyterMixin):
         self.get_time = get_time or self.console.get_time
         self.print = self.console.print
         self.log = self.console.log
+
+    @classmethod
+    def default_columns(cls) -> Tuple[ProgressColumn, ...]:
+        return (
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            TimeRemainingColumn(),
+        )
 
     @property
     def console(self) -> Console:
@@ -1015,10 +1019,7 @@ if __name__ == "__main__":  # pragma: no coverage
 
     with Progress(
         SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-        TimeRemainingColumn(),
+        *Progress.default_columns(),
         TimeElapsedColumn(),
         console=console,
         transient=True,
