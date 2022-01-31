@@ -21,7 +21,6 @@ repos:
     rev: v1.9.0
     hooks:
       - id: python-check-mock-methods
-      - id: python-no-eval
       - id: python-no-log-warn
       - id: python-use-type-annotations
       - id: rst-directive-colons
