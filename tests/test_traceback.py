@@ -111,7 +111,7 @@ def test_syntax_error():
     try:
         # raises SyntaxError: unexpected EOF while parsing
         eval("(2+2")
-    except Exception:
+    except SyntaxError:
         console.print_exception()
     exception_text = console.file.getvalue()
     assert "SyntaxError" in exception_text
