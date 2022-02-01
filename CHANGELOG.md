@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for US spelling of "gray" in ANSI color names https://github.com/Textualize/rich/issues/1890
 
+### Fixed
+
+- Fixed `test_syntax.py::test_from_path_lexer_override` test failure on PyPy3 https://github.com/Textualize/rich/pull/1904
+
 ## [11.1.0] - 2022-01-28
 
 ### Added

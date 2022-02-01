@@ -277,7 +277,7 @@ def test_from_path_lexer_override():
     try:
         os.write(fh, b"import this\n")
         syntax = Syntax.from_path(path, lexer="rust")
-        assert syntax.lexer.name is "Rust"
+        assert syntax.lexer.name == "Rust"
         assert syntax.code == "import this\n"
     finally:
         os.remove(path)
