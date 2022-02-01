@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed `test_syntax.py::test_from_path_lexer_override` test failure on PyPy3 https://github.com/Textualize/rich/pull/1904
+- Fixed test failures on PyPy3 https://github.com/Textualize/rich/pull/1904
 
 ## [11.1.0] - 2022-01-28
 
