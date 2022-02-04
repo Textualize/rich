@@ -36,6 +36,7 @@ from ._loop import loop_last
 from ._pick import pick_bool
 from .abc import RichRenderable
 from .cells import cell_len
+from .console import Console
 from .highlighter import ReprHighlighter
 from .jupyter import JupyterMixin, JupyterRenderable
 from .measure import Measurement
@@ -119,12 +120,17 @@ def _ipy_display_hook(
                     repr_result = method()
                 except Exception:
                     continue  # If the method raises, treat it as if it doesn't exist, try any others
-                if repr_result is not None:
-                    return  # Delegate rendering to IPython
+                else:
+                    # Delegated rendering to IPython, so no further action needed.
+                    return
 
     # certain renderables should start on a new line
     if _safe_isinstance(value, ConsoleRenderable):
         console.line()
+
+    if console.is_terminal:
+        # Force render as colored text, rather than html.
+        console = Console(force_terminal=True, force_jupyter=False)
 
     console.print(
         value
