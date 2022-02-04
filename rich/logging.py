@@ -77,7 +77,7 @@ class RichHandler(Handler):
         locals_max_length: int = 10,
         locals_max_string: int = 80,
         log_time_format: Union[str, FormatTimeCallable] = "[%x %X]",
-        keywords: Optional[List[str]] = None
+        keywords: Optional[List[str]] = None,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
