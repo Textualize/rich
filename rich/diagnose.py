@@ -7,7 +7,7 @@ from rich.panel import Panel
 from rich.text import Text
 
 
-def report():  # pragma: no cover
+def report() -> None:  # pragma: no cover
     """Print a report to the terminal with debugging information"""
     console = Console()
     inspect(console)
