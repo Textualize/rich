@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add support for US spelling of "gray" in ANSI color names https://github.com/Textualize/rich/issues/1890
+- Added `rich.diagnose.report` to expose environment debugging logic as function https://github.com/Textualize/rich/pull/1917
 
 ## [11.1.0] - 2022-01-28
 
