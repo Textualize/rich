@@ -41,6 +41,7 @@ class RichHandler(Handler):
             Defaults to 10.
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
         log_time_format (Union[str, TimeFormatterCallable], optional): If ``log_time`` is enabled, either string for strftime or callable that formats the time. Defaults to "[%x %X] ".
+        keywords (List[str], optional): List of words to highlight instead of ``RichHandler.KEYWORDS``.
     """
 
     KEYWORDS: ClassVar[Optional[List[str]]] = [
@@ -76,6 +77,7 @@ class RichHandler(Handler):
         locals_max_length: int = 10,
         locals_max_string: int = 80,
         log_time_format: Union[str, FormatTimeCallable] = "[%x %X]",
+        keywords: Optional[List[str]] = None
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
@@ -98,6 +100,7 @@ class RichHandler(Handler):
         self.tracebacks_show_locals = tracebacks_show_locals
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
+        self.keywords = keywords
 
     def get_level_text(self, record: LogRecord) -> Text:
         """Get the level name from the record.
@@ -171,7 +174,9 @@ class RichHandler(Handler):
         if highlighter:
             message_text = highlighter(message_text)
 
-        if self.KEYWORDS:
+        if self.keywords:
+            message_text.highlight_words(self.keywords, "logging.keyword")
+        elif self.KEYWORDS:
             message_text.highlight_words(self.KEYWORDS, "logging.keyword")
         return message_text
 
