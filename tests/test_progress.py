@@ -334,6 +334,32 @@ def test_columns() -> None:
     assert result == expected
 
 
+def test_using_default_columns() -> None:
+    # can only check types, as the instances do not '==' each other
+    expected_default_types = [
+        TextColumn,
+        BarColumn,
+        TextColumn,
+        TimeRemainingColumn,
+    ]
+
+    progress = Progress()
+    assert [type(c) for c in progress.columns] == expected_default_types
+
+    progress = Progress(
+        SpinnerColumn(),
+        *Progress.get_default_columns(),
+        "Elapsed:",
+        TimeElapsedColumn(),
+    )
+    assert [type(c) for c in progress.columns] == [
+        SpinnerColumn,
+        *expected_default_types,
+        str,
+        TimeElapsedColumn,
+    ]
+
+
 def test_task_create() -> None:
     task = Task(TaskID(1), "foo", 100, 0, _get_time=lambda: 1)
     assert task.elapsed is None
