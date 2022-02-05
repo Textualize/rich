@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add support for US spelling of "gray" in ANSI color names https://github.com/Textualize/rich/issues/1890
-
+- Add support for enum.Flag in ReprHighlighter
 ## [11.1.0] - 2022-01-28
 
 ### Added
