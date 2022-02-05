@@ -36,7 +36,6 @@ from ._loop import loop_last
 from ._pick import pick_bool
 from .abc import RichRenderable
 from .cells import cell_len
-from .console import Console
 from .highlighter import ReprHighlighter
 from .jupyter import JupyterMixin, JupyterRenderable
 from .measure import Measurement
@@ -90,7 +89,10 @@ def _ipy_display_hook(
     max_string: Optional[int] = None,
     expand_all: bool = False,
 ) -> None:
-    from .console import ConsoleRenderable  # needed here to prevent circular import
+    from .console import (  # needed here to prevent circular import
+        Console,
+        ConsoleRenderable,
+    )
 
     # always skip rich generated jupyter renderables or None values
     if _safe_isinstance(value, JupyterRenderable) or value is None:
