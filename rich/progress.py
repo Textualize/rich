@@ -475,7 +475,7 @@ class Task:
     """Optional[float]: The last speed for a finished task."""
 
     _progress: Deque[ProgressSample] = field(
-        default_factory=deque, init=False, repr=False
+        default_factory=lambda: deque(maxlen=1000), init=False, repr=False
     )
 
     _lock: RLock = field(repr=False, default_factory=RLock)
@@ -812,8 +812,6 @@ class Progress(JupyterMixin):
 
             popleft = _progress.popleft
             while _progress and _progress[0].timestamp < old_sample_time:
-                popleft()
-            while len(_progress) > 1000:
                 popleft()
             if update_completed > 0:
                 _progress.append(ProgressSample(current_time, update_completed))
