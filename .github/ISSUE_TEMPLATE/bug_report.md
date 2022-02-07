@@ -25,7 +25,7 @@ I may ask you to copy and paste the output of the following commands. It may sav
 If you're using Rich in a terminal:
 
 ```
-python -c "from rich.diagnose import report; report()"
+python -m rich.diagnose
 pip freeze | grep rich
 ```
 
