@@ -475,7 +475,7 @@ class Task:
     """Optional[float]: The last speed for a finished task."""
 
     _progress: Deque[ProgressSample] = field(
-        default_factory=deque, init=False, repr=False
+        default_factory=lambda: deque(maxlen=1000), init=False, repr=False
     )
 
     _lock: RLock = field(repr=False, default_factory=RLock)
@@ -588,12 +588,7 @@ class Progress(JupyterMixin):
             refresh_per_second is None or refresh_per_second > 0
         ), "refresh_per_second must be > 0"
         self._lock = RLock()
-        self.columns = columns or (
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-            TimeRemainingColumn(),
-        )
+        self.columns = columns or self.get_default_columns()
         self.speed_estimate_period = speed_estimate_period
 
         self.disable = disable
@@ -612,6 +607,37 @@ class Progress(JupyterMixin):
         self.get_time = get_time or self.console.get_time
         self.print = self.console.print
         self.log = self.console.log
+
+    @classmethod
+    def get_default_columns(cls) -> Tuple[ProgressColumn, ...]:
+        """Get the default columns used for a new Progress instance:
+           - a text column for the description (TextColumn)
+           - the bar itself (BarColumn)
+           - a text column showing completion percentage (TextColumn)
+           - an estimated-time-remaining column (TimeRemainingColumn)
+        If the Progress instance is created without passing a columns argument,
+        the default columns defined here will be used.
+
+        You can also create a Progress instance using custom columns before
+        and/or after the defaults, as in this example:
+
+            progress = Progress(
+                SpinnerColumn(),
+                *Progress.default_columns(),
+                "Elapsed:",
+                TimeElapsedColumn(),
+            )
+
+        This code shows the creation of a Progress display, containing
+        a spinner to the left, the default columns, and a labeled elapsed
+        time column.
+        """
+        return (
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            TimeRemainingColumn(),
+        )
 
     @property
     def console(self) -> Console:
@@ -786,8 +812,6 @@ class Progress(JupyterMixin):
 
             popleft = _progress.popleft
             while _progress and _progress[0].timestamp < old_sample_time:
-                popleft()
-            while len(_progress) > 1000:
                 popleft()
             if update_completed > 0:
                 _progress.append(ProgressSample(current_time, update_completed))
@@ -1015,10 +1039,7 @@ if __name__ == "__main__":  # pragma: no coverage
 
     with Progress(
         SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-        TimeRemainingColumn(),
+        *Progress.get_default_columns(),
         TimeElapsedColumn(),
         console=console,
         transient=True,

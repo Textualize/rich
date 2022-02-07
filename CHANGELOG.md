@@ -11,11 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for US spelling of "gray" in ANSI color names https://github.com/Textualize/rich/issues/1890
 - Added `rich.diagnose.report` to expose environment debugging logic as function https://github.com/Textualize/rich/pull/1917
+- Added classmethod `Progress.get_default_columns()` to get the default list of progress bar columns https://github.com/Textualize/rich/pull/1894
 
 ## [11.1.0] - 2022-01-28
 
 ### Added
 
+
+- Workaround for edge case of object from Faiss with no `__class__` https://github.com/Textualize/rich/issues/1838
+- Add Traditional Chinese readme
 - Add `Syntax.guess_lexer`, add support for more lexers (e.g. Django templates etc.) https://github.com/Textualize/rich/pull/1869
 - Add `lexer` parameter to `Syntax.from_path` to allow for overrides https://github.com/Textualize/rich/pull/1873
 

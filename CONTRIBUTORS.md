@@ -16,6 +16,7 @@ The following people have contributed to the development of Rich:
 - [Hedy Li](https://github.com/hedythedev)
 - [Alexander Mancevice](https://github.com/amancevice)
 - [Will McGugan](https://github.com/willmcgugan)
+- [Paul McGuire](https://github.com/ptmcg)
 - [Nathan Page](https://github.com/nathanrpage97)
 - [Avi Perl](https://github.com/avi-perl)
 - [Laurent Peuch](https://github.com/psycojoker)
