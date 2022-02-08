@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [11.2.0] - 2022-02-08
 
 ### Added
 
@@ -13,10 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `rich.diagnose.report` to expose environment debugging logic as function https://github.com/Textualize/rich/pull/1917
 - Added classmethod `Progress.get_default_columns()` to get the default list of progress bar columns https://github.com/Textualize/rich/pull/1894
 
+### Fixed
+
+- Fixed performance issue in measuring text
+
 ## [11.1.0] - 2022-01-28
 
 ### Added
-
 
 - Workaround for edge case of object from Faiss with no `__class__` https://github.com/Textualize/rich/issues/1838
 - Add Traditional Chinese readme
@@ -1627,6 +1630,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[11.2.0]: https://github.com/willmcgugan/rich/compare/v11.1.0...v11.2.0
 [11.1.0]: https://github.com/willmcgugan/rich/compare/v11.0.0...v11.1.0
 [11.0.0]: https://github.com/willmcgugan/rich/compare/v10.16.1...v11.0.0
 [10.16.1]: https://github.com/willmcgugan/rich/compare/v10.16.0...v10.16.1
