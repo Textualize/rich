@@ -62,14 +62,14 @@ There are a number of keyword arguments on the Table constructor you can use to 
 - ``expand`` Set to True to expand the table to the full available size.
 - ``show_header`` Set to True to show a header, False to disable it.
 - ``show_footer`` Set to True to show a footer, False to disable it.
-- ``show edge`` Set to False to disable the edge line around the table.
+- ``show_edge`` Set to False to disable the edge line around the table.
 - ``show_lines`` Set to True to show lines between rows as well as header / footer.
 - ``leading`` Additional space between rows.
 - ``style`` A Style to apply to the entire table, e.g. "on blue"
 - ``row_styles`` Set to a list of styles to style alternating rows. e.g. ``["dim", ""]`` to create *zebra stripes*
 - ``header_style`` Set the default style for the header.
 - ``footer_style`` Set the default style for the footer.
-- ``border style`` Set a style for border characters.
+- ``border_style`` Set a style for border characters.
 - ``title_style`` Set a style for the title.
 - ``caption_style`` Set a style for the caption.
 - ``title_justify`` Set the title justify method ("left", "right", "center", or "full")
