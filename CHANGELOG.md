@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed performance issue in measuring text
 
+### Fixed
+
+- Fixed test failures on PyPy3 https://github.com/Textualize/rich/pull/1904
+
 ## [11.1.0] - 2022-01-28
 
 ### Added

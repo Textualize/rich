@@ -28,3 +28,4 @@ The following people have contributed to the development of Rich:
 - [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
 - [Patrick Arminio](https://github.com/patrick91)
+- [Michał Górny](https://github.com/mgorny)
