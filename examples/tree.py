@@ -34,7 +34,7 @@ def walk_directory(directory: pathlib.Path, tree: Tree) -> None:
             walk_directory(path, branch)
         else:
             text_filename = Text(path.name, "green")
-            text_filename.highlight_regex(r"\..*$", "bold red")
+            text_filename.highlight_regex(r"\.([^.]*)$", "bold red")
             text_filename.stylize(f"link file://{path}")
             file_size = path.stat().st_size
             text_filename.append(f" ({decimal(file_size)})", "blue")
