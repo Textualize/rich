@@ -29,3 +29,4 @@ The following people have contributed to the development of Rich:
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
 - [Patrick Arminio](https://github.com/patrick91)
 - [Michał Górny](https://github.com/mgorny)
+- [Arian Mollik Wasi](https://github.com/wasi-master)
