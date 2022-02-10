@@ -1,7 +1,7 @@
 import pytest
 
 from rich.console import Console
-from rich.markup import escape, MarkupError, _parse, render, Tag, RE_TAGS
+from rich.markup import RE_TAGS, MarkupError, Tag, _parse, escape, render
 from rich.text import Span
 
 
@@ -139,6 +139,11 @@ def test_markup_error():
         assert render("[foo]hello[/bar]")
 
 
+def test_markup_escape():
+    result = str(render("[dim white]\[url=[/]"))
+    assert result == "[url="
+
+
 def test_escape_escape():
     # Escaped escapes (i.e. double backslash)should be treated as literal
     result = render(r"\\[bold]FOO")
@@ -165,7 +170,6 @@ def test_escape_escape():
 
 
 def test_events():
-
     result = render("[@click]Hello[/@click] [@click='view.toggle', 'left']World[/]")
     assert str(result) == "Hello World"
 
