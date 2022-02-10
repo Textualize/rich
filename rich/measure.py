@@ -1,5 +1,5 @@
 from operator import itemgetter
-from typing import Callable, Iterable, NamedTuple, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Iterable, NamedTuple, Optional
 
 from . import errors
 from .protocol import is_renderable, rich_cast
@@ -96,7 +96,9 @@ class Measurement(NamedTuple):
         if _max_width < 1:
             return Measurement(0, 0)
         if isinstance(renderable, str):
-            renderable = console.render_str(renderable, markup=options.markup)
+            renderable = console.render_str(
+                renderable, markup=options.markup, highlight=False
+            )
         renderable = rich_cast(renderable)
         if is_renderable(renderable):
             get_console_width: Optional[

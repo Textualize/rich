@@ -32,6 +32,11 @@ skip_py310 = pytest.mark.skipif(
     reason="rendered differently on py3.10",
 )
 
+skip_pypy3 = pytest.mark.skipif(
+    hasattr(sys, "pypy_version_info"),
+    reason="rendered differently on pypy3",
+)
+
 
 def render(obj, methods=False, value=False, width=50) -> str:
     console = Console(file=io.StringIO(), width=width, legacy_windows=False)
@@ -81,6 +86,7 @@ def test_render():
     assert expected == result
 
 
+@skip_pypy3
 def test_inspect_text():
     expected = (
         "╭──────────────── <class 'str'> ─────────────────╮\n"
@@ -98,6 +104,7 @@ def test_inspect_text():
 
 @skip_py36
 @skip_py37
+@skip_pypy3
 def test_inspect_empty_dict():
     expected = (
         "╭──────────────── <class 'dict'> ────────────────╮\n"
@@ -119,6 +126,7 @@ def test_inspect_empty_dict():
     assert render({}).startswith(expected)
 
 
+@skip_pypy3
 def test_inspect_builtin_function():
     expected = (
         "╭────────── <built-in function print> ───────────╮\n"
@@ -237,6 +245,7 @@ def test_inspect_integer_with_methods():
 
 @skip_py36
 @skip_py37
+@skip_pypy3
 def test_broken_call_attr():
     class NotCallable:
         __call__ = 5  # Passes callable() but isn't really callable

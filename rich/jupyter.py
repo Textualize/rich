@@ -63,7 +63,7 @@ def _render_segments(segments: Iterable[Segment]) -> str:
             rule = style.get_html_style(theme)
             text = f'<span style="{rule}">{text}</span>' if rule else text
             if style.link:
-                text = f'<a href="{style.link}">{text}</a>'
+                text = f'<a href="{style.link}" target="_blank">{text}</a>'
         append_fragment(text)
 
     code = "".join(fragments)

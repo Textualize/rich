@@ -7,14 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+- In Jupyter mode make the link target be set to "_blank"
+
+### Added
+
+- Add support for enum.Flag in ReprHighlighter https://github.com/Textualize/rich/pull/1920
+
+## [11.2.0] - 2022-02-08
+
 ### Added
 
 - Add support for US spelling of "gray" in ANSI color names https://github.com/Textualize/rich/issues/1890
-- Add support for enum.Flag in ReprHighlighter https://github.com/Textualize/rich/pull/1920
+- Added `rich.diagnose.report` to expose environment debugging logic as function https://github.com/Textualize/rich/pull/1917
+- Added classmethod `Progress.get_default_columns()` to get the default list of progress bar columns https://github.com/Textualize/rich/pull/1894
+
+### Fixed
+
+- Fixed performance issue in measuring text
+
+### Fixed
+
+- Fixed test failures on PyPy3 https://github.com/Textualize/rich/pull/1904
+
 ## [11.1.0] - 2022-01-28
 
 ### Added
-
 
 - Workaround for edge case of object from Faiss with no `__class__` https://github.com/Textualize/rich/issues/1838
 - Add Traditional Chinese readme
@@ -1625,6 +1644,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[11.2.0]: https://github.com/willmcgugan/rich/compare/v11.1.0...v11.2.0
 [11.1.0]: https://github.com/willmcgugan/rich/compare/v11.0.0...v11.1.0
 [11.0.0]: https://github.com/willmcgugan/rich/compare/v10.16.1...v11.0.0
 [10.16.1]: https://github.com/willmcgugan/rich/compare/v10.16.0...v10.16.1
