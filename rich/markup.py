@@ -145,7 +145,7 @@ def render(
 
     for position, plain_text, tag in _parse(markup):
         if plain_text is not None:
-            # Capture open brace escapes, where the brace is not part of a tag.
+            # Handle open brace escapes, where the brace is not part of a tag.
             plain_text = plain_text.replace("\\[", "[")
             append(emoji_replace(plain_text) if emoji else plain_text)
         elif tag is not None:
