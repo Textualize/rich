@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   but displays values as ints, does not convert to floats or add bit/bytes units). 
   https://github.com/Textualize/rich/pull/1941
 
+### Fixed
+
+- In Jupyter mode make the link target be set to "_blank"
 
 ## [11.2.0] - 2022-02-08
 
