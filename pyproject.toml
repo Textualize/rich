@@ -2,7 +2,7 @@
 name = "rich"
 homepage = "https://github.com/willmcgugan/rich"
 documentation = "https://rich.readthedocs.io/en/latest/"
-version = "11.0.0"
+version = "11.2.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"
@@ -39,13 +39,13 @@ ipywidgets = { version = "^7.5.1", optional = true }
 jupyter = ["ipywidgets"]
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2.5"
-black = "^21.11b1"
+pytest = "^7.0.0"
+black = "^22.1"
 mypy = "^0.930"
 pytest-cov = "^3.0.0"
 attrs = "^21.4.0"
-types-dataclasses = "^0.6.3"
-pre-commit = "^2.16.0"
+types-dataclasses = "^0.6.4"
+pre-commit = "^2.17.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

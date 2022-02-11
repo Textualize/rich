@@ -20,12 +20,21 @@ Provide a minimal code example that demonstrates the issue if you can. If the is
 
 What platform (Win/Linux/Mac) are you running on? What terminal software are you using?
 
-I may ask you to cut and paste the output of the following commands. It may save some time if you do it now.
+I may ask you to copy and paste the output of the following commands. It may save some time if you do it now.
+
+If you're using Rich in a terminal:
 
 ```
 python -m rich.diagnose
-python -m rich._windows
 pip freeze | grep rich
 ```
-  
+
+If you're using Rich in a Jupyter Notebook, run the following snippet in a cell
+and paste the output in your bug report.
+
+```python
+from rich.diagnose import report
+report()
+```
+
 </details>

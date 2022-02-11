@@ -243,6 +243,10 @@ if __name__ == "__main__":  # pragma: no cover
     sponsor_message.add_column(no_wrap=True)
 
     sponsor_message.add_row(
+        "Textualize",
+        "[u blue link=https://github.com/textualize]https://github.com/textualize",
+    )
+    sponsor_message.add_row(
         "Buy devs a :coffee:",
         "[u blue link=https://ko-fi.com/textualize]https://ko-fi.com/textualize",
     )
@@ -250,15 +254,12 @@ if __name__ == "__main__":  # pragma: no cover
         "Twitter",
         "[u blue link=https://twitter.com/willmcgugan]https://twitter.com/willmcgugan",
     )
-    sponsor_message.add_row(
-        "Blog", "[u blue link=https://www.willmcgugan.com]https://www.willmcgugan.com"
-    )
 
     intro_message = Text.from_markup(
         """\
 We hope you enjoy using Rich!
 
-Rich is maintained with :heart: by [link=https://www.textualize.io]Textualize.io[/]
+Rich is maintained with [red]:heart:[/] by [link=https://www.textualize.io]Textualize.io[/]
 
 - Will McGugan"""
     )
