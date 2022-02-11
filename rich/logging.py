@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from logging import Handler, LogRecord
 from pathlib import Path
-from typing import ClassVar, Iterable, List, Optional, Type, Union
+from typing import ClassVar, List, Optional, Type, Union
 
 from . import get_console
 from ._log_render import LogRender, FormatTimeCallable
@@ -44,7 +44,7 @@ class RichHandler(Handler):
         keywords (List[str], optional): List of words to highlight instead of ``RichHandler.KEYWORDS``.
     """
 
-    KEYWORDS: ClassVar[Optional[List[str]]] = [
+    KEYWORDS: ClassVar[List[str]] = [
         "GET",
         "POST",
         "HEAD",
@@ -77,7 +77,7 @@ class RichHandler(Handler):
         locals_max_length: int = 10,
         locals_max_string: int = 80,
         log_time_format: Union[str, FormatTimeCallable] = "[%x %X]",
-        keywords: Optional[Iterable[str]] = None,
+        keywords: Optional[List[str]] = None,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
