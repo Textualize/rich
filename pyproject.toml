@@ -45,7 +45,7 @@ mypy = "^0.930"
 pytest-cov = "^3.0.0"
 attrs = "^21.4.0"
 types-dataclasses = "^0.6.4"
-pre-commit = "^2.16.0"
+pre-commit = "^2.17.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
