@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Added ProgressColumn `MofNCompleteColumn` to display raw `completed/total` column (similar to DownloadColumn,
+  but displays values as ints, does not convert to floats or add bit/bytes units). 
+  https://github.com/Textualize/rich/pull/1941
+
 ### Fixed
 
 - In Jupyter mode make the link target be set to "_blank"
