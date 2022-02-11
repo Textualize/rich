@@ -113,12 +113,21 @@ The defaults are roughly equivalent to the following::
         TimeRemainingColumn(),
     )
 
+To create a Progress with your own columns in addition to the defaults, use :meth:`~rich.progress.Progress.get_default_columns`::
+
+    progress = Progress(
+        SpinnerColumn(),
+        *Progress.get_default_columns(),
+        TimeElapsedColumn(),
+    )
+
 The following column objects are available:
 
 - :class:`~rich.progress.BarColumn` Displays the bar.
 - :class:`~rich.progress.TextColumn` Displays text.
 - :class:`~rich.progress.TimeElapsedColumn` Displays the time elapsed.
 - :class:`~rich.progress.TimeRemainingColumn` Displays the estimated time remaining.
+- :class:`~rich.progress.MofNCompleteColumn` Displays completion progress as ``"{task.completed}/{task.total}"`` (works best if completed and total are ints).
 - :class:`~rich.progress.FileSizeColumn` Displays progress as file size (assumes the steps are bytes).
 - :class:`~rich.progress.TotalFileSizeColumn` Displays total file size (assumes the steps are bytes).
 - :class:`~rich.progress.DownloadColumn` Displays download progress (assumes the steps are bytes).
@@ -127,6 +136,7 @@ The following column objects are available:
 - :class:`~rich.progress.RenderableColumn` Displays an arbitrary Rich renderable in the column.
 
 To implement your own columns, extend the :class:`~rich.progress.ProgressColumn` class and use it as you would the other columns.
+
 
 Table Columns
 ~~~~~~~~~~~~~

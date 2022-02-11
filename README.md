@@ -1,14 +1,15 @@
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/rich/10.11.0)](https://pypi.org/project/rich/) [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
 
 [![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich)
-[![codecov](https://codecov.io/gh/willmcgugan/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/willmcgugan/rich)
+[![codecov](https://img.shields.io/codecov/c/github/Textualize/rich?label=codecov&logo=codecov)](https://codecov.io/gh/willmcgugan/rich)
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
 ![Logo](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
 
 [English readme](https://github.com/willmcgugan/rich/blob/master/README.md)
- • [中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md)
+ • [简体中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md)
+ • [正體中文 readme](https://github.com/willmcgugan/rich/blob/master/README.zh-tw.md)
  • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md)
  • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md)
  • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md)

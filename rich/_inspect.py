@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import inspect
 from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
 from typing import Any, Iterable, Optional, Tuple
 
@@ -106,8 +107,17 @@ class Inspect(JupyterMixin):
         signature_text = self.highlighter(_signature)
 
         qualname = name or getattr(obj, "__qualname__", name)
+
+        # If obj is a module, there may be classes (which are callable) to display
+        if inspect.isclass(obj):
+            prefix = "class"
+        else:
+            prefix = "def"
+
         qual_signature = Text.assemble(
-            ("def ", "inspect.def"), (qualname, "inspect.callable"), signature_text
+            (f"{prefix} ", f"inspect.{prefix}"),
+            (qualname, "inspect.callable"),
+            signature_text,
         )
 
         return qual_signature
