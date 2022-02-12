@@ -6,12 +6,12 @@ from rich.text import Span
 
 
 def test_re_no_match():
-    assert RE_TAGS.match("[True]") == None
-    assert RE_TAGS.match("[False]") == None
-    assert RE_TAGS.match("[None]") == None
-    assert RE_TAGS.match("[1]") == None
-    assert RE_TAGS.match("[2]") == None
-    assert RE_TAGS.match("[]") == None
+    assert RE_TAGS.match("[True]") is None
+    assert RE_TAGS.match("[False]") is None
+    assert RE_TAGS.match("[None]") is None
+    assert RE_TAGS.match("[1]") is None
+    assert RE_TAGS.match("[2]") is None
+    assert RE_TAGS.match("[]") is None
 
 
 def test_re_match():

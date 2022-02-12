@@ -22,8 +22,7 @@ def render(renderable: RenderableType) -> str:
         width=100, file=io.StringIO(), color_system="truecolor", legacy_windows=False
     )
     console.print(renderable)
-    output = replace_link_ids(console.file.getvalue())
-    return output
+    return replace_link_ids(console.file.getvalue())
 
 
 def test_card_render():

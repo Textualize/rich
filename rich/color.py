@@ -450,8 +450,11 @@ class Color(NamedTuple):
         color_24, color_8, color_rgb = color_match.groups()
         if color_24:
             triplet = ColorTriplet(
-                int(color_24[0:2], 16), int(color_24[2:4], 16), int(color_24[4:6], 16)
+                int(color_24[:2], 16),
+                int(color_24[2:4], 16),
+                int(color_24[4:6], 16),
             )
+
             return cls(color, ColorType.TRUECOLOR, triplet=triplet)
 
         elif color_8:
@@ -472,7 +475,7 @@ class Color(NamedTuple):
                 )
             red, green, blue = components
             triplet = ColorTriplet(int(red), int(green), int(blue))
-            if not all(component <= 255 for component in triplet):
+            if any(component > 255 for component in triplet):
                 raise ColorParseError(
                     f"color components must be <= 255 in {original_color!r}"
                 )
@@ -485,13 +488,7 @@ class Color(NamedTuple):
         if _type == ColorType.DEFAULT:
             return ("39" if foreground else "49",)
 
-        elif _type == ColorType.WINDOWS:
-            number = self.number
-            assert number is not None
-            fore, back = (30, 40) if number < 8 else (82, 92)
-            return (str(fore + number if foreground else back + number),)
-
-        elif _type == ColorType.STANDARD:
+        elif _type in [ColorType.WINDOWS, ColorType.STANDARD]:
             number = self.number
             assert number is not None
             fore, back = (30, 40) if number < 8 else (82, 92)
@@ -564,10 +561,11 @@ class Color(NamedTuple):
 def parse_rgb_hex(hex_color: str) -> ColorTriplet:
     """Parse six hex characters in to RGB triplet."""
     assert len(hex_color) == 6, "must be 6 characters"
-    color = ColorTriplet(
-        int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+    return ColorTriplet(
+        int(hex_color[:2], 16),
+        int(hex_color[2:4], 16),
+        int(hex_color[4:6], 16),
     )
-    return color
 
 
 def blend_rgb(
@@ -576,12 +574,11 @@ def blend_rgb(
     """Blend one RGB color in to another."""
     r1, g1, b1 = color1
     r2, g2, b2 = color2
-    new_color = ColorTriplet(
+    return ColorTriplet(
         int(r1 + (r2 - r1) * cross_fade),
         int(g1 + (g2 - g1) * cross_fade),
         int(b1 + (b2 - b1) * cross_fade),
     )
-    return new_color
 
 
 if __name__ == "__main__":  # pragma: no cover

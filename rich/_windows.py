@@ -25,8 +25,7 @@ except (AttributeError, ImportError, ValueError):
 
     # Fallback if we can't load the Windows DLL
     def get_windows_console_features() -> WindowsConsoleFeatures:
-        features = WindowsConsoleFeatures()
-        return features
+        return WindowsConsoleFeatures()
 
 else:
 
@@ -58,8 +57,7 @@ else:
             truecolor = win_version.major > 10 or (
                 win_version.major == 10 and win_version.build >= 15063
             )
-        features = WindowsConsoleFeatures(vt=vt, truecolor=truecolor)
-        return features
+        return WindowsConsoleFeatures(vt=vt, truecolor=truecolor)
 
 
 if __name__ == "__main__":

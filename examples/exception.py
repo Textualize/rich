@@ -9,9 +9,7 @@ console = Console()
 
 def divide_by(number: float, divisor: float) -> float:
     """Divide any number by zero."""
-    # Will throw a ZeroDivisionError if divisor is 0
-    result = number / divisor
-    return result
+    return number / divisor
 
 
 def divide_all(divides: List[Tuple[float, float]]) -> None:

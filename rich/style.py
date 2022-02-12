@@ -371,8 +371,7 @@ class Style:
             sgr: List[str] = []
             append = sgr.append
             _style_map = self._style_map
-            attributes = self._attributes & self._set_attributes
-            if attributes:
+            if attributes := self._attributes & self._set_attributes:
                 if attributes & 1:
                     append(_style_map[0])
                 if attributes & 2:
@@ -572,8 +571,7 @@ class Style:
                         f"unable to parse {word!r} as color; {error}"
                     ) from None
                 color = word
-        style = Style(color=color, bgcolor=bgcolor, link=link, **attributes)
-        return style
+        return Style(color=color, bgcolor=bgcolor, link=link, **attributes)
 
     @lru_cache(maxsize=1024)
     def get_html_style(self, theme: Optional[TerminalTheme] = None) -> str:
@@ -722,7 +720,7 @@ class Style:
         sys.stdout.write(f"{self.render(text)}\n")
 
     def __add__(self, style: Optional["Style"]) -> "Style":
-        if not (isinstance(style, Style) or style is None):
+        if not isinstance(style, Style) and style is not None:
             return NotImplemented
         if style is None or style._null:
             return self

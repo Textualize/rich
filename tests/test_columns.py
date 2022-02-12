@@ -57,8 +57,7 @@ def render():
     columns.expand = False
     console.print(columns)
     console.print()
-    render_result = console.file.getvalue()
-    return render_result
+    return console.file.getvalue()
 
 
 def test_render():

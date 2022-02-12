@@ -25,8 +25,7 @@ class Styled:
     ) -> "RenderResult":
         style = console.get_style(self.style)
         rendered_segments = console.render(self.renderable, options)
-        segments = Segment.apply_style(rendered_segments, style)
-        return segments
+        return Segment.apply_style(rendered_segments, style)
 
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"

@@ -33,5 +33,4 @@ class Constrain(JupyterMixin):
     ) -> "Measurement":
         if self.width is not None:
             options = options.update_width(self.width)
-        measurement = Measurement.get(console, options, self.renderable)
-        return measurement
+        return Measurement.get(console, options, self.renderable)

@@ -48,7 +48,6 @@ class FileProxy(io.TextIOBase):
         return len(text)
 
     def flush(self) -> None:
-        buffer = self.__buffer
-        if buffer:
+        if buffer := self.__buffer:
             self.__console.print("".join(buffer))
             del buffer[:]

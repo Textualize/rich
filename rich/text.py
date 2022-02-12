@@ -185,7 +185,7 @@ class Text(JupyterMixin):
     def __getitem__(self, slice: Union[int, slice]) -> "Text":
         def get_text_at(offset: int) -> "Text":
             _Span = Span
-            text = Text(
+            return Text(
                 self.plain[offset],
                 spans=[
                     _Span(0, 1, style)
@@ -194,7 +194,6 @@ class Text(JupyterMixin):
                 ],
                 end="",
             )
-            return text
 
         if isinstance(slice, int):
             return get_text_at(slice)
@@ -240,8 +239,7 @@ class Text(JupyterMixin):
                 position = offset
             if style:
                 append(f"[/{style}]" if closing else f"[{style}]")
-        markup = "".join(output)
-        return markup
+        return "".join(output)
 
     @classmethod
     def from_markup(
@@ -307,8 +305,7 @@ class Text(JupyterMixin):
             style=style,
         )
         decoder = AnsiDecoder()
-        result = joiner.join(line for line in decoder.decode(text))
-        return result
+        return joiner.join(iter(decoder.decode(text)))
 
     @classmethod
     def styled(
@@ -409,7 +406,7 @@ class Text(JupyterMixin):
 
     def blank_copy(self, plain: str = "") -> "Text":
         """Return a new Text instance with copied meta data (but not the string or spans)."""
-        copy_self = Text(
+        return Text(
             plain,
             style=self.style,
             justify=self.justify,
@@ -418,7 +415,6 @@ class Text(JupyterMixin):
             end=self.end,
             tab_size=self.tab_size,
         )
-        return copy_self
 
     def copy(self) -> "Text":
         """Return a copy of this instance."""
@@ -768,11 +764,10 @@ class Text(JupyterMixin):
             parts = line.split("\t", include_separator=True)
             for part in parts:
                 if part.plain.endswith("\t"):
-                    part._text = [part.plain[:-1] + " "]
+                    part._text = [f'{part.plain[:-1]} ']
                     append(part)
                     pos += len(part)
-                    spaces = tab_size - ((pos - 1) % tab_size) - 1
-                    if spaces:
+                    if spaces := tab_size - ((pos - 1) % tab_size) - 1:
                         append(" " * spaces, _style)
                         pos += spaces
                 else:
@@ -874,8 +869,7 @@ class Text(JupyterMixin):
             character (str, optional): Character to pad with. Defaults to " ".
         """
         self.truncate(width)
-        excess_space = width - cell_len(self.plain)
-        if excess_space:
+        if excess_space := width - cell_len(self.plain):
             if align == "left":
                 self.pad_right(excess_space, character)
             elif align == "center":
@@ -905,9 +899,9 @@ class Text(JupyterMixin):
             if isinstance(text, str):
                 text = strip_control_codes(text)
                 self._text.append(text)
-                offset = len(self)
                 text_length = len(text)
                 if style is not None:
+                    offset = len(self)
                     self._spans.append(Span(offset, offset + text_length, style))
                 self._length += text_length
             elif isinstance(text, Text):
@@ -1250,8 +1244,7 @@ class Text(JupyterMixin):
         if blank_lines:
             new_lines.extend([Text("", style=style)] * blank_lines)
 
-        new_text = text.blank_copy("\n").join(new_lines)
-        return new_text
+        return text.blank_copy("\n").join(new_lines)
 
 
 if __name__ == "__main__":  # pragma: no cover

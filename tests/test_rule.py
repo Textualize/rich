@@ -19,8 +19,11 @@ def test_rule():
     console.print(Rule("foo"))
     console.rule(Text("foo", style="bold"))
     console.rule("foobarbazeggfoobarbazegg")
-    expected = "\x1b[92m────────────────\x1b[0m\n"
-    expected += "\x1b[92m───── \x1b[0mfoo\x1b[92m ──────\x1b[0m\n"
+    expected = (
+        "\x1b[92m────────────────\x1b[0m\n"
+        + "\x1b[92m───── \x1b[0mfoo\x1b[92m ──────\x1b[0m\n"
+    )
+
     expected += "\x1b[92m───── \x1b[0m\x1b[1mfoo\x1b[0m\x1b[92m ──────\x1b[0m\n"
     expected += "\x1b[92m─ \x1b[0mfoobarbazeg…\x1b[92m ─\x1b[0m\n"
 
@@ -73,8 +76,7 @@ def test_characters():
     console.rule(characters="+*")
     console.rule("foo", characters="+*")
     console.print(Rule(characters=".,"))
-    expected = "+*+*+*+*+*+*+*+*\n"
-    expected += "+*+*+ foo +*+*+*\n"
+    expected = "+*+*+*+*+*+*+*+*\n" + "+*+*+ foo +*+*+*\n"
     expected += ".,.,.,.,.,.,.,.,\n"
     assert console.file.getvalue() == expected
 

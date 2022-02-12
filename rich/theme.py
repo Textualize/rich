@@ -30,10 +30,9 @@ class Theme:
     @property
     def config(self) -> str:
         """Get contents of a config file for this theme."""
-        config = "[styles]\n" + "\n".join(
+        return "[styles]\n" + "\n".join(
             f"{name} = {style}" for name, style in sorted(self.styles.items())
         )
-        return config
 
     @classmethod
     def from_file(
@@ -52,8 +51,7 @@ class Theme:
         config = configparser.ConfigParser()
         config.read_file(config_file, source=source)
         styles = {name: Style.parse(value) for name, value in config.items("styles")}
-        theme = Theme(styles, inherit=inherit)
-        return theme
+        return Theme(styles, inherit=inherit)
 
     @classmethod
     def read(cls, path: str, inherit: bool = True) -> "Theme":

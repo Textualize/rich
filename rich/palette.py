@@ -85,7 +85,7 @@ if __name__ == "__main__":  # pragma: no cover
             self, console: Console, options: ConsoleOptions
         ) -> Iterable[Segment]:
             height = console.size.height - 3
-            for y in range(0, height):
+            for y in range(height):
                 for x in range(options.max_width):
                     h = x / options.max_width
                     l = y / (height + 1)

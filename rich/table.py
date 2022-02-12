@@ -291,9 +291,7 @@ class Table(JupyterMixin):
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> Measurement:
-        max_width = options.max_width
-        if self.width is not None:
-            max_width = self.width
+        max_width = self.width if self.width is not None else options.max_width
         if max_width < 0:
             return Measurement(0, 0)
 
@@ -601,8 +599,7 @@ class Table(JupyterMixin):
         _padding_cache: Dict[Tuple[bool, bool], Tuple[int, int, int, int]] = {}
 
         def get_padding(first_row: bool, last_row: bool) -> Tuple[int, int, int, int]:
-            cached = _padding_cache.get((first_row, last_row))
-            if cached:
+            if cached := _padding_cache.get((first_row, last_row)):
                 return cached
             top, right, bottom, left = padding
 
@@ -661,9 +658,8 @@ class Table(JupyterMixin):
     def _get_padding_width(self, column_index: int) -> int:
         """Get extra width from padding."""
         _, pad_right, _, pad_left = self.padding
-        if self.collapse_padding:
-            if column_index > 0:
-                pad_left = max(0, pad_left - pad_right)
+        if self.collapse_padding and column_index > 0:
+            pad_left = max(0, pad_left - pad_right)
         return pad_left + pad_right
 
     def _measure_column(

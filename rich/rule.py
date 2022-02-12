@@ -85,9 +85,9 @@ class Rule(JupyterMixin):
             right_length = width - cell_len(left.plain) - cell_len(title_text.plain)
             right = Text(characters * (side_width // chars_len + 1))
             right.truncate(right_length)
-            rule_text.append(left.plain + " ", self.style)
+            rule_text.append(f'{left.plain} ', self.style)
             rule_text.append(title_text)
-            rule_text.append(" " + right.plain, self.style)
+            rule_text.append(f' {right.plain}', self.style)
         elif self.align == "left":
             title_text.truncate(width - 2, overflow="ellipsis")
             rule_text.append(title_text)

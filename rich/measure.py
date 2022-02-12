@@ -100,26 +100,24 @@ class Measurement(NamedTuple):
                 renderable, markup=options.markup, highlight=False
             )
         renderable = rich_cast(renderable)
-        if is_renderable(renderable):
-            get_console_width: Optional[
-                Callable[["Console", "ConsoleOptions"], "Measurement"]
-            ] = getattr(renderable, "__rich_measure__", None)
-            if get_console_width is not None:
-                render_width = (
-                    get_console_width(console, options)
-                    .normalize()
-                    .with_maximum(_max_width)
-                )
-                if render_width.maximum < 1:
-                    return Measurement(0, 0)
-                return render_width.normalize()
-            else:
-                return Measurement(0, _max_width)
-        else:
+        if not is_renderable(renderable):
             raise errors.NotRenderableError(
                 f"Unable to get render width for {renderable!r}; "
                 "a str, Segment, or object with __rich_console__ method is required"
             )
+        get_console_width: Optional[
+            Callable[["Console", "ConsoleOptions"], "Measurement"]
+        ] = getattr(renderable, "__rich_measure__", None)
+        if get_console_width is None:
+            return Measurement(0, _max_width)
+        render_width = (
+            get_console_width(console, options)
+            .normalize()
+            .with_maximum(_max_width)
+        )
+        if render_width.maximum < 1:
+            return Measurement(0, 0)
+        return render_width.normalize()
 
 
 def measure_renderables(
@@ -144,8 +142,7 @@ def measure_renderables(
     measurements = [
         get_measurement(console, options, renderable) for renderable in renderables
     ]
-    measured_width = Measurement(
+    return Measurement(
         max(measurements, key=itemgetter(0)).minimum,
         max(measurements, key=itemgetter(1)).maximum,
     )
-    return measured_width
