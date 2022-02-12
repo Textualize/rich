@@ -210,7 +210,7 @@ def test_recursive():
 
 
 def test_max_depth():
-    d = {'foo': {"fob": {"a": [1, 2, 3], "b": {"z": "x", "y": ["a", "b", "c"]}}}}
+    d = {"foo": {"fob": {"a": [1, 2, 3], "b": {"z": "x", "y": ["a", "b", "c"]}}}}
     assert pretty_repr(d, max_depth=0) == "..."
     assert pretty_repr(d, max_depth=1) == "{'foo': ...}"
     assert pretty_repr(d, max_depth=2) == "{'foo': {'fob': ...}}"

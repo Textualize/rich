@@ -764,7 +764,7 @@ class Text(JupyterMixin):
             parts = line.split("\t", include_separator=True)
             for part in parts:
                 if part.plain.endswith("\t"):
-                    part._text = [f'{part.plain[:-1]} ']
+                    part._text = [f"{part.plain[:-1]} "]
                     append(part)
                     pos += len(part)
                     if spaces := tab_size - ((pos - 1) % tab_size) - 1:

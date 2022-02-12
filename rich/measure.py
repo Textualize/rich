@@ -111,9 +111,7 @@ class Measurement(NamedTuple):
         if get_console_width is None:
             return Measurement(0, _max_width)
         render_width = (
-            get_console_width(console, options)
-            .normalize()
-            .with_maximum(_max_width)
+            get_console_width(console, options).normalize().with_maximum(_max_width)
         )
         if render_width.maximum < 1:
             return Measurement(0, 0)

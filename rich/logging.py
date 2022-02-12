@@ -109,9 +109,7 @@ class RichHandler(Handler):
             Text: A tuple of the style and level name.
         """
         level_name = record.levelname
-        return Text.styled(
-            level_name.ljust(8), f"logging.level.{level_name.lower()}"
-        )
+        return Text.styled(level_name.ljust(8), f"logging.level.{level_name.lower()}")
 
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""

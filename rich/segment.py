@@ -130,8 +130,8 @@ class Segment(NamedTuple):
                     _Segment(text[pos:], style, control),
                 )
             if cell_pos > cut:
-                return _Segment(f'{before[: pos - 1]} ', style, control), _Segment(
-                    f' {text[pos:]}', style, control
+                return _Segment(f"{before[: pos - 1]} ", style, control), _Segment(
+                    f" {text[pos:]}", style, control
                 )
 
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
@@ -706,9 +706,7 @@ if __name__ == "__main__":
     fragments = list(console.render(text))
     console.print(fragments)
     console.print()
-    console.print(
-        "The Segments are then processed to produce the following output:\n"
-    )
+    console.print("The Segments are then processed to produce the following output:\n")
     console.print(text)
     console.print(
         "\nYou will only need to know this if you are implementing your own Rich renderables."

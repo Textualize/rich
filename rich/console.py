@@ -1617,8 +1617,7 @@ class Console:
                         )
                     )
             if new_line_start and (
-                len("".join(segment.text for segment in new_segments).splitlines())
-                > 1
+                len("".join(segment.text for segment in new_segments).splitlines()) > 1
             ):
                 new_segments.insert(0, Segment.line())
             if crop:

@@ -102,7 +102,7 @@ def set_cell_size(text: str, total: int) -> str:
         before = text[: pos + 1]
         before_len = cell_len(before)
         if before_len == total + 1 and cell_len(before[-1]) == 2:
-            return f'{before[:-1]} '
+            return f"{before[:-1]} "
         if before_len == total:
             return before
         if before_len > total:

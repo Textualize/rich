@@ -145,8 +145,8 @@ class PygmentsSyntaxTheme(SyntaxTheme):
                 color = pygments_style["color"]
                 bgcolor = pygments_style["bgcolor"]
                 style = Style(
-                    color=f'#{color}' if color else "#000000",
-                    bgcolor=f'#{bgcolor}' if bgcolor else self._background_color,
+                    color=f"#{color}" if color else "#000000",
+                    bgcolor=f"#{bgcolor}" if bgcolor else self._background_color,
                     bold=pygments_style["bold"],
                     italic=pygments_style["italic"],
                     underline=pygments_style["underline"],

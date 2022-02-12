@@ -523,9 +523,7 @@ class Traceback:
             first_line = code[:new_line_index] if new_line_index != -1 else code
             if first_line.startswith("#!") and "python" in first_line.lower():
                 return "python"
-        return (
-            cls.LEXERS.get(ext) or guess_lexer_for_filename(filename, code).name
-        )
+        return cls.LEXERS.get(ext) or guess_lexer_for_filename(filename, code).name
 
     @group()
     def _render_stack(self, stack: Stack) -> RenderResult:
