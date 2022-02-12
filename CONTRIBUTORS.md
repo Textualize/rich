@@ -27,7 +27,7 @@ The following people have contributed to the development of Rich:
 - [Tim Savage](https://github.com/timsavage)
 - [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
-- [Patrick Arminio](https://github.com/patrick9)
+- [Patrick Arminio](https://github.com/patrick91)
 - [Dennis Brakhane](https://github.com/brakhane)
 - [Michał Górny](https://github.com/mgorny)
 - [Arian Mollik Wasi](https://github.com/wasi-master)
