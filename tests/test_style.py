@@ -79,10 +79,10 @@ def test_empty():
 
 
 def test_bool():
-    assert bool(Style()) is False
-    assert bool(Style(bold=True)) is True
-    assert bool(Style(color="red")) is True
-    assert bool(Style.parse("")) is False
+    assert not bool(Style())
+    assert bool(Style(bold=True))
+    assert bool(Style(color="red"))
+    assert not bool(Style.parse(""))
 
 
 def test_color_property():
@@ -203,8 +203,8 @@ def test_background_style():
 def test_without_color():
     style = Style(bold=True, color="red", bgcolor="blue")
     colorless_style = style.without_color
-    assert colorless_style.color == None
-    assert colorless_style.bgcolor == None
+    assert colorless_style.color is None
+    assert colorless_style.bgcolor is None
     assert colorless_style.bold == True
     null_style = Style.null()
     assert null_style.without_color == null_style

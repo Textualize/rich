@@ -19,7 +19,7 @@ class ColorBox:
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        for y in range(0, 5):
+        for y in range(5):
             for x in range(options.max_width):
                 h = x / options.max_width
                 l = 0.1 + ((y / 5) * 0.7)

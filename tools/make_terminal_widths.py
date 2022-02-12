@@ -18,8 +18,9 @@ def make_widths_table() -> List[Tuple[int, int, int]]:
 
     widths = (
         (codepoint, wcwidth(chr(codepoint)))
-        for codepoint in range(0, sys.maxunicode + 1)
+        for codepoint in range(sys.maxunicode + 1)
     )
+
 
     _widths = [(codepoint, width) for codepoint, width in widths if width != 1]
     iter_widths = iter(_widths)
@@ -60,9 +61,7 @@ def get_cell_size(table: List[Tuple[int, int, int]], character: str) -> int:
 
 
 def test(widths_table):
-    for codepoint in progress.track(
-        range(0, sys.maxunicode + 1), description="Testing..."
-    ):
+    for codepoint in progress.track(range(sys.maxunicode + 1), description="Testing..."):
         character = chr(codepoint)
         width1 = get_cell_size(widths_table, character)
         width2 = wcwidth(character)

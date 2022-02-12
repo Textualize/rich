@@ -782,8 +782,7 @@ class Console:
                 return ColorSystem.TRUECOLOR
             term = self._environ.get("TERM", "").strip().lower()
             _term_name, _hyphen, colors = term.rpartition("-")
-            color_system = _TERM_COLORS.get(colors, ColorSystem.STANDARD)
-            return color_system
+            return _TERM_COLORS.get(colors, ColorSystem.STANDARD)
 
     def _enter_buffer(self) -> None:
         """Enter in to a buffer context, and buffer all output."""
@@ -1055,8 +1054,7 @@ class Console:
         Returns:
             Capture: Context manager with disables writing to the terminal.
         """
-        capture = Capture(self)
-        return capture
+        return Capture(self)
 
     def pager(
         self, pager: Optional[Pager] = None, styles: bool = False, links: bool = False
@@ -1125,7 +1123,7 @@ class Console:
         """
         from .status import Status
 
-        status_renderable = Status(
+        return Status(
             status,
             console=self,
             spinner=spinner,
@@ -1133,7 +1131,6 @@ class Console:
             speed=speed,
             refresh_per_second=refresh_per_second,
         )
-        return status_renderable
 
     def show_cursor(self, show: bool = True) -> bool:
         """Show or hide the cursor.
@@ -1204,8 +1201,7 @@ class Console:
         Returns:
             Measurement: A measurement of the renderable.
         """
-        measurement = Measurement.get(self, options or self.options, renderable)
-        return measurement
+        return Measurement.get(self, options or self.options, renderable)
 
     def render(
         self, renderable: RenderableType, options: Optional[ConsoleOptions] = None
@@ -1611,22 +1607,20 @@ class Console:
             new_segments: List[Segment] = []
             extend = new_segments.extend
             render = self.render
-            if style is None:
-                for renderable in renderables:
+            for renderable in renderables:
+                if style is None:
                     extend(render(renderable, render_options))
-            else:
-                for renderable in renderables:
+                else:
                     extend(
                         Segment.apply_style(
                             render(renderable, render_options), self.get_style(style)
                         )
                     )
-            if new_line_start:
-                if (
-                    len("".join(segment.text for segment in new_segments).splitlines())
-                    > 1
-                ):
-                    new_segments.insert(0, Segment.line())
+            if new_line_start and (
+                len("".join(segment.text for segment in new_segments).splitlines())
+                > 1
+            ):
+                new_segments.insert(0, Segment.line())
             if crop:
                 buffer_extend = self._buffer.extend
                 for line in Segment.split_and_crop_lines(
@@ -1679,11 +1673,11 @@ class Console:
                 default=default,
                 sort_keys=sort_keys,
             )
+        elif not isinstance(json, str):
+            raise TypeError(
+                f"json must be str. Did you mean print_json(data={json!r}) ?"
+            )
         else:
-            if not isinstance(json, str):
-                raise TypeError(
-                    f"json must be str. Did you mean print_json(data={json!r}) ?"
-                )
             json_renderable = JSON(
                 json,
                 indent=indent,
@@ -1956,8 +1950,7 @@ class Console:
             elif not (not_terminal and control):
                 append(text)
 
-        rendered = "".join(output)
-        return rendered
+        return "".join(output)
 
     def input(
         self,
@@ -1992,14 +1985,12 @@ class Console:
             self.file.write(prompt_str)
             prompt_str = ""
         if password:
-            result = getpass(prompt_str, stream=stream)
+            return getpass(prompt_str, stream=stream)
+        elif stream:
+            self.file.write(prompt_str)
+            return stream.readline()
         else:
-            if stream:
-                self.file.write(prompt_str)
-                result = stream.readline()
-            else:
-                result = input(prompt_str)
-        return result
+            return input(prompt_str)
 
     def export_text(self, *, clear: bool = True, styles: bool = False) -> str:
         """Generate text from console contents (requires record=True argument in constructor).

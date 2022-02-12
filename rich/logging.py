@@ -109,10 +109,9 @@ class RichHandler(Handler):
             Text: A tuple of the style and level name.
         """
         level_name = record.levelname
-        level_text = Text.styled(
+        return Text.styled(
             level_name.ljust(8), f"logging.level.{level_name.lower()}"
         )
-        return level_text
 
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
@@ -167,8 +166,7 @@ class RichHandler(Handler):
         use_markup = getattr(record, "markup", self.markup)
         message_text = Text.from_markup(message) if use_markup else Text(message)
 
-        highlighter = getattr(record, "highlighter", self.highlighter)
-        if highlighter:
+        if highlighter := getattr(record, "highlighter", self.highlighter):
             message_text = highlighter(message_text)
 
         if self.KEYWORDS:
@@ -197,7 +195,7 @@ class RichHandler(Handler):
         time_format = None if self.formatter is None else self.formatter.datefmt
         log_time = datetime.fromtimestamp(record.created)
 
-        log_renderable = self._log_render(
+        return self._log_render(
             self.console,
             [message_renderable] if not traceback else [message_renderable, traceback],
             log_time=log_time,
@@ -207,7 +205,6 @@ class RichHandler(Handler):
             line_no=record.lineno,
             link_path=record.pathname if self.enable_link_path else None,
         )
-        return log_renderable
 
 
 if __name__ == "__main__":  # pragma: no cover

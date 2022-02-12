@@ -65,7 +65,7 @@ def make_sponsor_message() -> Panel:
     message.add_column(no_wrap=True)
     message.add_row(intro_message, sponsor_message)
 
-    message_panel = Panel(
+    return Panel(
         Align.center(
             Group(intro_message, "\n", Align.center(sponsor_message)),
             vertical="middle",
@@ -75,7 +75,6 @@ def make_sponsor_message() -> Panel:
         title="[b red]Thanks for trying out Rich!",
         border_style="bright_blue",
     )
-    return message_panel
 
 
 class Header:
@@ -132,8 +131,7 @@ def ratio_resolve(total: int, edges: List[Edge]) -> List[int]:
     # Sizes now contains integers only
     return cast(List[int], sizes)
     """
-    syntax = Syntax(code, "python", line_numbers=True)
-    return syntax
+    return Syntax(code, "python", line_numbers=True)
 
 
 job_progress = Progress(

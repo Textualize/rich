@@ -15,7 +15,7 @@ install(suppress=[click])
 def hello(count):
     """Simple program that greets NAME for a total of COUNT times."""
     1 / 0
-    for x in range(count):
+    for _ in range(count):
         click.echo(f"Hello {name}!")
 
 

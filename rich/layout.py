@@ -207,11 +207,10 @@ class Layout:
         """
         if self.name == name:
             return self
-        else:
-            for child in self._children:
-                named_layout = child.get(name)
-                if named_layout is not None:
-                    return named_layout
+        for child in self._children:
+            named_layout = child.get(name)
+            if named_layout is not None:
+                return named_layout
         return None
 
     def __getitem__(self, name: str) -> "Layout":
@@ -237,8 +236,7 @@ class Layout:
                 Pretty(layout) if layout.visible else Styled(Pretty(layout), "dim")
             )
             table.add_row(icon, text)
-            _summary = table
-            return _summary
+            return table
 
         layout = self
         tree = Tree(
@@ -354,16 +352,11 @@ class Layout:
         while stack:
             append_layout_region(pop())
             layout, region = layout_regions[-1]
-            children = layout.children
-            if children:
+            if children := layout.children:
                 for child_and_region in layout.splitter.divide(children, region):
                     push(child_and_region)
 
-        region_map = {
-            layout: region
-            for layout, region in sorted(layout_regions, key=itemgetter(1))
-        }
-        return region_map
+        return dict(sorted(layout_regions, key=itemgetter(1)))
 
     def render(self, console: Console, options: ConsoleOptions) -> RenderMap:
         """Render the sub_layouts.

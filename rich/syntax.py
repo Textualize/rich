@@ -145,12 +145,13 @@ class PygmentsSyntaxTheme(SyntaxTheme):
                 color = pygments_style["color"]
                 bgcolor = pygments_style["bgcolor"]
                 style = Style(
-                    color="#" + color if color else "#000000",
-                    bgcolor="#" + bgcolor if bgcolor else self._background_color,
+                    color=f'#{color}' if color else "#000000",
+                    bgcolor=f'#{bgcolor}' if bgcolor else self._background_color,
                     bold=pygments_style["bold"],
                     italic=pygments_style["italic"],
                     underline=pygments_style["underline"],
                 )
+
             self._style_cache[token_type] = style
         return style
 
@@ -220,11 +221,11 @@ class Syntax(JupyterMixin):
         if isinstance(name, SyntaxTheme):
             return name
         theme: SyntaxTheme
-        if name in RICH_SYNTAX_THEMES:
-            theme = ANSISyntaxTheme(RICH_SYNTAX_THEMES[name])
-        else:
-            theme = PygmentsSyntaxTheme(name)
-        return theme
+        return (
+            ANSISyntaxTheme(RICH_SYNTAX_THEMES[name])
+            if name in RICH_SYNTAX_THEMES
+            else PygmentsSyntaxTheme(name)
+        )
 
     def __init__(
         self,
@@ -340,7 +341,6 @@ class Syntax(JupyterMixin):
             str: The name of the Pygments lexer that best matches the supplied path/code.
         """
         lexer: Optional[Lexer] = None
-        lexer_name = "default"
         if code:
             try:
                 lexer = guess_lexer_for_filename(path, code)
@@ -357,17 +357,13 @@ class Syntax(JupyterMixin):
                 pass
 
         if lexer:
-            if lexer.aliases:
-                lexer_name = lexer.aliases[0]
-            else:
-                lexer_name = lexer.name
-
-        return lexer_name
+            return lexer.aliases[0] if lexer.aliases else lexer.name
+        else:
+            return "default"
 
     def _get_base_style(self) -> Style:
         """Get the base style."""
-        default_style = self._theme.get_background_style() + self.background_style
-        return default_style
+        return self._theme.get_background_style() + self.background_style
 
     def _get_token_color(self, token_type: TokenType) -> Optional[Color]:
         """Get a color (if any) for the given token.
@@ -496,10 +492,11 @@ class Syntax(JupyterMixin):
     @property
     def _numbers_column_width(self) -> int:
         """Get the number of characters used to render the numbers column."""
-        column_width = 0
-        if self.line_numbers:
-            column_width = len(str(self.start_line + self.code.count("\n"))) + 2
-        return column_width
+        return (
+            len(str(self.start_line + self.code.count("\n"))) + 2
+            if self.line_numbers
+            else 0
+        )
 
     def _get_number_styles(self, console: Console) -> Tuple[Style, Style, Style]:
         """Get background, number, and highlight styles for line numbers."""
@@ -589,9 +586,7 @@ class Syntax(JupyterMixin):
             return
 
         start_line, end_line = self.line_range or (None, None)
-        line_offset = 0
-        if start_line:
-            line_offset = max(0, start_line - 1)
+        line_offset = max(0, start_line - 1) if start_line else 0
         lines: Union[List[Text], Lines] = text.split("\n", allow_blank=ends_on_nl)
         if self.line_range:
             lines = lines[line_offset:end_line]

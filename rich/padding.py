@@ -109,15 +109,11 @@ class Padding(JupyterMixin):
         if self.top:
             blank_line = [_Segment(f'{" " * width}\n', style)]
             yield from blank_line * self.top
-        if left:
-            for line in lines:
+        for line in lines:
+            if left:
                 yield left
-                yield from line
-                yield from right
-        else:
-            for line in lines:
-                yield from line
-                yield from right
+            yield from line
+            yield from right
         if self.bottom:
             blank_line = blank_line or [_Segment(f'{" " * width}\n', style)]
             yield from blank_line * self.bottom

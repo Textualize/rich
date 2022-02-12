@@ -60,13 +60,9 @@ class Bar(JupyterMixin):
             return
 
         prefix_complete_eights = int(width * 8 * self.begin / self.size)
-        prefix_bar_count = prefix_complete_eights // 8
-        prefix_eights_count = prefix_complete_eights % 8
-
+        prefix_bar_count, prefix_eights_count = divmod(prefix_complete_eights, 8)
         body_complete_eights = int(width * 8 * self.end / self.size)
-        body_bar_count = body_complete_eights // 8
-        body_eights_count = body_complete_eights % 8
-
+        body_bar_count, body_eights_count = divmod(body_complete_eights, 8)
         # When start and end fall into the same cell, we ideally should render
         # a symbol that's "center-aligned", but there is no good symbol in Unicode.
         # In this case, we fall back to right-aligned block symbol for simplicity.

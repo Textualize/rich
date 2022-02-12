@@ -17,13 +17,13 @@ def test_renderable(live_render):
 
 
 def test_position_cursor(live_render):
-    assert str(live_render.position_cursor()) == ""
+    assert not str(live_render.position_cursor())
     live_render._shape = (80, 2)
     assert str(live_render.position_cursor()) == "\r\x1b[2K\x1b[1A\x1b[2K"
 
 
 def test_restore_cursor(live_render):
-    assert str(live_render.restore_cursor()) == ""
+    assert not str(live_render.restore_cursor())
     live_render._shape = (80, 2)
     assert str(live_render.restore_cursor()) == "\r\x1b[1A\x1b[2K\x1b[1A\x1b[2K"
 

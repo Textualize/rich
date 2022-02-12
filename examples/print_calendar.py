@@ -20,7 +20,7 @@ from rich.text import Text
 def print_calendar(year):
     """Print a calendar for a given year."""
 
-    today = datetime.today()
+    today = datetime.now()
     year = int(year)
     cal = calendar.Calendar()
     today_tuple = today.day, today.month, today.year

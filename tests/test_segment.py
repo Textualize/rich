@@ -85,7 +85,7 @@ def test_simplify():
             [Segment("Hello", "red"), Segment(" ", "red"), Segment("World!", "blue")]
         )
     ) == [Segment("Hello ", "red"), Segment("World!", "blue")]
-    assert list(Segment.simplify([])) == []
+    assert not list(Segment.simplify([]))
 
 
 def test_filter_control():
@@ -143,7 +143,7 @@ def test_divide():
         Segment(" World!", italic),
     ]
 
-    assert list(Segment.divide(segments, [])) == []
+    assert not list(Segment.divide(segments, []))
     assert list(Segment.divide([], [1])) == [[]]
 
     assert list(Segment.divide(segments, [1])) == [[Segment("H", bold)]]

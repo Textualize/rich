@@ -21,14 +21,13 @@ def cell_len(text: str, _cache: Dict[str, int] = LRUCache(1024 * 4)) -> int:
 
     if _is_single_cell_widths(text):
         return len(text)
-    else:
-        cached_result = _cache.get(text, None)
-        if cached_result is not None:
-            return cached_result
-        _get_size = get_character_cell_size
-        total_size = sum(_get_size(character) for character in text)
-        if len(text) <= 64:
-            _cache[text] = total_size
+    cached_result = _cache.get(text)
+    if cached_result is not None:
+        return cached_result
+    _get_size = get_character_cell_size
+    total_size = sum(_get_size(character) for character in text)
+    if len(text) <= 64:
+        _cache[text] = total_size
     return total_size
 
 
@@ -103,7 +102,7 @@ def set_cell_size(text: str, total: int) -> str:
         before = text[: pos + 1]
         before_len = cell_len(before)
         if before_len == total + 1 and cell_len(before[-1]) == 2:
-            return before[:-1] + " "
+            return f'{before[:-1]} '
         if before_len == total:
             return before
         if before_len > total:
