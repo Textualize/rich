@@ -443,9 +443,7 @@ class DownloadColumn(ProgressColumn):
         total_ratio = total / unit
         precision = 0 if unit == 1 else 1
         completed_str = f"{completed_ratio:,.{precision}f}"
-        total_str = (
-            "?" if task.total is None else f"{total_ratio:,.{precision}f}"
-        )
+        total_str = "?" if task.total is None else f"{total_ratio:,.{precision}f}"
         download_status = f"{completed_str}/{total_str} {suffix}"
         download_text = Text(download_status, style="progress.download")
         return download_text
