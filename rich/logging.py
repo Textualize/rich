@@ -174,10 +174,11 @@ class RichHandler(Handler):
         if highlighter:
             message_text = highlighter(message_text)
 
-        if self.keywords is not None:
+        if self.keywords is None:
+            self.keywords = self.KEYWORDS
+
+        if self.keywords:
             message_text.highlight_words(self.keywords, "logging.keyword")
-        elif self.KEYWORDS is not None:
-            message_text.highlight_words(self.KEYWORDS, "logging.keyword")
 
         return message_text
 
