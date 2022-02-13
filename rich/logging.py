@@ -44,7 +44,7 @@ class RichHandler(Handler):
         keywords (List[str], optional): List of words to highlight instead of ``RichHandler.KEYWORDS``.
     """
 
-    KEYWORDS: ClassVar[List[str]] = [
+    KEYWORDS: ClassVar[Optional[List[str]]] = [
         "GET",
         "POST",
         "HEAD",
@@ -174,9 +174,10 @@ class RichHandler(Handler):
         if highlighter:
             message_text = highlighter(message_text)
 
-        message_text.highlight_words(
-            self.KEYWORDS if self.keywords is None else self.keywords, "logging.keyword"
-        )
+        if self.keywords is not None:
+            message_text.highlight_words(self.keywords, "logging.keyword")
+        elif self.KEYWORDS is not None:
+            message_text.highlight_words(self.KEYWORDS, "logging.keyword")
 
         return message_text
 
