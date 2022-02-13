@@ -422,7 +422,7 @@ All Rich renderables make use of the [Console Protocol](https://rich.readthedocs
 # Rich CLI
 
 
-See also [Rich CLI](https://github.com/textualize/rich-cli) for a command line application powered by Rich. Syntax highlight code, render markdown, display CSVs in tables, directly from the command prompt.
+See also [Rich CLI](https://github.com/textualize/rich-cli) for a command line application powered by Rich. Syntax highlight code, render markdown, display CSVs in tables, and more, directly from the command prompt.
 
 
 ![Rich CLI](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/rich-cli-splash.jpg)
