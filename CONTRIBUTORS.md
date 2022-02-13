@@ -16,6 +16,7 @@ The following people have contributed to the development of Rich:
 - [Hedy Li](https://github.com/hedythedev)
 - [Alexander Mancevice](https://github.com/amancevice)
 - [Will McGugan](https://github.com/willmcgugan)
+- [Paul McGuire](https://github.com/ptmcg)
 - [Nathan Page](https://github.com/nathanrpage97)
 - [Avi Perl](https://github.com/avi-perl)
 - [Laurent Peuch](https://github.com/psycojoker)
@@ -28,3 +29,7 @@ The following people have contributed to the development of Rich:
 - [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
 - [Patrick Arminio](https://github.com/patrick91)
+- [Dennis Brakhane](https://github.com/brakhane)
+- [Michał Górny](https://github.com/mgorny)
+- [Arian Mollik Wasi](https://github.com/wasi-master)
+

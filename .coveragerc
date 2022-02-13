@@ -2,7 +2,8 @@
 omit = rich/jupyter.py
     rich/_windows.py
     rich/_timer.py
-    
+    rich/diagnose.py
+
 [report]
 exclude_lines =
     pragma: no cover

@@ -1,11 +1,11 @@
 import io
 import sys
+from types import ModuleType
 
 import pytest
 
 from rich import inspect
 from rich.console import Console
-
 
 skip_py36 = pytest.mark.skipif(
     sys.version_info.minor == 6 and sys.version_info.major == 3,
@@ -30,6 +30,11 @@ skip_py39 = pytest.mark.skipif(
 skip_py310 = pytest.mark.skipif(
     sys.version_info.minor == 10 and sys.version_info.major == 3,
     reason="rendered differently on py3.10",
+)
+
+skip_pypy3 = pytest.mark.skipif(
+    hasattr(sys, "pypy_version_info"),
+    reason="rendered differently on pypy3",
 )
 
 
@@ -81,8 +86,8 @@ def test_render():
     assert expected == result
 
 
+@skip_pypy3
 def test_inspect_text():
-
     expected = (
         "╭──────────────── <class 'str'> ─────────────────╮\n"
         "│ str(object='') -> str                          │\n"
@@ -99,8 +104,8 @@ def test_inspect_text():
 
 @skip_py36
 @skip_py37
+@skip_pypy3
 def test_inspect_empty_dict():
-
     expected = (
         "╭──────────────── <class 'dict'> ────────────────╮\n"
         "│ dict() -> new empty dictionary                 │\n"
@@ -121,8 +126,8 @@ def test_inspect_empty_dict():
     assert render({}).startswith(expected)
 
 
+@skip_pypy3
 def test_inspect_builtin_function():
-
     expected = (
         "╭────────── <built-in function print> ───────────╮\n"
         "│ def print(...)                                 │\n"
@@ -139,7 +144,6 @@ def test_inspect_builtin_function():
 
 @skip_py36
 def test_inspect_integer():
-
     expected = (
         "╭────── <class 'int'> ───────╮\n"
         "│ int([x]) -> integer        │\n"
@@ -156,7 +160,6 @@ def test_inspect_integer():
 
 @skip_py36
 def test_inspect_integer_with_value():
-
     expected = "╭────── <class 'int'> ───────╮\n│ int([x]) -> integer        │\n│ int(x, base=10) -> integer │\n│                            │\n│ ╭────────────────────────╮ │\n│ │ 1                      │ │\n│ ╰────────────────────────╯ │\n│                            │\n│ denominator = 1            │\n│        imag = 0            │\n│   numerator = 1            │\n│        real = 1            │\n╰────────────────────────────╯\n"
     value = render(1, value=True)
     print(repr(value))
@@ -167,7 +170,6 @@ def test_inspect_integer_with_value():
 @skip_py37
 @skip_py310
 def test_inspect_integer_with_methods():
-
     expected = (
         "╭──────────────── <class 'int'> ─────────────────╮\n"
         "│ int([x]) -> integer                            │\n"
@@ -205,7 +207,6 @@ def test_inspect_integer_with_methods():
 @skip_py38
 @skip_py39
 def test_inspect_integer_with_methods():
-
     expected = (
         "╭──────────────── <class 'int'> ─────────────────╮\n"
         "│ int([x]) -> integer                            │\n"
@@ -244,6 +245,7 @@ def test_inspect_integer_with_methods():
 
 @skip_py36
 @skip_py37
+@skip_pypy3
 def test_broken_call_attr():
     class NotCallable:
         __call__ = 5  # Passes callable() but isn't really callable
@@ -260,3 +262,40 @@ def test_broken_call_attr():
     result = render(foo, methods=True, width=100)
     print(repr(result))
     assert expected == result
+
+
+def test_inspect_swig_edge_case():
+    """Issue #1838 - Edge case with Faiss library - object with empty dir()"""
+
+    class Thing:
+        @property
+        def __class__(self):
+            raise AttributeError
+
+    thing = Thing()
+    try:
+        inspect(thing)
+    except Exception as e:
+        assert False, f"Object with no __class__ shouldn't raise {e}"
+
+
+def test_inspect_module_with_class():
+    def function():
+        pass
+
+    class Thing:
+        """Docstring"""
+
+        pass
+
+    module = ModuleType("my_module")
+    module.SomeClass = Thing
+    module.function = function
+
+    expected = (
+        "╭────────── <module 'my_module'> ──────────╮\n"
+        "│  function = def function():              │\n"
+        "│ SomeClass = class SomeClass(): Docstring │\n"
+        "╰──────────────────────────────────────────╯\n"
+    )
+    assert render(module, methods=True) == expected

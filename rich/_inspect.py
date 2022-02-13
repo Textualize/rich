@@ -1,9 +1,10 @@
 from __future__ import absolute_import
 
+import inspect
 from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
 from typing import Any, Iterable, Optional, Tuple
 
-from .console import RenderableType, Group
+from .console import Group, RenderableType
 from .highlighter import ReprHighlighter
 from .jupyter import JupyterMixin
 from .panel import Panel
@@ -106,8 +107,17 @@ class Inspect(JupyterMixin):
         signature_text = self.highlighter(_signature)
 
         qualname = name or getattr(obj, "__qualname__", name)
+
+        # If obj is a module, there may be classes (which are callable) to display
+        if inspect.isclass(obj):
+            prefix = "class"
+        else:
+            prefix = "def"
+
         qual_signature = Text.assemble(
-            ("def ", "inspect.def"), (qualname, "inspect.callable"), signature_text
+            (f"{prefix} ", f"inspect.{prefix}"),
+            (qualname, "inspect.callable"),
+            signature_text,
         )
 
         return qual_signature
@@ -204,7 +214,8 @@ class Inspect(JupyterMixin):
                 add_row(key_text, Pretty(value, highlighter=highlighter))
         if items_table.row_count:
             yield items_table
-        else:
+        elif not_shown_count:
             yield Text.from_markup(
-                f"[b cyan]{not_shown_count}[/][i] attribute(s) not shown.[/i] Run [b][magenta]inspect[/]([not b]inspect[/])[/b] for options."
+                f"[b cyan]{not_shown_count}[/][i] attribute(s) not shown.[/i] "
+                f"Run [b][magenta]inspect[/]([not b]inspect[/])[/b] for options."
             )

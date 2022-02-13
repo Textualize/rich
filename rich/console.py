@@ -2060,8 +2060,8 @@ class Console:
         Args:
             theme (TerminalTheme, optional): TerminalTheme object containing console colors.
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
-            code_format (str, optional): Format string to render HTML, should contain {foreground}
-                {background} and {code}.
+            code_format (str, optional): Format string to render HTML. In addition to '{foreground}',
+                '{background}', and '{code}', should contain '{stylesheet}' if inline_styles is ``False``.
             inline_styles (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
                 larger but easier to cut and paste markup. If ``False``, styles will be embedded in a style tag.
                 Defaults to False.
@@ -2137,8 +2137,8 @@ class Console:
             path (str): Path to write html file.
             theme (TerminalTheme, optional): TerminalTheme object containing console colors.
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
-            code_format (str, optional): Format string to render HTML, should contain {foreground}
-                {background} and {code}.
+            code_format (str, optional): Format string to render HTML. In addition to '{foreground}',
+                '{background}', and '{code}', should contain '{stylesheet}' if inline_styles is ``False``.
             inline_styles (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
                 larger but easier to cut and paste markup. If ``False``, styles will be embedded in a style tag.
                 Defaults to False.
