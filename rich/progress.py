@@ -404,8 +404,12 @@ class MofNCompleteColumn(ProgressColumn):
     def render(self, task: "Task") -> Text:
         """Show completed/total."""
         completed = int(task.completed)
-        total = int(task.total)
-        total_width = len(str(total))
+        if task.total is None:
+            total: Union[str, int] = "?"
+            total_width = len(str(completed))
+        else:
+            total = int(task.total)
+            total_width = len(str(total))
         return Text(
             f"{completed:{total_width}d}{self.separator}{total}",
             style="progress.download",
@@ -484,8 +488,8 @@ class Task:
     description: str
     """str: Description of the task."""
 
-    total: float
-    """float: Total number of steps in this task."""
+    total: Optional[float]
+    """Optional[float]: Total number of steps in this task."""
 
     completed: float
     """float: Number of steps completed"""
@@ -749,7 +753,7 @@ class Progress(JupyterMixin):
 
         if total is None:
             if isinstance(sequence, Sized):
-                task_total = float(len(sequence))
+                task_total: Optional[float] = float(len(sequence))
             else:
                 try:
                     iter(sequence)
