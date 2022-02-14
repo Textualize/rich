@@ -13,7 +13,7 @@ See Also:
 
 __all__ = ["decimal"]
 
-from typing import Iterable, List, Tuple, Optional
+from typing import Iterable, List, Optional, Tuple
 
 
 def _to_str(
