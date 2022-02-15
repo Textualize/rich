@@ -20,7 +20,7 @@ You may also use the color's number (an integer between 0 and 255) with the synt
 
     console.print("Hello", style="color(5)")
 
-Alteratively you can use a CSS-like syntax to specify a color with a "#" followed by three pairs of hex characters, or in RGB form with three decimal integers. The following two lines both print "Hello" in the same color (purple)::
+Alternatively you can use a CSS-like syntax to specify a color with a "#" followed by three pairs of hex characters, or in RGB form with three decimal integers. The following two lines both print "Hello" in the same color (purple)::
 
     console.print("Hello", style="#af00ff")
     console.print("Hello", style="rgb(175,0,255)")
