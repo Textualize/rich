@@ -2,6 +2,7 @@
 Basic example to show how to print an traceback of an exception
 """
 from typing import List, Tuple
+
 from rich.console import Console
 
 console = Console()
@@ -34,7 +35,7 @@ DIVIDES = [
     (0, 1000000),
     (3.1427, 2),
     (888, 0),
-    (2 ** 32, 2 ** 16),
+    (2**32, 2**16),
 ]
 
 divide_all(DIVIDES)
