@@ -19,7 +19,7 @@ class LogRender:
         show_path: bool = True,
         time_format: Union[str, FormatTimeCallable] = "[%x %X]",
         omit_repeated_times: bool = True,
-        limit_repeat_omissions: Optional[Union[int, float]] = 1 / 2,
+        show_time_reminders: bool = True,
         level_width: Optional[int] = 8,
     ) -> None:
         self.show_time = show_time
@@ -27,7 +27,7 @@ class LogRender:
         self.show_path = show_path
         self.time_format = time_format
         self.omit_repeated_times = omit_repeated_times
-        self.limit_repeat_omissions = limit_repeat_omissions
+        self.show_time_reminders = show_time_reminders
         self.level_width = level_width
         self._last_time: Optional[Text] = None
         self._time_omissions: int = 0
@@ -66,14 +66,9 @@ class LogRender:
 
             if self.omit_repeated_times:
                 if log_time_display == self._last_time:
-                    if self.limit_repeat_omissions:
-                        _max = (
-                            self.limit_repeat_omissions
-                            if isinstance(self.limit_repeat_omissions, int)
-                            else int(console.size.height * self.limit_repeat_omissions)
-                        )
-                        if self._time_omissions >= _max:
-                            log_time_display.stylize(style="log.limit_repeat_omissions")
+                    if self.show_time_reminders:
+                        if self._time_omissions >= int(console.height * 0.5):
+                            log_time_display.stylize(style="log.time.reminder")
                             row.append(log_time_display)
                             self._time_omissions = 0
                         else:

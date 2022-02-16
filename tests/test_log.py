@@ -69,39 +69,28 @@ def test_justify():
     [
         ({"omit_repeated_times": False}, itertools.repeat("TIME")),
         ({}, itertools.cycle(["TIME"] + (["    "] * 40))),
-        ({"limit_repeat_omissions": 1.5}, itertools.cycle(["TIME"] + (["    "] * 120))),
-        ({"limit_repeat_omissions": 20}, itertools.cycle(["TIME"] + (["    "] * 20))),
         (
-            {"limit_repeat_omissions": None},
+            {"show_time_reminders": False},
             itertools.chain(["TIME"], itertools.repeat("    ")),
         ),
     ],
 )
-def test_log_limit_omissions(handler_kwargs, exp_times):
+def test_log_time_reminders(handler_kwargs, exp_times):
+    console = Console(width=80, height=80, color_system=None)
     handler = RichHandler(
-        console=Console(
-            file=io.StringIO(),
-            width=80,
-            height=80,
-            color_system=None,
-            legacy_windows=False,
-        ),
-        level=logging.INFO,
-        **handler_kwargs,
+        logging.INFO, console, log_time_format="TIME", **handler_kwargs
     )
-    handler.setFormatter(logging.Formatter("%(message)s", datefmt="TIME"))
-
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
-    logger.addHandler(handler)
+    logger.handlers = [handler]
 
-    for i in range(200):
-        logger.info(f"logging line {i}")
-
-    times = [
-        line[:4]
-        for line in replace_link_ids(handler.console.file.getvalue()).split("\n")[:-1]
-    ]
+    console.begin_capture()
+    for i in range(100):
+        logger.info(f"<{i}>")
+    c = console.end_capture()
+    print(c)
+    times = [line[:4] for line in c.split("\n")][:-1]
+    print(times)
 
     for a, b in zip(times, exp_times):
         assert a == b
