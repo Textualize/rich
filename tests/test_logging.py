@@ -162,6 +162,11 @@ def test_markup_and_highlight():
     assert log_message in render_plain
 
 
+def test_console_params():
+    handler = RichHandler(console=dict(stderr=True))
+    assert handler.console.stderr
+
+
 if __name__ == "__main__":
     render = make_log()
     print(render)

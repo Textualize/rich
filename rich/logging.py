@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from logging import Handler, LogRecord
 from pathlib import Path
-from typing import ClassVar, List, Optional, Type, Union
+from typing import Any, ClassVar, List, Mapping, Optional, Type, Union
 
 from . import get_console
 from ._log_render import LogRender, FormatTimeCallable
@@ -58,7 +58,7 @@ class RichHandler(Handler):
     def __init__(
         self,
         level: Union[int, str] = logging.NOTSET,
-        console: Optional[Console] = None,
+        console: Optional[Union[Console, Mapping[str, Any]]] = None,
         *,
         show_time: bool = True,
         omit_repeated_times: bool = True,
@@ -78,7 +78,13 @@ class RichHandler(Handler):
         log_time_format: Union[str, FormatTimeCallable] = "[%x %X]",
     ) -> None:
         super().__init__(level=level)
-        self.console = console or get_console()
+        self.console = (
+            console
+            if isinstance(console, Console)
+            else Console(**console)
+            if console
+            else get_console()
+        )
         self.highlighter = highlighter or self.HIGHLIGHTER_CLASS()
         self._log_render = LogRender(
             show_time=show_time,
