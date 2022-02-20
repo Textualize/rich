@@ -1,3 +1,10 @@
+try:
+    import hy
+except ModuleNotFoundError:
+    hylang_installed = False
+else:
+    hylang_installed = True
+
 import io
 import sys
 from types import ModuleType
@@ -299,3 +306,72 @@ def test_inspect_module_with_class():
         "╰──────────────────────────────────────────╯\n"
     )
     assert render(module, methods=True) == expected
+
+
+class Hy_Foo:
+    """Hy Foo test
+
+    Second line
+    """
+
+    def __init__(self, foo: int) -> None:
+        """constructor docs."""
+        self.hyx_tXsolidusXfoo = foo
+        self.hyx_tXsolidusXdct = {
+            "hyx_tXsolidusXfoo": self.hyx_tXsolidusXfoo,
+            "hyx_tXsolidusXdct": {
+                "hyx_tXsolidusXfoo": self.hyx_tXsolidusXfoo,
+            },
+        }
+
+    @property
+    def hyx_tXsolidusXbroken(self):
+        raise InspectError()
+
+    def hyx_tXsolidusXmethod(self, a, b) -> str:
+        """Multi line
+
+        docs.
+        """
+        return "test"
+        
+    def __repr__(self):
+        return " "
+
+
+@skip_py36
+def test_hy_recursive_unmangle():
+    foo = Hy_Foo("hello")
+    expected = (
+        "╭─────────── <class 'tests.test_inspect.Hy_Foo'> ────────────╮\n"
+        "│ Hy Foo test                                                │\n"
+        "│                                                            │\n"
+        "│ ╭────────────────────────────────────────────────────────╮ │\n"
+        "│ │                                                        │ │\n"
+        "│ ╰────────────────────────────────────────────────────────╯ │\n"
+        "│                                                            │\n"
+        "│ t/broken = InspectError()                                  │\n"
+        "│    t/dct = {'t/foo': 'hello', 't/dct': {'t/foo': 'hello'}} │\n"
+        "│    t/foo = 'hello'                                         │\n"
+        "│ t/method = def t/method(a, b) -> str: Multi line           │\n"
+        "╰────────────────────────────────────────────────────────────╯\n"
+    ) if hylang_installed else (
+        "╭───────────────────── <class 'tests.test_inspect.Hy_Foo'> ──────────────────────╮\n"
+        "│ Hy Foo test                                                                    │\n"
+        "│                                                                                │\n"
+        "│ ╭────────────────────────────────────────────────────────────────────────────╮ │\n"
+        "│ │                                                                            │ │\n"
+        "│ ╰────────────────────────────────────────────────────────────────────────────╯ │\n"
+        "│                                                                                │\n"
+        "│ hyx_tXsolidusXbroken = InspectError()                                          │\n"
+        "│    hyx_tXsolidusXdct = {                                                       │\n"
+        "│                            'hyx_tXsolidusXfoo': 'hello',                       │\n"
+        "│                            'hyx_tXsolidusXdct': {                              │\n"
+        "│                                'hyx_tXsolidusXfoo': 'hello'                    │\n"
+        "│                            }                                                   │\n"
+        "│                        }                                                       │\n"
+        "│    hyx_tXsolidusXfoo = 'hello'                                                 │\n"
+        "│ hyx_tXsolidusXmethod = def hyx_tXsolidusXmethod(a, b) -> str: Multi line       │\n"
+        "╰────────────────────────────────────────────────────────────────────────────────╯\n"
+    )
+    assert render(foo, width=100, methods=True, value=True) == expected

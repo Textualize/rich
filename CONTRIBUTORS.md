@@ -22,6 +22,7 @@ The following people have contributed to the development of Rich:
 - [Laurent Peuch](https://github.com/psycojoker)
 - [Kylian Point](https://github.com/p0lux)
 - [Kyle Pollina](https://github.com/kylepollina)
+- [Jeet Ray](https://github.com/sylvorg)
 - [Clément Robert](https://github.com/neutrinoceros)
 - [Tushar Sadhwani](https://github.com/tusharsadhwani)
 - [Tim Savage](https://github.com/timsavage)

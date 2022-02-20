@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added ProgressColumn `MofNCompleteColumn` to display raw `completed/total` column (similar to DownloadColumn,
   but displays values as ints, does not convert to floats or add bit/bytes units). 
   https://github.com/Textualize/rich/pull/1941
+- Added support for recursively unmangling [hy](https://docs.hylang.org/en/alpha/) names when inspecting objects, if the dialect is installed.
 
 ### Fixed
 

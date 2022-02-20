@@ -2,14 +2,14 @@ from __future__ import absolute_import
 
 import inspect
 from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
+from itertools import chain
 from typing import Any, Dict, Iterable, Optional, Tuple
 
 try:
     from hy import unmangle
-except ModuleNotFoundError:
+except ImportError:
     hylang_installed = False
 else:
-    from itertools import chain
     hylang_installed = True
 
 from .console import Group, RenderableType
@@ -104,9 +104,17 @@ class Inspect(JupyterMixin):
             return None
         else:
             if hylang_installed:
-                _signature_split_equals = chain(*(item.split("=") for item in _signature.split(" ")))
-                _signature_split_left_paren = chain(*(item.split("(") for item in _signature_split_equals))
-                _unmangled_names = { item : unmangle(item) for item in _signature_split_left_paren if item != unmangle(item) }
+                _signature_split_equals = chain(
+                    *(item.split("=") for item in _signature.split(" "))
+                )
+                _signature_split_left_paren = chain(
+                    *(item.split("(") for item in _signature_split_equals)
+                )
+                _unmangled_names = {
+                    item: unmangle(item)
+                    for item in _signature_split_left_paren
+                    if item != unmangle(item)
+                }
                 for key, value in _unmangled_names.items():
                     _signature = _signature.replace(key, value)
 
@@ -143,7 +151,14 @@ class Inspect(JupyterMixin):
     def _recursive_unmangle(self, dct: Dict[Any, Any]) -> Dict[str, Any]:
         """Recursively unmangle hylang key names"""
         if hylang_installed:
-            return { unmangle(key) : (self._recursive_unmangle(value) if isinstance(value, dict) else value) for key, value in dct.items() }
+            return {
+                unmangle(key): (
+                    self._recursive_unmangle(value)
+                    if isinstance(value, dict)
+                    else value
+                )
+                for key, value in dct.items()
+            }
         else:
             return dct
 
@@ -216,7 +231,9 @@ class Inspect(JupyterMixin):
                 continue
 
             if key == "__slots__":
-                value = self._recursive_unmangle({ item : getattr(obj, item) for item in value if item != "__dict__" })
+                value = self._recursive_unmangle(
+                    {item: getattr(obj, item) for item in value if item != "__dict__"}
+                )
             elif isinstance(value, dict):
                 value = self._recursive_unmangle(value)
             elif isinstance(value, str):
