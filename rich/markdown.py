@@ -25,7 +25,7 @@ class MarkdownElement:
         """Factory to create markdown element,
 
         Args:
-            markdown (Markdown): THe parent Markdown object.
+            markdown (Markdown): The parent Markdown object.
             node (Any): A node from Pygments.
 
         Returns:
@@ -312,7 +312,7 @@ class ImageItem(TextElement):
         """Factory to create markdown element,
 
         Args:
-            markdown (Markdown): THe parent Markdown object.
+            markdown (Markdown): The parent Markdown object.
             node (Any): A node from Pygments.
 
         Returns:

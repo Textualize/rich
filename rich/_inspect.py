@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import inspect
 from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
 from typing import Any, Dict, Iterable, Optional, Tuple
 
@@ -125,8 +126,16 @@ class Inspect(JupyterMixin):
         if hylang_installed:
             qualname = unmangle(qualname)
 
+        # If obj is a module, there may be classes (which are callable) to display
+        if inspect.isclass(obj):
+            prefix = "class"
+        else:
+            prefix = "def"
+
         qual_signature = Text.assemble(
-            ("def ", "inspect.def"), (qualname, "inspect.callable"), signature_text
+            (f"{prefix} ", f"inspect.{prefix}"),
+            (qualname, "inspect.callable"),
+            signature_text,
         )
 
         return qual_signature

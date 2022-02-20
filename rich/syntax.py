@@ -1,6 +1,5 @@
 import os.path
 import platform
-from rich.containers import Lines
 import textwrap
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
@@ -22,6 +21,8 @@ from pygments.token import (
     Whitespace,
 )
 from pygments.util import ClassNotFound
+
+from rich.containers import Lines
 
 from ._loop import loop_first
 from .color import Color, blend_rgb
@@ -200,7 +201,8 @@ class Syntax(JupyterMixin):
         dedent (bool, optional): Enable stripping of initial whitespace. Defaults to False.
         line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
         start_line (int, optional): Starting number for line numbers. Defaults to 1.
-        line_range (Tuple[int, int], optional): If given should be a tuple of the start and end line to render.
+        line_range (Tuple[int | None, int | None], optional): If given should be a tuple of the start and end line to render.
+            A value of None in the tuple indicates the range is open in that direction.
         highlight_lines (Set[int]): A set of line numbers to highlight.
         code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
         tab_size (int, optional): Size of tabs. Defaults to 4.
@@ -233,7 +235,7 @@ class Syntax(JupyterMixin):
         dedent: bool = False,
         line_numbers: bool = False,
         start_line: int = 1,
-        line_range: Optional[Tuple[int, int]] = None,
+        line_range: Optional[Tuple[Optional[int], Optional[int]]] = None,
         highlight_lines: Optional[Set[int]] = None,
         code_width: Optional[int] = None,
         tab_size: int = 4,
@@ -264,6 +266,7 @@ class Syntax(JupyterMixin):
         cls,
         path: str,
         encoding: str = "utf-8",
+        lexer: Optional[Union[Lexer, str]] = None,
         theme: Union[str, SyntaxTheme] = DEFAULT_THEME,
         dedent: bool = False,
         line_numbers: bool = False,
@@ -281,6 +284,7 @@ class Syntax(JupyterMixin):
         Args:
             path (str): Path to file to highlight.
             encoding (str): Encoding of file.
+            lexer (str | Lexer, optional): Lexer to use. If None, lexer will be auto-detected from path/file content.
             theme (str, optional): Color theme, aka Pygments style (see https://pygments.org/docs/styles/#getting-a-list-of-available-styles). Defaults to "emacs".
             dedent (bool, optional): Enable stripping of initial whitespace. Defaults to True.
             line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
@@ -299,26 +303,12 @@ class Syntax(JupyterMixin):
         with open(path, "rt", encoding=encoding) as code_file:
             code = code_file.read()
 
-        lexer = None
-        lexer_name = "default"
-        try:
-            _, ext = os.path.splitext(path)
-            if ext:
-                extension = ext.lstrip(".").lower()
-                lexer = get_lexer_by_name(extension)
-                lexer_name = lexer.name
-        except ClassNotFound:
-            pass
-
-        if lexer is None:
-            try:
-                lexer_name = guess_lexer_for_filename(path, code).name
-            except ClassNotFound:
-                pass
+        if not lexer:
+            lexer = cls.guess_lexer(path, code=code)
 
         return cls(
             code,
-            lexer_name,
+            lexer,
             theme=theme,
             dedent=dedent,
             line_numbers=line_numbers,
@@ -331,6 +321,48 @@ class Syntax(JupyterMixin):
             background_color=background_color,
             indent_guides=indent_guides,
         )
+
+    @classmethod
+    def guess_lexer(cls, path: str, code: Optional[str] = None) -> str:
+        """Guess the alias of the Pygments lexer to use based on a path and an optional string of code.
+        If code is supplied, it will use a combination of the code and the filename to determine the
+        best lexer to use. For example, if the file is ``index.html`` and the file contains Django
+        templating syntax, then "html+django" will be returned. If the file is ``index.html``, and no
+        templating language is used, the "html" lexer will be used. If no string of code
+        is supplied, the lexer will be chosen based on the file extension..
+
+        Args:
+             path (AnyStr): The path to the file containing the code you wish to know the lexer for.
+             code (str, optional): Optional string of code that will be used as a fallback if no lexer
+                is found for the supplied path.
+
+        Returns:
+            str: The name of the Pygments lexer that best matches the supplied path/code.
+        """
+        lexer: Optional[Lexer] = None
+        lexer_name = "default"
+        if code:
+            try:
+                lexer = guess_lexer_for_filename(path, code)
+            except ClassNotFound:
+                pass
+
+        if not lexer:
+            try:
+                _, ext = os.path.splitext(path)
+                if ext:
+                    extension = ext.lstrip(".").lower()
+                    lexer = get_lexer_by_name(extension)
+            except ClassNotFound:
+                pass
+
+        if lexer:
+            if lexer.aliases:
+                lexer_name = lexer.aliases[0]
+            else:
+                lexer_name = lexer.name
+
+        return lexer_name
 
     def _get_base_style(self) -> Style:
         """Get the base style."""
@@ -369,7 +401,9 @@ class Syntax(JupyterMixin):
             return None
 
     def highlight(
-        self, code: str, line_range: Optional[Tuple[int, int]] = None
+        self,
+        code: str,
+        line_range: Optional[Tuple[Optional[int], Optional[int]]] = None,
     ) -> Text:
         """Highlight code and return a Text instance.
 
@@ -417,7 +451,7 @@ class Syntax(JupyterMixin):
                     """Convert tokens to spans."""
                     tokens = iter(line_tokenize())
                     line_no = 0
-                    _line_start = line_start - 1
+                    _line_start = line_start - 1 if line_start else 0
 
                     # Skip over tokens until line start
                     while line_no < _line_start:
@@ -430,7 +464,7 @@ class Syntax(JupyterMixin):
                         yield (token, _get_theme_style(token_type))
                         if token.endswith("\n"):
                             line_no += 1
-                            if line_no >= line_end:
+                            if line_end and line_no >= line_end:
                                 break
 
                 text.append_tokens(tokens_to_spans())
@@ -513,11 +547,6 @@ class Syntax(JupyterMixin):
             else self.code_width
         )
 
-        line_offset = 0
-        if self.line_range:
-            start_line, end_line = self.line_range
-            line_offset = max(0, start_line - 1)
-
         ends_on_nl = self.code.endswith("\n")
         code = self.code if ends_on_nl else self.code + "\n"
         code = textwrap.dedent(code) if self.dedent else code
@@ -550,7 +579,7 @@ class Syntax(JupyterMixin):
             else:
                 syntax_lines = console.render_lines(
                     text,
-                    options.update(width=code_width, height=None),
+                    options.update(width=code_width, height=None, justify="left"),
                     style=self.background_style,
                     pad=True,
                     new_lines=True,
@@ -559,6 +588,10 @@ class Syntax(JupyterMixin):
                     yield from syntax_line
             return
 
+        start_line, end_line = self.line_range or (None, None)
+        line_offset = 0
+        if start_line:
+            line_offset = max(0, start_line - 1)
         lines: Union[List[Text], Lines] = text.split("\n", allow_blank=ends_on_nl)
         if self.line_range:
             lines = lines[line_offset:end_line]
@@ -591,7 +624,7 @@ class Syntax(JupyterMixin):
             if self.word_wrap:
                 wrapped_lines = console.render_lines(
                     line,
-                    render_options.update(height=None),
+                    render_options.update(height=None, justify="left"),
                     style=background_style,
                     pad=not transparent_background,
                 )
@@ -726,6 +759,7 @@ if __name__ == "__main__":  # pragma: no cover
     else:
         syntax = Syntax.from_path(
             args.path,
+            lexer=args.lexer_name,
             line_numbers=args.line_numbers,
             word_wrap=args.word_wrap,
             theme=args.theme,

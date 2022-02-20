@@ -1,17 +1,17 @@
 # coding=utf-8
 
+import os
 import sys
-import os, tempfile
+import tempfile
 
 import pytest
-from .render import render
+from pygments.lexers import PythonLexer
 
 from rich.panel import Panel
 from rich.style import Style
-from rich.syntax import Syntax, ANSISyntaxTheme, PygmentsSyntaxTheme, Color, Console
+from rich.syntax import ANSISyntaxTheme, Color, Console, PygmentsSyntaxTheme, Syntax
 
-from pygments.lexers import PythonLexer
-
+from .render import render
 
 CODE = '''\
 def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
@@ -241,8 +241,13 @@ def test_ansi_theme():
     assert theme.get_background_style() == Style()
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="permissions error on Windows")
-def test_from_file():
+skip_windows_permission_error = pytest.mark.skipif(
+    sys.platform == "win32", reason="permissions error on Windows"
+)
+
+
+@skip_windows_permission_error
+def test_from_path():
     fh, path = tempfile.mkstemp("example.py")
     try:
         os.write(fh, b"import this\n")
@@ -254,8 +259,8 @@ def test_from_file():
         os.remove(path)
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="permissions error on Windows")
-def test_from_file_unknown_lexer():
+@skip_windows_permission_error
+def test_from_path_unknown_lexer():
     fh, path = tempfile.mkstemp("example.nosuchtype")
     try:
         os.write(fh, b"import this\n")
@@ -264,6 +269,38 @@ def test_from_file_unknown_lexer():
         assert syntax.code == "import this\n"
     finally:
         os.remove(path)
+
+
+@skip_windows_permission_error
+def test_from_path_lexer_override():
+    fh, path = tempfile.mkstemp("example.nosuchtype")
+    try:
+        os.write(fh, b"import this\n")
+        syntax = Syntax.from_path(path, lexer="rust")
+        assert syntax.lexer.name == "Rust"
+        assert syntax.code == "import this\n"
+    finally:
+        os.remove(path)
+
+
+@skip_windows_permission_error
+def test_from_path_lexer_override_invalid_lexer():
+    fh, path = tempfile.mkstemp("example.nosuchtype")
+    try:
+        os.write(fh, b"import this\n")
+        syntax = Syntax.from_path(path, lexer="blah")
+        assert syntax.lexer is None
+        assert syntax.code == "import this\n"
+    finally:
+        os.remove(path)
+
+
+def test_syntax_guess_lexer():
+    assert Syntax.guess_lexer("banana.py") == "python"
+    assert Syntax.guess_lexer("banana.py", "import this") == "python"
+    assert Syntax.guess_lexer("banana.html", "<a href='#'>hello</a>") == "html"
+    assert Syntax.guess_lexer("banana.html", "<%= @foo %>") == "rhtml"
+    assert Syntax.guess_lexer("banana.html", "{{something|filter:3}}") == "html+django"
 
 
 if __name__ == "__main__":

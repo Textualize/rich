@@ -2,7 +2,6 @@ from typing import Dict
 
 from .style import Style
 
-
 DEFAULT_STYLES: Dict[str, Style] = {
     "none": Style.null(),
     "reset": Style(
@@ -41,6 +40,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "inspect.attr.dunder": Style(color="yellow", italic=True, dim=True),
     "inspect.callable": Style(bold=True, color="red"),
     "inspect.def": Style(italic=True, color="bright_cyan"),
+    "inspect.class": Style(italic=True, color="bright_cyan"),
     "inspect.error": Style(bold=True, color="red"),
     "inspect.equals": Style(),
     "inspect.help": Style(color="cyan"),

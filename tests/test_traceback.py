@@ -110,8 +110,8 @@ def test_syntax_error():
     console = Console(width=100, file=io.StringIO())
     try:
         # raises SyntaxError: unexpected EOF while parsing
-        compile("(2+2")
-    except Exception:
+        eval("(2+2")
+    except SyntaxError:
         console.print_exception()
     exception_text = console.file.getvalue()
     assert "SyntaxError" in exception_text
