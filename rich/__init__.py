@@ -125,6 +125,7 @@ def inspect(
     sort: bool = True,
     all: bool = False,
     value: bool = True,
+    Hy: bool = False,
 ) -> None:
     """Inspect any Python object.
 
@@ -164,6 +165,7 @@ def inspect(
         sort=sort,
         all=all,
         value=value,
+        Hy=Hy,
     )
     _console.print(_inspect)
 
