@@ -123,7 +123,7 @@ def test_download_progress_uses_decimal_units() -> None:
     column = DownloadColumn()
     test_task = Task(1, "test", 1000, 500, _get_time=lambda: 1.0)
     rendered_progress = str(column.render(test_task))
-    expected = "0.5/1.0 KB"
+    expected = "0.5/1.0 kB"
     assert rendered_progress == expected
 
 
