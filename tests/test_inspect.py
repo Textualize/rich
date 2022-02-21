@@ -45,9 +45,9 @@ skip_pypy3 = pytest.mark.skipif(
 )
 
 
-def render(obj, methods=False, value=False, width=50) -> str:
+def render(obj, methods=False, value=False, width=50, Hy=False) -> str:
     console = Console(file=io.StringIO(), width=width, legacy_windows=False)
-    inspect(obj, console=console, methods=methods, value=value)
+    inspect(obj, console=console, methods=methods, value=value, Hy=Hy)
     return console.file.getvalue()
 
 
@@ -374,4 +374,4 @@ def test_hy_recursive_unmangle():
         "│ hyx_tXsolidusXmethod = def hyx_tXsolidusXmethod(a, b) -> str: Multi line       │\n"
         "╰────────────────────────────────────────────────────────────────────────────────╯\n"
     )
-    assert render(foo, width=100, methods=True, value=True) == expected
+    assert render(foo, width=100, methods=True, value=True, Hy=True) == expected
