@@ -2,14 +2,14 @@ from __future__ import absolute_import
 
 import inspect
 from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
-from itertools import chain
 from typing import Any, Dict, Iterable, Optional, Tuple
 
 try:
     from hy import unmangle
-except ImportError:
+except ModuleNotFoundError:
     hylang_installed = False
 else:
+    from itertools import chain
     hylang_installed = True
 
 from .console import Group, RenderableType
@@ -62,6 +62,7 @@ class Inspect(JupyterMixin):
         sort: bool = True,
         all: bool = True,
         value: bool = True,
+        Hy: bool = False,
     ) -> None:
         self.highlighter = ReprHighlighter()
         self.obj = obj
@@ -75,6 +76,7 @@ class Inspect(JupyterMixin):
         self.dunder = dunder
         self.sort = sort
         self.value = value
+        self.hy = Hy
 
     def _make_title(self, obj: Any) -> Text:
         """Make a default title."""
@@ -103,18 +105,10 @@ class Inspect(JupyterMixin):
         except TypeError:
             return None
         else:
-            if hylang_installed:
-                _signature_split_equals = chain(
-                    *(item.split("=") for item in _signature.split(" "))
-                )
-                _signature_split_left_paren = chain(
-                    *(item.split("(") for item in _signature_split_equals)
-                )
-                _unmangled_names = {
-                    item: unmangle(item)
-                    for item in _signature_split_left_paren
-                    if item != unmangle(item)
-                }
+            if hylang_installed and self.hy:
+                _signature_split_equals = chain(*(item.split("=") for item in _signature.split(" ")))
+                _signature_split_left_paren = chain(*(item.split("(") for item in _signature_split_equals))
+                _unmangled_names = { item : unmangle(item) for item in _signature_split_left_paren if item != unmangle(item) }
                 for key, value in _unmangled_names.items():
                     _signature = _signature.replace(key, value)
 
@@ -131,7 +125,7 @@ class Inspect(JupyterMixin):
 
         qualname = name or getattr(obj, "__qualname__", name)
 
-        if hylang_installed:
+        if hylang_installed and self.hy:
             qualname = unmangle(qualname)
 
         # If obj is a module, there may be classes (which are callable) to display
@@ -150,15 +144,8 @@ class Inspect(JupyterMixin):
 
     def _recursive_unmangle(self, dct: Dict[Any, Any]) -> Dict[str, Any]:
         """Recursively unmangle hylang key names"""
-        if hylang_installed:
-            return {
-                unmangle(key): (
-                    self._recursive_unmangle(value)
-                    if isinstance(value, dict)
-                    else value
-                )
-                for key, value in dct.items()
-            }
+        if hylang_installed and self.hy:
+            return { unmangle(key) : (self._recursive_unmangle(value) if isinstance(value, dict) else value) for key, value in dct.items() }
         else:
             return dct
 
@@ -219,7 +206,7 @@ class Inspect(JupyterMixin):
         for key, (error, value) in items:
             key_text = Text.assemble(
                 (
-                    unmangle(key) if hylang_installed else key,
+                    unmangle(key) if (hylang_installed and self.hy) else key,
                     "inspect.attr.dunder" if key.startswith("__") else "inspect.attr",
                 ),
                 (" =", "inspect.equals"),
@@ -231,15 +218,13 @@ class Inspect(JupyterMixin):
                 continue
 
             if key == "__slots__":
-                value = self._recursive_unmangle(
-                    {item: getattr(obj, item) for item in value if item != "__dict__"}
-                )
+                value = self._recursive_unmangle({ item : getattr(obj, item) for item in value if item != "__dict__" })
             elif isinstance(value, dict):
                 value = self._recursive_unmangle(value)
             elif isinstance(value, str):
                 pass
             else:
-                if hylang_installed:
+                if hylang_installed and self.hy:
                     try:
                         iter(value)
                     except TypeError:
