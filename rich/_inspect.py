@@ -230,7 +230,7 @@ class Inspect(JupyterMixin):
                     except TypeError:
                         pass
                     else:
-                        value = type(value)(unmangle(item) for item in value)
+                        value = type(value)([unmangle(item) for item in value])
 
             if callable(value):
                 if not self.methods:
