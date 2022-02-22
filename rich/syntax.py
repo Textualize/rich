@@ -735,7 +735,7 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument(
         "-x",
         "--lexer",
-        default="default",
+        default=None,
         dest="lexer_name",
         help="Lexer name",
     )

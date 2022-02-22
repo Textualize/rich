@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - In Jupyter mode make the link target be set to "_blank"
 - Fix some issues with markup handling around "[" characters https://github.com/Textualize/rich/pull/1950
+- Fix syntax lexer guessing.
 
 ### Added
 
