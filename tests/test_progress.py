@@ -2,6 +2,7 @@
 
 import io
 from time import sleep
+from types import SimpleNamespace
 
 import pytest
 
@@ -22,6 +23,7 @@ from rich.progress import (
     TextColumn,
     TimeElapsedColumn,
     TimeRemainingColumn,
+    CondensedTimeColumn,
     track,
     _TrackThread,
     TaskID,
@@ -87,6 +89,27 @@ def test_time_remaining_column():
 
     text = column(FakeTask(1, "test", 100, 20, _get_time=lambda: 1.0))
     assert str(text) == "0:01:00"
+
+
+@pytest.mark.parametrize("finished", [False, True])
+@pytest.mark.parametrize(
+    "task_time, formatted",
+    [
+        (None, "--:--"),
+        (0, "00:00"),
+        (59, "00:59"),
+        (71, "01:11"),
+        (4210, "1:10:10"),
+    ],
+)
+def test_condensed_time_column(finished, task_time, formatted):
+    if finished:
+        task = SimpleNamespace(finished=finished, finished_time=task_time)
+    else:
+        task = SimpleNamespace(finished=finished, time_remaining=task_time)
+
+    column = CondensedTimeColumn()
+    assert str(column.render(task)) == formatted
 
 
 def test_renderable_column():

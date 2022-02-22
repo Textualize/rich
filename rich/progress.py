@@ -357,6 +357,30 @@ class TimeRemainingColumn(ProgressColumn):
         return Text(str(remaining_delta), style="progress.remaining")
 
 
+class CondensedTimeColumn(ProgressColumn):
+    """Renders estimated time remaining, or elapsed time when the task is finished."""
+
+    # Only refresh twice a second to prevent jitter
+    max_refresh = 0.5
+
+    def render(self, task: "Task") -> Text:
+        """Show time."""
+        style = "progress.elapsed" if task.finished else "progress.remaining"
+        task_time = task.finished_time if task.finished else task.time_remaining
+        if task_time is None:
+            return Text("--:--", style=style)
+
+        # Based on https://github.com/tqdm/tqdm/blob/master/tqdm/std.py
+        minutes, seconds = divmod(int(task_time), 60)
+        hours, minutes = divmod(minutes, 60)
+        if hours:
+            formatted = f"{hours:d}:{minutes:02d}:{seconds:02d}"
+        else:
+            formatted = f"{minutes:02d}:{seconds:02d}"
+
+        return Text(formatted, style=style)
+
+
 class FileSizeColumn(ProgressColumn):
     """Renders completed filesize."""
 
