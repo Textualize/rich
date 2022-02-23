@@ -1655,6 +1655,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 [11.2.0]: https://github.com/willmcgugan/rich/compare/v11.1.0...v11.2.0
 [11.1.0]: https://github.com/willmcgugan/rich/compare/v11.0.0...v11.1.0
 [11.0.0]: https://github.com/willmcgugan/rich/compare/v10.16.1...v11.0.0
+[10.16.2]: https://github.com/willmcgugan/rich/compare/v10.16.1...v10.16.2
 [10.16.1]: https://github.com/willmcgugan/rich/compare/v10.16.0...v10.16.1
 [10.16.0]: https://github.com/willmcgugan/rich/compare/v10.15.2...v10.16.0
 [10.15.2]: https://github.com/willmcgugan/rich/compare/v10.15.1...v10.15.2
