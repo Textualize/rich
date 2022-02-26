@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added options to TimeRemainingColumn to render a compact time format and render elapsed time when a task is
+  finished. https://github.com/Textualize/rich/pull/1992
 - Added ProgressColumn `MofNCompleteColumn` to display raw `completed/total` column (similar to DownloadColumn,
-  but displays values as ints, does not convert to floats or add bit/bytes units). 
+  but displays values as ints, does not convert to floats or add bit/bytes units).
   https://github.com/Textualize/rich/pull/1941
 
 ### Fixed
