@@ -23,7 +23,6 @@ from rich.progress import (
     TextColumn,
     TimeElapsedColumn,
     TimeRemainingColumn,
-    CondensedTimeColumn,
     track,
     _TrackThread,
     TaskID,
@@ -91,7 +90,6 @@ def test_time_remaining_column():
     assert str(text) == "0:01:00"
 
 
-@pytest.mark.parametrize("finished", [False, True])
 @pytest.mark.parametrize(
     "task_time, formatted",
     [
@@ -102,13 +100,20 @@ def test_time_remaining_column():
         (4210, "1:10:10"),
     ],
 )
-def test_condensed_time_column(finished, task_time, formatted):
-    if finished:
-        task = SimpleNamespace(finished=finished, finished_time=task_time)
-    else:
-        task = SimpleNamespace(finished=finished, time_remaining=task_time)
+def test_compact_time_remaining_column(task_time, formatted):
+    task = SimpleNamespace(finished=False, time_remaining=task_time)
+    column = TimeRemainingColumn(compact=True)
 
-    column = CondensedTimeColumn()
+    assert str(column.render(task)) == formatted
+
+
+def test_time_remaining_column_elapsed_when_finished():
+    task_time = 71
+    formatted = "0:01:11"
+
+    task = SimpleNamespace(finished=True, finished_time=task_time)
+    column = TimeRemainingColumn(elapsed_when_finished=True)
+
     assert str(column.render(task)) == formatted
 
 
