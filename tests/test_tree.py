@@ -130,7 +130,7 @@ def test_render_tree_hide_root_win32():
     console.print(tree)
     result = console.end_capture()
     print(repr(result))
-    expected = "\x1b[3mbar\x1b[0m\x1b[3m                 \x1b[0m\n\x1b[44mbaz\x1b[0m\x1b[44m                 \x1b[0m\n\x1b[31;44m├── \x1b[0m\x1b[44m1\x1b[0m\x1b[44m               \x1b[0m\n\x1b[31;44m└── \x1b[0m\x1b[44m2\x1b[0m\x1b[44m               \x1b[0m\negg                 \n"
+    expected = "\x1b[3mbar\x1b[0m\n\x1b[44mbaz\x1b[0m\n\x1b[31;44m├── \x1b[0m\x1b[44m1\x1b[0m\n\x1b[31;44m└── \x1b[0m\x1b[44m2\x1b[0m\negg\n"
     assert result == expected
 
 
