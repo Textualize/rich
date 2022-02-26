@@ -1,4 +1,3 @@
-
 try:
     import emoji
 except ImportError:
