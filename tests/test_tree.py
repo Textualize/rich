@@ -87,12 +87,14 @@ def test_render_tree_win32():
     baz_tree.add("2")
     tree.add("egg")
 
-    console = Console(width=20, force_terminal=True, color_system="standard")
+    console = Console(
+        width=20, force_terminal=True, color_system="standard", legacy_windows=True
+    )
     console.begin_capture()
     console.print(tree, justify="left")
     result = console.end_capture()
     print(repr(result))
-    expected = "\x1b[3mbar\x1b[0m\n\x1b[44mbaz\x1b[0m\n\x1b[31;44m┣━━ \x1b[0m\x1b[44m1\x1b[0m\n\x1b[31;44m┗━━ \x1b[0m\x1b[44m2\x1b[0m\negg\n"
+    expected = "foo                                                                             \n├── \x1b[3mbar  \x1b[0m                                                                       \n\x1b[44m├── \x1b[0m\x1b[44mbaz  \x1b[0m                                                                       \n\x1b[44m│   \x1b[0m\x1b[31;44m├── \x1b[0m\x1b[44m1\x1b[0m                                                                       \n\x1b[44m│   \x1b[0m\x1b[31;44m└── \x1b[0m\x1b[44m2\x1b[0m                                                                       \n└── egg                                                                         \n"
     assert result == expected
 
 
