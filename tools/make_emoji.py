@@ -1,4 +1,3 @@
-from unicodedata import normalize
 
 try:
     import emoji
