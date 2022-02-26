@@ -19,15 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix some issues with markup handling around "[" characters https://github.com/Textualize/rich/pull/1950
 - Fix syntax lexer guessing.
 - Fixed Pretty measure not respecting expand_all https://github.com/Textualize/rich/issues/1998
-
-### Change
-
-- Improved support for enum.Flag in ReprHighlighter https://github.com/Textualize/rich/pull/1920
-
-### Fixed
-
 - Collapsed definitions for single-character spinners, to save memory and reduce import time.
 
+### Changed
+
+- Improved support for enum.Flag in ReprHighlighter https://github.com/Textualize/rich/pull/1920
+- Tree now respects justify=None, i.e. won't pad to right https://github.com/Textualize/rich/issues/1690
 
 ## [11.2.0] - 2022-02-08
 
