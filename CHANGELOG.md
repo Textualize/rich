@@ -23,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for enum.Flag in ReprHighlighter https://github.com/Textualize/rich/pull/1920
 
+### Fixed
+
+- Collapsed definitions for single-character spinners, to save memory and reduce import time.
+
+
 ## [11.2.0] - 2022-02-08
 
 ### Added
