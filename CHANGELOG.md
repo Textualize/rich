@@ -10,18 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added ProgressColumn `MofNCompleteColumn` to display raw `completed/total` column (similar to DownloadColumn,
-  but displays values as ints, does not convert to floats or add bit/bytes units). 
+  but displays values as ints, does not convert to floats or add bit/bytes units).
   https://github.com/Textualize/rich/pull/1941
 
 ### Fixed
 
-- In Jupyter mode make the link target be set to "_blank"
+- In Jupyter mode make the link target be set to "\_blank"
 - Fix some issues with markup handling around "[" characters https://github.com/Textualize/rich/pull/1950
 - Fix syntax lexer guessing.
+- Fixed Pretty measure not respecting expand_all https://github.com/Textualize/rich/issues/1998
 
-### Added
+### Change
 
-- Add support for enum.Flag in ReprHighlighter https://github.com/Textualize/rich/pull/1920
+- Improved support for enum.Flag in ReprHighlighter https://github.com/Textualize/rich/pull/1920
 
 ### Fixed
 
