@@ -4,12 +4,14 @@ The following people have contributed to the development of Rich:
 
 <!-- Add your name below, sort alphabetically by surname. Link to Github profile / your home page. -->
 
+- [Patrick Arminio](https://github.com/patrick91)
 - [Gregory Beauregard](https://github.com/GBeauregard/pyffstream)
 - [Darren Burns](https://github.com/darrenburns)
 - [Ed Davis](https://github.com/davised)
 - [Pete Davison](https://github.com/pd93)
 - [James Estevez](https://github.com/jstvz)
 - [Oleksis Fraga](https://github.com/oleksis)
+- [Leron Gray](https://github.com/daddycocoaman)
 - [Kenneth Hoste](https://github.com/boegel)
 - [Finn Hughes](https://github.com/finnhughes)
 - [Josh Karpel](https://github.com/JoshKarpel)
@@ -29,7 +31,6 @@ The following people have contributed to the development of Rich:
 - [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Aaron Stephens](https://github.com/aaronst)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
-- [Patrick Arminio](https://github.com/patrick91)
 - [Dennis Brakhane](https://github.com/brakhane)
 - [Michał Górny](https://github.com/mgorny)
 - [Arian Mollik Wasi](https://github.com/wasi-master)
