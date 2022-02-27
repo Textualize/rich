@@ -390,9 +390,8 @@ class Traceback:
                 exc_type = cause.__class__
                 exc_value = cause
                 traceback = cause.__traceback__
-                if traceback:
-                    is_cause = True
-                    continue
+                is_cause = True
+                continue
 
             cause = exc_value.__context__
             if (
@@ -403,9 +402,8 @@ class Traceback:
                 exc_type = cause.__class__
                 exc_value = cause
                 traceback = cause.__traceback__
-                if traceback:
-                    is_cause = False
-                    continue
+                is_cause = False
+                continue
             # No cover, code is reached but coverage doesn't recognize it.
             break  # pragma: no cover
 
