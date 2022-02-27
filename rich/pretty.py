@@ -323,6 +323,7 @@ class Pretty(JupyterMixin):
             indent_size=self.indent_size,
             max_length=self.max_length,
             max_string=self.max_string,
+            expand_all=self.expand_all,
         )
         text_width = (
             max(cell_len(line) for line in pretty_str.splitlines()) if pretty_str else 0
