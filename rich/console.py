@@ -602,6 +602,7 @@ class Console:
         emoji (bool, optional): Enable emoji code. Defaults to True.
         emoji_variant (str, optional): Optional emoji variant, either "text" or "emoji". Defaults to None.
         highlight (bool, optional): Enable automatic highlighting. Defaults to True.
+        log_omit_repeated_times (bool, optional): Boolean to omit the repetition of the same time by :meth:`log` methods. Defaults to True.
         log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
         log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
         log_time_format (Union[str, TimeFormatterCallable], optional): If ``log_time`` is enabled, either string for strftime or callable that formats the time. Defaults to "[%X] ".
@@ -639,6 +640,7 @@ class Console:
         emoji: bool = True,
         emoji_variant: Optional[EmojiVariant] = None,
         highlight: bool = True,
+        log_omit_repeated_times: bool = True,
         log_time: bool = True,
         log_path: bool = True,
         log_time_format: Union[str, FormatTimeCallable] = "[%X]",
@@ -700,6 +702,7 @@ class Console:
 
         self._lock = threading.RLock()
         self._log_render = LogRender(
+            omit_repeated_times=log_omit_repeated_times,
             show_time=log_time,
             show_path=log_path,
             time_format=log_time_format,
