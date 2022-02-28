@@ -35,3 +35,4 @@ The following people have contributed to the development of Rich:
 - [Aaron Stephens](https://github.com/aaronst)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
 - [Arian Mollik Wasi](https://github.com/wasi-master)
+- [Antonio Camargo](https://github.com/apcamargo)
