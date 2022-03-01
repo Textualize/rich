@@ -1,4 +1,5 @@
 import inspect
+import io
 import os
 import platform
 import sys
@@ -1910,14 +1911,24 @@ class Console:
                     del self._buffer[:]
                 else:
                     if WINDOWS:
-                        if self.legacy_windows:
+                        try:
+                            file_no = self.file.fileno()
+                        except io.UnsupportedOperation:
+                            file_no = -1
+
+                        legacy_windows_stdout = self.legacy_windows and file_no == 1
+                        if legacy_windows_stdout:
                             from rich._win32_console import LegacyWindowsTerm
                             from rich._windows_renderer import legacy_windows_render
 
                             legacy_windows_render(
                                 self._buffer[:], LegacyWindowsTerm(self.file)
                             )
-                        if not self.legacy_windows or self._buffer_index or self.record:
+                        if (
+                            not legacy_windows_stdout
+                            or self._buffer_index
+                            or self.record
+                        ):
                             text = self._render_buffer(self._buffer[:])
                             # https://bugs.python.org/issue37871
                             write = self.file.write
