@@ -2,6 +2,7 @@
 
 import io
 from time import sleep
+from types import SimpleNamespace
 
 import pytest
 
@@ -89,6 +90,33 @@ def test_time_remaining_column():
     assert str(text) == "0:01:00"
 
 
+@pytest.mark.parametrize(
+    "task_time, formatted",
+    [
+        (None, "--:--"),
+        (0, "00:00"),
+        (59, "00:59"),
+        (71, "01:11"),
+        (4210, "1:10:10"),
+    ],
+)
+def test_compact_time_remaining_column(task_time, formatted):
+    task = SimpleNamespace(finished=False, time_remaining=task_time)
+    column = TimeRemainingColumn(compact=True)
+
+    assert str(column.render(task)) == formatted
+
+
+def test_time_remaining_column_elapsed_when_finished():
+    task_time = 71
+    formatted = "0:01:11"
+
+    task = SimpleNamespace(finished=True, finished_time=task_time)
+    column = TimeRemainingColumn(elapsed_when_finished=True)
+
+    assert str(column.render(task)) == formatted
+
+
 def test_renderable_column():
     column = RenderableColumn("foo")
     task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
@@ -123,7 +151,7 @@ def test_download_progress_uses_decimal_units() -> None:
     column = DownloadColumn()
     test_task = Task(1, "test", 1000, 500, _get_time=lambda: 1.0)
     rendered_progress = str(column.render(test_task))
-    expected = "0.5/1.0 KB"
+    expected = "0.5/1.0 kB"
     assert rendered_progress == expected
 
 
