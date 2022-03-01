@@ -72,7 +72,7 @@ def GetConsoleMode(std_handle: wintypes.HANDLE, console_mode: wintypes.DWORD) ->
     return bool(_GetConsoleMode(std_handle, console_mode))
 
 
-_FillConsoleOutputCharacterW = windll.kernel32.FillConsoleOutputCharacterW
+_FillConsoleOutputCharacterW = kernel32.FillConsoleOutputCharacterW
 _FillConsoleOutputCharacterW.argtypes = [
     wintypes.HANDLE,
     ctypes.c_char,
@@ -104,7 +104,7 @@ def FillConsoleOutputCharacter(
     return num_written.value
 
 
-_FillConsoleOutputAttribute = windll.kernel32.FillConsoleOutputAttribute
+_FillConsoleOutputAttribute = kernel32.FillConsoleOutputAttribute
 _FillConsoleOutputAttribute.argtypes = [
     wintypes.HANDLE,
     wintypes.WORD,
@@ -130,7 +130,7 @@ def FillConsoleOutputAttribute(
     return num_written.value
 
 
-_SetConsoleTextAttribute = windll.kernel32.SetConsoleTextAttribute
+_SetConsoleTextAttribute = kernel32.SetConsoleTextAttribute
 _SetConsoleTextAttribute.argtypes = [
     wintypes.HANDLE,
     wintypes.WORD,
@@ -144,7 +144,7 @@ def SetConsoleTextAttribute(
     return bool(_SetConsoleTextAttribute(std_handle, attributes))
 
 
-_GetConsoleScreenBufferInfo = windll.kernel32.GetConsoleScreenBufferInfo
+_GetConsoleScreenBufferInfo = kernel32.GetConsoleScreenBufferInfo
 _GetConsoleScreenBufferInfo.argtypes = [
     wintypes.HANDLE,
     ctypes.POINTER(CONSOLE_SCREEN_BUFFER_INFO),
@@ -160,7 +160,7 @@ def GetConsoleScreenBufferInfo(
     return console_screen_buffer_info
 
 
-_SetConsoleCursorPosition = windll.kernel32.SetConsoleCursorPosition
+_SetConsoleCursorPosition = kernel32.SetConsoleCursorPosition
 _SetConsoleCursorPosition.argtypes = [
     wintypes.HANDLE,
     cast(Type[COORD], WindowsCoordinates),
@@ -171,12 +171,10 @@ _SetConsoleCursorPosition.restype = wintypes.BOOL
 def SetConsoleCursorPosition(
     std_handle: wintypes.HANDLE, coords: WindowsCoordinates
 ) -> bool:
-    if coords.col < 0 or coords.row < 0:
-        return False
     return bool(_SetConsoleCursorPosition(std_handle, coords))
 
 
-_SetConsoleCursorInfo = windll.kernel32.SetConsoleCursorInfo
+_SetConsoleCursorInfo = kernel32.SetConsoleCursorInfo
 _SetConsoleCursorInfo.argtypes = [
     wintypes.HANDLE,
     ctypes.POINTER(CONSOLE_CURSOR_INFO),
@@ -190,7 +188,7 @@ def SetConsoleCursorInfo(
     return bool(_SetConsoleCursorInfo(std_handle, byref(cursor_info)))
 
 
-_SetConsoleTitle = windll.kernel32.SetConsoleTitleW
+_SetConsoleTitle = kernel32.SetConsoleTitleW
 _SetConsoleTitle.argtypes = [wintypes.LPCWSTR]
 _SetConsoleTitle.restype = wintypes.BOOL
 
@@ -280,7 +278,6 @@ class LegacyWindowsTerm:
             text (str): The text to write
             style (Style): The style of the text
         """
-        # TODO: Check for bold, bright, etc. inside the style
         if style.color:
             fore = style.color.downgrade(ColorSystem.WINDOWS).number
             fore = fore if fore is not None else 7  # Default to ANSI 7: White
@@ -310,6 +307,8 @@ class LegacyWindowsTerm:
         Args:
             new_position (WindowsCoordinates): The WindowsCoordinates representing the new position of the cursor.
         """
+        if new_position.col < 0 or new_position.row < 0:
+            return
         SetConsoleCursorPosition(self._handle, coords=new_position)
 
     def erase_line(self) -> None:
@@ -412,7 +411,7 @@ class LegacyWindowsTerm:
 
     def show_cursor(self) -> None:
         """Show the cursor"""
-        visible_cursor = CONSOLE_CURSOR_INFO(dwSize=100, bVisibile=1)
+        visible_cursor = CONSOLE_CURSOR_INFO(dwSize=100, bVisible=1)
         SetConsoleCursorInfo(self._handle, cursor_info=visible_cursor)
 
     def set_title(self, title: str) -> None:
