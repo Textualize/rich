@@ -1913,7 +1913,7 @@ class Console:
                     if WINDOWS:
                         try:
                             file_no = self.file.fileno()
-                        except io.UnsupportedOperation:
+                        except (ValueError, io.UnsupportedOperation):
                             file_no = -1
 
                         legacy_windows_stdout = self.legacy_windows and file_no == 1
@@ -1933,16 +1933,20 @@ class Console:
                             # https://bugs.python.org/issue37871
                             write = self.file.write
                             for line in text.splitlines(True):
-                                write(line)
+                                try:
+                                    write(line)
+                                except UnicodeEncodeError as error:
+                                    error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
+                                    raise
                     else:
                         text = self._render_buffer(self._buffer[:])
                         try:
                             self.file.write(text)
-                            self.file.flush()
                         except UnicodeEncodeError as error:
                             error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
                             raise
 
+                    self.file.flush()
                     del self._buffer[:]
 
     def _render_buffer(self, buffer: Iterable[Segment]) -> str:
