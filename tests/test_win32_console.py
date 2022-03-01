@@ -19,6 +19,12 @@ try:
     SCREEN_HEIGHT = 30
     DEFAULT_STYLE_ATTRIBUTE = 16
 
+    @dataclasses.dataclass
+    class StubScreenBufferInfo:
+        dwCursorPosition: COORD = COORD(CURSOR_X, CURSOR_Y)
+        dwSize: COORD = COORD(SCREEN_WIDTH, SCREEN_HEIGHT)
+        wAttributes: int = DEFAULT_STYLE_ATTRIBUTE
+
 except ImportError:
     pass
 
@@ -29,13 +35,6 @@ def test_windows_coordinates_to_ctype():
     coord = WindowsCoordinates.from_param(WindowsCoordinates(row=1, col=2))
     assert coord.X == 2
     assert coord.Y == 1
-
-
-@dataclasses.dataclass
-class StubScreenBufferInfo:
-    dwCursorPosition: COORD = COORD(CURSOR_X, CURSOR_Y)
-    dwSize: COORD = COORD(SCREEN_WIDTH, SCREEN_HEIGHT)
-    wAttributes: int = DEFAULT_STYLE_ATTRIBUTE
 
 
 @pytest.fixture
