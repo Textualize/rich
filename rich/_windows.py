@@ -21,6 +21,13 @@ try:
     else:
         windll = None
         raise ImportError("Not windows")
+
+    from rich._win32_console import (
+        ENABLE_VIRTUAL_TERMINAL_PROCESSING,
+        GetConsoleMode,
+        GetStdHandle,
+    )
+
 except (AttributeError, ImportError, ValueError):
 
     # Fallback if we can't load the Windows DLL
@@ -30,27 +37,15 @@ except (AttributeError, ImportError, ValueError):
 
 else:
 
-    STDOUT = -11
-    ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4
-    _GetConsoleMode = windll.kernel32.GetConsoleMode
-    _GetConsoleMode.argtypes = [wintypes.HANDLE, wintypes.LPDWORD]
-    _GetConsoleMode.restype = wintypes.BOOL
-
-    _GetStdHandle = windll.kernel32.GetStdHandle
-    _GetStdHandle.argtypes = [
-        wintypes.DWORD,
-    ]
-    _GetStdHandle.restype = wintypes.HANDLE
-
     def get_windows_console_features() -> WindowsConsoleFeatures:
         """Get windows console features.
 
         Returns:
             WindowsConsoleFeatures: An instance of WindowsConsoleFeatures.
         """
-        handle = _GetStdHandle(STDOUT)
+        handle = GetStdHandle()
         console_mode = wintypes.DWORD()
-        result = _GetConsoleMode(handle, console_mode)
+        result = GetConsoleMode(handle, console_mode)
         vt = bool(result and console_mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING)
         truecolor = False
         if vt:
