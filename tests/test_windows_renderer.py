@@ -7,6 +7,7 @@ try:
     from rich._win32_console import LegacyWindowsTerm, WindowsCoordinates
     from rich._windows_renderer import legacy_windows_render
 except:
+    # These modules can only be imported on Windows
     pass
 from rich.segment import ControlType, Segment
 from rich.style import Style
