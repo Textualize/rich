@@ -1924,11 +1924,9 @@ class Console:
                             legacy_windows_render(
                                 self._buffer[:], LegacyWindowsTerm(self.file)
                             )
-                        if (
-                            not legacy_windows_stdout
-                            or self._buffer_index
-                            or self.record
-                        ):
+
+                        output_capture_enabled = bool(self._buffer_index)
+                        if not legacy_windows_stdout or output_capture_enabled:
                             text = self._render_buffer(self._buffer[:])
                             # https://bugs.python.org/issue37871
                             write = self.file.write
