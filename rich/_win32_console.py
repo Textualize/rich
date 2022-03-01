@@ -5,6 +5,7 @@ import sys
 if sys.platform == "win32":
     windll = ctypes.LibraryLoader(ctypes.WinDLL)
 else:
+    windll = None
     raise ImportError(f"{__name__} can only be imported on Windows")
 
 import time
