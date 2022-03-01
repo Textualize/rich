@@ -11,6 +11,14 @@ from rich.style import Style
 
 try:
     from rich._win32_console import COORD, LegacyWindowsTerm, WindowsCoordinates
+
+    CURSOR_X = 1
+    CURSOR_Y = 2
+    CURSOR_POSITION = WindowsCoordinates(row=CURSOR_Y, col=CURSOR_X)
+    SCREEN_WIDTH = 20
+    SCREEN_HEIGHT = 30
+    DEFAULT_STYLE_ATTRIBUTE = 16
+
 except ImportError:
     pass
 
@@ -21,14 +29,6 @@ def test_windows_coordinates_to_ctype():
     coord = WindowsCoordinates.from_param(WindowsCoordinates(row=1, col=2))
     assert coord.X == 2
     assert coord.Y == 1
-
-
-CURSOR_X = 1
-CURSOR_Y = 2
-CURSOR_POSITION = WindowsCoordinates(row=CURSOR_Y, col=CURSOR_X)
-SCREEN_WIDTH = 20
-SCREEN_HEIGHT = 30
-DEFAULT_STYLE_ATTRIBUTE = 16
 
 
 @dataclasses.dataclass
