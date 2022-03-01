@@ -1917,7 +1917,7 @@ class Console:
                             legacy_windows_render(
                                 self._buffer[:], LegacyWindowsTerm(self.file)
                             )
-                        else:
+                        if not self.legacy_windows or self._buffer_index or self.record:
                             text = self._render_buffer(self._buffer[:])
                             # https://bugs.python.org/issue37871
                             write = self.file.write
