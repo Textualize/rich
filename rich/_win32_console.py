@@ -1,9 +1,8 @@
-"""Light wrapper around the win32 Console API - this module can only be imported on Windows"""
+"""Light wrapper around the win32 Console API - this module should only be imported on Windows"""
 import ctypes
 import sys
-from typing import IO, Any, NamedTuple, Type, cast
+from typing import IO, NamedTuple, Type, cast
 
-windll: Any = None
 if sys.platform == "win32":
     windll = ctypes.LibraryLoader(ctypes.WinDLL)
 else:
