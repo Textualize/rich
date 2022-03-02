@@ -83,9 +83,14 @@ if sys.platform == "win32":
 
         assert f.getvalue() == text
         # Ensure we set the text attributes and then reset them after writing styled text
-        assert call_args[0].args == (win32_handle,)
-        assert call_args[0].kwargs["attributes"].value == 64
-        assert call_args[1] == call(win32_handle, attributes=DEFAULT_STYLE_ATTRIBUTE)
+
+        first_args, first_kwargs = call_args[0]
+        second_args, second_kwargs = call_args[1]
+
+        assert first_args == (win32_handle,)
+        assert first_kwargs["attributes"].value == 64
+        assert second_args == (win32_handle,)
+        assert second_kwargs["attributes"] == DEFAULT_STYLE_ATTRIBUTE
 
     @patch.object(_win32_console, "FillConsoleOutputCharacter", return_value=None)
     @patch.object(_win32_console, "FillConsoleOutputAttribute", return_value=None)
@@ -294,8 +299,10 @@ if sys.platform == "win32":
         call_args = SetConsoleCursorInfo.call_args_list
 
         assert len(call_args) == 1
-        assert call_args[0].kwargs["cursor_info"].bVisible == 0
-        assert call_args[0].kwargs["cursor_info"].dwSize == 100
+
+        args, kwargs = call_args[0]
+        assert kwargs["cursor_info"].bVisible == 0
+        assert kwargs["cursor_info"].dwSize == 100
 
     @patch.object(_win32_console, "SetConsoleCursorInfo", return_value=None)
     @patch.object(
@@ -308,8 +315,10 @@ if sys.platform == "win32":
         call_args = SetConsoleCursorInfo.call_args_list
 
         assert len(call_args) == 1
-        assert call_args[0].kwargs["cursor_info"].bVisible == 1
-        assert call_args[0].kwargs["cursor_info"].dwSize == 100
+
+        args, kwargs = call_args[0]
+        assert kwargs["cursor_info"].bVisible == 1
+        assert kwargs["cursor_info"].dwSize == 100
 
     @patch.object(_win32_console, "SetConsoleTitle", return_value=None)
     def test_set_title(SetConsoleTitle):
