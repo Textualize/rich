@@ -1,8 +1,9 @@
 """Light wrapper around the win32 Console API - this module should only be imported on Windows"""
 import ctypes
 import sys
-from typing import IO, NamedTuple, Type, cast
+from typing import IO, Any, NamedTuple, Type, cast
 
+windll: Any = None
 if sys.platform == "win32":
     windll = ctypes.LibraryLoader(ctypes.WinDLL)
 else:
@@ -18,7 +19,6 @@ from rich.text import Text
 STDOUT = -11
 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4
 
-kernel32 = windll.kernel32
 COORD = wintypes._COORD
 
 
@@ -51,7 +51,7 @@ class CONSOLE_CURSOR_INFO(ctypes.Structure):
     _fields_ = [("dwSize", wintypes.DWORD), ("bVisible", wintypes.BOOL)]
 
 
-_GetStdHandle = kernel32.GetStdHandle
+_GetStdHandle = windll.kernel32.GetStdHandle
 _GetStdHandle.argtypes = [
     wintypes.DWORD,
 ]
@@ -62,7 +62,7 @@ def GetStdHandle(handle: int = STDOUT) -> wintypes.HANDLE:
     return cast(wintypes.HANDLE, _GetStdHandle(handle))
 
 
-_GetConsoleMode = kernel32.GetConsoleMode
+_GetConsoleMode = windll.kernel32.GetConsoleMode
 _GetConsoleMode.argtypes = [wintypes.HANDLE, wintypes.LPDWORD]
 _GetConsoleMode.restype = wintypes.BOOL
 
@@ -71,7 +71,7 @@ def GetConsoleMode(std_handle: wintypes.HANDLE, console_mode: wintypes.DWORD) ->
     return bool(_GetConsoleMode(std_handle, console_mode))
 
 
-_FillConsoleOutputCharacterW = kernel32.FillConsoleOutputCharacterW
+_FillConsoleOutputCharacterW = windll.kernel32.FillConsoleOutputCharacterW
 _FillConsoleOutputCharacterW.argtypes = [
     wintypes.HANDLE,
     ctypes.c_char,
@@ -103,7 +103,7 @@ def FillConsoleOutputCharacter(
     return num_written.value
 
 
-_FillConsoleOutputAttribute = kernel32.FillConsoleOutputAttribute
+_FillConsoleOutputAttribute = windll.kernel32.FillConsoleOutputAttribute
 _FillConsoleOutputAttribute.argtypes = [
     wintypes.HANDLE,
     wintypes.WORD,
@@ -129,7 +129,7 @@ def FillConsoleOutputAttribute(
     return num_written.value
 
 
-_SetConsoleTextAttribute = kernel32.SetConsoleTextAttribute
+_SetConsoleTextAttribute = windll.kernel32.SetConsoleTextAttribute
 _SetConsoleTextAttribute.argtypes = [
     wintypes.HANDLE,
     wintypes.WORD,
@@ -143,7 +143,7 @@ def SetConsoleTextAttribute(
     return bool(_SetConsoleTextAttribute(std_handle, attributes))
 
 
-_GetConsoleScreenBufferInfo = kernel32.GetConsoleScreenBufferInfo
+_GetConsoleScreenBufferInfo = windll.kernel32.GetConsoleScreenBufferInfo
 _GetConsoleScreenBufferInfo.argtypes = [
     wintypes.HANDLE,
     ctypes.POINTER(CONSOLE_SCREEN_BUFFER_INFO),
@@ -159,7 +159,7 @@ def GetConsoleScreenBufferInfo(
     return console_screen_buffer_info
 
 
-_SetConsoleCursorPosition = kernel32.SetConsoleCursorPosition
+_SetConsoleCursorPosition = windll.kernel32.SetConsoleCursorPosition
 _SetConsoleCursorPosition.argtypes = [
     wintypes.HANDLE,
     cast(Type[COORD], WindowsCoordinates),
@@ -173,7 +173,7 @@ def SetConsoleCursorPosition(
     return bool(_SetConsoleCursorPosition(std_handle, coords))
 
 
-_SetConsoleCursorInfo = kernel32.SetConsoleCursorInfo
+_SetConsoleCursorInfo = windll.kernel32.SetConsoleCursorInfo
 _SetConsoleCursorInfo.argtypes = [
     wintypes.HANDLE,
     ctypes.POINTER(CONSOLE_CURSOR_INFO),
@@ -187,7 +187,7 @@ def SetConsoleCursorInfo(
     return bool(_SetConsoleCursorInfo(std_handle, byref(cursor_info)))
 
 
-_SetConsoleTitle = kernel32.SetConsoleTitleW
+_SetConsoleTitle = windll.kernel32.SetConsoleTitleW
 _SetConsoleTitle.argtypes = [wintypes.LPCWSTR]
 _SetConsoleTitle.restype = wintypes.BOOL
 
