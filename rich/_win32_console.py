@@ -253,8 +253,7 @@ class LegacyWindowsTerm:
         15,  # bright white
     ]
 
-    def __init__(self, file: IO[str] = sys.stdout):
-        self.file = file
+    def __init__(self) -> None:
         handle = GetStdHandle(STDOUT)
         self._handle = handle
         default_text = GetConsoleScreenBufferInfo(handle).wAttributes
@@ -262,10 +261,7 @@ class LegacyWindowsTerm:
 
         self._default_fore = default_text & 7
         self._default_back = (default_text >> 4) & 7
-        self._default_attrs = self._default_fore + self._default_back * 16
-
-        self.write = file.write
-        self.flush = file.flush
+        self._default_attrs = self._default_fore | (self._default_back << 4)
 
     @property
     def cursor_position(self) -> WindowsCoordinates:
@@ -322,7 +318,7 @@ class LegacyWindowsTerm:
         assert back is not None
 
         SetConsoleTextAttribute(
-            self._handle, attributes=ctypes.c_ushort(fore + back * 16)
+            self._handle, attributes=ctypes.c_ushort(fore | (back << 4))
         )
         self.write_text(text)
         SetConsoleTextAttribute(self._handle, attributes=self._default_text)
@@ -462,7 +458,7 @@ if __name__ == "__main__":
 
     console = Console()
 
-    term = LegacyWindowsTerm(console.file)
+    term = LegacyWindowsTerm()
     term.set_title("Win32 Console Examples")
 
     style = Style(color="black", bgcolor="red")
