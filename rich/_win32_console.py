@@ -17,12 +17,15 @@ from ctypes import Structure, byref, wintypes
 
 from rich.color import ColorSystem
 from rich.style import Style
-from rich.text import Text
 
 STDOUT = -11
 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4
 
 COORD = wintypes._COORD
+
+
+class LegacyWindowsError(Exception):
+    pass
 
 
 class WindowsCoordinates(NamedTuple):
@@ -74,7 +77,7 @@ def GetConsoleMode(std_handle: wintypes.HANDLE) -> int:
     console_mode = wintypes.DWORD()
     success = bool(_GetConsoleMode(std_handle, console_mode))
     if not success:
-        raise WindowsError("Unable to get legacy Windows Console Mode")
+        raise LegacyWindowsError("Unable to get legacy Windows Console Mode")
     return console_mode.value
 
 
@@ -477,9 +480,8 @@ if __name__ == "__main__":
 
     # Check colour output
     console.rule("Checking colour output")
-    # console.print("Checking colour output", style=Style.parse("black on green"))
-    text = Text("Hello world!", style=style)
-    console.print(text)
+    console.print("[on red]on red!")
+    console.print("[blue]blue!")
     console.print("[yellow]yellow!")
     console.print("[bold yellow]bold yellow!")
     console.print("[bright_yellow]bright_yellow!")

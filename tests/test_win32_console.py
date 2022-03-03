@@ -1,15 +1,13 @@
 import dataclasses
 import sys
-from io import StringIO
 from unittest import mock
-from unittest.mock import call, patch
+from unittest.mock import patch
 
 import pytest
 
 from rich.style import Style
 
 if sys.platform == "win32":
-
     from rich import _win32_console
     from rich._win32_console import COORD, LegacyWindowsTerm, WindowsCoordinates
 
@@ -95,6 +93,107 @@ if sys.platform == "win32":
         assert first_kwargs["attributes"].value == 64
         assert second_args == (win32_handle,)
         assert second_kwargs["attributes"] == DEFAULT_STYLE_ATTRIBUTE
+
+    @patch.object(_win32_console, "WriteConsole", return_value=True)
+    @patch.object(_win32_console, "SetConsoleTextAttribute")
+    @patch.object(
+        _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
+    )
+    def test_write_styled_bold(_, SetConsoleTextAttribute, __, win32_handle):
+        style = Style.parse("bold black on red")
+        text = "Hello, world!"
+        term = LegacyWindowsTerm()
+
+        term.write_styled(text, style)
+
+        call_args = SetConsoleTextAttribute.call_args_list
+        first_args, first_kwargs = call_args[0]
+
+        expected_attr = 64 + 8  # 64 for red bg, +8 for bright black
+        assert first_args == (win32_handle,)
+        assert first_kwargs["attributes"].value == expected_attr
+
+    @patch.object(_win32_console, "WriteConsole", return_value=True)
+    @patch.object(_win32_console, "SetConsoleTextAttribute")
+    @patch.object(
+        _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
+    )
+    def test_write_styled_reverse(_, SetConsoleTextAttribute, __, win32_handle):
+        style = Style.parse("reverse red on blue")
+        text = "Hello, world!"
+        term = LegacyWindowsTerm()
+
+        term.write_styled(text, style)
+
+        call_args = SetConsoleTextAttribute.call_args_list
+        first_args, first_kwargs = call_args[0]
+
+        expected_attr = 64 + 1  # 64 for red bg (after reverse), +1 for blue fg
+        assert first_args == (win32_handle,)
+        assert first_kwargs["attributes"].value == expected_attr
+
+    @patch.object(_win32_console, "WriteConsole", return_value=True)
+    @patch.object(_win32_console, "SetConsoleTextAttribute")
+    @patch.object(
+        _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
+    )
+    def test_write_styled_reverse(_, SetConsoleTextAttribute, __, win32_handle):
+        style = Style.parse("dim bright_red on blue")
+        text = "Hello, world!"
+        term = LegacyWindowsTerm()
+
+        term.write_styled(text, style)
+
+        call_args = SetConsoleTextAttribute.call_args_list
+        first_args, first_kwargs = call_args[0]
+
+        expected_attr = 4 + 16  # 4 for red text (after dim), +16 for blue bg
+        assert first_args == (win32_handle,)
+        assert first_kwargs["attributes"].value == expected_attr
+
+    @patch.object(_win32_console, "WriteConsole", return_value=True)
+    @patch.object(_win32_console, "SetConsoleTextAttribute")
+    @patch.object(
+        _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
+    )
+    def test_write_styled_no_foreground_color(
+        _, SetConsoleTextAttribute, __, win32_handle
+    ):
+        style = Style.parse("on blue")
+        text = "Hello, world!"
+        term = LegacyWindowsTerm()
+
+        term.write_styled(text, style)
+
+        call_args = SetConsoleTextAttribute.call_args_list
+        first_args, first_kwargs = call_args[0]
+
+        expected_attr = 16 | term._default_fore  # 16 for blue bg, plus default fg color
+        assert first_args == (win32_handle,)
+        assert first_kwargs["attributes"].value == expected_attr
+
+    @patch.object(_win32_console, "WriteConsole", return_value=True)
+    @patch.object(_win32_console, "SetConsoleTextAttribute")
+    @patch.object(
+        _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
+    )
+    def test_write_styled_no_background_color(
+        _, SetConsoleTextAttribute, __, win32_handle
+    ):
+        style = Style.parse("blue")
+        text = "Hello, world!"
+        term = LegacyWindowsTerm()
+
+        term.write_styled(text, style)
+
+        call_args = SetConsoleTextAttribute.call_args_list
+        first_args, first_kwargs = call_args[0]
+
+        expected_attr = (
+            16 | term._default_back
+        )  # 16 for blue foreground, plus default bg color
+        assert first_args == (win32_handle,)
+        assert first_kwargs["attributes"].value == expected_attr
 
     @patch.object(_win32_console, "FillConsoleOutputCharacter", return_value=None)
     @patch.object(_win32_console, "FillConsoleOutputAttribute", return_value=None)
