@@ -1,4 +1,7 @@
-"""Light wrapper around the win32 Console API - this module should only be imported on Windows"""
+"""Light wrapper around the Win32 Console API - this module should only be imported on Windows
+
+The API that this module wraps is documented at https://docs.microsoft.com/en-us/windows/console/console-functions
+"""
 import ctypes
 import sys
 from typing import IO, Any, NamedTuple, Type, cast
@@ -196,6 +199,31 @@ def SetConsoleTitle(title: str) -> bool:
     return bool(_SetConsoleTitle(title))
 
 
+_WriteConsole = windll.kernel32.WriteConsoleW
+_WriteConsole.argtypes = [
+    wintypes.HANDLE,
+    wintypes.LPWSTR,
+    wintypes.DWORD,
+    wintypes.LPDWORD,
+    wintypes.LPVOID,
+]
+_WriteConsole.restype = wintypes.BOOL
+
+
+def WriteConsole(std_handle: wintypes.HANDLE, text: str) -> bool:
+    buffer = wintypes.LPWSTR(text)
+    num_chars_written = wintypes.LPDWORD()
+    return bool(
+        _WriteConsole(
+            std_handle,
+            buffer,
+            wintypes.DWORD(len(text)),
+            num_chars_written,
+            wintypes.LPVOID(None),
+        )
+    )
+
+
 class LegacyWindowsTerm:
     """This class allows interaction with the legacy Windows Console API. It should only be used in the context
     of environments where virtual terminal processing is not available. However, if it is used in a Windows environment,
@@ -267,8 +295,9 @@ class LegacyWindowsTerm:
         Args:
             text (str): The text to write to the console
         """
-        self.write(text)
-        self.flush()
+        WriteConsole(self._handle, text)
+        # self.write(text)
+        # self.flush()
 
     def write_styled(self, text: str, style: Style) -> None:
         """Write styled text to the terminal
