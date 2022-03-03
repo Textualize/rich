@@ -44,9 +44,8 @@ else:
             WindowsConsoleFeatures: An instance of WindowsConsoleFeatures.
         """
         handle = GetStdHandle()
-        console_mode = wintypes.DWORD()
-        result = GetConsoleMode(handle, console_mode)
-        vt = bool(result and console_mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+        console_mode = GetConsoleMode(handle)
+        vt = bool(console_mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING)
         truecolor = False
         if vt:
             win_version = sys.getwindowsversion()

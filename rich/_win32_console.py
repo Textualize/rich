@@ -70,8 +70,12 @@ _GetConsoleMode.argtypes = [wintypes.HANDLE, wintypes.LPDWORD]
 _GetConsoleMode.restype = wintypes.BOOL
 
 
-def GetConsoleMode(std_handle: wintypes.HANDLE, console_mode: wintypes.DWORD) -> bool:
-    return bool(_GetConsoleMode(std_handle, console_mode))
+def GetConsoleMode(std_handle: wintypes.HANDLE) -> int:
+    console_mode = wintypes.DWORD()
+    success = bool(_GetConsoleMode(std_handle, console_mode))
+    if not success:
+        raise WindowsError("Unable to get legacy Windows Console Mode")
+    return console_mode.value
 
 
 _FillConsoleOutputCharacterW = windll.kernel32.FillConsoleOutputCharacterW
