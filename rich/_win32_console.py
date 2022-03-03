@@ -237,6 +237,8 @@ class LegacyWindowsTerm:
         file (IO[str]): The file which the Windows Console API HANDLE is retrieved from, defaults to sys.stdout.
     """
 
+    BRIGHT_BIT = 8
+
     # Indices are ANSI color numbers, values are the corresponding Windows Console API color numbers
     ANSI_TO_WINDOWS = [
         0,  # black                      The Windows colours are defined in wincon.h as follows:
@@ -298,21 +300,30 @@ class LegacyWindowsTerm:
         WriteConsole(self._handle, text)
 
     def write_styled(self, text: str, style: Style) -> None:
-        """Write styled text to the terminal
+        """Write styled text to the terminal.
 
         Args:
             text (str): The text to write
             style (Style): The style of the text
         """
-        if style.color:
-            fore = style.color.downgrade(ColorSystem.WINDOWS).number
+        color = style.color
+        bgcolor = style.bgcolor
+        if style.reverse:
+            color, bgcolor = bgcolor, color
+
+        if color:
+            fore = color.downgrade(ColorSystem.WINDOWS).number
             fore = fore if fore is not None else 7  # Default to ANSI 7: White
+            if style.bold:
+                fore = fore | self.BRIGHT_BIT
+            if style.dim:
+                fore = fore & ~self.BRIGHT_BIT
             fore = self.ANSI_TO_WINDOWS[fore]
         else:
             fore = self._default_fore
 
-        if style.bgcolor:
-            back = style.bgcolor.downgrade(ColorSystem.WINDOWS).number
+        if bgcolor:
+            back = bgcolor.downgrade(ColorSystem.WINDOWS).number
             back = back if back is not None else 0  # Default to ANSI 0: Black
             back = self.ANSI_TO_WINDOWS[back]
         else:
@@ -452,11 +463,6 @@ class LegacyWindowsTerm:
 
 if __name__ == "__main__":
     handle = GetStdHandle()
-    console_mode = wintypes.DWORD()
-    rv = GetConsoleMode(handle, console_mode)
-
-    print(rv)
-    print(type(rv))
 
     from rich.console import Console
 
@@ -474,9 +480,13 @@ if __name__ == "__main__":
     # console.print("Checking colour output", style=Style.parse("black on green"))
     text = Text("Hello world!", style=style)
     console.print(text)
-    console.print("[bold green]bold green!")
+    console.print("[yellow]yellow!")
+    console.print("[bold yellow]bold yellow!")
+    console.print("[bright_yellow]bright_yellow!")
+    console.print("[dim bright_yellow]dim bright_yellow!")
     console.print("[italic cyan]italic cyan!")
     console.print("[bold white on blue]bold white on blue!")
+    console.print("[reverse bold white on blue]reverse bold white on blue!")
     console.print("[bold black on cyan]bold black on cyan!")
     console.print("[black on green]black on green!")
     console.print("[blue on green]blue on green!")
