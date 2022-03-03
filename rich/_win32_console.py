@@ -296,8 +296,6 @@ class LegacyWindowsTerm:
             text (str): The text to write to the console
         """
         WriteConsole(self._handle, text)
-        # self.write(text)
-        # self.flush()
 
     def write_styled(self, text: str, style: Style) -> None:
         """Write styled text to the terminal

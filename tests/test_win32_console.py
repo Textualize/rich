@@ -55,35 +55,39 @@ if sys.platform == "win32":
             row=SCREEN_HEIGHT, col=SCREEN_WIDTH
         )
 
+    @patch.object(_win32_console, "WriteConsole", return_value=True)
     @patch.object(
         _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
     )
-    def test_write_text(_):
-        f = StringIO()
+    def test_write_text(_, WriteConsole, win32_handle):
         text = "Hello, world!"
-        term = LegacyWindowsTerm(file=f)
+        term = LegacyWindowsTerm()
 
         term.write_text(text)
 
-        assert f.getvalue() == text
+        WriteConsole.assert_called_once_with(win32_handle, text)
 
+    @patch.object(_win32_console, "WriteConsole", return_value=True)
     @patch.object(_win32_console, "SetConsoleTextAttribute")
     @patch.object(
         _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
     )
-    def test_write_styled(_, SetConsoleTextAttribute, win32_handle):
-        f = StringIO()
+    def test_write_styled(_, SetConsoleTextAttribute, WriteConsole, win32_handle):
         style = Style.parse("black on red")
         text = "Hello, world!"
-        term = LegacyWindowsTerm(file=f)
+        term = LegacyWindowsTerm()
 
         term.write_styled(text, style)
 
-        call_args = SetConsoleTextAttribute.call_args_list
+        # Check that we've called the Console API to write the text
+        call_args = WriteConsole.call_args_list
+        assert len(call_args) == 1
+        args, _ = call_args[0]
+        assert args == (win32_handle, text)
 
-        assert f.getvalue() == text
         # Ensure we set the text attributes and then reset them after writing styled text
-
+        call_args = SetConsoleTextAttribute.call_args_list
+        assert len(call_args) == 2
         first_args, first_kwargs = call_args[0]
         second_args, second_kwargs = call_args[1]
 
