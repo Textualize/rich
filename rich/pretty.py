@@ -525,6 +525,16 @@ class _Line:
 
 
 def _is_namedtuple(obj: Any) -> bool:
+    """Checks if an object is most likely a namedtuple. It is possible
+    to craft an object that passes this check and isn't a namedtuple, but
+    there is only a miniscule chance of this happening unintentionally.
+
+    Args:
+        obj (Any): The object to test
+
+    Returns:
+        bool: True if the object is a namedtuple. False otherwise.
+    """
     base_classes = getattr(type(obj), "__bases__", [])
     if len(base_classes) != 1 or base_classes[0] != tuple:
         return False
