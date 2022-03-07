@@ -1,4 +1,7 @@
-"""Light wrapper around the win32 Console API - this module should only be imported on Windows"""
+"""Light wrapper around the Win32 Console API - this module should only be imported on Windows
+
+The API that this module wraps is documented at https://docs.microsoft.com/en-us/windows/console/console-functions
+"""
 import ctypes
 import sys
 from typing import IO, Any, NamedTuple, Type, cast
@@ -14,12 +17,15 @@ from ctypes import Structure, byref, wintypes
 
 from rich.color import ColorSystem
 from rich.style import Style
-from rich.text import Text
 
 STDOUT = -11
 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4
 
 COORD = wintypes._COORD
+
+
+class LegacyWindowsError(Exception):
+    pass
 
 
 class WindowsCoordinates(NamedTuple):
@@ -34,6 +40,15 @@ class WindowsCoordinates(NamedTuple):
 
     @classmethod
     def from_param(cls, value: "WindowsCoordinates") -> COORD:
+        """Converts a WindowsCoordinates into a wintypes _COORD structure.
+        This classmethod is internally called by ctypes to perform the conversion.
+
+        Args:
+            value (WindowsCoordinates): The input coordinates to convert.
+
+        Returns:
+            wintypes._COORD: The converted coordinates struct.
+        """
         return COORD(value.col, value.row)
 
 
@@ -59,6 +74,14 @@ _GetStdHandle.restype = wintypes.HANDLE
 
 
 def GetStdHandle(handle: int = STDOUT) -> wintypes.HANDLE:
+    """Retrieves a handle to the specified standard device (standard input, standard output, or standard error).
+
+    Args:
+        handle (int): Integer identifier for the handle. Defaults to -11 (stdout).
+
+    Returns:
+        wintypes.HANDLE: The handle
+    """
     return cast(wintypes.HANDLE, _GetStdHandle(handle))
 
 
@@ -67,8 +90,26 @@ _GetConsoleMode.argtypes = [wintypes.HANDLE, wintypes.LPDWORD]
 _GetConsoleMode.restype = wintypes.BOOL
 
 
-def GetConsoleMode(std_handle: wintypes.HANDLE, console_mode: wintypes.DWORD) -> bool:
-    return bool(_GetConsoleMode(std_handle, console_mode))
+def GetConsoleMode(std_handle: wintypes.HANDLE) -> int:
+    """Retrieves the current input mode of a console's input buffer
+    or the current output mode of a console screen buffer.
+
+    Args:
+        std_handle (wintypes.HANDLE): A handle to the console input buffer or the console screen buffer.
+
+    Raises:
+        LegacyWindowsError: If any error occurs while calling the Windows console API.
+
+    Returns:
+        int: Value representing the current console mode as documented at
+            https://docs.microsoft.com/en-us/windows/console/getconsolemode#parameters
+    """
+
+    console_mode = wintypes.DWORD()
+    success = bool(_GetConsoleMode(std_handle, console_mode))
+    if not success:
+        raise LegacyWindowsError("Unable to get legacy Windows Console Mode")
+    return console_mode.value
 
 
 _FillConsoleOutputCharacterW = windll.kernel32.FillConsoleOutputCharacterW
@@ -88,8 +129,17 @@ def FillConsoleOutputCharacter(
     length: int,
     start: WindowsCoordinates,
 ) -> int:
-    """Writes a character to the console screen buffer a specified number of times, beginning at the specified coordinates."""
-    assert len(char) == 1
+    """Writes a character to the console screen buffer a specified number of times, beginning at the specified coordinates.
+
+    Args:
+        std_handle (wintypes.HANDLE): A handle to the console input buffer or the console screen buffer.
+        char (str): The character to write. Must be a string of length 1.
+        length (int): The number of times to write the character.
+        start (WindowsCoordinates): The coordinates to start writing at.
+
+    Returns:
+        int: The number of characters written.
+    """
     character = ctypes.c_char(char.encode())
     num_characters = wintypes.DWORD(length)
     num_written = wintypes.DWORD(0)
@@ -120,6 +170,18 @@ def FillConsoleOutputAttribute(
     length: int,
     start: WindowsCoordinates,
 ) -> int:
+    """Sets the character attributes for a specified number of character cells,
+    beginning at the specified coordinates in a screen buffer.
+
+    Args:
+        std_handle (wintypes.HANDLE): A handle to the console input buffer or the console screen buffer.
+        attributes (int): Integer value representing the foreground and background colours of the cells.
+        length (int): The number of cells to set the output attribute of.
+        start (WindowsCoordinates): The coordinates of the first cell whose attributes are to be set.
+
+    Returns:
+        int: The number of cells whose attributes were actually set.
+    """
     num_cells = wintypes.DWORD(length)
     style_attrs = wintypes.WORD(attributes)
     num_written = wintypes.DWORD(0)
@@ -140,6 +202,16 @@ _SetConsoleTextAttribute.restype = wintypes.BOOL
 def SetConsoleTextAttribute(
     std_handle: wintypes.HANDLE, attributes: wintypes.WORD
 ) -> bool:
+    """Set the colour attributes for all text written after this function is called.
+
+    Args:
+        std_handle (wintypes.HANDLE): A handle to the console input buffer or the console screen buffer.
+        attributes (int): Integer value representing the foreground and background colours.
+
+
+    Returns:
+        bool: True if the attribute was set successfully, otherwise False.
+    """
     return bool(_SetConsoleTextAttribute(std_handle, attributes))
 
 
@@ -154,6 +226,14 @@ _GetConsoleScreenBufferInfo.restype = wintypes.BOOL
 def GetConsoleScreenBufferInfo(
     std_handle: wintypes.HANDLE,
 ) -> CONSOLE_SCREEN_BUFFER_INFO:
+    """Retrieves information about the specified console screen buffer.
+
+    Args:
+        std_handle (wintypes.HANDLE): A handle to the console input buffer or the console screen buffer.
+
+    Returns:
+        CONSOLE_SCREEN_BUFFER_INFO: A CONSOLE_SCREEN_BUFFER_INFO ctype struct contain information about
+            screen size, cursor position, colour attributes, and more."""
     console_screen_buffer_info = CONSOLE_SCREEN_BUFFER_INFO()
     _GetConsoleScreenBufferInfo(std_handle, byref(console_screen_buffer_info))
     return console_screen_buffer_info
@@ -170,6 +250,15 @@ _SetConsoleCursorPosition.restype = wintypes.BOOL
 def SetConsoleCursorPosition(
     std_handle: wintypes.HANDLE, coords: WindowsCoordinates
 ) -> bool:
+    """Set the position of the cursor in the console screen
+
+    Args:
+        std_handle (wintypes.HANDLE): A handle to the console input buffer or the console screen buffer.
+        coords (WindowsCoordinates): The coordinates to move the cursor to.
+
+    Returns:
+        bool: True if the function succeeds, otherwise False.
+    """
     return bool(_SetConsoleCursorPosition(std_handle, coords))
 
 
@@ -184,6 +273,15 @@ _SetConsoleCursorInfo.restype = wintypes.BOOL
 def SetConsoleCursorInfo(
     std_handle: wintypes.HANDLE, cursor_info: CONSOLE_CURSOR_INFO
 ) -> bool:
+    """Set the cursor info - used for adjusting cursor visibility and width
+
+    Args:
+        std_handle (wintypes.HANDLE): A handle to the console input buffer or the console screen buffer.
+        cursor_info (CONSOLE_CURSOR_INFO): CONSOLE_CURSOR_INFO ctype struct containing the new cursor info.
+
+    Returns:
+          bool: True if the function succeeds, otherwise False.
+    """
     return bool(_SetConsoleCursorInfo(std_handle, byref(cursor_info)))
 
 
@@ -193,7 +291,49 @@ _SetConsoleTitle.restype = wintypes.BOOL
 
 
 def SetConsoleTitle(title: str) -> bool:
+    """Sets the title of the current console window
+
+    Args:
+        title (str): The new title of the console window.
+
+    Returns:
+        bool: True if the function succeeds, otherwise False.
+    """
     return bool(_SetConsoleTitle(title))
+
+
+_WriteConsole = windll.kernel32.WriteConsoleW
+_WriteConsole.argtypes = [
+    wintypes.HANDLE,
+    wintypes.LPWSTR,
+    wintypes.DWORD,
+    wintypes.LPDWORD,
+    wintypes.LPVOID,
+]
+_WriteConsole.restype = wintypes.BOOL
+
+
+def WriteConsole(std_handle: wintypes.HANDLE, text: str) -> bool:
+    """Write a string of text to the console, starting at the current cursor position
+
+    Args:
+        std_handle (wintypes.HANDLE): A handle to the console input buffer or the console screen buffer.
+        text (str): The text to write.
+
+    Returns:
+        bool: True if the function succeeds, otherwise False.
+    """
+    buffer = wintypes.LPWSTR(text)
+    num_chars_written = wintypes.LPDWORD()
+    return bool(
+        _WriteConsole(
+            std_handle,
+            buffer,
+            wintypes.DWORD(len(text)),
+            num_chars_written,
+            wintypes.LPVOID(None),
+        )
+    )
 
 
 class LegacyWindowsTerm:
@@ -204,6 +344,8 @@ class LegacyWindowsTerm:
     Args:
         file (IO[str]): The file which the Windows Console API HANDLE is retrieved from, defaults to sys.stdout.
     """
+
+    BRIGHT_BIT = 8
 
     # Indices are ANSI color numbers, values are the corresponding Windows Console API color numbers
     ANSI_TO_WINDOWS = [
@@ -225,8 +367,7 @@ class LegacyWindowsTerm:
         15,  # bright white
     ]
 
-    def __init__(self, file: IO[str] = sys.stdout):
-        self.file = file
+    def __init__(self) -> None:
         handle = GetStdHandle(STDOUT)
         self._handle = handle
         default_text = GetConsoleScreenBufferInfo(handle).wAttributes
@@ -234,10 +375,7 @@ class LegacyWindowsTerm:
 
         self._default_fore = default_text & 7
         self._default_back = (default_text >> 4) & 7
-        self._default_attrs = self._default_fore + self._default_back * 16
-
-        self.write = file.write
-        self.flush = file.flush
+        self._default_attrs = self._default_fore | (self._default_back << 4)
 
     @property
     def cursor_position(self) -> WindowsCoordinates:
@@ -267,25 +405,33 @@ class LegacyWindowsTerm:
         Args:
             text (str): The text to write to the console
         """
-        self.write(text)
-        self.flush()
+        WriteConsole(self._handle, text)
 
     def write_styled(self, text: str, style: Style) -> None:
-        """Write styled text to the terminal
+        """Write styled text to the terminal.
 
         Args:
             text (str): The text to write
             style (Style): The style of the text
         """
-        if style.color:
-            fore = style.color.downgrade(ColorSystem.WINDOWS).number
+        color = style.color
+        bgcolor = style.bgcolor
+        if style.reverse:
+            color, bgcolor = bgcolor, color
+
+        if color:
+            fore = color.downgrade(ColorSystem.WINDOWS).number
             fore = fore if fore is not None else 7  # Default to ANSI 7: White
+            if style.bold:
+                fore = fore | self.BRIGHT_BIT
+            if style.dim:
+                fore = fore & ~self.BRIGHT_BIT
             fore = self.ANSI_TO_WINDOWS[fore]
         else:
             fore = self._default_fore
 
-        if style.bgcolor:
-            back = style.bgcolor.downgrade(ColorSystem.WINDOWS).number
+        if bgcolor:
+            back = bgcolor.downgrade(ColorSystem.WINDOWS).number
             back = back if back is not None else 0  # Default to ANSI 0: Black
             back = self.ANSI_TO_WINDOWS[back]
         else:
@@ -295,7 +441,7 @@ class LegacyWindowsTerm:
         assert back is not None
 
         SetConsoleTextAttribute(
-            self._handle, attributes=ctypes.c_ushort(fore + back * 16)
+            self._handle, attributes=ctypes.c_ushort(fore | (back << 4))
         )
         self.write_text(text)
         SetConsoleTextAttribute(self._handle, attributes=self._default_text)
@@ -425,17 +571,12 @@ class LegacyWindowsTerm:
 
 if __name__ == "__main__":
     handle = GetStdHandle()
-    console_mode = wintypes.DWORD()
-    rv = GetConsoleMode(handle, console_mode)
-
-    print(rv)
-    print(type(rv))
 
     from rich.console import Console
 
     console = Console()
 
-    term = LegacyWindowsTerm(console.file)
+    term = LegacyWindowsTerm()
     term.set_title("Win32 Console Examples")
 
     style = Style(color="black", bgcolor="red")
@@ -444,12 +585,15 @@ if __name__ == "__main__":
 
     # Check colour output
     console.rule("Checking colour output")
-    # console.print("Checking colour output", style=Style.parse("black on green"))
-    text = Text("Hello world!", style=style)
-    console.print(text)
-    console.print("[bold green]bold green!")
+    console.print("[on red]on red!")
+    console.print("[blue]blue!")
+    console.print("[yellow]yellow!")
+    console.print("[bold yellow]bold yellow!")
+    console.print("[bright_yellow]bright_yellow!")
+    console.print("[dim bright_yellow]dim bright_yellow!")
     console.print("[italic cyan]italic cyan!")
     console.print("[bold white on blue]bold white on blue!")
+    console.print("[reverse bold white on blue]reverse bold white on blue!")
     console.print("[bold black on cyan]bold black on cyan!")
     console.print("[black on green]black on green!")
     console.print("[blue on green]blue on green!")

@@ -26,6 +26,7 @@ try:
         ENABLE_VIRTUAL_TERMINAL_PROCESSING,
         GetConsoleMode,
         GetStdHandle,
+        LegacyWindowsError,
     )
 
 except (AttributeError, ImportError, ValueError):
@@ -44,9 +45,13 @@ else:
             WindowsConsoleFeatures: An instance of WindowsConsoleFeatures.
         """
         handle = GetStdHandle()
-        console_mode = wintypes.DWORD()
-        result = GetConsoleMode(handle, console_mode)
-        vt = bool(result and console_mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+        try:
+            console_mode = GetConsoleMode(handle)
+            success = True
+        except LegacyWindowsError:
+            console_mode = 0
+            success = False
+        vt = bool(success and console_mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING)
         truecolor = False
         if vt:
             win_version = sys.getwindowsversion()
