@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix syntax lexer guessing.
 - Fixed Pretty measure not respecting expand_all https://github.com/Textualize/rich/issues/1998
 - Collapsed definitions for single-character spinners, to save memory and reduce import time.
+- Fix print_json indent type in __init__.py
 
 ### Changed
 
