@@ -744,12 +744,6 @@ def traverse(
 
                 pop_visited(obj_id)
         elif _is_namedtuple(obj):
-            obj_id = id(obj)
-            if obj_id in visited_ids:
-                # Recursion detected
-                return Node(value_repr="...")
-            push_visited(obj_id)
-
             children = []
             append = children.append
             if reached_max_depth:
@@ -760,15 +754,12 @@ def traverse(
                     close_brace=")",
                     children=children,
                 )
-
                 for last, (key, value) in loop_last(obj._asdict().items()):
                     child_node = _traverse(value, depth=depth + 1)
                     child_node.key_repr = key
                     child_node.last = last
                     child_node.key_separator = "="
                     append(child_node)
-
-                pop_visited(obj_id)
         elif _safe_isinstance(obj, _CONTAINERS):
             for container_type in _CONTAINERS:
                 if _safe_isinstance(obj, container_type):
