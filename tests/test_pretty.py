@@ -169,6 +169,41 @@ def test_pretty_dataclass():
     assert result == "ExampleDataclass(foo=1000, bar=..., baz=['foo', 'bar', 'baz'])"
 
 
+def test_pretty_namedtuple():
+    console = Console(color_system=None)
+    console.begin_capture()
+    from typing import NamedTuple
+
+    class StockKeepingUnit(NamedTuple):
+        name: str
+        description: str
+        price: float
+        category: str
+        reviews: List[str]
+
+    example_namedtuple = StockKeepingUnit(
+        "Sparkling British Spring Water",
+        "Carbonated spring water",
+        0.9,
+        "water",
+        ["its amazing!", "its terrible!"],
+    )
+
+    result = pretty_repr(example_namedtuple)
+
+    print(result)
+    assert (
+        result
+        == """StockKeepingUnit(
+    name='Sparkling British Spring Water',
+    description='Carbonated spring water',
+    price=0.9,
+    category='water',
+    reviews=['its amazing!', 'its terrible!']
+)"""
+    )
+
+
 def test_small_width():
     test = ["Hello world! 12345"]
     result = pretty_repr(test, max_width=10)

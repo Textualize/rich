@@ -524,6 +524,18 @@ class _Line:
             )
 
 
+def _is_namedtuple(obj: Any) -> bool:
+    base_classes = getattr(type(obj), "__bases__", [])
+    if len(base_classes) != 1 or base_classes[0] != tuple:
+        return False
+
+    fields = getattr(obj, "_fields", None)
+    if not fields or not isinstance(fields, tuple):
+        return False
+
+    return all(type(field) == str for field in fields)
+
+
 def traverse(
     _object: Any,
     max_length: Optional[int] = None,
@@ -731,7 +743,32 @@ def traverse(
                     append(child_node)
 
                 pop_visited(obj_id)
+        elif _is_namedtuple(obj):
+            obj_id = id(obj)
+            if obj_id in visited_ids:
+                # Recursion detected
+                return Node(value_repr="...")
+            push_visited(obj_id)
 
+            children = []
+            append = children.append
+            if reached_max_depth:
+                node = Node(value_repr="...")
+            else:
+                node = Node(
+                    open_brace=f"{obj.__class__.__name__}(",
+                    close_brace=")",
+                    children=children,
+                )
+
+                for last, (key, value) in loop_last(obj._asdict().items()):
+                    child_node = _traverse(value, depth=depth + 1)
+                    child_node.key_repr = key
+                    child_node.last = last
+                    child_node.key_separator = "="
+                    append(child_node)
+
+                pop_visited(obj_id)
         elif _safe_isinstance(obj, _CONTAINERS):
             for container_type in _CONTAINERS:
                 if _safe_isinstance(obj, container_type):
@@ -878,6 +915,15 @@ if __name__ == "__main__":  # pragma: no cover
             1 / 0
             return "this will fail"
 
+    from typing import NamedTuple
+
+    class StockKeepingUnit(NamedTuple):
+        name: str
+        description: str
+        price: float
+        category: str
+        reviews: List[str]
+
     d = defaultdict(int)
     d["foo"] = 5
     data = {
@@ -904,6 +950,13 @@ if __name__ == "__main__":  # pragma: no cover
             ]
         ),
         "atomic": (False, True, None),
+        "namedtuple": StockKeepingUnit(
+            "Sparkling British Spring Water",
+            "Carbonated spring water",
+            0.9,
+            "water",
+            ["its amazing!", "its terrible!"],
+        ),
         "Broken": BrokenRepr(),
     }
     data["foo"].append(data)  # type: ignore
