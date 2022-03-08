@@ -98,7 +98,8 @@ class Inspect(JupyterMixin):
         source_filename: Optional[str] = None
         try:
             source_filename = getfile(obj)
-        except TypeError:
+        except (OSError, TypeError):
+            # OSError is raised if obj has no source file, e.g. when defined in REPL.
             pass
 
         callable_name = Text(name, style="inspect.callable")
