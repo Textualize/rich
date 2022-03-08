@@ -79,7 +79,7 @@ def _is_dataclass_repr(obj: object) -> bool:
         return False
 
 
-_dummy_namedtuple = collections.namedtuple("dummy", [])
+_dummy_namedtuple = collections.namedtuple("_dummy_namedtuple", [])
 
 
 def _has_default_namedtuple_repr(obj: object) -> bool:
