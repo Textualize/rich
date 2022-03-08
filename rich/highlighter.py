@@ -108,6 +108,7 @@ class JSONHighlighter(RegexHighlighter):
 
     # Captures the start and end of JSON strings, handling escaped quotes
     JSON_STR = r"(?<![\\\w])(?P<str>b?\".*?(?<!\\)\")"
+    JSON_WHITESPACE = {" ", "\n", "\r", "\t"}
 
     base_style = "json."
     highlights = [
@@ -125,18 +126,18 @@ class JSONHighlighter(RegexHighlighter):
         # Additional work to handle highlighting JSON keys
         plain = text.plain
         append = text.spans.append
+        whitespace = self.JSON_WHITESPACE
         for match in re.finditer(self.JSON_STR, plain):
             start, end = match.span()
             cursor = end
             while cursor < len(plain):
                 char = plain[cursor]
                 cursor += 1
-                if char in string.whitespace:
-                    continue
-                elif char == ":":
+                if char == ":":
                     append(Span(start, end, "json.key"))
-                else:
-                    break
+                elif char in whitespace:
+                    continue
+                break
 
 
 if __name__ == "__main__":  # pragma: no cover
