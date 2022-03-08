@@ -91,9 +91,18 @@ def _has_default_namedtuple_repr(obj: object) -> bool:
     Returns:
         bool: True if the default repr is used, False if there's a custom repr.
     """
-    obj_file = inspect.getfile(obj.__repr__)
-    default_repr_file = inspect.getfile(_dummy_namedtuple.__repr__)
-    print(obj_file, default_repr_file)
+    obj_file = None
+    default_repr_file = None
+    try:
+        obj_file = inspect.getfile(obj.__repr__)
+    except (OSError, TypeError):
+        # OSError handles case where object is defined in __main__ scope, e.g. REPL - no filename available.
+        # TypeError trapped defensively, in case of object without filename slips through.
+        pass
+    try:
+        default_repr_file = inspect.getfile(_dummy_namedtuple.__repr__)
+    except (OSError, TypeError):
+        pass
     return obj_file == default_repr_file
 
 
@@ -554,15 +563,8 @@ def _is_namedtuple(obj: Any) -> bool:
     Returns:
         bool: True if the object is a namedtuple. False otherwise.
     """
-    base_classes = getattr(type(obj), "__bases__", [])
-    if len(base_classes) != 1 or base_classes[0] != tuple:
-        return False
-
     fields = getattr(obj, "_fields", None)
-    if not fields or not isinstance(fields, tuple):
-        return False
-
-    return True
+    return isinstance(obj, tuple) and isinstance(fields, tuple)
 
 
 def traverse(
@@ -784,7 +786,6 @@ def traverse(
                     children=children,
                 )
                 for last, (key, value) in loop_last(obj._asdict().items()):
-                    print(last, key, value)
                     child_node = _traverse(value, depth=depth + 1)
                     child_node.key_repr = key
                     child_node.last = last
