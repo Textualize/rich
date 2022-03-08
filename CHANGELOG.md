@@ -1,3 +1,4 @@
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -14,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added ProgressColumn `MofNCompleteColumn` to display raw `completed/total` column (similar to DownloadColumn,
   but displays values as ints, does not convert to floats or add bit/bytes units).
   https://github.com/Textualize/rich/pull/1941
+- Add support for namedtuples to `Pretty` https://github.com/Textualize/rich/pull/2031
 
 ### Fixed
 
@@ -23,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed Pretty measure not respecting expand_all https://github.com/Textualize/rich/issues/1998
 - Collapsed definitions for single-character spinners, to save memory and reduce import time.
 - Fix print_json indent type in __init__.py
+- Fix error when inspecting object defined in REPL https://github.com/Textualize/rich/pull/2037
 
 ### Changed
 
