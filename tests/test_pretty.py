@@ -1,3 +1,4 @@
+import collections
 import io
 import sys
 from array import array
@@ -202,6 +203,24 @@ def test_pretty_namedtuple():
     reviews=['its amazing!', 'its terrible!']
 )"""
     )
+
+
+def test_pretty_namedtuple_length_one_no_trailing_comma():
+    instance = collections.namedtuple("Thing", ["name"])(name="Bob")
+    assert pretty_repr(instance) == "Thing(name='Bob')"
+
+
+def test_pretty_namedtuple_empty():
+    instance = collections.namedtuple("Thing", [])()
+    assert pretty_repr(instance) == "Thing()"
+
+
+def test_pretty_namedtuple_custom_repr():
+    class Thing(NamedTuple):
+        def __repr__(self):
+            return "XX"
+
+    assert pretty_repr(Thing()) == "XX"
 
 
 def test_pretty_namedtuple_fields_invalid_type():

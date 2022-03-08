@@ -1,4 +1,5 @@
 import builtins
+import collections
 import dataclasses
 import inspect
 import os
@@ -29,7 +30,6 @@ try:
     import attr as _attr_module
 except ImportError:  # pragma: no cover
     _attr_module = None  # type: ignore
-
 
 from . import get_console
 from ._loop import loop_last
@@ -77,6 +77,24 @@ def _is_dataclass_repr(obj: object) -> bool:
         return obj.__repr__.__code__.co_filename == dataclasses.__file__
     except Exception:  # pragma: no coverage
         return False
+
+
+_dummy_namedtuple = collections.namedtuple("dummy", [])
+
+
+def _has_default_namedtuple_repr(obj: object) -> bool:
+    """Check if an instance of namedtuple contains the default repr
+
+    Args:
+        obj (object): A namedtuple
+
+    Returns:
+        bool: True if the default repr is used, False if there's a custom repr.
+    """
+    obj_file = inspect.getfile(obj.__repr__)
+    default_repr_file = inspect.getfile(_dummy_namedtuple.__repr__)
+    print(obj_file, default_repr_file)
+    return obj_file == default_repr_file
 
 
 def _ipy_display_hook(
@@ -383,6 +401,7 @@ class Node:
     empty: str = ""
     last: bool = False
     is_tuple: bool = False
+    is_namedtuple: bool = False
     children: Optional[List["Node"]] = None
     key_separator = ": "
     separator: str = ", "
@@ -397,7 +416,7 @@ class Node:
         elif self.children is not None:
             if self.children:
                 yield self.open_brace
-                if self.is_tuple and len(self.children) == 1:
+                if self.is_tuple and not self.is_namedtuple and len(self.children) == 1:
                     yield from self.children[0].iter_tokens()
                     yield ","
                 else:
@@ -543,7 +562,7 @@ def _is_namedtuple(obj: Any) -> bool:
     if not fields or not isinstance(fields, tuple):
         return False
 
-    return all(type(field) == str for field in fields)
+    return True
 
 
 def traverse(
@@ -753,7 +772,7 @@ def traverse(
                     append(child_node)
 
                 pop_visited(obj_id)
-        elif _is_namedtuple(obj):
+        elif _is_namedtuple(obj) and _has_default_namedtuple_repr(obj):
             children = []
             append = children.append
             if reached_max_depth:
@@ -765,6 +784,7 @@ def traverse(
                     children=children,
                 )
                 for last, (key, value) in loop_last(obj._asdict().items()):
+                    print(last, key, value)
                     child_node = _traverse(value, depth=depth + 1)
                     child_node.key_repr = key
                     child_node.last = last
@@ -818,7 +838,7 @@ def traverse(
                         child_node.last = index == last_item_index
                         append(child_node)
                 if max_length is not None and num_items > max_length:
-                    append(Node(value_repr=f"... +{num_items-max_length}", last=True))
+                    append(Node(value_repr=f"... +{num_items - max_length}", last=True))
             else:
                 node = Node(empty=empty, children=[], last=root)
 
@@ -826,6 +846,7 @@ def traverse(
         else:
             node = Node(value_repr=to_repr(obj), last=root)
         node.is_tuple = _safe_isinstance(obj, tuple)
+        node.is_namedtuple = _is_namedtuple(obj)
         return node
 
     node = _traverse(_object, root=True)
