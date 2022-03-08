@@ -1,9 +1,10 @@
+import collections
 import io
 import sys
 from array import array
 from collections import UserDict, defaultdict
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, NamedTuple
 
 import attr
 import pytest
@@ -167,6 +168,74 @@ def test_pretty_dataclass():
     result = pretty_repr(dc, max_width=80)
     print(repr(result))
     assert result == "ExampleDataclass(foo=1000, bar=..., baz=['foo', 'bar', 'baz'])"
+
+
+class StockKeepingUnit(NamedTuple):
+    name: str
+    description: str
+    price: float
+    category: str
+    reviews: List[str]
+
+
+def test_pretty_namedtuple():
+    console = Console(color_system=None)
+    console.begin_capture()
+
+    example_namedtuple = StockKeepingUnit(
+        "Sparkling British Spring Water",
+        "Carbonated spring water",
+        0.9,
+        "water",
+        ["its amazing!", "its terrible!"],
+    )
+
+    result = pretty_repr(example_namedtuple)
+
+    print(result)
+    assert (
+        result
+        == """StockKeepingUnit(
+    name='Sparkling British Spring Water',
+    description='Carbonated spring water',
+    price=0.9,
+    category='water',
+    reviews=['its amazing!', 'its terrible!']
+)"""
+    )
+
+
+def test_pretty_namedtuple_length_one_no_trailing_comma():
+    instance = collections.namedtuple("Thing", ["name"])(name="Bob")
+    assert pretty_repr(instance) == "Thing(name='Bob')"
+
+
+def test_pretty_namedtuple_empty():
+    instance = collections.namedtuple("Thing", [])()
+    assert pretty_repr(instance) == "Thing()"
+
+
+def test_pretty_namedtuple_custom_repr():
+    class Thing(NamedTuple):
+        def __repr__(self):
+            return "XX"
+
+    assert pretty_repr(Thing()) == "XX"
+
+
+def test_pretty_namedtuple_fields_invalid_type():
+    class LooksLikeANamedTupleButIsnt(tuple):
+        _fields = "blah"
+
+    instance = LooksLikeANamedTupleButIsnt()
+    result = pretty_repr(instance)
+    assert result == "()"  # Treated as tuple
+
+
+def test_pretty_namedtuple_max_depth():
+    instance = {"unit": StockKeepingUnit("a", "b", 1.0, "c", ["d", "e"])}
+    result = pretty_repr(instance, max_depth=1)
+    assert result == "{'unit': ...}"
 
 
 def test_small_width():
