@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Collapsed definitions for single-character spinners, to save memory and reduce import time.
 - Fix print_json indent type in __init__.py
 - Fix error when inspecting object defined in REPL https://github.com/Textualize/rich/pull/2037
+- Fix incorrect highlighting of non-indented JSON https://github.com/Textualize/rich/pull/2038
 
 ### Changed
 

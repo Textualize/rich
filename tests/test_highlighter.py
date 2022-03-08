@@ -113,6 +113,22 @@ def test_highlight_json_with_indent():
     ]
 
 
+def test_highlight_json_string_only():
+    json_string = '"abc"'
+    text = Text(json_string)
+    highlighter = JSONHighlighter()
+    highlighter.highlight(text)
+    assert text.spans == [Span(0, 5, "json.str")]
+
+
+def test_highlight_json_empty_string_only():
+    json_string = '""'
+    text = Text(json_string)
+    highlighter = JSONHighlighter()
+    highlighter.highlight(text)
+    assert text.spans == [Span(0, 2, "json.str")]
+
+
 def test_highlight_json_no_indent():
     json_string = json.dumps({"name": "apple", "count": 1}, indent=None)
     text = Text(json_string)
