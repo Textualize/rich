@@ -1,7 +1,7 @@
 """Rich text and beautiful formatting in the terminal."""
 
 import os
-from typing import Callable, IO, TYPE_CHECKING, Any, Optional
+from typing import Callable, IO, TYPE_CHECKING, Any, Optional, Union
 
 from ._extension import load_ipython_extension
 
@@ -73,7 +73,7 @@ def print_json(
     json: Optional[str] = None,
     *,
     data: Any = None,
-    indent: int = 2,
+    indent: Union[None, int, str] = 2,
     highlight: bool = True,
     skip_keys: bool = False,
     ensure_ascii: bool = True,

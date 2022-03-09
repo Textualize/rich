@@ -2222,3 +2222,5 @@ if __name__ == "__main__":  # pragma: no cover
         }
     )
     console.log("foo")
+
+    console.print_json(data={"name": "apple", "count": 1}, indent=None)
