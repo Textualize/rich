@@ -1,4 +1,5 @@
 import inspect
+import io
 import os
 import platform
 import sys
@@ -11,7 +12,6 @@ from getpass import getpass
 from html import escape
 from inspect import isclass
 from itertools import islice
-from threading import RLock
 from time import monotonic
 from types import FrameType, ModuleType, TracebackType
 from typing import (
@@ -569,12 +569,6 @@ def get_windows_console_features() -> "WindowsConsoleFeatures":  # pragma: no co
 def detect_legacy_windows() -> bool:
     """Detect legacy Windows."""
     return WINDOWS and not get_windows_console_features().vt
-
-
-if detect_legacy_windows():  # pragma: no cover
-    from colorama import init
-
-    init(strip=False)
 
 
 class Console:
@@ -1141,7 +1135,7 @@ class Console:
         Args:
             show (bool, optional): Set visibility of the cursor.
         """
-        if self.is_terminal and not self.legacy_windows:
+        if self.is_terminal:
             self.control(Control.show_cursor(show))
             return True
         return False
@@ -1916,21 +1910,40 @@ class Console:
                     display(self._buffer, self._render_buffer(self._buffer[:]))
                     del self._buffer[:]
                 else:
-                    text = self._render_buffer(self._buffer[:])
-                    del self._buffer[:]
-                    if text:
+                    if WINDOWS:
                         try:
-                            if WINDOWS:  # pragma: no cover
-                                # https://bugs.python.org/issue37871
-                                write = self.file.write
-                                for line in text.splitlines(True):
+                            file_no = self.file.fileno()
+                        except (ValueError, io.UnsupportedOperation):
+                            file_no = -1
+
+                        legacy_windows_stdout = self.legacy_windows and file_no == 1
+                        if legacy_windows_stdout:
+                            from rich._win32_console import LegacyWindowsTerm
+                            from rich._windows_renderer import legacy_windows_render
+
+                            legacy_windows_render(self._buffer[:], LegacyWindowsTerm())
+
+                        output_capture_enabled = bool(self._buffer_index)
+                        if not legacy_windows_stdout or output_capture_enabled:
+                            text = self._render_buffer(self._buffer[:])
+                            # https://bugs.python.org/issue37871
+                            write = self.file.write
+                            for line in text.splitlines(True):
+                                try:
                                     write(line)
-                            else:
-                                self.file.write(text)
-                            self.file.flush()
+                                except UnicodeEncodeError as error:
+                                    error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
+                                    raise
+                    else:
+                        text = self._render_buffer(self._buffer[:])
+                        try:
+                            self.file.write(text)
                         except UnicodeEncodeError as error:
                             error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
                             raise
+
+                    self.file.flush()
+                    del self._buffer[:]
 
     def _render_buffer(self, buffer: Iterable[Segment]) -> str:
         """Render buffered output, and clear buffer."""
