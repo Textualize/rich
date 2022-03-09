@@ -1,4 +1,3 @@
-
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -6,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [12.0.0] - Unreleased
 
 ### Added
 
@@ -25,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix syntax lexer guessing.
 - Fixed Pretty measure not respecting expand_all https://github.com/Textualize/rich/issues/1998
 - Collapsed definitions for single-character spinners, to save memory and reduce import time.
-- Fix print_json indent type in __init__.py
+- Fix print_json indent type in **init**.py
 - Fix error when inspecting object defined in REPL https://github.com/Textualize/rich/pull/2037
 - Fix incorrect highlighting of non-indented JSON https://github.com/Textualize/rich/pull/2038
 
@@ -1661,7 +1660,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[Unreleased]: https://github.com/willmcgugan/rich/compare/v11.0.0...HEAD
+[unreleased]: https://github.com/willmcgugan/rich/compare/v11.0.0...HEAD
 [11.2.0]: https://github.com/willmcgugan/rich/compare/v11.1.0...v11.2.0
 [11.1.0]: https://github.com/willmcgugan/rich/compare/v11.0.0...v11.1.0
 [11.0.0]: https://github.com/willmcgugan/rich/compare/v10.16.1...v11.0.0
