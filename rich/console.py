@@ -225,7 +225,7 @@ class ConsoleOptions:
         return options
 
     def reset_height(self) -> "ConsoleOptions":
-        """Resets the height to None.
+        """Return a copy of the options with height set to ``None``.
 
         Returns:
             ~ConsoleOptions: New console options instance.
