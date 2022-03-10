@@ -767,7 +767,11 @@ def test_reset_height():
             yield Panel("bar")
 
     console = Console(
-        force_terminal=True, color_system="truecolor", width=20, height=40
+        force_terminal=True,
+        color_system="truecolor",
+        width=20,
+        height=40,
+        legacy_windows=False,
     )
 
     with console.capture() as capture:
