@@ -308,24 +308,12 @@ def test_capture():
 
 
 def test_input(monkeypatch, capsys):
-    def fake_input(prompt):
+    def fake_input(prompt=""):
         console.file.write(prompt)
         return "bar"
 
     monkeypatch.setattr("builtins.input", fake_input)
     console = Console()
-    user_input = console.input(prompt="foo:")
-    assert capsys.readouterr().out == "foo:"
-    assert user_input == "bar"
-
-
-def test_input_legacy_windows(monkeypatch, capsys):
-    def fake_input(prompt):
-        console.file.write(prompt)
-        return "bar"
-
-    monkeypatch.setattr("builtins.input", fake_input)
-    console = Console(legacy_windows=True)
     user_input = console.input(prompt="foo:")
     assert capsys.readouterr().out == "foo:"
     assert user_input == "bar"
