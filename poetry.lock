@@ -861,7 +861,7 @@ python-versions = "*"
 
 [[package]]
 name = "pywinpty"
-version = "2.0.2"
+version = "2.0.3"
 description = "Pseudo terminal support for Windows from Python."
 category = "main"
 optional = true
@@ -1001,7 +1001,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "virtualenv"
-version = "20.13.2"
+version = "20.13.3"
 description = "Virtual Python Environment builder"
 category = "dev"
 optional = false
@@ -1064,7 +1064,7 @@ jupyter = ["ipywidgets"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.2"
-content-hash = "e333203e1576b408fcd0decf9bf8e604f8fafaf53828431b157d0a21e85e8f3c"
+content-hash = "5ce16f2949f71818ef5552c9001615a07b6e604a6291ff34b0f5fdc29a684cdc"
 
 [metadata.files]
 appnope = [
@@ -1586,11 +1586,11 @@ pywin32 = [
     {file = "pywin32-303-cp39-cp39-win_amd64.whl", hash = "sha256:79cbb862c11b9af19bcb682891c1b91942ec2ff7de8151e2aea2e175899cda34"},
 ]
 pywinpty = [
-    {file = "pywinpty-2.0.2-cp310-none-win_amd64.whl", hash = "sha256:4b421379b407bf2f52a64a4c58f61deffe623b5add02d871acb290b771bb6227"},
-    {file = "pywinpty-2.0.2-cp37-none-win_amd64.whl", hash = "sha256:238b75fc456a6bc558761a89c9e6b3c8f2f54d79db03ae28997a68313c24b2ca"},
-    {file = "pywinpty-2.0.2-cp38-none-win_amd64.whl", hash = "sha256:344858a0b956fdc64a547d5e1980b0257b47f5433ed7cb89bf7b6268cb280c6c"},
-    {file = "pywinpty-2.0.2-cp39-none-win_amd64.whl", hash = "sha256:a4a066eaf2e30944d3028d946883ceb7883a499b53c4b89ca2d54bd7a4210550"},
-    {file = "pywinpty-2.0.2.tar.gz", hash = "sha256:20ec117183f79642eff555ce0dd1823f942618d65813fb6122d14b6e34b5d05a"},
+    {file = "pywinpty-2.0.3-cp310-none-win_amd64.whl", hash = "sha256:7a330ef7a2ce284370b1a1fdd2a80c523585464fa5e5ab934c9f27220fa7feab"},
+    {file = "pywinpty-2.0.3-cp37-none-win_amd64.whl", hash = "sha256:6455f1075f978942d318f95616661c605d5e0f991c5b176c0c852d237aafefc0"},
+    {file = "pywinpty-2.0.3-cp38-none-win_amd64.whl", hash = "sha256:2e7a288a8121393c526d4e6ec7d65edef75d68c7787ab9560e438df867b75a5d"},
+    {file = "pywinpty-2.0.3-cp39-none-win_amd64.whl", hash = "sha256:def51627e6aa659f33ea7a0ea4c6b68365c83af4aad7940600f844746817a0ed"},
+    {file = "pywinpty-2.0.3.tar.gz", hash = "sha256:6b29a826e896105370c38d53904c3aaac6c36146a50448fc0ed5082cf9d092bc"},
 ]
 pyyaml = [
     {file = "PyYAML-6.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d4db7c7aef085872ef65a8fd7d6d09a14ae91f691dec3e87ee5ee0539d516f53"},
@@ -1782,8 +1782,8 @@ typing-extensions = [
     {file = "typing_extensions-4.1.1.tar.gz", hash = "sha256:1a9462dcc3347a79b1f1c0271fbe79e844580bb598bafa1ed208b94da3cdcd42"},
 ]
 virtualenv = [
-    {file = "virtualenv-20.13.2-py2.py3-none-any.whl", hash = "sha256:e7b34c9474e6476ee208c43a4d9ac1510b041c68347eabfe9a9ea0c86aa0a46b"},
-    {file = "virtualenv-20.13.2.tar.gz", hash = "sha256:01f5f80744d24a3743ce61858123488e91cb2dd1d3bdf92adaf1bba39ffdedf0"},
+    {file = "virtualenv-20.13.3-py2.py3-none-any.whl", hash = "sha256:dd448d1ded9f14d1a4bfa6bfc0c5b96ae3be3f2d6c6c159b23ddcfd701baa021"},
+    {file = "virtualenv-20.13.3.tar.gz", hash = "sha256:e9dd1a1359d70137559034c0f5433b34caf504af2dc756367be86a5a32967134"},
 ]
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},

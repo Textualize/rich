@@ -2,6 +2,7 @@
 .pytype
 .DS_Store
 .vscode
+.idea/
 mypy_report
 docs/build
 docs/source/_build
