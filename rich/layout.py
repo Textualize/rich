@@ -73,6 +73,7 @@ class _Placeholder:
             style=self.style,
             title=self.highlighter(title),
             border_style="blue",
+            height=height,
         )
 
 

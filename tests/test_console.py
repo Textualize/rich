@@ -308,24 +308,12 @@ def test_capture():
 
 
 def test_input(monkeypatch, capsys):
-    def fake_input(prompt):
+    def fake_input(prompt=""):
         console.file.write(prompt)
         return "bar"
 
     monkeypatch.setattr("builtins.input", fake_input)
     console = Console()
-    user_input = console.input(prompt="foo:")
-    assert capsys.readouterr().out == "foo:"
-    assert user_input == "bar"
-
-
-def test_input_legacy_windows(monkeypatch, capsys):
-    def fake_input(prompt):
-        console.file.write(prompt)
-        return "bar"
-
-    monkeypatch.setattr("builtins.input", fake_input)
-    console = Console(legacy_windows=True)
     user_input = console.input(prompt="foo:")
     assert capsys.readouterr().out == "foo:"
     assert user_input == "bar"
@@ -768,3 +756,28 @@ def test_is_terminal_broken_file():
 def test_detect_color_system():
     console = Console(_environ={"TERM": "rxvt-unicode-256color"}, force_terminal=True)
     assert console._detect_color_system() == ColorSystem.EIGHT_BIT
+
+
+def test_reset_height():
+    """Test height is reset when rendering complex renderables."""
+    # https://github.com/Textualize/rich/issues/2042
+    class Panels:
+        def __rich_console__(self, console, options):
+            yield Panel("foo")
+            yield Panel("bar")
+
+    console = Console(
+        force_terminal=True,
+        color_system="truecolor",
+        width=20,
+        height=40,
+        legacy_windows=False,
+    )
+
+    with console.capture() as capture:
+        console.print(Panel(Panels()), height=12)
+    result = capture.get()
+    print(repr(result))
+    expected = "╭──────────────────╮\n│ ╭──────────────╮ │\n│ │ foo          │ │\n│ ╰──────────────╯ │\n│ ╭──────────────╮ │\n│ │ bar          │ │\n│ ╰──────────────╯ │\n│                  │\n│                  │\n│                  │\n│                  │\n╰──────────────────╯\n"
+
+    assert result == expected

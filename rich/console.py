@@ -224,6 +224,16 @@ class ConsoleOptions:
         options.max_height = options.height = height
         return options
 
+    def reset_height(self) -> "ConsoleOptions":
+        """Resets the height to None.
+
+        Returns:
+            ~ConsoleOptions: New console options instance.
+        """
+        options = self.copy()
+        options.height = None
+        return options
+
     def update_dimensions(self, width: int, height: int) -> "ConsoleOptions":
         """Update the width and height, and return a copy.
 
@@ -1245,6 +1255,7 @@ class Console:
                 f"object {render_iterable!r} is not renderable"
             )
         _Segment = Segment
+        _options = _options.reset_height()
         for render_output in iter_render:
             if isinstance(render_output, _Segment):
                 yield render_output
