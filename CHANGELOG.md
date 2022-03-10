@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved support for enum.Flag in ReprHighlighter https://github.com/Textualize/rich/pull/1920
 - Tree now respects justify=None, i.e. won't pad to right https://github.com/Textualize/rich/issues/1690
 - Removed rich.tabulate which was marked for deprecation
+- Deprecated rich.align.AlignValues in favor of AlignMethod
 
 ## [11.2.0] - 2022-02-08
 
