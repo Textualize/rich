@@ -27,11 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix print_json indent type in **init**.py
 - Fix error when inspecting object defined in REPL https://github.com/Textualize/rich/pull/2037
 - Fix incorrect highlighting of non-indented JSON https://github.com/Textualize/rich/pull/2038
+- Fixed height reset in complex renderables https://github.com/Textualize/rich/issues/2042
 
 ### Changed
 
 - Improved support for enum.Flag in ReprHighlighter https://github.com/Textualize/rich/pull/1920
 - Tree now respects justify=None, i.e. won't pad to right https://github.com/Textualize/rich/issues/1690
+- Removed rich.tabulate which was marked for deprecation
 
 ## [11.2.0] - 2022-02-08
 
