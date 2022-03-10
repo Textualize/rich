@@ -5,7 +5,7 @@ import platform
 import sys
 from dataclasses import dataclass, field
 from traceback import walk_tb
-from types import ModuleType, TracebackType
+from types import FrameType, ModuleType, TracebackType
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Type, Union
 
 from pygments.lexers import guess_lexer_for_filename
