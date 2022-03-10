@@ -766,7 +766,9 @@ def test_reset_height():
             yield Panel("foo")
             yield Panel("bar")
 
-    console = Console(force_terminal=False, width=20)
+    console = Console(
+        force_terminal=True, color_system="truecolor", width=20, height=40
+    )
 
     with console.capture() as capture:
         console.print(Panel(Panels()), height=12)
