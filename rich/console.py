@@ -2006,23 +2006,15 @@ class Console:
         Returns:
             str: Text read from stdin.
         """
-        prompt_str = ""
         if prompt:
-            with self.capture() as capture:
-                self.print(prompt, markup=markup, emoji=emoji, end="")
-            prompt_str = capture.get()
-        if self.legacy_windows:
-            # Legacy windows doesn't like ANSI codes in getpass or input (colorama bug)?
-            self.file.write(prompt_str)
-            prompt_str = ""
+            self.print(prompt, markup=markup, emoji=emoji, end="")
         if password:
-            result = getpass(prompt_str, stream=stream)
+            result = getpass("", stream=stream)
         else:
             if stream:
-                self.file.write(prompt_str)
                 result = stream.readline()
             else:
-                result = input(prompt_str)
+                result = input()
         return result
 
     def export_text(self, *, clear: bool = True, styles: bool = False) -> str:
