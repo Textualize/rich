@@ -26,7 +26,7 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
   - repo: https://github.com/hadialqattan/pycln
-    rev: v1.2.3
+    rev: v1.2.4
     hooks:
       - id: pycln
         args: [--all]
