@@ -4,7 +4,7 @@ The API that this module wraps is documented at https://docs.microsoft.com/en-us
 """
 import ctypes
 import sys
-from typing import IO, Any, NamedTuple, Type, cast
+from typing import Any, NamedTuple, Type, cast
 
 windll: Any = None
 if sys.platform == "win32":
