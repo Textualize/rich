@@ -8,6 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 
+import rich.progress
 from rich.progress_bar import ProgressBar
 from rich.console import Console
 from rich.highlighter import NullHighlighter
@@ -17,7 +18,6 @@ from rich.progress import (
     TotalFileSizeColumn,
     DownloadColumn,
     TransferSpeedColumn,
-    read,
     RenderableColumn,
     SpinnerColumn,
     MofNCompleteColumn,
@@ -552,7 +552,7 @@ def test_no_output_if_progress_is_disabled() -> None:
     assert result == expected
 
 
-def test_read_file_closed() -> None:
+def test_open() -> None:
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
@@ -569,7 +569,7 @@ def test_read_file_closed() -> None:
     with os.fdopen(fd, "wb") as f:
         f.write(b"Hello, World!")
     try:
-        with read(filename) as f:
+        with rich.progress.open(filename) as f:
             assert f.read() == b"Hello, World!"
         assert f.closed
         assert f.handle.closed
@@ -577,7 +577,31 @@ def test_read_file_closed() -> None:
         os.remove(filename)
 
 
-def test_read_filehandle_not_closed() -> None:
+def test_open_text_mode() -> None:
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=60,
+        color_system="truecolor",
+        legacy_windows=False,
+        _environ={},
+    )
+    progress = Progress(
+        console=console,
+    )
+
+    fd, filename = tempfile.mkstemp()
+    with os.fdopen(fd, "wb") as f:
+        f.write(b"Hello, World!")
+    try:
+        with rich.progress.open(filename, "r") as f:
+            assert f.read() == "Hello, World!"
+        assert f.closed
+    finally:
+        os.remove(filename)
+
+
+def test_wrap_file() -> None:
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
@@ -595,7 +619,7 @@ def test_read_filehandle_not_closed() -> None:
         total = f.write(b"Hello, World!")
     try:
         with open(filename, "rb") as file:
-            with read(file, total=total) as f:
+            with rich.progress.wrap_file(file, total=total) as f:
                 assert f.read() == b"Hello, World!"
             assert f.closed
             assert not f.handle.closed

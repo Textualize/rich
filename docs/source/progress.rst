@@ -212,30 +212,38 @@ If the :class:`~rich.progress.Progress` class doesn't offer exactly what you nee
 Reading from a file
 ~~~~~~~~~~~~~~~~~~~
 
-You can obtain a progress-tracking reader using the :meth:`~rich.progress.Progress.read` method by giving either a path or a *file-like* object. When a path is given, :meth:`~rich.progress.Progress.read` will query the size of the file with :func:`os.stat`, and take care of opening the file for you, but you are still responsible for closing it. For this, you should consider using a *context*::
+You can obtain a progress-tracking reader using the :meth:`~rich.progress.Progress.open` method by giving it a path. You can specify the number of bytes to be read, but by default :meth:`~rich.progress.Progress.open` will query the size of the file with :func:`os.stat`. You are responsible for closing the file, and you should consider using a *context* to make sure it is closed ::
+
+    import json
+    from rich.progress import Progress
+
+    with Progress() as progress:
+        with progress.open("file.json", "rb") as file:
+            json.load(file)
+
+
+Note that in the above snippet we use the `"rb"` mode, because we needed the file to be opened in binary mode to pass it to :func:`json.load`. If the API consuming the file is expecting an object in *text mode* (for instance, :func:`csv.reader`), you can open the file with the `"r"` mode, which happens to be the default ::
 
     from rich.progress import Progress
 
     with Progress() as progress:
-        with progress.read("file.bin") as file:
-            do_work(file)
+        with progress.open("README.md") as file:
+            for line in file:
+                print(line)
 
-If a file-like object is provided, it must be in *binary mode*, and the total size must be provided to :meth:`~rich.progress.Progress.read` with the ``total`` argument. In that case :meth:`~rich.progress.Progress.read` will not close the file-like object, so you need to take care of that yourself::
 
-    from rich.progress import Progress
+Reading from a file-like object
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    with Progress() as progress:
-        with open("file.bin", "rb") as file:
-            do_work(progress.read(file, total=2048))
-
-If the API consuming the file is expecting an object in *text mode* (for instance, :func:`csv.reader`), you can always wrap the object returned by :meth:`~rich.progress.Progress.read` in an :class:`io.TextIOWrapper`::
+You can obtain a progress-tracking reader wrapping a file-like object using the :meth:`~rich.progress.Progress.wrap_file` method. The file-like object must be in *binary mode*, and a total must be provided, unless it was provided to a :class:`~rich.progress.Task` created beforehand. The returned reader may be used in a context, but will not take care of closing the wrapped file ::
 
     import io
+    import json
     from rich.progress import Progress
 
     with Progress() as progress:
-        with progress.read("file.bin") as file:
-            do_work_txt(io.TextIOWrapper(file))
+        file = io.BytesIO("...")
+        json.load(progress.read(file, total=2048))
 
 
 Multiple Progress

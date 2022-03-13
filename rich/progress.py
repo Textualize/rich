@@ -1,3 +1,4 @@
+import io
 from abc import ABC, abstractmethod
 from collections import deque
 from collections.abc import Sized
@@ -272,10 +273,10 @@ class _ReadContext(ContextManager[BinaryIO]):
         self.reader.__exit__(exc_type, exc_val, exc_tb)
 
 
-def read(
-    file: Union[str, "PathLike[str]", BinaryIO],
+def wrap_file(
+    file: BinaryIO,
+    total: int,
     description: str = "Reading...",
-    total: Optional[int] = None,
     auto_refresh: bool = True,
     console: Optional[Console] = None,
     transient: bool = False,
@@ -292,8 +293,8 @@ def read(
 
     Args:
         file (Union[str, PathLike[str], BinaryIO]): The path to the file to read, or a file-like object in binary mode.
+        total (int): Total number of bytes to read.
         description (str, optional): Description of task show next to progress bar. Defaults to "Reading".
-        total: (int, optional): Total number of bytes to read. Must be provided if reading from a file handle. Default for a path is os.stat(file).st_size.
         auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         console (Console, optional): Console to write to. Default creates internal Console instance.
@@ -334,7 +335,84 @@ def read(
         disable=disable,
     )
 
-    reader = progress.read(file, total=total, description=description)
+    reader = progress.wrap_file(file, total=total, description=description)
+    return _ReadContext(progress, reader)
+
+
+def open(
+    file: Union[str, "PathLike[str]", bytes],
+    mode: str = "rb",
+    total: Optional[int] = None,
+    description: str = "Reading...",
+    auto_refresh: bool = True,
+    console: Optional[Console] = None,
+    transient: bool = False,
+    get_time: Optional[Callable[[], float]] = None,
+    refresh_per_second: float = 10,
+    style: StyleType = "bar.back",
+    complete_style: StyleType = "bar.complete",
+    finished_style: StyleType = "bar.finished",
+    pulse_style: StyleType = "bar.pulse",
+    update_period: float = 0.1,
+    disable: bool = False,
+    encoding: Optional[str] = None,
+) -> ContextManager[BinaryIO]:
+    """Read bytes from a file while tracking progress.
+
+    Args:
+        path (Union[str, PathLike[str], BinaryIO]): The path to the file to read, or a file-like object in binary mode.
+        mode (str): The mode to use to open the file. Only supports "r", "rb" or "rt".
+        total: (int, optional): Total number of bytes to read. Must be provided if reading from a file handle. Default for a path is os.stat(file).st_size.
+        description (str, optional): Description of task show next to progress bar. Defaults to "Reading".
+        auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
+        transient: (bool, optional): Clear the progress on exit. Defaults to False.
+        console (Console, optional): Console to write to. Default creates internal Console instance.
+        refresh_per_second (float): Number of times per second to refresh the progress information. Defaults to 10.
+        style (StyleType, optional): Style for the bar background. Defaults to "bar.back".
+        complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
+        finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
+        pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
+        update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
+        disable (bool, optional): Disable display of progress.
+        encoding (str, optional): The encoding to use when reading in text mode.
+
+    Returns:
+        ContextManager[BinaryIO]: A context manager yielding a progress reader.
+
+    """
+
+    columns: List["ProgressColumn"] = (
+        [TextColumn("[progress.description]{task.description}")] if description else []
+    )
+    columns.extend(
+        (
+            BarColumn(
+                style=style,
+                complete_style=complete_style,
+                finished_style=finished_style,
+                pulse_style=pulse_style,
+            ),
+            DownloadColumn(),
+            TimeRemainingColumn(),
+        )
+    )
+    progress = Progress(
+        *columns,
+        auto_refresh=auto_refresh,
+        console=console,
+        transient=transient,
+        get_time=get_time,
+        refresh_per_second=refresh_per_second or 10,
+        disable=disable,
+    )
+
+    reader = progress.open(
+        file,
+        mode=mode,
+        total=total,
+        description=description,
+        encoding=encoding,
+    )
     return _ReadContext(progress, reader)
 
 
@@ -983,50 +1061,93 @@ class Progress(JupyterMixin):
                 advance(task_id, 1)
                 refresh()
 
-    def read(
+    def wrap_file(
         self,
-        file: Union[str, "PathLike[str]", BinaryIO],
+        file: BinaryIO,
         total: Optional[int] = None,
         task_id: Optional[TaskID] = None,
         description: str = "Reading...",
     ) -> BinaryIO:
-        """Track progress while reading from a binary file.
+        """Track progress file reading from a binary file.
 
         Args:
-            file (Union[str, PathLike[str], BinaryIO]): The path to the file to read, or a file-like object in binary mode.
-            total: (int, optional): Total number of bytes to read. Must be provided if reading from a file handle. Default for a path is os.stat(file).st_size.
-            task_id: (TaskID): Task to track. Default is new task.
-            description: (str, optional): Description of task, if new task is created.
+            file (BinaryIO): A file-like object opened in binary mode.
+            total (int, optional): Total number of bytes to read. This must be provided unless a task with a total is also given.
+            task_id (TaskID): Task to track. Default is new task.
+            description (str, optional): Description of task, if new task is created.
 
         Returns:
             BinaryIO: A readable file-like object in binary mode.
+
+        Raises:
+            ValueError: When no total value can be extracted from the arguments or the task.
         """
-
+        # attempt to recover the total from the task
+        if total is None and task_id is not None:
+            with self._lock:
+                task = self._tasks[task_id].total
         if total is None:
-            if isinstance(file, (str, PathLike)):
-                task_total = stat(file).st_size
-            else:
-                raise ValueError(
-                    f"unable to get size of {file!r}, please specify 'total'"
-                )
-        else:
-            task_total = total
+            raise ValueError(
+                f"unable to get the total number of bytes, please specify 'total'"
+            )
 
+        # update total of task or create new task
         if task_id is None:
-            task_id = self.add_task(description, total=task_total)
+            task_id = self.add_task(description, total=total)
         else:
-            self.update(task_id, total=task_total)
+            self.update(task_id, total=total)
 
-        if isinstance(file, (str, PathLike)):
-            handle = open(file, "rb")
-            close_handle = True
+        # return a reader
+        return _Reader(file, self, task_id, close_handle=False)
+
+    def open(
+        self,
+        file: Union[str, "PathLike[str]", bytes],
+        mode: str = "r",
+        total: Optional[int] = None,
+        task_id: Optional[TaskID] = None,
+        description: str = "Reading...",
+        encoding: Optional[str] = None,
+    ) -> BinaryIO:
+        """Track progress while reading from a binary file.
+
+        Args:
+            path (Union[str, PathLike[str]]): The path to the file to read.
+            mode (str): The mode to use to open the file. Only supports "r", "rb" or "rt".
+            total (int, optional): Total number of bytes to read. If none given, os.stat(path).st_size is used.
+            task_id (TaskID): Task to track. Default is new task.
+            description (str, optional): Description of task, if new task is created.
+            encoding (str, optional): The encoding to use when reading in text mode.
+
+        Returns:
+            BinaryIO: A readable file-like object in binary mode.
+
+        Raises:
+            ValueError: When an invalid mode is given.
+        """
+        # attempt to get the total with `os.stat`
+        if total is None:
+            total = stat(file).st_size
+
+        # update total of task or create new task
+        if task_id is None:
+            task_id = self.add_task(description, total=total)
         else:
-            if not isinstance(file.read(0), bytes):
-                raise ValueError("expected file open in binary mode")
-            handle = file
-            close_handle = False
+            self.update(task_id, total=total)
 
-        return _Reader(handle, self, task_id, close_handle=close_handle)
+        # normalize the mode (always rb, rt)
+        _mode = "".join(sorted(mode, reverse=False))
+        if _mode not in ("br", "rt", "r"):
+            raise ValueError("invalid mode {!r}".format(mode))
+
+        # open the file in binary mode,
+        reader = _Reader(io.open(file, "rb"), self, task_id, close_handle=True)
+
+        # wrap the reader in a `TextIOWrapper` if text mode
+        if mode == "r" or mode == "rt":
+            reader = io.TextIOWrapper(reader, encoding=encoding)
+
+        return reader
 
     def start_task(self, task_id: TaskID) -> None:
         """Start a task.
