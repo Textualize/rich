@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Progress.read method to track the progress while reading from a file https://github.com/willmcgugan/rich/pull/1759
+- Progress.open and Progress.wrap_file method to track the progress while reading from a file or file-like object https://github.com/willmcgugan/rich/pull/1759
 
 
 ## [12.0.0] - 2022-03-10
