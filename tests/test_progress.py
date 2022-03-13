@@ -578,18 +578,6 @@ def test_open() -> None:
 
 
 def test_open_text_mode() -> None:
-    console = Console(
-        file=io.StringIO(),
-        force_terminal=True,
-        width=60,
-        color_system="truecolor",
-        legacy_windows=False,
-        _environ={},
-    )
-    progress = Progress(
-        console=console,
-    )
-
     fd, filename = tempfile.mkstemp()
     with os.fdopen(fd, "wb") as f:
         f.write(b"Hello, World!")
@@ -602,6 +590,22 @@ def test_open_text_mode() -> None:
 
 
 def test_wrap_file() -> None:
+    fd, filename = tempfile.mkstemp()
+    with os.fdopen(fd, "wb") as f:
+        total = f.write(b"Hello, World!")
+    try:
+        with open(filename, "rb") as file:
+            with rich.progress.wrap_file(file, total=total) as f:
+                assert f.read() == b"Hello, World!"
+            assert f.closed
+            assert not f.handle.closed
+            assert not file.closed
+        assert file.closed
+    finally:
+        os.remove(filename)
+
+
+def test_wrap_file_task_total() -> None:
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
@@ -618,13 +622,11 @@ def test_wrap_file() -> None:
     with os.fdopen(fd, "wb") as f:
         total = f.write(b"Hello, World!")
     try:
-        with open(filename, "rb") as file:
-            with rich.progress.wrap_file(file, total=total) as f:
-                assert f.read() == b"Hello, World!"
-            assert f.closed
-            assert not f.handle.closed
-            assert not file.closed
-        assert file.closed
+        with progress:
+            with open(filename, "rb") as file:
+                task_id = progress.add_task("Reading", total=total)
+                with progress.wrap_file(file, task_id=task_id) as f:
+                    assert f.read() == b"Hello, World!"
     finally:
         os.remove(filename)
 

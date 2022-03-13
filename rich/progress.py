@@ -1085,7 +1085,7 @@ class Progress(JupyterMixin):
         # attempt to recover the total from the task
         if total is None and task_id is not None:
             with self._lock:
-                task = self._tasks[task_id].total
+                total = self._tasks[task_id].total
         if total is None:
             raise ValueError(
                 f"unable to get the total number of bytes, please specify 'total'"
