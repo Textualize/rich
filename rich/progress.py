@@ -1,4 +1,6 @@
 import io
+import sys
+import typing
 import warnings
 from abc import ABC, abstractmethod
 from collections import deque
@@ -18,17 +20,24 @@ from typing import (
     ContextManager,
     Deque,
     Dict,
+    Generic,
     Iterable,
     List,
     NamedTuple,
     NewType,
     Optional,
     Sequence,
+    TextIO,
     Tuple,
     Type,
     TypeVar,
     Union,
 )
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal  # pragma: no cover
 
 from . import filesize, get_console
 from .console import Console, JustifyMethod, RenderableType, Group
@@ -46,6 +55,9 @@ TaskID = NewType("TaskID", int)
 ProgressType = TypeVar("ProgressType")
 
 GetTimeCallable = Callable[[], float]
+
+
+_I = typing.TypeVar("_I", TextIO, BinaryIO)
 
 
 class _TrackThread(Thread):
@@ -253,14 +265,14 @@ class _Reader(RawIOBase, BinaryIO):
         raise UnsupportedOperation("write")
 
 
-class _ReadContext(ContextManager[BinaryIO]):
+class _ReadContext(ContextManager[_I], Generic[_I]):
     """A utility class to handle a context for both a reader and a progress."""
 
-    def __init__(self, progress: "Progress", reader: BinaryIO) -> None:
+    def __init__(self, progress: "Progress", reader: _I) -> None:
         self.progress = progress
-        self.reader = reader
+        self.reader: _I = reader
 
-    def __enter__(self) -> BinaryIO:
+    def __enter__(self) -> _I:
         self.progress.start()
         return self.reader.__enter__()
 
@@ -340,9 +352,34 @@ def wrap_file(
     return _ReadContext(progress, reader)
 
 
+@typing.overload
 def open(
     file: Union[str, "PathLike[str]", bytes],
-    mode: str = "rb",
+    mode: Union[Literal["rt"], Literal["r"]],
+    buffering: int = -1,
+    encoding: Optional[str] = None,
+    errors: Optional[str] = None,
+    newline: Optional[str] = None,
+    total: Optional[int] = None,
+    description: str = "Reading...",
+    auto_refresh: bool = True,
+    console: Optional[Console] = None,
+    transient: bool = False,
+    get_time: Optional[Callable[[], float]] = None,
+    refresh_per_second: float = 10,
+    style: StyleType = "bar.back",
+    complete_style: StyleType = "bar.complete",
+    finished_style: StyleType = "bar.finished",
+    pulse_style: StyleType = "bar.pulse",
+    update_period: float = 0.1,
+    disable: bool = False,
+) -> ContextManager[TextIO]:
+    pass
+
+@typing.overload
+def open(
+    file: Union[str, "PathLike[str]", bytes],
+    mode: Literal["rb"],
     buffering: int = -1,
     encoding: Optional[str] = None,
     errors: Optional[str] = None,
@@ -361,6 +398,29 @@ def open(
     update_period: float = 0.1,
     disable: bool = False,
 ) -> ContextManager[BinaryIO]:
+    pass
+
+def open(
+    file: Union[str, "PathLike[str]", bytes],
+    mode: Union[Literal["rb"], Literal["rt"], Literal["r"]] = "r",
+    buffering: int = -1,
+    encoding: Optional[str] = None,
+    errors: Optional[str] = None,
+    newline: Optional[str] = None,
+    total: Optional[int] = None,
+    description: str = "Reading...",
+    auto_refresh: bool = True,
+    console: Optional[Console] = None,
+    transient: bool = False,
+    get_time: Optional[Callable[[], float]] = None,
+    refresh_per_second: float = 10,
+    style: StyleType = "bar.back",
+    complete_style: StyleType = "bar.complete",
+    finished_style: StyleType = "bar.finished",
+    pulse_style: StyleType = "bar.pulse",
+    update_period: float = 0.1,
+    disable: bool = False,
+) -> Union[ContextManager[BinaryIO], ContextManager[TextIO]]:
     """Read bytes from a file while tracking progress.
 
     Args:
@@ -424,7 +484,7 @@ def open(
         total=total,
         description=description,
     )
-    return _ReadContext(progress, reader)
+    return _ReadContext(progress, reader) # type: ignore
 
 
 class ProgressColumn(ABC):
@@ -1096,7 +1156,7 @@ class Progress(JupyterMixin):
         # attempt to recover the total from the task
         if total is None and task_id is not None:
             with self._lock:
-                total = self._tasks[task_id].total
+                total = self._tasks[task_id].total # type: ignore
         if total is None:
             raise ValueError(
                 f"unable to get the total number of bytes, please specify 'total'"
@@ -1111,10 +1171,11 @@ class Progress(JupyterMixin):
         # return a reader
         return _Reader(file, self, task_id, close_handle=False)
 
+    @typing.overload
     def open(
         self,
         file: Union[str, "PathLike[str]", bytes],
-        mode: str = "r",
+        mode: Literal["rb"],
         buffering: int = -1,
         encoding: Optional[str] = None,
         errors: Optional[str] = None,
@@ -1123,6 +1184,35 @@ class Progress(JupyterMixin):
         task_id: Optional[TaskID] = None,
         description: str = "Reading...",
     ) -> BinaryIO:
+        pass
+
+    @typing.overload
+    def open(
+        self,
+        file: Union[str, "PathLike[str]", bytes],
+        mode: Union[Literal["r"], Literal["rt"]],
+        buffering: int = -1,
+        encoding: Optional[str] = None,
+        errors: Optional[str] = None,
+        newline: Optional[str] = None,
+        total: Optional[int] = None,
+        task_id: Optional[TaskID] = None,
+        description: str = "Reading...",
+    ) -> TextIO:
+        pass
+
+    def open(
+        self,
+        file: Union[str, "PathLike[str]", bytes],
+        mode: Union[Literal["rb"], Literal["rt"], Literal["r"]] = "r",
+        buffering: int = -1,
+        encoding: Optional[str] = None,
+        errors: Optional[str] = None,
+        newline: Optional[str] = None,
+        total: Optional[int] = None,
+        task_id: Optional[TaskID] = None,
+        description: str = "Reading...",
+    ) -> Union[BinaryIO, TextIO]:
         """Track progress while reading from a binary file.
 
         Args:
@@ -1177,7 +1267,7 @@ class Progress(JupyterMixin):
 
         # wrap the reader in a `TextIOWrapper` if text mode
         if mode == "r" or mode == "rt":
-            reader = io.TextIOWrapper(
+            return io.TextIOWrapper(
                 reader,
                 encoding=encoding,
                 errors=errors,
