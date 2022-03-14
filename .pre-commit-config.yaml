@@ -29,8 +29,10 @@ repos:
     rev: 22.1.0
     hooks:
       - id: black
+        exclude: ^benchmarks/
   - repo: https://github.com/PyCQA/isort
     rev: 5.10.1
     hooks:
       - id: isort
+        exclude: ^benchmarks/
         args: ["--profile", "black"]
