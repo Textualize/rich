@@ -226,10 +226,7 @@ if __name__ == "__main__":  # pragma: no cover
     console.print(test_card)
     taken = round((process_time() - start) * 1000.0, 1)
 
-    text = console.file.getvalue()
-    # https://bugs.python.org/issue37871
-    for line in text.splitlines(True):
-        print(line, end="")
+    Console().print(test_card)
 
     print(f"rendered in {pre_cache_taken}ms (cold cache)")
     print(f"rendered in {taken}ms (warm cache)")

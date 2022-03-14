@@ -64,7 +64,7 @@ class Segment(NamedTuple):
     Args:
         text (str): A piece of text.
         style (:class:`~rich.style.Style`, optional): An optional style to apply to the text.
-        control (Tuple[ControlCode..], optional): Optional sequence of control codes.
+        control (Sequence[ControlCode], optional): Optional sequence of control codes.
     """
 
     text: str = ""
