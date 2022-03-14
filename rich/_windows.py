@@ -63,33 +63,10 @@ else:
 
 
 if __name__ == "__main__":
-    # import platform
-    #
-    # features = get_windows_console_features()
-    # from rich import print
-    #
-    # print(f'platform="{platform.system()}"')
-    # print(repr(features))
+    import platform
 
-    import subprocess
-    import sys
+    features = get_windows_console_features()
+    from rich import print
 
-    code = """import sys
-from rich.console import Console
-
-console = Console(file=sys.stdout)
-console.print("spam")
-    """
-    err_code = code.replace("sys.stdout", "sys.stderr")
-    cmd = [sys.executable, "-"]
-
-    print("[capture_output=True via sys.stdout]")
-    proc = subprocess.run(cmd, input=code, capture_output=True, encoding="utf-8")
-    print(f"{proc.stdout=} {proc.stderr=}")
-
-    print("[capture_output=True via sys.stderr]")
-    proc = subprocess.run(cmd, input=err_code, capture_output=True, encoding="utf-8")
-    print(f"{proc.stdout=} {proc.stderr=}")
-
-    print("[capture_output=False via sys.stdout]")
-    proc = subprocess.run(cmd, input=code, capture_output=False, encoding="utf-8")
+    print(f'platform="{platform.system()}"')
+    print(repr(features))
