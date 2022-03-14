@@ -24,7 +24,8 @@ def cell_len(text: str, _cache: Dict[str, int] = LRUCache(1024 * 4)) -> int:
 
     _get_size = get_character_cell_size
     total_size = sum(_get_size(character) for character in text)
-    _cache[text] = total_size
+    if len(text) <= 512:
+        _cache[text] = total_size
     return total_size
 
 
