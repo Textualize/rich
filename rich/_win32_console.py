@@ -302,40 +302,6 @@ def SetConsoleTitle(title: str) -> bool:
     return bool(_SetConsoleTitle(title))
 
 
-_WriteConsole = windll.kernel32.WriteConsoleW
-_WriteConsole.argtypes = [
-    wintypes.HANDLE,
-    wintypes.LPWSTR,
-    wintypes.DWORD,
-    wintypes.LPDWORD,
-    wintypes.LPVOID,
-]
-_WriteConsole.restype = wintypes.BOOL
-
-
-def WriteConsole(std_handle: wintypes.HANDLE, text: str) -> bool:
-    """Write a string of text to the console, starting at the current cursor position
-
-    Args:
-        std_handle (wintypes.HANDLE): A handle to the console input buffer or the console screen buffer.
-        text (str): The text to write.
-
-    Returns:
-        bool: True if the function succeeds, otherwise False.
-    """
-    buffer = wintypes.LPWSTR(text)
-    num_chars_written = wintypes.LPDWORD()
-    return bool(
-        _WriteConsole(
-            std_handle,
-            buffer,
-            wintypes.DWORD(len(text)),
-            num_chars_written,
-            wintypes.LPVOID(None),
-        )
-    )
-
-
 class LegacyWindowsTerm:
     """This class allows interaction with the legacy Windows Console API. It should only be used in the context
     of environments where virtual terminal processing is not available. However, if it is used in a Windows environment,
