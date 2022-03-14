@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Progress.open and Progress.wrap_file method to track the progress while reading from a file or file-like object https://github.com/willmcgugan/rich/pull/1759
 
+## [12.0.1] - 2022-03-14
+
+### Fixed
+
+- Fix capturing stdout on legacy Windows https://github.com/Textualize/rich/pull/2055
 
 ## [12.0.0] - 2022-03-10
 
