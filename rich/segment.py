@@ -5,10 +5,11 @@ from logging import getLogger
 from operator import attrgetter
 from typing import (
     TYPE_CHECKING,
+    Any,
     Dict,
     Iterable,
+    Iterator,
     List,
-    NamedTuple,
     Optional,
     Sequence,
     Tuple,
@@ -57,22 +58,45 @@ ControlCode = Union[
 
 
 @rich_repr()
-class Segment(NamedTuple):
+class Segment:
     """A piece of text with associated style. Segments are produced by the Console render process and
     are ultimately converted in to strings to be written to the terminal.
 
     Args:
         text (str): A piece of text.
         style (:class:`~rich.style.Style`, optional): An optional style to apply to the text.
-        control (Sequence[ControlCode], optional): Optional sequence of control codes.
+        control (Tuple[ControlCode], optional): Optional sequence of control codes.
+
+    Attributes:
+        cell_length (int): The cell length of this Segment.
     """
 
-    text: str = ""
-    """Raw text."""
-    style: Optional[Style] = None
-    """An optional style."""
-    control: Optional[Sequence[ControlCode]] = None
-    """Optional sequence of control codes."""
+    __slots__ = ["text", "style", "control", "cell_length", "_tuple"]
+
+    def __init__(
+        self,
+        text: str = "",
+        style: Optional[Style] = None,
+        control: Optional[Sequence[ControlCode]] = None,
+    ):
+        self.text = text
+        self.style = style
+        self.control = control
+
+        self.cell_length = 0 if self.control else cell_len(self.text)
+
+        self._tuple = text, style, control
+
+    def __iter__(self) -> Iterator[Any]:
+        return iter(self._tuple)
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Segment):
+            return self._tuple == other._tuple
+        return self._tuple == other
+
+    def __hash__(self) -> int:
+        return hash(self._tuple)
 
     def __rich_repr__(self) -> Result:
         yield self.text
@@ -86,11 +110,6 @@ class Segment(NamedTuple):
     def __bool__(self) -> bool:
         """Check if the segment contains text."""
         return bool(self.text)
-
-    @property
-    def cell_length(self) -> int:
-        """Get cell length of segment."""
-        return 0 if self.control else cell_len(self.text)
 
     @property
     def is_control(self) -> bool:
