@@ -76,7 +76,6 @@ if sys.platform == "win32":
 
         term.write_styled(text, style)
 
-        # Check that we've called the Console API to write the text
         captured = capsys.readouterr()
         assert captured.out == text
 
@@ -91,12 +90,11 @@ if sys.platform == "win32":
         assert second_args == (win32_handle,)
         assert second_kwargs["attributes"] == DEFAULT_STYLE_ATTRIBUTE
 
-    @patch.object(_win32_console, "WriteConsole", return_value=True)
     @patch.object(_win32_console, "SetConsoleTextAttribute")
     @patch.object(
         _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
     )
-    def test_write_styled_bold(_, SetConsoleTextAttribute, __, win32_handle):
+    def test_write_styled_bold(_, SetConsoleTextAttribute, win32_handle):
         style = Style.parse("bold black on red")
         text = "Hello, world!"
         term = LegacyWindowsTerm(sys.stdout)
@@ -110,12 +108,11 @@ if sys.platform == "win32":
         assert first_args == (win32_handle,)
         assert first_kwargs["attributes"].value == expected_attr
 
-    @patch.object(_win32_console, "WriteConsole", return_value=True)
     @patch.object(_win32_console, "SetConsoleTextAttribute")
     @patch.object(
         _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
     )
-    def test_write_styled_reverse(_, SetConsoleTextAttribute, __, win32_handle):
+    def test_write_styled_reverse(_, SetConsoleTextAttribute, win32_handle):
         style = Style.parse("reverse red on blue")
         text = "Hello, world!"
         term = LegacyWindowsTerm(sys.stdout)
@@ -129,12 +126,11 @@ if sys.platform == "win32":
         assert first_args == (win32_handle,)
         assert first_kwargs["attributes"].value == expected_attr
 
-    @patch.object(_win32_console, "WriteConsole", return_value=True)
     @patch.object(_win32_console, "SetConsoleTextAttribute")
     @patch.object(
         _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
     )
-    def test_write_styled_reverse(_, SetConsoleTextAttribute, __, win32_handle):
+    def test_write_styled_reverse(_, SetConsoleTextAttribute, win32_handle):
         style = Style.parse("dim bright_red on blue")
         text = "Hello, world!"
         term = LegacyWindowsTerm(sys.stdout)
@@ -148,14 +144,11 @@ if sys.platform == "win32":
         assert first_args == (win32_handle,)
         assert first_kwargs["attributes"].value == expected_attr
 
-    @patch.object(_win32_console, "WriteConsole", return_value=True)
     @patch.object(_win32_console, "SetConsoleTextAttribute")
     @patch.object(
         _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
     )
-    def test_write_styled_no_foreground_color(
-        _, SetConsoleTextAttribute, __, win32_handle
-    ):
+    def test_write_styled_no_foreground_color(_, SetConsoleTextAttribute, win32_handle):
         style = Style.parse("on blue")
         text = "Hello, world!"
         term = LegacyWindowsTerm(sys.stdout)
@@ -169,7 +162,6 @@ if sys.platform == "win32":
         assert first_args == (win32_handle,)
         assert first_kwargs["attributes"].value == expected_attr
 
-    @patch.object(_win32_console, "WriteConsole", return_value=True)
     @patch.object(_win32_console, "SetConsoleTextAttribute")
     @patch.object(
         _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
