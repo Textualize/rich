@@ -166,9 +166,7 @@ if sys.platform == "win32":
     @patch.object(
         _win32_console, "GetConsoleScreenBufferInfo", return_value=StubScreenBufferInfo
     )
-    def test_write_styled_no_background_color(
-        _, SetConsoleTextAttribute, __, win32_handle
-    ):
+    def test_write_styled_no_background_color(_, SetConsoleTextAttribute, win32_handle):
         style = Style.parse("blue")
         text = "Hello, world!"
         term = LegacyWindowsTerm(sys.stdout)
