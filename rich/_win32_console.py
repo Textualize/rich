@@ -4,7 +4,7 @@ The API that this module wraps is documented at https://docs.microsoft.com/en-us
 """
 import ctypes
 import sys
-from typing import IO, Any, NamedTuple, Type, cast
+from typing import Any
 
 windll: Any = None
 if sys.platform == "win32":
@@ -14,6 +14,7 @@ else:
 
 import time
 from ctypes import Structure, byref, wintypes
+from typing import IO, NamedTuple, Type, cast
 
 from rich.color import ColorSystem
 from rich.style import Style
