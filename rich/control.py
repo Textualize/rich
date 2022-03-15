@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Iterable, List, TYPE_CHECKING, Union
+from typing import Callable, Dict, Iterable, List, TYPE_CHECKING, Union
 
 from .segment import ControlCode, ControlType, Segment
 

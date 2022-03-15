@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import unittest
 
 from rich._lru_cache import LRUCache
 

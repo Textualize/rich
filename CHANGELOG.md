@@ -5,13 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 12.1.0
 
 ### Added
 
 - Progress.open and Progress.wrap_file method to track the progress while reading from a file or file-like object https://github.com/willmcgugan/rich/pull/1759
 
-## [12.0.1] - 2022-03-14
+### Changed
+
+- Improve performance of cell_length https://github.com/Textualize/rich/pull/2061
 
 ### Fixed
 

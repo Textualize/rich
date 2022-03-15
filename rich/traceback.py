@@ -14,7 +14,7 @@ from pygments.token import Text as TextToken
 from pygments.token import Token
 
 from . import pretty
-from ._loop import loop_first, loop_last
+from ._loop import loop_last
 from .columns import Columns
 from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, group
 from .constrain import Constrain
