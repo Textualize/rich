@@ -1932,7 +1932,10 @@ class Console:
                             from rich._win32_console import LegacyWindowsTerm
                             from rich._windows_renderer import legacy_windows_render
 
-                            legacy_windows_render(self._buffer[:], LegacyWindowsTerm())
+                            with open(file_no, "w") as output_file:
+                                legacy_windows_render(
+                                    self._buffer[:], LegacyWindowsTerm(output_file)
+                                )
 
                         output_capture_enabled = bool(self._buffer_index)
                         if not legacy_windows_stdout or output_capture_enabled:
