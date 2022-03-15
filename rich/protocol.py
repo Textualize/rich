@@ -1,4 +1,4 @@
-from typing import Any, Callable, cast, Set, TYPE_CHECKING
+from typing import Any, cast, Set, TYPE_CHECKING
 from inspect import isclass
 
 if TYPE_CHECKING:
