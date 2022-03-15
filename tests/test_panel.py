@@ -1,6 +1,5 @@
 import io
 from rich.console import Console
-from rich.measure import Measurement
 from rich.panel import Panel
 
 import pytest
