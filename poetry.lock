@@ -40,6 +40,21 @@ dev = ["pytest", "cogapp", "pre-commit", "wheel"]
 tests = ["pytest"]
 
 [[package]]
+name = "asv"
+version = "0.5.1"
+description = "Airspeed Velocity: A simple Python history benchmarking tool"
+category = "dev"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[package.dependencies]
+six = ">=1.4"
+
+[package.extras]
+hg = ["python-hglib (>=1.5)"]
+testing = ["virtualenv (>=1.7)", "filelock", "six", "pip", "setuptools", "wheel", "numpy", "scipy", "selenium", "pytest-xdist", "pytest-timeout", "feedparser", "python-hglib", "pytest (>=4.4.0)", "pytest-rerunfailures (>=8.0)", "pytest-faulthandler", "pytest (>=4.4.0,<5.0)", "pytest-rerunfailures (>=8.0,<9.0)", "pytest-faulthandler (<2.0)"]
+
+[[package]]
 name = "async-generator"
 version = "1.10"
 description = "Async generators and context managers for Python 3.5+"
@@ -1049,7 +1064,7 @@ jupyter = ["ipywidgets"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.2"
-content-hash = "05eba8d679f7fd74e1fb50881b99c09705bea9330a70beeead174c5b8fe6338c"
+content-hash = "5ce16f2949f71818ef5552c9001615a07b6e604a6291ff34b0f5fdc29a684cdc"
 
 [metadata.files]
 appnope = [
@@ -1082,6 +1097,9 @@ argon2-cffi-bindings = [
     {file = "argon2_cffi_bindings-21.2.0-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:20ef543a89dee4db46a1a6e206cd015360e5a75822f76df533845c3cbaf72670"},
     {file = "argon2_cffi_bindings-21.2.0-pp38-pypy38_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ed2937d286e2ad0cc79a7087d3c272832865f779430e0cc2b4f3718d3159b0cb"},
     {file = "argon2_cffi_bindings-21.2.0-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:5e00316dabdaea0b2dd82d141cc66889ced0cdcbfa599e8b471cf22c620c329a"},
+]
+asv = [
+    {file = "asv-0.5.1.tar.gz", hash = "sha256:805fc3cc46c0bcf3e7baeaa16a12e4b92f1276c25490db4cb80fc541afa52bfc"},
 ]
 async-generator = [
     {file = "async_generator-1.10-py3-none-any.whl", hash = "sha256:01c7bf666359b4967d2cda0000cc2e4af16a0ae098cbffcb8472fb9e8ad6585b"},
