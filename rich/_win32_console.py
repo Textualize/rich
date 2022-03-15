@@ -4,8 +4,9 @@ The API that this module wraps is documented at https://docs.microsoft.com/en-us
 """
 import ctypes
 import sys
+from typing import Any
 
-windll: object = None
+windll: Any = None
 if sys.platform == "win32":
     windll = ctypes.LibraryLoader(ctypes.WinDLL)
 else:
