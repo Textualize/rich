@@ -25,12 +25,19 @@ repos:
       - id: python-use-type-annotations
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
+  - repo: https://github.com/hadialqattan/pycln
+    rev: v1.2.5
+    hooks:
+      - id: pycln
+        args: [--all]
   - repo: https://github.com/psf/black
     rev: 22.1.0
     hooks:
       - id: black
+        exclude: ^benchmarks/
   - repo: https://github.com/PyCQA/isort
     rev: 5.10.1
     hooks:
       - id: isort
+        exclude: ^benchmarks/
         args: ["--profile", "black"]
