@@ -2,7 +2,6 @@ import inspect
 import io
 import os
 import platform
-import pty
 import sys
 import threading
 from abc import ABC, abstractmethod
@@ -83,6 +82,15 @@ class NoChange:
 
 NO_CHANGE = NoChange()
 
+try:
+    _STDOUT_FILENO = sys.__stdout__.fileno()
+except Exception:
+    _STDOUT_FILENO = 1
+
+try:
+    _STDERR_FILENO = sys.__stderr__.fileno()
+except Exception:
+    _STDERR_FILENO = 2
 
 CONSOLE_HTML_FORMAT = """\
 <!DOCTYPE html>
@@ -1937,8 +1945,8 @@ class Console:
                         except (ValueError, io.UnsupportedOperation):
                             file_no = -1
 
-                        stdout_num = pty.STDOUT_FILENO
-                        stderr_num = pty.STDERR_FILENO
+                        stdout_num = _STDOUT_FILENO
+                        stderr_num = _STDERR_FILENO
                         is_std_stream = file_no in (stdout_num, stderr_num)
                         legacy_windows_std = self.legacy_windows and is_std_stream
                         if legacy_windows_std:
