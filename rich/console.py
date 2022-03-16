@@ -2,6 +2,7 @@ import inspect
 import io
 import os
 import platform
+import pty
 import sys
 import threading
 from abc import ABC, abstractmethod
@@ -796,7 +797,7 @@ class Console:
     def _exit_buffer(self) -> None:
         """Leave buffer context, and render content if required."""
         self._buffer_index -= 1
-        self._check_and_render_buffer()
+        self._check_buffer()
 
     def set_live(self, live: "Live") -> None:
         """Set Live instance. Used by Live context manager.
@@ -1754,7 +1755,7 @@ class Console:
         screen_update = ScreenUpdate(lines, x, y)
         segments = self.render(screen_update)
         self._buffer.extend(segments)
-        self._check_and_render_buffer()
+        self._check_buffer()
 
     def print_exception(
         self,
@@ -1908,8 +1909,12 @@ class Console:
             ):
                 buffer_extend(line)
 
-    def _check_and_render_buffer(self) -> None:
-        """Check if the buffer may be rendered. Render it if it can."""
+    def _check_buffer(self) -> None:
+        """Check if the buffer may be rendered. Render it if it can (e.g. Console.quiet is False)
+        Rendering is supported on Windows, Unix and Jupyter environments. For
+        legacy Windows consoles, the win32 API is called directly.
+        This method will also record what it renders if recording is enabled via Console.record.
+        """
         if self.quiet:
             del self._buffer[:]
             return
@@ -1929,13 +1934,11 @@ class Console:
                     if WINDOWS:
                         try:
                             file_no = self.file.fileno()
-                            stdout_num = sys.stdout.fileno()
-                            stderr_num = sys.stderr.fileno()
                         except (ValueError, io.UnsupportedOperation):
                             file_no = -1
-                            stdout_num = 1
-                            stderr_num = 2
 
+                        stdout_num = pty.STDOUT_FILENO
+                        stderr_num = pty.STDERR_FILENO
                         is_std_stream = file_no in (stdout_num, stderr_num)
                         legacy_windows_std = self.legacy_windows and is_std_stream
                         if legacy_windows_std:
