@@ -11,6 +11,7 @@ from typing import (
     Iterator,
     List,
     Optional,
+    NamedTuple,
     Sequence,
     Tuple,
     Type,
@@ -58,7 +59,7 @@ ControlCode = Union[
 
 
 @rich_repr()
-class Segment:
+class Segment(NamedTuple):
     """A piece of text with associated style. Segments are produced by the Console render process and
     are ultimately converted in to strings to be written to the terminal.
 
@@ -71,32 +72,19 @@ class Segment:
         cell_length (int): The cell length of this Segment.
     """
 
-    __slots__ = ["text", "style", "control", "cell_length", "_tuple"]
+    text: str
+    style: Optional[Style] = None
+    control: Optional[Sequence[ControlCode]] = None
 
-    def __init__(
-        self,
-        text: str = "",
-        style: Optional[Style] = None,
-        control: Optional[Sequence[ControlCode]] = None,
-    ):
-        self.text = text
-        self.style = style
-        self.control = control
+    @property
+    def cell_length(self) -> int:
+        """The number of terminal cells required to display self.text.
 
-        self.cell_length = 0 if self.control else cell_len(self.text)
-
-        self._tuple = text, style, control
-
-    def __iter__(self) -> Iterator[Any]:
-        return iter(self._tuple)
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, Segment):
-            return self._tuple == other._tuple
-        return self._tuple == other
-
-    def __hash__(self) -> int:
-        return hash(self._tuple)
+        Returns:
+            int: A number of cells.
+        """
+        text, _style, control = self
+        return 0 if control else cell_len(text)
 
     def __rich_repr__(self) -> Result:
         yield self.text
