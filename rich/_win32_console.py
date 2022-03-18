@@ -334,7 +334,7 @@ class LegacyWindowsTerm:
         15,  # bright white
     ]
 
-    def __init__(self, file: IO[str]) -> None:
+    def __init__(self, file: "IO[str]") -> None:
         handle = GetStdHandle(STDOUT)
         self._handle = handle
         default_text = GetConsoleScreenBufferInfo(handle).wAttributes

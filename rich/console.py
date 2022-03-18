@@ -82,6 +82,15 @@ class NoChange:
 
 NO_CHANGE = NoChange()
 
+try:
+    _STDOUT_FILENO = sys.__stdout__.fileno()
+except Exception:
+    _STDOUT_FILENO = 1
+
+try:
+    _STDERR_FILENO = sys.__stderr__.fileno()
+except Exception:
+    _STDERR_FILENO = 2
 
 CONSOLE_HTML_FORMAT = """\
 <!DOCTYPE html>
@@ -1909,12 +1918,21 @@ class Console:
                 buffer_extend(line)
 
     def _check_buffer(self) -> None:
-        """Check if the buffer may be rendered."""
+        """Check if the buffer may be rendered. Render it if it can (e.g. Console.quiet is False)
+        Rendering is supported on Windows, Unix and Jupyter environments. For
+        legacy Windows consoles, the win32 API is called directly.
+        This method will also record what it renders if recording is enabled via Console.record.
+        """
         if self.quiet:
             del self._buffer[:]
             return
         with self._lock:
             if self._buffer_index == 0:
+
+                if self.record:
+                    with self._record_buffer_lock:
+                        self._record_buffer.extend(self._buffer[:])
+
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
 
@@ -1927,18 +1945,19 @@ class Console:
                         except (ValueError, io.UnsupportedOperation):
                             file_no = -1
 
-                        legacy_windows_stdout = self.legacy_windows and file_no == 1
-                        if legacy_windows_stdout:
+                        stdout_num = _STDOUT_FILENO
+                        stderr_num = _STDERR_FILENO
+                        is_std_stream = file_no in (stdout_num, stderr_num)
+                        legacy_windows_std = self.legacy_windows and is_std_stream
+                        if legacy_windows_std:
                             from rich._win32_console import LegacyWindowsTerm
                             from rich._windows_renderer import legacy_windows_render
 
-                            with open(file_no, "w") as output_file:
-                                legacy_windows_render(
-                                    self._buffer[:], LegacyWindowsTerm(output_file)
-                                )
-
-                        output_capture_enabled = bool(self._buffer_index)
-                        if not legacy_windows_stdout or output_capture_enabled:
+                            legacy_windows_render(
+                                self._buffer[:], LegacyWindowsTerm(self.file)
+                            )
+                        else:
+                            # Either a non-std stream on legacy Windows, or modern Windows.
                             text = self._render_buffer(self._buffer[:])
                             # https://bugs.python.org/issue37871
                             write = self.file.write
@@ -1965,9 +1984,6 @@ class Console:
         append = output.append
         color_system = self._color_system
         legacy_windows = self.legacy_windows
-        if self.record:
-            with self._record_buffer_lock:
-                self._record_buffer.extend(buffer)
         not_terminal = not self.is_terminal
         if self.no_color and color_system:
             buffer = Segment.remove_color(buffer)
