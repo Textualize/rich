@@ -1,12 +1,16 @@
-from collections import OrderedDict
-from typing import Dict, Generic, TypeVar
-
+from typing import Dict, Generic, TypeVar, TYPE_CHECKING
+import sys
 
 CacheKey = TypeVar("CacheKey")
 CacheValue = TypeVar("CacheValue")
 
+if sys.version_info < (3, 9):
+    from typing_extensions import OrderedDict
+else:
+    from collections import OrderedDict
 
-class LRUCache(Generic[CacheKey, CacheValue], OrderedDict):  # type: ignore # https://github.com/python/mypy/issues/6904
+
+class LRUCache(OrderedDict[CacheKey, CacheValue]):
     """
     A dictionary-like container that stores a given maximum items.
 

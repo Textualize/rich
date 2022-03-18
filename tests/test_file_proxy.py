@@ -12,9 +12,9 @@ def test_empty_bytes():
     file_proxy = FileProxy(console, sys.stdout)
     # File should raise TypeError when writing bytes
     with pytest.raises(TypeError):
-        file_proxy.write(b"")  # type: ignore
+        file_proxy.write(b"")
     with pytest.raises(TypeError):
-        file_proxy.write(b"foo")  # type: ignore
+        file_proxy.write(b"foo")
 
 
 def test_flush():

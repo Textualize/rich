@@ -617,7 +617,7 @@ if __name__ == "__main__":  # pragma: no cover
             file=io.StringIO(), force_terminal=args.force_color, width=args.width
         )
         console.print(markdown)
-        pydoc.pager(console.file.getvalue())  # type: ignore
+        pydoc.pager(console.file.getvalue())  # type: ignore[attr-defined]
 
     else:
         console = Console(force_terminal=args.force_color, width=args.width)

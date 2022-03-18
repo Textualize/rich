@@ -10,6 +10,9 @@ if TYPE_CHECKING:
     from .style import StyleType
 
 
+__all__ = ["Spinner", "SPINNERS"]
+
+
 class Spinner:
     def __init__(
         self,

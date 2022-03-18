@@ -3,6 +3,7 @@
 This example demonstrates how to write a custom highlighter.
 
 """
+# mypy: allow-untyped-defs
 
 from random import randint
 

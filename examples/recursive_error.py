@@ -5,6 +5,7 @@ Demonstrates Rich tracebacks for recursion errors.
 Rich can exclude frames in the middle to avoid huge tracebacks.
 
 """
+# mypy: allow-untyped-defs, allow-untyped-calls
 
 from rich.console import Console
 

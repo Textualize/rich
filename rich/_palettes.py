@@ -47,7 +47,8 @@ STANDARD_PALETTE = Palette(
 
 
 # The 256 color palette
-EIGHT_BIT_PALETTE = Palette(
+# MyPy requires the Palette type only on this one (MyPy bug?)
+EIGHT_BIT_PALETTE: Palette = Palette(
     [
         (0, 0, 0),
         (128, 0, 0),

@@ -50,7 +50,7 @@ console.log(
 time.sleep(1)
 
 
-def test_locals():
+def test_locals() -> None:
     foo = (1, 2, 3)
     movies = ["Deadpool", "Rise of the Skywalker"]
     console = Console()

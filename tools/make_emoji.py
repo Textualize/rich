@@ -4,9 +4,10 @@ except ImportError:
     print("pip install emoji")
     raise
 
-from emoji.unicode_codes import EMOJI_ALIAS_UNICODE
+from tkinter import W
+from emoji.unicode_codes import EMOJI_ALIAS_UNICODE_ENGLISH
 
-emoji = {k.lower().strip(":"): v for k, v in EMOJI_ALIAS_UNICODE.items()}
+emoji_dict = {k.lower().strip(":"): v for k, v in EMOJI_ALIAS_UNICODE_ENGLISH.items()}
 
 with open("_emoji_codes.py", "wt") as f:
-    f.write("EMOJI=" + str(emoji))
+    f.write("EMOJI=" + str(emoji_dict))

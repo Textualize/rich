@@ -50,3 +50,16 @@ asv = "^0.5.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.mypy]
+files = ["benchmarks", "examples", "rich", "tools"]
+python_version = "3.6"
+warn_unused_configs = true
+enable_error_code = ["ignore-without-code"]
+show_error_codes = true
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["wcwidth.*", "pygments.*", "IPython.*", "commonmark.*", "ipywidgets.*"]
+ignore_missing_imports = true

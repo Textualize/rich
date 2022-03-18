@@ -263,7 +263,9 @@ class ConsoleOptions:
 class RichCast(Protocol):
     """An object that may be 'cast' to a console renderable."""
 
-    def __rich__(self) -> Union["ConsoleRenderable", str]:  # pragma: no cover
+    def __rich__(
+        self,
+    ) -> Union["ConsoleRenderable", "RichCast", str]:  # pragma: no cover
         ...
 
 
@@ -520,10 +522,10 @@ def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
 def _is_jupyter() -> bool:  # pragma: no cover
     """Check if we're running in a Jupyter notebook."""
     try:
-        get_ipython  # type: ignore
+        get_ipython  # type: ignore[name-defined]
     except NameError:
         return False
-    ipython = get_ipython()  # type: ignore
+    ipython = get_ipython()  # type: ignore[name-defined]
     shell = ipython.__class__.__name__
     if "google.colab" in str(ipython.__class__) or shell == "ZMQInteractiveShell":
         return True  # Jupyter notebook or qtconsole
@@ -1244,8 +1246,8 @@ class Console:
         render_iterable: RenderResult
 
         renderable = rich_cast(renderable)
-        if hasattr(renderable, "__rich_console__") and not isclass(renderable):
-            render_iterable = renderable.__rich_console__(self, _options)  # type: ignore
+        if isinstance(renderable, ConsoleRenderable) and not isclass(renderable):
+            render_iterable = renderable.__rich_console__(self, _options)
         elif isinstance(renderable, str):
             text_renderable = self.render_str(
                 renderable, highlight=_options.highlight, markup=_options.markup

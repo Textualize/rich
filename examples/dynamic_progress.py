@@ -5,6 +5,7 @@ showing multi-level progress for multiple tasks (installing apps in the example)
 each of which consisting of multiple steps.
 
 """
+# mypy: allow-untyped-defs, allow-untyped-calls
 
 import time
 

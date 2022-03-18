@@ -3,6 +3,7 @@ This example shows how to display content in columns.
 
 The data is pulled from https://randomuser.me
 """
+# mypy: allow-untyped-defs, allow-untyped-calls
 
 import json
 from urllib.request import urlopen

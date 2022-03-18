@@ -19,5 +19,5 @@ result = console.end_capture()
 taken = (time() - start) * 1000
 print(result)
 
-print(console.file.getvalue())
+print(console.file.getvalue())  # type: ignore[attr-defined]
 print(f"{taken:.1f}")

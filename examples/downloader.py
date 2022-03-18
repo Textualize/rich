@@ -1,6 +1,7 @@
 """
 A rudimentary URL downloader (like wget or curl) to demonstrate Rich progress bars.
 """
+# mypy: allow-untyped-defs
 
 import os.path
 import sys
@@ -60,7 +61,7 @@ def copy_url(task_id: TaskID, url: str, path: str) -> None:
     progress.console.log(f"Downloaded {path}")
 
 
-def download(urls: Iterable[str], dest_dir: str):
+def download(urls: Iterable[str], dest_dir: str) -> None:
     """Download multuple files to the given directory."""
 
     with progress:

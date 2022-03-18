@@ -1,5 +1,7 @@
 from typing import Any, Dict, Iterable, List
 
+import rich.console
+
 from . import get_console
 from .segment import Segment
 from .terminal_theme import DEFAULT_TERMINAL_THEME
@@ -33,10 +35,13 @@ class JupyterMixin:
     __slots__ = ()
 
     def _repr_mimebundle_(
-        self, include: Iterable[str], exclude: Iterable[str], **kwargs: Any
+        self: "rich.console.ConsoleRenderable",
+        include: Iterable[str],
+        exclude: Iterable[str],
+        **kwargs: Any,
     ) -> Dict[str, str]:
         console = get_console()
-        segments = list(console.render(self, console.options))  # type: ignore
+        segments = list(console.render(self, console.options))
         html = _render_segments(segments)
         text = console._render_buffer(segments)
         data = {"text/plain": text, "text/html": html}

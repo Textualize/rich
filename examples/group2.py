@@ -1,3 +1,4 @@
+# mypy: allow-untyped-defs
 from rich import print
 from rich.console import group
 from rich.panel import Panel

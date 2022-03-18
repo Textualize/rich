@@ -1,6 +1,7 @@
 """
 Demonstrates export console output
 """
+# mypy: allow-untyped-defs, allow-untyped-calls
 
 from rich.console import Console
 from rich.table import Table

@@ -1,3 +1,4 @@
+# mypy: allow-untyped-defs
 try:
     import click
 except ImportError:
@@ -16,7 +17,7 @@ def hello(count):
     """Simple program that greets NAME for a total of COUNT times."""
     1 / 0
     for x in range(count):
-        click.echo(f"Hello {name}!")
+        click.echo(f"Hello {name}!")  # type: ignore[name-defined]
 
 
 if __name__ == "__main__":

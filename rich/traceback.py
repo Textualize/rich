@@ -130,7 +130,7 @@ def install(
 
     try:  # pragma: no cover
         # if within ipython, use customized traceback
-        ip = get_ipython()  # type: ignore
+        ip = get_ipython()  # type: ignore[name-defined]
         ipy_excepthook_closure(ip)
         return sys.excepthook
     except Exception:
@@ -669,7 +669,7 @@ if __name__ == "__main__":  # pragma: no cover
             try:
                 foo(0)
             except:
-                slfkjsldkfj  # type: ignore
+                slfkjsldkfj  # type: ignore[name-defined]
         except:
             console.print_exception(show_locals=True)
 

@@ -5,6 +5,7 @@ If your terminal supports hyperlinks you should be able to launch files by click
 (usually with cmd / ctrl).
 
 """
+# mypy: allow-untyped-defs, allow-untyped-calls
 
 import os
 import sys

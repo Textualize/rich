@@ -1,6 +1,7 @@
 """Same as the table_movie.py but uses Live to update"""
 import time
 from contextlib import contextmanager
+from typing import Generator
 
 from rich import box
 from rich.align import Align
@@ -60,7 +61,7 @@ BEAT_TIME = 0.04
 
 
 @contextmanager
-def beat(length: int = 1) -> None:
+def beat(length: int = 1) -> Generator[None, None, None]:
     yield
     time.sleep(length * BEAT_TIME)
 

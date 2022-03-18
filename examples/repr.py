@@ -1,3 +1,5 @@
+# mypy: allow-untyped-defs, allow-untyped-calls
+
 import rich.repr
 
 

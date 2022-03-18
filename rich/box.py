@@ -475,8 +475,8 @@ if __name__ == "__main__":  # pragma: no cover
         table.add_column("Header 2", "Footer 2")
         table.add_row("Cell", "Cell")
         table.add_row("Cell", "Cell")
-        table.box = getattr(box, box_name)
-        table.title = Text(f"box.{box_name}", style="magenta")
+        table.box = getattr(box, box_name)  # type: ignore[has-type]
+        table.title = Text(f"box.{box_name}", style="magenta")  # type: ignore[has-type]
         columns.add_renderable(table)
     console.print(columns)
 

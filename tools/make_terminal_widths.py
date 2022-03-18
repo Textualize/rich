@@ -59,7 +59,7 @@ def get_cell_size(table: List[Tuple[int, int, int]], character: str) -> int:
     return 1
 
 
-def test(widths_table):
+def test(widths_table: List[Tuple[int, int, int]]) -> None:
     for codepoint in progress.track(
         range(0, sys.maxunicode + 1), description="Testing..."
     ):
@@ -71,7 +71,7 @@ def test(widths_table):
             break
 
 
-def run():
+def run() -> None:
     with progress:
         widths_table = make_widths_table()
         test(widths_table)

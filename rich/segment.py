@@ -106,7 +106,7 @@ class Segment(NamedTuple):
 
     @classmethod
     @lru_cache(1024 * 16)
-    def _split_cells(cls, segment: "Segment", cut: int) -> Tuple["Segment", "Segment"]:  # type: ignore
+    def _split_cells(cls, segment: "Segment", cut: int) -> Tuple["Segment", "Segment"]:
 
         text, style, control = segment
         _Segment = Segment
@@ -141,6 +141,7 @@ class Segment(NamedTuple):
                     _Segment(before[: pos - 1] + " ", style, control),
                     _Segment(" " + text[pos:], style, control),
                 )
+        raise AssertionError("Can't reach here")
 
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
         """Split segment in to two segments at the specified column.

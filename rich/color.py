@@ -5,6 +5,8 @@ from enum import IntEnum
 from functools import lru_cache
 from typing import TYPE_CHECKING, NamedTuple, Optional, Tuple
 
+from rich.palette import Palette
+
 from ._palettes import EIGHT_BIT_PALETTE, STANDARD_PALETTE, WINDOWS_PALETTE
 from .color_triplet import ColorTriplet
 from .repr import Result, rich_repr
@@ -607,7 +609,8 @@ if __name__ == "__main__":  # pragma: no cover
         if color_number < 16:
             table.add_row(color_cell, f"{color_number}", Text(f'"{name}"'))
         else:
-            color = EIGHT_BIT_PALETTE[color_number]  # type: ignore
+            # This is trying to evaluate as a type expression (pylance is happy, MyPy bug?)
+            color = EIGHT_BIT_PALETTE[color_number]  # type: ignore[valid-type]
             table.add_row(
                 color_cell, str(color_number), Text(f'"{name}"'), color.hex, color.rgb
             )

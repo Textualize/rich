@@ -1,3 +1,5 @@
+# mypy: allow-untyped-defs, allow-untyped-calls
+
 from io import StringIO
 
 from benchmarks import snippets
