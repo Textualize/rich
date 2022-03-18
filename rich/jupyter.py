@@ -1,6 +1,7 @@
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, TYPE_CHECKING
 
-import rich.console
+if TYPE_CHECKING:
+    from rich.console import ConsoleRenderable
 
 from . import get_console
 from .segment import Segment
@@ -35,7 +36,7 @@ class JupyterMixin:
     __slots__ = ()
 
     def _repr_mimebundle_(
-        self: "rich.console.ConsoleRenderable",
+        self: "ConsoleRenderable",
         include: Iterable[str],
         exclude: Iterable[str],
         **kwargs: Any,

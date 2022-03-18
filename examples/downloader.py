@@ -1,7 +1,6 @@
 """
 A rudimentary URL downloader (like wget or curl) to demonstrate Rich progress bars.
 """
-# mypy: allow-untyped-defs
 
 import os.path
 import sys
@@ -9,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 import signal
 from functools import partial
 from threading import Event
-from typing import Iterable
+from typing import Any, Iterable
 from urllib.request import urlopen
 
 from rich.progress import (
@@ -38,7 +37,7 @@ progress = Progress(
 done_event = Event()
 
 
-def handle_sigint(signum, frame):
+def handle_sigint(signum: Any, frame: Any) -> None:
     done_event.set()
 
 

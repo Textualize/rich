@@ -4,7 +4,7 @@ import sys
 CacheKey = TypeVar("CacheKey")
 CacheValue = TypeVar("CacheValue")
 
-if sys.version_info < (3, 9):
+if sys.version_info < (3, 8):
     from typing_extensions import OrderedDict
 else:
     from collections import OrderedDict

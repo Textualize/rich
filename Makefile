@@ -5,9 +5,9 @@ format-check:
 format:
 	black .
 typecheck:
-	pre-commit run --all-files mypy
+	mypy --no-warn-unused-ignores
 typecheck-report:
-	mypy -p rich --strict --html-report mypy_report
+	mypy -p rich --html-report mypy_report  --no-warn-unused-ignores
 .PHONY: docs
 docs:
 	cd docs; make html

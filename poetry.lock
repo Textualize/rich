@@ -993,6 +993,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "types-emoji"
+version = "1.2.7"
+description = "Typing stubs for emoji"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "typing-extensions"
 version = "4.1.1"
 description = "Backported and Experimental Type Hints for Python 3.6+"
@@ -1065,7 +1073,7 @@ jupyter = ["ipywidgets"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.2"
-content-hash = "9d010fc1dade302bb784d0607a4c23d00e89f6709572310452428d347ff8b89a"
+content-hash = "4c4f2f87a87e7e0f2fa30c6fd8c641448e3fdde5108f280c2ab11bf828d73824"
 
 [metadata.files]
 appnope = [
@@ -1745,6 +1753,10 @@ typed-ast = [
 types-dataclasses = [
     {file = "types-dataclasses-0.6.4.tar.gz", hash = "sha256:2f7ab6c565cf05cc7f27f31a4c2fcc803384e319aab292807b857ddf1473429f"},
     {file = "types_dataclasses-0.6.4-py3-none-any.whl", hash = "sha256:fef6ed4742ca27996530c6d549cd704772a4a86e4781841c9bb387001e369ec3"},
+]
+types-emoji = [
+    {file = "types-emoji-1.2.7.tar.gz", hash = "sha256:3be036d560ff90351944bb08f8e70447c7e831660fe51c4599974a326585aacb"},
+    {file = "types_emoji-1.2.7-py3-none-any.whl", hash = "sha256:003f6140fffe8ab8a606bf030416f8a48785039882c97e3d1c5d9a1baf7c7673"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.1.1-py3-none-any.whl", hash = "sha256:21c85e0fe4b9a155d0799430b0ad741cdce7e359660ccbd8b530613e8df88ce2"},

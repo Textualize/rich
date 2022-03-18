@@ -47,5 +47,5 @@ repos:
     hooks:
       - id: mypy
         files: ^(examples|benchmark|rich|tools)
-        args: []
+        args: [--python-version=3.6]
         additional_dependencies: [attrs, click, types-dataclasses, types-emoji]
