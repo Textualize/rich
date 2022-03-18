@@ -113,14 +113,12 @@ def chop_cells(text: str, max_size: int, position: int = 0) -> List[str]:
     _get_character_cell_size = get_character_cell_size
     characters = [
         (character, _get_character_cell_size(character)) for character in text
-    ][::-1]
+    ]
     total_size = position
     lines: List[List[str]] = [[]]
     append = lines[-1].append
 
-    pop = characters.pop
-    while characters:
-        character, size = pop()
+    for character, size in reversed(characters):
         if total_size + size > max_size:
             lines.append([character])
             append = lines[-1].append
@@ -128,6 +126,7 @@ def chop_cells(text: str, max_size: int, position: int = 0) -> List[str]:
         else:
             total_size += size
             append(character)
+
     return ["".join(line) for line in lines]
 
 
