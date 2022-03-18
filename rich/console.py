@@ -92,6 +92,8 @@ try:
 except Exception:
     _STDERR_FILENO = 2
 
+_STD_STREAMS = (_STDOUT_FILENO, _STDERR_FILENO)
+
 CONSOLE_HTML_FORMAT = """\
 <!DOCTYPE html>
 <head>
@@ -1940,16 +1942,16 @@ class Console:
                     del self._buffer[:]
                 else:
                     if WINDOWS:
-                        try:
-                            file_no = self.file.fileno()
-                        except (ValueError, io.UnsupportedOperation):
-                            file_no = -1
+                        use_legacy_windows_render = False
+                        if self.legacy_windows:
+                            try:
+                                use_legacy_windows_render = (
+                                    self.file.fileno() in _STD_STREAMS
+                                )
+                            except (ValueError, io.UnsupportedOperation):
+                                pass
 
-                        stdout_num = _STDOUT_FILENO
-                        stderr_num = _STDERR_FILENO
-                        is_std_stream = file_no in (stdout_num, stderr_num)
-                        legacy_windows_std = self.legacy_windows and is_std_stream
-                        if legacy_windows_std:
+                        if use_legacy_windows_render:
                             from rich._win32_console import LegacyWindowsTerm
                             from rich._windows_renderer import legacy_windows_render
 
