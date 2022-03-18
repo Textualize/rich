@@ -21,18 +21,18 @@ class LRUCache(OrderedDict[CacheKey, CacheValue]):
 
     def __init__(self, cache_size: int) -> None:
         self.cache_size = cache_size
-        super(LRUCache, self).__init__()
+        super().__init__()
 
     def __setitem__(self, key: CacheKey, value: CacheValue) -> None:
         """Store a new views, potentially discarding an old value."""
         if key not in self:
             if len(self) >= self.cache_size:
                 self.popitem(last=False)
-        OrderedDict.__setitem__(self, key, value)
+        super().__setitem__(key, value)
 
-    def __getitem__(self: Dict[CacheKey, CacheValue], key: CacheKey) -> CacheValue:
+    def __getitem__(self, key: CacheKey) -> CacheValue:
         """Gets the item, but also makes it most recent."""
-        value: CacheValue = OrderedDict.__getitem__(self, key)
-        OrderedDict.__delitem__(self, key)
-        OrderedDict.__setitem__(self, key, value)
+        value: CacheValue = super().__getitem__(key)
+        super().__delitem__(key)
+        super().__setitem__(key, value)
         return value
