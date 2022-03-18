@@ -83,6 +83,7 @@ highlight_tests = [
     ('"""hello"""', [Span(0, 11, "repr.str")]),
     ("\\'foo'", []),
     ("it's no 'string'", [Span(8, 16, "repr.str")]),
+    ("78351748-9b32-4e08-ad3e-7e9ff124d541", [Span(0, 36, "repr.uuid")]),
 ]
 
 
