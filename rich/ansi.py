@@ -198,7 +198,7 @@ class AnsiDecoder:
         return text
 
 
-if __name__ == "__main__":  # pragma: no cover
+if sys.platform != "win32" and __name__ == "__main__":  # pragma: no cover
     import io
     import os
     import pty
@@ -213,7 +213,7 @@ if __name__ == "__main__":  # pragma: no cover
         stdout.write(data)
         return data
 
-    pty.spawn(sys.argv[1:], read)  # type: ignore
+    pty.spawn(sys.argv[1:], read)
 
     from .console import Console
 
