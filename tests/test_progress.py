@@ -570,9 +570,8 @@ def test_open() -> None:
         f.write(b"Hello, World!")
     try:
         with rich.progress.open(filename) as f:
-            assert f.read() == b"Hello, World!"
+            assert f.read() == "Hello, World!"
         assert f.closed
-        assert f.handle.closed
     finally:
         os.remove(filename)
 
