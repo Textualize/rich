@@ -10,12 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Improve performance of cell_length https://github.com/Textualize/rich/pull/2061
+- Improve performance of chop_cells https://github.com/Textualize/rich/pull/2077
 
 ## [12.0.1] - 2022-03-14
 
 ### Fixed
 
-- Fix capturing stdout on legacy Windows https://github.com/Textualize/rich/pull/2055
+- Fix capturing stdout on legacy Windows https://github.com/Textualize/rich/pull/2066
 
 ## [12.0.0] - 2022-03-10
 
