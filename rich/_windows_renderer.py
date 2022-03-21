@@ -11,9 +11,7 @@ def legacy_windows_render(buffer: Iterable[Segment], term: LegacyWindowsTerm) ->
         buffer (Iterable[Segment]): Iterable of Segments to convert to Win32 API calls.
         term (LegacyWindowsTerm): Used to call the Windows Console API.
     """
-    for segment in buffer:
-        text, style, control = segment
-
+    for text, style, control in buffer:
         if not control:
             if style:
                 term.write_styled(text, style)
