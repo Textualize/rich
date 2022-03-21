@@ -299,7 +299,6 @@ def wrap_file(
     complete_style: StyleType = "bar.complete",
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
-    update_period: float = 0.1,
     disable: bool = False,
 ) -> ContextManager[BinaryIO]:
     """Read bytes from a file while tracking progress.
@@ -316,7 +315,6 @@ def wrap_file(
         complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
         pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
-        update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
         disable (bool, optional): Disable display of progress.
     Returns:
         ContextManager[BinaryIO]: A context manager yielding a progress reader.
@@ -371,7 +369,6 @@ def open(
     complete_style: StyleType = "bar.complete",
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
-    update_period: float = 0.1,
     disable: bool = False,
 ) -> ContextManager[TextIO]:
     pass
@@ -395,7 +392,6 @@ def open(
     complete_style: StyleType = "bar.complete",
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
-    update_period: float = 0.1,
     disable: bool = False,
 ) -> ContextManager[BinaryIO]:
     pass
@@ -418,7 +414,6 @@ def open(
     complete_style: StyleType = "bar.complete",
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
-    update_period: float = 0.1,
     disable: bool = False,
 ) -> Union[ContextManager[BinaryIO], ContextManager[TextIO]]:
     """Read bytes from a file while tracking progress.
@@ -440,7 +435,6 @@ def open(
         complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.done".
         pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
-        update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
         disable (bool, optional): Disable display of progress.
         encoding (str, optional): The encoding to use when reading in text mode.
 
@@ -1154,21 +1148,23 @@ class Progress(JupyterMixin):
             ValueError: When no total value can be extracted from the arguments or the task.
         """
         # attempt to recover the total from the task
-        if total is None and task_id is not None:
+        total_bytes: Optional[float] = None
+        if total is not None:
+            total_bytes = total
+        elif task_id is not None:
             with self._lock:
-                total = self._tasks[task_id].total # type: ignore
-        if total is None:
+                total_bytes = self._tasks[task_id].total
+        if total_bytes is None:
             raise ValueError(
                 f"unable to get the total number of bytes, please specify 'total'"
             )
 
         # update total of task or create new task
         if task_id is None:
-            task_id = self.add_task(description, total=total)
+            task_id = self.add_task(description, total=total_bytes)
         else:
-            self.update(task_id, total=total)
+            self.update(task_id, total=total_bytes)
 
-        # return a reader
         return _Reader(file, self, task_id, close_handle=False)
 
     @typing.overload
