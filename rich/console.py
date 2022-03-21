@@ -282,10 +282,8 @@ class ConsoleRenderable(Protocol):
 # A type that may be rendered by Console.
 RenderableType = Union[ConsoleRenderable, RichCast, str]
 
-
 # The result of calling a __rich_console__ method.
 RenderResult = Iterable[Union[RenderableType, Segment]]
-
 
 _null_highlighter = NullHighlighter()
 
@@ -541,7 +539,6 @@ COLOR_SYSTEMS = {
     "truecolor": ColorSystem.TRUECOLOR,
     "windows": ColorSystem.WINDOWS,
 }
-
 
 _COLOR_SYSTEMS_NAMES = {system: name for name, system in COLOR_SYSTEMS.items()}
 
@@ -2189,6 +2186,12 @@ class Console:
         )
         with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(html)
+
+    def export_svg(self) -> str:
+        pass
+
+    def save_svg(self) -> None:
+        pass
 
 
 if __name__ == "__main__":  # pragma: no cover
