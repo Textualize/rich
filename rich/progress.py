@@ -373,6 +373,7 @@ def open(
 ) -> ContextManager[TextIO]:
     pass
 
+
 @typing.overload
 def open(
     file: Union[str, "PathLike[str]", bytes],
@@ -395,6 +396,7 @@ def open(
     disable: bool = False,
 ) -> ContextManager[BinaryIO]:
     pass
+
 
 def open(
     file: Union[str, "PathLike[str]", bytes],
@@ -478,7 +480,7 @@ def open(
         total=total,
         description=description,
     )
-    return _ReadContext(progress, reader) # type: ignore
+    return _ReadContext(progress, reader)  # type: ignore
 
 
 class ProgressColumn(ABC):
