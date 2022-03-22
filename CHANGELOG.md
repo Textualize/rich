@@ -1674,7 +1674,8 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[unreleased]: https://github.com/willmcgugan/rich/compare/v12.0.0...HEAD
+[unreleased]: https://github.com/willmcgugan/rich/compare/v12.0.1...HEAD
+[12.0.1]: https://github.com/willmcgugan/rich/compare/v12.0.0...v12.0.1
 [12.0.0]: https://github.com/willmcgugan/rich/compare/v11.2.0...v12.0.0
 [11.2.0]: https://github.com/willmcgugan/rich/compare/v11.1.0...v11.2.0
 [11.1.0]: https://github.com/willmcgugan/rich/compare/v11.0.0...v11.1.0
