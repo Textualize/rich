@@ -1,7 +1,7 @@
 from io import StringIO
 import pytest
 
-from rich.console import Console
+from rich.console import Console, Group
 from rich.text import Span, Text
 from rich.measure import Measurement
 from rich.style import Style
@@ -296,6 +296,13 @@ def test_append_text():
     test.append_text(Text("bar", style="bold"))
     assert str(test) == "foobar"
     assert test._spans == [Span(3, 6, "bold")]
+
+
+def test_end():
+    console = Console(width=20, file=StringIO())
+    test = Group(Text.from_markup("foo", end=" "), Text.from_markup("bar"))
+    console.print(test)
+    assert console.file.getvalue() == "foo bar\n"
 
 
 def test_split():
