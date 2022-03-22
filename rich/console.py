@@ -107,7 +107,7 @@ body {{
 </style>
 </head>
 <html>
-<body>
+<body xmlns="http://www.w3.org/1999/xhtml">
     <code>
         <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">{code}</pre>
     </code>
@@ -117,6 +117,11 @@ body {{
 
 CONSOLE_SVG_FORMAT = """
 <svg width="{total_width}" height="{total_height}" viewBox="-{margin} -{margin} {total_width} {total_height}" xmlns="http://www.w3.org/2000/svg">
+    <style>
+    pre {{
+       margin: 0;
+    }}
+    </style>
   <defs>
     <filter id="shadow">
       <feDropShadow dx="0" dy="14" stdDeviation="15" flood-color="black" flood-opacity=".85"/>
@@ -125,12 +130,18 @@ CONSOLE_SVG_FORMAT = """
   <g>
     <rect rx="10" ry="10" width="{terminal_width}" height="{terminal_height}" fill="#0c0c0c" style="filter:url(#shadow);" />
     <text text-anchor='middle' x="{title_mid_anchor}" y="18" font-family="Sans-Serif" font-size="14" font-weight="bold" fill="#e9e9e9">{title}</text>
-    <circle cx="16" cy="14" r="5" fill="#ff6159" />
-    <circle cx="30" cy="14" r="5" fill="#ffbd2e" />
-    <circle cx="44" cy="14" r="5" fill="#28c941" />
+    <circle cx="18" cy="14" r="7" fill="#ff6159" />
+    <circle cx="36" cy="14" r="7" fill="#ffbd2e" />
+    <circle cx="54" cy="14" r="7" fill="#28c941" />
   </g>
-  <g font-family="Fira Code, Source Code Pro, Monaco, Monospace" font-size="{font_size}px" fill="#e9e9e9">
-    {code}
+  <g>
+    <foreignObject x="0" y="32" width="100%" height="100%">
+        <body xmlns="http://www.w3.org/1999/xhtml">
+            <div style="font-size: 12px; font-family:Fira Code,Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
+            {code}
+            </div>
+        </body>
+    </foreignObject>
   </g>
 </svg>
 """
@@ -2233,35 +2244,44 @@ class Console:
                     segments, length=self.width, include_new_lines=False
                 )
             )
-            left_margin = 12
-            font_size = 12  # TODO: currently hardcoded here, need to use in template
-            line_spacing = 2
-            code_start_y = 60
-            y = code_start_y
-            required_code_height = (font_size + line_spacing) * len(lines)
 
+            fragments = []
+            foreground_color = _theme.foreground_color.hex
+            theme_default_foreground = (
+                f"color: {foreground_color}; text-decoration-color: {foreground_color};"
+            )
             for line in segment_lines:
                 line_spans = []
                 for segment in line:
                     text, style, _ = segment
                     text = escape(text)
                     if style:
-                        font_weight = "bold" if style.bold else "normal"
-                        font_style = "italic" if style.italic else "normal"
-                        fill_color = "#f0f0f0"  # TODO: what to default to? - terminal theme foreground color
-                        # TODO: inject terminal theme background into template
-                        color = style.color
-                        if color:
-                            triplet = style.color.get_truecolor(_theme)
-                            fill_color = triplet.hex
+                        rule = style.get_html_style(_theme)
+                        if style.link:
+                            text = f'<a href="{style.link}">{text}</a>'
 
-                    text_spaces_escaped = text.replace(" ", "&#160;")
-                    text = f'<tspan fill="{fill_color}" font-style="{font_style}" font-weight="{font_weight}">{text_spaces_escaped}</tspan>'
+                        # If the style doesn't contain a color, we still
+                        # need to make sure we output the default colors
+                        # from the TerminalTheme.
+                        additional_styles = ""
+                        if not style.color:
+                            additional_styles += theme_default_foreground
+
+                        text = (
+                            f'<span style="{rule}; {additional_styles}">{text}</span>'
+                        )
+                    else:
+                        text = f'<span style="{theme_default_foreground}">{text}</span>'
                     line_spans.append(text)
 
-                line_text = "".join(line_spans)
-                append(f'<text x="{left_margin}" y="{y}">{line_text}</text>')
-                y += font_size + line_spacing
+                fragments.append(f"<pre>{''.join(line_spans)}</pre>")
+
+            left_margin = 12
+            font_size = 12
+            line_spacing = 2
+            code_start_y = 60
+            y = code_start_y
+            required_code_height = (font_size + line_spacing) * len(lines)
 
         margin = 50
         terminal_height = required_code_height + code_start_y
@@ -2276,7 +2296,7 @@ class Console:
         title_mid_anchor = terminal_width / 2
 
         rendered_code = code_format.format(
-            code="\n\t".join(fragments),
+            code="\n".join(fragments),
             total_height=total_height,
             total_width=total_width,
             terminal_width=terminal_width,
@@ -2362,10 +2382,21 @@ if __name__ == "__main__":  # pragma: no cover
     console.log("foo")
 
     from rich.panel import Panel
+    from rich.syntax import Syntax
 
     console.print_json(data={"name": "apple", "count": 1}, indent=None)
     console.print_json(data={"name": "apple", "count": 1}, indent=None)
     console.print(Panel("Hello, world!"), width=20)
+    console.print(
+        Syntax(
+            """
+        def hello_world():
+            print("Hello, world!")
+        """,
+            lexer="python",
+        )
+    )
+    console.print("[white on blue]white on blue!")
     svg = console.export_svg(
         title="Rich Output Exported to SVG", theme=SVG_EXPORT_THEME
     )
