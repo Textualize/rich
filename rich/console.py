@@ -60,7 +60,7 @@ from .screen import Screen
 from .segment import Segment
 from .style import Style, StyleType
 from .styled import Styled
-from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
+from .terminal_theme import DEFAULT_TERMINAL_THEME, SVG_EXPORT_THEME, TerminalTheme
 from .text import Text, TextType
 from .theme import Theme, ThemeStack
 
@@ -113,6 +113,26 @@ body {{
     </code>
 </body>
 </html>
+"""
+
+CONSOLE_SVG_FORMAT = """
+<svg width="{total_width}" height="{total_height}" viewBox="-{margin} -{margin} {total_width} {total_height}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="14" stdDeviation="15" flood-color="black" flood-opacity=".85"/>
+    </filter>
+  </defs>
+  <g>
+    <rect rx="10" ry="10" width="{terminal_width}" height="{terminal_height}" fill="#0c0c0c" style="filter:url(#shadow);" />
+    <text text-anchor='middle' x="{title_mid_anchor}" y="18" font-family="Sans-Serif" font-size="14" font-weight="bold" fill="#e9e9e9">{title}</text>
+    <circle cx="16" cy="14" r="5" fill="#ff6159" />
+    <circle cx="30" cy="14" r="5" fill="#ffbd2e" />
+    <circle cx="44" cy="14" r="5" fill="#28c941" />
+  </g>
+  <g font-family="Fira Code, Source Code Pro, Monaco, Monospace" font-size="{font_size}px" fill="#e9e9e9">
+    {code}
+  </g>
+</svg>
 """
 
 _TERM_COLORS = {"256color": ColorSystem.EIGHT_BIT, "16color": ColorSystem.STANDARD}
@@ -2187,15 +2207,106 @@ class Console:
         with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(html)
 
-    def export_svg(self) -> str:
-        pass
+    def export_svg(
+        self,
+        title: str = "Rich",
+        theme: Optional[TerminalTheme] = None,
+        clear: bool = True,
+    ) -> str:
+        assert (
+            self.record
+        ), "To export console contents set record=True in the constructor or instance"
 
-    def save_svg(self) -> None:
-        pass
+        fragments: List[str] = []
+        append = fragments.append
+        _theme = theme or SVG_EXPORT_THEME
+        code_format = CONSOLE_SVG_FORMAT  # TODO: Support user defined formats
+
+        with self._record_buffer_lock:
+            segments = Segment.simplify(self._record_buffer)
+            segments = Segment.filter_control(segments)
+            text = Text.assemble(*((text, style) for text, style, _ in segments))
+            lines = text.wrap(self, width=self.width, overflow="fold")
+            segments = self.render(lines, options=self.options)
+            segment_lines = list(
+                Segment.split_and_crop_lines(
+                    segments, length=self.width, include_new_lines=False
+                )
+            )
+            left_margin = 12
+            font_size = 12  # TODO: currently hardcoded here, need to use in template
+            line_spacing = 2
+            code_start_y = 60
+            y = code_start_y
+            required_code_height = (font_size + line_spacing) * len(lines)
+
+            for line in segment_lines:
+                line_spans = []
+                for segment in line:
+                    text, style, _ = segment
+                    text = escape(text)
+                    if style:
+                        font_weight = "bold" if style.bold else "normal"
+                        font_style = "italic" if style.italic else "normal"
+                        fill_color = "#f0f0f0"  # TODO: what to default to? - terminal theme foreground color
+                        # TODO: inject terminal theme background into template
+                        color = style.color
+                        if color:
+                            triplet = style.color.get_truecolor(_theme)
+                            fill_color = triplet.hex
+
+                    text_spaces_escaped = text.replace(" ", "&#160;")
+                    text = f'<tspan fill="{fill_color}" font-style="{font_style}" font-weight="{font_weight}">{text_spaces_escaped}</tspan>'
+                    line_spans.append(text)
+
+                line_text = "".join(line_spans)
+                append(f'<text x="{left_margin}" y="{y}">{line_text}</text>')
+                y += font_size + line_spacing
+
+        margin = 50
+        terminal_height = required_code_height + code_start_y
+        monospace_font_width_scale = 0.55
+        terminal_width = (
+            self.width * monospace_font_width_scale * font_size
+            + 2 * left_margin
+            + self.width
+        )
+        total_height = terminal_height + 2 * margin
+        total_width = terminal_width + 2 * margin
+        title_mid_anchor = terminal_width / 2
+
+        rendered_code = code_format.format(
+            code="\n\t".join(fragments),
+            total_height=total_height,
+            total_width=total_width,
+            terminal_width=terminal_width,
+            terminal_height=terminal_height,
+            title_mid_anchor=title_mid_anchor,
+            margin=margin,
+            font_size=font_size,
+            title=title,
+        )
+
+        if clear:
+            self._record_buffer.clear()
+
+        return rendered_code
+
+    def save_svg(
+        self,
+        path: str,
+        *,
+        title: str = "Rich",
+        theme: Optional[TerminalTheme] = None,
+        clear: bool = True,
+    ) -> None:
+        svg = self.export_svg(title=title, theme=theme, clear=clear)
+        with open(path, "wt", encoding="utf-8") as write_file:
+            write_file.write(svg)
 
 
 if __name__ == "__main__":  # pragma: no cover
-    console = Console()
+    console = Console(record=True)
 
     console.log(
         "JSONRPC [i]request[/i]",
@@ -2250,4 +2361,12 @@ if __name__ == "__main__":  # pragma: no cover
     )
     console.log("foo")
 
+    from rich.panel import Panel
+
     console.print_json(data={"name": "apple", "count": 1}, indent=None)
+    console.print_json(data={"name": "apple", "count": 1}, indent=None)
+    console.print(Panel("Hello, world!"), width=20)
+    svg = console.export_svg(
+        title="Rich Output Exported to SVG", theme=SVG_EXPORT_THEME
+    )
+    print(svg)
