@@ -5,13 +5,11 @@ from logging import getLogger
 from operator import attrgetter
 from typing import (
     TYPE_CHECKING,
-    Any,
     Dict,
     Iterable,
-    Iterator,
     List,
-    Optional,
     NamedTuple,
+    Optional,
     Sequence,
     Tuple,
     Type,
@@ -689,39 +687,35 @@ class SegmentLines:
                 yield from line
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
+    from rich.console import Console
+    from rich.syntax import Syntax
+    from rich.text import Text
 
-    if __name__ == "__main__":  # pragma: no cover
-        from rich.console import Console
-        from rich.syntax import Syntax
-        from rich.text import Text
+    code = """from rich.console import Console
+console = Console()
+text = Text.from_markup("Hello, [bold magenta]World[/]!")
+console.print(text)"""
 
-        code = """from rich.console import Console
-    console = Console()
     text = Text.from_markup("Hello, [bold magenta]World[/]!")
-    console.print(text)"""
 
-        text = Text.from_markup("Hello, [bold magenta]World[/]!")
+    console = Console()
 
-        console = Console()
-
-        console.rule("rich.Segment")
-        console.print(
-            "A Segment is the last step in the Rich render process before generating text with ANSI codes."
-        )
-        console.print("\nConsider the following code:\n")
-        console.print(Syntax(code, "python", line_numbers=True))
-        console.print()
-        console.print(
-            "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
-        )
-        fragments = list(console.render(text))
-        console.print(fragments)
-        console.print()
-        console.print(
-            "The Segments are then processed to produce the following output:\n"
-        )
-        console.print(text)
-        console.print(
-            "\nYou will only need to know this if you are implementing your own Rich renderables."
-        )
+    console.rule("rich.Segment")
+    console.print(
+        "A Segment is the last step in the Rich render process before generating text with ANSI codes."
+    )
+    console.print("\nConsider the following code:\n")
+    console.print(Syntax(code, "python", line_numbers=True))
+    console.print()
+    console.print(
+        "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
+    )
+    fragments = list(console.render(text))
+    console.print(fragments)
+    console.print()
+    console.print("The Segments are then processed to produce the following output:\n")
+    console.print(text)
+    console.print(
+        "\nYou will only need to know this if you are implementing your own Rich renderables."
+    )
