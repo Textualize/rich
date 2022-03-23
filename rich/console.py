@@ -115,34 +115,76 @@ body {{
 </html>
 """
 
-CONSOLE_SVG_FORMAT = """
-<svg width="{total_width}" height="{total_height}" viewBox="-{margin} -{margin} {total_width} {total_height}" xmlns="http://www.w3.org/2000/svg">
+CONSOLE_SVG_FORMAT = """\
+<svg width="{total_width}" height="{total_height}" viewBox="0 0 {total_width} {total_height}"
+     xmlns="http://www.w3.org/2000/svg">
     <style>
-    pre {{
-       margin: 0;
-    }}
+        span {{
+            display: inline-block;
+            white-space: pre;
+            vertical-align: top;
+            margin: 0;
+            font-size: {font_size}px;
+            font-family:Fira Code,Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
+        }}
+        a {{
+            text-decoration: none;
+            color: inherit;
+        }}
+        .terminal {{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: {margin}px;
+            margin-top: 50px;
+            background-color: {theme_background_color};
+            padding: 14px;
+            padding-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: inset 0 0 0 1px rgb(255,255,255,.4),
+                        0px 0.9px 0.7px rgba(0, 0, 0, 0.163),
+                        0px 2.5px 4.8px rgba(0, 0, 0, 0.24),
+                        0px 6px 16.5px rgba(0, 0, 0, 0.258),
+                        0px 20px 60px rgba(0, 0, 0, 0.51)
+        }}
+        .terminal-header {{
+            position: relative;
+            width: 100%;
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: bold;
+            color: {theme_foreground_color};
+        }}
+        .terminal-traffic-lights {{
+            position: absolute;
+            top: 2px;
+            left: 6px;
+        }}
+        .terminal-body {{
+            line-height: {line_height}px;
+        }}
     </style>
-  <defs>
-    <filter id="shadow">
-      <feDropShadow dx="0" dy="14" stdDeviation="15" flood-color="black" flood-opacity=".85"/>
-    </filter>
-  </defs>
-  <g>
-    <rect rx="10" ry="10" width="{terminal_width}" height="{terminal_height}" fill="#0c0c0c" style="filter:url(#shadow);" />
-    <text text-anchor='middle' x="{title_mid_anchor}" y="18" font-family="Sans-Serif" font-size="14" font-weight="bold" fill="#e9e9e9">{title}</text>
-    <circle cx="18" cy="14" r="7" fill="#ff6159" />
-    <circle cx="36" cy="14" r="7" fill="#ffbd2e" />
-    <circle cx="54" cy="14" r="7" fill="#28c941" />
-  </g>
-  <g>
-    <foreignObject x="0" y="32" width="100%" height="100%">
+    <foreignObject x="0" y="0" width="100%" height="100%">
         <body xmlns="http://www.w3.org/1999/xhtml">
-            <div style="font-size: 12px; font-family:Fira Code,Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-            {code}
+            <div class="terminal">
+                <div class='terminal-header'>
+                    <svg class="terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="14" cy="8" r="8" fill="#ff6159"/>
+                        <circle cx="38" cy="8" r="8" fill="#ffbd2e"/>
+                        <circle cx="62" cy="8" r="8" fill="#28c941"/>
+                    </svg>
+                    <div class="terminal-title">
+                        Rich Output Exported to SVG
+                    </div>
+                </div>
+                <div class='terminal-body'>
+                    {code}
+                </div>
             </div>
         </body>
     </foreignObject>
-  </g>
 </svg>
 """
 
@@ -2247,6 +2289,7 @@ class Console:
 
             fragments = []
             foreground_color = _theme.foreground_color.hex
+            background_color = _theme.background_color.hex
             theme_default_foreground = (
                 f"color: {foreground_color}; text-decoration-color: {foreground_color};"
             )
@@ -2274,18 +2317,19 @@ class Console:
                         text = f'<span style="{theme_default_foreground}">{text}</span>'
                     line_spans.append(text)
 
-                fragments.append(f"<pre>{''.join(line_spans)}</pre>")
+                fragments.append(f"<div>{''.join(line_spans)}</div>")
 
             left_margin = 12
-            font_size = 12
-            line_spacing = 2
+            font_size = 18
+            line_height = font_size + 4
             code_start_y = 60
-            y = code_start_y
-            required_code_height = (font_size + line_spacing) * len(lines)
+            required_code_height = line_height * len(lines)
 
-        margin = 50
+        margin = 140
         terminal_height = required_code_height + code_start_y
-        monospace_font_width_scale = 0.55
+        monospace_font_width_scale = (
+            0.6  # generally around 0.5-0.55 width/height ratio, added extra to be safe
+        )
         terminal_width = (
             self.width * monospace_font_width_scale * font_size
             + 2 * left_margin
@@ -2302,8 +2346,11 @@ class Console:
             terminal_width=terminal_width,
             terminal_height=terminal_height,
             title_mid_anchor=title_mid_anchor,
+            theme_foreground_color=foreground_color,
+            theme_background_color=background_color,
             margin=margin,
             font_size=font_size,
+            line_height=line_height,
             title=title,
         )
 
@@ -2397,7 +2444,6 @@ if __name__ == "__main__":  # pragma: no cover
         )
     )
     console.print("[white on blue]white on blue!")
-    svg = console.export_svg(
-        title="Rich Output Exported to SVG", theme=SVG_EXPORT_THEME
-    )
+
+    svg = console.export_svg(title="Rich Output Exported to SVG")
     print(svg)
