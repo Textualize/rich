@@ -2266,19 +2266,20 @@ class Console:
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
     ) -> str:
+
+        # TODO: Dim, reverse, flashing style support
+
         assert (
             self.record
         ), "To export console contents set record=True in the constructor or instance"
 
-        fragments: List[str] = []
-        append = fragments.append
         _theme = theme or SVG_EXPORT_THEME
-        code_format = CONSOLE_SVG_FORMAT  # TODO: Support user defined formats
 
         with self._record_buffer_lock:
             segments = Segment.simplify(self._record_buffer)
             segments = Segment.filter_control(segments)
-            text = Text.assemble(*((text, style) for text, style, _ in segments))
+            parts = [(text, style or Style.null()) for text, style, _ in segments]
+            text = Text.assemble(*parts)
             lines = text.wrap(self, width=self.width, overflow="fold")
             segments = self.render(lines, options=self.options)
             segment_lines = list(
@@ -2304,7 +2305,7 @@ class Console:
                             text = f'<a href="{style.link}">{text}</a>'
 
                         # If the style doesn't contain a color, we still
-                        # need to make sure we output the default colors
+                        # need to make sure we output the default foreground color
                         # from the TerminalTheme.
                         additional_styles = ""
                         if not style.color:
@@ -2319,11 +2320,14 @@ class Console:
 
                 fragments.append(f"<div>{''.join(line_spans)}</div>")
 
-            left_margin = 12
-            font_size = 18
-            line_height = font_size + 4
-            code_start_y = 60
-            required_code_height = line_height * len(lines)
+            if clear:
+                self._record_buffer.clear()
+
+        left_margin = 12
+        font_size = 18
+        line_height = font_size + 4
+        code_start_y = 60
+        required_code_height = line_height * len(lines)
 
         margin = 140
         terminal_height = required_code_height + code_start_y
@@ -2339,7 +2343,7 @@ class Console:
         total_width = terminal_width + 2 * margin
         title_mid_anchor = terminal_width / 2
 
-        rendered_code = code_format.format(
+        rendered_code = CONSOLE_SVG_FORMAT.format(
             code="\n".join(fragments),
             total_height=total_height,
             total_width=total_width,
@@ -2353,9 +2357,6 @@ class Console:
             line_height=line_height,
             title=title,
         )
-
-        if clear:
-            self._record_buffer.clear()
 
         return rendered_code
 
