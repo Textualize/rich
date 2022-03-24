@@ -233,7 +233,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich.panel import Panel
 
-    console = Console(record=True)
+    console = Console()
 
     sponsor_message = Table.grid(padding=1)
     sponsor_message.add_column(style="green", justify="right")
