@@ -2360,14 +2360,14 @@ class Console:
         line_height = font_size + 4
         code_start_y = 60
         required_code_height = line_height * len(lines)
+        margin = 140
 
         # Monospace fonts are generally around 0.5-0.55 width/height ratio, but I've
         # added extra width to ensure that the output SVG is big enough.
         monospace_font_width_scale = 0.6
-        margin = 140
-        terminal_height = required_code_height + code_start_y
 
-        # This works out as a good heuristic for the final width of the drawn terminal.
+        # This works out as a good heuristic for the final size of the drawn terminal.
+        terminal_height = required_code_height + code_start_y
         terminal_width = (
             self.width * monospace_font_width_scale * font_size
             + 2 * terminal_padding
@@ -2399,7 +2399,7 @@ class Console:
         clear: bool = True,
         code_format: str = CONSOLE_SVG_FORMAT,
     ) -> None:
-        """Generate an SVG file from the console contents (requires record=True in Console constructor)
+        """Generate an SVG file from the console contents (requires record=True in Console constructor).
 
         Args:
             title (str): The title of the tab in the output image
