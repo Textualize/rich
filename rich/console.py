@@ -124,7 +124,7 @@ CONSOLE_SVG_FORMAT = """\
             white-space: pre;
             vertical-align: top;
             font-size: {font_size}px;
-            font-family:Fira Code,Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
+            font-family:'Fira Code','Cascadia Code',Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
         }}
         a {{
             text-decoration: none;
@@ -2287,10 +2287,21 @@ class Console:
         title: str = "Rich",
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
+        code_format: str = CONSOLE_SVG_FORMAT,
     ) -> str:
+        """Generate an SVG string from the console contents (requires record=True in Console constructor)
 
-        # TODO: Dim, reverse, flashing style support
+        Args:
+            title (str): The title of the tab in the output image
+            theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
+            code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
+                into the string in order to form the final SVG output. The default template used and the variables
+                injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
 
+        Returns:
+            str: The string representation of the SVG. That is, the ``code_format`` template with content injected.
+        """
         assert (
             self.record
         ), "To export console contents set record=True in the constructor or instance"
@@ -2341,33 +2352,34 @@ class Console:
             if clear:
                 self._record_buffer.clear()
 
-        left_margin = 12
+        # These values are the ones that I found to work well after experimentation.
+        # Many of them can be tweaked, but too much variation from these values could
+        # result in visually broken output/clipping issues.
+        terminal_padding = 12
         font_size = 18
         line_height = font_size + 4
         code_start_y = 60
         required_code_height = line_height * len(lines)
 
+        # Monospace fonts are generally around 0.5-0.55 width/height ratio, but I've
+        # added extra width to ensure that the output SVG is big enough.
+        monospace_font_width_scale = 0.6
         margin = 140
         terminal_height = required_code_height + code_start_y
-        monospace_font_width_scale = (
-            0.6  # generally around 0.5-0.55 width/height ratio, added extra to be safe
-        )
+
+        # This works out as a good heuristic for the final width of the drawn terminal.
         terminal_width = (
             self.width * monospace_font_width_scale * font_size
-            + 2 * left_margin
+            + 2 * terminal_padding
             + self.width
         )
         total_height = terminal_height + 2 * margin
         total_width = terminal_width + 2 * margin
-        title_mid_anchor = terminal_width / 2
 
-        rendered_code = CONSOLE_SVG_FORMAT.format(
+        rendered_code = code_format.format(
             code="\n".join(fragments),
             total_height=total_height,
             total_width=total_width,
-            terminal_width=terminal_width,
-            terminal_height=terminal_height,
-            title_mid_anchor=title_mid_anchor,
             theme_foreground_color=theme_foreground_color,
             theme_background_color=theme_background_color,
             margin=margin,
@@ -2385,8 +2397,21 @@ class Console:
         title: str = "Rich",
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
+        code_format: str = CONSOLE_SVG_FORMAT,
     ) -> None:
-        svg = self.export_svg(title=title, theme=theme, clear=clear)
+        """Generate an SVG file from the console contents (requires record=True in Console constructor)
+
+        Args:
+            title (str): The title of the tab in the output image
+            theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
+            code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
+                into the string in order to form the final SVG output. The default template used and the variables
+                injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
+        """
+        svg = self.export_svg(
+            title=title, theme=theme, clear=clear, code_format=code_format
+        )
         with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(svg)
 
