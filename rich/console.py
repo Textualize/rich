@@ -2312,8 +2312,8 @@ class Console:
             segments = Segment.simplify(self._record_buffer)
             segments = Segment.filter_control(segments)
             parts = [(text, style or Style.null()) for text, style, _ in segments]
-            text = Text.assemble(*parts)
-            lines = text.wrap(self, width=self.width, overflow="fold")
+            terminal_text = Text.assemble(*parts)
+            lines = terminal_text.wrap(self, width=self.width, overflow="fold")
             segments = self.render(lines, options=self.options)
             segment_lines = list(
                 Segment.split_and_crop_lines(
