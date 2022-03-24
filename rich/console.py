@@ -2402,6 +2402,7 @@ class Console:
         """Generate an SVG file from the console contents (requires record=True in Console constructor).
 
         Args:
+            path (str): The path to write the SVG to.
             title (str): The title of the tab in the output image
             theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``

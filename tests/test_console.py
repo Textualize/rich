@@ -450,6 +450,108 @@ def test_export_html_inline():
     assert html == expected
 
 
+def test_export_svg():
+    console = Console(record=True, width=100)
+    console.print("[b]foo [link=https://example.org]Click[/link]")
+    svg = console.export_svg()
+    expected = """\
+<svg width="1484.0" height="384" viewBox="0 0 1484.0 384"
+     xmlns="http://www.w3.org/2000/svg">
+    <style>
+        span {
+            display: inline-block;
+            white-space: pre;
+            vertical-align: top;
+            font-size: 18px;
+            font-family:'Fira Code','Cascadia Code',Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        #wrapper {
+            padding: 140px;
+        }
+        #terminal {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #0c0c0c;
+            border-radius: 14px;
+            outline: 1px solid #484848;
+        }
+        #terminal:after {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            content: '';
+            border-radius: 14px;
+            background: rgb(71,77,102);
+            background: linear-gradient(90deg, #804D69 0%, #4E4B89 100%);
+            transform: rotate(-4.5deg);
+            z-index: -1;
+        }
+        #terminal-header {
+            position: relative;
+            width: 100%;
+            background-color: #2e2e2e;
+            margin-bottom: 12px;
+            font-weight: bold;
+            border-radius: 14px 14px 0 0;
+            color: #f2f2f2;
+            font-size: 18px;
+            box-shadow: inset 0px -1px 0px 0px #4e4e4e,
+                        inset 0px -4px 8px 0px #1a1a1a;
+        }
+        #terminal-title-tab {
+            display: inline-block;
+            margin-top: 14px;
+            margin-left: 124px;
+            font-family: sans-serif;
+            padding: 14px 28px;
+            border-radius: 6px 6px 0 0;
+            background-color: #0c0c0c;
+            box-shadow: inset 0px 1px 0px 0px #4e4e4e,
+                        0px -4px 4px 0px #1e1e1e,
+                        inset 1px 0px 0px 0px #4e4e4e,
+                        inset -1px 0px 0px 0px #4e4e4e;
+        }
+        #terminal-traffic-lights {
+            position: absolute;
+            top: 24px;
+            left: 20px;
+        }
+        #terminal-body {
+            line-height: 22px;
+            padding: 14px;
+        }
+    </style>
+    <foreignObject x="0" y="0" width="100%" height="100%">
+        <body xmlns="http://www.w3.org/1999/xhtml">
+            <div id="wrapper">
+                <div id="terminal">
+                    <div id='terminal-header'>
+                        <svg id="terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="14" cy="8" r="8" fill="#ff6159"/>
+                            <circle cx="38" cy="8" r="8" fill="#ffbd2e"/>
+                            <circle cx="62" cy="8" r="8" fill="#28c941"/>
+                        </svg>
+                        <div id="terminal-title-tab">Rich</div>
+                    </div>
+                    <div id='terminal-body'>
+                        <div><span style="color: #f2f2f2; text-decoration-color: #f2f2f2;;font-weight: bold;">foo </span><span style="color: #f2f2f2; text-decoration-color: #f2f2f2;;font-weight: bold;"><a href="https://example.org">Click</a></span><span style="color:#f2f2f2;">                                                                                           </span></div>
+<div><span style="color:#f2f2f2;"></span><span style="color:#f2f2f2;">                                                                                                    </span></div>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </foreignObject>
+</svg>
+"""
+    assert svg == expected
+
+
 def test_save_text():
     console = Console(record=True, width=100)
     console.print("foo")
