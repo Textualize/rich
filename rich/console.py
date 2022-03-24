@@ -2470,24 +2470,3 @@ if __name__ == "__main__":  # pragma: no cover
             },
         }
     )
-    console.log("foo")
-
-    from rich.panel import Panel
-    from rich.syntax import Syntax
-
-    console.print_json(data={"name": "apple", "count": 1}, indent=None)
-    console.print_json(data={"name": "apple", "count": 1}, indent=None)
-    console.print(Panel("Hello, world!"), width=20)
-    console.print(
-        Syntax(
-            """
-        def hello_world():
-            print("Hello, world!")
-        """,
-            lexer="python",
-        )
-    )
-    console.print("[white on blue]white on blue!")
-
-    svg = console.export_svg(title="Rich Output Exported to SVG")
-    print(svg)
