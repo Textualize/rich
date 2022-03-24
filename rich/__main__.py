@@ -233,7 +233,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich.panel import Panel
 
-    console = Console()
+    console = Console(record=True)
 
     sponsor_message = Table.grid(padding=1)
     sponsor_message.add_column(style="green", justify="right")
@@ -276,3 +276,6 @@ Rich is maintained with [red]:heart:[/] by [link=https://www.textualize.io]Textu
         ),
         justify="center",
     )
+
+    svg = console.export_svg()
+    print(svg)

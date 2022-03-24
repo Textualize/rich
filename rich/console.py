@@ -123,7 +123,6 @@ CONSOLE_SVG_FORMAT = """\
             display: inline-block;
             white-space: pre;
             vertical-align: top;
-            margin: 0;
             font-size: {font_size}px;
             font-family:Fira Code,Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
         }}
@@ -131,43 +130,67 @@ CONSOLE_SVG_FORMAT = """\
             text-decoration: none;
             color: inherit;
         }}
+        .wrapper {{
+            padding: {margin}px;
+        }}
         .terminal {{
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: {margin}px;
-            margin-top: 50px;
             background-color: {theme_background_color};
-            padding: 14px;
-            padding-bottom: 20px;
-            border-radius: 12px;
-            box-shadow: inset 0 0 0 1px rgb(255,255,255,.4),
-                        0px 0.9px 0.7px rgba(0, 0, 0, 0.163),
-                        0px 2.5px 4.8px rgba(0, 0, 0, 0.24),
-                        0px 6px 16.5px rgba(0, 0, 0, 0.258),
-                        0px 20px 60px rgba(0, 0, 0, 0.51)
+            border-radius: 14px;
+            outline: 1px solid #484848;
+        }}
+        .terminal:after {{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            content: '';
+            border-radius: 14px;
+            background: rgb(71,77,102);
+            background: linear-gradient(90deg, #365D73 0%, #4F7775 100%);
+            transform: rotate(3.5deg);
+            z-index: -1;
         }}
         .terminal-header {{
             position: relative;
             width: 100%;
-            text-align: center;
-            font-family: sans-serif;
-            font-size: 18px;
-            margin-bottom: 24px;
+            background-color: #2e2e2e;
+            margin-bottom: 12px;
             font-weight: bold;
+            border-radius: 14px 14px 0 0;
             color: {theme_foreground_color};
+            font-size: 18px;
+            box-shadow: inset 0px -1px 0px 0px #4e4e4e,
+                        inset 0px -4px 8px 0px #1a1a1a;
+        }}
+        .terminal-title-tab {{
+            display: inline-block;
+            margin-top: 14px;
+            margin-left: 124px;
+            font-family: sans-serif;
+            padding: 14px 28px;
+            border-radius: 6px 6px 0 0;
+            background-color: #0c0c0c;
+            box-shadow: inset 0px 1px 0px 0px #4e4e4e,
+                        0px -4px 4px 0px #1e1e1e,
+                        inset 1px 0px 0px 0px #4e4e4e,
+                        inset -1px 0px 0px 0px #4e4e4e;
         }}
         .terminal-traffic-lights {{
             position: absolute;
-            top: 2px;
-            left: 6px;
+            top: 24px;
+            left: 20px;
         }}
         .terminal-body {{
             line-height: {line_height}px;
+            padding: 14px;
         }}
     </style>
     <foreignObject x="0" y="0" width="100%" height="100%">
         <body xmlns="http://www.w3.org/1999/xhtml">
+            <div class="wrapper">
             <div class="terminal">
                 <div class='terminal-header'>
                     <svg class="terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
@@ -175,13 +198,12 @@ CONSOLE_SVG_FORMAT = """\
                         <circle cx="38" cy="8" r="8" fill="#ffbd2e"/>
                         <circle cx="62" cy="8" r="8" fill="#28c941"/>
                     </svg>
-                    <div class="terminal-title">
-                        Rich Output Exported to SVG
-                    </div>
+                    <div class="terminal-title-tab">{title}</div>
                 </div>
                 <div class='terminal-body'>
                     {code}
                 </div>
+            </div>
             </div>
         </body>
     </foreignObject>
