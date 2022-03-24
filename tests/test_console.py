@@ -450,11 +450,7 @@ def test_export_html_inline():
     assert html == expected
 
 
-def test_export_svg():
-    console = Console(record=True, width=100)
-    console.print("[b]foo [link=https://example.org]Click[/link]")
-    svg = console.export_svg()
-    expected = """\
+EXPECTED_SVG = """\
 <svg width="1484.0" height="384" viewBox="0 0 1484.0 384"
      xmlns="http://www.w3.org/2000/svg">
     <style>
@@ -549,7 +545,24 @@ def test_export_svg():
     </foreignObject>
 </svg>
 """
-    assert svg == expected
+
+
+def test_export_svg():
+    console = Console(record=True, width=100)
+    console.print("[b]foo [link=https://example.org]Click[/link]")
+    svg = console.export_svg()
+
+    assert svg == EXPECTED_SVG
+
+
+def test_save_svg():
+    console = Console(record=True, width=100)
+    console.print("[b]foo [link=https://example.org]Click[/link]")
+    with tempfile.TemporaryDirectory() as path:
+        export_path = os.path.join(path, "example.svg")
+        console.save_svg(export_path)
+        with open(export_path, "rt") as svg_file:
+            assert svg_file.read() == EXPECTED_SVG
 
 
 def test_save_text():
