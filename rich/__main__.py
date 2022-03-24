@@ -276,6 +276,3 @@ Rich is maintained with [red]:heart:[/] by [link=https://www.textualize.io]Textu
         ),
         justify="center",
     )
-
-    svg = console.export_svg()
-    print(svg)

@@ -130,10 +130,10 @@ CONSOLE_SVG_FORMAT = """\
             text-decoration: none;
             color: inherit;
         }}
-        .wrapper {{
+        #wrapper {{
             padding: {margin}px;
         }}
-        .terminal {{
+        #terminal {{
             position: relative;
             display: flex;
             flex-direction: column;
@@ -142,18 +142,18 @@ CONSOLE_SVG_FORMAT = """\
             border-radius: 14px;
             outline: 1px solid #484848;
         }}
-        .terminal:after {{
+        #terminal:after {{
             position: absolute;
             width: 100%;
             height: 100%;
             content: '';
             border-radius: 14px;
             background: rgb(71,77,102);
-            background: linear-gradient(90deg, #365D73 0%, #4F7775 100%);
-            transform: rotate(3.5deg);
+            background: linear-gradient(90deg, #804D69 0%, #4E4B89 100%);
+            transform: rotate(-4.5deg);
             z-index: -1;
         }}
-        .terminal-header {{
+        #terminal-header {{
             position: relative;
             width: 100%;
             background-color: #2e2e2e;
@@ -165,45 +165,45 @@ CONSOLE_SVG_FORMAT = """\
             box-shadow: inset 0px -1px 0px 0px #4e4e4e,
                         inset 0px -4px 8px 0px #1a1a1a;
         }}
-        .terminal-title-tab {{
+        #terminal-title-tab {{
             display: inline-block;
             margin-top: 14px;
             margin-left: 124px;
             font-family: sans-serif;
             padding: 14px 28px;
             border-radius: 6px 6px 0 0;
-            background-color: #0c0c0c;
+            background-color: {theme_background_color};
             box-shadow: inset 0px 1px 0px 0px #4e4e4e,
                         0px -4px 4px 0px #1e1e1e,
                         inset 1px 0px 0px 0px #4e4e4e,
                         inset -1px 0px 0px 0px #4e4e4e;
         }}
-        .terminal-traffic-lights {{
+        #terminal-traffic-lights {{
             position: absolute;
             top: 24px;
             left: 20px;
         }}
-        .terminal-body {{
+        #terminal-body {{
             line-height: {line_height}px;
             padding: 14px;
         }}
     </style>
     <foreignObject x="0" y="0" width="100%" height="100%">
         <body xmlns="http://www.w3.org/1999/xhtml">
-            <div class="wrapper">
-            <div class="terminal">
-                <div class='terminal-header'>
-                    <svg class="terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="14" cy="8" r="8" fill="#ff6159"/>
-                        <circle cx="38" cy="8" r="8" fill="#ffbd2e"/>
-                        <circle cx="62" cy="8" r="8" fill="#28c941"/>
-                    </svg>
-                    <div class="terminal-title-tab">{title}</div>
+            <div id="wrapper">
+                <div id="terminal">
+                    <div id='terminal-header'>
+                        <svg id="terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="14" cy="8" r="8" fill="#ff6159"/>
+                            <circle cx="38" cy="8" r="8" fill="#ffbd2e"/>
+                            <circle cx="62" cy="8" r="8" fill="#28c941"/>
+                        </svg>
+                        <div id="terminal-title-tab">{title}</div>
+                    </div>
+                    <div id='terminal-body'>
+                        {code}
+                    </div>
                 </div>
-                <div class='terminal-body'>
-                    {code}
-                </div>
-            </div>
             </div>
         </body>
     </foreignObject>
@@ -2311,11 +2311,8 @@ class Console:
             )
 
             fragments = []
-            foreground_color = _theme.foreground_color.hex
-            background_color = _theme.background_color.hex
-            theme_default_foreground = (
-                f"color: {foreground_color}; text-decoration-color: {foreground_color};"
-            )
+            theme_foreground_color = _theme.foreground_color.hex
+            theme_background_color = _theme.background_color.hex
             for line in segment_lines:
                 line_spans = []
                 for segment in line:
@@ -2329,15 +2326,14 @@ class Console:
                         # If the style doesn't contain a color, we still
                         # need to make sure we output the default foreground color
                         # from the TerminalTheme.
+                        theme_default_foreground = f"color: {theme_foreground_color}; text-decoration-color: {theme_foreground_color};"
                         additional_styles = ""
                         if not style.color:
                             additional_styles += theme_default_foreground
 
-                        text = (
-                            f'<span style="{rule}; {additional_styles}">{text}</span>'
-                        )
+                        text = f'<span style="{theme_default_foreground};{rule};">{text}</span>'
                     else:
-                        text = f'<span style="{theme_default_foreground}">{text}</span>'
+                        text = f'<span style="color:{theme_foreground_color};">{text}</span>'
                     line_spans.append(text)
 
                 fragments.append(f"<div>{''.join(line_spans)}</div>")
@@ -2372,8 +2368,8 @@ class Console:
             terminal_width=terminal_width,
             terminal_height=terminal_height,
             title_mid_anchor=title_mid_anchor,
-            theme_foreground_color=foreground_color,
-            theme_background_color=background_color,
+            theme_foreground_color=theme_foreground_color,
+            theme_background_color=theme_background_color,
             margin=margin,
             font_size=font_size,
             line_height=line_height,
