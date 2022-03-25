@@ -19,6 +19,7 @@ The following people have contributed to the development of Rich:
 - [Josh Karpel](https://github.com/JoshKarpel)
 - [Andrew Kettmann](https://github.com/akettmann)
 - [Hedy Li](https://github.com/hedythedev)
+- [Luka Mamukashvili](https://github.com/UltraStudioLTD)
 - [Alexander Mancevice](https://github.com/amancevice)
 - [Will McGugan](https://github.com/willmcgugan)
 - [Paul McGuire](https://github.com/ptmcg)
