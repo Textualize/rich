@@ -141,8 +141,7 @@ class AnsiDecoder:
         text = Text()
         append = text.append
         line = line.rsplit("\r", 1)[-1]
-        for token in _ansi_tokenize(line):
-            plain_text, sgr, osc = token
+        for plain_text, sgr, osc in _ansi_tokenize(line):
             if plain_text:
                 append(plain_text, self.style or None)
             elif osc is not None:
