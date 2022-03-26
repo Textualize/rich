@@ -35,8 +35,8 @@ def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
     """
 
     position = 0
-    sgr: str | None
-    osc: str | None
+    sgr: Optional[str]
+    osc: Optional[str]
     for match in re_ansi.finditer(ansi_text):
         start, end = match.span(0)
         osc, sgr = match.groups()
@@ -45,11 +45,7 @@ def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
 
         if sgr and not sgr.endswith("m"):
             sgr = ""
-        yield _AnsiToken(
-            "",
-            sgr[1:-1] if sgr else None,
-            osc,
-        )
+        yield _AnsiToken("", sgr[1:-1] if sgr else None, osc)
         position = end
     if position < len(ansi_text):
         yield _AnsiToken(ansi_text[position:])
@@ -161,7 +157,7 @@ class AnsiDecoder:
                 # Translate in to semi-colon separated codes
                 # Ignore invalid codes, because we want to be lenient
                 codes = [
-                    min(255, int(_code or "0"))
+                    min(255, int(_code) if _code else 0)
                     for _code in sgr.split(";")
                     if _code.isdigit() or _code == ""
                 ]
