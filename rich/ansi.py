@@ -15,8 +15,8 @@ class _AnsiToken(NamedTuple):
     """Result of ansi tokenized string."""
 
     plain: str = ""
-    sgr: str = ""
-    osc: str = ""
+    sgr: str | None = ""
+    osc: str | None = ""
 
 
 def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
@@ -34,6 +34,8 @@ def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
         return re_csi.sub("", ansi_text)
 
     position = 0
+    sgr: str | None
+    osc: str | None
     for match in re_ansi.finditer(ansi_text):
         start, end = match.span(0)
         sgr, osc = match.groups()
@@ -143,16 +145,18 @@ class AnsiDecoder:
             plain_text, sgr, osc = token
             if plain_text:
                 append(plain_text, self.style or None)
-            elif osc:
+            elif osc is not None:
                 if osc.startswith("8;"):
                     _params, semicolon, link = osc[2:].partition(";")
                     if semicolon:
                         self.style = self.style.update_link(link or None)
-            elif sgr:
+            elif sgr is not None:
                 # Translate in to semi-colon separated codes
                 # Ignore invalid codes, because we want to be lenient
                 codes = [
-                    min(255, int(_code)) for _code in sgr.split(";") if _code.isdigit()
+                    min(255, int(_code or "0"))
+                    for _code in sgr.split(";")
+                    if _code.isdigit() or _code == ""
                 ]
                 iter_codes = iter(codes)
                 for code in iter_codes:
