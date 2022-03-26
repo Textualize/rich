@@ -5,7 +5,7 @@ format-check:
 format:
 	black .
 typecheck:
-	mypy -p rich--no-incremental
+	mypy -p rich --no-incremental
 typecheck-report:
 	mypy -p rich --html-report mypy_report
 .PHONY: docs
