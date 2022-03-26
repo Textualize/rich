@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Add missing `end` keyword argument to `Text.from_markup`
+- Fixed issue with decoding ANSI reset https://github.com/Textualize/rich/issues/2112
 
 ## [12.0.1] - 2022-03-22
 
