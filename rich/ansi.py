@@ -1,7 +1,7 @@
 import re
 import sys
 from contextlib import suppress
-from typing import Iterable, NamedTuple
+from typing import Iterable, NamedTuple, Optional
 
 from .color import Color
 from .style import Style
@@ -20,8 +20,8 @@ class _AnsiToken(NamedTuple):
     """Result of ansi tokenized string."""
 
     plain: str = ""
-    sgr: str | None = ""
-    osc: str | None = ""
+    sgr: Optional[str] = ""
+    osc: Optional[str] = ""
 
 
 def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
