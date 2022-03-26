@@ -7,8 +7,13 @@ from .color import Color
 from .style import Style
 from .text import Text
 
-re_ansi = re.compile(r"(?:\x1b\[(.*?)m)|(?:\x1b\](.*?)\x1b\\)")
-re_csi = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+re_ansi = re.compile(
+    r"""
+(?:\x1b\](.*?)\x1b\\)|
+(?:\x1b([(@-Z\\-_]|\[[0-?]*[ -/]*[@-~]))
+""",
+    re.VERBOSE,
+)
 
 
 class _AnsiToken(NamedTuple):
@@ -29,22 +34,25 @@ def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
         AnsiToken: A named tuple of (plain, sgr, osc)
     """
 
-    def remove_csi(ansi_text: str) -> str:
-        """Remove unknown CSI sequences."""
-        return re_csi.sub("", ansi_text)
-
     position = 0
     sgr: str | None
     osc: str | None
     for match in re_ansi.finditer(ansi_text):
         start, end = match.span(0)
-        sgr, osc = match.groups()
+        osc, sgr = match.groups()
         if start > position:
-            yield _AnsiToken(remove_csi(ansi_text[position:start]))
-        yield _AnsiToken("", sgr, osc)
+            yield _AnsiToken(ansi_text[position:start])
+
+        if sgr and not sgr.endswith("m"):
+            sgr = ""
+        yield _AnsiToken(
+            "",
+            sgr[1:-1] if sgr else None,
+            osc,
+        )
         position = end
     if position < len(ansi_text):
-        yield _AnsiToken(remove_csi(ansi_text[position:]))
+        yield _AnsiToken(ansi_text[position:])
 
 
 SGR_STYLE_MAP = {

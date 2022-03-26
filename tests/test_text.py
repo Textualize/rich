@@ -109,6 +109,10 @@ def test_from_ansi():
     assert str(text) == "BOLD not bold"
     assert text._spans == [Span(0, 4, Style(bold=True))]
 
+    text = Text.from_ansi("\033[1m\033[Kfoo barmbaz")
+    assert str(text) == "foo barmbaz"
+    assert text._spans == [Span(0, 11, Style(bold=True))]
+
 
 def test_copy():
     test = Text()
