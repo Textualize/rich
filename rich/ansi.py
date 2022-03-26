@@ -42,10 +42,11 @@ def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
         osc, sgr = match.groups()
         if start > position:
             yield _AnsiToken(ansi_text[position:start])
-
-        if sgr and not sgr.endswith("m"):
-            sgr = ""
-        yield _AnsiToken("", sgr[1:-1] if sgr else None, osc)
+        if sgr:
+            if sgr.endswith("m"):
+                yield _AnsiToken("", sgr[1:-1], osc)
+        else:
+            yield _AnsiToken("", sgr, osc)
         position = end
     if position < len(ansi_text):
         yield _AnsiToken(ansi_text[position:])
