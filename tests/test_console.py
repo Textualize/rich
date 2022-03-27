@@ -658,6 +658,41 @@ def test_lines_env():
     console = Console(width=40, _environ={"LINES": "broken"})
 
 
+def test_options_default_env_overrides(monkeypatch):
+    import rich.console
+
+    def _mock_is_jupyter():
+        return True
+
+    def _mock_isnt_jupyter():
+        return True
+
+    mock_file = io.StringIO()
+
+    def _mock_isatty():
+        return True
+
+    monkeypatch.setattr(rich.console, "_is_jupyter", _mock_isnt_jupyter)
+    console = Console(_environ={"RICH_FORCE_JUPYTER": "True"})
+    assert console.is_jupyter == True
+
+    monkeypatch.setattr(rich.console, "_is_jupyter", _mock_is_jupyter)
+    console = Console(_environ={"RICH_FORCE_JUPYTER": "False"})
+    assert console.is_jupyter == False
+
+    console = Console(_environ={"RICH_FORCE_TERMINAL": "True"})
+    assert console._force_terminal == True
+    console = Console(_environ={"RICH_FORCE_TERMINAL": "False"})
+    assert console._force_terminal == False
+
+    console = Console(file=mock_file, _environ={"RICH_FORCE_INTERACTIVE": "True"})
+    assert console.is_interactive == True
+
+    mock_file.isatty = _mock_isatty
+    console = Console(file=mock_file, _environ={"RICH_FORCE_INTERACTIVE": "False"})
+    assert console.is_interactive == False
+
+
 def test_screen_update_class():
     screen_update = ScreenUpdate([[Segment("foo")], [Segment("bar")]], 5, 10)
     assert screen_update.x == 5

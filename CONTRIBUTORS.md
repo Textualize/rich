@@ -14,6 +14,7 @@ The following people have contributed to the development of Rich:
 - [Oleksis Fraga](https://github.com/oleksis)
 - [Michał Górny](https://github.com/mgorny)
 - [Leron Gray](https://github.com/daddycocoaman)
+- [Josiah Outram Halstead](https://github.com/joouha)
 - [Kenneth Hoste](https://github.com/boegel)
 - [Finn Hughes](https://github.com/finnhughes)
 - [Josh Karpel](https://github.com/JoshKarpel)

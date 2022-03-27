@@ -5,6 +5,7 @@ import platform
 import sys
 import threading
 from abc import ABC, abstractmethod
+from ast import literal_eval
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import wraps
@@ -670,7 +671,12 @@ class Console:
         if _environ is not None:
             self._environ = _environ
 
+        if force_jupyter is None:
+            env_var = self._environ.get("RICH_FORCE_JUPYTER")
+            if env_var is not None:
+                force_jupyter = env_var.strip().lower() == "true"
         self.is_jupyter = _is_jupyter() if force_jupyter is None else force_jupyter
+
         if self.is_jupyter:
             width = width or 93
             height = height or 100
@@ -703,7 +709,12 @@ class Console:
         self._height = height
 
         self._color_system: Optional[ColorSystem]
+        if force_terminal is None:
+            env_var = self._environ.get("RICH_FORCE_TERMINAL")
+            if env_var is not None:
+                force_terminal = env_var.strip().lower() == "true"
         self._force_terminal = force_terminal
+
         self._file = file
         self.quiet = quiet
         self.stderr = stderr
@@ -729,6 +740,10 @@ class Console:
         self.no_color = (
             no_color if no_color is not None else "NO_COLOR" in self._environ
         )
+        if force_interactive is None:
+            env_var = self._environ.get("RICH_FORCE_INTERACTIVE")
+            if env_var is not None:
+                force_interactive = env_var.strip().lower() == "true"
         self.is_interactive = (
             (self.is_terminal and not self.is_dumb_terminal)
             if force_interactive is None
