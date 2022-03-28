@@ -271,15 +271,18 @@ The image below shows an example of an SVG exported by Rich.
 
 .. image:: ../images/svg_export.svg
 
-You can customise the theme used during SVG export by importing the desired theme from the :mod:`rich.terminal_themes` module and passing it to
+You can customise the theme used during SVG export by importing the desired theme from the :mod:`rich.terminal_theme` module and passing it to
 :meth:`~rich.console.Console.export_svg` or :meth:`~rich.console.Console.save_svg` via the ``theme`` parameter::
 
 
     from rich.console import Console
-    from rich.terminal_themes import MONOKAI
+    from rich.terminal_theme import MONOKAI
 
     console = Console(record=True)
     console.save_svg("example.svg", theme=MONOKAI)
+
+Alternatively, you can create your own themes by constructing a :class:`~rich.terminal_theme.TerminalTheme` instance
+yourself and passing that in.
 
 Error console
 -------------
