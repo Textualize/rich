@@ -156,6 +156,7 @@ CONSOLE_SVG_FORMAT = """\
         }}
         #wrapper {{
             padding: {margin}px;
+            padding-top: 100px;
         }}
         #terminal {{
             position: relative;
@@ -1454,7 +1455,7 @@ class Console:
         highlight: Optional[bool] = None,
         highlighter: Optional[HighlighterType] = None,
     ) -> "Text":
-        """Convert a string to a Text instance. This is is called automatically if
+        """Convert a string to a Text instance. This is called automatically if
         you print or log a string.
 
         Args:
@@ -1504,7 +1505,7 @@ class Console:
     def get_style(
         self, name: Union[str, Style], *, default: Optional[Union[Style, str]] = None
     ) -> Style:
-        """Get a Style instance by it's theme name or parse a definition.
+        """Get a Style instance by its theme name or parse a definition.
 
         Args:
             name (str): The name of a style or a style definition.
@@ -2391,7 +2392,7 @@ class Console:
 
         # Monospace fonts are generally around 0.5-0.55 width/height ratio, but I've
         # added extra width to ensure that the output SVG is big enough.
-        monospace_font_width_scale = 0.57
+        monospace_font_width_scale = 0.60
 
         # This works out as a good heuristic for the final size of the drawn terminal.
         terminal_height = required_code_height + code_start_y

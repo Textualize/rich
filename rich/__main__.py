@@ -226,7 +226,9 @@ if __name__ == "__main__":  # pragma: no cover
     console.print(test_card)
     taken = round((process_time() - start) * 1000.0, 1)
 
-    Console().print(test_card)
+    c = Console(record=True)
+    c.print(test_card)
+    # c.save_svg(path="/Users/darrenburns/Library/Application Support/JetBrains/PyCharm2021.3/scratches/scratch_7.svg", title="Rich can export to SVG!")
 
     print(f"rendered in {pre_cache_taken}ms (cold cache)")
     print(f"rendered in {taken}ms (warm cache)")
