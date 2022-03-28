@@ -743,7 +743,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich.console import Console
 
-    console = Console(force_terminal=args.force_color, width=args.width, record=True)
+    console = Console(force_terminal=args.force_color, width=args.width)
 
     if args.path == "-":
         code = sys.stdin.read()
@@ -767,5 +767,3 @@ if __name__ == "__main__":  # pragma: no cover
             indent_guides=args.indent_guides,
         )
     console.print(syntax, soft_wrap=args.soft_wrap)
-    svg = console.export_svg(title="Rich Output Exported to SVG")
-    print(svg)
