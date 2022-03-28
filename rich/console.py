@@ -119,6 +119,22 @@ CONSOLE_SVG_FORMAT = """\
 <svg width="{total_width}" height="{total_height}" viewBox="0 0 {total_width} {total_height}"
      xmlns="http://www.w3.org/2000/svg">
     <style>
+        @font-face {{
+            font-family: "Fira Code";
+            src: local("FiraCode-Regular"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");
+            font-style: normal;
+            font-weight: 400;
+        }}
+        @font-face {{
+            font-family: "Fira Code";
+            src: local("FiraCode-Bold"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");
+            font-style: bold;
+            font-weight: 700;
+        }}
         span {{
             display: inline-block;
             white-space: pre;
@@ -129,6 +145,14 @@ CONSOLE_SVG_FORMAT = """\
         a {{
             text-decoration: none;
             color: inherit;
+        }}
+        .blink {{
+           animation: blinker 1s infinite;
+        }}
+        @keyframes blinker {{
+            from {{ opacity: 1.0; }}
+            50% {{ opacity: 0.3; }}
+            to {{ opacity: 1.0; }}
         }}
         #wrapper {{
             padding: {margin}px;
@@ -2334,6 +2358,9 @@ class Console:
                         if style.link:
                             text = f'<a href="{style.link}">{text}</a>'
 
+                        if style.blink or style.blink2:
+                            text = f'<span class="blink">{text}</span>'
+
                         # If the style doesn't contain a color, we still
                         # need to make sure we output the default foreground color
                         # from the TerminalTheme.
@@ -2364,7 +2391,7 @@ class Console:
 
         # Monospace fonts are generally around 0.5-0.55 width/height ratio, but I've
         # added extra width to ensure that the output SVG is big enough.
-        monospace_font_width_scale = 0.6
+        monospace_font_width_scale = 0.57
 
         # This works out as a good heuristic for the final size of the drawn terminal.
         terminal_height = required_code_height + code_start_y
