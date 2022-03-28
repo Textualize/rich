@@ -451,9 +451,25 @@ def test_export_html_inline():
 
 
 EXPECTED_SVG = """\
-<svg width="1484.0" height="384" viewBox="0 0 1484.0 384"
+<svg width="1429.9999999999998" height="384" viewBox="0 0 1429.9999999999998 384"
      xmlns="http://www.w3.org/2000/svg">
     <style>
+        @font-face {
+            font-family: "Fira Code";
+            src: local("FiraCode-Regular"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");
+            font-style: normal;
+            font-weight: 400;
+        }
+        @font-face {
+            font-family: "Fira Code";
+            src: local("FiraCode-Bold"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");
+            font-style: bold;
+            font-weight: 700;
+        }
         span {
             display: inline-block;
             white-space: pre;
@@ -464,6 +480,14 @@ EXPECTED_SVG = """\
         a {
             text-decoration: none;
             color: inherit;
+        }
+        .blink {
+           animation: blinker 1s infinite;
+        }
+        @keyframes blinker {
+            from { opacity: 1.0; }
+            50% { opacity: 0.3; }
+            to { opacity: 1.0; }
         }
         #wrapper {
             padding: 140px;
@@ -536,7 +560,7 @@ EXPECTED_SVG = """\
                         <div id="terminal-title-tab">Rich</div>
                     </div>
                     <div id='terminal-body'>
-                        <div><span style="color: #f2f2f2; text-decoration-color: #f2f2f2;;font-weight: bold;">foo </span><span style="color: #f2f2f2; text-decoration-color: #f2f2f2;;font-weight: bold;"><a href="https://example.org">Click</a></span><span style="color:#f2f2f2;">                                                                                           </span></div>
+                        <div><span style="color: #f2f2f2; text-decoration-color: #f2f2f2;;font-weight: bold;">foo </span><span style="color: #f2f2f2; text-decoration-color: #f2f2f2;;font-weight: bold;"><span class="blink"><a href="https://example.org">Click</a></span></span><span style="color:#f2f2f2;">                                                                                           </span></div>
 <div><span style="color:#f2f2f2;"></span><span style="color:#f2f2f2;">                                                                                                    </span></div>
                     </div>
                 </div>
@@ -549,7 +573,7 @@ EXPECTED_SVG = """\
 
 def test_export_svg():
     console = Console(record=True, width=100)
-    console.print("[b]foo [link=https://example.org]Click[/link]")
+    console.print("[b]foo [blink][link=https://example.org]Click[/link][/]")
     svg = console.export_svg()
 
     assert svg == EXPECTED_SVG
@@ -557,7 +581,7 @@ def test_export_svg():
 
 def test_save_svg():
     console = Console(record=True, width=100)
-    console.print("[b]foo [link=https://example.org]Click[/link]")
+    console.print("[b]foo [blink][link=https://example.org]Click[/link][/]")
     with tempfile.TemporaryDirectory() as path:
         export_path = os.path.join(path, "example.svg")
         console.save_svg(export_path)
