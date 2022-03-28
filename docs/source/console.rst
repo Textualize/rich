@@ -265,9 +265,21 @@ When using :meth:`~rich.console.Console.export_svg` or :meth:`~rich.console.Cons
 match the width (in terms of character cells) of your terminal window. The height of the exported SVG will scale automatically to accommodate the console output.
 
 The generated SVG can be viewed inside any web browser, and can be included on a webpage either by directly including the SVG markup
-or by referencing the file itself using an :mod:`<img>` tag. For finer control over the dimensions, you'll have to use an :mod:`<img>` tag.
+or by referencing the file itself using an ``<img>`` tag. For finer control over the dimensions, you'll have to use an ``<img>`` tag.
+
+The image below shows an example of an SVG exported by Rich.
 
 .. image:: ../images/svg_export.svg
+
+You can customise the theme used during SVG export by importing the desired theme from the :mod:`rich.terminal_themes` module and passing it to
+:meth:`~rich.console.Console.export_svg` or :meth:`~rich.console.Console.save_svg` via the ``theme`` parameter::
+
+
+    from rich.console import Console
+    from rich.terminal_themes import MONOKAI
+
+    console = Console(record=True)
+    console.save_svg("example.svg", theme=MONOKAI)
 
 Error console
 -------------
