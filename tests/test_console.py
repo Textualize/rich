@@ -451,7 +451,7 @@ def test_export_html_inline():
 
 
 EXPECTED_SVG = """\
-<svg width="1429.9999999999998" height="384" viewBox="0 0 1429.9999999999998 384"
+<svg width="1484.0" height="384" viewBox="0 0 1484.0 384"
      xmlns="http://www.w3.org/2000/svg">
     <style>
         @font-face {
@@ -491,6 +491,7 @@ EXPECTED_SVG = """\
         }
         #wrapper {
             padding: 140px;
+            padding-top: 100px;
         }
         #terminal {
             position: relative;
