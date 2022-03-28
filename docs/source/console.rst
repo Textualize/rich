@@ -281,7 +281,7 @@ You can customise the theme used during SVG export by importing the desired them
     console = Console(record=True)
     console.save_svg("example.svg", theme=MONOKAI)
 
-Alternatively, you can create your own themes by constructing a :class:`~rich.terminal_theme.TerminalTheme` instance
+Alternatively, you can create your own theme by constructing a :class:`~rich.terminal_theme.TerminalTheme` instance
 yourself and passing that in.
 
 Error console
