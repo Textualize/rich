@@ -547,6 +547,8 @@ EXPECTED_SVG = """\
             line-height: 22px;
             padding: 14px;
         }
+        .r1 {color: #f2f2f2; text-decoration-color: #f2f2f2;}
+.r2 {font-weight: bold; color: #f2f2f2; text-decoration-color: #f2f2f2;}
     </style>
     <foreignObject x="0" y="0" width="100%" height="100%">
         <body xmlns="http://www.w3.org/1999/xhtml">
@@ -561,8 +563,8 @@ EXPECTED_SVG = """\
                         <div id="terminal-title-tab">Rich</div>
                     </div>
                     <div id='terminal-body'>
-                        <div><span style="color: #f2f2f2; text-decoration-color: #f2f2f2;;font-weight: bold;">foo </span><span style="color: #f2f2f2; text-decoration-color: #f2f2f2;;font-weight: bold;"><span class="blink"><a href="https://example.org">Click</a></span></span><span style="color:#f2f2f2;">                                                                                           </span></div>
-<div><span style="color:#f2f2f2;"></span><span style="color:#f2f2f2;">                                                                                                    </span></div>
+                        <div><span class="r2">foo </span><span class="r2"><span class="blink"><a href="https://example.org">Click</a></span></span><span class="r1">                                                                                           </span></div>
+<div><span class="r1"></span><span class="r1">                                                                                                    </span></div>
                     </div>
                 </div>
             </div>
@@ -576,7 +578,6 @@ def test_export_svg():
     console = Console(record=True, width=100)
     console.print("[b]foo [blink][link=https://example.org]Click[/link][/]")
     svg = console.export_svg()
-
     assert svg == EXPECTED_SVG
 
 

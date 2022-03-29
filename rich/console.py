@@ -212,6 +212,7 @@ CONSOLE_SVG_FORMAT = """\
             line-height: {line_height}px;
             padding: 14px;
         }}
+        {stylesheet}
     </style>
     <foreignObject x="0" y="0" width="100%" height="100%">
         <body xmlns="http://www.w3.org/1999/xhtml">
@@ -2346,9 +2347,13 @@ class Console:
                 )
             )
 
+            styles: Dict[str, int] = {}
             fragments = []
             theme_foreground_color = _theme.foreground_color.hex
             theme_background_color = _theme.background_color.hex
+            theme_default_foreground_css = f"color: {theme_foreground_color}; text-decoration-color: {theme_foreground_color};"
+            styles[theme_default_foreground_css] = 1
+
             for line in segment_lines:
                 line_spans = []
                 for segment in line:
@@ -2365,17 +2370,22 @@ class Console:
                         # If the style doesn't contain a color, we still
                         # need to make sure we output the default foreground color
                         # from the TerminalTheme.
-                        theme_default_foreground = f"color: {theme_foreground_color}; text-decoration-color: {theme_foreground_color};"
-                        additional_styles = ""
                         if not style.color:
-                            additional_styles += theme_default_foreground
+                            rule += "; " + theme_default_foreground_css
 
-                        text = f'<span style="{theme_default_foreground};{rule};">{text}</span>'
+                        style_number = styles.setdefault(rule, len(styles) + 1)
+                        text = f'<span class="r{style_number}">{text}</span>'
                     else:
-                        text = f'<span style="color:{theme_foreground_color};">{text}</span>'
+                        text = f'<span class="r1">{text}</span>'
                     line_spans.append(text)
 
                 fragments.append(f"<div>{''.join(line_spans)}</div>")
+
+            stylesheet_rules = []
+            for style_rule, style_number in styles.items():
+                if style_rule:
+                    stylesheet_rules.append(f".r{style_number} {{{ style_rule }}}")
+            stylesheet = "\n".join(stylesheet_rules)
 
             if clear:
                 self._record_buffer.clear()
@@ -2414,6 +2424,7 @@ class Console:
             font_size=font_size,
             line_height=line_height,
             title=title,
+            stylesheet=stylesheet,
         )
 
         return rendered_code
