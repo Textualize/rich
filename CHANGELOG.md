@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- SVG export functionality https://github.com/Textualize/rich/pull/2101
+
 ### Fixed
 
 - Add missing `end` keyword argument to `Text.from_markup`
