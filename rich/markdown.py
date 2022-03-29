@@ -613,11 +613,12 @@ if __name__ == "__main__":  # pragma: no cover
         import pydoc
         import io
 
+        fileio = io.StringIO()
         console = Console(
-            file=io.StringIO(), force_terminal=args.force_color, width=args.width
+            file=fileio, force_terminal=args.force_color, width=args.width
         )
         console.print(markdown)
-        pydoc.pager(console.file.getvalue())  # type: ignore
+        pydoc.pager(fileio.getvalue())
 
     else:
         console = Console(force_terminal=args.force_color, width=args.width)
