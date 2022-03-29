@@ -2310,6 +2310,7 @@ class Console:
 
     def export_svg(
         self,
+        *,
         title: str = "Rich",
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
@@ -2347,12 +2348,17 @@ class Console:
                 )
             )
 
-            styles: Dict[str, int] = {}
             fragments = []
             theme_foreground_color = _theme.foreground_color.hex
             theme_background_color = _theme.background_color.hex
-            theme_default_foreground_css = f"color: {theme_foreground_color}; text-decoration-color: {theme_foreground_color};"
-            styles[theme_default_foreground_css] = 1
+
+            theme_foreground_css = f"color: {theme_foreground_color}; text-decoration-color: {theme_foreground_color};"
+            theme_background_css = f"background-color: {theme_background_color};"
+
+            theme_css = theme_foreground_css + theme_background_css
+
+            styles: Dict[str, int] = {}
+            styles[theme_css] = 1
 
             for line in segment_lines:
                 line_spans = []
@@ -2360,7 +2366,7 @@ class Console:
                     text, style, _ = segment
                     text = escape(text)
                     if style:
-                        rule = style.get_html_style(_theme)
+                        rules = style.get_html_style(_theme)
                         if style.link:
                             text = f'<a href="{style.link}">{text}</a>'
 
@@ -2370,10 +2376,21 @@ class Console:
                         # If the style doesn't contain a color, we still
                         # need to make sure we output the default foreground color
                         # from the TerminalTheme.
-                        if not style.color:
-                            rule += "; " + theme_default_foreground_css
+                        if not style.reverse:
+                            foreground_css = theme_foreground_css
+                            background_css = theme_background_css
+                        else:
+                            foreground_css = f"color: {theme_background_color}; text-decoration-color: {theme_background_color};"
+                            background_css = (
+                                f"background-color: {theme_foreground_color};"
+                            )
 
-                        style_number = styles.setdefault(rule, len(styles) + 1)
+                        if style.color is None:
+                            rules += f";{foreground_css}"
+                        if style.bgcolor is None:
+                            rules += f";{background_css}"
+
+                        style_number = styles.setdefault(rules, len(styles) + 1)
                         text = f'<span class="r{style_number}">{text}</span>'
                     else:
                         text = f'<span class="r1">{text}</span>'
