@@ -1,10 +1,11 @@
 from io import StringIO
+
 import pytest
 
-from rich.console import Console
-from rich.text import Span, Text
+from rich.console import Console, Group
 from rich.measure import Measurement
 from rich.style import Style
+from rich.text import Span, Text
 
 
 def test_span():
@@ -103,6 +104,14 @@ def test_from_ansi():
     text = Text.from_ansi("Hello, \033[1m\nWorld!\033[0m")
     assert str(text) == "Hello, \nWorld!"
     assert text._spans == [Span(8, 14, Style(bold=True))]
+
+    text = Text.from_ansi("\033[1mBOLD\033[m not bold")
+    assert str(text) == "BOLD not bold"
+    assert text._spans == [Span(0, 4, Style(bold=True))]
+
+    text = Text.from_ansi("\033[1m\033[Kfoo barmbaz")
+    assert str(text) == "foo barmbaz"
+    assert text._spans == [Span(0, 11, Style(bold=True))]
 
 
 def test_copy():
@@ -296,6 +305,13 @@ def test_append_text():
     test.append_text(Text("bar", style="bold"))
     assert str(test) == "foobar"
     assert test._spans == [Span(3, 6, "bold")]
+
+
+def test_end():
+    console = Console(width=20, file=StringIO())
+    test = Group(Text.from_markup("foo", end=" "), Text.from_markup("bar"))
+    console.print(test)
+    assert console.file.getvalue() == "foo bar\n"
 
 
 def test_split():

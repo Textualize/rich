@@ -1,5 +1,6 @@
 from functools import partial
 import inspect
+import sys
 
 from typing import (
     Any,
@@ -27,27 +28,27 @@ class ReprError(Exception):
 
 
 @overload
-def auto(cls: Optional[T]) -> T:
+def auto(cls: Optional[Type[T]]) -> Type[T]:
     ...
 
 
 @overload
-def auto(*, angular: bool = False) -> Callable[[T], T]:
+def auto(*, angular: bool = False) -> Callable[[Type[T]], Type[T]]:
     ...
 
 
 def auto(
-    cls: Optional[T] = None, *, angular: Optional[bool] = None
-) -> Union[T, Callable[[T], T]]:
+    cls: Optional[Type[T]] = None, *, angular: Optional[bool] = None
+) -> Union[Type[T], Callable[[Type[T]], Type[T]]]:
     """Class decorator to create __repr__ from __rich_repr__"""
 
     def do_replace(cls: Type[T], angular: Optional[bool] = None) -> Type[T]:
-        def auto_repr(self: Type[T]) -> str:
+        def auto_repr(self: T) -> str:
             """Create repr string from __rich_repr__"""
             repr_str: List[str] = []
             append = repr_str.append
 
-            angular = getattr(self.__rich_repr__, "angular", False)  # type: ignore
+            angular: bool = getattr(self.__rich_repr__, "angular", False)  # type: ignore
             for arg in self.__rich_repr__():  # type: ignore
                 if isinstance(arg, tuple):
                     if len(arg) == 1:
@@ -70,7 +71,7 @@ def auto(
         def auto_rich_repr(self: Type[T]) -> Result:
             """Auto generate __rich_rep__ from signature of __init__"""
             try:
-                signature = inspect.signature(self.__init__)  ## type: ignore
+                signature = inspect.signature(self.__init__)
                 for name, param in signature.parameters.items():
                     if param.kind == param.POSITIONAL_ONLY:
                         yield getattr(self, name)
@@ -98,24 +99,24 @@ def auto(
         return cls
 
     if cls is None:
-        return partial(do_replace, angular=angular)  # type: ignore
+        return partial(do_replace, angular=angular)
     else:
-        return do_replace(cls, angular=angular)  # type: ignore
+        return do_replace(cls, angular=angular)
 
 
 @overload
-def rich_repr(cls: Optional[T]) -> T:
+def rich_repr(cls: Optional[Type[T]]) -> Type[T]:
     ...
 
 
 @overload
-def rich_repr(*, angular: bool = False) -> Callable[[T], T]:
+def rich_repr(*, angular: bool = False) -> Callable[[Type[T]], Type[T]]:
     ...
 
 
 def rich_repr(
-    cls: Optional[T] = None, *, angular: bool = False
-) -> Union[T, Callable[[T], T]]:
+    cls: Optional[Type[T]] = None, *, angular: bool = False
+) -> Union[Type[T], Callable[[Type[T]], Type[T]]]:
     if cls is None:
         return auto(angular=angular)
     else:
