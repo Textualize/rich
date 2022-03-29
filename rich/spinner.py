@@ -79,7 +79,8 @@ class Spinner:
             self.speed = self._update_speed
             self._update_speed = 0.0
 
-        if not self.text:
+        # This normally can't be str, unless someone assigned it later.
+        if not self.text:  # type: ignore[truthy-bool]
             return frame
         elif isinstance(self.text, (str, Text)):
             return Text.assemble(frame, " ", self.text)

@@ -54,10 +54,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 files = ["rich"]
-warn_unused_configs = true
 show_error_codes = true
 strict = true
-enable_error_code = ["ignore-without-code"]
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
 [[tool.mypy.overrides]]
 module = ["pygments.*", "IPython.*", "commonmark.*", "ipywidgets.*"]

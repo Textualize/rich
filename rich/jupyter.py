@@ -1,4 +1,7 @@
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, TYPE_CHECKING, Sequence
+
+if TYPE_CHECKING:
+    from rich.console import ConsoleRenderable
 
 from . import get_console
 from .segment import Segment
@@ -20,7 +23,7 @@ class JupyterRenderable:
         self.text = text
 
     def _repr_mimebundle_(
-        self, include: Iterable[str], exclude: Iterable[str], **kwargs: Any
+        self, include: Sequence[str], exclude: Sequence[str], **kwargs: Any
     ) -> Dict[str, str]:
         data = {"text/plain": self.text, "text/html": self.html}
         if include:
@@ -37,8 +40,8 @@ class JupyterMixin:
 
     def _repr_mimebundle_(
         self: "ConsoleRenderable",
-        include: Iterable[str],
-        exclude: Iterable[str],
+        include: Sequence[str],
+        exclude: Sequence[str],
         **kwargs: Any,
     ) -> Dict[str, str]:
         console = get_console()

@@ -740,7 +740,7 @@ class Style:
         new_style._link = style._link or self._link
         new_style._link_id = style._link_id or self._link_id
         new_style._hash = style._hash
-        new_style._null = self._null or style._null
+        new_style._null = style._null
         if self._meta and style._meta:
             new_style._meta = dumps({**self.meta, **style.meta})
         else:

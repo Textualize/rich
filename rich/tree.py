@@ -45,7 +45,7 @@ class Tree(JupyterMixin):
         style: Optional[StyleType] = None,
         guide_style: Optional[StyleType] = None,
         expanded: bool = True,
-        highlight: bool = False,
+        highlight: Optional[bool] = False,
     ) -> "Tree":
         """Add a child tree.
 

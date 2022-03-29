@@ -1947,7 +1947,7 @@ class Console:
         frame = currentframe()
         if frame is not None:
             # Use the faster currentframe where implemented
-            while offset and frame:
+            while offset and frame is not None:
                 frame = frame.f_back
                 offset -= 1
             assert frame is not None

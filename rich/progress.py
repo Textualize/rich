@@ -643,9 +643,7 @@ class Progress(JupyterMixin):
         disable: bool = False,
         expand: bool = False,
     ) -> None:
-        assert (
-            refresh_per_second is None or refresh_per_second > 0
-        ), "refresh_per_second must be > 0"
+        assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self._lock = RLock()
         self.columns = columns or self.get_default_columns()
         self.speed_estimate_period = speed_estimate_period
