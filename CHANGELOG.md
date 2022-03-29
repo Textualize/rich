@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Adding Indonesian translation
+
 ### Fixed
 
 - Add missing `end` keyword argument to `Text.from_markup`
