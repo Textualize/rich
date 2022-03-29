@@ -607,7 +607,7 @@ if __name__ == "__main__":  # pragma: no cover
         if color_number < 16:
             table.add_row(color_cell, f"{color_number}", Text(f'"{name}"'))
         else:
-            color = EIGHT_BIT_PALETTE[color_number]  # type: ignore
+            color = EIGHT_BIT_PALETTE[color_number]  # type: ignore[has-type]
             table.add_row(
                 color_cell, str(color_number), Text(f'"{name}"'), color.hex, color.rgb
             )

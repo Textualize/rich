@@ -48,8 +48,8 @@ def auto(
             repr_str: List[str] = []
             append = repr_str.append
 
-            angular: bool = getattr(self.__rich_repr__, "angular", False)  # type: ignore
-            for arg in self.__rich_repr__():  # type: ignore
+            angular: bool = getattr(self.__rich_repr__, "angular", False)  # type: ignore[attr-defined]
+            for arg in self.__rich_repr__():  # type: ignore[attr-defined]
                 if isinstance(arg, tuple):
                     if len(arg) == 1:
                         append(repr(arg[0]))
@@ -90,12 +90,12 @@ def auto(
 
         if not hasattr(cls, "__rich_repr__"):
             auto_rich_repr.__doc__ = "Build a rich repr"
-            cls.__rich_repr__ = auto_rich_repr  # type: ignore
+            cls.__rich_repr__ = auto_rich_repr  # type: ignore[attr-defined]
 
         auto_repr.__doc__ = "Return repr(self)"
-        cls.__repr__ = auto_repr  # type: ignore
+        cls.__repr__ = auto_repr  # type: ignore[assignment]
         if angular is not None:
-            cls.__rich_repr__.angular = angular  # type: ignore
+            cls.__rich_repr__.angular = angular  # type: ignore[attr-defined]
         return cls
 
     if cls is None:
@@ -144,7 +144,7 @@ if __name__ == "__main__":
     console.print(foo, width=30)
 
     console.rule("Angular repr")
-    Foo.__rich_repr__.angular = True  # type: ignore
+    Foo.__rich_repr__.angular = True  # type: ignore[attr-defined]
 
     console.print(foo)
 

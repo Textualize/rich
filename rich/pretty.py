@@ -29,7 +29,7 @@ from rich.repr import RichReprResult
 try:
     import attr as _attr_module
 except ImportError:  # pragma: no cover
-    _attr_module = None  # type: ignore
+    _attr_module = None  # type: ignore[assignment]
 
 from . import get_console
 from ._loop import loop_last
@@ -207,7 +207,7 @@ def install(
         """Replacement sys.displayhook which prettifies objects with Rich."""
         if value is not None:
             assert console is not None
-            builtins._ = None  # type: ignore
+            builtins._ = None  # type: ignore[attr-defined]
             console.print(
                 value
                 if _safe_isinstance(value, RichRenderable)
@@ -221,13 +221,13 @@ def install(
                 ),
                 crop=crop,
             )
-            builtins._ = value  # type: ignore
+            builtins._ = value  # type: ignore[attr-defined]
 
     try:  # pragma: no cover
-        ip = get_ipython()  # type: ignore
+        ip = get_ipython()  # type: ignore[name-defined]
         from IPython.core.formatters import BaseFormatter
 
-        class RichFormatter(BaseFormatter):  # type: ignore
+        class RichFormatter(BaseFormatter):  # type: ignore[misc]
             pprint: bool = True
 
             def __call__(self, value: Any) -> Any:
@@ -984,7 +984,7 @@ if __name__ == "__main__":  # pragma: no cover
         ),
         "Broken": BrokenRepr(),
     }
-    data["foo"].append(data)  # type: ignore
+    data["foo"].append(data)  # type: ignore[attr-defined]
 
     from rich import print
 
