@@ -11,13 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Progress.open and Progress.wrap_file method to track the progress while reading from a file or file-like object https://github.com/willmcgugan/rich/pull/1759
 
-### Changed
+### Added
 
-- Improve performance of cell_length https://github.com/Textualize/rich/pull/2061
+- SVG export functionality https://github.com/Textualize/rich/pull/2101
 
 ### Fixed
 
-- Fix capturing stdout on legacy Windows https://github.com/Textualize/rich/pull/2055
+- Add missing `end` keyword argument to `Text.from_markup`
+- Fixed issue with decoding ANSI reset https://github.com/Textualize/rich/issues/2112
+
+## [12.0.1] - 2022-03-22
+
+### Changed
+
+- Improve performance of cell_length https://github.com/Textualize/rich/pull/2061
+- Improve performance of chop_cells https://github.com/Textualize/rich/pull/2077
+
+### Fixed
+
+- Fix capturing stdout on legacy Windows https://github.com/Textualize/rich/pull/2066
 
 ## [12.0.0] - 2022-03-10
 
@@ -1677,7 +1689,8 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[unreleased]: https://github.com/willmcgugan/rich/compare/v12.0.0...HEAD
+[unreleased]: https://github.com/willmcgugan/rich/compare/v12.0.1...HEAD
+[12.0.1]: https://github.com/willmcgugan/rich/compare/v12.0.0...v12.0.1
 [12.0.0]: https://github.com/willmcgugan/rich/compare/v11.2.0...v12.0.0
 [11.2.0]: https://github.com/willmcgugan/rich/compare/v11.1.0...v11.2.0
 [11.1.0]: https://github.com/willmcgugan/rich/compare/v11.0.0...v11.1.0

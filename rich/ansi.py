@@ -1,21 +1,27 @@
-from contextlib import suppress
 import re
-from typing import Iterable, NamedTuple
+import sys
+from contextlib import suppress
+from typing import Iterable, NamedTuple, Optional
 
 from .color import Color
 from .style import Style
 from .text import Text
 
-re_ansi = re.compile(r"(?:\x1b\[(.*?)m)|(?:\x1b\](.*?)\x1b\\)")
-re_csi = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+re_ansi = re.compile(
+    r"""
+(?:\x1b\](.*?)\x1b\\)|
+(?:\x1b([(@-Z\\-_]|\[[0-?]*[ -/]*[@-~]))
+""",
+    re.VERBOSE,
+)
 
 
 class _AnsiToken(NamedTuple):
     """Result of ansi tokenized string."""
 
     plain: str = ""
-    sgr: str = ""
-    osc: str = ""
+    sgr: Optional[str] = ""
+    osc: Optional[str] = ""
 
 
 def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
@@ -28,20 +34,22 @@ def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
         AnsiToken: A named tuple of (plain, sgr, osc)
     """
 
-    def remove_csi(ansi_text: str) -> str:
-        """Remove unknown CSI sequences."""
-        return re_csi.sub("", ansi_text)
-
     position = 0
+    sgr: Optional[str]
+    osc: Optional[str]
     for match in re_ansi.finditer(ansi_text):
         start, end = match.span(0)
-        sgr, osc = match.groups()
+        osc, sgr = match.groups()
         if start > position:
-            yield _AnsiToken(remove_csi(ansi_text[position:start]))
-        yield _AnsiToken("", sgr, osc)
+            yield _AnsiToken(ansi_text[position:start])
+        if sgr:
+            if sgr.endswith("m"):
+                yield _AnsiToken("", sgr[1:-1], osc)
+        else:
+            yield _AnsiToken("", sgr, osc)
         position = end
     if position < len(ansi_text):
-        yield _AnsiToken(remove_csi(ansi_text[position:]))
+        yield _AnsiToken(ansi_text[position:])
 
 
 SGR_STYLE_MAP = {
@@ -138,20 +146,21 @@ class AnsiDecoder:
         text = Text()
         append = text.append
         line = line.rsplit("\r", 1)[-1]
-        for token in _ansi_tokenize(line):
-            plain_text, sgr, osc = token
+        for plain_text, sgr, osc in _ansi_tokenize(line):
             if plain_text:
                 append(plain_text, self.style or None)
-            elif osc:
+            elif osc is not None:
                 if osc.startswith("8;"):
                     _params, semicolon, link = osc[2:].partition(";")
                     if semicolon:
                         self.style = self.style.update_link(link or None)
-            elif sgr:
+            elif sgr is not None:
                 # Translate in to semi-colon separated codes
                 # Ignore invalid codes, because we want to be lenient
                 codes = [
-                    min(255, int(_code)) for _code in sgr.split(";") if _code.isdigit()
+                    min(255, int(_code) if _code else 0)
+                    for _code in sgr.split(";")
+                    if _code.isdigit() or _code == ""
                 ]
                 iter_codes = iter(codes)
                 for code in iter_codes:
@@ -198,10 +207,10 @@ class AnsiDecoder:
         return text
 
 
-if __name__ == "__main__":  # pragma: no cover
-    import pty
+if sys.platform != "win32" and __name__ == "__main__":  # pragma: no cover
     import io
     import os
+    import pty
     import sys
 
     decoder = AnsiDecoder()
