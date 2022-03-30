@@ -218,7 +218,7 @@ You can obtain a progress-tracking reader using the :meth:`~rich.progress.Progre
     from rich.progress import Progress
 
     with Progress() as progress:
-        with progress.open("file.json", "rb") as file:
+        with progress.open("data.json", "rb") as file:
             json.load(file)
 
 
@@ -237,13 +237,12 @@ Reading from a file-like object
 
 You can obtain a progress-tracking reader wrapping a file-like object using the :meth:`~rich.progress.Progress.wrap_file` method. The file-like object must be in *binary mode*, and a total must be provided, unless it was provided to a :class:`~rich.progress.Task` created beforehand. The returned reader may be used in a context, but will not take care of closing the wrapped file ::
 
-    import io
     import json
     from rich.progress import Progress
 
     with Progress() as progress:
-        file = io.BytesIO("...")
-        json.load(progress.read(file, total=2048))
+        with open("data.json", "rb") as file:
+            json.load(progress.wrap_file(file, total=2048))
 
 
 Multiple Progress
