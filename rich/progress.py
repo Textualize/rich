@@ -228,12 +228,12 @@ class _Reader(RawIOBase, BinaryIO):
         self.progress.advance(self.task, advance=len(block))
         return block
 
-    def readinto(self, b: Union[bytearray, memoryview, mmap]):  # type: ignore
-        n = self.handle.readinto(b)  # type: ignore
+    def readinto(self, b: Union[bytearray, memoryview, mmap]):  # type: ignore[no-untyped-def, override]
+        n = self.handle.readinto(b)  # type: ignore[attr-defined]
         self.progress.advance(self.task, advance=n)
         return n
 
-    def readline(self, size: int = -1) -> bytes:  # type: ignore
+    def readline(self, size: int = -1) -> bytes:  # type: ignore[override]
         line = self.handle.readline(size)
         self.progress.advance(self.task, advance=len(line))
         return line
@@ -479,7 +479,7 @@ def open(
         total=total,
         description=description,
     )
-    return _ReadContext(progress, reader)  # type: ignore
+    return _ReadContext(progress, reader)  # type: ignore[return-value, type-var]
 
 
 class ProgressColumn(ABC):
