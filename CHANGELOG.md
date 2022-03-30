@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Add missing `end` keyword argument to `Text.from_markup`
+- Add missing `end` keyword argument to `Text.from_markup` https://github.com/Textualize/rich/pull/2095
+- Fallback to text lexer when no lexer guessed https://github.com/Textualize/rich/pull/2133
 - Fixed issue with decoding ANSI reset https://github.com/Textualize/rich/issues/2112
 
 ## [12.0.1] - 2022-03-22
