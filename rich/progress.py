@@ -289,6 +289,7 @@ class _ReadContext(ContextManager[_I], Generic[_I]):
 def wrap_file(
     file: BinaryIO,
     total: int,
+    *,
     description: str = "Reading...",
     auto_refresh: bool = True,
     console: Optional[Console] = None,
@@ -1135,6 +1136,7 @@ class Progress(JupyterMixin):
         self,
         file: BinaryIO,
         total: Optional[int] = None,
+        *,
         task_id: Optional[TaskID] = None,
         description: str = "Reading...",
     ) -> BinaryIO:
