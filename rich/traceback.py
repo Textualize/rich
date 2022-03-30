@@ -12,6 +12,7 @@ from pygments.lexers import guess_lexer_for_filename
 from pygments.token import Comment, Keyword, Name, Number, Operator, String
 from pygments.token import Text as TextToken
 from pygments.token import Token
+from pygments.util import ClassNotFound
 
 from . import pretty
 from ._loop import loop_last
@@ -521,10 +522,10 @@ class Traceback:
             first_line = code[:new_line_index] if new_line_index != -1 else code
             if first_line.startswith("#!") and "python" in first_line.lower():
                 return "python"
-        lexer_name = (
-            cls.LEXERS.get(ext) or guess_lexer_for_filename(filename, code).name
-        )
-        return lexer_name
+        try:
+            return cls.LEXERS.get(ext) or guess_lexer_for_filename(filename, code).name
+        except ClassNotFound:
+            return "text"
 
     @group()
     def _render_stack(self, stack: Stack) -> RenderResult:
