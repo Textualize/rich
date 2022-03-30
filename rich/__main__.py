@@ -51,7 +51,6 @@ def make_test_card() -> Table:
         pad_edge=False,
     )
     color_table.add_row(
-        # "[bold yellow]256[/] colors or [bold green]16.7 million[/] colors [blue](if supported by your terminal)[/].",
         (
             "✓ [bold green]4-bit color[/]\n"
             "✓ [bold blue]8-bit color[/]\n"
@@ -226,7 +225,12 @@ if __name__ == "__main__":  # pragma: no cover
     console.print(test_card)
     taken = round((process_time() - start) * 1000.0, 1)
 
-    Console().print(test_card)
+    c = Console(record=True)
+    c.print(test_card)
+    # c.save_svg(
+    #     path="/Users/darrenburns/Library/Application Support/JetBrains/PyCharm2021.3/scratches/svg_export.svg",
+    #     title="Rich can export to SVG",
+    # )
 
     print(f"rendered in {pre_cache_taken}ms (cold cache)")
     print(f"rendered in {taken}ms (warm cache)")

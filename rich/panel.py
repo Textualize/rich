@@ -1,14 +1,13 @@
-from typing import Optional, TYPE_CHECKING
-
-from .box import Box, ROUNDED
+from typing import TYPE_CHECKING, Optional
 
 from .align import AlignMethod
+from .box import ROUNDED, Box
 from .jupyter import JupyterMixin
 from .measure import Measurement, measure_renderables
 from .padding import Padding, PaddingDimensions
+from .segment import Segment
 from .style import StyleType
 from .text import Text, TextType
-from .segment import Segment
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderableType, RenderResult
@@ -183,7 +182,7 @@ class Panel(JupyterMixin):
         else:
             title_text.align(self.title_align, width - 4, character=box.top)
             yield Segment(box.top_left + box.top, border_style)
-            yield from console.render(title_text)
+            yield from console.render(title_text, child_options.update_width(width - 4))
             yield Segment(box.top + box.top_right, border_style)
 
         yield new_line
@@ -202,7 +201,9 @@ class Panel(JupyterMixin):
         else:
             subtitle_text.align(self.subtitle_align, width - 4, character=box.bottom)
             yield Segment(box.bottom_left + box.bottom, border_style)
-            yield from console.render(subtitle_text)
+            yield from console.render(
+                subtitle_text, child_options.update_width(width - 4)
+            )
             yield Segment(box.bottom + box.bottom_right, border_style)
 
         yield new_line
@@ -235,8 +236,8 @@ if __name__ == "__main__":  # pragma: no cover
 
     c = Console()
 
+    from .box import DOUBLE, ROUNDED
     from .padding import Padding
-    from .box import ROUNDED, DOUBLE
 
     p = Panel(
         "Hello, World!",

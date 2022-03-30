@@ -253,6 +253,7 @@ class Text(JupyterMixin):
         emoji_variant: Optional[EmojiVariant] = None,
         justify: Optional["JustifyMethod"] = None,
         overflow: Optional["OverflowMethod"] = None,
+        end: str = "\n",
     ) -> "Text":
         """Create Text instance from markup.
 
@@ -261,6 +262,7 @@ class Text(JupyterMixin):
             emoji (bool, optional): Also render emoji code. Defaults to True.
             justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
             overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
+            end (str, optional): Character to end text with. Defaults to "\\\\n".
 
         Returns:
             Text: A Text instance with markup rendered.
@@ -270,6 +272,7 @@ class Text(JupyterMixin):
         rendered_text = render(text, style, emoji=emoji, emoji_variant=emoji_variant)
         rendered_text.justify = justify
         rendered_text.overflow = overflow
+        rendered_text.end = end
         return rendered_text
 
     @classmethod

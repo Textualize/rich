@@ -1,8 +1,11 @@
-from typing import Any, Dict, Iterable, List
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List
 
 from . import get_console
 from .segment import Segment
 from .terminal_theme import DEFAULT_TERMINAL_THEME
+
+if TYPE_CHECKING:
+    from rich.console import ConsoleRenderable
 
 JUPYTER_HTML_FORMAT = """\
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">{code}</pre>
@@ -33,10 +36,13 @@ class JupyterMixin:
     __slots__ = ()
 
     def _repr_mimebundle_(
-        self, include: Iterable[str], exclude: Iterable[str], **kwargs: Any
+        self: "ConsoleRenderable",
+        include: Iterable[str],
+        exclude: Iterable[str],
+        **kwargs: Any,
     ) -> Dict[str, str]:
         console = get_console()
-        segments = list(console.render(self, console.options))  # type: ignore
+        segments = list(console.render(self, console.options))
         html = _render_segments(segments)
         text = console._render_buffer(segments)
         data = {"text/plain": text, "text/html": html}

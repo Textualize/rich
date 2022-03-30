@@ -13,7 +13,7 @@ jobs:
           python-version: '3.10.2'
       - run: 'pip install asv'
       - run: 'asv publish'
-      - uses: pina/github-action-push-to-another-repository@v1.4.1
+      - uses: cpina/github-action-push-to-another-repository@v1.4.1
         name: 'Copy files to Textualize/rich-benchmarks repo'
         env:
           API_TOKEN_GITHUB: ${{ secrets.PUBLISH_ASV }}

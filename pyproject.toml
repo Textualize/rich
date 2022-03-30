@@ -2,7 +2,7 @@
 name = "rich"
 homepage = "https://github.com/willmcgugan/rich"
 documentation = "https://rich.readthedocs.io/en/latest/"
-version = "12.0.0"
+version = "12.0.1"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"
@@ -27,7 +27,7 @@ include = ["rich/py.typed"]
 
 [tool.poetry.dependencies]
 python = "^3.6.2"
-typing-extensions = { version = ">=3.7.4, <5.0", python = "<3.8" }
+typing-extensions = { version = ">=3.7.4, <5.0", python = "<3.9" }
 dataclasses = { version = ">=0.7,<0.9", python = "<3.7" }
 pygments = "^2.6.0"
 commonmark = "^0.9.0"
@@ -39,8 +39,8 @@ jupyter = ["ipywidgets"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.0"
-black = "^22.1"
-mypy = "^0.941"
+black = "^22.3"
+mypy = "^0.942"
 pytest-cov = "^3.0.0"
 attrs = "^21.4.0"
 types-dataclasses = "^0.6.4"
@@ -50,3 +50,15 @@ asv = "^0.5.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.mypy]
+files = ["rich"]
+warn_unused_configs = true
+show_error_codes = true
+strict = true
+enable_error_code = ["ignore-without-code"]
+
+[[tool.mypy.overrides]]
+module = ["pygments.*", "IPython.*", "commonmark.*", "ipywidgets.*"]
+ignore_missing_imports = true

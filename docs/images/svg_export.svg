@@ -1,0 +1,817 @@
+<svg width="2262.8" height="1594" viewBox="0 0 2262.8 1594"
+     xmlns="http://www.w3.org/2000/svg">
+    <style>
+        @font-face {
+            font-family: "Fira Code";
+            src: local("FiraCode-Regular"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");
+            font-style: normal;
+            font-weight: 400;
+        }
+        @font-face {
+            font-family: "Fira Code";
+            src: local("FiraCode-Bold"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");
+            font-style: bold;
+            font-weight: 700;
+        }
+        span {
+            display: inline-block;
+            white-space: pre;
+            vertical-align: top;
+            font-size: 18px;
+            font-family:'Fira Code','Cascadia Code',Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .blink {
+           animation: blinker 1s infinite;
+        }
+        @keyframes blinker {
+            from { opacity: 1.0; }
+            50% { opacity: 0.3; }
+            to { opacity: 1.0; }
+        }
+        #wrapper {
+            padding: 140px;
+            padding-top: 100px;
+        }
+        #terminal {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #0c0c0c;
+            border-radius: 14px;
+            outline: 1px solid #484848;
+        }
+        #terminal:after {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            content: '';
+            border-radius: 14px;
+            background: rgb(71,77,102);
+            background: linear-gradient(90deg, #804D69 0%, #4E4B89 100%);
+            transform: rotate(-4.5deg);
+            z-index: -1;
+        }
+        #terminal-header {
+            position: relative;
+            width: 100%;
+            background-color: #2e2e2e;
+            margin-bottom: 12px;
+            font-weight: bold;
+            border-radius: 14px 14px 0 0;
+            color: #f2f2f2;
+            font-size: 18px;
+            box-shadow: inset 0px -1px 0px 0px #4e4e4e,
+                        inset 0px -4px 8px 0px #1a1a1a;
+        }
+        #terminal-title-tab {
+            display: inline-block;
+            margin-top: 14px;
+            margin-left: 124px;
+            font-family: sans-serif;
+            padding: 14px 28px;
+            border-radius: 6px 6px 0 0;
+            background-color: #0c0c0c;
+            box-shadow: inset 0px 1px 0px 0px #4e4e4e,
+                        0px -4px 4px 0px #1e1e1e,
+                        inset 1px 0px 0px 0px #4e4e4e,
+                        inset -1px 0px 0px 0px #4e4e4e;
+        }
+        #terminal-traffic-lights {
+            position: absolute;
+            top: 24px;
+            left: 20px;
+        }
+        #terminal-body {
+            line-height: 22px;
+            padding: 14px;
+        }
+        .r1 {color: #f2f2f2; text-decoration-color: #f2f2f2;background-color: #0c0c0c;}
+.r2 {font-style: italic;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
+.r3 {color: #cd3131; text-decoration-color: #cd3131; font-weight: bold;background-color: #0c0c0c;}
+.r4 {color: #0dbc79; text-decoration-color: #0dbc79; font-weight: bold;background-color: #0c0c0c;}
+.r5 {color: #560000; text-decoration-color: #560000; background-color: #330000}
+.r6 {color: #560400; text-decoration-color: #560400; background-color: #330200}
+.r7 {color: #560800; text-decoration-color: #560800; background-color: #330500}
+.r8 {color: #560c00; text-decoration-color: #560c00; background-color: #330700}
+.r9 {color: #561100; text-decoration-color: #561100; background-color: #330a00}
+.r10 {color: #561500; text-decoration-color: #561500; background-color: #330c00}
+.r11 {color: #561900; text-decoration-color: #561900; background-color: #330f00}
+.r12 {color: #561e00; text-decoration-color: #561e00; background-color: #331100}
+.r13 {color: #562200; text-decoration-color: #562200; background-color: #331400}
+.r14 {color: #562600; text-decoration-color: #562600; background-color: #331600}
+.r15 {color: #562a00; text-decoration-color: #562a00; background-color: #331900}
+.r16 {color: #562f00; text-decoration-color: #562f00; background-color: #331b00}
+.r17 {color: #563300; text-decoration-color: #563300; background-color: #331e00}
+.r18 {color: #563700; text-decoration-color: #563700; background-color: #332000}
+.r19 {color: #563c00; text-decoration-color: #563c00; background-color: #332300}
+.r20 {color: #564000; text-decoration-color: #564000; background-color: #332500}
+.r21 {color: #564400; text-decoration-color: #564400; background-color: #332800}
+.r22 {color: #564900; text-decoration-color: #564900; background-color: #332a00}
+.r23 {color: #564d00; text-decoration-color: #564d00; background-color: #332d00}
+.r24 {color: #565100; text-decoration-color: #565100; background-color: #333000}
+.r25 {color: #565500; text-decoration-color: #565500; background-color: #333200}
+.r26 {color: #535600; text-decoration-color: #535600; background-color: #303300}
+.r27 {color: #4e5600; text-decoration-color: #4e5600; background-color: #2e3300}
+.r28 {color: #4a5600; text-decoration-color: #4a5600; background-color: #2b3300}
+.r29 {color: #465600; text-decoration-color: #465600; background-color: #293300}
+.r30 {color: #415600; text-decoration-color: #415600; background-color: #263300}
+.r31 {color: #3d5600; text-decoration-color: #3d5600; background-color: #243300}
+.r32 {color: #395600; text-decoration-color: #395600; background-color: #213300}
+.r33 {color: #355600; text-decoration-color: #355600; background-color: #1f3300}
+.r34 {color: #305600; text-decoration-color: #305600; background-color: #1c3300}
+.r35 {color: #2c5600; text-decoration-color: #2c5600; background-color: #1a3300}
+.r36 {color: #285600; text-decoration-color: #285600; background-color: #173300}
+.r37 {color: #235600; text-decoration-color: #235600; background-color: #153300}
+.r38 {color: #1f5600; text-decoration-color: #1f5600; background-color: #123300}
+.r39 {color: #1b5600; text-decoration-color: #1b5600; background-color: #103300}
+.r40 {color: #165600; text-decoration-color: #165600; background-color: #0d3300}
+.r41 {color: #125600; text-decoration-color: #125600; background-color: #0a3300}
+.r42 {color: #0e5600; text-decoration-color: #0e5600; background-color: #083300}
+.r43 {color: #0a5600; text-decoration-color: #0a5600; background-color: #053300}
+.r44 {color: #055600; text-decoration-color: #055600; background-color: #033300}
+.r45 {color: #015600; text-decoration-color: #015600; background-color: #003300}
+.r46 {color: #005602; text-decoration-color: #005602; background-color: #003301}
+.r47 {color: #005607; text-decoration-color: #005607; background-color: #003304}
+.r48 {color: #00560b; text-decoration-color: #00560b; background-color: #003306}
+.r49 {color: #00560f; text-decoration-color: #00560f; background-color: #003309}
+.r50 {color: #005614; text-decoration-color: #005614; background-color: #00330b}
+.r51 {color: #005618; text-decoration-color: #005618; background-color: #00330e}
+.r52 {color: #00561c; text-decoration-color: #00561c; background-color: #003310}
+.r53 {color: #005620; text-decoration-color: #005620; background-color: #003313}
+.r54 {color: #005625; text-decoration-color: #005625; background-color: #003315}
+.r55 {color: #005629; text-decoration-color: #005629; background-color: #003318}
+.r56 {color: #00562d; text-decoration-color: #00562d; background-color: #00331a}
+.r57 {color: #005632; text-decoration-color: #005632; background-color: #00331d}
+.r58 {color: #005636; text-decoration-color: #005636; background-color: #003320}
+.r59 {color: #00563a; text-decoration-color: #00563a; background-color: #003322}
+.r60 {color: #00563f; text-decoration-color: #00563f; background-color: #003325}
+.r61 {color: #005643; text-decoration-color: #005643; background-color: #003327}
+.r62 {color: #005647; text-decoration-color: #005647; background-color: #00332a}
+.r63 {color: #00564b; text-decoration-color: #00564b; background-color: #00332c}
+.r64 {color: #005650; text-decoration-color: #005650; background-color: #00332f}
+.r65 {color: #005654; text-decoration-color: #005654; background-color: #003331}
+.r66 {color: #005456; text-decoration-color: #005456; background-color: #003133}
+.r67 {color: #005056; text-decoration-color: #005056; background-color: #002f33}
+.r68 {color: #004b56; text-decoration-color: #004b56; background-color: #002c33}
+.r69 {color: #004756; text-decoration-color: #004756; background-color: #002a33}
+.r70 {color: #004356; text-decoration-color: #004356; background-color: #002733}
+.r71 {color: #003f56; text-decoration-color: #003f56; background-color: #002533}
+.r72 {color: #003a56; text-decoration-color: #003a56; background-color: #002233}
+.r73 {color: #003656; text-decoration-color: #003656; background-color: #002033}
+.r74 {color: #003256; text-decoration-color: #003256; background-color: #001d33}
+.r75 {color: #002d56; text-decoration-color: #002d56; background-color: #001a33}
+.r76 {color: #002956; text-decoration-color: #002956; background-color: #001833}
+.r77 {color: #002556; text-decoration-color: #002556; background-color: #001533}
+.r78 {color: #002056; text-decoration-color: #002056; background-color: #001333}
+.r79 {color: #001c56; text-decoration-color: #001c56; background-color: #001033}
+.r80 {color: #001856; text-decoration-color: #001856; background-color: #000e33}
+.r81 {color: #001456; text-decoration-color: #001456; background-color: #000b33}
+.r82 {color: #000f56; text-decoration-color: #000f56; background-color: #000933}
+.r83 {color: #000b56; text-decoration-color: #000b56; background-color: #000633}
+.r84 {color: #000756; text-decoration-color: #000756; background-color: #000433}
+.r85 {color: #000256; text-decoration-color: #000256; background-color: #000133}
+.r86 {color: #010056; text-decoration-color: #010056; background-color: #000033}
+.r87 {color: #050056; text-decoration-color: #050056; background-color: #030033}
+.r88 {color: #0a0056; text-decoration-color: #0a0056; background-color: #050033}
+.r89 {color: #0e0056; text-decoration-color: #0e0056; background-color: #080033}
+.r90 {color: #120056; text-decoration-color: #120056; background-color: #0a0033}
+.r91 {color: #160056; text-decoration-color: #160056; background-color: #0d0033}
+.r92 {color: #1b0056; text-decoration-color: #1b0056; background-color: #100033}
+.r93 {color: #1f0056; text-decoration-color: #1f0056; background-color: #120033}
+.r94 {color: #230056; text-decoration-color: #230056; background-color: #150033}
+.r95 {color: #280056; text-decoration-color: #280056; background-color: #170033}
+.r96 {color: #2c0056; text-decoration-color: #2c0056; background-color: #1a0033}
+.r97 {color: #300056; text-decoration-color: #300056; background-color: #1c0033}
+.r98 {color: #350056; text-decoration-color: #350056; background-color: #1f0033}
+.r99 {color: #390056; text-decoration-color: #390056; background-color: #210033}
+.r100 {color: #3d0056; text-decoration-color: #3d0056; background-color: #240033}
+.r101 {color: #410056; text-decoration-color: #410056; background-color: #260033}
+.r102 {color: #460056; text-decoration-color: #460056; background-color: #290033}
+.r103 {color: #4a0056; text-decoration-color: #4a0056; background-color: #2b0033}
+.r104 {color: #4e0056; text-decoration-color: #4e0056; background-color: #2e0033}
+.r105 {color: #530056; text-decoration-color: #530056; background-color: #300033}
+.r106 {color: #560055; text-decoration-color: #560055; background-color: #330032}
+.r107 {color: #560051; text-decoration-color: #560051; background-color: #330030}
+.r108 {color: #56004d; text-decoration-color: #56004d; background-color: #33002d}
+.r109 {color: #560049; text-decoration-color: #560049; background-color: #33002a}
+.r110 {color: #560044; text-decoration-color: #560044; background-color: #330028}
+.r111 {color: #560040; text-decoration-color: #560040; background-color: #330025}
+.r112 {color: #56003c; text-decoration-color: #56003c; background-color: #330023}
+.r113 {color: #560037; text-decoration-color: #560037; background-color: #330020}
+.r114 {color: #560033; text-decoration-color: #560033; background-color: #33001e}
+.r115 {color: #56002f; text-decoration-color: #56002f; background-color: #33001b}
+.r116 {color: #56002a; text-decoration-color: #56002a; background-color: #330019}
+.r117 {color: #560026; text-decoration-color: #560026; background-color: #330016}
+.r118 {color: #560022; text-decoration-color: #560022; background-color: #330014}
+.r119 {color: #56001e; text-decoration-color: #56001e; background-color: #330011}
+.r120 {color: #560019; text-decoration-color: #560019; background-color: #33000f}
+.r121 {color: #560015; text-decoration-color: #560015; background-color: #33000c}
+.r122 {color: #560011; text-decoration-color: #560011; background-color: #33000a}
+.r123 {color: #56000c; text-decoration-color: #56000c; background-color: #330007}
+.r124 {color: #560008; text-decoration-color: #560008; background-color: #330005}
+.r125 {color: #560004; text-decoration-color: #560004; background-color: #330002}
+.r126 {color: #2472c8; text-decoration-color: #2472c8; font-weight: bold;background-color: #0c0c0c;}
+.r127 {color: #9e0000; text-decoration-color: #9e0000; background-color: #7a0000}
+.r128 {color: #9e0700; text-decoration-color: #9e0700; background-color: #7a0600}
+.r129 {color: #9e0f00; text-decoration-color: #9e0f00; background-color: #7a0c00}
+.r130 {color: #9e1700; text-decoration-color: #9e1700; background-color: #7a1200}
+.r131 {color: #9e1f00; text-decoration-color: #9e1f00; background-color: #7a1800}
+.r132 {color: #9e2700; text-decoration-color: #9e2700; background-color: #7a1e00}
+.r133 {color: #9e2f00; text-decoration-color: #9e2f00; background-color: #7a2400}
+.r134 {color: #9e3600; text-decoration-color: #9e3600; background-color: #7a2a00}
+.r135 {color: #9e3e00; text-decoration-color: #9e3e00; background-color: #7a3000}
+.r136 {color: #9e4600; text-decoration-color: #9e4600; background-color: #7a3600}
+.r137 {color: #9e4e00; text-decoration-color: #9e4e00; background-color: #7a3c00}
+.r138 {color: #9e5600; text-decoration-color: #9e5600; background-color: #7a4200}
+.r139 {color: #9e5e00; text-decoration-color: #9e5e00; background-color: #7a4800}
+.r140 {color: #9e6500; text-decoration-color: #9e6500; background-color: #7a4e00}
+.r141 {color: #9e6d00; text-decoration-color: #9e6d00; background-color: #7a5400}
+.r142 {color: #9e7500; text-decoration-color: #9e7500; background-color: #7a5b00}
+.r143 {color: #9e7d00; text-decoration-color: #9e7d00; background-color: #7a6100}
+.r144 {color: #9e8500; text-decoration-color: #9e8500; background-color: #7a6700}
+.r145 {color: #9e8d00; text-decoration-color: #9e8d00; background-color: #7a6d00}
+.r146 {color: #9e9400; text-decoration-color: #9e9400; background-color: #7a7300}
+.r147 {color: #9e9c00; text-decoration-color: #9e9c00; background-color: #7a7900}
+.r148 {color: #979e00; text-decoration-color: #979e00; background-color: #757a00}
+.r149 {color: #8f9e00; text-decoration-color: #8f9e00; background-color: #6f7a00}
+.r150 {color: #879e00; text-decoration-color: #879e00; background-color: #697a00}
+.r151 {color: #809e00; text-decoration-color: #809e00; background-color: #637a00}
+.r152 {color: #789e00; text-decoration-color: #789e00; background-color: #5d7a00}
+.r153 {color: #709e00; text-decoration-color: #709e00; background-color: #567a00}
+.r154 {color: #689e00; text-decoration-color: #689e00; background-color: #507a00}
+.r155 {color: #609e00; text-decoration-color: #609e00; background-color: #4a7a00}
+.r156 {color: #589e00; text-decoration-color: #589e00; background-color: #447a00}
+.r157 {color: #519e00; text-decoration-color: #519e00; background-color: #3e7a00}
+.r158 {color: #499e00; text-decoration-color: #499e00; background-color: #387a00}
+.r159 {color: #419e00; text-decoration-color: #419e00; background-color: #327a00}
+.r160 {color: #399e00; text-decoration-color: #399e00; background-color: #2c7a00}
+.r161 {color: #319e00; text-decoration-color: #319e00; background-color: #267a00}
+.r162 {color: #299e00; text-decoration-color: #299e00; background-color: #207a00}
+.r163 {color: #219e00; text-decoration-color: #219e00; background-color: #1a7a00}
+.r164 {color: #1a9e00; text-decoration-color: #1a9e00; background-color: #147a00}
+.r165 {color: #129e00; text-decoration-color: #129e00; background-color: #0e7a00}
+.r166 {color: #0a9e00; text-decoration-color: #0a9e00; background-color: #087a00}
+.r167 {color: #029e00; text-decoration-color: #029e00; background-color: #027a00}
+.r168 {color: #009e05; text-decoration-color: #009e05; background-color: #007a04}
+.r169 {color: #009e0d; text-decoration-color: #009e0d; background-color: #007a0a}
+.r170 {color: #009e14; text-decoration-color: #009e14; background-color: #007a10}
+.r171 {color: #009e1c; text-decoration-color: #009e1c; background-color: #007a16}
+.r172 {color: #009e24; text-decoration-color: #009e24; background-color: #007a1c}
+.r173 {color: #009e2c; text-decoration-color: #009e2c; background-color: #007a22}
+.r174 {color: #009e34; text-decoration-color: #009e34; background-color: #007a28}
+.r175 {color: #009e3c; text-decoration-color: #009e3c; background-color: #007a2e}
+.r176 {color: #009e43; text-decoration-color: #009e43; background-color: #007a34}
+.r177 {color: #009e4b; text-decoration-color: #009e4b; background-color: #007a3a}
+.r178 {color: #009e53; text-decoration-color: #009e53; background-color: #007a40}
+.r179 {color: #009e5b; text-decoration-color: #009e5b; background-color: #007a46}
+.r180 {color: #009e63; text-decoration-color: #009e63; background-color: #007a4c}
+.r181 {color: #009e6b; text-decoration-color: #009e6b; background-color: #007a52}
+.r182 {color: #009e72; text-decoration-color: #009e72; background-color: #007a59}
+.r183 {color: #009e7a; text-decoration-color: #009e7a; background-color: #007a5f}
+.r184 {color: #009e82; text-decoration-color: #009e82; background-color: #007a65}
+.r185 {color: #009e8a; text-decoration-color: #009e8a; background-color: #007a6b}
+.r186 {color: #009e92; text-decoration-color: #009e92; background-color: #007a71}
+.r187 {color: #009e9a; text-decoration-color: #009e9a; background-color: #007a77}
+.r188 {color: #009a9e; text-decoration-color: #009a9e; background-color: #00777a}
+.r189 {color: #00929e; text-decoration-color: #00929e; background-color: #00717a}
+.r190 {color: #008a9e; text-decoration-color: #008a9e; background-color: #006b7a}
+.r191 {color: #00829e; text-decoration-color: #00829e; background-color: #00657a}
+.r192 {color: #007a9e; text-decoration-color: #007a9e; background-color: #005f7a}
+.r193 {color: #00729e; text-decoration-color: #00729e; background-color: #00597a}
+.r194 {color: #006b9e; text-decoration-color: #006b9e; background-color: #00527a}
+.r195 {color: #00639e; text-decoration-color: #00639e; background-color: #004c7a}
+.r196 {color: #005b9e; text-decoration-color: #005b9e; background-color: #00467a}
+.r197 {color: #00539e; text-decoration-color: #00539e; background-color: #00407a}
+.r198 {color: #004b9e; text-decoration-color: #004b9e; background-color: #003a7a}
+.r199 {color: #00439e; text-decoration-color: #00439e; background-color: #00347a}
+.r200 {color: #003c9e; text-decoration-color: #003c9e; background-color: #002e7a}
+.r201 {color: #00349e; text-decoration-color: #00349e; background-color: #00287a}
+.r202 {color: #002c9e; text-decoration-color: #002c9e; background-color: #00227a}
+.r203 {color: #00249e; text-decoration-color: #00249e; background-color: #001c7a}
+.r204 {color: #001c9e; text-decoration-color: #001c9e; background-color: #00167a}
+.r205 {color: #00149e; text-decoration-color: #00149e; background-color: #00107a}
+.r206 {color: #000d9e; text-decoration-color: #000d9e; background-color: #000a7a}
+.r207 {color: #00059e; text-decoration-color: #00059e; background-color: #00047a}
+.r208 {color: #02009e; text-decoration-color: #02009e; background-color: #02007a}
+.r209 {color: #0a009e; text-decoration-color: #0a009e; background-color: #08007a}
+.r210 {color: #12009e; text-decoration-color: #12009e; background-color: #0e007a}
+.r211 {color: #1a009e; text-decoration-color: #1a009e; background-color: #14007a}
+.r212 {color: #21009e; text-decoration-color: #21009e; background-color: #1a007a}
+.r213 {color: #29009e; text-decoration-color: #29009e; background-color: #20007a}
+.r214 {color: #31009e; text-decoration-color: #31009e; background-color: #26007a}
+.r215 {color: #39009e; text-decoration-color: #39009e; background-color: #2c007a}
+.r216 {color: #41009e; text-decoration-color: #41009e; background-color: #32007a}
+.r217 {color: #49009e; text-decoration-color: #49009e; background-color: #38007a}
+.r218 {color: #51009e; text-decoration-color: #51009e; background-color: #3e007a}
+.r219 {color: #58009e; text-decoration-color: #58009e; background-color: #44007a}
+.r220 {color: #60009e; text-decoration-color: #60009e; background-color: #4a007a}
+.r221 {color: #68009e; text-decoration-color: #68009e; background-color: #50007a}
+.r222 {color: #70009e; text-decoration-color: #70009e; background-color: #56007a}
+.r223 {color: #78009e; text-decoration-color: #78009e; background-color: #5d007a}
+.r224 {color: #80009e; text-decoration-color: #80009e; background-color: #63007a}
+.r225 {color: #87009e; text-decoration-color: #87009e; background-color: #69007a}
+.r226 {color: #8f009e; text-decoration-color: #8f009e; background-color: #6f007a}
+.r227 {color: #97009e; text-decoration-color: #97009e; background-color: #75007a}
+.r228 {color: #9e009c; text-decoration-color: #9e009c; background-color: #7a0079}
+.r229 {color: #9e0094; text-decoration-color: #9e0094; background-color: #7a0073}
+.r230 {color: #9e008d; text-decoration-color: #9e008d; background-color: #7a006d}
+.r231 {color: #9e0085; text-decoration-color: #9e0085; background-color: #7a0067}
+.r232 {color: #9e007d; text-decoration-color: #9e007d; background-color: #7a0061}
+.r233 {color: #9e0075; text-decoration-color: #9e0075; background-color: #7a005b}
+.r234 {color: #9e006d; text-decoration-color: #9e006d; background-color: #7a0054}
+.r235 {color: #9e0065; text-decoration-color: #9e0065; background-color: #7a004e}
+.r236 {color: #9e005e; text-decoration-color: #9e005e; background-color: #7a0048}
+.r237 {color: #9e0056; text-decoration-color: #9e0056; background-color: #7a0042}
+.r238 {color: #9e004e; text-decoration-color: #9e004e; background-color: #7a003c}
+.r239 {color: #9e0046; text-decoration-color: #9e0046; background-color: #7a0036}
+.r240 {color: #9e003e; text-decoration-color: #9e003e; background-color: #7a0030}
+.r241 {color: #9e0036; text-decoration-color: #9e0036; background-color: #7a002a}
+.r242 {color: #9e002f; text-decoration-color: #9e002f; background-color: #7a0024}
+.r243 {color: #9e0027; text-decoration-color: #9e0027; background-color: #7a001e}
+.r244 {color: #9e001f; text-decoration-color: #9e001f; background-color: #7a0018}
+.r245 {color: #9e0017; text-decoration-color: #9e0017; background-color: #7a0012}
+.r246 {color: #9e000f; text-decoration-color: #9e000f; background-color: #7a000c}
+.r247 {color: #9e0007; text-decoration-color: #9e0007; background-color: #7a0006}
+.r248 {color: #bc3fbc; text-decoration-color: #bc3fbc; font-weight: bold;background-color: #0c0c0c;}
+.r249 {color: #e50000; text-decoration-color: #e50000; background-color: #c10000}
+.r250 {color: #e50b00; text-decoration-color: #e50b00; background-color: #c10900}
+.r251 {color: #e51600; text-decoration-color: #e51600; background-color: #c11300}
+.r252 {color: #e52200; text-decoration-color: #e52200; background-color: #c11c00}
+.r253 {color: #e52d00; text-decoration-color: #e52d00; background-color: #c12600}
+.r254 {color: #e53800; text-decoration-color: #e53800; background-color: #c13000}
+.r255 {color: #e54400; text-decoration-color: #e54400; background-color: #c13900}
+.r256 {color: #e54f00; text-decoration-color: #e54f00; background-color: #c14300}
+.r257 {color: #e55b00; text-decoration-color: #e55b00; background-color: #c14c00}
+.r258 {color: #e56600; text-decoration-color: #e56600; background-color: #c15600}
+.r259 {color: #e57100; text-decoration-color: #e57100; background-color: #c16000}
+.r260 {color: #e57d00; text-decoration-color: #e57d00; background-color: #c16900}
+.r261 {color: #e58800; text-decoration-color: #e58800; background-color: #c17300}
+.r262 {color: #e59300; text-decoration-color: #e59300; background-color: #c17c00}
+.r263 {color: #e59f00; text-decoration-color: #e59f00; background-color: #c18600}
+.r264 {color: #e5aa00; text-decoration-color: #e5aa00; background-color: #c19000}
+.r265 {color: #e5b600; text-decoration-color: #e5b600; background-color: #c19900}
+.r266 {color: #e5c100; text-decoration-color: #e5c100; background-color: #c1a300}
+.r267 {color: #e5cc00; text-decoration-color: #e5cc00; background-color: #c1ac00}
+.r268 {color: #e5d800; text-decoration-color: #e5d800; background-color: #c1b600}
+.r269 {color: #e5e300; text-decoration-color: #e5e300; background-color: #c1c000}
+.r270 {color: #dce500; text-decoration-color: #dce500; background-color: #b9c100}
+.r271 {color: #d0e500; text-decoration-color: #d0e500; background-color: #b0c100}
+.r272 {color: #c5e500; text-decoration-color: #c5e500; background-color: #a6c100}
+.r273 {color: #b9e500; text-decoration-color: #b9e500; background-color: #9cc100}
+.r274 {color: #aee500; text-decoration-color: #aee500; background-color: #93c100}
+.r275 {color: #a3e500; text-decoration-color: #a3e500; background-color: #89c100}
+.r276 {color: #97e500; text-decoration-color: #97e500; background-color: #80c100}
+.r277 {color: #8ce500; text-decoration-color: #8ce500; background-color: #76c100}
+.r278 {color: #80e500; text-decoration-color: #80e500; background-color: #6cc100}
+.r279 {color: #75e500; text-decoration-color: #75e500; background-color: #63c100}
+.r280 {color: #6ae500; text-decoration-color: #6ae500; background-color: #59c100}
+.r281 {color: #5ee500; text-decoration-color: #5ee500; background-color: #50c100}
+.r282 {color: #53e500; text-decoration-color: #53e500; background-color: #46c100}
+.r283 {color: #48e500; text-decoration-color: #48e500; background-color: #3cc100}
+.r284 {color: #3ce500; text-decoration-color: #3ce500; background-color: #33c100}
+.r285 {color: #31e500; text-decoration-color: #31e500; background-color: #29c100}
+.r286 {color: #25e500; text-decoration-color: #25e500; background-color: #20c100}
+.r287 {color: #1ae500; text-decoration-color: #1ae500; background-color: #16c100}
+.r288 {color: #0fe500; text-decoration-color: #0fe500; background-color: #0cc100}
+.r289 {color: #03e500; text-decoration-color: #03e500; background-color: #03c100}
+.r290 {color: #00e507; text-decoration-color: #00e507; background-color: #00c106}
+.r291 {color: #00e512; text-decoration-color: #00e512; background-color: #00c110}
+.r292 {color: #00e51e; text-decoration-color: #00e51e; background-color: #00c119}
+.r293 {color: #00e529; text-decoration-color: #00e529; background-color: #00c123}
+.r294 {color: #00e535; text-decoration-color: #00e535; background-color: #00c12c}
+.r295 {color: #00e540; text-decoration-color: #00e540; background-color: #00c136}
+.r296 {color: #00e54b; text-decoration-color: #00e54b; background-color: #00c140}
+.r297 {color: #00e557; text-decoration-color: #00e557; background-color: #00c149}
+.r298 {color: #00e562; text-decoration-color: #00e562; background-color: #00c153}
+.r299 {color: #00e56e; text-decoration-color: #00e56e; background-color: #00c15c}
+.r300 {color: #00e579; text-decoration-color: #00e579; background-color: #00c166}
+.r301 {color: #00e584; text-decoration-color: #00e584; background-color: #00c170}
+.r302 {color: #00e590; text-decoration-color: #00e590; background-color: #00c179}
+.r303 {color: #00e59b; text-decoration-color: #00e59b; background-color: #00c183}
+.r304 {color: #00e5a6; text-decoration-color: #00e5a6; background-color: #00c18c}
+.r305 {color: #00e5b2; text-decoration-color: #00e5b2; background-color: #00c196}
+.r306 {color: #00e5bd; text-decoration-color: #00e5bd; background-color: #00c1a0}
+.r307 {color: #00e5c9; text-decoration-color: #00e5c9; background-color: #00c1a9}
+.r308 {color: #00e5d4; text-decoration-color: #00e5d4; background-color: #00c1b3}
+.r309 {color: #00e5df; text-decoration-color: #00e5df; background-color: #00c1bc}
+.r310 {color: #00dfe5; text-decoration-color: #00dfe5; background-color: #00bcc1}
+.r311 {color: #00d4e5; text-decoration-color: #00d4e5; background-color: #00b3c1}
+.r312 {color: #00c9e5; text-decoration-color: #00c9e5; background-color: #00a9c1}
+.r313 {color: #00bde5; text-decoration-color: #00bde5; background-color: #00a0c1}
+.r314 {color: #00b2e5; text-decoration-color: #00b2e5; background-color: #0096c1}
+.r315 {color: #00a6e5; text-decoration-color: #00a6e5; background-color: #008cc1}
+.r316 {color: #009be5; text-decoration-color: #009be5; background-color: #0083c1}
+.r317 {color: #0090e5; text-decoration-color: #0090e5; background-color: #0079c1}
+.r318 {color: #0084e5; text-decoration-color: #0084e5; background-color: #0070c1}
+.r319 {color: #0079e5; text-decoration-color: #0079e5; background-color: #0066c1}
+.r320 {color: #006ee5; text-decoration-color: #006ee5; background-color: #005cc1}
+.r321 {color: #0062e5; text-decoration-color: #0062e5; background-color: #0053c1}
+.r322 {color: #0057e5; text-decoration-color: #0057e5; background-color: #0049c1}
+.r323 {color: #004be5; text-decoration-color: #004be5; background-color: #0040c1}
+.r324 {color: #0040e5; text-decoration-color: #0040e5; background-color: #0036c1}
+.r325 {color: #0035e5; text-decoration-color: #0035e5; background-color: #002cc1}
+.r326 {color: #0029e5; text-decoration-color: #0029e5; background-color: #0023c1}
+.r327 {color: #001ee5; text-decoration-color: #001ee5; background-color: #0019c1}
+.r328 {color: #0012e5; text-decoration-color: #0012e5; background-color: #0010c1}
+.r329 {color: #0007e5; text-decoration-color: #0007e5; background-color: #0006c1}
+.r330 {color: #0300e5; text-decoration-color: #0300e5; background-color: #0300c1}
+.r331 {color: #0f00e5; text-decoration-color: #0f00e5; background-color: #0c00c1}
+.r332 {color: #1a00e5; text-decoration-color: #1a00e5; background-color: #1600c1}
+.r333 {color: #2500e5; text-decoration-color: #2500e5; background-color: #2000c1}
+.r334 {color: #3100e5; text-decoration-color: #3100e5; background-color: #2900c1}
+.r335 {color: #3c00e5; text-decoration-color: #3c00e5; background-color: #3300c1}
+.r336 {color: #4800e5; text-decoration-color: #4800e5; background-color: #3c00c1}
+.r337 {color: #5300e5; text-decoration-color: #5300e5; background-color: #4600c1}
+.r338 {color: #5e00e5; text-decoration-color: #5e00e5; background-color: #5000c1}
+.r339 {color: #6a00e5; text-decoration-color: #6a00e5; background-color: #5900c1}
+.r340 {color: #7500e5; text-decoration-color: #7500e5; background-color: #6300c1}
+.r341 {color: #8000e5; text-decoration-color: #8000e5; background-color: #6c00c1}
+.r342 {color: #8c00e5; text-decoration-color: #8c00e5; background-color: #7600c1}
+.r343 {color: #9700e5; text-decoration-color: #9700e5; background-color: #8000c1}
+.r344 {color: #a300e5; text-decoration-color: #a300e5; background-color: #8900c1}
+.r345 {color: #ae00e5; text-decoration-color: #ae00e5; background-color: #9300c1}
+.r346 {color: #b900e5; text-decoration-color: #b900e5; background-color: #9c00c1}
+.r347 {color: #c500e5; text-decoration-color: #c500e5; background-color: #a600c1}
+.r348 {color: #d000e5; text-decoration-color: #d000e5; background-color: #b000c1}
+.r349 {color: #dc00e5; text-decoration-color: #dc00e5; background-color: #b900c1}
+.r350 {color: #e500e3; text-decoration-color: #e500e3; background-color: #c100c0}
+.r351 {color: #e500d8; text-decoration-color: #e500d8; background-color: #c100b6}
+.r352 {color: #e500cc; text-decoration-color: #e500cc; background-color: #c100ac}
+.r353 {color: #e500c1; text-decoration-color: #e500c1; background-color: #c100a3}
+.r354 {color: #e500b6; text-decoration-color: #e500b6; background-color: #c10099}
+.r355 {color: #e500aa; text-decoration-color: #e500aa; background-color: #c10090}
+.r356 {color: #e5009f; text-decoration-color: #e5009f; background-color: #c10086}
+.r357 {color: #e50093; text-decoration-color: #e50093; background-color: #c1007c}
+.r358 {color: #e50088; text-decoration-color: #e50088; background-color: #c10073}
+.r359 {color: #e5007d; text-decoration-color: #e5007d; background-color: #c10069}
+.r360 {color: #e50071; text-decoration-color: #e50071; background-color: #c10060}
+.r361 {color: #e50066; text-decoration-color: #e50066; background-color: #c10056}
+.r362 {color: #e5005b; text-decoration-color: #e5005b; background-color: #c1004c}
+.r363 {color: #e5004f; text-decoration-color: #e5004f; background-color: #c10043}
+.r364 {color: #e50044; text-decoration-color: #e50044; background-color: #c10039}
+.r365 {color: #e50038; text-decoration-color: #e50038; background-color: #c10030}
+.r366 {color: #e5002d; text-decoration-color: #e5002d; background-color: #c10026}
+.r367 {color: #e50022; text-decoration-color: #e50022; background-color: #c1001c}
+.r368 {color: #e50016; text-decoration-color: #e50016; background-color: #c10013}
+.r369 {color: #e5000b; text-decoration-color: #e5000b; background-color: #c10009}
+.r370 {color: #e5e510; text-decoration-color: #e5e510; font-weight: bold;background-color: #0c0c0c;}
+.r371 {color: #fe2d2d; text-decoration-color: #fe2d2d; background-color: #ff0a0a}
+.r372 {color: #fe382d; text-decoration-color: #fe382d; background-color: #ff160a}
+.r373 {color: #fe422d; text-decoration-color: #fe422d; background-color: #ff220a}
+.r374 {color: #fe4d2d; text-decoration-color: #fe4d2d; background-color: #ff2e0a}
+.r375 {color: #fe572d; text-decoration-color: #fe572d; background-color: #ff3a0a}
+.r376 {color: #fe612d; text-decoration-color: #fe612d; background-color: #ff460a}
+.r377 {color: #fe6c2d; text-decoration-color: #fe6c2d; background-color: #ff530a}
+.r378 {color: #fe762d; text-decoration-color: #fe762d; background-color: #ff5f0a}
+.r379 {color: #fe802d; text-decoration-color: #fe802d; background-color: #ff6b0a}
+.r380 {color: #fe8b2d; text-decoration-color: #fe8b2d; background-color: #ff770a}
+.r381 {color: #fe952d; text-decoration-color: #fe952d; background-color: #ff830a}
+.r382 {color: #fe9f2d; text-decoration-color: #fe9f2d; background-color: #ff8f0a}
+.r383 {color: #feaa2d; text-decoration-color: #feaa2d; background-color: #ff9b0a}
+.r384 {color: #feb42d; text-decoration-color: #feb42d; background-color: #ffa80a}
+.r385 {color: #febf2d; text-decoration-color: #febf2d; background-color: #ffb40a}
+.r386 {color: #fec92d; text-decoration-color: #fec92d; background-color: #ffc00a}
+.r387 {color: #fed32d; text-decoration-color: #fed32d; background-color: #ffcc0a}
+.r388 {color: #fede2d; text-decoration-color: #fede2d; background-color: #ffd80a}
+.r389 {color: #fee82d; text-decoration-color: #fee82d; background-color: #ffe40a}
+.r390 {color: #fef22d; text-decoration-color: #fef22d; background-color: #fff00a}
+.r391 {color: #fefd2d; text-decoration-color: #fefd2d; background-color: #fffc0a}
+.r392 {color: #f6fe2d; text-decoration-color: #f6fe2d; background-color: #f4ff0a}
+.r393 {color: #ebfe2d; text-decoration-color: #ebfe2d; background-color: #e8ff0a}
+.r394 {color: #e1fe2d; text-decoration-color: #e1fe2d; background-color: #dcff0a}
+.r395 {color: #d7fe2d; text-decoration-color: #d7fe2d; background-color: #d0ff0a}
+.r396 {color: #ccfe2d; text-decoration-color: #ccfe2d; background-color: #c4ff0a}
+.r397 {color: #c2fe2d; text-decoration-color: #c2fe2d; background-color: #b8ff0a}
+.r398 {color: #b8fe2d; text-decoration-color: #b8fe2d; background-color: #acff0a}
+.r399 {color: #adfe2d; text-decoration-color: #adfe2d; background-color: #9fff0a}
+.r400 {color: #a3fe2d; text-decoration-color: #a3fe2d; background-color: #93ff0a}
+.r401 {color: #99fe2d; text-decoration-color: #99fe2d; background-color: #87ff0a}
+.r402 {color: #8efe2d; text-decoration-color: #8efe2d; background-color: #7bff0a}
+.r403 {color: #84fe2d; text-decoration-color: #84fe2d; background-color: #6fff0a}
+.r404 {color: #79fe2d; text-decoration-color: #79fe2d; background-color: #63ff0a}
+.r405 {color: #6ffe2d; text-decoration-color: #6ffe2d; background-color: #57ff0a}
+.r406 {color: #65fe2d; text-decoration-color: #65fe2d; background-color: #4aff0a}
+.r407 {color: #5afe2d; text-decoration-color: #5afe2d; background-color: #3eff0a}
+.r408 {color: #50fe2d; text-decoration-color: #50fe2d; background-color: #32ff0a}
+.r409 {color: #46fe2d; text-decoration-color: #46fe2d; background-color: #26ff0a}
+.r410 {color: #3bfe2d; text-decoration-color: #3bfe2d; background-color: #1aff0a}
+.r411 {color: #31fe2d; text-decoration-color: #31fe2d; background-color: #0eff0a}
+.r412 {color: #2dfe34; text-decoration-color: #2dfe34; background-color: #0aff12}
+.r413 {color: #2dfe3f; text-decoration-color: #2dfe3f; background-color: #0aff1e}
+.r414 {color: #2dfe49; text-decoration-color: #2dfe49; background-color: #0aff2a}
+.r415 {color: #2dfe53; text-decoration-color: #2dfe53; background-color: #0aff36}
+.r416 {color: #2dfe5e; text-decoration-color: #2dfe5e; background-color: #0aff42}
+.r417 {color: #2dfe68; text-decoration-color: #2dfe68; background-color: #0aff4e}
+.r418 {color: #2dfe73; text-decoration-color: #2dfe73; background-color: #0aff5b}
+.r419 {color: #2dfe7d; text-decoration-color: #2dfe7d; background-color: #0aff67}
+.r420 {color: #2dfe87; text-decoration-color: #2dfe87; background-color: #0aff73}
+.r421 {color: #2dfe92; text-decoration-color: #2dfe92; background-color: #0aff7f}
+.r422 {color: #2dfe9c; text-decoration-color: #2dfe9c; background-color: #0aff8b}
+.r423 {color: #2dfea6; text-decoration-color: #2dfea6; background-color: #0aff97}
+.r424 {color: #2dfeb1; text-decoration-color: #2dfeb1; background-color: #0affa3}
+.r425 {color: #2dfebb; text-decoration-color: #2dfebb; background-color: #0affb0}
+.r426 {color: #2dfec5; text-decoration-color: #2dfec5; background-color: #0affbc}
+.r427 {color: #2dfed0; text-decoration-color: #2dfed0; background-color: #0affc8}
+.r428 {color: #2dfeda; text-decoration-color: #2dfeda; background-color: #0affd4}
+.r429 {color: #2dfee5; text-decoration-color: #2dfee5; background-color: #0affe0}
+.r430 {color: #2dfeef; text-decoration-color: #2dfeef; background-color: #0affec}
+.r431 {color: #2dfef9; text-decoration-color: #2dfef9; background-color: #0afff8}
+.r432 {color: #2df9fe; text-decoration-color: #2df9fe; background-color: #0af8ff}
+.r433 {color: #2deffe; text-decoration-color: #2deffe; background-color: #0aecff}
+.r434 {color: #2de5fe; text-decoration-color: #2de5fe; background-color: #0ae0ff}
+.r435 {color: #2ddafe; text-decoration-color: #2ddafe; background-color: #0ad4ff}
+.r436 {color: #2dd0fe; text-decoration-color: #2dd0fe; background-color: #0ac8ff}
+.r437 {color: #2dc5fe; text-decoration-color: #2dc5fe; background-color: #0abcff}
+.r438 {color: #2dbbfe; text-decoration-color: #2dbbfe; background-color: #0ab0ff}
+.r439 {color: #2db1fe; text-decoration-color: #2db1fe; background-color: #0aa3ff}
+.r440 {color: #2da6fe; text-decoration-color: #2da6fe; background-color: #0a97ff}
+.r441 {color: #2d9cfe; text-decoration-color: #2d9cfe; background-color: #0a8bff}
+.r442 {color: #2d92fe; text-decoration-color: #2d92fe; background-color: #0a7fff}
+.r443 {color: #2d87fe; text-decoration-color: #2d87fe; background-color: #0a73ff}
+.r444 {color: #2d7dfe; text-decoration-color: #2d7dfe; background-color: #0a67ff}
+.r445 {color: #2d73fe; text-decoration-color: #2d73fe; background-color: #0a5bff}
+.r446 {color: #2d68fe; text-decoration-color: #2d68fe; background-color: #0a4eff}
+.r447 {color: #2d5efe; text-decoration-color: #2d5efe; background-color: #0a42ff}
+.r448 {color: #2d53fe; text-decoration-color: #2d53fe; background-color: #0a36ff}
+.r449 {color: #2d49fe; text-decoration-color: #2d49fe; background-color: #0a2aff}
+.r450 {color: #2d3ffe; text-decoration-color: #2d3ffe; background-color: #0a1eff}
+.r451 {color: #2d34fe; text-decoration-color: #2d34fe; background-color: #0a12ff}
+.r452 {color: #312dfe; text-decoration-color: #312dfe; background-color: #0e0aff}
+.r453 {color: #3b2dfe; text-decoration-color: #3b2dfe; background-color: #1a0aff}
+.r454 {color: #462dfe; text-decoration-color: #462dfe; background-color: #260aff}
+.r455 {color: #502dfe; text-decoration-color: #502dfe; background-color: #320aff}
+.r456 {color: #5a2dfe; text-decoration-color: #5a2dfe; background-color: #3e0aff}
+.r457 {color: #652dfe; text-decoration-color: #652dfe; background-color: #4a0aff}
+.r458 {color: #6f2dfe; text-decoration-color: #6f2dfe; background-color: #570aff}
+.r459 {color: #792dfe; text-decoration-color: #792dfe; background-color: #630aff}
+.r460 {color: #842dfe; text-decoration-color: #842dfe; background-color: #6f0aff}
+.r461 {color: #8e2dfe; text-decoration-color: #8e2dfe; background-color: #7b0aff}
+.r462 {color: #992dfe; text-decoration-color: #992dfe; background-color: #870aff}
+.r463 {color: #a32dfe; text-decoration-color: #a32dfe; background-color: #930aff}
+.r464 {color: #ad2dfe; text-decoration-color: #ad2dfe; background-color: #9f0aff}
+.r465 {color: #b82dfe; text-decoration-color: #b82dfe; background-color: #ac0aff}
+.r466 {color: #c22dfe; text-decoration-color: #c22dfe; background-color: #b80aff}
+.r467 {color: #cc2dfe; text-decoration-color: #cc2dfe; background-color: #c40aff}
+.r468 {color: #d72dfe; text-decoration-color: #d72dfe; background-color: #d00aff}
+.r469 {color: #e12dfe; text-decoration-color: #e12dfe; background-color: #dc0aff}
+.r470 {color: #eb2dfe; text-decoration-color: #eb2dfe; background-color: #e80aff}
+.r471 {color: #f62dfe; text-decoration-color: #f62dfe; background-color: #f40aff}
+.r472 {color: #fe2dfd; text-decoration-color: #fe2dfd; background-color: #ff0afc}
+.r473 {color: #fe2df2; text-decoration-color: #fe2df2; background-color: #ff0af0}
+.r474 {color: #fe2de8; text-decoration-color: #fe2de8; background-color: #ff0ae4}
+.r475 {color: #fe2dde; text-decoration-color: #fe2dde; background-color: #ff0ad8}
+.r476 {color: #fe2dd3; text-decoration-color: #fe2dd3; background-color: #ff0acc}
+.r477 {color: #fe2dc9; text-decoration-color: #fe2dc9; background-color: #ff0ac0}
+.r478 {color: #fe2dbf; text-decoration-color: #fe2dbf; background-color: #ff0ab4}
+.r479 {color: #fe2db4; text-decoration-color: #fe2db4; background-color: #ff0aa8}
+.r480 {color: #fe2daa; text-decoration-color: #fe2daa; background-color: #ff0a9b}
+.r481 {color: #fe2d9f; text-decoration-color: #fe2d9f; background-color: #ff0a8f}
+.r482 {color: #fe2d95; text-decoration-color: #fe2d95; background-color: #ff0a83}
+.r483 {color: #fe2d8b; text-decoration-color: #fe2d8b; background-color: #ff0a77}
+.r484 {color: #fe2d80; text-decoration-color: #fe2d80; background-color: #ff0a6b}
+.r485 {color: #fe2d76; text-decoration-color: #fe2d76; background-color: #ff0a5f}
+.r486 {color: #fe2d6c; text-decoration-color: #fe2d6c; background-color: #ff0a53}
+.r487 {color: #fe2d61; text-decoration-color: #fe2d61; background-color: #ff0a46}
+.r488 {color: #fe2d57; text-decoration-color: #fe2d57; background-color: #ff0a3a}
+.r489 {color: #fe2d4d; text-decoration-color: #fe2d4d; background-color: #ff0a2e}
+.r490 {color: #fe2d42; text-decoration-color: #fe2d42; background-color: #ff0a22}
+.r491 {color: #fe2d38; text-decoration-color: #fe2d38; background-color: #ff0a16}
+.r492 {color: #11a8cd; text-decoration-color: #11a8cd; font-weight: bold;background-color: #0c0c0c;}
+.r493 {color: #ff7575; text-decoration-color: #ff7575; background-color: #ff5151}
+.r494 {color: #ff7c75; text-decoration-color: #ff7c75; background-color: #ff5a51}
+.r495 {color: #ff8275; text-decoration-color: #ff8275; background-color: #ff6251}
+.r496 {color: #ff8975; text-decoration-color: #ff8975; background-color: #ff6b51}
+.r497 {color: #ff9075; text-decoration-color: #ff9075; background-color: #ff7351}
+.r498 {color: #ff9775; text-decoration-color: #ff9775; background-color: #ff7c51}
+.r499 {color: #ff9e75; text-decoration-color: #ff9e75; background-color: #ff8551}
+.r500 {color: #ffa575; text-decoration-color: #ffa575; background-color: #ff8d51}
+.r501 {color: #ffab75; text-decoration-color: #ffab75; background-color: #ff9651}
+.r502 {color: #ffb275; text-decoration-color: #ffb275; background-color: #ff9e51}
+.r503 {color: #ffb975; text-decoration-color: #ffb975; background-color: #ffa751}
+.r504 {color: #ffc075; text-decoration-color: #ffc075; background-color: #ffb051}
+.r505 {color: #ffc775; text-decoration-color: #ffc775; background-color: #ffb851}
+.r506 {color: #ffce75; text-decoration-color: #ffce75; background-color: #ffc151}
+.r507 {color: #ffd475; text-decoration-color: #ffd475; background-color: #ffc951}
+.r508 {color: #ffdb75; text-decoration-color: #ffdb75; background-color: #ffd251}
+.r509 {color: #ffe275; text-decoration-color: #ffe275; background-color: #ffdb51}
+.r510 {color: #ffe975; text-decoration-color: #ffe975; background-color: #ffe351}
+.r511 {color: #fff075; text-decoration-color: #fff075; background-color: #ffec51}
+.r512 {color: #fff775; text-decoration-color: #fff775; background-color: #fff451}
+.r513 {color: #fffd75; text-decoration-color: #fffd75; background-color: #fffd51}
+.r514 {color: #f9ff75; text-decoration-color: #f9ff75; background-color: #f7ff51}
+.r515 {color: #f2ff75; text-decoration-color: #f2ff75; background-color: #efff51}
+.r516 {color: #ebff75; text-decoration-color: #ebff75; background-color: #e6ff51}
+.r517 {color: #e4ff75; text-decoration-color: #e4ff75; background-color: #deff51}
+.r518 {color: #ddff75; text-decoration-color: #ddff75; background-color: #d5ff51}
+.r519 {color: #d7ff75; text-decoration-color: #d7ff75; background-color: #ccff51}
+.r520 {color: #d0ff75; text-decoration-color: #d0ff75; background-color: #c4ff51}
+.r521 {color: #c9ff75; text-decoration-color: #c9ff75; background-color: #bbff51}
+.r522 {color: #c2ff75; text-decoration-color: #c2ff75; background-color: #b3ff51}
+.r523 {color: #bbff75; text-decoration-color: #bbff75; background-color: #aaff51}
+.r524 {color: #b5ff75; text-decoration-color: #b5ff75; background-color: #a1ff51}
+.r525 {color: #aeff75; text-decoration-color: #aeff75; background-color: #99ff51}
+.r526 {color: #a7ff75; text-decoration-color: #a7ff75; background-color: #90ff51}
+.r527 {color: #a0ff75; text-decoration-color: #a0ff75; background-color: #88ff51}
+.r528 {color: #99ff75; text-decoration-color: #99ff75; background-color: #7fff51}
+.r529 {color: #92ff75; text-decoration-color: #92ff75; background-color: #76ff51}
+.r530 {color: #8cff75; text-decoration-color: #8cff75; background-color: #6eff51}
+.r531 {color: #85ff75; text-decoration-color: #85ff75; background-color: #65ff51}
+.r532 {color: #7eff75; text-decoration-color: #7eff75; background-color: #5dff51}
+.r533 {color: #77ff75; text-decoration-color: #77ff75; background-color: #54ff51}
+.r534 {color: #75ff79; text-decoration-color: #75ff79; background-color: #51ff57}
+.r535 {color: #75ff80; text-decoration-color: #75ff80; background-color: #51ff5f}
+.r536 {color: #75ff87; text-decoration-color: #75ff87; background-color: #51ff68}
+.r537 {color: #75ff8e; text-decoration-color: #75ff8e; background-color: #51ff71}
+.r538 {color: #75ff95; text-decoration-color: #75ff95; background-color: #51ff79}
+.r539 {color: #75ff9b; text-decoration-color: #75ff9b; background-color: #51ff82}
+.r540 {color: #75ffa2; text-decoration-color: #75ffa2; background-color: #51ff8a}
+.r541 {color: #75ffa9; text-decoration-color: #75ffa9; background-color: #51ff93}
+.r542 {color: #75ffb0; text-decoration-color: #75ffb0; background-color: #51ff9c}
+.r543 {color: #75ffb7; text-decoration-color: #75ffb7; background-color: #51ffa4}
+.r544 {color: #75ffbe; text-decoration-color: #75ffbe; background-color: #51ffad}
+.r545 {color: #75ffc4; text-decoration-color: #75ffc4; background-color: #51ffb5}
+.r546 {color: #75ffcb; text-decoration-color: #75ffcb; background-color: #51ffbe}
+.r547 {color: #75ffd2; text-decoration-color: #75ffd2; background-color: #51ffc7}
+.r548 {color: #75ffd9; text-decoration-color: #75ffd9; background-color: #51ffcf}
+.r549 {color: #75ffe0; text-decoration-color: #75ffe0; background-color: #51ffd8}
+.r550 {color: #75ffe7; text-decoration-color: #75ffe7; background-color: #51ffe0}
+.r551 {color: #75ffed; text-decoration-color: #75ffed; background-color: #51ffe9}
+.r552 {color: #75fff4; text-decoration-color: #75fff4; background-color: #51fff2}
+.r553 {color: #75fffb; text-decoration-color: #75fffb; background-color: #51fffa}
+.r554 {color: #75fbff; text-decoration-color: #75fbff; background-color: #51faff}
+.r555 {color: #75f4ff; text-decoration-color: #75f4ff; background-color: #51f2ff}
+.r556 {color: #75edff; text-decoration-color: #75edff; background-color: #51e9ff}
+.r557 {color: #75e7ff; text-decoration-color: #75e7ff; background-color: #51e0ff}
+.r558 {color: #75e0ff; text-decoration-color: #75e0ff; background-color: #51d8ff}
+.r559 {color: #75d9ff; text-decoration-color: #75d9ff; background-color: #51cfff}
+.r560 {color: #75d2ff; text-decoration-color: #75d2ff; background-color: #51c7ff}
+.r561 {color: #75cbff; text-decoration-color: #75cbff; background-color: #51beff}
+.r562 {color: #75c4ff; text-decoration-color: #75c4ff; background-color: #51b5ff}
+.r563 {color: #75beff; text-decoration-color: #75beff; background-color: #51adff}
+.r564 {color: #75b7ff; text-decoration-color: #75b7ff; background-color: #51a4ff}
+.r565 {color: #75b0ff; text-decoration-color: #75b0ff; background-color: #519cff}
+.r566 {color: #75a9ff; text-decoration-color: #75a9ff; background-color: #5193ff}
+.r567 {color: #75a2ff; text-decoration-color: #75a2ff; background-color: #518aff}
+.r568 {color: #759bff; text-decoration-color: #759bff; background-color: #5182ff}
+.r569 {color: #7595ff; text-decoration-color: #7595ff; background-color: #5179ff}
+.r570 {color: #758eff; text-decoration-color: #758eff; background-color: #5171ff}
+.r571 {color: #7587ff; text-decoration-color: #7587ff; background-color: #5168ff}
+.r572 {color: #7580ff; text-decoration-color: #7580ff; background-color: #515fff}
+.r573 {color: #7579ff; text-decoration-color: #7579ff; background-color: #5157ff}
+.r574 {color: #7775ff; text-decoration-color: #7775ff; background-color: #5451ff}
+.r575 {color: #7e75ff; text-decoration-color: #7e75ff; background-color: #5d51ff}
+.r576 {color: #8575ff; text-decoration-color: #8575ff; background-color: #6551ff}
+.r577 {color: #8c75ff; text-decoration-color: #8c75ff; background-color: #6e51ff}
+.r578 {color: #9275ff; text-decoration-color: #9275ff; background-color: #7651ff}
+.r579 {color: #9975ff; text-decoration-color: #9975ff; background-color: #7f51ff}
+.r580 {color: #a075ff; text-decoration-color: #a075ff; background-color: #8851ff}
+.r581 {color: #a775ff; text-decoration-color: #a775ff; background-color: #9051ff}
+.r582 {color: #ae75ff; text-decoration-color: #ae75ff; background-color: #9951ff}
+.r583 {color: #b575ff; text-decoration-color: #b575ff; background-color: #a151ff}
+.r584 {color: #bb75ff; text-decoration-color: #bb75ff; background-color: #aa51ff}
+.r585 {color: #c275ff; text-decoration-color: #c275ff; background-color: #b351ff}
+.r586 {color: #c975ff; text-decoration-color: #c975ff; background-color: #bb51ff}
+.r587 {color: #d075ff; text-decoration-color: #d075ff; background-color: #c451ff}
+.r588 {color: #d775ff; text-decoration-color: #d775ff; background-color: #cc51ff}
+.r589 {color: #dd75ff; text-decoration-color: #dd75ff; background-color: #d551ff}
+.r590 {color: #e475ff; text-decoration-color: #e475ff; background-color: #de51ff}
+.r591 {color: #eb75ff; text-decoration-color: #eb75ff; background-color: #e651ff}
+.r592 {color: #f275ff; text-decoration-color: #f275ff; background-color: #ef51ff}
+.r593 {color: #f975ff; text-decoration-color: #f975ff; background-color: #f751ff}
+.r594 {color: #ff75fd; text-decoration-color: #ff75fd; background-color: #ff51fd}
+.r595 {color: #ff75f7; text-decoration-color: #ff75f7; background-color: #ff51f4}
+.r596 {color: #ff75f0; text-decoration-color: #ff75f0; background-color: #ff51ec}
+.r597 {color: #ff75e9; text-decoration-color: #ff75e9; background-color: #ff51e3}
+.r598 {color: #ff75e2; text-decoration-color: #ff75e2; background-color: #ff51db}
+.r599 {color: #ff75db; text-decoration-color: #ff75db; background-color: #ff51d2}
+.r600 {color: #ff75d4; text-decoration-color: #ff75d4; background-color: #ff51c9}
+.r601 {color: #ff75ce; text-decoration-color: #ff75ce; background-color: #ff51c1}
+.r602 {color: #ff75c7; text-decoration-color: #ff75c7; background-color: #ff51b8}
+.r603 {color: #ff75c0; text-decoration-color: #ff75c0; background-color: #ff51b0}
+.r604 {color: #ff75b9; text-decoration-color: #ff75b9; background-color: #ff51a7}
+.r605 {color: #ff75b2; text-decoration-color: #ff75b2; background-color: #ff519e}
+.r606 {color: #ff75ab; text-decoration-color: #ff75ab; background-color: #ff5196}
+.r607 {color: #ff75a5; text-decoration-color: #ff75a5; background-color: #ff518d}
+.r608 {color: #ff759e; text-decoration-color: #ff759e; background-color: #ff5185}
+.r609 {color: #ff7597; text-decoration-color: #ff7597; background-color: #ff517c}
+.r610 {color: #ff7590; text-decoration-color: #ff7590; background-color: #ff5173}
+.r611 {color: #ff7589; text-decoration-color: #ff7589; background-color: #ff516b}
+.r612 {color: #ff7582; text-decoration-color: #ff7582; background-color: #ff5162}
+.r613 {color: #ff757c; text-decoration-color: #ff757c; background-color: #ff515a}
+.r614 {font-weight: bold;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
+.r615 {color: #7f7f7f; text-decoration-color: #7f7f7f;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
+.r616 {text-decoration: underline;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
+.r617 {text-decoration: line-through;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
+.r618 {;color: #0c0c0c; text-decoration-color: #0c0c0c;;background-color: #f2f2f2;}
+.r619 {;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
+.r620 {color: #0dbc79; text-decoration-color: #0dbc79;background-color: #0c0c0c;}
+.r621 {color: #e5e510; text-decoration-color: #e5e510;background-color: #0c0c0c;}
+.r622 {color: #2472c8; text-decoration-color: #2472c8;background-color: #0c0c0c;}
+.r623 {color: #cd3131; text-decoration-color: #cd3131;background-color: #0c0c0c;}
+.r624 {color: #11a8cd; text-decoration-color: #11a8cd;background-color: #0c0c0c;}
+.r625 {color: #bc3fbc; text-decoration-color: #bc3fbc;background-color: #0c0c0c;}
+.r626 {color: #0c6442; text-decoration-color: #0c6442;background-color: #0c0c0c;}
+.r627 {color: #183f6a; text-decoration-color: #183f6a;background-color: #0c0c0c;}
+.r628 {color: #183f6a; text-decoration-color: #183f6a; font-weight: bold;background-color: #0c0c0c;}
+.r629 {color: #0e5a6c; text-decoration-color: #0e5a6c;background-color: #0c0c0c;}
+.r630 {color: #642564; text-decoration-color: #642564;background-color: #0c0c0c;}
+.r631 {color: #183f6a; text-decoration-color: #183f6a; font-style: italic;background-color: #0c0c0c;}
+.r632 {color: #e3e3dd; text-decoration-color: #e3e3dd; background-color: #272822; font-weight: bold}
+.r633 {color: #656660; text-decoration-color: #656660; background-color: #272822}
+.r634 {color: #66d9ef; text-decoration-color: #66d9ef; background-color: #272822}
+.r635 {color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822}
+.r636 {color: #a6e22e; text-decoration-color: #a6e22e; background-color: #272822}
+.r637 {color: #f92672; text-decoration-color: #f92672; background-color: #272822}
+.r638 {background-color: #272822;color: #f2f2f2; text-decoration-color: #f2f2f2;}
+.r639 {color: #403e35; text-decoration-color: #403e35; background-color: #272822}
+.r640 {color: #e6db74; text-decoration-color: #e6db74; background-color: #272822}
+.r641 {color: #f14c4c; text-decoration-color: #f14c4c; font-style: italic;background-color: #0c0c0c;}
+.r642 {color: #23d18b; text-decoration-color: #23d18b; font-style: italic;background-color: #0c0c0c;}
+.r643 {color: #bc3fbc; text-decoration-color: #bc3fbc; font-style: italic;background-color: #0c0c0c;}
+.r644 {color: #e5e5e5; text-decoration-color: #e5e5e5; background-color: #0c0c0c}
+    </style>
+    <foreignObject x="0" y="0" width="100%" height="100%">
+        <body xmlns="http://www.w3.org/1999/xhtml">
+            <div id="wrapper">
+                <div id="terminal">
+                    <div id='terminal-header'>
+                        <svg id="terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="14" cy="8" r="8" fill="#ff6159"/>
+                            <circle cx="38" cy="8" r="8" fill="#ffbd2e"/>
+                            <circle cx="62" cy="8" r="8" fill="#28c941"/>
+                        </svg>
+                        <div id="terminal-title-tab">Rich can export to SVG</div>
+                    </div>
+                    <div id='terminal-body'>
+                        <div><span class="r2">                                                                            Rich features                                                                             </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                                                                                                        </span></div>
+<div><span class="r3">    Colors    </span><span class="r1">✓ </span><span class="r4">4-bit color</span><span class="r1">                 </span><span class="r5">▄</span><span class="r6">▄</span><span class="r7">▄</span><span class="r8">▄</span><span class="r9">▄</span><span class="r10">▄</span><span class="r11">▄</span><span class="r12">▄</span><span class="r13">▄</span><span class="r14">▄</span><span class="r15">▄</span><span class="r16">▄</span><span class="r17">▄</span><span class="r18">▄</span><span class="r19">▄</span><span class="r20">▄</span><span class="r21">▄</span><span class="r22">▄</span><span class="r23">▄</span><span class="r24">▄</span><span class="r25">▄</span><span class="r26">▄</span><span class="r27">▄</span><span class="r28">▄</span><span class="r29">▄</span><span class="r30">▄</span><span class="r31">▄</span><span class="r32">▄</span><span class="r33">▄</span><span class="r34">▄</span><span class="r35">▄</span><span class="r36">▄</span><span class="r37">▄</span><span class="r38">▄</span><span class="r39">▄</span><span class="r40">▄</span><span class="r41">▄</span><span class="r42">▄</span><span class="r43">▄</span><span class="r44">▄</span><span class="r45">▄</span><span class="r46">▄</span><span class="r47">▄</span><span class="r48">▄</span><span class="r49">▄</span><span class="r50">▄</span><span class="r51">▄</span><span class="r52">▄</span><span class="r53">▄</span><span class="r54">▄</span><span class="r55">▄</span><span class="r56">▄</span><span class="r57">▄</span><span class="r58">▄</span><span class="r59">▄</span><span class="r60">▄</span><span class="r61">▄</span><span class="r62">▄</span><span class="r63">▄</span><span class="r64">▄</span><span class="r65">▄</span><span class="r66">▄</span><span class="r67">▄</span><span class="r68">▄</span><span class="r69">▄</span><span class="r70">▄</span><span class="r71">▄</span><span class="r72">▄</span><span class="r73">▄</span><span class="r74">▄</span><span class="r75">▄</span><span class="r76">▄</span><span class="r77">▄</span><span class="r78">▄</span><span class="r79">▄</span><span class="r80">▄</span><span class="r81">▄</span><span class="r82">▄</span><span class="r83">▄</span><span class="r84">▄</span><span class="r85">▄</span><span class="r86">▄</span><span class="r87">▄</span><span class="r88">▄</span><span class="r89">▄</span><span class="r90">▄</span><span class="r91">▄</span><span class="r92">▄</span><span class="r93">▄</span><span class="r94">▄</span><span class="r95">▄</span><span class="r96">▄</span><span class="r97">▄</span><span class="r98">▄</span><span class="r99">▄</span><span class="r100">▄</span><span class="r101">▄</span><span class="r102">▄</span><span class="r103">▄</span><span class="r104">▄</span><span class="r105">▄</span><span class="r106">▄</span><span class="r107">▄</span><span class="r108">▄</span><span class="r109">▄</span><span class="r110">▄</span><span class="r111">▄</span><span class="r112">▄</span><span class="r113">▄</span><span class="r114">▄</span><span class="r115">▄</span><span class="r116">▄</span><span class="r117">▄</span><span class="r118">▄</span><span class="r119">▄</span><span class="r120">▄</span><span class="r121">▄</span><span class="r122">▄</span><span class="r123">▄</span><span class="r124">▄</span><span class="r125">▄</span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r1">✓ </span><span class="r126">8-bit color</span><span class="r1">                 </span><span class="r127">▄</span><span class="r128">▄</span><span class="r129">▄</span><span class="r130">▄</span><span class="r131">▄</span><span class="r132">▄</span><span class="r133">▄</span><span class="r134">▄</span><span class="r135">▄</span><span class="r136">▄</span><span class="r137">▄</span><span class="r138">▄</span><span class="r139">▄</span><span class="r140">▄</span><span class="r141">▄</span><span class="r142">▄</span><span class="r143">▄</span><span class="r144">▄</span><span class="r145">▄</span><span class="r146">▄</span><span class="r147">▄</span><span class="r148">▄</span><span class="r149">▄</span><span class="r150">▄</span><span class="r151">▄</span><span class="r152">▄</span><span class="r153">▄</span><span class="r154">▄</span><span class="r155">▄</span><span class="r156">▄</span><span class="r157">▄</span><span class="r158">▄</span><span class="r159">▄</span><span class="r160">▄</span><span class="r161">▄</span><span class="r162">▄</span><span class="r163">▄</span><span class="r164">▄</span><span class="r165">▄</span><span class="r166">▄</span><span class="r167">▄</span><span class="r168">▄</span><span class="r169">▄</span><span class="r170">▄</span><span class="r171">▄</span><span class="r172">▄</span><span class="r173">▄</span><span class="r174">▄</span><span class="r175">▄</span><span class="r176">▄</span><span class="r177">▄</span><span class="r178">▄</span><span class="r179">▄</span><span class="r180">▄</span><span class="r181">▄</span><span class="r182">▄</span><span class="r183">▄</span><span class="r184">▄</span><span class="r185">▄</span><span class="r186">▄</span><span class="r187">▄</span><span class="r188">▄</span><span class="r189">▄</span><span class="r190">▄</span><span class="r191">▄</span><span class="r192">▄</span><span class="r193">▄</span><span class="r194">▄</span><span class="r195">▄</span><span class="r196">▄</span><span class="r197">▄</span><span class="r198">▄</span><span class="r199">▄</span><span class="r200">▄</span><span class="r201">▄</span><span class="r202">▄</span><span class="r203">▄</span><span class="r204">▄</span><span class="r205">▄</span><span class="r206">▄</span><span class="r207">▄</span><span class="r208">▄</span><span class="r209">▄</span><span class="r210">▄</span><span class="r211">▄</span><span class="r212">▄</span><span class="r213">▄</span><span class="r214">▄</span><span class="r215">▄</span><span class="r216">▄</span><span class="r217">▄</span><span class="r218">▄</span><span class="r219">▄</span><span class="r220">▄</span><span class="r221">▄</span><span class="r222">▄</span><span class="r223">▄</span><span class="r224">▄</span><span class="r225">▄</span><span class="r226">▄</span><span class="r227">▄</span><span class="r228">▄</span><span class="r229">▄</span><span class="r230">▄</span><span class="r231">▄</span><span class="r232">▄</span><span class="r233">▄</span><span class="r234">▄</span><span class="r235">▄</span><span class="r236">▄</span><span class="r237">▄</span><span class="r238">▄</span><span class="r239">▄</span><span class="r240">▄</span><span class="r241">▄</span><span class="r242">▄</span><span class="r243">▄</span><span class="r244">▄</span><span class="r245">▄</span><span class="r246">▄</span><span class="r247">▄</span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r1">✓ </span><span class="r248">Truecolor (16.7 million)</span><span class="r1">    </span><span class="r249">▄</span><span class="r250">▄</span><span class="r251">▄</span><span class="r252">▄</span><span class="r253">▄</span><span class="r254">▄</span><span class="r255">▄</span><span class="r256">▄</span><span class="r257">▄</span><span class="r258">▄</span><span class="r259">▄</span><span class="r260">▄</span><span class="r261">▄</span><span class="r262">▄</span><span class="r263">▄</span><span class="r264">▄</span><span class="r265">▄</span><span class="r266">▄</span><span class="r267">▄</span><span class="r268">▄</span><span class="r269">▄</span><span class="r270">▄</span><span class="r271">▄</span><span class="r272">▄</span><span class="r273">▄</span><span class="r274">▄</span><span class="r275">▄</span><span class="r276">▄</span><span class="r277">▄</span><span class="r278">▄</span><span class="r279">▄</span><span class="r280">▄</span><span class="r281">▄</span><span class="r282">▄</span><span class="r283">▄</span><span class="r284">▄</span><span class="r285">▄</span><span class="r286">▄</span><span class="r287">▄</span><span class="r288">▄</span><span class="r289">▄</span><span class="r290">▄</span><span class="r291">▄</span><span class="r292">▄</span><span class="r293">▄</span><span class="r294">▄</span><span class="r295">▄</span><span class="r296">▄</span><span class="r297">▄</span><span class="r298">▄</span><span class="r299">▄</span><span class="r300">▄</span><span class="r301">▄</span><span class="r302">▄</span><span class="r303">▄</span><span class="r304">▄</span><span class="r305">▄</span><span class="r306">▄</span><span class="r307">▄</span><span class="r308">▄</span><span class="r309">▄</span><span class="r310">▄</span><span class="r311">▄</span><span class="r312">▄</span><span class="r313">▄</span><span class="r314">▄</span><span class="r315">▄</span><span class="r316">▄</span><span class="r317">▄</span><span class="r318">▄</span><span class="r319">▄</span><span class="r320">▄</span><span class="r321">▄</span><span class="r322">▄</span><span class="r323">▄</span><span class="r324">▄</span><span class="r325">▄</span><span class="r326">▄</span><span class="r327">▄</span><span class="r328">▄</span><span class="r329">▄</span><span class="r330">▄</span><span class="r331">▄</span><span class="r332">▄</span><span class="r333">▄</span><span class="r334">▄</span><span class="r335">▄</span><span class="r336">▄</span><span class="r337">▄</span><span class="r338">▄</span><span class="r339">▄</span><span class="r340">▄</span><span class="r341">▄</span><span class="r342">▄</span><span class="r343">▄</span><span class="r344">▄</span><span class="r345">▄</span><span class="r346">▄</span><span class="r347">▄</span><span class="r348">▄</span><span class="r349">▄</span><span class="r350">▄</span><span class="r351">▄</span><span class="r352">▄</span><span class="r353">▄</span><span class="r354">▄</span><span class="r355">▄</span><span class="r356">▄</span><span class="r357">▄</span><span class="r358">▄</span><span class="r359">▄</span><span class="r360">▄</span><span class="r361">▄</span><span class="r362">▄</span><span class="r363">▄</span><span class="r364">▄</span><span class="r365">▄</span><span class="r366">▄</span><span class="r367">▄</span><span class="r368">▄</span><span class="r369">▄</span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r1">✓ </span><span class="r370">Dumb terminals</span><span class="r1">              </span><span class="r371">▄</span><span class="r372">▄</span><span class="r373">▄</span><span class="r374">▄</span><span class="r375">▄</span><span class="r376">▄</span><span class="r377">▄</span><span class="r378">▄</span><span class="r379">▄</span><span class="r380">▄</span><span class="r381">▄</span><span class="r382">▄</span><span class="r383">▄</span><span class="r384">▄</span><span class="r385">▄</span><span class="r386">▄</span><span class="r387">▄</span><span class="r388">▄</span><span class="r389">▄</span><span class="r390">▄</span><span class="r391">▄</span><span class="r392">▄</span><span class="r393">▄</span><span class="r394">▄</span><span class="r395">▄</span><span class="r396">▄</span><span class="r397">▄</span><span class="r398">▄</span><span class="r399">▄</span><span class="r400">▄</span><span class="r401">▄</span><span class="r402">▄</span><span class="r403">▄</span><span class="r404">▄</span><span class="r405">▄</span><span class="r406">▄</span><span class="r407">▄</span><span class="r408">▄</span><span class="r409">▄</span><span class="r410">▄</span><span class="r411">▄</span><span class="r412">▄</span><span class="r413">▄</span><span class="r414">▄</span><span class="r415">▄</span><span class="r416">▄</span><span class="r417">▄</span><span class="r418">▄</span><span class="r419">▄</span><span class="r420">▄</span><span class="r421">▄</span><span class="r422">▄</span><span class="r423">▄</span><span class="r424">▄</span><span class="r425">▄</span><span class="r426">▄</span><span class="r427">▄</span><span class="r428">▄</span><span class="r429">▄</span><span class="r430">▄</span><span class="r431">▄</span><span class="r432">▄</span><span class="r433">▄</span><span class="r434">▄</span><span class="r435">▄</span><span class="r436">▄</span><span class="r437">▄</span><span class="r438">▄</span><span class="r439">▄</span><span class="r440">▄</span><span class="r441">▄</span><span class="r442">▄</span><span class="r443">▄</span><span class="r444">▄</span><span class="r445">▄</span><span class="r446">▄</span><span class="r447">▄</span><span class="r448">▄</span><span class="r449">▄</span><span class="r450">▄</span><span class="r451">▄</span><span class="r452">▄</span><span class="r453">▄</span><span class="r454">▄</span><span class="r455">▄</span><span class="r456">▄</span><span class="r457">▄</span><span class="r458">▄</span><span class="r459">▄</span><span class="r460">▄</span><span class="r461">▄</span><span class="r462">▄</span><span class="r463">▄</span><span class="r464">▄</span><span class="r465">▄</span><span class="r466">▄</span><span class="r467">▄</span><span class="r468">▄</span><span class="r469">▄</span><span class="r470">▄</span><span class="r471">▄</span><span class="r472">▄</span><span class="r473">▄</span><span class="r474">▄</span><span class="r475">▄</span><span class="r476">▄</span><span class="r477">▄</span><span class="r478">▄</span><span class="r479">▄</span><span class="r480">▄</span><span class="r481">▄</span><span class="r482">▄</span><span class="r483">▄</span><span class="r484">▄</span><span class="r485">▄</span><span class="r486">▄</span><span class="r487">▄</span><span class="r488">▄</span><span class="r489">▄</span><span class="r490">▄</span><span class="r491">▄</span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r1">✓ </span><span class="r492">Automatic color conversion</span><span class="r1">  </span><span class="r493">▄</span><span class="r494">▄</span><span class="r495">▄</span><span class="r496">▄</span><span class="r497">▄</span><span class="r498">▄</span><span class="r499">▄</span><span class="r500">▄</span><span class="r501">▄</span><span class="r502">▄</span><span class="r503">▄</span><span class="r504">▄</span><span class="r505">▄</span><span class="r506">▄</span><span class="r507">▄</span><span class="r508">▄</span><span class="r509">▄</span><span class="r510">▄</span><span class="r511">▄</span><span class="r512">▄</span><span class="r513">▄</span><span class="r514">▄</span><span class="r515">▄</span><span class="r516">▄</span><span class="r517">▄</span><span class="r518">▄</span><span class="r519">▄</span><span class="r520">▄</span><span class="r521">▄</span><span class="r522">▄</span><span class="r523">▄</span><span class="r524">▄</span><span class="r525">▄</span><span class="r526">▄</span><span class="r527">▄</span><span class="r528">▄</span><span class="r529">▄</span><span class="r530">▄</span><span class="r531">▄</span><span class="r532">▄</span><span class="r533">▄</span><span class="r534">▄</span><span class="r535">▄</span><span class="r536">▄</span><span class="r537">▄</span><span class="r538">▄</span><span class="r539">▄</span><span class="r540">▄</span><span class="r541">▄</span><span class="r542">▄</span><span class="r543">▄</span><span class="r544">▄</span><span class="r545">▄</span><span class="r546">▄</span><span class="r547">▄</span><span class="r548">▄</span><span class="r549">▄</span><span class="r550">▄</span><span class="r551">▄</span><span class="r552">▄</span><span class="r553">▄</span><span class="r554">▄</span><span class="r555">▄</span><span class="r556">▄</span><span class="r557">▄</span><span class="r558">▄</span><span class="r559">▄</span><span class="r560">▄</span><span class="r561">▄</span><span class="r562">▄</span><span class="r563">▄</span><span class="r564">▄</span><span class="r565">▄</span><span class="r566">▄</span><span class="r567">▄</span><span class="r568">▄</span><span class="r569">▄</span><span class="r570">▄</span><span class="r571">▄</span><span class="r572">▄</span><span class="r573">▄</span><span class="r574">▄</span><span class="r575">▄</span><span class="r576">▄</span><span class="r577">▄</span><span class="r578">▄</span><span class="r579">▄</span><span class="r580">▄</span><span class="r581">▄</span><span class="r582">▄</span><span class="r583">▄</span><span class="r584">▄</span><span class="r585">▄</span><span class="r586">▄</span><span class="r587">▄</span><span class="r588">▄</span><span class="r589">▄</span><span class="r590">▄</span><span class="r591">▄</span><span class="r592">▄</span><span class="r593">▄</span><span class="r594">▄</span><span class="r595">▄</span><span class="r596">▄</span><span class="r597">▄</span><span class="r598">▄</span><span class="r599">▄</span><span class="r600">▄</span><span class="r601">▄</span><span class="r602">▄</span><span class="r603">▄</span><span class="r604">▄</span><span class="r605">▄</span><span class="r606">▄</span><span class="r607">▄</span><span class="r608">▄</span><span class="r609">▄</span><span class="r610">▄</span><span class="r611">▄</span><span class="r612">▄</span><span class="r613">▄</span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                                                                                                        </span></div>
+<div><span class="r3">    Styles    </span><span class="r1">All ansi styles: </span><span class="r614">bold</span><span class="r1">, </span><span class="r615">dim</span><span class="r1">, </span><span class="r2">italic</span><span class="r1">, </span><span class="r616">underline</span><span class="r1">, </span><span class="r617">strikethrough</span><span class="r1">, </span><span class="r618">reverse</span><span class="r1">, and even </span><span class="r619"><span class="blink">blink</span></span><span class="r1">.                                                                  </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                                                                                                        </span></div>
+<div><span class="r3">     Text     </span><span class="r1">Word wrap text. Justify </span><span class="r620">left</span><span class="r1">, </span><span class="r621">center</span><span class="r1">, </span><span class="r622">right</span><span class="r1"> or </span><span class="r623">full</span><span class="r1">.                                                                                                    </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                                                                                                        </span></div>
+<div><span class="r3">              </span><span class="r620">Lorem ipsum dolor sit amet,          </span><span class="r1"> </span><span class="r621">     Lorem ipsum dolor sit amet,     </span><span class="r1"> </span><span class="r622">         Lorem ipsum dolor sit amet,</span><span class="r1"> </span><span class="r623">Lorem   ipsum    dolor    sit    amet,</span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r620">consectetur adipiscing elit. Quisque </span><span class="r1"> </span><span class="r621">consectetur adipiscing elit. Quisque </span><span class="r1"> </span><span class="r622">consectetur adipiscing elit. Quisque</span><span class="r1"> </span><span class="r623">consectetur adipiscing  elit.  Quisque</span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r620">in metus sed sapien ultricies pretium</span><span class="r1"> </span><span class="r621">in metus sed sapien ultricies pretium</span><span class="r1"> </span><span class="r622">       in metus sed sapien ultricies</span><span class="r1"> </span><span class="r623">in metus sed sapien ultricies  pretium</span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r620">a at justo. Maecenas luctus velit et </span><span class="r1"> </span><span class="r621">a at justo. Maecenas luctus velit et </span><span class="r1"> </span><span class="r622"> pretium a at justo. Maecenas luctus</span><span class="r1"> </span><span class="r623">a at justo. Maecenas luctus  velit  et</span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r620">auctor maximus.                      </span><span class="r1"> </span><span class="r621">           auctor maximus.           </span><span class="r1"> </span><span class="r622">            velit et auctor maximus.</span><span class="r1"> </span><span class="r623">auctor maximus.</span><span class="r1">                       </span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                                                                                                        </span></div>
+<div><span class="r3">    Asian     </span><span class="r1">🇨🇳  该库支持中文，日文和韩文文本！                                                                                                                     </span><span class="r1"> </span></div>
+<div><span class="r3">   language   </span><span class="r1">🇯🇵  ライブラリは中国語、日本語、韓国語のテキストをサポートしています                                                                                   </span><span class="r1"> </span></div>
+<div><span class="r3">   support    </span><span class="r1">🇰🇷  이 라이브러리는 중국어, 일본어 및 한국어 텍스트를 지원합니다                                                                                       </span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                                                                                                        </span></div>
+<div><span class="r3">    Markup    </span><span class="r248">Rich</span><span class="r1"> supports a simple </span><span class="r2">bbcode</span><span class="r1">-like </span><span class="r614">markup</span><span class="r1"> for </span><span class="r621">color</span><span class="r1">, </span><span class="r616">style</span><span class="r1">, and emoji! 👍 🍎 🐜 🐻 🥖 🚌                                                                </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                                                                                                        </span></div>
+<div><span class="r3">    Tables    </span><span class="r614"> </span><span class="r4">Date</span><span class="r614">         </span><span class="r1"> </span><span class="r614"> </span><span class="r126">Title</span><span class="r614">                               </span><span class="r1"> </span><span class="r614"> </span><span class="r492">Production Budget</span><span class="r614"> </span><span class="r1"> </span><span class="r614">     </span><span class="r248">Box Office</span><span class="r614"> </span><span class="r1">                                                              </span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r1">─────────────────────────────────────────────────────────────────────────────────────────</span><span class="r1">                                                              </span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r620"> Dec 20, 2019 </span><span class="r1"> </span><span class="r622"> Star Wars: The Rise of Skywalker    </span><span class="r1"> </span><span class="r624">      $275,000,000 </span><span class="r1"> </span><span class="r625">   $375,126,118 </span><span class="r1">                                                              </span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r626"> May 25, 2018 </span><span class="r1"> </span><span class="r627"> </span><span class="r628">Solo</span><span class="r627">: A Star Wars Story             </span><span class="r1"> </span><span class="r629">      $275,000,000 </span><span class="r1"> </span><span class="r630">   $393,151,347 </span><span class="r1">                                                              </span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r620"> Dec 15, 2017 </span><span class="r1"> </span><span class="r622"> Star Wars Ep. VIII: The Last Jedi   </span><span class="r1"> </span><span class="r624">      $262,000,000 </span><span class="r1"> </span><span class="r625"> </span><span class="r248">$1,332,539,889</span><span class="r625"> </span><span class="r1">                                                              </span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r626"> May 19, 1999 </span><span class="r1"> </span><span class="r627"> Star Wars Ep. </span><span class="r628">I</span><span class="r627">: </span><span class="r631">The phantom Menace</span><span class="r627"> </span><span class="r1"> </span><span class="r629">      $115,000,000 </span><span class="r1"> </span><span class="r630"> $1,027,044,677 </span><span class="r1">                                                              </span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                                                                                                        </span></div>
+<div><span class="r3">    Syntax    </span><span class="r632">  </span><span class="r633"> 1 </span><span class="r634">def</span><span class="r635"> </span><span class="r636">iter_last</span><span class="r635">(values: Iterable[T]) </span><span class="r637">-&gt;</span><span class="r635"> Iterable[Tuple[bool, T]]:</span><span class="r638">       </span><span class="r1">  </span><span class="r614">{</span><span class="r1">                                                                          </span></div>
+<div><span class="r3"> highlighting </span><span class="r632">  </span><span class="r633"> 2 </span><span class="r639">│   </span><span class="r640">&quot;&quot;&quot;Iterate and generate a tuple with a flag for last value.&quot;&quot;&quot;</span><span class="r638">    </span><span class="r1">  </span><span class="r626">│   </span><span class="r620">&#x27;foo&#x27;</span><span class="r1">: </span><span class="r614">[</span><span class="r1">                                                               </span></div>
+<div><span class="r3">      &amp;       </span><span class="r632">  </span><span class="r633"> 3 </span><span class="r639">│   </span><span class="r635">iter_values </span><span class="r637">=</span><span class="r635"> iter(values)</span><span class="r638">                                        </span><span class="r1">  </span><span class="r626">│   │   </span><span class="r492">3.1427</span><span class="r1">,                                                            </span></div>
+<div><span class="r3">    pretty    </span><span class="r632">  </span><span class="r633"> 4 </span><span class="r639">│   </span><span class="r634">try</span><span class="r635">:</span><span class="r638">                                                              </span><span class="r1">  </span><span class="r626">│   │   </span><span class="r614">(</span><span class="r620">&#x27;Paul Atreides&#x27;</span><span class="r1">, </span><span class="r620">&#x27;Vladimir Harkonnen&#x27;</span><span class="r1">, </span><span class="r620">&#x27;Thufir Hawat&#x27;</span><span class="r614">)</span><span class="r1">            </span></div>
+<div><span class="r3">   printing   </span><span class="r632">  </span><span class="r633"> 5 </span><span class="r639">│   │   </span><span class="r635">previous_value </span><span class="r637">=</span><span class="r635"> next(iter_values)</span><span class="r638">                            </span><span class="r1">  </span><span class="r626">│   </span><span class="r614">]</span><span class="r1">,                                                                     </span></div>
+<div><span class="r3">              </span><span class="r632">  </span><span class="r633"> 6 </span><span class="r639">│   </span><span class="r634">except</span><span class="r635"> </span><span class="r636">StopIteration</span><span class="r635">:</span><span class="r638">                                             </span><span class="r1">  </span><span class="r626">│   </span><span class="r620">&#x27;atomic&#x27;</span><span class="r1">: </span><span class="r614">(</span><span class="r641">False</span><span class="r1">, </span><span class="r642">True</span><span class="r1">, </span><span class="r643">None</span><span class="r614">)</span><span class="r1">                                          </span></div>
+<div><span class="r3">              </span><span class="r632">  </span><span class="r633"> 7 </span><span class="r639">│   │   </span><span class="r634">return</span><span class="r638">                                                        </span><span class="r1">  </span><span class="r614">}</span><span class="r1">                                                                          </span></div>
+<div><span class="r3">              </span><span class="r632">  </span><span class="r633"> 8 </span><span class="r639">│   </span><span class="r634">for</span><span class="r635"> value </span><span class="r637">in</span><span class="r635"> iter_values:</span><span class="r638">                                         </span><span class="r1">                                                                             </span></div>
+<div><span class="r3">              </span><span class="r632">  </span><span class="r633"> 9 </span><span class="r639">│   │   </span><span class="r634">yield</span><span class="r635"> </span><span class="r634">False</span><span class="r635">, previous_value</span><span class="r638">                                   </span><span class="r1">                                                                             </span></div>
+<div><span class="r3">              </span><span class="r632">  </span><span class="r633">10 </span><span class="r639">│   │   </span><span class="r635">previous_value </span><span class="r637">=</span><span class="r635"> value</span><span class="r638">                                        </span><span class="r1">                                                                             </span></div>
+<div><span class="r3">              </span><span class="r632">  </span><span class="r633">11 </span><span class="r639">│   </span><span class="r634">yield</span><span class="r635"> </span><span class="r634">True</span><span class="r635">, previous_value</span><span class="r638">                                        </span><span class="r1">                                                                             </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                                                                                                        </span></div>
+<div><span class="r3">   Markdown   </span><span class="r624"># Markdown</span><span class="r1">                                                                   ╔════════════════════════════════════════════════════════════════════════╗ </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                             ║                                </span><span class="r614">Markdown</span><span class="r1">                                ║ </span></div>
+<div><span class="r3">              </span><span class="r624">Supports much of the *markdown* __syntax__!</span><span class="r1">                                  ╚════════════════════════════════════════════════════════════════════════╝ </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                             </span><span class="r1">                                                                          </span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r624">- Headers</span><span class="r1">                                                                    Supports much of the </span><span class="r2">markdown</span><span class="r1"> </span><span class="r614">syntax</span><span class="r1">!                                      </span></div>
+<div><span class="r3">              </span><span class="r624">- Basic formatting: **bold**, *italic*, `code`</span><span class="r1">                               </span><span class="r1">                                                                          </span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r624">- Block quotes</span><span class="r1">                                                               </span><span class="r370"> • </span><span class="r1">Headers                                                                 </span></div>
+<div><span class="r3">              </span><span class="r624">- Lists, and more...</span><span class="r1">                                                         </span><span class="r370"> • </span><span class="r1">Basic formatting: </span><span class="r614">bold</span><span class="r1">, </span><span class="r2">italic</span><span class="r1">, </span><span class="r644">code</span><span class="r1">                                    </span></div>
+<div><span class="r3">              </span><span class="r624">    </span><span class="r1">                                                                         </span><span class="r370"> • </span><span class="r1">Block quotes                                                            </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                             </span><span class="r370"> • </span><span class="r1">Lists, and more...                                                      </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                                                                                                        </span></div>
+<div><span class="r3">    +more!    </span><span class="r1">Progress bars, columns, styled logging handler, tracebacks, etc...                                                                                     </span><span class="r1"> </span></div>
+<div><span class="r3">              </span><span class="r1">                                                                                                                                                        </span></div>
+<div><span class="r1"></span><span class="r1">                                                                                                                                                                      </span></div>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </foreignObject>
+</svg>
