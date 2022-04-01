@@ -2350,7 +2350,7 @@ class Console:
                 )
             )
 
-            fragments = []
+            fragments: List[str] = []
             theme_foreground_color = _theme.foreground_color.hex
             theme_background_color = _theme.background_color.hex
 

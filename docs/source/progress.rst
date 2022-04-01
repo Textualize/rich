@@ -212,7 +212,7 @@ If the :class:`~rich.progress.Progress` class doesn't offer exactly what you nee
 Reading from a file
 ~~~~~~~~~~~~~~~~~~~
 
-Rich provides an easy way to generate a progress bar for reading a file. If you call :func:`~rich.progress.open` it will return a context manager which displays a progress bar while you read.
+Rich provides an easy way to generate a progress bar for reading a file. If you call :func:`~rich.progress.open` it will return a context manager which displays a progress bar while you read. This is particularly useful when you can't easily modify the code that does the reading.
 
 The following example shows how we might show progress for reading a JSON file::
 
@@ -223,7 +223,7 @@ The following example shows how we might show progress for reading a JSON file::
         data = json.load(file)
     print(data)
 
-If you already have a file object, you can call :func:`~rich.progress.wrap_file` which returns a context manager that wraps your file so that it generates a progress bar. If you use this function you will need to set the number of bytes or characters you expect to read.
+If you already have a file object, you can call :func:`~rich.progress.wrap_file` which returns a context manager that wraps your file so that it displays a progress bar. If you use this function you will need to set the number of bytes or characters you expect to read.
 
 Here's an example that reads a url from the internet::
 
