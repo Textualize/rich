@@ -212,37 +212,38 @@ If the :class:`~rich.progress.Progress` class doesn't offer exactly what you nee
 Reading from a file
 ~~~~~~~~~~~~~~~~~~~
 
-You can obtain a progress-tracking reader using the :meth:`~rich.progress.Progress.open` method by giving it a path. You can specify the number of bytes to be read, but by default :meth:`~rich.progress.Progress.open` will query the size of the file with :func:`os.stat`. You are responsible for closing the file, and you should consider using a *context* to make sure it is closed ::
+Rich provides an easy way to generate a progress bar for reading a file. If you call :func:`~rich.progress.open` it will return a context manager which displays a progress bar while you read.
+
+The following example shows how we might show progress for reading a JSON file::
 
     import json
-    from rich.progress import Progress
+    import rich.progress
 
-    with Progress() as progress:
-        with progress.open("data.json", "rb") as file:
-            json.load(file)
+    with rich.progress.open("data.json", "rb") as file:
+        data = json.load(file)
+    print(data)
+
+If you already have a file object, you can call :func:`~rich.progress.wrap_file` which returns a context manager that wraps your file so that it generates a progress bar. If you use this function you will need to set the number of bytes or characters you expect to read.
+
+Here's an example that reads a url from the internet::
+
+    from time import sleep
+    from urllib.request import urlopen
+
+    from rich.progress import wrap_file
+
+    response = urlopen("https://www.textualize.io")
+    size = int(response.headers["Content-Length"])
+
+    with wrap_file(response, size) as file:
+        for line in file:
+            print(line.decode("utf-8"), end="")
+            sleep(0.1)
 
 
-Note that in the above snippet we use the `"rb"` mode, because we needed the file to be opened in binary mode to pass it to :func:`json.load`. If the API consuming the file is expecting an object in *text mode* (for instance, :func:`csv.reader`), you can open the file with the `"r"` mode, which happens to be the default ::
+If you expect to be reading from multiple files, you can use :meth:`~rich.progress.Progress.open` or :meth:`~rich.progress.Progress.wrap_file` to add a file progress to an existing Progress instance.
 
-    from rich.progress import Progress
-
-    with Progress() as progress:
-        with progress.open("README.md") as file:
-            for line in file:
-                print(line)
-
-
-Reading from a file-like object
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You can obtain a progress-tracking reader wrapping a file-like object using the :meth:`~rich.progress.Progress.wrap_file` method. The file-like object must be in *binary mode*, and a total must be provided, unless it was provided to a :class:`~rich.progress.Task` created beforehand. The returned reader may be used in a context, but will not take care of closing the wrapped file ::
-
-    import json
-    from rich.progress import Progress
-
-    with Progress() as progress:
-        with open("data.json", "rb") as file:
-            json.load(progress.wrap_file(file, total=2048))
+See `cp_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/cp_progress.py>` for a minimal clone of the ``cp`` command which shows a progress bar as the file is copied.
 
 
 Multiple Progress
