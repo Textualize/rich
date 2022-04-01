@@ -300,7 +300,7 @@ class Layout:
         self._children.extend(_layouts)
 
     def split_row(self, *layouts: Union["Layout", RenderableType]) -> None:
-        """Split the layout in tow a row (Layouts side by side).
+        """Split the layout in to a row (layouts side by side).
 
         Args:
             *layouts (Layout): Positional arguments should be (sub) Layout instances.
