@@ -18,6 +18,24 @@ Spinners are from:
     ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
     IN THE SOFTWARE.
 """
+import itertools
+import random
+
+
+def waves_frames(size: int, shuffle: bool = False) -> list[str]:
+    frames = "▁▂▃▄▅▆▇█▇▆▅▄▃▂"
+    waves_frames = [
+        "".join([frames[(item + x) % len(frames)] for x in range(size)])
+        for item in range(len(frames))
+    ]
+    if shuffle:
+        waves_frames = [
+            "".join(item)
+            for item in itertools.product(frames, repeat=4)
+        ]
+        random.shuffle(waves_frames)
+    return waves_frames
+
 
 SPINNERS = {
     "dots": {
@@ -478,5 +496,13 @@ SPINNERS = {
             "▰▰▰▰▰▰▰",
             "▰▱▱▱▱▱▱",
         ],
+    },
+    "waves1": {
+        "interval": 120,
+        "frames": waves_frames(4, False),
+    },
+    "waves2": {
+        "interval": 120,
+        "frames": waves_frames(4, True),
     },
 }
