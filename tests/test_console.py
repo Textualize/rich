@@ -3,7 +3,8 @@ import io
 import os
 import sys
 import tempfile
-from typing import Optional
+from typing import Optional, Tuple, Type, Union
+from unittest import mock
 
 import pytest
 
@@ -120,6 +121,48 @@ def test_size():
     console = Console(width=99, height=101, legacy_windows=False)
     w, h = console.size
     assert w == 99 and h == 101
+
+
+@pytest.mark.parametrize(
+    "is_windows,no_descriptor_size,stdin_size,stdout_size,stderr_size,expected_size",
+    [
+        # on Windows we'll use `os.get_terminal_size()` without arguments...
+        (True, (133, 24), ValueError, ValueError, ValueError, (133, 24)),
+        (False, (133, 24), ValueError, ValueError, ValueError, (80, 25)),
+        # ...while on other OS we'll try to pass stdin, then stdout, then stderr to it:
+        (False, ValueError, (133, 24), ValueError, ValueError, (133, 24)),
+        (False, ValueError, ValueError, (133, 24), ValueError, (133, 24)),
+        (False, ValueError, ValueError, ValueError, (133, 24), (133, 24)),
+        (False, ValueError, ValueError, ValueError, ValueError, (80, 25)),
+    ],
+)
+@mock.patch("rich.console.os.get_terminal_size")
+def test_size_can_fall_back_to_std_descriptors(
+    get_terminal_size_mock: mock.MagicMock,
+    is_windows: bool,
+    no_descriptor_size: Union[Tuple[int, int], Type[ValueError]],
+    stdin_size: Union[Tuple[int, int], Type[ValueError]],
+    stdout_size: Union[Tuple[int, int], Type[ValueError]],
+    stderr_size: Union[Tuple[int, int], Type[ValueError]],
+    expected_size,
+):
+    def get_terminal_size_mock_impl(fileno: int = None) -> Tuple[int, int]:
+        value = {
+            None: no_descriptor_size,
+            sys.__stdin__.fileno(): stdin_size,
+            sys.__stdout__.fileno(): stdout_size,
+            sys.__stderr__.fileno(): stderr_size,
+        }[fileno]
+        if value is ValueError:
+            raise value
+        return value
+
+    get_terminal_size_mock.side_effect = get_terminal_size_mock_impl
+
+    console = Console(legacy_windows=False)
+    with mock.patch("rich.console.WINDOWS", new=is_windows):
+        w, h = console.size
+    assert (w, h) == expected_size
 
 
 def test_repr():

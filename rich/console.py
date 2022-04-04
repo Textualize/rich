@@ -1102,12 +1102,16 @@ class Console:
             except OSError:  # Probably not a terminal
                 pass
         else:
-            try:
-                width, height = os.get_terminal_size(sys.__stdin__.fileno())
-            except (AttributeError, ValueError, OSError):
+            posix_std_descriptors = (
+                sys.__stdin__,  # try this one first...
+                sys.__stdout__,  # ...then that one...
+                sys.__stderr__,  # ...and ultimately try to fall back to this one
+            )
+            for descriptor in posix_std_descriptors:
                 try:
-                    width, height = os.get_terminal_size(sys.__stdout__.fileno())
-                except (AttributeError, ValueError, OSError):
+                    width, height = os.get_terminal_size(descriptor.fileno())
+                    break
+                except (AttributeError, ValueError, OSError) as err:
                     pass
 
         columns = self._environ.get("COLUMNS")
