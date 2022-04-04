@@ -23,7 +23,7 @@
 
 Rich는 터미널에서 _풍부한(rich)_ 텍스트와 아름다운 서식을 지원하기 위한 파이썬 라이브러리입니다.
 
-[Rich API](https://rich.readthedocs.io/en/latest/)는 터미널 출력에 색깔과 스타일을 입히기 쉽게 도와줍니다. 또한 Rich는 별다른 설정 없이 표, 진행 바, 마크다운, 소스코드 구문 강조, tracebacks 등을 예쁘게 보여줄 수 있습니다.  
+[Rich API](https://rich.readthedocs.io/en/latest/)는 터미널 출력에 색깔과 스타일을 입히기 쉽게 도와줍니다. 또한 Rich는 별다른 설정 없이 표, 진행 바, 마크다운, 소스코드 구문 강조, tracebacks 등을 예쁘게 보여줄 수 있습니다.
 
 ![Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
 
@@ -33,7 +33,7 @@ Rich에 대한 동영상 설명을 보시려면 [@fishnets88](https://twitter.co
 
 ## 호환성
 
-Rich는 리눅스, OSX, 윈도우에서 동작합니다. 트루 컬러 / 이모지는 새로운 윈도우 터미널에서 동작하지만 구형 터미널에서는 16가지 색으로 제한됩니다. Rich는 파이썬 3.6.1 버전 혹은 그 이후 버전이 필요합니다.
+Rich는 리눅스, OSX, 윈도우에서 동작합니다. 트루 컬러 / 이모지는 새로운 윈도우 터미널에서 동작하지만 구형 터미널에서는 16가지 색으로 제한됩니다. Rich는 파이썬 3.6.3 버전 혹은 그 이후 버전이 필요합니다.
 
 Rich는 [Jupyter notebooks](https://jupyter.org/)에서 별도의 설정없이 바로 동작합니다.
 
@@ -53,7 +53,7 @@ python -m rich
 
 ## Rich Print
 
-간단하게 당신의 어플리케이션에 rich한 출력을 추가하려면, 파이썬 내장 함수와 signature가 같은 [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) 메서드를 import 할 수 있습니다. 
+간단하게 당신의 어플리케이션에 rich한 출력을 추가하려면, 파이썬 내장 함수와 signature가 같은 [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) 메서드를 import 할 수 있습니다.
 따라해보세요:
 
 ```python
@@ -84,13 +84,13 @@ from rich.console import Console
 
 console = Console()
 ```
- 
+
 콘솔 객체에는 `print` 메서드가 있는데, 내부적으로 내장 `print` 함수와 유사한 인터페이스를 가지고 있습니다. 아래는 예제입니다:
 
 ```python
 console.print("Hello", "World!")
 ```
- 
+
 예상대로 `"Hello World!"`이 터미널에 출력될 것입니다. 내장 `print` 함수와 달리, Rich는 터미널 폭에 맞춰 자동 줄바꿈(word-wrap)을 적용하는 것에 유의하세요.
 
 출력에 색깔과 스타일을 입히는 방법은 몇가지가 있습니다. `style` 키워드 전달인자를 추가해 전체 출력에 대해 스타일을 변경할 수 있습니다. 예제는 다음과 같습니다:
@@ -129,13 +129,13 @@ Rich는 class나 instance, builtin 같은 파이썬 객체의 레포트를 생�
 
 # Rich Library
 
-Rich는 CLI에서 우아하게 출력하거나 코드 디버깅을 돕도록 다양한 빌트인 _렌더링을_ 포함하고 있습니다. 
+Rich는 CLI에서 우아하게 출력하거나 코드 디버깅을 돕도록 다양한 빌트인 _렌더링을_ 포함하고 있습니다.
 
 자세한 내용을 확인하려면 제목을 눌러주세요:
 
 <details>
 <summary>Log</summary>
- 
+
 Console 객체는 `print()`와 인터페이스가 유사한 `log()` 메서드를 가지고 있습니다. `Log()`는 호출이 이루어진 파일과 라인, 현재 시간도 같이 출력합니다. 기본적으로 Rich는 파이썬 구조체와 repr string에 대해 신택스 하이라이팅을 지원합니다. 만약 당신이 collection(예를 들어 dict나 list)을 로깅한다면, Rich는 표현 가능한 공간에 맞춰 예쁘게 출력해줍니다. 이러한 기능들에 대한 예시입니다:
 
 ```python
@@ -167,7 +167,7 @@ test_log()
 
 `log_locals` 인자를 사용하면 log 메서드가 호출된 곳의 로컬 변수들을 표로 보여준다는 것도 알아두세요.
 
-로그 메서드는 서버처럼 오랫동안 실행되는 어플리케이션을 터미널로 로깅할때 사용할 수 있지만 디버깅 할 때도 매우 좋습니다. 
+로그 메서드는 서버처럼 오랫동안 실행되는 어플리케이션을 터미널로 로깅할때 사용할 수 있지만 디버깅 할 때도 매우 좋습니다.
 
 </details>
 <details>
@@ -238,7 +238,7 @@ console.print(table)
 
 ![table](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
 
-콘솔 출력은 `print()`나 `log()`와 같은 방식으로 렌더링 된다는 것을 주의하세요. 사실, Rich로 표현할 수 있는 것은 무엇이든 headers / rows (심지어 다른 표들도)에 포함할 수 있습니다. 
+콘솔 출력은 `print()`나 `log()`와 같은 방식으로 렌더링 된다는 것을 주의하세요. 사실, Rich로 표현할 수 있는 것은 무엇이든 headers / rows (심지어 다른 표들도)에 포함할 수 있습니다.
 
 `Table` 클래스는 터미널의 폭에 맞춰 필요한 만큼 줄을 내리고 열 길이를 스스로 조절합니다. 위의 표보다 작은 터미널에서 만들어진 표 예시입니다:
 
@@ -309,7 +309,7 @@ python -m rich.spinner
 
 <details>
 <summary>Tree(트리)</summary>
- 
+
 Rich는 가이드라인과 함께 [트리](https://rich.readthedocs.io/en/latest/tree.html)를 표현할 수 있습니다. 파일 구조나, 계층적 데이터를 보여주는데 적합합니다.
 
 트리의 라벨은 간단한 텍스트나 Rich로 표현할 수 있는 것은 모든지 가능합니다. 아래의 예시를 따라해보세요:
@@ -321,7 +321,7 @@ python -m rich.tree
 이는 아래와 같이 출력됩니다:
 
 ![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
- 
+
 리눅스의 `tree` 명령어처럼 아무 디렉토리의 트리를 보여주는 스크립트 예제를 보시려면 [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py)를 확인해주세요.
 
 </details>
@@ -408,8 +408,8 @@ console.print(syntax)
 
 <details>
 <summary>Tracebacks</summary>
-  
-Rich는 [예쁜 tracebacks](https://rich.readthedocs.io/en/latest/traceback.html)을 표현할 수 있습니다. 이것은 읽기도 더 쉽고 일반적인 파이썬 tracebacks 보다 더 많은 코드를 보여줍니다. uncaught exceptions가 Rich로 출력되도록 Rich를 기본 Traceback 핸들러로 설정할 수도 있습니다. 
+
+Rich는 [예쁜 tracebacks](https://rich.readthedocs.io/en/latest/traceback.html)을 표현할 수 있습니다. 이것은 읽기도 더 쉽고 일반적인 파이썬 tracebacks 보다 더 많은 코드를 보여줍니다. uncaught exceptions가 Rich로 출력되도록 Rich를 기본 Traceback 핸들러로 설정할 수도 있습니다.
 
 OSX에서는 이렇게 출력됩니다 (리눅스도 유사함):
 
@@ -423,7 +423,7 @@ OSX에서는 이렇게 출력됩니다 (리눅스도 유사함):
 
 Tidelift 구독의 일환으로 가능합니다.
 
-Rich를 포함한 수천가지 다른 패키지들의 메인테이너들은 당신이 앱을 만들기 위해 사용하는 오픈소스 패키지의 상업적인 지원과 유지보수를 위해 Tidelift와 함께 일하고 있습니다. 당신이 사용하는 패키지의 메인테이너에게 비용을 지불하는 대신 시간을 절약하고, 리스크를 줄이고, 코드의 품질을 향상시킬 수 있습니다. [더 자세한 정보는 여기를 참고바랍니다.](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)  
+Rich를 포함한 수천가지 다른 패키지들의 메인테이너들은 당신이 앱을 만들기 위해 사용하는 오픈소스 패키지의 상업적인 지원과 유지보수를 위해 Tidelift와 함께 일하고 있습니다. 당신이 사용하는 패키지의 메인테이너에게 비용을 지불하는 대신 시간을 절약하고, 리스크를 줄이고, 코드의 품질을 향상시킬 수 있습니다. [더 자세한 정보는 여기를 참고바랍니다.](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
 
 # Rich를 사용하는 프로젝트들
 
@@ -451,7 +451,7 @@ Rich를 사용하는 몇가지 프로젝트들입니다:
   자동으로 자막과 영상의 싱크를 맞추세요.
 - [tryolabs/norfair](https://github.com/tryolabs/norfair)
   모든 탐지된 것에 실시간으로 2D 오브젝트 트래킹을 추가하는 경량화된 파이썬 라이브러리.
-- [ansible/ansible-lint](https://github.com/ansible/ansible-lint) 
+- [ansible/ansible-lint](https://github.com/ansible/ansible-lint)
   Ansible-lint가 playbooks를 확인해 잠재적으로 개선될 수 있는 practices나 동작을 확인합니다.
 - [ansible-community/molecule](https://github.com/ansible-community/molecule)
   Ansible Molecule의 테스트 프레임워크
