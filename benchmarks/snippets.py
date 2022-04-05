@@ -115,7 +115,7 @@ Richの紹介動画はこちらをご覧ください。 [calmcode.io](https://ca
 
 ## 互換性
 
-RichはLinux、OSX、Windowsに対応しています。True colorと絵文字は新しい Windows ターミナルで動作しますが、古いターミナルでは8色に制限されています。Richを使用するにはPythonのバージョンは3.6.1以降が必要です。
+RichはLinux、OSX、Windowsに対応しています。True colorと絵文字は新しい Windows ターミナルで動作しますが、古いターミナルでは8色に制限されています。Richを使用するにはPythonのバージョンは3.6.3以降が必要です。
 
 Richは追加の設定を行わずとも、[Jupyter notebooks](https://jupyter.org/)で動作します。
 

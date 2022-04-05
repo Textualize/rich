@@ -35,7 +35,7 @@ Lihat pendapat [pengguna yang telah menggunakan Rich](https://www.willmcgugan.co
 
 ## Kompabilitas
 
-Rich dapat berjalan di Linux, OSX, dan Windows. Warna tambahan / emoji dapat berjalan di Windows Terminal baru, untuk terminal lama pewarnaan terbatas ke dalam 16 warna. Rich memerlukan versi Python 3.6.1 atau ke atas. 
+Rich dapat berjalan di Linux, OSX, dan Windows. Warna tambahan / emoji dapat berjalan di Windows Terminal baru, untuk terminal lama pewarnaan terbatas ke dalam 16 warna. Rich memerlukan versi Python 3.6.3 atau ke atas.
 
 Rich dapat berjalan di [Jupyter notebooks](https://jupyter.org/) tanpa memerlukan konfigurasi tambahan.
 
@@ -92,7 +92,7 @@ Console object memiliki method `print` yang berfungsi serupa dengan built-in `pr
 console.print("Hello", "World!")
 ```
 
-Seperti yang anda perkirakan, perintah tersebut akan menampilkan `"Hello World!"` sebagai output di terminal. Catatan, perbedaan dengan fungsi built-in `print`, Rich membuat teks termampatkan disesuaikan dengan lebar terminal. 
+Seperti yang anda perkirakan, perintah tersebut akan menampilkan `"Hello World!"` sebagai output di terminal. Catatan, perbedaan dengan fungsi built-in `print`, Rich membuat teks termampatkan disesuaikan dengan lebar terminal.
 
 Terdapat beberapa cara untuk melakukan penambahan warna dan gaya output dari program anda. Anda dapat mengatur keseluruhan output dengan menambahkan keyword argumen `style`. Berikut adalah contoh penerapannya:
 
@@ -135,9 +135,9 @@ Rich mengandung sejumlah built-in yang bersifat _renderables_, artinya anda dapa
 Klik pilihan berikut untuk detail lebih lanjut:
 
 <details>
-<summary>Log</summary> 
+<summary>Log</summary>
 
-Console object mempunyai method bernama `log()` yang serupa dengan `print()`, tetapi juga mendukung fitur perenderan kolom waktu terkini serta baris file yang melakukan pemanggilan fungsi tertentu. Secara default Rich akan menghilight syntax untuk struktur python dan REPR strings. Jika anda melakukan log pada sekumpulan data (misal dictionary atau list) Rich akan memperindah output yang ditampilkan serta disesuaikan dengan ukuran terminal yang tersedia. Berikut adalah contoh penerapan dari beberapa fitur ini. 
+Console object mempunyai method bernama `log()` yang serupa dengan `print()`, tetapi juga mendukung fitur perenderan kolom waktu terkini serta baris file yang melakukan pemanggilan fungsi tertentu. Secara default Rich akan menghilight syntax untuk struktur python dan REPR strings. Jika anda melakukan log pada sekumpulan data (misal dictionary atau list) Rich akan memperindah output yang ditampilkan serta disesuaikan dengan ukuran terminal yang tersedia. Berikut adalah contoh penerapan dari beberapa fitur ini.
 
 ```python
 from rich.console import Console
@@ -456,7 +456,7 @@ Berikut adalah beberpa projek yang menggunakan Rich:
 - [tryolabs/norfair](https://github.com/tryolabs/norfair)
   Library Python ringan untuk menambahkan deteksi objek secara real-time pada objek 2D pada suatu detektor.
 - [ansible/ansible-lint](https://github.com/ansible/ansible-lint) Sebuah ansible-lint untuk memeriksa playbooks yang digunakan sebagai practices and behaviour yang secara potensial dapat ditingkatkan.
-- [ansible-community/molecule](https://github.com/ansible-community/molecule) Ansible Molecule untuk framework testing 
+- [ansible-community/molecule](https://github.com/ansible-community/molecule) Ansible Molecule untuk framework testing
 - +[Lebih banyak lagi](https://github.com/willmcgugan/rich/network/dependents)!
 
 <!-- This is a test, no need to translate -->

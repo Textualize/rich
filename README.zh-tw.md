@@ -33,7 +33,7 @@ Rich 是一款提供終端機介面中 _豐富的_ 文字效果及精美的格�
 
 ## 相容性
 
-Rich 可在 Linux、macOS、Windows 上運作。在新的 Windows Terminal 中可支援顯示全彩及 Emoji，但傳統的終端機中僅支援 16 色。Rich 最低需要的 Python 版本為 3.6.1。
+Rich 可在 Linux、macOS、Windows 上運作。在新的 Windows Terminal 中可支援顯示全彩及 Emoji，但傳統的終端機中僅支援 16 色。Rich 最低需要的 Python 版本為 3.6.3。
 
 Rich 可在 [Jupyter notebooks](https://jupyter.org/) 上使用，無須額外設定。
 
@@ -195,7 +195,7 @@ log 方法可用於伺服器上長時間運作的程式，也很適合一般程�
 <details>
 <summary>表格</summary>
 
-Rich 可以用 unicode box 字元繪製彈性的 [表格](https://rich.readthedocs.io/en/latest/tables.html)。格式設定十分多元，包含框線、樣式、儲存格對齊……。 
+Rich 可以用 unicode box 字元繪製彈性的 [表格](https://rich.readthedocs.io/en/latest/tables.html)。格式設定十分多元，包含框線、樣式、儲存格對齊……。
 
 ![table movie](https://github.com/willmcgugan/rich/raw/master/imgs/table_movie.gif)
 
