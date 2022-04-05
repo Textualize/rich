@@ -40,7 +40,7 @@ else:
     from typing_extensions import Literal  # pragma: no cover
 
 from . import filesize, get_console
-from .console import Console, JustifyMethod, RenderableType, Group
+from .console import Console, Group, JustifyMethod, RenderableType
 from .highlighter import Highlighter
 from .jupyter import JupyterMixin
 from .live import Live
@@ -651,7 +651,7 @@ class BarColumn(ProgressColumn):
     def render(self, task: "Task") -> ProgressBar:
         """Gets a progress bar widget for a task."""
         return ProgressBar(
-            total=max(0, task.total),
+            total=max(0, task.total) if task.total is not None else None,
             completed=max(0, task.completed),
             width=None if self.bar_width is None else max(1, self.bar_width),
             pulse=not task.started,
@@ -734,7 +734,7 @@ class TotalFileSizeColumn(ProgressColumn):
 
     def render(self, task: "Task") -> Text:
         """Show data completed."""
-        data_size = filesize.decimal(int(task.total))
+        data_size = filesize.decimal(int(task.total)) if task.total is not None else ""
         return Text(data_size, style="progress.filesize.total")
 
 
@@ -757,7 +757,7 @@ class MofNCompleteColumn(ProgressColumn):
     def render(self, task: "Task") -> Text:
         """Show completed/total."""
         completed = int(task.completed)
-        total = int(task.total)
+        total = int(task.total) if task.total is not None else "?"
         total_width = len(str(total))
         return Text(
             f"{completed:{total_width}d}{self.separator}{total}",
@@ -781,24 +781,34 @@ class DownloadColumn(ProgressColumn):
     def render(self, task: "Task") -> Text:
         """Calculate common unit for completed and total."""
         completed = int(task.completed)
-        total = int(task.total)
+
+        unit_and_suffix_calculation_base = (
+            int(task.total) if task.total is not None else completed
+        )
         if self.binary_units:
             unit, suffix = filesize.pick_unit_and_suffix(
-                total,
+                unit_and_suffix_calculation_base,
                 ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"],
                 1024,
             )
         else:
             unit, suffix = filesize.pick_unit_and_suffix(
-                total,
+                unit_and_suffix_calculation_base,
                 ["bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
                 1000,
             )
-        completed_ratio = completed / unit
-        total_ratio = total / unit
         precision = 0 if unit == 1 else 1
+
+        completed_ratio = completed / unit
         completed_str = f"{completed_ratio:,.{precision}f}"
-        total_str = f"{total_ratio:,.{precision}f}"
+
+        if task.total is not None:
+            total = int(task.total)
+            total_ratio = total / unit
+            total_str = f"{total_ratio:,.{precision}f}"
+        else:
+            total_str = "?"
+
         download_status = f"{completed_str}/{total_str} {suffix}"
         download_text = Text(download_status, style="progress.download")
         return download_text
@@ -839,8 +849,8 @@ class Task:
     description: str
     """str: Description of the task."""
 
-    total: float
-    """str: Total number of steps in this task."""
+    total: Optional[float]
+    """Optional[float]: Total number of steps in this task."""
 
     completed: float
     """float: Number of steps completed"""
@@ -883,8 +893,10 @@ class Task:
         return self.start_time is not None
 
     @property
-    def remaining(self) -> float:
-        """float: Get the number of steps remaining."""
+    def remaining(self) -> Optional[float]:
+        """Optional[float]: Get the number of steps remaining, if a non-None total was set."""
+        if self.total is None:
+            return None
         return self.total - self.completed
 
     @property
@@ -903,7 +915,7 @@ class Task:
 
     @property
     def percentage(self) -> float:
-        """float: Get progress of task as a percentage."""
+        """float: Get progress of task as a percentage. If a None total was set, returns 0"""
         if not self.total:
             return 0.0
         completed = (self.completed / self.total) * 100.0
@@ -936,7 +948,10 @@ class Task:
         speed = self.speed
         if not speed:
             return None
-        estimate = ceil(self.remaining / speed)
+        remaining = self.remaining
+        if not remaining:
+            return None
+        estimate = ceil(remaining / speed)
         return estimate
 
     def _reset(self) -> None:
@@ -1358,7 +1373,11 @@ class Progress(JupyterMixin):
                 popleft()
             if update_completed > 0:
                 _progress.append(ProgressSample(current_time, update_completed))
-            if task.completed >= task.total and task.finished_time is None:
+            if (
+                task.total is not None
+                and task.completed >= task.total
+                and task.finished_time is None
+            ):
                 task.finished_time = task.elapsed
 
         if refresh:
@@ -1423,7 +1442,11 @@ class Progress(JupyterMixin):
             while len(_progress) > 1000:
                 popleft()
             _progress.append(ProgressSample(current_time, update_completed))
-            if task.completed >= task.total and task.finished_time is None:
+            if (
+                task.total is not None
+                and task.completed >= task.total
+                and task.finished_time is None
+            ):
                 task.finished_time = task.elapsed
                 task.finished_speed = task.speed
 
@@ -1484,7 +1507,7 @@ class Progress(JupyterMixin):
         self,
         description: str,
         start: bool = True,
-        total: float = 100.0,
+        total: Optional[float] = 100.0,
         completed: int = 0,
         visible: bool = True,
         **fields: Any,
@@ -1495,7 +1518,7 @@ class Progress(JupyterMixin):
             description (str): A description of the task.
             start (bool, optional): Start the task immediately (to calculate elapsed time). If set to False,
                 you will need to call `start` manually. Defaults to True.
-            total (float, optional): Number of total steps in the progress if know. Defaults to 100.
+            total (float, optional): Number of total steps in the progress if known. Defaults to 100. Set to None to render a pulsing animation.
             completed (int, optional): Number of steps completed so far.. Defaults to 0.
             visible (bool, optional): Enable display of the task. Defaults to True.
             **fields (str): Additional data fields required for rendering.
@@ -1585,12 +1608,12 @@ if __name__ == "__main__":  # pragma: no coverage
         *Progress.get_default_columns(),
         TimeElapsedColumn(),
         console=console,
-        transient=True,
+        transient=False,
     ) as progress:
 
         task1 = progress.add_task("[red]Downloading", total=1000)
         task2 = progress.add_task("[green]Processing", total=1000)
-        task3 = progress.add_task("[yellow]Thinking", total=1000, start=False)
+        task3 = progress.add_task("[yellow]Thinking", total=None)
 
         while not progress.finished:
             progress.update(task1, advance=0.5)
