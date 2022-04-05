@@ -1,7 +1,7 @@
 """Rich text and beautiful formatting in the terminal."""
 
 import os
-from typing import Callable, IO, TYPE_CHECKING, Any, Optional, Union
+from typing import IO, TYPE_CHECKING, Any, Callable, Optional, Union
 
 from ._extension import load_ipython_extension  # noqa: F401
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from .console import Console
 
 # Global console used by alternative print
-_console: Optional["Console"] = None
+_console_default_singleton: Optional["Console"] = None
 
 _IMPORT_CWD = os.path.abspath(os.getcwd())
 
@@ -23,13 +23,13 @@ def get_console() -> "Console":
     Returns:
         Console: A console instance.
     """
-    global _console
-    if _console is None:
+    global _console_default_singleton
+    if _console_default_singleton is None:
         from .console import Console
 
-        _console = Console()
+        _console_default_singleton = Console()
 
-    return _console
+    return _console_default_singleton
 
 
 def reconfigure(*args: Any, **kwargs: Any) -> None:

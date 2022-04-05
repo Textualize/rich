@@ -455,7 +455,7 @@ EXPECTED_SVG = """\
      xmlns="http://www.w3.org/2000/svg">
     <style>
         @font-face {
-            font-family: "Fira Code";
+            font-family: "Rich Fira Code";
             src: local("FiraCode-Regular"),
                  url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),
                  url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");
@@ -463,37 +463,37 @@ EXPECTED_SVG = """\
             font-weight: 400;
         }
         @font-face {
-            font-family: "Fira Code";
+            font-family: "Rich Fira Code";
             src: local("FiraCode-Bold"),
                  url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),
                  url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");
             font-style: bold;
             font-weight: 700;
         }
-        span {
+        #rich-svg-wrapper span {
             display: inline-block;
             white-space: pre;
             vertical-align: top;
             font-size: 18px;
-            font-family:'Fira Code','Cascadia Code',Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
+            font-family:'Rich Fira Code','Cascadia Code',Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
         }
-        a {
+        #rich-svg-wrapper a {
             text-decoration: none;
             color: inherit;
         }
-        .blink {
-           animation: blinker 1s infinite;
+        #rich-svg-wrapper .blink {
+           animation: rich-svg-wrapper-blinker 1s infinite;
         }
-        @keyframes blinker {
+        @keyframes rich-svg-wrapper-blinker {
             from { opacity: 1.0; }
             50% { opacity: 0.3; }
             to { opacity: 1.0; }
         }
-        #wrapper {
+        #rich-svg-wrapper {
             padding: 140px;
             padding-top: 100px;
         }
-        #terminal {
+        #rich-svg-wrapper #terminal {
             position: relative;
             display: flex;
             flex-direction: column;
@@ -502,7 +502,7 @@ EXPECTED_SVG = """\
             border-radius: 14px;
             outline: 1px solid #484848;
         }
-        #terminal:after {
+        #rich-svg-wrapper #terminal:after {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -513,7 +513,7 @@ EXPECTED_SVG = """\
             transform: rotate(-4.5deg);
             z-index: -1;
         }
-        #terminal-header {
+        #rich-svg-wrapper #terminal-header {
             position: relative;
             width: 100%;
             background-color: #2e2e2e;
@@ -525,7 +525,7 @@ EXPECTED_SVG = """\
             box-shadow: inset 0px -1px 0px 0px #4e4e4e,
                         inset 0px -4px 8px 0px #1a1a1a;
         }
-        #terminal-title-tab {
+        #rich-svg-wrapper #terminal-title-tab {
             display: inline-block;
             margin-top: 14px;
             margin-left: 124px;
@@ -538,22 +538,22 @@ EXPECTED_SVG = """\
                         inset 1px 0px 0px 0px #4e4e4e,
                         inset -1px 0px 0px 0px #4e4e4e;
         }
-        #terminal-traffic-lights {
+        #rich-svg-wrapper #terminal-traffic-lights {
             position: absolute;
             top: 24px;
             left: 20px;
         }
-        #terminal-body {
+        #rich-svg-wrapper #terminal-body {
             line-height: 22px;
             padding: 14px;
         }
-        .r1 {color: #f2f2f2; text-decoration-color: #f2f2f2;background-color: #0c0c0c;}
-.r2 {color: #2472c8; text-decoration-color: #2472c8; background-color: #cd3131; font-weight: bold}
-.r3 {;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
+        #rich-svg-wrapper .r1 {color: #f2f2f2; text-decoration-color: #f2f2f2;background-color: #0c0c0c;}
+#rich-svg-wrapper .r2 {color: #2472c8; text-decoration-color: #2472c8; background-color: #cd3131; font-weight: bold}
+#rich-svg-wrapper .r3 {;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
     </style>
     <foreignObject x="0" y="0" width="100%" height="100%">
         <body xmlns="http://www.w3.org/1999/xhtml">
-            <div id="wrapper">
+            <div id="rich-svg-wrapper">
                 <div id="terminal">
                     <div id='terminal-header'>
                         <svg id="terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
