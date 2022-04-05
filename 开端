@@ -1,0 +1,199 @@
+def cycle():
+        
+    print("你采取的措施是：")
+    print("A.不作为")
+    print("B.想办法下车")
+    print("C.呆在车上找出凶手")
+    print("D.正常到站下车")
+    print("E.想办法让所有人都下车")
+    print("F.强抢高压锅")
+    print("G.质问司机")
+    print("H.联系警察")
+    action_0 = input("请输入：") 
+    if action_0 == "A":
+        result_1()
+    if action_0 == "B":
+        result_2()
+    if action_0 == "C":
+        result_3()
+    if action_0 == "D":
+        result_4()    
+    if action_0 == "E":
+        result_5()
+    if action_0 == "F":
+        result_6()        
+    if action_0 == "G":
+        result_7()        
+    if action_0 == "H":
+        result_8()        
+        
+        
+        
+def result_1():
+    bomb_1()
+        
+def result_2():
+    print("你下车的方法是：")
+    print("A.谎称遇到了色狼")
+    print("B.强行打开车门车窗跳车")
+    print("C.装病")
+    action_2 = input("请输入：")
+    if action_2 == "A":
+        result_2_1()
+    if action_2 == "B":
+        result_2_2()
+    if action_2 == "C":
+        result_2_3()
+    
+def result_2_1():
+    print("司机开门，成功下车")
+    bomb_4()
+    
+def result_2_2():
+    bomb_2()
+        
+def result_2_3():
+    bomb_2()
+    
+        
+def result_3():
+    print("你怀疑的人是：")
+    print("A.卢笛")
+    print("B.西瓜老伯")
+    print("C.行李箱大叔")
+    action_3 = input("请输入：")
+    if action_3 == "A":
+        result_3_1()
+    if action_3 == "B":
+        result_3_2()
+    if action_3 == "C":
+        result_3_3()
+
+    
+def result_3_1():
+    print("验证卢迪：")
+    print("A.假装吵架，抢卢笛的包")
+    print("B.谎称卢笛偷拍，抢卢笛的包")
+    print("C.阻止卢笛上车")
+    action_3_1 = input("请输入：")
+    if action_3_1 == "A":
+        result_3_1_1()
+    if action_3_1 == "B":
+        result_3_1_2()
+    if action_3_1 == "C":
+        result_3_1_3()
+        
+def result_3_1_1():
+    bomb_1()
+        
+def result_3_1_2():
+    print("桥上靠边停车，众人准备下车")
+    bomb_3()
+        
+def result_3_1_3():
+    print("三人下车，发现卢笛包里是小猫，排除卢笛")
+    bomb_4()
+        
+def result_3_2():
+    print("经过一系列操作，排除西瓜老伯")
+    bomb_1()
+        
+def result_3_3():
+    print("经过一系列操作，排除行李箱大叔，锁定炸弹在锅姨处")
+    print("强抢高压锅")
+    bomb_3()
+        
+def result_4():
+    print("下车后你去了：")
+    print("A.警局报警")
+    print("B.调查司机夫妇")
+    action_4 = input("请输入：")
+    if action_4 == "A":
+        result_4_1()
+    if action_4 == "B":
+        result_4_2()
+    
+    
+def result_4_1():
+    print("你在警局待到很晚，直到慢慢睡去......")
+    
+def result_4_2():
+    print("你们调查到了真相，协助警察破案")
+    
+def result_5():
+    print("你采取的措施是：")
+    print("A.大喊车上有炸弹")
+    print("B.伪装警察，告诉所有人下车")
+    print("C.伪装警察，偷偷求助他人制服锅姨")
+    action_5 = input("请输入：")
+    if action_5 == "A":
+        result_5_1()
+    if action_5 == "B":
+        result_5_2()
+    if action_5 == "C":
+        result_5_3()
+    
+def result_5_1():
+    bomb_3()
+        
+def result_5_2():
+    print("锅姨起了疑心")
+    bomb_3()
+        
+def result_5_3():
+    print("成功控制锅姨，但司机不开门")
+    print("发现司机也是凶手")
+    bomb_1()
+            
+def result_6():
+    print("一系列的争斗后：")
+    print("A.李诗情被刺死")
+    print("B.锅姨被误杀")
+    action_6 = input("请输入：")
+    if action_6 == "A":
+        result_6_1()
+    if action_6 == "B":
+        result_6_2()
+
+def result_6_1():
+    bomb_3()
+        
+def result_6_2():
+    bomb_5()        
+        
+def result_7():
+    print("锅姨情绪激动：“王兴德！！她是谁？？")
+    bomb_3()
+        
+def result_8():
+    print("告诉司锅姨夫妇事情真相")
+    print("张警官成功接锅，阻止了公交车爆炸")
+    print("循环结束")
+
+        
+def bomb_1():
+    print("时间到达1:45，阴乐响起，炸弹爆炸")
+        
+def bomb_2():
+    print("司机被影响减速，公交车在十字路口与油罐车相撞爆炸")
+        
+def bomb_3():
+    print("锅姨手动拉线，炸弹爆炸")
+    
+def bomb_4():
+    print("下车不久后听见一声巨响，公交车在跨江大桥上爆炸") 
+        
+def bomb_5():
+    print("司机手动拉线，炸弹爆炸")
+
+
+
+        
+for i in range(1,25):
+    print(f"\n这是第{i}次循环")
+    if i<=16:
+        minute = 46-i
+    else:
+        minute = 29
+    print(f"你的苏醒时间是 1:{minute}")
+    cycle()
