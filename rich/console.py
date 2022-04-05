@@ -83,16 +83,20 @@ class NoChange:
 NO_CHANGE = NoChange()
 
 try:
+    _STDIN_FILENO = sys.__stdin__.fileno()
+except Exception:
+    _STDIN_FILENO = 0
+try:
     _STDOUT_FILENO = sys.__stdout__.fileno()
 except Exception:
     _STDOUT_FILENO = 1
-
 try:
     _STDERR_FILENO = sys.__stderr__.fileno()
 except Exception:
     _STDERR_FILENO = 2
 
-_STD_STREAMS = (_STDOUT_FILENO, _STDERR_FILENO)
+_STD_STREAMS = (_STDIN_FILENO, _STDOUT_FILENO, _STDERR_FILENO)
+_STD_STREAMS_OUTPUT = (_STDOUT_FILENO, _STDERR_FILENO)
 
 CONSOLE_HTML_FORMAT = """\
 <!DOCTYPE html>
@@ -1102,16 +1106,11 @@ class Console:
             except OSError:  # Probably not a terminal
                 pass
         else:
-            posix_std_descriptors = (
-                sys.__stdin__,  # try this one first...
-                sys.__stdout__,  # ...then that one...
-                sys.__stderr__,  # ...and ultimately try to fall back to this one
-            )
-            for descriptor in posix_std_descriptors:
+            for file_descriptor in _STD_STREAMS:
                 try:
-                    width, height = os.get_terminal_size(descriptor.fileno())
+                    width, height = os.get_terminal_size(file_descriptor)
                     break
-                except (AttributeError, ValueError, OSError) as err:
+                except (AttributeError, ValueError, OSError):
                     pass
 
         columns = self._environ.get("COLUMNS")
@@ -2070,7 +2069,7 @@ class Console:
                         if self.legacy_windows:
                             try:
                                 use_legacy_windows_render = (
-                                    self.file.fileno() in _STD_STREAMS
+                                    self.file.fileno() in _STD_STREAMS_OUTPUT
                                 )
                             except (ValueError, io.UnsupportedOperation):
                                 pass
