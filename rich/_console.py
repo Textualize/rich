@@ -39,30 +39,30 @@ CONSOLE_SVG_FORMAT = """\
             font-style: bold;
             font-weight: 700;
         }}
-        #{wrapper_id} span {{
+        .{classes_prefix}-terminal-wrapper span {{
             display: inline-block;
             white-space: pre;
             vertical-align: top;
             font-size: {font_size}px;
             font-family:'{font_family}','Cascadia Code',Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
         }}
-        #{wrapper_id} a {{
+        .{classes_prefix}-terminal-wrapper a {{
             text-decoration: none;
             color: inherit;
         }}
-        #{wrapper_id} .blink {{
-           animation: {wrapper_id}-blinker 1s infinite;
+        .{classes_prefix}-terminal-body .blink {{
+           animation: {classes_prefix}-blinker 1s infinite;
         }}
-        @keyframes {wrapper_id}-blinker {{
+        @keyframes {classes_prefix}-blinker {{
             from {{ opacity: 1.0; }}
             50% {{ opacity: 0.3; }}
             to {{ opacity: 1.0; }}
         }}
-        #{wrapper_id} {{
+        .{classes_prefix}-terminal-wrapper {{
             padding: {margin}px;
             padding-top: 100px;
         }}
-        #{wrapper_id} #terminal {{
+        .{classes_prefix}-terminal {{
             position: relative;
             display: flex;
             flex-direction: column;
@@ -71,7 +71,7 @@ CONSOLE_SVG_FORMAT = """\
             border-radius: 14px;
             outline: 1px solid #484848;
         }}
-        #{wrapper_id} #terminal:after {{
+        .{classes_prefix}-terminal:after {{
             position: absolute;
             width: 100%;
             height: 100%;
@@ -82,7 +82,7 @@ CONSOLE_SVG_FORMAT = """\
             transform: rotate(-4.5deg);
             z-index: -1;
         }}
-        #{wrapper_id} #terminal-header {{
+        .{classes_prefix}-terminal-header {{
             position: relative;
             width: 100%;
             background-color: #2e2e2e;
@@ -94,7 +94,7 @@ CONSOLE_SVG_FORMAT = """\
             box-shadow: inset 0px -1px 0px 0px #4e4e4e,
                         inset 0px -4px 8px 0px #1a1a1a;
         }}
-        #{wrapper_id} #terminal-title-tab {{
+        .{classes_prefix}-terminal-title-tab {{
             display: inline-block;
             margin-top: 14px;
             margin-left: 124px;
@@ -107,12 +107,12 @@ CONSOLE_SVG_FORMAT = """\
                         inset 1px 0px 0px 0px #4e4e4e,
                         inset -1px 0px 0px 0px #4e4e4e;
         }}
-        #{wrapper_id} #terminal-traffic-lights {{
+        .{classes_prefix}-terminal-traffic-lights {{
             position: absolute;
             top: 24px;
             left: 20px;
         }}
-        #{wrapper_id} #terminal-body {{
+        .{classes_prefix}-terminal-body {{
             line-height: {line_height}px;
             padding: 14px;
         }}
@@ -120,17 +120,17 @@ CONSOLE_SVG_FORMAT = """\
     </style>
     <foreignObject x="0" y="0" width="100%" height="100%">
         <body xmlns="http://www.w3.org/1999/xhtml">
-            <div id="{wrapper_id}">
-                <div id="terminal">
-                    <div id='terminal-header'>
-                        <svg id="terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
+            <div class="{classes_prefix}-terminal-wrapper">
+                <div class="{classes_prefix}-terminal">
+                    <div class="{classes_prefix}-terminal-header">
+                        <svg class="{classes_prefix}-terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="14" cy="8" r="8" fill="#ff6159"/>
                             <circle cx="38" cy="8" r="8" fill="#ffbd2e"/>
                             <circle cx="62" cy="8" r="8" fill="#28c941"/>
                         </svg>
-                        <div id="terminal-title-tab">{title}</div>
+                        <div class="{classes_prefix}-terminal-title-tab">{title}</div>
                     </div>
-                    <div id='terminal-body'>
+                    <div class="{classes_prefix}-terminal-body">
                         {code}
                     </div>
                 </div>
@@ -139,3 +139,6 @@ CONSOLE_SVG_FORMAT = """\
     </foreignObject>
 </svg>
 """
+
+_SVG_FONT_FAMILY = "Rich Fira Code"
+_SVG_CLASSES_PREFIX = "rich-svg"

@@ -42,7 +42,12 @@ else:
     )  # pragma: no cover
 
 from . import errors, themes
-from ._console import CONSOLE_HTML_FORMAT, CONSOLE_SVG_FORMAT
+from ._console import (
+    _SVG_CLASSES_PREFIX,
+    _SVG_FONT_FAMILY,
+    CONSOLE_HTML_FORMAT,
+    CONSOLE_SVG_FORMAT,
+)
 from ._emoji_replace import _emoji_replace
 from ._log_render import FormatTimeCallable, LogRender
 from .align import Align, AlignMethod
@@ -2177,8 +2182,6 @@ class Console:
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
         code_format: str = CONSOLE_SVG_FORMAT,
-        font_family: str = "Rich Fira Code",
-        wrapper_id: str = "rich-svg-wrapper",
     ) -> str:
         """Generate an SVG string from the console contents (requires record=True in Console constructor)
 
@@ -2189,10 +2192,6 @@ class Console:
             code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
                 into the string in order to form the final SVG output. The default template used and the variables
                 injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
-            font_family (str): The name of the CSS font family used in the SVG. Defaults to ``"Rich Fira Code"``,
-                in order to avoid contaminating the other fonts when the SVG is embedded into an HTML page.
-            wrapper_id (str): The ID of the SVG's root element. Defaults to ``"rich-svg-wrapper"``,
-                in order to avoid contaminating the other CSS selectors when the SVG is embedded into an HTML page.
 
         Returns:
             str: The string representation of the SVG. That is, the ``code_format`` template with content injected.
@@ -2270,7 +2269,7 @@ class Console:
             for style_rule, style_number in styles.items():
                 if style_rule:
                     stylesheet_rules.append(
-                        f"#{wrapper_id} .r{style_number} {{{ style_rule }}}"
+                        f".{_SVG_CLASSES_PREFIX}-terminal-body .r{style_number} {{{ style_rule }}}"
                     )
             stylesheet = "\n".join(stylesheet_rules)
 
@@ -2309,8 +2308,8 @@ class Console:
             theme_background_color=theme_background_color,
             margin=margin,
             font_size=font_size,
-            font_family=font_family,
-            wrapper_id=wrapper_id,
+            font_family=_SVG_FONT_FAMILY,
+            classes_prefix=_SVG_CLASSES_PREFIX,
             line_height=line_height,
             title=title,
             stylesheet=stylesheet,
@@ -2326,8 +2325,6 @@ class Console:
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
         code_format: str = CONSOLE_SVG_FORMAT,
-        font_family: str = "Rich Fira Code",
-        wrapper_id: str = "rich-svg-wrapper",
     ) -> None:
         """Generate an SVG file from the console contents (requires record=True in Console constructor).
 
@@ -2339,18 +2336,12 @@ class Console:
             code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
                 into the string in order to form the final SVG output. The default template used and the variables
                 injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
-            font_family (str): The name of the CSS font family used in the SVG. Defaults to ``"Rich Fira Code"``,
-                in order to avoid contaminating the other fonts when the SVG is embedded into an HTML page.
-            wrapper_id (str): The ID of the SVG's root element. Defaults to ``"rich-svg-wrapper"``,
-                in order to avoid contaminating the other CSS selectors when the SVG is embedded into an HTML page.
         """
         svg = self.export_svg(
             title=title,
             theme=theme,
             clear=clear,
             code_format=code_format,
-            font_family=font_family,
-            wrapper_id=wrapper_id,
         )
         with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(svg)

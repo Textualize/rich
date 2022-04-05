@@ -470,30 +470,30 @@ EXPECTED_SVG = """\
             font-style: bold;
             font-weight: 700;
         }
-        #rich-svg-wrapper span {
+        .rich-svg-terminal-wrapper span {
             display: inline-block;
             white-space: pre;
             vertical-align: top;
             font-size: 18px;
             font-family:'Rich Fira Code','Cascadia Code',Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
         }
-        #rich-svg-wrapper a {
+        .rich-svg-terminal-wrapper a {
             text-decoration: none;
             color: inherit;
         }
-        #rich-svg-wrapper .blink {
-           animation: rich-svg-wrapper-blinker 1s infinite;
+        .rich-svg-terminal-body .blink {
+           animation: rich-svg-blinker 1s infinite;
         }
-        @keyframes rich-svg-wrapper-blinker {
+        @keyframes rich-svg-blinker {
             from { opacity: 1.0; }
             50% { opacity: 0.3; }
             to { opacity: 1.0; }
         }
-        #rich-svg-wrapper {
+        .rich-svg-terminal-wrapper {
             padding: 140px;
             padding-top: 100px;
         }
-        #rich-svg-wrapper #terminal {
+        .rich-svg-terminal {
             position: relative;
             display: flex;
             flex-direction: column;
@@ -502,7 +502,7 @@ EXPECTED_SVG = """\
             border-radius: 14px;
             outline: 1px solid #484848;
         }
-        #rich-svg-wrapper #terminal:after {
+        .rich-svg-terminal:after {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -513,7 +513,7 @@ EXPECTED_SVG = """\
             transform: rotate(-4.5deg);
             z-index: -1;
         }
-        #rich-svg-wrapper #terminal-header {
+        .rich-svg-terminal-header {
             position: relative;
             width: 100%;
             background-color: #2e2e2e;
@@ -525,7 +525,7 @@ EXPECTED_SVG = """\
             box-shadow: inset 0px -1px 0px 0px #4e4e4e,
                         inset 0px -4px 8px 0px #1a1a1a;
         }
-        #rich-svg-wrapper #terminal-title-tab {
+        .rich-svg-terminal-title-tab {
             display: inline-block;
             margin-top: 14px;
             margin-left: 124px;
@@ -538,32 +538,32 @@ EXPECTED_SVG = """\
                         inset 1px 0px 0px 0px #4e4e4e,
                         inset -1px 0px 0px 0px #4e4e4e;
         }
-        #rich-svg-wrapper #terminal-traffic-lights {
+        .rich-svg-terminal-traffic-lights {
             position: absolute;
             top: 24px;
             left: 20px;
         }
-        #rich-svg-wrapper #terminal-body {
+        .rich-svg-terminal-body {
             line-height: 22px;
             padding: 14px;
         }
-        #rich-svg-wrapper .r1 {color: #f2f2f2; text-decoration-color: #f2f2f2;background-color: #0c0c0c;}
-#rich-svg-wrapper .r2 {color: #2472c8; text-decoration-color: #2472c8; background-color: #cd3131; font-weight: bold}
-#rich-svg-wrapper .r3 {;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
+        .rich-svg-terminal-body .r1 {color: #f2f2f2; text-decoration-color: #f2f2f2;background-color: #0c0c0c;}
+.rich-svg-terminal-body .r2 {color: #2472c8; text-decoration-color: #2472c8; background-color: #cd3131; font-weight: bold}
+.rich-svg-terminal-body .r3 {;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
     </style>
     <foreignObject x="0" y="0" width="100%" height="100%">
         <body xmlns="http://www.w3.org/1999/xhtml">
-            <div id="rich-svg-wrapper">
-                <div id="terminal">
-                    <div id='terminal-header'>
-                        <svg id="terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
+            <div class="rich-svg-terminal-wrapper">
+                <div class="rich-svg-terminal">
+                    <div class="rich-svg-terminal-header">
+                        <svg class="rich-svg-terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="14" cy="8" r="8" fill="#ff6159"/>
                             <circle cx="38" cy="8" r="8" fill="#ffbd2e"/>
                             <circle cx="62" cy="8" r="8" fill="#28c941"/>
                         </svg>
-                        <div id="terminal-title-tab">Rich</div>
+                        <div class="rich-svg-terminal-title-tab">Rich</div>
                     </div>
-                    <div id='terminal-body'>
+                    <div class="rich-svg-terminal-body">
                         <div><span class="r2">foo</span><span class="r1"> </span><span class="r3"><span class="blink"><a href="https://example.org">Click</a></span></span><span class="r1">                                                                                           </span></div>
 <div><span class="r1"></span><span class="r1">                                                                                                    </span></div>
                     </div>
