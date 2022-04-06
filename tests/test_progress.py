@@ -3,33 +3,32 @@
 import io
 import os
 import tempfile
-from time import sleep
 from types import SimpleNamespace
 
 import pytest
 
 import rich.progress
-from rich.progress_bar import ProgressBar
 from rich.console import Console
 from rich.highlighter import NullHighlighter
 from rich.progress import (
     BarColumn,
-    FileSizeColumn,
-    TotalFileSizeColumn,
     DownloadColumn,
-    TransferSpeedColumn,
-    RenderableColumn,
-    SpinnerColumn,
+    FileSizeColumn,
     MofNCompleteColumn,
     Progress,
+    RenderableColumn,
+    SpinnerColumn,
     Task,
+    TaskID,
     TextColumn,
     TimeElapsedColumn,
     TimeRemainingColumn,
-    track,
+    TotalFileSizeColumn,
+    TransferSpeedColumn,
     _TrackThread,
-    TaskID,
+    track,
 )
+from rich.progress_bar import ProgressBar
 from rich.text import Text
 
 
@@ -241,6 +240,31 @@ def test_expand_bar() -> None:
     with progress:
         pass
     expected = "\x1b[?25l\x1b[38;5;237m━━━━━━━━━━\x1b[0m\r\x1b[2K\x1b[38;5;237m━━━━━━━━━━\x1b[0m\n\x1b[?25h"
+    render_result = console.file.getvalue()
+    print("RESULT\n", repr(render_result))
+    print("EXPECTED\n", repr(expected))
+    assert render_result == expected
+
+
+def test_progress_with_none_total_renders_a_pulsing_bar() -> None:
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=10,
+        color_system="truecolor",
+        legacy_windows=False,
+        _environ={},
+    )
+    progress = Progress(
+        BarColumn(bar_width=None),
+        console=console,
+        get_time=lambda: 1.0,
+        auto_refresh=False,
+    )
+    progress.add_task("foo", total=None)
+    with progress:
+        pass
+    expected = "\x1b[?25l\x1b[38;2;153;48;86m━\x1b[0m\x1b[38;2;183;44;94m━\x1b[0m\x1b[38;2;209;42;102m━\x1b[0m\x1b[38;2;230;39;108m━\x1b[0m\x1b[38;2;244;38;112m━\x1b[0m\x1b[38;2;249;38;114m━\x1b[0m\x1b[38;2;244;38;112m━\x1b[0m\x1b[38;2;230;39;108m━\x1b[0m\x1b[38;2;209;42;102m━\x1b[0m\x1b[38;2;183;44;94m━\x1b[0m\r\x1b[2K\x1b[38;2;153;48;86m━\x1b[0m\x1b[38;2;183;44;94m━\x1b[0m\x1b[38;2;209;42;102m━\x1b[0m\x1b[38;2;230;39;108m━\x1b[0m\x1b[38;2;244;38;112m━\x1b[0m\x1b[38;2;249;38;114m━\x1b[0m\x1b[38;2;244;38;112m━\x1b[0m\x1b[38;2;230;39;108m━\x1b[0m\x1b[38;2;209;42;102m━\x1b[0m\x1b[38;2;183;44;94m━\x1b[0m\n\x1b[?25h"
     render_result = console.file.getvalue()
     print("RESULT\n", repr(render_result))
     print("EXPECTED\n", repr(expected))
