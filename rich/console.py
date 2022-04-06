@@ -47,6 +47,7 @@ from ._console import (
     _SVG_FONT_FAMILY,
     CONSOLE_HTML_FORMAT,
     CONSOLE_SVG_FORMAT,
+    _svg_hash,
 )
 from ._emoji_replace import _emoji_replace
 from ._log_render import FormatTimeCallable, LogRender
@@ -2265,11 +2266,14 @@ class Console:
 
                 fragments.append(f"<div>{''.join(line_spans)}</div>")
 
+            main_code = "\n".join(fragments)
+            classes_prefix = f"{_SVG_CLASSES_PREFIX}-{_svg_hash(main_code)}"
+
             stylesheet_rules = []
             for style_rule, style_number in styles.items():
                 if style_rule:
                     stylesheet_rules.append(
-                        f".{_SVG_CLASSES_PREFIX}-terminal-body .r{style_number} {{{ style_rule }}}"
+                        f".{classes_prefix}-terminal-body .r{style_number} {{{ style_rule }}}"
                     )
             stylesheet = "\n".join(stylesheet_rules)
 
@@ -2301,7 +2305,7 @@ class Console:
         total_width = terminal_width + 2 * margin
 
         rendered_code = code_format.format(
-            code="\n".join(fragments),
+            code=main_code,
             total_height=total_height,
             total_width=total_width,
             theme_foreground_color=theme_foreground_color,
@@ -2309,7 +2313,7 @@ class Console:
             margin=margin,
             font_size=font_size,
             font_family=_SVG_FONT_FAMILY,
-            classes_prefix=_SVG_CLASSES_PREFIX,
+            classes_prefix=classes_prefix,
             line_height=line_height,
             title=title,
             stylesheet=stylesheet,
