@@ -1109,9 +1109,10 @@ class Console:
             for file_descriptor in _STD_STREAMS:
                 try:
                     width, height = os.get_terminal_size(file_descriptor)
-                    break
                 except (AttributeError, ValueError, OSError):
                     pass
+                else:
+                    break
 
         columns = self._environ.get("COLUMNS")
         if columns is not None and columns.isdigit():
