@@ -27,6 +27,7 @@ The following people have contributed to the development of Rich:
 - [Nathan Page](https://github.com/nathanrpage97)
 - [Avi Perl](https://github.com/avi-perl)
 - [Laurent Peuch](https://github.com/psycojoker)
+- [Olivier Philippon](https://github.com/DrBenton)
 - [Kylian Point](https://github.com/p0lux)
 - [Kyle Pollina](https://github.com/kylepollina)
 - [Clément Robert](https://github.com/neutrinoceros)
