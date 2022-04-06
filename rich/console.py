@@ -4,6 +4,7 @@ import os
 import platform
 import sys
 import threading
+import zlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -42,14 +43,13 @@ else:
     )  # pragma: no cover
 
 from . import errors, themes
-from ._console import (
+from ._emoji_replace import _emoji_replace
+from ._export_format import (
     _SVG_CLASSES_PREFIX,
     _SVG_FONT_FAMILY,
     CONSOLE_HTML_FORMAT,
     CONSOLE_SVG_FORMAT,
-    _svg_hash,
 )
-from ._emoji_replace import _emoji_replace
 from ._log_render import FormatTimeCallable, LogRender
 from .align import Align, AlignMethod
 from .color import ColorSystem
@@ -2349,6 +2349,18 @@ class Console:
         )
         with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(svg)
+
+
+def _svg_hash(svg_main_code: str) -> str:
+    """Returns a unique hash for the given SVG main code.
+
+    Args:
+        svg_main_code (str): The content we're going to inject in the SVG envelope.
+
+    Returns:
+        str: a hash of the given content
+    """
+    return str(zlib.adler32(svg_main_code.encode()))
 
 
 if __name__ == "__main__":  # pragma: no cover

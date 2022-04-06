@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from .console import Console
 
 # Global console used by alternative print
-_console_default_singleton: Optional["Console"] = None
+_console: Optional["Console"] = None
 
 _IMPORT_CWD = os.path.abspath(os.getcwd())
 
@@ -23,13 +23,13 @@ def get_console() -> "Console":
     Returns:
         Console: A console instance.
     """
-    global _console_default_singleton
-    if _console_default_singleton is None:
+    global _console
+    if _console is None:
         from .console import Console
 
-        _console_default_singleton = Console()
+        _console = Console()
 
-    return _console_default_singleton
+    return _console
 
 
 def reconfigure(*args: Any, **kwargs: Any) -> None:

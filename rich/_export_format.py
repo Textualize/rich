@@ -1,5 +1,3 @@
-import zlib
-
 CONSOLE_HTML_FORMAT = """\
 <!DOCTYPE html>
 <head>
@@ -141,11 +139,6 @@ CONSOLE_SVG_FORMAT = """\
     </foreignObject>
 </svg>
 """
-
-
-def _svg_hash(svg_main_code: str) -> str:
-    return str(zlib.adler32(svg_main_code.encode()))
-
 
 _SVG_FONT_FAMILY = "Rich Fira Code"
 _SVG_CLASSES_PREFIX = "rich-svg"
