@@ -949,7 +949,7 @@ class Task:
         if not speed:
             return None
         remaining = self.remaining
-        if not remaining:
+        if remaining is None:
             return None
         estimate = ceil(remaining / speed)
         return estimate
