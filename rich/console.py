@@ -4,6 +4,7 @@ import os
 import platform
 import sys
 import threading
+import zlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -43,6 +44,12 @@ else:
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
+from ._export_format import (
+    _SVG_CLASSES_PREFIX,
+    _SVG_FONT_FAMILY,
+    CONSOLE_HTML_FORMAT,
+    CONSOLE_SVG_FORMAT,
+)
 from ._log_render import FormatTimeCallable, LogRender
 from .align import Align, AlignMethod
 from .color import ColorSystem
@@ -83,158 +90,21 @@ class NoChange:
 NO_CHANGE = NoChange()
 
 try:
+    _STDIN_FILENO = sys.__stdin__.fileno()
+except Exception:
+    _STDIN_FILENO = 0
+try:
     _STDOUT_FILENO = sys.__stdout__.fileno()
 except Exception:
     _STDOUT_FILENO = 1
-
 try:
     _STDERR_FILENO = sys.__stderr__.fileno()
 except Exception:
     _STDERR_FILENO = 2
 
-_STD_STREAMS = (_STDOUT_FILENO, _STDERR_FILENO)
+_STD_STREAMS = (_STDIN_FILENO, _STDOUT_FILENO, _STDERR_FILENO)
+_STD_STREAMS_OUTPUT = (_STDOUT_FILENO, _STDERR_FILENO)
 
-CONSOLE_HTML_FORMAT = """\
-<!DOCTYPE html>
-<head>
-<meta charset="UTF-8">
-<style>
-{stylesheet}
-body {{
-    color: {foreground};
-    background-color: {background};
-}}
-</style>
-</head>
-<html>
-<body>
-    <code>
-        <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">{code}</pre>
-    </code>
-</body>
-</html>
-"""
-
-CONSOLE_SVG_FORMAT = """\
-<svg width="{total_width}" height="{total_height}" viewBox="0 0 {total_width} {total_height}"
-     xmlns="http://www.w3.org/2000/svg">
-    <style>
-        @font-face {{
-            font-family: "Fira Code";
-            src: local("FiraCode-Regular"),
-                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),
-                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");
-            font-style: normal;
-            font-weight: 400;
-        }}
-        @font-face {{
-            font-family: "Fira Code";
-            src: local("FiraCode-Bold"),
-                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),
-                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");
-            font-style: bold;
-            font-weight: 700;
-        }}
-        span {{
-            display: inline-block;
-            white-space: pre;
-            vertical-align: top;
-            font-size: {font_size}px;
-            font-family:'Fira Code','Cascadia Code',Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
-        }}
-        a {{
-            text-decoration: none;
-            color: inherit;
-        }}
-        .blink {{
-           animation: blinker 1s infinite;
-        }}
-        @keyframes blinker {{
-            from {{ opacity: 1.0; }}
-            50% {{ opacity: 0.3; }}
-            to {{ opacity: 1.0; }}
-        }}
-        #wrapper {{
-            padding: {margin}px;
-            padding-top: 100px;
-        }}
-        #terminal {{
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: {theme_background_color};
-            border-radius: 14px;
-            outline: 1px solid #484848;
-        }}
-        #terminal:after {{
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            content: '';
-            border-radius: 14px;
-            background: rgb(71,77,102);
-            background: linear-gradient(90deg, #804D69 0%, #4E4B89 100%);
-            transform: rotate(-4.5deg);
-            z-index: -1;
-        }}
-        #terminal-header {{
-            position: relative;
-            width: 100%;
-            background-color: #2e2e2e;
-            margin-bottom: 12px;
-            font-weight: bold;
-            border-radius: 14px 14px 0 0;
-            color: {theme_foreground_color};
-            font-size: 18px;
-            box-shadow: inset 0px -1px 0px 0px #4e4e4e,
-                        inset 0px -4px 8px 0px #1a1a1a;
-        }}
-        #terminal-title-tab {{
-            display: inline-block;
-            margin-top: 14px;
-            margin-left: 124px;
-            font-family: sans-serif;
-            padding: 14px 28px;
-            border-radius: 6px 6px 0 0;
-            background-color: {theme_background_color};
-            box-shadow: inset 0px 1px 0px 0px #4e4e4e,
-                        0px -4px 4px 0px #1e1e1e,
-                        inset 1px 0px 0px 0px #4e4e4e,
-                        inset -1px 0px 0px 0px #4e4e4e;
-        }}
-        #terminal-traffic-lights {{
-            position: absolute;
-            top: 24px;
-            left: 20px;
-        }}
-        #terminal-body {{
-            line-height: {line_height}px;
-            padding: 14px;
-        }}
-        {stylesheet}
-    </style>
-    <foreignObject x="0" y="0" width="100%" height="100%">
-        <body xmlns="http://www.w3.org/1999/xhtml">
-            <div id="wrapper">
-                <div id="terminal">
-                    <div id='terminal-header'>
-                        <svg id="terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="14" cy="8" r="8" fill="#ff6159"/>
-                            <circle cx="38" cy="8" r="8" fill="#ffbd2e"/>
-                            <circle cx="62" cy="8" r="8" fill="#28c941"/>
-                        </svg>
-                        <div id="terminal-title-tab">{title}</div>
-                    </div>
-                    <div id='terminal-body'>
-                        {code}
-                    </div>
-                </div>
-            </div>
-        </body>
-    </foreignObject>
-</svg>
-"""
 
 _TERM_COLORS = {"256color": ColorSystem.EIGHT_BIT, "16color": ColorSystem.STANDARD}
 
@@ -1102,13 +972,13 @@ class Console:
             except OSError:  # Probably not a terminal
                 pass
         else:
-            try:
-                width, height = os.get_terminal_size(sys.__stdin__.fileno())
-            except (AttributeError, ValueError, OSError):
+            for file_descriptor in _STD_STREAMS:
                 try:
-                    width, height = os.get_terminal_size(sys.__stdout__.fileno())
+                    width, height = os.get_terminal_size(file_descriptor)
                 except (AttributeError, ValueError, OSError):
                     pass
+                else:
+                    break
 
         columns = self._environ.get("COLUMNS")
         if columns is not None and columns.isdigit():
@@ -2066,7 +1936,7 @@ class Console:
                         if self.legacy_windows:
                             try:
                                 use_legacy_windows_render = (
-                                    self.file.fileno() in _STD_STREAMS
+                                    self.file.fileno() in _STD_STREAMS_OUTPUT
                                 )
                             except (ValueError, io.UnsupportedOperation):
                                 pass
@@ -2350,7 +2220,7 @@ class Console:
                 )
             )
 
-            fragments = []
+            fragments: List[str] = []
             theme_foreground_color = _theme.foreground_color.hex
             theme_background_color = _theme.background_color.hex
 
@@ -2400,10 +2270,15 @@ class Console:
 
                 fragments.append(f"<div>{''.join(line_spans)}</div>")
 
+            main_code = "\n".join(fragments)
+            classes_prefix = f"{_SVG_CLASSES_PREFIX}-{_svg_hash(main_code)}"
+
             stylesheet_rules = []
             for style_rule, style_number in styles.items():
                 if style_rule:
-                    stylesheet_rules.append(f".r{style_number} {{{ style_rule }}}")
+                    stylesheet_rules.append(
+                        f".{classes_prefix}-terminal-body .r{style_number} {{{ style_rule }}}"
+                    )
             stylesheet = "\n".join(stylesheet_rules)
 
             if clear:
@@ -2434,13 +2309,15 @@ class Console:
         total_width = terminal_width + 2 * margin
 
         rendered_code = code_format.format(
-            code="\n".join(fragments),
+            code=main_code,
             total_height=total_height,
             total_width=total_width,
             theme_foreground_color=theme_foreground_color,
             theme_background_color=theme_background_color,
             margin=margin,
             font_size=font_size,
+            font_family=_SVG_FONT_FAMILY,
+            classes_prefix=classes_prefix,
             line_height=line_height,
             title=title,
             stylesheet=stylesheet,
@@ -2469,10 +2346,25 @@ class Console:
                 injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
         """
         svg = self.export_svg(
-            title=title, theme=theme, clear=clear, code_format=code_format
+            title=title,
+            theme=theme,
+            clear=clear,
+            code_format=code_format,
         )
         with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(svg)
+
+
+def _svg_hash(svg_main_code: str) -> str:
+    """Returns a unique hash for the given SVG main code.
+
+    Args:
+        svg_main_code (str): The content we're going to inject in the SVG envelope.
+
+    Returns:
+        str: a hash of the given content
+    """
+    return str(zlib.adler32(svg_main_code.encode()))
 
 
 if __name__ == "__main__":  # pragma: no cover
