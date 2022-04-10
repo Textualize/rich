@@ -30,8 +30,7 @@ def waves_frames(size: int, shuffle: bool = False) -> list[str]:
     ]
     if shuffle:
         waves_frames = [
-            "".join(item)
-            for item in itertools.product(frames, repeat=4)
+            "".join(item) for item in itertools.product(frames[:8], repeat=4)
         ]
         random.shuffle(waves_frames)
     return waves_frames
