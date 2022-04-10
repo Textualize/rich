@@ -1,7 +1,7 @@
 """Rich text and beautiful formatting in the terminal."""
 
 import os
-from typing import Callable, IO, TYPE_CHECKING, Any, Optional, Union
+from typing import IO, TYPE_CHECKING, Any, Callable, Optional, Union
 
 from ._extension import load_ipython_extension  # noqa: F401
 

@@ -33,7 +33,7 @@ Guarda cosa [le persone dicono su Rich](https://www.willmcgugan.com/blog/pages/p
 
 ## Compatibilità
 
-Rich funziona su Linux, OSX, e Windows. True color / emoji funzionano con il nuovo Windows Terminal, il terminale classico è limitato a 16 colori. Rich richiede Python 3.6.1 o superiore.
+Rich funziona su Linux, OSX, e Windows. True color / emoji funzionano con il nuovo Windows Terminal, il terminale classico è limitato a 16 colori. Rich richiede Python 3.6.3 o superiore.
 
 Rich funziona con i [Jupyter notebooks](https://jupyter.org/) senza configurazioni aggiuntive.
 

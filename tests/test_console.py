@@ -3,7 +3,8 @@ import io
 import os
 import sys
 import tempfile
-from typing import Optional
+from typing import Optional, Tuple, Type, Union
+from unittest import mock
 
 import pytest
 
@@ -120,6 +121,48 @@ def test_size():
     console = Console(width=99, height=101, legacy_windows=False)
     w, h = console.size
     assert w == 99 and h == 101
+
+
+@pytest.mark.parametrize(
+    "is_windows,no_descriptor_size,stdin_size,stdout_size,stderr_size,expected_size",
+    [
+        # on Windows we'll use `os.get_terminal_size()` without arguments...
+        (True, (133, 24), ValueError, ValueError, ValueError, (133, 24)),
+        (False, (133, 24), ValueError, ValueError, ValueError, (80, 25)),
+        # ...while on other OS we'll try to pass stdin, then stdout, then stderr to it:
+        (False, ValueError, (133, 24), ValueError, ValueError, (133, 24)),
+        (False, ValueError, ValueError, (133, 24), ValueError, (133, 24)),
+        (False, ValueError, ValueError, ValueError, (133, 24), (133, 24)),
+        (False, ValueError, ValueError, ValueError, ValueError, (80, 25)),
+    ],
+)
+@mock.patch("rich.console.os.get_terminal_size")
+def test_size_can_fall_back_to_std_descriptors(
+    get_terminal_size_mock: mock.MagicMock,
+    is_windows: bool,
+    no_descriptor_size: Union[Tuple[int, int], Type[ValueError]],
+    stdin_size: Union[Tuple[int, int], Type[ValueError]],
+    stdout_size: Union[Tuple[int, int], Type[ValueError]],
+    stderr_size: Union[Tuple[int, int], Type[ValueError]],
+    expected_size,
+):
+    def get_terminal_size_mock_impl(fileno: int = None) -> Tuple[int, int]:
+        value = {
+            None: no_descriptor_size,
+            sys.__stdin__.fileno(): stdin_size,
+            sys.__stdout__.fileno(): stdout_size,
+            sys.__stderr__.fileno(): stderr_size,
+        }[fileno]
+        if value is ValueError:
+            raise value
+        return value
+
+    get_terminal_size_mock.side_effect = get_terminal_size_mock_impl
+
+    console = Console(legacy_windows=False)
+    with mock.patch("rich.console.WINDOWS", new=is_windows):
+        w, h = console.size
+    assert (w, h) == expected_size
 
 
 def test_repr():
@@ -455,7 +498,7 @@ EXPECTED_SVG = """\
      xmlns="http://www.w3.org/2000/svg">
     <style>
         @font-face {
-            font-family: "Fira Code";
+            font-family: "Rich Fira Code";
             src: local("FiraCode-Regular"),
                  url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),
                  url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");
@@ -463,37 +506,37 @@ EXPECTED_SVG = """\
             font-weight: 400;
         }
         @font-face {
-            font-family: "Fira Code";
+            font-family: "Rich Fira Code";
             src: local("FiraCode-Bold"),
                  url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),
                  url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");
             font-style: bold;
             font-weight: 700;
         }
-        span {
+        .rich-svg-${SVG_HASH}-terminal-wrapper span {
             display: inline-block;
             white-space: pre;
             vertical-align: top;
             font-size: 18px;
-            font-family:'Fira Code','Cascadia Code',Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
+            font-family:'Rich Fira Code','Cascadia Code',Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
         }
-        a {
+        .rich-svg-${SVG_HASH}-terminal-wrapper a {
             text-decoration: none;
             color: inherit;
         }
-        .blink {
-           animation: blinker 1s infinite;
+        .rich-svg-${SVG_HASH}-terminal-body .blink {
+           animation: rich-svg-${SVG_HASH}-blinker 1s infinite;
         }
-        @keyframes blinker {
+        @keyframes rich-svg-${SVG_HASH}-blinker {
             from { opacity: 1.0; }
             50% { opacity: 0.3; }
             to { opacity: 1.0; }
         }
-        #wrapper {
+        .rich-svg-${SVG_HASH}-terminal-wrapper {
             padding: 140px;
             padding-top: 100px;
         }
-        #terminal {
+        .rich-svg-${SVG_HASH}-terminal {
             position: relative;
             display: flex;
             flex-direction: column;
@@ -502,7 +545,7 @@ EXPECTED_SVG = """\
             border-radius: 14px;
             outline: 1px solid #484848;
         }
-        #terminal:after {
+        .rich-svg-${SVG_HASH}-terminal:after {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -513,7 +556,7 @@ EXPECTED_SVG = """\
             transform: rotate(-4.5deg);
             z-index: -1;
         }
-        #terminal-header {
+        .rich-svg-${SVG_HASH}-terminal-header {
             position: relative;
             width: 100%;
             background-color: #2e2e2e;
@@ -525,7 +568,7 @@ EXPECTED_SVG = """\
             box-shadow: inset 0px -1px 0px 0px #4e4e4e,
                         inset 0px -4px 8px 0px #1a1a1a;
         }
-        #terminal-title-tab {
+        .rich-svg-${SVG_HASH}-terminal-title-tab {
             display: inline-block;
             margin-top: 14px;
             margin-left: 124px;
@@ -538,32 +581,32 @@ EXPECTED_SVG = """\
                         inset 1px 0px 0px 0px #4e4e4e,
                         inset -1px 0px 0px 0px #4e4e4e;
         }
-        #terminal-traffic-lights {
+        .rich-svg-${SVG_HASH}-terminal-traffic-lights {
             position: absolute;
             top: 24px;
             left: 20px;
         }
-        #terminal-body {
+        .rich-svg-${SVG_HASH}-terminal-body {
             line-height: 22px;
             padding: 14px;
         }
-        .r1 {color: #f2f2f2; text-decoration-color: #f2f2f2;background-color: #0c0c0c;}
-.r2 {color: #2472c8; text-decoration-color: #2472c8; background-color: #cd3131; font-weight: bold}
-.r3 {;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
+        .rich-svg-${SVG_HASH}-terminal-body .r1 {color: #f2f2f2; text-decoration-color: #f2f2f2;background-color: #0c0c0c;}
+.rich-svg-${SVG_HASH}-terminal-body .r2 {color: #2472c8; text-decoration-color: #2472c8; background-color: #cd3131; font-weight: bold}
+.rich-svg-${SVG_HASH}-terminal-body .r3 {;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
     </style>
     <foreignObject x="0" y="0" width="100%" height="100%">
         <body xmlns="http://www.w3.org/1999/xhtml">
-            <div id="wrapper">
-                <div id="terminal">
-                    <div id='terminal-header'>
-                        <svg id="terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
+            <div class="rich-svg-${SVG_HASH}-terminal-wrapper">
+                <div class="rich-svg-${SVG_HASH}-terminal">
+                    <div class="rich-svg-${SVG_HASH}-terminal-header">
+                        <svg class="rich-svg-${SVG_HASH}-terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="14" cy="8" r="8" fill="#ff6159"/>
                             <circle cx="38" cy="8" r="8" fill="#ffbd2e"/>
                             <circle cx="62" cy="8" r="8" fill="#28c941"/>
                         </svg>
-                        <div id="terminal-title-tab">Rich</div>
+                        <div class="rich-svg-${SVG_HASH}-terminal-title-tab">Rich</div>
                     </div>
-                    <div id='terminal-body'>
+                    <div class="rich-svg-${SVG_HASH}-terminal-body">
                         <div><span class="r2">foo</span><span class="r1"> </span><span class="r3"><span class="blink"><a href="https://example.org">Click</a></span></span><span class="r1">                                                                                           </span></div>
 <div><span class="r1"></span><span class="r1">                                                                                                    </span></div>
                     </div>
@@ -581,7 +624,11 @@ def test_export_svg():
         "[b red on blue reverse]foo[/] [blink][link=https://example.org]Click[/link]"
     )
     svg = console.export_svg()
-    assert svg == EXPECTED_SVG
+    svg_main_code_hash = (
+        "857433718"  # hard-coded here after the 1st time we ran this test
+    )
+    expected_svg = EXPECTED_SVG.replace("${SVG_HASH}", svg_main_code_hash)
+    assert svg == expected_svg
 
 
 def test_save_svg():
@@ -589,11 +636,13 @@ def test_save_svg():
     console.print(
         "[b red on blue reverse]foo[/] [blink][link=https://example.org]Click[/link]"
     )
+    svg_main_code_hash = "857433718"
+    expected_svg = EXPECTED_SVG.replace("${SVG_HASH}", svg_main_code_hash)
     with tempfile.TemporaryDirectory() as path:
         export_path = os.path.join(path, "example.svg")
         console.save_svg(export_path)
         with open(export_path, "rt") as svg_file:
-            assert svg_file.read() == EXPECTED_SVG
+            assert svg_file.read() == expected_svg
 
 
 def test_save_text():

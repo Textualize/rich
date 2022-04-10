@@ -5,15 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 12.1.0
+## [Unreleased]
+
+### Fixed
+
+- Fall back to `sys.__stderr__` on POSIX systems when trying to get the terminal size (fix issues when Rich is piped to another process)
+
+## [12.2.0] - 2022-04-05
+
+### Changed
+
+- Bumped typing-extensions minimum to 4.0.0
+- Bumped minimum Python version to 3.6.3
+
+## [12.1.0] - 2022-04-03
 
 ### Added
 
 - Progress.open and Progress.wrap_file method to track the progress while reading from a file or file-like object https://github.com/willmcgugan/rich/pull/1759
+- SVG export functionality https://github.com/Textualize/rich/pull/2101
 
 ### Added
 
-- SVG export functionality https://github.com/Textualize/rich/pull/2101
+- Adding Indonesian translation
 
 ### Fixed
 
@@ -1690,7 +1704,9 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[unreleased]: https://github.com/willmcgugan/rich/compare/v12.0.1...HEAD
+[unreleased]: https://github.com/willmcgugan/rich/compare/v12.2.0...HEAD
+[12.2.0]: https://github.com/willmcgugan/rich/compare/v12.1.0...v12.2.0
+[12.1.0]: https://github.com/willmcgugan/rich/compare/v12.0.1...v12.1.0
 [12.0.1]: https://github.com/willmcgugan/rich/compare/v12.0.0...v12.0.1
 [12.0.0]: https://github.com/willmcgugan/rich/compare/v11.2.0...v12.0.0
 [11.2.0]: https://github.com/willmcgugan/rich/compare/v11.1.0...v11.2.0
