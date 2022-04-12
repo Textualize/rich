@@ -1,7 +1,8 @@
 import pytest
 
 from rich.console import Console
-from rich.markup import RE_TAGS, MarkupError, Tag, _parse, escape, render
+from rich.errors import MarkupError
+from rich.markup import RE_TAGS, Tag, _parse, escape, render
 from rich.text import Span
 
 
@@ -38,6 +39,9 @@ def test_escape():
     # Test @ escape
     assert escape("[@foo]") == "\\[@foo]"
     assert escape("[@]") == "\\[@]"
+
+    # https://github.com/Textualize/rich/issues/2187
+    assert escape("[nil, [nil]]") == r"[nil, \[nil]]"
 
 
 def test_render_escape():
