@@ -1,13 +1,30 @@
 import io
 
 from rich.console import Console
-from rich.prompt import Prompt, IntPrompt, Confirm
+from rich.prompt import Prompt, IntPrompt, Confirm, FuzzyPrompt
 
 
 def test_prompt_str():
     INPUT = "egg\nfoo"
     console = Console(file=io.StringIO())
     name = Prompt.ask(
+        "what is your name",
+        console=console,
+        choices=["foo", "bar"],
+        default="baz",
+        stream=io.StringIO(INPUT),
+    )
+    assert name == "foo"
+    expected = "what is your name [foo/bar] (baz): Please select one of the available options\nwhat is your name [foo/bar] (baz): "
+    output = console.file.getvalue()
+    print(repr(output))
+    assert output == expected
+
+
+def test_prompt_fuzzy_choice():
+    INPUT = "egg\nFO"
+    console = Console(file=io.StringIO())
+    name = FuzzyPrompt.ask(
         "what is your name",
         console=console,
         choices=["foo", "bar"],

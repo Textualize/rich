@@ -319,6 +319,28 @@ class FloatPrompt(PromptBase[int]):
     validate_error_message = "[prompt.invalid]Please enter a number"
 
 
+class FuzzyPrompt(PromptBase[str]):
+    """A Choice prompt that matches partial strings and ignores case.
+
+    For example, this matcher will match input 'fo' for choice Foo."""
+
+    response_type = str
+
+    def process_response(self, value: str) -> str:
+        """Check if the input is similar to exactly 1 choice"""
+        if not self.choices:
+            return PromptBase.process_response(self, value)
+        matches = []
+        for choice in self.choices:
+            if choice.lower().startswith(value.lower()):
+                matches.append(choice)
+
+        if len(matches) == 1:
+            return matches.pop()
+
+        raise InvalidResponse(self.illegal_choice_message)
+
+
 class Confirm(PromptBase[bool]):
     """A yes / no confirmation prompt.
 
