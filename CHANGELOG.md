@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New `FuzzyPrompt` to support partial and case-insensitive matches for choice-based prompts
+
 ### Fixed
 
 - Fall back to `sys.__stderr__` on POSIX systems when trying to get the terminal size (fix issues when Rich is piped to another process)
