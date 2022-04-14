@@ -20,6 +20,7 @@ from rich.progress import (
     SpinnerColumn,
     Task,
     TaskID,
+    TaskProgressColumn,
     TextColumn,
     TimeElapsedColumn,
     TimeRemainingColumn,
@@ -103,7 +104,7 @@ def test_time_remaining_column():
     ],
 )
 def test_compact_time_remaining_column(task_time, formatted):
-    task = SimpleNamespace(finished=False, time_remaining=task_time)
+    task = SimpleNamespace(finished=False, time_remaining=task_time, total=100)
     column = TimeRemainingColumn(compact=True)
 
     assert str(column.render(task)) == formatted
@@ -113,7 +114,7 @@ def test_time_remaining_column_elapsed_when_finished():
     task_time = 71
     formatted = "0:01:11"
 
-    task = SimpleNamespace(finished=True, finished_time=task_time)
+    task = SimpleNamespace(finished=True, finished_time=task_time, total=100)
     column = TimeRemainingColumn(elapsed_when_finished=True)
 
     assert str(column.render(task)) == formatted
@@ -398,7 +399,7 @@ def test_using_default_columns() -> None:
     expected_default_types = [
         TextColumn,
         BarColumn,
-        TextColumn,
+        TaskProgressColumn,
         TimeRemainingColumn,
     ]
 
