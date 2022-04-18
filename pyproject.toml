@@ -43,7 +43,7 @@ black = "^22.3"
 mypy = "^0.942"
 pytest-cov = "^3.0.0"
 attrs = "^21.4.0"
-types-dataclasses = "^0.6.4"
+types-dataclasses = "^0.6.5"
 pre-commit = "^2.17.0"
 asv = "^0.5.1"
 
