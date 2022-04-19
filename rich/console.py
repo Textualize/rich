@@ -1181,6 +1181,38 @@ class Console:
         """
         return self._is_alt_screen
 
+    def set_window_title(self, title: str) -> bool:
+        """Set the title of the console terminal window.
+
+        Warning: There is no means within Rich of "resetting" the window title to its
+        previous value, meaning the title you set will persist even after your application
+        exits.
+
+        ``fish`` shell resets the window title before and after each command by default,
+        negating this issue. Windows Terminal and command prompt will also reset the title for you.
+        Most other shells and terminals, however, do not do this.
+
+        Some terminals may require configuration changes before you can set the title.
+        Some terminals may not support setting the title at all.
+
+        Other software (including the terminal itself, the shell, custom prompts, plugins, etc.)
+        may also set the terminal window title. This could result in whatever value you write
+        using this method being overwritten.
+
+        Args:
+            title (str): The new title of the terminal window.
+
+        Returns:
+            bool: True if the control code to change the terminal title was
+                written, otherwise False. Note that a return value of True
+                does not guarantee that the window title has actually changed,
+                since the feature may be unsupported/disabled in some terminals.
+        """
+        if self.is_terminal:
+            self.control(Control.title(title))
+            return True
+        return False
+
     def screen(
         self, hide_cursor: bool = True, style: Optional[StyleType] = None
     ) -> "ScreenContext":

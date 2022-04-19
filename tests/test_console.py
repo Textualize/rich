@@ -877,6 +877,18 @@ def test_is_alt_screen():
     assert not console.is_alt_screen
 
 
+def test_set_console_title():
+    console = Console(force_terminal=True, _environ={})
+    if console.legacy_windows:
+        return
+
+    with console.capture() as captured:
+        console.set_window_title("hello")
+
+    result = captured.get()
+    assert result == "\x1b]0;hello\x07"
+
+
 def test_update_screen():
     console = Console(force_terminal=True, width=20, height=5, _environ={})
     if console.legacy_windows:

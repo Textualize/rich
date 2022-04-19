@@ -51,3 +51,6 @@ def legacy_windows_render(buffer: Iterable[Segment], term: LegacyWindowsTerm) ->
                         term.erase_start_of_line()
                     elif mode == 2:
                         term.erase_line()
+                elif control_type == ControlType.SET_WINDOW_TITLE:
+                    _, title = cast(Tuple[ControlType, str], control_code)
+                    term.set_title(title)
