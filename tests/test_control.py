@@ -1,5 +1,5 @@
 from rich.control import Control, strip_control_codes
-from rich.segment import Segment, ControlType
+from rich.segment import ControlType, Segment
 
 
 def test_control():
@@ -44,4 +44,13 @@ def test_move_to_column():
         "\x1b[11G\x1b[20A",
         None,
         [(ControlType.CURSOR_MOVE_TO_COLUMN, 10), (ControlType.CURSOR_UP, 20)],
+    )
+
+
+def test_title():
+    control_segment = Control.title("hello").segment
+    assert control_segment == Segment(
+        "\x1b]0;hello\x07",
+        None,
+        [(ControlType.SET_WINDOW_TITLE, "hello")],
     )

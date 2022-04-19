@@ -1,4 +1,5 @@
-from typing import Callable, Dict, Iterable, List, TYPE_CHECKING, Union
+import time
+from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Union
 
 from .segment import ControlCode, ControlType, Segment
 
@@ -30,6 +31,7 @@ CONTROL_CODES_FORMAT: Dict[int, Callable[..., str]] = {
     ControlType.CURSOR_MOVE_TO_COLUMN: lambda param: f"\x1b[{param+1}G",
     ControlType.ERASE_IN_LINE: lambda param: f"\x1b[{param}K",
     ControlType.CURSOR_MOVE_TO: lambda x, y: f"\x1b[{y+1};{x+1}H",
+    ControlType.SET_WINDOW_TITLE: lambda title: f"\x1b]0;{title}\x07",
 }
 
 
@@ -147,6 +149,15 @@ class Control:
         else:
             return cls(ControlType.DISABLE_ALT_SCREEN)
 
+    @classmethod
+    def title(cls, title: str) -> "Control":
+        """Set the terminal window title
+
+        Args:
+            title (str): The new terminal window title
+        """
+        return cls((ControlType.SET_WINDOW_TITLE, title))
+
     def __str__(self) -> str:
         return self.segment.text
 
@@ -172,4 +183,11 @@ def strip_control_codes(
 
 
 if __name__ == "__main__":  # pragma: no cover
-    print(strip_control_codes("hello\rWorld"))
+    from rich.console import Console
+
+    console = Console()
+    console.print("Look at the title of your terminal window ^")
+    # console.print(Control((ControlType.SET_WINDOW_TITLE, "Hello, world!")))
+    for i in range(10):
+        console.set_window_title("🚀 Loading" + "." * i)
+        time.sleep(0.5)
