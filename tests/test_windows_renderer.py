@@ -131,3 +131,11 @@ def test_control_cursor_move_to_column(legacy_term_mock):
     legacy_windows_render(buffer, legacy_term_mock)
 
     legacy_term_mock.move_cursor_to_column.assert_called_once_with(2)
+
+
+def test_control_set_terminal_window_title(legacy_term_mock):
+    buffer = [Segment("", None, [(ControlType.SET_WINDOW_TITLE, "Hello, world!")])]
+
+    legacy_windows_render(buffer, legacy_term_mock)
+
+    legacy_term_mock.set_title.assert_called_once_with("Hello, world!")

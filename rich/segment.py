@@ -49,10 +49,13 @@ class ControlType(IntEnum):
     CURSOR_MOVE_TO_COLUMN = 13
     CURSOR_MOVE_TO = 14
     ERASE_IN_LINE = 15
+    SET_WINDOW_TITLE = 16
 
 
 ControlCode = Union[
-    Tuple[ControlType], Tuple[ControlType, int], Tuple[ControlType, int, int]
+    Tuple[ControlType],
+    Tuple[ControlType, Union[int, str]],
+    Tuple[ControlType, int, int],
 ]
 
 
