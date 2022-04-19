@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Ability to change terminal window title https://github.com/Textualize/rich/pull/2200
+
 ### Fixed
 
 - Fall back to `sys.__stderr__` on POSIX systems when trying to get the terminal size (fix issues when Rich is piped to another process)
@@ -25,9 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Progress.open and Progress.wrap_file method to track the progress while reading from a file or file-like object https://github.com/willmcgugan/rich/pull/1759
 - SVG export functionality https://github.com/Textualize/rich/pull/2101
-
-### Added
-
 - Adding Indonesian translation
 
 ### Fixed
