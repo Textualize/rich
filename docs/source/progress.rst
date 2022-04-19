@@ -26,6 +26,16 @@ For basic usage call the :func:`~rich.progress.track` function, which accepts a 
     for n in track(range(n), description="Processing..."):
         do_work(n)
 
+
+To get a progress bar while reading from a file, you may consider using the :func:`~rich.progress.read` function, which accepts a path, or a *file-like* object. It will return a *file-like* object in *binary mode* that will update the progress information as it's being read from. Here's an example, tracking the progresses made by :func:`json.load` to load a file::
+
+    import json
+    from rich.progress import read
+
+    with read("data.json", description="Loading data...") as f:
+        data = json.load(f)
+
+
 Advanced usage
 --------------
 
@@ -34,9 +44,9 @@ If you require multiple tasks in the display, or wish to configure the columns i
 The Progress class is designed to be used as a *context manager* which will start and stop the progress display automatically.
 
 Here's a simple example::
-    
+
     import time
-    
+
     from rich.progress import Progress
 
     with Progress() as progress:
@@ -81,7 +91,7 @@ Transient progress displays are useful if you want more minimal output in the te
 Indeterminate progress
 ~~~~~~~~~~~~~~~~~~~~~~
 
-When you add a task it is automatically *started*, which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. This may not work well if there is a long delay before you can start updating progress; you may need to wait for a response from a server or count files in a directory (for example). In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` which will display a pulsing animation that lets the user know something is working. This is know as an *indeterminate* progress bar. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
+When you add a task it is automatically *started*, which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. This may not work well if there is a long delay before you can start updating progress; you may need to wait for a response from a server or count files in a directory (for example). In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` or ``total=None`` which will display a pulsing animation that lets the user know something is working. This is know as an *indeterminate* progress bar. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
 
 Auto refresh
 ~~~~~~~~~~~~
@@ -179,7 +189,7 @@ If you have another Console object you want to use, pass it in to the :class:`~r
     with Progress(console=my_console) as progress:
         my_console.print("[bold blue]Starting work!")
         do_work(progress)
-        
+
 
 Redirecting stdout / stderr
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -199,6 +209,43 @@ If the :class:`~rich.progress.Progress` class doesn't offer exactly what you nee
         def get_renderables(self):
             yield Panel(self.make_tasks_table(self.tasks))
 
+Reading from a file
+~~~~~~~~~~~~~~~~~~~
+
+Rich provides an easy way to generate a progress bar for reading a file. If you call :func:`~rich.progress.open` it will return a context manager which displays a progress bar while you read. This is particularly useful when you can't easily modify the code that does the reading.
+
+The following example shows how we might show progress for reading a JSON file::
+
+    import json
+    import rich.progress
+
+    with rich.progress.open("data.json", "rb") as file:
+        data = json.load(file)
+    print(data)
+
+If you already have a file object, you can call :func:`~rich.progress.wrap_file` which returns a context manager that wraps your file so that it displays a progress bar. If you use this function you will need to set the number of bytes or characters you expect to read.
+
+Here's an example that reads a url from the internet::
+
+    from time import sleep
+    from urllib.request import urlopen
+
+    from rich.progress import wrap_file
+
+    response = urlopen("https://www.textualize.io")
+    size = int(response.headers["Content-Length"])
+
+    with wrap_file(response, size) as file:
+        for line in file:
+            print(line.decode("utf-8"), end="")
+            sleep(0.1)
+
+
+If you expect to be reading from multiple files, you can use :meth:`~rich.progress.Progress.open` or :meth:`~rich.progress.Progress.wrap_file` to add a file progress to an existing Progress instance.
+
+See `cp_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/cp_progress.py>` for a minimal clone of the ``cp`` command which shows a progress bar as the file is copied.
+
+
 Multiple Progress
 -----------------
 
@@ -208,4 +255,3 @@ Example
 -------
 
 See `downloader.py <https://github.com/willmcgugan/rich/blob/master/examples/downloader.py>`_ for a realistic application of a progress display. This script can download multiple concurrent files with a progress bar, transfer speed and file size.
-

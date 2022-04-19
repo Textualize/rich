@@ -1,32 +1,35 @@
 # encoding=utf-8
 
 import io
-from time import sleep
+import os
+import tempfile
 from types import SimpleNamespace
 
 import pytest
 
-from rich.progress_bar import ProgressBar
+import rich.progress
 from rich.console import Console
 from rich.highlighter import NullHighlighter
 from rich.progress import (
     BarColumn,
-    FileSizeColumn,
-    TotalFileSizeColumn,
     DownloadColumn,
-    TransferSpeedColumn,
-    RenderableColumn,
-    SpinnerColumn,
+    FileSizeColumn,
     MofNCompleteColumn,
     Progress,
+    RenderableColumn,
+    SpinnerColumn,
     Task,
+    TaskID,
+    TaskProgressColumn,
     TextColumn,
     TimeElapsedColumn,
     TimeRemainingColumn,
-    track,
+    TotalFileSizeColumn,
+    TransferSpeedColumn,
     _TrackThread,
-    TaskID,
+    track,
 )
+from rich.progress_bar import ProgressBar
 from rich.text import Text
 
 
@@ -101,7 +104,7 @@ def test_time_remaining_column():
     ],
 )
 def test_compact_time_remaining_column(task_time, formatted):
-    task = SimpleNamespace(finished=False, time_remaining=task_time)
+    task = SimpleNamespace(finished=False, time_remaining=task_time, total=100)
     column = TimeRemainingColumn(compact=True)
 
     assert str(column.render(task)) == formatted
@@ -111,7 +114,7 @@ def test_time_remaining_column_elapsed_when_finished():
     task_time = 71
     formatted = "0:01:11"
 
-    task = SimpleNamespace(finished=True, finished_time=task_time)
+    task = SimpleNamespace(finished=True, finished_time=task_time, total=100)
     column = TimeRemainingColumn(elapsed_when_finished=True)
 
     assert str(column.render(task)) == formatted
@@ -238,6 +241,31 @@ def test_expand_bar() -> None:
     with progress:
         pass
     expected = "\x1b[?25l\x1b[38;5;237m━━━━━━━━━━\x1b[0m\r\x1b[2K\x1b[38;5;237m━━━━━━━━━━\x1b[0m\n\x1b[?25h"
+    render_result = console.file.getvalue()
+    print("RESULT\n", repr(render_result))
+    print("EXPECTED\n", repr(expected))
+    assert render_result == expected
+
+
+def test_progress_with_none_total_renders_a_pulsing_bar() -> None:
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=10,
+        color_system="truecolor",
+        legacy_windows=False,
+        _environ={},
+    )
+    progress = Progress(
+        BarColumn(bar_width=None),
+        console=console,
+        get_time=lambda: 1.0,
+        auto_refresh=False,
+    )
+    progress.add_task("foo", total=None)
+    with progress:
+        pass
+    expected = "\x1b[?25l\x1b[38;2;153;48;86m━\x1b[0m\x1b[38;2;183;44;94m━\x1b[0m\x1b[38;2;209;42;102m━\x1b[0m\x1b[38;2;230;39;108m━\x1b[0m\x1b[38;2;244;38;112m━\x1b[0m\x1b[38;2;249;38;114m━\x1b[0m\x1b[38;2;244;38;112m━\x1b[0m\x1b[38;2;230;39;108m━\x1b[0m\x1b[38;2;209;42;102m━\x1b[0m\x1b[38;2;183;44;94m━\x1b[0m\r\x1b[2K\x1b[38;2;153;48;86m━\x1b[0m\x1b[38;2;183;44;94m━\x1b[0m\x1b[38;2;209;42;102m━\x1b[0m\x1b[38;2;230;39;108m━\x1b[0m\x1b[38;2;244;38;112m━\x1b[0m\x1b[38;2;249;38;114m━\x1b[0m\x1b[38;2;244;38;112m━\x1b[0m\x1b[38;2;230;39;108m━\x1b[0m\x1b[38;2;209;42;102m━\x1b[0m\x1b[38;2;183;44;94m━\x1b[0m\n\x1b[?25h"
     render_result = console.file.getvalue()
     print("RESULT\n", repr(render_result))
     print("EXPECTED\n", repr(expected))
@@ -371,7 +399,7 @@ def test_using_default_columns() -> None:
     expected_default_types = [
         TextColumn,
         BarColumn,
-        TextColumn,
+        TaskProgressColumn,
         TimeRemainingColumn,
     ]
 
@@ -547,6 +575,84 @@ def test_no_output_if_progress_is_disabled() -> None:
     print(repr(result))
     expected = ""
     assert result == expected
+
+
+def test_open() -> None:
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=60,
+        color_system="truecolor",
+        legacy_windows=False,
+        _environ={},
+    )
+    progress = Progress(
+        console=console,
+    )
+
+    fd, filename = tempfile.mkstemp()
+    with os.fdopen(fd, "wb") as f:
+        f.write(b"Hello, World!")
+    try:
+        with rich.progress.open(filename) as f:
+            assert f.read() == "Hello, World!"
+        assert f.closed
+    finally:
+        os.remove(filename)
+
+
+def test_open_text_mode() -> None:
+    fd, filename = tempfile.mkstemp()
+    with os.fdopen(fd, "wb") as f:
+        f.write(b"Hello, World!")
+    try:
+        with rich.progress.open(filename, "r") as f:
+            assert f.read() == "Hello, World!"
+        assert f.closed
+    finally:
+        os.remove(filename)
+
+
+def test_wrap_file() -> None:
+    fd, filename = tempfile.mkstemp()
+    with os.fdopen(fd, "wb") as f:
+        total = f.write(b"Hello, World!")
+    try:
+        with open(filename, "rb") as file:
+            with rich.progress.wrap_file(file, total=total) as f:
+                assert f.read() == b"Hello, World!"
+            assert f.closed
+            assert not f.handle.closed
+            assert not file.closed
+        assert file.closed
+    finally:
+        os.remove(filename)
+
+
+def test_wrap_file_task_total() -> None:
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=60,
+        color_system="truecolor",
+        legacy_windows=False,
+        _environ={},
+    )
+    progress = Progress(
+        console=console,
+    )
+
+    fd, filename = tempfile.mkstemp()
+    with os.fdopen(fd, "wb") as f:
+        total = f.write(b"Hello, World!")
+    try:
+        with progress:
+            with open(filename, "rb") as file:
+                task_id = progress.add_task("Reading", total=total)
+                with progress.wrap_file(file, task_id=task_id) as f:
+                    assert f.read() == b"Hello, World!"
+    finally:
+        os.remove(filename)
 
 
 if __name__ == "__main__":

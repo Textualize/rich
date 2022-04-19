@@ -237,6 +237,16 @@ def test_guess_lexer():
     assert Traceback._guess_lexer("foo", "foo\nbnar") == "text"
 
 
+def test_guess_lexer_yaml_j2():
+    # https://github.com/Textualize/rich/issues/2018
+    code = """\
+foobar:
+    something: {{ raiser() }}
+    else: {{ 5 + 5 }}
+    """
+    assert Traceback._guess_lexer("test.yaml.j2", code) == "text"
+
+
 def test_recursive():
     def foo(n):
         return bar(n)
