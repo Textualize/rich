@@ -1186,8 +1186,11 @@ class Console:
 
         Warning: There is no means within Rich of "resetting" the window title to its
         previous value, meaning the title you set will persist even after your application
-        exists. ``fish`` shell resets the window title before and after each command by default,
-        negating this issue. Most shells, however, do not do this.
+        exists.
+
+        ``fish`` shell resets the window title before and after each command by default,
+        negating this issue. Windows Terminal and command prompt will also reset the title for you.
+        Most other shells and terminals, however, do not do this.
 
         Some terminals may require configuration changes before you can set the title.
         Some terminals may not support setting the title at all.
