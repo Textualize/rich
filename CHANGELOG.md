@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fall back to `sys.__stderr__` on POSIX systems when trying to get the terminal size (fix issues when Rich is piped to another process)
 - Fixed markup escaping issue https://github.com/Textualize/rich/issues/2187
+- Safari - Box appearing around SVG export https://github.com/Textualize/rich/pull/2201
 
 ## [12.2.0] - 2022-04-05
 

@@ -543,7 +543,7 @@ EXPECTED_SVG = """\
             align-items: center;
             background-color: #0c0c0c;
             border-radius: 14px;
-            outline: 1px solid #484848;
+            box-shadow: 0 0 0 1px #484848;
         }
         .rich-svg-${SVG_HASH}-terminal:after {
             position: absolute;

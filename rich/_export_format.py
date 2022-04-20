@@ -69,7 +69,7 @@ CONSOLE_SVG_FORMAT = """\
             align-items: center;
             background-color: {theme_background_color};
             border-radius: 14px;
-            outline: 1px solid #484848;
+            box-shadow: 0 0 0 1px #484848;
         }}
         .{classes_prefix}-terminal:after {{
             position: absolute;
