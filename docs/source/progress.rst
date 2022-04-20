@@ -27,13 +27,16 @@ For basic usage call the :func:`~rich.progress.track` function, which accepts a 
         do_work(n)
 
 
-To get a progress bar while reading from a file, you may consider using the :func:`~rich.progress.read` function, which accepts a path, or a *file-like* object. It will return a *file-like* object in *binary mode* that will update the progress information as it's being read from. Here's an example, tracking the progresses made by :func:`json.load` to load a file::
+Rich provides an easy way to generate a progress bar for reading a file. If you call :func:`~rich.progress.open` it will return a context manager which displays a progress bar while you read. This is particularly useful when you can't easily modify the code that does the reading.
+
+The following example shows how we might show progress for reading a JSON file::
 
     import json
-    from rich.progress import read
+    import rich.progress
 
-    with read("data.json", description="Loading data...") as f:
-        data = json.load(f)
+    with rich.progress.open("data.json", "rb") as file:
+        data = json.load(file)
+    print(data)
 
 
 Advanced usage
@@ -209,19 +212,8 @@ If the :class:`~rich.progress.Progress` class doesn't offer exactly what you nee
         def get_renderables(self):
             yield Panel(self.make_tasks_table(self.tasks))
 
-Reading from a file
-~~~~~~~~~~~~~~~~~~~
-
-Rich provides an easy way to generate a progress bar for reading a file. If you call :func:`~rich.progress.open` it will return a context manager which displays a progress bar while you read. This is particularly useful when you can't easily modify the code that does the reading.
-
-The following example shows how we might show progress for reading a JSON file::
-
-    import json
-    import rich.progress
-
-    with rich.progress.open("data.json", "rb") as file:
-        data = json.load(file)
-    print(data)
+Wrapping a file
+~~~~~~~~~~~~~~~
 
 If you already have a file object, you can call :func:`~rich.progress.wrap_file` which returns a context manager that wraps your file so that it displays a progress bar. If you use this function you will need to set the number of bytes or characters you expect to read.
 
