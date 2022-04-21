@@ -716,9 +716,16 @@ class TaskProgressColumn(TextColumn):
             table_column=table_column,
         )
 
-    def render_speed(self, task: "Task") -> Text:
-        """Show data transfer speed."""
-        speed = task.finished_speed or task.speed
+    @classmethod
+    def render_speed(cls, speed: float | None) -> Text:
+        """Render the speed in iterations per second.
+
+        Args:
+            task (Task): A Task object.
+
+        Returns:
+            Text: Text object containing the task speed.
+        """
         if speed is None:
             return Text("", style="progress.percentage")
         unit, suffix = filesize.pick_unit_and_suffix(
@@ -731,7 +738,7 @@ class TaskProgressColumn(TextColumn):
 
     def render(self, task: "Task") -> Text:
         if task.total is None and self.show_speed:
-            return self.render_speed(task)
+            return self.render_speed(task.finished_speed or task.speed)
         text_format = (
             self.text_format_no_percentage if task.total is None else self.text_format
         )
