@@ -681,7 +681,7 @@ class TaskProgressColumn(TextColumn):
     """Show task progress as a percentage.
 
     Args:
-        text_format (_type_, optional): Format for percentage display. Defaults to "[progress.percentage]{task.percentage:>3.0f}%".
+        text_format (str, optional): Format for percentage display. Defaults to "[progress.percentage]{task.percentage:>3.0f}%".
         text_format_no_percentage (str, optional): Format if percentage is unknown. Defaults to "".
         style (StyleType, optional): Style of output. Defaults to "none".
         justify (JustifyMethod, optional): Text justification. Defaults to "left".
