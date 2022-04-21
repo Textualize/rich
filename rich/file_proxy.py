@@ -51,4 +51,4 @@ class FileProxy(io.TextIOBase):
         output = "".join(self.__buffer)
         if output:
             self.__console.print(output)
-            del self.__buffer[:]
+        del self.__buffer[:]
