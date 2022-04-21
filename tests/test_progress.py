@@ -308,10 +308,6 @@ def test_track() -> None:
 
     assert result == expected
 
-    with pytest.raises(ValueError):
-        for n in track(5):
-            pass
-
 
 def test_progress_track() -> None:
     console = Console(
@@ -340,10 +336,6 @@ def test_progress_track() -> None:
     print(repr(result))
 
     assert result == expected
-
-    with pytest.raises(ValueError):
-        for n in progress.track(5):
-            pass
 
 
 def test_columns() -> None:

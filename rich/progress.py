@@ -115,6 +115,7 @@ def track(
     pulse_style: StyleType = "bar.pulse",
     update_period: float = 0.1,
     disable: bool = False,
+    show_speed: bool = True,
 ) -> Iterable[ProgressType]:
     """Track progress by iterating over a sequence.
 
@@ -132,6 +133,7 @@ def track(
         pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
         update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
         disable (bool, optional): Disable display of progress.
+        show_speed (bool, optional): Show speed if total isn't known. Defaults to False
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
 
@@ -140,15 +142,17 @@ def track(
     columns: List["ProgressColumn"] = (
         [TextColumn("[progress.description]{task.description}")] if description else []
     )
+    columns.append(
+        BarColumn(
+            style=style,
+            complete_style=complete_style,
+            finished_style=finished_style,
+            pulse_style=pulse_style,
+        )
+    )
     columns.extend(
         (
-            BarColumn(
-                style=style,
-                complete_style=complete_style,
-                finished_style=finished_style,
-                pulse_style=pulse_style,
-            ),
-            TaskProgressColumn(),
+            TaskProgressColumn(show_speed=show_speed),
             TimeRemainingColumn(),
         )
     )
@@ -676,7 +680,18 @@ class TimeElapsedColumn(ProgressColumn):
 
 
 class TaskProgressColumn(TextColumn):
-    """A column displaying the progress of a task."""
+    """Show task progress as a percentage.
+
+    Args:
+        text_format (_type_, optional): Format for percentage display. Defaults to "[progress.percentage]{task.percentage:>3.0f}%".
+        text_format_no_percentage (str, optional): Format if percentage is unknown. Defaults to "".
+        style (StyleType, optional): Style of output. Defaults to "none".
+        justify (JustifyMethod, optional): Text justification. Defaults to "left".
+        markup (bool, optional): Enable markup. Defaults to True.
+        highlighter (Optional[Highlighter], optional): Highlighter to apply to output. Defaults to None.
+        table_column (Optional[Column], optional): Table Column to use. Defaults to None.
+        show_speed (bool, optional): Show speed if total is unknown. Defaults to True.
+    """
 
     def __init__(
         self,
@@ -687,8 +702,11 @@ class TaskProgressColumn(TextColumn):
         markup: bool = True,
         highlighter: Optional[Highlighter] = None,
         table_column: Optional[Column] = None,
+        show_speed: bool = False,
     ) -> None:
+
         self.text_format_no_percentage = text_format_no_percentage
+        self.show_speed = show_speed
         super().__init__(
             text_format=text_format,
             style=style,
@@ -698,7 +716,22 @@ class TaskProgressColumn(TextColumn):
             table_column=table_column,
         )
 
+    def render_speed(self, task: "Task") -> Text:
+        """Show data transfer speed."""
+        speed = task.finished_speed or task.speed
+        if speed is None:
+            return Text("", style="progress.percentage")
+        unit, suffix = filesize.pick_unit_and_suffix(
+            int(speed),
+            ["", "×10³", "×10⁶", "×10⁹", "×10¹²"],
+            1000,
+        )
+        data_speed = speed / unit
+        return Text(f"{data_speed:.1f}{suffix} it/s", style="progress.percentage")
+
     def render(self, task: "Task") -> Text:
+        if task.total is None and self.show_speed:
+            return self.render_speed(task)
         text_format = (
             self.text_format_no_percentage if task.total is None else self.text_format
         )
@@ -1152,13 +1185,10 @@ class Progress(JupyterMixin):
             Iterable[ProgressType]: An iterable of values taken from the provided sequence.
         """
 
+        task_total: float | None = None
         if total is None:
             if isinstance(sequence, Sized):
                 task_total = float(len(sequence))
-            else:
-                raise ValueError(
-                    f"unable to get size of {sequence!r}, please specify 'total'"
-                )
         else:
             task_total = total
 
