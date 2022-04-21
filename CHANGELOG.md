@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Safari - Box appearing around SVG export https://github.com/Textualize/rich/pull/2201
 - Fixed recursion error in Jupyter progress bars https://github.com/Textualize/rich/issues/2047
 
+### Changed
+
+- Setting `total=None` on progress is now possible, and will display pulsing animation
+
 ## [12.2.0] - 2022-04-05
 
 ### Changed
