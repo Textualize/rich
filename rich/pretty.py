@@ -19,6 +19,7 @@ from typing import (
     Iterable,
     List,
     Optional,
+    Sequence,
     Set,
     Tuple,
     Union,
@@ -28,8 +29,10 @@ from rich.repr import RichReprResult
 
 try:
     import attr as _attr_module
+
+    _has_attrs = True
 except ImportError:  # pragma: no cover
-    _attr_module = None  # type: ignore[assignment]
+    _has_attrs = False
 
 from . import get_console
 from ._loop import loop_last
@@ -54,12 +57,12 @@ if TYPE_CHECKING:
 
 def _is_attr_object(obj: Any) -> bool:
     """Check if an object was created with attrs module."""
-    return _attr_module is not None and _attr_module.has(type(obj))
+    return _has_attrs and _attr_module.has(type(obj))
 
 
-def _get_attr_fields(obj: Any) -> Iterable["_attr_module.Attribute[Any]"]:
+def _get_attr_fields(obj: Any) -> Sequence["_attr_module.Attribute[Any]"]:
     """Get fields for an attrs object."""
-    return _attr_module.fields(type(obj)) if _attr_module is not None else []
+    return _attr_module.fields(type(obj)) if _has_attrs else []
 
 
 def _is_dataclass_repr(obj: object) -> bool:
