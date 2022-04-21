@@ -717,7 +717,7 @@ class TaskProgressColumn(TextColumn):
         )
 
     @classmethod
-    def render_speed(cls, speed: float | None) -> Text:
+    def render_speed(cls, speed: Optional[float]) -> Text:
         """Render the speed in iterations per second.
 
         Args:
@@ -1192,7 +1192,7 @@ class Progress(JupyterMixin):
             Iterable[ProgressType]: An iterable of values taken from the provided sequence.
         """
 
-        task_total: float | None = None
+        task_total: Optional[float] = None
         if total is None:
             if isinstance(sequence, Sized):
                 task_total = float(len(sequence))
