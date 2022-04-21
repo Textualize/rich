@@ -25,3 +25,14 @@ def test_flush():
     assert file.getvalue() == ""
     file_proxy.flush()
     assert file.getvalue() == "foo\n"
+
+
+def test_new_lines():
+
+    file = io.StringIO()
+    console = Console(file=file)
+    file_proxy = FileProxy(console, file)
+    file_proxy.write("-\n-")
+    assert file.getvalue() == "-\n"
+    file_proxy.flush()
+    assert file.getvalue() == "-\n-\n"
