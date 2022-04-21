@@ -142,16 +142,14 @@ def track(
     columns: List["ProgressColumn"] = (
         [TextColumn("[progress.description]{task.description}")] if description else []
     )
-    columns.append(
-        BarColumn(
-            style=style,
-            complete_style=complete_style,
-            finished_style=finished_style,
-            pulse_style=pulse_style,
-        )
-    )
     columns.extend(
         (
+            BarColumn(
+                style=style,
+                complete_style=complete_style,
+                finished_style=finished_style,
+                pulse_style=pulse_style,
+            ),
             TaskProgressColumn(show_speed=show_speed),
             TimeRemainingColumn(),
         )
