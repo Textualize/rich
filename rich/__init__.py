@@ -13,7 +13,11 @@ if TYPE_CHECKING:
 # Global console used by alternative print
 _console: Optional["Console"] = None
 
-_IMPORT_CWD = os.path.abspath(os.getcwd())
+try:
+    _IMPORT_CWD = os.path.abspath(os.getcwd())
+except FileNotFoundError:
+    # Can happen if the cwd has been deleted
+    _IMPORT_CWD = ""
 
 
 def get_console() -> "Console":
