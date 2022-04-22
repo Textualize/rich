@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Ability to change terminal window title https://github.com/Textualize/rich/pull/2200
+- Added show_speed parameter to progress.track which will show the speed when the total is not known
 
 ### Fixed
 
