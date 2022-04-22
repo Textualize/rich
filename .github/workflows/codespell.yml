@@ -1,5 +1,8 @@
 name: codespell
 on: [pull_request, push]
+permissions:
+  contents: read
+
 jobs:
   codespell:
     runs-on: ubuntu-latest
