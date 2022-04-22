@@ -133,7 +133,7 @@ def track(
         pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
         update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
         disable (bool, optional): Disable display of progress.
-        show_speed (bool, optional): Show speed if total isn't known. Defaults to False
+        show_speed (bool, optional): Show speed if total isn't known. Defaults to True.
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
 
@@ -688,7 +688,7 @@ class TaskProgressColumn(TextColumn):
         markup (bool, optional): Enable markup. Defaults to True.
         highlighter (Optional[Highlighter], optional): Highlighter to apply to output. Defaults to None.
         table_column (Optional[Column], optional): Table Column to use. Defaults to None.
-        show_speed (bool, optional): Show speed if total is unknown. Defaults to True.
+        show_speed (bool, optional): Show speed if total is unknown. Defaults to False.
     """
 
     def __init__(
