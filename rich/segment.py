@@ -611,9 +611,14 @@ class Segment(NamedTuple):
             yield []
         pos = 0
 
+        _cell_len = cell_len
         for segment in segments:
-            while segment.text:
-                end_pos = pos + segment.cell_length
+            text, _style, control = segment
+            while text:
+                if control:
+                    end_pos = pos
+                else:
+                    end_pos = pos + _cell_len(text)
                 if end_pos < cut:
                     add_segment(segment)
                     pos = end_pos
@@ -628,6 +633,7 @@ class Segment(NamedTuple):
                         break
                     else:
                         before, segment = segment.split_cells(cut - pos)
+                        text, _style, control = segment
                         add_segment(before)
                         yield split_segments[:]
                         del split_segments[:]
