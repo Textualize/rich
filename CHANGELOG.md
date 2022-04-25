@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Setting `total=None` on progress is now possible, and will display pulsing animation
+- Micro-optimization for Segment.divide
 
 ## [12.2.0] - 2022-04-05
 
