@@ -366,7 +366,7 @@ def _get_braces_for_defaultdict(_object: DefaultDict[Any, Any]) -> Tuple[str, st
 
 
 def _get_braces_for_array(_object: "array[Any]") -> Tuple[str, str, str]:
-    return (f"array({_object.typecode!r}, [", "])", "array({_object.typecode!r})")
+    return (f"array({_object.typecode!r}, [", "])", f"array({_object.typecode!r})")
 
 
 _BRACES: Dict[type, Callable[[Any], Tuple[str, str, str]]] = {
