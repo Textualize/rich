@@ -1,6 +1,6 @@
 [![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich)
 [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
-[![codecov](https://codecov.io/gh/willmcgugan/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/willmcgugan/rich)
+[![codecov](https://codecov.io/gh/Textualize/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/Textualize/rich)
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
@@ -126,7 +126,7 @@ Rich possède une fonction [inspect](https://rich.readthedocs.io/en/latest/refer
 
 Consultez la [documentation d'inspect](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) pour plus de détails.
 
-## Bibliothèque Rich  
+## Bibliothèque Rich
 Rich contient un certain nombre _d'éléments de rendu_ intégrés que vous pouvez utiliser pour créer une sortie élégante dans votre CLI et vous aider à déboguer votre code.
 
 Cliquez sur les rubriques suivantes pour plus de détails :
