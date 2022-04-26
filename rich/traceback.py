@@ -584,7 +584,7 @@ class Traceback:
                 )
                 excluded = False
 
-            first = frame_index == 1
+            first = frame_index == 0
             frame_filename = frame.filename
             suppressed = any(frame_filename.startswith(path) for path in self.suppress)
 
