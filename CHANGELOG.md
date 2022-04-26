@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed markup escaping issue https://github.com/Textualize/rich/issues/2187
 - Safari - Box appearing around SVG export https://github.com/Textualize/rich/pull/2201
 - Fixed recursion error in Jupyter progress bars https://github.com/Textualize/rich/issues/2047
+- Complex numbers are now identified by the highlighter https://github.com/Textualize/rich/issues/2214
 
 ### Changed
 
