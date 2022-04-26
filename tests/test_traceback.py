@@ -326,7 +326,8 @@ def test_rich_traceback_omit_optional_local_flag(
         return level2()
 
     def level2():
-        _rich_traceback_omit = rich_traceback_omit_for_level2
+        # true-ish values are enough to trigger the opt-out:
+        _rich_traceback_omit = 1 if rich_traceback_omit_for_level2 else 0
         return level3()
 
     def level3():
