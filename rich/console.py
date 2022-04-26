@@ -916,7 +916,7 @@ class Console:
         if self._force_terminal is not None:
             return self._force_terminal
         try:
-            if WINDOWS and sys.stdin.__module__.startswith('idlelib'):
+            if sys.stdin.__module__.startswith('idlelib'):
                 # Return False for Idle which claims to be a tty but can't handle ansi codes
                 return False
         except AttributeError:

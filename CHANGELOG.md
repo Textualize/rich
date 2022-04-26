@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed markup escaping issue https://github.com/Textualize/rich/issues/2187
 - Safari - Box appearing around SVG export https://github.com/Textualize/rich/pull/2201
 - Fixed recursion error in Jupyter progress bars https://github.com/Textualize/rich/issues/2047
+- Fix crash on IDLE and forced is_terminal detection to False because IDLE can't do escape codes https://github.com/Textualize/rich/issues/2222
 
 ### Changed
 
