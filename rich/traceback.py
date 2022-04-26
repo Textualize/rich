@@ -367,6 +367,8 @@ class Traceback:
                 if filename and not filename.startswith("<"):
                     if not os.path.isabs(filename):
                         filename = os.path.join(_IMPORT_CWD, filename)
+                if frame_summary.f_locals.get("_rich_traceback_omit", False):
+                    continue
                 frame = Frame(
                     filename=filename or "?",
                     lineno=line_no,
@@ -383,7 +385,7 @@ class Traceback:
                     else None,
                 )
                 append(frame)
-                if "_rich_traceback_guard" in frame_summary.f_locals:
+                if frame_summary.f_locals.get("_rich_traceback_guard", False):
                     del stack.frames[:]
 
             cause = getattr(exc_value, "__cause__", None)

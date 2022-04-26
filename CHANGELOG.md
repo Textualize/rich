@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Ability to change terminal window title https://github.com/Textualize/rich/pull/2200
 - Added show_speed parameter to progress.track which will show the speed when the total is not known
+- Python blocks can now opt out from being rendered in tracebacks's frames, by setting a `_rich_traceback_omit = True` in their local scope https://github.com/Textualize/rich/issues/2207
 
 ### Fixed
 
