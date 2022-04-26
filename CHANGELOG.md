@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [12.3.0] - 2022-04-26
 
 ### Added
 
@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complex numbers are now identified by the highlighter https://github.com/Textualize/rich/issues/2214
 - Fix crash on IDLE and forced is_terminal detection to False because IDLE can't do escape codes https://github.com/Textualize/rich/issues/2222
 - Fixed missing blank line in traceback rendering https://github.com/Textualize/rich/issues/2206
+- Fixed running Rich with the current working dir was deleted https://github.com/Textualize/rich/issues/2197
 
 ### Changed
 
@@ -1718,7 +1719,8 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[unreleased]: https://github.com/willmcgugan/rich/compare/v12.2.0...HEAD
+[unreleased]: https://github.com/willmcgugan/rich/compare/v12.3.0...HEAD
+[12.3.0]: https://github.com/willmcgugan/rich/compare/v12.2.0...v12.3.0
 [12.2.0]: https://github.com/willmcgugan/rich/compare/v12.1.0...v12.2.0
 [12.1.0]: https://github.com/willmcgugan/rich/compare/v12.0.1...v12.1.0
 [12.0.1]: https://github.com/willmcgugan/rich/compare/v12.0.0...v12.0.1
