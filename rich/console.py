@@ -916,13 +916,13 @@ class Console:
         if self._force_terminal is not None:
             return self._force_terminal
         try:
-            if sys.stdin.__module__.startswith('idlelib'):
+            if sys.stdin.__module__.startswith("idlelib"):
                 # Return False for Idle which claims to be a tty but can't handle ansi codes
                 return False
         except AttributeError:
             pass
 
-        isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)        
+        isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
         try:
             return False if isatty is None else isatty()
         except ValueError:
@@ -930,7 +930,6 @@ class Console:
             # ValueError: I/O operation on closed file
             # return False because we aren't in a terminal anymore
             return False
-
 
     @property
     def is_dumb_terminal(self) -> bool:
