@@ -59,14 +59,14 @@ highlight_tests = [
     (" 1.2 ", [Span(1, 4, "repr.number")]),
     (" 0xff ", [Span(1, 5, "repr.number")]),
     (" 1e10 ", [Span(1, 5, "repr.number")]),
-    (" 1j ", [Span(1, 3, "repr.complex_number")]),
-    (" 3.14j ", [Span(1, 6, "repr.complex_number")]),
+    (" 1j ", [Span(1, 3, "repr.number_complex")]),
+    (" 3.14j ", [Span(1, 6, "repr.number_complex")]),
     (
         " (3.14+2.06j) ",
         [
             Span(1, 2, "repr.brace"),
             Span(12, 13, "repr.brace"),
-            Span(2, 12, "repr.complex_number"),
+            Span(2, 12, "repr.number_complex"),
         ],
     ),
     (
@@ -74,7 +74,7 @@ highlight_tests = [
         [
             Span(1, 2, "repr.brace"),
             Span(6, 7, "repr.brace"),
-            Span(2, 6, "repr.complex_number"),
+            Span(2, 6, "repr.number_complex"),
         ],
     ),
     (
@@ -82,7 +82,7 @@ highlight_tests = [
         [
             Span(1, 2, "repr.brace"),
             Span(24, 25, "repr.brace"),
-            Span(2, 24, "repr.complex_number"),
+            Span(2, 24, "repr.number_complex"),
         ],
     ),
     (
@@ -90,7 +90,7 @@ highlight_tests = [
         [
             Span(1, 2, "repr.brace"),
             Span(33, 34, "repr.brace"),
-            Span(2, 33, "repr.complex_number"),
+            Span(2, 33, "repr.number_complex"),
         ],
     ),
     (" /foo ", [Span(1, 2, "repr.path"), Span(2, 5, "repr.filename")]),
