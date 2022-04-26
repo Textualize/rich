@@ -367,6 +367,8 @@ class Traceback:
                 if filename and not filename.startswith("<"):
                     if not os.path.isabs(filename):
                         filename = os.path.join(_IMPORT_CWD, filename)
+                if frame_summary.f_locals.get("_rich_traceback_omit", False) is True:
+                    continue
                 frame = Frame(
                     filename=filename or "?",
                     lineno=line_no,

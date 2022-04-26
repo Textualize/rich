@@ -1,6 +1,7 @@
 import io
 import re
 import sys
+from typing import List
 
 import pytest
 
@@ -305,6 +306,41 @@ def test_suppress():
         assert len(traceback.suppress) == 2
         assert "pytest" in traceback.suppress[0]
         assert "foo" in traceback.suppress[1]
+
+
+@pytest.mark.parametrize(
+    "rich_traceback_omit_for_level2,expected_frames_length,expected_frame_names",
+    (
+        # fmt: off
+        [True, 3, ["test_rich_traceback_omit_optional_local_flag", "level1", "level3"]],
+        [False, 4, ["test_rich_traceback_omit_optional_local_flag", "level1", "level2", "level3"]],
+        # fmt: on
+    ),
+)
+def test_rich_traceback_omit_optional_local_flag(
+    rich_traceback_omit_for_level2: bool,
+    expected_frames_length: int,
+    expected_frame_names: List[str],
+):
+    def level1():
+        return level2()
+
+    def level2():
+        _rich_traceback_omit = rich_traceback_omit_for_level2
+        return level3()
+
+    def level3():
+        return 1 / 0
+
+    try:
+        level1()
+    except Exception:
+        exc_type, exc_value, traceback = sys.exc_info()
+        trace = Traceback.from_exception(exc_type, exc_value, traceback).trace
+        frames = trace.stacks[0].frames
+        assert len(frames) == expected_frames_length
+        frame_names = [f.name for f in frames]
+        assert frame_names == expected_frame_names
 
 
 if __name__ == "__main__":  # pragma: no cover
