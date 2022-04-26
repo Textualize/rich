@@ -78,6 +78,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "repr.attrib_equal": Style(bold=True),
     "repr.attrib_value": Style(color="magenta", italic=False),
     "repr.number": Style(color="cyan", bold=True, italic=False),
+    "repr.number_complex": Style(color="cyan", bold=True, italic=False),  # same
     "repr.bool_true": Style(color="bright_green", italic=True),
     "repr.bool_false": Style(color="bright_red", italic=True),
     "repr.none": Style(color="magenta", italic=True),

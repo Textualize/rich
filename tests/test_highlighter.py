@@ -59,6 +59,40 @@ highlight_tests = [
     (" 1.2 ", [Span(1, 4, "repr.number")]),
     (" 0xff ", [Span(1, 5, "repr.number")]),
     (" 1e10 ", [Span(1, 5, "repr.number")]),
+    (" 1j ", [Span(1, 3, "repr.number_complex")]),
+    (" 3.14j ", [Span(1, 6, "repr.number_complex")]),
+    (
+        " (3.14+2.06j) ",
+        [
+            Span(1, 2, "repr.brace"),
+            Span(12, 13, "repr.brace"),
+            Span(2, 12, "repr.number_complex"),
+        ],
+    ),
+    (
+        " (3+2j) ",
+        [
+            Span(1, 2, "repr.brace"),
+            Span(6, 7, "repr.brace"),
+            Span(2, 6, "repr.number_complex"),
+        ],
+    ),
+    (
+        " (123456.4321-1234.5678j) ",
+        [
+            Span(1, 2, "repr.brace"),
+            Span(24, 25, "repr.brace"),
+            Span(2, 24, "repr.number_complex"),
+        ],
+    ),
+    (
+        " (-123123-2.1312342342423422e+25j) ",
+        [
+            Span(1, 2, "repr.brace"),
+            Span(33, 34, "repr.brace"),
+            Span(2, 33, "repr.number_complex"),
+        ],
+    ),
     (" /foo ", [Span(1, 2, "repr.path"), Span(2, 5, "repr.filename")]),
     (" /foo/bar.html ", [Span(1, 6, "repr.path"), Span(6, 14, "repr.filename")]),
     ("01-23-45-67-89-AB", [Span(0, 17, "repr.eui48")]),  # 6x2 hyphen
