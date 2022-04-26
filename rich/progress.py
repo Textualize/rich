@@ -924,6 +924,9 @@ class Task:
     id: TaskID
     """Task ID associated with this task (used in Progress methods)."""
 
+    progress: "Progress"
+    """Associated Progress object"""
+
     description: str
     """str: Description of the task."""
 
@@ -1037,6 +1040,90 @@ class Task:
         self._progress.clear()
         self.finished_time = None
         self.finished_speed = None
+
+    def start(self) -> None:
+        """Start a task.
+
+        Starts a task (used when calculating elapsed time). You may need to call this manually,
+        if you called ``add_task`` with ``start=False``.
+        """
+        self.progress.start_task(self.id)
+
+    def stop(self) -> None:
+        """Stop a task.
+
+        This will freeze the elapsed time on the task.
+        """
+        self.progress.stop_task(self.id)
+
+    def update(
+        self,
+        *,
+        total: Optional[float] = None,
+        completed: Optional[float] = None,
+        advance: Optional[float] = None,
+        description: Optional[str] = None,
+        visible: Optional[bool] = None,
+        refresh: bool = False,
+        **fields: Any,
+    ) -> None:
+        """Update information associated with a task.
+
+        Args:
+            total (float, optional): Updates task.total if not None.
+            completed (float, optional): Updates task.completed if not None.
+            advance (float, optional): Add a value to task.completed if not None.
+            description (str, optional): Change task description if not None.
+            visible (bool, optional): Set visible flag if not None.
+            refresh (bool): Force a refresh of progress information. Default is False.
+            **fields (Any): Additional data fields required for rendering.
+        """
+        self.progress.update(
+            self.id,
+            total=total,
+            completed=completed,
+            advance=advance,
+            description=description,
+            visible=visible,
+            refresh=refresh,
+            fields=fields,
+        )
+
+    def reset(
+        self,
+        *,
+        start: bool = True,
+        total: Optional[float] = None,
+        completed: int = 0,
+        visible: Optional[bool] = None,
+        description: Optional[str] = None,
+        **fields: Any,
+    ) -> None:
+        """Reset a task so completed is 0 and the clock is reset.
+
+        Args:
+            start (bool, optional): Start the task after reset. Defaults to True.
+            total (float, optional): New total steps in task, or None to use current total. Defaults to None.
+            completed (int, optional): Number of steps completed. Defaults to 0.
+            **fields (str): Additional data fields required for rendering.
+        """
+        self.progress.update(
+            self.id,
+            start=start,
+            total=total,
+            completed=completed,
+            visible=visible,
+            description=description,
+            fields=fields,
+        )
+
+    def advance(self, advance: float = 1) -> None:
+        """Advance task by a number of steps.
+
+        Args:
+            advance (float): Number of steps to advance. Default is 1.
+        """
+        self.progress.advance(self.id, advance)
 
 
 class Progress(JupyterMixin):
@@ -1198,7 +1285,7 @@ class Progress(JupyterMixin):
             task_total = total
 
         if task_id is None:
-            task_id = self.add_task(description, total=task_total)
+            task_id = self.add_task(description, total=task_total).id
         else:
             self.update(task_id, total=task_total)
 
@@ -1251,7 +1338,7 @@ class Progress(JupyterMixin):
 
         # update total of task or create new task
         if task_id is None:
-            task_id = self.add_task(description, total=total_bytes)
+            task_id = self.add_task(description, total=total_bytes).id
         else:
             self.update(task_id, total=total_bytes)
 
@@ -1346,7 +1433,7 @@ class Progress(JupyterMixin):
 
         # update total of task or create new task
         if task_id is None:
-            task_id = self.add_task(description, total=total)
+            task_id = self.add_task(description, total=total).id
         else:
             self.update(task_id, total=total)
 
@@ -1584,7 +1671,7 @@ class Progress(JupyterMixin):
         completed: int = 0,
         visible: bool = True,
         **fields: Any,
-    ) -> TaskID:
+    ) -> Task:
         """Add a new 'task' to the Progress display.
 
         Args:
@@ -1598,11 +1685,12 @@ class Progress(JupyterMixin):
             **fields (str): Additional data fields required for rendering.
 
         Returns:
-            TaskID: An ID you can use when calling `update`.
+            Task: A Task object you can update/advance/etc
         """
         with self._lock:
             task = Task(
                 self._task_index,
+                self,
                 description,
                 total,
                 completed,
@@ -1617,7 +1705,7 @@ class Progress(JupyterMixin):
             new_task_index = self._task_index
             self._task_index = TaskID(int(self._task_index) + 1)
         self.refresh()
-        return new_task_index
+        return task
 
     def remove_task(self, task_id: TaskID) -> None:
         """Delete a task if it exists.
@@ -1690,8 +1778,8 @@ if __name__ == "__main__":  # pragma: no coverage
         task3 = progress.add_task("[yellow]Thinking", total=None)
 
         while not progress.finished:
-            progress.update(task1, advance=0.5)
-            progress.update(task2, advance=0.3)
+            task1.update(advance=0.5)
+            task2.update(advance=0.3)
             time.sleep(0.01)
             if random.randint(0, 100) < 1:
                 progress.log(next(examples))

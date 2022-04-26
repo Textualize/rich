@@ -54,7 +54,7 @@ class MockClock:
 def test_bar_columns():
     bar_column = BarColumn(100)
     assert bar_column.bar_width == 100
-    task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
+    task = Task(1, Progress(), "test", 100, 20, _get_time=lambda: 1.0)
     bar = bar_column(task)
     assert isinstance(bar, ProgressBar)
     assert bar.completed == 20
@@ -63,19 +63,19 @@ def test_bar_columns():
 
 def test_text_column():
     text_column = TextColumn("[b]foo", highlighter=NullHighlighter())
-    task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
+    task = Task(1, Progress(), "test", 100, 20, _get_time=lambda: 1.0)
     text = text_column.render(task)
     assert str(text) == "foo"
 
     text_column = TextColumn("[b]bar", markup=False)
-    task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
+    task = Task(1, Progress(), "test", 100, 20, _get_time=lambda: 1.0)
     text = text_column.render(task)
     assert text == Text("[b]bar")
 
 
 def test_time_elapsed_column():
     column = TimeElapsedColumn()
-    task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
+    task = Task(1, Progress(), "test", 100, 20, _get_time=lambda: 1.0)
     text = column.render(task)
     assert str(text) == "-:--:--"
 
@@ -85,11 +85,11 @@ def test_time_remaining_column():
         time_remaining = 60
 
     column = TimeRemainingColumn()
-    task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
+    task = Task(1, Progress(), "test", 100, 20, _get_time=lambda: 1.0)
     text = column(task)
     assert str(text) == "-:--:--"
 
-    text = column(FakeTask(1, "test", 100, 20, _get_time=lambda: 1.0))
+    text = column(FakeTask(1, Progress(), "test", 100, 20, _get_time=lambda: 1.0))
     assert str(text) == "0:01:00"
 
 
@@ -122,7 +122,7 @@ def test_time_remaining_column_elapsed_when_finished():
 
 def test_renderable_column():
     column = RenderableColumn("foo")
-    task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
+    task = Task(1, Progress(), "test", 100, 20, _get_time=lambda: 1.0)
     assert column.render(task) == "foo"
 
 
@@ -135,7 +135,7 @@ def test_spinner_column():
 
     column = SpinnerColumn()
     column.set_spinner("dots2")
-    task = Task(1, "test", 100, 20, _get_time=get_time)
+    task = Task(1, Progress(), "test", 100, 20, _get_time=get_time)
     result = column.render(task)
     print(repr(result))
     expected = "⣾"
@@ -152,7 +152,7 @@ def test_spinner_column():
 def test_download_progress_uses_decimal_units() -> None:
 
     column = DownloadColumn()
-    test_task = Task(1, "test", 1000, 500, _get_time=lambda: 1.0)
+    test_task = Task(1, Progress(), "test", 1000, 500, _get_time=lambda: 1.0)
     rendered_progress = str(column.render(test_task))
     expected = "0.5/1.0 kB"
     assert rendered_progress == expected
@@ -161,7 +161,7 @@ def test_download_progress_uses_decimal_units() -> None:
 def test_download_progress_uses_binary_units() -> None:
 
     column = DownloadColumn(binary_units=True)
-    test_task = Task(1, "test", 1024, 512, _get_time=lambda: 1.0)
+    test_task = Task(1, Progress(), "test", 1024, 512, _get_time=lambda: 1.0)
     rendered_progress = str(column.render(test_task))
     expected = "0.5/1.0 KiB"
     assert rendered_progress == expected
@@ -198,17 +198,17 @@ def make_progress() -> Progress:
     progress = Progress(console=console, get_time=fake_time, auto_refresh=False)
     task1 = progress.add_task("foo")
     task2 = progress.add_task("bar", total=30)
-    progress.advance(task2, 16)
+    progress.advance(task2.id, 16)
     task3 = progress.add_task("baz", visible=False)
     task4 = progress.add_task("egg")
-    progress.remove_task(task4)
+    progress.remove_task(task4.id)
     task4 = progress.add_task("foo2", completed=50, start=False)
-    progress.stop_task(task4)
-    progress.start_task(task4)
+    progress.stop_task(task4.id)
+    progress.start_task(task4.id)
     progress.update(
-        task4, total=200, advance=50, completed=200, visible=True, refresh=True
+        task4.id, total=200, advance=50, completed=200, visible=True, refresh=True
     )
-    progress.stop_task(task4)
+    progress.stop_task(task4.id)
     return progress
 
 
@@ -367,8 +367,8 @@ def test_columns() -> None:
         auto_refresh=False,
         get_time=MockClock(),
     )
-    task1 = progress.add_task("foo", total=10)
-    task2 = progress.add_task("bar", total=7)
+    task1 = progress.add_task("foo", total=10).id
+    task2 = progress.add_task("bar", total=7).id
     with progress:
         for n in range(4):
             progress.advance(task1, 3)
@@ -413,7 +413,7 @@ def test_using_default_columns() -> None:
 
 
 def test_task_create() -> None:
-    task = Task(TaskID(1), "foo", 100, 0, _get_time=lambda: 1)
+    task = Task(TaskID(1), Progress(), "foo", 100, 0, _get_time=lambda: 1)
     assert task.elapsed is None
     assert not task.finished
     assert task.percentage == 0.0
@@ -428,7 +428,7 @@ def test_task_start() -> None:
         nonlocal current_time
         return current_time
 
-    task = Task(TaskID(1), "foo", 100, 0, _get_time=get_time)
+    task = Task(TaskID(1), Progress(), "foo", 100, 0, _get_time=get_time)
     task.start_time = get_time()
     assert task.started == True
     assert task.elapsed == 0
@@ -441,7 +441,7 @@ def test_task_start() -> None:
 
 
 def test_task_zero_total() -> None:
-    task = Task(TaskID(1), "foo", 0, 0, _get_time=lambda: 1)
+    task = Task(TaskID(1), Progress(), "foo", 0, 0, _get_time=lambda: 1)
     assert task.percentage == 0
 
 
@@ -454,7 +454,7 @@ def test_progress_create() -> None:
 
 def test_track_thread() -> None:
     progress = Progress()
-    task_id = progress.add_task("foo")
+    task_id = progress.add_task("foo").id
     track_thread = _TrackThread(progress, task_id, 0.1)
     assert track_thread.completed == 0
     from time import sleep
@@ -468,7 +468,7 @@ def test_track_thread() -> None:
 
 def test_reset() -> None:
     progress = Progress()
-    task_id = progress.add_task("foo")
+    task_id = progress.add_task("foo").id
     progress.advance(task_id, 1)
     progress.advance(task_id, 1)
     progress.advance(task_id, 1)
@@ -519,7 +519,7 @@ def test_progress_max_refresh() -> None:
     )
     console.begin_capture()
     with progress:
-        task_id = progress.add_task("start")
+        task_id = progress.add_task("start").id
         for tick in range(6):
             progress.update(task_id, description=f"tick {tick}")
             progress.refresh()
@@ -640,7 +640,7 @@ def test_wrap_file_task_total() -> None:
     try:
         with progress:
             with open(filename, "rb") as file:
-                task_id = progress.add_task("Reading", total=total)
+                task_id = progress.add_task("Reading", total=total).id
                 with progress.wrap_file(file, task_id=task_id) as f:
                     assert f.read() == b"Hello, World!"
     finally:
