@@ -915,6 +915,13 @@ class Console:
         """
         if self._force_terminal is not None:
             return self._force_terminal
+
+        if hasattr(sys.stdin, "__module__") and sys.stdin.__module__.startswith(
+            "idlelib"
+        ):
+            # Return False for Idle which claims to be a tty but can't handle ansi codes
+            return False
+
         isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
         try:
             return False if isatty is None else isatty()
@@ -969,7 +976,7 @@ class Console:
         if WINDOWS:  # pragma: no cover
             try:
                 width, height = os.get_terminal_size()
-            except OSError:  # Probably not a terminal
+            except (AttributeError, ValueError, OSError):  # Probably not a terminal
                 pass
         else:
             for file_descriptor in _STD_STREAMS:
