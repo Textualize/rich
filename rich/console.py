@@ -915,12 +915,12 @@ class Console:
         """
         if self._force_terminal is not None:
             return self._force_terminal
-        try:
-            if sys.stdin.__module__.startswith("idlelib"):
-                # Return False for Idle which claims to be a tty but can't handle ansi codes
-                return False
-        except AttributeError:
-            pass
+
+        if hasattr(sys.stdin, "__module__") and sys.stdin.__module__.startswith(
+            "idlelib"
+        ):
+            # Return False for Idle which claims to be a tty but can't handle ansi codes
+            return False
 
         isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
         try:
