@@ -969,7 +969,7 @@ class Console:
         if WINDOWS:  # pragma: no cover
             try:
                 width, height = os.get_terminal_size()
-            except OSError:  # Probably not a terminal
+            except (AttributeError, ValueError, OSError):  # Probably not a terminal
                 pass
         else:
             for file_descriptor in _STD_STREAMS:
