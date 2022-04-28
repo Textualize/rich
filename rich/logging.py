@@ -43,6 +43,9 @@ class RichHandler(Handler):
             Defaults to 10.
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
         log_time_format (Union[str, TimeFormatterCallable], optional): If ``log_time`` is enabled, either string for strftime or callable that formats the time. Defaults to "[%x %X] ".
+        level_width int: Level column size.
+            Defaults to 8.
+        level_format str: format of level column.
         keywords (List[str], optional): List of words to highlight instead of ``RichHandler.KEYWORDS``.
     """
 
@@ -80,6 +83,8 @@ class RichHandler(Handler):
         locals_max_length: int = 10,
         locals_max_string: int = 80,
         log_time_format: Union[str, FormatTimeCallable] = "[%x %X]",
+        level_width: int = 8,
+        level_format: Optional[str] = None,
         keywords: Optional[List[str]] = None,
     ) -> None:
         super().__init__(level=level)
@@ -91,7 +96,7 @@ class RichHandler(Handler):
             show_path=show_path,
             time_format=log_time_format,
             omit_repeated_times=omit_repeated_times,
-            level_width=None,
+            level_width=level_width,
         )
         self.enable_link_path = enable_link_path
         self.markup = markup
@@ -104,6 +109,8 @@ class RichHandler(Handler):
         self.tracebacks_suppress = tracebacks_suppress
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
+        self.level_width = level_width
+        self.level_format = level_format or "{{:<{0}.{0}}}".format(level_width)
         self.keywords = keywords
 
     def get_level_text(self, record: LogRecord) -> Text:
@@ -115,9 +122,9 @@ class RichHandler(Handler):
         Returns:
             Text: A tuple of the style and level name.
         """
-        level_name = record.levelname
+        level_name = self.level_format.format(record.levelname)
         level_text = Text.styled(
-            level_name.ljust(8), f"logging.level.{level_name.lower()}"
+            level_name, f"logging.level.{record.levelname.lower()}"
         )
         return level_text
 

@@ -162,6 +162,67 @@ def test_markup_and_highlight():
     assert log_message in render_plain
 
 
+def test_level_width():
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=140,
+        color_system=None,
+        _environ={},
+    )
+    handler_level_width = RichHandler(
+        console=console,
+        level_width=4,
+    )
+    log.setLevel(logging.INFO)
+    log.addHandler(handler_level_width)
+
+    log.info("Great")
+    log.warning("Few warning")
+    log.error("Some error")
+
+    render = handler_level_width.console.file.getvalue()
+    print(render)
+
+    assert "INFO Great" in render
+    assert "WARN Few warning" in render
+    assert "ERRO Some error" in render
+
+    assert "WARNING" not in render
+    assert "ERROR" not in render
+
+
+def test_level_format():
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=140,
+        color_system=None,
+        _environ={},
+    )
+    handler_level_width = RichHandler(
+        console=console,
+        level_width=10,
+        level_format="[{:>8.8}]",
+        omit_repeated_times=False,
+    )
+    log.setLevel(logging.INFO)
+    log.addHandler(handler_level_width)
+
+    log.info("Great")
+    log.warning("Few warning")
+    log.error("Some error")
+    log.critical("Something terrible happened")
+
+    render = handler_level_width.console.file.getvalue()
+    print(render)
+
+    assert "] [    INFO] Great" in render
+    assert "] [ WARNING] Few warning" in render
+    assert "] [   ERROR] Some error" in render
+    assert "] [CRITICAL] Something terrible happened" in render
+
+
 if __name__ == "__main__":
     render = make_log()
     print(render)
