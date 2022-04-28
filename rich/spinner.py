@@ -1,4 +1,4 @@
-from typing import cast, List, Optional, TYPE_CHECKING
+from typing import cast, List, Optional, TYPE_CHECKING, Union
 
 from ._spinners import SPINNERS
 from .measure import Measurement
@@ -34,7 +34,9 @@ class Spinner:
             spinner = SPINNERS[name]
         except KeyError:
             raise KeyError(f"no spinner called {name!r}")
-        self.text = Text.from_markup(text) if isinstance(text, str) else text
+        self.text: "Union[RenderableType, Text]" = (
+            Text.from_markup(text) if isinstance(text, str) else text
+        )
         self.frames = cast(List[str], spinner["frames"])[:]
         self.interval = cast(float, spinner["interval"])
         self.start_time: Optional[float] = None

@@ -5,16 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [12.3.0] - 2022-04-26
 
 ### Added
 
 - Ability to change terminal window title https://github.com/Textualize/rich/pull/2200
+- Added show_speed parameter to progress.track which will show the speed when the total is not known
+- Python blocks can now opt out from being rendered in tracebacks's frames, by setting a `_rich_traceback_omit = True` in their local scope https://github.com/Textualize/rich/issues/2207
 
 ### Fixed
 
 - Fall back to `sys.__stderr__` on POSIX systems when trying to get the terminal size (fix issues when Rich is piped to another process)
 - Fixed markup escaping issue https://github.com/Textualize/rich/issues/2187
+- Safari - Box appearing around SVG export https://github.com/Textualize/rich/pull/2201
+- Fixed recursion error in Jupyter progress bars https://github.com/Textualize/rich/issues/2047
+- Complex numbers are now identified by the highlighter https://github.com/Textualize/rich/issues/2214
+- Fix crash on IDLE and forced is_terminal detection to False because IDLE can't do escape codes https://github.com/Textualize/rich/issues/2222
+- Fixed missing blank line in traceback rendering https://github.com/Textualize/rich/issues/2206
+- Fixed running Rich with the current working dir was deleted https://github.com/Textualize/rich/issues/2197
+
+### Changed
+
+- Setting `total=None` on progress is now possible, and will display pulsing animation
+- Micro-optimization for Segment.divide
 
 ## [12.2.0] - 2022-04-05
 
@@ -1706,7 +1719,8 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[unreleased]: https://github.com/willmcgugan/rich/compare/v12.2.0...HEAD
+[unreleased]: https://github.com/willmcgugan/rich/compare/v12.3.0...HEAD
+[12.3.0]: https://github.com/willmcgugan/rich/compare/v12.2.0...v12.3.0
 [12.2.0]: https://github.com/willmcgugan/rich/compare/v12.1.0...v12.2.0
 [12.1.0]: https://github.com/willmcgugan/rich/compare/v12.0.1...v12.1.0
 [12.0.1]: https://github.com/willmcgugan/rich/compare/v12.0.0...v12.0.1

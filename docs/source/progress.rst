@@ -26,16 +26,6 @@ For basic usage call the :func:`~rich.progress.track` function, which accepts a 
     for n in track(range(n), description="Processing..."):
         do_work(n)
 
-
-To get a progress bar while reading from a file, you may consider using the :func:`~rich.progress.read` function, which accepts a path, or a *file-like* object. It will return a *file-like* object in *binary mode* that will update the progress information as it's being read from. Here's an example, tracking the progresses made by :func:`json.load` to load a file::
-
-    import json
-    from rich.progress import read
-
-    with read("data.json", description="Loading data...") as f:
-        data = json.load(f)
-
-
 Advanced usage
 --------------
 
@@ -110,16 +100,16 @@ The progress bar(s) will use only as much of the width of the terminal as requir
 Columns
 ~~~~~~~
 
-You may customize the columns in the progress display with the positional arguments to the :class:`~rich.progress.Progress` constructor. The columns are specified as either a format string or a :class:`~rich.progress.ProgressColumn` object.
+You may customize the columns in the progress display with the positional arguments to the :class:`~rich.progress.Progress` constructor. The columns are specified as either a *format string* or a :class:`~rich.progress.ProgressColumn` object.
 
-Format strings will be rendered with a single value `"task"` which will be a :class:`~rich.progress.Task` instance. For example ``"{task.description}"`` would display the task description in the column, and ``"{task.completed} of {task.total}"`` would display how many of the total steps have been completed.
+Format strings will be rendered with a single value `"task"` which will be a :class:`~rich.progress.Task` instance. For example ``"{task.description}"`` would display the task description in the column, and ``"{task.completed} of {task.total}"`` would display how many of the total steps have been completed. Additional fields passed via keyword arguments to `~rich.progress.Progress.update` are store in ``task.fields``. You can add them to a format string with the following syntax: ``"extra info: {task.fields[extra]}"``.
 
-The defaults are roughly equivalent to the following::
+The default columns are equivalent to the following:
 
     progress = Progress(
-        "[progress.description]{task.description}",
+        TextColumn("[progress.description]{task.description}"),
         BarColumn(),
-        "[progress.percentage]{task.percentage:>3.0f}%",
+        TaskProgressColumn(),
         TimeRemainingColumn(),
     )
 
@@ -212,9 +202,9 @@ If the :class:`~rich.progress.Progress` class doesn't offer exactly what you nee
 Reading from a file
 ~~~~~~~~~~~~~~~~~~~
 
-Rich provides an easy way to generate a progress bar for reading a file. If you call :func:`~rich.progress.open` it will return a context manager which displays a progress bar while you read. This is particularly useful when you can't easily modify the code that does the reading.
+Rich provides an easy way to generate a progress bar while reading a file. If you call :func:`~rich.progress.open` it will return a context manager which displays a progress bar while you read. This is particularly useful when you can't easily modify the code that does the reading.
 
-The following example shows how we might show progress for reading a JSON file::
+The following example demonstrates how we might show progress when reading a JSON file::
 
     import json
     import rich.progress

@@ -308,10 +308,6 @@ def test_track() -> None:
 
     assert result == expected
 
-    with pytest.raises(ValueError):
-        for n in track(5):
-            pass
-
 
 def test_progress_track() -> None:
     console = Console(
@@ -340,10 +336,6 @@ def test_progress_track() -> None:
     print(repr(result))
 
     assert result == expected
-
-    with pytest.raises(ValueError):
-        for n in progress.track(5):
-            pass
 
 
 def test_columns() -> None:
@@ -653,6 +645,20 @@ def test_wrap_file_task_total() -> None:
                     assert f.read() == b"Hello, World!"
     finally:
         os.remove(filename)
+
+
+def test_task_progress_column_speed():
+    speed_text = TaskProgressColumn.render_speed(None)
+    assert speed_text.plain == ""
+
+    speed_text = TaskProgressColumn.render_speed(5)
+    assert speed_text.plain == "5.0 it/s"
+
+    speed_text = TaskProgressColumn.render_speed(5000)
+    assert speed_text.plain == "5.0×10³ it/s"
+
+    speed_text = TaskProgressColumn.render_speed(8888888)
+    assert speed_text.plain == "8.9×10⁶ it/s"
 
 
 if __name__ == "__main__":
