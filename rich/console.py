@@ -1810,7 +1810,7 @@ class Console:
         """Prints a rich render of the last exception and traceback.
 
         Args:
-            width (Optional[int], optional): Number of characters used to render code. Defaults to 88.
+            width (Optional[int], optional): Number of characters used to render code. Defaults to 100.
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
             theme (str, optional): Override pygments theme used in traceback
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
