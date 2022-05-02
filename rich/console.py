@@ -51,6 +51,7 @@ from ._export_format import (
     CONSOLE_SVG_FORMAT,
 )
 from ._log_render import FormatTimeCallable, LogRender
+from ._loop import loop_last
 from .align import Align, AlignMethod
 from .color import ColorSystem
 from .control import Control
@@ -2363,6 +2364,142 @@ class Console:
         )
 
         return rendered_code
+
+    def export_svg(
+        self,
+        *,
+        title: str = "Rich",
+        theme: Optional[TerminalTheme] = None,
+        clear: bool = True,
+        code_format: str = CONSOLE_SVG_FORMAT,
+        id: str | None = None,
+    ) -> str:
+
+        code_format = """
+<svg id="{unique_id}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg">
+    <style>
+    text {{
+        font-family: Fira Code, monospace;
+        font-size: {char_height}px;
+        font-variant: east-asian-width-values;
+        line-height: {line_height}px;
+        dominant-baseline: text-before-edge;
+    }}
+    {styles}
+    </style>
+    <g transform="translate({terminal_x}, {terminal_y})">
+    {backgrounds}
+    <text>{matrix}</text>
+    </g>
+</svg>
+"""
+        from rich.cells import cell_len
+
+        style_cache: dict[Style, str] = {}
+
+        def get_svg_style(style: Style) -> str:
+            if style in style_cache:
+                return style_cache[style]
+            css_rules = []
+            if style.color is not None:
+                r, g, b = style.color.get_truecolor(_theme)
+                css_rules.append(f"fill: #{r:02X}{g:02x}{b:02X}")
+
+            if style.bold:
+                css_rules.append("font-weight: bold")
+            if style.italic:
+                css_rules.append("font-style: italic;")
+            if style.underline:
+                css_rules.append("text-decoration: underline;")
+
+            css = ";".join(css_rules)
+            style_cache[style] = css
+            return css
+
+        _theme = theme or SVG_EXPORT_THEME
+
+        width = 0
+        char_height = 20
+        char_width = char_height * 0.62
+        line_height = char_height * 1.15
+
+        padding_top = 20
+        padding_left = 10
+        padding_right = 10
+        padding_bottom = 20
+
+        text_backgrounds = []
+        text_group: list[str] = []
+        classes: dict[str, int] = {}
+        style_no = 1
+
+        with self._record_buffer_lock:
+            x = 0
+            y = 1
+            segments = list(
+                Segment.filter_control(
+                    Segment.simplify(self._record_buffer),
+                )
+            )
+
+            if id is None:
+                unique_id = "terminal-" + str(
+                    zlib.adler32(
+                        ("".join(segment.text for segment in segments)).encode(
+                            "utf-8", "ignore"
+                        )
+                        + title.encode("utf-8", "ignore")
+                    )
+                )
+            else:
+                unique_id = id
+            for last, line in loop_last(Segment.split_lines(segments)):
+                x = 0
+                for text, style, _control in line:
+                    style = style or Style()
+                    rules = get_svg_style(style)
+                    if rules not in classes:
+                        classes[rules] = style_no
+                        style_no += 1
+                    class_name = f"r{classes[rules]}"
+
+                    for character in text:
+                        if style.bgcolor is not None:
+                            r, g, b = style.bgcolor.get_truecolor(_theme)
+                            text_backgrounds.append(
+                                f"""<rect fill="#{r:02X}{g:02x}{b:02X}" x="{x * char_width}" y="{y * line_height}" width="{char_width}" height="{line_height}"></rect> """
+                            )
+                        text_group.append(
+                            f"""<tspan class="#{unique_id} {class_name}" x="{x * char_width}" y="{y * line_height}" textLength="{char_width}px">{character}</tspan>"""
+                        )
+                        x += cell_len(character)
+                if not last:
+                    text_group.append(
+                        f"""<tspan x="{x * char_width}" y="{y * line_height}" textLength="{char_width}px">\n</tspan>"""
+                    )
+                width = max(x, width)
+                y += 1
+
+        styles = "\n".join(
+            f"#{unique_id} .r{rule_no} {{ {css} }}" for css, rule_no in classes.items()
+        )
+        backgrounds = "".join(text_backgrounds)
+        matrix = "".join(text_group)
+
+        svg = code_format.format(
+            unique_id=unique_id,
+            char_width=char_width,
+            char_height=char_height,
+            line_height=line_height,
+            width=width * char_width,
+            height=y * line_height,
+            terminal_x=0,
+            terminal_y=0,
+            styles=styles,
+            backgrounds=backgrounds,
+            matrix=matrix,
+        )
+        return svg
 
     def save_svg(
         self,
