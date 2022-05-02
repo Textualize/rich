@@ -2304,7 +2304,9 @@ class Console:
             """HTML escape text and replace spaces with nbsp."""
             return escape(text).replace(" ", "\u00A0")
 
-        def make_tag(name: str, content: str | None = None, **attribs: object) -> str:
+        def make_tag(
+            name: str, content: Optional[str] = None, **attribs: object
+        ) -> str:
             """Make a tag from name, content, and attributes."""
             tag_attribs = " ".join(
                 f'{k.lstrip("_").replace("_", "-")}="{v}"' for k, v in attribs.items()
