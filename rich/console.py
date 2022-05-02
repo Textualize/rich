@@ -2278,7 +2278,7 @@ class Console:
         width = self.width
         char_height = 20
         char_width = char_height * 0.62
-        line_height = ceil(char_height * 1.55)
+        line_height = char_height * 1.55
 
         margin_top = 20
         margin_right = 16
@@ -2375,10 +2375,10 @@ class Console:
                         _class=f"{unique_id}-{class_name}",
                         x=x * char_width,
                         y=y * line_height + char_height,
-                        textLength=ceil(char_width * len(text)),
+                        textLength=char_width * len(text),
                     )
                 )
-                x += len(text)
+                x += cell_len(text)
 
         styles = "\n".join(
             f".{unique_id}-r{rule_no} {{ {css} }}" for css, rule_no in classes.items()
@@ -2386,7 +2386,7 @@ class Console:
         backgrounds = "".join(text_backgrounds)
         matrix = "".join(text_group)
 
-        terminal_width = width * char_width + padding_width
+        terminal_width = ceil(width * char_width + padding_width)
         terminal_height = (y + 1) * line_height + padding_height
         chrome = make_tag(
             "rect",
