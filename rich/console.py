@@ -2315,7 +2315,6 @@ class Console:
                 else f"<{name} {tag_attribs}/>"
             )
 
-        x = y = 0
         with self._record_buffer_lock:
             segments = list(
                 Segment.filter_control(
@@ -2333,6 +2332,7 @@ class Console:
                 + title.encode("utf-8", "ignore")
             )
         )
+        y = 0
         for y, line in enumerate(Segment.split_and_crop_lines(segments, length=width)):
             x = 0
             for text, style, _control in line:
