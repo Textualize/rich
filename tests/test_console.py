@@ -493,129 +493,7 @@ def test_export_html_inline():
     assert html == expected
 
 
-EXPECTED_SVG = """\
-<svg width="1484.0" height="384" viewBox="0 0 1484.0 384"
-     xmlns="http://www.w3.org/2000/svg">
-    <style>
-        @font-face {
-            font-family: "Rich Fira Code";
-            src: local("FiraCode-Regular"),
-                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),
-                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");
-            font-style: normal;
-            font-weight: 400;
-        }
-        @font-face {
-            font-family: "Rich Fira Code";
-            src: local("FiraCode-Bold"),
-                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),
-                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");
-            font-style: bold;
-            font-weight: 700;
-        }
-        .rich-svg-${SVG_HASH}-terminal-wrapper span {
-            display: inline-block;
-            white-space: pre;
-            vertical-align: top;
-            font-size: 18px;
-            font-family:'Rich Fira Code','Cascadia Code',Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
-        }
-        .rich-svg-${SVG_HASH}-terminal-wrapper a {
-            text-decoration: none;
-            color: inherit;
-        }
-        .rich-svg-${SVG_HASH}-terminal-body .blink {
-           animation: rich-svg-${SVG_HASH}-blinker 1s infinite;
-        }
-        @keyframes rich-svg-${SVG_HASH}-blinker {
-            from { opacity: 1.0; }
-            50% { opacity: 0.3; }
-            to { opacity: 1.0; }
-        }
-        .rich-svg-${SVG_HASH}-terminal-wrapper {
-            padding: 140px;
-            padding-top: 100px;
-        }
-        .rich-svg-${SVG_HASH}-terminal {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #0c0c0c;
-            border-radius: 14px;
-            box-shadow: 0 0 0 1px #484848;
-        }
-        .rich-svg-${SVG_HASH}-terminal:after {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            content: '';
-            border-radius: 14px;
-            background: rgb(71,77,102);
-            background: linear-gradient(90deg, #804D69 0%, #4E4B89 100%);
-            transform: rotate(-4.5deg);
-            z-index: -1;
-        }
-        .rich-svg-${SVG_HASH}-terminal-header {
-            position: relative;
-            width: 100%;
-            background-color: #2e2e2e;
-            margin-bottom: 12px;
-            font-weight: bold;
-            border-radius: 14px 14px 0 0;
-            color: #f2f2f2;
-            font-size: 18px;
-            box-shadow: inset 0px -1px 0px 0px #4e4e4e,
-                        inset 0px -4px 8px 0px #1a1a1a;
-        }
-        .rich-svg-${SVG_HASH}-terminal-title-tab {
-            display: inline-block;
-            margin-top: 14px;
-            margin-left: 124px;
-            font-family: sans-serif;
-            padding: 14px 28px;
-            border-radius: 6px 6px 0 0;
-            background-color: #0c0c0c;
-            box-shadow: inset 0px 1px 0px 0px #4e4e4e,
-                        0px -4px 4px 0px #1e1e1e,
-                        inset 1px 0px 0px 0px #4e4e4e,
-                        inset -1px 0px 0px 0px #4e4e4e;
-        }
-        .rich-svg-${SVG_HASH}-terminal-traffic-lights {
-            position: absolute;
-            top: 24px;
-            left: 20px;
-        }
-        .rich-svg-${SVG_HASH}-terminal-body {
-            line-height: 22px;
-            padding: 14px;
-        }
-        .rich-svg-${SVG_HASH}-terminal-body .r1 {color: #f2f2f2; text-decoration-color: #f2f2f2;background-color: #0c0c0c;}
-.rich-svg-${SVG_HASH}-terminal-body .r2 {color: #2472c8; text-decoration-color: #2472c8; background-color: #cd3131; font-weight: bold}
-.rich-svg-${SVG_HASH}-terminal-body .r3 {;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
-    </style>
-    <foreignObject x="0" y="0" width="100%" height="100%">
-        <body xmlns="http://www.w3.org/1999/xhtml">
-            <div class="rich-svg-${SVG_HASH}-terminal-wrapper">
-                <div class="rich-svg-${SVG_HASH}-terminal">
-                    <div class="rich-svg-${SVG_HASH}-terminal-header">
-                        <svg class="rich-svg-${SVG_HASH}-terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="14" cy="8" r="8" fill="#ff6159"/>
-                            <circle cx="38" cy="8" r="8" fill="#ffbd2e"/>
-                            <circle cx="62" cy="8" r="8" fill="#28c941"/>
-                        </svg>
-                        <div class="rich-svg-${SVG_HASH}-terminal-title-tab">Rich</div>
-                    </div>
-                    <div class="rich-svg-${SVG_HASH}-terminal-body">
-                        <div><span class="r2">foo</span><span class="r1"> </span><span class="r3"><span class="blink"><a href="https://example.org">Click</a></span></span><span class="r1">                                                                                           </span></div>
-<div><span class="r1"></span><span class="r1">                                                                                                    </span></div>
-                    </div>
-                </div>
-            </div>
-        </body>
-    </foreignObject>
-</svg>
-"""
+EXPECTED_SVG = '<svg class="rich-terminal" viewBox="0 0 1296.0 115" xmlns="http://www.w3.org/2000/svg">\n    <style>\n\n    @font-face {\n        font-family: "Fira Code";\n        src: local("FiraCode-Regular"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");\n        font-style: normal;\n        font-weight: 400;\n    }\n    @font-face {\n        font-family: "Fira Code";\n        src: local("FiraCode-Bold"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");\n        font-style: bold;\n        font-weight: 700;\n    }\n\n    .terminal-614794459-matrix {\n        font-family: Fira Code, monospace;\n        font-size: 20px;\n        font-variant: east-asian-width-values;\n        line-height: 31px;       \n    }\n\n    .terminal-614794459-title {\n        font-size: 14px;\n        opacity: 0.8;\n        font-weight: bold;\n        font-family: arial;        \n    }\n\n    .terminal-614794459-r1 { fill: #4f76a1;font-weight: bold }\n.terminal-614794459-r2 { fill: #b9bcba }\n    </style>\n    <rect fill="#191919" x="16" y="20" width="1264.0" height="75" rx="12"/><text class="terminal-614794459-title" fill="#b9bcba" text-anchor="middle" x="632.0" y="40">Rich</text>\n            <circle cx="35" cy="36" r="6" fill="#ff5f57"/>\n            <circle cx="55" cy="36" r="6" fill="#febc2e"/>\n            <circle cx="75" cy="36" r="6" fill="#28c840"/>\n        \n    <g transform="translate(28, 52)">\n    <rect fill="#be3f48" x="0.0" y="0" width="38.2" height="32"/><rect fill="#191919" x="37.2" y="0" width="13.4" height="32"/><rect fill="#191919" x="49.6" y="0" width="63.0" height="32"/><rect fill="#191919" x="111.60000000000001" y="0" width="1129.4" height="32"/><rect fill="#191919" x="1240.0" y="0" width="1.0" height="32"/>\n    <text alignment-baseline="baseline" class="terminal-614794459-matrix"><tspan class="terminal-614794459-r1" x="0.0" y="20" textLength="38">foo</tspan><tspan class="terminal-614794459-r2" x="37.2" y="20" textLength="13">\xa0</tspan><tspan class="terminal-614794459-r2" x="49.6" y="20" textLength="62">Click</tspan><tspan class="terminal-614794459-r2" x="111.60000000000001" y="20" textLength="1129">\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0</tspan><tspan class="terminal-614794459-r2" x="1240.0" y="20" textLength="13">\n</tspan></text>\n    </g>\n</svg>\n'
 
 
 def test_export_svg():
@@ -624,11 +502,9 @@ def test_export_svg():
         "[b red on blue reverse]foo[/] [blink][link=https://example.org]Click[/link]"
     )
     svg = console.export_svg()
-    svg_main_code_hash = (
-        "857433718"  # hard-coded here after the 1st time we ran this test
-    )
-    expected_svg = EXPECTED_SVG.replace("${SVG_HASH}", svg_main_code_hash)
-    assert svg == expected_svg
+    print(repr(svg))
+
+    assert svg == EXPECTED_SVG
 
 
 def test_save_svg():
