@@ -512,13 +512,11 @@ def test_save_svg():
     console.print(
         "[b red on blue reverse]foo[/] [blink][link=https://example.org]Click[/link]"
     )
-    svg_main_code_hash = "857433718"
-    expected_svg = EXPECTED_SVG.replace("${SVG_HASH}", svg_main_code_hash)
     with tempfile.TemporaryDirectory() as path:
         export_path = os.path.join(path, "example.svg")
         console.save_svg(export_path)
         with open(export_path, "rt") as svg_file:
-            assert svg_file.read() == expected_svg
+            assert svg_file.read() == EXPECTED_SVG
 
 
 def test_save_text():
