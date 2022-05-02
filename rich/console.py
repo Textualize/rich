@@ -2238,7 +2238,7 @@ class Console:
 
         from rich.cells import cell_len
 
-        style_cache: dict[Style, str] = {}
+        style_cache: Dict[Style, str] = {}
 
         def get_svg_style(style: Style) -> str:
             """Convert a Style to CSS rules for SVG."""
@@ -2295,9 +2295,9 @@ class Console:
         margin_width = margin_left + margin_right
         margin_height = margin_top + margin_bottom
 
-        text_backgrounds: list[str] = []
-        text_group: list[str] = []
-        classes: dict[str, int] = {}
+        text_backgrounds: List[str] = []
+        text_group: List[str] = []
+        classes: Dict[str, int] = {}
         style_no = 1
 
         def escape_text(text: str) -> str:
