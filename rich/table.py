@@ -987,6 +987,7 @@ if __name__ == "__main__":  # pragma: no cover
         header("leading=1, row_styles=['dim', 'none']")
         console.print(table, justify="center")
 
+        console = Console(record=True)
         table.width = None
         table.expand = False
         table.row_styles = ["dim", "none"]
@@ -994,3 +995,4 @@ if __name__ == "__main__":  # pragma: no cover
         table.leading = 0
         header("show_lines=True, row_styles=['dim', 'none']")
         console.print(table, justify="center")
+        console.save_svg("table.svg")
