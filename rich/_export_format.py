@@ -48,7 +48,7 @@ CONSOLE_SVG_FORMAT = """\
     }}
 
     .{unique_id}-title {{
-        font-size: 14px;
+        font-size: 18px;
         opacity: 0.8;
         font-weight: bold;
         font-family: arial;

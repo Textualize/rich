@@ -2285,7 +2285,7 @@ class Console:
         margin_bottom = 20
         margin_left = 16
 
-        padding_top = 32
+        padding_top = 40
         padding_right = 12
         padding_bottom = 12
         padding_left = 12
@@ -2406,12 +2406,12 @@ class Console:
                 fill=title_color,
                 text_anchor="middle",
                 x=terminal_width // 2,
-                y=margin_top + char_height,
+                y=margin_top + char_height + 6,
             )
         chrome += f"""
-            <circle cx="35" cy="36" r="6" fill="#ff5f57"/>
-            <circle cx="55" cy="36" r="6" fill="#febc2e"/>
-            <circle cx="75" cy="36" r="6" fill="#28c840"/>
+            <circle cx="40" cy="40" r="7" fill="#ff5f57"/>
+            <circle cx="62" cy="40" r="7" fill="#febc2e"/>
+            <circle cx="84" cy="40" r="7" fill="#28c840"/>
         """
 
         svg = code_format.format(
