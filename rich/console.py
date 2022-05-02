@@ -2302,7 +2302,7 @@ class Console:
 
         def escape_text(text: str) -> str:
             """HTML escape text and replace spaces with nbsp."""
-            return escape(text).replace(" ", "\u00A0")
+            return escape(text).replace(" ", "&#160;")
 
         def make_tag(
             name: str, content: Optional[str] = None, **attribs: object
@@ -2346,12 +2346,14 @@ class Console:
                 class_name = f"r{classes[rules]}"
 
                 if style.reverse:
+                    has_background = True
                     background = (
                         _theme.foreground_color.hex
                         if style.color is None
                         else style.color.get_truecolor(_theme).hex
                     )
                 else:
+                    has_background = style.bgcolor is not None
                     background = (
                         _theme.background_color.hex
                         if style.bgcolor is None
@@ -2359,7 +2361,7 @@ class Console:
                     )
 
                 text_length = cell_len(text)
-                if background is not None:
+                if has_background:
                     text_backgrounds.append(
                         make_tag(
                             "rect",
