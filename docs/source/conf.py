@@ -19,7 +19,6 @@
 
 
 import pkg_resources
-
 import sphinx_rtd_theme
 
 html_theme = "sphinx_rtd_theme"
@@ -72,3 +71,7 @@ html_static_path = ["_static"]
 intersphinx_mapping = {"python": ("http://docs.python.org/3", None)}
 
 autodoc_typehints = "description"
+
+html_css_files = [
+    "https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/fira_code.min.css"
+]

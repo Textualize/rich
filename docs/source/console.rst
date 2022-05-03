@@ -278,7 +278,10 @@ You can customize the theme used during SVG export by importing the desired them
     console = Console(record=True)
     console.save_svg("example.svg", theme=MONOKAI)
 
-Alternatively, you can create a them of your own by constructing a :class:`rich.terminal_theme.TerminalTheme` instance yourself and passing that in.
+Alternatively, you can create a theme of your own by constructing a :class:`rich.terminal_theme.TerminalTheme` instance yourself and passing that in.
+
+.. note::
+    The SVGs reference the Fira Code font. If you embed a Rich SVG in your page, you may also want to add a link to the `Fira Code CSS <https://cdnjs.com/libraries/firacode>`_
 
 Error console
 -------------
