@@ -547,16 +547,11 @@ class Syntax(JupyterMixin):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        (
-            background_style,
-            number_style,
-            highlight_number_style,
-        ) = self._get_number_styles(console)
-        segments = Segments(
-            self._get_syntax(console, options, self._theme.get_background_style())
-        )
+        segments = Segments(self._get_syntax(console, options))
         if self.padding:
-            yield Padding(segments, style=background_style, pad=self.padding)
+            yield Padding(
+                segments, style=self._theme.get_background_style(), pad=self.padding
+            )
         else:
             yield segments
 
@@ -564,7 +559,6 @@ class Syntax(JupyterMixin):
         self,
         console: Console,
         options: ConsoleOptions,
-        background_style: Style,
     ) -> Iterable[Segment]:
         """
         Get the Segments for the Syntax object, excluding any vertical/horizontal padding
@@ -642,12 +636,15 @@ class Syntax(JupyterMixin):
 
         highlight_line = self.highlight_lines.__contains__
         _Segment = Segment
-        wrapped_line_left_pad = _Segment(
-            " " * numbers_column_width + " ", background_style
-        )
         new_line = _Segment("\n")
 
         line_pointer = "> " if options.legacy_windows else "❱ "
+
+        (
+            background_style,
+            number_style,
+            highlight_number_style,
+        ) = self._get_number_styles(console)
 
         for line_no, line in enumerate(lines, self.start_line + line_offset):
             if self.word_wrap:
@@ -672,11 +669,9 @@ class Syntax(JupyterMixin):
                     ]
 
             if self.line_numbers:
-                (
-                    background_style,
-                    number_style,
-                    highlight_number_style,
-                ) = self._get_number_styles(console)
+                wrapped_line_left_pad = _Segment(
+                    " " * numbers_column_width + " ", background_style
+                )
                 for first, wrapped_line in loop_first(wrapped_lines):
                     if first:
                         line_column = str(line_no).rjust(numbers_column_width - 2) + " "
