@@ -1327,6 +1327,11 @@ class Console:
             _rendered = self.render(renderable, render_options)
             if style:
                 _rendered = Segment.apply_style(_rendered, style)
+
+            render_height = render_options.height
+            if render_height is not None:
+                render_height = max(0, render_height)
+
             lines = list(
                 islice(
                     Segment.split_and_crop_lines(
@@ -1336,7 +1341,7 @@ class Console:
                         pad=pad,
                     ),
                     None,
-                    render_options.height,
+                    render_height,
                 )
             )
             if render_options.height is not None:
