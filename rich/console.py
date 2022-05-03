@@ -2297,10 +2297,13 @@ class Console:
                                 f"background-color: {theme_foreground_color};"
                             )
 
-                        if style.color is None:
-                            rules += f";{foreground_css}"
-                        if style.bgcolor is None:
-                            rules += f";{background_css}"
+                        if (
+                            not style.dim
+                        ):  # style.color is set as None when dim style is active. This will issue a problem where more than one color is applied to the span, overwriting the dimmed color for the foreground color.
+                            if style.color is None:
+                                rules += f";{foreground_css}"
+                            if style.bgcolor is None:
+                                rules += f";{background_css}"
 
                         style_number = styles.setdefault(rules, len(styles) + 1)
                         text = f'<span class="r{style_number}">{text}</span>'
