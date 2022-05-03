@@ -20,6 +20,7 @@ from rich.console import (
 )
 from rich.control import Control
 from rich.measure import measure_renderables
+from rich.padding import Padding
 from rich.pager import SystemPager
 from rich.panel import Panel
 from rich.region import Region
@@ -988,3 +989,18 @@ def test_reset_height():
     expected = "╭──────────────────╮\n│ ╭──────────────╮ │\n│ │ foo          │ │\n│ ╰──────────────╯ │\n│ ╭──────────────╮ │\n│ │ bar          │ │\n│ ╰──────────────╯ │\n│                  │\n│                  │\n│                  │\n│                  │\n╰──────────────────╯\n"
 
     assert result == expected
+
+
+def test_render_lines_height_minus_vertical_pad_is_negative():
+    # https://github.com/Textualize/textual/issues/389
+    console = Console(
+        force_terminal=True,
+        color_system="truecolor",
+        width=20,
+        height=40,
+        legacy_windows=False,
+    )
+    options = console.options.update_height(1)
+
+    # Ensuring that no exception is raised...
+    console.render_lines(Padding("hello", pad=(1, 0)), options=options)
