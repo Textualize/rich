@@ -13,6 +13,7 @@ from getpass import getpass
 from html import escape
 from inspect import isclass
 from itertools import islice
+from math import ceil
 from time import monotonic
 from types import FrameType, ModuleType, TracebackType
 from typing import (
@@ -44,15 +45,10 @@ else:
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
-from ._export_format import (
-    _SVG_CLASSES_PREFIX,
-    _SVG_FONT_FAMILY,
-    CONSOLE_HTML_FORMAT,
-    CONSOLE_SVG_FORMAT,
-)
+from ._export_format import CONSOLE_HTML_FORMAT, CONSOLE_SVG_FORMAT
 from ._log_render import FormatTimeCallable, LogRender
 from .align import Align, AlignMethod
-from .color import ColorSystem
+from .color import ColorSystem, blend_rgb
 from .control import Control
 from .emoji import EmojiVariant
 from .highlighter import NullHighlighter, ReprHighlighter
@@ -1810,7 +1806,7 @@ class Console:
         """Prints a rich render of the last exception and traceback.
 
         Args:
-            width (Optional[int], optional): Number of characters used to render code. Defaults to 88.
+            width (Optional[int], optional): Number of characters used to render code. Defaults to 100.
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
             theme (str, optional): Override pygments theme used in traceback
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
@@ -2227,142 +2223,223 @@ class Console:
         clear: bool = True,
         code_format: str = CONSOLE_SVG_FORMAT,
     ) -> str:
-        """Generate an SVG string from the console contents (requires record=True in Console constructor)
+        """
+        Generate an SVG from the console contents (requires record=True in Console constructor).
 
         Args:
+            path (str): The path to write the SVG to.
             title (str): The title of the tab in the output image
             theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
             code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
                 into the string in order to form the final SVG output. The default template used and the variables
                 injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
-
-        Returns:
-            str: The string representation of the SVG. That is, the ``code_format`` template with content injected.
         """
-        assert (
-            self.record
-        ), "To export console contents set record=True in the constructor or instance"
+
+        from rich.cells import cell_len
+
+        style_cache: Dict[Style, str] = {}
+
+        def get_svg_style(style: Style) -> str:
+            """Convert a Style to CSS rules for SVG."""
+            if style in style_cache:
+                return style_cache[style]
+            css_rules = []
+            color = (
+                _theme.foreground_color
+                if style.color is None
+                else style.color.get_truecolor(_theme)
+            )
+            bgcolor = (
+                _theme.background_color
+                if style.bgcolor is None
+                else style.bgcolor.get_truecolor(_theme)
+            )
+            if style.reverse:
+                color, bgcolor = bgcolor, color
+            if style.dim:
+                color = blend_rgb(color, bgcolor, 0.4)
+            css_rules.append(f"fill: {color.hex}")
+            if style.bold:
+                css_rules.append("font-weight: bold")
+            if style.italic:
+                css_rules.append("font-style: italic;")
+            if style.underline:
+                css_rules.append("text-decoration: underline;")
+            if style.strike:
+                css_rules.append("text-decoration: line-through;")
+
+            css = ";".join(css_rules)
+            style_cache[style] = css
+            return css
 
         _theme = theme or SVG_EXPORT_THEME
 
-        with self._record_buffer_lock:
-            segments = Segment.simplify(self._record_buffer)
-            segments = Segment.filter_control(segments)
-            parts = [(text, style or Style.null()) for text, style, _ in segments]
-            terminal_text = Text.assemble(*parts)
-            lines = terminal_text.wrap(self, width=self.width, overflow="fold")
-            segments = self.render(lines, options=self.options)
-            segment_lines = list(
-                Segment.split_and_crop_lines(
-                    segments, length=self.width, include_new_lines=False
-                )
+        width = self.width
+        char_height = 20
+        char_width = char_height * 0.62
+        line_height = char_height * 1.32
+
+        margin_top = 20
+        margin_right = 16
+        margin_bottom = 20
+        margin_left = 16
+
+        padding_top = 40
+        padding_right = 12
+        padding_bottom = 12
+        padding_left = 12
+
+        padding_width = padding_left + padding_right
+        padding_height = padding_top + padding_bottom
+        margin_width = margin_left + margin_right
+        margin_height = margin_top + margin_bottom
+
+        text_backgrounds: List[str] = []
+        text_group: List[str] = []
+        classes: Dict[str, int] = {}
+        style_no = 1
+
+        def escape_text(text: str) -> str:
+            """HTML escape text and replace spaces with nbsp."""
+            return escape(text).replace(" ", "&#160;")
+
+        def make_tag(
+            name: str, content: Optional[str] = None, **attribs: object
+        ) -> str:
+            """Make a tag from name, content, and attributes."""
+
+            def stringify(value: object) -> str:
+                if isinstance(value, (float)):
+                    return format(value, "g")
+                return str(value)
+
+            tag_attribs = " ".join(
+                f'{k.lstrip("_").replace("_", "-")}="{stringify(v)}"'
+                for k, v in attribs.items()
+            )
+            return (
+                f"<{name} {tag_attribs}>{content}</{name}>"
+                if content
+                else f"<{name} {tag_attribs}/>"
             )
 
-            fragments: List[str] = []
-            theme_foreground_color = _theme.foreground_color.hex
-            theme_background_color = _theme.background_color.hex
-
-            theme_foreground_css = f"color: {theme_foreground_color}; text-decoration-color: {theme_foreground_color};"
-            theme_background_css = f"background-color: {theme_background_color};"
-
-            theme_css = theme_foreground_css + theme_background_css
-
-            styles: Dict[str, int] = {}
-            styles[theme_css] = 1
-
-            for line in segment_lines:
-                line_spans = []
-                for segment in line:
-                    text, style, _ = segment
-                    text = escape(text)
-                    if style:
-                        rules = style.get_html_style(_theme)
-                        if style.link:
-                            text = f'<a href="{style.link}">{text}</a>'
-
-                        if style.blink or style.blink2:
-                            text = f'<span class="blink">{text}</span>'
-
-                        # If the style doesn't contain a color, we still
-                        # need to make sure we output the default foreground color
-                        # from the TerminalTheme.
-                        if not style.reverse:
-                            foreground_css = theme_foreground_css
-                            background_css = theme_background_css
-                        else:
-                            foreground_css = f"color: {theme_background_color}; text-decoration-color: {theme_background_color};"
-                            background_css = (
-                                f"background-color: {theme_foreground_color};"
-                            )
-
-                        if style.color is None:
-                            rules += f";{foreground_css}"
-                        if style.bgcolor is None:
-                            rules += f";{background_css}"
-
-                        style_number = styles.setdefault(rules, len(styles) + 1)
-                        text = f'<span class="r{style_number}">{text}</span>'
-                    else:
-                        text = f'<span class="r1">{text}</span>'
-                    line_spans.append(text)
-
-                fragments.append(f"<div>{''.join(line_spans)}</div>")
-
-            main_code = "\n".join(fragments)
-            classes_prefix = f"{_SVG_CLASSES_PREFIX}-{_svg_hash(main_code)}"
-
-            stylesheet_rules = []
-            for style_rule, style_number in styles.items():
-                if style_rule:
-                    stylesheet_rules.append(
-                        f".{classes_prefix}-terminal-body .r{style_number} {{{ style_rule }}}"
-                    )
-            stylesheet = "\n".join(stylesheet_rules)
-
+        with self._record_buffer_lock:
+            segments = list(
+                Segment.filter_control(
+                    Segment.simplify(self._record_buffer),
+                )
+            )
             if clear:
                 self._record_buffer.clear()
 
-        # These values are the ones that I found to work well after experimentation.
-        # Many of them can be tweaked, but too much variation from these values could
-        # result in visually broken output/clipping issues.
-        terminal_padding = 12
-        font_size = 18
-        line_height = font_size + 4
-        code_start_y = 60
-        required_code_height = line_height * len(lines)
-        margin = 140
-
-        # Monospace fonts are generally around 0.5-0.55 width/height ratio, but I've
-        # added extra width to ensure that the output SVG is big enough.
-        monospace_font_width_scale = 0.60
-
-        # This works out as a good heuristic for the final size of the drawn terminal.
-        terminal_height = required_code_height + code_start_y
-        terminal_width = (
-            self.width * monospace_font_width_scale * font_size
-            + 2 * terminal_padding
-            + self.width
+        unique_id = "terminal-" + str(
+            zlib.adler32(
+                ("".join(segment.text for segment in segments)).encode(
+                    "utf-8", "ignore"
+                )
+                + title.encode("utf-8", "ignore")
+            )
         )
-        total_height = terminal_height + 2 * margin
-        total_width = terminal_width + 2 * margin
+        y = 0
+        for y, line in enumerate(Segment.split_and_crop_lines(segments, length=width)):
+            x = 0
+            for text, style, _control in line:
+                style = style or Style()
+                rules = get_svg_style(style)
+                if rules not in classes:
+                    classes[rules] = style_no
+                    style_no += 1
+                class_name = f"r{classes[rules]}"
 
-        rendered_code = code_format.format(
-            code=main_code,
-            total_height=total_height,
-            total_width=total_width,
-            theme_foreground_color=theme_foreground_color,
-            theme_background_color=theme_background_color,
-            margin=margin,
-            font_size=font_size,
-            font_family=_SVG_FONT_FAMILY,
-            classes_prefix=classes_prefix,
+                if style.reverse:
+                    has_background = True
+                    background = (
+                        _theme.foreground_color.hex
+                        if style.color is None
+                        else style.color.get_truecolor(_theme).hex
+                    )
+                else:
+                    has_background = style.bgcolor is not None
+                    background = (
+                        _theme.background_color.hex
+                        if style.bgcolor is None
+                        else style.bgcolor.get_truecolor(_theme).hex
+                    )
+
+                text_length = cell_len(text)
+                if has_background:
+                    text_backgrounds.append(
+                        make_tag(
+                            "rect",
+                            fill=background,
+                            x=x * char_width,
+                            y=y * line_height,
+                            width=char_width * text_length + 1,
+                            height=line_height + 1,
+                        )
+                    )
+                text_group.append(
+                    make_tag(
+                        "tspan",
+                        escape_text(text),
+                        _class=f"{unique_id}-{class_name}",
+                        x=x * char_width,
+                        y=y * line_height + char_height,
+                        textLength=char_width * len(text),
+                    )
+                )
+                x += cell_len(text)
+
+        styles = "\n".join(
+            f".{unique_id}-r{rule_no} {{ {css} }}" for css, rule_no in classes.items()
+        )
+        backgrounds = "".join(text_backgrounds)
+        matrix = "".join(text_group)
+
+        terminal_width = ceil(width * char_width + padding_width)
+        terminal_height = (y + 1) * line_height + padding_height
+        chrome = make_tag(
+            "rect",
+            fill=_theme.background_color.hex,
+            x=margin_left,
+            y=margin_top,
+            width=terminal_width,
+            height=terminal_height,
+            rx=12,
+        )
+        title_color = _theme.foreground_color.hex
+        if title:
+            chrome += make_tag(
+                "text",
+                title,
+                _class=f"{unique_id}-title",
+                fill=title_color,
+                text_anchor="middle",
+                x=terminal_width // 2,
+                y=margin_top + char_height + 6,
+            )
+        chrome += f"""
+            <circle cx="40" cy="40" r="7" fill="#ff5f57"/>
+            <circle cx="62" cy="40" r="7" fill="#febc2e"/>
+            <circle cx="84" cy="40" r="7" fill="#28c840"/>
+        """
+
+        svg = code_format.format(
+            unique_id=unique_id,
+            char_width=char_width,
+            char_height=char_height,
             line_height=line_height,
-            title=title,
-            stylesheet=stylesheet,
+            width=terminal_width + margin_width,
+            height=terminal_height + margin_height,
+            terminal_x=margin_left + padding_left,
+            terminal_y=margin_top + padding_top,
+            styles=styles,
+            chrome=chrome,
+            backgrounds=backgrounds,
+            matrix=matrix,
         )
-
-        return rendered_code
+        return svg
 
     def save_svg(
         self,
