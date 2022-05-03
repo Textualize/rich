@@ -23,6 +23,7 @@ from pygments.token import (
 from pygments.util import ClassNotFound
 
 from rich.containers import Lines
+from rich.padding import PaddingDimensions
 
 from ._loop import loop_first
 from .color import Color, blend_rgb
@@ -209,6 +210,7 @@ class Syntax(JupyterMixin):
         word_wrap (bool, optional): Enable word wrapping.
         background_color (str, optional): Optional background color, or None to use theme color. Defaults to None.
         indent_guides (bool, optional): Show indent guides. Defaults to False.
+        padding (PaddingDimensions): Padding to apply around the syntax. Defaults to 0 (no padding).
     """
 
     _pygments_style_class: Type[PygmentsStyle]
@@ -242,7 +244,7 @@ class Syntax(JupyterMixin):
         word_wrap: bool = False,
         background_color: Optional[str] = None,
         indent_guides: bool = False,
-        padding: int = 0,
+        padding: PaddingDimensions = 0,
     ) -> None:
         self.code = code
         self._lexer = lexer
@@ -280,6 +282,7 @@ class Syntax(JupyterMixin):
         word_wrap: bool = False,
         background_color: Optional[str] = None,
         indent_guides: bool = False,
+        padding: PaddingDimensions = 0,
     ) -> "Syntax":
         """Construct a Syntax object from a file.
 
@@ -298,6 +301,7 @@ class Syntax(JupyterMixin):
             word_wrap (bool, optional): Enable word wrapping of code.
             background_color (str, optional): Optional background color, or None to use theme color. Defaults to None.
             indent_guides (bool, optional): Show indent guides. Defaults to False.
+            padding (PaddingDimensions): Padding to apply around the syntax. Defaults to 0 (no padding).
 
         Returns:
             [Syntax]: A Syntax object that may be printed to the console
@@ -322,6 +326,7 @@ class Syntax(JupyterMixin):
             word_wrap=word_wrap,
             background_color=background_color,
             indent_guides=indent_guides,
+            padding=padding,
         )
 
     @classmethod
