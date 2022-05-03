@@ -2542,11 +2542,3 @@ if __name__ == "__main__":  # pragma: no cover
             },
         }
     )
-    from rich.console import Console
-    from rich.padding import Padding
-
-    console = Console()
-    options = console.options.update_height(1)
-
-    padding = Padding("hello", pad=(1, 1, 1, 1))
-    console.render_lines(padding, options=options)
