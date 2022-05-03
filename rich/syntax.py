@@ -23,7 +23,7 @@ from pygments.token import (
 from pygments.util import ClassNotFound
 
 from rich.containers import Lines
-from rich.padding import PaddingDimensions
+from rich.padding import Padding, PaddingDimensions
 
 from ._loop import loop_first
 from .color import Color, blend_rgb
@@ -534,15 +534,15 @@ class Syntax(JupyterMixin):
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "Measurement":
+        _, right, _, left = Padding.unpack(self.padding)
         if self.code_width is not None:
-            width = self.code_width + self._numbers_column_width
+            width = self.code_width + self._numbers_column_width + right + left
             return Measurement(self._numbers_column_width, width)
         return Measurement(self._numbers_column_width, options.max_width)
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-
         transparent_background = self._get_base_style().transparent_background
         code_width = (
             (
@@ -622,11 +622,17 @@ class Syntax(JupyterMixin):
 
         highlight_line = self.highlight_lines.__contains__
         _Segment = Segment
-        padding = _Segment(" " * numbers_column_width + " ", background_style)
+        wrapped_line_left_pad = _Segment(
+            " " * numbers_column_width + " ", background_style
+        )
         new_line = _Segment("\n")
 
         line_pointer = "> " if options.legacy_windows else "❱ "
 
+        top, right, bottom, left = Padding.unpack(self.padding)
+        yield from self._vertical_padding_segments(
+            top, code_width + left + right, style=background_style
+        )
         for line_no, line in enumerate(lines, self.start_line + line_offset):
             if self.word_wrap:
                 wrapped_lines = console.render_lines(
@@ -635,7 +641,6 @@ class Syntax(JupyterMixin):
                     style=background_style,
                     pad=not transparent_background,
                 )
-
             else:
                 segments = list(line.render(console, end=""))
                 if options.no_wrap:
@@ -649,6 +654,7 @@ class Syntax(JupyterMixin):
                             pad=not transparent_background,
                         )
                     ]
+
             if self.line_numbers:
                 for first, wrapped_line in loop_first(wrapped_lines):
                     if first:
@@ -660,13 +666,23 @@ class Syntax(JupyterMixin):
                             yield _Segment("  ", highlight_number_style)
                             yield _Segment(line_column, number_style)
                     else:
-                        yield padding
+                        yield wrapped_line_left_pad
                     yield from wrapped_line
                     yield new_line
             else:
                 for wrapped_line in wrapped_lines:
                     yield from wrapped_line
                     yield new_line
+        yield from self._vertical_padding_segments(
+            top, code_width + left + right, background_style
+        )
+
+    def _vertical_padding_segments(
+        self, pad_amount: int, width: int, style: Style
+    ) -> Iterable[Segment]:
+        for _ in range(pad_amount):
+            yield Segment(" " * width, style)
+            yield Segment.line()
 
 
 if __name__ == "__main__":  # pragma: no cover
@@ -746,6 +762,9 @@ if __name__ == "__main__":  # pragma: no cover
         dest="lexer_name",
         help="Lexer name",
     )
+    parser.add_argument(
+        "-p", "--padding", type=int, default=0, dest="padding", help="Padding"
+    )
     args = parser.parse_args()
 
     from rich.console import Console
@@ -762,6 +781,7 @@ if __name__ == "__main__":  # pragma: no cover
             theme=args.theme,
             background_color=args.background_color,
             indent_guides=args.indent_guides,
+            padding=args.padding,
         )
     else:
         syntax = Syntax.from_path(
@@ -772,5 +792,6 @@ if __name__ == "__main__":  # pragma: no cover
             theme=args.theme,
             background_color=args.background_color,
             indent_guides=args.indent_guides,
+            padding=args.padding,
         )
     console.print(syntax, soft_wrap=args.soft_wrap)
