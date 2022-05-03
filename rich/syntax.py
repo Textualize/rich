@@ -553,9 +553,7 @@ class Syntax(JupyterMixin):
             highlight_number_style,
         ) = self._get_number_styles(console)
         segments = Segments(
-            self._get_syntax(
-                console, options, background_style, number_style, highlight_number_style
-            )
+            self._get_syntax(console, options, self._theme.get_background_style())
         )
         if self.padding:
             yield Padding(segments, style=background_style, pad=self.padding)
@@ -566,10 +564,11 @@ class Syntax(JupyterMixin):
         self,
         console: Console,
         options: ConsoleOptions,
-        background_style,
-        number_style,
-        highlight_number_style,
-    ) -> RenderResult:
+        background_style: Style,
+    ) -> Iterable[Segment]:
+        """
+        Get the Segments for the Syntax object, excluding any vertical/horizontal padding
+        """
         transparent_background = self._get_base_style().transparent_background
         code_width = (
             (
@@ -673,6 +672,11 @@ class Syntax(JupyterMixin):
                     ]
 
             if self.line_numbers:
+                (
+                    background_style,
+                    number_style,
+                    highlight_number_style,
+                ) = self._get_number_styles(console)
                 for first, wrapped_line in loop_first(wrapped_lines):
                     if first:
                         line_column = str(line_no).rjust(numbers_column_width - 2) + " "
