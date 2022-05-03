@@ -59,7 +59,7 @@ CONSOLE_SVG_FORMAT = """\
     {chrome}
     <g transform="translate({terminal_x}, {terminal_y})">
     {backgrounds}
-    <text alignment-baseline="baseline" class="{unique_id}-matrix">{matrix}</text>
+    <text alignment-baseline="baseline" class="{unique_id}-matrix" font-variant="east-asian-width-values">{matrix}</text>
     </g>
 </svg>
 """

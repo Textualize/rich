@@ -2258,7 +2258,7 @@ class Console:
             if style.reverse:
                 color, bgcolor = bgcolor, color
             if style.dim:
-                color = blend_rgb(color, bgcolor, 0.6)
+                color = blend_rgb(color, bgcolor, 0.4)
             css_rules.append(f"fill: {color.hex}")
             if style.bold:
                 css_rules.append("font-weight: bold")
