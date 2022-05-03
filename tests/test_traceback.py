@@ -277,7 +277,7 @@ foobar:
     something: {{ raiser() }}
     else: {{ 5 + 5 }}
     """
-    assert Traceback._guess_lexer("test.yaml.j2", code) == "text"
+    assert Traceback._guess_lexer("test.yaml.j2", code) in ("text", "YAML+Jinja")
 
 
 def test_recursive():
