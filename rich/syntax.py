@@ -30,7 +30,7 @@ from .color import Color, blend_rgb
 from .console import Console, ConsoleOptions, JustifyMethod, RenderResult
 from .jupyter import JupyterMixin
 from .measure import Measurement
-from .segment import Segment
+from .segment import Segment, Segments
 from .style import Style
 from .text import Text
 
@@ -101,6 +101,7 @@ ANSI_DARK: Dict[TokenType, Style] = {
 }
 
 RICH_SYNTAX_THEMES = {"ansi_light": ANSI_LIGHT, "ansi_dark": ANSI_DARK}
+NUMBERS_COLUMN_DEFAULT_PADDING = 2
 
 
 class SyntaxTheme(ABC):
@@ -505,7 +506,10 @@ class Syntax(JupyterMixin):
         """Get the number of characters used to render the numbers column."""
         column_width = 0
         if self.line_numbers:
-            column_width = len(str(self.start_line + self.code.count("\n"))) + 2
+            column_width = (
+                len(str(self.start_line + self.code.count("\n")))
+                + NUMBERS_COLUMN_DEFAULT_PADDING
+            )
         return column_width
 
     def _get_number_styles(self, console: Console) -> Tuple[Style, Style, Style]:
@@ -543,6 +547,29 @@ class Syntax(JupyterMixin):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
+        (
+            background_style,
+            number_style,
+            highlight_number_style,
+        ) = self._get_number_styles(console)
+        segments = Segments(
+            self._get_syntax(
+                console, options, background_style, number_style, highlight_number_style
+            )
+        )
+        if self.padding:
+            yield Padding(segments, style=background_style, pad=self.padding)
+        else:
+            yield segments
+
+    def _get_syntax(
+        self,
+        console: Console,
+        options: ConsoleOptions,
+        background_style,
+        number_style,
+        highlight_number_style,
+    ) -> RenderResult:
         transparent_background = self._get_base_style().transparent_background
         code_width = (
             (
@@ -559,12 +586,6 @@ class Syntax(JupyterMixin):
         code = textwrap.dedent(code) if self.dedent else code
         code = code.expandtabs(self.tab_size)
         text = self.highlight(code, self.line_range)
-
-        (
-            background_style,
-            number_style,
-            highlight_number_style,
-        ) = self._get_number_styles(console)
 
         if not self.line_numbers and not self.word_wrap and not self.line_range:
             if not ends_on_nl:
@@ -629,10 +650,6 @@ class Syntax(JupyterMixin):
 
         line_pointer = "> " if options.legacy_windows else "❱ "
 
-        top, right, bottom, left = Padding.unpack(self.padding)
-        yield from self._vertical_padding_segments(
-            top, code_width + left + right, style=background_style
-        )
         for line_no, line in enumerate(lines, self.start_line + line_offset):
             if self.word_wrap:
                 wrapped_lines = console.render_lines(
@@ -673,13 +690,11 @@ class Syntax(JupyterMixin):
                 for wrapped_line in wrapped_lines:
                     yield from wrapped_line
                     yield new_line
-        yield from self._vertical_padding_segments(
-            top, code_width + left + right, background_style
-        )
 
     def _vertical_padding_segments(
         self, pad_amount: int, width: int, style: Style
     ) -> Iterable[Segment]:
+        """Yields Segments for the padding at the top and bottom of the Syntax"""
         for _ in range(pad_amount):
             yield Segment(" " * width, style)
             yield Segment.line()
@@ -765,6 +780,13 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument(
         "-p", "--padding", type=int, default=0, dest="padding", help="Padding"
     )
+    parser.add_argument(
+        "--highlight-line",
+        type=int,
+        default=None,
+        dest="highlight_line",
+        help="The line number (not index!) to highlight",
+    )
     args = parser.parse_args()
 
     from rich.console import Console
@@ -782,6 +804,7 @@ if __name__ == "__main__":  # pragma: no cover
             background_color=args.background_color,
             indent_guides=args.indent_guides,
             padding=args.padding,
+            highlight_lines={args.highlight_line},
         )
     else:
         syntax = Syntax.from_path(
@@ -793,5 +816,6 @@ if __name__ == "__main__":  # pragma: no cover
             background_color=args.background_color,
             indent_guides=args.indent_guides,
             padding=args.padding,
+            highlight_lines={args.highlight_line},
         )
     console.print(syntax, soft_wrap=args.soft_wrap)
