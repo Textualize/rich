@@ -242,6 +242,7 @@ class Syntax(JupyterMixin):
         word_wrap: bool = False,
         background_color: Optional[str] = None,
         indent_guides: bool = False,
+        padding: int = 0,
     ) -> None:
         self.code = code
         self._lexer = lexer
@@ -258,6 +259,7 @@ class Syntax(JupyterMixin):
             Style(bgcolor=background_color) if background_color else Style()
         )
         self.indent_guides = indent_guides
+        self.padding = padding
 
         self._theme = self.get_theme(theme)
 
