@@ -48,7 +48,7 @@ from ._emoji_replace import _emoji_replace
 from ._export_format import CONSOLE_HTML_FORMAT, CONSOLE_SVG_FORMAT
 from ._log_render import FormatTimeCallable, LogRender
 from .align import Align, AlignMethod
-from .color import ColorSystem
+from .color import ColorSystem, blend_rgb
 from .control import Control
 from .emoji import EmojiVariant
 from .highlighter import NullHighlighter, ReprHighlighter
@@ -2245,21 +2245,21 @@ class Console:
             if style in style_cache:
                 return style_cache[style]
             css_rules = []
+            color = (
+                _theme.foreground_color
+                if style.color is None
+                else style.color.get_truecolor(_theme)
+            )
+            bgcolor = (
+                _theme.background_color
+                if style.bgcolor is None
+                else style.bgcolor.get_truecolor(_theme)
+            )
             if style.reverse:
-                color = (
-                    _theme.background_color.hex
-                    if style.bgcolor is None
-                    else style.bgcolor.get_truecolor(_theme).hex
-                )
-            else:
-                color = (
-                    _theme.foreground_color.hex
-                    if style.color is None
-                    else style.color.get_truecolor(_theme).hex
-                )
+                color, bgcolor = bgcolor, color
             if style.dim:
-                css_rules.append(f"opacity: 0.6")
-            css_rules.append(f"fill: {color}")
+                color = blend_rgb(color, bgcolor, 0.6)
+            css_rules.append(f"fill: {color.hex}")
             if style.bold:
                 css_rules.append("font-weight: bold")
             if style.italic:
@@ -2278,7 +2278,7 @@ class Console:
         width = self.width
         char_height = 20
         char_width = char_height * 0.62
-        line_height = char_height * 1.55
+        line_height = char_height * 1.32
 
         margin_top = 20
         margin_right = 16
@@ -2308,8 +2308,15 @@ class Console:
             name: str, content: Optional[str] = None, **attribs: object
         ) -> str:
             """Make a tag from name, content, and attributes."""
+
+            def stringify(value: object) -> str:
+                if isinstance(value, (float)):
+                    return format(value, "g")
+                return str(value)
+
             tag_attribs = " ".join(
-                f'{k.lstrip("_").replace("_", "-")}="{v}"' for k, v in attribs.items()
+                f'{k.lstrip("_").replace("_", "-")}="{stringify(v)}"'
+                for k, v in attribs.items()
             )
             return (
                 f"<{name} {tag_attribs}>{content}</{name}>"
