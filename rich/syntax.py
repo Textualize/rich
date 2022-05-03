@@ -690,14 +690,6 @@ class Syntax(JupyterMixin):
                     yield from wrapped_line
                     yield new_line
 
-    def _vertical_padding_segments(
-        self, pad_amount: int, width: int, style: Style
-    ) -> Iterable[Segment]:
-        """Yields Segments for the padding at the top and bottom of the Syntax"""
-        for _ in range(pad_amount):
-            yield Segment(" " * width, style)
-            yield Segment.line()
-
 
 if __name__ == "__main__":  # pragma: no cover
 
