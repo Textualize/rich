@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Change SVG export to create a simpler SVG
+- Fix render_lines crash when render height was negative https://github.com/Textualize/rich/pull/2246
 
 ## [12.3.0] - 2022-04-26
 
