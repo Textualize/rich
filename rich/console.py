@@ -2224,7 +2224,7 @@ class Console:
         code_format: str = CONSOLE_SVG_FORMAT,
     ) -> str:
         """
-        Export terminal as an SVG.
+        Generate an SVG from the console contents (requires record=True in Console constructor).
 
         Args:
             path (str): The path to write the SVG to.
