@@ -23,13 +23,14 @@ from pygments.token import (
 from pygments.util import ClassNotFound
 
 from rich.containers import Lines
+from rich.padding import Padding, PaddingDimensions
 
 from ._loop import loop_first
 from .color import Color, blend_rgb
 from .console import Console, ConsoleOptions, JustifyMethod, RenderResult
 from .jupyter import JupyterMixin
 from .measure import Measurement
-from .segment import Segment
+from .segment import Segment, Segments
 from .style import Style
 from .text import Text
 
@@ -100,6 +101,7 @@ ANSI_DARK: Dict[TokenType, Style] = {
 }
 
 RICH_SYNTAX_THEMES = {"ansi_light": ANSI_LIGHT, "ansi_dark": ANSI_DARK}
+NUMBERS_COLUMN_DEFAULT_PADDING = 2
 
 
 class SyntaxTheme(ABC):
@@ -209,6 +211,7 @@ class Syntax(JupyterMixin):
         word_wrap (bool, optional): Enable word wrapping.
         background_color (str, optional): Optional background color, or None to use theme color. Defaults to None.
         indent_guides (bool, optional): Show indent guides. Defaults to False.
+        padding (PaddingDimensions): Padding to apply around the syntax. Defaults to 0 (no padding).
     """
 
     _pygments_style_class: Type[PygmentsStyle]
@@ -242,6 +245,7 @@ class Syntax(JupyterMixin):
         word_wrap: bool = False,
         background_color: Optional[str] = None,
         indent_guides: bool = False,
+        padding: PaddingDimensions = 0,
     ) -> None:
         self.code = code
         self._lexer = lexer
@@ -258,6 +262,7 @@ class Syntax(JupyterMixin):
             Style(bgcolor=background_color) if background_color else Style()
         )
         self.indent_guides = indent_guides
+        self.padding = padding
 
         self._theme = self.get_theme(theme)
 
@@ -278,6 +283,7 @@ class Syntax(JupyterMixin):
         word_wrap: bool = False,
         background_color: Optional[str] = None,
         indent_guides: bool = False,
+        padding: PaddingDimensions = 0,
     ) -> "Syntax":
         """Construct a Syntax object from a file.
 
@@ -296,6 +302,7 @@ class Syntax(JupyterMixin):
             word_wrap (bool, optional): Enable word wrapping of code.
             background_color (str, optional): Optional background color, or None to use theme color. Defaults to None.
             indent_guides (bool, optional): Show indent guides. Defaults to False.
+            padding (PaddingDimensions): Padding to apply around the syntax. Defaults to 0 (no padding).
 
         Returns:
             [Syntax]: A Syntax object that may be printed to the console
@@ -320,6 +327,7 @@ class Syntax(JupyterMixin):
             word_wrap=word_wrap,
             background_color=background_color,
             indent_guides=indent_guides,
+            padding=padding,
         )
 
     @classmethod
@@ -498,7 +506,10 @@ class Syntax(JupyterMixin):
         """Get the number of characters used to render the numbers column."""
         column_width = 0
         if self.line_numbers:
-            column_width = len(str(self.start_line + self.code.count("\n"))) + 2
+            column_width = (
+                len(str(self.start_line + self.code.count("\n")))
+                + NUMBERS_COLUMN_DEFAULT_PADDING
+            )
         return column_width
 
     def _get_number_styles(self, console: Console) -> Tuple[Style, Style, Style]:
@@ -527,15 +538,31 @@ class Syntax(JupyterMixin):
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "Measurement":
+        _, right, _, left = Padding.unpack(self.padding)
         if self.code_width is not None:
-            width = self.code_width + self._numbers_column_width
+            width = self.code_width + self._numbers_column_width + right + left
             return Measurement(self._numbers_column_width, width)
         return Measurement(self._numbers_column_width, options.max_width)
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
+        segments = Segments(self._get_syntax(console, options))
+        if self.padding:
+            yield Padding(
+                segments, style=self._theme.get_background_style(), pad=self.padding
+            )
+        else:
+            yield segments
 
+    def _get_syntax(
+        self,
+        console: Console,
+        options: ConsoleOptions,
+    ) -> Iterable[Segment]:
+        """
+        Get the Segments for the Syntax object, excluding any vertical/horizontal padding
+        """
         transparent_background = self._get_base_style().transparent_background
         code_width = (
             (
@@ -552,12 +579,6 @@ class Syntax(JupyterMixin):
         code = textwrap.dedent(code) if self.dedent else code
         code = code.expandtabs(self.tab_size)
         text = self.highlight(code, self.line_range)
-
-        (
-            background_style,
-            number_style,
-            highlight_number_style,
-        ) = self._get_number_styles(console)
 
         if not self.line_numbers and not self.word_wrap and not self.line_range:
             if not ends_on_nl:
@@ -615,10 +636,15 @@ class Syntax(JupyterMixin):
 
         highlight_line = self.highlight_lines.__contains__
         _Segment = Segment
-        padding = _Segment(" " * numbers_column_width + " ", background_style)
         new_line = _Segment("\n")
 
         line_pointer = "> " if options.legacy_windows else "❱ "
+
+        (
+            background_style,
+            number_style,
+            highlight_number_style,
+        ) = self._get_number_styles(console)
 
         for line_no, line in enumerate(lines, self.start_line + line_offset):
             if self.word_wrap:
@@ -628,7 +654,6 @@ class Syntax(JupyterMixin):
                     style=background_style,
                     pad=not transparent_background,
                 )
-
             else:
                 segments = list(line.render(console, end=""))
                 if options.no_wrap:
@@ -642,7 +667,11 @@ class Syntax(JupyterMixin):
                             pad=not transparent_background,
                         )
                     ]
+
             if self.line_numbers:
+                wrapped_line_left_pad = _Segment(
+                    " " * numbers_column_width + " ", background_style
+                )
                 for first, wrapped_line in loop_first(wrapped_lines):
                     if first:
                         line_column = str(line_no).rjust(numbers_column_width - 2) + " "
@@ -653,7 +682,7 @@ class Syntax(JupyterMixin):
                             yield _Segment("  ", highlight_number_style)
                             yield _Segment(line_column, number_style)
                     else:
-                        yield padding
+                        yield wrapped_line_left_pad
                     yield from wrapped_line
                     yield new_line
             else:
@@ -739,6 +768,16 @@ if __name__ == "__main__":  # pragma: no cover
         dest="lexer_name",
         help="Lexer name",
     )
+    parser.add_argument(
+        "-p", "--padding", type=int, default=0, dest="padding", help="Padding"
+    )
+    parser.add_argument(
+        "--highlight-line",
+        type=int,
+        default=None,
+        dest="highlight_line",
+        help="The line number (not index!) to highlight",
+    )
     args = parser.parse_args()
 
     from rich.console import Console
@@ -755,6 +794,8 @@ if __name__ == "__main__":  # pragma: no cover
             theme=args.theme,
             background_color=args.background_color,
             indent_guides=args.indent_guides,
+            padding=args.padding,
+            highlight_lines={args.highlight_line},
         )
     else:
         syntax = Syntax.from_path(
@@ -765,5 +806,7 @@ if __name__ == "__main__":  # pragma: no cover
             theme=args.theme,
             background_color=args.background_color,
             indent_guides=args.indent_guides,
+            padding=args.padding,
+            highlight_lines={args.highlight_line},
         )
     console.print(syntax, soft_wrap=args.soft_wrap)
