@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix crash on IDLE and forced is_terminal detection to False because IDLE can't do escape codes https://github.com/Textualize/rich/issues/2222
 - Fixed missing blank line in traceback rendering https://github.com/Textualize/rich/issues/2206
 - Fixed running Rich with the current working dir was deleted https://github.com/Textualize/rich/issues/2197
+- Fixed traceback missing file errors when running Rich from a pyinstaller bundle https://github.com/Textualize/rich/issues/2251
 
 ### Changed
 
