@@ -1,8 +1,10 @@
 """Tests for the highlighter classes."""
-import pytest
+import json
 from typing import List
 
-from rich.highlighter import NullHighlighter, ReprHighlighter
+import pytest
+
+from rich.highlighter import JSONHighlighter, NullHighlighter, ReprHighlighter
 from rich.text import Span, Text
 
 
@@ -40,6 +42,16 @@ highlight_tests = [
             Span(4, 9, "repr.str"),
         ],
     ),
+    (
+        "<Permission.WRITE|READ: 3>",
+        [
+            Span(0, 1, "repr.tag_start"),
+            Span(1, 23, "repr.tag_name"),
+            Span(23, 25, "repr.tag_contents"),
+            Span(25, 26, "repr.tag_end"),
+            Span(24, 25, "repr.number"),
+        ],
+    ),
     ("( )", [Span(0, 1, "repr.brace"), Span(2, 3, "repr.brace")]),
     ("[ ]", [Span(0, 1, "repr.brace"), Span(2, 3, "repr.brace")]),
     ("{ }", [Span(0, 1, "repr.brace"), Span(2, 3, "repr.brace")]),
@@ -47,6 +59,40 @@ highlight_tests = [
     (" 1.2 ", [Span(1, 4, "repr.number")]),
     (" 0xff ", [Span(1, 5, "repr.number")]),
     (" 1e10 ", [Span(1, 5, "repr.number")]),
+    (" 1j ", [Span(1, 3, "repr.number_complex")]),
+    (" 3.14j ", [Span(1, 6, "repr.number_complex")]),
+    (
+        " (3.14+2.06j) ",
+        [
+            Span(1, 2, "repr.brace"),
+            Span(12, 13, "repr.brace"),
+            Span(2, 12, "repr.number_complex"),
+        ],
+    ),
+    (
+        " (3+2j) ",
+        [
+            Span(1, 2, "repr.brace"),
+            Span(6, 7, "repr.brace"),
+            Span(2, 6, "repr.number_complex"),
+        ],
+    ),
+    (
+        " (123456.4321-1234.5678j) ",
+        [
+            Span(1, 2, "repr.brace"),
+            Span(24, 25, "repr.brace"),
+            Span(2, 24, "repr.number_complex"),
+        ],
+    ),
+    (
+        " (-123123-2.1312342342423422e+25j) ",
+        [
+            Span(1, 2, "repr.brace"),
+            Span(33, 34, "repr.brace"),
+            Span(2, 33, "repr.number_complex"),
+        ],
+    ),
     (" /foo ", [Span(1, 2, "repr.path"), Span(2, 5, "repr.filename")]),
     (" /foo/bar.html ", [Span(1, 6, "repr.path"), Span(6, 14, "repr.filename")]),
     ("01-23-45-67-89-AB", [Span(0, 17, "repr.eui48")]),  # 6x2 hyphen
@@ -71,6 +117,7 @@ highlight_tests = [
     ('"""hello"""', [Span(0, 11, "repr.str")]),
     ("\\'foo'", []),
     ("it's no 'string'", [Span(8, 16, "repr.str")]),
+    ("78351748-9b32-4e08-ad3e-7e9ff124d541", [Span(0, 36, "repr.uuid")]),
 ]
 
 
@@ -82,3 +129,53 @@ def test_highlight_regex(test: str, spans: List[Span]):
     highlighter.highlight(text)
     print(text.spans)
     assert text.spans == spans
+
+
+def test_highlight_json_with_indent():
+    json_string = json.dumps({"name": "apple", "count": 1}, indent=4)
+    text = Text(json_string)
+    highlighter = JSONHighlighter()
+    highlighter.highlight(text)
+    assert text.spans == [
+        Span(0, 1, "json.brace"),
+        Span(6, 12, "json.str"),
+        Span(14, 21, "json.str"),
+        Span(27, 34, "json.str"),
+        Span(36, 37, "json.number"),
+        Span(38, 39, "json.brace"),
+        Span(6, 12, "json.key"),
+        Span(27, 34, "json.key"),
+    ]
+
+
+def test_highlight_json_string_only():
+    json_string = '"abc"'
+    text = Text(json_string)
+    highlighter = JSONHighlighter()
+    highlighter.highlight(text)
+    assert text.spans == [Span(0, 5, "json.str")]
+
+
+def test_highlight_json_empty_string_only():
+    json_string = '""'
+    text = Text(json_string)
+    highlighter = JSONHighlighter()
+    highlighter.highlight(text)
+    assert text.spans == [Span(0, 2, "json.str")]
+
+
+def test_highlight_json_no_indent():
+    json_string = json.dumps({"name": "apple", "count": 1}, indent=None)
+    text = Text(json_string)
+    highlighter = JSONHighlighter()
+    highlighter.highlight(text)
+    assert text.spans == [
+        Span(0, 1, "json.brace"),
+        Span(1, 7, "json.str"),
+        Span(9, 16, "json.str"),
+        Span(18, 25, "json.str"),
+        Span(27, 28, "json.number"),
+        Span(28, 29, "json.brace"),
+        Span(1, 7, "json.key"),
+        Span(18, 25, "json.key"),
+    ]

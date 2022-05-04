@@ -1,5 +1,3 @@
-import io
-
 from rich.ansi import AnsiDecoder
 from rich.console import Console
 from rich.style import Style
@@ -30,3 +28,20 @@ def test_decode():
     ]
 
     assert lines == expected
+
+
+def test_decode_example():
+    ansi_bytes = b"\x1b[01m\x1b[KC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:\x1b[m\x1b[K In function '\x1b[01m\x1b[Kmain\x1b[m\x1b[K':\n\x1b[01m\x1b[KC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:3:5:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused variable '\x1b[01m\x1b[Ka\x1b[m\x1b[K' [\x1b[01;35m\x1b[K-Wunused-variable\x1b[m\x1b[K]\n    3 | int \x1b[01;35m\x1b[Ka\x1b[m\x1b[K=1;\n      |     \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n"
+    ansi_text = ansi_bytes.decode("utf-8")
+
+    text = Text.from_ansi(ansi_text)
+
+    console = Console(
+        force_terminal=True, legacy_windows=False, color_system="truecolor"
+    )
+    with console.capture() as capture:
+        console.print(text)
+    result = capture.get()
+    print(repr(result))
+    expected = "\x1b[1mC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:\x1b[0m In function '\x1b[1mmain\x1b[0m':\n\x1b[1mC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:3:5:\x1b[0m \x1b[1;35mwarning: \x1b[0munused variable '\x1b[1ma\x1b[0m' \n[\x1b[1;35m-Wunused-variable\x1b[0m]\n    3 | int \x1b[1;35ma\x1b[0m=1;\n      |     \x1b[1;35m^\x1b[0m\n"
+    assert result == expected

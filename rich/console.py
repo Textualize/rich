@@ -1,8 +1,10 @@
 import inspect
+import io
 import os
 import platform
 import sys
 import threading
+import zlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -11,7 +13,7 @@ from getpass import getpass
 from html import escape
 from inspect import isclass
 from itertools import islice
-from threading import RLock
+from math import ceil
 from time import monotonic
 from types import FrameType, ModuleType, TracebackType
 from typing import (
@@ -43,9 +45,10 @@ else:
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
+from ._export_format import CONSOLE_HTML_FORMAT, CONSOLE_SVG_FORMAT
 from ._log_render import FormatTimeCallable, LogRender
 from .align import Align, AlignMethod
-from .color import ColorSystem
+from .color import ColorSystem, blend_rgb
 from .control import Control
 from .emoji import EmojiVariant
 from .highlighter import NullHighlighter, ReprHighlighter
@@ -60,7 +63,7 @@ from .screen import Screen
 from .segment import Segment
 from .style import Style, StyleType
 from .styled import Styled
-from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
+from .terminal_theme import DEFAULT_TERMINAL_THEME, SVG_EXPORT_THEME, TerminalTheme
 from .text import Text, TextType
 from .theme import Theme, ThemeStack
 
@@ -82,27 +85,22 @@ class NoChange:
 
 NO_CHANGE = NoChange()
 
+try:
+    _STDIN_FILENO = sys.__stdin__.fileno()
+except Exception:
+    _STDIN_FILENO = 0
+try:
+    _STDOUT_FILENO = sys.__stdout__.fileno()
+except Exception:
+    _STDOUT_FILENO = 1
+try:
+    _STDERR_FILENO = sys.__stderr__.fileno()
+except Exception:
+    _STDERR_FILENO = 2
 
-CONSOLE_HTML_FORMAT = """\
-<!DOCTYPE html>
-<head>
-<meta charset="UTF-8">
-<style>
-{stylesheet}
-body {{
-    color: {foreground};
-    background-color: {background};
-}}
-</style>
-</head>
-<html>
-<body>
-    <code>
-        <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">{code}</pre>
-    </code>
-</body>
-</html>
-"""
+_STD_STREAMS = (_STDIN_FILENO, _STDOUT_FILENO, _STDERR_FILENO)
+_STD_STREAMS_OUTPUT = (_STDOUT_FILENO, _STDERR_FILENO)
+
 
 _TERM_COLORS = {"256color": ColorSystem.EIGHT_BIT, "16color": ColorSystem.STANDARD}
 
@@ -224,6 +222,16 @@ class ConsoleOptions:
         options.max_height = options.height = height
         return options
 
+    def reset_height(self) -> "ConsoleOptions":
+        """Return a copy of the options with height set to ``None``.
+
+        Returns:
+            ~ConsoleOptions: New console options instance.
+        """
+        options = self.copy()
+        options.height = None
+        return options
+
     def update_dimensions(self, width: int, height: int) -> "ConsoleOptions":
         """Update the width and height, and return a copy.
 
@@ -244,7 +252,9 @@ class ConsoleOptions:
 class RichCast(Protocol):
     """An object that may be 'cast' to a console renderable."""
 
-    def __rich__(self) -> Union["ConsoleRenderable", str]:  # pragma: no cover
+    def __rich__(
+        self,
+    ) -> Union["ConsoleRenderable", "RichCast", str]:  # pragma: no cover
         ...
 
 
@@ -261,10 +271,8 @@ class ConsoleRenderable(Protocol):
 # A type that may be rendered by Console.
 RenderableType = Union[ConsoleRenderable, RichCast, str]
 
-
 # The result of calling a __rich_console__ method.
 RenderResult = Iterable[Union[RenderableType, Segment]]
-
 
 _null_highlighter = NullHighlighter()
 
@@ -501,10 +509,10 @@ def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
 def _is_jupyter() -> bool:  # pragma: no cover
     """Check if we're running in a Jupyter notebook."""
     try:
-        get_ipython  # type: ignore
+        get_ipython  # type: ignore[name-defined]
     except NameError:
         return False
-    ipython = get_ipython()  # type: ignore
+    ipython = get_ipython()  # type: ignore[name-defined]
     shell = ipython.__class__.__name__
     if "google.colab" in str(ipython.__class__) or shell == "ZMQInteractiveShell":
         return True  # Jupyter notebook or qtconsole
@@ -520,7 +528,6 @@ COLOR_SYSTEMS = {
     "truecolor": ColorSystem.TRUECOLOR,
     "windows": ColorSystem.WINDOWS,
 }
-
 
 _COLOR_SYSTEMS_NAMES = {system: name for name, system in COLOR_SYSTEMS.items()}
 
@@ -571,12 +578,6 @@ def detect_legacy_windows() -> bool:
     return WINDOWS and not get_windows_console_features().vt
 
 
-if detect_legacy_windows():  # pragma: no cover
-    from colorama import init
-
-    init(strip=False)
-
-
 class Console:
     """A high level console interface.
 
@@ -597,7 +598,7 @@ class Console:
         no_color (Optional[bool], optional): Enabled no color mode, or None to auto detect. Defaults to None.
         tab_size (int, optional): Number of spaces used to replace a tab character. Defaults to 8.
         record (bool, optional): Boolean to enable recording of terminal output,
-            required to call :meth:`export_html` and :meth:`export_text`. Defaults to False.
+            required to call :meth:`export_html`, :meth:`export_svg`, and :meth:`export_text`. Defaults to False.
         markup (bool, optional): Boolean to enable :ref:`console_markup`. Defaults to True.
         emoji (bool, optional): Enable emoji code. Defaults to True.
         emoji_variant (str, optional): Optional emoji variant, either "text" or "emoji". Defaults to None.
@@ -910,6 +911,13 @@ class Console:
         """
         if self._force_terminal is not None:
             return self._force_terminal
+
+        if hasattr(sys.stdin, "__module__") and sys.stdin.__module__.startswith(
+            "idlelib"
+        ):
+            # Return False for Idle which claims to be a tty but can't handle ansi codes
+            return False
+
         isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
         try:
             return False if isatty is None else isatty()
@@ -964,16 +972,16 @@ class Console:
         if WINDOWS:  # pragma: no cover
             try:
                 width, height = os.get_terminal_size()
-            except OSError:  # Probably not a terminal
+            except (AttributeError, ValueError, OSError):  # Probably not a terminal
                 pass
         else:
-            try:
-                width, height = os.get_terminal_size(sys.__stdin__.fileno())
-            except (AttributeError, ValueError, OSError):
+            for file_descriptor in _STD_STREAMS:
                 try:
-                    width, height = os.get_terminal_size(sys.__stdout__.fileno())
+                    width, height = os.get_terminal_size(file_descriptor)
                 except (AttributeError, ValueError, OSError):
                     pass
+                else:
+                    break
 
         columns = self._environ.get("COLUMNS")
         if columns is not None and columns.isdigit():
@@ -1141,7 +1149,7 @@ class Console:
         Args:
             show (bool, optional): Set visibility of the cursor.
         """
-        if self.is_terminal and not self.legacy_windows:
+        if self.is_terminal:
             self.control(Control.show_cursor(show))
             return True
         return False
@@ -1175,6 +1183,38 @@ class Console:
             bool: True if the alt screen was enabled, otherwise False.
         """
         return self._is_alt_screen
+
+    def set_window_title(self, title: str) -> bool:
+        """Set the title of the console terminal window.
+
+        Warning: There is no means within Rich of "resetting" the window title to its
+        previous value, meaning the title you set will persist even after your application
+        exits.
+
+        ``fish`` shell resets the window title before and after each command by default,
+        negating this issue. Windows Terminal and command prompt will also reset the title for you.
+        Most other shells and terminals, however, do not do this.
+
+        Some terminals may require configuration changes before you can set the title.
+        Some terminals may not support setting the title at all.
+
+        Other software (including the terminal itself, the shell, custom prompts, plugins, etc.)
+        may also set the terminal window title. This could result in whatever value you write
+        using this method being overwritten.
+
+        Args:
+            title (str): The new title of the terminal window.
+
+        Returns:
+            bool: True if the control code to change the terminal title was
+                written, otherwise False. Note that a return value of True
+                does not guarantee that the window title has actually changed,
+                since the feature may be unsupported/disabled in some terminals.
+        """
+        if self.is_terminal:
+            self.control(Control.title(title))
+            return True
+        return False
 
     def screen(
         self, hide_cursor: bool = True, style: Optional[StyleType] = None
@@ -1232,7 +1272,7 @@ class Console:
 
         renderable = rich_cast(renderable)
         if hasattr(renderable, "__rich_console__") and not isclass(renderable):
-            render_iterable = renderable.__rich_console__(self, _options)  # type: ignore
+            render_iterable = renderable.__rich_console__(self, _options)  # type: ignore[union-attr]
         elif isinstance(renderable, str):
             text_renderable = self.render_str(
                 renderable, highlight=_options.highlight, markup=_options.markup
@@ -1251,6 +1291,7 @@ class Console:
                 f"object {render_iterable!r} is not renderable"
             )
         _Segment = Segment
+        _options = _options.reset_height()
         for render_output in iter_render:
             if isinstance(render_output, _Segment):
                 yield render_output
@@ -1286,6 +1327,11 @@ class Console:
             _rendered = self.render(renderable, render_options)
             if style:
                 _rendered = Segment.apply_style(_rendered, style)
+
+            render_height = render_options.height
+            if render_height is not None:
+                render_height = max(0, render_height)
+
             lines = list(
                 islice(
                     Segment.split_and_crop_lines(
@@ -1295,7 +1341,7 @@ class Console:
                         pad=pad,
                     ),
                     None,
-                    render_options.height,
+                    render_height,
                 )
             )
             if render_options.height is not None:
@@ -1322,7 +1368,7 @@ class Console:
         highlight: Optional[bool] = None,
         highlighter: Optional[HighlighterType] = None,
     ) -> "Text":
-        """Convert a string to a Text instance. This is is called automatically if
+        """Convert a string to a Text instance. This is called automatically if
         you print or log a string.
 
         Args:
@@ -1372,7 +1418,7 @@ class Console:
     def get_style(
         self, name: Union[str, Style], *, default: Optional[Union[Style, str]] = None
     ) -> Style:
-        """Get a Style instance by it's theme name or parse a definition.
+        """Get a Style instance by its theme name or parse a definition.
 
         Args:
             name (str): The name of a style or a style definition.
@@ -1765,7 +1811,7 @@ class Console:
         """Prints a rich render of the last exception and traceback.
 
         Args:
-            width (Optional[int], optional): Number of characters used to render code. Defaults to 88.
+            width (Optional[int], optional): Number of characters used to render code. Defaults to 100.
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
             theme (str, optional): Override pygments theme used in traceback
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
@@ -1811,7 +1857,7 @@ class Console:
         frame = currentframe()
         if frame is not None:
             # Use the faster currentframe where implemented
-            while offset and frame:
+            while offset and frame is not None:
                 frame = frame.f_back
                 offset -= 1
             assert frame is not None
@@ -1904,33 +1950,65 @@ class Console:
                 buffer_extend(line)
 
     def _check_buffer(self) -> None:
-        """Check if the buffer may be rendered."""
+        """Check if the buffer may be rendered. Render it if it can (e.g. Console.quiet is False)
+        Rendering is supported on Windows, Unix and Jupyter environments. For
+        legacy Windows consoles, the win32 API is called directly.
+        This method will also record what it renders if recording is enabled via Console.record.
+        """
         if self.quiet:
             del self._buffer[:]
             return
         with self._lock:
             if self._buffer_index == 0:
+
+                if self.record:
+                    with self._record_buffer_lock:
+                        self._record_buffer.extend(self._buffer[:])
+
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
 
                     display(self._buffer, self._render_buffer(self._buffer[:]))
                     del self._buffer[:]
                 else:
-                    text = self._render_buffer(self._buffer[:])
-                    del self._buffer[:]
-                    if text:
-                        try:
-                            if WINDOWS:  # pragma: no cover
-                                # https://bugs.python.org/issue37871
-                                write = self.file.write
-                                for line in text.splitlines(True):
+                    if WINDOWS:
+                        use_legacy_windows_render = False
+                        if self.legacy_windows:
+                            try:
+                                use_legacy_windows_render = (
+                                    self.file.fileno() in _STD_STREAMS_OUTPUT
+                                )
+                            except (ValueError, io.UnsupportedOperation):
+                                pass
+
+                        if use_legacy_windows_render:
+                            from rich._win32_console import LegacyWindowsTerm
+                            from rich._windows_renderer import legacy_windows_render
+
+                            legacy_windows_render(
+                                self._buffer[:], LegacyWindowsTerm(self.file)
+                            )
+                        else:
+                            # Either a non-std stream on legacy Windows, or modern Windows.
+                            text = self._render_buffer(self._buffer[:])
+                            # https://bugs.python.org/issue37871
+                            write = self.file.write
+                            for line in text.splitlines(True):
+                                try:
                                     write(line)
-                            else:
-                                self.file.write(text)
-                            self.file.flush()
+                                except UnicodeEncodeError as error:
+                                    error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
+                                    raise
+                    else:
+                        text = self._render_buffer(self._buffer[:])
+                        try:
+                            self.file.write(text)
                         except UnicodeEncodeError as error:
                             error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
                             raise
+
+                    self.file.flush()
+                    del self._buffer[:]
 
     def _render_buffer(self, buffer: Iterable[Segment]) -> str:
         """Render buffered output, and clear buffer."""
@@ -1938,9 +2016,6 @@ class Console:
         append = output.append
         color_system = self._color_system
         legacy_windows = self.legacy_windows
-        if self.record:
-            with self._record_buffer_lock:
-                self._record_buffer.extend(buffer)
         not_terminal = not self.is_terminal
         if self.no_color and color_system:
             buffer = Segment.remove_color(buffer)
@@ -1982,23 +2057,15 @@ class Console:
         Returns:
             str: Text read from stdin.
         """
-        prompt_str = ""
         if prompt:
-            with self.capture() as capture:
-                self.print(prompt, markup=markup, emoji=emoji, end="")
-            prompt_str = capture.get()
-        if self.legacy_windows:
-            # Legacy windows doesn't like ANSI codes in getpass or input (colorama bug)?
-            self.file.write(prompt_str)
-            prompt_str = ""
+            self.print(prompt, markup=markup, emoji=emoji, end="")
         if password:
-            result = getpass(prompt_str, stream=stream)
+            result = getpass("", stream=stream)
         else:
             if stream:
-                self.file.write(prompt_str)
                 result = stream.readline()
             else:
-                result = input(prompt_str)
+                result = input()
         return result
 
     def export_text(self, *, clear: bool = True, styles: bool = False) -> str:
@@ -2060,8 +2127,8 @@ class Console:
         Args:
             theme (TerminalTheme, optional): TerminalTheme object containing console colors.
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
-            code_format (str, optional): Format string to render HTML, should contain {foreground}
-                {background} and {code}.
+            code_format (str, optional): Format string to render HTML. In addition to '{foreground}',
+                '{background}', and '{code}', should contain '{stylesheet}' if inline_styles is ``False``.
             inline_styles (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
                 larger but easier to cut and paste markup. If ``False``, styles will be embedded in a style tag.
                 Defaults to False.
@@ -2137,8 +2204,8 @@ class Console:
             path (str): Path to write html file.
             theme (TerminalTheme, optional): TerminalTheme object containing console colors.
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
-            code_format (str, optional): Format string to render HTML, should contain {foreground}
-                {background} and {code}.
+            code_format (str, optional): Format string to render HTML. In addition to '{foreground}',
+                '{background}', and '{code}', should contain '{stylesheet}' if inline_styles is ``False``.
             inline_styles (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
                 larger but easier to cut and paste markup. If ``False``, styles will be embedded in a style tag.
                 Defaults to False.
@@ -2153,9 +2220,276 @@ class Console:
         with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(html)
 
+    def export_svg(
+        self,
+        *,
+        title: str = "Rich",
+        theme: Optional[TerminalTheme] = None,
+        clear: bool = True,
+        code_format: str = CONSOLE_SVG_FORMAT,
+    ) -> str:
+        """
+        Generate an SVG from the console contents (requires record=True in Console constructor).
+
+        Args:
+            path (str): The path to write the SVG to.
+            title (str): The title of the tab in the output image
+            theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
+            code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
+                into the string in order to form the final SVG output. The default template used and the variables
+                injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
+        """
+
+        from rich.cells import cell_len
+
+        style_cache: Dict[Style, str] = {}
+
+        def get_svg_style(style: Style) -> str:
+            """Convert a Style to CSS rules for SVG."""
+            if style in style_cache:
+                return style_cache[style]
+            css_rules = []
+            color = (
+                _theme.foreground_color
+                if style.color is None
+                else style.color.get_truecolor(_theme)
+            )
+            bgcolor = (
+                _theme.background_color
+                if style.bgcolor is None
+                else style.bgcolor.get_truecolor(_theme)
+            )
+            if style.reverse:
+                color, bgcolor = bgcolor, color
+            if style.dim:
+                color = blend_rgb(color, bgcolor, 0.4)
+            css_rules.append(f"fill: {color.hex}")
+            if style.bold:
+                css_rules.append("font-weight: bold")
+            if style.italic:
+                css_rules.append("font-style: italic;")
+            if style.underline:
+                css_rules.append("text-decoration: underline;")
+            if style.strike:
+                css_rules.append("text-decoration: line-through;")
+
+            css = ";".join(css_rules)
+            style_cache[style] = css
+            return css
+
+        _theme = theme or SVG_EXPORT_THEME
+
+        width = self.width
+        char_height = 20
+        char_width = char_height * 0.62
+        line_height = char_height * 1.32
+
+        margin_top = 20
+        margin_right = 16
+        margin_bottom = 20
+        margin_left = 16
+
+        padding_top = 40
+        padding_right = 12
+        padding_bottom = 12
+        padding_left = 12
+
+        padding_width = padding_left + padding_right
+        padding_height = padding_top + padding_bottom
+        margin_width = margin_left + margin_right
+        margin_height = margin_top + margin_bottom
+
+        text_backgrounds: List[str] = []
+        text_group: List[str] = []
+        classes: Dict[str, int] = {}
+        style_no = 1
+
+        def escape_text(text: str) -> str:
+            """HTML escape text and replace spaces with nbsp."""
+            return escape(text).replace(" ", "&#160;")
+
+        def make_tag(
+            name: str, content: Optional[str] = None, **attribs: object
+        ) -> str:
+            """Make a tag from name, content, and attributes."""
+
+            def stringify(value: object) -> str:
+                if isinstance(value, (float)):
+                    return format(value, "g")
+                return str(value)
+
+            tag_attribs = " ".join(
+                f'{k.lstrip("_").replace("_", "-")}="{stringify(v)}"'
+                for k, v in attribs.items()
+            )
+            return (
+                f"<{name} {tag_attribs}>{content}</{name}>"
+                if content
+                else f"<{name} {tag_attribs}/>"
+            )
+
+        with self._record_buffer_lock:
+            segments = list(
+                Segment.filter_control(
+                    Segment.simplify(self._record_buffer),
+                )
+            )
+            if clear:
+                self._record_buffer.clear()
+
+        unique_id = "terminal-" + str(
+            zlib.adler32(
+                ("".join(segment.text for segment in segments)).encode(
+                    "utf-8", "ignore"
+                )
+                + title.encode("utf-8", "ignore")
+            )
+        )
+        y = 0
+        for y, line in enumerate(Segment.split_and_crop_lines(segments, length=width)):
+            x = 0
+            for text, style, _control in line:
+                style = style or Style()
+                rules = get_svg_style(style)
+                if rules not in classes:
+                    classes[rules] = style_no
+                    style_no += 1
+                class_name = f"r{classes[rules]}"
+
+                if style.reverse:
+                    has_background = True
+                    background = (
+                        _theme.foreground_color.hex
+                        if style.color is None
+                        else style.color.get_truecolor(_theme).hex
+                    )
+                else:
+                    has_background = style.bgcolor is not None
+                    background = (
+                        _theme.background_color.hex
+                        if style.bgcolor is None
+                        else style.bgcolor.get_truecolor(_theme).hex
+                    )
+
+                text_length = cell_len(text)
+                if has_background:
+                    text_backgrounds.append(
+                        make_tag(
+                            "rect",
+                            fill=background,
+                            x=x * char_width,
+                            y=y * line_height,
+                            width=char_width * text_length + 1,
+                            height=line_height + 1,
+                        )
+                    )
+                text_group.append(
+                    make_tag(
+                        "tspan",
+                        escape_text(text),
+                        _class=f"{unique_id}-{class_name}",
+                        x=x * char_width,
+                        y=y * line_height + char_height,
+                        textLength=char_width * len(text),
+                    )
+                )
+                x += cell_len(text)
+
+        styles = "\n".join(
+            f".{unique_id}-r{rule_no} {{ {css} }}" for css, rule_no in classes.items()
+        )
+        backgrounds = "".join(text_backgrounds)
+        matrix = "".join(text_group)
+
+        terminal_width = ceil(width * char_width + padding_width)
+        terminal_height = (y + 1) * line_height + padding_height
+        chrome = make_tag(
+            "rect",
+            fill=_theme.background_color.hex,
+            x=margin_left,
+            y=margin_top,
+            width=terminal_width,
+            height=terminal_height,
+            rx=12,
+        )
+        title_color = _theme.foreground_color.hex
+        if title:
+            chrome += make_tag(
+                "text",
+                title,
+                _class=f"{unique_id}-title",
+                fill=title_color,
+                text_anchor="middle",
+                x=terminal_width // 2,
+                y=margin_top + char_height + 6,
+            )
+        chrome += f"""
+            <circle cx="40" cy="40" r="7" fill="#ff5f57"/>
+            <circle cx="62" cy="40" r="7" fill="#febc2e"/>
+            <circle cx="84" cy="40" r="7" fill="#28c840"/>
+        """
+
+        svg = code_format.format(
+            unique_id=unique_id,
+            char_width=char_width,
+            char_height=char_height,
+            line_height=line_height,
+            width=terminal_width + margin_width,
+            height=terminal_height + margin_height,
+            terminal_x=margin_left + padding_left,
+            terminal_y=margin_top + padding_top,
+            styles=styles,
+            chrome=chrome,
+            backgrounds=backgrounds,
+            matrix=matrix,
+        )
+        return svg
+
+    def save_svg(
+        self,
+        path: str,
+        *,
+        title: str = "Rich",
+        theme: Optional[TerminalTheme] = None,
+        clear: bool = True,
+        code_format: str = CONSOLE_SVG_FORMAT,
+    ) -> None:
+        """Generate an SVG file from the console contents (requires record=True in Console constructor).
+
+        Args:
+            path (str): The path to write the SVG to.
+            title (str): The title of the tab in the output image
+            theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
+            code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
+                into the string in order to form the final SVG output. The default template used and the variables
+                injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
+        """
+        svg = self.export_svg(
+            title=title,
+            theme=theme,
+            clear=clear,
+            code_format=code_format,
+        )
+        with open(path, "wt", encoding="utf-8") as write_file:
+            write_file.write(svg)
+
+
+def _svg_hash(svg_main_code: str) -> str:
+    """Returns a unique hash for the given SVG main code.
+
+    Args:
+        svg_main_code (str): The content we're going to inject in the SVG envelope.
+
+    Returns:
+        str: a hash of the given content
+    """
+    return str(zlib.adler32(svg_main_code.encode()))
+
 
 if __name__ == "__main__":  # pragma: no cover
-    console = Console()
+    console = Console(record=True)
 
     console.log(
         "JSONRPC [i]request[/i]",
@@ -2208,4 +2542,3 @@ if __name__ == "__main__":  # pragma: no cover
             },
         }
     )
-    console.log("foo")

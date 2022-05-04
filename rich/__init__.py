@@ -1,9 +1,9 @@
 """Rich text and beautiful formatting in the terminal."""
 
 import os
-from typing import Callable, IO, TYPE_CHECKING, Any, Optional
+from typing import IO, TYPE_CHECKING, Any, Callable, Optional, Union
 
-from ._extension import load_ipython_extension
+from ._extension import load_ipython_extension  # noqa: F401
 
 __all__ = ["get_console", "reconfigure", "print", "inspect"]
 
@@ -13,7 +13,11 @@ if TYPE_CHECKING:
 # Global console used by alternative print
 _console: Optional["Console"] = None
 
-_IMPORT_CWD = os.path.abspath(os.getcwd())
+try:
+    _IMPORT_CWD = os.path.abspath(os.getcwd())
+except FileNotFoundError:
+    # Can happen if the cwd has been deleted
+    _IMPORT_CWD = ""
 
 
 def get_console() -> "Console":
@@ -73,7 +77,7 @@ def print_json(
     json: Optional[str] = None,
     *,
     data: Any = None,
-    indent: int = 2,
+    indent: Union[None, int, str] = 2,
     highlight: bool = True,
     skip_keys: bool = False,
     ensure_ascii: bool = True,

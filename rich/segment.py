@@ -49,10 +49,13 @@ class ControlType(IntEnum):
     CURSOR_MOVE_TO_COLUMN = 13
     CURSOR_MOVE_TO = 14
     ERASE_IN_LINE = 15
+    SET_WINDOW_TITLE = 16
 
 
 ControlCode = Union[
-    Tuple[ControlType], Tuple[ControlType, int], Tuple[ControlType, int, int]
+    Tuple[ControlType],
+    Tuple[ControlType, Union[int, str]],
+    Tuple[ControlType, int, int],
 ]
 
 
@@ -64,15 +67,25 @@ class Segment(NamedTuple):
     Args:
         text (str): A piece of text.
         style (:class:`~rich.style.Style`, optional): An optional style to apply to the text.
-        control (Tuple[ControlCode..], optional): Optional sequence of control codes.
+        control (Tuple[ControlCode], optional): Optional sequence of control codes.
+
+    Attributes:
+        cell_length (int): The cell length of this Segment.
     """
 
-    text: str = ""
-    """Raw text."""
+    text: str
     style: Optional[Style] = None
-    """An optional style."""
     control: Optional[Sequence[ControlCode]] = None
-    """Optional sequence of control codes."""
+
+    @property
+    def cell_length(self) -> int:
+        """The number of terminal cells required to display self.text.
+
+        Returns:
+            int: A number of cells.
+        """
+        text, _style, control = self
+        return 0 if control else cell_len(text)
 
     def __rich_repr__(self) -> Result:
         yield self.text
@@ -88,18 +101,13 @@ class Segment(NamedTuple):
         return bool(self.text)
 
     @property
-    def cell_length(self) -> int:
-        """Get cell length of segment."""
-        return 0 if self.control else cell_len(self.text)
-
-    @property
     def is_control(self) -> bool:
         """Check if the segment contains control codes."""
         return self.control is not None
 
     @classmethod
     @lru_cache(1024 * 16)
-    def _split_cells(cls, segment: "Segment", cut: int) -> Tuple["Segment", "Segment"]:  # type: ignore
+    def _split_cells(cls, segment: "Segment", cut: int) -> Tuple["Segment", "Segment"]:
 
         text, style, control = segment
         _Segment = Segment
@@ -134,6 +142,8 @@ class Segment(NamedTuple):
                     _Segment(before[: pos - 1] + " ", style, control),
                     _Segment(" " + text[pos:], style, control),
                 )
+
+        raise AssertionError("Will never reach here")
 
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
         """Split segment in to two segments at the specified column.
@@ -601,9 +611,14 @@ class Segment(NamedTuple):
             yield []
         pos = 0
 
+        _cell_len = cell_len
         for segment in segments:
-            while segment.text:
-                end_pos = pos + segment.cell_length
+            text, _style, control = segment
+            while text:
+                if control:
+                    end_pos = pos
+                else:
+                    end_pos = pos + _cell_len(text)
                 if end_pos < cut:
                     add_segment(segment)
                     pos = end_pos
@@ -618,6 +633,7 @@ class Segment(NamedTuple):
                         break
                     else:
                         before, segment = segment.split_cells(cut - pos)
+                        text, _style, control = segment
                         add_segment(before)
                         yield split_segments[:]
                         del split_segments[:]
@@ -682,39 +698,35 @@ class SegmentLines:
                 yield from line
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
+    from rich.console import Console
+    from rich.syntax import Syntax
+    from rich.text import Text
 
-    if __name__ == "__main__":  # pragma: no cover
-        from rich.console import Console
-        from rich.syntax import Syntax
-        from rich.text import Text
+    code = """from rich.console import Console
+console = Console()
+text = Text.from_markup("Hello, [bold magenta]World[/]!")
+console.print(text)"""
 
-        code = """from rich.console import Console
-    console = Console()
     text = Text.from_markup("Hello, [bold magenta]World[/]!")
-    console.print(text)"""
 
-        text = Text.from_markup("Hello, [bold magenta]World[/]!")
+    console = Console()
 
-        console = Console()
-
-        console.rule("rich.Segment")
-        console.print(
-            "A Segment is the last step in the Rich render process before generating text with ANSI codes."
-        )
-        console.print("\nConsider the following code:\n")
-        console.print(Syntax(code, "python", line_numbers=True))
-        console.print()
-        console.print(
-            "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
-        )
-        fragments = list(console.render(text))
-        console.print(fragments)
-        console.print()
-        console.print(
-            "The Segments are then processed to produce the following output:\n"
-        )
-        console.print(text)
-        console.print(
-            "\nYou will only need to know this if you are implementing your own Rich renderables."
-        )
+    console.rule("rich.Segment")
+    console.print(
+        "A Segment is the last step in the Rich render process before generating text with ANSI codes."
+    )
+    console.print("\nConsider the following code:\n")
+    console.print(Syntax(code, "python", line_numbers=True))
+    console.print()
+    console.print(
+        "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
+    )
+    fragments = list(console.render(text))
+    console.print(fragments)
+    console.print()
+    console.print("The Segments are then processed to produce the following output:\n")
+    console.print(text)
+    console.print(
+        "\nYou will only need to know this if you are implementing your own Rich renderables."
+    )

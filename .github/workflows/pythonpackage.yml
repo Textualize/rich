@@ -13,7 +13,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -40,7 +40,7 @@ jobs:
           source $VENV
           pytest tests -v --cov=./rich --cov-report=xml:./coverage.xml --cov-report term-missing
       - name: Upload code coverage
-        uses: codecov/codecov-action@v1.0.10
+        uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml

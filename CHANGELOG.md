@@ -5,16 +5,123 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [Unreleased]
+
+### Changed
+
+- Change SVG export to create a simpler SVG
+- Fix render_lines crash when render height was negative https://github.com/Textualize/rich/pull/2246
+
+### Added
+
+- Add `padding` to Syntax constructor https://github.com/Textualize/rich/pull/2247
+
+## [12.3.0] - 2022-04-26
+
+### Added
+
+- Ability to change terminal window title https://github.com/Textualize/rich/pull/2200
+- Added show_speed parameter to progress.track which will show the speed when the total is not known
+- Python blocks can now opt out from being rendered in tracebacks's frames, by setting a `_rich_traceback_omit = True` in their local scope https://github.com/Textualize/rich/issues/2207
+
+### Fixed
+
+- Fall back to `sys.__stderr__` on POSIX systems when trying to get the terminal size (fix issues when Rich is piped to another process)
+- Fixed markup escaping issue https://github.com/Textualize/rich/issues/2187
+- Safari - Box appearing around SVG export https://github.com/Textualize/rich/pull/2201
+- Fixed recursion error in Jupyter progress bars https://github.com/Textualize/rich/issues/2047
+- Complex numbers are now identified by the highlighter https://github.com/Textualize/rich/issues/2214
+- Fix crash on IDLE and forced is_terminal detection to False because IDLE can't do escape codes https://github.com/Textualize/rich/issues/2222
+- Fixed missing blank line in traceback rendering https://github.com/Textualize/rich/issues/2206
+- Fixed running Rich with the current working dir was deleted https://github.com/Textualize/rich/issues/2197
+
+### Changed
+
+- Setting `total=None` on progress is now possible, and will display pulsing animation
+- Micro-optimization for Segment.divide
+
+## [12.2.0] - 2022-04-05
+
+### Changed
+
+- Bumped typing-extensions minimum to 4.0.0
+- Bumped minimum Python version to 3.6.3
+
+## [12.1.0] - 2022-04-03
+
+### Added
+
+- Progress.open and Progress.wrap_file method to track the progress while reading from a file or file-like object https://github.com/willmcgugan/rich/pull/1759
+- SVG export functionality https://github.com/Textualize/rich/pull/2101
+- Adding Indonesian translation
+
+### Fixed
+
+- Add missing `end` keyword argument to `Text.from_markup` https://github.com/Textualize/rich/pull/2095
+- Fallback to text lexer when no lexer guessed https://github.com/Textualize/rich/pull/2133
+- Fixed issue with decoding ANSI reset https://github.com/Textualize/rich/issues/2112
+
+## [12.0.1] - 2022-03-22
+
+### Changed
+
+- Improve performance of cell_length https://github.com/Textualize/rich/pull/2061
+- Improve performance of chop_cells https://github.com/Textualize/rich/pull/2077
+
+### Fixed
+
+- Fix capturing stdout on legacy Windows https://github.com/Textualize/rich/pull/2066
+
+## [12.0.0] - 2022-03-10
+
+### Added
+
+- Added options to TimeRemainingColumn to render a compact time format and render elapsed time when a task is
+  finished. https://github.com/Textualize/rich/pull/1992
+- Added ProgressColumn `MofNCompleteColumn` to display raw `completed/total` column (similar to DownloadColumn,
+  but displays values as ints, does not convert to floats or add bit/bytes units).
+  https://github.com/Textualize/rich/pull/1941
+- Replace Colorama with win32 renderer https://github.com/Textualize/rich/pull/1993
+- Add support for namedtuples to `Pretty` https://github.com/Textualize/rich/pull/2031
+
+### Fixed
+
+- In Jupyter mode make the link target be set to "\_blank"
+- Fix some issues with markup handling around "[" characters https://github.com/Textualize/rich/pull/1950
+- Fix syntax lexer guessing.
+- Fixed Pretty measure not respecting expand_all https://github.com/Textualize/rich/issues/1998
+- Collapsed definitions for single-character spinners, to save memory and reduce import time.
+- Fix print_json indent type in `__init__.py`
+- Fix error when inspecting object defined in REPL https://github.com/Textualize/rich/pull/2037
+- Fix incorrect highlighting of non-indented JSON https://github.com/Textualize/rich/pull/2038
+- Fixed height reset in complex renderables https://github.com/Textualize/rich/issues/2042
+
+### Changed
+
+- Improved support for enum.Flag in ReprHighlighter https://github.com/Textualize/rich/pull/1920
+- Tree now respects justify=None, i.e. won't pad to right https://github.com/Textualize/rich/issues/1690
+- Removed rich.tabulate which was marked for deprecation
+- Deprecated rich.align.AlignValues in favor of AlignMethod
+
+## [11.2.0] - 2022-02-08
 
 ### Added
 
 - Add support for US spelling of "gray" in ANSI color names https://github.com/Textualize/rich/issues/1890
+- Added `rich.diagnose.report` to expose environment debugging logic as function https://github.com/Textualize/rich/pull/1917
+- Added classmethod `Progress.get_default_columns()` to get the default list of progress bar columns https://github.com/Textualize/rich/pull/1894
+
+### Fixed
+
+- Fixed performance issue in measuring text
+
+### Fixed
+
+- Fixed test failures on PyPy3 https://github.com/Textualize/rich/pull/1904
 
 ## [11.1.0] - 2022-01-28
 
 ### Added
-
 
 - Workaround for edge case of object from Faiss with no `__class__` https://github.com/Textualize/rich/issues/1838
 - Add Traditional Chinese readme
@@ -95,8 +202,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed issue with progress bar not rendering markup https://github.com/willmcgugan/rich/issues/1721
 - Fixed race condition when exiting Live https://github.com/willmcgugan/rich/issues/1530
-
-[10.15.0]: https://github.com/willmcgugan/rich/compare/v10.14.0...v10.15.0
 
 ## [10.14.0] - 2021-11-16
 
@@ -394,7 +499,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [9.12.1] - 2021-02-27
 
-### Fixed
+### Fixed
 
 - Fixed deadlock in Progress https://github.com/willmcgugan/rich/issues/1061
 
@@ -451,7 +556,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed error message for tracebacks with broken `__str__` https://github.com/willmcgugan/rich/issues/980
 - Fixed markup edge case https://github.com/willmcgugan/rich/issues/987
 
-### Added
+### Added
 
 - Added cheeky sponsorship request to test card
 - Added `quiet` argument to Console constructor
@@ -510,7 +615,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [9.8.0] - 2021-01-11
 
-### Added
+### Added
 
 - Added **rich_measure** for tree
 - Added rich.align.VerticalCenter
@@ -599,7 +704,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [9.4.0] - 2020-12-12
 
-### Added
+### Added
 
 - Added rich.live https://github.com/willmcgugan/rich/pull/382
 - Added algin parameter to Rule and Console.rule
@@ -608,7 +713,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added style parameter to Console.log
 - Added rich.diagnose command
 
-### Changed
+### Changed
 
 - Table.add_row style argument now applies to entire line and not just cells
 - Added end_section parameter to Table.add_row to force a line underneath row
@@ -619,7 +724,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [9.3.0] - 2020-12-1
 
-### Added
+### Added
 
 - Added get_datetime parameter to Console, to allow for repeatable tests
 - Added get_time parameter to Console
@@ -719,7 +824,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [8.0.0] - 2020-10-03
 
-### Added
+### Added
 
 - Added Console.bell method
 - Added Set to types that Console.print will automatically pretty print
@@ -744,7 +849,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Console.begin_capture, Console.end_capture and Console.capture
 - Added Table.title_justify and Table.caption_justify https://github.com/willmcgugan/rich/issues/301
 
-### Changed
+### Changed
 
 - Improved formatting of exceptions
 - Enabled Rich exceptions in logging https://github.com/taliraj
@@ -763,7 +868,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Text.remove_suffix
 - Added Text.append_tokens
 
-### Changed
+### Changed
 
 - Text.tabs_to_spaces was renamed to Text.expand_tabs, which works in place rather than returning a new instance
 - Renamed Column.index to Column.\_index
@@ -1047,7 +1152,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 ## [3.0.2] - 2020-07-02
 
-### Added
+### Added
 
 - Added rich.styled.Styled class to apply styles to renderable
 - Table.add_row now has an optional style parameter
@@ -1160,7 +1265,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - Added 'transient' option to Progress
 
-### Changed
+### Changed
 
 - Truncated overly long text in Rule with ellipsis overflow
 
@@ -1282,7 +1387,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - Optimizations for Segment, Console and Table
 
-### Added
+### Added
 
 - Added Console.clear method
 - Added exporting of links to HTML
@@ -1304,7 +1409,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 ## [1.1.6] - 2020-05-17
 
-### Added
+### Added
 
 - Added rich.align.Align class
 - Added justify argument to Console.print and console.log
@@ -1323,7 +1428,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 - Fixes for legacy windows: Bar, Panel, and Rule now use ASCII characters
 - show_cursor is now a no-op on legacy windows
 
-### Added
+### Added
 
 - Added Console.input
 
@@ -1625,141 +1730,147 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[unreleased]: https://github.com/willmcgugan/rich/compare/v12.3.0...HEAD
+[12.3.0]: https://github.com/willmcgugan/rich/compare/v12.2.0...v12.3.0
+[12.2.0]: https://github.com/willmcgugan/rich/compare/v12.1.0...v12.2.0
+[12.1.0]: https://github.com/willmcgugan/rich/compare/v12.0.1...v12.1.0
+[12.0.1]: https://github.com/willmcgugan/rich/compare/v12.0.0...v12.0.1
+[12.0.0]: https://github.com/willmcgugan/rich/compare/v11.2.0...v12.0.0
+[11.2.0]: https://github.com/willmcgugan/rich/compare/v11.1.0...v11.2.0
 [11.1.0]: https://github.com/willmcgugan/rich/compare/v11.0.0...v11.1.0
 [11.0.0]: https://github.com/willmcgugan/rich/compare/v10.16.1...v11.0.0
+[10.16.2]: https://github.com/willmcgugan/rich/compare/v10.16.1...v10.16.2
 [10.16.1]: https://github.com/willmcgugan/rich/compare/v10.16.0...v10.16.1
 [10.16.0]: https://github.com/willmcgugan/rich/compare/v10.15.2...v10.16.0
 [10.15.2]: https://github.com/willmcgugan/rich/compare/v10.15.1...v10.15.2
 [10.15.1]: https://github.com/willmcgugan/rich/compare/v10.15.0...v10.15.1
-[10.14.0]: https://github.com/willmcgugan/rich/compare/v10.14.0...v10.15.0
-[10.13.0]: https://github.com/willmcgugan/rich/compare/v10.13.0...v10.14.0
-[10.12.0]: https://github.com/willmcgugan/rich/compare/v10.12.0...v10.13.0
-[10.11.0]: https://github.com/willmcgugan/rich/compare/v10.11.0...v10.12.0
-[10.10.0]: https://github.com/willmcgugan/rich/compare/v10.10.0...v10.11.0
-[10.9.0]: https://github.com/willmcgugan/rich/compare/v10.9.0...v10.10.0
-[10.8.0]: https://github.com/willmcgugan/rich/compare/v10.8.0...v10.9.0
-[10.7.0]: https://github.com/willmcgugan/rich/compare/v10.7.0...v10.8.0
-[10.6.0]: https://github.com/willmcgugan/rich/compare/v10.6.0...v10.7.0
-[10.5.0]: https://github.com/willmcgugan/rich/compare/v10.5.0...v10.6.0
-[10.4.0]: https://github.com/willmcgugan/rich/compare/v10.4.0...v10.5.0
-[10.3.0]: https://github.com/willmcgugan/rich/compare/v10.3.0...v10.4.0
-[10.2.2]: https://github.com/willmcgugan/rich/compare/v10.2.2...v10.3.0
-[10.2.1]: https://github.com/willmcgugan/rich/compare/v10.2.1...v10.2.2
-[10.2.0]: https://github.com/willmcgugan/rich/compare/v10.2.0...v10.2.1
-[10.1.0]: https://github.com/willmcgugan/rich/compare/v10.1.0...v10.2.0
-[10.0.1]: https://github.com/willmcgugan/rich/compare/v10.0.1...v10.1.0
-[10.0.0]: https://github.com/willmcgugan/rich/compare/v10.0.0...v10.0.1
-[9.13.0]: https://github.com/willmcgugan/rich/compare/v9.13.0...v10.0.0
-[9.12.4]: https://github.com/willmcgugan/rich/compare/v9.12.4...v9.13.0
-[9.12.3]: https://github.com/willmcgugan/rich/compare/v9.12.3...v9.12.4
-[9.12.2]: https://github.com/willmcgugan/rich/compare/v9.12.2...v9.12.3
-[9.12.1]: https://github.com/willmcgugan/rich/compare/v9.12.1...v9.12.2
-[9.12.0]: https://github.com/willmcgugan/rich/compare/v9.12.0...v9.12.1
-[9.11.1]: https://github.com/willmcgugan/rich/compare/v9.11.1...v9.12.0
-[9.11.0]: https://github.com/willmcgugan/rich/compare/v9.11.0...v9.11.1
-[9.10.0]: https://github.com/willmcgugan/rich/compare/v9.10.0...v9.11.0
-[9.9.0]: https://github.com/willmcgugan/rich/compare/v9.9.0...v9.10.0
-[9.8.2]: https://github.com/willmcgugan/rich/compare/v9.8.2...v9.9.0
-[9.8.1]: https://github.com/willmcgugan/rich/compare/v9.8.1...v9.8.2
-[9.8.0]: https://github.com/willmcgugan/rich/compare/v9.8.0...v9.8.1
-[9.7.0]: https://github.com/willmcgugan/rich/compare/v9.7.0...v9.8.0
-[9.6.2]: https://github.com/willmcgugan/rich/compare/v9.6.2...v9.7.0
-[9.6.1]: https://github.com/willmcgugan/rich/compare/v9.6.1...v9.6.2
-[9.6.0]: https://github.com/willmcgugan/rich/compare/v9.6.0...v9.6.1
-[9.5.1]: https://github.com/willmcgugan/rich/compare/v9.5.1...v9.6.0
-[9.5.0]: https://github.com/willmcgugan/rich/compare/v9.5.0...v9.5.1
-[9.4.0]: https://github.com/willmcgugan/rich/compare/v9.4.0...v9.5.0
-[9.3.0]: https://github.com/willmcgugan/rich/compare/v9.3.0...v9.4.0
-[9.2.0]: https://github.com/willmcgugan/rich/compare/v9.2.0...v9.3.0
-[9.1.0]: https://github.com/willmcgugan/rich/compare/v9.1.0...v9.2.0
-[9.0.1]: https://github.com/willmcgugan/rich/compare/v9.0.1...v9.1.0
-[9.0.0]: https://github.com/willmcgugan/rich/compare/v9.0.0...v9.0.1
-[8.0.0]: https://github.com/willmcgugan/rich/compare/v8.0.0...v9.0.0
-[7.1.0]: https://github.com/willmcgugan/rich/compare/v7.1.0...v8.0.0
-[7.0.0]: https://github.com/willmcgugan/rich/compare/v7.0.0...v7.1.0
-[6.2.0]: https://github.com/willmcgugan/rich/compare/v6.2.0...v7.0.0
-[6.1.2]: https://github.com/willmcgugan/rich/compare/v6.1.2...v6.2.0
-[6.1.1]: https://github.com/willmcgugan/rich/compare/v6.1.1...v6.1.2
-[6.1.0]: https://github.com/willmcgugan/rich/compare/v6.1.0...v6.1.1
-[6.0.0]: https://github.com/willmcgugan/rich/compare/v6.0.0...v6.1.0
-[5.2.1]: https://github.com/willmcgugan/rich/compare/v5.2.1...v6.0.0
-[5.2.0]: https://github.com/willmcgugan/rich/compare/v5.2.0...v5.2.1
-[5.1.2]: https://github.com/willmcgugan/rich/compare/v5.1.2...v5.2.0
-[5.1.1]: https://github.com/willmcgugan/rich/compare/v5.1.1...v5.1.2
-[5.1.0]: https://github.com/willmcgugan/rich/compare/v5.1.0...v5.1.1
-[5.0.0]: https://github.com/willmcgugan/rich/compare/v5.0.0...v5.1.0
-[4.2.2]: https://github.com/willmcgugan/rich/compare/v4.2.2...v5.0.0
-[4.2.1]: https://github.com/willmcgugan/rich/compare/v4.2.1...v4.2.2
-[4.2.0]: https://github.com/willmcgugan/rich/compare/v4.2.0...v4.2.1
-[4.1.0]: https://github.com/willmcgugan/rich/compare/v4.1.0...v4.2.0
-[4.0.0]: https://github.com/willmcgugan/rich/compare/v4.0.0...v4.1.0
-[3.4.1]: https://github.com/willmcgugan/rich/compare/v3.4.1...v4.0.0
-[3.4.0]: https://github.com/willmcgugan/rich/compare/v3.4.0...v3.4.1
-[3.3.2]: https://github.com/willmcgugan/rich/compare/v3.3.2...v3.4.0
-[3.3.1]: https://github.com/willmcgugan/rich/compare/v3.3.1...v3.3.2
-[3.3.0]: https://github.com/willmcgugan/rich/compare/v3.3.0...v3.3.1
-[3.2.0]: https://github.com/willmcgugan/rich/compare/v3.2.0...v3.3.0
-[3.1.0]: https://github.com/willmcgugan/rich/compare/v3.1.0...v3.2.0
-[3.0.5]: https://github.com/willmcgugan/rich/compare/v3.0.5...v3.1.0
-[3.0.4]: https://github.com/willmcgugan/rich/compare/v3.0.4...v3.0.5
-[3.0.3]: https://github.com/willmcgugan/rich/compare/v3.0.3...v3.0.4
-[3.0.2]: https://github.com/willmcgugan/rich/compare/v3.0.2...v3.0.3
-[3.0.1]: https://github.com/willmcgugan/rich/compare/v3.0.1...v3.0.2
-[3.0.0]: https://github.com/willmcgugan/rich/compare/v3.0.0...v3.0.1
-[2.3.1]: https://github.com/willmcgugan/rich/compare/v2.3.1...v3.0.0
-[2.3.0]: https://github.com/willmcgugan/rich/compare/v2.3.0...v2.3.1
-[2.2.6]: https://github.com/willmcgugan/rich/compare/v2.2.6...v2.3.0
-[2.2.5]: https://github.com/willmcgugan/rich/compare/v2.2.5...v2.2.6
-[2.2.4]: https://github.com/willmcgugan/rich/compare/v2.2.4...v2.2.5
-[2.2.3]: https://github.com/willmcgugan/rich/compare/v2.2.3...v2.2.4
-[2.2.2]: https://github.com/willmcgugan/rich/compare/v2.2.2...v2.2.3
-[2.2.1]: https://github.com/willmcgugan/rich/compare/v2.2.1...v2.2.2
-[2.2.0]: https://github.com/willmcgugan/rich/compare/v2.2.0...v2.2.1
-[2.1.0]: https://github.com/willmcgugan/rich/compare/v2.1.0...v2.2.0
-[2.0.1]: https://github.com/willmcgugan/rich/compare/v2.0.1...v2.1.0
-[2.0.0]: https://github.com/willmcgugan/rich/compare/v2.0.0...v2.0.1
-[1.3.1]: https://github.com/willmcgugan/rich/compare/v1.3.1...v2.0.0
-[1.3.0]: https://github.com/willmcgugan/rich/compare/v1.3.0...v1.3.1
-[1.2.3]: https://github.com/willmcgugan/rich/compare/v1.2.3...v1.3.0
-[1.2.2]: https://github.com/willmcgugan/rich/compare/v1.2.2...v1.2.3
-[1.2.1]: https://github.com/willmcgugan/rich/compare/v1.2.1...v1.2.2
-[1.2.0]: https://github.com/willmcgugan/rich/compare/v1.2.0...v1.2.1
-[1.1.9]: https://github.com/willmcgugan/rich/compare/v1.1.9...v1.2.0
-[1.1.8]: https://github.com/willmcgugan/rich/compare/v1.1.8...v1.1.9
-[1.1.7]: https://github.com/willmcgugan/rich/compare/v1.1.7...v1.1.8
-[1.1.6]: https://github.com/willmcgugan/rich/compare/v1.1.6...v1.1.7
-[1.1.5]: https://github.com/willmcgugan/rich/compare/v1.1.5...v1.1.6
-[1.1.4]: https://github.com/willmcgugan/rich/compare/v1.1.4...v1.1.5
-[1.1.3]: https://github.com/willmcgugan/rich/compare/v1.1.3...v1.1.4
-[1.1.2]: https://github.com/willmcgugan/rich/compare/v1.1.2...v1.1.3
-[1.1.1]: https://github.com/willmcgugan/rich/compare/v1.1.1...v1.1.2
-[1.1.0]: https://github.com/willmcgugan/rich/compare/v1.1.0...v1.1.1
-[1.0.3]: https://github.com/willmcgugan/rich/compare/v1.0.3...v1.1.0
-[1.0.2]: https://github.com/willmcgugan/rich/compare/v1.0.2...v1.0.3
-[1.0.1]: https://github.com/willmcgugan/rich/compare/v1.0.1...v1.0.2
-[1.0.0]: https://github.com/willmcgugan/rich/compare/v1.0.0...v1.0.1
-[0.8.13]: https://github.com/willmcgugan/rich/compare/v0.8.13...v1.0.0
-[0.8.12]: https://github.com/willmcgugan/rich/compare/v0.8.12...v0.8.13
-[0.8.11]: https://github.com/willmcgugan/rich/compare/v0.8.11...v0.8.12
-[0.8.10]: https://github.com/willmcgugan/rich/compare/v0.8.10...v0.8.11
-[0.8.9]: https://github.com/willmcgugan/rich/compare/v0.8.9...v0.8.10
-[0.8.8]: https://github.com/willmcgugan/rich/compare/v0.8.8...v0.8.9
-[0.8.7]: https://github.com/willmcgugan/rich/compare/v0.8.7...v0.8.8
-[0.8.6]: https://github.com/willmcgugan/rich/compare/v0.8.6...v0.8.7
-[0.8.5]: https://github.com/willmcgugan/rich/compare/v0.8.5...v0.8.6
-[0.8.4]: https://github.com/willmcgugan/rich/compare/v0.8.4...v0.8.5
-[0.8.3]: https://github.com/willmcgugan/rich/compare/v0.8.3...v0.8.4
-[0.8.2]: https://github.com/willmcgugan/rich/compare/v0.8.2...v0.8.3
-[0.8.1]: https://github.com/willmcgugan/rich/compare/v0.8.1...v0.8.2
-[0.8.0]: https://github.com/willmcgugan/rich/compare/v0.8.0...v0.8.1
-[0.7.2]: https://github.com/willmcgugan/rich/compare/v0.7.2...v0.8.0
-[0.7.1]: https://github.com/willmcgugan/rich/compare/v0.7.1...v0.7.2
-[0.7.0]: https://github.com/willmcgugan/rich/compare/v0.7.0...v0.7.1
-[0.6.0]: https://github.com/willmcgugan/rich/compare/v0.6.0...v0.7.0
-[0.5.0]: https://github.com/willmcgugan/rich/compare/v0.5.0...v0.6.0
-[0.4.1]: https://github.com/willmcgugan/rich/compare/v0.4.1...v0.5.0
-[0.4.0]: https://github.com/willmcgugan/rich/compare/v0.4.0...v0.4.1
-[0.3.3]: https://github.com/willmcgugan/rich/compare/v0.3.3...v0.4.0
-[0.3.2]: https://github.com/willmcgugan/rich/compare/v0.3.2...v0.3.3
-[0.3.1]: https://github.com/willmcgugan/rich/compare/v0.3.1...v0.3.2
-[0.3.0]: https://github.com/willmcgugan/rich/compare/v0.3.0...v0.3.1
+[10.15.0]: https://github.com/willmcgugan/rich/compare/v10.14.0...v10.15.0
+[10.14.0]: https://github.com/willmcgugan/rich/compare/v10.13.0...v10.14.0
+[10.13.0]: https://github.com/willmcgugan/rich/compare/v10.12.0...v10.13.0
+[10.12.0]: https://github.com/willmcgugan/rich/compare/v10.11.0...v10.12.0
+[10.11.0]: https://github.com/willmcgugan/rich/compare/v10.10.0...v10.11.0
+[10.10.0]: https://github.com/willmcgugan/rich/compare/v10.9.0...v10.10.0
+[10.9.0]: https://github.com/willmcgugan/rich/compare/v10.8.0...v10.9.0
+[10.8.0]: https://github.com/willmcgugan/rich/compare/v10.7.0...v10.8.0
+[10.7.0]: https://github.com/willmcgugan/rich/compare/v10.6.0...v10.7.0
+[10.6.0]: https://github.com/willmcgugan/rich/compare/v10.5.0...v10.6.0
+[10.5.0]: https://github.com/willmcgugan/rich/compare/v10.4.0...v10.5.0
+[10.4.0]: https://github.com/willmcgugan/rich/compare/v10.3.0...v10.4.0
+[10.3.0]: https://github.com/willmcgugan/rich/compare/v10.2.2...v10.3.0
+[10.2.2]: https://github.com/willmcgugan/rich/compare/v10.2.1...v10.2.2
+[10.2.1]: https://github.com/willmcgugan/rich/compare/v10.2.0...v10.2.1
+[10.2.0]: https://github.com/willmcgugan/rich/compare/v10.1.0...v10.2.0
+[10.1.0]: https://github.com/willmcgugan/rich/compare/v10.0.1...v10.1.0
+[10.0.1]: https://github.com/willmcgugan/rich/compare/v10.0.0...v10.0.1
+[10.0.0]: https://github.com/willmcgugan/rich/compare/v9.13.0...v10.0.0
+[9.13.0]: https://github.com/willmcgugan/rich/compare/v9.12.4...v9.13.0
+[9.12.4]: https://github.com/willmcgugan/rich/compare/v9.12.3...v9.12.4
+[9.12.3]: https://github.com/willmcgugan/rich/compare/v9.12.2...v9.12.3
+[9.12.2]: https://github.com/willmcgugan/rich/compare/v9.12.1...v9.12.2
+[9.12.1]: https://github.com/willmcgugan/rich/compare/v9.12.0...v9.12.1
+[9.12.0]: https://github.com/willmcgugan/rich/compare/v9.11.1...v9.12.0
+[9.11.1]: https://github.com/willmcgugan/rich/compare/v9.11.0...v9.11.1
+[9.11.0]: https://github.com/willmcgugan/rich/compare/v9.10.0...v9.11.0
+[9.10.0]: https://github.com/willmcgugan/rich/compare/v9.9.0...v9.10.0
+[9.9.0]: https://github.com/willmcgugan/rich/compare/v9.8.2...v9.9.0
+[9.8.2]: https://github.com/willmcgugan/rich/compare/v9.8.1...v9.8.2
+[9.8.1]: https://github.com/willmcgugan/rich/compare/v9.8.0...v9.8.1
+[9.8.0]: https://github.com/willmcgugan/rich/compare/v9.7.0...v9.8.0
+[9.7.0]: https://github.com/willmcgugan/rich/compare/v9.6.2...v9.7.0
+[9.6.2]: https://github.com/willmcgugan/rich/compare/v9.6.1...v9.6.2
+[9.6.1]: https://github.com/willmcgugan/rich/compare/v9.6.0...v9.6.1
+[9.6.0]: https://github.com/willmcgugan/rich/compare/v9.5.1...v9.6.0
+[9.5.1]: https://github.com/willmcgugan/rich/compare/v9.5.0...v9.5.1
+[9.5.0]: https://github.com/willmcgugan/rich/compare/v9.4.0...v9.5.0
+[9.4.0]: https://github.com/willmcgugan/rich/compare/v9.3.0...v9.4.0
+[9.3.0]: https://github.com/willmcgugan/rich/compare/v9.2.0...v9.3.0
+[9.2.0]: https://github.com/willmcgugan/rich/compare/v9.1.0...v9.2.0
+[9.1.0]: https://github.com/willmcgugan/rich/compare/v9.0.1...v9.1.0
+[9.0.1]: https://github.com/willmcgugan/rich/compare/v9.0.0...v9.0.1
+[9.0.0]: https://github.com/willmcgugan/rich/compare/v8.0.0...v9.0.0
+[8.0.0]: https://github.com/willmcgugan/rich/compare/v7.1.0...v8.0.0
+[7.1.0]: https://github.com/willmcgugan/rich/compare/v7.0.0...v7.1.0
+[7.0.0]: https://github.com/willmcgugan/rich/compare/v6.2.0...v7.0.0
+[6.2.0]: https://github.com/willmcgugan/rich/compare/v6.1.2...v6.2.0
+[6.1.2]: https://github.com/willmcgugan/rich/compare/v6.1.1...v6.1.2
+[6.1.1]: https://github.com/willmcgugan/rich/compare/v6.1.0...v6.1.1
+[6.1.0]: https://github.com/willmcgugan/rich/compare/v6.0.0...v6.1.0
+[6.0.0]: https://github.com/willmcgugan/rich/compare/v5.2.1...v6.0.0
+[5.2.1]: https://github.com/willmcgugan/rich/compare/v5.2.0...v5.2.1
+[5.2.0]: https://github.com/willmcgugan/rich/compare/v5.1.2...v5.2.0
+[5.1.2]: https://github.com/willmcgugan/rich/compare/v5.1.1...v5.1.2
+[5.1.1]: https://github.com/willmcgugan/rich/compare/v5.1.0...v5.1.1
+[5.1.0]: https://github.com/willmcgugan/rich/compare/v5.0.0...v5.1.0
+[5.0.0]: https://github.com/willmcgugan/rich/compare/v4.2.2...v5.0.0
+[4.2.2]: https://github.com/willmcgugan/rich/compare/v4.2.1...v4.2.2
+[4.2.1]: https://github.com/willmcgugan/rich/compare/v4.2.0...v4.2.1
+[4.2.0]: https://github.com/willmcgugan/rich/compare/v4.1.0...v4.2.0
+[4.1.0]: https://github.com/willmcgugan/rich/compare/v4.0.0...v4.1.0
+[4.0.0]: https://github.com/willmcgugan/rich/compare/v3.4.1...v4.0.0
+[3.4.1]: https://github.com/willmcgugan/rich/compare/v3.4.0...v3.4.1
+[3.4.0]: https://github.com/willmcgugan/rich/compare/v3.3.2...v3.4.0
+[3.3.2]: https://github.com/willmcgugan/rich/compare/v3.3.1...v3.3.2
+[3.3.1]: https://github.com/willmcgugan/rich/compare/v3.3.0...v3.3.1
+[3.3.0]: https://github.com/willmcgugan/rich/compare/v3.2.0...v3.3.0
+[3.2.0]: https://github.com/willmcgugan/rich/compare/v3.1.0...v3.2.0
+[3.1.0]: https://github.com/willmcgugan/rich/compare/v3.0.5...v3.1.0
+[3.0.5]: https://github.com/willmcgugan/rich/compare/v3.0.4...v3.0.5
+[3.0.4]: https://github.com/willmcgugan/rich/compare/v3.0.3...v3.0.4
+[3.0.3]: https://github.com/willmcgugan/rich/compare/v3.0.2...v3.0.3
+[3.0.2]: https://github.com/willmcgugan/rich/compare/v3.0.1...v3.0.2
+[3.0.1]: https://github.com/willmcgugan/rich/compare/v3.0.0...v3.0.1
+[3.0.0]: https://github.com/willmcgugan/rich/compare/v2.3.1...v3.0.0
+[2.3.1]: https://github.com/willmcgugan/rich/compare/v2.3.0...v2.3.1
+[2.3.0]: https://github.com/willmcgugan/rich/compare/v2.2.6...v2.3.0
+[2.2.6]: https://github.com/willmcgugan/rich/compare/v2.2.5...v2.2.6
+[2.2.5]: https://github.com/willmcgugan/rich/compare/v2.2.4...v2.2.5
+[2.2.4]: https://github.com/willmcgugan/rich/compare/v2.2.3...v2.2.4
+[2.2.3]: https://github.com/willmcgugan/rich/compare/v2.2.2...v2.2.3
+[2.2.2]: https://github.com/willmcgugan/rich/compare/v2.2.1...v2.2.2
+[2.2.1]: https://github.com/willmcgugan/rich/compare/v2.2.0...v2.2.1
+[2.2.0]: https://github.com/willmcgugan/rich/compare/v2.1.0...v2.2.0
+[2.1.0]: https://github.com/willmcgugan/rich/compare/v2.0.1...v2.1.0
+[2.0.1]: https://github.com/willmcgugan/rich/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/willmcgugan/rich/compare/v1.3.1...v2.0.0
+[1.3.1]: https://github.com/willmcgugan/rich/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/willmcgugan/rich/compare/v1.2.3...v1.3.0
+[1.2.3]: https://github.com/willmcgugan/rich/compare/v1.2.2...v1.2.3
+[1.2.2]: https://github.com/willmcgugan/rich/compare/v1.2.1...v1.2.2
+[1.2.1]: https://github.com/willmcgugan/rich/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/willmcgugan/rich/compare/v1.1.9...v1.2.0
+[1.1.9]: https://github.com/willmcgugan/rich/compare/v1.1.8...v1.1.9
+[1.1.8]: https://github.com/willmcgugan/rich/compare/v1.1.7...v1.1.8
+[1.1.7]: https://github.com/willmcgugan/rich/compare/v1.1.6...v1.1.7
+[1.1.6]: https://github.com/willmcgugan/rich/compare/v1.1.5...v1.1.6
+[1.1.5]: https://github.com/willmcgugan/rich/compare/v1.1.4...v1.1.5
+[1.1.4]: https://github.com/willmcgugan/rich/compare/v1.1.3...v1.1.4
+[1.1.3]: https://github.com/willmcgugan/rich/compare/v1.1.2...v1.1.3
+[1.1.2]: https://github.com/willmcgugan/rich/compare/v1.1.1...v1.1.2
+[1.1.1]: https://github.com/willmcgugan/rich/compare/v1.1.0...v1.1.1
+[1.1.0]: https://github.com/willmcgugan/rich/compare/v1.0.3...v1.1.0
+[1.0.3]: https://github.com/willmcgugan/rich/compare/v1.0.2...v1.0.3
+[1.0.2]: https://github.com/willmcgugan/rich/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/willmcgugan/rich/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/willmcgugan/rich/compare/v0.8.13...v1.0.0
+[0.8.13]: https://github.com/willmcgugan/rich/compare/v0.8.12...v0.8.13
+[0.8.12]: https://github.com/willmcgugan/rich/compare/v0.8.11...v0.8.12
+[0.8.11]: https://github.com/willmcgugan/rich/compare/v0.8.10...v0.8.11
+[0.8.10]: https://github.com/willmcgugan/rich/compare/v0.8.9...v0.8.10
+[0.8.9]: https://github.com/willmcgugan/rich/compare/v0.8.8...v0.8.9
+[0.8.8]: https://github.com/willmcgugan/rich/compare/v0.8.7...v0.8.8
+[0.8.7]: https://github.com/willmcgugan/rich/compare/v0.8.6...v0.8.7
+[0.8.6]: https://github.com/willmcgugan/rich/compare/v0.8.5...v0.8.6
+[0.8.5]: https://github.com/willmcgugan/rich/compare/v0.8.4...v0.8.5
+[0.8.4]: https://github.com/willmcgugan/rich/compare/v0.8.3...v0.8.4
+[0.8.3]: https://github.com/willmcgugan/rich/compare/v0.8.2...v0.8.3
+[0.8.2]: https://github.com/willmcgugan/rich/compare/v0.8.1...v0.8.2
+[0.8.1]: https://github.com/willmcgugan/rich/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/willmcgugan/rich/compare/v0.7.2...v0.8.0
+[0.7.2]: https://github.com/willmcgugan/rich/compare/v0.7.1...v0.7.2
+[0.7.1]: https://github.com/willmcgugan/rich/compare/v0.7.0...v0.7.1
+[0.7.0]: https://github.com/willmcgugan/rich/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/willmcgugan/rich/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/willmcgugan/rich/compare/v0.4.1...v0.5.0
+[0.4.1]: https://github.com/willmcgugan/rich/compare/v0.4.0...v0.4.1
+[0.4.0]: https://github.com/willmcgugan/rich/compare/v0.3.3...v0.4.0
+[0.3.3]: https://github.com/willmcgugan/rich/compare/v0.3.2...v0.3.3

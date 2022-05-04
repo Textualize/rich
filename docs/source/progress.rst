@@ -34,9 +34,9 @@ If you require multiple tasks in the display, or wish to configure the columns i
 The Progress class is designed to be used as a *context manager* which will start and stop the progress display automatically.
 
 Here's a simple example::
-    
+
     import time
-    
+
     from rich.progress import Progress
 
     with Progress() as progress:
@@ -81,7 +81,7 @@ Transient progress displays are useful if you want more minimal output in the te
 Indeterminate progress
 ~~~~~~~~~~~~~~~~~~~~~~
 
-When you add a task it is automatically *started*, which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. This may not work well if there is a long delay before you can start updating progress; you may need to wait for a response from a server or count files in a directory (for example). In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` which will display a pulsing animation that lets the user know something is working. This is know as an *indeterminate* progress bar. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
+When you add a task it is automatically *started*, which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. This may not work well if there is a long delay before you can start updating progress; you may need to wait for a response from a server or count files in a directory (for example). In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` or ``total=None`` which will display a pulsing animation that lets the user know something is working. This is know as an *indeterminate* progress bar. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
 
 Auto refresh
 ~~~~~~~~~~~~
@@ -100,17 +100,25 @@ The progress bar(s) will use only as much of the width of the terminal as requir
 Columns
 ~~~~~~~
 
-You may customize the columns in the progress display with the positional arguments to the :class:`~rich.progress.Progress` constructor. The columns are specified as either a format string or a :class:`~rich.progress.ProgressColumn` object.
+You may customize the columns in the progress display with the positional arguments to the :class:`~rich.progress.Progress` constructor. The columns are specified as either a *format string* or a :class:`~rich.progress.ProgressColumn` object.
 
-Format strings will be rendered with a single value `"task"` which will be a :class:`~rich.progress.Task` instance. For example ``"{task.description}"`` would display the task description in the column, and ``"{task.completed} of {task.total}"`` would display how many of the total steps have been completed.
+Format strings will be rendered with a single value `"task"` which will be a :class:`~rich.progress.Task` instance. For example ``"{task.description}"`` would display the task description in the column, and ``"{task.completed} of {task.total}"`` would display how many of the total steps have been completed. Additional fields passed via keyword arguments to `~rich.progress.Progress.update` are store in ``task.fields``. You can add them to a format string with the following syntax: ``"extra info: {task.fields[extra]}"``.
 
-The defaults are roughly equivalent to the following::
+The default columns are equivalent to the following:
 
     progress = Progress(
-        "[progress.description]{task.description}",
+        TextColumn("[progress.description]{task.description}"),
         BarColumn(),
-        "[progress.percentage]{task.percentage:>3.0f}%",
+        TaskProgressColumn(),
         TimeRemainingColumn(),
+    )
+
+To create a Progress with your own columns in addition to the defaults, use :meth:`~rich.progress.Progress.get_default_columns`::
+
+    progress = Progress(
+        SpinnerColumn(),
+        *Progress.get_default_columns(),
+        TimeElapsedColumn(),
     )
 
 The following column objects are available:
@@ -119,6 +127,7 @@ The following column objects are available:
 - :class:`~rich.progress.TextColumn` Displays text.
 - :class:`~rich.progress.TimeElapsedColumn` Displays the time elapsed.
 - :class:`~rich.progress.TimeRemainingColumn` Displays the estimated time remaining.
+- :class:`~rich.progress.MofNCompleteColumn` Displays completion progress as ``"{task.completed}/{task.total}"`` (works best if completed and total are ints).
 - :class:`~rich.progress.FileSizeColumn` Displays progress as file size (assumes the steps are bytes).
 - :class:`~rich.progress.TotalFileSizeColumn` Displays total file size (assumes the steps are bytes).
 - :class:`~rich.progress.DownloadColumn` Displays download progress (assumes the steps are bytes).
@@ -127,6 +136,7 @@ The following column objects are available:
 - :class:`~rich.progress.RenderableColumn` Displays an arbitrary Rich renderable in the column.
 
 To implement your own columns, extend the :class:`~rich.progress.ProgressColumn` class and use it as you would the other columns.
+
 
 Table Columns
 ~~~~~~~~~~~~~
@@ -169,7 +179,7 @@ If you have another Console object you want to use, pass it in to the :class:`~r
     with Progress(console=my_console) as progress:
         my_console.print("[bold blue]Starting work!")
         do_work(progress)
-        
+
 
 Redirecting stdout / stderr
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -189,6 +199,43 @@ If the :class:`~rich.progress.Progress` class doesn't offer exactly what you nee
         def get_renderables(self):
             yield Panel(self.make_tasks_table(self.tasks))
 
+Reading from a file
+~~~~~~~~~~~~~~~~~~~
+
+Rich provides an easy way to generate a progress bar while reading a file. If you call :func:`~rich.progress.open` it will return a context manager which displays a progress bar while you read. This is particularly useful when you can't easily modify the code that does the reading.
+
+The following example demonstrates how we might show progress when reading a JSON file::
+
+    import json
+    import rich.progress
+
+    with rich.progress.open("data.json", "rb") as file:
+        data = json.load(file)
+    print(data)
+
+If you already have a file object, you can call :func:`~rich.progress.wrap_file` which returns a context manager that wraps your file so that it displays a progress bar. If you use this function you will need to set the number of bytes or characters you expect to read.
+
+Here's an example that reads a url from the internet::
+
+    from time import sleep
+    from urllib.request import urlopen
+
+    from rich.progress import wrap_file
+
+    response = urlopen("https://www.textualize.io")
+    size = int(response.headers["Content-Length"])
+
+    with wrap_file(response, size) as file:
+        for line in file:
+            print(line.decode("utf-8"), end="")
+            sleep(0.1)
+
+
+If you expect to be reading from multiple files, you can use :meth:`~rich.progress.Progress.open` or :meth:`~rich.progress.Progress.wrap_file` to add a file progress to an existing Progress instance.
+
+See `cp_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/cp_progress.py>` for a minimal clone of the ``cp`` command which shows a progress bar as the file is copied.
+
+
 Multiple Progress
 -----------------
 
@@ -198,4 +245,3 @@ Example
 -------
 
 See `downloader.py <https://github.com/willmcgugan/rich/blob/master/examples/downloader.py>`_ for a realistic application of a progress display. This script can download multiple concurrent files with a progress bar, transfer speed and file size.
-

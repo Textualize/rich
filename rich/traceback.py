@@ -12,9 +12,10 @@ from pygments.lexers import guess_lexer_for_filename
 from pygments.token import Comment, Keyword, Name, Number, Operator, String
 from pygments.token import Text as TextToken
 from pygments.token import Token
+from pygments.util import ClassNotFound
 
 from . import pretty
-from ._loop import loop_first, loop_last
+from ._loop import loop_last
 from .columns import Columns
 from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, group
 from .constrain import Constrain
@@ -130,7 +131,7 @@ def install(
 
     try:  # pragma: no cover
         # if within ipython, use customized traceback
-        ip = get_ipython()  # type: ignore
+        ip = get_ipython()  # type: ignore[name-defined]
         ipy_excepthook_closure(ip)
         return sys.excepthook
     except Exception:
@@ -366,6 +367,8 @@ class Traceback:
                 if filename and not filename.startswith("<"):
                     if not os.path.isabs(filename):
                         filename = os.path.join(_IMPORT_CWD, filename)
+                if frame_summary.f_locals.get("_rich_traceback_omit", False):
+                    continue
                 frame = Frame(
                     filename=filename or "?",
                     lineno=line_no,
@@ -382,7 +385,7 @@ class Traceback:
                     else None,
                 )
                 append(frame)
-                if "_rich_traceback_guard" in frame_summary.f_locals:
+                if frame_summary.f_locals.get("_rich_traceback_guard", False):
                     del stack.frames[:]
 
             cause = getattr(exc_value, "__cause__", None)
@@ -390,9 +393,8 @@ class Traceback:
                 exc_type = cause.__class__
                 exc_value = cause
                 traceback = cause.__traceback__
-                if traceback:
-                    is_cause = True
-                    continue
+                is_cause = True
+                continue
 
             cause = exc_value.__context__
             if (
@@ -403,9 +405,8 @@ class Traceback:
                 exc_type = cause.__class__
                 exc_value = cause
                 traceback = cause.__traceback__
-                if traceback:
-                    is_cause = False
-                    continue
+                is_cause = False
+                continue
             # No cover, code is reached but coverage doesn't recognize it.
             break  # pragma: no cover
 
@@ -523,10 +524,10 @@ class Traceback:
             first_line = code[:new_line_index] if new_line_index != -1 else code
             if first_line.startswith("#!") and "python" in first_line.lower():
                 return "python"
-        lexer_name = (
-            cls.LEXERS.get(ext) or guess_lexer_for_filename(filename, code).name
-        )
-        return lexer_name
+        try:
+            return cls.LEXERS.get(ext) or guess_lexer_for_filename(filename, code).name
+        except ClassNotFound:
+            return "text"
 
     @group()
     def _render_stack(self, stack: Stack) -> RenderResult:
@@ -585,7 +586,7 @@ class Traceback:
                 )
                 excluded = False
 
-            first = frame_index == 1
+            first = frame_index == 0
             frame_filename = frame.filename
             suppressed = any(frame_filename.startswith(path) for path in self.suppress)
 
@@ -671,7 +672,7 @@ if __name__ == "__main__":  # pragma: no cover
             try:
                 foo(0)
             except:
-                slfkjsldkfj  # type: ignore
+                slfkjsldkfj  # type: ignore[name-defined]
         except:
             console.print_exception(show_locals=True)
 

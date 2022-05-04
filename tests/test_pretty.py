@@ -1,15 +1,17 @@
+import collections
 import io
 import sys
 from array import array
-from collections import defaultdict, UserDict
-from typing import List
+from collections import UserDict, defaultdict
+from dataclasses import dataclass, field
+from typing import List, NamedTuple
 
 import attr
 import pytest
-from dataclasses import dataclass, field
 
 from rich.console import Console
-from rich.pretty import install, Pretty, pprint, pretty_repr, Node, _ipy_display_hook
+from rich.measure import Measurement
+from rich.pretty import Node, Pretty, _ipy_display_hook, install, pprint, pretty_repr
 from rich.text import Text
 
 skip_py36 = pytest.mark.skipif(
@@ -166,6 +168,74 @@ def test_pretty_dataclass():
     result = pretty_repr(dc, max_width=80)
     print(repr(result))
     assert result == "ExampleDataclass(foo=1000, bar=..., baz=['foo', 'bar', 'baz'])"
+
+
+class StockKeepingUnit(NamedTuple):
+    name: str
+    description: str
+    price: float
+    category: str
+    reviews: List[str]
+
+
+def test_pretty_namedtuple():
+    console = Console(color_system=None)
+    console.begin_capture()
+
+    example_namedtuple = StockKeepingUnit(
+        "Sparkling British Spring Water",
+        "Carbonated spring water",
+        0.9,
+        "water",
+        ["its amazing!", "its terrible!"],
+    )
+
+    result = pretty_repr(example_namedtuple)
+
+    print(result)
+    assert (
+        result
+        == """StockKeepingUnit(
+    name='Sparkling British Spring Water',
+    description='Carbonated spring water',
+    price=0.9,
+    category='water',
+    reviews=['its amazing!', 'its terrible!']
+)"""
+    )
+
+
+def test_pretty_namedtuple_length_one_no_trailing_comma():
+    instance = collections.namedtuple("Thing", ["name"])(name="Bob")
+    assert pretty_repr(instance) == "Thing(name='Bob')"
+
+
+def test_pretty_namedtuple_empty():
+    instance = collections.namedtuple("Thing", [])()
+    assert pretty_repr(instance) == "Thing()"
+
+
+def test_pretty_namedtuple_custom_repr():
+    class Thing(NamedTuple):
+        def __repr__(self):
+            return "XX"
+
+    assert pretty_repr(Thing()) == "XX"
+
+
+def test_pretty_namedtuple_fields_invalid_type():
+    class LooksLikeANamedTupleButIsnt(tuple):
+        _fields = "blah"
+
+    instance = LooksLikeANamedTupleButIsnt()
+    result = pretty_repr(instance)
+    assert result == "()"  # Treated as tuple
+
+
+def test_pretty_namedtuple_max_depth():
+    instance = {"unit": StockKeepingUnit("a", "b", 1.0, "c", ["d", "e"])}
+    result = pretty_repr(instance, max_depth=1)
+    assert result == "{'unit': ...}"
 
 
 def test_small_width():
@@ -464,3 +534,13 @@ def test_lying_attribute():
     foo = Foo()
     result = pretty_repr(foo)
     assert "Foo" in result
+
+
+def test_measure_pretty():
+    """Test measure respects expand_all"""
+    # https://github.com/Textualize/rich/issues/1998
+    console = Console()
+    pretty = Pretty(["alpha", "beta", "delta", "gamma"], expand_all=True)
+
+    measurement = console.measure(pretty)
+    assert measurement == Measurement(12, 12)

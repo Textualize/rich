@@ -1,7 +1,8 @@
+import re
 from abc import ABC, abstractmethod
 from typing import List, Union
 
-from .text import Text
+from .text import Span, Text
 
 
 def _combine_regex(*regexes: str) -> str:
@@ -81,22 +82,23 @@ class ReprHighlighter(RegexHighlighter):
 
     base_style = "repr."
     highlights = [
-        r"(?P<tag_start>\<)(?P<tag_name>[\w\-\.\:]*)(?P<tag_contents>[\w\W]*?)(?P<tag_end>\>)",
-        r"(?P<attrib_name>[\w_]{1,50})=(?P<attrib_value>\"?[\w_]+\"?)?",
-        r"(?P<brace>[\{\[\(\)\]\}])",
+        r"(?P<tag_start><)(?P<tag_name>[-\w.:|]*)(?P<tag_contents>[\w\W]*?)(?P<tag_end>>)",
+        r'(?P<attrib_name>[\w_]{1,50})=(?P<attrib_value>"?[\w_]+"?)?',
+        r"(?P<brace>[][{}()])",
         _combine_regex(
             r"(?P<ipv4>[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})",
             r"(?P<ipv6>([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})",
             r"(?P<eui64>(?:[0-9A-Fa-f]{1,2}-){7}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{1,2}:){7}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{4}\.){3}[0-9A-Fa-f]{4})",
             r"(?P<eui48>(?:[0-9A-Fa-f]{1,2}-){5}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{1,2}:){5}[0-9A-Fa-f]{1,2}|(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})",
-            r"(?P<call>[\w\.]*?)\(",
+            r"(?P<uuid>[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})",
+            r"(?P<call>[\w.]*?)\(",
             r"\b(?P<bool_true>True)\b|\b(?P<bool_false>False)\b|\b(?P<none>None)\b",
             r"(?P<ellipsis>\.\.\.)",
-            r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[\-\+]?\d+?)?\b|0x[0-9a-fA-F]*)",
-            r"(?P<path>\B(\/[\w\.\-\_\+]+)*\/)(?P<filename>[\w\.\-\_\+]*)?",
-            r"(?<![\\\w])(?P<str>b?\'\'\'.*?(?<!\\)\'\'\'|b?\'.*?(?<!\\)\'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
-            r"(?P<uuid>[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12})",
-            r"(?P<url>(file|https|http|ws|wss):\/\/[0-9a-zA-Z\$\-\_\+\!`\(\)\,\.\?\/\;\:\&\=\%\#]*)",
+            r"(?P<number_complex>(?<!\w)(?:\-?[0-9]+\.?[0-9]*(?:e[-+]?\d+?)?)(?:[-+](?:[0-9]+\.?[0-9]*(?:e[-+]?\d+)?))?j)",
+            r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[-+]?\d+?)?\b|0x[0-9a-fA-F]*)",
+            r"(?P<path>\B(/[-\w._+]+)*\/)(?P<filename>[-\w._+]*)?",
+            r"(?<![\\\w])(?P<str>b?'''.*?(?<!\\)'''|b?'.*?(?<!\\)'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
+            r"(?P<url>(file|https|http|ws|wss)://[-0-9a-zA-Z$_+!`(),.?/;:&=%#]*)",
         ),
     ]
 
@@ -104,16 +106,38 @@ class ReprHighlighter(RegexHighlighter):
 class JSONHighlighter(RegexHighlighter):
     """Highlights JSON"""
 
+    # Captures the start and end of JSON strings, handling escaped quotes
+    JSON_STR = r"(?<![\\\w])(?P<str>b?\".*?(?<!\\)\")"
+    JSON_WHITESPACE = {" ", "\n", "\r", "\t"}
+
     base_style = "json."
     highlights = [
         _combine_regex(
             r"(?P<brace>[\{\[\(\)\]\}])",
             r"\b(?P<bool_true>true)\b|\b(?P<bool_false>false)\b|\b(?P<null>null)\b",
             r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[\-\+]?\d+?)?\b|0x[0-9a-fA-F]*)",
-            r"(?<![\\\w])(?P<str>b?\".*?(?<!\\)\")",
+            JSON_STR,
         ),
-        r"(?<![\\\w])(?P<key>b?\".*?(?<!\\)\")\:",
     ]
+
+    def highlight(self, text: Text) -> None:
+        super().highlight(text)
+
+        # Additional work to handle highlighting JSON keys
+        plain = text.plain
+        append = text.spans.append
+        whitespace = self.JSON_WHITESPACE
+        for match in re.finditer(self.JSON_STR, plain):
+            start, end = match.span()
+            cursor = end
+            while cursor < len(plain):
+                char = plain[cursor]
+                cursor += 1
+                if char == ":":
+                    append(Span(start, end, "json.key"))
+                elif char in whitespace:
+                    continue
+                break
 
 
 if __name__ == "__main__":  # pragma: no cover
@@ -145,3 +169,6 @@ if __name__ == "__main__":  # pragma: no cover
     console.print(
         "127.0.1.1 bar 192.168.1.4 2001:0db8:85a3:0000:0000:8a2e:0370:7334 foo"
     )
+    import json
+
+    console.print_json(json.dumps(obj={"name": "apple", "count": 1}), indent=None)

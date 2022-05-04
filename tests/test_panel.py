@@ -1,9 +1,11 @@
 import io
-from rich.console import Console
-from rich.measure import Measurement
-from rich.panel import Panel
 
 import pytest
+
+from rich.console import Console
+from rich.panel import Panel
+from rich.segment import Segment
+from rich.style import Style
 
 tests = [
     Panel("Hello, World", padding=0),
@@ -51,6 +53,49 @@ def test_fixed_width():
     min_width, max_width = panel.__rich_measure__(console, console.options)
     assert min_width == 20
     assert max_width == 20
+
+
+def test_render_size():
+    console = Console(width=63, height=46, legacy_windows=False)
+    options = console.options.update_dimensions(80, 4)
+    lines = console.render_lines(Panel("foo", title="Hello"), options=options)
+    print(repr(lines))
+    expected = [
+        [
+            Segment("╭─", Style()),
+            Segment(
+                "────────────────────────────────── Hello ───────────────────────────────────"
+            ),
+            Segment("─╮", Style()),
+        ],
+        [
+            Segment("│", Style()),
+            Segment(" ", Style()),
+            Segment("foo"),
+            Segment(
+                "                                                                         "
+            ),
+            Segment(" ", Style()),
+            Segment("│", Style()),
+        ],
+        [
+            Segment("│", Style()),
+            Segment(" ", Style()),
+            Segment(
+                "                                                                            ",
+                Style(),
+            ),
+            Segment(" ", Style()),
+            Segment("│", Style()),
+        ],
+        [
+            Segment(
+                "╰──────────────────────────────────────────────────────────────────────────────╯",
+                Style(),
+            )
+        ],
+    ]
+    assert lines == expected
 
 
 if __name__ == "__main__":

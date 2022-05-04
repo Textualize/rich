@@ -1,5 +1,5 @@
-from functools import lru_cache
 import re
+from functools import lru_cache
 from typing import Dict, List
 
 from ._cell_widths import CELL_WIDTHS
@@ -18,17 +18,14 @@ def cell_len(text: str, _cache: Dict[str, int] = LRUCache(1024 * 4)) -> int:
     Returns:
         int: Get the number of cells required to display text.
     """
+    cached_result = _cache.get(text, None)
+    if cached_result is not None:
+        return cached_result
 
-    if _is_single_cell_widths(text):
-        return len(text)
-    else:
-        cached_result = _cache.get(text, None)
-        if cached_result is not None:
-            return cached_result
-        _get_size = get_character_cell_size
-        total_size = sum(_get_size(character) for character in text)
-        if len(text) <= 64:
-            _cache[text] = total_size
+    _get_size = get_character_cell_size
+    total_size = sum(_get_size(character) for character in text)
+    if len(text) <= 512:
+        _cache[text] = total_size
     return total_size
 
 
@@ -42,9 +39,6 @@ def get_character_cell_size(character: str) -> int:
     Returns:
         int: Number of cells (0, 1 or 2) occupied by that character.
     """
-    if _is_single_cell_widths(character):
-        return 1
-
     return _get_codepoint_cell_size(ord(character))
 
 
@@ -119,14 +113,12 @@ def chop_cells(text: str, max_size: int, position: int = 0) -> List[str]:
     _get_character_cell_size = get_character_cell_size
     characters = [
         (character, _get_character_cell_size(character)) for character in text
-    ][::-1]
+    ]
     total_size = position
     lines: List[List[str]] = [[]]
     append = lines[-1].append
 
-    pop = characters.pop
-    while characters:
-        character, size = pop()
+    for character, size in reversed(characters):
         if total_size + size > max_size:
             lines.append([character])
             append = lines[-1].append
@@ -134,6 +126,7 @@ def chop_cells(text: str, max_size: int, position: int = 0) -> List[str]:
         else:
             total_size += size
             append(character)
+
     return ["".join(line) for line in lines]
 
 

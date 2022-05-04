@@ -18,7 +18,6 @@ if TYPE_CHECKING:
 
 AlignMethod = Literal["left", "center", "right"]
 VerticalAlignMethod = Literal["top", "middle", "bottom"]
-AlignValues = AlignMethod  # TODO: deprecate AlignValues
 
 
 class Align(JupyterMixin):

@@ -1,5 +1,5 @@
 # coding=utf-8
-
+import io
 import os
 import sys
 import tempfile
@@ -277,7 +277,7 @@ def test_from_path_lexer_override():
     try:
         os.write(fh, b"import this\n")
         syntax = Syntax.from_path(path, lexer="rust")
-        assert syntax.lexer.name is "Rust"
+        assert syntax.lexer.name == "Rust"
         assert syntax.code == "import this\n"
     finally:
         os.remove(path)
@@ -301,6 +301,22 @@ def test_syntax_guess_lexer():
     assert Syntax.guess_lexer("banana.html", "<a href='#'>hello</a>") == "html"
     assert Syntax.guess_lexer("banana.html", "<%= @foo %>") == "rhtml"
     assert Syntax.guess_lexer("banana.html", "{{something|filter:3}}") == "html+django"
+
+
+def test_syntax_padding():
+    syntax = Syntax("x = 1", lexer="python", padding=(1, 3))
+    console = Console(
+        width=20,
+        file=io.StringIO(),
+        color_system="truecolor",
+        legacy_windows=False,
+        record=True,
+    )
+    console.print(syntax)
+    output = console.export_text()
+    assert (
+        output == "                    \n   x = 1            \n                    \n"
+    )
 
 
 if __name__ == "__main__":

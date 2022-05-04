@@ -5,7 +5,6 @@ import io
 import pytest
 
 from rich import box, errors
-from rich.align import VerticalAlignMethod
 from rich.console import Console
 from rich.measure import Measurement
 from rich.style import Style
