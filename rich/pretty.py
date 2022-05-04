@@ -114,15 +114,13 @@ def _ipy_display_hook(
     max_length: Optional[int] = None,
     max_string: Optional[int] = None,
     expand_all: bool = False,
-) -> None:
-    from .console import (  # needed here to prevent circular import
-        Console,
-        ConsoleRenderable,
-    )
+) -> Optional[str]:
+    # needed here to prevent circular import
+    from .console import Console, ConsoleRenderable
 
     # always skip rich generated jupyter renderables or None values
     if _safe_isinstance(value, JupyterRenderable) or value is None:
-        return
+        return None
 
     console = console or get_console()
     if console.is_jupyter:
@@ -148,33 +146,36 @@ def _ipy_display_hook(
                     repr_result = method()
                 except Exception:
                     continue  # If the method raises, treat it as if it doesn't exist, try any others
-                else:
-                    # Delegated rendering to IPython, so no further action needed.
-                    return
+                if repr_result is not None:
+                    return None  # Delegate rendering to IPython
 
     # certain renderables should start on a new line
     if _safe_isinstance(value, ConsoleRenderable):
         console.line()
 
     if console.is_terminal:
-        # Force render as colored text, rather than html.
+        # Specifically requested to render as colored text rather than html.
         console = Console(force_terminal=True, force_jupyter=False)
 
-    console.print(
-        value
-        if _safe_isinstance(value, RichRenderable)
-        else Pretty(
-            value,
-            overflow=overflow,
-            indent_guides=indent_guides,
-            max_length=max_length,
-            max_string=max_string,
-            expand_all=expand_all,
-            margin=12,
-        ),
-        crop=crop,
-        new_line_start=True,
-    )
+    with console.capture() as capture:
+        console.print(
+            value
+            if _safe_isinstance(value, RichRenderable)
+            else Pretty(
+                value,
+                overflow=overflow,
+                indent_guides=indent_guides,
+                max_length=max_length,
+                max_string=max_string,
+                expand_all=expand_all,
+                margin=12,
+            ),
+            crop=crop,
+            new_line_start=True,
+        )
+
+    # https://jupyter-client.readthedocs.io/en/stable/messaging.html#display-data
+    return capture.get()
 
 
 def _safe_isinstance(
