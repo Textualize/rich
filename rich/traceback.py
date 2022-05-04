@@ -366,7 +366,22 @@ class Traceback:
                 filename = frame_summary.f_code.co_filename
                 if filename and not filename.startswith("<"):
                     if not os.path.isabs(filename):
-                        filename = os.path.join(_IMPORT_CWD, filename)
+                        # py2exe doesn't set the _MEIPASS attr and we don't
+                        # know if py2exe has the same behavior as pyinstaller,
+                        # so we check if it exists to avoid errors in py2exe.
+                        if (
+                            hasattr(sys, "frozen")
+                            and hasattr(sys, "_MEIPASS")
+                            and getattr(sys, "frozen", False) == True
+                        ):
+                            # Use a custom filename when we're running with pyinstaller,
+                            # this avoids raising OSErrors later. See issue #2251.
+                            mod_name = os.path.splitext(filename)[0].replace(
+                                os.path.sep, "."
+                            )
+                            filename = f"<pyinstaller module ({mod_name})>"
+                        else:
+                            filename = os.path.join(_IMPORT_CWD, filename)
                 if frame_summary.f_locals.get("_rich_traceback_omit", False):
                     continue
                 frame = Frame(
