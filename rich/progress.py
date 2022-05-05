@@ -217,7 +217,7 @@ class _Reader(RawIOBase, BinaryIO):
         return self.handle.isatty()
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str:
         return self.handle.name
 
     def readable(self) -> bool:
