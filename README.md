@@ -437,6 +437,6 @@ See also Rich's sister project, [Textual](https://github.com/Textualize/textual)
 
 For some examples of projects using Rich, see the [Rich Gallery](https://www.textualize.io/rich/gallery) on [Textualize.io](https://www.textualize.io).
 
-Would you like to add your own project to the gallery? You can! Follow [these instruction](https://www.textualize.io/gallery-instructions).
+Would you like to add your own project to the gallery? You can! Follow [these instructions](https://www.textualize.io/gallery-instructions).
 
 <!-- This is a test, no need to translate -->
