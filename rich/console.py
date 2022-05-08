@@ -2252,12 +2252,12 @@ class Console:
             css_rules = []
             color = (
                 _theme.foreground_color
-                if style.color is None
+                if (style.color is None or style.color.is_default)
                 else style.color.get_truecolor(_theme)
             )
             bgcolor = (
                 _theme.background_color
-                if style.bgcolor is None
+                if (style.bgcolor is None or style.bgcolor.is_default)
                 else style.bgcolor.get_truecolor(_theme)
             )
             if style.reverse:
@@ -2365,7 +2365,8 @@ class Console:
                         else style.color.get_truecolor(_theme).hex
                     )
                 else:
-                    has_background = style.bgcolor is not None
+                    bgcolor = style.bgcolor
+                    has_background = bgcolor is not None and not bgcolor.is_default
                     background = (
                         _theme.background_color.hex
                         if style.bgcolor is None
@@ -2407,12 +2408,15 @@ class Console:
         chrome = make_tag(
             "rect",
             fill=_theme.background_color.hex,
+            stroke="rgba(255,255,255,0.35)",
+            stroke_width="1",
             x=margin_left,
             y=margin_top,
             width=terminal_width,
             height=terminal_height,
             rx=12,
         )
+
         title_color = _theme.foreground_color.hex
         if title:
             chrome += make_tag(
