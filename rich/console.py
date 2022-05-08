@@ -2414,6 +2414,18 @@ class Console:
             height=terminal_height,
             rx=12,
         )
+
+        chrome += make_tag(
+            "rect",
+            stroke="rgba(255,255,255,0.5)",
+            stoke_width="2",
+            x=margin_left,
+            y=margin_top,
+            width=terminal_width,
+            height=terminal_height,
+            rx=12,
+        )
+
         title_color = _theme.foreground_color.hex
         if title:
             chrome += make_tag(

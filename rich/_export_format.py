@@ -21,6 +21,7 @@ body {{
 
 CONSOLE_SVG_FORMAT = """\
 <svg class="rich-terminal" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg">
+    <!-- Generated with Rich https://www.textualize.io -->
     <style>
 
     @font-face {{
@@ -49,7 +50,7 @@ CONSOLE_SVG_FORMAT = """\
 
     .{unique_id}-title {{
         font-size: 18px;
-        opacity: 0.8;
+
         font-weight: bold;
         font-family: arial;
     }}
