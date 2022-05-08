@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix for https://github.com/Textualize/rich/issues/2260
 
+### Changed
+
+- Added a keyline around SVG terminals which is visible on dark backgrounds
+
 ## [12.4.0] - 2022-05-07
 
 ### Changed
