@@ -2408,17 +2408,8 @@ class Console:
         chrome = make_tag(
             "rect",
             fill=_theme.background_color.hex,
-            x=margin_left,
-            y=margin_top,
-            width=terminal_width,
-            height=terminal_height,
-            rx=12,
-        )
-
-        chrome += make_tag(
-            "rect",
-            stroke="rgba(255,255,255,0.5)",
-            stoke_width="2",
+            stroke="rgba(255,255,255,0.35)",
+            stroke_width="1",
             x=margin_left,
             y=margin_top,
             width=terminal_width,

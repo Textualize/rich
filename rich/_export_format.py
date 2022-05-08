@@ -44,8 +44,8 @@ CONSOLE_SVG_FORMAT = """\
     .{unique_id}-matrix {{
         font-family: Fira Code, monospace;
         font-size: {char_height}px;
-        font-variant: east-asian-width-values;
         line-height: {line_height}px;
+        font-variant-east-asian: full-width;
     }}
 
     .{unique_id}-title {{
