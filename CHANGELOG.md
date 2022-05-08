@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix for https://github.com/Textualize/rich/issues/2260
+- Fix for default background color in SVG export https://github.com/Textualize/rich/issues/2260
+
+### Changed
+
+- Added a keyline around SVG terminals which is visible on dark backgrounds
 
 ### Changed
 
