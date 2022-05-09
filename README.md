@@ -427,35 +427,16 @@ See also [Rich CLI](https://github.com/textualize/rich-cli) for a command line a
 
 ![Rich CLI](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/rich-cli-splash.jpg)
 
+# Textual
+
+See also Rich's sister project, [Textual](https://github.com/Textualize/textual), which you can use to build sophisticated User Interfaces in the terminal.
+
+![Textual screenshot](https://raw.githubusercontent.com/Textualize/textual/main/imgs/textual.png)
 
 # Projects using Rich
 
-Here are a few projects using Rich:
+For some examples of projects using Rich, see the [Rich Gallery](https://www.textualize.io/rich/gallery) on [Textualize.io](https://www.textualize.io).
 
-- [BrancoLab/BrainRender](https://github.com/BrancoLab/BrainRender)
-  a python package for the visualization of three dimensional neuro-anatomical data
-- [Ciphey/Ciphey](https://github.com/Ciphey/Ciphey)
-  Automated decryption tool
-- [emeryberger/scalene](https://github.com/emeryberger/scalene)
-  a high-performance, high-precision CPU and memory profiler for Python
-- [hedythedev/StarCli](https://github.com/hedythedev/starcli)
-  Browse GitHub trending projects from your command line
-- [intel/cve-bin-tool](https://github.com/intel/cve-bin-tool)
-  This tool scans for a number of common, vulnerable components (openssl, libpng, libxml2, expat and a few others) to let you know if your system includes common libraries with known vulnerabilities.
-- [nf-core/tools](https://github.com/nf-core/tools)
-  Python package with helper tools for the nf-core community.
-- [cansarigol/pdbr](https://github.com/cansarigol/pdbr)
-  pdb + Rich library for enhanced debugging
-- [plant99/felicette](https://github.com/plant99/felicette)
-  Satellite imagery for dummies.
-- [seleniumbase/SeleniumBase](https://github.com/seleniumbase/SeleniumBase)
-  Automate & test 10x faster with Selenium & pytest. Batteries included.
-- [smacke/ffsubsync](https://github.com/smacke/ffsubsync)
-  Automagically synchronize subtitles with video.
-- [tryolabs/norfair](https://github.com/tryolabs/norfair)
-  Lightweight Python library for adding real-time 2D object tracking to any detector.
-- [ansible/ansible-lint](https://github.com/ansible/ansible-lint) Ansible-lint checks playbooks for practices and behaviour that could potentially be improved
-- [ansible-community/molecule](https://github.com/ansible-community/molecule) Ansible Molecule testing framework
-- +[Many more](https://github.com/willmcgugan/rich/network/dependents)!
+Would you like to add your own project to the gallery? You can! Follow [these instructions](https://www.textualize.io/gallery-instructions).
 
 <!-- This is a test, no need to translate -->
