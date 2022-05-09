@@ -373,6 +373,85 @@ def test_node():
     assert pretty_repr(node) == "abc: "
 
 
+# Define two simple classes used when testing multi-line repr-related things.
+class L2:
+    def __repr__(self):
+        return "X v\n  ^"
+
+
+class Stair:
+    def __repr__(self):
+        return "A\n B\n  C\n   D"
+
+
+def test_multiline_repr():
+    """Test multi-line representations force containers to span multiple lines."""
+
+    test_dict = {"key": L2()}
+    result = pretty_repr(test_dict)
+    assert result == "{\n    'key': X v\n             ^\n}"
+
+    test_list = [Stair()]
+    result = pretty_repr(test_list)
+    assert result == "[\n    A\n     B\n      C\n       D\n]"
+
+
+def test_multiline_repr_busy_container():
+    """Test multi-line representations still work in containers with other objects."""
+
+    test_dict = {73: None, True: L2()}
+    result = pretty_repr(test_dict)
+    assert result == "{\n    73: None,\n    True: X v\n            ^\n}"
+
+    test_list = [Stair(), 5.6]
+    result = pretty_repr(test_list)
+    assert result == "[\n    A\n     B\n      C\n       D,\n    5.6\n]"
+
+    test_tuple = ("Yes", L2(), Stair(), "No")
+    result = pretty_repr(test_tuple)
+    assert (
+        result
+        == "(\n    'Yes',\n    X v\n      ^,\n    A\n     B\n      C\n       D,\n    'No'\n)"
+    )
+
+
+def test_multiline_repr_nested():
+    """Test multi-line representations in nested containers."""
+
+    test_container = (
+        L2(),
+        {
+            73: Stair(),
+            "oi": False,
+            None: [
+                L2(),
+                L2(),
+            ],
+        },
+    )
+    result = pretty_repr(test_container)
+    expected = """
+(
+    X v
+      ^,
+    {
+        73: A
+             B
+              C
+               D,
+        'oi': False,
+        None: [
+            X v
+              ^,
+            X v
+              ^
+        ]
+    }
+)
+""".strip()
+    assert result == expected
+
+
 def test_indent_lines():
     console = Console(width=100, color_system=None)
     console.begin_capture()
