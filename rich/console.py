@@ -522,14 +522,19 @@ def _is_jupyter() -> bool:  # pragma: no cover
         return False  # Other type (?)
 
 
-COLOR_SYSTEMS = {
+ConsoleColorSystem = Literal["auto", "standard", "256", "truecolor", "windows"]
+
+
+COLOR_SYSTEMS: Dict[ConsoleColorSystem, ColorSystem] = {
     "standard": ColorSystem.STANDARD,
     "256": ColorSystem.EIGHT_BIT,
     "truecolor": ColorSystem.TRUECOLOR,
     "windows": ColorSystem.WINDOWS,
 }
 
-_COLOR_SYSTEMS_NAMES = {system: name for name, system in COLOR_SYSTEMS.items()}
+_COLOR_SYSTEMS_NAMES: Dict[ColorSystem, ConsoleColorSystem] = {
+    system: name for name, system in COLOR_SYSTEMS.items()
+}
 
 
 @dataclass
@@ -619,9 +624,7 @@ class Console:
     def __init__(
         self,
         *,
-        color_system: Optional[
-            Literal["auto", "standard", "256", "truecolor", "windows"]
-        ] = "auto",
+        color_system: Optional[ConsoleColorSystem] = "auto",
         force_terminal: Optional[bool] = None,
         force_jupyter: Optional[bool] = None,
         force_interactive: Optional[bool] = None,
@@ -880,11 +883,11 @@ class Console:
         return ThemeContext(self, theme, inherit)
 
     @property
-    def color_system(self) -> Optional[str]:
+    def color_system(self) -> Optional[ConsoleColorSystem]:
         """Get color system string.
 
         Returns:
-            Optional[str]: "standard", "256" or "truecolor".
+            Optional[ConsoleColorSystem]: "standard", "256", "truecolor" or "windows".
         """
 
         if self._color_system is not None:
