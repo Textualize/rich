@@ -474,9 +474,7 @@ console.print(syntax)
 
 # Rich CLI
 
-همچنین ببینید
-[Rich CLI](https://github.com/textualize/rich-cli) را برای برنامه های کامند لاینی که توسط Rich ساخته شده اند.
-برجسته سازی کد، رندر کردن مارک دون، نمایش فایل های CSV در جدول ها، و غیره... ، به صورت مستقیم از خط فرمان.
+همچنین [Rich CLI](https://github.com/textualize/rich-cli) را که برای برنامه های دستوری (command line)، توسط Rich ساخته شده است ببینید. برجسته سازی کد (Syntax highlight code)، پردازش کردن مارک دون، نمایش فایل های CSV در جدول ها و موارد بیشتر، به صورت مستقیم از خط فرمان و ترمینال.
 
 
 
@@ -484,7 +482,7 @@ console.print(syntax)
 
 # Textual
 
-همچنین ببینید پروژه خواهر ریچ [Textual](https://github.com/Textualize/textual)، که با استفاده از آن شما می توانید رابط های کاربری پیچیده را در ترمینال بسازید.
+همچنین (پروژه) خواهر ریچ [Textual](https://github.com/Textualize/textual) را ببینید، که با استفاده از آن شما می توانید رابط های کاربری پیچیده را در ترمینال بسازید.
 
 ![Textual screenshot](https://raw.githubusercontent.com/Textualize/textual/main/imgs/textual.png)
 
@@ -492,6 +490,4 @@ console.print(syntax)
 
 برای دیدن چند نمونه از پروژه هایی که از ریچ استفاده می کنند، به [Rich Gallery](https://www.textualize.io/rich/gallery) در [Textualize.io](https://www.textualize.io) سر بزنید.
 
-آیا می خواهید پروژه خودتان را به گالری اضافه کنید؟
-شما می توانید!
-[این کار ها را](https://www.textualize.io/gallery-instructions) انجام دهید.
+آیا می خواهید پروژه خودتان را به گالری اضافه کنید؟ شما می توانید! کافیست [از این دستورات](https://www.textualize.io/gallery-instructions) پیروی کنید.
