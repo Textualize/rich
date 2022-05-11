@@ -149,10 +149,7 @@ console.print("Hello", "World!", style="bold red")
 
 ![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/hello_world.png)
 
-تا اینجا برای سبک و استایل دادن به یک خط خوب است.
-برای سبکی با دانه بندی (Finely Grained Styling)،
-ریچ یک نشانه گذاری خاص ارائه می دهند که چیزی شبیه به [bbcode](https://en.wikipedia.org/wiki/BBCode) است.
-اینجا یک مثال هست:
+تا اینجا برای سبک و استایل دادن به یک خط خوب است. برای سبکی با دانه بندی (Finely Grained Styling)، ریچ یک نشانه گذاری خاص ارائه می دهند که چیزی شبیه به [bbcode](https://en.wikipedia.org/wiki/BBCode) است. مثال آن به صورت زیر است:
 
 ```python
 console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i]way[/i].")
@@ -160,24 +157,11 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![Console Markup](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
 
-You can use a Console object to generate sophisticated output with minimal effort. See the [Console API](https://rich.readthedocs.io/en/latest/console.html) docs for details.
-
-شما می توانید از یک شیء
-Console
-برای تولید خروجی پیچیده، با کمترین تلاش استفاده کنید. برای جزئیات بیشتر به 
-[Console API](https://rich.readthedocs.io/en/latest/console.html) 
-مراجعه کنید.
+شما می توانید از یک شیء Console برای تولید خروجی پیچیده، با کمترین تلاش استفاده کنید. برای جزئیات بیشتر به  [Console API](https://rich.readthedocs.io/en/latest/console.html)  مراجعه کنید.
 
 ## Rich Inspect
 
-ریچ دارای یک تابع `inspect`
-است که می تواند یک گزارش از هر شیء از پایتون، مثل کلاس
-(Class)،
-نمونه
-(Instance)
-یا توابع
-(Builtin)
-را تولید کند.
+ریچ دارای یک تابع `inspect` است که می تواند یک گزارش از هر شیء از پایتون، مثل کلاس (Class)، نمونه (Instance) یا توابع (Builtin) را تولید کند.
 
 ```python
 >>> my_list = ["foo", "bar"]
@@ -191,37 +175,15 @@ Console
 
 # Rich Library
 
-ریچ شامل تعدادی از توابع
-_قابل اجرا_
-داخلی است که شما می توانید برای ایجاد خروجی برازنده و مناسب در ترمینال
-(CLI)
-خود استفاده کنید و به شما برای تصحیح
-(Debug)
-کد کمک می کند.
+ریچ شامل تعدادی از توابع _قابل اجرا_ داخلی است که شما می توانید برای ایجاد خروجی برازنده و مناسب در ترمینال (CLI) خود استفاده کنید و به شما برای تصحیح (Debug) کد کمک می کند.
 
 برای جزئیات بیشتر روی سر فصل های زیر کلیک کنید:
 
 <details>
 <summary>Log</summary>
 
-شیء
-Console
-دارای یک تابع
-`()log`
-است که رفتاری مشابه
-`()print`
-دارد، اما همچنین یک ستون برای نمایش زمان، فایل مربوطه و شماره خطِ کدِ اجرا شده در نظر می گیرد.
-به صورت پیشفرض، ریچ علائم
-(syntax)
-را برای ساختار های پایتون و برای رشته
-(String)
-های
-repr
-برجسته می کند.
-اگر شما یک مجموعه
-(دیکشنری یا لیست)
-را چاپ کنید، ریچ به زیبایی آن را در فضای موجود چاپ می کند.
-مثال زیر نمایش برخی ویژگی های آن است:
+شیء Console دارای یک تابع `()log` است که رفتاری مشابه `()print` دارد، اما همچنین یک ستون برای نمایش زمان، فایل مربوطه و شماره خطِ کدِ اجرا شده در نظر می گیرد. به صورت پیشفرض، ریچ علائم (syntax) را برای ساختار های پایتون و برای رشته (String)
+های repr برجسته می کند. اگر شما یک مجموعه (دیکشنری یا لیست) را چاپ کنید، ریچ به زیبایی آن را در فضای موجود چاپ می کند. مثال زیر نمایش برخی ویژگی های آن است:
 
 
 ```python
@@ -251,27 +213,15 @@ test_log()
 
 ![Log](https://github.com/willmcgugan/rich/raw/master/imgs/log.png)
 
-به متغیر های
-`log_locals`
-توجه کنید، جایی که تابع
-log
-صدا زده می شود، یک جدول که شامل متغیر های محلی است در خروجی نمایش داده می شود.
+به متغیر های `log_locals` توجه کنید، جایی که تابع log صدا زده می شود، یک جدول که شامل متغیر های محلی است در خروجی نمایش داده می شود.
 
-تابع
-log
-میتواند برای گزارش گیری در ترمینال برای برنامه هایی با اجراهای طولانی مدت، مثل سرور استفاده شود؛ اما همچنین کمک بسیار مناسب و خوبی برای تصحیح
-(debugging)
-برخی خطاهاست.
+تابع log میتواند برای گزارش گیری در ترمینال برای برنامه هایی با اجراهای طولانی مدت، مثل سرور استفاده شود؛ اما همچنین کمک بسیار مناسب و خوبی برای تصحیح (debugging) برخی خطاهاست.
 
 </details>
 <details>
 <summary>Logging Handler</summary>
 
-همچنین شما می توانید از
-[Handler class](https://rich.readthedocs.io/en/latest/logging.html)
-های داخلی برای فرمت دادن و رنگی کردن خروجی از ماژول گزارش پایتون
-(Python's logging module) استفاده کنید.
-کد زیر یک مثال از خروجی را نشان می دهد:
+همچنین شما می توانید از [Handler class](https://rich.readthedocs.io/en/latest/logging.html) های داخلی برای فرمت دادن و رنگی کردن خروجی از ماژول گزارش پایتون (Python's logging module) استفاده کنید. کد زیر یک مثال از خروجی را نشان می دهد:
 
 ![Logging](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
 
@@ -280,10 +230,7 @@ log
 <details>
 <summary>Emoji</summary>
 
-برای افزودن یک ایموجی به خروجی ترمینال، اسم آن را بین دو نقطه
-(colon)
-قرار دهید.
-قطعه کد زیر مثال آن است:
+برای افزودن یک ایموجی به خروجی ترمینال، اسم آن را بین دو نقطه (colon) قرار دهید. قطعه کد زیر مثال آن است:
 
 ```python
 >>> console.print(":smiley: :vampire: :pile_of_poo: :thumbs_up: :raccoon:")
@@ -297,15 +244,11 @@ log
 <details>
 <summary>Tables</summary>
 
-ریچ توانایی آن را دارد که
-[جداول](https://rich.readthedocs.io/en/latest/tables.html)
-انعطاف پذیری را با کارکتر های یونیکد (unicode) بسازد.
+ریچ توانایی آن را دارد که [جداول](https://rich.readthedocs.io/en/latest/tables.html) انعطاف پذیری را با کارکتر های یونیکد (unicode) بسازد.
 
 ![table movie](https://github.com/willmcgugan/rich/raw/master/imgs/table_movie.gif)
 
-انیمشن بالا با استفاده از
-[table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py)
-در دایرکتوری (پوشه) تست ساخته شده است.
+انیمشن بالا با استفاده از [table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py) در دایرکتوری (پوشه) تست ساخته شده است.
 
 این یک مثال ساده از جدول است:
 
@@ -343,17 +286,9 @@ console.print(table)
 
 ![table](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
 
-توجه داشته باشید که نشانه گذاری کنسول به همان روش 
-`print()` و `log()`
-پردازش می شود.
-در واقع، هر چیزی که توسط
-Rich
-قابل رندر است در هدرها / ردیف ها (حتی جداول دیگر) ممکن است گنجانده شود.
+توجه داشته باشید که نشانه گذاری کنسول به همان روش  `print()` و `log()` پردازش می شود. در واقع، هر چیزی که توسط Rich قابل رندر است در هدرها / ردیف ها (حتی جداول دیگر) ممکن است گنجانده شود.
 
-کلاس
-`Table`
-به اندازه کافی هوشمند است که اندازه ستون ها را متناسب با عرض موجود ترمینال تغییر دهد و متن را در صورت لزوم بسته بندی کند.
-این همان مثال با ترمینال کوچکتر از جدول بالاست:
+کلاس `Table` به اندازه کافی هوشمند است که اندازه ستون ها را متناسب با عرض موجود ترمینال تغییر دهد و متن را در صورت لزوم بسته بندی کند. این همان مثال با ترمینال کوچکتر از جدول بالاست:
 
 ![table2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
 
@@ -362,15 +297,9 @@ Rich
 <details>
 <summary>Progress Bars</summary>
 
-ریچ
-می تواند چندین نوار پیشرفت بدون نا هماهنگی برای پیگیری وظایف طولانی مدت ارائه دهد.
+ریچ می تواند چندین نوار پیشرفت ([progress](https://rich.readthedocs.io/en/latest/progress.html)) را بدون ناهماهنگی و اختلال برای پیگیری وظایف طولانی مدت پردازش کند.
 
-
-For basic usage, wrap any sequence in the `track` function and iterate over the result. Here's an example:
-
-برای استفاده اولیه، هر دنباله ای را در تابع
-`track`
-روی نتیجه تکرار کنید. در اینجا یک مثال است:
+برای استفاده اولیه، هر دنباله ای را در تابع `track` بسته بندی کنید و روی نتیجه تکرار کنید. مثال آن به صورت زیر است:
 
 ```python
 from rich.progress import track
@@ -379,31 +308,22 @@ for step in track(range(100)):
     do_step(step)
 ```
 
-اضافه کردن چندین نوار پیشرفت خیلی سخت نیست. در اینجا یک مثال آورده شده است:
-
-
+اضافه کردن چندین نوار پیشرفت خیلی سخت نیست. مثال آن که برگرفته از اسناد و داکیومنت میباشد به صورت زیر است:
 
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
 
-ستون ها ممکن است به گونه ای پیکربندی شوند که جزئیاتی را که می خواهید نشان دهند. ستون های داخلی شامل درصد کامل، اندازه فایل، سرعت فایل و زمان باقی مانده است. در اینجا مثال دیگری وجود دارد که دانلود در حال انجام را نشان می دهد:
+ستون ها ممکن است به گونه ای پیکربندی شوند که جزئیاتی را که می خواهید نشان دهند. ستون های از پیش تعیین شده شامل درصد کامل شده، اندازه فایل، سرعت فایل و زمان باقی مانده است. در زیر مثال دیگری وجود دارد که دانلود در حال انجام را نشان می دهد:
 
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/downloader.gif)
 
-برای اینکه خودتان این را امتحان کنید،
-[examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py)
-را ببینید که می‌تواند چندین
-URL
-را به طور همزمان بارگیری کند و پیشرفت را نشان دهد.
+برای اینکه خودتان این را امتحان کنید، فایل [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) را ببینید که می‌تواند چندین لینک URL را به طور همزمان بارگیری کند و پیشرفت را نشان دهد.
 
 </details>
 
 <details>
 <summary>Status</summary>
 
-برای موقعیت هایی که محاسبه پیشرفت دشوار است، می توانید از روش [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status)
-استفاده کنید که یک انیمیشن و پیام چرخنده
-(spinner)
-را نمایش می‌دهد. این انیمیشن شما را از استفاده عادی از کنسول باز نمی دارد. در اینجا یک مثال است:
+برای موقعیت هایی که محاسبه پیشرفت، دشوار است، می توانید از روش [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) استفاده کنید که یک پیام و یک انیمیشن چرخنده (spinner) را نمایش می‌دهد. این انیمیشن شما را از استفاده عادی از کنسول باز نمی دارد. مثال آن به صورت زیر است:
 
 ```python
 from time import sleep
@@ -423,12 +343,7 @@ with console.status("[bold green]Working on tasks...") as status:
 
 ![status](https://github.com/willmcgugan/rich/raw/master/imgs/status.gif)
 
-در انیمیشن های چرخنده از
-[cli-spinners](https://www.npmjs.com/package/cli-spinners)
-استفاده شده است.
-می توانید با تعیین پارامتر
-`spinner`
-یک چرخنده را انتخاب کنید. برای مشاهده دستور زیر را اجرا کنید:
+در انیمیشن های چرخنده از [cli-spinners](https://www.npmjs.com/package/cli-spinners) استفاده شده است. شما می توانید با تعیین پارامتر `spinner` یک چرخنده را انتخاب کنید. برای مشاهده موارد موجود، دستور زیر را اجرا کنید:
 
 ```
 python -m rich.spinner
@@ -443,15 +358,9 @@ python -m rich.spinner
 <details>
 <summary>Tree</summary>
 
-ریچ می تواند یک
-[tree](https://rich.readthedocs.io/en/latest/tree.html)
-را با خطوط راهنما نمایش دهد. درخت
-`tree`
-برای نمایش ساختار فایل یا هر داده سلسله مراتبی دیگر خوب است.
+ریچ می تواند یک [tree](https://rich.readthedocs.io/en/latest/tree.html) را با خطوط راهنما نمایش دهد. یک درخت برای نمایش ساختار فایل یا هر داده سلسله مراتبی دیگر مناسب است.
 
-برچسب های
-`labels`
-درخت می توانند متن ساده یا هر چیز دیگری که ریچ می تواند نمایش دهد باشد. برای نمایش موارد دستور زیر را اجرا کنید:
+برچسب (labels) های درخت می توانند متن ساده یا هر چیز دیگری که ریچ می تواند نمایش دهد باشد. برای نمایش موارد گفته شده دستور زیر را اجرا کنید:
 
 ```
 python -m rich.tree
@@ -461,27 +370,15 @@ python -m rich.tree
 
 ![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
 
-See the [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) example for a script that displays a tree view of any directory, similar to the linux `tree` command.
-
-مثال
-[این]
-را برای اسکریپتی ببینید که نمایش درختی از هر دایرکتوری را نمایش می دهد، شبیه به فرمان 
-`tree`
-در لینوکس است.
+مثال [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) را برای اسکریپتی ببینید که نمایش درختی از هر دایرکتوری را نمایش می دهد، شبیه به فرمان `tree` در لینوکس است.
 
 </details>
 
 <details>
 <summary>Columns</summary>
 
-ریچ می تواند محتوا را به صورت 
-[منظم](https://rich.readthedocs.io/en/latest/columns.html)
-با عرض مساوی یا بهینه ارائه دهد.
-در اینجا یک کلون بسیار ابتدایی از دستور
-ls
-در
-(مک او اس / لینوکس)
-وجود دارد که فهرست دایرکتوری را در ستون ها نمایش می دهد:
+ریچ می تواند محتوا را به صورت [columns](https://rich.readthedocs.io/en/latest/columns.html) مرتب با عرض مساوی یا بهینه ارائه دهد. مثال زیر یک شبیه سازی بسیار ابتدایی از دستور `ls` در (مک او اس / لینوکس) است که فهرست دایرکتوری را در ستون ها نمایش می دهد:
+
 
 ```python
 import os
@@ -494,11 +391,7 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-تصویر زیر خروجی از
-[columns example](https://github.com/willmcgugan/rich/blob/master/examples/columns.py)
-است که داده های استخراج شده از یک
-API
-را در ستون ها نمایش می دهد:
+تصویر زیر خروجی [columns example](https://github.com/willmcgugan/rich/blob/master/examples/columns.py) است که داده های استخراج شده از یک API را در ستون ها نمایش می دهد:
 
 ![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
 
@@ -507,17 +400,10 @@ API
 <details>
 <summary>Markdown</summary>
 
-ریچ می تواند
-[markdown](https://rich.readthedocs.io/en/latest/markdown.html)
-را رندر کند و کار خوبی برای ترجمه آن در ترمینال انجام دهد.
+ریچ میتواند [markdown](https://rich.readthedocs.io/en/latest/markdown.html) را پردازش کند و کار مناسبی را برای فرمت بندی آن در ترمینال انجام میدهد.
 
-برای رندر کردن مارک دون، کلاس
-`Markdown`
-را وارد کنید و آن را با رشته ای
-`Str`
-حاوی کد مارک دون است بسازید.
-سپس آن را در کنسول چاپ کنید.
-در اینجا یک مثال است:
+برای پردازش markdown کافی است تا کلاس `Markdown` آنرا فرا خوانی کرده و یک شی از آن را بسازید و متن حاوی markdown  را به آن بدهید. در نهایت آنرا در کنسول و ترمینال چاپ کنید. مثال آن به صورت زیر است:
+
 
 ```python
 from rich.console import Console
@@ -538,17 +424,7 @@ console.print(markdown)
 <details>
 <summary>Syntax Highlighting</summary>
 
-ریچ از کتابخانه
-[pygments](https://pygments.org/)
-برای پیاده سازی
-[syntax highlighting](https://rich.readthedocs.io/en/latest/syntax.html)
-استفاده می کند.
-استفاده از آن مشابه پردازش
-markdown
-هاست؛ یک شی
-`Syntax`
-بسازید و آن را برای کنسول چاپ کنید
-مثال آن به صورت زیر است:
+ریچ از کتابخانه [pygments](https://pygments.org/) برای پیاده سازی[syntax highlighting](https://rich.readthedocs.io/en/latest/syntax.html) استفاده می کند. استفاده از آن مشابه پردازش markdown هاست؛ یک شی `Syntax` بسازید و آن را برای کنسول چاپ کنید. مثال آن به صورت زیر است:
 
 ```python
 from rich.console import Console
@@ -583,14 +459,7 @@ console.print(syntax)
 <details>
 <summary>Tracebacks</summary>
 
-ریچ می تواند
-[tracebacks](https://rich.readthedocs.io/en/latest/traceback.html)
-های زیبا را نمایش دهد که خواندن آن آسان تر است و کد بیشتری را نسبت به 
-`traceback`
-های استاندارد پایتون نشان می دهد.
-شما می توانید ریچ را به عنوان کنترل کننده اصلی 
-`tracebacks`
-تنظیم کنید تا همه استثناهای کشف نشده توسط ریچ ارائه شوند.
+ریچ می تواند [tracebacks](https://rich.readthedocs.io/en/latest/traceback.html) های زیبایی را نمایش دهد که خواندن آن آسان تر است و کد بیشتری را نسبت به `traceback` های استاندارد پایتون نشان می دهد. شما می توانید ریچ را به عنوان کنترل کننده اصلی `tracebacks` تنظیم کنید تا همه استثناهای کشف نشده توسط ریچ ارائه شوند.
 
 در مک او اس به صورت زیر نمایش داده می شود (در لینوکس نیز مشابه این است):
 
