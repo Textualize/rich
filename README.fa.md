@@ -602,3 +602,27 @@ console.print(syntax)
 [Console Protocol](https://rich.readthedocs.io/en/latest/protocol.html)
 استفاده می کنند،
 بنابراین شما می توانید برای پیاده سازی محتوای ریچ خود نیز از آن استفاده کنید.
+
+# Rich CLI
+
+همچنین ببینید
+[Rich CLI](https://github.com/textualize/rich-cli) را برای برنامه های کامند لاینی که توسط Rich ساخته شده اند.
+برجسته سازی کد، رندر کردن مارک دون، نمایش فایل های CSV در جدول ها، و غیره... ، به صورت مستقیم از خط فرمان.
+
+
+
+![Rich CLI](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/rich-cli-splash.jpg)
+
+# Textual
+
+همچنین ببینید پروژه خواهر ریچ [Textual](https://github.com/Textualize/textual)، که با استفاده از آن شما می توانید رابط های کاربری پیچیده را در ترمینال بسازید.
+
+![Textual screenshot](https://raw.githubusercontent.com/Textualize/textual/main/imgs/textual.png)
+
+# پروژه هایی که از ریچ استفاده می کنند
+
+برای دیدن چند نمونه از پروژه هایی که از ریچ استفاده می کنند، به [Rich Gallery](https://www.textualize.io/rich/gallery) در [Textualize.io](https://www.textualize.io) سر بزنید.
+
+آیا می خواهید پروژه خودتان را به گالری اضافه کنید؟
+شما می توانید!
+[این کار ها را](https://www.textualize.io/gallery-instructions) انجام دهید.
