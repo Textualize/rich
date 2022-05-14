@@ -453,6 +453,14 @@ class Node:
                 return False
         return True
 
+    def check_multiline(self) -> bool:
+        """Check if the node spans multiple lines.
+
+        Returns:
+            bool: True if the node spans two or more lines, otherwise False.
+        """
+        return any("\n" in token for token in self.iter_tokens())
+
     def __str__(self) -> str:
         repr_text = "".join(self.iter_tokens())
         return repr_text
@@ -475,7 +483,11 @@ class Node:
         while line_no < len(lines):
             line = lines[line_no]
             if line.expandable and not line.expanded:
-                if expand_all or not line.check_length(max_width):
+                if (
+                    expand_all
+                    or not line.check_length(max_width)
+                    or line.check_multiline()
+                ):
                     lines[line_no : line_no + 1] = line.expand(indent_size)
             line_no += 1
 
@@ -508,6 +520,11 @@ class _Line:
         )
         assert self.node is not None
         return self.node.check_length(start_length, max_length)
+
+    def check_multiline(self) -> bool:
+        """Check if the line actually contains multiline text."""
+        assert self.node is not None
+        return "\n" in self.text or self.node.check_multiline()
 
     def expand(self, indent_size: int) -> Iterable["_Line"]:
         """Expand this line by adding children on their own line."""
@@ -543,12 +560,17 @@ class _Line:
         )
 
     def __str__(self) -> str:
+        node_str = str(self.node or "")
+        if "\n" in node_str:
+            assert self.node is not None
+            spaces = len(self.whitespace) + len(self.text)
+            if self.node.key_repr:
+                spaces += len(self.node.key_repr) + len(self.node.key_separator)
+            node_str = ("\n" + " " * spaces).join(node_str.split("\n"))
         if self.last:
-            return f"{self.whitespace}{self.text}{self.node or ''}"
+            return f"{self.whitespace}{self.text}{node_str}"
         else:
-            return (
-                f"{self.whitespace}{self.text}{self.node or ''}{self.suffix.rstrip()}"
-            )
+            return f"{self.whitespace}{self.text}{node_str}{self.suffix.rstrip()}"
 
 
 def _is_namedtuple(obj: Any) -> bool:
