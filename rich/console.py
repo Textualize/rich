@@ -2385,16 +2385,18 @@ class Console:
                             height=line_height + 1,
                         )
                     )
-                text_group.append(
-                    make_tag(
-                        "tspan",
-                        escape_text(text),
-                        _class=f"{unique_id}-{class_name}",
-                        x=x * char_width,
-                        y=y * line_height + char_height,
-                        textLength=char_width * len(text),
+
+                if text != " " * len(text):
+                    text_group.append(
+                        make_tag(
+                            "text",
+                            escape_text(text),
+                            _class=f"{unique_id}-{class_name}",
+                            x=x * char_width,
+                            y=y * line_height + char_height,
+                            textLength=char_width * len(text),
+                        )
                     )
-                )
                 x += cell_len(text)
 
         styles = "\n".join(

@@ -50,7 +50,6 @@ CONSOLE_SVG_FORMAT = """\
 
     .{unique_id}-title {{
         font-size: 18px;
-
         font-weight: bold;
         font-family: arial;
     }}
@@ -60,7 +59,9 @@ CONSOLE_SVG_FORMAT = """\
     {chrome}
     <g transform="translate({terminal_x}, {terminal_y})">
     {backgrounds}
-    <text alignment-baseline="baseline" class="{unique_id}-matrix" font-variant="east-asian-width-values">{matrix}</text>
+    <g class="{unique_id}-matrix">
+    {matrix}
+    </g>
     </g>
 </svg>
 """
