@@ -56,8 +56,15 @@ CONSOLE_SVG_FORMAT = """\
 
     {styles}
     </style>
+
+    <defs>
+    <clipPath id="{unique_id}-clip-terminal">
+      <rect x="0" y="0" width="{terminal_width}" height="{terminal_height}" />
+    </clipPath>
+    </defs>
+
     {chrome}
-    <g transform="translate({terminal_x}, {terminal_y})">
+    <g transform="translate({terminal_x}, {terminal_y})" clip-path="url(#{unique_id}-clip-terminal)">
     {backgrounds}
     <g class="{unique_id}-matrix">
     {matrix}
