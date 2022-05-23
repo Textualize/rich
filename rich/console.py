@@ -2282,18 +2282,18 @@ class Console:
 
         width = self.width
         char_height = 20
-        char_width = char_height * 0.62
-        line_height = char_height * 1.32
+        char_width = char_height * 0.61
+        line_height = char_height * 1.22
 
-        margin_top = 20
-        margin_right = 16
-        margin_bottom = 20
-        margin_left = 16
+        margin_top = 1
+        margin_right = 1
+        margin_bottom = 1
+        margin_left = 1
 
         padding_top = 40
-        padding_right = 12
+        padding_right = 8
         padding_bottom = 12
-        padding_left = 12
+        padding_left = 8
 
         padding_width = padding_left + padding_right
         padding_height = padding_top + padding_bottom
@@ -2423,7 +2423,7 @@ class Console:
         if title:
             chrome += make_tag(
                 "text",
-                title,
+                escape_text(title),
                 _class=f"{unique_id}-title",
                 fill=title_color,
                 text_anchor="middle",
@@ -2431,9 +2431,11 @@ class Console:
                 y=margin_top + char_height + 6,
             )
         chrome += f"""
-            <circle cx="40" cy="40" r="7" fill="#ff5f57"/>
-            <circle cx="62" cy="40" r="7" fill="#febc2e"/>
-            <circle cx="84" cy="40" r="7" fill="#28c840"/>
+            <g transform="translate(30,24)">
+            <circle cx="0" cy="0" r="7" fill="#ff5f57"/>
+            <circle cx="22" cy="0" r="7" fill="#febc2e"/>
+            <circle cx="44" cy="0" r="7" fill="#28c840"/>
+            </g>
         """
 
         svg = code_format.format(
