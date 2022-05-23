@@ -2380,9 +2380,9 @@ class Console:
                             "rect",
                             fill=background,
                             x=x * char_width,
-                            y=y * line_height,
-                            width=char_width * text_length + 1,
-                            height=line_height + 1,
+                            y=y * line_height + 1.5,
+                            width=char_width * text_length + 0.5,
+                            height=line_height + 0.25,
                         )
                     )
 
