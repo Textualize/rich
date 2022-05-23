@@ -2292,7 +2292,7 @@ class Console:
 
         padding_top = 40
         padding_right = 8
-        padding_bottom = 12
+        padding_bottom = 8
         padding_left = 8
 
         padding_width = padding_left + padding_right
@@ -2380,9 +2380,9 @@ class Console:
                             "rect",
                             fill=background,
                             x=x * char_width,
-                            y=y * line_height,
-                            width=char_width * text_length + 1,
-                            height=line_height + 1,
+                            y=y * line_height + 1.5,
+                            width=char_width * text_length,
+                            height=line_height + 0.25,
                         )
                     )
 
@@ -2416,7 +2416,7 @@ class Console:
             y=margin_top,
             width=terminal_width,
             height=terminal_height,
-            rx=12,
+            rx=8,
         )
 
         title_color = _theme.foreground_color.hex
@@ -2431,7 +2431,7 @@ class Console:
                 y=margin_top + char_height + 6,
             )
         chrome += f"""
-            <g transform="translate(30,24)">
+            <g transform="translate(26,22)">
             <circle cx="0" cy="0" r="7" fill="#ff5f57"/>
             <circle cx="22" cy="0" r="7" fill="#febc2e"/>
             <circle cx="44" cy="0" r="7" fill="#28c840"/>
@@ -2443,6 +2443,8 @@ class Console:
             char_width=char_width,
             char_height=char_height,
             line_height=line_height,
+            terminal_width=char_width * width,
+            terminal_height=(y + 1) * line_height,
             width=terminal_width + margin_width,
             height=terminal_height + margin_height,
             terminal_x=margin_left + padding_left,
