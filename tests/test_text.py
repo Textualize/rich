@@ -412,7 +412,7 @@ def test_wrap_4():
     assert lines[2] == Text("baz ")
 
 
-def test_wrap_wrapped_word_full_line_length():
+def test_wrap_length_greater_than_available_width():
     text = Text("abc")
     lines = text.wrap(Console(), 2)
     assert lines._lines == [
