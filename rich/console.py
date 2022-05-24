@@ -2252,12 +2252,12 @@ class Console:
             css_rules = []
             color = (
                 _theme.foreground_color
-                if style.color is None
+                if (style.color is None or style.color.is_default)
                 else style.color.get_truecolor(_theme)
             )
             bgcolor = (
                 _theme.background_color
-                if style.bgcolor is None
+                if (style.bgcolor is None or style.bgcolor.is_default)
                 else style.bgcolor.get_truecolor(_theme)
             )
             if style.reverse:
@@ -2282,18 +2282,18 @@ class Console:
 
         width = self.width
         char_height = 20
-        char_width = char_height * 0.62
-        line_height = char_height * 1.32
+        char_width = char_height * 0.61
+        line_height = char_height * 1.22
 
-        margin_top = 20
-        margin_right = 16
-        margin_bottom = 20
-        margin_left = 16
+        margin_top = 1
+        margin_right = 1
+        margin_bottom = 1
+        margin_left = 1
 
         padding_top = 40
-        padding_right = 12
-        padding_bottom = 12
-        padding_left = 12
+        padding_right = 8
+        padding_bottom = 8
+        padding_left = 8
 
         padding_width = padding_left + padding_right
         padding_height = padding_top + padding_bottom
@@ -2330,11 +2330,7 @@ class Console:
             )
 
         with self._record_buffer_lock:
-            segments = list(
-                Segment.filter_control(
-                    Segment.simplify(self._record_buffer),
-                )
-            )
+            segments = list(Segment.filter_control(self._record_buffer))
             if clear:
                 self._record_buffer.clear()
 
@@ -2365,7 +2361,8 @@ class Console:
                         else style.color.get_truecolor(_theme).hex
                     )
                 else:
-                    has_background = style.bgcolor is not None
+                    bgcolor = style.bgcolor
+                    has_background = bgcolor is not None and not bgcolor.is_default
                     background = (
                         _theme.background_color.hex
                         if style.bgcolor is None
@@ -2379,22 +2376,34 @@ class Console:
                             "rect",
                             fill=background,
                             x=x * char_width,
-                            y=y * line_height,
-                            width=char_width * text_length + 1,
-                            height=line_height + 1,
+                            y=y * line_height + 1.5,
+                            width=char_width * text_length,
+                            height=line_height + 0.25,
+                            shape_rendering="crispEdges",
                         )
                     )
-                text_group.append(
-                    make_tag(
-                        "tspan",
-                        escape_text(text),
-                        _class=f"{unique_id}-{class_name}",
-                        x=x * char_width,
-                        y=y * line_height + char_height,
-                        textLength=char_width * len(text),
+
+                if text != " " * len(text):
+                    text_group.append(
+                        make_tag(
+                            "text",
+                            escape_text(text),
+                            _class=f"{unique_id}-{class_name}",
+                            x=x * char_width,
+                            y=y * line_height + char_height,
+                            textLength=char_width * len(text),
+                            clip_path=f"url(#{unique_id}-line-{y})",
+                        )
                     )
-                )
                 x += cell_len(text)
+
+        line_offsets = [line_no * line_height + 1.5 for line_no in range(y)]
+        lines = "\n".join(
+            f"""<clipPath id="{unique_id}-line-{line_no}">
+    {make_tag("rect", x=0, y=offset, width=char_width * width, height=line_height + 0.25)}
+            </clipPath>"""
+            for line_no, offset in enumerate(line_offsets)
+        )
 
         styles = "\n".join(
             f".{unique_id}-r{rule_no} {{ {css} }}" for css, rule_no in classes.items()
@@ -2407,17 +2416,20 @@ class Console:
         chrome = make_tag(
             "rect",
             fill=_theme.background_color.hex,
+            stroke="rgba(255,255,255,0.35)",
+            stroke_width="1",
             x=margin_left,
             y=margin_top,
             width=terminal_width,
             height=terminal_height,
-            rx=12,
+            rx=8,
         )
+
         title_color = _theme.foreground_color.hex
         if title:
             chrome += make_tag(
                 "text",
-                title,
+                escape_text(title),
                 _class=f"{unique_id}-title",
                 fill=title_color,
                 text_anchor="middle",
@@ -2425,9 +2437,11 @@ class Console:
                 y=margin_top + char_height + 6,
             )
         chrome += f"""
-            <circle cx="40" cy="40" r="7" fill="#ff5f57"/>
-            <circle cx="62" cy="40" r="7" fill="#febc2e"/>
-            <circle cx="84" cy="40" r="7" fill="#28c840"/>
+            <g transform="translate(26,22)">
+            <circle cx="0" cy="0" r="7" fill="#ff5f57"/>
+            <circle cx="22" cy="0" r="7" fill="#febc2e"/>
+            <circle cx="44" cy="0" r="7" fill="#28c840"/>
+            </g>
         """
 
         svg = code_format.format(
@@ -2435,6 +2449,8 @@ class Console:
             char_width=char_width,
             char_height=char_height,
             line_height=line_height,
+            terminal_width=char_width * width - 1,
+            terminal_height=(y + 1) * line_height - 1,
             width=terminal_width + margin_width,
             height=terminal_height + margin_height,
             terminal_x=margin_left + padding_left,
@@ -2443,6 +2459,7 @@ class Console:
             chrome=chrome,
             backgrounds=backgrounds,
             matrix=matrix,
+            lines=lines,
         )
         return svg
 
