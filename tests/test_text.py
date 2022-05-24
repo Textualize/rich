@@ -421,6 +421,16 @@ def test_wrap_length_greater_than_available_width():
     ]
 
 
+def test_wrap_wrapped_word_length_greater_than_available_width():
+    text = Text("1234 12345678")
+    lines = text.wrap(Console(), 7)
+    assert lines._lines == [
+        Text("1234 "),
+        Text("1234567"),
+        Text("8"),
+    ]
+
+
 def test_wrap_long():
     text = Text("abracadabra", justify="left")
     lines = text.wrap(Console(), 4)
