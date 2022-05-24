@@ -61,6 +61,7 @@ CONSOLE_SVG_FORMAT = """\
     <clipPath id="{unique_id}-clip-terminal">
       <rect x="0" y="0" width="{terminal_width}" height="{terminal_height}" />
     </clipPath>
+    {lines}
     </defs>
 
     {chrome}

@@ -2330,11 +2330,7 @@ class Console:
             )
 
         with self._record_buffer_lock:
-            segments = list(
-                Segment.filter_control(
-                    Segment.simplify(self._record_buffer),
-                )
-            )
+            segments = list(Segment.filter_control(self._record_buffer))
             if clear:
                 self._record_buffer.clear()
 
@@ -2383,6 +2379,7 @@ class Console:
                             y=y * line_height + 1.5,
                             width=char_width * text_length,
                             height=line_height + 0.25,
+                            shape_rendering="crispEdges",
                         )
                     )
 
@@ -2395,9 +2392,18 @@ class Console:
                             x=x * char_width,
                             y=y * line_height + char_height,
                             textLength=char_width * len(text),
+                            clip_path=f"url(#{unique_id}-line-{y})",
                         )
                     )
                 x += cell_len(text)
+
+        line_offsets = [line_no * line_height + 1.5 for line_no in range(y)]
+        lines = "\n".join(
+            f"""<clipPath id="{unique_id}-line-{line_no}">
+    {make_tag("rect", x=0, y=offset, width=char_width * width, height=line_height + 0.25)}
+            </clipPath>"""
+            for line_no, offset in enumerate(line_offsets)
+        )
 
         styles = "\n".join(
             f".{unique_id}-r{rule_no} {{ {css} }}" for css, rule_no in classes.items()
@@ -2443,8 +2449,8 @@ class Console:
             char_width=char_width,
             char_height=char_height,
             line_height=line_height,
-            terminal_width=char_width * width,
-            terminal_height=(y + 1) * line_height,
+            terminal_width=char_width * width - 1,
+            terminal_height=(y + 1) * line_height - 1,
             width=terminal_width + margin_width,
             height=terminal_height + margin_height,
             terminal_x=margin_left + padding_left,
@@ -2453,6 +2459,7 @@ class Console:
             chrome=chrome,
             backgrounds=backgrounds,
             matrix=matrix,
+            lines=lines,
         )
         return svg
 
