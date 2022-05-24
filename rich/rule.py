@@ -4,6 +4,7 @@ from .align import AlignMethod
 from .cells import cell_len, set_cell_size
 from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin
+from .measure import Measurement
 from .style import Style
 from .text import Text
 
@@ -101,6 +102,11 @@ class Rule(JupyterMixin):
 
         rule_text.plain = set_cell_size(rule_text.plain, width)
         yield rule_text
+
+    def __rich_measure__(
+        self, console: Console, options: ConsoleOptions
+    ) -> Measurement:
+        return Measurement(1, 1)
 
 
 if __name__ == "__main__":  # pragma: no cover
