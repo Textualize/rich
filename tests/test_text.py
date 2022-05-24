@@ -412,6 +412,15 @@ def test_wrap_4():
     assert lines[2] == Text("baz ")
 
 
+def test_wrap_wrapped_word_full_line_length():
+    text = Text("abc")
+    lines = text.wrap(Console(), 2)
+    assert lines._lines == [
+        Text("ab"),
+        Text("c"),
+    ]
+
+
 def test_wrap_long():
     text = Text("abracadabra", justify="left")
     lines = text.wrap(Console(), 4)
