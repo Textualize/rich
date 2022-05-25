@@ -421,7 +421,6 @@ def test_wrap_length_greater_than_available_width():
     ]
 
 
-@pytest.mark.xfail
 def test_wrap_wrapped_word_length_greater_than_available_width():
     text = Text("1234 12345678")
     lines = text.wrap(Console(), 7)
@@ -458,13 +457,25 @@ def test_wrap_overflow_long():
 
 
 def test_wrap_long_words():
+    text = Text("X 123456789")
+    lines = text.wrap(Console(), 4)
+
+    assert len(lines) == 4
+    assert lines[0] == Text("X ")
+    assert lines[1] == Text("1234")
+    assert lines[2] == Text("5678")
+    assert lines[3] == Text("9")
+
+
+def test_wrap_long_words_justify_left():
     text = Text("X 123456789", justify="left")
     lines = text.wrap(Console(), 4)
 
-    assert len(lines) == 3
-    assert lines[0] == Text("X 12")
-    assert lines[1] == Text("3456")
-    assert lines[2] == Text("789 ")
+    assert len(lines) == 4
+    assert lines[0] == Text("X   ")
+    assert lines[1] == Text("1234")
+    assert lines[2] == Text("5678")
+    assert lines[3] == Text("9   ")
 
 
 def test_no_wrap_no_crop():
@@ -711,7 +722,6 @@ foo = [
 
 
 def test_slice():
-
     text = Text.from_markup("[red]foo [bold]bar[/red] baz[/bold]")
     assert text[0] == Text("f", spans=[Span(0, 1, "red")])
     assert text[4] == Text("b", spans=[Span(0, 1, "red"), Span(0, 1, "bold")])
