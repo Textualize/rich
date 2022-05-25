@@ -467,14 +467,26 @@ def test_wrap_overflow_long():
 
 
 def test_wrap_long_words():
-    text = Text("X 123456789")
+    text = Text("XX 12345678912")
     lines = text.wrap(Console(), 4)
 
-    assert len(lines) == 4
-    assert lines[0] == Text("X ")
-    assert lines[1] == Text("1234")
-    assert lines[2] == Text("5678")
-    assert lines[3] == Text("9")
+    assert lines._lines == [
+        Text("XX "),
+        Text("1234"),
+        Text("5678"),
+        Text("912"),
+    ]
+
+
+def test_wrap_long_words_2():
+    # https://github.com/Textualize/rich/issues/2273
+    text = Text("Hello, World...123")
+    lines = text.wrap(Console(), 10)
+    assert lines._lines == [
+        Text("Hello, "),
+        Text("World...12"),
+        Text("3"),
+    ]
 
 
 def test_wrap_long_words_justify_left():

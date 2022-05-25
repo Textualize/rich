@@ -27,8 +27,8 @@ def divide_line(text: str, width: int, fold: bool = True) -> List[int]:
         if line_position + word_length > width:
             if word_length > width:
                 if fold:
-                    chopped_words = chop_cells(word, width, position=line_position)
-                    for last, line in loop_last(reversed(chopped_words)):
+                    chopped_words = chop_cells(word, max_size=width, position=0)
+                    for last, line in loop_last(chopped_words):
                         if start:
                             append(start)
 
