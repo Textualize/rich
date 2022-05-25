@@ -422,6 +422,25 @@ def test_wrap_wrapped_word_length_greater_than_available_width():
     ]
 
 
+def test_wrap_cjk():
+    text = Text("わさび")
+    lines = text.wrap(Console(), 4)
+    assert lines._lines == [
+        Text("わさ"),
+        Text("び"),
+    ]
+
+
+def test_wrap_cjk_width_mid_character():
+    text = Text("わさび")
+    lines = text.wrap(Console(), 3)
+    assert lines._lines == [
+        Text("わ"),
+        Text("さ"),
+        Text("び"),
+    ]
+
+
 def test_wrap_long():
     text = Text("abracadabra", justify="left")
     lines = text.wrap(Console(), 4)
