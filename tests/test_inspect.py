@@ -299,3 +299,41 @@ def test_inspect_module_with_class():
         "╰──────────────────────────────────────────╯\n"
     )
     assert render(module, methods=True) == expected
+
+
+@pytest.mark.parametrize(
+    "special_character,expected_replacement",
+    (
+        ("\a", "\\a"),
+        ("\b", "\\b"),
+        ("\f", "\\f"),
+        ("\r", "\\r"),
+        ("\v", "\\v"),
+    ),
+)
+def test_can_handle_special_characters_in_docstrings(
+    special_character: str, expected_replacement: str
+):
+    class Something:
+        class Thing:
+            pass
+
+    Something.Thing.__doc__ = f"""
+    Multiline docstring
+    with {special_character} should be handled
+    """
+
+    expected = """\
+╭─ <class 'tests.test_inspect.test_can_handle_sp─╮
+│ class test_can_handle_special_characters_in_do │
+│ cstrings.<locals>.Something():                 │
+│                                                │
+│ Thing = class Thing():                         │
+│         Multiline docstring                    │
+│         with %s should be handled              │
+╰────────────────────────────────────────────────╯
+""" % (
+        expected_replacement
+    )
+
+    assert render(Something, methods=True) == expected

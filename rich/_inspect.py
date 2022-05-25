@@ -12,17 +12,24 @@ from .pretty import Pretty
 from .table import Table
 from .text import Text, TextType
 
+_SPECIAL_CHARACTERS_TRANSLATION_TABLE = str.maketrans(
+    # Some special characters (such as "\b", aka "Backspace") are stripped from the docstrings when
+    # we display them, and also mess up our processing
+    # --> let's replace them with a readable "non-special" version of them (i.e. "\b" -> "\\b"):
+    {
+        "\a": "\\a",  # ASCII Bell
+        "\b": "\\b",  # ASCII Backspace
+        "\f": "\\f",  # ASCII Formfeed
+        "\r": "\\r",  # ASCII Carriage Return
+        "\v": "\\v",  # ASCII Vertical Tab
+    }
+)
+
 
 def _first_paragraph(doc: str) -> str:
     """Get the first paragraph from a docstring."""
     paragraph, _, _ = doc.partition("\n\n")
     return paragraph
-
-
-def _reformat_doc(doc: str) -> str:
-    """Reformat docstring."""
-    doc = cleandoc(doc).strip()
-    return doc
 
 
 class Inspect(JupyterMixin):
@@ -161,11 +168,9 @@ class Inspect(JupyterMixin):
                 yield ""
 
         if self.docs:
-            _doc = getdoc(obj)
+            _doc = self._get_formatted_doc(obj)
             if _doc is not None:
-                if not self.help:
-                    _doc = _first_paragraph(_doc)
-                doc_text = Text(_reformat_doc(_doc), style="inspect.help")
+                doc_text = Text(_doc, style="inspect.help")
                 doc_text = highlighter(doc_text)
                 yield doc_text
                 yield ""
@@ -200,13 +205,10 @@ class Inspect(JupyterMixin):
                     add_row(key_text, Pretty(value, highlighter=highlighter))
                 else:
                     if self.docs:
-                        docs = getdoc(value)
+                        docs = self._get_formatted_doc(value)
                         if docs is not None:
-                            _doc = _reformat_doc(str(docs))
-                            if not self.help:
-                                _doc = _first_paragraph(_doc)
-                            _signature_text.append("\n" if "\n" in _doc else " ")
-                            doc = highlighter(_doc)
+                            _signature_text.append("\n" if "\n" in docs else " ")
+                            doc = highlighter(docs)
                             doc.stylize("inspect.doc")
                             _signature_text.append(doc)
 
@@ -220,3 +222,13 @@ class Inspect(JupyterMixin):
                 f"[b cyan]{not_shown_count}[/][i] attribute(s) not shown.[/i] "
                 f"Run [b][magenta]inspect[/]([not b]inspect[/])[/b] for options."
             )
+
+    def _get_formatted_doc(self, object_: Any) -> Optional[str]:
+        docs = getdoc(object_)
+        if docs is None:
+            return None
+        docs = cleandoc(docs).strip()
+        if not self.help:
+            docs = _first_paragraph(docs)
+        docs = docs.translate(_SPECIAL_CHARACTERS_TRANSLATION_TABLE)
+        return docs
