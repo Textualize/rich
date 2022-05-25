@@ -1,19 +1,35 @@
+import sys
 import time
 from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Union
+
+if sys.version_info >= (3, 8):
+    from typing import Final
+else:
+    from typing_extensions import Final  # pragma: no cover
 
 from .segment import ControlCode, ControlType, Segment
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult
 
-STRIP_CONTROL_CODES = [
+STRIP_CONTROL_CODES: Final = [
+    7,  # Bell
     8,  # Backspace
     11,  # Vertical tab
     12,  # Form feed
     13,  # Carriage return
 ]
-_CONTROL_TRANSLATE = {_codepoint: None for _codepoint in STRIP_CONTROL_CODES}
+_CONTROL_STRIP_TRANSLATE: Final = {
+    _codepoint: None for _codepoint in STRIP_CONTROL_CODES
+}
 
+_CONTROL_MAKE_READABLE_TRANSLATE: Final = {
+    7: "\\a",
+    8: "\\b",
+    11: "\\v",
+    12: "\\f",
+    13: "\\r",
+}
 
 CONTROL_CODES_FORMAT: Dict[int, Callable[..., str]] = {
     ControlType.BELL: lambda: "\x07",
@@ -169,7 +185,7 @@ class Control:
 
 
 def strip_control_codes(
-    text: str, _translate_table: Dict[int, None] = _CONTROL_TRANSLATE
+    text: str, _translate_table: Dict[int, None] = _CONTROL_STRIP_TRANSLATE
 ) -> str:
     """Remove control codes from text.
 
@@ -178,6 +194,22 @@ def strip_control_codes(
 
     Returns:
         str: String with control codes removed.
+    """
+    return text.translate(_translate_table)
+
+
+def make_control_codes_readable(
+    text: str,
+    _translate_table: Dict[int, str] = _CONTROL_MAKE_READABLE_TRANSLATE,
+) -> str:
+    """Replace control codes with their "readable" equivalent in the given text.
+    (e.g. "\b" becomes "\\b")
+
+    Args:
+        text (str): A string possibly contain control codes.
+
+    Returns:
+        str: String with control codes replaced with a readable version.
     """
     return text.translate(_translate_table)
 
