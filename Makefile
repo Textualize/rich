@@ -1,5 +1,13 @@
+TEST_KW?=
+VERBOSE?=1
+COVERAGE?=1
+
 test:
-	TERM=unknown pytest --cov-report term-missing --cov=rich tests/ -vv
+	TERM=unknown pytest \
+	$(if $(findstring 1,$(COVERAGE)),--cov-report term-missing --cov=rich) \
+	$(if $(findstring 1,$(VERBOSE)),-vv) \
+	-k $(TEST_KW) \
+	tests/
 format-check:
 	black --check .
 format:
