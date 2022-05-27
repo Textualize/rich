@@ -23,7 +23,7 @@ _CONTROL_STRIP_TRANSLATE: Final = {
     _codepoint: None for _codepoint in STRIP_CONTROL_CODES
 }
 
-_CONTROL_MAKE_READABLE_TRANSLATE: Final = {
+CONTROL_ESCAPE: Final = {
     7: "\\a",
     8: "\\b",
     11: "\\v",
@@ -198,18 +198,18 @@ def strip_control_codes(
     return text.translate(_translate_table)
 
 
-def make_control_codes_readable(
+def escape_control_codes(
     text: str,
-    _translate_table: Dict[int, str] = _CONTROL_MAKE_READABLE_TRANSLATE,
+    _translate_table: Dict[int, str] = CONTROL_ESCAPE,
 ) -> str:
-    """Replace control codes with their "readable" equivalent in the given text.
+    """Replace control codes with their "escaped" equivalent in the given text.
     (e.g. "\b" becomes "\\b")
 
     Args:
-        text (str): A string possibly contain control codes.
+        text (str): A string possibly containing control codes.
 
     Returns:
-        str: String with control codes replaced with a readable version.
+        str: String with control codes replaced with their escaped version.
     """
     return text.translate(_translate_table)
 

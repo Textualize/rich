@@ -5,7 +5,7 @@ from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
 from typing import Any, Iterable, Optional, Tuple
 
 from .console import Group, RenderableType
-from .control import make_control_codes_readable
+from .control import escape_control_codes
 from .highlighter import ReprHighlighter
 from .jupyter import JupyterMixin
 from .panel import Panel
@@ -212,10 +212,22 @@ class Inspect(JupyterMixin):
             )
 
     def _get_formatted_doc(self, object_: Any) -> Optional[str]:
+        """
+        Extract the docstring of an object, process it and returns it.
+        The processing consists in cleaning up the doctring's indentation,
+        taking only its 1st paragraph if `self.help` is not True,
+        and escape its control codes.
+
+        Args:
+            object_ (Any): the object to get the docstring from.
+
+        Returns:
+            Optional[str]: the processed docstring, or None if no docstring was found.
+        """
         docs = getdoc(object_)
         if docs is None:
             return None
         docs = cleandoc(docs).strip()
         if not self.help:
             docs = _first_paragraph(docs)
-        return make_control_codes_readable(docs)
+        return escape_control_codes(docs)
