@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix text wrapping edge case https://github.com/Textualize/rich/pull/2296
+- Allow exceptions that are raised while a Live is rendered to be displayed and/or processed https://github.com/Textualize/rich/pull/2305
+- Fix crashes that can happen with `inspect` when docstrings contain some special control codes https://github.com/Textualize/rich/pull/2294
 
 ## [12.4.4] - 2022-05-24
 
