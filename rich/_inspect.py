@@ -5,6 +5,7 @@ from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
 from typing import Any, Iterable, Optional, Tuple
 
 from .console import Group, RenderableType
+from .control import escape_control_codes
 from .highlighter import ReprHighlighter
 from .jupyter import JupyterMixin
 from .panel import Panel
@@ -17,12 +18,6 @@ def _first_paragraph(doc: str) -> str:
     """Get the first paragraph from a docstring."""
     paragraph, _, _ = doc.partition("\n\n")
     return paragraph
-
-
-def _reformat_doc(doc: str) -> str:
-    """Reformat docstring."""
-    doc = cleandoc(doc).strip()
-    return doc
 
 
 class Inspect(JupyterMixin):
@@ -161,11 +156,9 @@ class Inspect(JupyterMixin):
                 yield ""
 
         if self.docs:
-            _doc = getdoc(obj)
+            _doc = self._get_formatted_doc(obj)
             if _doc is not None:
-                if not self.help:
-                    _doc = _first_paragraph(_doc)
-                doc_text = Text(_reformat_doc(_doc), style="inspect.help")
+                doc_text = Text(_doc, style="inspect.help")
                 doc_text = highlighter(doc_text)
                 yield doc_text
                 yield ""
@@ -200,13 +193,10 @@ class Inspect(JupyterMixin):
                     add_row(key_text, Pretty(value, highlighter=highlighter))
                 else:
                     if self.docs:
-                        docs = getdoc(value)
+                        docs = self._get_formatted_doc(value)
                         if docs is not None:
-                            _doc = _reformat_doc(str(docs))
-                            if not self.help:
-                                _doc = _first_paragraph(_doc)
-                            _signature_text.append("\n" if "\n" in _doc else " ")
-                            doc = highlighter(_doc)
+                            _signature_text.append("\n" if "\n" in docs else " ")
+                            doc = highlighter(docs)
                             doc.stylize("inspect.doc")
                             _signature_text.append(doc)
 
@@ -220,3 +210,24 @@ class Inspect(JupyterMixin):
                 f"[b cyan]{not_shown_count}[/][i] attribute(s) not shown.[/i] "
                 f"Run [b][magenta]inspect[/]([not b]inspect[/])[/b] for options."
             )
+
+    def _get_formatted_doc(self, object_: Any) -> Optional[str]:
+        """
+        Extract the docstring of an object, process it and returns it.
+        The processing consists in cleaning up the doctring's indentation,
+        taking only its 1st paragraph if `self.help` is not True,
+        and escape its control codes.
+
+        Args:
+            object_ (Any): the object to get the docstring from.
+
+        Returns:
+            Optional[str]: the processed docstring, or None if no docstring was found.
+        """
+        docs = getdoc(object_)
+        if docs is None:
+            return None
+        docs = cleandoc(docs).strip()
+        if not self.help:
+            docs = _first_paragraph(docs)
+        return escape_control_codes(docs)
