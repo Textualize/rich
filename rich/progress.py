@@ -1,3 +1,4 @@
+import atexit
 import io
 import sys
 import typing
@@ -1628,6 +1629,32 @@ class Progress(JupyterMixin):
         """
         with self._lock:
             del self._tasks[task_id]
+
+
+class rqdm:
+    _PROGRESS = None
+
+    def __init__(self, it, desc=None, leave=True):
+        self.it = it
+        self.leave = leave
+        self.desc = desc
+        if type(self)._PROGRESS is None:
+            type(self)._PROGRESS = Progress()
+        self.task_id = type(self)._PROGRESS.add_task(self.desc, total=len(self.it))
+        atexit.register(self.cleanup)
+
+    def __iter__(self):
+        type(self)._PROGRESS.start()
+        yield from type(self)._PROGRESS.track(self.it, task_id=self.task_id)
+        if self.leave is False:
+            type(self)._PROGRESS.remove_task(self.task_id)
+
+    def cleanup(self):
+        type(self)._PROGRESS.stop()
+
+
+def rrange(*args, **kwargs):
+    return rqdm(range(*args), **kwargs)
 
 
 if __name__ == "__main__":  # pragma: no coverage
