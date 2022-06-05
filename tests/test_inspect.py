@@ -313,7 +313,7 @@ def test_inspect_module_with_class():
 )
 def test_can_handle_special_characters_in_docstrings(
     special_character: str, expected_replacement: str
-):
+) -> None:
     class Something:
         class Thing:
             pass
@@ -325,8 +325,9 @@ def test_can_handle_special_characters_in_docstrings(
 
     expected = """\
 ╭─ <class 'tests.test_inspect.test_can_handle_sp─╮
-│ class test_can_handle_special_characters_in_do │
-│ cstrings.<locals>.Something():                 │
+│ class                                          │
+│ test_can_handle_special_characters_in_docstrin │
+│ gs.<locals>.Something():                       │
 │                                                │
 │ Thing = class Thing():                         │
 │         Multiline docstring                    │
@@ -335,5 +336,4 @@ def test_can_handle_special_characters_in_docstrings(
 """ % (
         expected_replacement
     )
-
     assert render(Something, methods=True) == expected
