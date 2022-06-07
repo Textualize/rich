@@ -181,6 +181,34 @@ def test_vertical_align_top():
     assert result == expected
 
 
+@pytest.mark.parametrize(
+    "box,result",
+    [
+        (None, " 1  2 \n 3  4 \n"),
+        (box.HEAVY_HEAD, "┌───┬───┐\n│ 1 │ 2 │\n│ 3 │ 4 │\n└───┴───┘\n"),
+        (box.SQUARE_DOUBLE_HEAD, "┌───┬───┐\n│ 1 │ 2 │\n│ 3 │ 4 │\n└───┴───┘\n"),
+        (box.MINIMAL_DOUBLE_HEAD, "    ╷    \n  1 │ 2  \n  3 │ 4  \n    ╵    \n"),
+        (box.MINIMAL_HEAVY_HEAD, "    ╷    \n  1 │ 2  \n  3 │ 4  \n    ╵    \n"),
+        (box.ASCII_DOUBLE_HEAD, "+---+---+\n| 1 | 2 |\n| 3 | 4 |\n+---+---+\n"),
+    ],
+)
+def test_table_show_header_false_substitution(box, result):
+    """When the box style is one with a custom header edge, it should be substituted for
+    the equivalent box that does not have a custom header when show_header=False"""
+    table = Table(show_header=False, box=box)
+    table.add_column()
+    table.add_column()
+
+    table.add_row("1", "2")
+    table.add_row("3", "4")
+
+    console = Console(record=True)
+    console.print(table)
+    output = console.export_text()
+
+    assert output == result
+
+
 if __name__ == "__main__":
     render = render_tables()
     print(render)
