@@ -927,7 +927,6 @@ if __name__ == "__main__":  # pragma: no cover
             title="Star Wars Movies",
             caption="Rich example table",
             caption_justify="right",
-            box=box.MINIMAL,
         )
 
         table.add_column(
