@@ -656,8 +656,8 @@ class Console:
 
         self.is_jupyter = _is_jupyter() if force_jupyter is None else force_jupyter
         if self.is_jupyter:
-            width = width or 93
-            height = height or 100
+            width = width or int(self._environ.get("COLUMNS", 93))
+            height = height or int(self._environ.get("LINES", 100))
 
         self.soft_wrap = soft_wrap
         self._width = width
