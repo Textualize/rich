@@ -20,6 +20,7 @@
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
  • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
  • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
+  • [فارسی readme](https://github.com/willmcgugan/rich/blob/master/README.fa.md)
 
 Rich ist eine Python-Bibliothek für _rich_ Text und schöne Formatierung im Terminal.
 
