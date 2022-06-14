@@ -41,3 +41,4 @@ The following people have contributed to the development of Rich:
 - [Arian Mollik Wasi](https://github.com/wasi-master)
 - [Handhika Yanuar Pratama](https://github.com/theDreamer911)
 - [za](https://github.com/za)
+- [Motahhar Mokfi](https://github.com/motahhar)

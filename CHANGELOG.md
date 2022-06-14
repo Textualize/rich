@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix text wrapping edge case https://github.com/Textualize/rich/pull/2296
 - Allow exceptions that are raised while a Live is rendered to be displayed and/or processed https://github.com/Textualize/rich/pull/2305
 - Fix crashes that can happen with `inspect` when docstrings contain some special control codes https://github.com/Textualize/rich/pull/2294
+- Fix edges used in first row of tables when `show_header=False` https://github.com/Textualize/rich/pull/2330
 
 ## [12.4.4] - 2022-05-24
 
@@ -57,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Rebuilt SVG export to create a simpler SVG that is more portable
 - Fix render_lines crash when render height was negative https://github.com/Textualize/rich/pull/2246
+- Make objects from `rich.progress.open` forward the name of the internal handle https://github.com/Textualize/rich/pull/2254
 
 ### Added
 

@@ -88,6 +88,16 @@ class Box:
             box = ASCII
         return box
 
+    def get_plain_headed_box(self) -> "Box":
+        """If this box uses special characters for the borders of the header, then
+        return the equivalent box that does not.
+
+        Returns:
+            Box: The most similar Box that doesn't use header-specific box characters.
+                If the current Box already satisfies this criterion, then it's returned.
+        """
+        return PLAIN_HEADED_SUBSTITUTIONS.get(self, self)
+
     def get_top(self, widths: Iterable[int]) -> str:
         """Get the top of a simple box.
 
@@ -427,6 +437,15 @@ LEGACY_WINDOWS_SUBSTITUTIONS = {
     HEAVY: SQUARE,
     HEAVY_EDGE: SQUARE,
     HEAVY_HEAD: SQUARE,
+}
+
+# Map headed boxes to their headerless equivalents
+PLAIN_HEADED_SUBSTITUTIONS = {
+    HEAVY_HEAD: SQUARE,
+    SQUARE_DOUBLE_HEAD: SQUARE,
+    MINIMAL_DOUBLE_HEAD: MINIMAL,
+    MINIMAL_HEAVY_HEAD: MINIMAL,
+    ASCII_DOUBLE_HEAD: ASCII2,
 }
 
 
