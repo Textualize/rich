@@ -263,6 +263,30 @@ def SetConsoleCursorPosition(
     return bool(_SetConsoleCursorPosition(std_handle, coords))
 
 
+_GetConsoleCursorInfo = windll.kernel32.GetConsoleCursorInfo
+_GetConsoleCursorInfo.argtypes = [
+    wintypes.HANDLE,
+    ctypes.POINTER(CONSOLE_CURSOR_INFO),
+]
+_GetConsoleCursorInfo.restype = wintypes.BOOL
+
+
+def GetConsoleCursorInfo(
+    std_handle: wintypes.HANDLE, cursor_info: CONSOLE_CURSOR_INFO
+) -> bool:
+    """Get the cursor info - used to get cursor visibility and width
+
+    Args:
+        std_handle (wintypes.HANDLE): A handle to the console input buffer or the console screen buffer.
+        cursor_info (CONSOLE_CURSOR_INFO): CONSOLE_CURSOR_INFO ctype struct that receives information
+            about the console's cursor.
+
+    Returns:
+          bool: True if the function succeeds, otherwise False.
+    """
+    return bool(_GetConsoleCursorInfo(std_handle, byref(cursor_info)))
+
+
 _SetConsoleCursorInfo = windll.kernel32.SetConsoleCursorInfo
 _SetConsoleCursorInfo.argtypes = [
     wintypes.HANDLE,
@@ -339,6 +363,12 @@ class LegacyWindowsTerm:
         self._handle = handle
         default_text = GetConsoleScreenBufferInfo(handle).wAttributes
         self._default_text = default_text
+
+        # Store the current cursor size
+        # @link https://docs.microsoft.com/en-us/windows/console/console-cursor-info-str
+        initial_cursor_info = CONSOLE_CURSOR_INFO()
+        GetConsoleCursorInfo(self._handle, cursor_info=initial_cursor_info)
+        self._initial_cursor_size = initial_cursor_info.dwSize
 
         self._default_fore = default_text & 7
         self._default_back = (default_text >> 4) & 7
@@ -523,12 +553,16 @@ class LegacyWindowsTerm:
 
     def hide_cursor(self) -> None:
         """Hide the cursor"""
-        invisible_cursor = CONSOLE_CURSOR_INFO(dwSize=100, bVisible=0)
+        invisible_cursor = CONSOLE_CURSOR_INFO(
+            dwSize=self._initial_cursor_size, bVisible=0
+        )
         SetConsoleCursorInfo(self._handle, cursor_info=invisible_cursor)
 
     def show_cursor(self) -> None:
         """Show the cursor"""
-        visible_cursor = CONSOLE_CURSOR_INFO(dwSize=100, bVisible=1)
+        visible_cursor = CONSOLE_CURSOR_INFO(
+            dwSize=self._initial_cursor_size, bVisible=1
+        )
         SetConsoleCursorInfo(self._handle, cursor_info=visible_cursor)
 
     def set_title(self, title: str) -> None:
