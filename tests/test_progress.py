@@ -600,6 +600,7 @@ def test_open_text_mode() -> None:
     try:
         with rich.progress.open(filename, "r") as f:
             assert f.read() == "Hello, World!"
+            assert f.name == filename
         assert f.closed
     finally:
         os.remove(filename)
@@ -613,6 +614,7 @@ def test_wrap_file() -> None:
         with open(filename, "rb") as file:
             with rich.progress.wrap_file(file, total=total) as f:
                 assert f.read() == b"Hello, World!"
+                assert f.name == filename
             assert f.closed
             assert not f.handle.closed
             assert not file.closed

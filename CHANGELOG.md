@@ -58,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Rebuilt SVG export to create a simpler SVG that is more portable
 - Fix render_lines crash when render height was negative https://github.com/Textualize/rich/pull/2246
+- Make objects from `rich.progress.open` forward the name of the internal handle https://github.com/Textualize/rich/pull/2254
 
 ### Added
 
