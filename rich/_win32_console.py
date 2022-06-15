@@ -364,12 +364,6 @@ class LegacyWindowsTerm:
         default_text = GetConsoleScreenBufferInfo(handle).wAttributes
         self._default_text = default_text
 
-        # Store the current cursor size
-        # @link https://docs.microsoft.com/en-us/windows/console/console-cursor-info-str
-        initial_cursor_info = CONSOLE_CURSOR_INFO()
-        GetConsoleCursorInfo(self._handle, cursor_info=initial_cursor_info)
-        self._initial_cursor_size = initial_cursor_info.dwSize
-
         self._default_fore = default_text & 7
         self._default_back = (default_text >> 4) & 7
         self._default_attrs = self._default_fore | (self._default_back << 4)
@@ -553,16 +547,14 @@ class LegacyWindowsTerm:
 
     def hide_cursor(self) -> None:
         """Hide the cursor"""
-        invisible_cursor = CONSOLE_CURSOR_INFO(
-            dwSize=self._initial_cursor_size, bVisible=0
-        )
+        current_cursor_size = self._get_cursor_size()
+        invisible_cursor = CONSOLE_CURSOR_INFO(dwSize=current_cursor_size, bVisible=0)
         SetConsoleCursorInfo(self._handle, cursor_info=invisible_cursor)
 
     def show_cursor(self) -> None:
         """Show the cursor"""
-        visible_cursor = CONSOLE_CURSOR_INFO(
-            dwSize=self._initial_cursor_size, bVisible=1
-        )
+        current_cursor_size = self._get_cursor_size()
+        visible_cursor = CONSOLE_CURSOR_INFO(dwSize=current_cursor_size, bVisible=1)
         SetConsoleCursorInfo(self._handle, cursor_info=visible_cursor)
 
     def set_title(self, title: str) -> None:
@@ -573,6 +565,12 @@ class LegacyWindowsTerm:
         """
         assert len(title) < 255, "Console title must be less than 255 characters"
         SetConsoleTitle(title)
+
+    def _get_cursor_size(self) -> int:
+        """Get the percentage of the character cell that is filled by the cursor"""
+        cursor_info = CONSOLE_CURSOR_INFO()
+        GetConsoleCursorInfo(self._handle, cursor_info=cursor_info)
+        return int(cursor_info.dwSize)
 
 
 if __name__ == "__main__":
