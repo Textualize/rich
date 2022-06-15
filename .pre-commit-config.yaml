@@ -14,7 +14,6 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: mixed-line-ending
-      - id: trailing-whitespace
       - id: check-vcs-permalinks
       - id: check-shebang-scripts-are-executable
   - repo: https://github.com/pre-commit/pygrep-hooks
@@ -31,7 +30,7 @@ repos:
       - id: pycln
         args: [--all]
   - repo: https://github.com/psf/black
-    rev: 22.1.0
+    rev: 22.3.0
     hooks:
       - id: black
         exclude: ^benchmarks/

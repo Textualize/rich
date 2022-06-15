@@ -216,6 +216,10 @@ class _Reader(RawIOBase, BinaryIO):
     def isatty(self) -> bool:
         return self.handle.isatty()
 
+    @property
+    def name(self) -> str:
+        return self.handle.name
+
     def readable(self) -> bool:
         return self.handle.readable()
 

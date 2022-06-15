@@ -1,8 +1,8 @@
 import re
 from typing import Iterable, List, Tuple
 
-from .cells import cell_len, chop_cells
 from ._loop import loop_last
+from .cells import cell_len, chop_cells
 
 re_word = re.compile(r"\s*\S+\s*")
 
@@ -27,14 +27,15 @@ def divide_line(text: str, width: int, fold: bool = True) -> List[int]:
         if line_position + word_length > width:
             if word_length > width:
                 if fold:
-                    for last, line in loop_last(
-                        chop_cells(word, width, position=line_position)
-                    ):
+                    chopped_words = chop_cells(word, max_size=width, position=0)
+                    for last, line in loop_last(chopped_words):
+                        if start:
+                            append(start)
+
                         if last:
                             line_position = _cell_len(line)
                         else:
                             start += len(line)
-                            append(start)
                 else:
                     if start:
                         append(start)
