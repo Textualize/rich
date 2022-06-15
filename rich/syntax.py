@@ -2,7 +2,19 @@ import os.path
 import platform
 import textwrap
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 from pygments.lexer import Lexer
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
@@ -193,6 +205,24 @@ class ANSISyntaxTheme(SyntaxTheme):
         return self._background_style
 
 
+class SyntaxPosition(NamedTuple):
+    """A position in a Syntax object. Lines start at 1, columns at 0"""
+
+    line_number: int
+    column_index: int
+
+
+class SyntaxHighlightRange(NamedTuple):
+    """
+    A range to highlight in a Syntax object.
+    The default style, if none is provided, is to highlight the range in bold.
+    """
+
+    start: SyntaxPosition
+    end: SyntaxPosition
+    style: Style = Style(bold=True)
+
+
 class Syntax(JupyterMixin):
     """Construct a Syntax object to render syntax highlighted code.
 
@@ -206,6 +236,7 @@ class Syntax(JupyterMixin):
         line_range (Tuple[int | None, int | None], optional): If given should be a tuple of the start and end line to render.
             A value of None in the tuple indicates the range is open in that direction.
         highlight_lines (Set[int]): A set of line numbers to highlight.
+        highlight_ranges (Sequence[SyntaxHighlightRange], optional): An optional sequence of ranges to highlight.
         code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
         tab_size (int, optional): Size of tabs. Defaults to 4.
         word_wrap (bool, optional): Enable word wrapping.
@@ -240,6 +271,7 @@ class Syntax(JupyterMixin):
         start_line: int = 1,
         line_range: Optional[Tuple[Optional[int], Optional[int]]] = None,
         highlight_lines: Optional[Set[int]] = None,
+        highlight_ranges: Optional[Sequence[SyntaxHighlightRange]] = None,
         code_width: Optional[int] = None,
         tab_size: int = 4,
         word_wrap: bool = False,
@@ -254,6 +286,7 @@ class Syntax(JupyterMixin):
         self.start_line = start_line
         self.line_range = line_range
         self.highlight_lines = highlight_lines or set()
+        self.highlight_ranges = highlight_ranges or ()
         self.code_width = code_width
         self.tab_size = tab_size
         self.word_wrap = word_wrap
@@ -278,6 +311,7 @@ class Syntax(JupyterMixin):
         line_range: Optional[Tuple[int, int]] = None,
         start_line: int = 1,
         highlight_lines: Optional[Set[int]] = None,
+        highlight_ranges: Optional[Sequence[SyntaxHighlightRange]] = None,
         code_width: Optional[int] = None,
         tab_size: int = 4,
         word_wrap: bool = False,
@@ -297,6 +331,7 @@ class Syntax(JupyterMixin):
             start_line (int, optional): Starting number for line numbers. Defaults to 1.
             line_range (Tuple[int, int], optional): If given should be a tuple of the start and end line to render.
             highlight_lines (Set[int]): A set of line numbers to highlight.
+            highlight_ranges (Sequence[SyntaxHighlightRange], optional): An optional sequence of ranges to highlight.
             code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
             tab_size (int, optional): Size of tabs. Defaults to 4.
             word_wrap (bool, optional): Enable word wrapping of code.
@@ -322,6 +357,7 @@ class Syntax(JupyterMixin):
             line_range=line_range,
             start_line=start_line,
             highlight_lines=highlight_lines,
+            highlight_ranges=highlight_ranges,
             code_width=code_width,
             tab_size=tab_size,
             word_wrap=word_wrap,
@@ -448,7 +484,7 @@ class Syntax(JupyterMixin):
 
                 def line_tokenize() -> Iterable[Tuple[Any, str]]:
                     """Split tokens to one per line."""
-                    assert lexer
+                    assert lexer  # required to make MyPy happy, despite the `if lexer is None/else` 🤷
 
                     for token_type, token in lexer.get_tokens(code):
                         while token:
@@ -484,7 +520,62 @@ class Syntax(JupyterMixin):
                 )
             if self.background_color is not None:
                 text.stylize(f"on {self.background_color}")
+
+        if self.highlight_ranges:
+            for highlight_range in self.highlight_ranges:
+                self._apply_highlight_range(
+                    code=code, text=text, highlight_range=highlight_range
+                )
+
         return text
+
+    def _apply_highlight_range(
+        self, *, code: str, text: Text, highlight_range: SyntaxHighlightRange
+    ) -> None:
+        """
+        Apply a highlight range to a text instance,
+        using the given code to determine the right portion to apply the style to.
+
+        Args:
+            code (str): Code to highlight.
+            text (Text): Text instance to apply the style to.
+            highlight_range (SyntaxHighlightRange): Highlight range to apply.
+        """
+        start = self._get_code_index_for_syntax_position(code, highlight_range.start)
+        end = self._get_code_index_for_syntax_position(code, highlight_range.end)
+        if start is not None and end is not None:
+            text.stylize(highlight_range.style, start, end)
+
+    def _get_code_index_for_syntax_position(
+        self, code: str, position: SyntaxPosition
+    ) -> Optional[int]:
+        """
+        Returns the index of the code string for the given position.
+
+        Args:
+            code (str): The code string to search.
+            position (SyntaxPosition): The position to search for.
+
+        Returns:
+            Optional[int]: The index of the code string for the given position, or `None`
+                if the position is invalid or out of range.
+        """
+        current_line_number = 1
+        current_column_index = 0
+        for index, char in enumerate(code):
+            if (
+                current_line_number == position.line_number
+                and current_column_index == position.column_index
+            ):
+                return index  # gotcha!
+            if char == "\n":
+                current_line_number += 1
+                current_column_index = 0
+            else:
+                current_column_index += 1
+            if current_line_number > position.line_number:
+                return None  # stop searching
+        return None
 
     def _get_line_numbers_color(self, blend: float = 0.3) -> Color:
         background_style = self._theme.get_background_style() + self.background_style
@@ -574,11 +665,8 @@ class Syntax(JupyterMixin):
             else self.code_width
         )
 
-        ends_on_nl = self.code.endswith("\n")
-        code = self.code if ends_on_nl else self.code + "\n"
-        code = textwrap.dedent(code) if self.dedent else code
-        code = code.expandtabs(self.tab_size)
-        text = self.highlight(code, self.line_range)
+        ends_on_nl, processed_code = self._get_processed_code(self.code)
+        text = self.highlight(processed_code, self.line_range)
 
         if not self.line_numbers and not self.word_wrap and not self.line_range:
             if not ends_on_nl:
@@ -689,6 +777,26 @@ class Syntax(JupyterMixin):
                 for wrapped_line in wrapped_lines:
                     yield from wrapped_line
                     yield new_line
+
+    def _get_processed_code(self, code: str) -> Tuple[bool, str]:
+        """
+        Applies various processing to a raw code string
+        (normalises it so it always ends with a line return, dedents it if necessary, etc.)
+
+        Args:
+            code (str): The raw code string to process
+
+        Returns:
+            Tuple[bool, str]: the boolean indicates whether the raw code ends with a line return,
+                while the string is the processed code.
+        """
+        ends_on_nl = code.endswith("\n")
+        processed_code = code if ends_on_nl else code + "\n"
+        processed_code = (
+            textwrap.dedent(processed_code) if self.dedent else processed_code
+        )
+        processed_code = processed_code.expandtabs(self.tab_size)
+        return ends_on_nl, processed_code
 
 
 if __name__ == "__main__":  # pragma: no cover
