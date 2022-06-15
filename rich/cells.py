@@ -80,7 +80,7 @@ def set_cell_size(text: str, total: int) -> str:
             return text + " " * (total - size)
         return text[:total]
 
-    if not total:
+    if total <= 0:
         return ""
     cell_size = cell_len(text)
     if cell_size == total:
