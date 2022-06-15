@@ -752,8 +752,8 @@ class Table(JupyterMixin):
             if self.box
             else None
         )
+        _box = _box.get_plain_headed_box() if _box and not self.show_header else _box
 
-        # _box = self.box
         new_line = Segment.line()
 
         columns = self.columns

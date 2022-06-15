@@ -1,14 +1,13 @@
 import sys
 from functools import lru_cache
-from marshal import loads, dumps
+from marshal import dumps, loads
 from random import randint
-from typing import Any, cast, Dict, Iterable, List, Optional, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
 
 from . import errors
 from .color import Color, ColorParseError, ColorSystem, blend_rgb
-from .repr import rich_repr, Result
+from .repr import Result, rich_repr
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
-
 
 # Style instances and style definitions are often interchangeable
 StyleType = Union[str, "Style"]
@@ -279,7 +278,7 @@ class Style:
             style = Style.on(click=self.on_click)
 
         Args:
-            meta (Optiona[Dict[str, Any]], optional): An optional dict of meta information.
+            meta (Optional[Dict[str, Any]], optional): An optional dict of meta information.
             **handlers (Any): Keyword arguments are translated in to handlers.
 
         Returns:

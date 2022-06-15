@@ -1,4 +1,4 @@
-from rich.control import Control, strip_control_codes
+from rich.control import Control, escape_control_codes, strip_control_codes
 from rich.segment import ControlType, Segment
 
 
@@ -11,6 +11,12 @@ def test_strip_control_codes():
     assert strip_control_codes("") == ""
     assert strip_control_codes("foo\rbar") == "foobar"
     assert strip_control_codes("Fear is the mind killer") == "Fear is the mind killer"
+
+
+def test_escape_control_codes():
+    assert escape_control_codes("") == ""
+    assert escape_control_codes("foo\rbar") == "foo\\rbar"
+    assert escape_control_codes("Fear is the mind killer") == "Fear is the mind killer"
 
 
 def test_control_move_to():

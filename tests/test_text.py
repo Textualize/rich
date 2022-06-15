@@ -65,11 +65,11 @@ def test_eq():
 
 
 def test_contain():
-    test = Text("foobar")
-    assert "foo" in test
-    assert "foo " not in test
-    assert Text("bar") in test
-    assert None not in test
+    text = Text("foobar")
+    assert "foo" in text
+    assert "foo " not in text
+    assert Text("bar") in text
+    assert None not in text
 
 
 def test_plain_property():
@@ -80,14 +80,14 @@ def test_plain_property():
 
 
 def test_plain_property_setter():
-    test = Text("foo")
-    test.plain = "bar"
-    assert str(test) == "bar"
-    test = Text()
-    test.append("Hello, World", "bold")
-    test.plain = "Hello"
-    assert str(test) == "Hello"
-    assert test._spans == [Span(0, 5, "bold")]
+    text = Text("foo")
+    text.plain = "bar"
+    assert str(text) == "bar"
+    text = Text()
+    text.append("Hello, World", "bold")
+    text.plain = "Hello"
+    assert str(text) == "Hello"
+    assert text._spans == [Span(0, 5, "bold")]
 
 
 def test_from_markup():
@@ -115,66 +115,66 @@ def test_from_ansi():
 
 
 def test_copy():
-    test = Text()
-    test.append("Hello", "bold")
-    test.append(" ")
-    test.append("World", "italic")
-    test_copy = test.copy()
-    assert test == test_copy
-    assert test is not test_copy
+    text = Text()
+    text.append("Hello", "bold")
+    text.append(" ")
+    text.append("World", "italic")
+    test_copy = text.copy()
+    assert text == test_copy
+    assert text is not test_copy
 
 
 def test_rstrip():
-    test = Text("Hello, World!    ")
-    test.rstrip()
-    assert str(test) == "Hello, World!"
+    text = Text("Hello, World!    ")
+    text.rstrip()
+    assert str(text) == "Hello, World!"
 
 
 def test_rstrip_end():
-    test = Text("Hello, World!    ")
-    test.rstrip_end(14)
-    assert str(test) == "Hello, World! "
+    text = Text("Hello, World!    ")
+    text.rstrip_end(14)
+    assert str(text) == "Hello, World! "
 
 
 def test_stylize():
-    test = Text("Hello, World!")
-    test.stylize("bold", 7, 11)
-    assert test._spans == [Span(7, 11, "bold")]
-    test.stylize("bold", 20, 25)
-    assert test._spans == [Span(7, 11, "bold")]
+    text = Text("Hello, World!")
+    text.stylize("bold", 7, 11)
+    assert text._spans == [Span(7, 11, "bold")]
+    text.stylize("bold", 20, 25)
+    assert text._spans == [Span(7, 11, "bold")]
 
 
 def test_stylize_negative_index():
-    test = Text("Hello, World!")
-    test.stylize("bold", -6, -1)
-    assert test._spans == [Span(7, 12, "bold")]
+    text = Text("Hello, World!")
+    text.stylize("bold", -6, -1)
+    assert text._spans == [Span(7, 12, "bold")]
 
 
 def test_highlight_regex():
-    test = Text("peek-a-boo")
+    text = Text("peek-a-boo")
 
-    count = test.highlight_regex(r"NEVER_MATCH", "red")
+    count = text.highlight_regex(r"NEVER_MATCH", "red")
     assert count == 0
-    assert len(test._spans) == 0
+    assert len(text._spans) == 0
 
     # text: peek-a-boo
     # indx: 0123456789
-    count = test.highlight_regex(r"[a|e|o]+", "red")
+    count = text.highlight_regex(r"[a|e|o]+", "red")
     assert count == 3
-    assert sorted(test._spans) == [
+    assert sorted(text._spans) == [
         Span(1, 3, "red"),
         Span(5, 6, "red"),
         Span(8, 10, "red"),
     ]
 
-    test = Text("Ada Lovelace, Alan Turing")
-    count = test.highlight_regex(
+    text = Text("Ada Lovelace, Alan Turing")
+    count = text.highlight_regex(
         r"(?P<yellow>[A-Za-z]+)[ ]+(?P<red>[A-Za-z]+)(?P<NEVER_MATCH>NEVER_MATCH)*"
     )
 
     # The number of matched name should be 2
     assert count == 2
-    assert sorted(test._spans) == [
+    assert sorted(text._spans) == [
         Span(0, 3, "yellow"),  # Ada
         Span(4, 12, "red"),  # Lovelace
         Span(14, 18, "yellow"),  # Alan
@@ -183,7 +183,7 @@ def test_highlight_regex():
 
 
 def test_highlight_regex_callable():
-    test = Text("Vulnerability CVE-2018-6543 detected")
+    text = Text("Vulnerability CVE-2018-6543 detected")
     re_cve = r"CVE-\d{4}-\d+"
 
     def get_style(text: str) -> Style:
@@ -191,141 +191,141 @@ def test_highlight_regex_callable():
             f"bold yellow link https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword={text}"
         )
 
-    count = test.highlight_regex(re_cve, get_style)
+    count = text.highlight_regex(re_cve, get_style)
     assert count == 1
-    assert len(test._spans) == 1
-    assert test._spans[0].start == 14
-    assert test._spans[0].end == 27
+    assert len(text._spans) == 1
+    assert text._spans[0].start == 14
+    assert text._spans[0].end == 27
     assert (
-        test._spans[0].style.link
+        text._spans[0].style.link
         == "https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=CVE-2018-6543"
     )
 
 
 def test_highlight_words():
-    test = Text("Do NOT! touch anything!")
+    text = Text("Do NOT! touch anything!")
     words = ["NOT", "!"]
-    count = test.highlight_words(words, "red")
+    count = text.highlight_words(words, "red")
     assert count == 3
-    assert sorted(test._spans) == [
+    assert sorted(text._spans) == [
         Span(3, 6, "red"),  # NOT
         Span(6, 7, "red"),  # !
         Span(22, 23, "red"),  # !
     ]
 
     # regex escape test
-    test = Text("[o|u]aeiou")
+    text = Text("[o|u]aeiou")
     words = ["[a|e|i]", "[o|u]"]
-    count = test.highlight_words(words, "red")
+    count = text.highlight_words(words, "red")
     assert count == 1
-    assert test._spans == [Span(0, 5, "red")]
+    assert text._spans == [Span(0, 5, "red")]
 
     # case sensitive
-    test = Text("AB Ab aB ab")
+    text = Text("AB Ab aB ab")
     words = ["AB"]
 
-    count = test.highlight_words(words, "red")
+    count = text.highlight_words(words, "red")
     assert count == 1
-    assert test._spans == [Span(0, 2, "red")]
+    assert text._spans == [Span(0, 2, "red")]
 
-    test = Text("AB Ab aB ab")
-    count = test.highlight_words(words, "red", case_sensitive=False)
+    text = Text("AB Ab aB ab")
+    count = text.highlight_words(words, "red", case_sensitive=False)
     assert count == 4
 
 
 def test_set_length():
-    test = Text("Hello")
-    test.set_length(5)
-    assert test == Text("Hello")
+    text = Text("Hello")
+    text.set_length(5)
+    assert text == Text("Hello")
 
-    test = Text("Hello")
-    test.set_length(10)
-    assert test == Text("Hello     ")
+    text = Text("Hello")
+    text.set_length(10)
+    assert text == Text("Hello     ")
 
-    test = Text("Hello World")
-    test.stylize("bold", 0, 5)
-    test.stylize("italic", 7, 9)
+    text = Text("Hello World")
+    text.stylize("bold", 0, 5)
+    text.stylize("italic", 7, 9)
 
-    test.set_length(3)
+    text.set_length(3)
     expected = Text()
     expected.append("Hel", "bold")
-    assert test == expected
+    assert text == expected
 
 
 def test_console_width():
     console = Console()
-    test = Text("Hello World!\nfoobarbaz")
-    assert test.__rich_measure__(console, 80) == Measurement(9, 12)
+    text = Text("Hello World!\nfoobarbaz")
+    assert text.__rich_measure__(console, 80) == Measurement(9, 12)
     assert Text(" " * 4).__rich_measure__(console, 80) == Measurement(4, 4)
     assert Text(" \n  \n   ").__rich_measure__(console, 80) == Measurement(3, 3)
 
 
 def test_join():
-    test = Text("bar").join([Text("foo", "red"), Text("baz", "blue")])
-    assert str(test) == "foobarbaz"
-    assert test._spans == [Span(0, 3, "red"), Span(6, 9, "blue")]
+    text = Text("bar").join([Text("foo", "red"), Text("baz", "blue")])
+    assert str(text) == "foobarbaz"
+    assert text._spans == [Span(0, 3, "red"), Span(6, 9, "blue")]
 
 
 def test_trim_spans():
-    test = Text("Hello")
-    test._spans[:] = [Span(0, 3, "red"), Span(3, 6, "green"), Span(6, 9, "blue")]
-    test._trim_spans()
-    assert test._spans == [Span(0, 3, "red"), Span(3, 5, "green")]
+    text = Text("Hello")
+    text._spans[:] = [Span(0, 3, "red"), Span(3, 6, "green"), Span(6, 9, "blue")]
+    text._trim_spans()
+    assert text._spans == [Span(0, 3, "red"), Span(3, 5, "green")]
 
 
 def test_pad_left():
-    test = Text("foo")
-    test.pad_left(3, "X")
-    assert str(test) == "XXXfoo"
+    text = Text("foo")
+    text.pad_left(3, "X")
+    assert str(text) == "XXXfoo"
 
 
 def test_pad_right():
-    test = Text("foo")
-    test.pad_right(3, "X")
-    assert str(test) == "fooXXX"
+    text = Text("foo")
+    text.pad_right(3, "X")
+    assert str(text) == "fooXXX"
 
 
 def test_append():
-    test = Text("foo")
-    test.append("bar")
-    assert str(test) == "foobar"
-    test.append(Text("baz", "bold"))
-    assert str(test) == "foobarbaz"
-    assert test._spans == [Span(6, 9, "bold")]
+    text = Text("foo")
+    text.append("bar")
+    assert str(text) == "foobar"
+    text.append(Text("baz", "bold"))
+    assert str(text) == "foobarbaz"
+    assert text._spans == [Span(6, 9, "bold")]
 
     with pytest.raises(ValueError):
-        test.append(Text("foo"), "bar")
+        text.append(Text("foo"), "bar")
 
     with pytest.raises(TypeError):
-        test.append(1)
+        text.append(1)
 
 
 def test_append_text():
-    test = Text("foo")
-    test.append_text(Text("bar", style="bold"))
-    assert str(test) == "foobar"
-    assert test._spans == [Span(3, 6, "bold")]
+    text = Text("foo")
+    text.append_text(Text("bar", style="bold"))
+    assert str(text) == "foobar"
+    assert text._spans == [Span(3, 6, "bold")]
 
 
 def test_end():
     console = Console(width=20, file=StringIO())
-    test = Group(Text.from_markup("foo", end=" "), Text.from_markup("bar"))
-    console.print(test)
+    text = Group(Text.from_markup("foo", end=" "), Text.from_markup("bar"))
+    console.print(text)
     assert console.file.getvalue() == "foo bar\n"
 
 
 def test_split():
-    test = Text()
-    test.append("foo", "red")
-    test.append("\n")
-    test.append("bar", "green")
-    test.append("\n")
+    text = Text()
+    text.append("foo", "red")
+    text.append("\n")
+    text.append("bar", "green")
+    text.append("\n")
 
     line1 = Text()
     line1.append("foo", "red")
     line2 = Text()
     line2.append("bar", "green")
-    split = test.split("\n")
+    split = text.split("\n")
     assert len(split) == 2
     assert split[0] == line1
     assert split[1] == line2
@@ -334,8 +334,8 @@ def test_split():
 
 
 def test_split_spans():
-    test = Text.from_markup("[red]Hello\n[b]World")
-    lines = test.split("\n")
+    text = Text.from_markup("[red]Hello\n[b]World")
+    lines = text.split("\n")
     assert lines[0].plain == "Hello"
     assert lines[1].plain == "World"
     assert lines[0].spans == [Span(0, 5, "red")]
@@ -386,16 +386,16 @@ def test_divide():
 
 
 def test_right_crop():
-    test = Text()
-    test.append("foobar", "red")
-    test.right_crop(3)
-    assert str(test) == "foo"
-    assert test._spans == [Span(0, 3, "red")]
+    text = Text()
+    text.append("foobar", "red")
+    text.right_crop(3)
+    assert str(text) == "foo"
+    assert text._spans == [Span(0, 3, "red")]
 
 
 def test_wrap_3():
-    test = Text("foo bar baz")
-    lines = test.wrap(Console(), 3)
+    text = Text("foo bar baz")
+    lines = text.wrap(Console(), 3)
     print(repr(lines))
     assert len(lines) == 3
     assert lines[0] == Text("foo")
@@ -404,17 +404,46 @@ def test_wrap_3():
 
 
 def test_wrap_4():
-    test = Text("foo bar baz", justify="left")
-    lines = test.wrap(Console(), 4)
+    text = Text("foo bar baz", justify="left")
+    lines = text.wrap(Console(), 4)
     assert len(lines) == 3
     assert lines[0] == Text("foo ")
     assert lines[1] == Text("bar ")
     assert lines[2] == Text("baz ")
 
 
+def test_wrap_wrapped_word_length_greater_than_available_width():
+    text = Text("1234 12345678")
+    lines = text.wrap(Console(), 7)
+    assert lines._lines == [
+        Text("1234 "),
+        Text("1234567"),
+        Text("8"),
+    ]
+
+
+def test_wrap_cjk():
+    text = Text("わさび")
+    lines = text.wrap(Console(), 4)
+    assert lines._lines == [
+        Text("わさ"),
+        Text("び"),
+    ]
+
+
+def test_wrap_cjk_width_mid_character():
+    text = Text("わさび")
+    lines = text.wrap(Console(), 3)
+    assert lines._lines == [
+        Text("わ"),
+        Text("さ"),
+        Text("び"),
+    ]
+
+
 def test_wrap_long():
-    test = Text("abracadabra", justify="left")
-    lines = test.wrap(Console(), 4)
+    text = Text("abracadabra", justify="left")
+    lines = text.wrap(Console(), 4)
     assert len(lines) == 3
     assert lines[0] == Text("abra")
     assert lines[1] == Text("cada")
@@ -422,8 +451,8 @@ def test_wrap_long():
 
 
 def test_wrap_overflow():
-    test = Text("Some more words")
-    lines = test.wrap(Console(), 4, overflow="ellipsis")
+    text = Text("Some more words")
+    lines = text.wrap(Console(), 4, overflow="ellipsis")
     assert (len(lines)) == 3
     assert lines[0] == Text("Some")
     assert lines[1] == Text("more")
@@ -431,28 +460,52 @@ def test_wrap_overflow():
 
 
 def test_wrap_overflow_long():
-    test = Text("bigword" * 10)
-    lines = test.wrap(Console(), 4, overflow="ellipsis")
+    text = Text("bigword" * 10)
+    lines = text.wrap(Console(), 4, overflow="ellipsis")
     assert len(lines) == 1
     assert lines[0] == Text("big…")
 
 
 def test_wrap_long_words():
-    test = Text("X 123456789", justify="left")
-    lines = test.wrap(Console(), 4)
+    text = Text("XX 12345678912")
+    lines = text.wrap(Console(), 4)
 
-    assert len(lines) == 3
-    assert lines[0] == Text("X 12")
-    assert lines[1] == Text("3456")
-    assert lines[2] == Text("789 ")
+    assert lines._lines == [
+        Text("XX "),
+        Text("1234"),
+        Text("5678"),
+        Text("912"),
+    ]
+
+
+def test_wrap_long_words_2():
+    # https://github.com/Textualize/rich/issues/2273
+    text = Text("Hello, World...123")
+    lines = text.wrap(Console(), 10)
+    assert lines._lines == [
+        Text("Hello, "),
+        Text("World...12"),
+        Text("3"),
+    ]
+
+
+def test_wrap_long_words_justify_left():
+    text = Text("X 123456789", justify="left")
+    lines = text.wrap(Console(), 4)
+
+    assert len(lines) == 4
+    assert lines[0] == Text("X   ")
+    assert lines[1] == Text("1234")
+    assert lines[2] == Text("5678")
+    assert lines[3] == Text("9   ")
 
 
 def test_no_wrap_no_crop():
-    test = Text("Hello World!" * 3)
+    text = Text("Hello World!" * 3)
 
     console = Console(width=20, file=StringIO())
-    console.print(test, no_wrap=True)
-    console.print(test, no_wrap=True, crop=False, overflow="ignore")
+    console.print(text, no_wrap=True)
+    console.print(text, no_wrap=True, crop=False, overflow="ignore")
 
     print(repr(console.file.getvalue()))
     assert (
@@ -462,15 +515,15 @@ def test_no_wrap_no_crop():
 
 
 def test_fit():
-    test = Text("Hello\nWorld")
-    lines = test.fit(3)
+    text = Text("Hello\nWorld")
+    lines = text.fit(3)
     assert str(lines[0]) == "Hel"
     assert str(lines[1]) == "Wor"
 
 
 def test_wrap_tabs():
-    test = Text("foo\tbar", justify="left")
-    lines = test.wrap(Console(), 4)
+    text = Text("foo\tbar", justify="left")
+    lines = text.wrap(Console(), 4)
     assert len(lines) == 2
     assert str(lines[0]) == "foo "
     assert str(lines[1]) == "bar "
@@ -478,10 +531,10 @@ def test_wrap_tabs():
 
 def test_render():
     console = Console(width=15, record=True)
-    test = Text.from_markup(
+    text = Text.from_markup(
         "[u][b]Where[/b] there is a [i]Will[/i], there is a Way.[/u]"
     )
-    console.print(test)
+    console.print(text)
     output = console.export_text(styles=True)
     expected = "\x1b[1;4mWhere\x1b[0m\x1b[4m there is \x1b[0m\n\x1b[4ma \x1b[0m\x1b[3;4mWill\x1b[0m\x1b[4m, there \x1b[0m\n\x1b[4mis a Way.\x1b[0m\n"
     assert output == expected
@@ -524,21 +577,21 @@ def test_print_sep_end(print_text, result):
 
 
 def test_tabs_to_spaces():
-    test = Text("\tHello\tWorld", tab_size=8)
-    test.expand_tabs()
-    assert test.plain == "        Hello   World"
+    text = Text("\tHello\tWorld", tab_size=8)
+    text.expand_tabs()
+    assert text.plain == "        Hello   World"
 
-    test = Text("\tHello\tWorld", tab_size=4)
-    test.expand_tabs()
-    assert test.plain == "    Hello   World"
+    text = Text("\tHello\tWorld", tab_size=4)
+    text.expand_tabs()
+    assert text.plain == "    Hello   World"
 
-    test = Text(".\t..\t...\t....\t", tab_size=4)
-    test.expand_tabs()
-    assert test.plain == ".   ..  ... ....    "
+    text = Text(".\t..\t...\t....\t", tab_size=4)
+    text.expand_tabs()
+    assert text.plain == ".   ..  ... ....    "
 
-    test = Text("No Tabs")
-    test.expand_tabs()
-    assert test.plain == "No Tabs"
+    text = Text("No Tabs")
+    text.expand_tabs()
+    assert text.plain == "No Tabs"
 
 
 def test_markup_switch():
@@ -629,47 +682,47 @@ def test_truncate_ellipsis_pad(input, count, expected):
 
 
 def test_pad():
-    test = Text("foo")
-    test.pad(2)
-    assert test.plain == "  foo  "
+    text = Text("foo")
+    text.pad(2)
+    assert text.plain == "  foo  "
 
 
 def test_align_left():
-    test = Text("foo")
-    test.align("left", 10)
-    assert test.plain == "foo       "
+    text = Text("foo")
+    text.align("left", 10)
+    assert text.plain == "foo       "
 
 
 def test_align_right():
-    test = Text("foo")
-    test.align("right", 10)
-    assert test.plain == "       foo"
+    text = Text("foo")
+    text.align("right", 10)
+    assert text.plain == "       foo"
 
 
 def test_align_center():
-    test = Text("foo")
-    test.align("center", 10)
-    assert test.plain == "   foo    "
+    text = Text("foo")
+    text.align("center", 10)
+    assert text.plain == "   foo    "
 
 
 def test_detect_indentation():
-    test = """\
+    text = """\
 foo
     bar
     """
-    assert Text(test).detect_indentation() == 4
-    test = """\
+    assert Text(text).detect_indentation() == 4
+    text = """\
 foo
     bar
       baz
     """
-    assert Text(test).detect_indentation() == 2
+    assert Text(text).detect_indentation() == 2
     assert Text("").detect_indentation() == 1
     assert Text(" ").detect_indentation() == 1
 
 
 def test_indentation_guides():
-    test = Text(
+    text = Text(
         """\
 for a in range(10):
     print(a)
@@ -683,7 +736,7 @@ foo = [
 
 """
     )
-    result = test.with_indent_guides()
+    result = text.with_indent_guides()
     print(result.plain)
     print(repr(result.plain))
     expected = "for a in range(10):\n│   print(a)\n\nfoo = [\n│   1,\n│   {\n│   │   2\n│   }\n]\n\n"
@@ -691,7 +744,6 @@ foo = [
 
 
 def test_slice():
-
     text = Text.from_markup("[red]foo [bold]bar[/red] baz[/bold]")
     assert text[0] == Text("f", spans=[Span(0, 1, "red")])
     assert text[4] == Text("b", spans=[Span(0, 1, "red"), Span(0, 1, "bold")])

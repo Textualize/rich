@@ -19,12 +19,13 @@ To see how the progress display looks, try this from the command line::
 Basic Usage
 -----------
 
-For basic usage call the :func:`~rich.progress.track` function, which accepts a sequence (such as a list or range object) and an optional description of the job you are working on. The track method will yield values from the sequence and update the progress information on each iteration. Here's an example::
+For basic usage call the :func:`~rich.progress.track` function, which accepts a sequence (such as a list or range object) and an optional description of the job you are working on. The track function will yield values from the sequence and update the progress information on each iteration. Here's an example::
 
+    import time
     from rich.progress import track
 
-    for n in track(range(n), description="Processing..."):
-        do_work(n)
+    for i in track(range(20), description="Processing..."):
+        time.sleep(1)  # Simulate work being done
 
 Advanced usage
 --------------
