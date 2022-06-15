@@ -664,7 +664,6 @@ class Style:
         style._hash = None
         style._null = False
         style._meta = self._meta
-
         return style
 
     def render(
