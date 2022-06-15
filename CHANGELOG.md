@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow exceptions that are raised while a Live is rendered to be displayed and/or processed https://github.com/Textualize/rich/pull/2305
 - Fix crashes that can happen with `inspect` when docstrings contain some special control codes https://github.com/Textualize/rich/pull/2294
 - Fix edges used in first row of tables when `show_header=False` https://github.com/Textualize/rich/pull/2330
+- Fixed hash issue in Styles class https://github.com/Textualize/rich/pull/2346
 
 ## [12.4.4] - 2022-05-24
 
