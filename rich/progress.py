@@ -1633,6 +1633,18 @@ class Progress(JupyterMixin):
         with self._lock:
             del self._tasks[task_id]
 
+    def get_task_elapsed(self, task_id: TaskID) -> Optional[float]:
+        """Return a task's current elapsed time, if it exists.
+
+        Args:
+            task_id (TaskID): A task ID.
+
+        Returns:
+            Optional[float]: Time elapsed since task was started, or ``None`` if the task hasn't started.
+        """
+        with self._lock:
+            return self._tasks[task_id].elapsed
+
 
 if __name__ == "__main__":  # pragma: no coverage
 
