@@ -1959,11 +1959,11 @@ class Console:
             del self._buffer[:]
             return
         with self._lock:
-            if self._buffer_index == 0:
+            if self.record:
+                with self._record_buffer_lock:
+                    self._record_buffer.extend(self._buffer[:])
 
-                if self.record:
-                    with self._record_buffer_lock:
-                        self._record_buffer.extend(self._buffer[:])
+            if self._buffer_index == 0:
 
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display

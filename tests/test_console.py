@@ -351,6 +351,20 @@ def test_capture():
     assert capture.get() == "Hello\n"
 
 
+def test_capture_and_record():
+    recorder = Console(record=True)
+    recorder.print("ABC")
+
+    with recorder.capture() as capture:
+        recorder.print("Hello")
+
+    assert capture.get() == "Hello\n"
+
+    text = recorder.export_text()
+    assert text == "ABC\nHello\n"
+    assert capture.get() == "Hello\n"
+
+
 def test_input(monkeypatch, capsys):
     def fake_input(prompt=""):
         console.file.write(prompt)
