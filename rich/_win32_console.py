@@ -263,6 +263,30 @@ def SetConsoleCursorPosition(
     return bool(_SetConsoleCursorPosition(std_handle, coords))
 
 
+_GetConsoleCursorInfo = windll.kernel32.GetConsoleCursorInfo
+_GetConsoleCursorInfo.argtypes = [
+    wintypes.HANDLE,
+    ctypes.POINTER(CONSOLE_CURSOR_INFO),
+]
+_GetConsoleCursorInfo.restype = wintypes.BOOL
+
+
+def GetConsoleCursorInfo(
+    std_handle: wintypes.HANDLE, cursor_info: CONSOLE_CURSOR_INFO
+) -> bool:
+    """Get the cursor info - used to get cursor visibility and width
+
+    Args:
+        std_handle (wintypes.HANDLE): A handle to the console input buffer or the console screen buffer.
+        cursor_info (CONSOLE_CURSOR_INFO): CONSOLE_CURSOR_INFO ctype struct that receives information
+            about the console's cursor.
+
+    Returns:
+          bool: True if the function succeeds, otherwise False.
+    """
+    return bool(_GetConsoleCursorInfo(std_handle, byref(cursor_info)))
+
+
 _SetConsoleCursorInfo = windll.kernel32.SetConsoleCursorInfo
 _SetConsoleCursorInfo.argtypes = [
     wintypes.HANDLE,
@@ -523,12 +547,14 @@ class LegacyWindowsTerm:
 
     def hide_cursor(self) -> None:
         """Hide the cursor"""
-        invisible_cursor = CONSOLE_CURSOR_INFO(dwSize=100, bVisible=0)
+        current_cursor_size = self._get_cursor_size()
+        invisible_cursor = CONSOLE_CURSOR_INFO(dwSize=current_cursor_size, bVisible=0)
         SetConsoleCursorInfo(self._handle, cursor_info=invisible_cursor)
 
     def show_cursor(self) -> None:
         """Show the cursor"""
-        visible_cursor = CONSOLE_CURSOR_INFO(dwSize=100, bVisible=1)
+        current_cursor_size = self._get_cursor_size()
+        visible_cursor = CONSOLE_CURSOR_INFO(dwSize=current_cursor_size, bVisible=1)
         SetConsoleCursorInfo(self._handle, cursor_info=visible_cursor)
 
     def set_title(self, title: str) -> None:
@@ -539,6 +565,12 @@ class LegacyWindowsTerm:
         """
         assert len(title) < 255, "Console title must be less than 255 characters"
         SetConsoleTitle(title)
+
+    def _get_cursor_size(self) -> int:
+        """Get the percentage of the character cell that is filled by the cursor"""
+        cursor_info = CONSOLE_CURSOR_INFO()
+        GetConsoleCursorInfo(self._handle, cursor_info=cursor_info)
+        return int(cursor_info.dwSize)
 
 
 if __name__ == "__main__":
