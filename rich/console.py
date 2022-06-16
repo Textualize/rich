@@ -27,6 +27,7 @@ from typing import (
     Mapping,
     NamedTuple,
     Optional,
+    Set,
     TextIO,
     Tuple,
     Type,
@@ -317,14 +318,17 @@ class Capture:
 
     Args:
         console (Console): A console instance to capture output.
+        echo (bool): True if captured content should also be written to the
+            terminal. False otherwise.
     """
 
-    def __init__(self, console: "Console") -> None:
+    def __init__(self, console: "Console", echo: bool = False) -> None:
         self._console = console
+        self._echo = echo
         self._result: Optional[str] = None
 
     def __enter__(self) -> "Capture":
-        self._console.begin_capture()
+        self._console.begin_capture(self._echo)
         return self
 
     def __exit__(
@@ -723,6 +727,7 @@ class Console:
         self._thread_locals = ConsoleThreadLocals(
             theme_stack=ThemeStack(themes.DEFAULT if theme is None else theme)
         )
+        self._buffer_indices_to_echo: Set[int] = {self._thread_locals.buffer_index}
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
         self._live: Optional["Live"] = None
@@ -837,9 +842,16 @@ class Console:
         """Exit buffer context."""
         self._exit_buffer()
 
-    def begin_capture(self) -> None:
-        """Begin capturing console output. Call :meth:`end_capture` to exit capture mode and return output."""
+    def begin_capture(self, echo: bool = False) -> None:
+        """Begin capturing console output. Call :meth:`end_capture` to exit capture mode and return output.
+
+        Args:
+            echo (bool): True if captured content should also be written to the
+                terminal. False otherwise.
+        """
         self._enter_buffer()
+        if echo:
+            self._buffer_indices_to_echo.add(self._buffer_index)
 
     def end_capture(self) -> str:
         """End capture mode and return captured string.
@@ -849,6 +861,8 @@ class Console:
         """
         render_result = self._render_buffer(self._buffer)
         del self._buffer[:]
+        if self._buffer_index in self._buffer_indices_to_echo:
+            self._buffer_indices_to_echo.remove(self._buffer_index)
         self._exit_buffer()
         return render_result
 
@@ -1049,7 +1063,7 @@ class Console:
         """Play a 'bell' sound (if supported by the terminal)."""
         self.control(Control.bell())
 
-    def capture(self) -> Capture:
+    def capture(self, echo: bool = False) -> Capture:
         """A context manager to *capture* the result of print() or log() in a string,
         rather than writing it to the console.
 
@@ -1063,7 +1077,7 @@ class Console:
         Returns:
             Capture: Context manager with disables writing to the terminal.
         """
-        capture = Capture(self)
+        capture = Capture(self, echo=echo)
         return capture
 
     def pager(
@@ -1951,6 +1965,7 @@ class Console:
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered. Render it if it can (e.g. Console.quiet is False)
+        be rendered, then clear it.
         Rendering is supported on Windows, Unix and Jupyter environments. For
         legacy Windows consoles, the win32 API is called directly.
         This method will also record what it renders if recording is enabled via Console.record.
@@ -1963,13 +1978,12 @@ class Console:
                 with self._record_buffer_lock:
                     self._record_buffer.extend(self._buffer[:])
 
-            if self._buffer_index == 0:
+            if self._buffer_index in self._buffer_indices_to_echo:
 
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
 
                     display(self._buffer, self._render_buffer(self._buffer[:]))
-                    del self._buffer[:]
                 else:
                     if WINDOWS:
                         use_legacy_windows_render = False
@@ -2008,6 +2022,8 @@ class Console:
                             raise
 
                     self.file.flush()
+
+                if self._buffer_index == 0:
                     del self._buffer[:]
 
     def _render_buffer(self, buffer: Iterable[Segment]) -> str:
