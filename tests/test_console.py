@@ -351,7 +351,7 @@ def test_capture():
     assert capture.get() == "Hello\n"
 
 
-def test_capture_and_record():
+def test_capture_and_record(capsys):
     recorder = Console(record=True)
     recorder.print("ABC")
 
@@ -360,9 +360,12 @@ def test_capture_and_record():
 
     assert capture.get() == "Hello\n"
 
-    text = recorder.export_text()
-    assert text == "ABC\nHello\n"
+    recorded_text = recorder.export_text()
+    out, err = capsys.readouterr()
+
+    assert recorded_text == "ABC\nHello\n"
     assert capture.get() == "Hello\n"
+    assert out == "ABC\n"
 
 
 def test_input(monkeypatch, capsys):
