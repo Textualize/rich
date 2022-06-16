@@ -247,7 +247,9 @@ def test_syntax_highlight_ranges():
         lexer="python",
         line_numbers=True,
         word_wrap=False,
-        highlight_ranges=[
+    )
+    syntax.stylize_ranges(
+        [
             SyntaxHighlightRange(
                 # overline the 2nd char of the 1st line:
                 start=SyntaxPosition(1, 1),
@@ -285,7 +287,7 @@ def test_syntax_highlight_ranges():
                 end=SyntaxPosition(30, 2),  # `line_number` is out of range
                 style=Style(bold=True),
             ),
-        ],
+        ]
     )
     rendered_syntax = render(syntax, True)
     print(repr(rendered_syntax))

@@ -236,7 +236,6 @@ class Syntax(JupyterMixin):
         line_range (Tuple[int | None, int | None], optional): If given should be a tuple of the start and end line to render.
             A value of None in the tuple indicates the range is open in that direction.
         highlight_lines (Set[int]): A set of line numbers to highlight.
-        highlight_ranges (Sequence[SyntaxHighlightRange], optional): An optional sequence of ranges to highlight.
         code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
         tab_size (int, optional): Size of tabs. Defaults to 4.
         word_wrap (bool, optional): Enable word wrapping.
@@ -271,7 +270,6 @@ class Syntax(JupyterMixin):
         start_line: int = 1,
         line_range: Optional[Tuple[Optional[int], Optional[int]]] = None,
         highlight_lines: Optional[Set[int]] = None,
-        highlight_ranges: Optional[Sequence[SyntaxHighlightRange]] = None,
         code_width: Optional[int] = None,
         tab_size: int = 4,
         word_wrap: bool = False,
@@ -286,7 +284,6 @@ class Syntax(JupyterMixin):
         self.start_line = start_line
         self.line_range = line_range
         self.highlight_lines = highlight_lines or set()
-        self.highlight_ranges = highlight_ranges or ()
         self.code_width = code_width
         self.tab_size = tab_size
         self.word_wrap = word_wrap
@@ -298,6 +295,7 @@ class Syntax(JupyterMixin):
         self.padding = padding
 
         self._theme = self.get_theme(theme)
+        self._stylized_ranges: Sequence[SyntaxHighlightRange] = ()
 
     @classmethod
     def from_path(
@@ -311,7 +309,6 @@ class Syntax(JupyterMixin):
         line_range: Optional[Tuple[int, int]] = None,
         start_line: int = 1,
         highlight_lines: Optional[Set[int]] = None,
-        highlight_ranges: Optional[Sequence[SyntaxHighlightRange]] = None,
         code_width: Optional[int] = None,
         tab_size: int = 4,
         word_wrap: bool = False,
@@ -331,7 +328,6 @@ class Syntax(JupyterMixin):
             start_line (int, optional): Starting number for line numbers. Defaults to 1.
             line_range (Tuple[int, int], optional): If given should be a tuple of the start and end line to render.
             highlight_lines (Set[int]): A set of line numbers to highlight.
-            highlight_ranges (Sequence[SyntaxHighlightRange], optional): An optional sequence of ranges to highlight.
             code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
             tab_size (int, optional): Size of tabs. Defaults to 4.
             word_wrap (bool, optional): Enable word wrapping of code.
@@ -357,7 +353,6 @@ class Syntax(JupyterMixin):
             line_range=line_range,
             start_line=start_line,
             highlight_lines=highlight_lines,
-            highlight_ranges=highlight_ranges,
             code_width=code_width,
             tab_size=tab_size,
             word_wrap=word_wrap,
@@ -521,61 +516,21 @@ class Syntax(JupyterMixin):
             if self.background_color is not None:
                 text.stylize(f"on {self.background_color}")
 
-        if self.highlight_ranges:
-            for highlight_range in self.highlight_ranges:
-                self._apply_highlight_range(
-                    code=code, text=text, highlight_range=highlight_range
-                )
+        if self._stylized_ranges:
+            self._apply_stylized_ranges(code=code, text=text)
 
         return text
 
-    def _apply_highlight_range(
-        self, *, code: str, text: Text, highlight_range: SyntaxHighlightRange
-    ) -> None:
+    def stylize_ranges(self, stylized_ranges: Sequence[SyntaxHighlightRange]) -> None:
         """
-        Apply a highlight range to a text instance,
-        using the given code to determine the right portion to apply the style to.
+        Adds custom stylized ranges to apply to the syntax display when it's rendered.
 
         Args:
-            code (str): Code to highlight.
-            text (Text): Text instance to apply the style to.
-            highlight_range (SyntaxHighlightRange): Highlight range to apply.
+            stylized_ranges (Sequence[SyntaxHighlightRange]): A list of SyntaxHighlightRange objects.
+                SyntaxHighlightRange objects contain the start and end position
+                (each given as a line number and column index), as well as a style to apply to the range.
         """
-        start = self._get_code_index_for_syntax_position(code, highlight_range.start)
-        end = self._get_code_index_for_syntax_position(code, highlight_range.end)
-        if start is not None and end is not None:
-            text.stylize(highlight_range.style, start, end)
-
-    def _get_code_index_for_syntax_position(
-        self, code: str, position: SyntaxPosition
-    ) -> Optional[int]:
-        """
-        Returns the index of the code string for the given position.
-
-        Args:
-            code (str): The code string to search.
-            position (SyntaxPosition): The position to search for.
-
-        Returns:
-            Optional[int]: The index of the code string for the given position, or `None`
-                if the position is invalid or out of range.
-        """
-        current_line_number = 1
-        current_column_index = 0
-        for index, char in enumerate(code):
-            if (
-                current_line_number == position.line_number
-                and current_column_index == position.column_index
-            ):
-                return index  # gotcha!
-            if char == "\n":
-                current_line_number += 1
-                current_column_index = 0
-            else:
-                current_column_index += 1
-            if current_line_number > position.line_number:
-                return None  # stop searching
-        return None
+        self._stylized_ranges = stylized_ranges
 
     def _get_line_numbers_color(self, blend: float = 0.3) -> Color:
         background_style = self._theme.get_background_style() + self.background_style
@@ -778,6 +733,24 @@ class Syntax(JupyterMixin):
                     yield from wrapped_line
                     yield new_line
 
+    def _apply_stylized_ranges(self, *, code: str, text: Text) -> None:
+        """
+        Apply stylized ranges to a text instance,
+        using the given code to determine the right portion to apply the style to.
+
+        Args:
+            code (str): Code to highlight.
+            text (Text): Text instance to apply the style to.
+        """
+        lines_length = _get_lines_length(code)
+
+        for stylized_range in self._stylized_ranges:
+            start, end = _get_code_indexes_for_syntax_positions(
+                lines_length, (stylized_range.start, stylized_range.end)
+            )
+            if start is not None and end is not None:
+                text.stylize(stylized_range.style, start, end)
+
     def _get_processed_code(self, code: str) -> Tuple[bool, str]:
         """
         Applies various processing to a raw code string
@@ -797,6 +770,68 @@ class Syntax(JupyterMixin):
         )
         processed_code = processed_code.expandtabs(self.tab_size)
         return ends_on_nl, processed_code
+
+
+def _get_lines_length(code: str) -> List[int]:
+    """
+    Returns the length of each line in the given code string.
+
+    Args:
+        code (str): The code string to get the line lengths from.
+    """
+
+    code_length = len(code)
+
+    lines_length = []
+    search_index = 0
+    while True:
+        new_line_index = code.find("\n", search_index)
+        if new_line_index == -1:
+            if search_index < code_length:
+                # add the last line length:
+                lines_length.append(code_length - search_index)
+            break
+        line_length = (
+            new_line_index if search_index == 0 else (new_line_index - search_index)
+        )
+        lines_length.append(line_length)
+        search_index = new_line_index + 1
+
+    return lines_length
+
+
+def _get_code_indexes_for_syntax_positions(
+    lines_length: Sequence[int], positions: Sequence[SyntaxPosition]
+) -> Sequence[Optional[int]]:
+    """
+    Returns the index of the code string for the given positions.
+
+    Args:
+        lines_length (Sequence[int]): The lengths of each line that form the code.
+        positions (Sequence[SyntaxPosition]): The positions to search for.
+
+    Returns:
+        Sequence[Optional[int]]: For each position, the index of the code string for this position, or `None`
+            if the position is out of range.
+    """
+    lines_count = len(lines_length)
+
+    def index_for_position(position: SyntaxPosition) -> Optional[int]:
+        if position.line_number > lines_count:
+            return None  # `line_number` is out of range
+        current_line_number = 1
+        lines_length_sum = 0
+        for line_no, line_length in enumerate(lines_length, start=1):
+            if line_no == position.line_number:
+                if position.column_index > line_length:
+                    return None  # `column_index` is out of range
+                else:
+                    return lines_length_sum + position.column_index
+            current_line_number += 1
+            lines_length_sum += line_length + 1  # +1 for the newline
+        return None
+
+    return [index_for_position(position) for position in positions]
 
 
 if __name__ == "__main__":  # pragma: no cover
