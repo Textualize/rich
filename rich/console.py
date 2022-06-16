@@ -2023,7 +2023,8 @@ class Console:
 
                     self.file.flush()
 
-                if self._buffer_index == 0:
+                is_capture = self._buffer_index != 0
+                if not is_capture:
                     del self._buffer[:]
 
     def _render_buffer(self, buffer: Iterable[Segment]) -> str:
