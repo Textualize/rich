@@ -2025,6 +2025,8 @@ class Console:
 
                 is_capture = self._buffer_index != 0
                 if not is_capture:
+                    # The Capture context still needs access to the buffer to read the captured content,
+                    # so we can't clear it here. It's the responsibility of the Capture context to clear it.
                     del self._buffer[:]
 
     def _render_buffer(self, buffer: Iterable[Segment]) -> str:
