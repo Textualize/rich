@@ -727,7 +727,7 @@ class Console:
         self._thread_locals = ConsoleThreadLocals(
             theme_stack=ThemeStack(themes.DEFAULT if theme is None else theme)
         )
-        self._buffer_indices_to_echo: Set[int] = {self._thread_locals.buffer_index}
+        self._buffer_indices_to_render: Set[int] = {self._thread_locals.buffer_index}
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
         self._live: Optional["Live"] = None
@@ -851,7 +851,7 @@ class Console:
         """
         self._enter_buffer()
         if echo:
-            self._buffer_indices_to_echo.add(self._buffer_index)
+            self._buffer_indices_to_render.add(self._buffer_index)
 
     def end_capture(self) -> str:
         """End capture mode and return captured string.
@@ -861,8 +861,8 @@ class Console:
         """
         render_result = self._render_buffer(self._buffer)
         del self._buffer[:]
-        if self._buffer_index in self._buffer_indices_to_echo:
-            self._buffer_indices_to_echo.remove(self._buffer_index)
+        if self._buffer_index in self._buffer_indices_to_render:
+            self._buffer_indices_to_render.remove(self._buffer_index)
         self._exit_buffer()
         return render_result
 
@@ -1978,7 +1978,7 @@ class Console:
                 with self._record_buffer_lock:
                     self._record_buffer.extend(self._buffer[:])
 
-            if self._buffer_index in self._buffer_indices_to_echo:
+            if self._buffer_index in self._buffer_indices_to_render:
 
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
