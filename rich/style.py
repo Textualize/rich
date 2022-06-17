@@ -709,7 +709,6 @@ class Style:
         sys.stdout.write(f"{self.render(text)}\n")
 
     def __add__(self, style: Optional["Style"]) -> "Style":
-
         cache_key = (self, style)
         cached_style = self._add_cache.get(cache_key)
         if cached_style is not None:
