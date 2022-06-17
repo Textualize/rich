@@ -819,17 +819,19 @@ def _get_code_indexes_for_syntax_positions(
     def index_for_position(position: SyntaxPosition) -> Optional[int]:
         if position.line_number > lines_count:
             return None  # `line_number` is out of range
-        current_line_number = 1
-        lines_length_sum = 0
-        for line_no, line_length in enumerate(lines_length, start=1):
-            if line_no == position.line_number:
-                if position.column_index > line_length:
-                    return None  # `column_index` is out of range
-                else:
-                    return lines_length_sum + position.column_index
-            current_line_number += 1
-            lines_length_sum += line_length + 1  # +1 for the newline
-        return None
+        line_index = position.line_number - 1
+        if lines_length[line_index] < position.column_index:
+            return None  # `column_index` is out of range
+        return sum(
+            (
+                # number of characters of all previous lines...
+                sum(lines_length[0:line_index]),
+                # ...plus one "\n" character for each previous line...
+                line_index,
+                # ...plus the number of characters on this line before the column index
+                position.column_index,
+            )
+        )
 
     return [index_for_position(position) for position in positions]
 
