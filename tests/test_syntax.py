@@ -15,7 +15,6 @@ from rich.syntax import (
     PygmentsSyntaxTheme,
     Syntax,
     SyntaxHighlightRange,
-    SyntaxPosition,
 )
 
 from .render import render
@@ -248,47 +247,47 @@ def test_syntax_highlight_ranges():
         line_numbers=True,
         word_wrap=False,
     )
-    syntax.stylize_ranges(
-        [
-            SyntaxHighlightRange(
-                # overline the 2nd char of the 1st line:
-                start=SyntaxPosition(1, 1),
-                end=SyntaxPosition(1, 2),
-                style=Style(overline=True),
-            ),
-            SyntaxHighlightRange(
-                start=SyntaxPosition(1, len("def loop_")),
-                end=SyntaxPosition(1, len("def loop_first_last")),
-                style=Style(underline=True),
-            ),
-            SyntaxHighlightRange(
-                start=SyntaxPosition(1, len("def loop_first")),
-                end=SyntaxPosition(3, len("    iter_values = iter")),
-                style=Style(bold=True),
-            ),
-            SyntaxHighlightRange(
-                start=SyntaxPosition(9, len("    for ")),
-                end=SyntaxPosition(9, len("    for value in")),
-                style=Style(strike=True),
-            ),
-            SyntaxHighlightRange(
-                start=SyntaxPosition(6, len("    except ")),
-                end=SyntaxPosition(6, len("    except StopIteration")),
-                style=Style(reverse=True),
-            ),
-            # Those should be out of range, and have no impact:
-            SyntaxHighlightRange(
-                start=SyntaxPosition(1, 100),  # `column_index` is out of range
-                end=SyntaxPosition(2, 2),
-                style=Style(bold=True),
-            ),
-            SyntaxHighlightRange(
-                start=SyntaxPosition(1, 1),
-                end=SyntaxPosition(30, 2),  # `line_number` is out of range
-                style=Style(bold=True),
-            ),
-        ]
-    )
+    stylized_ranges = [
+        SyntaxHighlightRange(
+            # overline the 2nd char of the 1st line:
+            start=(1, 1),
+            end=(1, 2),
+            style=Style(overline=True),
+        ),
+        SyntaxHighlightRange(
+            start=(1, len("def loop_")),
+            end=(1, len("def loop_first_last")),
+            style=Style(underline=True),
+        ),
+        SyntaxHighlightRange(
+            start=(1, len("def loop_first")),
+            end=(3, len("    iter_values = iter")),
+            style=Style(bold=True),
+        ),
+        SyntaxHighlightRange(
+            start=(9, len("    for ")),
+            end=(9, len("    for value in")),
+            style=Style(strike=True),
+        ),
+        SyntaxHighlightRange(
+            start=(6, len("    except ")),
+            end=(6, len("    except StopIteration")),
+            style=Style(reverse=True),
+        ),
+        # Those should be out of range, and have no impact:
+        SyntaxHighlightRange(
+            start=(1, 100),  # `column_index` is out of range
+            end=(2, 2),
+            style=Style(bold=True),
+        ),
+        SyntaxHighlightRange(
+            start=(1, 1),
+            end=(30, 2),  # `line_number` is out of range
+            style=Style(bold=True),
+        ),
+    ]
+    for range_ in stylized_ranges:
+        syntax.stylize_range(range_.style, range_.start, range_.end)
     rendered_syntax = render(syntax, True)
     print(repr(rendered_syntax))
     expected = '\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 1 \x1b[0m\x1b[38;2;102;217;239;48;2;39;40;34md\x1b[0m\x1b[53;38;2;102;217;239;48;2;39;40;34me\x1b[0m\x1b[38;2;102;217;239;48;2;39;40;34mf\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;166;226;46;48;2;39;40;34mloop_\x1b[0m\x1b[4;38;2;166;226;46;48;2;39;40;34mfirst\x1b[0m\x1b[1;4;38;2;166;226;46;48;2;39;40;34m_last\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m(\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34mvalues\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m:\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34mIterable\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m[\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34mT\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m]\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m)\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[1;38;2;249;38;114;48;2;39;40;34m-\x1b[0m\x1b[1;38;2;249;38;114;48;2;39;40;34m>\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34mIterable\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m[\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34mTuple\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m[\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34mbool\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m,\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34mbool\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m,\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34mT\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m]\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m]\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m:\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 2 \x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m    \x1b[0m\x1b[1;38;2;230;219;116;48;2;39;40;34m"""Iterate and generate a tuple with a flag for first and last value."""\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 3 \x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m    \x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34miter_values\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[1;38;2;249;38;114;48;2;39;40;34m=\x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[1;38;2;248;248;242;48;2;39;40;34miter\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m(\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mvalues\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m)\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 4 \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m    \x1b[0m\x1b[38;2;102;217;239;48;2;39;40;34mtry\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m:\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 5 \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m        \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mprevious_value\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;249;38;114;48;2;39;40;34m=\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mnext\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m(\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34miter_values\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m)\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 6 \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m    \x1b[0m\x1b[38;2;102;217;239;48;2;39;40;34mexcept\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[7;38;2;166;226;46;48;2;39;40;34mStopIteration\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m:\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 7 \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m        \x1b[0m\x1b[38;2;102;217;239;48;2;39;40;34mreturn\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 8 \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m    \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mfirst\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;249;38;114;48;2;39;40;34m=\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;102;217;239;48;2;39;40;34mTrue\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m 9 \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m    \x1b[0m\x1b[38;2;102;217;239;48;2;39;40;34mfor\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[9;38;2;248;248;242;48;2;39;40;34mvalue\x1b[0m\x1b[9;38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[9;38;2;249;38;114;48;2;39;40;34min\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34miter_values\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m:\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m10 \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m        \x1b[0m\x1b[38;2;102;217;239;48;2;39;40;34myield\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mfirst\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m,\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;102;217;239;48;2;39;40;34mFalse\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m,\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mprevious_value\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m11 \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m        \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mfirst\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;249;38;114;48;2;39;40;34m=\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;102;217;239;48;2;39;40;34mFalse\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m12 \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m        \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mprevious_value\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;249;38;114;48;2;39;40;34m=\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mvalue\x1b[0m\n\x1b[1;38;2;227;227;221;48;2;39;40;34m  \x1b[0m\x1b[38;2;101;102;96;48;2;39;40;34m13 \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m    \x1b[0m\x1b[38;2;102;217;239;48;2;39;40;34myield\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mfirst\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m,\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;102;217;239;48;2;39;40;34mTrue\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m,\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mprevious_value\x1b[0m\n'
