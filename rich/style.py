@@ -2,9 +2,10 @@ import sys
 from functools import lru_cache
 from marshal import dumps, loads
 from random import randint
-from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union, cast
 
 from . import errors
+from ._lru_cache import LRUCache
 from .color import Color, ColorParseError, ColorSystem, blend_rgb
 from .repr import Result, rich_repr
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
@@ -59,7 +60,7 @@ class Style:
     _bgcolor: Optional[Color]
     _attributes: int
     _set_attributes: int
-    _hash: int
+    _hash: Optional[int]
     _null: bool
     _meta: Optional[bytes]
 
@@ -118,6 +119,9 @@ class Style:
         "overline": "overline",
         "o": "overline",
     }
+
+    # Caches results of Style.__add__
+    _add_cache: LRUCache[Tuple["Style", Optional["Style"]], "Style"] = LRUCache(1024)
 
     def __init__(
         self,
@@ -190,16 +194,7 @@ class Style:
         self._link = link
         self._link_id = f"{randint(0, 999999)}" if link else ""
         self._meta = None if meta is None else dumps(meta)
-        self._hash = hash(
-            (
-                self._color,
-                self._bgcolor,
-                self._attributes,
-                self._set_attributes,
-                link,
-                self._meta,
-            )
-        )
+        self._hash: Optional[int] = None
         self._null = not (self._set_attributes or color or bgcolor or link or meta)
 
     @classmethod
@@ -227,17 +222,8 @@ class Style:
         style._link = None
         style._link_id = ""
         style._meta = None
-        style._hash = hash(
-            (
-                color,
-                bgcolor,
-                None,
-                None,
-                None,
-                None,
-            )
-        )
         style._null = not (color or bgcolor)
+        style._hash = None
         return style
 
     @classmethod
@@ -257,16 +243,7 @@ class Style:
         style._link = None
         style._link_id = ""
         style._meta = dumps(meta)
-        style._hash = hash(
-            (
-                None,
-                None,
-                None,
-                None,
-                None,
-                style._meta,
-            )
-        )
+        style._hash = None
         style._null = not (meta)
         return style
 
@@ -366,6 +343,7 @@ class Style:
         Returns:
             str: String containing codes.
         """
+
         if self._ansi is None:
             sgr: List[str] = []
             append = sgr.append
@@ -446,16 +424,26 @@ class Style:
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Style):
             return NotImplemented
-        return (
-            self._color == other._color
-            and self._bgcolor == other._bgcolor
-            and self._set_attributes == other._set_attributes
-            and self._attributes == other._attributes
-            and self._link == other._link
-            and self._meta == other._meta
-        )
+        return self.__hash__() == other.__hash__()
+
+    def __ne__(self, other: Any) -> bool:
+        if not isinstance(other, Style):
+            return NotImplemented
+        return self.__hash__() != other.__hash__()
 
     def __hash__(self) -> int:
+        if self._hash is not None:
+            return self._hash
+        self._hash = hash(
+            (
+                self._color,
+                self._bgcolor,
+                self._attributes,
+                self._set_attributes,
+                self._link,
+                self._meta,
+            )
+        )
         return self._hash
 
     @property
@@ -502,9 +490,9 @@ class Style:
         style._set_attributes = self._set_attributes
         style._link = self._link
         style._link_id = f"{randint(0, 999999)}" if self._link else ""
-        style._hash = self._hash
         style._null = False
         style._meta = None
+        style._hash = None
         return style
 
     @classmethod
@@ -677,7 +665,7 @@ class Style:
         style._set_attributes = self._set_attributes
         style._link = link
         style._link_id = f"{randint(0, 999999)}" if link else ""
-        style._hash = self._hash
+        style._hash = None
         style._null = False
         style._meta = self._meta
         return style
@@ -700,7 +688,7 @@ class Style:
         """
         if not text or color_system is None:
             return text
-        attrs = self._make_ansi_codes(color_system)
+        attrs = self._ansi or self._make_ansi_codes(color_system)
         rendered = f"\x1b[{attrs}m{text}\x1b[0m" if attrs else text
         if self._link and not legacy_windows:
             rendered = (
@@ -721,6 +709,10 @@ class Style:
         sys.stdout.write(f"{self.render(text)}\n")
 
     def __add__(self, style: Optional["Style"]) -> "Style":
+        cache_key = (self, style)
+        cached_style = self._add_cache.get(cache_key)
+        if cached_style is not None:
+            return cached_style.copy() if cached_style.link else cached_style
         if not (isinstance(style, Style) or style is None):
             return NotImplemented
         if style is None or style._null:
@@ -738,12 +730,13 @@ class Style:
         new_style._set_attributes = self._set_attributes | style._set_attributes
         new_style._link = style._link or self._link
         new_style._link_id = style._link_id or self._link_id
-        new_style._hash = style._hash
         new_style._null = style._null
         if self._meta and style._meta:
             new_style._meta = dumps({**self.meta, **style.meta})
         else:
             new_style._meta = self._meta or style._meta
+        new_style._hash = None
+        self._add_cache[cache_key] = new_style
         return new_style
 
 

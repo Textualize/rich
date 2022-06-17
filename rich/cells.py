@@ -1,6 +1,6 @@
 import re
 from functools import lru_cache
-from typing import Dict, List
+from typing import List
 
 from ._cell_widths import CELL_WIDTHS
 from ._lru_cache import LRUCache
@@ -9,7 +9,7 @@ from ._lru_cache import LRUCache
 _is_single_cell_widths = re.compile("^[\u0020-\u006f\u00a0\u02ff\u0370-\u0482]*$").match
 
 
-def cell_len(text: str, _cache: Dict[str, int] = LRUCache(1024 * 4)) -> int:
+def cell_len(text: str, _cache: LRUCache[str, int] = LRUCache(1024 * 4)) -> int:
     """Get the number of cells required to display text.
 
     Args:
@@ -80,7 +80,7 @@ def set_cell_size(text: str, total: int) -> str:
             return text + " " * (total - size)
         return text[:total]
 
-    if not total:
+    if total <= 0:
         return ""
     cell_size = cell_len(text)
     if cell_size == total:
