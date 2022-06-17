@@ -2,7 +2,7 @@ import sys
 from functools import lru_cache
 from marshal import dumps, loads
 from random import randint
-from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union, cast
 
 from . import errors
 from ._lru_cache import LRUCache
@@ -121,7 +121,7 @@ class Style:
     }
 
     # Caches results of Style.__add__
-    _add_cache: LRUCache[tuple["Style", Optional["Style"]], "Style"] = LRUCache(1024)
+    _add_cache: LRUCache[Tuple["Style", Optional["Style"]], "Style"] = LRUCache(1024)
 
     def __init__(
         self,

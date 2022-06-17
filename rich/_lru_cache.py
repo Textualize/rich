@@ -1,5 +1,5 @@
 from threading import Lock
-from typing import Generic, List, Optional, TypeVar, Union, overload
+from typing import Dict, Generic, List, Optional, TypeVar, Union, overload
 
 CacheKey = TypeVar("CacheKey")
 CacheValue = TypeVar("CacheValue")
@@ -23,7 +23,7 @@ class LRUCache(Generic[CacheKey, CacheValue]):
 
     def __init__(self, maxsize: int) -> None:
         self.maxsize = maxsize
-        self.cache: dict[CacheKey, List[object]] = {}
+        self.cache: Dict[CacheKey, List[object]] = {}
         self.full = False
         self.root: List[object] = []
         self._lock = Lock()
