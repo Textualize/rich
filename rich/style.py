@@ -5,6 +5,7 @@ from random import randint
 from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
 
 from . import errors
+from ._lru_cache import LRUCache
 from .color import Color, ColorParseError, ColorSystem, blend_rgb
 from .repr import Result, rich_repr
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
@@ -118,6 +119,9 @@ class Style:
         "overline": "overline",
         "o": "overline",
     }
+
+    # Caches results of Style.__add__
+    _add_cache: LRUCache[tuple["Style", Optional["Style"]], "Style"] = LRUCache(1024)
 
     def __init__(
         self,
@@ -704,8 +708,12 @@ class Style:
         text = text or str(self)
         sys.stdout.write(f"{self.render(text)}\n")
 
-    @lru_cache(maxsize=4096)
     def __add__(self, style: Optional["Style"]) -> "Style":
+
+        cache_key = (self, style)
+        cached_style = self._add_cache.get(cache_key)
+        if cached_style is not None:
+            return cached_style.copy() if cached_style.link else cached_style
         if not (isinstance(style, Style) or style is None):
             return NotImplemented
         if style is None or style._null:
@@ -729,6 +737,7 @@ class Style:
         else:
             new_style._meta = self._meta or style._meta
         new_style._hash = None
+        self._add_cache[cache_key] = new_style
         return new_style
 
 
