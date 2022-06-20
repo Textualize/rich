@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Environment variables `JUPYTER_COLUMNS` and `JUPYTER_LINES` to control width and height of console in Jupyter
+
+### Changed
+
+- Default width of Jupyter console size is increased to 115
+
 ### Fixed
 
 - Fix Rich clobbering cursor style on Windows https://github.com/Textualize/rich/pull/2339

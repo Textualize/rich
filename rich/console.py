@@ -72,6 +72,8 @@ if TYPE_CHECKING:
     from .live import Live
     from .status import Status
 
+JUPYTER_DEFAULT_COLUMNS = 115
+JUPYTER_DEFAULT_LINES = 100
 WINDOWS = platform.system() == "Windows"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
@@ -656,8 +658,18 @@ class Console:
 
         self.is_jupyter = _is_jupyter() if force_jupyter is None else force_jupyter
         if self.is_jupyter:
-            width = width or 93
-            height = height or 100
+            if width is None:
+                jupyter_columns = self._environ.get("JUPYTER_COLUMNS")
+                if jupyter_columns is not None and jupyter_columns.isdigit():
+                    width = int(jupyter_columns)
+                else:
+                    width = JUPYTER_DEFAULT_COLUMNS
+            if height is None:
+                jupyter_lines = self._environ.get("JUPYTER_LINES")
+                if jupyter_lines is not None and jupyter_lines.isdigit():
+                    height = int(jupyter_lines)
+                else:
+                    height = JUPYTER_DEFAULT_LINES
 
         self.soft_wrap = soft_wrap
         self._width = width
