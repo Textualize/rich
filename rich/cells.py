@@ -1,15 +1,15 @@
 import re
 from functools import lru_cache
-from typing import List
+from typing import Callable, List
 
 from ._cell_widths import CELL_WIDTHS
-from ._lru_cache import LRUCache
 
 # Regex to match sequence of the most common character ranges
 _is_single_cell_widths = re.compile("^[\u0020-\u006f\u00a0\u02ff\u0370-\u0482]*$").match
 
 
-def cell_len(text: str, _cache: LRUCache[str, int] = LRUCache(1024 * 4)) -> int:
+@lru_cache(4096)
+def _cached_cell_len(text: str) -> int:
     """Get the number of cells required to display text.
 
     Args:
@@ -18,14 +18,24 @@ def cell_len(text: str, _cache: LRUCache[str, int] = LRUCache(1024 * 4)) -> int:
     Returns:
         int: Get the number of cells required to display text.
     """
-    cached_result = _cache.get(text, None)
-    if cached_result is not None:
-        return cached_result
-
     _get_size = get_character_cell_size
     total_size = sum(_get_size(character) for character in text)
-    if len(text) <= 512:
-        _cache[text] = total_size
+    return total_size
+
+
+def cell_len(text: str, _cell_len: Callable[[str], int] = _cached_cell_len) -> int:
+    """Get the number of cells required to display text.
+
+    Args:
+        text (str): Text to display.
+
+    Returns:
+        int: Get the number of cells required to display text.
+    """
+    if len(text) < 512:
+        return _cell_len(text)
+    _get_size = get_character_cell_size
+    total_size = sum(_get_size(character) for character in text)
     return total_size
 
 
