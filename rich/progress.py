@@ -1478,6 +1478,8 @@ class Progress(JupyterMixin):
             start (bool, optional): Start the task after reset. Defaults to True.
             total (float, optional): New total steps in task, or None to use current total. Defaults to None.
             completed (int, optional): Number of steps completed. Defaults to 0.
+            visible (bool, optional): Enable display of the task. Defaults to True.
+            description (str, optional): Change task description if not None. Defaults to None.
             **fields (str): Additional data fields required for rendering.
         """
         current_time = self.get_time()
@@ -1597,7 +1599,7 @@ class Progress(JupyterMixin):
                 you will need to call `start` manually. Defaults to True.
             total (float, optional): Number of total steps in the progress if known.
                 Set to None to render a pulsing animation. Defaults to 100.
-            completed (int, optional): Number of steps completed so far.. Defaults to 0.
+            completed (int, optional): Number of steps completed so far. Defaults to 0.
             visible (bool, optional): Enable display of the task. Defaults to True.
             **fields (str): Additional data fields required for rendering.
 
