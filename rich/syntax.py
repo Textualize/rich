@@ -45,7 +45,7 @@ from .console import Console, ConsoleOptions, JustifyMethod, RenderResult
 from .jupyter import JupyterMixin
 from .measure import Measurement
 from .segment import Segment, Segments
-from .style import Style
+from .style import Style, StyleType
 from .text import Text
 
 if sys.version_info < (3, 10):
@@ -215,17 +215,16 @@ class ANSISyntaxTheme(SyntaxTheme):
 SyntaxPosition: TypeAlias = Tuple[int, int]
 
 
-class SyntaxHighlightRange(NamedTuple):
+class _SyntaxHighlightRange(NamedTuple):
     """
     A range to highlight in a Syntax object.
     `start` and `end` are 2-integers tuples, where the first integer is the line number
     (starting from 1) and the second integer is the column index (starting from 0).
-    The default style, if none is provided, is to highlight the range in bold.
     """
 
+    style: StyleType
     start: SyntaxPosition
     end: SyntaxPosition
-    style: Style = Style(bold=True)
 
 
 class Syntax(JupyterMixin):
@@ -300,7 +299,7 @@ class Syntax(JupyterMixin):
         self.padding = padding
 
         self._theme = self.get_theme(theme)
-        self._stylized_ranges: List[SyntaxHighlightRange] = []
+        self._stylized_ranges: List[_SyntaxHighlightRange] = []
 
     @classmethod
     def from_path(
@@ -484,7 +483,7 @@ class Syntax(JupyterMixin):
 
                 def line_tokenize() -> Iterable[Tuple[Any, str]]:
                     """Split tokens to one per line."""
-                    assert lexer  # required to make MyPy happy
+                    assert lexer  # required to make MyPy happy - we know lexer is not None at this point
 
                     for token_type, token in lexer.get_tokens(code):
                         while token:
@@ -522,25 +521,23 @@ class Syntax(JupyterMixin):
                 text.stylize(f"on {self.background_color}")
 
         if self._stylized_ranges:
-            self._apply_stylized_ranges(code=code, text=text)
+            self._apply_stylized_ranges(text)
 
         return text
 
     def stylize_range(
-        self, style: Style, start: SyntaxPosition, end: SyntaxPosition
+        self, style: StyleType, start: SyntaxPosition, end: SyntaxPosition
     ) -> None:
         """
         Adds a custom style on a part of the code, that will be applied to the syntax display when it's rendered.
         Line numbers are 1-based, while column indexes are 0-based.
 
         Args:
-            style (Style): The style to apply.
+            style (StyleType): The style to apply.
             start (Tuple[int, int]): The start of the range, in the form `[line number, column index]`.
             end (Tuple[int, int]): The end of the range, in the form `[line number, column index]`.
         """
-        self._stylized_ranges.append(
-            SyntaxHighlightRange(style=style, start=start, end=end)
-        )
+        self._stylized_ranges.append(_SyntaxHighlightRange(style, start, end))
 
     def _get_line_numbers_color(self, blend: float = 0.3) -> Color:
         background_style = self._theme.get_background_style() + self.background_style
@@ -743,26 +740,29 @@ class Syntax(JupyterMixin):
                     yield from wrapped_line
                     yield new_line
 
-    def _apply_stylized_ranges(self, *, code: str, text: Text) -> None:
+    def _apply_stylized_ranges(self, text: Text) -> None:
         """
         Apply stylized ranges to a text instance,
         using the given code to determine the right portion to apply the style to.
 
         Args:
-            code (str): Code to highlight.
             text (Text): Text instance to apply the style to.
         """
-        # N.B. using "\n" here is much faster than using metacharacters such as "^" or "\Z":
+        code = text.plain
         newlines_offsets = [
-            match.start() for match in re.finditer("\n", code, flags=re.MULTILINE)
+            # Let's add outer boundaries at each side of the list:
+            -1,
+            # N.B. using "\n" here is much faster than using metacharacters such as "^" or "\Z":
+            *[match.start() for match in re.finditer("\n", code, flags=re.MULTILINE)],
+            len(code),
         ]
-        # Let's add outer boundaries at each side of the list:
-        newlines_offsets.insert(0, -1)
-        newlines_offsets.append(len(code))
 
         for stylized_range in self._stylized_ranges:
-            start, end = _get_code_indexes_for_syntax_positions(
-                newlines_offsets, (stylized_range.start, stylized_range.end)
+            start = _get_code_index_for_syntax_position(
+                newlines_offsets, stylized_range.start
+            )
+            end = _get_code_index_for_syntax_position(
+                newlines_offsets, stylized_range.end
             )
             if start is not None and end is not None:
                 text.stylize(stylized_range.style, start, end)
@@ -788,35 +788,30 @@ class Syntax(JupyterMixin):
         return ends_on_nl, processed_code
 
 
-def _get_code_indexes_for_syntax_positions(
-    newlines_offsets: Sequence[int], positions: Sequence[SyntaxPosition]
-) -> Sequence[Optional[int]]:
+def _get_code_index_for_syntax_position(
+    newlines_offsets: Sequence[int], position: SyntaxPosition
+) -> Optional[int]:
     """
     Returns the index of the code string for the given positions.
 
     Args:
         newlines_offsets (Sequence[int]): The offset of each newline character found in the code snippet.
-        positions (Sequence[SyntaxPosition]): The positions to search for.
+        position (SyntaxPosition): The position to search for.
 
     Returns:
-        Sequence[Optional[int]]: For each position, the index of the code string for this position, or `None`
+        Optional[int]: The index of the code string for this position, or `None`
             if the position is out of range.
     """
     lines_count = len(newlines_offsets)
 
-    def index_for_position(position: SyntaxPosition) -> Optional[int]:
-        line_number, column_index = position
-        if line_number > lines_count:
-            return None  # `line_number` is out of range
-        line_index = line_number - 1
-        line_length = (
-            newlines_offsets[line_index + 1] - newlines_offsets[line_index] - 1
-        )
-        if line_length < column_index:
-            return None  # `column_index` is out of range
-        return newlines_offsets[line_index] + column_index + 1
-
-    return [index_for_position(position) for position in positions]
+    line_number, column_index = position
+    if line_number > lines_count:
+        return None  # `line_number` is out of range
+    line_index = line_number - 1
+    line_length = newlines_offsets[line_index + 1] - newlines_offsets[line_index] - 1
+    if line_length < column_index:
+        return None  # `column_index` is out of range
+    return newlines_offsets[line_index] + column_index + 1
 
 
 if __name__ == "__main__":  # pragma: no cover

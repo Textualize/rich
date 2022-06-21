@@ -14,7 +14,7 @@ from rich.syntax import (
     Console,
     PygmentsSyntaxTheme,
     Syntax,
-    SyntaxHighlightRange,
+    _SyntaxHighlightRange,
 )
 
 from .render import render
@@ -248,39 +248,39 @@ def test_syntax_highlight_ranges():
         word_wrap=False,
     )
     stylized_ranges = [
-        SyntaxHighlightRange(
+        _SyntaxHighlightRange(
             # overline the 2nd char of the 1st line:
             start=(1, 1),
             end=(1, 2),
             style=Style(overline=True),
         ),
-        SyntaxHighlightRange(
+        _SyntaxHighlightRange(
             start=(1, len("def loop_")),
             end=(1, len("def loop_first_last")),
             style=Style(underline=True),
         ),
-        SyntaxHighlightRange(
+        _SyntaxHighlightRange(
             start=(1, len("def loop_first")),
             end=(3, len("    iter_values = iter")),
             style=Style(bold=True),
         ),
-        SyntaxHighlightRange(
+        _SyntaxHighlightRange(
             start=(9, len("    for ")),
             end=(9, len("    for value in")),
             style=Style(strike=True),
         ),
-        SyntaxHighlightRange(
+        _SyntaxHighlightRange(
             start=(6, len("    except ")),
             end=(6, len("    except StopIteration")),
             style=Style(reverse=True),
         ),
         # Those should be out of range, and have no impact:
-        SyntaxHighlightRange(
+        _SyntaxHighlightRange(
             start=(1, 100),  # `column_index` is out of range
             end=(2, 2),
             style=Style(bold=True),
         ),
-        SyntaxHighlightRange(
+        _SyntaxHighlightRange(
             start=(1, 1),
             end=(30, 2),  # `line_number` is out of range
             style=Style(bold=True),
