@@ -37,6 +37,7 @@ The following people have contributed to the development of Rich:
 - [Tushar Sadhwani](https://github.com/tusharsadhwani)
 - [Paul Sanders](https://github.com/sanders41)
 - [Tim Savage](https://github.com/timsavage)
+- [Anthony Shaw](https://github.com/tonybaloney)
 - [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Aaron Stephens](https://github.com/aaronst)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)

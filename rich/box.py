@@ -442,7 +442,7 @@ MARKDOWN: Box = Box(
 """,
     ascii=True,
 )
-    
+
 # Map Boxes that don't render with raster fonts on to equivalent that do
 LEGACY_WINDOWS_SUBSTITUTIONS = {
     ROUNDED: SQUARE,
