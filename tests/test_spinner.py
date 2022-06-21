@@ -46,17 +46,15 @@ def test_spinner_update():
     spinner = Spinner("dots")
     console.print(spinner)
 
-    spinner.update(text="Bar", style="green", speed=2)
-    time += 80 / 1000
-    console.print(spinner)
+    rule = Rule("Bar")
 
-    spinner.update(text=Rule("Bar"))
+    spinner.update(text=rule)
     time += 80 / 1000
     console.print(spinner)
 
     result = console.end_capture()
     print(repr(result))
-    expected = f"⠋\n\x1b[32m⠙\x1b[0m Bar\n\x1b[32m⠸\x1b[0m \x1b[92m────── \x1b[0mBar\x1b[92m ───────\x1b[0m\n"
+    expected = "⠋\n⠙ \x1b[92m─\x1b[0m\n"
     assert result == expected
 
 

@@ -5,7 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [12.4.5] - Unreleased
+
+### Added
+
+- Environment variables `JUPYTER_COLUMNS` and `JUPYTER_LINES` to control width and height of console in Jupyter
+
+### Changed
+
+- Default width of Jupyter console size is increased to 115
 
 ### Fixed
 
@@ -14,6 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow exceptions that are raised while a Live is rendered to be displayed and/or processed https://github.com/Textualize/rich/pull/2305
 - Fix crashes that can happen with `inspect` when docstrings contain some special control codes https://github.com/Textualize/rich/pull/2294
 - Fix edges used in first row of tables when `show_header=False` https://github.com/Textualize/rich/pull/2330
+- Fix interaction between `Capture` contexts and `Console(record=True)` https://github.com/Textualize/rich/pull/2343
+- Fixed hash issue in Styles class https://github.com/Textualize/rich/pull/2346
+
+### Changed
+
+- `Style.__add__` will no longer return `NotImplemented`
+- Remove rich.\_lru_cache
 
 ## [12.4.4] - 2022-05-24
 
