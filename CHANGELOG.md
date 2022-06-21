@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Environment variables `JUPYTER_COLUMNS` and `JUPYTER_LINES` to control width and height of console in Jupyter
+- `inspect` will prefix coroutine functions with `async def`
 
 ### Changed
 
