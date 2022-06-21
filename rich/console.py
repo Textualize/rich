@@ -1964,8 +1964,8 @@ class Console:
                 buffer_extend(line)
 
     def _check_buffer(self) -> None:
-        """Check if the buffer may be rendered. Render it if it can (e.g. Console.quiet is False)
-        be rendered, then clear it.
+        """Render the buffer if possible. Clear it if required.
+        The buffer may not be rendered in the event that Console.quiet is True.
         Rendering is supported on Windows, Unix and Jupyter environments. For
         legacy Windows consoles, the win32 API is called directly.
         This method will also record what it renders if recording is enabled via Console.record.
