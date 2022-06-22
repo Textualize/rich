@@ -271,6 +271,22 @@
         "version": "8842a5f141d8208ba2bab66e4973e978cb5d0615f326af5d70385ff8fa44b3b9",
         "warmup_time": -1
     },
+    "benchmarks.TextHotCacheSuite.time_wrapping_unicode_heavy_warm_cache": {
+        "code": "class TextHotCacheSuite:\n    def time_wrapping_unicode_heavy_warm_cache(self):\n        for _ in range(20):\n            Text(snippets.UNICODE_HEAVY_TEXT).wrap(self.console, 12, overflow=\"fold\")\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )",
+        "min_run_count": 2,
+        "name": "benchmarks.TextHotCacheSuite.time_wrapping_unicode_heavy_warm_cache",
+        "number": 0,
+        "param_names": [],
+        "params": [],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "timeout": 60.0,
+        "type": "time",
+        "unit": "seconds",
+        "version": "61a0be6fba20247e1a659912134e0628d062a6711afe7df190007679849f9585",
+        "warmup_time": -1
+    },
     "benchmarks.TextSuite.time_align_center": {
         "code": "class TextSuite:\n    def time_align_center(self):\n        Text(snippets.LOREM_IPSUM).align(\"center\", width=self.len_lorem_ipsum * 3)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
         "min_run_count": 2,
