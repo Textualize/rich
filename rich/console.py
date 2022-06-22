@@ -767,6 +767,10 @@ class Console:
         self._thread_locals.buffer_index = value
 
     @property
+    def _buffer_indices_to_render(self) -> Set[int]:
+        return self._thread_locals.buffer_indices_to_render
+
+    @property
     def _theme_stack(self) -> ThemeStack:
         """Get the thread local theme stack."""
         return self._thread_locals.theme_stack
@@ -865,8 +869,7 @@ class Console:
         """
         render_result = self._render_buffer(self._buffer)
         del self._buffer[:]
-        if self._buffer_index in self._buffer_indices_to_render:
-            self._buffer_indices_to_render.remove(self._buffer_index)
+        self._buffer_indices_to_render.discard(self._buffer_index)
         self._exit_buffer()
         return render_result
 
