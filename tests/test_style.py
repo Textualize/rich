@@ -1,7 +1,7 @@
 import pytest
 
-from rich.color import Color, ColorSystem, ColorType
 from rich import errors
+from rich.color import Color, ColorSystem, ColorType
 from rich.style import Style, StyleStack
 
 
@@ -168,7 +168,6 @@ def test_test():
 
 def test_add():
     assert Style(color="red") + None == Style(color="red")
-    assert Style().__add__("foo") == NotImplemented
 
 
 def test_iadd():
