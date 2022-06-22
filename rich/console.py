@@ -543,6 +543,7 @@ class ConsoleThreadLocals(threading.local):
     theme_stack: ThemeStack
     buffer: List[Segment] = field(default_factory=list)
     buffer_index: int = 0
+    buffer_indices_to_render: Set[int] = field(default_factory=set)
 
 
 class RenderHook(ABC):
@@ -724,10 +725,13 @@ class Console:
         )
 
         self._record_buffer_lock = threading.RLock()
+
+        buffer_index = 0
         self._thread_locals = ConsoleThreadLocals(
-            theme_stack=ThemeStack(themes.DEFAULT if theme is None else theme)
+            theme_stack=ThemeStack(themes.DEFAULT if theme is None else theme),
+            buffer_index=buffer_index,
+            buffer_indices_to_render={buffer_index},
         )
-        self._buffer_indices_to_render: Set[int] = {self._thread_locals.buffer_index}
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
         self._live: Optional["Live"] = None
@@ -1066,6 +1070,10 @@ class Console:
     def capture(self, echo: bool = False) -> Capture:
         """A context manager to *capture* the result of print() or log() in a string,
         rather than writing it to the console.
+
+        Args:
+            echo (bool): True if the captured output should also be written to the console,
+                False otherwise.
 
         Example:
             >>> from rich.console import Console
