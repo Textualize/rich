@@ -48,8 +48,7 @@ python -m pip install rich
 
 ## Rich 的打印功能
 
-想毫不费力地将 Rich 的输出功能添加到您的应用程序中，您只需导入 [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start)方法，该方法和其他 Python 的自带功能的参数类似。
-您可以试试：
+想毫不费力地将 Rich 的输出功能添加到您的应用程序中，您只需导入 [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) 方法，它和 Python 内置的同名函数有着完全一致的函数签名。试试看：
 
 ```python
 from rich import print
@@ -58,6 +57,17 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 ```
 
 ![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/print.png)
+
+## 在交互式命令行（REPL）中使用 Rich
+
+Rich 可以被安装到 Python 交互式命令行中，那样做以后，任何数据结构都可以被漂亮的打印出来，自带语法高亮。
+
+```python
+>>> from rich import pretty
+>>> pretty.install()
+```
+
+![REPL](https://github.com/willmcgugan/rich/raw/master/imgs/repl.png)
 
 ## 使用控制台
 
@@ -290,7 +300,7 @@ python -m rich.spinner
 
 Rich 可以渲染一个包含引导线的[树（tree）](https://rich.readthedocs.io/en/latest/tree.html)。对于展示文件目录结构和其他分级数据来说，树是理想选择。
 
-书的标签可以是简单文本或任何 Rich 能渲染的东西。执行以下命令查看演示：
+树的标签可以是简单文本或任何 Rich 能渲染的东西。执行以下命令查看演示：
 
 ```
 python -m rich.tree
