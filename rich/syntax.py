@@ -751,10 +751,13 @@ class Syntax(JupyterMixin):
         code = text.plain
         newlines_offsets = [
             # Let's add outer boundaries at each side of the list:
-            -1,
+            0,
             # N.B. using "\n" here is much faster than using metacharacters such as "^" or "\Z":
-            *[match.start() for match in re.finditer("\n", code, flags=re.MULTILINE)],
-            len(code),
+            *[
+                match.start() + 1
+                for match in re.finditer("\n", code, flags=re.MULTILINE)
+            ],
+            len(code) + 1,
         ]
 
         for stylized_range in self._stylized_ranges:
@@ -805,13 +808,13 @@ def _get_code_index_for_syntax_position(
     lines_count = len(newlines_offsets)
 
     line_number, column_index = position
-    if line_number > lines_count:
+    if line_number > lines_count or len(newlines_offsets) < (line_number + 1):
         return None  # `line_number` is out of range
     line_index = line_number - 1
     line_length = newlines_offsets[line_index + 1] - newlines_offsets[line_index] - 1
     if line_length < column_index:
         return None  # `column_index` is out of range
-    return newlines_offsets[line_index] + column_index + 1
+    return newlines_offsets[line_index] + column_index
 
 
 if __name__ == "__main__":  # pragma: no cover
