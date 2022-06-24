@@ -107,11 +107,13 @@ class Inspect(JupyterMixin):
         # If obj is a module, there may be classes (which are callable) to display
         if inspect.isclass(obj):
             prefix = "class"
+        elif inspect.iscoroutinefunction(obj):
+            prefix = "async def"
         else:
             prefix = "def"
 
         qual_signature = Text.assemble(
-            (f"{prefix} ", f"inspect.{prefix}"),
+            (f"{prefix} ", f"inspect.{prefix.replace(' ', '_')}"),
             (qualname, "inspect.callable"),
             signature_text,
         )
