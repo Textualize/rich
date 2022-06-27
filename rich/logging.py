@@ -173,7 +173,10 @@ class RichHandler(Handler):
             ConsoleRenderable: Renderable to display log message.
         """
         use_markup = getattr(record, "markup", self.markup)
-        message_text = Text.from_markup(message) if use_markup else Text(message)
+        if isinstance(message, Text):
+            message_text = message
+        else:
+            message_text = Text.from_markup(message) if use_markup else Text(message)
 
         highlighter = getattr(record, "highlighter", self.highlighter)
         if highlighter:
