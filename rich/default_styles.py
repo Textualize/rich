@@ -39,6 +39,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "inspect.attr": Style(color="yellow", italic=True),
     "inspect.attr.dunder": Style(color="yellow", italic=True, dim=True),
     "inspect.callable": Style(bold=True, color="red"),
+    "inspect.async_def": Style(italic=True, color="bright_cyan"),
     "inspect.def": Style(italic=True, color="bright_cyan"),
     "inspect.class": Style(italic=True, color="bright_cyan"),
     "inspect.error": Style(bold=True, color="red"),

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Environment variables `JUPYTER_COLUMNS` and `JUPYTER_LINES` to control width and height of console in Jupyter
 - Markdown friendly `Box` style, `MARKDOWN`, for rendering tables ready to copy into markdown files
+- `inspect` will prefix coroutine functions with `async def`
 
 ### Changed
 

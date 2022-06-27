@@ -142,6 +142,19 @@ def test_inspect_builtin_function():
     assert expected == render(print)
 
 
+@skip_pypy3
+def test_inspect_coroutine():
+    async def coroutine():
+        pass
+
+    expected = (
+        "╭─ <function test_inspect_coroutine.<locals>.cor─╮\n"
+        "│ async def                                      │\n"
+        "│ test_inspect_coroutine.<locals>.coroutine():   │\n"
+    )
+    assert render(coroutine).startswith(expected)
+
+
 @skip_py36
 def test_inspect_integer():
     expected = (
