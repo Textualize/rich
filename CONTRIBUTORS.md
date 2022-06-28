@@ -16,6 +16,7 @@ The following people have contributed to the development of Rich:
 - [Michał Górny](https://github.com/mgorny)
 - [Leron Gray](https://github.com/daddycocoaman)
 - [Kenneth Hoste](https://github.com/boegel)
+- [Lanqing Huang](https://github.com/lqhuang)
 - [Finn Hughes](https://github.com/finnhughes)
 - [Josh Karpel](https://github.com/JoshKarpel)
 - [Andrew Kettmann](https://github.com/akettmann)
