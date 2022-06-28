@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, List, TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Sequence
 
 if TYPE_CHECKING:
     from rich.console import ConsoleRenderable
@@ -13,6 +13,12 @@ if TYPE_CHECKING:
 JUPYTER_HTML_FORMAT = """\
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">{code}</pre>
 """
+
+JUPYTER_CLASSES_TO_NOT_RENDER = {
+    # Matplotlib "Artists" manage their own rendering in a Jupyter notebook, and we should not try to render them too.
+    # "Typically, all [Matplotlib] visible elements in a figure are subclasses of Artist."
+    "matplotlib.artist.Artist",
+}
 
 
 class JupyterRenderable:

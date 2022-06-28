@@ -40,7 +40,7 @@ from ._pick import pick_bool
 from .abc import RichRenderable
 from .cells import cell_len
 from .highlighter import ReprHighlighter
-from .jupyter import JupyterMixin, JupyterRenderable
+from .jupyter import JUPYTER_CLASSES_TO_NOT_RENDER, JupyterMixin, JupyterRenderable
 from .measure import Measurement
 from .text import Text
 
@@ -147,6 +147,18 @@ def _ipy_display_hook(
                     continue  # If the method raises, treat it as if it doesn't exist, try any others
                 if repr_result is not None:
                     return  # Delegate rendering to IPython
+
+        # When in a Jupyter notebook let's avoid the display of some specific classes,
+        # as they result in the rendering of useless and noisy lines such as `<Figure size 432x288 with 1 Axes>`.
+        # What does this do?
+        # --> if the class has "matplotlib.artist.Artist" in its hierarchy for example, we don't render it.
+        classes_hierarchy_fully_qualified_names = {
+            # With this `[8:-2]` we convert  "<class 'pkg.Something'>" to  "pkg.Something":
+            str(class_)[8:-2]
+            for class_ in value.__class__.__mro__
+        }
+        if classes_hierarchy_fully_qualified_names & JUPYTER_CLASSES_TO_NOT_RENDER:
+            return
 
     # certain renderables should start on a new line
     if _safe_isinstance(value, ConsoleRenderable):
