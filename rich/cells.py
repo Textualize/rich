@@ -9,8 +9,11 @@ _is_single_cell_widths = re.compile("^[\u0020-\u006f\u00a0\u02ff\u0370-\u0482]*$
 
 
 @lru_cache(4096)
-def _cached_cell_len(text: str) -> int:
+def cached_cell_len(text: str) -> int:
     """Get the number of cells required to display text.
+
+    This method always caches, which may use up a lot of memory. It is recommended to use
+    `cell_len` over this method.
 
     Args:
         text (str): Text to display.
@@ -23,7 +26,7 @@ def _cached_cell_len(text: str) -> int:
     return total_size
 
 
-def cell_len(text: str, _cell_len: Callable[[str], int] = _cached_cell_len) -> int:
+def cell_len(text: str, _cell_len: Callable[[str], int] = cached_cell_len) -> int:
     """Get the number of cells required to display text.
 
     Args:
