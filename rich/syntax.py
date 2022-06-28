@@ -1,8 +1,22 @@
 import os.path
 import platform
+import re
+import sys
 import textwrap
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 from pygments.lexer import Lexer
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
@@ -31,8 +45,13 @@ from .console import Console, ConsoleOptions, JustifyMethod, RenderResult
 from .jupyter import JupyterMixin
 from .measure import Measurement
 from .segment import Segment, Segments
-from .style import Style
+from .style import Style, StyleType
 from .text import Text
+
+if sys.version_info < (3, 10):
+    from typing_extensions import TypeAlias
+else:
+    from typing import TypeAlias
 
 TokenType = Tuple[str, ...]
 
@@ -193,6 +212,21 @@ class ANSISyntaxTheme(SyntaxTheme):
         return self._background_style
 
 
+SyntaxPosition: TypeAlias = Tuple[int, int]
+
+
+class _SyntaxHighlightRange(NamedTuple):
+    """
+    A range to highlight in a Syntax object.
+    `start` and `end` are 2-integers tuples, where the first integer is the line number
+    (starting from 1) and the second integer is the column index (starting from 0).
+    """
+
+    style: StyleType
+    start: SyntaxPosition
+    end: SyntaxPosition
+
+
 class Syntax(JupyterMixin):
     """Construct a Syntax object to render syntax highlighted code.
 
@@ -265,6 +299,7 @@ class Syntax(JupyterMixin):
         self.padding = padding
 
         self._theme = self.get_theme(theme)
+        self._stylized_ranges: List[_SyntaxHighlightRange] = []
 
     @classmethod
     def from_path(
@@ -448,7 +483,7 @@ class Syntax(JupyterMixin):
 
                 def line_tokenize() -> Iterable[Tuple[Any, str]]:
                     """Split tokens to one per line."""
-                    assert lexer
+                    assert lexer  # required to make MyPy happy - we know lexer is not None at this point
 
                     for token_type, token in lexer.get_tokens(code):
                         while token:
@@ -484,7 +519,25 @@ class Syntax(JupyterMixin):
                 )
             if self.background_color is not None:
                 text.stylize(f"on {self.background_color}")
+
+        if self._stylized_ranges:
+            self._apply_stylized_ranges(text)
+
         return text
+
+    def stylize_range(
+        self, style: StyleType, start: SyntaxPosition, end: SyntaxPosition
+    ) -> None:
+        """
+        Adds a custom style on a part of the code, that will be applied to the syntax display when it's rendered.
+        Line numbers are 1-based, while column indexes are 0-based.
+
+        Args:
+            style (StyleType): The style to apply.
+            start (Tuple[int, int]): The start of the range, in the form `[line number, column index]`.
+            end (Tuple[int, int]): The end of the range, in the form `[line number, column index]`.
+        """
+        self._stylized_ranges.append(_SyntaxHighlightRange(style, start, end))
 
     def _get_line_numbers_color(self, blend: float = 0.3) -> Color:
         background_style = self._theme.get_background_style() + self.background_style
@@ -574,11 +627,8 @@ class Syntax(JupyterMixin):
             else self.code_width
         )
 
-        ends_on_nl = self.code.endswith("\n")
-        code = self.code if ends_on_nl else self.code + "\n"
-        code = textwrap.dedent(code) if self.dedent else code
-        code = code.expandtabs(self.tab_size)
-        text = self.highlight(code, self.line_range)
+        ends_on_nl, processed_code = self._process_code(self.code)
+        text = self.highlight(processed_code, self.line_range)
 
         if not self.line_numbers and not self.word_wrap and not self.line_range:
             if not ends_on_nl:
@@ -689,6 +739,83 @@ class Syntax(JupyterMixin):
                 for wrapped_line in wrapped_lines:
                     yield from wrapped_line
                     yield new_line
+
+    def _apply_stylized_ranges(self, text: Text) -> None:
+        """
+        Apply stylized ranges to a text instance,
+        using the given code to determine the right portion to apply the style to.
+
+        Args:
+            text (Text): Text instance to apply the style to.
+        """
+        code = text.plain
+        newlines_offsets = [
+            # Let's add outer boundaries at each side of the list:
+            0,
+            # N.B. using "\n" here is much faster than using metacharacters such as "^" or "\Z":
+            *[
+                match.start() + 1
+                for match in re.finditer("\n", code, flags=re.MULTILINE)
+            ],
+            len(code) + 1,
+        ]
+
+        for stylized_range in self._stylized_ranges:
+            start = _get_code_index_for_syntax_position(
+                newlines_offsets, stylized_range.start
+            )
+            end = _get_code_index_for_syntax_position(
+                newlines_offsets, stylized_range.end
+            )
+            if start is not None and end is not None:
+                text.stylize(stylized_range.style, start, end)
+
+    def _process_code(self, code: str) -> Tuple[bool, str]:
+        """
+        Applies various processing to a raw code string
+        (normalises it so it always ends with a line return, dedents it if necessary, etc.)
+
+        Args:
+            code (str): The raw code string to process
+
+        Returns:
+            Tuple[bool, str]: the boolean indicates whether the raw code ends with a line return,
+                while the string is the processed code.
+        """
+        ends_on_nl = code.endswith("\n")
+        processed_code = code if ends_on_nl else code + "\n"
+        processed_code = (
+            textwrap.dedent(processed_code) if self.dedent else processed_code
+        )
+        processed_code = processed_code.expandtabs(self.tab_size)
+        return ends_on_nl, processed_code
+
+
+def _get_code_index_for_syntax_position(
+    newlines_offsets: Sequence[int], position: SyntaxPosition
+) -> Optional[int]:
+    """
+    Returns the index of the code string for the given positions.
+
+    Args:
+        newlines_offsets (Sequence[int]): The offset of each newline character found in the code snippet.
+        position (SyntaxPosition): The position to search for.
+
+    Returns:
+        Optional[int]: The index of the code string for this position, or `None`
+            if the given position's line number is out of range (if it's the column that is out of range
+            we silently clamp its value so that it reaches the end of the line)
+    """
+    lines_count = len(newlines_offsets)
+
+    line_number, column_index = position
+    if line_number > lines_count or len(newlines_offsets) < (line_number + 1):
+        return None  # `line_number` is out of range
+    line_index = line_number - 1
+    line_length = newlines_offsets[line_index + 1] - newlines_offsets[line_index] - 1
+    # If `column_index` is out of range: let's silently clamp it:
+    column_index = min(line_length, column_index)
+    return newlines_offsets[line_index] + column_index
 
 
 if __name__ == "__main__":  # pragma: no cover
