@@ -24,19 +24,19 @@
 
 Rich 是一个 Python 库，可以为您在终端中提供富文本和精美格式。
 
-[Rich API](https://rich.readthedocs.io/en/latest/) 可以很容易的在终端输出添加各种颜色和不同风格。Rich 还可以绘制漂亮的表格，进度条，markdown，突出显示语法的源代码及回溯等等，不胜枚举。
+[Rich 的 API](https://rich.readthedocs.io/en/latest/) 让在终端输出颜色和样式变得很简单。此外，Rich 还可以绘制漂亮的表格、进度条、markdown、语法高亮的源代码以及栈回溯信息（tracebacks）等——开箱即用。
 
 ![功能纵览](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
 
 有关 Rich 的视频介绍，请参见
-[@fishnets88](https://twitter.com/fishnets88)录制的
+[@fishnets88](https://twitter.com/fishnets88) 录制的
 [calmcode.io](https://calmcode.io/rich/introduction.html)。
 
 ## 兼容性
 
 Rich 适用于 Linux，OSX 和 Windows。真彩色/表情符号可与新的 Windows 终端一起使用，Windows 的经典终端仅限 8 种颜色。
 
-Rich 还可以与[Jupyter 笔记本](https://jupyter.org/)一起使用，而无需其他配置。
+Rich 还可以与 [Jupyter 笔记本](https://jupyter.org/)一起使用，而无需其他配置。
 
 ## 安装说明
 
@@ -48,8 +48,7 @@ python -m pip install rich
 
 ## Rich 的打印功能
 
-想毫不费力地将 Rich 的输出功能添加到您的应用程序中，您只需导入[rich 打印](https://rich.readthedocs.io/en/latest/introduction.html#quick-start)方法，该方法和其他 Python 的自带功能的参数类似。
-您可以试试：
+想毫不费力地将 Rich 的输出功能添加到您的应用程序中，您只需导入 [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) 方法，它和 Python 内置的同名函数有着完全一致的函数签名。试试看：
 
 ```python
 from rich import print
@@ -58,6 +57,17 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 ```
 
 ![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/print.png)
+
+## 在交互式命令行（REPL）中使用 Rich
+
+Rich 可以被安装到 Python 交互式命令行中，那样做以后，任何数据结构都可以被漂亮的打印出来，自带语法高亮。
+
+```python
+>>> from rich import pretty
+>>> pretty.install()
+```
+
+![REPL](https://github.com/willmcgugan/rich/raw/master/imgs/repl.png)
 
 ## 使用控制台
 
@@ -69,17 +79,15 @@ from rich.console import Console
 console = Console()
 ```
 
-Console 对象含有一个`print`方法，它的界面与 python 内置的`print`功能界面相似。
-
-您可以试试：
+Console 对象包含一个`print`方法，它和语言内置的`print`函数有着相似的接口。下面是一段使用样例：
 
 ```python
 console.print("Hello", "World!")
 ```
 
-您可能已经料到，这时终端上会显示“ Hello World！”。请注意，与内置的“打印”功能不同，Rich 会将文字自动换行以适合终端宽度。
+您可能已经料到，这时终端上会显示“ Hello World！”。请注意，与内置的“print”函数不同，Rich 会将文字自动换行以适合终端宽度。
 
-有几种方法可以为输出添加颜色和样式。您可以通过添加`style`关键字参数来为整个输出设置样式。例子如下：
+有好几种方法可以为输出添加颜色和样式。您可以通过添加`style`关键字参数来为整个输出设置样式。例子如下：
 
 ```python
 console.print("Hello", "World!", style="bold red")
@@ -97,9 +105,32 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![控制台标记](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
 
-### 控制台记录
+使用`Console`对象，你可以花最少的工夫生成复杂的输出。更详细的内容可查阅 [Console API](https://rich.readthedocs.io/en/latest/console.html) 文档。
 
-Console 对象具有一个`log()`方法，该方法具有与`print()`类似的界面，除此之外，还能成列显示当前时间以及被调用的文件和行。默认情况下，Rich 将针对 Python 结构和 repr 字符串进行语法突出显示。如果您记录一个集合（如字典或列表），Rich 会把它漂亮地打印出来，使其切合可用空间。下面是其中一些功能的示例：
+## Rich Inspect
+
+Rich 提供一个 [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) 函数来给任意的 Python 对象打印报告，比如类（class）、实例（instance）和内置对象（builtin）等。
+
+```python
+>>> my_list = ["foo", "bar"]
+>>> from rich import inspect
+>>> inspect(my_list, methods=True)
+```
+
+![Log](https://github.com/willmcgugan/rich/raw/master/imgs/inspect.png)
+
+查看  [inspect 文档](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect)详细了解。
+
+# Rich 库内容
+
+Rich 包含了一系列内置的 _可渲染类型(renderables)_ ，你可以用它们为命令行程序构建出优雅的输出，也可以拿它们来辅助调试你的代码。
+
+点击以下标题查看详细：
+
+<details>
+<summary>日志（Log）</summary>
+
+Console 对象有一个与`print()`类似的`log()`方法，但它会多输出一列内容，里面包含当前时间以及调用方法的文件行号。默认情况下，Rich 将针对 Python 结构和 repr 字符串添加语法高亮。如果您记录一个集合（如字典或列表），Rich 会把它漂亮地打印出来，使其切合可用空间。下面是其中一些功能的示例：
 
 ```python
 from rich.console import Console
@@ -130,17 +161,22 @@ test_log()
 
 注意其中的`log_locals`参数会输出一个表格，该表格包含调用 log 方法的局部变量。
 
-log 方法既可用于将长时间运行应用程序（例如服务器）的日志记录到终端，也可用于辅助调试。
+log 方法既可用于将常驻进程（例如服务器进程）的日志打印到终端，在调试时也是个好帮手。
 
-### 记录处理程序
+</details>
+<details>
+<summary>日志处理器（Logging Handler）</summary>
 
-您还可以使用内置的[处理类](https://rich.readthedocs.io/en/latest/logging.html)来对 Python 日志记录模块的输出进行格式化和着色。下面是输出示例：
+您还可以使用内置的[处理器类](https://rich.readthedocs.io/en/latest/logging.html)来对 Python 的 logging 模块的输出进行格式化和着色。下面是输出示例：
 
 ![记录](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
 
-## 表情符号
+</details>
 
-将名称放在两个冒号之间即可在控制台输出中插入表情符号。示例如下：
+<details>
+<summary>Emoji 表情</summary>
+
+将名称放在两个冒号之间即可在控制台输出中插入 emoji 表情符。示例如下：
 
 ```python
 >>> console.print(":smiley: :vampire: :pile_of_poo: :thumbs_up: :raccoon:")
@@ -149,7 +185,10 @@ log 方法既可用于将长时间运行应用程序（例如服务器）的日�
 
 请谨慎地使用此功能。
 
-## 表格
+</details>
+
+<details>
+<summary>表格（Tables）</summary>
 
 Rich 可以使用 Unicode 框字符来呈现多变的[表格](https://rich.readthedocs.io/en/latest/tables.html)。Rich 包含多种边框，样式，单元格对齐等格式设置的选项。下面是一个简单的示例：
 
@@ -189,13 +228,16 @@ console.print(table)
 
 请注意，控制台标记的呈现方式与`print()`和`log()`相同。实际上，由 Rich 渲染的任何内容都可以添加到标题/行（甚至其他表格）中。
 
-`Table`类很聪明，可以调整列的大小以适合终端的可用宽度，并能根据需要环绕文本。下面是相同的示例，输出与比上表小的终端上：
+`Table`类很聪明，可以调整列的大小以适合终端的可用宽度，并能根据需要对文字折行。下面是相同的示例，输出与比上表小的终端上：
 
 ![表格 2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
 
-## 进度条
+</details>
 
-Rich 可以渲染多个不闪烁的[进度](https://rich.readthedocs.io/en/latest/progress.html)条形图，以跟踪长时间运行的任务。
+<details>
+<summary>进度条（Progress Bars）</summary>
+
+Rich 可以渲染多种“无闪烁”的[进度](https://rich.readthedocs.io/en/latest/progress.html)条图形，以跟踪长时间运行的任务。
 
 基本用法：用`track`函数调用任何程序并迭代结果。下面是一个例子：
 
@@ -216,7 +258,64 @@ for step in track(range(100)):
 
 要自己尝试一下，请参阅[examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py)，它可以在显示进度的同时下载多个 URL。
 
-## 列
+</details>
+
+<details>
+<summary>状态动画（Status）</summary>
+
+对于那些很难计算进度的情况，你可以使用 [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) 方法，它会展示一个“环形旋转（spinner）”的动画和文字信息。这个动画并不会妨碍你正常使用控制台。下面是个例子：
+
+```python
+from time import sleep
+from rich.console import Console
+
+console = Console()
+tasks = [f"task {n}" for n in range(1, 11)]
+
+with console.status("[bold green]Working on tasks...") as status:
+    while tasks:
+        task = tasks.pop(0)
+        sleep(1)
+        console.log(f"{task} complete")
+```
+
+这会往终端生成以下输出：
+
+![status](https://github.com/willmcgugan/rich/raw/master/imgs/status.gif)
+
+这个旋转动画借鉴自 [cli-spinners](https://www.npmjs.com/package/cli-spinners) 项目。你可以通过`spinner`参数指定一种动画效果。执行以下命令来查看所有可选值：
+
+```
+python -m rich.spinner
+```
+
+这会往终端输出以下内容：
+
+![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
+
+</details>
+
+<details>
+<summary>树（Tree）</summary>
+
+Rich 可以渲染一个包含引导线的[树（tree）](https://rich.readthedocs.io/en/latest/tree.html)。对于展示文件目录结构和其他分级数据来说，树是理想选择。
+
+树的标签可以是简单文本或任何 Rich 能渲染的东西。执行以下命令查看演示：
+
+```
+python -m rich.tree
+```
+
+这会产生以下输出：
+
+![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
+
+[tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) 是一个展示任意目录的文件树视图的样例文件，类似于 Linux 中的 `tree` 命令。
+
+</details>
+
+<details>
+<summary>列（Columns）</summary>
 
 Rich 可以将内容通过排列整齐的，具有相等或最佳的宽度的[列](https://rich.readthedocs.io/en/latest/columns.html)来呈现。下面是（macOS / Linux）`ls`命令的一个非常基本的克隆，用于用列来显示目录列表：
 
@@ -235,7 +334,10 @@ print(Columns(directory))
 
 ![列](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
 
-## Markdown
+</details>
+
+<details>
+<summary>Markdown</summary>
 
 Rich 可以呈现[markdown](https://rich.readthedocs.io/en/latest/markdown.html)，并可相当不错的将其格式转移到终端。
 
@@ -255,7 +357,10 @@ console.print(markdown)
 
 ![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
 
-## 语法突出显示
+</details>
+
+<details>
+<summary>语法高亮（Syntax Highlighting）</summary>
 
 Rich 使用[pygments](https://pygments.org/)库来实现[语法高亮显示](https://rich.readthedocs.io/en/latest/syntax.html)。用法类似于渲染 markdown。构造一个`Syntax`对象并将其打印到控制台。下面是一个例子：
 
@@ -287,13 +392,20 @@ console.print(syntax)
 
 ![语法](https://github.com/willmcgugan/rich/raw/master/imgs/syntax.png)
 
-## 回溯
+</details>
 
-Rich 可以渲染漂亮的回溯，比标准 Python 回溯更容易阅读，并能显示更多代码。您可以将 Rich 设置为默认的回溯处理程序，这样所有难以捕获的异常都将由 Rich 为您呈现。
+<details>
+<summary>栈回溯信息（Tracebacks）</summary>
 
-下面是在 OSX（与 Linux 类似）上的外观：
+Rich 可以渲染出漂亮的[栈回溯信息](https://rich.readthedocs.io/en/latest/traceback.html)，它比标准的 Python 格式更容易阅读，且能显示更多的代码。您可以将 Rich 设置为默认的栈回溯处理程序，这样所有未捕获的异常都将由 Rich 为渲染。
+
+下面是在 OSX（在 Linux 上也类似）系统的效果：
 
 ![回溯](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
+
+</details>
+
+所有的 Rich 可渲染对象都采用了 [Console Protocol](https://rich.readthedocs.io/en/latest/protocol.html) 协议，你可以用该协议实现你独有的 Rich 内容。
 
 ## 使用 Rich 的项目
 
