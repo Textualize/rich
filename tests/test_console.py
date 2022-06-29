@@ -381,6 +381,20 @@ def test_capture_echo_outputs_captured_content_to_terminal(capsys):
     assert out == "1\n2\n3\n"
 
 
+def test_capture_echo_nested_capture():
+    # TODO: This behaviour doesn't seem correct
+    console = Console()
+    console.print(1)
+    with console.capture() as capture1:
+        console.print(2)
+        with console.capture() as capture2:
+            console.print(3)
+    console.print(4)
+
+    assert capture1.get() == ""
+    assert capture2.get() == "2\n3\n"
+
+
 def test_input(monkeypatch, capsys):
     def fake_input(prompt=""):
         console.file.write(prompt)
