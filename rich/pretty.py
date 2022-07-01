@@ -40,7 +40,7 @@ from ._pick import pick_bool
 from .abc import RichRenderable
 from .cells import cell_len
 from .highlighter import ReprHighlighter
-from .jupyter import JUPYTER_CLASSES_TO_NOT_RENDER, JupyterMixin, JupyterRenderable
+from .jupyter import JupyterMixin, JupyterRenderable
 from .measure import Measurement
 from .text import Text
 
@@ -53,6 +53,13 @@ if TYPE_CHECKING:
         OverflowMethod,
         RenderResult,
     )
+
+
+JUPYTER_CLASSES_TO_NOT_RENDER = {
+    # Matplotlib "Artists" manage their own rendering in a Jupyter notebook, and we should not try to render them too.
+    # "Typically, all [Matplotlib] visible elements in a figure are subclasses of Artist."
+    "matplotlib.artist.Artist",
+}
 
 
 def _is_attr_object(obj: Any) -> bool:
@@ -115,7 +122,9 @@ def _ipy_display_hook(
     max_string: Optional[int] = None,
     expand_all: bool = False,
 ) -> None:
-    from .console import ConsoleRenderable  # needed here to prevent circular import
+    # needed here to prevent circular import:
+    from ._inspect import object_is_one_of_types
+    from .console import ConsoleRenderable
 
     # always skip rich generated jupyter renderables or None values
     if _safe_isinstance(value, JupyterRenderable) or value is None:
@@ -152,12 +161,7 @@ def _ipy_display_hook(
         # as they result in the rendering of useless and noisy lines such as `<Figure size 432x288 with 1 Axes>`.
         # What does this do?
         # --> if the class has "matplotlib.artist.Artist" in its hierarchy for example, we don't render it.
-        classes_hierarchy_fully_qualified_names = {
-            # With this `[8:-2]` we convert  "<class 'pkg.Something'>" to  "pkg.Something":
-            str(class_)[8:-2]
-            for class_ in value.__class__.__mro__
-        }
-        if classes_hierarchy_fully_qualified_names & JUPYTER_CLASSES_TO_NOT_RENDER:
+        if object_is_one_of_types(value, JUPYTER_CLASSES_TO_NOT_RENDER):
             return
 
     # certain renderables should start on a new line

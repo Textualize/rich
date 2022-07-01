@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import inspect
 from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
-from typing import Any, Iterable, Optional, Tuple
+from typing import Any, Collection, Iterable, Optional, Tuple, Type, Union, cast
 
 from .console import Group, RenderableType
 from .control import escape_control_codes
@@ -233,3 +233,29 @@ class Inspect(JupyterMixin):
         if not self.help:
             docs = _first_paragraph(docs)
         return escape_control_codes(docs)
+
+
+def object_types_tree(obj: Union[object, Type[Any]]) -> Tuple[type, ...]:
+    obj_type: Type[Any] = type(obj)
+    if obj_type is type:
+        # the given object was already a type: let's use this instead:
+        obj_type = cast(Type[Any], obj)  # I wish MyPy could infer this itself :-/
+    return getattr(obj_type, "__mro__", ())
+
+
+def object_types_tree_as_strings(obj: object) -> Tuple[str, ...]:
+    return tuple(
+        [
+            f'{getattr(type_, "__module__", "")}.{getattr(type_, "__qualname__", "")}'
+            for type_ in object_types_tree(obj)
+        ]
+    )
+
+
+def object_is_one_of_types(
+    obj: object, fully_qualified_types_names: Collection[str]
+) -> bool:
+    for type_name in object_types_tree_as_strings(obj):
+        if type_name in fully_qualified_types_names:
+            return True
+    return False
