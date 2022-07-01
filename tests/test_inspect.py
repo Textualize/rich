@@ -7,9 +7,9 @@ import pytest
 
 from rich import inspect
 from rich._inspect import (
-    object_is_one_of_types,
-    object_types_tree,
-    object_types_tree_as_strings,
+    get_object_types_mro,
+    get_object_types_mro_as_strings,
+    is_object_one_of_types,
 )
 from rich.console import Console
 
@@ -375,25 +375,25 @@ def test_can_handle_special_characters_in_docstrings(
         [FooSubclass, (FooSubclass, Foo, object)],
     ),
 )
-def test_object_types_tree(obj: object, expected_result: Sequence[Type]):
-    assert object_types_tree(obj) == expected_result
+def test_object_types_mro(obj: object, expected_result: Sequence[Type]):
+    assert get_object_types_mro(obj) == expected_result
 
 
 @pytest.mark.parametrize(
     "obj,expected_result",
     (
         # fmt: off
-        ["hi", ("builtins.str", "builtins.object")],
-        [str, ("builtins.str", "builtins.object")],
-        [Foo(1), (f"{__name__}.Foo", "builtins.object")],
-        [Foo, (f"{__name__}.Foo", "builtins.object")],
-        [FooSubclass(1), (f"{__name__}.FooSubclass", f"{__name__}.Foo", "builtins.object")],
-        [FooSubclass, (f"{__name__}.FooSubclass", f"{__name__}.Foo", "builtins.object")],
+        ["hi", ["builtins.str", "builtins.object"]],
+        [str, ["builtins.str", "builtins.object"]],
+        [Foo(1), [f"{__name__}.Foo", "builtins.object"]],
+        [Foo, [f"{__name__}.Foo", "builtins.object"]],
+        [FooSubclass(1), [f"{__name__}.FooSubclass", f"{__name__}.Foo", "builtins.object"]],
+        [FooSubclass, [f"{__name__}.FooSubclass", f"{__name__}.Foo", "builtins.object"]],
         # fmt: on
     ),
 )
-def test_object_types_tree_as_strings(obj: object, expected_result: Sequence[str]):
-    assert object_types_tree_as_strings(obj) == expected_result
+def test_object_types_mro_as_strings(obj: object, expected_result: Sequence[str]):
+    assert get_object_types_mro_as_strings(obj) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -418,4 +418,4 @@ def test_object_types_tree_as_strings(obj: object, expected_result: Sequence[str
 def test_object_is_one_of_types(
     obj: object, types: Sequence[str], expected_result: bool
 ):
-    assert object_is_one_of_types(obj, types) is expected_result
+    assert is_object_one_of_types(obj, types) is expected_result

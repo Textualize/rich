@@ -123,7 +123,7 @@ def _ipy_display_hook(
     expand_all: bool = False,
 ) -> None:
     # needed here to prevent circular import:
-    from ._inspect import object_is_one_of_types
+    from ._inspect import is_object_one_of_types
     from .console import ConsoleRenderable
 
     # always skip rich generated jupyter renderables or None values
@@ -161,7 +161,7 @@ def _ipy_display_hook(
         # as they result in the rendering of useless and noisy lines such as `<Figure size 432x288 with 1 Axes>`.
         # What does this do?
         # --> if the class has "matplotlib.artist.Artist" in its hierarchy for example, we don't render it.
-        if object_is_one_of_types(value, JUPYTER_CLASSES_TO_NOT_RENDER):
+        if is_object_one_of_types(value, JUPYTER_CLASSES_TO_NOT_RENDER):
             return
 
     # certain renderables should start on a new line
