@@ -104,7 +104,7 @@ Here's an example::
 Rules
 -----
 
-The :meth:`~rich.console.Console.rule` method will draw a horizontal line with an optional title, which is a good way of dividing your terminal output in to sections.
+The :meth:`~rich.console.Console.rule` method will draw a horizontal line with an optional title, which is a good way of dividing your terminal output into sections.
 
     >>> console.rule("[bold red]Chapter 2")
 
