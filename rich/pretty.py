@@ -680,15 +680,14 @@ def traverse(
                     for last, arg in loop_last(args):
                         if _safe_isinstance(arg, tuple):
                             key, child = arg
-                            child_node = _traverse(child, depth=depth + 1)
-                            child_node.last = last
+                        else:
+                            key, child = None, arg
+                        child_node = _traverse(child, depth=depth + 1)
+                        child_node.last = last
+                        if key is not None:
                             child_node.key_repr = key
                             child_node.key_separator = "="
-                            append(child_node)
-                        else:
-                            child_node = _traverse(arg, depth=depth + 1)
-                            child_node.last = last
-                            append(child_node)
+                        append(child_node)
             else:
                 node = Node(
                     value_repr=f"<{class_name}>" if angular else f"{class_name}()",

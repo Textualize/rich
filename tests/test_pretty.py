@@ -322,6 +322,7 @@ def test_max_depth_rich_repr():
     )
 
 
+
 def test_max_depth_attrs():
     @attr.define
     class Foo:
@@ -544,3 +545,24 @@ def test_measure_pretty():
 
     measurement = console.measure(pretty)
     assert measurement == Measurement(12, 12)
+
+
+def test_tuple_rich_repr():
+    """
+    Test that can use None as key to have tuple positional values.
+    """
+    class Foo:
+        def __rich_repr__(self):
+            yield None, (1,)
+
+    assert pretty_repr(Foo()) == "Foo((1,))"
+
+def test_tuple_rich_repr_default():
+    """
+    Test that can use None as key to have tuple positional values and with a default.
+    """
+    class Foo:
+        def __rich_repr__(self):
+            yield None, (1,), (1,)
+
+    assert pretty_repr(Foo()) == "Foo()"
