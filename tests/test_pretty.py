@@ -322,7 +322,6 @@ def test_max_depth_rich_repr():
     )
 
 
-
 def test_max_depth_attrs():
     @attr.define
     class Foo:
