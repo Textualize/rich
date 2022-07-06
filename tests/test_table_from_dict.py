@@ -127,4 +127,49 @@ def test_init_append_column():
     assert Table(*test_columns).columns == t.columns
 
 
-# def test_from_dict_with_column_instances():
+def data():
+    return [
+        {
+            "Released": "Dec 20, 2019",
+            "Title": "Star Wars: The Rise of Skywalker",
+            "Box Office": "$952,110,690",
+        },
+        {
+            "Released": "May 25, 2018",
+            "Title": "Solo: A Star Wars Story",
+            "Box Office": "$393,151,347",
+        },
+        {
+            "Released": "Dec 15, 2017",
+            "Title": "Star Wars Ep. V111: The Last Jedi",
+            "Box Office": "$1,332,539,889",
+        },
+        {
+            "Released": "Dec 16, 2016",
+            "Title": "Rogue One: A Star Wars Story",
+            "Box Office": "$1,332,439,889",
+        },
+    ]
+
+
+def test_table_with_excess_header_attrs():
+    d = data()
+    t = Table(title="Star Wars Movies")
+    header_attrs = [
+        {"header_style": "bright_cyan", "style": "cyan", "no_wrap": True},
+        {"style": "magenta"},
+        {"justify": "right", "style": "green"},
+        {"style": "red", "vertical": "top"},  # extra attribute
+    ]
+
+    # test exception for more header attrs than headers
+    with pytest.raises(ValueError):
+        t.from_dict(d, header_attrs=header_attrs)
+
+
+def test_table_with_excess_row_attrs():
+    d = data()
+    t = Table(title="Star wars Movies")
+    row_attrs = (None, None, None, {"style": "white on blue"}, None)
+    with pytest.raises(ValueError):
+        t.from_dict(d, row_attrs=row_attrs)

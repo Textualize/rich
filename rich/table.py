@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field, replace
-from itertools import zip_longest
 from typing import (
     TYPE_CHECKING,
     Dict,
@@ -465,10 +464,10 @@ class Table(JupyterMixin):
 
     def from_dict(
         self,
-        row_dict: Iterable[Dict['RenderableType', 'RenderableType']],
+        row_dict: Iterable[Dict["RenderableType", "RenderableType"]],
         *,
-        headers: Optional[List['RenderableType']] = None,
-        header_attrs: Optional[List[Union[Dict[str, str],None]]] = None,
+        headers: Optional[List["RenderableType"]] = None,
+        header_attrs: Optional[List[Union[Dict[str, str], None]]] = None,
         fillvalue: Optional["RenderableType"] = None,
         row_styles: Optional[List[Union[Dict[str, str], None]]] = None,
         row_attrs: Optional[List[Union[Dict[str, str], None]]] = None,
@@ -485,7 +484,7 @@ class Table(JupyterMixin):
         """
         if headers == None:
             # get all keys
-            headers =  []
+            headers = []
             for d in row_dict:
                 for k in d.keys():
                     if k in headers:
@@ -509,7 +508,9 @@ class Table(JupyterMixin):
             header_attrs = [*header_attrs, *[None] * (len(headers) - len(header_attrs))]
         elif len(header_attrs) > len(headers):
             # raise appropriate exception
-            pass
+            raise ValueError(
+                f"too many values to unpack (expected {len(headers)}). got {len(header_attrs)} header attributes for table of {len(headers)} headers"
+            )
 
         # add columns to table
         for index, _ in enumerate(headers):
@@ -528,7 +529,7 @@ class Table(JupyterMixin):
         # get rows and rows attributes
 
         # get all rows
-        rows:list = []
+        rows: list = []
         for d in row_dict:
             _row = d.values()
             rows.append(tuple(_row, *("") * (len(headers) - len(_row))))
@@ -536,8 +537,9 @@ class Table(JupyterMixin):
         # add rows to table
         row_attrs = row_attrs or []
         if len(row_attrs) > len(rows):
-            print("raising exception")
-            pass
+            raise ValueError(
+                f"too many values to unpack (expected {len(rows)}). got {len(row_attrs)} row attributes for table of {len(rows)} rows"
+            )
 
         else:
             if len(rows) < len(row_attrs) and apply_to_all_rows == True:
