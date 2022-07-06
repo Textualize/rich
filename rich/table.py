@@ -468,10 +468,10 @@ class Table(JupyterMixin):
         row_dict: Iterable[Dict['RenderableType', 'RenderableType']],
         *,
         headers: Optional[List['RenderableType']] = None,
-        header_attrs: Optional[List[Dict[str, str]]] = None,
-        fillvalue: Optional[str] = None,
-        row_styles: Optional[List[Dict[str, str]]] = None,
-        row_attrs: Optional[List[Dict[str, str]]] = None,
+        header_attrs: Optional[List[Union[Dict[str, str],None]]] = None,
+        fillvalue: Optional["RenderableType"] = None,
+        row_styles: Optional[List[Union[Dict[str, str], None]]] = None,
+        row_attrs: Optional[List[Union[Dict[str, str], None]]] = None,
         apply_to_all_rows: bool = False,
     ) -> None:
         """Populates a table object from a list of dictionary objects
@@ -485,7 +485,7 @@ class Table(JupyterMixin):
         """
         if headers == None:
             # get all keys
-            header:List[str] = []
+            headers =  []
             for d in row_dict:
                 for k in d.keys():
                     if k in headers:
