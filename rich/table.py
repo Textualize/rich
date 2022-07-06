@@ -465,14 +465,14 @@ class Table(JupyterMixin):
 
     def from_dict(
         self,
-        row_dict,
+        row_dict: Iterable[Dict['RenderableType', 'RenderableType']],
         *,
-        headers=None,
-        header_attrs=None,
-        fillvalue=None,
-        row_styles=None,
-        row_attrs=None,
-        apply_to_all_rows=False,
+        headers: Optional[List['RenderableType']] = None,
+        header_attrs: Optional[List[Dict[str, str]]] = None,
+        fillvalue: Optional[str] = None,
+        row_styles: Optional[List[Dict[str, str]]] = None,
+        row_attrs: Optional[List[Dict[str, str]]] = None,
+        apply_to_all_rows: bool = False,
     ) -> None:
         """Populates a table object from a list of dictionary objects
         Args:
@@ -483,10 +483,9 @@ class Table(JupyterMixin):
             row_attrs(Sequence(dict)) : valid attributes to pass to add_rows function
             fillvalue : value used to fill up sparse rows
         """
-
         if headers == None:
             # get all keys
-            headers = []
+            header:List[str] = []
             for d in row_dict:
                 for k in d.keys():
                     if k in headers:
@@ -529,7 +528,7 @@ class Table(JupyterMixin):
         # get rows and rows attributes
 
         # get all rows
-        rows = []
+        rows:list = []
         for d in row_dict:
             _row = d.values()
             rows.append(tuple(_row, *("") * (len(headers) - len(_row))))
@@ -553,7 +552,7 @@ class Table(JupyterMixin):
                     if attrs == None:
                         attrs = {}
                     self.add_row(*_row, **attrs)
-        if row_styles:
+        if row_styles == []:
             self.row_styles = row_styles
 
     def __rich_console__(
