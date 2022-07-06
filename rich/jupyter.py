@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, List, TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Sequence
 
 if TYPE_CHECKING:
     from rich.console import ConsoleRenderable
