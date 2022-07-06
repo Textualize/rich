@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field, replace
+from itertools import zip_longest
 from typing import (
     TYPE_CHECKING,
     Dict,
@@ -461,6 +462,99 @@ class Table(JupyterMixin):
                     f"unable to render {type(renderable).__name__}; a string or other renderable object is required"
                 )
         self.rows.append(Row(style=style, end_section=end_section))
+
+    def from_dict(
+        self,
+        row_dict,
+        *,
+        headers=None,
+        header_attrs=None,
+        fillvalue=None,
+        row_styles=None,
+        row_attrs=None,
+        apply_to_all_rows=False,
+    ) -> None:
+        """Populates a table object from a list of dictionary objects
+        Args:
+            row_dict (list[dict]): dictionary list in the format [{header : value}]
+            headers (union(list[str], list[Column]), optional) : table headers. Defaults to dictionary keys
+            header_attrs(dict[column attrs], optional) : used to configure headers.
+            row_styles (Sequence(Styles)): applies row_style to table (i.e table.row_style = row_style)
+            row_attrs(Sequence(dict)) : valid attributes to pass to add_rows function
+            fillvalue : value used to fill up sparse rows
+        """
+
+        if headers == None:
+            # get all keys
+            headers = []
+            for d in row_dict:
+                for k in d.keys():
+                    if k in headers:
+                        continue
+                    headers.append(k)
+            # fill sparse rows with fillvalue
+            # order dict according to how they are added to keys
+            table_data = []
+            keys = headers[:]
+            for d in row_dict:
+                table = dict()
+                for k in keys:
+                    value = d.setdefault(k, fillvalue)
+                    table[k] = value
+                table_data.append(table)
+            row_dict = table_data
+        # get header and header attributes
+        # raise appropriate exception if len(header_attrs) > len(headers)
+        header_attrs = header_attrs or []
+        if len(header_attrs) < len(headers):
+            header_attrs = [*header_attrs, *[None] * (len(headers) - len(header_attrs))]
+        elif len(header_attrs) > len(headers):
+            # raise appropriate exception
+            pass
+
+        # add columns to table
+        for index, _ in enumerate(headers):
+            header, attrs = headers[index], header_attrs[index]
+            if attrs is None:
+                attrs = {}
+
+            if isinstance(header, str):
+                self.add_column(header, **attrs)
+
+            # setting header attrs does not affect
+            # Column objects are passed as is
+            else:
+                self.columns.append(header)
+
+        # get rows and rows attributes
+
+        # get all rows
+        rows = []
+        for d in row_dict:
+            _row = d.values()
+            rows.append(tuple(_row, *("") * (len(headers) - len(_row))))
+
+        # add rows to table
+        row_attrs = row_attrs or []
+        if len(row_attrs) > len(rows):
+            print("raising exception")
+            pass
+
+        else:
+            if len(rows) < len(row_attrs) and apply_to_all_rows == True:
+                # USES ONLY THE FIRST INDEX OF ATTRS AND IGNORE THE REST
+                for index, _ in enumerate(rows):
+                    _row = row[index]
+                    self.add_row(*row, **row_attrs[0])
+            else:
+                row_attrs = [*row_attrs, *[None] * (len(rows) - len(row_attrs))]
+                for index, _ in enumerate(rows):
+                    _row, attrs = rows[index], row_attrs[index]
+                    if attrs == None:
+                        attrs = {}
+                    self.add_row(*_row, **attrs)
+        if row_styles:
+            self.row_styles = row_styles
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
