@@ -473,14 +473,14 @@ class Table(JupyterMixin):
         row_attrs: Optional[List[Union[Dict[str, str], None]]] = None,
         apply_to_all_rows: bool = False,
     ) -> None:
-        """Populates a table object from a list of dictionary objects
+        """Populates a table object from a list of dictionary objects works like a csv Dictwriter
         Args:
-            row_dict (list[dict]): dictionary list in the format [{header : value}]
-            headers (union(list[str], list[Column]), optional) : table headers. Defaults to dictionary keys
-            header_attrs(dict[column attrs], optional) : used to configure headers.
-            row_styles (Sequence(Styles)): applies row_style to table (i.e table.row_style = row_style)
-            row_attrs(Sequence(dict)) : valid attributes to pass to add_rows function
-            fillvalue : value used to fill up sparse rows
+            row_dict (list[dict]): list of dictionary in the format [{header : row_value}]
+            headers  : list of valid column renderables. Defaults to dictionary keys
+            header_attrs :list of dictionary to be parsed as column attributes when adding a column.
+            row_styles : valid row style (i.e table.row_style = row_style)
+            row_attrs(list(dict)) : list of dictionary of valid attributes to parsed as row attributes when calling add_rows function
+            fillvalue : valid renderable used to fill up sparse rows
         """
         if headers == None:
             # get all keys
