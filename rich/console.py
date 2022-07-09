@@ -43,6 +43,11 @@ else:
         runtime_checkable,
     )  # pragma: no cover
 
+if sys.version_info >= (3, 10):
+    from typing import ParamSpec
+else:
+    from typing_extensions import ParamSpec  # pragma: no cover
+
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
 from ._export_format import CONSOLE_HTML_FORMAT, CONSOLE_SVG_FORMAT
@@ -71,6 +76,8 @@ if TYPE_CHECKING:
     from ._windows import WindowsConsoleFeatures
     from .live import Live
     from .status import Status
+
+_FuncParams = ParamSpec("_FuncParams")
 
 JUPYTER_DEFAULT_COLUMNS = 115
 JUPYTER_DEFAULT_LINES = 100
@@ -486,7 +493,11 @@ class Group:
         yield from self.renderables
 
 
-def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
+def group(
+    fit: bool = True,
+) -> Callable[
+    [Callable[_FuncParams, Iterable[RenderableType]]], Callable[_FuncParams, Group]
+]:
     """A decorator that turns an iterable of renderables in to a group.
 
     Args:
@@ -494,12 +505,12 @@ def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
     """
 
     def decorator(
-        method: Callable[..., Iterable[RenderableType]]
-    ) -> Callable[..., Group]:
+        method: Callable[_FuncParams, Iterable[RenderableType]]
+    ) -> Callable[_FuncParams, Group]:
         """Convert a method that returns an iterable of renderables in to a Group."""
 
         @wraps(method)
-        def _replace(*args: Any, **kwargs: Any) -> Group:
+        def _replace(*args: _FuncParams.args, **kwargs: _FuncParams.kwargs) -> Group:
             renderables = method(*args, **kwargs)
             return Group(*renderables, fit=fit)
 
