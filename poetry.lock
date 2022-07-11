@@ -1064,7 +1064,7 @@ jupyter = ["ipywidgets"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.3"
-content-hash = "f1d6e161db8476ef1d80e2058a54ee1c54cb2f0301eba529e446aac1e6e40186"
+content-hash = "1f8cf812fff5986c8c250f7e954e7b6f2c7597b89f67b9d6a19ace46bf2ca1de"
 
 [metadata.files]
 appnope = [
