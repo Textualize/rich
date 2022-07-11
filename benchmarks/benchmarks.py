@@ -59,6 +59,17 @@ class TextSuite:
         Text(snippets.UNICODE_HEAVY_TEXT).render(self.console)
 
 
+class TextHotCacheSuite:
+    def setup(self):
+        self.console = Console(
+            file=StringIO(), color_system="truecolor", legacy_windows=False
+        )
+
+    def time_wrapping_unicode_heavy_warm_cache(self):
+        for _ in range(20):
+            Text(snippets.UNICODE_HEAVY_TEXT).wrap(self.console, 12, overflow="fold")
+
+
 class SyntaxWrappingSuite:
     def setup(self):
         self.console = Console(
