@@ -48,11 +48,6 @@ from .segment import Segment, Segments
 from .style import Style, StyleType
 from .text import Text
 
-if sys.version_info < (3, 10):
-    from typing_extensions import TypeAlias
-else:
-    from typing import TypeAlias
-
 TokenType = Tuple[str, ...]
 
 WINDOWS = platform.system() == "Windows"
@@ -212,7 +207,7 @@ class ANSISyntaxTheme(SyntaxTheme):
         return self._background_style
 
 
-SyntaxPosition: TypeAlias = Tuple[int, int]
+SyntaxPosition = Tuple[int, int]
 
 
 class _SyntaxHighlightRange(NamedTuple):
