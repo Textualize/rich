@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix edges used in first row of tables when `show_header=False` https://github.com/Textualize/rich/pull/2330
 - Fix interaction between `Capture` contexts and `Console(record=True)` https://github.com/Textualize/rich/pull/2343
 - Fixed hash issue in Styles class https://github.com/Textualize/rich/pull/2346
-- Fixes using tuples as positional arguments in `__rich_repr__` https://github.com/Textualize/rich/pull/2379
+- Document using `None` as name in `__rich_repr__` for tuple posotional args https://github.com/Textualize/rich/pull/2379
 
 ### Changed
 
