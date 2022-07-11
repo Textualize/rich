@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Default width of Jupyter console size is increased to 115
 - Optimized Segment.divide
+- `Style.__add__` will no longer return `NotImplemented`
+- Remove rich.\_lru_cache
 
 ### Fixed
 
@@ -28,11 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix interaction between `Capture` contexts and `Console(record=True)` https://github.com/Textualize/rich/pull/2343
 - Fixed hash issue in Styles class https://github.com/Textualize/rich/pull/2346
 - Fixed bug in `Segment.split_and_crop_lines`
-
-### Changed
-
-- `Style.__add__` will no longer return `NotImplemented`
-- Remove rich.\_lru_cache
 
 ## [12.4.4] - 2022-05-24
 
