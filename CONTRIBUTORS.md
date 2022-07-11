@@ -47,3 +47,4 @@ The following people have contributed to the development of Rich:
 - [Handhika Yanuar Pratama](https://github.com/theDreamer911)
 - [za](https://github.com/za)
 - [Motahhar Mokfi](https://github.com/motahhar)
+- [Tomer Shalev](https://github.com/tomers)
