@@ -603,9 +603,8 @@ class Segment(NamedTuple):
         iter_cuts = iter(cuts)
 
         while True:
-            try:
-                cut = next(iter_cuts)
-            except StopIteration:
+            cut = next(iter_cuts, -1)
+            if cut == -1:
                 return []
             if cut != 0:
                 break
