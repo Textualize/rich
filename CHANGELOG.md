@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Environment variables `JUPYTER_COLUMNS` and `JUPYTER_LINES` to control width and height of console in Jupyter
 - Markdown friendly `Box` style, `MARKDOWN`, for rendering tables ready to copy into markdown files
 - `inspect` will prefix coroutine functions with `async def`
+- `Style.__add__` will no longer return `NotImplemented`
+- Remove rich.\_lru_cache
 
 ### Changed
 
@@ -28,11 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix interaction between `Capture` contexts and `Console(record=True)` https://github.com/Textualize/rich/pull/2343
 - Fixed hash issue in Styles class https://github.com/Textualize/rich/pull/2346
 - Fixed bug in `Segment.split_and_crop_lines`
-
-### Changed
-
-- `Style.__add__` will no longer return `NotImplemented`
-- Remove rich.\_lru_cache
 
 ## [12.4.4] - 2022-05-24
 
