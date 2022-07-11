@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [12.4.5] - Unreleased
+## [12.5.0] - 2022-07-11
 
 ### Added
 
@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Default width of Jupyter console size is increased to 115
+- Optimized Segment.divide
 
 ### Fixed
 
@@ -26,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix edges used in first row of tables when `show_header=False` https://github.com/Textualize/rich/pull/2330
 - Fix interaction between `Capture` contexts and `Console(record=True)` https://github.com/Textualize/rich/pull/2343
 - Fixed hash issue in Styles class https://github.com/Textualize/rich/pull/2346
+- Fixed bug in `Segment.split_and_crop_lines`
 
 ### Changed
 

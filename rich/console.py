@@ -1349,6 +1349,7 @@ class Console:
                         render_options.max_width,
                         include_new_lines=new_lines,
                         pad=pad,
+                        style=style,
                     ),
                     None,
                     render_height,
