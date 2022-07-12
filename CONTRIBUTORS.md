@@ -27,6 +27,7 @@ The following people have contributed to the development of Rich:
 - [Will McGugan](https://github.com/willmcgugan)
 - [Paul McGuire](https://github.com/ptmcg)
 - [Antony Milne](https://github.com/AntonyMilneQB)
+- [Goodness Onunwa](https://github.com/Noble-47)
 - [Nathan Page](https://github.com/nathanrpage97)
 - [Avi Perl](https://github.com/avi-perl)
 - [Laurent Peuch](https://github.com/psycojoker)
