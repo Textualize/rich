@@ -1972,19 +1972,15 @@ class Console:
         with self._lock:
             if self.record:
                 with self._record_buffer_lock:
-                    self._record_buffer.extend(self._buffer[:])
+                    self._record_buffer.extend(
+                        [
+                            segment
+                            for segment in self._buffer[:]
+                            if not isinstance(segment, _NonRecordedSegment)
+                        ]
+                    )
 
             if self._buffer_index == 0:
-                if self.record:
-                    with self._record_buffer_lock:
-                        self._record_buffer.extend(
-                            [
-                                segment
-                                for segment in self._buffer[:]
-                                if not isinstance(segment, _NonRecordedSegment)
-                            ]
-                        )
-
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
 
