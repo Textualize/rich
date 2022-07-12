@@ -705,6 +705,14 @@ class SegmentLines:
                 yield from line
 
 
+class _NonRecordedSegment(Segment):
+    """A specialised Segment which will not be written to the record
+    buffer and therefore will not appear in exported output. Useful for
+    live updating renderables like progress bars."""
+
+    pass
+
+
 if __name__ == "__main__":  # pragma: no cover
     from rich.console import Console
     from rich.syntax import Syntax

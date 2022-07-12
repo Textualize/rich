@@ -1,10 +1,16 @@
 import sys
 from threading import Event, RLock, Thread
 from types import TracebackType
-from typing import IO, Any, Callable, List, Optional, TextIO, Type, cast
+from typing import IO, Any, Callable, List, Optional, Type, cast
 
 from . import get_console
-from .console import Console, ConsoleRenderable, RenderableType, RenderHook
+from .console import (
+    Console,
+    ConsoleRenderable,
+    HideFromRecord,
+    RenderableType,
+    RenderHook,
+)
 from .control import Control
 from .file_proxy import FileProxy
 from .jupyter import JupyterMixin
@@ -257,7 +263,7 @@ class Live(JupyterMixin, RenderHook):
                     if self._alt_screen
                     else self._live_render.position_cursor()
                 )
-                renderables = [reset, *renderables, self._live_render]
+                renderables = [reset, *renderables, HideFromRecord(self._live_render)]
         elif (
             not self._started and not self.transient
         ):  # if it is finished render the final output for files or dumb_terminals

@@ -60,7 +60,7 @@ from .protocol import rich_cast
 from .region import Region
 from .scope import render_scope
 from .screen import Screen
-from .segment import Segment
+from .segment import Segment, _NonRecordedSegment
 from .style import Style, StyleType
 from .styled import Styled
 from .terminal_theme import DEFAULT_TERMINAL_THEME, SVG_EXPORT_THEME, TerminalTheme
@@ -1975,6 +1975,15 @@ class Console:
                     self._record_buffer.extend(self._buffer[:])
 
             if self._buffer_index == 0:
+                if self.record:
+                    with self._record_buffer_lock:
+                        self._record_buffer.extend(
+                            [
+                                segment
+                                for segment in self._buffer[:]
+                                if not isinstance(segment, _NonRecordedSegment)
+                            ]
+                        )
 
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
@@ -2514,6 +2523,20 @@ def _svg_hash(svg_main_code: str) -> str:
         str: a hash of the given content
     """
     return str(zlib.adler32(svg_main_code.encode()))
+
+
+class HideFromRecord:
+    """Wraps a renderable and prevents it from being written to the record buffer."""
+
+    def __init__(self, renderable: ConsoleRenderable):
+        self.renderable = renderable
+
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
+        rendered = console.render(self.renderable, options)
+        for segment in rendered:
+            yield _NonRecordedSegment(*segment)
 
 
 if __name__ == "__main__":  # pragma: no cover

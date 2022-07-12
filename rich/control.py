@@ -7,7 +7,7 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final  # pragma: no cover
 
-from .segment import ControlCode, ControlType, Segment
+from .segment import ControlCode, ControlType, Segment, _NonRecordedSegment
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult
@@ -181,7 +181,7 @@ class Control:
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         if self.segment.text:
-            yield self.segment
+            yield _NonRecordedSegment(*self.segment)
 
 
 def strip_control_codes(
