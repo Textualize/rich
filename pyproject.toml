@@ -2,7 +2,7 @@
 name = "rich"
 homepage = "https://github.com/willmcgugan/rich"
 documentation = "https://rich.readthedocs.io/en/latest/"
-version = "12.4.4"
+version = "12.5.1"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"
@@ -39,7 +39,7 @@ jupyter = ["ipywidgets"]
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.0"
-black = "^22.3"
+black = "^22.6"
 mypy = "^0.961"
 pytest-cov = "^3.0.0"
 attrs = "^21.4.0"
