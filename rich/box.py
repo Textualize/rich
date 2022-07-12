@@ -429,6 +429,20 @@ DOUBLE_EDGE: Box = Box(
 """
 )
 
+MARKDOWN: Box = Box(
+    """\
+    
+| ||
+|-||
+| ||
+|-||
+|-||
+| ||
+    
+""",
+    ascii=True,
+)
+
 # Map Boxes that don't render with raster fonts on to equivalent that do
 LEGACY_WINDOWS_SUBSTITUTIONS = {
     ROUNDED: SQUARE,
@@ -480,6 +494,7 @@ if __name__ == "__main__":  # pragma: no cover
         "HEAVY_HEAD",
         "DOUBLE",
         "DOUBLE_EDGE",
+        "MARKDOWN",
     ]
 
     console.print(Panel("[bold green]Box Constants", style="green"), justify="center")

@@ -171,3 +171,9 @@ Console オブジェクトには `print` メソッドがあり、これは組み
 
 出力結果に色やスタイルを追加する方法はいくつかあります。キーワード引数に `style` を追加することで、出力結果全体のスタイルを設定することができます。以下に例を示します:
 """
+
+
+MARKUP = "\n".join(
+    """[bold]Hello [i]World[/i] [bold magenta]foo [i]bar[/i] baz[/] [blue u]https://textualize.io[/]"""
+    for _ in range(20)
+)
