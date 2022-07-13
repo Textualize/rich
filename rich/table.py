@@ -82,6 +82,9 @@ class Column:
     style: StyleType = ""
     """StyleType: The style of the column."""
 
+    cell_styles: Optional[List[StyleType]] = None
+    """StyleType: The style of the column."""
+
     justify: "JustifyMethod" = "left"
     """str: How to justify text within the column ("left", "center", "right", or "full")"""
 
@@ -376,6 +379,7 @@ class Table(JupyterMixin):
         max_width: Optional[int] = None,
         ratio: Optional[int] = None,
         no_wrap: bool = False,
+        cell_styles: Optional[List[StyleType]] = None
     ) -> None:
         """Add a column to the table.
 
@@ -412,6 +416,7 @@ class Table(JupyterMixin):
             max_width=max_width,
             ratio=ratio,
             no_wrap=no_wrap,
+            cell_styles=cell_styles
         )
         self.columns.append(column)
 
@@ -662,7 +667,9 @@ class Table(JupyterMixin):
             )
             _append((header_style, column.header))
         cell_style = get_style(column.style or "")
-        for cell in column.cells:
+        for ix, cell in enumerate(column.cells):
+            if column.cell_styles is not None:
+                cell_style = get_style(column.cell_styles[ix])
             _append((cell_style, cell))
         if self.show_footer:
             footer_style = get_style(self.footer_style or "") + get_style(
