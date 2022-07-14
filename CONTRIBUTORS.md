@@ -22,6 +22,7 @@ The following people have contributed to the development of Rich:
 - [Andrew Kettmann](https://github.com/akettmann)
 - [Martin Larralde](https://github.com/althonos)
 - [Hedy Li](https://github.com/hedythedev)
+- [Brecht Machiels](https://github.com/brechtm)
 - [Luka Mamukashvili](https://github.com/UltraStudioLTD)
 - [Alexander Mancevice](https://github.com/amancevice)
 - [Will McGugan](https://github.com/willmcgugan)

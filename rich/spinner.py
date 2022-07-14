@@ -18,6 +18,7 @@ class Spinner:
         *,
         style: Optional["StyleType"] = None,
         speed: float = 1.0,
+        spacer: str = " ",
     ) -> None:
         """A spinner animation.
 
@@ -26,6 +27,7 @@ class Spinner:
             text (RenderableType, optional): A renderable to display at the right of the spinner (str or Text typically). Defaults to "".
             style (StyleType, optional): Style for spinner animation. Defaults to None.
             speed (float, optional): Speed factor for animation. Defaults to 1.0.
+            spacer (str, optional): Characters to place between the spinner and text. Defaults to " ".
 
         Raises:
             KeyError: If name isn't one of the supported spinner animations.
@@ -42,6 +44,7 @@ class Spinner:
         self.start_time: Optional[float] = None
         self.style = style
         self.speed = speed
+        self.spacer = spacer
         self.frame_no_offset: float = 0.0
         self._update_speed = 0.0
 
@@ -84,7 +87,7 @@ class Spinner:
         if not self.text:
             return frame
         elif isinstance(self.text, (str, Text)):
-            return Text.assemble(frame, " ", self.text)
+            return Text.assemble(frame, self.spacer, self.text)
         else:
             table = Table.grid(padding=1)
             table.add_row(frame, self.text)
