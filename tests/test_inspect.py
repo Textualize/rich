@@ -98,13 +98,14 @@ def test_render():
 
 @skip_pypy3
 def test_inspect_text():
+    num_attributes = 34 if sys.version_info >= (3, 11) else 33
     expected = (
         "╭──────────────── <class 'str'> ─────────────────╮\n"
         "│ str(object='') -> str                          │\n"
         "│ str(bytes_or_buffer[, encoding[, errors]]) ->  │\n"
         "│ str                                            │\n"
         "│                                                │\n"
-        "│ 33 attribute(s) not shown. Run                 │\n"
+        f"│ {num_attributes} attribute(s) not shown. Run                 │\n"
         "│ inspect(inspect) for options.                  │\n"
         "╰────────────────────────────────────────────────╯\n"
     )
