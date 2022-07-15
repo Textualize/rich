@@ -35,13 +35,13 @@ jobs:
         run: |
           source $VENV
           make typecheck
-      - if: ${{ matrix.python-version }} != '3.11.0-beta.4'
-        name: Test with pytest (with coverage)
+      - name: Test with pytest (with coverage)
+        if: matrix.python-version != '3.11.0-beta.4'
         run: |
           source $VENV
           pytest tests -v --cov=./rich --cov-report=xml:./coverage.xml --cov-report term-missing
-      - if: ${{ matrix.python-version }} == '3.11.0-beta.4'
-        name: Test with pytest (no coverage)
+      - name: Test with pytest (no coverage)
+        if: matrix.python-version == '3.11.0-beta.4'
         run: |
           source $VENV
           pytest tests -v
