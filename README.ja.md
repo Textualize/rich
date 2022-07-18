@@ -21,6 +21,7 @@
  • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
  • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
   • [فارسی readme](https://github.com/willmcgugan/rich/blob/master/README.fa.md)
+ • [Türkçe readme](https://github.com/willmcgugan/rich/blob/master/README.tr.md)
 
 Richは、 _リッチ_ なテキストや美しい書式設定をターミナルで行うためのPythonライブラリです。
 

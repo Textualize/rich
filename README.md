@@ -23,6 +23,7 @@
  • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
  • [Indonesian readme](https://github.com/willmcgugan/rich/blob/master/README.id.md)
  • [فارسی readme](https://github.com/willmcgugan/rich/blob/master/README.fa.md)
+ • [Türkçe readme](https://github.com/willmcgugan/rich/blob/master/README.tr.md)
 
 
 Rich is a Python library for _rich_ text and beautiful formatting in the terminal.

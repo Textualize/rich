@@ -20,6 +20,7 @@
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
  • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
   • [فارسی readme](https://github.com/willmcgugan/rich/blob/master/README.fa.md)
+ • [Türkçe readme](https://github.com/willmcgugan/rich/blob/master/README.tr.md)
 
 Rich é uma biblioteca Python para _rich_ text e formatação de estilos no terminal.
 
@@ -429,6 +430,7 @@ Os mantenedores do Rich e milhares de outros pacotes estão trabalhando com o Ti
 Aqui estão alguns projetos que usam o Rich:
 
 - [BrancoLab/BrainRender](https://github.com/BrancoLab/BrainRender)
+  a python package for the visualization of three dimensional neuro-anatomical data
   um pacote python para visualisação tridimensional de dados neuro-atômicos.
 - [Ciphey/Ciphey](https://github.com/Ciphey/Ciphey)
   ferramenta de descriptografia autoatizada.
