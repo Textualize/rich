@@ -637,7 +637,7 @@ class Table(JupyterMixin):
                 ]
                 for index, _ in enumerate(rows):
                     _row = rows[index]
-                    row_attr = r_attrs[index] or None
+                    row_attr = r_attrs[index] or dict()
                     # if r_attrs[index] is not None:
                     #     row_attr = r_attrs[index]
                     fill_row(_row, attrs=row_attr)
