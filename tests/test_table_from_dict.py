@@ -31,6 +31,7 @@ def render_tables_with_header_attrs():
     return console.file.getvalue()
 
 
+# remove if cannot fix
 def test_table_from_dict_with_header_attrs():
     t = Table(
         title="Star Wars Movies", caption="Rich example table", caption_justify="right"

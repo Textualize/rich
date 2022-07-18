@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field, replace
 from typing import (
     TYPE_CHECKING,
+    TypedDict,
     Dict,
     Iterable,
     List,
@@ -33,6 +34,25 @@ if TYPE_CHECKING:
         RenderableType,
         RenderResult,
     )
+
+
+class HeaderAttributes(TypedDict):
+    header_style: Optional[StyleType]
+    footer_style: Optional[StyleType]
+    style: Optional[StyleType]
+    justify: "JustifyMethod"
+    vertical: "VerticalAlignMethod"
+    overflow: "OverflowMethod"
+    width: Optional[int]
+    min_width: Optional[int]
+    max_width: Optional[int]
+    ratio: Optional[int]
+    no_wrap: bool
+
+
+class RowAttributes(TypedDict):
+    style: Optional[StyleType]
+    end_section: bool
 
 
 @dataclass
@@ -464,64 +484,121 @@ class Table(JupyterMixin):
 
     def from_dict(
         self,
-        row_dict: Iterable[Dict["RenderableType", "RenderableType"]],
+        row_dict: List[Dict[Union[Column, str], str]],
         *,
-        headers: Optional[List["RenderableType"]] = None,
-        header_attrs: Optional[List[Union[Dict[str, str], None]]] = None,
-        fillvalue: Optional["RenderableType"] = None,
-        row_styles: Optional[List[Union[Dict[str, str], None]]] = None,
-        row_attrs: Optional[List[Union[Dict[str, str], None]]] = None,
+        headers: Optional[List[Union[Column, str]]] = None,
+        header_attrs: Optional[List[HeaderAttributes]] = None,
+        fillvalue: str = "",
+        row_attrs: Optional[List[RowAttributes]] = None,
+        row_styles: Optional[List[StyleType]] = None,
         apply_to_all_rows: bool = False,
     ) -> None:
         """Populates a table object from a list of dictionary objects works like a csv Dictwriter
         Args:
-            row_dict (list[dict]): list of dictionary in the format [{header : row_value}]
-            headers  : list of valid column renderables. Defaults to dictionary keys
+            row_dict : list of dictionary in the format [{header : row_value}]
+            headers : list of valid column renderables. Defaults to dictionary keys
             header_attrs :list of dictionary to be parsed as column attributes when adding a column.
-            row_styles : valid row style (i.e table.row_style = row_style)
-            row_attrs(list(dict)) : list of dictionary of valid attributes to parsed as row attributes when calling add_rows function
+            row_styles : valid row style. Specifies the row_style of the table
+            row_attrs : list of dictionary of valid attributes to parsed as row attributes when calling add_rows function
             fillvalue : valid renderable used to fill up sparse rows
+
+        Because attributes from row_attrs and header_attrs are used in the order they appear, it is expected that to supply
+        attributes for a header column at index `n`, you should fill the preceeding indices of the attribute list with None
         """
-        if headers == None:
-            # get all keys
-            headers = []
+
+        def fill_column(header: "RenderableType", attrs: HeaderAttributes) -> None:
+            header_style: Optional[StyleType] = attrs.get("header_style", "")
+            footer_style: Optional[StyleType] = attrs.get("footer_style", None)
+            style: Optional[StyleType] = attrs.get("style", None)
+            justify: "JustifyMethod" = attrs.get("justify", "left")
+            vertical: "VerticalAlignMethod" = attrs.get("vertical", "top")
+            overflow: "OverflowMethod" = attrs.get("overflow", "ellipsis")
+            width: Optional[int] = attrs.get("width", None)
+            min_width: Optional[int] = attrs.get("min_width", None)
+            max_width: Optional[int] = attrs.get("max_width", None)
+            ratio: Optional[int] = attrs.get("ratio", None)
+            no_wrap: bool = attrs.get("no_wrap", False)
+
+            self.add_column(
+                header,
+                header_style=header_style,
+                footer_style=footer_style,
+                style=style,
+                justify=justify,
+                vertical=vertical,
+                overflow=overflow,
+                width=width,
+                min_width=min_width,
+                max_width=max_width,
+                ratio=ratio,
+                no_wrap=no_wrap,
+            )
+
+        def fill_row(row: List[str], attrs: RowAttributes) -> None:
+            style: Optional[StyleType] = attrs.get("style", None)
+            end_section: bool = attrs.get("end_section", False)
+            self.add_row(*row, style=style, end_section=end_section)
+
+        default_h_attrs: HeaderAttributes = {
+            "header_style": None,
+            "footer_style": None,
+            "style": None,
+            "justify": "left",
+            "vertical": "top",
+            "overflow": "ellipsis",
+            "width": None,
+            "min_width": None,
+            "max_width": None,
+            "ratio": None,
+            "no_wrap": False,
+        }
+
+        default_r_attrs: RowAttributes = {
+            "style": None,
+            "end_section": False,
+        }
+        h_attrs: List[HeaderAttributes] = header_attrs or list([])
+        r_attrs: List[RowAttributes] = row_attrs or list([])
+        _headers: List[Union[Column, str]] = headers or list([])
+
+        if _headers == []:
+            # get all dictionary keys
             for d in row_dict:
                 for k in d.keys():
-                    if k in headers:
+                    if k in _headers:
                         continue
-                    headers.append(k)
+                    _headers.append(k)
             # fill sparse rows with fillvalue
             # order dict according to how they are added to keys
             table_data = []
-            keys = headers[:]
+            keys = _headers[:]
             for d in row_dict:
                 table = dict()
-                for k in keys:
-                    value = d.setdefault(k, fillvalue)
-                    table[k] = value
+                for key in keys:
+                    value = d.setdefault(key, fillvalue)
+                    table[key] = value
                 table_data.append(table)
             row_dict = table_data
         # get header and header attributes
         # raise appropriate exception if len(header_attrs) > len(headers)
-        header_attrs = header_attrs or []
-        if len(header_attrs) < len(headers):
-            header_attrs = [*header_attrs, *[None] * (len(headers) - len(header_attrs))]
-        elif len(header_attrs) > len(headers):
+        # header_attrs = header_attrs or []
+        if len(h_attrs) < len(_headers):
+            h_attrs = [*h_attrs, *[default_h_attrs] * (len(_headers) - len(h_attrs))]
+        elif len(h_attrs) > len(_headers):
             # raise appropriate exception
             raise ValueError(
-                f"too many values to unpack (expected {len(headers)}). got {len(header_attrs)} header attributes for table of {len(headers)} headers"
+                f"too many values to unpack (expected {len(_headers)}). got {len(h_attrs)} header attributes for table of {len(_headers)} headers"
             )
 
         # add columns to table
-        for index, _ in enumerate(headers):
-            header, attrs = headers[index], header_attrs[index]
-            if attrs is None:
-                attrs = {}
+        for index, _ in enumerate(_headers):
+            header = _headers[index]
+            attrs = h_attrs[index] or dict()
 
             if isinstance(header, str):
-                self.add_column(header, **attrs)
+                fill_column(header, attrs)
 
-            # setting header attrs does not affect
+            # setting header attrs does not affect Column objects
             # Column objects are passed as is
             else:
                 self.columns.append(header)
@@ -529,31 +606,42 @@ class Table(JupyterMixin):
         # get rows and rows attributes
 
         # get all rows
-        rows: list = []
+        rows: List[List[str]] = []
         for d in row_dict:
-            _row = d.values()
-            rows.append(tuple(_row, *("") * (len(headers) - len(_row))))
+            _values = d.values()
+            # In cases when headers is popultated, any empty value would not
+            # pass through the mechanism for filling it, that's why each row is
+            # still checked for empty data
+            r = [*_values, *[fillvalue] * (len(_headers) - len(_values))]
+            rows.append(r)
 
         # add rows to table
-        row_attrs = row_attrs or []
-        if len(row_attrs) > len(rows):
+        # row_attrs = row_attrs or []
+        if len(r_attrs) > len(rows):
             raise ValueError(
-                f"too many values to unpack (expected {len(rows)}). got {len(row_attrs)} row attributes for table of {len(rows)} rows"
+                f"too many values to unpack (expected {len(rows)}). got {len(r_attrs)} row attributes for table of {len(rows)} rows"
             )
 
         else:
-            if len(rows) < len(row_attrs) and apply_to_all_rows == True:
+            # row_attr: RowAttributes = {}
+            if len(rows) < len(r_attrs) and apply_to_all_rows == True:
                 # USES ONLY THE FIRST INDEX OF ATTRS AND IGNORE THE REST
+                row_attr = r_attrs[0] or dict()
                 for index, _ in enumerate(rows):
-                    _row = row[index]
-                    self.add_row(*row, **row_attrs[0])
+                    _row = rows[index]
+                    fill_row(_row, attrs=row_attr)
             else:
-                row_attrs = [*row_attrs, *[None] * (len(rows) - len(row_attrs))]
+                r_attrs = [
+                    *r_attrs,
+                    *[default_r_attrs] * (len(rows) - len(r_attrs)),
+                ]
                 for index, _ in enumerate(rows):
-                    _row, attrs = rows[index], row_attrs[index]
-                    if attrs == None:
-                        attrs = {}
-                    self.add_row(*_row, **attrs)
+                    _row = rows[index]
+                    row_attr = r_attrs[index] or None
+                    # if r_attrs[index] is not None:
+                    #     row_attr = r_attrs[index]
+                    fill_row(_row, attrs=row_attr)
+
         if row_styles == []:
             self.row_styles = row_styles
 
