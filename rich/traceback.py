@@ -1,12 +1,13 @@
 from __future__ import absolute_import
 
 import os
+import re
 import platform
 import sys
 from dataclasses import dataclass, field
 from traceback import walk_tb
 from types import ModuleType, TracebackType
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Type, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Type, Union, Tuple
 
 from pygments.lexers import guess_lexer_for_filename
 from pygments.token import Comment, Keyword, Name, Number, Operator, String
@@ -41,6 +42,7 @@ def install(
     theme: Optional[str] = None,
     word_wrap: bool = False,
     show_locals: bool = False,
+    exclude_locals: Optional[Tuple[str]],
     indent_guides: bool = True,
     suppress: Iterable[Union[str, ModuleType]] = (),
     max_frames: int = 100,
@@ -58,6 +60,8 @@ def install(
             a theme appropriate for the platform.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
+        exclude_locals (Optional[Tuple[str]], optional): List patterns to exclude from local variables output. 
+            Defaults to None.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
         suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
 
@@ -82,6 +86,7 @@ def install(
                 theme=theme,
                 word_wrap=word_wrap,
                 show_locals=show_locals,
+                exclude_locals=exclude_locals,
                 indent_guides=indent_guides,
                 suppress=suppress,
                 max_frames=max_frames,
@@ -188,6 +193,8 @@ class Traceback:
         theme (str, optional): Override pygments theme used in traceback.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
+        exclude_locals (Optional[Tuple[str]], optional): List patterns to exclude from local variables output. 
+            Defaults to None.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to 10.
@@ -213,6 +220,7 @@ class Traceback:
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
+        exclude_locals: Optional[Tuple[str]] = None,
         indent_guides: bool = True,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
@@ -262,6 +270,7 @@ class Traceback:
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
+        exclude_locals: Optional[Tuple[str]] = None,
         indent_guides: bool = True,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
@@ -299,6 +308,7 @@ class Traceback:
             theme=theme,
             word_wrap=word_wrap,
             show_locals=show_locals,
+            exclude_locals=exclude_locals,
             indent_guides=indent_guides,
             locals_max_length=locals_max_length,
             locals_max_string=locals_max_string,
@@ -313,6 +323,7 @@ class Traceback:
         exc_value: BaseException,
         traceback: Optional[TracebackType],
         show_locals: bool = False,
+        exclude_locals: Optional[Tuple[str]] = None,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
     ) -> Trace:
@@ -323,6 +334,8 @@ class Traceback:
             exc_value (BaseException): Exception value.
             traceback (TracebackType): Python Traceback object.
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
+            exclude_locals (Optional[Tuple[str]], optional): List patterns to exclude from local variables output. 
+                Defaults to None.
             locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
                 Defaults to 10.
             locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
@@ -361,6 +374,8 @@ class Traceback:
 
             stacks.append(stack)
             append = stack.frames.append
+
+            exclude_patterns = exclude_locals if exclude_locals else []
 
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
