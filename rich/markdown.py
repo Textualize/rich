@@ -419,6 +419,10 @@ class Markdown(JupyterMixin):
         "image": ImageItem,
     }
 
+    tag_to_style_name = {
+        "em": "emph",
+    }
+
     inlines = {"em", "strong", "code", "strike"}
 
     def __init__(
@@ -440,6 +444,9 @@ class Markdown(JupyterMixin):
         self.hyperlinks = hyperlinks
         self.inline_code_lexer = inline_code_lexer
         self.inline_code_theme = inline_code_theme or code_theme
+
+    def _get_style_name_for_tag(self, tag: str) -> str:
+        return self.tag_to_style_name.get(tag, tag)
 
     def _flatten_tokens(self, tokens: Iterable[Token]) -> Iterable[Token]:
         """Flattens the token stream"""
@@ -482,14 +489,16 @@ class Markdown(JupyterMixin):
                 if entering:
                     # If it's an opening inline token e.g. strong, em, etc.
                     # Then we move into a style context i.e. push to stack.
+                    style_name = self._get_style_name_for_tag(tag)
                     context.enter_style(
-                        f"markdown.{tag}"
+                        f"markdown.{style_name}"
                     )  # TODO: Map tags to style keys
                 elif exiting:
                     # If it's a closing inline style, then we pop the style
                     # off of the stack, to move out of the context of it...
                     context.leave_style()
             else:
+
                 # Map the markdown tag -> MarkdownElement renderable
                 element_class = self.elements.get(tag) or UnknownElement
 
@@ -533,6 +542,42 @@ class Markdown(JupyterMixin):
 
                     # Handle the closing of the self-closing tag
                     element.on_leave(context)
+
+                # element_class = self.elements.get(tag) or UnknownElement
+                # if entering:
+                #     element = element_class.create(self, token)
+                #     context.stack.push(element)
+                #     element.on_enter(context)
+                # elif exiting:
+                #     element = context.stack.pop()
+                #     if context.stack:
+                #         if context.stack.top.on_child_close(context, element):
+                #             if new_line:
+                #                 yield Segment("\n")
+                #             yield from console.render(element, context.options)
+                #             element.on_leave(context)
+                #         else:
+                #             element.on_leave(context)
+                #     else:
+                #         element.on_leave(context)
+                #         yield from console.render(element, context.options)
+                #     new_line = element.new_line
+                # else: # <===== This branch is SELF-CLOSING tags!
+                #     element = element_class.create(self, token)
+                #
+                #     context.stack.push(element)
+                #     element.on_enter(context)
+                #     if token.content:
+                #         element.on_text(context, token.content.rstrip())
+                #     context.stack.pop()
+                #     if context.stack.top.on_child_close(context, element):
+                #         if new_line:
+                #             yield Segment("\n")
+                #         yield from console.render(element, context.options)
+                #         element.on_leave(context)
+                #     else:
+                #         element.on_leave(context)
+                #     new_line = element.new_line
 
         # for current, entering in nodes:
         #     node_type = current.t
