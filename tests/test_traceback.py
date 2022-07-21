@@ -139,6 +139,26 @@ def test_print_exception_locals():
     assert "console = <console width=100 None>" in exception_text
 
 
+def test_print_exception_locals_exclude():
+    console = Console(width=100, file=io.StringIO())
+    my_dict = {"key_1": "a", "illegal_value": "b", "key_3": "c"}
+    my_list = [1, 2, 3]
+    my_nested_dict = {1: "a", 2: "b", 3: {"credentials": {"test": "some thing"}}}
+    try:
+        1 / 0
+    except Exception:
+        console.print_exception(
+            show_locals=True, exclude_locals=("cred.+", "illegal_value")
+        )
+    exception_text = console.file.getvalue()
+    locals_exception_text = exception_text.split("─── locals ──")[1]
+
+    assert "console = " in locals_exception_text
+    assert "my_dict = " not in locals_exception_text
+    assert "my_list = " in locals_exception_text
+    assert "my_nested_dict =" not in locals_exception_text
+
+
 def test_syntax_error():
     console = Console(width=100, file=io.StringIO())
     try:

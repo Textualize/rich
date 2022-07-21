@@ -1,13 +1,24 @@
 from __future__ import absolute_import
 
 import os
-import re
 import platform
+import re
 import sys
 from dataclasses import dataclass, field
 from traceback import walk_tb
 from types import ModuleType, TracebackType
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Type, Union, Tuple
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+)
 
 from pygments.lexers import guess_lexer_for_filename
 from pygments.token import Comment, Keyword, Name, Number, Operator, String
@@ -42,7 +53,7 @@ def install(
     theme: Optional[str] = None,
     word_wrap: bool = False,
     show_locals: bool = False,
-    exclude_locals: Optional[Tuple[str]],
+    exclude_locals: Optional[Tuple[str]] = None,
     indent_guides: bool = True,
     suppress: Iterable[Union[str, ModuleType]] = (),
     max_frames: int = 100,
@@ -60,7 +71,7 @@ def install(
             a theme appropriate for the platform.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
-        exclude_locals (Optional[Tuple[str]], optional): List patterns to exclude from local variables output. 
+        exclude_locals (Optional[Tuple[str]], optional): List patterns to exclude from local variables output.
             Defaults to None.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
         suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
@@ -193,7 +204,7 @@ class Traceback:
         theme (str, optional): Override pygments theme used in traceback.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
-        exclude_locals (Optional[Tuple[str]], optional): List patterns to exclude from local variables output. 
+        exclude_locals (Optional[Tuple[str]], optional): List patterns to exclude from local variables output.
             Defaults to None.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
@@ -234,7 +245,11 @@ class Traceback:
                     "Value for 'trace' required if not called in except: block"
                 )
             trace = self.extract(
-                exc_type, exc_value, traceback, show_locals=show_locals
+                exc_type,
+                exc_value,
+                traceback,
+                show_locals=show_locals,
+                exclude_locals=exclude_locals,
             )
         self.trace = trace
         self.width = width
@@ -242,6 +257,7 @@ class Traceback:
         self.theme = Syntax.get_theme(theme or "ansi_dark")
         self.word_wrap = word_wrap
         self.show_locals = show_locals
+        self.exclude_locals = exclude_locals
         self.indent_guides = indent_guides
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
@@ -299,7 +315,11 @@ class Traceback:
             Traceback: A Traceback instance that may be printed.
         """
         rich_traceback = cls.extract(
-            exc_type, exc_value, traceback, show_locals=show_locals
+            exc_type,
+            exc_value,
+            traceback,
+            show_locals=show_locals,
+            exclude_locals=exclude_locals,
         )
         return cls(
             rich_traceback,
@@ -334,7 +354,7 @@ class Traceback:
             exc_value (BaseException): Exception value.
             traceback (TracebackType): Python Traceback object.
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
-            exclude_locals (Optional[Tuple[str]], optional): List patterns to exclude from local variables output. 
+            exclude_locals (Optional[Tuple[str]], optional): List patterns to exclude from local variables output.
                 Defaults to None.
             locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
                 Defaults to 10.
@@ -375,7 +395,7 @@ class Traceback:
             stacks.append(stack)
             append = stack.frames.append
 
-            exclude_patterns = exclude_locals if exclude_locals else []
+            exclude_patterns = exclude_locals if exclude_locals else ()
 
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
@@ -384,20 +404,26 @@ class Traceback:
                         filename = os.path.join(_IMPORT_CWD, filename)
                 if frame_summary.f_locals.get("_rich_traceback_omit", False):
                     continue
+
+                if show_locals:
+                    local_vars = {
+                        k: v
+                        for k, v in frame_summary.f_locals.items()
+                        if not any(
+                            (
+                                (re.search(x, str(k)) or re.search(x, str(v)))
+                                for x in exclude_patterns
+                            )
+                        )
+                    }
+                else:
+                    local_vars = None
+
                 frame = Frame(
                     filename=filename or "?",
                     lineno=line_no,
                     name=frame_summary.f_code.co_name,
-                    locals={
-                        key: pretty.traverse(
-                            value,
-                            max_length=locals_max_length,
-                            max_string=locals_max_string,
-                        )
-                        for key, value in frame_summary.f_locals.items()
-                    }
-                    if show_locals
-                    else None,
+                    locals=local_vars,
                 )
                 append(frame)
                 if frame_summary.f_locals.get("_rich_traceback_guard", False):
