@@ -141,7 +141,7 @@ def test_print_exception_locals():
 
 def test_print_exception_locals_exclude():
     console = Console(width=100, file=io.StringIO())
-    my_dict = {"key_1": "a", "illegal_value": "b", "key_3": "c"}
+    my_dict = {"key_1": "a", "key_2": "illegal_value", "key_3": "c"}
     my_list = [1, 2, 3]
     my_nested_dict = {1: "a", 2: "b", 3: {"credentials": {"test": "some thing"}}}
     try:
