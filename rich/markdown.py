@@ -454,10 +454,7 @@ class Markdown(JupyterMixin):
             if token.children:
                 yield from self._flatten_tokens(token.children)
             else:
-                if token.type == "text" and not token.content:
-                    continue
-                else:
-                    yield token
+                yield token
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
@@ -475,6 +472,7 @@ class Markdown(JupyterMixin):
         tokens = self.parsed
         inline_style_tags = self.inlines
         new_line = False
+        new_line_segment = Segment.line()
 
         # for token in self._flatten_tokens(tokens):
         #     pprint(token)
@@ -483,6 +481,7 @@ class Markdown(JupyterMixin):
             tag = token.tag
             entering = token.nesting == 1
             exiting = token.nesting == -1
+            self_closing = token.nesting == 0
 
             print("Node", tag or "text", f"[{token.content}]", entering)
             if tag in inline_style_tags:
@@ -490,45 +489,37 @@ class Markdown(JupyterMixin):
                     # If it's an opening inline token e.g. strong, em, etc.
                     # Then we move into a style context i.e. push to stack.
                     style_name = self._get_style_name_for_tag(tag)
-                    context.enter_style(
-                        f"markdown.{style_name}"
-                    )  # TODO: Map tags to style keys
+                    context.enter_style(f"markdown.{style_name}")
                 elif exiting:
                     # If it's a closing inline style, then we pop the style
                     # off of the stack, to move out of the context of it...
                     context.leave_style()
             else:
+                # tag in (text, code, ...)
 
                 # Map the markdown tag -> MarkdownElement renderable
                 element_class = self.elements.get(tag) or UnknownElement
 
-                # At this point, we could be entering or exiting the tag.
-                # Our behaviour will vary depending on this.
-
-                if entering:  # OPENING tag
+                if entering or self_closing:
                     element = element_class.create(self, token)
                     context.stack.push(element)
                     element.on_enter(context)
-                elif exiting:  # CLOSING tag
+                else:
                     element = context.stack.pop()
+
+                if exiting:  # CLOSING tag
                     should_render = context.stack and context.stack.top.on_child_close(
                         context, element
                     )
                     if should_render:
                         if new_line:
-                            yield Segment("\n")
+                            yield new_line_segment
                         yield from console.render(element, context.options)
-                    element.on_leave(context)
-                else:  # SELF-CLOSING tags (e.g. text)
-                    element = element_class.create(self, token)
-
-                    # This is a self-closing tag, so we'll both push it and pop it here.
-                    context.stack.push(element)
-                    element.on_enter(context)
-                    if token.type == "text":
-                        text = token.content
-                        if text is not None:
-                            element.on_text(context, text.rstrip())
+                elif self_closing:  # SELF-CLOSING tags (e.g. text, code)
+                    # This is a self-closing tag, so it'll be fully handled here
+                    text = token.content
+                    if text is not None:
+                        element.on_text(context, text.rstrip())
 
                     context.stack.pop()
 
@@ -536,12 +527,13 @@ class Markdown(JupyterMixin):
                         context, element
                     )
                     if should_render:
-                        # TODO: What is `newline` variable for? Do we need to consider it here?
-                        #  Looks like it tells the next iteration of this loop whether to render a newline or not
+                        if new_line:
+                            yield new_line_segment
                         yield from console.render(element, context.options)
 
-                    # Handle the closing of the self-closing tag
+                if exiting or self_closing:
                     element.on_leave(context)
+                    new_line = element.new_line
 
                 # element_class = self.elements.get(tag) or UnknownElement
                 # if entering:

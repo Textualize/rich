@@ -105,7 +105,23 @@ def test_markdown_render():
 
 def test_simple_markdown():
     markdown = Markdown(
-        """***hello***
+        """***hello*** `world`
+"""
+    )
+    rendered = render(markdown)
+    assert rendered == ""
+
+
+def test_simple_markdown_2():
+    markdown = Markdown(
+        """
+# Hello, world!
+
+
+
+## Heading 2
+
+***hello***
 """
     )
     rendered = render(markdown)
