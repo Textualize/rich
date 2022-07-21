@@ -26,7 +26,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `inspect` will prefix coroutine functions with `async def`
 - `Style.__add__` will no longer return `NotImplemented`
 - Remove rich.\_lru_cache
-- Ability to 
 
 ### Changed
 
