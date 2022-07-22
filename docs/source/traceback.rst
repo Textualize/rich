@@ -96,12 +96,21 @@ Here's an example of printing a recursive error::
     except Exception:
         console.print_exception(max_frames=20)
 
-Excluding locals
+Mask locals
 ----------------
 
-Exclude certain local variables by providing regular expressions to the ``exclude_locals`` parameter. The expressions will be applied to all variable names and their string content.
+Mask certain local variables by providing regular expressions to the ``mask_locals`` parameter. The expressions will be applied to all variable names and their string content.
 
 Add the following code to the file::
 
     from rich.traceback import install
-    install(show_locals=True, exclude_locals=('password.*'))
+    install(show_locals=True, mask_locals=('password.*'))
+
+This will produce output that looks as follows:
+
+.. raw:: text
+    ╭────────────────────── locals ──────────────────────╮
+    │         password = <redacted variable name>        │
+    │          my_list = [1, 2, 3]                       │
+    │ credentials_dict = <redacted variable content>     │
+    ╰────────────────────────────────────────────────────╯

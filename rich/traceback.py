@@ -53,7 +53,7 @@ def install(
     theme: Optional[str] = None,
     word_wrap: bool = False,
     show_locals: bool = False,
-    exclude_locals: Optional[Tuple[str]] = None,
+    mask_locals: Optional[Iterable[Tuple[str]]] = None,
     indent_guides: bool = True,
     suppress: Iterable[Union[str, ModuleType]] = (),
     max_frames: int = 100,
@@ -71,7 +71,7 @@ def install(
             a theme appropriate for the platform.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
-        exclude_locals (Optional[Tuple[str]], optional): List patterns to exclude from local variables output.
+        mask_locals (Optional[Iterable[str]], optional): List patterns to mask from local variables output.
             Defaults to None.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
         suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
@@ -97,7 +97,7 @@ def install(
                 theme=theme,
                 word_wrap=word_wrap,
                 show_locals=show_locals,
-                exclude_locals=exclude_locals,
+                mask_locals=mask_locals,
                 indent_guides=indent_guides,
                 suppress=suppress,
                 max_frames=max_frames,
@@ -193,6 +193,23 @@ class PathHighlighter(RegexHighlighter):
     highlights = [r"(?P<dim>.*/)(?P<bold>.+)"]
 
 
+@dataclass
+class RedactedLocal:
+    excluded_variable_name: bool
+    excluded_variable_value: bool
+
+    def __repr__(self) -> str:
+
+        reasons = filter(
+            None,
+            (
+                "name" if self.excluded_variable_name else None,
+                "content" if self.excluded_variable_value else None,
+            ),
+        )
+        return f"<redacted variable {', '.join(reasons)}>"
+
+
 class Traceback:
     """A Console renderable that renders a traceback.
 
@@ -204,7 +221,7 @@ class Traceback:
         theme (str, optional): Override pygments theme used in traceback.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
-        exclude_locals (Optional[Tuple[str]], optional): List patterns to exclude from local variables output.
+        mask_locals (Optional[Iterable[str]], optional): List patterns to mask from local variables output.
             Defaults to None.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
@@ -231,7 +248,7 @@ class Traceback:
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
-        exclude_locals: Optional[Tuple[str]] = None,
+        mask_locals: Optional[Iterable[str]] = None,
         indent_guides: bool = True,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
@@ -249,7 +266,7 @@ class Traceback:
                 exc_value,
                 traceback,
                 show_locals=show_locals,
-                exclude_locals=exclude_locals,
+                mask_locals=mask_locals,
             )
         self.trace = trace
         self.width = width
@@ -257,7 +274,7 @@ class Traceback:
         self.theme = Syntax.get_theme(theme or "ansi_dark")
         self.word_wrap = word_wrap
         self.show_locals = show_locals
-        self.exclude_locals = exclude_locals
+        self.mask_locals = mask_locals
         self.indent_guides = indent_guides
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
@@ -286,7 +303,7 @@ class Traceback:
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
-        exclude_locals: Optional[Tuple[str]] = None,
+        mask_locals: Optional[Iterable[str]] = None,
         indent_guides: bool = True,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
@@ -319,7 +336,7 @@ class Traceback:
             exc_value,
             traceback,
             show_locals=show_locals,
-            exclude_locals=exclude_locals,
+            mask_locals=mask_locals,
         )
         return cls(
             rich_traceback,
@@ -328,7 +345,7 @@ class Traceback:
             theme=theme,
             word_wrap=word_wrap,
             show_locals=show_locals,
-            exclude_locals=exclude_locals,
+            mask_locals=mask_locals,
             indent_guides=indent_guides,
             locals_max_length=locals_max_length,
             locals_max_string=locals_max_string,
@@ -343,7 +360,7 @@ class Traceback:
         exc_value: BaseException,
         traceback: Optional[TracebackType],
         show_locals: bool = False,
-        exclude_locals: Optional[Tuple[str]] = None,
+        mask_locals: Optional[Iterable[str]] = None,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
     ) -> Trace:
@@ -354,7 +371,7 @@ class Traceback:
             exc_value (BaseException): Exception value.
             traceback (TracebackType): Python Traceback object.
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
-            exclude_locals (Optional[Tuple[str]], optional): List patterns to exclude from local variables output.
+            mask_locals (Optional[Tuple[str]], optional): List patterns to mask from local variables output.
                 Defaults to None.
             locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
                 Defaults to 10.
@@ -376,6 +393,27 @@ class Traceback:
             except Exception:
                 return "<exception str() failed>"
 
+        def mask_local_variable(
+            key: Any, value: Any, patterns: Optional[Iterable[str]]
+        ) -> Any:
+            """Mask locals output if key or value match regular expressions passed into `mask_locals`."""
+
+            exclude_patterns = patterns if patterns else ()
+
+            excluded_variable_name = any(
+                re.search(x, key.__repr__()) for x in exclude_patterns
+            )
+            excluded_variable_value = any(
+                re.search(x, value.__repr__()) for x in exclude_patterns
+            )
+
+            if excluded_variable_name or excluded_variable_value:
+                return RedactedLocal(
+                    excluded_variable_name=excluded_variable_name,
+                    excluded_variable_value=excluded_variable_value,
+                )
+            return value
+
         while True:
             stack = Stack(
                 exc_type=safe_str(exc_type.__name__),
@@ -395,8 +433,6 @@ class Traceback:
             stacks.append(stack)
             append = stack.frames.append
 
-            exclude_patterns = exclude_locals if exclude_locals else ()
-
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
                 if filename and not filename.startswith("<"):
@@ -406,24 +442,19 @@ class Traceback:
                     continue
 
                 if show_locals:
-                    local_vars = {
-                        k: v
+                    local_variables = {
+                        k: mask_local_variable(key=k, value=v, patterns=mask_locals)
                         for k, v in frame_summary.f_locals.items()
-                        if not any(
-                            (
-                                (re.search(x, str(k)) or re.search(x, str(v)))
-                                for x in exclude_patterns
-                            )
-                        )
                     }
+
                 else:
-                    local_vars = None
+                    local_variables = None
 
                 frame = Frame(
                     filename=filename or "?",
                     lineno=line_no,
                     name=frame_summary.f_code.co_name,
-                    locals=local_vars,
+                    locals=local_variables,
                 )
                 append(frame)
                 if frame_summary.f_locals.get("_rich_traceback_guard", False):

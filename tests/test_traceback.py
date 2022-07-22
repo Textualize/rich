@@ -141,22 +141,24 @@ def test_print_exception_locals():
 
 def test_print_exception_locals_exclude():
     console = Console(width=100, file=io.StringIO())
-    my_dict = {"key_1": "a", "key_2": "illegal_value", "key_3": "c"}
+    my_dict = {"key_1": "a", "key_2": "illegal_name", "key_3": "c"}
     my_list = [1, 2, 3]
+    credentials = "test"
     my_nested_dict = {1: "a", 2: "b", 3: {"credentials": {"test": "some thing"}}}
+    illegal_name = {"credentials"}
     try:
         1 / 0
     except Exception:
-        console.print_exception(
-            show_locals=True, exclude_locals=("cred.+", "illegal_value")
-        )
+        console.print_exception(show_locals=True, mask_locals=(r"cred.+", r"illegal_"))
     exception_text = console.file.getvalue()
     locals_exception_text = exception_text.split("─── locals ──")[1]
 
-    assert "console = " in locals_exception_text
-    assert "my_dict = " not in locals_exception_text
-    assert "my_list = " in locals_exception_text
-    assert "my_nested_dict =" not in locals_exception_text
+    assert "console = <console width=100 None>" in locals_exception_text
+    assert "credentials = <redacted variable name>" in locals_exception_text
+    assert "my_dict = <redacted variable content>" in locals_exception_text
+    assert "my_list = [1, 2, 3]" in locals_exception_text
+    assert "my_nested_dict = <redacted variable content>" in locals_exception_text
+    assert "illegal_name = <redacted variable name, content>" in locals_exception_text
 
 
 def test_syntax_error():
