@@ -23,13 +23,13 @@
  • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
   • [فارسی readme](https://github.com/willmcgugan/rich/blob/master/README.fa.md)
 
-Rich это Python библиотека позволяющая отображать _красивый_ текст и форматировать терминал.
+Rich это Python библиотека, позволяющая отображать _красивый_ текст и форматировать терминал.
 
 [Rich API](https://rich.readthedocs.io/en/latest/) упрощает добавление цветов и стилей к выводу терминала. Rich также позволяет отображать красивые таблицы, прогресс бары, markdown, код с отображением синтаксиса, ошибки, и т.д. — прямо после установки.
 
 ![Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
 
-Для видео инструкции смотрите [calmcode.io](https://calmcode.io/rich/introduction.html) от [@fishnets88](https://twitter.com/fishnets88).
+Для видеоинструкции смотрите [calmcode.io](https://calmcode.io/rich/introduction.html) от [@fishnets88](https://twitter.com/fishnets88).
 
 Посмотрите [что люди думают о Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
@@ -47,7 +47,7 @@ Rich работает с [Jupyter notebooks](https://jupyter.org/) без доп
 python -m pip install rich
 ```
 
-Запустите следующею команду чтобы проверить Rich вывод в вашем терминале:
+Запустите следующую команду, чтобы проверить Rich вывод в вашем терминале:
 
 ```sh
 python -m rich
