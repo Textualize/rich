@@ -21,6 +21,7 @@
  • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
  • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
   • [فارسی readme](https://github.com/willmcgugan/rich/blob/master/README.fa.md)
+ • [Türkçe readme](https://github.com/willmcgugan/rich/blob/master/README.tr.md)
 
 Rich टर्मिनल में _समृद्ध_ पाठ और सुंदर स्वरूपण के लिए एक Python संग्रह है।
 

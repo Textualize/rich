@@ -23,6 +23,7 @@
  • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
  • [Indonesian readme](https://github.com/willmcgugan/rich/blob/master/README.id.md)
   • [فارسی readme](https://github.com/willmcgugan/rich/blob/master/README.fa.md)
+ • [Türkçe readme](https://github.com/willmcgugan/rich/blob/master/README.tr.md)
 
 Rich adalah library Python yang membantu _memperindah_ tampilan output suatu program di terminal.
 
