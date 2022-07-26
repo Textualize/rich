@@ -49,21 +49,6 @@ An [example](http://example.com).
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
 
 
-```
-a=1
-```
-
-```python
-import this
-```
-
-```somelang
-foobar
-```
-
-    import this
-
-
 1. List item
 
        Code block
@@ -105,8 +90,8 @@ def test_markdown_render():
 
 def test_simple_markdown():
     markdown = Markdown(
-        """*hello* **world**
-"""
+        """# Big _Heading_
+*hello* **world**"""
     )
     rendered = render(markdown)
     assert rendered == ""

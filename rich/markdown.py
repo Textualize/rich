@@ -127,17 +127,16 @@ class Heading(TextElement):
     """A heading."""
 
     @classmethod
-    def create(cls, markdown: "Markdown", node: Any) -> "Heading":
-        heading = cls(node.level)
-        return heading
+    def create(cls, markdown: "Markdown", token: Any) -> "Heading":
+        return cls(token.tag)
 
     def on_enter(self, context: "MarkdownContext") -> None:
         self.text = Text()
         context.enter_style(self.style_name)
 
-    def __init__(self, level: int) -> None:
-        self.level = level
-        self.style_name = f"markdown.h{level}"
+    def __init__(self, tag: str) -> None:
+        self.tag = tag
+        self.style_name = f"markdown.{tag}"
         super().__init__()
 
     def __rich_console__(
@@ -145,7 +144,7 @@ class Heading(TextElement):
     ) -> RenderResult:
         text = self.text
         text.justify = "center"
-        if self.level == 1:
+        if self.tag == "h1":
             # Draw a border around h1s
             yield Panel(
                 text,
@@ -154,7 +153,7 @@ class Heading(TextElement):
             )
         else:
             # Styled text for h2 and beyond
-            if self.level == 2:
+            if self.tag == "h2":
                 yield Text("")
             yield text
 
@@ -370,7 +369,7 @@ class MarkdownContext:
 
     def on_text(self, text: str, node_type: str) -> None:
         """Called when the parser visits text."""
-        if node_type in "code" and self._syntax is not None:
+        if node_type in {"code", "code_inline"} and self._syntax is not None:
             highlight_text = self._syntax.highlight(text)
             highlight_text.rstrip()
             self.stack.top.on_text(
@@ -454,7 +453,8 @@ class Markdown(JupyterMixin):
             if token.children:
                 yield from self._flatten_tokens(token.children)
             else:
-                if token.type in {"text", "code"} and not token.content:
+                # TODO: ???
+                if token.type in {"text"} and not token.content:
                     continue
                 else:
                     yield token
@@ -500,10 +500,10 @@ class Markdown(JupyterMixin):
             exiting = token.nesting == -1
             self_closing = token.nesting == 0
 
-            print("Node type =", node_type)
+            print("Node type =", node_type, token)
             if node_type == "text":
                 context.on_text(token.content.replace("\n", " "), node_type)
-            elif node_type in {"em_open", "strong_open", "code_open", "strike_open"}:
+            elif tag in inline_style_tags:
                 if entering:
                     # If it's an opening inline token e.g. strong, em, etc.
                     # Then we move into a style context i.e. push to stack.
@@ -517,25 +517,30 @@ class Markdown(JupyterMixin):
                     # If it's a self-closing inline style e.g. `code_inline`
                     style_name = self._get_style_name_for_tag(tag)
                     context.enter_style(f"markdown.{style_name}")
-                    t = list(handle_self_closing_tag(token))
-                    yield from t
+                    # yield from handle_self_closing_tag(token)
+                    if token.content:
+                        context.on_text(token.content, node_type)
                     context.leave_style()
             else:
-                # tag in (text, code, ...)
-
                 # Map the markdown tag -> MarkdownElement renderable
                 element_class = self.elements.get(token.type) or UnknownElement
                 element = element_class.create(self, token)
 
                 if entering or self_closing:
+                    print(f"pushing {element}")
                     context.stack.push(element)
                     element.on_enter(context)
 
                 if exiting:  # CLOSING tag
                     element = context.stack.pop()
-                    should_render = context.stack and context.stack.top.on_child_close(
-                        context, element
+                    print(f"popped {element}", vars(element))
+
+                    should_render = not context.stack or (
+                        context.stack
+                        and context.stack.top.on_child_close(context, element)
                     )
+
+                    print(f"should_render = {should_render}")
                     if should_render:
                         if new_line:
                             yield _new_line_segment
