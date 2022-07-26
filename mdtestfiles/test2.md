@@ -31,6 +31,7 @@ Bullet list:
   * apples
   * oranges
   * pears
+    * and nested
 
 Numbered list:
 

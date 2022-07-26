@@ -410,9 +410,9 @@ class Markdown(JupyterMixin):
         "heading_open": Heading,
         "code_block": CodeBlock,
         "block_quote": BlockQuote,
-        "thematic_break": HorizontalRule,
-        "list": ListElement,
-        "item": ListItem,
+        "hr": HorizontalRule,
+        # "bullet_list_open": ListElement,
+        # "list_item_open": ListItem,
         "image": ImageItem,
     }
 
@@ -550,7 +550,6 @@ class Markdown(JupyterMixin):
                         yield from t
                 elif self_closing:  # SELF-CLOSING tags (e.g. text, code)
                     # This is a self-closing tag, so it'll be fully handled here
-                    context.stack.pop()
                     yield from handle_self_closing_tag(token)
 
                 if exiting or self_closing:
