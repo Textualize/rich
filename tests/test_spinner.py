@@ -70,3 +70,18 @@ def test_spinner_markup():
     spinner = Spinner("dots", "[bold]spinning[/bold]")
     assert isinstance(spinner.text, Text)
     assert str(spinner.text) == "spinning"
+
+
+def test_spinner_spacer():
+    console = Console(
+        width=80, color_system=None, force_terminal=True, get_time=lambda: 0.0
+    )
+    console.begin_capture()
+    clock_default = Spinner("clock", "label")
+    clock_nospace = Spinner("clock", "label", spacer="")
+    console.print(clock_default)
+    console.print(clock_nospace)
+    result = console.end_capture()
+    print(repr(result))
+    expected = "🕛  label\n🕛 label\n"
+    assert result == expected
