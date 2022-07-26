@@ -502,8 +502,8 @@ class Markdown(JupyterMixin):
 
             print("Node type =", node_type, token)
             if node_type == "text":
-                context.on_text(token.content.replace("\n", " "), node_type)
-            elif node_type == "hardbreak":
+                context.on_text(token.content, node_type)
+            elif node_type == "hardbreak" or node_type == "softbreak":
                 context.on_text("\n", node_type)
             elif tag in inline_style_tags:
                 if entering:
