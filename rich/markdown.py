@@ -505,6 +505,23 @@ class Markdown(JupyterMixin):
                 context.on_text(token.content, node_type)
             elif node_type == "hardbreak" or node_type == "softbreak":
                 context.on_text("\n", node_type)
+            elif tag == "a":
+                if entering:
+                    link_style = console.get_style("markdown.link", default="none")
+                    if self.hyperlinks:
+                        link_style += Style(link=token.attrs.get("href"))
+                    context.enter_style(link_style)
+                else:
+                    context.leave_style()
+                    if not self.hyperlinks:
+                        context.on_text(" (", node_type)
+                        style = Style(underline=True) + console.get_style(
+                            "markdown.link_url", default="none"
+                        )
+                        context.enter_style(style)
+                        context.on_text(token.attrs.get("href"), node_type)
+                        context.leave_style()
+                        context.on_text(")", node_type)
             elif tag in inline_style_tags:
                 if entering:
                     # If it's an opening inline token e.g. strong, em, etc.
@@ -549,7 +566,6 @@ class Markdown(JupyterMixin):
                         t = list(console.render(element, context.options))
                         yield from t
                 elif self_closing:  # SELF-CLOSING tags (e.g. text, code)
-                    # This is a self-closing tag, so it'll be fully handled here
                     yield from handle_self_closing_tag(token)
 
                 if exiting or self_closing:
