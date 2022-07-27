@@ -671,9 +671,6 @@ class Console:
                 else:
                     height = JUPYTER_DEFAULT_LINES
 
-        self.soft_wrap = soft_wrap
-        self._width = width
-        self._height = height
         self.tab_size = tab_size
         self.record = record
         self._markup = markup
@@ -685,6 +682,7 @@ class Console:
             if legacy_windows is None
             else legacy_windows
         )
+
         if width is None:
             columns = self._environ.get("COLUMNS")
             if columns is not None and columns.isdigit():
@@ -1351,6 +1349,7 @@ class Console:
                         render_options.max_width,
                         include_new_lines=new_lines,
                         pad=pad,
+                        style=style,
                     ),
                     None,
                     render_height,

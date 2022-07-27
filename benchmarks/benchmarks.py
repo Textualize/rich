@@ -4,6 +4,7 @@ from benchmarks import snippets
 from rich.color import Color, ColorSystem
 from rich.console import Console
 from rich.pretty import Pretty
+from rich.segment import Segment
 from rich.style import Style
 from rich.syntax import Syntax
 from rich.table import Table
@@ -16,9 +17,10 @@ class TextSuite:
             file=StringIO(), color_system="truecolor", legacy_windows=False
         )
         self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)
+        self.text = Text.from_markup(snippets.MARKUP)
 
     def time_wrapping(self):
-        Text(snippets.LOREM_IPSUM).wrap(self.console, 12, overflow="fold")
+        self.text.wrap(self.console, 12, overflow="fold")
 
     def time_indent_guides(self):
         Text(snippets.PYTHON_SNIPPET).with_indent_guides()
@@ -27,7 +29,7 @@ class TextSuite:
         Text(snippets.LOREM_IPSUM).fit(12)
 
     def time_split(self):
-        Text(snippets.LOREM_IPSUM).split()
+        self.text.split()
 
     def time_divide(self):
         Text(snippets.LOREM_IPSUM).divide(range(20, 100, 4))
@@ -36,7 +38,7 @@ class TextSuite:
         Text(snippets.LOREM_IPSUM).align("center", width=self.len_lorem_ipsum * 3)
 
     def time_render(self):
-        Text(snippets.LOREM_IPSUM).render(self.console)
+        list(self.text.render(self.console))
 
     def time_wrapping_unicode_heavy(self):
         Text(snippets.UNICODE_HEAVY_TEXT).wrap(self.console, 12, overflow="fold")
@@ -48,7 +50,7 @@ class TextSuite:
         Text(snippets.UNICODE_HEAVY_TEXT).split()
 
     def time_divide_unicode_heavy(self):
-        Text(snippets.UNICODE_HEAVY_TEXT).divide(range(20, 100, 4))
+        self.text.divide(range(20, 100, 4))
 
     def time_align_center_unicode_heavy(self):
         Text(snippets.UNICODE_HEAVY_TEXT).align(
@@ -56,7 +58,18 @@ class TextSuite:
         )
 
     def time_render_unicode_heavy(self):
-        Text(snippets.UNICODE_HEAVY_TEXT).render(self.console)
+        list(Text(snippets.UNICODE_HEAVY_TEXT).render(self.console))
+
+
+class TextHotCacheSuite:
+    def setup(self):
+        self.console = Console(
+            file=StringIO(), color_system="truecolor", legacy_windows=False
+        )
+
+    def time_wrapping_unicode_heavy_warm_cache(self):
+        for _ in range(20):
+            Text(snippets.UNICODE_HEAVY_TEXT).wrap(self.console, 12, overflow="fold")
 
 
 class SyntaxWrappingSuite:
@@ -137,6 +150,8 @@ class StyleSuite:
         self.console = Console(
             file=StringIO(), color_system="truecolor", legacy_windows=False, width=100
         )
+        self.style1 = Style.parse("blue on red")
+        self.style2 = Style.parse("green italic bold")
 
     def time_parse_ansi(self):
         Style.parse("red on blue")
@@ -146,6 +161,9 @@ class StyleSuite:
 
     def time_parse_mixed_complex_style(self):
         Style.parse("dim bold reverse #00ee00 on rgb(123,12,50)")
+
+    def time_style_add(self):
+        self.style1 + self.style2
 
 
 class ColorSuite:
@@ -188,6 +206,13 @@ class ColorSuiteCached:
 
 class SegmentSuite:
     def setup(self):
-        self.console = Console(
-            file=StringIO(), color_system="truecolor", legacy_windows=False, width=100
-        )
+        self.line = [
+            Segment("foo"),
+            Segment("bar"),
+            Segment("egg"),
+            Segment("Where there is a Will"),
+            Segment("There is a way"),
+        ] * 2
+
+    def test_divide_complex(self):
+        list(Segment.divide(self.line, [5, 10, 20, 50, 108, 110, 118]))
