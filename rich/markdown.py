@@ -177,7 +177,6 @@ class CodeBlock(TextElement):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        print("RENDERING SYNTAX")
         code = str(self.text).rstrip()
         syntax = Syntax(
             code, self.lexer_name, theme=self.theme, word_wrap=True, padding=1
@@ -242,7 +241,6 @@ class ListElement(MarkdownElement):
         self, context: "MarkdownContext", child: "MarkdownElement"
     ) -> bool:
         assert isinstance(child, ListItem)
-        print("==> calling ListElement.on_child_close")
         self.items.append(child)
         return False
 
@@ -341,7 +339,6 @@ class ImageItem(TextElement):
         if self.hyperlinks:
             title.stylize(link_style)
         text = Text.assemble("🌆 ", title, " ", end="")
-        print(f"===> yielding {text}")
         yield text
 
 
@@ -439,7 +436,7 @@ class Markdown(JupyterMixin):
         inline_code_lexer: Optional[str] = None,
         inline_code_theme: Optional[str] = None,
     ) -> None:
-        parser = MarkdownIt("gfm-like")
+        parser = MarkdownIt().enable("table")
         self.markup = markup
         self.parsed = parser.parse(markup)
         self.code_theme = code_theme
@@ -496,7 +493,6 @@ class Markdown(JupyterMixin):
                 or context.stack
                 and context.stack.top.on_child_close(context, element)
             )
-            print(f"Should render = {should_render}")
             if should_render:
                 if new_line:
                     yield _new_line_segment
@@ -511,9 +507,6 @@ class Markdown(JupyterMixin):
             entering = token.nesting == 1
             exiting = token.nesting == -1
             self_closing = token.nesting == 0
-
-            print(f"Stack = {context.stack}")
-            print("Node type =", node_type, token)
 
             if node_type == "text":
                 context.on_text(token.content, node_type)
@@ -565,27 +558,23 @@ class Markdown(JupyterMixin):
                 element = element_class.create(self, token)
 
                 if entering or self_closing:
-                    print(f".pushing {element}")
                     context.stack.push(element)
                     element.on_enter(context)
 
                 if exiting:  # CLOSING tag
                     element = context.stack.pop()
-                    print(f"popped {element}", vars(element))
 
                     should_render = not context.stack or (
                         context.stack
                         and context.stack.top.on_child_close(context, element)
                     )
 
-                    print(f"should_render = {should_render}")
                     if should_render:
                         if new_line:
                             yield _new_line_segment
                         t = list(console.render(element, context.options))
                         yield from t
                 elif self_closing:  # SELF-CLOSING tags (e.g. text, code, image)
-                    print(f"Handling self closing {token}")
                     context.stack.pop()
                     yield from handle_self_closing_tag(token)
 
