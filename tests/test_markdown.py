@@ -51,10 +51,23 @@ Numbered list:
 
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
 
+```
+a=1
+```
+
+```python
+import this
+```
+
+```somelang
+foobar
+```
 
 1. List item
 
        Code block
+       Indented
+       Like this!
 """
 
 import io
@@ -137,6 +150,27 @@ def test_inline_code():
     print(result)
     print(repr(result))
     assert result == expected
+
+
+def test_md_3():
+    md = """```
+a=1
+```
+
+```python
+import this
+```
+
+
+       Code block
+       Indented
+       Like this!
+       
+Normal text
+"""
+    markdown = Markdown(md)
+    result = render(markdown)
+    assert result == ""
 
 
 if __name__ == "__main__":

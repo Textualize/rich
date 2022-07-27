@@ -21,7 +21,7 @@ by a blank line.
 Two spaces at the end of a line  
 produces a line break.
 
-Text attributes _italic_,
+Text attributes _italic_, 
 **bold**, `monospace`.
 
 An [example](http://example.com) of a link.
@@ -32,7 +32,7 @@ Horizontal rule:
 
 Bullet list:
 
-  * apples *italic* **bold**
+  * apples *hello*
   * oranges
   * pears
     * and nested
@@ -41,7 +41,6 @@ Numbered list:
 
   1. lather
   2. rinse
-     1. blah
   3. repeat
 
 > Markdown uses email-style > characters for blockquoting.
@@ -50,7 +49,20 @@ Numbered list:
 
 ![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
 
+```
+a=1
+```
+
+```python
+import this
+```
+
+```somelang
+foobar
+```
 
 1. List item
 
        Code block
+       Indented
+       Like this!

@@ -177,6 +177,7 @@ class CodeBlock(TextElement):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
+        print("RENDERING SYNTAX")
         code = str(self.text).rstrip()
         syntax = Panel(
             Syntax(code, self.lexer_name, theme=self.theme, word_wrap=True),
@@ -373,7 +374,7 @@ class MarkdownContext:
 
     def on_text(self, text: str, node_type: str) -> None:
         """Called when the parser visits text."""
-        if node_type in {"code", "code_inline"} and self._syntax is not None:
+        if node_type in {"fence", "code_inline"} and self._syntax is not None:
             highlight_text = self._syntax.highlight(text)
             highlight_text.rstrip()
             self.stack.top.on_text(
@@ -412,6 +413,7 @@ class Markdown(JupyterMixin):
     elements: ClassVar[Dict[str, Type[MarkdownElement]]] = {
         "paragraph_open": Paragraph,
         "heading_open": Heading,
+        "fence": CodeBlock,
         "code_block": CodeBlock,
         "blockquote_open": BlockQuote,
         "hr": HorizontalRule,
@@ -421,10 +423,10 @@ class Markdown(JupyterMixin):
         "image": ImageItem,
     }
 
-    # TODO: Map all tag names to their styles
     # Maps tag names to Rich style keys, if tag and key differ
     tag_to_style_name = {
         "em": "emph",
+        "code": "code_block",
     }
 
     inlines = {"em", "strong", "code", "strike"}
@@ -455,10 +457,11 @@ class Markdown(JupyterMixin):
     def _flatten_tokens(self, tokens: Iterable[Token]) -> Iterable[Token]:
         """Flattens the token stream"""
         for token in tokens:
+            is_fence = token.type == "fence"
             is_image = (
                 token.tag == "img"
             )  # img tags contain everything we need, without looking at children
-            if token.children and not is_image:
+            if token.children and not is_image and not is_fence:
                 yield from self._flatten_tokens(token.children)
             else:
                 # TODO: ???
@@ -490,9 +493,12 @@ class Markdown(JupyterMixin):
             if text is not None:
                 element.on_text(context, text)
 
-            should_render = context.stack and context.stack.top.on_child_close(
-                context, element
+            should_render = (
+                not context.stack
+                or context.stack
+                and context.stack.top.on_child_close(context, element)
             )
+            print(f"Should render = {should_render}")
             if should_render:
                 if new_line:
                     yield _new_line_segment
@@ -501,7 +507,6 @@ class Markdown(JupyterMixin):
                 yield from t
 
         for token in self._flatten_tokens(tokens):
-
             node_type = token.type
             tag = token.tag
 
@@ -535,7 +540,11 @@ class Markdown(JupyterMixin):
                         context.on_text(token.attrs.get("href"), node_type)
                         context.leave_style()
                         context.on_text(")", node_type)
-            elif tag in inline_style_tags:
+            elif (
+                tag in inline_style_tags
+                and node_type != "fence"
+                and node_type != "code_block"
+            ):
                 if entering:
                     # If it's an opening inline token e.g. strong, em, etc.
                     # Then we move into a style context i.e. push to stack.
