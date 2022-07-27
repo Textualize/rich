@@ -39,6 +39,7 @@ Numbered list:
 
   1. lather
   2. rinse
+     1. blah
   3. repeat
 
 > Markdown uses email-style > characters for blockquoting.

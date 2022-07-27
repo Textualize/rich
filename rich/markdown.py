@@ -411,7 +411,7 @@ class Markdown(JupyterMixin):
         "paragraph_open": Paragraph,
         "heading_open": Heading,
         "code_block": CodeBlock,
-        "block_quote_open": BlockQuote,
+        "blockquote_open": BlockQuote,
         "hr": HorizontalRule,
         "bullet_list_open": ListElement,
         "ordered_list_open": ListElement,
