@@ -411,7 +411,7 @@ class Markdown(JupyterMixin):
         "paragraph_open": Paragraph,
         "heading_open": Heading,
         "code_block": CodeBlock,
-        "block_quote": BlockQuote,
+        "block_quote_open": BlockQuote,
         "hr": HorizontalRule,
         "bullet_list_open": ListElement,
         "ordered_list_open": ListElement,
@@ -509,8 +509,10 @@ class Markdown(JupyterMixin):
 
             if node_type == "text":
                 context.on_text(token.content, node_type)
-            elif node_type == "hardbreak" or node_type == "softbreak":
+            elif node_type == "hardbreak":
                 context.on_text("\n", node_type)
+            elif node_type == "softbreak":
+                context.on_text(" ", node_type)
             elif tag == "a":
                 if entering:
                     link_style = console.get_style("markdown.link", default="none")
