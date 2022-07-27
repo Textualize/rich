@@ -48,3 +48,4 @@ The following people have contributed to the development of Rich:
 - [za](https://github.com/za)
 - [Motahhar Mokfi](https://github.com/motahhar)
 - [Tomer Shalev](https://github.com/tomers)
+- [Serkan UYSAL](https://github.com/uysalserkan)

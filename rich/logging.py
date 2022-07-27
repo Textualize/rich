@@ -166,8 +166,9 @@ class RichHandler(Handler):
     def render_message(self, record: LogRecord, message: str) -> "ConsoleRenderable":
         """Render message text in to Text.
 
-        record (LogRecord): logging Record.
-        message (str): String containing log message.
+        Args:
+            record (LogRecord): logging Record.
+            message (str): String containing log message.
 
         Returns:
             ConsoleRenderable: Renderable to display log message.

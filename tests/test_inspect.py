@@ -38,6 +38,11 @@ skip_py310 = pytest.mark.skipif(
     reason="rendered differently on py3.10",
 )
 
+skip_py311 = pytest.mark.skipif(
+    sys.version_info.minor == 11 and sys.version_info.major == 3,
+    reason="rendered differently on py3.11",
+)
+
 skip_pypy3 = pytest.mark.skipif(
     hasattr(sys, "pypy_version_info"),
     reason="rendered differently on pypy3",
@@ -93,23 +98,24 @@ def test_render():
     result = console.file.getvalue()
     print(repr(result))
     expected = "╭────────────── <class 'tests.test_inspect.Foo'> ──────────────╮\n│ Foo test                                                     │\n│                                                              │\n│   broken = InspectError()                                    │\n│ __init__ = def __init__(foo: int) -> None: constructor docs. │\n│   method = def method(a, b) -> str: Multi line               │\n╰──────────────────────────────────────────────────────────────╯\n"
-    assert expected == result
+    assert result == expected
 
 
 @skip_pypy3
 def test_inspect_text():
+    num_attributes = 34 if sys.version_info >= (3, 11) else 33
     expected = (
         "╭──────────────── <class 'str'> ─────────────────╮\n"
         "│ str(object='') -> str                          │\n"
         "│ str(bytes_or_buffer[, encoding[, errors]]) ->  │\n"
         "│ str                                            │\n"
         "│                                                │\n"
-        "│ 33 attribute(s) not shown. Run                 │\n"
+        f"│ {num_attributes} attribute(s) not shown. Run                 │\n"
         "│ inspect(inspect) for options.                  │\n"
         "╰────────────────────────────────────────────────╯\n"
     )
     print(repr(expected))
-    assert expected == render("Hello")
+    assert render("Hello") == expected
 
 
 @skip_py36
@@ -136,8 +142,10 @@ def test_inspect_empty_dict():
     assert render({}).startswith(expected)
 
 
+@skip_py311
 @skip_pypy3
-def test_inspect_builtin_function():
+def test_inspect_builtin_function_except_python311():
+    # Pre-3.11 Python versions - print builtin has no signature available
     expected = (
         "╭────────── <built-in function print> ───────────╮\n"
         "│ def print(...)                                 │\n"
@@ -149,7 +157,28 @@ def test_inspect_builtin_function():
         "│ inspect(inspect) for options.                  │\n"
         "╰────────────────────────────────────────────────╯\n"
     )
-    assert expected == render(print)
+    assert render(print) == expected
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="print builtin signature only available on 3.11+"
+)
+@skip_pypy3
+def test_inspect_builtin_function_only_python311():
+    # On 3.11, the print builtin *does* have a signature, unlike in prior versions
+    expected = (
+        "╭────────── <built-in function print> ───────────╮\n"
+        "│ def print(*args, sep=' ', end='\\n', file=None, │\n"
+        "│ flush=False):                                  │\n"
+        "│                                                │\n"
+        "│ Prints the values to a stream, or to           │\n"
+        "│ sys.stdout by default.                         │\n"
+        "│                                                │\n"
+        "│ 30 attribute(s) not shown. Run                 │\n"
+        "│ inspect(inspect) for options.                  │\n"
+        "╰────────────────────────────────────────────────╯\n"
+    )
+    assert render(print) == expected
 
 
 @skip_pypy3
@@ -186,13 +215,14 @@ def test_inspect_integer_with_value():
     expected = "╭────── <class 'int'> ───────╮\n│ int([x]) -> integer        │\n│ int(x, base=10) -> integer │\n│                            │\n│ ╭────────────────────────╮ │\n│ │ 1                      │ │\n│ ╰────────────────────────╯ │\n│                            │\n│ denominator = 1            │\n│        imag = 0            │\n│   numerator = 1            │\n│        real = 1            │\n╰────────────────────────────╯\n"
     value = render(1, value=True)
     print(repr(value))
-    assert expected == value
+    assert value == expected
 
 
 @skip_py36
 @skip_py37
 @skip_py310
-def test_inspect_integer_with_methods():
+@skip_py311
+def test_inspect_integer_with_methods_python38_and_python39():
     expected = (
         "╭──────────────── <class 'int'> ─────────────────╮\n"
         "│ int([x]) -> integer                            │\n"
@@ -222,14 +252,15 @@ def test_inspect_integer_with_methods():
         "│                    an integer.                 │\n"
         "╰────────────────────────────────────────────────╯\n"
     )
-    assert expected == render(1, methods=True)
+    assert render(1, methods=True) == expected
 
 
 @skip_py36
 @skip_py37
 @skip_py38
 @skip_py39
-def test_inspect_integer_with_methods():
+@skip_py311
+def test_inspect_integer_with_methods_python310only():
     expected = (
         "╭──────────────── <class 'int'> ─────────────────╮\n"
         "│ int([x]) -> integer                            │\n"
@@ -263,7 +294,51 @@ def test_inspect_integer_with_methods():
         "│                    an integer.                 │\n"
         "╰────────────────────────────────────────────────╯\n"
     )
-    assert expected == render(1, methods=True)
+    assert render(1, methods=True) == expected
+
+
+@skip_py36
+@skip_py37
+@skip_py38
+@skip_py39
+@skip_py310
+def test_inspect_integer_with_methods_python311_and_above():
+    # to_bytes and from_bytes methods on int had minor signature change -
+    # they now, as of 3.11, have default values for all of their parameters
+    expected = (
+        "╭──────────────── <class 'int'> ─────────────────╮\n"
+        "│ int([x]) -> integer                            │\n"
+        "│ int(x, base=10) -> integer                     │\n"
+        "│                                                │\n"
+        "│      denominator = 1                           │\n"
+        "│             imag = 0                           │\n"
+        "│        numerator = 1                           │\n"
+        "│             real = 1                           │\n"
+        "│ as_integer_ratio = def as_integer_ratio():     │\n"
+        "│                    Return integer ratio.       │\n"
+        "│        bit_count = def bit_count(): Number of  │\n"
+        "│                    ones in the binary          │\n"
+        "│                    representation of the       │\n"
+        "│                    absolute value of self.     │\n"
+        "│       bit_length = def bit_length(): Number of │\n"
+        "│                    bits necessary to represent │\n"
+        "│                    self in binary.             │\n"
+        "│        conjugate = def conjugate(...) Returns  │\n"
+        "│                    self, the complex conjugate │\n"
+        "│                    of any int.                 │\n"
+        "│       from_bytes = def from_bytes(bytes,       │\n"
+        "│                    byteorder='big', *,         │\n"
+        "│                    signed=False): Return the   │\n"
+        "│                    integer represented by the  │\n"
+        "│                    given array of bytes.       │\n"
+        "│         to_bytes = def to_bytes(length=1,      │\n"
+        "│                    byteorder='big', *,         │\n"
+        "│                    signed=False): Return an    │\n"
+        "│                    array of bytes representing │\n"
+        "│                    an integer.                 │\n"
+        "╰────────────────────────────────────────────────╯\n"
+    )
+    assert render(1, methods=True) == expected
 
 
 @skip_py36
@@ -387,8 +462,10 @@ def test_object_types_mro(obj: object, expected_result: Sequence[Type]):
         [str, ["builtins.str", "builtins.object"]],
         [Foo(1), [f"{__name__}.Foo", "builtins.object"]],
         [Foo, [f"{__name__}.Foo", "builtins.object"]],
-        [FooSubclass(1), [f"{__name__}.FooSubclass", f"{__name__}.Foo", "builtins.object"]],
-        [FooSubclass, [f"{__name__}.FooSubclass", f"{__name__}.Foo", "builtins.object"]],
+        [FooSubclass(1),
+         [f"{__name__}.FooSubclass", f"{__name__}.Foo", "builtins.object"]],
+        [FooSubclass,
+         [f"{__name__}.FooSubclass", f"{__name__}.Foo", "builtins.object"]],
         # fmt: on
     ),
 )

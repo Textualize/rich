@@ -29,6 +29,9 @@ class ColorSystem(IntEnum):
     def __repr__(self) -> str:
         return f"ColorSystem.{self.name}"
 
+    def __str__(self) -> str:
+        return repr(self)
+
 
 class ColorType(IntEnum):
     """Type of color stored in Color class."""
