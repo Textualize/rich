@@ -316,7 +316,7 @@ class ImageItem(TextElement):
 
         Args:
             markdown (Markdown): The parent Markdown object.
-            node (Any): A node from Pygments.
+            token (Any): A token from markdown-it.
 
         Returns:
             MarkdownElement: A new markdown element
@@ -341,7 +341,9 @@ class ImageItem(TextElement):
         title = self.text or Text(self.destination.strip("/").rsplit("/", 1)[-1])
         if self.hyperlinks:
             title.stylize(link_style)
-        yield Text.assemble("🌆 ", title, " ", end="")
+        text = Text.assemble("🌆 ", title, " ", end="")
+        print(f"===> yielding {text}")
+        yield text
 
 
 class MarkdownContext:
@@ -556,7 +558,7 @@ class Markdown(JupyterMixin):
                 element = element_class.create(self, token)
 
                 if entering or self_closing:
-                    print(f"pushing {element}")
+                    print(f".pushing {element}")
                     context.stack.push(element)
                     element.on_enter(context)
 
@@ -575,7 +577,9 @@ class Markdown(JupyterMixin):
                             yield _new_line_segment
                         t = list(console.render(element, context.options))
                         yield from t
-                elif self_closing:  # SELF-CLOSING tags (e.g. text, code)
+                elif self_closing:  # SELF-CLOSING tags (e.g. text, code, image)
+                    print(f"Handling self closing {token}")
+                    context.stack.pop()
                     yield from handle_self_closing_tag(token)
 
                 if exiting or self_closing:
