@@ -499,23 +499,6 @@ optional = true
 python-versions = ">=3.6"
 
 [[package]]
-name = "linkify-it-py"
-version = "1.0.3"
-description = "Links recognition library with FULL unicode support."
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-uc-micro-py = "*"
-
-[package.extras]
-test = ["pytest-cov", "pytest", "coverage"]
-doc = ["myst-parser", "sphinx-book-theme", "sphinx"]
-dev = ["black", "flake8", "isort", "pre-commit"]
-benchmark = ["pytest-benchmark", "pytest"]
-
-[[package]]
 name = "markdown-it-py"
 version = "2.1.0"
 description = "Python port of markdown-it. Markdown parsing, done right!"
@@ -524,7 +507,6 @@ optional = false
 python-versions = ">=3.7"
 
 [package.dependencies]
-linkify-it-py = {version = ">=1.0,<2.0", optional = true, markers = "extra == \"linkify\""}
 mdurl = ">=0.1,<1.0"
 typing_extensions = {version = ">=3.7.4", markers = "python_version < \"3.8\""}
 
@@ -1104,17 +1086,6 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
-name = "uc-micro-py"
-version = "1.0.1"
-description = "Micro subset of unicode data files for linkify-it-py projects."
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.extras]
-test = ["pytest-cov", "pytest", "coverage"]
-
-[[package]]
 name = "virtualenv"
 version = "20.16.1"
 description = "Virtual Python Environment builder"
@@ -1177,7 +1148,7 @@ jupyter = ["ipywidgets"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.0"
-content-hash = "86574cfe7c21da88fccc614da3dcb3809718ee5cd95cc71d34c0b23cf1ace434"
+content-hash = "31211b2c23a45701178fcf00f45806c3d4788894067167e51e486dabd73fcc05"
 
 [metadata.files]
 appnope = []
@@ -1311,7 +1282,6 @@ jupyter-client = []
 jupyter-core = []
 jupyterlab-pygments = []
 jupyterlab-widgets = []
-linkify-it-py = []
 markdown-it-py = []
 markupsafe = [
     {file = "MarkupSafe-2.1.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:86b1f75c4e7c2ac2ccdaec2b9022845dbb81880ca318bb7a0a01fbf7813e3812"},
@@ -1550,7 +1520,6 @@ typing-extensions = [
     {file = "typing_extensions-4.3.0-py3-none-any.whl", hash = "sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02"},
     {file = "typing_extensions-4.3.0.tar.gz", hash = "sha256:e6d2677a32f47fc7eb2795db1dd15c1f34eff616bcaf2cfb5e997f854fa1c4a6"},
 ]
-uc-micro-py = []
 virtualenv = []
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},
