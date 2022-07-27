@@ -1,6 +1,8 @@
 Heading
 =======
 
+![An image](http://blah.com/me.png)
+
 Sub-heading
 -----------
 

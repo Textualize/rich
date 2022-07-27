@@ -311,7 +311,7 @@ class ImageItem(TextElement):
     new_line = False
 
     @classmethod
-    def create(cls, markdown: "Markdown", node: Any) -> "MarkdownElement":
+    def create(cls, markdown: "Markdown", token: Any) -> "MarkdownElement":
         """Factory to create markdown element,
 
         Args:
@@ -321,7 +321,7 @@ class ImageItem(TextElement):
         Returns:
             MarkdownElement: A new markdown element
         """
-        return cls(node.destination, markdown.hyperlinks)
+        return cls(token.attrs.get("src"), markdown.hyperlinks)
 
     def __init__(self, destination: str, hyperlinks: bool) -> None:
         self.destination = destination
@@ -453,7 +453,10 @@ class Markdown(JupyterMixin):
     def _flatten_tokens(self, tokens: Iterable[Token]) -> Iterable[Token]:
         """Flattens the token stream"""
         for token in tokens:
-            if token.children:
+            is_image = (
+                token.tag == "img"
+            )  # img tags contain everything we need, without looking at children
+            if token.children and not is_image:
                 yield from self._flatten_tokens(token.children)
             else:
                 # TODO: ???
