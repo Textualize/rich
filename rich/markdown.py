@@ -20,6 +20,7 @@ from .text import Text, TextType
 class MarkdownElement:
 
     new_line: ClassVar[bool] = True
+    hidden: ClassVar[bool] = False
 
     @classmethod
     def create(cls, markdown: "Markdown", node: Any) -> "MarkdownElement":
@@ -229,9 +230,9 @@ class ListElement(MarkdownElement):
     """A list element."""
 
     @classmethod
-    def create(cls, markdown: "Markdown", node: Any) -> "ListElement":
-        list_data = node.list_data
-        return cls(list_data["type"], list_data["start"])
+    def create(cls, markdown: "Markdown", token: Any) -> "ListElement":
+        # list_data = node.list_data
+        return cls(token.type, 1)  # TODO: Hardcoded at 1
 
     def __init__(self, list_type: str, list_start: Optional[int]) -> None:
         self.items: List[ListItem] = []
@@ -242,6 +243,7 @@ class ListElement(MarkdownElement):
         self, context: "MarkdownContext", child: "MarkdownElement"
     ) -> bool:
         assert isinstance(child, ListItem)
+        print("==> calling ListElement.on_child_close")
         self.items.append(child)
         return False
 
@@ -411,8 +413,9 @@ class Markdown(JupyterMixin):
         "code_block": CodeBlock,
         "block_quote": BlockQuote,
         "hr": HorizontalRule,
-        # "bullet_list_open": ListElement,
-        # "list_item_open": ListItem,
+        "bullet_list_open": ListElement,
+        "ordered_list_open": ListElement,
+        "list_item_open": ListItem,
         "image": ImageItem,
     }
 
@@ -493,6 +496,7 @@ class Markdown(JupyterMixin):
                 yield from t
 
         for token in self._flatten_tokens(tokens):
+
             node_type = token.type
             tag = token.tag
 
@@ -500,7 +504,9 @@ class Markdown(JupyterMixin):
             exiting = token.nesting == -1
             self_closing = token.nesting == 0
 
+            print(f"Stack = {context.stack}")
             print("Node type =", node_type, token)
+
             if node_type == "text":
                 context.on_text(token.content, node_type)
             elif node_type == "hardbreak" or node_type == "softbreak":
@@ -536,7 +542,6 @@ class Markdown(JupyterMixin):
                     # If it's a self-closing inline style e.g. `code_inline`
                     style_name = self._get_style_name_for_tag(tag)
                     context.enter_style(f"markdown.{style_name}")
-                    # yield from handle_self_closing_tag(token)
                     if token.content:
                         context.on_text(token.content, node_type)
                     context.leave_style()

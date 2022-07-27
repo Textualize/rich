@@ -30,7 +30,7 @@ Horizontal rule:
 
 Bullet list:
 
-  * apples
+  * apples *italic* **bold**
   * oranges
   * pears
     * and nested
