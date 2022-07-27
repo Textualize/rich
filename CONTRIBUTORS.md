@@ -14,6 +14,7 @@ The following people have contributed to the development of Rich:
 - [Oleksis Fraga](https://github.com/oleksis)
 - [Andy Gimblett](https://github.com/gimbo)
 - [Michał Górny](https://github.com/mgorny)
+- [Nok Lam Chan](https://github.com/noklam)
 - [Leron Gray](https://github.com/daddycocoaman)
 - [Kenneth Hoste](https://github.com/boegel)
 - [Lanqing Huang](https://github.com/lqhuang)

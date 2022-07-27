@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed missing typing extensions dependency on 3.9 https://github.com/Textualize/rich/issues/2386
+- Fixed Databricks Notebook is not detected as Jupyter environment. https://github.com/Textualize/rich/issues/2422
 
 ## [12.5.0] - 2022-07-11
 
