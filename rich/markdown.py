@@ -250,7 +250,7 @@ class ListElement(MarkdownElement):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        if self.list_type == "bullet":
+        if self.list_type == "bullet_list_open":
             for item in self.items:
                 yield from item.render_bullet(console, options)
         else:
