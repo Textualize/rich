@@ -61,8 +61,6 @@ import this
 foobar
 ```
 
-1. List item
-
-       Code block
-       Indented
-       Like this!
+    Code block
+    Indented 
+        Like this!
