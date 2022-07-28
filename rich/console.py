@@ -518,7 +518,7 @@ def _is_jupyter() -> bool:  # pragma: no cover
     shell = ipython.__class__.__name__
     if (
         "google.colab" in str(ipython.__class__)
-        or os.getenv("DATABRICKS_ROOT_VIRTUALENV_ENV")
+        or os.getenv("DATABRICKS_RUNTIME_VERSION")
         or shell == "ZMQInteractiveShell"
     ):
         return True  # Jupyter notebook or qtconsole
