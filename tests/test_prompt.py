@@ -93,3 +93,36 @@ def test_prompt_confirm_default():
     output = console.file.getvalue()
     print(repr(output))
     assert output == expected
+
+
+def test_prompt_illegal_choice_message():
+    INPUT = "egg\nfoo"
+    console = Console(file=io.StringIO())
+    name = Prompt.ask(
+        "what is your name",
+        console=console,
+        choices=["foo", "bar"],
+        stream=io.StringIO(INPUT),
+        illegal_choice_message="Only select `foo` or `bar`",
+    )
+    assert name == "foo"
+    expected = "what is your name [foo/bar]: Only select `foo` or `bar`\nwhat is your name [foo/bar]: "
+    output = console.file.getvalue()
+    print(repr(output))
+    assert output == expected
+
+
+def test_prompt_validate_error_message():
+    INPUT = "foo\ny"
+    console = Console(file=io.StringIO())
+    answer = Confirm.ask(
+        "continue",
+        console=console,
+        stream=io.StringIO(INPUT),
+        validate_error_message="Entered an invalid choice, try again",
+    )
+    assert answer is True
+    expected = "continue [y/n]: Entered an invalid choice, try again\ncontinue [y/n]: "
+    output = console.file.getvalue()
+    print(repr(output))
+    assert output == expected

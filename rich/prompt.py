@@ -38,6 +38,10 @@ class PromptBase(Generic[PromptType]):
         choices (List[str], optional): A list of valid choices. Defaults to None.
         show_default (bool, optional): Show default in prompt. Defaults to True.
         show_choices (bool, optional): Show choices in prompt. Defaults to True.
+        validate_error_message (str, optional): Message to user upon an invalid input.
+            Defaults to "[prompt.invalid]Please enter a valid value".
+        illegal_choice_message (str, optional): Message to user upon them not selecting a valid choice.
+            Defaults to "[prompt.invalid.choice]Please select one of the available options".
     """
 
     response_type: type = str
@@ -59,7 +63,11 @@ class PromptBase(Generic[PromptType]):
         choices: Optional[List[str]] = None,
         show_default: bool = True,
         show_choices: bool = True,
+        validate_error_message: Optional[str] = None,
+        illegal_choice_message: Optional[str] = None,
     ) -> None:
+        if validate_error_message is not None:
+            self.validate_error_message = validate_error_message
         self.console = console or get_console()
         self.prompt = (
             Text.from_markup(prompt, style="prompt")
@@ -69,6 +77,8 @@ class PromptBase(Generic[PromptType]):
         self.password = password
         if choices is not None:
             self.choices = choices
+            if illegal_choice_message is not None:
+                self.illegal_choice_message = illegal_choice_message
         self.show_default = show_default
         self.show_choices = show_choices
 
@@ -85,6 +95,8 @@ class PromptBase(Generic[PromptType]):
         show_choices: bool = True,
         default: DefaultType,
         stream: Optional[TextIO] = None,
+        validate_error_message: Optional[str] = None,
+        illegal_choice_message: Optional[str] = None,
     ) -> Union[DefaultType, PromptType]:
         ...
 
@@ -100,6 +112,8 @@ class PromptBase(Generic[PromptType]):
         show_default: bool = True,
         show_choices: bool = True,
         stream: Optional[TextIO] = None,
+        validate_error_message: Optional[str] = None,
+        illegal_choice_message: Optional[str] = None,
     ) -> PromptType:
         ...
 
@@ -115,6 +129,8 @@ class PromptBase(Generic[PromptType]):
         show_choices: bool = True,
         default: Any = ...,
         stream: Optional[TextIO] = None,
+        validate_error_message: Optional[str] = None,
+        illegal_choice_message: Optional[str] = None,
     ) -> Any:
         """Shortcut to construct and run a prompt loop and return the result.
 
@@ -129,6 +145,10 @@ class PromptBase(Generic[PromptType]):
             show_default (bool, optional): Show default in prompt. Defaults to True.
             show_choices (bool, optional): Show choices in prompt. Defaults to True.
             stream (TextIO, optional): Optional text file open for reading to get input. Defaults to None.
+            validate_error_message (str, optional): Message to user upon an invalid input.
+                Defaults to "[prompt.invalid]Please enter a valid value".
+            illegal_choice_message (str, optional): Message to user upon them not selecting a valid choice.
+                Defaults to "[prompt.invalid.choice]Please select one of the available options".
         """
         _prompt = cls(
             prompt,
@@ -137,6 +157,8 @@ class PromptBase(Generic[PromptType]):
             choices=choices,
             show_default=show_default,
             show_choices=show_choices,
+            validate_error_message=validate_error_message,
+            illegal_choice_message=illegal_choice_message,
         )
         return _prompt(default=default, stream=stream)
 
