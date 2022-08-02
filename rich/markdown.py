@@ -311,12 +311,6 @@ class Link(TextElement):
         self.text = Text(text)
         self.href = href
 
-    def on_child_close(
-        self, context: "MarkdownContext", child: "MarkdownElement"
-    ) -> bool:
-        print(f"Link.on_child_close({child})")
-        return False
-
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
