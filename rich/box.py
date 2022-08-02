@@ -514,4 +514,4 @@ if __name__ == "__main__":  # pragma: no cover
         columns.add_renderable(table)
     console.print(columns)
 
-    # console.save_html("box.html", inline_styles=True)
+    # console.save_svg("box.svg")
