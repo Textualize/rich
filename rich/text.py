@@ -903,7 +903,7 @@ class Text(JupyterMixin):
         """
 
         if not isinstance(text, (str, Text)):
-            raise TypeError("Only str or Text can be appended to Text")
+            raise TypeError(f"Only str or Text can be appended to Text")
 
         if len(text):
             if isinstance(text, str):

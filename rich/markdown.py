@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, Iterable, List, Optional, Type, Union
+from typing import Any, ClassVar, Dict, Iterable, List, Optional, Type, Union, cast
 
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
@@ -255,7 +255,31 @@ class ListElement(MarkdownElement):
             last_number = number + len(self.items)
             for item in self.items:
                 yield from item.render_number(console, options, number, last_number)
-                number += 1
+
+
+class Link(TextElement):
+    @classmethod
+    def create(cls, markdown: "Markdown", token: Any) -> "MarkdownElement":
+        return cls(token.content, token.attrs.get("href"))
+
+    def __init__(self, text: str, href: str):
+        self.text = Text(text)
+        self.href = href
+
+    def on_child_close(
+        self, context: "MarkdownContext", child: "MarkdownElement"
+    ) -> bool:
+        self.text.append(str(child))
+        return False
+
+    def __rich_console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
+        style = Style(underline=True) + console.get_style(
+            "markdown.link_url", default="none"
+        )
+        text = Text.assemble("-", self.text, "-", " (", (self.href, style), ")")
+        yield text
 
 
 class ListItem(TextElement):
@@ -376,6 +400,7 @@ class MarkdownContext:
                 self, Text.assemble(highlight_text, style=self.style_stack.current)
             )
         else:
+            print(f"{self.stack.top}.on_text({text}, {node_type})")
             self.stack.top.on_text(self, text)
 
     def enter_style(self, style_name: Union[str, Style]) -> Style:
@@ -508,29 +533,31 @@ class Markdown(JupyterMixin):
             exiting = token.nesting == -1
             self_closing = token.nesting == 0
 
+            print(node_type)
             if node_type == "text":
+                print(f"text {token.content}")
                 context.on_text(token.content, node_type)
             elif node_type == "hardbreak":
                 context.on_text("\n", node_type)
             elif node_type == "softbreak":
                 context.on_text(" ", node_type)
-            elif tag == "a":
+            elif node_type == "link_open":
+                href = token.attrs.get("href")
                 if entering:
                     link_style = console.get_style("markdown.link", default="none")
                     if self.hyperlinks:
-                        link_style += Style(link=token.attrs.get("href"))
+                        link_style += Style(link=href)
+                    else:
+                        context.stack.push(Link.create(self, token))
                     context.enter_style(link_style)
-                else:
-                    context.leave_style()
-                    if not self.hyperlinks:
-                        context.on_text(" (", node_type)
-                        style = Style(underline=True) + console.get_style(
-                            "markdown.link_url", default="none"
-                        )
-                        context.enter_style(style)
-                        context.on_text(token.attrs.get("href"), node_type)
-                        context.leave_style()
-                        context.on_text(")", node_type)
+            elif node_type == "link_close":
+                if not self.hyperlinks:
+                    element = cast(Link, context.stack.pop())
+                    context.on_text(
+                        "".join((element.text.plain, " (", element.href, ")")), "a"
+                    )
+                    print(f"ELEMENT = {element}")
+                context.leave_style()
             elif (
                 tag in inline_style_tags
                 and node_type != "fence"
