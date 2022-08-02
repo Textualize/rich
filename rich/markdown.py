@@ -118,7 +118,6 @@ class Paragraph(TextElement):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        # self.text gets assigned in on_enter
         self.text.justify = self.justify
         yield self.text
 
