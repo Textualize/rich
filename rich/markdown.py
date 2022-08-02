@@ -242,7 +242,6 @@ class ListElement(MarkdownElement):
     ) -> bool:
         assert isinstance(child, ListItem)
         self.items.append(child)
-        print(f"closing list item child {vars(child)}")
         return False
 
     def __rich_console__(
@@ -397,7 +396,6 @@ class MarkdownContext:
                 self, Text.assemble(highlight_text, style=self.style_stack.current)
             )
         else:
-            print(f"{self.stack.top}.on_text({text}, {node_type})")
             self.stack.top.on_text(self, text)
 
     def enter_style(self, style_name: Union[str, Style]) -> Style:
@@ -529,9 +527,7 @@ class Markdown(JupyterMixin):
             exiting = token.nesting == -1
             self_closing = token.nesting == 0
 
-            print(node_type, token)
             if node_type == "text":
-                print(f"text {token.content}")
                 context.on_text(token.content, node_type)
             elif node_type == "hardbreak":
                 context.on_text("\n", node_type)
@@ -581,7 +577,6 @@ class Markdown(JupyterMixin):
                 else:
                     # If it's a self-closing inline style e.g. `code_inline`
                     style_name = self._get_style_name_for_tag(tag)
-                    print(tag, f"markdown.{style_name}")
                     context.enter_style(f"markdown.{style_name}")
                     if token.content:
                         context.on_text(token.content, node_type)
