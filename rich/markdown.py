@@ -230,7 +230,7 @@ class ListElement(MarkdownElement):
     @classmethod
     def create(cls, markdown: "Markdown", token: Any) -> "ListElement":
         # list_data = node.list_data
-        return cls(token.type, 1)  # TODO: Hardcoded at 1
+        return cls(token.type, token.attrs.get("start", 1))
 
     def __init__(self, list_type: str, list_start: Optional[int]) -> None:
         self.items: List[ListItem] = []
@@ -242,6 +242,7 @@ class ListElement(MarkdownElement):
     ) -> bool:
         assert isinstance(child, ListItem)
         self.items.append(child)
+        print(f"closing list item child {vars(child)}")
         return False
 
     def __rich_console__(
@@ -253,27 +254,10 @@ class ListElement(MarkdownElement):
         else:
             number = 1 if self.list_start is None else self.list_start
             last_number = number + len(self.items)
-            for item in self.items:
-                yield from item.render_number(console, options, number, last_number)
-
-
-class Link(TextElement):
-    @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "MarkdownElement":
-        return cls(token.content, token.attrs.get("href"))
-
-    def __init__(self, text: str, href: str):
-        self.text = Text(text)
-        self.href = href
-
-    def __rich_console__(
-        self, console: "Console", options: "ConsoleOptions"
-    ) -> "RenderResult":
-        style = Style(underline=True) + console.get_style(
-            "markdown.link_url", default="none"
-        )
-        text = Text.assemble("-", self.text, "-", " (", (self.href, style), ")")
-        yield text
+            for index, item in enumerate(self.items):
+                yield from item.render_number(
+                    console, options, number + index, last_number
+                )
 
 
 class ListItem(TextElement):
@@ -318,6 +302,25 @@ class ListItem(TextElement):
             yield numeral if first else padding
             yield from line
             yield new_line
+
+
+class Link(TextElement):
+    @classmethod
+    def create(cls, markdown: "Markdown", token: Any) -> "MarkdownElement":
+        return cls(token.content, token.attrs.get("href"))
+
+    def __init__(self, text: str, href: str):
+        self.text = Text(text)
+        self.href = href
+
+    def __rich_console__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "RenderResult":
+        style = Style(underline=True) + console.get_style(
+            "markdown.link_url", default="none"
+        )
+        text = Text.assemble("-", self.text, "-", " (", (self.href, style), ")")
+        yield text
 
 
 class ImageItem(TextElement):
@@ -526,7 +529,7 @@ class Markdown(JupyterMixin):
             exiting = token.nesting == -1
             self_closing = token.nesting == 0
 
-            print(node_type)
+            print(node_type, token)
             if node_type == "text":
                 print(f"text {token.content}")
                 context.on_text(token.content, node_type)
