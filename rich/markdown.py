@@ -228,7 +228,6 @@ class ListElement(MarkdownElement):
 
     @classmethod
     def create(cls, markdown: "Markdown", token: Any) -> "ListElement":
-        # list_data = node.list_data
         return cls(token.type, token.attrs.get("start", 1))
 
     def __init__(self, list_type: str, list_start: Optional[int]) -> None:
