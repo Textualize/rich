@@ -483,21 +483,6 @@ class Markdown(JupyterMixin):
         new_line = False
         _new_line_segment = Segment.line()
 
-        def handle_self_closing_tag(token: Token) -> Iterable[Segment]:
-            text = token.content
-            if text is not None:
-                element.on_text(context, text)
-
-            should_render = (
-                not context.stack
-                or context.stack
-                and context.stack.top.on_child_close(context, element)
-            )
-            if should_render:
-                if new_line:
-                    yield _new_line_segment
-                yield from console.render(element, context.options)
-
         for token in self._flatten_tokens(tokens):
             node_type = token.type
             tag = token.tag
@@ -580,7 +565,19 @@ class Markdown(JupyterMixin):
                         yield from console.render(element, context.options)
                 elif self_closing:  # SELF-CLOSING tags (e.g. text, code, image)
                     context.stack.pop()
-                    yield from handle_self_closing_tag(token)
+                    text = token.content
+                    if text is not None:
+                        element.on_text(context, text)
+
+                    should_render = (
+                        not context.stack
+                        or context.stack
+                        and context.stack.top.on_child_close(context, element)
+                    )
+                    if should_render:
+                        if new_line:
+                            yield _new_line_segment
+                        yield from console.render(element, context.options)
 
                 if exiting or self_closing:
                     element.on_leave(context)
