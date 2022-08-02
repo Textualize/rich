@@ -390,7 +390,7 @@ class MarkdownContext:
 
     def on_text(self, text: str, node_type: str) -> None:
         """Called when the parser visits text."""
-        if node_type in {"fence"} and self._syntax is not None:
+        if node_type in {"fence", "code_inline"} and self._syntax is not None:
             highlight_text = self._syntax.highlight(text)
             highlight_text.rstrip()
             self.stack.top.on_text(
