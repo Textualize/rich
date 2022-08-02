@@ -19,15 +19,14 @@ from .text import Text, TextType
 
 class MarkdownElement:
     new_line: ClassVar[bool] = True
-    hidden: ClassVar[bool] = False
 
     @classmethod
-    def create(cls, markdown: "Markdown", node: Any) -> "MarkdownElement":
+    def create(cls, markdown: "Markdown", token: Any) -> "MarkdownElement":
         """Factory to create markdown element,
 
         Args:
             markdown (Markdown): The parent Markdown object.
-            node (Any): A node from Pygments.
+            token (Any): A node from markdown-it.
 
         Returns:
             MarkdownElement: A new markdown element
@@ -109,7 +108,7 @@ class Paragraph(TextElement):
     justify: JustifyMethod
 
     @classmethod
-    def create(cls, markdown: "Markdown", node: MarkdownElement) -> "Paragraph":
+    def create(cls, markdown: "Markdown", token: MarkdownElement) -> "Paragraph":
         return cls(justify=markdown.justify or "left")
 
     def __init__(self, justify: JustifyMethod) -> None:
@@ -163,8 +162,8 @@ class CodeBlock(TextElement):
     style_name = "markdown.code_block"
 
     @classmethod
-    def create(cls, markdown: "Markdown", node: Any) -> "CodeBlock":
-        node_info = node.info or ""
+    def create(cls, markdown: "Markdown", token: Any) -> "CodeBlock":
+        node_info = token.info or ""
         lexer_name = node_info.partition(" ")[0]
         return cls(lexer_name or "default", markdown.code_theme)
 
@@ -308,15 +307,6 @@ class Link(TextElement):
     def __init__(self, text: str, href: str):
         self.text = Text(text)
         self.href = href
-
-    def __rich_console__(
-        self, console: "Console", options: "ConsoleOptions"
-    ) -> "RenderResult":
-        style = Style(underline=True) + console.get_style(
-            "markdown.link_url", default="none"
-        )
-        text = Text.assemble(self.text, " -(", (self.href, style), ")")
-        yield text
 
 
 class ImageItem(TextElement):
