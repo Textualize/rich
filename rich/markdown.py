@@ -478,11 +478,7 @@ class Markdown(JupyterMixin):
             if token.children and not is_image and not is_fence:
                 yield from self._flatten_tokens(token.children)
             else:
-                # TODO: ???
-                if token.type in {"text"} and not token.content:
-                    continue
-                else:
-                    yield token
+                yield token
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
