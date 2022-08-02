@@ -140,7 +140,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "markdown.text": Style(),
     "markdown.emph": Style(italic=True),
     "markdown.strong": Style(bold=True),
-    "markdown.code": Style(bgcolor="black", color="bright_white"),
+    "markdown.code": Style(bold=True, color="cyan", bgcolor="black"),
     "markdown.code_block": Style(dim=True, color="cyan", bgcolor="black"),
     "markdown.block_quote": Style(color="magenta"),
     "markdown.list": Style(color="cyan"),

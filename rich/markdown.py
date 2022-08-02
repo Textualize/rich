@@ -387,7 +387,7 @@ class MarkdownContext:
 
     def on_text(self, text: str, node_type: str) -> None:
         """Called when the parser visits text."""
-        if node_type in {"fence", "code_inline"} and self._syntax is not None:
+        if node_type in {"fence"} and self._syntax is not None:
             highlight_text = self._syntax.highlight(text)
             highlight_text.rstrip()
             self.stack.top.on_text(
@@ -440,7 +440,6 @@ class Markdown(JupyterMixin):
     # Maps tag names to Rich style keys, if tag and key differ
     tag_to_style_name = {
         "em": "emph",
-        "code": "code_block",
     }
 
     inlines = {"em", "strong", "code", "strike"}
@@ -549,6 +548,11 @@ class Markdown(JupyterMixin):
                     context.leave_style()
                 else:
                     element = cast(Link, context.stack.pop())
+
+                    # TODO: I want to encapsulate the stuff below into the Link renderable
+                    #  but can't work out how to do it. Do I need to implement on_child_close
+                    #  to have the child `text` tag not render itself, so that the Link handles
+                    #  the rendering of the child text? :shrug:
                     context.enter_style(link_style)
                     context.on_text(element.text.plain, node_type)
                     context.leave_style()
@@ -574,6 +578,7 @@ class Markdown(JupyterMixin):
                 else:
                     # If it's a self-closing inline style e.g. `code_inline`
                     style_name = self._get_style_name_for_tag(tag)
+                    print(tag, f"markdown.{style_name}")
                     context.enter_style(f"markdown.{style_name}")
                     if token.content:
                         context.on_text(token.content, node_type)
