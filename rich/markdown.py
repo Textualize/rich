@@ -537,21 +537,26 @@ class Markdown(JupyterMixin):
                 context.on_text(" ", node_type)
             elif node_type == "link_open":
                 href = token.attrs.get("href")
-                if entering:
-                    link_style = console.get_style("markdown.link", default="none")
-                    if self.hyperlinks:
-                        link_style += Style(link=href)
-                    else:
-                        context.stack.push(Link.create(self, token))
+                link_style = console.get_style("markdown.link", default="none")
+                if self.hyperlinks:
+                    link_style += Style(link=href)
                     context.enter_style(link_style)
+                else:
+                    context.stack.push(Link.create(self, token))
             elif node_type == "link_close":
-                if not self.hyperlinks:
+                link_style = console.get_style("markdown.link", default="none")
+                if self.hyperlinks:
+                    context.leave_style()
+                else:
                     element = cast(Link, context.stack.pop())
-                    context.on_text(
-                        "".join((element.text.plain, " (", element.href, ")")),
-                        node_type,
-                    )
-                context.leave_style()
+                    context.enter_style(link_style)
+                    context.on_text(element.text.plain, node_type)
+                    context.leave_style()
+                    context.on_text(" (", node_type)
+                    context.enter_style(link_style)
+                    context.on_text(element.href, node_type)
+                    context.leave_style()
+                    context.on_text(")", node_type)
             elif (
                 tag in inline_style_tags
                 and node_type != "fence"
