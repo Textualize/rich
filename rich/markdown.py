@@ -266,12 +266,6 @@ class Link(TextElement):
         self.text = Text(text)
         self.href = href
 
-    def on_child_close(
-        self, context: "MarkdownContext", child: "MarkdownElement"
-    ) -> bool:
-        self.text.append(str(child))
-        return False
-
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
@@ -554,9 +548,9 @@ class Markdown(JupyterMixin):
                 if not self.hyperlinks:
                     element = cast(Link, context.stack.pop())
                     context.on_text(
-                        "".join((element.text.plain, " (", element.href, ")")), "a"
+                        "".join((element.text.plain, " (", element.href, ")")),
+                        node_type,
                     )
-                    print(f"ELEMENT = {element}")
                 context.leave_style()
             elif (
                 tag in inline_style_tags
