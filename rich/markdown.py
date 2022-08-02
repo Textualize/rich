@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, Iterable, List, Optional, Type, Union, cast
+from typing import Any, ClassVar, Dict, Iterable, List, Optional, Type, Union
 
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
@@ -18,7 +18,6 @@ from .text import Text, TextType
 
 
 class MarkdownElement:
-
     new_line: ClassVar[bool] = True
     hidden: ClassVar[bool] = False
 
@@ -312,13 +311,19 @@ class Link(TextElement):
         self.text = Text(text)
         self.href = href
 
+    def on_child_close(
+        self, context: "MarkdownContext", child: "MarkdownElement"
+    ) -> bool:
+        print(f"Link.on_child_close({child})")
+        return False
+
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
         style = Style(underline=True) + console.get_style(
             "markdown.link_url", default="none"
         )
-        text = Text.assemble("-", self.text, "-", " (", (self.href, style), ")")
+        text = Text.assemble(self.text, " -(", (self.href, style), ")")
         yield text
 
 
@@ -469,13 +474,11 @@ class Markdown(JupyterMixin):
         return self.tag_to_style_name.get(tag, tag)
 
     def _flatten_tokens(self, tokens: Iterable[Token]) -> Iterable[Token]:
-        """Flattens the token stream"""
+        """Flattens the token stream."""
         for token in tokens:
             is_fence = token.type == "fence"
-            is_image = (
-                token.tag == "img"
-            )  # img tags contain everything we need, without looking at children
-            if token.children and not is_image and not is_fence:
+            is_image = token.tag == "img"
+            if token.children and not (is_image or is_fence):
                 yield from self._flatten_tokens(token.children)
             else:
                 yield token
@@ -498,7 +501,7 @@ class Markdown(JupyterMixin):
         new_line = False
         _new_line_segment = Segment.line()
 
-        def handle_self_closing_tag(token):
+        def handle_self_closing_tag(token: Token) -> Iterable[Segment]:
             text = token.content
             if text is not None:
                 element.on_text(context, text)
@@ -511,9 +514,7 @@ class Markdown(JupyterMixin):
             if should_render:
                 if new_line:
                     yield _new_line_segment
-
-                t = list(console.render(element, context.options))
-                yield from t
+                yield from console.render(element, context.options)
 
         for token in self._flatten_tokens(tokens):
             node_type = token.type
@@ -530,7 +531,7 @@ class Markdown(JupyterMixin):
             elif node_type == "softbreak":
                 context.on_text(" ", node_type)
             elif node_type == "link_open":
-                href = token.attrs.get("href")
+                href = str(token.attrs.get("href", ""))
                 link_style = console.get_style("markdown.link", default="none")
                 if self.hyperlinks:
                     link_style += Style(link=href)
@@ -542,12 +543,9 @@ class Markdown(JupyterMixin):
                 if self.hyperlinks:
                     context.leave_style()
                 else:
-                    element = cast(Link, context.stack.pop())
-
+                    element: Any = context.stack.pop()
                     # TODO: I want to encapsulate the stuff below into the Link renderable
-                    #  but can't work out how to do it. Do I need to implement on_child_close
-                    #  to have the child `text` tag not render itself, so that the Link handles
-                    #  the rendering of the child text? :shrug:
+                    #  but can't work out how to do it.
                     context.enter_style(link_style)
                     context.on_text(element.text.plain, node_type)
                     context.leave_style()
@@ -597,8 +595,7 @@ class Markdown(JupyterMixin):
                     if should_render:
                         if new_line:
                             yield _new_line_segment
-                        t = list(console.render(element, context.options))
-                        yield from t
+                        yield from console.render(element, context.options)
                 elif self_closing:  # SELF-CLOSING tags (e.g. text, code, image)
                     context.stack.pop()
                     yield from handle_self_closing_tag(token)
