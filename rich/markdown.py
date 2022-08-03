@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any, ClassVar, Dict, Iterable, List, Optional, Type, Union
 
 from markdown_it import MarkdownIt
@@ -21,12 +23,12 @@ class MarkdownElement:
     new_line: ClassVar[bool] = True
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "MarkdownElement":
+    def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
         """Factory to create markdown element,
 
         Args:
             markdown (Markdown): The parent Markdown object.
-            token (Any): A node from markdown-it.
+            token (Token): A node from markdown-it.
 
         Returns:
             MarkdownElement: A new markdown element
@@ -108,7 +110,7 @@ class Paragraph(TextElement):
     justify: JustifyMethod
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: MarkdownElement) -> "Paragraph":
+    def create(cls, markdown: "Markdown", token: Token) -> "Paragraph":
         return cls(justify=markdown.justify or "left")
 
     def __init__(self, justify: JustifyMethod) -> None:
@@ -125,7 +127,7 @@ class Heading(TextElement):
     """A heading."""
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "Heading":
+    def create(cls, markdown: "Markdown", token: Token) -> "Heading":
         return cls(token.tag)
 
     def on_enter(self, context: "MarkdownContext") -> None:
@@ -162,7 +164,7 @@ class CodeBlock(TextElement):
     style_name = "markdown.code_block"
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "CodeBlock":
+    def create(cls, markdown: "Markdown", token: Token) -> "CodeBlock":
         node_info = token.info or ""
         lexer_name = node_info.partition(" ")[0]
         return cls(lexer_name or "default", markdown.code_theme)
@@ -225,10 +227,10 @@ class ListElement(MarkdownElement):
     """A list element."""
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "ListElement":
-        return cls(token.type, token.attrs.get("start", 1))
+    def create(cls, markdown: "Markdown", token: Token) -> "ListElement":
+        return cls(token.type, int(token.attrs.get("start", 1)))
 
-    def __init__(self, list_type: str, list_start: Optional[int]) -> None:
+    def __init__(self, list_type: str, list_start: int | None) -> None:
         self.items: List[ListItem] = []
         self.list_type = list_type
         self.list_start = list_start
@@ -301,8 +303,8 @@ class ListItem(TextElement):
 
 class Link(TextElement):
     @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "MarkdownElement":
-        return cls(token.content, token.attrs.get("href"))
+    def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
+        return cls(token.content, str(token.attrs.get("href", "#")))
 
     def __init__(self, text: str, href: str):
         self.text = Text(text)
@@ -315,7 +317,7 @@ class ImageItem(TextElement):
     new_line = False
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "MarkdownElement":
+    def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
         """Factory to create markdown element,
 
         Args:
@@ -325,7 +327,7 @@ class ImageItem(TextElement):
         Returns:
             MarkdownElement: A new markdown element
         """
-        return cls(token.attrs.get("src"), markdown.hyperlinks)
+        return cls(str(token.attrs.get("src", "")), markdown.hyperlinks)
 
     def __init__(self, destination: str, hyperlinks: bool) -> None:
         self.destination = destination
