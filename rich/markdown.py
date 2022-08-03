@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, ClassVar, Dict, Iterable, List, Optional, Type, Union
+from typing import ClassVar, Dict, Iterable, List, Optional, Type, Union
 
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
@@ -504,9 +504,8 @@ class Markdown(JupyterMixin):
                 if self.hyperlinks:
                     context.leave_style()
                 else:
-                    element: Any = context.stack.pop()
-                    # TODO: I want to encapsulate the stuff below into the Link renderable
-                    #  but can't work out how to do it.
+                    element = context.stack.pop()
+                    assert isinstance(element, Link)
                     context.enter_style(link_style)
                     context.on_text(element.text.plain, node_type)
                     context.leave_style()
