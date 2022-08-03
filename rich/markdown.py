@@ -425,11 +425,6 @@ class Markdown(JupyterMixin):
         "image": ImageItem,
     }
 
-    # Maps tag names to Rich style keys, if tag and key differ
-    tag_to_style_name = {
-        "em": "emph",
-    }
-
     inlines = {"em", "strong", "code", "strike"}
 
     def __init__(
@@ -451,9 +446,6 @@ class Markdown(JupyterMixin):
         self.hyperlinks = hyperlinks
         self.inline_code_lexer = inline_code_lexer
         self.inline_code_theme = inline_code_theme or code_theme
-
-    def _get_style_name_for_tag(self, tag: str) -> str:
-        return self.tag_to_style_name.get(tag, tag)
 
     def _flatten_tokens(self, tokens: Iterable[Token]) -> Iterable[Token]:
         """Flattens the token stream."""
@@ -529,16 +521,14 @@ class Markdown(JupyterMixin):
                 if entering:
                     # If it's an opening inline token e.g. strong, em, etc.
                     # Then we move into a style context i.e. push to stack.
-                    style_name = self._get_style_name_for_tag(tag)
-                    context.enter_style(f"markdown.{style_name}")
+                    context.enter_style(f"markdown.{tag}")
                 elif exiting:
                     # If it's a closing inline style, then we pop the style
                     # off of the stack, to move out of the context of it...
                     context.leave_style()
                 else:
                     # If it's a self-closing inline style e.g. `code_inline`
-                    style_name = self._get_style_name_for_tag(tag)
-                    context.enter_style(f"markdown.{style_name}")
+                    context.enter_style(f"markdown.{tag}")
                     if token.content:
                         context.on_text(token.content, node_type)
                     context.leave_style()
