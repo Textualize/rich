@@ -2,9 +2,10 @@
 
 from rich.text_transform import TextTransform, Upper, Lower, SwapCase
 from rich.console        import Console
+from rich.panel          import Panel
 
-def _as_text( to_test: TextTransform ) -> str:
-    return "".join( segment.text for segment in Console().render( to_test ) ).strip()
+def _as_text( to_test: TextTransform, **console ) -> str:
+    return "".join( segment.text for segment in Console( **console ).render( to_test ) ).strip()
 
 PLAIN_TEXT = "Wait a minute – it's you! The man from Maybury Hill!"
 
