@@ -8,7 +8,7 @@ from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .segment import Segment
 
 class TextTransform:
-    """A console renderable that transform text found in its contents.
+    """A console renderable that transforms text found in its contents.
 
     Example:
         >>> console.print( TextTransform( Panel( "Hello, World!" ), str.upper ) )
