@@ -1,6 +1,8 @@
 from typing import TYPE_CHECKING, Iterable
 
+
 from .jupyter import JupyterMixin
+from .measure import Measurement
 from .segment import Segment
 
 if TYPE_CHECKING:
@@ -13,6 +15,9 @@ class Crosshairs(JupyterMixin):
         self.x = x
         self.y = y
         self.style = style
+
+    def __repr__(self) -> str:
+        return f"Crosshairs({self.x}, {self.y})"
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -61,6 +66,11 @@ class Crosshairs(JupyterMixin):
 
         # Yield all segments below the horizontal cross line.
         yield from vertical_bar_lines(height - 1 - self.y)
+
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "Measurement":
+        return Measurement(self.x, options.max_width)
 
 
 if __name__ == "__main__":
