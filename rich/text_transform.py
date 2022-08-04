@@ -16,6 +16,9 @@ from .segment import Segment
 class TextTransform:
     """A console renderable that transform text found in its contents.
 
+    Example:
+        >>> console.print( TextTransform( Panel( "Hello, World!" ), str.upper ) )
+
     Args:
         renderable (RenderableType): A console renderable object.
         transformer (Callable[[str],str]) A string transformation function to apply to all found text.
@@ -33,6 +36,9 @@ class TextTransform:
 class Upper( TextTransform ):
     """A console renderable that upper-cases all text found in its contents.
 
+    Example:
+        >>> console.print( Upper( Panel( "Hello, World!" ) ) )
+
     Args:
         renderable (RenderableType): A console renderable object.
     """
@@ -43,6 +49,9 @@ class Upper( TextTransform ):
 class Lower( TextTransform ):
     """A console renderable that lower-cases all text found in its contents.
 
+    Example:
+        >>> console.print( Lower( Panel( "Hello, World!" ) ) )
+
     Args:
         renderable (RenderableType): A console renderable object.
     """
@@ -52,6 +61,9 @@ class Lower( TextTransform ):
 
 class SwapCase( TextTransform ):
     """A console renderable that swaps the case of all text found in its contents.
+
+    Example:
+        >>> console.print( SwapCase( Panel( "Hello, World!" ) ) )
 
     Args:
         renderable (RenderableType): A console renderable object.
