@@ -26,8 +26,9 @@ class TextTransform:
         self.transformer = transformer
 
     def __rich_console__( self, console: Console, options: ConsoleOptions ) -> RenderResult:
+        del options             # options is unused in here.
         for segment in console.render( self.renderable ):
-            yield Segment( self.transformer( segment.text ), segment.style )
+            yield Segment( self.transformer( segment.text ), segment.style, segment.control )
 
 class Upper( TextTransform ):
     """A console renderable that upper-cases all text found in its contents.
