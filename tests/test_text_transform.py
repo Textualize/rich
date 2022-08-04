@@ -9,7 +9,7 @@ def _as_text( to_test: TextTransform, **console ) -> str:
 
 PLAIN_TEXT = "Wait a minute – it's you! The man from Maybury Hill!"
 
-def test_plain_text():
+def test_plain_text() -> None:
     assert _as_text( Upper( PLAIN_TEXT ) ) == PLAIN_TEXT.upper()
     assert _as_text( Lower( PLAIN_TEXT ) ) == PLAIN_TEXT.lower()
     assert _as_text( SwapCase( PLAIN_TEXT ) ) == PLAIN_TEXT.swapcase()
