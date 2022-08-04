@@ -3,14 +3,24 @@
 from rich.text_transform import TextTransform, Upper, Lower, SwapCase
 from rich.console        import Console
 
-SOURCE_TEXT = "Wait a minute – it's you! The man from Maybury Hill!"
-
 def _as_text( to_test: TextTransform ) -> str:
-    return Console().render_lines( to_test )[ 0 ][ 0 ].text
+    return "".join( segment.text for segment in Console().render( to_test ) ).strip()
 
-def test_basic_text():
-    assert _as_text( Upper( SOURCE_TEXT ) ) == SOURCE_TEXT.upper()
-    assert _as_text( Lower( SOURCE_TEXT ) ) == SOURCE_TEXT.lower()
-    assert _as_text( SwapCase( SOURCE_TEXT ) ) == SOURCE_TEXT.swapcase()
+PLAIN_TEXT = "Wait a minute – it's you! The man from Maybury Hill!"
+
+def test_plain_text():
+    assert _as_text( Upper( PLAIN_TEXT ) ) == PLAIN_TEXT.upper()
+    assert _as_text( Lower( PLAIN_TEXT ) ) == PLAIN_TEXT.lower()
+    assert _as_text( SwapCase( PLAIN_TEXT ) ) == PLAIN_TEXT.swapcase()
+
+COLOUR_TEXT = (
+    "We're looking at a remarkable landscape, littered with different kinds of rocks – "
+    "[red]red[/red], [purple]purple[/purple]"
+)
+
+def test_colour_text() -> None:
+    assert _as_text( Upper( COLOUR_TEXT ) ) == _as_text( COLOUR_TEXT ).upper()
+    assert _as_text( Lower( COLOUR_TEXT ) ) == _as_text( COLOUR_TEXT ).lower()
+    assert _as_text( SwapCase( COLOUR_TEXT ) ) == _as_text( COLOUR_TEXT ).swapcase()
 
 ### test_text_transform.py ends here
