@@ -8,13 +8,13 @@ from rich.crosshairs import Crosshairs
 CROSSHAIRS_DIAGRAMS = """
 0,0
 ┌──
-│
-│
+│  
+│  
 
 1,0
 ─┬─
- │
- │
+ │ 
+ │ 
 
 2,0
 ──┐
@@ -32,20 +32,22 @@ CROSSHAIRS_DIAGRAMS = """
 ──┘
 
 1,2
- │
- │
+ │ 
+ │ 
 ─┴─
 
 0,2
-│
-│
+│  
+│  
 └──
 
 0,1
-│
+│  
 ├──
-│
-""".strip().split("\n\n")
+│  
+""".strip().split(
+    "\n\n"
+)
 
 
 def test_crosshairs():
@@ -56,13 +58,15 @@ def test_crosshairs():
 
 
 def test_crosshairs_edge_cases():
+    """Test crosshairs creation when cross centre is flush with edges or corners."""
+
     console = Console(width=3, height=3)
     for diagram in CROSSHAIRS_DIAGRAMS:
-        # Parse the diagram,
+        # Parse the diagram ...
         coords, output = diagram.split("\n", maxsplit=1)
         x, y = map(int, coords.split(","))
 
-        # and feed it to the test.
+        # and actually run the test.
         console.begin_capture()
         console.print(Crosshairs(x, y))
         assert console.end_capture() == output
