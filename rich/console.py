@@ -2231,25 +2231,27 @@ class Console:
         with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(html)
 
-    def export_svg(
+    def build_svg(
         self,
         *,
         title: str = "Rich",
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
         code_format: str = CONSOLE_SVG_FORMAT,
-    ) -> str:
+    ) -> Tuple[str, int, int]:
         """
         Generate an SVG from the console contents (requires record=True in Console constructor).
 
         Args:
-            path (str): The path to write the SVG to.
             title (str): The title of the tab in the output image
             theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
             code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
                 into the string in order to form the final SVG output. The default template used and the variables
                 injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
+
+        Returns:
+            Tuple[str, int, int]: the SVG code, the width of the SVG, and the height of the SVG
         """
 
         from rich.cells import cell_len
@@ -2455,6 +2457,9 @@ class Console:
             </g>
         """
 
+        svg_width = terminal_width + margin_width
+        svg_height = terminal_height + margin_height
+
         svg = code_format.format(
             unique_id=unique_id,
             char_width=char_width,
@@ -2462,8 +2467,8 @@ class Console:
             line_height=line_height,
             terminal_width=char_width * width - 1,
             terminal_height=(y + 1) * line_height - 1,
-            width=terminal_width + margin_width,
-            height=terminal_height + margin_height,
+            width=svg_width,
+            height=svg_height,
             terminal_x=margin_left + padding_left,
             terminal_y=margin_top + padding_top,
             styles=styles,
@@ -2471,6 +2476,33 @@ class Console:
             backgrounds=backgrounds,
             matrix=matrix,
             lines=lines,
+        )
+        return svg, svg_width, svg_height
+
+    def export_svg(
+        self,
+        *,
+        title: str = "Rich",
+        theme: Optional[TerminalTheme] = None,
+        clear: bool = True,
+        code_format: str = CONSOLE_SVG_FORMAT,
+    ) -> str:
+        """
+        Generate an SVG from the console contents (requires record=True in Console constructor).
+
+        Args:
+            title (str): The title of the tab in the output image
+            theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
+            code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
+                into the string in order to form the final SVG output. The default template used and the variables
+                injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
+
+        Returns:
+            str: The SVG code
+        """
+        svg, _, _ = self.build_svg(
+            title=title, theme=theme, clear=clear, code_format=code_format
         )
         return svg
 
