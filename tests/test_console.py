@@ -538,18 +538,6 @@ def test_export_svg():
     assert svg == EXPECTED_SVG
 
 
-def test_build_then_export():
-    console = Console(record=True, width=100)
-    console.print(
-        "[b red on blue reverse]foo[/] [blink][link=https://example.org]Click[/link]"
-    )
-    svg, _, _ = console.build_svg()
-    svg = console.export_svg()
-    print(repr(svg))
-
-    assert svg == EXPECTED_SVG
-
-
 def test_save_svg():
     console = Console(record=True, width=100)
     console.print(
