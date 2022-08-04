@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable
 
 from .jupyter import JupyterMixin
 from .segment import Segment
@@ -20,15 +20,19 @@ class Crosshairs(JupyterMixin):
 
         width, height = console.size
         console_style = console.get_style(self.style)
+        new_line = Segment.line()
 
         # First, we build the line that only contains the vertical bar.
         vertical_bar_line = " " * self.x + "│" + " " * (width - self.x - 1)
         vertical_bar_segment = Segment(vertical_bar_line, style=console_style)
 
+        def vertical_bar_lines(count: int) -> Iterable[Segment]:
+            for _ in range(count):
+                yield vertical_bar_segment
+                yield new_line
+
         # Yield all segments above the horizontal cross line.
-        for _ in range(self.y):
-            yield vertical_bar_segment
-            yield Segment.line()
+        yield from vertical_bar_lines(self.y)
 
         # Then, we build the horizontal line by finding what cross centre we need.
         placement = (  # Is the cross centre flush to...
@@ -53,12 +57,10 @@ class Crosshairs(JupyterMixin):
 
         horizontal_bar_line = "─" * self.x + cross_centre + "─" * (width - 1 - self.x)
         yield Segment(horizontal_bar_line, style=console_style)
-        yield Segment.line()
+        yield new_line
 
         # Yield all segments below the horizontal cross line.
-        for _ in range(height - 1 - self.y):
-            yield vertical_bar_segment
-            yield Segment.line()
+        yield from vertical_bar_lines(height - 1 - self.y)
 
 
 if __name__ == "__main__":
