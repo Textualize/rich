@@ -19,6 +19,18 @@ class TextTransform:
     Example:
         >>> console.print( TextTransform( Panel( "Hello, World!" ), str.upper ) )
 
+    Note:
+        This class only really works well if the given transformation
+        function works at the individual character level. While
+        `transformer` can be called with strings that are multiple
+        characters in length, there is no guarantee that logical groupings
+        will be passed during calls to it. As an example of where this would
+        be a problem, attempting to do anything at a word boundary would
+        fail.
+
+        Consider the difference of how `str.upper` works vs
+        `str.capitalize`.
+
     Args:
         renderable (RenderableType): A console renderable object.
         transformer (Callable[[str],str]) A string transformation function to apply to all found text.
