@@ -7,12 +7,6 @@ from typing import Callable
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .segment import Segment
 
-# Experimenting with getting to know the __rich_console__ protocol. Tidying
-# up and documentation and stuff to follow. Also need to remind myself how
-# to type hint a method; as in, what the type hint for "pointer". I type
-# hint "normal" Callables all the time but now I think about it I can't
-# remember the last time I type-hinted an instance method.
-
 class TextTransform:
     """A console renderable that transform text found in its contents.
 
