@@ -26,7 +26,7 @@ def render_scope(
         scope (Mapping): A mapping containing variable names and values.
         title (str, optional): Optional title. Defaults to None.
         sort_keys (bool, optional): Enable sorting of items. Defaults to True.
-        indent_guides (bool, optional): Enable indentaton guides. Defaults to False.
+        indent_guides (bool, optional): Enable indentation guides. Defaults to False.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
