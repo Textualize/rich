@@ -2236,7 +2236,7 @@ class Console:
         *,
         title: str = "Rich",
         theme: Optional[TerminalTheme] = None,
-        clear: bool = True,
+        clear: bool = False,
         code_format: str = CONSOLE_SVG_FORMAT,
     ) -> Tuple[str, int, int]:
         """
@@ -2245,7 +2245,7 @@ class Console:
         Args:
             title (str): The title of the tab in the output image
             theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
-            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
+            clear (bool, optional): Clear record buffer after exporting. Defaults to ``False``
             code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
                 into the string in order to form the final SVG output. The default template used and the variables
                 injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
