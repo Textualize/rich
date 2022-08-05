@@ -81,6 +81,3 @@ class SwapCase(TextTransform):
 
     def __init__(self, renderable: RenderableType) -> None:
         super().__init__(renderable, str.swapcase)
-
-
-### text_transform.py ends here
