@@ -7,6 +7,7 @@ from typing import Callable
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .segment import Segment
 
+
 class TextTransform:
     """A console renderable that transforms text found in its contents.
 
@@ -30,15 +31,22 @@ class TextTransform:
         transformer (Callable[[str],str]) A string transformation function to apply to all found text.
     """
 
-    def __init__( self, renderable: RenderableType, transformer: Callable[ [ str ], str ] ) -> None:
-        self.renderable  = renderable
+    def __init__(
+        self, renderable: RenderableType, transformer: Callable[[str], str]
+    ) -> None:
+        self.renderable = renderable
         self.transformer = transformer
 
-    def __rich_console__( self, console: Console, options: ConsoleOptions ) -> RenderResult:
-        for segment in console.render( self.renderable, options ):
-            yield Segment( self.transformer( segment.text ), segment.style, segment.control )
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
+        for segment in console.render(self.renderable, options):
+            yield Segment(
+                self.transformer(segment.text), segment.style, segment.control
+            )
 
-class Upper( TextTransform ):
+
+class Upper(TextTransform):
     """A console renderable that upper-cases all text found in its contents.
 
     Example:
@@ -48,10 +56,11 @@ class Upper( TextTransform ):
         renderable (RenderableType): A console renderable object.
     """
 
-    def __init__( self, renderable: RenderableType ) -> None:
-        super().__init__( renderable, str.upper )
+    def __init__(self, renderable: RenderableType) -> None:
+        super().__init__(renderable, str.upper)
 
-class Lower( TextTransform ):
+
+class Lower(TextTransform):
     """A console renderable that lower-cases all text found in its contents.
 
     Example:
@@ -61,10 +70,11 @@ class Lower( TextTransform ):
         renderable (RenderableType): A console renderable object.
     """
 
-    def __init__( self, renderable: RenderableType ) -> None:
-        super().__init__( renderable, str.lower )
+    def __init__(self, renderable: RenderableType) -> None:
+        super().__init__(renderable, str.lower)
 
-class SwapCase( TextTransform ):
+
+class SwapCase(TextTransform):
     """A console renderable that swaps the case of all text found in its contents.
 
     Example:
@@ -74,7 +84,8 @@ class SwapCase( TextTransform ):
         renderable (RenderableType): A console renderable object.
     """
 
-    def __init__( self, renderable: RenderableType ) -> None:
-        super().__init__( renderable, str.swapcase )
+    def __init__(self, renderable: RenderableType) -> None:
+        super().__init__(renderable, str.swapcase)
+
 
 ### text_transform.py ends here
