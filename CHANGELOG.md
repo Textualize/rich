@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [12.6.0] - Unreleased
+
+### Added
+
+- Added `text_transform.TextTransform`
+- Added `text_transform.Upper`
+- Added `text_transform.Lower`
+- Added `text_transform.SwapCase`
+
 ## [12.5.2] - 2022-07-18
 
 ### Added
