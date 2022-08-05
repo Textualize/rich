@@ -40,10 +40,8 @@ class TextTransform:
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        for segment in console.render(self.renderable, options):
-            yield Segment(
-                self.transformer(segment.text), segment.style, segment.control
-            )
+        for text, style, control in console.render(self.renderable, options):
+            yield Segment(self.transformer(text), style, control)
 
 
 class Upper(TextTransform):
