@@ -1,9 +1,6 @@
 """Console renderables for transforming text within other console renderables."""
 
-# Python imports.
 from typing import Callable
-
-# Local Rich imports.
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .segment import Segment
 
