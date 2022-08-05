@@ -7,7 +7,8 @@ from rich.panel import Panel
 
 def _as_text(to_test: TextTransform, **console) -> str:
     return "".join(
-        segment.text for segment in Console(**console).render(to_test)
+        segment.text
+        for segment in Console(legacy_windows=False, **console).render(to_test)
     ).strip()
 
 
