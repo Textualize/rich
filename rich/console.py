@@ -2238,7 +2238,7 @@ class Console:
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
         code_format: str = CONSOLE_SVG_FORMAT,
-    ) -> Tuple[str, int, int]:
+    ) -> Tuple[str, float, float]:
         """
         Generate an SVG from the console contents (requires record=True in Console constructor).
 
@@ -2251,7 +2251,7 @@ class Console:
                 injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
 
         Returns:
-            Tuple[str, int, int]: the SVG code, the width of the SVG, and the height of the SVG
+            Tuple[str, float, float]: the SVG code, the width of the SVG, and the height of the SVG
         """
 
         from rich.cells import cell_len
