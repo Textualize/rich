@@ -40,6 +40,3 @@ def test_panel_text() -> None:
     assert _as_text(Upper(Panel(PANEL_TEXT)), width=10) == PANEL_RESULT.upper()
     assert _as_text(Lower(Panel(PANEL_TEXT)), width=10) == PANEL_RESULT.lower()
     assert _as_text(SwapCase(Panel(PANEL_TEXT)), width=10) == PANEL_RESULT.swapcase()
-
-
-### test_text_transform.py ends here
