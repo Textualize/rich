@@ -40,6 +40,7 @@ The following people have contributed to the development of Rich:
 - [Paul Sanders](https://github.com/sanders41)
 - [Tim Savage](https://github.com/timsavage)
 - [Anthony Shaw](https://github.com/tonybaloney)
+- [Rodrigo Girão Serrão](https://github.com/rodrigogiraoserrao)
 - [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Aaron Stephens](https://github.com/aaronst)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
