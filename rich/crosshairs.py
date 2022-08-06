@@ -19,7 +19,7 @@ class Crosshairs(JupyterMixin):
         style (StyleType, optional): Style to render the crosshairs with. Defaults to "".
     """
 
-    def __init__(self, x: int, y: int, style: "StyleType" = ""):
+    def __init__(self, x: int, y: int, style: "StyleType" = "") -> None:
         self.x = x
         self.y = y
         self.style = style
