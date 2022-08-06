@@ -11,13 +11,21 @@ if TYPE_CHECKING:
 
 
 class Crosshairs(JupyterMixin):
+    """Renders a crosshairs that spans the whole console window.
+
+    Args:
+        x (int): The x position of the cross centre.
+        y (int): The y position of the cross centre.
+        style (StyleType, optional): Style to render the crosshairs with. Defaults to "".
+    """
+
     def __init__(self, x: int, y: int, style: "StyleType" = ""):
         self.x = x
         self.y = y
         self.style = style
 
     def __repr__(self) -> str:
-        return f"Crosshairs({self.x}, {self.y})"
+        return f"Crosshairs({self.x}, {self.y}, {self.style!r})"
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
