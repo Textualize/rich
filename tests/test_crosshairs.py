@@ -1,4 +1,5 @@
-from audioop import cross
+import pytest
+
 from rich.console import Console
 from rich.crosshairs import Crosshairs
 
@@ -54,23 +55,21 @@ CROSSHAIRS_DIAGRAMS = """
 
 def test_crosshairs():
     console = Console(width=4, height=3, legacy_windows=False)
-    console.print(Crosshairs(1, 1))
     console.begin_capture()
     console.print(Crosshairs(1, 1))
     assert console.end_capture() == " │  \n─┼──\n │  \n"
 
 
-def test_crosshairs_edge_cases():
+@pytest.mark.parametrize("diagram", CROSSHAIRS_DIAGRAMS)
+def test_crosshairs_edge_cases(diagram):
     """Test crosshairs creation when cross centre is flush with edges or corners."""
 
     console = Console(width=3, height=3, legacy_windows=False)
-    for diagram in CROSSHAIRS_DIAGRAMS:
-        # Parse the diagram ...
-        coords, output = diagram.split("\n", maxsplit=1)
-        x, y = map(int, coords.split(","))
-        # ... add the final newline...
-        output += "\n"
-        # ... and actually run the test.
-        console.begin_capture()
-        console.print(Crosshairs(x, y))
-        assert console.end_capture() == output
+    # Parse the diagram to build crosshairs arguments and expected output.
+    coords, expected_output = diagram.split("\n", maxsplit=1)
+    expected_output += "\n"
+    x, y = map(int, coords.split(","))
+    # ... and actually run the test.
+    console.begin_capture()
+    console.print(Crosshairs(x, y))
+    assert console.end_capture() == expected_output
