@@ -1,15 +1,32 @@
 import re
 from functools import lru_cache
-from typing import Dict, List
+from typing import Callable, List
 
 from ._cell_widths import CELL_WIDTHS
-from ._lru_cache import LRUCache
 
 # Regex to match sequence of the most common character ranges
 _is_single_cell_widths = re.compile("^[\u0020-\u006f\u00a0\u02ff\u0370-\u0482]*$").match
 
 
-def cell_len(text: str, _cache: Dict[str, int] = LRUCache(1024 * 4)) -> int:
+@lru_cache(4096)
+def cached_cell_len(text: str) -> int:
+    """Get the number of cells required to display text.
+
+    This method always caches, which may use up a lot of memory. It is recommended to use
+    `cell_len` over this method.
+
+    Args:
+        text (str): Text to display.
+
+    Returns:
+        int: Get the number of cells required to display text.
+    """
+    _get_size = get_character_cell_size
+    total_size = sum(_get_size(character) for character in text)
+    return total_size
+
+
+def cell_len(text: str, _cell_len: Callable[[str], int] = cached_cell_len) -> int:
     """Get the number of cells required to display text.
 
     Args:
@@ -18,14 +35,10 @@ def cell_len(text: str, _cache: Dict[str, int] = LRUCache(1024 * 4)) -> int:
     Returns:
         int: Get the number of cells required to display text.
     """
-    cached_result = _cache.get(text, None)
-    if cached_result is not None:
-        return cached_result
-
+    if len(text) < 512:
+        return _cell_len(text)
     _get_size = get_character_cell_size
     total_size = sum(_get_size(character) for character in text)
-    if len(text) <= 512:
-        _cache[text] = total_size
     return total_size
 
 
@@ -80,7 +93,7 @@ def set_cell_size(text: str, total: int) -> str:
             return text + " " * (total - size)
         return text[:total]
 
-    if not total:
+    if total <= 0:
         return ""
     cell_size = cell_len(text)
     if cell_size == total:
@@ -109,7 +122,8 @@ def set_cell_size(text: str, total: int) -> str:
 # TODO: This is inefficient
 # TODO: This might not work with CWJ type characters
 def chop_cells(text: str, max_size: int, position: int = 0) -> List[str]:
-    """Break text in to equal (cell) length strings."""
+    """Break text in to equal (cell) length strings, returning the characters in reverse
+    order"""
     _get_character_cell_size = get_character_cell_size
     characters = [
         (character, _get_character_cell_size(character)) for character in text

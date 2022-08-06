@@ -19,12 +19,13 @@ To see how the progress display looks, try this from the command line::
 Basic Usage
 -----------
 
-For basic usage call the :func:`~rich.progress.track` function, which accepts a sequence (such as a list or range object) and an optional description of the job you are working on. The track method will yield values from the sequence and update the progress information on each iteration. Here's an example::
+For basic usage call the :func:`~rich.progress.track` function, which accepts a sequence (such as a list or range object) and an optional description of the job you are working on. The track function will yield values from the sequence and update the progress information on each iteration. Here's an example::
 
+    import time
     from rich.progress import track
 
-    for n in track(range(n), description="Processing..."):
-        do_work(n)
+    for i in track(range(20), description="Processing..."):
+        time.sleep(1)  # Simulate work being done
 
 Advanced usage
 --------------
@@ -104,7 +105,7 @@ You may customize the columns in the progress display with the positional argume
 
 Format strings will be rendered with a single value `"task"` which will be a :class:`~rich.progress.Task` instance. For example ``"{task.description}"`` would display the task description in the column, and ``"{task.completed} of {task.total}"`` would display how many of the total steps have been completed. Additional fields passed via keyword arguments to `~rich.progress.Progress.update` are store in ``task.fields``. You can add them to a format string with the following syntax: ``"extra info: {task.fields[extra]}"``.
 
-The default columns are equivalent to the following:
+The default columns are equivalent to the following::
 
     progress = Progress(
         TextColumn("[progress.description]{task.description}"),

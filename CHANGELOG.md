@@ -5,6 +5,68 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [12.5.2] - 2022-07-18
+
+### Added
+
+- Add Turkish Readme.
+
+## [12.5.1] - 2022-07-11
+
+### Fixed
+
+- Fixed missing typing extensions dependency on 3.9 https://github.com/Textualize/rich/issues/2386
+
+## [12.5.0] - 2022-07-11
+
+### Added
+
+- Environment variables `JUPYTER_COLUMNS` and `JUPYTER_LINES` to control width and height of console in Jupyter
+- Markdown friendly `Box` style, `MARKDOWN`, for rendering tables ready to copy into markdown files
+- `inspect` will prefix coroutine functions with `async def`
+- `Style.__add__` will no longer return `NotImplemented`
+- Remove rich.\_lru_cache
+
+### Changed
+
+- Default width of Jupyter console size is increased to 115
+- Optimized Segment.divide
+
+### Fixed
+
+- Fix Rich clobbering cursor style on Windows https://github.com/Textualize/rich/pull/2339
+- Fix text wrapping edge case https://github.com/Textualize/rich/pull/2296
+- Allow exceptions that are raised while a Live is rendered to be displayed and/or processed https://github.com/Textualize/rich/pull/2305
+- Fix crashes that can happen with `inspect` when docstrings contain some special control codes https://github.com/Textualize/rich/pull/2294
+- Fix edges used in first row of tables when `show_header=False` https://github.com/Textualize/rich/pull/2330
+- Fix interaction between `Capture` contexts and `Console(record=True)` https://github.com/Textualize/rich/pull/2343
+- Fixed hash issue in Styles class https://github.com/Textualize/rich/pull/2346
+- Fixed bug in `Segment.split_and_crop_lines`
+
+## [12.4.4] - 2022-05-24
+
+### Changed
+
+- Added clipping per line to SVG output to avoid box characters overlapping
+- Optimized SVG output
+
+## [12.4.3] - 2022-05-23
+
+### Changed
+
+- Further tweaks to SVG character matrix
+- Added clip rect to SVG to prevent box characters overlapping bottom of terminal
+
+## [12.4.2] - 2022-05-23
+
+### Fixed
+
+- Fix for SVG on Firefox
+
+### Changed
+
+- Removed excess margin from SVG, tweaked cell sizes to better render block characters
+
 ## [12.4.1] - 2022-05-08
 
 ### Fixed
@@ -25,6 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Rebuilt SVG export to create a simpler SVG that is more portable
 - Fix render_lines crash when render height was negative https://github.com/Textualize/rich/pull/2246
+- Make objects from `rich.progress.open` forward the name of the internal handle https://github.com/Textualize/rich/pull/2254
 
 ### Added
 
@@ -1744,7 +1807,9 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[unreleased]: https://github.com/willmcgugan/rich/compare/v12.4.1...HEAD
+[unreleased]: https://github.com/willmcgugan/rich/compare/v12.4.3...HEAD
+[12.4.1]: https://github.com/willmcgugan/rich/compare/v12.4.2...v12.4.3
+[12.4.1]: https://github.com/willmcgugan/rich/compare/v12.4.1...v12.4.2
 [12.4.1]: https://github.com/willmcgugan/rich/compare/v12.4.0...v12.4.1
 [12.4.0]: https://github.com/willmcgugan/rich/compare/v12.3.0...v12.4.0
 [12.3.0]: https://github.com/willmcgugan/rich/compare/v12.2.0...v12.3.0

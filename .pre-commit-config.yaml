@@ -1,5 +1,6 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+exclude: benchmarks/
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
@@ -14,7 +15,6 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: mixed-line-ending
-      - id: trailing-whitespace
       - id: check-vcs-permalinks
       - id: check-shebang-scripts-are-executable
   - repo: https://github.com/pre-commit/pygrep-hooks
@@ -31,7 +31,7 @@ repos:
       - id: pycln
         args: [--all]
   - repo: https://github.com/psf/black
-    rev: 22.1.0
+    rev: 22.3.0
     hooks:
       - id: black
         exclude: ^benchmarks/

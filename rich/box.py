@@ -88,6 +88,16 @@ class Box:
             box = ASCII
         return box
 
+    def get_plain_headed_box(self) -> "Box":
+        """If this box uses special characters for the borders of the header, then
+        return the equivalent box that does not.
+
+        Returns:
+            Box: The most similar Box that doesn't use header-specific box characters.
+                If the current Box already satisfies this criterion, then it's returned.
+        """
+        return PLAIN_HEADED_SUBSTITUTIONS.get(self, self)
+
     def get_top(self, widths: Iterable[int]) -> str:
         """Get the top of a simple box.
 
@@ -419,6 +429,20 @@ DOUBLE_EDGE: Box = Box(
 """
 )
 
+MARKDOWN: Box = Box(
+    """\
+    
+| ||
+|-||
+| ||
+|-||
+|-||
+| ||
+    
+""",
+    ascii=True,
+)
+
 # Map Boxes that don't render with raster fonts on to equivalent that do
 LEGACY_WINDOWS_SUBSTITUTIONS = {
     ROUNDED: SQUARE,
@@ -427,6 +451,15 @@ LEGACY_WINDOWS_SUBSTITUTIONS = {
     HEAVY: SQUARE,
     HEAVY_EDGE: SQUARE,
     HEAVY_HEAD: SQUARE,
+}
+
+# Map headed boxes to their headerless equivalents
+PLAIN_HEADED_SUBSTITUTIONS = {
+    HEAVY_HEAD: SQUARE,
+    SQUARE_DOUBLE_HEAD: SQUARE,
+    MINIMAL_DOUBLE_HEAD: MINIMAL,
+    MINIMAL_HEAVY_HEAD: MINIMAL,
+    ASCII_DOUBLE_HEAD: ASCII2,
 }
 
 
@@ -461,6 +494,7 @@ if __name__ == "__main__":  # pragma: no cover
         "HEAVY_HEAD",
         "DOUBLE",
         "DOUBLE_EDGE",
+        "MARKDOWN",
     ]
 
     console.print(Panel("[bold green]Box Constants", style="green"), justify="center")
@@ -480,4 +514,4 @@ if __name__ == "__main__":  # pragma: no cover
         columns.add_renderable(table)
     console.print(columns)
 
-    # console.save_html("box.html", inline_styles=True)
+    # console.save_svg("box.svg")

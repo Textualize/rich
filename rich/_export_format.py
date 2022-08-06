@@ -50,17 +50,26 @@ CONSOLE_SVG_FORMAT = """\
 
     .{unique_id}-title {{
         font-size: 18px;
-
         font-weight: bold;
         font-family: arial;
     }}
 
     {styles}
     </style>
+
+    <defs>
+    <clipPath id="{unique_id}-clip-terminal">
+      <rect x="0" y="0" width="{terminal_width}" height="{terminal_height}" />
+    </clipPath>
+    {lines}
+    </defs>
+
     {chrome}
-    <g transform="translate({terminal_x}, {terminal_y})">
+    <g transform="translate({terminal_x}, {terminal_y})" clip-path="url(#{unique_id}-clip-terminal)">
     {backgrounds}
-    <text alignment-baseline="baseline" class="{unique_id}-matrix" font-variant="east-asian-width-values">{matrix}</text>
+    <g class="{unique_id}-matrix">
+    {matrix}
+    </g>
     </g>
 </svg>
 """

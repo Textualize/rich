@@ -1,7 +1,7 @@
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/rich/10.11.0)](https://pypi.org/project/rich/) [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
 
 [![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich)
-[![codecov](https://codecov.io/gh/willmcgugan/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/willmcgugan/rich)
+[![codecov](https://codecov.io/gh/Textualize/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/Textualize/rich)
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
@@ -21,14 +21,16 @@
  • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
  • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
  • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
+  • [فارسی readme](https://github.com/willmcgugan/rich/blob/master/README.fa.md)
+ • [Türkçe readme](https://github.com/willmcgugan/rich/blob/master/README.tr.md)
 
-Rich это Python библиотека позволяющая отображать _красивый_ текст и форматировать терминал.
+Rich это Python библиотека, позволяющая отображать _красивый_ текст и форматировать терминал.
 
 [Rich API](https://rich.readthedocs.io/en/latest/) упрощает добавление цветов и стилей к выводу терминала. Rich также позволяет отображать красивые таблицы, прогресс бары, markdown, код с отображением синтаксиса, ошибки, и т.д. — прямо после установки.
 
 ![Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
 
-Для видео инструкции смотрите [calmcode.io](https://calmcode.io/rich/introduction.html) от [@fishnets88](https://twitter.com/fishnets88).
+Для видеоинструкции смотрите [calmcode.io](https://calmcode.io/rich/introduction.html) от [@fishnets88](https://twitter.com/fishnets88).
 
 Посмотрите [что люди думают о Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
@@ -46,7 +48,7 @@ Rich работает с [Jupyter notebooks](https://jupyter.org/) без доп
 python -m pip install rich
 ```
 
-Запустите следующею команду чтобы проверить Rich вывод в вашем терминале:
+Запустите следующую команду, чтобы проверить Rich вывод в вашем терминале:
 
 ```sh
 python -m rich

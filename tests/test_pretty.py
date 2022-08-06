@@ -5,6 +5,7 @@ from array import array
 from collections import UserDict, defaultdict
 from dataclasses import dataclass, field
 from typing import List, NamedTuple
+from unittest.mock import patch
 
 import attr
 import pytest
@@ -34,6 +35,10 @@ skip_py39 = pytest.mark.skipif(
 skip_py310 = pytest.mark.skipif(
     sys.version_info.minor == 10 and sys.version_info.major == 3,
     reason="rendered differently on py3.10",
+)
+skip_py311 = pytest.mark.skipif(
+    sys.version_info.minor == 11 and sys.version_info.major == 3,
+    reason="rendered differently on py3.11",
 )
 
 
@@ -123,6 +128,22 @@ def test_ipy_display_hook__console_renderables_on_newline():
     console.begin_capture()
     _ipy_display_hook(Text("hello"), console=console)
     assert console.end_capture() == "\nhello\n"
+
+
+def test_ipy_display_hook__classes_to_not_render():
+    console = Console(file=io.StringIO(), force_jupyter=True)
+    console.begin_capture()
+
+    class Thing:
+        def __repr__(self) -> str:
+            return "hello"
+
+    class_fully_qualified_name = f"{__name__}.{Thing.__qualname__}"
+    with patch(
+        "rich.pretty.JUPYTER_CLASSES_TO_NOT_RENDER", {class_fully_qualified_name}
+    ):
+        _ipy_display_hook(Thing(), console=console)
+    assert console.end_capture() == ""
 
 
 def test_pretty():
@@ -476,6 +497,7 @@ def test_attrs_empty():
 
 @skip_py36
 @skip_py310
+@skip_py311
 def test_attrs_broken():
     @attr.define
     class Foo:

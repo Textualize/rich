@@ -72,6 +72,8 @@ if TYPE_CHECKING:
     from .live import Live
     from .status import Status
 
+JUPYTER_DEFAULT_COLUMNS = 115
+JUPYTER_DEFAULT_LINES = 100
 WINDOWS = platform.system() == "Windows"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
@@ -656,12 +658,19 @@ class Console:
 
         self.is_jupyter = _is_jupyter() if force_jupyter is None else force_jupyter
         if self.is_jupyter:
-            width = width or 93
-            height = height or 100
+            if width is None:
+                jupyter_columns = self._environ.get("JUPYTER_COLUMNS")
+                if jupyter_columns is not None and jupyter_columns.isdigit():
+                    width = int(jupyter_columns)
+                else:
+                    width = JUPYTER_DEFAULT_COLUMNS
+            if height is None:
+                jupyter_lines = self._environ.get("JUPYTER_LINES")
+                if jupyter_lines is not None and jupyter_lines.isdigit():
+                    height = int(jupyter_lines)
+                else:
+                    height = JUPYTER_DEFAULT_LINES
 
-        self.soft_wrap = soft_wrap
-        self._width = width
-        self._height = height
         self.tab_size = tab_size
         self.record = record
         self._markup = markup
@@ -673,6 +682,7 @@ class Console:
             if legacy_windows is None
             else legacy_windows
         )
+
         if width is None:
             columns = self._environ.get("COLUMNS")
             if columns is not None and columns.isdigit():
@@ -1339,6 +1349,7 @@ class Console:
                         render_options.max_width,
                         include_new_lines=new_lines,
                         pad=pad,
+                        style=style,
                     ),
                     None,
                     render_height,
@@ -1959,11 +1970,11 @@ class Console:
             del self._buffer[:]
             return
         with self._lock:
-            if self._buffer_index == 0:
+            if self.record:
+                with self._record_buffer_lock:
+                    self._record_buffer.extend(self._buffer[:])
 
-                if self.record:
-                    with self._record_buffer_lock:
-                        self._record_buffer.extend(self._buffer[:])
+            if self._buffer_index == 0:
 
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
@@ -2282,18 +2293,18 @@ class Console:
 
         width = self.width
         char_height = 20
-        char_width = char_height * 0.62
-        line_height = char_height * 1.32
+        char_width = char_height * 0.61
+        line_height = char_height * 1.22
 
-        margin_top = 20
-        margin_right = 16
-        margin_bottom = 20
-        margin_left = 16
+        margin_top = 1
+        margin_right = 1
+        margin_bottom = 1
+        margin_left = 1
 
         padding_top = 40
-        padding_right = 12
-        padding_bottom = 12
-        padding_left = 12
+        padding_right = 8
+        padding_bottom = 8
+        padding_left = 8
 
         padding_width = padding_left + padding_right
         padding_height = padding_top + padding_bottom
@@ -2330,11 +2341,7 @@ class Console:
             )
 
         with self._record_buffer_lock:
-            segments = list(
-                Segment.filter_control(
-                    Segment.simplify(self._record_buffer),
-                )
-            )
+            segments = list(Segment.filter_control(self._record_buffer))
             if clear:
                 self._record_buffer.clear()
 
@@ -2380,22 +2387,34 @@ class Console:
                             "rect",
                             fill=background,
                             x=x * char_width,
-                            y=y * line_height,
-                            width=char_width * text_length + 1,
-                            height=line_height + 1,
+                            y=y * line_height + 1.5,
+                            width=char_width * text_length,
+                            height=line_height + 0.25,
+                            shape_rendering="crispEdges",
                         )
                     )
-                text_group.append(
-                    make_tag(
-                        "tspan",
-                        escape_text(text),
-                        _class=f"{unique_id}-{class_name}",
-                        x=x * char_width,
-                        y=y * line_height + char_height,
-                        textLength=char_width * len(text),
+
+                if text != " " * len(text):
+                    text_group.append(
+                        make_tag(
+                            "text",
+                            escape_text(text),
+                            _class=f"{unique_id}-{class_name}",
+                            x=x * char_width,
+                            y=y * line_height + char_height,
+                            textLength=char_width * len(text),
+                            clip_path=f"url(#{unique_id}-line-{y})",
+                        )
                     )
-                )
                 x += cell_len(text)
+
+        line_offsets = [line_no * line_height + 1.5 for line_no in range(y)]
+        lines = "\n".join(
+            f"""<clipPath id="{unique_id}-line-{line_no}">
+    {make_tag("rect", x=0, y=offset, width=char_width * width, height=line_height + 0.25)}
+            </clipPath>"""
+            for line_no, offset in enumerate(line_offsets)
+        )
 
         styles = "\n".join(
             f".{unique_id}-r{rule_no} {{ {css} }}" for css, rule_no in classes.items()
@@ -2414,14 +2433,14 @@ class Console:
             y=margin_top,
             width=terminal_width,
             height=terminal_height,
-            rx=12,
+            rx=8,
         )
 
         title_color = _theme.foreground_color.hex
         if title:
             chrome += make_tag(
                 "text",
-                title,
+                escape_text(title),
                 _class=f"{unique_id}-title",
                 fill=title_color,
                 text_anchor="middle",
@@ -2429,9 +2448,11 @@ class Console:
                 y=margin_top + char_height + 6,
             )
         chrome += f"""
-            <circle cx="40" cy="40" r="7" fill="#ff5f57"/>
-            <circle cx="62" cy="40" r="7" fill="#febc2e"/>
-            <circle cx="84" cy="40" r="7" fill="#28c840"/>
+            <g transform="translate(26,22)">
+            <circle cx="0" cy="0" r="7" fill="#ff5f57"/>
+            <circle cx="22" cy="0" r="7" fill="#febc2e"/>
+            <circle cx="44" cy="0" r="7" fill="#28c840"/>
+            </g>
         """
 
         svg = code_format.format(
@@ -2439,6 +2460,8 @@ class Console:
             char_width=char_width,
             char_height=char_height,
             line_height=line_height,
+            terminal_width=char_width * width - 1,
+            terminal_height=(y + 1) * line_height - 1,
             width=terminal_width + margin_width,
             height=terminal_height + margin_height,
             terminal_x=margin_left + padding_left,
@@ -2447,6 +2470,7 @@ class Console:
             chrome=chrome,
             backgrounds=backgrounds,
             matrix=matrix,
+            lines=lines,
         )
         return svg
 

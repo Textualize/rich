@@ -2,9 +2,10 @@ from __future__ import absolute_import
 
 import inspect
 from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
-from typing import Any, Iterable, Optional, Tuple
+from typing import Any, Collection, Iterable, Optional, Tuple, Type, Union
 
 from .console import Group, RenderableType
+from .control import escape_control_codes
 from .highlighter import ReprHighlighter
 from .jupyter import JupyterMixin
 from .panel import Panel
@@ -17,12 +18,6 @@ def _first_paragraph(doc: str) -> str:
     """Get the first paragraph from a docstring."""
     paragraph, _, _ = doc.partition("\n\n")
     return paragraph
-
-
-def _reformat_doc(doc: str) -> str:
-    """Reformat docstring."""
-    doc = cleandoc(doc).strip()
-    return doc
 
 
 class Inspect(JupyterMixin):
@@ -112,11 +107,13 @@ class Inspect(JupyterMixin):
         # If obj is a module, there may be classes (which are callable) to display
         if inspect.isclass(obj):
             prefix = "class"
+        elif inspect.iscoroutinefunction(obj):
+            prefix = "async def"
         else:
             prefix = "def"
 
         qual_signature = Text.assemble(
-            (f"{prefix} ", f"inspect.{prefix}"),
+            (f"{prefix} ", f"inspect.{prefix.replace(' ', '_')}"),
             (qualname, "inspect.callable"),
             signature_text,
         )
@@ -161,11 +158,9 @@ class Inspect(JupyterMixin):
                 yield ""
 
         if self.docs:
-            _doc = getdoc(obj)
+            _doc = self._get_formatted_doc(obj)
             if _doc is not None:
-                if not self.help:
-                    _doc = _first_paragraph(_doc)
-                doc_text = Text(_reformat_doc(_doc), style="inspect.help")
+                doc_text = Text(_doc, style="inspect.help")
                 doc_text = highlighter(doc_text)
                 yield doc_text
                 yield ""
@@ -200,13 +195,10 @@ class Inspect(JupyterMixin):
                     add_row(key_text, Pretty(value, highlighter=highlighter))
                 else:
                     if self.docs:
-                        docs = getdoc(value)
+                        docs = self._get_formatted_doc(value)
                         if docs is not None:
-                            _doc = _reformat_doc(str(docs))
-                            if not self.help:
-                                _doc = _first_paragraph(_doc)
-                            _signature_text.append("\n" if "\n" in _doc else " ")
-                            doc = highlighter(_doc)
+                            _signature_text.append("\n" if "\n" in docs else " ")
+                            doc = highlighter(docs)
                             doc.stylize("inspect.doc")
                             _signature_text.append(doc)
 
@@ -220,3 +212,59 @@ class Inspect(JupyterMixin):
                 f"[b cyan]{not_shown_count}[/][i] attribute(s) not shown.[/i] "
                 f"Run [b][magenta]inspect[/]([not b]inspect[/])[/b] for options."
             )
+
+    def _get_formatted_doc(self, object_: Any) -> Optional[str]:
+        """
+        Extract the docstring of an object, process it and returns it.
+        The processing consists in cleaning up the doctring's indentation,
+        taking only its 1st paragraph if `self.help` is not True,
+        and escape its control codes.
+
+        Args:
+            object_ (Any): the object to get the docstring from.
+
+        Returns:
+            Optional[str]: the processed docstring, or None if no docstring was found.
+        """
+        docs = getdoc(object_)
+        if docs is None:
+            return None
+        docs = cleandoc(docs).strip()
+        if not self.help:
+            docs = _first_paragraph(docs)
+        return escape_control_codes(docs)
+
+
+def get_object_types_mro(obj: Union[object, Type[Any]]) -> Tuple[type, ...]:
+    """Returns the MRO of an object's class, or of the object itself if it's a class."""
+    if not hasattr(obj, "__mro__"):
+        # N.B. we cannot use `if type(obj) is type` here because it doesn't work with
+        # some types of classes, such as the ones that use abc.ABCMeta.
+        obj = type(obj)
+    return getattr(obj, "__mro__", ())
+
+
+def get_object_types_mro_as_strings(obj: object) -> Collection[str]:
+    """
+    Returns the MRO of an object's class as full qualified names, or of the object itself if it's a class.
+
+    Examples:
+        `object_types_mro_as_strings(JSONDecoder)` will return `['json.decoder.JSONDecoder', 'builtins.object']`
+    """
+    return [
+        f'{getattr(type_, "__module__", "")}.{getattr(type_, "__qualname__", "")}'
+        for type_ in get_object_types_mro(obj)
+    ]
+
+
+def is_object_one_of_types(
+    obj: object, fully_qualified_types_names: Collection[str]
+) -> bool:
+    """
+    Returns `True` if the given object's class (or the object itself, if it's a class) has one of the
+    fully qualified names in its MRO.
+    """
+    for type_name in get_object_types_mro_as_strings(obj):
+        if type_name in fully_qualified_types_names:
+            return True
+    return False
