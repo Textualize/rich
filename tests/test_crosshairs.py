@@ -1,3 +1,5 @@
+import io
+
 import pytest
 
 from rich.console import Console
@@ -73,3 +75,18 @@ def test_crosshairs_edge_cases(diagram):
     console.begin_capture()
     console.print(Crosshairs(x, y))
     assert console.end_capture() == expected_output
+
+
+def test_crosshairs_styling():
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=3,
+        height=3,
+        color_system="truecolor",
+        legacy_windows=False,
+    )
+    console.print(Crosshairs(1, 1, "black on red"))
+    expected = "\x1b[30;41m │ \x1b[0m\n\x1b[30;41m─┼─\x1b[0m\n\x1b[30;41m │ \x1b[0m\n"
+    result = console.file.getvalue()
+    assert result == expected
