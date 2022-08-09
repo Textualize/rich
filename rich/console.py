@@ -1998,7 +1998,7 @@ class Console:
 
                             buffer = self._buffer[:]
                             if self.no_color and self._color_system:
-                                buffer = Segment.remove_color(buffer)
+                                buffer = list(Segment.remove_color(buffer))
 
                             legacy_windows_render(buffer, LegacyWindowsTerm(self.file))
                         else:
