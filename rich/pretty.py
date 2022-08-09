@@ -333,7 +333,7 @@ class Pretty(JupyterMixin):
             max_depth=self.max_depth,
             expand_all=self.expand_all,
         )
-        pretty_text = Text(
+        pretty_text = Text.from_ansi(
             pretty_str,
             justify=self.justify or options.justify,
             overflow=self.overflow or options.overflow,
@@ -1008,3 +1008,9 @@ if __name__ == "__main__":  # pragma: no cover
     from rich import print
 
     print(Pretty(data, indent_guides=True, max_string=20))
+
+    class Thing:
+        def __repr__(self):
+            return "\x1b[38;5;239mHello World!"
+
+    print(Pretty(Thing()))
