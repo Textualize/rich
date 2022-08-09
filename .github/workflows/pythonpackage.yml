@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11.0-beta.4"]
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11.0-beta.5"]
     defaults:
       run:
         shell: bash
@@ -36,12 +36,12 @@ jobs:
           source $VENV
           make typecheck
       - name: Test with pytest (with coverage)
-        if: matrix.python-version != '3.11.0-beta.4'
+        if: matrix.python-version != '3.11.0-beta.5'
         run: |
           source $VENV
           pytest tests -v --cov=./rich --cov-report=xml:./coverage.xml --cov-report term-missing
       - name: Test with pytest (no coverage)
-        if: matrix.python-version == '3.11.0-beta.4'
+        if: matrix.python-version == '3.11.0-beta.5'
         run: |
           source $VENV
           pytest tests -v
