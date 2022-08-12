@@ -5,11 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [12.5.3] - 2022-08-04
+## [Unreleased]
 
 ### Added
 
 - New `Console.build_svg()` to get SVG code and its size, https://github.com/Textualize/rich/issues/2431
+
+### Fixed
+
+- Fix NO_COLOR support on legacy Windows https://github.com/Textualize/rich/pull/2458
 
 ## [12.5.2] - 2022-07-18
 

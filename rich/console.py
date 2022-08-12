@@ -1996,9 +1996,11 @@ class Console:
                             from rich._win32_console import LegacyWindowsTerm
                             from rich._windows_renderer import legacy_windows_render
 
-                            legacy_windows_render(
-                                self._buffer[:], LegacyWindowsTerm(self.file)
-                            )
+                            buffer = self._buffer[:]
+                            if self.no_color and self._color_system:
+                                buffer = list(Segment.remove_color(buffer))
+
+                            legacy_windows_render(buffer, LegacyWindowsTerm(self.file))
                         else:
                             # Either a non-std stream on legacy Windows, or modern Windows.
                             text = self._render_buffer(self._buffer[:])
