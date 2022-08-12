@@ -49,7 +49,7 @@ def test_handler():
                 "│" + (" " * 98) + "│",
             )
             for frame_start in re.finditer(
-                "^│ .+rich/tests/test_traceback\.py:",
+                "^│ .+rich/tests/test_traceback.py:",
                 rendered_exception,
                 flags=re.MULTILINE,
             ):
