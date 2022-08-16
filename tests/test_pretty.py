@@ -266,6 +266,20 @@ def test_small_width():
     assert result == expected
 
 
+def test_ansi_in_pretty_repr():
+    class Hello:
+        def __repr__(self):
+            return "Hello \x1b[38;5;239mWorld!"
+
+    pretty = Pretty(Hello())
+
+    console = Console(file=io.StringIO(), record=True)
+    console.print(pretty)
+    result = console.export_text()
+
+    assert result == "Hello World!\n"
+
+
 @skip_py36
 def test_broken_repr():
     class BrokenRepr:
