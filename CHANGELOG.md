@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for `FORCE_COLOR` env var https://github.com/Textualize/rich/pull/2449
 
+### Fixed
+
+- Fix NO_COLOR support on legacy Windows https://github.com/Textualize/rich/pull/2458
+
 ## [12.5.2] - 2022-07-18
 
 ### Added
