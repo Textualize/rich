@@ -1007,4 +1007,10 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich import print
 
-    print(Pretty(data, indent_guides=True, max_string=20))
+    # print(Pretty(data, indent_guides=True, max_string=20))
+
+    class Thing:
+        def __repr__(self) -> str:
+            return "Hello\x1b[38;5;239m World!"
+
+    print(Pretty(Thing()))

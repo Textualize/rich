@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Parse ANSI escape sequences in pretty repr https://github.com/Textualize/rich/pull/2470
+
 ### Fixed
 
 - Fix NO_COLOR support on legacy Windows https://github.com/Textualize/rich/pull/2458
