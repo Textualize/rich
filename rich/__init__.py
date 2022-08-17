@@ -40,7 +40,8 @@ def reconfigure(*args: Any, **kwargs: Any) -> None:
     """Reconfigures the global console by replacing it with another.
 
     Args:
-        console (Console): Replacement console instance.
+        *args (Any): Positional arguments for the replacement :class:`~rich.console.Console`.
+        **kwargs (Any): Keyword arguments for the replacement :class:`~rich.console.Console`.
     """
     from rich.console import Console
 
