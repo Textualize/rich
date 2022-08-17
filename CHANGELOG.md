@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Parse ANSI escape sequences in pretty repr https://github.com/Textualize/rich/pull/2470
 - Add support for `FORCE_COLOR` env var https://github.com/Textualize/rich/pull/2449
 
 ### Fixed
