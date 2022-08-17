@@ -216,7 +216,7 @@ SPINNERS = {
     },
     "smiley": {"interval": 200, "frames": ["😄 ", "😝 "]},
     "monkey": {"interval": 300, "frames": ["🙈 ", "🙈 ", "🙉 ", "🙊 "]},
-    "hearts": {"interval": 100, "frames": ["💛 ", "💙 ", "💜 ", "💚 ", "❤️ "]},
+    "hearts": {"interval": 100, "frames": ["💛 ", "💙 ", "💜 ", "💚 ", "🤍 "]},
     "clock": {
         "interval": 100,
         "frames": [
