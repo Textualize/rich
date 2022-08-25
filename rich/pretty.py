@@ -676,7 +676,10 @@ def traverse(
                 append = children.append
 
                 if reached_max_depth:
-                    node = Node(value_repr=f"...")
+                    if angular:
+                        node = Node(value_repr=f"<{class_name}...>")
+                    else:
+                        node = Node(value_repr=f"{class_name}(...)")
                 else:
                     if angular:
                         node = Node(
@@ -718,7 +721,7 @@ def traverse(
             attr_fields = _get_attr_fields(obj)
             if attr_fields:
                 if reached_max_depth:
-                    node = Node(value_repr=f"...")
+                    node = Node(value_repr=f"{obj.__class__.__name__}(...)")
                 else:
                     node = Node(
                         open_brace=f"{obj.__class__.__name__}(",
@@ -774,7 +777,7 @@ def traverse(
             children = []
             append = children.append
             if reached_max_depth:
-                node = Node(value_repr=f"...")
+                node = Node(value_repr=f"{obj.__class__.__name__}(...)")
             else:
                 node = Node(
                     open_brace=f"{obj.__class__.__name__}(",
@@ -794,18 +797,21 @@ def traverse(
 
                 pop_visited(obj_id)
         elif _is_namedtuple(obj) and _has_default_namedtuple_repr(obj):
+            class_name = obj.__class__.__name__
             if reached_max_depth:
-                node = Node(value_repr="...")
+                # If we've reached the max depth, we still show the class name, but not its contents
+                node = Node(
+                    value_repr=f"{class_name}(...)",
+                )
             else:
                 children = []
-                class_name = obj.__class__.__name__
+                append = children.append
                 node = Node(
                     open_brace=f"{class_name}(",
                     close_brace=")",
                     children=children,
                     empty=f"{class_name}()",
                 )
-                append = children.append
                 for last, (key, value) in loop_last(obj._asdict().items()):
                     child_node = _traverse(value, depth=depth + 1)
                     child_node.key_repr = key
@@ -827,7 +833,7 @@ def traverse(
             open_brace, close_brace, empty = _BRACES[obj_type](obj)
 
             if reached_max_depth:
-                node = Node(value_repr=f"...", last=root)
+                node = Node(value_repr=f"{open_brace}...{close_brace}")
             elif obj_type.__repr__ != type(obj).__repr__:
                 node = Node(value_repr=to_repr(obj), last=root)
             elif obj:
