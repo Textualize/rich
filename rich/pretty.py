@@ -120,6 +120,7 @@ def _ipy_display_hook(
     indent_guides: bool = False,
     max_length: Optional[int] = None,
     max_string: Optional[int] = None,
+    max_depth: Optional[int] = None,
     expand_all: bool = False,
 ) -> None:
     # needed here to prevent circular import:
@@ -177,6 +178,7 @@ def _ipy_display_hook(
             indent_guides=indent_guides,
             max_length=max_length,
             max_string=max_string,
+            max_depth=max_depth,
             expand_all=expand_all,
             margin=12,
         ),
@@ -202,6 +204,7 @@ def install(
     indent_guides: bool = False,
     max_length: Optional[int] = None,
     max_string: Optional[int] = None,
+    max_depth: Optional[int] = None,
     expand_all: bool = False,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
@@ -214,6 +217,7 @@ def install(
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
+        max_depth (int, optional): Maximum depth of nested data structures, or None for no maximum. Defaults to None.
         expand_all (bool, optional): Expand all containers. Defaults to False.
         max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
     """
@@ -236,6 +240,7 @@ def install(
                     indent_guides=indent_guides,
                     max_length=max_length,
                     max_string=max_string,
+                    max_depth=max_depth,
                     expand_all=expand_all,
                 ),
                 crop=crop,
@@ -258,6 +263,7 @@ def install(
                         indent_guides=indent_guides,
                         max_length=max_length,
                         max_string=max_string,
+                        max_depth=max_depth,
                         expand_all=expand_all,
                     )
                 else:
