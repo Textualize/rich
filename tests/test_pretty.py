@@ -51,6 +51,15 @@ def test_install():
     assert sys.displayhook is not dh
 
 
+def test_install_max_depth():
+    console = Console(file=io.StringIO())
+    dh = sys.displayhook
+    install(console, max_depth=1)
+    sys.displayhook({"foo": {"bar": True}})
+    assert console.file.getvalue() == "{'foo': ...}\n"
+    assert sys.displayhook is not dh
+
+
 def test_ipy_display_hook__repr_html():
     console = Console(file=io.StringIO(), force_jupyter=True)
 
