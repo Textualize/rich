@@ -256,7 +256,7 @@ def test_pretty_namedtuple_fields_invalid_type():
 def test_pretty_namedtuple_max_depth():
     instance = {"unit": StockKeepingUnit("a", "b", 1.0, "c", ["d", "e"])}
     result = pretty_repr(instance, max_depth=1)
-    assert result == "{'unit': ...}"
+    assert result == "{'unit': StockKeepingUnit(...)}"
 
 
 def test_small_width():
@@ -318,13 +318,13 @@ def test_max_depth():
     d = {}
     d["foo"] = {"fob": {"a": [1, 2, 3], "b": {"z": "x", "y": ["a", "b", "c"]}}}
 
-    assert pretty_repr(d, max_depth=0) == "..."
-    assert pretty_repr(d, max_depth=1) == "{'foo': ...}"
-    assert pretty_repr(d, max_depth=2) == "{'foo': {'fob': ...}}"
-    assert pretty_repr(d, max_depth=3) == "{'foo': {'fob': {'a': ..., 'b': ...}}}"
+    assert pretty_repr(d, max_depth=0) == "{...}"
+    assert pretty_repr(d, max_depth=1) == "{'foo': {...}}"
+    assert pretty_repr(d, max_depth=2) == "{'foo': {'fob': {...}}}"
+    assert pretty_repr(d, max_depth=3) == "{'foo': {'fob': {'a': [...], 'b': {...}}}}"
     assert (
         pretty_repr(d, max_width=100, max_depth=4)
-        == "{'foo': {'fob': {'a': [1, 2, 3], 'b': {'z': 'x', 'y': ...}}}}"
+        == "{'foo': {'fob': {'a': [1, 2, 3], 'b': {'z': 'x', 'y': [...]}}}}"
     )
     assert (
         pretty_repr(d, max_width=100, max_depth=5)
@@ -353,7 +353,7 @@ def test_max_depth_rich_repr():
 
     assert (
         pretty_repr(Foo(foo=Bar(bar=Foo(foo=[]))), max_depth=2)
-        == "Foo(foo=Bar(bar=...))"
+        == "Foo(foo=Bar(bar=Foo(...)))"
     )
 
 
@@ -368,7 +368,7 @@ def test_max_depth_attrs():
 
     assert (
         pretty_repr(Foo(foo=Bar(bar=Foo(foo=[]))), max_depth=2)
-        == "Foo(foo=Bar(bar=...))"
+        == "Foo(foo=Bar(bar=Foo(...)))"
     )
 
 
@@ -383,7 +383,7 @@ def test_max_depth_dataclass():
 
     assert (
         pretty_repr(Foo(foo=Bar(bar=Foo(foo=[]))), max_depth=2)
-        == "Foo(foo=Bar(bar=...))"
+        == "Foo(foo=Bar(bar=Foo(...)))"
     )
 
 
