@@ -308,6 +308,17 @@ def test_suppress():
         assert "foo" in traceback.suppress[1]
 
 
+def test_locals_suppress():
+    try:
+        a = [1, 2, 3]
+        1 / 0
+    except Exception:
+        traceback = Traceback(locals_suppress=[int, str])
+        assert traceback.locals_suppress == [int, str]
+        assert traceback.locals_suppress[0] is int
+        assert traceback.locals_suppress[1] is str
+
+
 @pytest.mark.parametrize(
     "rich_traceback_omit_for_level2,expected_frames_length,expected_frame_names",
     (
