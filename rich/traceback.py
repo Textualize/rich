@@ -231,7 +231,11 @@ class Traceback:
                     "Value for 'trace' required if not called in except: block"
                 )
             trace = self.extract(
-                exc_type, exc_value, traceback, show_locals=show_locals, locals_suppress=locals_suppress
+                exc_type,
+                exc_value,
+                traceback,
+                show_locals=show_locals,
+                locals_suppress=locals_suppress,
             )
         self.trace = trace
         self.width = width
@@ -351,7 +355,7 @@ class Traceback:
                 return str(_object)
             except Exception:
                 return "<exception str() failed>"
-               
+
         def clean_values(_object: Any) -> Any:
             if isinstance(_object, tuple(locals_suppress)):
                 return type(_object)
