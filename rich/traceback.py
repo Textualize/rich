@@ -260,6 +260,8 @@ class Traceback:
             self.suppress.append(path)
         self.max_frames = max(4, max_frames) if max_frames > 0 else 0
 
+        self.locals_suppress = locals_suppress
+
     @classmethod
     def from_exception(
         cls,
@@ -301,7 +303,7 @@ class Traceback:
             Traceback: A Traceback instance that may be printed.
         """
         rich_traceback = cls.extract(
-            exc_type, exc_value, traceback, show_locals=show_locals, locals_suppress
+            exc_type, exc_value, traceback, show_locals=show_locals, locals_suppress=locals_suppress,
         )
         return cls(
             rich_traceback,
