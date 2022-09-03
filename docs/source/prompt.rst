@@ -26,7 +26,7 @@ The :class:`~rich.prompt.Confirm` class is a specialized prompt which may be use
     >>> is_rich_great = Confirm.ask("Do you like rich?")
     >>> assert is_rich_great
 
-The Prompt class was designed to be customizable via inheritance. See `prompt.py <https://github.com/willmcgugan/rich/blob/master/rich/prompt.py>`_ for examples.
+The Prompt class was designed to be customizable via inheritance. See `prompt.py <https://github.com/Textualize/rich/blob/master/rich/prompt.py>`_ for examples.
 
 To see some of the prompts in action, run the following command from the command line::
 

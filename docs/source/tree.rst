@@ -41,5 +41,5 @@ If you set ``guide_style`` to bold, Rich will select the thicker variations of u
 Examples
 ~~~~~~~~
 
-For a more practical demonstration, see `tree.py <https://github.com/willmcgugan/rich/blob/master/examples/tree.py>`_ which can generate a tree view of a directory in your hard drive.
+For a more practical demonstration, see `tree.py <https://github.com/Textualize/rich/blob/master/examples/tree.py>`_ which can generate a tree view of a directory in your hard drive.
 

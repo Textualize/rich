@@ -160,6 +160,6 @@ In practice this is rarely a problem because you can display any combination of 
 Examples
 --------
 
-See `table_movie.py <https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py>`_ and
-`top_lite_simulator.py <https://github.com/willmcgugan/rich/blob/master/examples/top_lite_simulator.py>`_
+See `table_movie.py <https://github.com/Textualize/rich/blob/master/examples/table_movie.py>`_ and
+`top_lite_simulator.py <https://github.com/Textualize/rich/blob/master/examples/top_lite_simulator.py>`_
 for deeper examples of live displaying.

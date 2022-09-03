@@ -19,5 +19,5 @@ The following example is a very basic clone of the ``ls`` command in OSX / Linux
         print(columns)
 
 
-See `columns.py <https://github.com/willmcgugan/rich/blob/master/examples/columns.py>`_ for an example which outputs columns containing more than just text. 
+See `columns.py <https://github.com/Textualize/rich/blob/master/examples/columns.py>`_ for an example which outputs columns containing more than just text. 
 

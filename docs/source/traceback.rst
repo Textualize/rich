@@ -23,7 +23,7 @@ The :meth:`~rich.console.Console.print_exception` method will print a traceback 
 
 The ``show_locals=True`` parameter causes Rich to display the value of local variables for each frame of the traceback.
  
-See `exception.py <https://github.com/willmcgugan/rich/blob/master/examples/exception.py>`_ for a larger example.
+See `exception.py <https://github.com/Textualize/rich/blob/master/examples/exception.py>`_ for a larger example.
 
 
 Traceback Handler
@@ -95,4 +95,3 @@ Here's an example of printing a recursive error::
         foo(1)
     except Exception:
         console.print_exception(max_frames=20)
-
