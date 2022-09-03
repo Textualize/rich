@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-Consider posting in https://github.com/willmcgugan/rich/discussions for feedback before raising a feature request.
+Consider posting in https://github.com/Textualize/rich/discussions for feedback before raising a feature request.
 
 Have you checked the issues for a similar suggestions?
 
