@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix NO_COLOR support on legacy Windows https://github.com/Textualize/rich/pull/2458
+- Update links to current repo https://github.com/Textualize/rich/pull/2509
 
 ## [12.5.2] - 2022-07-18
 
