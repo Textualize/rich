@@ -337,7 +337,7 @@ class Traceback:
         from rich import _IMPORT_CWD
 
         def safe_str(_object: Any) -> str:
-            """Don't allow exceptions from __str__ to propegate."""
+            """Don't allow exceptions from __str__ to propagate."""
             try:
                 return str(_object)
             except Exception:
