@@ -95,4 +95,3 @@ Here's an example of printing a recursive error::
         foo(1)
     except Exception:
         console.print_exception(max_frames=20)
-

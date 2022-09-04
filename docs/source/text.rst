@@ -56,5 +56,3 @@ A Text instance may be used in place of a plain string virtually everywhere in t
     from rich.text import Text
     panel = Panel(Text("Hello", justify="right"))
     print(panel)
-
-

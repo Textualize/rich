@@ -42,4 +42,3 @@ Examples
 ~~~~~~~~
 
 For a more practical demonstration, see `tree.py <https://github.com/willmcgugan/rich/blob/master/examples/tree.py>`_ which can generate a tree view of a directory in your hard drive.
-

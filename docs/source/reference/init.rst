@@ -4,4 +4,3 @@ rich
 .. automodule:: rich
     :members:
     
-
