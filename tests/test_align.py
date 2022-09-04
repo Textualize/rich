@@ -2,8 +2,8 @@ import io
 
 import pytest
 
-from rich.console import Console
 from rich.align import Align, VerticalCenter
+from rich.console import Console
 from rich.measure import Measurement
 
 

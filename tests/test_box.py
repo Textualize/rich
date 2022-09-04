@@ -1,7 +1,7 @@
 import pytest
 
-from rich.console import ConsoleOptions, ConsoleDimensions
-from rich.box import ASCII, DOUBLE, ROUNDED, HEAVY, SQUARE
+from rich.box import ASCII, DOUBLE, HEAVY, ROUNDED, SQUARE
+from rich.console import ConsoleDimensions, ConsoleOptions
 
 
 def test_str():

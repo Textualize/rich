@@ -1,9 +1,9 @@
 import pytest
 
-from rich.padding import Padding
 from rich.console import Console, ConsoleDimensions, ConsoleOptions
-from rich.style import Style
+from rich.padding import Padding
 from rich.segment import Segment
+from rich.style import Style
 
 
 def test_repr():

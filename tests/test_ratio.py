@@ -1,5 +1,6 @@
-import pytest
 from typing import NamedTuple, Optional
+
+import pytest
 
 from rich._ratio import ratio_reduce, ratio_resolve
 

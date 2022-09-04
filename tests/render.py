@@ -3,7 +3,6 @@ import re
 
 from rich.console import Console, RenderableType
 
-
 re_link_ids = re.compile(r"id=[\d\.\-]*?;.*?\x1b")
 
 

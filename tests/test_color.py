@@ -1,16 +1,16 @@
+import pytest
+
 from rich.color import (
-    blend_rgb,
-    parse_rgb_hex,
     Color,
     ColorParseError,
     ColorSystem,
-    ColorType,
     ColorTriplet,
+    ColorType,
+    blend_rgb,
+    parse_rgb_hex,
 )
 from rich.style import Style
-from rich.text import Text, Span
-
-import pytest
+from rich.text import Span, Text
 
 
 def test_str() -> None:

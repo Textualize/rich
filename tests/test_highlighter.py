@@ -5,10 +5,10 @@ from typing import List
 import pytest
 
 from rich.highlighter import (
+    ISO8601Highlighter,
     JSONHighlighter,
     NullHighlighter,
     ReprHighlighter,
-    ISO8601Highlighter,
 )
 from rich.text import Span, Text
 

@@ -1,7 +1,7 @@
 from rich.console import Console
 from rich.containers import Lines, Renderables
-from rich.text import Span, Text
 from rich.style import Style
+from rich.text import Span, Text
 
 
 def test_renderables_measure():

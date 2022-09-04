@@ -1,13 +1,13 @@
 from itertools import zip_longest
 from typing import (
-    Iterator,
+    TYPE_CHECKING,
     Iterable,
+    Iterator,
     List,
     Optional,
+    TypeVar,
     Union,
     overload,
-    TypeVar,
-    TYPE_CHECKING,
 )
 
 if TYPE_CHECKING:

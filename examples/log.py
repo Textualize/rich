@@ -3,10 +3,11 @@ A simulation of Rich console logging.
 """
 
 import time
+
 from rich.console import Console
+from rich.highlighter import RegexHighlighter
 from rich.style import Style
 from rich.theme import Theme
-from rich.highlighter import RegexHighlighter
 
 
 class RequestHighlighter(RegexHighlighter):

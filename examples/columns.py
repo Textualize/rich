@@ -7,8 +7,8 @@ The data is pulled from https://randomuser.me
 import json
 from urllib.request import urlopen
 
-from rich.console import Console
 from rich.columns import Columns
+from rich.console import Console
 from rich.panel import Panel
 
 

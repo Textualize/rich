@@ -1,11 +1,10 @@
 import subprocess
-from typing import List, Tuple
 import sys
-
-from rich.progress import Progress
+from typing import List, Tuple
 
 from wcwidth import wcwidth
 
+from rich.progress import Progress
 
 progress = Progress()
 

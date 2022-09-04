@@ -610,8 +610,8 @@ if __name__ == "__main__":  # pragma: no cover
         inline_code_lexer=args.inline_code_lexer,
     )
     if args.page:
-        import pydoc
         import io
+        import pydoc
 
         fileio = io.StringIO()
         console = Console(

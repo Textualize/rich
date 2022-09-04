@@ -1,8 +1,8 @@
 import io
 import re
 
-from rich.console import Console, RenderableType
 from rich.__main__ import make_test_card
+from rich.console import Console, RenderableType
 
 from ._card_render import expected
 

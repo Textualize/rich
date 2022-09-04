@@ -1,10 +1,10 @@
 from time import sleep
 
 from rich.columns import Columns
-from rich.panel import Panel
 from rich.live import Live
+from rich.panel import Panel
+from rich.spinner import SPINNERS, Spinner
 from rich.text import Text
-from rich.spinner import Spinner, SPINNERS
 
 all_spinners = Columns(
     [

@@ -5,7 +5,6 @@ Demonstrates a dynamic Layout
 """
 
 from datetime import datetime
-
 from time import sleep
 
 from rich.align import Align

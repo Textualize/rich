@@ -3,9 +3,9 @@ A rudimentary URL downloader (like wget or curl) to demonstrate Rich progress ba
 """
 
 import os.path
+import signal
 import sys
 from concurrent.futures import ThreadPoolExecutor
-import signal
 from functools import partial
 from threading import Event
 from typing import Iterable

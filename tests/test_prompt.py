@@ -1,7 +1,7 @@
 import io
 
 from rich.console import Console
-from rich.prompt import Prompt, IntPrompt, Confirm
+from rich.prompt import Confirm, IntPrompt, Prompt
 
 
 def test_prompt_str():

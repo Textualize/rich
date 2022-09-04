@@ -10,7 +10,7 @@ from rich.align import Align
 from rich.console import Console, Group
 from rich.layout import Layout
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.syntax import Syntax
 from rich.table import Table
 from rich.text import Text
@@ -170,8 +170,9 @@ layout["box1"].update(Panel(layout.tree, border_style="red"))
 layout["footer"].update(progress_table)
 
 
-from rich.live import Live
 from time import sleep
+
+from rich.live import Live
 
 with Live(layout, refresh_per_second=10, screen=True):
     while not overall_progress.finished:

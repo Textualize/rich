@@ -1,4 +1,4 @@
-from rich._loop import loop_first, loop_last, loop_first_last
+from rich._loop import loop_first, loop_first_last, loop_last
 from rich._ratio import ratio_distribute
 
 

@@ -1,4 +1,5 @@
 from typing import List
+
 from rich.console import Console, OverflowMethod
 
 console = Console(width=14)

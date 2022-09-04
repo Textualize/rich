@@ -1,8 +1,8 @@
-from json import loads, dumps
+from json import dumps, loads
 from typing import Any, Callable, Optional, Union
 
-from .text import Text
 from .highlighter import JSONHighlighter, NullHighlighter
+from .text import Text
 
 
 class JSON:

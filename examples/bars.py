@@ -5,11 +5,10 @@ Use Bar to renderer a sort-of circle.
 """
 import math
 
+from rich import print
 from rich.align import Align
 from rich.bar import Bar
 from rich.color import Color
-from rich import print
-
 
 SIZE = 40
 

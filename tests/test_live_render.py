@@ -1,8 +1,9 @@
 import pytest
-from rich.live_render import LiveRender
+
 from rich.console import Console, ConsoleDimensions, ConsoleOptions
-from rich.style import Style
+from rich.live_render import LiveRender
 from rich.segment import Segment
+from rich.style import Style
 
 
 @pytest.fixture

@@ -75,7 +75,6 @@ import re
 from rich.console import Console, RenderableType
 from rich.markdown import Markdown
 
-
 re_link_ids = re.compile(r"id=[\d\.\-]*?;.*?\x1b")
 
 

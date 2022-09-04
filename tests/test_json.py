@@ -1,5 +1,6 @@
-from rich.json import JSON
 import datetime
+
+from rich.json import JSON
 
 
 def test_print_json_data_with_default():

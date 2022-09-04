@@ -9,8 +9,8 @@ each of which consisting of multiple steps.
 import time
 
 from rich.console import Group
-from rich.panel import Panel
 from rich.live import Live
+from rich.panel import Panel
 from rich.progress import (
     BarColumn,
     Progress,

@@ -1,10 +1,10 @@
-import pytest
 import sys
 from typing import Optional
 
-from rich.console import Console
-import rich.repr
+import pytest
 
+import rich.repr
+from rich.console import Console
 
 skip_py36 = pytest.mark.skipif(
     sys.version_info.minor == 6 and sys.version_info.major == 3,

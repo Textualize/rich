@@ -20,8 +20,8 @@ from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .highlighter import ReprHighlighter
 from .panel import Panel
 from .pretty import Pretty
-from .repr import rich_repr, Result
 from .region import Region
+from .repr import Result, rich_repr
 from .segment import Segment
 from .style import StyleType
 
