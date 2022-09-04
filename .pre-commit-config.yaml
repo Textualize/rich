@@ -17,6 +17,7 @@ repos:
       - id: mixed-line-ending
       - id: check-vcs-permalinks
       - id: check-shebang-scripts-are-executable
+        exclude: setup.py
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.9.0
     hooks:
