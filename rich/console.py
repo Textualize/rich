@@ -708,8 +708,6 @@ class Console:
             else:
                 self._force_terminal = None
 
-        print(self._force_terminal)
-
         self._file = file
         self.quiet = quiet
         self.stderr = stderr
