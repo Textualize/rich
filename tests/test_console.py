@@ -5,6 +5,7 @@ import sys
 import tempfile
 from typing import Optional, Tuple, Type, Union
 from unittest import mock
+from unittest.mock import PropertyMock
 
 import pytest
 
@@ -895,6 +896,19 @@ def test_render_lines_height_minus_vertical_pad_is_negative():
 
     # Ensuring that no exception is raised...
     console.render_lines(Padding("hello", pad=(1, 0)), options=options)
+
+
+def test_no_stdout_file():
+    # Rich should work even if there's no file available to write to.
+    # For example, pythonw nullifies output streams.
+    # Built-in print silently no-ops in pythonw.
+    # Related: https://github.com/Textualize/rich/issues/2400
+    console = Console()
+    with mock.patch.object(
+        Console, "file", new_callable=PropertyMock
+    ) as mock_file_property:
+        mock_file_property.return_value = None
+        console.print("hello world")
 
 
 @mock.patch.dict(os.environ, {"FORCE_COLOR": "anything"})
