@@ -5,7 +5,6 @@ import sys
 import tempfile
 from typing import Optional, Tuple, Type, Union
 from unittest import mock
-from unittest.mock import PropertyMock
 
 import pytest
 
@@ -860,6 +859,7 @@ def test_detect_color_system():
 
 def test_reset_height():
     """Test height is reset when rendering complex renderables."""
+
     # https://github.com/Textualize/rich/issues/2042
     class Panels:
         def __rich_console__(self, console, options):
@@ -898,17 +898,26 @@ def test_render_lines_height_minus_vertical_pad_is_negative():
     console.render_lines(Padding("hello", pad=(1, 0)), options=options)
 
 
-def test_no_stdout_file():
+def test_recording_no_stdout_and_no_stderr_files(monkeypatch):
     # Rich should work even if there's no file available to write to.
     # For example, pythonw nullifies output streams.
     # Built-in print silently no-ops in pythonw.
     # Related: https://github.com/Textualize/rich/issues/2400
+    monkeypatch.setattr("sys.stdout", None)
+    monkeypatch.setattr("sys.stderr", None)
+    console = Console(record=True)
+    console.print("hello world")
+    text = console.export_text()
+    assert text == "hello world\n"
+
+
+def test_capturing_no_stdout_and_no_stderr_files(monkeypatch):
+    monkeypatch.setattr("sys.stdout", None)
+    monkeypatch.setattr("sys.stderr", None)
     console = Console()
-    with mock.patch.object(
-        Console, "file", new_callable=PropertyMock
-    ) as mock_file_property:
-        mock_file_property.return_value = None
+    with console.capture() as capture:
         console.print("hello world")
+    assert capture.get() == "hello world\n"
 
 
 @mock.patch.dict(os.environ, {"FORCE_COLOR": "anything"})

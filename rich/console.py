@@ -1997,7 +1997,8 @@ class Console:
                         if self.legacy_windows:
                             try:
                                 use_legacy_windows_render = (
-                                    self.file.fileno() in _STD_STREAMS_OUTPUT
+                                    self.file is not None
+                                    and self.file.fileno() in _STD_STREAMS_OUTPUT
                                 )
                             except (ValueError, io.UnsupportedOperation):
                                 pass
@@ -2014,23 +2015,26 @@ class Console:
                         else:
                             # Either a non-std stream on legacy Windows, or modern Windows.
                             text = self._render_buffer(self._buffer[:])
-                            # https://bugs.python.org/issue37871
-                            write = self.file.write
-                            for line in text.splitlines(True):
-                                try:
-                                    write(line)
-                                except UnicodeEncodeError as error:
-                                    error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
-                                    raise
+                            if self.file is not None:
+                                # https://bugs.python.org/issue37871
+                                write = self.file.write
+                                for line in text.splitlines(True):
+                                    try:
+                                        write(line)
+                                    except UnicodeEncodeError as error:
+                                        error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
+                                        raise
                     else:
                         text = self._render_buffer(self._buffer[:])
                         try:
-                            self.file.write(text)
+                            if self.file is not None:
+                                self.file.write(text)
                         except UnicodeEncodeError as error:
                             error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
                             raise
 
-                    self.file.flush()
+                    if self.file is not None:
+                        self.file.flush()
                     del self._buffer[:]
 
     def _render_buffer(self, buffer: Iterable[Segment]) -> str:

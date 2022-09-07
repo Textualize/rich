@@ -56,7 +56,7 @@ def test_install_max_depth():
     dh = sys.displayhook
     install(console, max_depth=1)
     sys.displayhook({"foo": {"bar": True}})
-    assert console.file.getvalue() == "{'foo': ...}\n"
+    assert console.file.getvalue() == "{'foo': {...}}\n"
     assert sys.displayhook is not dh
 
 
