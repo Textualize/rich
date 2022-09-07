@@ -34,6 +34,8 @@ from typing import (
     cast,
 )
 
+from rich._null_file import NULL_FILE
+
 if sys.version_info >= (3, 8):
     from typing import Literal, Protocol, runtime_checkable
 else:
@@ -698,15 +700,14 @@ class Console:
 
         self._color_system: Optional[ColorSystem]
 
+        self._force_terminal = None
         if force_terminal is not None:
             self._force_terminal = force_terminal
         else:
             # If FORCE_COLOR env var has any value at all, we force terminal.
-            force_terminal = self._environ.get("FORCE_COLOR")
-            if force_terminal is not None:
-                self._force_terminal = bool(force_terminal)
-            else:
-                self._force_terminal = None
+            force_color = self._environ.get("FORCE_COLOR")
+            if force_color is not None:
+                self._force_terminal = bool(force_color)
 
         self._file = file
         self.quiet = quiet
@@ -756,6 +757,8 @@ class Console:
         """Get the file object to write to."""
         file = self._file or (sys.stderr if self.stderr else sys.stdout)
         file = getattr(file, "rich_proxied_file", file)
+        if file is None:
+            file = NULL_FILE
         return file
 
     @file.setter
@@ -1997,8 +2000,7 @@ class Console:
                         if self.legacy_windows:
                             try:
                                 use_legacy_windows_render = (
-                                    self.file is not None
-                                    and self.file.fileno() in _STD_STREAMS_OUTPUT
+                                    self.file.fileno() in _STD_STREAMS_OUTPUT
                                 )
                             except (ValueError, io.UnsupportedOperation):
                                 pass
@@ -2015,26 +2017,23 @@ class Console:
                         else:
                             # Either a non-std stream on legacy Windows, or modern Windows.
                             text = self._render_buffer(self._buffer[:])
-                            if self.file is not None:
-                                # https://bugs.python.org/issue37871
-                                write = self.file.write
-                                for line in text.splitlines(True):
-                                    try:
-                                        write(line)
-                                    except UnicodeEncodeError as error:
-                                        error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
-                                        raise
+                            # https://bugs.python.org/issue37871
+                            write = self.file.write
+                            for line in text.splitlines(True):
+                                try:
+                                    write(line)
+                                except UnicodeEncodeError as error:
+                                    error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
+                                    raise
                     else:
                         text = self._render_buffer(self._buffer[:])
                         try:
-                            if self.file is not None:
-                                self.file.write(text)
+                            self.file.write(text)
                         except UnicodeEncodeError as error:
                             error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
                             raise
 
-                    if self.file is not None:
-                        self.file.flush()
+                    self.file.flush()
                     del self._buffer[:]
 
     def _render_buffer(self, buffer: Iterable[Segment]) -> str:

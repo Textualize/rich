@@ -5,6 +5,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import ClassVar, Iterable, List, Optional, Type, Union
 
+from rich._null_file import NullFile
+
 from . import get_console
 from ._log_render import FormatTimeCallable, LogRender
 from .console import Console, ConsoleRenderable
@@ -158,13 +160,16 @@ class RichHandler(Handler):
         log_renderable = self.render(
             record=record, traceback=traceback, message_renderable=message_renderable
         )
-        try:
-            if self.console.file is not None:
-                self.console.print(log_renderable)
-            else:
-                self.handleError(record)
-        except Exception:
+        if isinstance(self.console.file, NullFile):
+            # Handles pythonw, where stdout/stderr are null, and we return NullFile
+            # instance from Console.file. In this case, we still want to make a log record
+            # even though we won't be writing anything to a file.
             self.handleError(record)
+        else:
+            try:
+                self.console.print(log_renderable)
+            except Exception:
+                self.handleError(record)
 
     def render_message(self, record: LogRecord, message: str) -> "ConsoleRenderable":
         """Render message text in to Text.
