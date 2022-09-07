@@ -895,3 +895,11 @@ def test_render_lines_height_minus_vertical_pad_is_negative():
 
     # Ensuring that no exception is raised...
     console.render_lines(Padding("hello", pad=(1, 0)), options=options)
+
+
+@mock.patch.dict(os.environ, {"FORCE_COLOR": "anything"})
+def test_force_color():
+    # Even though we use a non-tty file, the presence of FORCE_COLOR env var
+    # means is_terminal returns True.
+    console = Console(file=io.StringIO())
+    assert console.is_terminal

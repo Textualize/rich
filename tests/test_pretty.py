@@ -51,6 +51,15 @@ def test_install():
     assert sys.displayhook is not dh
 
 
+def test_install_max_depth():
+    console = Console(file=io.StringIO())
+    dh = sys.displayhook
+    install(console, max_depth=1)
+    sys.displayhook({"foo": {"bar": True}})
+    assert console.file.getvalue() == "{'foo': ...}\n"
+    assert sys.displayhook is not dh
+
+
 def test_ipy_display_hook__repr_html():
     console = Console(file=io.StringIO(), force_jupyter=True)
 
@@ -256,7 +265,7 @@ def test_pretty_namedtuple_fields_invalid_type():
 def test_pretty_namedtuple_max_depth():
     instance = {"unit": StockKeepingUnit("a", "b", 1.0, "c", ["d", "e"])}
     result = pretty_repr(instance, max_depth=1)
-    assert result == "{'unit': ...}"
+    assert result == "{'unit': StockKeepingUnit(...)}"
 
 
 def test_small_width():
@@ -264,6 +273,20 @@ def test_small_width():
     result = pretty_repr(test, max_width=10)
     expected = "[\n    'Hello world! 12345'\n]"
     assert result == expected
+
+
+def test_ansi_in_pretty_repr():
+    class Hello:
+        def __repr__(self):
+            return "Hello \x1b[38;5;239mWorld!"
+
+    pretty = Pretty(Hello())
+
+    console = Console(file=io.StringIO(), record=True)
+    console.print(pretty)
+    result = console.export_text()
+
+    assert result == "Hello World!\n"
 
 
 @skip_py36
@@ -304,13 +327,13 @@ def test_max_depth():
     d = {}
     d["foo"] = {"fob": {"a": [1, 2, 3], "b": {"z": "x", "y": ["a", "b", "c"]}}}
 
-    assert pretty_repr(d, max_depth=0) == "..."
-    assert pretty_repr(d, max_depth=1) == "{'foo': ...}"
-    assert pretty_repr(d, max_depth=2) == "{'foo': {'fob': ...}}"
-    assert pretty_repr(d, max_depth=3) == "{'foo': {'fob': {'a': ..., 'b': ...}}}"
+    assert pretty_repr(d, max_depth=0) == "{...}"
+    assert pretty_repr(d, max_depth=1) == "{'foo': {...}}"
+    assert pretty_repr(d, max_depth=2) == "{'foo': {'fob': {...}}}"
+    assert pretty_repr(d, max_depth=3) == "{'foo': {'fob': {'a': [...], 'b': {...}}}}"
     assert (
         pretty_repr(d, max_width=100, max_depth=4)
-        == "{'foo': {'fob': {'a': [1, 2, 3], 'b': {'z': 'x', 'y': ...}}}}"
+        == "{'foo': {'fob': {'a': [1, 2, 3], 'b': {'z': 'x', 'y': [...]}}}}"
     )
     assert (
         pretty_repr(d, max_width=100, max_depth=5)
@@ -339,7 +362,7 @@ def test_max_depth_rich_repr():
 
     assert (
         pretty_repr(Foo(foo=Bar(bar=Foo(foo=[]))), max_depth=2)
-        == "Foo(foo=Bar(bar=...))"
+        == "Foo(foo=Bar(bar=Foo(...)))"
     )
 
 
@@ -354,7 +377,7 @@ def test_max_depth_attrs():
 
     assert (
         pretty_repr(Foo(foo=Bar(bar=Foo(foo=[]))), max_depth=2)
-        == "Foo(foo=Bar(bar=...))"
+        == "Foo(foo=Bar(bar=Foo(...)))"
     )
 
 
@@ -369,7 +392,7 @@ def test_max_depth_dataclass():
 
     assert (
         pretty_repr(Foo(foo=Bar(bar=Foo(foo=[]))), max_depth=2)
-        == "Foo(foo=Bar(bar=...))"
+        == "Foo(foo=Bar(bar=Foo(...)))"
     )
 
 

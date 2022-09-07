@@ -120,6 +120,7 @@ def _ipy_display_hook(
     indent_guides: bool = False,
     max_length: Optional[int] = None,
     max_string: Optional[int] = None,
+    max_depth: Optional[int] = None,
     expand_all: bool = False,
 ) -> None:
     # needed here to prevent circular import:
@@ -177,6 +178,7 @@ def _ipy_display_hook(
             indent_guides=indent_guides,
             max_length=max_length,
             max_string=max_string,
+            max_depth=max_depth,
             expand_all=expand_all,
             margin=12,
         ),
@@ -202,6 +204,7 @@ def install(
     indent_guides: bool = False,
     max_length: Optional[int] = None,
     max_string: Optional[int] = None,
+    max_depth: Optional[int] = None,
     expand_all: bool = False,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
@@ -214,6 +217,7 @@ def install(
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
+        max_depth (int, optional): Maximum depth of nested data structures, or None for no maximum. Defaults to None.
         expand_all (bool, optional): Expand all containers. Defaults to False.
         max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
     """
@@ -236,6 +240,7 @@ def install(
                     indent_guides=indent_guides,
                     max_length=max_length,
                     max_string=max_string,
+                    max_depth=max_depth,
                     expand_all=expand_all,
                 ),
                 crop=crop,
@@ -258,6 +263,7 @@ def install(
                         indent_guides=indent_guides,
                         max_length=max_length,
                         max_string=max_string,
+                        max_depth=max_depth,
                         expand_all=expand_all,
                     )
                 else:
@@ -333,7 +339,7 @@ class Pretty(JupyterMixin):
             max_depth=self.max_depth,
             expand_all=self.expand_all,
         )
-        pretty_text = Text(
+        pretty_text = Text.from_ansi(
             pretty_str,
             justify=self.justify or options.justify,
             overflow=self.overflow or options.overflow,
@@ -676,7 +682,10 @@ def traverse(
                 append = children.append
 
                 if reached_max_depth:
-                    node = Node(value_repr=f"...")
+                    if angular:
+                        node = Node(value_repr=f"<{class_name}...>")
+                    else:
+                        node = Node(value_repr=f"{class_name}(...)")
                 else:
                     if angular:
                         node = Node(
@@ -718,7 +727,7 @@ def traverse(
             attr_fields = _get_attr_fields(obj)
             if attr_fields:
                 if reached_max_depth:
-                    node = Node(value_repr=f"...")
+                    node = Node(value_repr=f"{obj.__class__.__name__}(...)")
                 else:
                     node = Node(
                         open_brace=f"{obj.__class__.__name__}(",
@@ -774,7 +783,7 @@ def traverse(
             children = []
             append = children.append
             if reached_max_depth:
-                node = Node(value_repr=f"...")
+                node = Node(value_repr=f"{obj.__class__.__name__}(...)")
             else:
                 node = Node(
                     open_brace=f"{obj.__class__.__name__}(",
@@ -794,18 +803,21 @@ def traverse(
 
                 pop_visited(obj_id)
         elif _is_namedtuple(obj) and _has_default_namedtuple_repr(obj):
+            class_name = obj.__class__.__name__
             if reached_max_depth:
-                node = Node(value_repr="...")
+                # If we've reached the max depth, we still show the class name, but not its contents
+                node = Node(
+                    value_repr=f"{class_name}(...)",
+                )
             else:
                 children = []
-                class_name = obj.__class__.__name__
+                append = children.append
                 node = Node(
                     open_brace=f"{class_name}(",
                     close_brace=")",
                     children=children,
                     empty=f"{class_name}()",
                 )
-                append = children.append
                 for last, (key, value) in loop_last(obj._asdict().items()):
                     child_node = _traverse(value, depth=depth + 1)
                     child_node.key_repr = key
@@ -827,7 +839,7 @@ def traverse(
             open_brace, close_brace, empty = _BRACES[obj_type](obj)
 
             if reached_max_depth:
-                node = Node(value_repr=f"...", last=root)
+                node = Node(value_repr=f"{open_brace}...{close_brace}")
             elif obj_type.__repr__ != type(obj).__repr__:
                 node = Node(value_repr=to_repr(obj), last=root)
             elif obj:
@@ -1007,4 +1019,10 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich import print
 
-    print(Pretty(data, indent_guides=True, max_string=20))
+    # print(Pretty(data, indent_guides=True, max_string=20))
+
+    class Thing:
+        def __repr__(self) -> str:
+            return "Hello\x1b[38;5;239m World!"
+
+    print(Pretty(Thing()))

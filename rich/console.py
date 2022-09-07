@@ -697,7 +697,12 @@ class Console:
         self._height = height
 
         self._color_system: Optional[ColorSystem]
-        self._force_terminal = force_terminal
+
+        if force_terminal is not None:
+            self._force_terminal = force_terminal
+        else:
+            self._force_terminal = self._environ.get("FORCE_COLOR") is not None
+
         self._file = file
         self.quiet = quiet
         self.stderr = stderr
