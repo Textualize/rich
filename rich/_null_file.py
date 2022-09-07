@@ -1,5 +1,5 @@
 from types import TracebackType
-from typing import IO, AnyStr, Iterable, Iterator, Optional, Type
+from typing import IO, AnyStr, Iterable, Iterator, List, Optional, Type
 
 
 class NullFile(IO[str]):
@@ -18,7 +18,7 @@ class NullFile(IO[str]):
     def readline(self, __limit: int = ...) -> AnyStr:
         pass
 
-    def readlines(self, __hint: int = ...) -> list[AnyStr]:
+    def readlines(self, __hint: int = ...) -> List[AnyStr]:
         pass
 
     def seek(self, __offset: int, __whence: int = ...) -> int:
