@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 from types import TracebackType
-from typing import IO, AnyStr, Iterable, Iterator, Type
+from typing import IO, AnyStr, Iterable, Iterator, Optional, Type
 
 
 class NullFile(IO[str]):
@@ -32,7 +30,7 @@ class NullFile(IO[str]):
     def tell(self) -> int:
         pass
 
-    def truncate(self, __size: int | None = ...) -> int:
+    def truncate(self, __size: Optional[int] = ...) -> int:
         pass
 
     def writable(self) -> bool:
@@ -52,9 +50,9 @@ class NullFile(IO[str]):
 
     def __exit__(
         self,
-        __t: Type[BaseException] | None,
-        __value: BaseException | None,
-        __traceback: TracebackType | None,
+        __t: Optional[Type[BaseException]],
+        __value: Optional[BaseException],
+        __traceback: Optional[TracebackType],
     ) -> None:
         pass
 
