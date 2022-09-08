@@ -707,7 +707,7 @@ class Console:
             # If FORCE_COLOR env var has any value at all, we force terminal.
             force_color = self._environ.get("FORCE_COLOR")
             if force_color is not None:
-                self._force_terminal = bool(force_color)
+                self._force_terminal = True
 
         self._file = file
         self.quiet = quiet
