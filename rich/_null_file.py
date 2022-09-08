@@ -3,44 +3,58 @@ from typing import IO, AnyStr, Iterable, Iterator, List, Optional, Type
 
 
 class NullFile(IO[str]):
+
+    # TODO: "mode", "name" and "closed" are only required for Python 3.6.
+
+    @property
+    def mode(self) -> str:
+        return ""
+
+    @property
+    def name(self) -> str:
+        return ""
+
+    def closed(self) -> bool:
+        return False
+
     def close(self) -> None:
         pass
 
     def isatty(self) -> bool:
-        pass
+        return False
 
     def read(self, __n: int = ...) -> AnyStr:
-        pass
+        return ""
 
     def readable(self) -> bool:
-        pass
+        return False
 
     def readline(self, __limit: int = ...) -> AnyStr:
-        pass
+        return ""
 
     def readlines(self, __hint: int = ...) -> List[AnyStr]:
-        pass
+        return []
 
     def seek(self, __offset: int, __whence: int = ...) -> int:
-        pass
+        return 0
 
     def seekable(self) -> bool:
-        pass
+        return False
 
     def tell(self) -> int:
-        pass
+        return 0
 
     def truncate(self, __size: Optional[int] = ...) -> int:
-        pass
+        return 0
 
     def writable(self) -> bool:
-        pass
+        return False
 
     def writelines(self, __lines: Iterable[AnyStr]) -> None:
         pass
 
     def __next__(self) -> AnyStr:
-        pass
+        return ""
 
     def __iter__(self) -> Iterator[AnyStr]:
         pass
@@ -57,7 +71,7 @@ class NullFile(IO[str]):
         pass
 
     def write(self, text: str) -> int:
-        return 1
+        return 0
 
     def flush(self) -> None:
         pass
