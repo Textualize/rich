@@ -9,6 +9,7 @@ from unittest import mock
 import pytest
 
 from rich import errors
+from rich._null_file import NullFile
 from rich.color import ColorSystem
 from rich.console import (
     CaptureError,
@@ -236,6 +237,15 @@ def test_print_json_indent_none():
     result = console.file.getvalue()
     expected = '\x1b[1m{\x1b[0m\x1b[1;34m"name"\x1b[0m: \x1b[32m"apple"\x1b[0m, \x1b[1;34m"count"\x1b[0m: \x1b[1;36m1\x1b[0m\x1b[1m}\x1b[0m\n'
     assert result == expected
+
+
+def test_console_null_file(monkeypatch):
+    # When stdout and stderr are null, Console.file should be replaced with NullFile
+    monkeypatch.setattr("sys.stdout", None)
+    monkeypatch.setattr("sys.stderr", None)
+
+    console = Console()
+    assert isinstance(console.file, NullFile)
 
 
 def test_log():
