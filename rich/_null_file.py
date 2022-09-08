@@ -1,5 +1,5 @@
 from types import TracebackType
-from typing import IO, AnyStr, Iterable, Iterator, List, Optional, Type
+from typing import IO, Iterable, Iterator, List, Optional, Type
 
 
 class NullFile(IO[str]):
@@ -23,19 +23,19 @@ class NullFile(IO[str]):
     def isatty(self) -> bool:
         return False
 
-    def read(self, __n: int = ...) -> AnyStr:
+    def read(self, __n: int = 1) -> str:
         return ""
 
     def readable(self) -> bool:
         return False
 
-    def readline(self, __limit: int = ...) -> AnyStr:
+    def readline(self, __limit: int = 1) -> str:
         return ""
 
-    def readlines(self, __hint: int = ...) -> List[AnyStr]:
+    def readlines(self, __hint: int = 1) -> List[str]:
         return []
 
-    def seek(self, __offset: int, __whence: int = ...) -> int:
+    def seek(self, __offset: int, __whence: int = 1) -> int:
         return 0
 
     def seekable(self) -> bool:
@@ -44,22 +44,22 @@ class NullFile(IO[str]):
     def tell(self) -> int:
         return 0
 
-    def truncate(self, __size: Optional[int] = ...) -> int:
+    def truncate(self, __size: Optional[int] = 1) -> int:
         return 0
 
     def writable(self) -> bool:
         return False
 
-    def writelines(self, __lines: Iterable[AnyStr]) -> None:
+    def writelines(self, __lines: Iterable[str]) -> None:
         pass
 
-    def __next__(self) -> AnyStr:
+    def __next__(self) -> str:
         return ""
 
-    def __iter__(self) -> Iterator[AnyStr]:
+    def __iter__(self) -> Iterator[str]:
         return iter([""])
 
-    def __enter__(self) -> IO[AnyStr]:
+    def __enter__(self) -> IO[str]:
         pass
 
     def __exit__(
