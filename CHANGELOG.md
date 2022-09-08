@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Handle stdout/stderr being null https://github.com/Textualize/rich/pull/2513
 - Fix NO_COLOR support on legacy Windows https://github.com/Textualize/rich/pull/2458
 
 ## [12.5.2] - 2022-07-18
