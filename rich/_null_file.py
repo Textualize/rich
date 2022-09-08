@@ -12,7 +12,7 @@ class NullFile(IO[str]):
 
     @property
     def name(self) -> str:
-        return ""
+        return "NullFile"
 
     def closed(self) -> bool:
         return False
@@ -57,7 +57,7 @@ class NullFile(IO[str]):
         return ""
 
     def __iter__(self) -> Iterator[AnyStr]:
-        pass
+        return iter([""])
 
     def __enter__(self) -> IO[AnyStr]:
         pass
