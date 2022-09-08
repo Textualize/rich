@@ -930,9 +930,9 @@ def test_capturing_no_stdout_and_no_stderr_files(monkeypatch):
     assert capture.get() == "hello world\n"
 
 
-@mock.patch.dict(os.environ, {"FORCE_COLOR": "anything"})
-def test_force_color():
+@pytest.mark.parametrize("env_value", ["", "something", "0"])
+def test_force_color(env_value):
     # Even though we use a non-tty file, the presence of FORCE_COLOR env var
     # means is_terminal returns True.
-    console = Console(file=io.StringIO())
+    console = Console(file=io.StringIO(), _environ={"FORCE_COLOR": env_value})
     assert console.is_terminal
