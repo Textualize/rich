@@ -36,12 +36,17 @@ def get_console() -> "Console":
     return _console
 
 
-def reconfigure(*args: Any, **kwargs: Any) -> None:
+def reconfigure(*args: Any, console: Optional["Console"] = None, **kwargs: Any) -> None:
     """Reconfigures the global console by replacing it with another.
 
     Args:
         console (Console): Replacement console instance.
     """
+    if console is not None:
+        global _console
+        _console = console
+        return
+
     from rich.console import Console
 
     new_console = Console(*args, **kwargs)

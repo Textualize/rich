@@ -5,6 +5,10 @@ import rich
 from rich.console import Console
 
 
+class CustomConsole(Console):
+    pass
+
+
 def test_get_console():
     console = rich.get_console()
     assert isinstance(console, Console)
@@ -13,6 +17,14 @@ def test_get_console():
 def test_reconfigure_console():
     rich.reconfigure(width=100)
     assert rich.get_console().width == 100
+    assert isinstance(rich.get_console(), Console)
+
+
+def test_reconfigure_custom_console():
+    new_console = CustomConsole(width=100)
+    rich.reconfigure(console=new_console)
+    assert rich.get_console().width == 100
+    assert isinstance(rich.get_console(), CustomConsole)
 
 
 def test_rich_print():

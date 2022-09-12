@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Handle stdout/stderr being null https://github.com/Textualize/rich/pull/2513
 - Fix NO_COLOR support on legacy Windows https://github.com/Textualize/rich/pull/2458
+- `rich.reconfigure` accepts `console` argument as was in the documentation but was not implemented
 
 ## [12.5.2] - 2022-07-18
 
