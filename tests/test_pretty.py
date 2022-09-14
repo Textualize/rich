@@ -4,7 +4,7 @@ import sys
 from array import array
 from collections import UserDict, defaultdict
 from dataclasses import dataclass, field
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Any
 from unittest.mock import patch
 
 import attr
@@ -315,12 +315,112 @@ def test_broken_getattr():
     assert result == "BrokenAttr()"
 
 
-def test_recursive():
+def test_reference_cycle_container():
     test = []
     test.append(test)
-    result = pretty_repr(test)
-    expected = "[...]"
-    assert result == expected
+    res = pretty_repr(test)
+    assert res == "[...]"
+
+    test = [1, []]
+    test[1].append(test)
+    res = pretty_repr(test)
+    assert res == "[1, [...]]"
+
+    # Not a cyclic reference, just a repeated reference
+    a = [2]
+    test = [1, [a, a]]
+    res = pretty_repr(test)
+    assert res == "[1, [[2], [2]]]"
+
+
+def test_reference_cycle_namedtuple():
+    class Example(NamedTuple):
+        x: int
+        y: Any
+
+    test = Example(1, [Example(2, [])])
+    test.y[0].y.append(test)
+    res = pretty_repr(test)
+    assert res == "Example(x=1, y=[Example(x=2, y=[...])])"
+
+    # Not a cyclic reference, just a repeated reference
+    a = Example(2, None)
+    test = Example(1, [a, a])
+    res = pretty_repr(test)
+    assert res == "Example(x=1, y=[Example(x=2, y=None), Example(x=2, y=None)])"
+
+
+def test_reference_cycle_dataclass():
+    @dataclass
+    class Example:
+        x: int
+        y: Any
+
+    test = Example(1, None)
+    test.y = test
+    res = pretty_repr(test)
+    assert res == "Example(x=1, y=...)"
+
+    test = Example(1, Example(2, None))
+    test.y.y = test
+    res = pretty_repr(test)
+    assert res == "Example(x=1, y=Example(x=2, y=...))"
+
+    # Not a cyclic reference, just a repeated reference
+    a = Example(2, None)
+    test = Example(1, [a, a])
+    res = pretty_repr(test)
+    assert res == "Example(x=1, y=[Example(x=2, y=None), Example(x=2, y=None)])"
+
+
+def test_reference_cycle_attrs():
+    @attr.define
+    class Example:
+        x: int
+        y: Any
+
+    test = Example(1, None)
+    test.y = test
+    res = pretty_repr(test)
+    assert res == "Example(x=1, y=...)"
+
+    test = Example(1, Example(2, None))
+    test.y.y = test
+    res = pretty_repr(test)
+    assert res == "Example(x=1, y=Example(x=2, y=...))"
+
+    # Not a cyclic reference, just a repeated reference
+    a = Example(2, None)
+    test = Example(1, [a, a])
+    res = pretty_repr(test)
+    assert res == "Example(x=1, y=[Example(x=2, y=None), Example(x=2, y=None)])"
+
+
+def test_reference_cycle_custom_repr():
+    class Example:
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+
+        def __rich_repr__(self):
+            yield ("x", self.x)
+            yield ("y", self.y)
+
+    test = Example(1, None)
+    test.y = test
+    res = pretty_repr(test)
+    assert res == "Example(x=1, y=...)"
+
+    test = Example(1, Example(2, None))
+    test.y.y = test
+    res = pretty_repr(test)
+    assert res == "Example(x=1, y=Example(x=2, y=...))"
+
+    # Not a cyclic reference, just a repeated reference
+    a = Example(2, None)
+    test = Example(1, [a, a])
+    res = pretty_repr(test)
+    assert res == "Example(x=1, y=[Example(x=2, y=None), Example(x=2, y=None)])"
 
 
 def test_max_depth():
