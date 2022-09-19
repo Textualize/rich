@@ -227,10 +227,6 @@ if __name__ == "__main__":  # pragma: no cover
 
     c = Console(record=True)
     c.print(test_card)
-    # c.save_svg(
-    #     path="/Users/darrenburns/Library/Application Support/JetBrains/PyCharm2021.3/scratches/svg_export.svg",
-    #     title="Rich can export to SVG",
-    # )
 
     print(f"rendered in {pre_cache_taken}ms (cold cache)")
     print(f"rendered in {taken}ms (warm cache)")
@@ -246,10 +242,6 @@ if __name__ == "__main__":  # pragma: no cover
     sponsor_message.add_row(
         "Textualize",
         "[u blue link=https://github.com/textualize]https://github.com/textualize",
-    )
-    sponsor_message.add_row(
-        "Buy devs a :coffee:",
-        "[u blue link=https://ko-fi.com/textualize]https://ko-fi.com/textualize",
     )
     sponsor_message.add_row(
         "Twitter",
