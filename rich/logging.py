@@ -3,10 +3,12 @@ from datetime import datetime
 from logging import Handler, LogRecord
 from pathlib import Path
 from types import ModuleType
-from typing import ClassVar, List, Optional, Iterable, Type, Union
+from typing import ClassVar, Iterable, List, Optional, Type, Union
+
+from rich._null_file import NullFile
 
 from . import get_console
-from ._log_render import LogRender, FormatTimeCallable
+from ._log_render import FormatTimeCallable, LogRender
 from .console import Console, ConsoleRenderable
 from .highlighter import Highlighter, ReprHighlighter
 from .text import Text
@@ -158,16 +160,23 @@ class RichHandler(Handler):
         log_renderable = self.render(
             record=record, traceback=traceback, message_renderable=message_renderable
         )
-        try:
-            self.console.print(log_renderable)
-        except Exception:
+        if isinstance(self.console.file, NullFile):
+            # Handles pythonw, where stdout/stderr are null, and we return NullFile
+            # instance from Console.file. In this case, we still want to make a log record
+            # even though we won't be writing anything to a file.
             self.handleError(record)
+        else:
+            try:
+                self.console.print(log_renderable)
+            except Exception:
+                self.handleError(record)
 
     def render_message(self, record: LogRecord, message: str) -> "ConsoleRenderable":
         """Render message text in to Text.
 
-        record (LogRecord): logging Record.
-        message (str): String containing log message.
+        Args:
+            record (LogRecord): logging Record.
+            message (str): String containing log message.
 
         Returns:
             ConsoleRenderable: Renderable to display log message.

@@ -4,6 +4,7 @@ Highlighting
 ============
 
 Rich can apply styles to patterns in text which you :meth:`~rich.console.Console.print` or :meth:`~rich.console.Console.log`. With the default settings, Rich will highlight things such as numbers, strings, collections, booleans, None, and a few more exotic patterns such as file paths, URLs and UUIDs.
+Additional non-default highlighter are available, such as :class:`~rich.highlighter.ISO8601Highlighter` to highlight date and time.
 
 You can disable highlighting either by setting ``highlight=False`` on :meth:`~rich.console.Console.print` or :meth:`~rich.console.Console.log`, or by setting ``highlight=False`` on the :class:`~rich.console.Console` constructor which disables it everywhere. If you disable highlighting on the constructor, you can still selectively *enable* highlighting with ``highlight=True`` on print/log.
 

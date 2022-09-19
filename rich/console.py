@@ -34,6 +34,8 @@ from typing import (
     cast,
 )
 
+from rich._null_file import NULL_FILE
+
 if sys.version_info >= (3, 8):
     from typing import Literal, Protocol, runtime_checkable
 else:
@@ -697,7 +699,16 @@ class Console:
         self._height = height
 
         self._color_system: Optional[ColorSystem]
-        self._force_terminal = force_terminal
+
+        self._force_terminal = None
+        if force_terminal is not None:
+            self._force_terminal = force_terminal
+        else:
+            # If FORCE_COLOR env var has any value at all, we force terminal.
+            force_color = self._environ.get("FORCE_COLOR")
+            if force_color is not None:
+                self._force_terminal = True
+
         self._file = file
         self.quiet = quiet
         self.stderr = stderr
@@ -746,6 +757,8 @@ class Console:
         """Get the file object to write to."""
         file = self._file or (sys.stderr if self.stderr else sys.stdout)
         file = getattr(file, "rich_proxied_file", file)
+        if file is None:
+            file = NULL_FILE
         return file
 
     @file.setter
@@ -1349,6 +1362,7 @@ class Console:
                         render_options.max_width,
                         include_new_lines=new_lines,
                         pad=pad,
+                        style=style,
                     ),
                     None,
                     render_height,
@@ -1995,9 +2009,11 @@ class Console:
                             from rich._win32_console import LegacyWindowsTerm
                             from rich._windows_renderer import legacy_windows_render
 
-                            legacy_windows_render(
-                                self._buffer[:], LegacyWindowsTerm(self.file)
-                            )
+                            buffer = self._buffer[:]
+                            if self.no_color and self._color_system:
+                                buffer = list(Segment.remove_color(buffer))
+
+                            legacy_windows_render(buffer, LegacyWindowsTerm(self.file))
                         else:
                             # Either a non-std stream on legacy Windows, or modern Windows.
                             text = self._render_buffer(self._buffer[:])

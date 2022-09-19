@@ -1,6 +1,6 @@
 {
     "benchmarks.ColorSuite.time_downgrade_to_eight_bit": {
-        "code": "class ColorSuite:\n    def time_downgrade_to_eight_bit(self):\n        self.color.downgrade(ColorSystem.EIGHT_BIT)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100)\n        self.color = Color.parse(\"#0d1da0\")",
+        "code": "class ColorSuite:\n    def time_downgrade_to_eight_bit(self):\n        self.color.downgrade(ColorSystem.EIGHT_BIT)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )\n        self.color = Color.parse(\"#0d1da0\")",
         "min_run_count": 2,
         "name": "benchmarks.ColorSuite.time_downgrade_to_eight_bit",
         "number": 0,
@@ -12,11 +12,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "019b972f782c6291df9a6a4dea9bb3c6268a69b177e71383d6e19a608e84920d",
+        "version": "9da5ad0b5cfed4def0fe21fbea49ad4605f84bae78c584d9178a6b21be58d506",
         "warmup_time": -1
     },
     "benchmarks.ColorSuite.time_downgrade_to_standard": {
-        "code": "class ColorSuite:\n    def time_downgrade_to_standard(self):\n        self.color.downgrade(ColorSystem.STANDARD)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100)\n        self.color = Color.parse(\"#0d1da0\")",
+        "code": "class ColorSuite:\n    def time_downgrade_to_standard(self):\n        self.color.downgrade(ColorSystem.STANDARD)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )\n        self.color = Color.parse(\"#0d1da0\")",
         "min_run_count": 2,
         "name": "benchmarks.ColorSuite.time_downgrade_to_standard",
         "number": 0,
@@ -28,11 +28,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "f5e8556491c977450fff6ebfd9fff4fc8f12d74829aa5b8570bd27ea7a1c9d28",
+        "version": "431bf40cae6650c65cdc6da70528f559c2e902abe9370cb73780dac5b5ef6826",
         "warmup_time": -1
     },
     "benchmarks.ColorSuite.time_downgrade_to_windows": {
-        "code": "class ColorSuite:\n    def time_downgrade_to_windows(self):\n        self.color.downgrade(ColorSystem.WINDOWS)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100)\n        self.color = Color.parse(\"#0d1da0\")",
+        "code": "class ColorSuite:\n    def time_downgrade_to_windows(self):\n        self.color.downgrade(ColorSystem.WINDOWS)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )\n        self.color = Color.parse(\"#0d1da0\")",
         "min_run_count": 2,
         "name": "benchmarks.ColorSuite.time_downgrade_to_windows",
         "number": 0,
@@ -44,11 +44,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "373eb97dd7ce2823e080972249235f528e8b3a47210911981cf432ecf0eef5fb",
+        "version": "fef8d3fdb69ece95d49b5637f9d69760e29819d2d6e65e53e62356fec2e11b91",
         "warmup_time": -1
     },
     "benchmarks.ColorSuiteCached.time_downgrade_to_eight_bit": {
-        "code": "class ColorSuiteCached:\n    def time_downgrade_to_eight_bit(self):\n        self.color.downgrade(ColorSystem.EIGHT_BIT)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100)\n        self.color = Color.parse(\"#0d1da0\")\n        # Warm cache\n        self.color.downgrade(ColorSystem.EIGHT_BIT)\n        self.color.downgrade(ColorSystem.STANDARD)\n        self.color.downgrade(ColorSystem.WINDOWS)",
+        "code": "class ColorSuiteCached:\n    def time_downgrade_to_eight_bit(self):\n        self.color.downgrade(ColorSystem.EIGHT_BIT)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )\n        self.color = Color.parse(\"#0d1da0\")\n        # Warm cache\n        self.color.downgrade(ColorSystem.EIGHT_BIT)\n        self.color.downgrade(ColorSystem.STANDARD)\n        self.color.downgrade(ColorSystem.WINDOWS)",
         "min_run_count": 2,
         "name": "benchmarks.ColorSuiteCached.time_downgrade_to_eight_bit",
         "number": 0,
@@ -60,11 +60,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "716ff06a471a5d90af3730f6d4470eba3577432d781e0210dff1fd156b8c549c",
+        "version": "5fdae4522a081f8212ac2d43d69bbc86b73876c4222f6ea36a80970afe663579",
         "warmup_time": -1
     },
     "benchmarks.ColorSuiteCached.time_downgrade_to_standard": {
-        "code": "class ColorSuiteCached:\n    def time_downgrade_to_standard(self):\n        self.color.downgrade(ColorSystem.STANDARD)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100)\n        self.color = Color.parse(\"#0d1da0\")\n        # Warm cache\n        self.color.downgrade(ColorSystem.EIGHT_BIT)\n        self.color.downgrade(ColorSystem.STANDARD)\n        self.color.downgrade(ColorSystem.WINDOWS)",
+        "code": "class ColorSuiteCached:\n    def time_downgrade_to_standard(self):\n        self.color.downgrade(ColorSystem.STANDARD)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )\n        self.color = Color.parse(\"#0d1da0\")\n        # Warm cache\n        self.color.downgrade(ColorSystem.EIGHT_BIT)\n        self.color.downgrade(ColorSystem.STANDARD)\n        self.color.downgrade(ColorSystem.WINDOWS)",
         "min_run_count": 2,
         "name": "benchmarks.ColorSuiteCached.time_downgrade_to_standard",
         "number": 0,
@@ -76,11 +76,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "3a752a7884e99e095c31b2a28cfefdf916cb2033c06afae1ea146a72f3ba650c",
+        "version": "3806eb6f32fcfc22ff57b23b1d09e25fc82c35a97183e285d257fb2e2b464f8f",
         "warmup_time": -1
     },
     "benchmarks.ColorSuiteCached.time_downgrade_to_windows": {
-        "code": "class ColorSuiteCached:\n    def time_downgrade_to_windows(self):\n        self.color.downgrade(ColorSystem.WINDOWS)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100)\n        self.color = Color.parse(\"#0d1da0\")\n        # Warm cache\n        self.color.downgrade(ColorSystem.EIGHT_BIT)\n        self.color.downgrade(ColorSystem.STANDARD)\n        self.color.downgrade(ColorSystem.WINDOWS)",
+        "code": "class ColorSuiteCached:\n    def time_downgrade_to_windows(self):\n        self.color.downgrade(ColorSystem.WINDOWS)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )\n        self.color = Color.parse(\"#0d1da0\")\n        # Warm cache\n        self.color.downgrade(ColorSystem.EIGHT_BIT)\n        self.color.downgrade(ColorSystem.STANDARD)\n        self.color.downgrade(ColorSystem.WINDOWS)",
         "min_run_count": 2,
         "name": "benchmarks.ColorSuiteCached.time_downgrade_to_windows",
         "number": 0,
@@ -92,11 +92,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "1732bbd18ada49eb7b054fc18b40d6acfb533023463366f37203dab6fbb0cc20",
+        "version": "2844899e3d81f71bd0b997401e1d300394b3ca130a056eb6b9aaca15ef07f39d",
         "warmup_time": -1
     },
     "benchmarks.PrettySuite.time_pretty": {
-        "code": "class PrettySuite:\n    def time_pretty(self):\n        pretty = Pretty(snippets.PYTHON_DICT)\n        self.console.print(pretty)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100)",
+        "code": "class PrettySuite:\n    def time_pretty(self):\n        pretty = Pretty(snippets.PYTHON_DICT)\n        self.console.print(pretty)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )",
         "min_run_count": 2,
         "name": "benchmarks.PrettySuite.time_pretty",
         "number": 0,
@@ -108,11 +108,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "9bb0e6d8a29aad21b3d1b550a160fa5f1e9030c69d16bad500c0dcc77bff6d01",
+        "version": "12ef039b78ab19f0024f810fc30791bfe497731139b30a8c8ea7aef36ef9fed2",
         "warmup_time": -1
     },
     "benchmarks.PrettySuite.time_pretty_indent_guides": {
-        "code": "class PrettySuite:\n    def time_pretty_indent_guides(self):\n        pretty = Pretty(snippets.PYTHON_DICT, indent_guides=True)\n        self.console.print(pretty)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100)",
+        "code": "class PrettySuite:\n    def time_pretty_indent_guides(self):\n        pretty = Pretty(snippets.PYTHON_DICT, indent_guides=True)\n        self.console.print(pretty)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )",
         "min_run_count": 2,
         "name": "benchmarks.PrettySuite.time_pretty_indent_guides",
         "number": 0,
@@ -124,11 +124,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "8d71bf19dfe999b0fba95d009986bfd6911c53c7a0c455466725f553005c3bc7",
+        "version": "27d39951a834104a09759cd0c9b1efe8570946400d606a04baad7b0e2355a259",
         "warmup_time": -1
     },
     "benchmarks.PrettySuite.time_pretty_justify_center": {
-        "code": "class PrettySuite:\n    def time_pretty_justify_center(self):\n        pretty = Pretty(snippets.PYTHON_DICT, justify=\"center\")\n        self.console.print(pretty)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100)",
+        "code": "class PrettySuite:\n    def time_pretty_justify_center(self):\n        pretty = Pretty(snippets.PYTHON_DICT, justify=\"center\")\n        self.console.print(pretty)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )",
         "min_run_count": 2,
         "name": "benchmarks.PrettySuite.time_pretty_justify_center",
         "number": 0,
@@ -140,11 +140,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "54cbf71bacab14ccbe1d063847c0b89198ed1bbe06edc89c14d2e3c7b1986c41",
+        "version": "51fe6d435fa7bcd605b26131da960edffb88929baa7aca98c9b3f7b23364cb6f",
         "warmup_time": -1
     },
     "benchmarks.StyleSuite.time_parse_ansi": {
-        "code": "class StyleSuite:\n    def time_parse_ansi(self):\n        Style.parse(\"red on blue\")\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100)",
+        "code": "class StyleSuite:\n    def time_parse_ansi(self):\n        Style.parse(\"red on blue\")\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )\n        self.style1 = Style.parse(\"blue on red\")\n        self.style2 = Style.parse(\"green italic bold\")",
         "min_run_count": 2,
         "name": "benchmarks.StyleSuite.time_parse_ansi",
         "number": 0,
@@ -156,11 +156,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "a003aaa8017585efeb1cd9c43351282df4df6249bf28a4c447b1304d984aa753",
+        "version": "ef195062397e8505c3a84b44f8357e0bf4e659abc9a92ae1028707afade51f8a",
         "warmup_time": -1
     },
     "benchmarks.StyleSuite.time_parse_hex": {
-        "code": "class StyleSuite:\n    def time_parse_hex(self):\n        Style.parse(\"#f0f0f0 on #e2e28a\")\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100)",
+        "code": "class StyleSuite:\n    def time_parse_hex(self):\n        Style.parse(\"#f0f0f0 on #e2e28a\")\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )\n        self.style1 = Style.parse(\"blue on red\")\n        self.style2 = Style.parse(\"green italic bold\")",
         "min_run_count": 2,
         "name": "benchmarks.StyleSuite.time_parse_hex",
         "number": 0,
@@ -172,11 +172,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "cf5a3f0def435d3da5bc3a6e7549c44c0a02e9cce6c00ecde8dd7f527556f8ca",
+        "version": "9077fcf6d594cd70a2eaeb984a0af1d8086f9ee865a4edffc0e00e7cec66963d",
         "warmup_time": -1
     },
     "benchmarks.StyleSuite.time_parse_mixed_complex_style": {
-        "code": "class StyleSuite:\n    def time_parse_mixed_complex_style(self):\n        Style.parse(\"dim bold reverse #00ee00 on rgb(123,12,50)\")\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100)",
+        "code": "class StyleSuite:\n    def time_parse_mixed_complex_style(self):\n        Style.parse(\"dim bold reverse #00ee00 on rgb(123,12,50)\")\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )\n        self.style1 = Style.parse(\"blue on red\")\n        self.style2 = Style.parse(\"green italic bold\")",
         "min_run_count": 2,
         "name": "benchmarks.StyleSuite.time_parse_mixed_complex_style",
         "number": 0,
@@ -188,11 +188,27 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "01c9e12ae829b1984e55a5aeef1a9ae6f1461577adaf5ae59f06358c8b52802f",
+        "version": "1494bc2364e167cce5ae6752fa198ce43b323d4955b6944b5640d33988cdcabc",
+        "warmup_time": -1
+    },
+    "benchmarks.StyleSuite.time_style_add": {
+        "code": "class StyleSuite:\n    def time_style_add(self):\n        self.style1 + self.style2\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False, width=100\n        )\n        self.style1 = Style.parse(\"blue on red\")\n        self.style2 = Style.parse(\"green italic bold\")",
+        "min_run_count": 2,
+        "name": "benchmarks.StyleSuite.time_style_add",
+        "number": 0,
+        "param_names": [],
+        "params": [],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "timeout": 60.0,
+        "type": "time",
+        "unit": "seconds",
+        "version": "c5f2383878cc982ab31d2624f4de284dcc12c3c299c94c3b1fc1d698dd8d8260",
         "warmup_time": -1
     },
     "benchmarks.SyntaxWrappingSuite.time_text_thin_terminal_heavy_wrapping": {
-        "code": "class SyntaxWrappingSuite:\n    def time_text_thin_terminal_heavy_wrapping(self):\n        self._print_with_width(20)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.syntax = Syntax(code=snippets.PYTHON_SNIPPET, lexer=\"python\", word_wrap=True)",
+        "code": "class SyntaxWrappingSuite:\n    def time_text_thin_terminal_heavy_wrapping(self):\n        self._print_with_width(20)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.syntax = Syntax(\n            code=snippets.PYTHON_SNIPPET, lexer=\"python\", word_wrap=True\n        )",
         "min_run_count": 2,
         "name": "benchmarks.SyntaxWrappingSuite.time_text_thin_terminal_heavy_wrapping",
         "number": 0,
@@ -204,11 +220,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "1ed4d74ea424990cfb40c96f07635f9bcf7b8bacc7ade5204aaf96363e1622ee",
+        "version": "bcf6771787d6f643c3a02ed76b9045b8c773101dd7d307f989596e535a1dc8fa",
         "warmup_time": -1
     },
     "benchmarks.SyntaxWrappingSuite.time_text_thin_terminal_medium_wrapping": {
-        "code": "class SyntaxWrappingSuite:\n    def time_text_thin_terminal_medium_wrapping(self):\n        self._print_with_width(60)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.syntax = Syntax(code=snippets.PYTHON_SNIPPET, lexer=\"python\", word_wrap=True)",
+        "code": "class SyntaxWrappingSuite:\n    def time_text_thin_terminal_medium_wrapping(self):\n        self._print_with_width(60)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.syntax = Syntax(\n            code=snippets.PYTHON_SNIPPET, lexer=\"python\", word_wrap=True\n        )",
         "min_run_count": 2,
         "name": "benchmarks.SyntaxWrappingSuite.time_text_thin_terminal_medium_wrapping",
         "number": 0,
@@ -220,11 +236,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "0880e162a4907ee025cef8ac3380502554fde27fd0c90a4c15cebc9c27f3e333",
+        "version": "df349deebd0cb3fe2602808efb2cc95270bdd3ff3734e07c13348039c5385ff9",
         "warmup_time": -1
     },
     "benchmarks.SyntaxWrappingSuite.time_text_wide_terminal_no_wrapping": {
-        "code": "class SyntaxWrappingSuite:\n    def time_text_wide_terminal_no_wrapping(self):\n        self._print_with_width(100)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.syntax = Syntax(code=snippets.PYTHON_SNIPPET, lexer=\"python\", word_wrap=True)",
+        "code": "class SyntaxWrappingSuite:\n    def time_text_wide_terminal_no_wrapping(self):\n        self._print_with_width(100)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.syntax = Syntax(\n            code=snippets.PYTHON_SNIPPET, lexer=\"python\", word_wrap=True\n        )",
         "min_run_count": 2,
         "name": "benchmarks.SyntaxWrappingSuite.time_text_wide_terminal_no_wrapping",
         "number": 0,
@@ -236,7 +252,7 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "feb11e94ae6a75de2dee899fb93db098b55cde232710660d7d66f9e2b288d9c0",
+        "version": "0af0a4fdbcad1978765c9980b246270adec7d7917b7fb7ce9f544a55892503c2",
         "warmup_time": -1
     },
     "benchmarks.TableSuite.time_table_heavy_wrapping": {
@@ -271,8 +287,24 @@
         "version": "8842a5f141d8208ba2bab66e4973e978cb5d0615f326af5d70385ff8fa44b3b9",
         "warmup_time": -1
     },
+    "benchmarks.TextHotCacheSuite.time_wrapping_unicode_heavy_warm_cache": {
+        "code": "class TextHotCacheSuite:\n    def time_wrapping_unicode_heavy_warm_cache(self):\n        for _ in range(20):\n            Text(snippets.UNICODE_HEAVY_TEXT).wrap(self.console, 12, overflow=\"fold\")\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )",
+        "min_run_count": 2,
+        "name": "benchmarks.TextHotCacheSuite.time_wrapping_unicode_heavy_warm_cache",
+        "number": 0,
+        "param_names": [],
+        "params": [],
+        "repeat": 0,
+        "rounds": 2,
+        "sample_time": 0.01,
+        "timeout": 60.0,
+        "type": "time",
+        "unit": "seconds",
+        "version": "61a0be6fba20247e1a659912134e0628d062a6711afe7df190007679849f9585",
+        "warmup_time": -1
+    },
     "benchmarks.TextSuite.time_align_center": {
-        "code": "class TextSuite:\n    def time_align_center(self):\n        Text(snippets.LOREM_IPSUM).align(\"center\", width=self.len_lorem_ipsum * 3)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_align_center(self):\n        Text(snippets.LOREM_IPSUM).align(\"center\", width=self.len_lorem_ipsum * 3)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_align_center",
         "number": 0,
@@ -284,11 +316,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "1ceeeef2de43fcb3d0dfec409972d8f0eb791e9615fa9f9c959e0423725b089b",
+        "version": "a8b6e02d49879810e61cd70701e4a41a61682871ba4a4b2f4273ace0bdb1250b",
         "warmup_time": -1
     },
     "benchmarks.TextSuite.time_align_center_unicode_heavy": {
-        "code": "class TextSuite:\n    def time_align_center_unicode_heavy(self):\n        Text(snippets.UNICODE_HEAVY_TEXT).align(\"center\", width=self.len_lorem_ipsum * 3)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_align_center_unicode_heavy(self):\n        Text(snippets.UNICODE_HEAVY_TEXT).align(\n            \"center\", width=self.len_lorem_ipsum * 3\n        )\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_align_center_unicode_heavy",
         "number": 0,
@@ -300,11 +332,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "a83ff79614dd2ae17e8b68f45981fcaa0d9833c59a7a14f171b896cf970f54ce",
+        "version": "c65e269d15b432f2add210392f1126e0759c869fca2ae08729cf6baba45f3a15",
         "warmup_time": -1
     },
     "benchmarks.TextSuite.time_divide": {
-        "code": "class TextSuite:\n    def time_divide(self):\n        Text(snippets.LOREM_IPSUM).divide(range(20, 100, 4))\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_divide(self):\n        Text(snippets.LOREM_IPSUM).divide(range(20, 100, 4))\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_divide",
         "number": 0,
@@ -316,11 +348,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "dcc120b921cb2ec77632f8fe2f6f4150d479cb49ef2608f8e86b569a937756e9",
+        "version": "11caa260e10d0b561700f4457776c1548091694f5939e1cb201f494c44988c67",
         "warmup_time": -1
     },
     "benchmarks.TextSuite.time_divide_unicode_heavy": {
-        "code": "class TextSuite:\n    def time_divide_unicode_heavy(self):\n        Text(snippets.UNICODE_HEAVY_TEXT).divide(range(20, 100, 4))\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_divide_unicode_heavy(self):\n        self.text.divide(range(20, 100, 4))\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_divide_unicode_heavy",
         "number": 0,
@@ -332,11 +364,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "ea53e662c0553324f90ac3336dcee77f733bb33638888e1f84bf71945a2f3f8e",
+        "version": "44af19dfa643c363c09525d54342353925b59b3701794c06f5b056cd4cf85a72",
         "warmup_time": -1
     },
     "benchmarks.TextSuite.time_fit": {
-        "code": "class TextSuite:\n    def time_fit(self):\n        Text(snippets.LOREM_IPSUM).fit(12)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_fit(self):\n        Text(snippets.LOREM_IPSUM).fit(12)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_fit",
         "number": 0,
@@ -348,11 +380,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "ec77b412db357b1e1c1e7bc620b941dddfc36dc76d2a66a0417feae4f21fe1d3",
+        "version": "58c2358185e76c28a0552ba5bee2b9184fbaf918b9f34485b8940a971f166b38",
         "warmup_time": -1
     },
     "benchmarks.TextSuite.time_fit_unicode_heavy": {
-        "code": "class TextSuite:\n    def time_fit_unicode_heavy(self):\n        Text(snippets.UNICODE_HEAVY_TEXT).fit(12)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_fit_unicode_heavy(self):\n        Text(snippets.UNICODE_HEAVY_TEXT).fit(12)\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_fit_unicode_heavy",
         "number": 0,
@@ -364,11 +396,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "d1574b4af2ef8b80b95b4dbeeb13e5de67b66783f76f9968834776239dd0dc66",
+        "version": "55d075d8f450b944e46b02814deedab2f4b05cb5550a2b4e0dcbb04dea51246b",
         "warmup_time": -1
     },
     "benchmarks.TextSuite.time_indent_guides": {
-        "code": "class TextSuite:\n    def time_indent_guides(self):\n        Text(snippets.PYTHON_SNIPPET).with_indent_guides()\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_indent_guides(self):\n        Text(snippets.PYTHON_SNIPPET).with_indent_guides()\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_indent_guides",
         "number": 0,
@@ -380,11 +412,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "18da036dcfc15ec5e3c11e72be7c8f0c22fba695a5f19c95836be36952376cf2",
+        "version": "a90fc2f17dbf830377011b10d0b9d263b6c7fc06215b9e47e264cd129851f421",
         "warmup_time": -1
     },
     "benchmarks.TextSuite.time_render": {
-        "code": "class TextSuite:\n    def time_render(self):\n        Text(snippets.LOREM_IPSUM).render(self.console)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_render(self):\n        list(self.text.render(self.console))\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_render",
         "number": 0,
@@ -396,11 +428,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "907d30581cfdc7bb2c4d302b7e3cb474aaefd8b84821365fe105af7d82be3b09",
+        "version": "4d859e28c2f3d6fd67f25a1d92b2b865110be2ad42b26faa6549816824f1d06b",
         "warmup_time": -1
     },
     "benchmarks.TextSuite.time_render_unicode_heavy": {
-        "code": "class TextSuite:\n    def time_render_unicode_heavy(self):\n        Text(snippets.UNICODE_HEAVY_TEXT).render(self.console)\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_render_unicode_heavy(self):\n        list(Text(snippets.UNICODE_HEAVY_TEXT).render(self.console))\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_render_unicode_heavy",
         "number": 0,
@@ -412,11 +444,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "b3f1c09dfd06f412a20dacfe378c3b446727c7d4f9a975336eab3daa8543e1cb",
+        "version": "4c10b25361392c9889c32587b68541e3dff0a4fe069405d7f5e5763deb07e3c1",
         "warmup_time": -1
     },
     "benchmarks.TextSuite.time_split": {
-        "code": "class TextSuite:\n    def time_split(self):\n        Text(snippets.LOREM_IPSUM).split()\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_split(self):\n        self.text.split()\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_split",
         "number": 0,
@@ -428,11 +460,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "9c165854130cb95fea5491ffcd8b580a5bd373149da2ef8aace0e9480f649854",
+        "version": "cf8cd074f1b4bbd424d0cad4548c43a9cd19f7b5a8da2a1598bfa1cbaac5223c",
         "warmup_time": -1
     },
     "benchmarks.TextSuite.time_split_unicode_heavy": {
-        "code": "class TextSuite:\n    def time_split_unicode_heavy(self):\n        Text(snippets.UNICODE_HEAVY_TEXT).split()\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_split_unicode_heavy(self):\n        Text(snippets.UNICODE_HEAVY_TEXT).split()\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_split_unicode_heavy",
         "number": 0,
@@ -444,11 +476,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "d55b02f6d06f478d70635bac3409f3a9899137d9cee87a70a293b8ccf5a6afa4",
+        "version": "33cad3b4a38b0ed37ade46bda66bc9e84e0f73e3519cc77ac02d7da5123a9137",
         "warmup_time": -1
     },
     "benchmarks.TextSuite.time_wrapping": {
-        "code": "class TextSuite:\n    def time_wrapping(self):\n        Text(snippets.LOREM_IPSUM).wrap(self.console, 12, overflow=\"fold\")\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_wrapping(self):\n        self.text.wrap(self.console, 12, overflow=\"fold\")\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_wrapping",
         "number": 0,
@@ -460,11 +492,11 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "8c821eba13d043f228fd902d8f678c397741855db05d02abe9b82f3d65cdf03d",
+        "version": "961df5c6a57de40e2a07182136f3644f42f1dcab1017b571383e5cb2b3dcbf46",
         "warmup_time": -1
     },
     "benchmarks.TextSuite.time_wrapping_unicode_heavy": {
-        "code": "class TextSuite:\n    def time_wrapping_unicode_heavy(self):\n        Text(snippets.UNICODE_HEAVY_TEXT).wrap(self.console, 12, overflow=\"fold\")\n\n    def setup(self):\n        self.console = Console(file=StringIO(), color_system=\"truecolor\", legacy_windows=False)\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)",
+        "code": "class TextSuite:\n    def time_wrapping_unicode_heavy(self):\n        Text(snippets.UNICODE_HEAVY_TEXT).wrap(self.console, 12, overflow=\"fold\")\n\n    def setup(self):\n        self.console = Console(\n            file=StringIO(), color_system=\"truecolor\", legacy_windows=False\n        )\n        self.len_lorem_ipsum = len(snippets.LOREM_IPSUM)\n        self.text = Text.from_markup(snippets.MARKUP)",
         "min_run_count": 2,
         "name": "benchmarks.TextSuite.time_wrapping_unicode_heavy",
         "number": 0,
@@ -476,7 +508,7 @@
         "timeout": 60.0,
         "type": "time",
         "unit": "seconds",
-        "version": "ec6e2ef08b6cdee182fef4e26c0043f8c365984f9a31be07dbd792e1aed862d8",
+        "version": "0c9e448fb577a673d91bfd3d0da5ade88ee11474cf9113869e669cbc6cf4c444",
         "warmup_time": -1
     },
     "version": 2

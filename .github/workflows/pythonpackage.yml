@@ -35,7 +35,7 @@ jobs:
         run: |
           source $VENV
           make typecheck
-      - name: Test with pytest
+      - name: Test with pytest (with coverage)
         run: |
           source $VENV
           pytest tests -v --cov=./rich --cov-report=xml:./coverage.xml --cov-report term-missing

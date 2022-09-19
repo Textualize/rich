@@ -5,16 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [12.4.5] - Unreleased
+
+## [Unreleased]
+
+### Added
+
+- Parse ANSI escape sequences in pretty repr https://github.com/Textualize/rich/pull/2470
+- Add support for `FORCE_COLOR` env var https://github.com/Textualize/rich/pull/2449
+- Allow a `max_depth` argument to be passed to the `install()` hook https://github.com/Textualize/rich/issues/2486
+- Document using `None` as name in `__rich_repr__` for tuple posotional args https://github.com/Textualize/rich/pull/2379
+
+### Fixed
+
+- Handle stdout/stderr being null https://github.com/Textualize/rich/pull/2513
+- Fix NO_COLOR support on legacy Windows https://github.com/Textualize/rich/pull/2458
+
+## [12.5.2] - 2022-07-18
+
+### Added
+
+- Add Turkish Readme.
+
+## [12.5.1] - 2022-07-11
+
+### Fixed
+
+- Fixed missing typing extensions dependency on 3.9 https://github.com/Textualize/rich/issues/2386
+
+## [12.5.0] - 2022-07-11
 
 ### Added
 
 - Environment variables `JUPYTER_COLUMNS` and `JUPYTER_LINES` to control width and height of console in Jupyter
+- Markdown friendly `Box` style, `MARKDOWN`, for rendering tables ready to copy into markdown files
 - `inspect` will prefix coroutine functions with `async def`
+- `Style.__add__` will no longer return `NotImplemented`
+- Remove rich.\_lru_cache
 
 ### Changed
 
 - Default width of Jupyter console size is increased to 115
+- Optimized Segment.divide
 
 ### Fixed
 
@@ -25,12 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix edges used in first row of tables when `show_header=False` https://github.com/Textualize/rich/pull/2330
 - Fix interaction between `Capture` contexts and `Console(record=True)` https://github.com/Textualize/rich/pull/2343
 - Fixed hash issue in Styles class https://github.com/Textualize/rich/pull/2346
-- Document using `None` as name in `__rich_repr__` for tuple posotional args https://github.com/Textualize/rich/pull/2379
-
-### Changed
-
-- `Style.__add__` will no longer return `NotImplemented`
-- Remove rich.\_lru_cache
+- Fixed bug in `Segment.split_and_crop_lines`
 
 ## [12.4.4] - 2022-05-24
 
@@ -1796,9 +1822,13 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[unreleased]: https://github.com/willmcgugan/rich/compare/v12.4.3...HEAD
-[12.4.1]: https://github.com/willmcgugan/rich/compare/v12.4.2...v12.4.3
-[12.4.1]: https://github.com/willmcgugan/rich/compare/v12.4.1...v12.4.2
+[unreleased]: https://github.com/willmcgugan/rich/compare/v12.5.2...HEAD
+[12.5.2]: https://github.com/willmcgugan/rich/compare/v12.5.1...v12.5.2
+[12.5.1]: https://github.com/willmcgugan/rich/compare/v12.5.0...v12.5.1
+[12.5.0]: https://github.com/willmcgugan/rich/compare/v12.4.4...v12.5.0
+[12.4.4]: https://github.com/willmcgugan/rich/compare/v12.4.3...v12.4.4
+[12.4.3]: https://github.com/willmcgugan/rich/compare/v12.4.2...v12.4.3
+[12.4.2]: https://github.com/willmcgugan/rich/compare/v12.4.1...v12.4.2
 [12.4.1]: https://github.com/willmcgugan/rich/compare/v12.4.0...v12.4.1
 [12.4.0]: https://github.com/willmcgugan/rich/compare/v12.3.0...v12.4.0
 [12.3.0]: https://github.com/willmcgugan/rich/compare/v12.2.0...v12.3.0
@@ -1944,3 +1974,6 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 [0.4.1]: https://github.com/willmcgugan/rich/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/willmcgugan/rich/compare/v0.3.3...v0.4.0
 [0.3.3]: https://github.com/willmcgugan/rich/compare/v0.3.2...v0.3.3
+[0.3.2]: https://github.com/willmcgugan/rich/compare/v0.3.1...v0.3.2
+[0.3.1]: https://github.com/willmcgugan/rich/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/willmcgugan/rich/compare/v0.2.0...v0.3.0

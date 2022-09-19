@@ -73,7 +73,8 @@ def test_render_size():
             Segment(" ", Style()),
             Segment("foo"),
             Segment(
-                "                                                                         "
+                "                                                                         ",
+                Style(),
             ),
             Segment(" ", Style()),
             Segment("│", Style()),

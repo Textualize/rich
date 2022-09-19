@@ -5,6 +5,7 @@ from array import array
 from collections import UserDict, defaultdict
 from dataclasses import dataclass, field
 from typing import List, NamedTuple
+from unittest.mock import patch
 
 import attr
 import pytest
@@ -35,6 +36,10 @@ skip_py310 = pytest.mark.skipif(
     sys.version_info.minor == 10 and sys.version_info.major == 3,
     reason="rendered differently on py3.10",
 )
+skip_py311 = pytest.mark.skipif(
+    sys.version_info.minor == 11 and sys.version_info.major == 3,
+    reason="rendered differently on py3.11",
+)
 
 
 def test_install():
@@ -43,6 +48,15 @@ def test_install():
     install(console)
     sys.displayhook("foo")
     assert console.file.getvalue() == "'foo'\n"
+    assert sys.displayhook is not dh
+
+
+def test_install_max_depth():
+    console = Console(file=io.StringIO())
+    dh = sys.displayhook
+    install(console, max_depth=1)
+    sys.displayhook({"foo": {"bar": True}})
+    assert console.file.getvalue() == "{'foo': {...}}\n"
     assert sys.displayhook is not dh
 
 
@@ -123,6 +137,22 @@ def test_ipy_display_hook__console_renderables_on_newline():
     console.begin_capture()
     _ipy_display_hook(Text("hello"), console=console)
     assert console.end_capture() == "\nhello\n"
+
+
+def test_ipy_display_hook__classes_to_not_render():
+    console = Console(file=io.StringIO(), force_jupyter=True)
+    console.begin_capture()
+
+    class Thing:
+        def __repr__(self) -> str:
+            return "hello"
+
+    class_fully_qualified_name = f"{__name__}.{Thing.__qualname__}"
+    with patch(
+        "rich.pretty.JUPYTER_CLASSES_TO_NOT_RENDER", {class_fully_qualified_name}
+    ):
+        _ipy_display_hook(Thing(), console=console)
+    assert console.end_capture() == ""
 
 
 def test_pretty():
@@ -235,7 +265,7 @@ def test_pretty_namedtuple_fields_invalid_type():
 def test_pretty_namedtuple_max_depth():
     instance = {"unit": StockKeepingUnit("a", "b", 1.0, "c", ["d", "e"])}
     result = pretty_repr(instance, max_depth=1)
-    assert result == "{'unit': ...}"
+    assert result == "{'unit': StockKeepingUnit(...)}"
 
 
 def test_small_width():
@@ -243,6 +273,20 @@ def test_small_width():
     result = pretty_repr(test, max_width=10)
     expected = "[\n    'Hello world! 12345'\n]"
     assert result == expected
+
+
+def test_ansi_in_pretty_repr():
+    class Hello:
+        def __repr__(self):
+            return "Hello \x1b[38;5;239mWorld!"
+
+    pretty = Pretty(Hello())
+
+    console = Console(file=io.StringIO(), record=True)
+    console.print(pretty)
+    result = console.export_text()
+
+    assert result == "Hello World!\n"
 
 
 @skip_py36
@@ -283,13 +327,13 @@ def test_max_depth():
     d = {}
     d["foo"] = {"fob": {"a": [1, 2, 3], "b": {"z": "x", "y": ["a", "b", "c"]}}}
 
-    assert pretty_repr(d, max_depth=0) == "..."
-    assert pretty_repr(d, max_depth=1) == "{'foo': ...}"
-    assert pretty_repr(d, max_depth=2) == "{'foo': {'fob': ...}}"
-    assert pretty_repr(d, max_depth=3) == "{'foo': {'fob': {'a': ..., 'b': ...}}}"
+    assert pretty_repr(d, max_depth=0) == "{...}"
+    assert pretty_repr(d, max_depth=1) == "{'foo': {...}}"
+    assert pretty_repr(d, max_depth=2) == "{'foo': {'fob': {...}}}"
+    assert pretty_repr(d, max_depth=3) == "{'foo': {'fob': {'a': [...], 'b': {...}}}}"
     assert (
         pretty_repr(d, max_width=100, max_depth=4)
-        == "{'foo': {'fob': {'a': [1, 2, 3], 'b': {'z': 'x', 'y': ...}}}}"
+        == "{'foo': {'fob': {'a': [1, 2, 3], 'b': {'z': 'x', 'y': [...]}}}}"
     )
     assert (
         pretty_repr(d, max_width=100, max_depth=5)
@@ -318,7 +362,7 @@ def test_max_depth_rich_repr():
 
     assert (
         pretty_repr(Foo(foo=Bar(bar=Foo(foo=[]))), max_depth=2)
-        == "Foo(foo=Bar(bar=...))"
+        == "Foo(foo=Bar(bar=Foo(...)))"
     )
 
 
@@ -333,7 +377,7 @@ def test_max_depth_attrs():
 
     assert (
         pretty_repr(Foo(foo=Bar(bar=Foo(foo=[]))), max_depth=2)
-        == "Foo(foo=Bar(bar=...))"
+        == "Foo(foo=Bar(bar=Foo(...)))"
     )
 
 
@@ -348,7 +392,7 @@ def test_max_depth_dataclass():
 
     assert (
         pretty_repr(Foo(foo=Bar(bar=Foo(foo=[]))), max_depth=2)
-        == "Foo(foo=Bar(bar=...))"
+        == "Foo(foo=Bar(bar=Foo(...)))"
     )
 
 
@@ -476,6 +520,7 @@ def test_attrs_empty():
 
 @skip_py36
 @skip_py310
+@skip_py311
 def test_attrs_broken():
     @attr.define
     class Foo:

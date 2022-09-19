@@ -29,6 +29,9 @@ class ColorSystem(IntEnum):
     def __repr__(self) -> str:
         return f"ColorSystem.{self.name}"
 
+    def __str__(self) -> str:
+        return repr(self)
+
 
 class ColorType(IntEnum):
     """Type of color stored in Color class."""
@@ -310,7 +313,7 @@ class Color(NamedTuple):
     """A triplet of color components, if an RGB color."""
 
     def __rich__(self) -> "Text":
-        """Dispays the actual color if Rich printed."""
+        """Displays the actual color if Rich printed."""
         from .style import Style
         from .text import Text
 

@@ -4,7 +4,12 @@ from typing import List
 
 import pytest
 
-from rich.highlighter import JSONHighlighter, NullHighlighter, ReprHighlighter
+from rich.highlighter import (
+    JSONHighlighter,
+    NullHighlighter,
+    ReprHighlighter,
+    ISO8601Highlighter,
+)
 from rich.text import Span, Text
 
 
@@ -179,3 +184,249 @@ def test_highlight_json_no_indent():
         Span(1, 7, "json.key"),
         Span(18, 25, "json.key"),
     ]
+
+
+iso8601_highlight_tests = [
+    ("2008-08", [Span(0, 4, "iso8601.year"), Span(5, 7, "iso8601.month")]),
+    (
+        "2008-08-30",
+        [
+            Span(0, 10, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(5, 7, "iso8601.month"),
+            Span(8, 10, "iso8601.day"),
+        ],
+    ),
+    (
+        "20080830",
+        [
+            Span(0, 8, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(4, 6, "iso8601.month"),
+            Span(6, 8, "iso8601.day"),
+        ],
+    ),
+    (
+        "2008-243",
+        [
+            Span(0, 8, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(5, 8, "iso8601.day"),
+        ],
+    ),
+    (
+        "2008243",
+        [
+            Span(0, 7, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(4, 7, "iso8601.day"),
+        ],
+    ),
+    (
+        "2008-W35",
+        [
+            Span(0, 8, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(6, 8, "iso8601.week"),
+        ],
+    ),
+    (
+        "2008W35",
+        [
+            Span(0, 7, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(5, 7, "iso8601.week"),
+        ],
+    ),
+    (
+        "2008-W35-6",
+        [
+            Span(0, 10, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(6, 8, "iso8601.week"),
+            Span(9, 10, "iso8601.day"),
+        ],
+    ),
+    (
+        "2008W356",
+        [
+            Span(0, 8, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(5, 7, "iso8601.week"),
+            Span(7, 8, "iso8601.day"),
+        ],
+    ),
+    (
+        "17:21",
+        [
+            Span(0, 5, "iso8601.time"),
+            Span(0, 2, "iso8601.hour"),
+            Span(3, 5, "iso8601.minute"),
+        ],
+    ),
+    (
+        "1721",
+        [
+            Span(0, 4, "iso8601.time"),
+            Span(0, 2, "iso8601.hour"),
+            Span(2, 4, "iso8601.minute"),
+        ],
+    ),
+    (
+        "172159",
+        [
+            Span(0, 6, "iso8601.time"),
+            Span(0, 2, "iso8601.hour"),
+            Span(2, 4, "iso8601.minute"),
+            Span(4, 6, "iso8601.second"),
+        ],
+    ),
+    ("Z", [Span(0, 1, "iso8601.timezone")]),
+    ("+07", [Span(0, 3, "iso8601.timezone")]),
+    ("+07:00", [Span(0, 6, "iso8601.timezone")]),
+    (
+        "17:21:59+07:00",
+        [
+            Span(0, 8, "iso8601.time"),
+            Span(0, 2, "iso8601.hour"),
+            Span(3, 5, "iso8601.minute"),
+            Span(6, 8, "iso8601.second"),
+            Span(8, 14, "iso8601.timezone"),
+        ],
+    ),
+    (
+        "172159+0700",
+        [
+            Span(0, 6, "iso8601.time"),
+            Span(0, 2, "iso8601.hour"),
+            Span(2, 4, "iso8601.minute"),
+            Span(4, 6, "iso8601.second"),
+            Span(6, 11, "iso8601.timezone"),
+        ],
+    ),
+    (
+        "172159+07",
+        [
+            Span(0, 6, "iso8601.time"),
+            Span(0, 2, "iso8601.hour"),
+            Span(2, 4, "iso8601.minute"),
+            Span(4, 6, "iso8601.second"),
+            Span(6, 9, "iso8601.timezone"),
+        ],
+    ),
+    (
+        "2008-08-30 17:21:59",
+        [
+            Span(0, 10, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(4, 5, "iso8601.hyphen"),
+            Span(5, 7, "iso8601.month"),
+            Span(8, 10, "iso8601.day"),
+            Span(11, 19, "iso8601.time"),
+            Span(11, 13, "iso8601.hour"),
+            Span(14, 16, "iso8601.minute"),
+            Span(17, 19, "iso8601.second"),
+        ],
+    ),
+    (
+        "20080830 172159",
+        [
+            Span(0, 8, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(4, 6, "iso8601.month"),
+            Span(6, 8, "iso8601.day"),
+            Span(9, 15, "iso8601.time"),
+            Span(9, 11, "iso8601.hour"),
+            Span(11, 13, "iso8601.minute"),
+            Span(13, 15, "iso8601.second"),
+        ],
+    ),
+    (
+        "2008-08-30",
+        [
+            Span(0, 10, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(5, 7, "iso8601.month"),
+            Span(8, 10, "iso8601.day"),
+        ],
+    ),
+    (
+        "2008-08-30+07:00",
+        [
+            Span(0, 10, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(5, 7, "iso8601.month"),
+            Span(8, 10, "iso8601.day"),
+            Span(10, 16, "iso8601.timezone"),
+        ],
+    ),
+    (
+        "01:45:36",
+        [
+            Span(0, 8, "iso8601.time"),
+            Span(0, 2, "iso8601.hour"),
+            Span(3, 5, "iso8601.minute"),
+            Span(6, 8, "iso8601.second"),
+        ],
+    ),
+    (
+        "01:45:36.123+07:00",
+        [
+            Span(0, 12, "iso8601.time"),
+            Span(0, 2, "iso8601.hour"),
+            Span(3, 5, "iso8601.minute"),
+            Span(6, 8, "iso8601.second"),
+            Span(8, 12, "iso8601.frac"),
+            Span(12, 18, "iso8601.timezone"),
+        ],
+    ),
+    (
+        "01:45:36.123+07:00",
+        [
+            Span(0, 12, "iso8601.time"),
+            Span(0, 2, "iso8601.hour"),
+            Span(3, 5, "iso8601.minute"),
+            Span(6, 8, "iso8601.second"),
+            Span(8, 12, "iso8601.frac"),
+            Span(12, 18, "iso8601.timezone"),
+        ],
+    ),
+    (
+        "2008-08-30T01:45:36",
+        [
+            Span(0, 10, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(5, 7, "iso8601.month"),
+            Span(8, 10, "iso8601.day"),
+            Span(11, 19, "iso8601.time"),
+            Span(11, 13, "iso8601.hour"),
+            Span(14, 16, "iso8601.minute"),
+            Span(17, 19, "iso8601.second"),
+        ],
+    ),
+    (
+        "2008-08-30T01:45:36.123Z",
+        [
+            Span(0, 10, "iso8601.date"),
+            Span(0, 4, "iso8601.year"),
+            Span(5, 7, "iso8601.month"),
+            Span(8, 10, "iso8601.day"),
+            Span(11, 23, "iso8601.time"),
+            Span(11, 13, "iso8601.hour"),
+            Span(14, 16, "iso8601.minute"),
+            Span(17, 19, "iso8601.second"),
+            Span(19, 23, "iso8601.ms"),
+            Span(23, 24, "iso8601.timezone"),
+        ],
+    ),
+]
+
+
+@pytest.mark.parametrize("test, spans", iso8601_highlight_tests)
+def test_highlight_iso8601_regex(test: str, spans: List[Span]):
+    """Tests for the regular expressions used in ISO8601Highlighter."""
+    text = Text(test)
+    highlighter = ISO8601Highlighter()
+    highlighter.highlight(text)
+    print(text.spans)
+    assert text.spans == spans

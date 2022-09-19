@@ -1,6 +1,11 @@
 from rich import cells
 
 
+def test_cell_len_long_string():
+    # Long strings don't use cached cell length implementation
+    assert cells.cell_len("abc" * 200) == 3 * 200
+
+
 def test_set_cell_size():
     assert cells.set_cell_size("foo", 0) == ""
     assert cells.set_cell_size("f", 0) == ""
