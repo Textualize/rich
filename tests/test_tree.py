@@ -142,4 +142,4 @@ def test_tree_measure():
     tree.add("mushroom risotto")
     console = Console()
     measurement = Measurement.get(console, console.options, tree)
-    assert measurement == Measurement(11, 19)
+    assert measurement == Measurement(12, 20)
