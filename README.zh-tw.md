@@ -4,30 +4,30 @@
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
-![Logo](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
+![Logo](https://github.com/textualize/rich/raw/master/imgs/logo.svg)
 
-[English readme](https://github.com/willmcgugan/rich/blob/master/README.md)
- • [简体中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md)
- • [正體中文 readme](https://github.com/willmcgugan/rich/blob/master/README.zh-tw.md)
- • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md)
- • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md)
- • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md)
- • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md)
- • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md)
- • [Français readme](https://github.com/willmcgugan/rich/blob/master/README.fr.md)
- • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md)
- • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
- • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
- • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
- • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
-  • [فارسی readme](https://github.com/willmcgugan/rich/blob/master/README.fa.md)
- • [Türkçe readme](https://github.com/willmcgugan/rich/blob/master/README.tr.md)
+[English readme](https://github.com/textualize/rich/blob/master/README.md)
+ • [简体中文 readme](https://github.com/textualize/rich/blob/master/README.cn.md)
+ • [正體中文 readme](https://github.com/textualize/rich/blob/master/README.zh-tw.md)
+ • [Lengua española readme](https://github.com/textualize/rich/blob/master/README.es.md)
+ • [Deutsche readme](https://github.com/textualize/rich/blob/master/README.de.md)
+ • [Läs på svenska](https://github.com/textualize/rich/blob/master/README.sv.md)
+ • [日本語 readme](https://github.com/textualize/rich/blob/master/README.ja.md)
+ • [한국어 readme](https://github.com/textualize/rich/blob/master/README.kr.md)
+ • [Français readme](https://github.com/textualize/rich/blob/master/README.fr.md)
+ • [Schwizerdütsch readme](https://github.com/textualize/rich/blob/master/README.de-ch.md)
+ • [हिन्दी readme](https://github.com/textualize/rich/blob/master/README.hi.md)
+ • [Português brasileiro readme](https://github.com/textualize/rich/blob/master/README.pt-br.md)
+ • [Italian readme](https://github.com/textualize/rich/blob/master/README.it.md)
+ • [Русский readme](https://github.com/textualize/rich/blob/master/README.ru.md)
+  • [فارسی readme](https://github.com/textualize/rich/blob/master/README.fa.md)
+ • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
 
 Rich 是一款提供終端機介面中 _豐富的_ 文字效果及精美的格式設定的 Python 函式庫。
 
 [Rich API](https://rich.readthedocs.io/en/latest/) 讓終端機介面加上色彩及樣式變得易如反掌。Rich 也可以繪製漂亮的表格、進度條、Markdown、語法醒目標示的程式碼、Traceback（追溯）……。
 
-![Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
+![Features](https://github.com/textualize/rich/raw/master/imgs/features.png)
 
 關於 Rich 的介紹，請參見 [@fishnets88](https://twitter.com/fishnets88) 在 [calmcode.io](https://calmcode.io/rich/introduction.html) 錄製的影片。
 
@@ -63,7 +63,7 @@ from rich import print
 print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 ```
 
-![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/print.png)
+![Hello World](https://github.com/textualize/rich/raw/master/imgs/print.png)
 
 ## Rich REPL
 
@@ -74,7 +74,7 @@ Rich 可以安裝在 Python REPL 中，如此一來就可以漂亮的輸出與�
 >>> pretty.install()
 ```
 
-![REPL](https://github.com/willmcgugan/rich/raw/master/imgs/repl.png)
+![REPL](https://github.com/textualize/rich/raw/master/imgs/repl.png)
 
 ## 使用 Console
 
@@ -102,7 +102,7 @@ console.print("Hello", "World!", style="bold red")
 
 輸出結果如下圖：
 
-![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/hello_world.png)
+![Hello World](https://github.com/textualize/rich/raw/master/imgs/hello_world.png)
 
 介紹完了如何對整行文字設定樣式，接著來看看更細部的使用。Rich 可以接受類似 [bbcode](https://en.wikipedia.org/wiki/BBCode) 的語法，對個別文字設定樣式。參考此範例：
 
@@ -110,7 +110,7 @@ console.print("Hello", "World!", style="bold red")
 console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i]way[/i].")
 ```
 
-![Console Markup](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
+![Console Markup](https://github.com/textualize/rich/raw/master/imgs/where_there_is_a_will.png)
 
 您可以用 Console 物件不費吹灰之力地達成細膩的輸出效果。參閱 [Console API](https://rich.readthedocs.io/en/latest/console.html) 說明文件以了解細節。
 
@@ -124,7 +124,7 @@ Rich 提供了 [inspect](https://rich.readthedocs.io/en/latest/reference/init.ht
 >>> inspect(my_list, methods=True)
 ```
 
-![Log](https://github.com/willmcgugan/rich/raw/master/imgs/inspect.png)
+![Log](https://github.com/textualize/rich/raw/master/imgs/inspect.png)
 
 參閱 [inspect 說明文件](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) 以了解細節。
 
@@ -164,7 +164,7 @@ test_log()
 
 上面的程式碼會產生下圖結果：
 
-![Log](https://github.com/willmcgugan/rich/raw/master/imgs/log.png)
+![Log](https://github.com/textualize/rich/raw/master/imgs/log.png)
 
 注意到 `log_locals` 引數，可用來輸出一張表格，用來顯示 log 方法被呼叫時，區域變數的內容。
 
@@ -176,7 +176,7 @@ log 方法可用於伺服器上長時間運作的程式，也很適合一般程�
 
 您也可以使用內建的 [Handler 類別](https://rich.readthedocs.io/en/latest/logging.html) 來將 Python logging 模組的輸出內容格式化並賦予色彩：
 
-![Logging](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
+![Logging](https://github.com/textualize/rich/raw/master/imgs/logging.png)
 
 </details>
 
@@ -199,9 +199,9 @@ log 方法可用於伺服器上長時間運作的程式，也很適合一般程�
 
 Rich 可以用 unicode box 字元繪製彈性的 [表格](https://rich.readthedocs.io/en/latest/tables.html)。格式設定十分多元，包含框線、樣式、儲存格對齊……。
 
-![table movie](https://github.com/willmcgugan/rich/raw/master/imgs/table_movie.gif)
+![table movie](https://github.com/textualize/rich/raw/master/imgs/table_movie.gif)
 
-上圖的動畫效果是以 [table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py) 產生的，該檔案位於 examples 資料夾。
+上圖的動畫效果是以 [table_movie.py](https://github.com/textualize/rich/blob/master/examples/table_movie.py) 產生的，該檔案位於 examples 資料夾。
 
 參考這個簡單的表格範例：
 
@@ -237,13 +237,13 @@ console.print(table)
 
 執行結果如圖：
 
-![table](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
+![table](https://github.com/textualize/rich/raw/master/imgs/table.png)
 
 請留意，主控台標記的呈現方式與 `print()`、`log()` 相同。事實上，由 Rich 繪製的任何東西都可以被放在任何標題、列，甚至其他表格裡。
 
 `Table` 類別很聰明，能夠自動調整欄寬來配合終端機的大小，也會在需要時自動將文字換行。此範例的程式碼與上一個相同，然而終端機變小了一點：
 
-![table2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
+![table2](https://github.com/textualize/rich/raw/master/imgs/table2.png)
 
 </details>
 
@@ -263,13 +263,13 @@ for step in track(range(100)):
 
 新增多個進度條也不是難事，來看看說明文件中的範例：
 
-![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
+![progress](https://github.com/textualize/rich/raw/master/imgs/progress.gif)
 
 您可以調整要顯示的狀態欄位。內建的欄位包含完成百分比、檔案大小、讀寫速度及剩餘時間。來看看另一個用來顯示下載進度的範例：
 
-![progress](https://github.com/willmcgugan/rich/raw/master/imgs/downloader.gif)
+![progress](https://github.com/textualize/rich/raw/master/imgs/downloader.gif)
 
-想嘗試看看嗎？您可以在 [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) 取得此範例程式。此程式可以在下載多個檔案時顯示各自的進度。
+想嘗試看看嗎？您可以在 [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) 取得此範例程式。此程式可以在下載多個檔案時顯示各自的進度。
 
 </details>
 
@@ -294,7 +294,7 @@ with console.status("[bold green]Working on tasks...") as status:
 
 終端機的顯示效果如下：
 
-![status](https://github.com/willmcgugan/rich/raw/master/imgs/status.gif)
+![status](https://github.com/textualize/rich/raw/master/imgs/status.gif)
 
 該 spinner 動畫乃借用自 [cli-spinners](https://www.npmjs.com/package/cli-spinners)。可以用 `spinner` 參數指定 spinner 樣式。執行此命令以顯示可用的值：
 
@@ -304,7 +304,7 @@ python -m rich.spinner
 
 此命令在終端機的輸出結果如下圖：
 
-![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
+![spinners](https://github.com/textualize/rich/raw/master/imgs/spinners.gif)
 
 </details>
 
@@ -321,9 +321,9 @@ python -m rich.tree
 
 這會產生下圖的結果：
 
-![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
+![markdown](https://github.com/textualize/rich/raw/master/imgs/tree.png)
 
-您可以參考 [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) 範例程式，此程式可以樹狀圖展示目錄結構，如同 Linux 的 `tree` 命令。
+您可以參考 [tree.py](https://github.com/textualize/rich/blob/master/examples/tree.py) 範例程式，此程式可以樹狀圖展示目錄結構，如同 Linux 的 `tree` 命令。
 
 </details>
 
@@ -343,9 +343,9 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-此螢幕截圖為 [資料欄範例](https://github.com/willmcgugan/rich/blob/master/examples/columns.py) 的輸出結果。此程式從某 API 取得資料，並以資料欄呈現：
+此螢幕截圖為 [資料欄範例](https://github.com/textualize/rich/blob/master/examples/columns.py) 的輸出結果。此程式從某 API 取得資料，並以資料欄呈現：
 
-![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
+![columns](https://github.com/textualize/rich/raw/master/imgs/columns.png)
 
 </details>
 
@@ -368,7 +368,7 @@ console.print(markdown)
 
 執行結果如下圖：
 
-![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
+![markdown](https://github.com/textualize/rich/raw/master/imgs/markdown.png)
 
 </details>
 
@@ -403,7 +403,7 @@ console.print(syntax)
 
 執行結果如下圖：
 
-![syntax](https://github.com/willmcgugan/rich/raw/master/imgs/syntax.png)
+![syntax](https://github.com/textualize/rich/raw/master/imgs/syntax.png)
 
 </details>
 
@@ -414,7 +414,7 @@ Rich 可以繪製 [漂亮的 tracebacks](https://rich.readthedocs.io/en/latest/t
 
 它在 macOS 上執行的效果如圖（Linux 上差異不大）：
 
-![traceback](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
+![traceback](https://github.com/textualize/rich/raw/master/imgs/traceback.png)
 
 </details>
 
@@ -454,6 +454,6 @@ Rich 及其他數以千計的套件維護者正與 Tidelift 合作，以提供�
   Lightweight Python library for adding real-time 2D object tracking to any detector.
 - [ansible/ansible-lint](https://github.com/ansible/ansible-lint) Ansible-lint checks playbooks for practices and behaviour that could potentially be improved
 - [ansible-community/molecule](https://github.com/ansible-community/molecule) Ansible Molecule testing framework
-- +[Many more](https://github.com/willmcgugan/rich/network/dependents)!
+- +[Many more](https://github.com/textualize/rich/network/dependents)!
 
 <!-- This is a test, no need to translate -->

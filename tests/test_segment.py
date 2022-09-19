@@ -165,7 +165,7 @@ def test_divide():
     ]
 
 
-# https://github.com/willmcgugan/rich/issues/1755
+# https://github.com/textualize/rich/issues/1755
 def test_divide_complex():
     MAP = (
         "[on orange4]          [on green]XX[on orange4]          \n"
