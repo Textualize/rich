@@ -144,7 +144,7 @@ def test_markup_error():
 
 
 def test_markup_escape():
-    result = str(render("[dim white]\[url=[/]"))
+    result = str(render("[dim white][url=[/]"))
     assert result == "[url="
 
 

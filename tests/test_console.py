@@ -9,6 +9,7 @@ from unittest import mock
 import pytest
 
 from rich import errors
+from rich._null_file import NullFile
 from rich.color import ColorSystem
 from rich.console import (
     CaptureError,
@@ -236,6 +237,15 @@ def test_print_json_indent_none():
     result = console.file.getvalue()
     expected = '\x1b[1m{\x1b[0m\x1b[1;34m"name"\x1b[0m: \x1b[32m"apple"\x1b[0m, \x1b[1;34m"count"\x1b[0m: \x1b[1;36m1\x1b[0m\x1b[1m}\x1b[0m\n'
     assert result == expected
+
+
+def test_console_null_file(monkeypatch):
+    # When stdout and stderr are null, Console.file should be replaced with NullFile
+    monkeypatch.setattr("sys.stdout", None)
+    monkeypatch.setattr("sys.stderr", None)
+
+    console = Console()
+    assert isinstance(console.file, NullFile)
 
 
 def test_log():
@@ -859,6 +869,7 @@ def test_detect_color_system():
 
 def test_reset_height():
     """Test height is reset when rendering complex renderables."""
+
     # https://github.com/Textualize/rich/issues/2042
     class Panels:
         def __rich_console__(self, console, options):
@@ -897,9 +908,31 @@ def test_render_lines_height_minus_vertical_pad_is_negative():
     console.render_lines(Padding("hello", pad=(1, 0)), options=options)
 
 
-@mock.patch.dict(os.environ, {"FORCE_COLOR": "anything"})
-def test_force_color():
+def test_recording_no_stdout_and_no_stderr_files(monkeypatch):
+    # Rich should work even if there's no file available to write to.
+    # For example, pythonw nullifies output streams.
+    # Built-in print silently no-ops in pythonw.
+    # Related: https://github.com/Textualize/rich/issues/2400
+    monkeypatch.setattr("sys.stdout", None)
+    monkeypatch.setattr("sys.stderr", None)
+    console = Console(record=True)
+    console.print("hello world")
+    text = console.export_text()
+    assert text == "hello world\n"
+
+
+def test_capturing_no_stdout_and_no_stderr_files(monkeypatch):
+    monkeypatch.setattr("sys.stdout", None)
+    monkeypatch.setattr("sys.stderr", None)
+    console = Console()
+    with console.capture() as capture:
+        console.print("hello world")
+    assert capture.get() == "hello world\n"
+
+
+@pytest.mark.parametrize("env_value", ["", "something", "0"])
+def test_force_color(env_value):
     # Even though we use a non-tty file, the presence of FORCE_COLOR env var
     # means is_terminal returns True.
-    console = Console(file=io.StringIO())
+    console = Console(file=io.StringIO(), _environ={"FORCE_COLOR": env_value})
     assert console.is_terminal

@@ -56,7 +56,7 @@ def test_install_max_depth():
     dh = sys.displayhook
     install(console, max_depth=1)
     sys.displayhook({"foo": {"bar": True}})
-    assert console.file.getvalue() == "{'foo': ...}\n"
+    assert console.file.getvalue() == "{'foo': {...}}\n"
     assert sys.displayhook is not dh
 
 
@@ -589,3 +589,27 @@ def test_measure_pretty():
 
     measurement = console.measure(pretty)
     assert measurement == Measurement(12, 12)
+
+
+def test_tuple_rich_repr():
+    """
+    Test that can use None as key to have tuple positional values.
+    """
+
+    class Foo:
+        def __rich_repr__(self):
+            yield None, (1,)
+
+    assert pretty_repr(Foo()) == "Foo((1,))"
+
+
+def test_tuple_rich_repr_default():
+    """
+    Test that can use None as key to have tuple positional values and with a default.
+    """
+
+    class Foo:
+        def __rich_repr__(self):
+            yield None, (1,), (1,)
+
+    assert pretty_repr(Foo()) == "Foo()"

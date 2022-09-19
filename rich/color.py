@@ -313,7 +313,7 @@ class Color(NamedTuple):
     """A triplet of color components, if an RGB color."""
 
     def __rich__(self) -> "Text":
-        """Dispays the actual color if Rich printed."""
+        """Displays the actual color if Rich printed."""
         from .style import Style
         from .text import Text
 
