@@ -4,29 +4,29 @@
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
-![Logo](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
+![Logo](https://github.com/textualize/rich/raw/master/imgs/logo.svg)
 
-[English readme](https://github.com/willmcgugan/rich/blob/master/README.md)
- • [简体中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md)
- • [正體中文 readme](https://github.com/willmcgugan/rich/blob/master/README.zh-tw.md)
- • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md)
- • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md)
- • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md)
- • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md)
- • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md)
- • [Français readme](https://github.com/willmcgugan/rich/blob/master/README.fr.md)
- • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md)
- • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
- • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
- • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
-  • [فارسی readme](https://github.com/willmcgugan/rich/blob/master/README.fa.md)
- • [Türkçe readme](https://github.com/willmcgugan/rich/blob/master/README.tr.md)
+[English readme](https://github.com/textualize/rich/blob/master/README.md)
+ • [简体中文 readme](https://github.com/textualize/rich/blob/master/README.cn.md)
+ • [正體中文 readme](https://github.com/textualize/rich/blob/master/README.zh-tw.md)
+ • [Lengua española readme](https://github.com/textualize/rich/blob/master/README.es.md)
+ • [Deutsche readme](https://github.com/textualize/rich/blob/master/README.de.md)
+ • [Läs på svenska](https://github.com/textualize/rich/blob/master/README.sv.md)
+ • [日本語 readme](https://github.com/textualize/rich/blob/master/README.ja.md)
+ • [한국어 readme](https://github.com/textualize/rich/blob/master/README.kr.md)
+ • [Français readme](https://github.com/textualize/rich/blob/master/README.fr.md)
+ • [Schwizerdütsch readme](https://github.com/textualize/rich/blob/master/README.de-ch.md)
+ • [हिन्दी readme](https://github.com/textualize/rich/blob/master/README.hi.md)
+ • [Português brasileiro readme](https://github.com/textualize/rich/blob/master/README.pt-br.md)
+ • [Русский readme](https://github.com/textualize/rich/blob/master/README.ru.md)
+  • [فارسی readme](https://github.com/textualize/rich/blob/master/README.fa.md)
+ • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
 
 Rich är ett Python bibliotek för _rich_ text och vacker formattering i terminalen.
 
 [Rich API](https://rich.readthedocs.io/en/latest/) gör det enkelt att lägga till färg och stil till terminal utmatning. Rich kan också framställa fina tabeller, framstegsfält, märkspråk, syntaxmarkerad källkod, tillbaka-spårning, och mera - redo att använda.
 
-![Funktioner](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
+![Funktioner](https://github.com/textualize/rich/raw/master/imgs/features.png)
 
 För en video demonstration av Rich kolla [calmcode.io](https://calmcode.io/rich/introduction.html) av [@fishnets88](https://twitter.com/fishnets88).
 
@@ -62,7 +62,7 @@ from rich import print
 print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 ```
 
-![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/print.png)
+![Hello World](https://github.com/textualize/rich/raw/master/imgs/print.png)
 
 ## Rich REPL
 
@@ -73,7 +73,7 @@ Rich kan installeras i Python REPL, så att varje datastruktur kommer att skriva
 >>> pretty.install()
 ```
 
-![REPL](https://github.com/willmcgugan/rich/raw/master/imgs/repl.png)
+![REPL](https://github.com/textualize/rich/raw/master/imgs/repl.png)
 
 ## Användning av konsolen
 
@@ -101,7 +101,7 @@ console.print("Hello", "World!", style="bold red")
 
 Utmatningen kommer bli något liknande:
 
-![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/hello_world.png)
+![Hello World](https://github.com/textualize/rich/raw/master/imgs/hello_world.png)
 
 Det är bra för att ge stil till en textrad åt gången. För mer finkornad stilisering, Rich framställer en speciell märkspråk vilket liknar [bbcode](https://en.wikipedia.org/wiki/BBCode) i syntax. Här är ett exempel:
 
@@ -109,7 +109,7 @@ Det är bra för att ge stil till en textrad åt gången. För mer finkornad sti
 console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i]way[/i].")
 ```
 
-![Konsol märkspråk](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
+![Konsol märkspråk](https://github.com/textualize/rich/raw/master/imgs/where_there_is_a_will.png)
 
 Du kan använda ett `Console` objekt för att generera sofistikerad utmatning med minimal ansträngning. Se [Console API](https://rich.readthedocs.io/en/latest/console.html) dokument för detaljer.
 
@@ -123,7 +123,7 @@ Rich har en [inspektionsfunktion](https://rich.readthedocs.io/en/latest/referenc
 >>> inspect(my_list, methods=True)
 ```
 
-![Log](https://github.com/willmcgugan/rich/raw/master/imgs/inspect.png)
+![Log](https://github.com/textualize/rich/raw/master/imgs/inspect.png)
 
 See [inspektionsdokumentationen](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) för detaljer.
 
@@ -163,7 +163,7 @@ test_log()
 
 Det ovanstående har följande utmatning:
 
-![Log](https://github.com/willmcgugan/rich/raw/master/imgs/log.png)
+![Log](https://github.com/textualize/rich/raw/master/imgs/log.png)
 
 Notera `log_locals` argumentet, vilket utmatar en tabell innehållandes de lokala variablerna varifrån log metoden kallades från.
 
@@ -175,7 +175,7 @@ Log metoden kan användas för att logga till terminal för långkörande applik
 
 Du kan också använda den inbyggda [Handler klassen](https://rich.readthedocs.io/en/latest/logging.html) för att formatera och färglägga utmatningen från Pythons loggningsmodul. Här är ett exempel av utmatningen:
 
-![Loggning](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
+![Loggning](https://github.com/textualize/rich/raw/master/imgs/logging.png)
 
 </details>
 
@@ -198,9 +198,9 @@ Vänligen använd denna funktion klokt.
 
 Rich kan framställa flexibla [tabeller](https://rich.readthedocs.io/en/latest/tables.html) med unicode boxkaraktärer. Det finns en stor mängd av formateringsalternativ för gränser, stilar, och celljustering etc.
 
-![Tabell film](https://github.com/willmcgugan/rich/raw/master/imgs/table_movie.gif)
+![Tabell film](https://github.com/textualize/rich/raw/master/imgs/table_movie.gif)
 
-Animationen ovan genererades utav [table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py) i exempelkatalogen.
+Animationen ovan genererades utav [table_movie.py](https://github.com/textualize/rich/blob/master/examples/table_movie.py) i exempelkatalogen.
 
 Här är ett exempel av en enklare tabell:
 
@@ -236,13 +236,13 @@ console.print(table)
 
 Detta producerar följande utmatning:
 
-![tabell](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
+![tabell](https://github.com/textualize/rich/raw/master/imgs/table.png)
 
 Notera att konsol märkspråk är framställt på samma sätt som `print()` och `log()`. I själva verket, vad som helst som är framställt av Rich kan inkluderas i rubriker / rader (även andra tabeller).
 
 `Table` klassen är smart nog att storleksändra kolumner att passa den tillgängliga bredden av terminalen, och slår in text ifall det behövs. Här är samma exempel, med terminalen gjord mindre än tabell ovan:
 
-![tabell2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
+![tabell2](https://github.com/textualize/rich/raw/master/imgs/table2.png)
 
 </details>
 
@@ -262,13 +262,13 @@ for step in track(range(100)):
 
 Det är inte mycket svårare att lägga till flera framstegsfält. Här är ett exempel tagen från dokumentationen:
 
-![framsteg](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
+![framsteg](https://github.com/textualize/rich/raw/master/imgs/progress.gif)
 
 Dessa kolumner kan konfigureras att visa vilka detaljer du vill. Inbyggda kolumner inkluderar procentuell färdig, filstorlek, filhastighet, och återstående tid. Här är ännu ett exempel som visar en pågående nedladdning:
 
-![framsteg](https://github.com/willmcgugan/rich/raw/master/imgs/downloader.gif)
+![framsteg](https://github.com/textualize/rich/raw/master/imgs/downloader.gif)
 
-För att själv testa detta, kolla [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) vilket kan ladda ner flera URLs samtidigt medan visar framsteg.
+För att själv testa detta, kolla [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) vilket kan ladda ner flera URLs samtidigt medan visar framsteg.
 
 </details>
 
@@ -293,7 +293,7 @@ with console.status("[bold green]Working on tasks...") as status:
 
 Detta genererar följande utmatning i terminalen.
 
-![status](https://github.com/willmcgugan/rich/raw/master/imgs/status.gif)
+![status](https://github.com/textualize/rich/raw/master/imgs/status.gif)
 
 Snurra animationen är lånad ifrån [cli-spinners](https://www.npmjs.com/package/cli-spinners). Du kan välja en snurra genom att specifiera `spinner` parametern. Kör följande kommando för att se tillgängliga värden:
 
@@ -303,7 +303,7 @@ python -m rich.spinner
 
 Kommandot ovan genererar följande utmatning i terminalen:
 
-![Snurror](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
+![Snurror](https://github.com/textualize/rich/raw/master/imgs/spinners.gif)
 
 </details>
 
@@ -320,9 +320,9 @@ python -m rich.tree
 
 Detta genererar följande utmatning:
 
-![märkspråk](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
+![märkspråk](https://github.com/textualize/rich/raw/master/imgs/tree.png)
 
-Se [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) exemplet för ett skript som visar en trädvy av vilken katalog som helst, som liknar linux `tree` kommandot.
+Se [tree.py](https://github.com/textualize/rich/blob/master/examples/tree.py) exemplet för ett skript som visar en trädvy av vilken katalog som helst, som liknar linux `tree` kommandot.
 
 </details>
 
@@ -342,9 +342,9 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-Följande skärmdump är resultatet från [kolumner exempelet](https://github.com/willmcgugan/rich/blob/master/examples/columns.py) vilket visar data tagen från ett API i kolumner:
+Följande skärmdump är resultatet från [kolumner exempelet](https://github.com/textualize/rich/blob/master/examples/columns.py) vilket visar data tagen från ett API i kolumner:
 
-![kolumner](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
+![kolumner](https://github.com/textualize/rich/raw/master/imgs/columns.png)
 
 </details>
 
@@ -367,7 +367,7 @@ console.print(markdown)
 
 Detta kommer att producera utmatning som liknar följande:
 
-![märkspråk](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
+![märkspråk](https://github.com/textualize/rich/raw/master/imgs/markdown.png)
 
 </details>
 
@@ -402,7 +402,7 @@ console.print(syntax)
 
 Detta kommer producera följande utmatning:
 
-![syntax](https://github.com/willmcgugan/rich/raw/master/imgs/syntax.png)
+![syntax](https://github.com/textualize/rich/raw/master/imgs/syntax.png)
 
 </details>
 
@@ -413,7 +413,7 @@ Rich kan framställa [vackra tillbaka-spårningar](https://rich.readthedocs.io/e
 
 Så här ser det ut på OSX (liknande på Linux):
 
-![traceback](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
+![traceback](https://github.com/textualize/rich/raw/master/imgs/traceback.png)
 
 </details>
 
@@ -453,4 +453,4 @@ Här är ett par projekt som använder Rich:
   Lättvikt Python bibliotek för att addera 2d-objektspårning i realtid till vilken detektor som helst.
 - [ansible/ansible-lint](https://github.com/ansible/ansible-lint) Ansible-lint kontroller playbooks för dess metoder och beteenden som potentiellt kan förbättras
 - [ansible-community/molecule](https://github.com/ansible-community/molecule) Ansible Molecule ramverk för testning
-- +[Many more](https://github.com/willmcgugan/rich/network/dependents)!
+- +[Many more](https://github.com/textualize/rich/network/dependents)!

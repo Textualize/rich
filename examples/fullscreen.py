@@ -10,10 +10,9 @@ from rich.align import Align
 from rich.console import Console, Group
 from rich.layout import Layout
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.syntax import Syntax
 from rich.table import Table
-from rich.text import Text
 
 console = Console()
 
@@ -41,33 +40,25 @@ def make_sponsor_message() -> Panel:
     sponsor_message.add_column(style="green", justify="right")
     sponsor_message.add_column(no_wrap=True)
     sponsor_message.add_row(
-        "Sponsor me",
-        "[u blue link=https://github.com/sponsors/willmcgugan]https://github.com/sponsors/willmcgugan",
-    )
-    sponsor_message.add_row(
-        "Buy me a :coffee:",
-        "[u blue link=https://ko-fi.com/willmcgugan]https://ko-fi.com/willmcgugan",
-    )
-    sponsor_message.add_row(
         "Twitter",
+        "[u blue link=https://twitter.com/textualize]https://twitter.com/textualize",
+    )
+    sponsor_message.add_row(
+        "CEO",
         "[u blue link=https://twitter.com/willmcgugan]https://twitter.com/willmcgugan",
     )
     sponsor_message.add_row(
-        "Blog", "[u blue link=https://www.willmcgugan.com]https://www.willmcgugan.com"
-    )
-
-    intro_message = Text.from_markup(
-        """Consider supporting my work via Github Sponsors (ask your company / organization), or buy me a coffee to say thanks. - Will McGugan"""
+        "Textualize", "[u blue link=https://www.textualize.io]https://www.textualize.io"
     )
 
     message = Table.grid(padding=1)
     message.add_column()
     message.add_column(no_wrap=True)
-    message.add_row(intro_message, sponsor_message)
+    message.add_row(sponsor_message)
 
     message_panel = Panel(
         Align.center(
-            Group(intro_message, "\n", Align.center(sponsor_message)),
+            Group("\n", Align.center(sponsor_message)),
             vertical="middle",
         ),
         box=box.ROUNDED,
@@ -170,8 +161,9 @@ layout["box1"].update(Panel(layout.tree, border_style="red"))
 layout["footer"].update(progress_table)
 
 
-from rich.live import Live
 from time import sleep
+
+from rich.live import Live
 
 with Live(layout, refresh_per_second=10, screen=True):
     while not overall_progress.finished:
