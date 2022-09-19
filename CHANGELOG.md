@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Parse ANSI escape sequences in pretty repr https://github.com/Textualize/rich/pull/2470
 - Add support for `FORCE_COLOR` env var https://github.com/Textualize/rich/pull/2449
 - Allow a `max_depth` argument to be passed to the `install()` hook https://github.com/Textualize/rich/issues/2486
+- Document using `None` as name in `__rich_repr__` for tuple posotional args https://github.com/Textualize/rich/pull/2379
 
 ### Fixed
 
