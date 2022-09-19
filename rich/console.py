@@ -106,7 +106,11 @@ _STD_STREAMS = (_STDIN_FILENO, _STDOUT_FILENO, _STDERR_FILENO)
 _STD_STREAMS_OUTPUT = (_STDOUT_FILENO, _STDERR_FILENO)
 
 
-_TERM_COLORS = {"256color": ColorSystem.EIGHT_BIT, "16color": ColorSystem.STANDARD}
+_TERM_COLORS = {
+    "kitty": ColorSystem.EIGHT_BIT,
+    "256color": ColorSystem.EIGHT_BIT,
+    "16color": ColorSystem.STANDARD,
+}
 
 
 class ConsoleDimensions(NamedTuple):
