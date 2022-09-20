@@ -106,7 +106,11 @@ _STD_STREAMS = (_STDIN_FILENO, _STDOUT_FILENO, _STDERR_FILENO)
 _STD_STREAMS_OUTPUT = (_STDOUT_FILENO, _STDERR_FILENO)
 
 
-_TERM_COLORS = {"256color": ColorSystem.EIGHT_BIT, "16color": ColorSystem.STANDARD}
+_TERM_COLORS = {
+    "kitty": ColorSystem.EIGHT_BIT,
+    "256color": ColorSystem.EIGHT_BIT,
+    "16color": ColorSystem.STANDARD,
+}
 
 
 class ConsoleDimensions(NamedTuple):
@@ -518,7 +522,11 @@ def _is_jupyter() -> bool:  # pragma: no cover
         return False
     ipython = get_ipython()  # type: ignore[name-defined]
     shell = ipython.__class__.__name__
-    if "google.colab" in str(ipython.__class__) or shell == "ZMQInteractiveShell":
+    if (
+        "google.colab" in str(ipython.__class__)
+        or os.getenv("DATABRICKS_RUNTIME_VERSION")
+        or shell == "ZMQInteractiveShell"
+    ):
         return True  # Jupyter notebook or qtconsole
     elif shell == "TerminalInteractiveShell":
         return False  # Terminal running IPython

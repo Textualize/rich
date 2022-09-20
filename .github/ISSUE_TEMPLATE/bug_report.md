@@ -6,7 +6,7 @@ labels: Needs triage
 assignees: ""
 ---
 
-You may find a solution to your problem in the [docs](https://rich.readthedocs.io/en/latest/introduction.html) or [issues](https://github.com/willmcgugan/rich/issues).
+You may find a solution to your problem in the [docs](https://rich.readthedocs.io/en/latest/introduction.html) or [issues](https://github.com/textualize/rich/issues).
 
 **Describe the bug**
 

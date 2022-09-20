@@ -217,6 +217,10 @@ class _Reader(RawIOBase, BinaryIO):
         return self.handle.isatty()
 
     @property
+    def mode(self) -> str:
+        return self.handle.mode
+
+    @property
     def name(self) -> str:
         return self.handle.name
 

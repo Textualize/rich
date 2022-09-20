@@ -46,7 +46,7 @@ An [example](http://example.com).
 >
 > Lorem ipsum
 
-![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
+![progress](https://github.com/textualize/rich/raw/master/imgs/progress.gif)
 
 
 ```
@@ -68,7 +68,6 @@ import re
 
 from rich.console import Console, RenderableType
 from rich.markdown import Markdown
-
 
 re_link_ids = re.compile(r"id=[\d\.\-]*?;.*?\x1b")
 
