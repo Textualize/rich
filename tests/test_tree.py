@@ -139,7 +139,7 @@ def test_render_tree_hide_root_win32():
 def test_tree_measure():
     tree = Tree("foo")
     tree.add("bar")
-    tree.add("musroom risotto")
+    tree.add("mushroom risotto")
     console = Console()
     measurement = Measurement.get(console, console.options, tree)
-    assert measurement == Measurement(11, 19)
+    assert measurement == Measurement(12, 20)
