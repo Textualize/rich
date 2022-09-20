@@ -5,7 +5,7 @@ from typing import IO, TYPE_CHECKING, Any, Callable, Optional, Union
 
 from ._extension import load_ipython_extension  # noqa: F401
 
-__all__ = ["get_console", "reconfigure", "print", "inspect"]
+__all__ = ["get_console", "reconfigure", "print", "inspect", "print_json"]
 
 if TYPE_CHECKING:
     from .console import Console
