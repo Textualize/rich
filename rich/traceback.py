@@ -337,7 +337,7 @@ class Traceback:
         from rich import _IMPORT_CWD
 
         def safe_str(_object: Any) -> str:
-            """Don't allow exceptions from __str__ to propegate."""
+            """Don't allow exceptions from __str__ to propagate."""
             try:
                 return str(_object)
             except Exception:
@@ -389,19 +389,17 @@ class Traceback:
                     del stack.frames[:]
 
             cause = getattr(exc_value, "__cause__", None)
-            if cause and cause.__traceback__:
+            if cause:
                 exc_type = cause.__class__
                 exc_value = cause
+                # __traceback__ can be None, e.g. for exceptions raised by the
+                # 'multiprocessing' module
                 traceback = cause.__traceback__
                 is_cause = True
                 continue
 
             cause = exc_value.__context__
-            if (
-                cause
-                and cause.__traceback__
-                and not getattr(exc_value, "__suppress_context__", False)
-            ):
+            if cause and not getattr(exc_value, "__suppress_context__", False):
                 exc_type = cause.__class__
                 exc_value = cause
                 traceback = cause.__traceback__

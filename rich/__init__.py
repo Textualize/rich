@@ -5,7 +5,7 @@ from typing import IO, TYPE_CHECKING, Any, Callable, Optional, Union
 
 from ._extension import load_ipython_extension  # noqa: F401
 
-__all__ = ["get_console", "reconfigure", "print", "inspect"]
+__all__ = ["get_console", "reconfigure", "print", "inspect", "print_json"]
 
 if TYPE_CHECKING:
     from .console import Console
@@ -40,7 +40,8 @@ def reconfigure(*args: Any, **kwargs: Any) -> None:
     """Reconfigures the global console by replacing it with another.
 
     Args:
-        console (Console): Replacement console instance.
+        *args (Any): Positional arguments for the replacement :class:`~rich.console.Console`.
+        **kwargs (Any): Keyword arguments for the replacement :class:`~rich.console.Console`.
     """
     from rich.console import Console
 

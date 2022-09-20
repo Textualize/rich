@@ -120,7 +120,7 @@ class AnsiDecoder:
         self.style = Style.null()
 
     def decode(self, terminal_text: str) -> Iterable[Text]:
-        """Decode ANSI codes in an interable of lines.
+        """Decode ANSI codes in an iterable of lines.
 
         Args:
             lines (Iterable[str]): An iterable of lines of terminal output.

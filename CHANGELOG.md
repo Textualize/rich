@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Handle stdout/stderr being null https://github.com/Textualize/rich/pull/2513
 - Fix NO_COLOR support on legacy Windows https://github.com/Textualize/rich/pull/2458
+- Fix pretty printer handling of cyclic references https://github.com/Textualize/rich/pull/2524
 - Fix missing `mode` property on file wrapper breaking uploads via `requests` https://github.com/Textualize/rich/pull/2495
 
 ### Changed
@@ -36,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed missing typing extensions dependency on 3.9 https://github.com/Textualize/rich/issues/2386
+- Fixed Databricks Notebook is not detected as Jupyter environment. https://github.com/Textualize/rich/issues/2422
 
 ## [12.5.0] - 2022-07-11
 
