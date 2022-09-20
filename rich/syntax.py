@@ -40,6 +40,7 @@ from rich.containers import Lines
 from rich.padding import Padding, PaddingDimensions
 
 from ._loop import loop_first
+from .cells import cell_len
 from .color import Color, blend_rgb
 from .console import Console, ConsoleOptions, JustifyMethod, RenderResult
 from .jupyter import JupyterMixin
@@ -586,11 +587,20 @@ class Syntax(JupyterMixin):
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "Measurement":
+
         _, right, _, left = Padding.unpack(self.padding)
+        padding = left + right
         if self.code_width is not None:
-            width = self.code_width + self._numbers_column_width + right + left
+            width = self.code_width + self._numbers_column_width + padding + 1
             return Measurement(self._numbers_column_width, width)
-        return Measurement(self._numbers_column_width, options.max_width)
+        width = (
+            self._numbers_column_width
+            + padding
+            + max(cell_len(line) for line in self.code.splitlines())
+        )
+        if self.line_numbers:
+            width += 1
+        return Measurement(self._numbers_column_width, width)
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
