@@ -176,10 +176,8 @@ class CodeBlock(TextElement):
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         code = str(self.text).rstrip()
-        syntax = Panel(
-            Syntax(code, self.lexer_name, theme=self.theme, word_wrap=True),
-            border_style="dim",
-            box=box.SQUARE,
+        syntax = Syntax(
+            code, self.lexer_name, theme=self.theme, word_wrap=True, padding=0
         )
         yield syntax
 
@@ -610,8 +608,8 @@ if __name__ == "__main__":  # pragma: no cover
         inline_code_lexer=args.inline_code_lexer,
     )
     if args.page:
-        import pydoc
         import io
+        import pydoc
 
         fileio = io.StringIO()
         console = Console(
