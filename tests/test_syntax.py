@@ -6,6 +6,7 @@ import tempfile
 import pytest
 from pygments.lexers import PythonLexer
 
+from rich.measure import Measurement
 from rich.panel import Panel
 from rich.style import Style
 from rich.syntax import (
@@ -378,6 +379,18 @@ def test_syntax_padding():
     assert (
         output == "                    \n   x = 1            \n                    \n"
     )
+
+
+def test_syntax_measure():
+    console = Console()
+    code = Syntax("Hello, World", "python")
+    assert code.__rich_measure__(console, console.options) == Measurement(0, 12)
+
+    code = Syntax("Hello, World", "python", line_numbers=True)
+    assert code.__rich_measure__(console, console.options) == Measurement(3, 16)
+
+    code = Syntax("Hello, World", "python", code_width=20, line_numbers=True)
+    assert code.__rich_measure__(console, console.options) == Measurement(3, 24)
 
 
 if __name__ == "__main__":
