@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix NO_COLOR support on legacy Windows https://github.com/Textualize/rich/pull/2458
 - Fix missing `mode` property on file wrapper breaking uploads via `requests` https://github.com/Textualize/rich/pull/2495
 
+### Changed
+
+- Removed border from code blocks in Markdown
+
 ## [12.5.2] - 2022-07-18
 
 ### Added
