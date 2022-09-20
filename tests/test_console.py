@@ -66,6 +66,16 @@ def test_truecolor_terminal():
     assert console.color_system == "truecolor"
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
+def test_kitty_terminal():
+    console = Console(
+        force_terminal=True,
+        legacy_windows=False,
+        _environ={"TERM": "xterm-kitty"},
+    )
+    assert console.color_system == "256"
+
+
 def test_console_options_update():
     options = ConsoleOptions(
         ConsoleDimensions(80, 25),
