@@ -47,6 +47,7 @@ The following people have contributed to the development of Rich:
 - [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Aaron Stephens](https://github.com/aaronst)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
+- [Nils Vu](https://github.com/nilsvu)
 - [Arian Mollik Wasi](https://github.com/wasi-master)
 - [Handhika Yanuar Pratama](https://github.com/theDreamer911)
 - [za](https://github.com/za)
