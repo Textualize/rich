@@ -2262,12 +2262,12 @@ class Console:
         clear: bool = True,
         code_format: str = CONSOLE_SVG_FORMAT,
         font_aspect_ratio: float = 0.61,
+        unique_id: Optional[str] = None,
     ) -> str:
         """
         Generate an SVG from the console contents (requires record=True in Console constructor).
 
         Args:
-            path (str): The path to write the SVG to.
             title (str, optional): The title of the tab in the output image
             theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
@@ -2277,6 +2277,8 @@ class Console:
             font_aspect_ratio (float, optional): The width to height ratio of the font used in the ``code_format``
                 string. Defaults to 0.61, which is the width to height ratio of Fira Code (the default font).
                 If you aren't specifying a different font inside ``code_format``, you probably don't need this.
+            unique_id (str, optional): unique id that is used as the prefix for various elements (CSS styles, node
+                ids). If not set, this defaults to a computed value based on the recorded content.
         """
 
         from rich.cells import cell_len
@@ -2372,14 +2374,16 @@ class Console:
             if clear:
                 self._record_buffer.clear()
 
-        unique_id = "terminal-" + str(
-            zlib.adler32(
-                ("".join(repr(segment) for segment in segments)).encode(
-                    "utf-8", "ignore"
+        if unique_id is None:
+            unique_id = "terminal-" + str(
+                zlib.adler32(
+                    ("".join(repr(segment) for segment in segments)).encode(
+                        "utf-8",
+                        "ignore",
+                    )
+                    + title.encode("utf-8", "ignore")
                 )
-                + title.encode("utf-8", "ignore")
             )
-        )
         y = 0
         for y, line in enumerate(Segment.split_and_crop_lines(segments, length=width)):
             x = 0
@@ -2510,6 +2514,7 @@ class Console:
         clear: bool = True,
         code_format: str = CONSOLE_SVG_FORMAT,
         font_aspect_ratio: float = 0.61,
+        unique_id: Optional[str] = None,
     ) -> None:
         """Generate an SVG file from the console contents (requires record=True in Console constructor).
 
@@ -2524,6 +2529,8 @@ class Console:
             font_aspect_ratio (float, optional): The width to height ratio of the font used in the ``code_format``
                 string. Defaults to 0.61, which is the width to height ratio of Fira Code (the default font).
                 If you aren't specifying a different font inside ``code_format``, you probably don't need this.
+            unique_id (str, optional): unique id that is used as the prefix for various elements (CSS styles, node
+                ids). If not set, this defaults to a computed value based on the recorded content.
         """
         svg = self.export_svg(
             title=title,
@@ -2531,6 +2538,7 @@ class Console:
             clear=clear,
             code_format=code_format,
             font_aspect_ratio=font_aspect_ratio,
+            unique_id=unique_id,
         )
         with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(svg)
