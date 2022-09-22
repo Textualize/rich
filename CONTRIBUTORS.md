@@ -55,3 +55,4 @@ The following people have contributed to the development of Rich:
 - [Motahhar Mokfi](https://github.com/motahhar)
 - [Tomer Shalev](https://github.com/tomers)
 - [Serkan UYSAL](https://github.com/uysalserkan)
+- [Zhe Huang](https://github.com/onlyacat)
