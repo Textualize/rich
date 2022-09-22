@@ -1722,7 +1722,7 @@ class Console:
         indent: Union[None, int, str] = 2,
         highlight: bool = True,
         skip_keys: bool = False,
-        ensure_ascii: bool = True,
+        ensure_ascii: bool = False,
         check_circular: bool = True,
         allow_nan: bool = True,
         default: Optional[Callable[[Any], Any]] = None,
