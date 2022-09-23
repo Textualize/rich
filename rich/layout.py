@@ -20,8 +20,8 @@ from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .highlighter import ReprHighlighter
 from .panel import Panel
 from .pretty import Pretty
-from .repr import rich_repr, Result
 from .region import Region
+from .repr import Result, rich_repr
 from .segment import Segment
 from .style import StyleType
 
@@ -162,7 +162,6 @@ class Layout:
         minimum_size: int = 1,
         ratio: int = 1,
         visible: bool = True,
-        height: Optional[int] = None,
     ) -> None:
         self._renderable = renderable or _Placeholder(self)
         self.size = size
@@ -170,7 +169,6 @@ class Layout:
         self.ratio = ratio
         self.name = name
         self.visible = visible
-        self.height = height
         self.splitter: Splitter = self.splitters["column"]()
         self._children: List[Layout] = []
         self._render_map: RenderMap = {}
