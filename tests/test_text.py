@@ -144,6 +144,13 @@ def test_stylize():
     assert text._spans == [Span(7, 11, "bold")]
 
 
+def test_stylize_before():
+    text = Text("Hello, World!")
+    text.stylize("bold", 0, 5)
+    text.stylize_before("italic", 2, 7)
+    assert text._spans == [Span(2, 7, "italic"), Span(0, 5, "bold")]
+
+
 def test_stylize_negative_index():
     text = Text("Hello, World!")
     text.stylize("bold", -6, -1)
