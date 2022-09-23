@@ -28,7 +28,7 @@ Add the ``-U`` switch to update to the current version, if Rich is already insta
 
 If you intend to use Rich with Jupyter then there are some additional dependencies which you can install with the following command::
 
-    pip install rich[jupyter]
+    pip install "rich[jupyter]"
 
 
 Quick Start
