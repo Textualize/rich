@@ -554,6 +554,18 @@ def test_export_svg():
     assert svg == EXPECTED_SVG
 
 
+def test_export_svg_specified_unique_id():
+    expected_svg = EXPECTED_SVG.replace("terminal-3526644552", "given-id")
+    console = Console(record=True, width=100)
+    console.print(
+        "[b red on blue reverse]foo[/] [blink][link=https://example.org]Click[/link]"
+    )
+    svg = console.export_svg(unique_id="given-id")
+    print(repr(svg))
+
+    assert svg == expected_svg
+
+
 def test_save_svg():
     console = Console(record=True, width=100)
     console.print(
