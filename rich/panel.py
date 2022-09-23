@@ -225,7 +225,6 @@ class Panel(JupyterMixin):
         if title_text is None or width <= 4:
             yield Segment(box.get_top([width - 2]), border_style)
         else:
-            # title_text.align(self.title_align, width - 4, character=box.top)
             title_text = align_text(
                 title_text,
                 width - 4,
@@ -251,7 +250,6 @@ class Panel(JupyterMixin):
         if subtitle_text is None or width <= 4:
             yield Segment(box.get_bottom([width - 2]), border_style)
         else:
-            # subtitle_text.align(self.subtitle_align, width - 4, character=box.bottom)
             subtitle_text = align_text(
                 subtitle_text,
                 width - 4,
