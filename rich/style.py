@@ -188,8 +188,10 @@ class Style:
         )
 
         self._link = link
-        self._link_id = f"{randint(0, 999999)}" if link else ""
         self._meta = None if meta is None else dumps(meta)
+        self._link_id = (
+            f"{randint(0, 999999)}{hash(self._meta)}" if (link or meta) else ""
+        )
         self._hash: Optional[int] = None
         self._null = not (self._set_attributes or color or bgcolor or link or meta)
 
@@ -237,8 +239,8 @@ class Style:
         style._set_attributes = 0
         style._attributes = 0
         style._link = None
-        style._link_id = ""
         style._meta = dumps(meta)
+        style._link_id = f"{randint(0, 999999)}{hash(style._meta)}"
         style._hash = None
         style._null = not (meta)
         return style

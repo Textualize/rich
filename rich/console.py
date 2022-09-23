@@ -2374,7 +2374,7 @@ class Console:
 
         unique_id = "terminal-" + str(
             zlib.adler32(
-                ("".join(segment.text for segment in segments)).encode(
+                ("".join(repr(segment) for segment in segments)).encode(
                     "utf-8", "ignore"
                 )
                 + title.encode("utf-8", "ignore")
