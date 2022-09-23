@@ -240,6 +240,15 @@ def test_print_json_ensure_ascii():
     assert result == expected
 
 
+def test_print_json_with_default_ensure_ascii():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print_json(data={"foo": "💩"})
+    result = console.file.getvalue()
+    print(repr(result))
+    expected = '\x1b[1m{\x1b[0m\n  \x1b[1;34m"foo"\x1b[0m: \x1b[32m"💩"\x1b[0m\n\x1b[1m}\x1b[0m\n'
+    assert result == expected
+
+
 def test_print_json_indent_none():
     console = Console(file=io.StringIO(), color_system="truecolor")
     data = {"name": "apple", "count": 1}
