@@ -220,7 +220,13 @@ def test_section():
     table.add_row("row5")
     table.add_section()  # Null-op
 
-    console = Console(record=True)
+    console = Console(
+        width=80,
+        force_terminal=True,
+        color_system="truecolor",
+        legacy_windows=False,
+        record=True,
+    )
     console.print(table)
     output = console.export_text()
     print(repr(output))
