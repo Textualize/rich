@@ -96,6 +96,8 @@ Lines
 
 By default, Tables will show a line under the header only. If you want to show lines between all rows add ``show_lines=True`` to the constructor.
 
+You can also force a line on the next row by setting ``end_section=True`` on the call to ``add_row()``.
+
 
 Empty Tables
 ~~~~~~~~~~~~
