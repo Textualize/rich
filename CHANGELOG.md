@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add support for `FORCE_COLOR` env var https://github.com/Textualize/rich/pull/2449
 - Allow a `max_depth` argument to be passed to the `install()` hook https://github.com/Textualize/rich/issues/2486
 - Document using `None` as name in `__rich_repr__` for tuple positional args https://github.com/Textualize/rich/pull/2379
+- Add `font_aspect_ratio` parameter in SVG export https://github.com/Textualize/rich/pull/2539/files
 
 ### Fixed
 
@@ -22,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix pretty printer handling of cyclic references https://github.com/Textualize/rich/pull/2524
 - Fix missing `mode` property on file wrapper breaking uploads via `requests` https://github.com/Textualize/rich/pull/2495
 - Fix mismatching default value of parameter `ensure_ascii` https://github.com/Textualize/rich/pull/2538
+- Remove unused height parameter in `Layout` class https://github.com/Textualize/rich/pull/2540
+
 
 ### Changed
 

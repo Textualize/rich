@@ -2261,18 +2261,22 @@ class Console:
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
         code_format: str = CONSOLE_SVG_FORMAT,
+        font_aspect_ratio: float = 0.61,
     ) -> str:
         """
         Generate an SVG from the console contents (requires record=True in Console constructor).
 
         Args:
             path (str): The path to write the SVG to.
-            title (str): The title of the tab in the output image
+            title (str, optional): The title of the tab in the output image
             theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
-            code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
+            code_format (str, optional): Format string used to generate the SVG. Rich will inject a number of variables
                 into the string in order to form the final SVG output. The default template used and the variables
                 injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
+            font_aspect_ratio (float, optional): The width to height ratio of the font used in the ``code_format``
+                string. Defaults to 0.61, which is the width to height ratio of Fira Code (the default font).
+                If you aren't specifying a different font inside ``code_format``, you probably don't need this.
         """
 
         from rich.cells import cell_len
@@ -2316,7 +2320,7 @@ class Console:
 
         width = self.width
         char_height = 20
-        char_width = char_height * 0.61
+        char_width = char_height * font_aspect_ratio
         line_height = char_height * 1.22
 
         margin_top = 1
@@ -2505,23 +2509,28 @@ class Console:
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
         code_format: str = CONSOLE_SVG_FORMAT,
+        font_aspect_ratio: float = 0.61,
     ) -> None:
         """Generate an SVG file from the console contents (requires record=True in Console constructor).
 
         Args:
             path (str): The path to write the SVG to.
-            title (str): The title of the tab in the output image
+            title (str, optional): The title of the tab in the output image
             theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
-            code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
+            code_format (str, optional): Format string used to generate the SVG. Rich will inject a number of variables
                 into the string in order to form the final SVG output. The default template used and the variables
                 injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
+            font_aspect_ratio (float, optional): The width to height ratio of the font used in the ``code_format``
+                string. Defaults to 0.61, which is the width to height ratio of Fira Code (the default font).
+                If you aren't specifying a different font inside ``code_format``, you probably don't need this.
         """
         svg = self.export_svg(
             title=title,
             theme=theme,
             clear=clear,
             code_format=code_format,
+            font_aspect_ratio=font_aspect_ratio,
         )
         with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(svg)
