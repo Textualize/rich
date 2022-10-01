@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Document using `None` as name in `__rich_repr__` for tuple positional args https://github.com/Textualize/rich/pull/2379
 - Add `font_aspect_ratio` parameter in SVG export https://github.com/Textualize/rich/pull/2539/files
 - Added `Table.add_section` method. https://github.com/Textualize/rich/pull/2544
+- Add more terminal themes. https://github.com/Textualize/rich/pull/2556
 
 ### Fixed
 
