@@ -39,11 +39,20 @@ def test_lines_justify():
     console = Console()
     lines1 = Lines([Text("foo", style="b"), Text("test", style="b")])
     lines1.justify(console, 10, justify="left")
-    assert lines1._lines == [Text("foo       ", style="b"), Text("test      ", style="b")]
+    assert lines1._lines == [
+        Text("foo       ", style="b"),
+        Text("test      ", style="b"),
+    ]
     lines1.justify(console, 10, justify="center")
-    assert lines1._lines == [Text("   foo    ", style="b"), Text("   test   ", style="b")]
+    assert lines1._lines == [
+        Text("   foo    ", style="b"),
+        Text("   test   ", style="b"),
+    ]
     lines1.justify(console, 10, justify="right")
-    assert lines1._lines == [Text("       foo", style="b"), Text("      test", style="b")]
+    assert lines1._lines == [
+        Text("       foo", style="b"),
+        Text("      test", style="b"),
+    ]
 
     lines2 = Lines([Text("foo bar", style="b"), Text("test", style="b")])
     lines2.justify(console, 7, justify="full")

@@ -84,26 +84,27 @@ def test_le():
     assert_less_than(green_foo, red_foo_styled_with_obj)
     assert red_foo > green_foo
 
-    def partially_styled(initial_style='', style_start=None, partial_style=''):
+    def partially_styled(initial_style="", style_start=None, partial_style=""):
         hello = Text("hello, cold world!", initial_style)
         if style_start:
             hello.stylize(partial_style, style_start)
         return hello
 
-    red_hello = partially_styled('red')
-    half_red_hello = partially_styled(style_start=6, partial_style='red')
-    half_green_hello = partially_styled(style_start=6, partial_style='green')
-    quarter_red_hello = partially_styled(style_start=3, partial_style='red')
-    half_red_half_green_hello = partially_styled('red', 6, 'green')
+    red_hello = partially_styled("red")
+    half_red_hello = partially_styled(style_start=6, partial_style="red")
+    half_green_hello = partially_styled(style_start=6, partial_style="green")
+    quarter_red_hello = partially_styled(style_start=3, partial_style="red")
+    half_red_half_green_hello = partially_styled("red", 6, "green")
     half_red_quarter_underline = half_red_hello.copy()
-    half_red_quarter_underline.stylize('underline', 9)
+    half_red_quarter_underline.stylize("underline", 9)
     assert_less_than(half_green_hello, half_red_hello)
     assert_less_than(quarter_red_hello, half_red_hello)
     assert_less_than(quarter_red_hello, half_green_hello)
     assert_less_than(red_hello, half_red_half_green_hello)
     assert_less_than(half_red_hello, half_red_quarter_underline)
-    assert sorted([red_hello, half_red_half_green_hello, green_foo, red_foo_styled_with_obj]) == \
-        [green_foo, red_foo_styled_with_obj, red_hello, half_red_half_green_hello]
+    assert sorted(
+        [red_hello, half_red_half_green_hello, green_foo, red_foo_styled_with_obj]
+    ) == [green_foo, red_foo_styled_with_obj, red_hello, half_red_half_green_hello]
     assert foo.__le__(1) == NotImplemented
 
 

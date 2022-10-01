@@ -173,9 +173,11 @@ class Text(JupyterMixin):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Text):
             return NotImplemented
-        return self.plain == other.plain and \
-               self.style == other.style and \
-               self._spans == other._spans
+        return (
+            self.plain == other.plain
+            and self.style == other.style
+            and self._spans == other._spans
+        )
 
     def __le__(self, other: object) -> bool:
         """
