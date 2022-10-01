@@ -9,6 +9,7 @@ The following people have contributed to the development of Rich:
 - [Dennis Brakhane](https://github.com/brakhane)
 - [Darren Burns](https://github.com/darrenburns)
 - [Jim Crist-Harif](https://github.com/jcrist)
+- [Michel de Cryptadamus](https://github.com/michelcrypt4d4mus)
 - [Ed Davis](https://github.com/davised)
 - [Pete Davison](https://github.com/pd93)
 - [James Estevez](https://github.com/jstvz)
