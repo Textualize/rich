@@ -173,13 +173,15 @@ class Text(JupyterMixin):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Text):
             return NotImplemented
-        return self.plain == other.plain and self._spans == other._spans
+        return self.plain == other.plain and \
+               self.style == other.style and \
+               self._spans == other._spans
 
     def __le__(self, other: object) -> bool:
         """
-        This Text object is considered less than or equal to the other if:
-          1. It's plain string representation is less than the other's.
-          2. Plain strings are the same but the style string is less than other's style string.
+        A Text object is less than or equal to the other if:
+          1. Its plain string representation is less than the other's.
+          2. The plain strings are the same but the style string is less than other's style string.
           3. Plain strings and style strings are the same but the Nth Span tuple is less than
              the other's Nth Span tuple
           4. Plain strings, style strings, and all N of its Spans are the same as the other's.
