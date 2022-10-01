@@ -70,7 +70,7 @@ def test_text_column():
     text_column = TextColumn("[b]bar", markup=False)
     task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
     text = text_column.render(task)
-    assert text == Text("[b]bar")
+    assert text == Text("[b]bar", style="none")
 
 
 def test_time_elapsed_column():

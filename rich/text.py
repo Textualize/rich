@@ -186,32 +186,22 @@ class Text(JupyterMixin):
              the other's Nth Span tuple
           4. Plain strings, style strings, and all N of its Spans are the same as the other's.
         """
-        if isinstance(other, Text):
-            if self.plain != other.plain:
-                return self.plain <= other.plain
-            elif str(self.style) != str(other.style):
-                return str(self.style) <= str(other.style)
-            elif len(self.spans) == len(other.spans) == 0:
-                return True
-
-            # If plain string and style strings match, we compare span by span
-            for i, span in enumerate(self.spans):
-                if len(other.spans) < i + 1:
-                    return False
-                # Normalize the span styles to strings to ensure safe comparison
-                other_span = other.spans[i]
-                this_span = (span.start, span.end, str(span.style))
-                that_span = (other_span.start, other_span.end, str(other_span.style))
-                if this_span == that_span:
-                    continue
-                return this_span < that_span
-            return True
-        elif isinstance(other, str):
-            if other == self.plain:
-                return False
-            return self.plain <= other
-        else:
+        if not isinstance(other, Text):
             return NotImplemented
+        if self.plain != other.plain:
+            return self.plain <= other.plain
+        elif str(self.style) != str(other.style):
+            return str(self.style) <= str(other.style)
+        elif len(self.spans) == 0:
+            return True
+        # If plain string and style strings match, we compare span by span
+        for i, span in enumerate(self.spans):
+            if len(other.spans) < i + 1:
+                return False
+            if repr(span) == repr(other.spans[i]):
+                continue
+            return span < other.spans[i]
+        return True
 
     def __lt__(self, other):
         if self == other:
