@@ -76,6 +76,7 @@ def test_le():
     red_foo_styled_with_obj = Text("foo", Style(color="red"))
     assert_less_than(foo, goo)
     assert foo <= foo
+    assert not foo < foo
     assert red_foo <= red_foo
     assert red_foo_styled_with_obj <= red_foo
     assert red_foo <= red_foo_styled_with_obj
