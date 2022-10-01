@@ -211,6 +211,11 @@ class Text(JupyterMixin):
         else:
             return NotImplemented
 
+    def __lt__(self, other):
+        if self == other:
+            return False
+        return self <= other
+
     def __hash__(self) -> int:
         return hash(self.markup)
 

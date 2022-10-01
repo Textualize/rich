@@ -84,7 +84,7 @@ def test_le():
     assert_less_than(green_foo, red_foo_styled_with_obj)
 
     def partially_styled(initial_style='', style_start=None, partial_style=''):
-        hello = Text("Hello, cold world!", initial_style)
+        hello = Text("hello, cold world!", initial_style)
         if style_start:
             hello.stylize(partial_style, style_start)
         return hello
