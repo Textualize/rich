@@ -71,26 +71,46 @@ def test_le():
 
     foo = Text("foo")
     goo = Text("goo")
+    red_foo = Text("foo", "red")
+    green_foo = Text("foo", style="green")
+    red_foo_styled_with_obj = Text("foo", Style(color="red"))
     assert_less_than(foo, goo)
     assert foo <= foo
     assert foo <= "goo"
-    red_foo = Text("foo", style="red")
-    green_foo = Text("foo", style="green")
-    assert_less_than(green_foo, red_foo)
     assert red_foo <= red_foo
+    assert red_foo_styled_with_obj <= red_foo
+    assert red_foo <= red_foo_styled_with_obj
+    assert_less_than(green_foo, red_foo)
+    assert_less_than(green_foo, red_foo_styled_with_obj)
 
-    def partially_styled(style_start, style):
-        hello = Text("Hello, cold world!")
-        hello.stylize(style, style_start)
+    def partially_styled(initial_style='', style_start=None, partial_style=''):
+        hello = Text("Hello, cold world!", initial_style)
+        if style_start:
+            hello.stylize(partial_style, style_start)
         return hello
 
-    half_red_hello = partially_styled(6, 'red')
-    half_green_hello = partially_styled(6, 'green')
+    red_hello = partially_styled('red')
+    half_red_hello = partially_styled(style_start=6, partial_style='red')
+    half_green_hello = partially_styled(style_start=6, partial_style='green')
+    quarter_red_hello = partially_styled(style_start=3, partial_style='red')
+    half_red_half_green_hello = partially_styled('red', 6, 'green')
+    half_red_quarter_underline = half_red_hello.copy()
+    half_red_quarter_underline.stylize('underline', 9)
     assert_less_than(half_green_hello, half_red_hello)
-    quarter_red_hello = partially_styled(3, 'red')
     assert_less_than(quarter_red_hello, half_red_hello)
     assert_less_than(quarter_red_hello, half_green_hello)
+    assert_less_than(red_hello, half_red_half_green_hello)
+    assert_less_than(half_red_hello, half_red_quarter_underline)
+    assert sorted([red_hello, half_red_half_green_hello, green_foo, red_foo_styled_with_obj]) == \
+        [green_foo, red_foo_styled_with_obj, red_hello, half_red_half_green_hello]
     assert foo.__le__(1) == NotImplemented
+
+
+def test_hash():
+    try:
+        _dict = {Text("foo"): 1, Text("foo", "red"): 2}
+    except Exception as e:
+        assert False, f"Using Text obj as a dict key failed with {e}"
 
 
 def test_contain():

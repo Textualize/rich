@@ -211,6 +211,8 @@ class Text(JupyterMixin):
         else:
             return NotImplemented
 
+    def __hash__(self) -> int:
+        return hash(self.markup)
 
     def __contains__(self, other: object) -> bool:
         if isinstance(other, str):
