@@ -64,6 +64,33 @@ def test_eq():
     assert Text("foo").__eq__(1) == NotImplemented
 
 
+def test_le():
+    def assert_less_than(a, b):
+        assert a <= b
+        assert not b <= a
+
+    foo = Text("foo")
+    goo = Text("goo")
+    assert_less_than(foo, goo)
+    assert foo <= foo
+    red_foo = Text("foo", style="red")
+    green_foo = Text("foo", style="green")
+    assert_less_than(green_foo, red_foo)
+    assert red_foo <= red_foo
+
+    def partially_styled(style_start, style):
+        hello = Text("Hello, cold world!")
+        hello.stylize(style, style_start)
+        return hello
+
+    half_red_hello = partially_styled(6, 'red')
+    half_green_hello = partially_styled(6, 'green')
+    assert_less_than(half_green_hello, half_red_hello)
+    quarter_red_hello = partially_styled(3, 'red')
+    assert_less_than(quarter_red_hello, half_red_hello)
+    assert_less_than(quarter_red_hello, half_green_hello)
+    assert foo.__le__(1) == NotImplemented
+
 def test_contain():
     text = Text("foobar")
     assert "foo" in text
