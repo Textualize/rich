@@ -203,7 +203,7 @@ class Text(JupyterMixin):
             return span < other.spans[i]
         return True
 
-    def __lt__(self, other):
+    def __lt__(self, other: object) -> bool:
         if self == other:
             return False
         return self <= other
