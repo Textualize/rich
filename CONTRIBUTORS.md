@@ -56,3 +56,4 @@ The following people have contributed to the development of Rich:
 - [Tomer Shalev](https://github.com/tomers)
 - [Serkan UYSAL](https://github.com/uysalserkan)
 - [Zhe Huang](https://github.com/onlyacat)
+- [Sourajyoti Basak](https://github.com/wizard-28)
