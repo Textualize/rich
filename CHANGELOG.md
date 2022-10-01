@@ -16,8 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Document using `None` as name in `__rich_repr__` for tuple positional args https://github.com/Textualize/rich/pull/2379
 - Add `font_aspect_ratio` parameter in SVG export https://github.com/Textualize/rich/pull/2539/files
 - Added `Table.add_section` method. https://github.com/Textualize/rich/pull/2544
-- Implemented `Text.__hash__` method (enables `Text` objects to be used as `dict` keys).
-- Implemented `Text.__le__` and `Text.__lt__` to enable comparison (and thus also sorting) of `Text` objects in a reproducible way based on the string, the style, and the `Span`s.
+- Implemented `Text.__hash__` method (enables `Text` objects to be used as `dict` keys). https://github.com/Textualize/rich/pull/2554
+- Implemented `Text.__le__` and `Text.__lt__` to enable comparison (and thus also sorting) of `Text` objects in a reproducible way based on the string, the style, and the `Span`s. https://github.com/Textualize/rich/pull/2554
 
 ### Fixed
 
@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix missing `mode` property on file wrapper breaking uploads via `requests` https://github.com/Textualize/rich/pull/2495
 - Fix mismatching default value of parameter `ensure_ascii` https://github.com/Textualize/rich/pull/2538
 - Remove unused height parameter in `Layout` class https://github.com/Textualize/rich/pull/2540
-- `Text` equality now checks the string, the style, and the spans instead of just the string and the spans
+- `Text` equality now checks the string, the style, and the spans instead of just the string and the spans. https://github.com/Textualize/rich/pull/2554
 
 
 ### Changed
