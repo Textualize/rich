@@ -593,10 +593,11 @@ class Syntax(JupyterMixin):
         if self.code_width is not None:
             width = self.code_width + self._numbers_column_width + padding + 1
             return Measurement(self._numbers_column_width, width)
+        lines = self.code.splitlines()
         width = (
             self._numbers_column_width
             + padding
-            + max(cell_len(line) for line in self.code.splitlines())
+            + (max(cell_len(line) for line in lines) if lines else 0)
         )
         if self.line_numbers:
             width += 1

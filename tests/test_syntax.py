@@ -392,6 +392,9 @@ def test_syntax_measure():
     code = Syntax("Hello, World", "python", code_width=20, line_numbers=True)
     assert code.__rich_measure__(console, console.options) == Measurement(3, 24)
 
+    code = Syntax("", "python", code_width=20, line_numbers=True)
+    assert code.__rich_measure__(console, console.options) == Measurement(3, 24)
+
 
 if __name__ == "__main__":
     syntax = Panel.fit(
