@@ -73,6 +73,7 @@ def test_le():
     goo = Text("goo")
     assert_less_than(foo, goo)
     assert foo <= foo
+    assert foo <= "goo"
     red_foo = Text("foo", style="red")
     green_foo = Text("foo", style="green")
     assert_less_than(green_foo, red_foo)
@@ -90,6 +91,7 @@ def test_le():
     assert_less_than(quarter_red_hello, half_red_hello)
     assert_less_than(quarter_red_hello, half_green_hello)
     assert foo.__le__(1) == NotImplemented
+
 
 def test_contain():
     text = Text("foobar")

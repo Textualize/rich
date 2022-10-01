@@ -191,6 +191,7 @@ class Text(JupyterMixin):
                 return str(self.style) <= str(other.style)
             elif len(self.spans) == len(other.spans) == 0:
                 return True
+
             # If plain string and style strings match, we compare span by span
             for i, span in enumerate(self.spans):
                 if len(other.spans) < i + 1:
@@ -199,10 +200,9 @@ class Text(JupyterMixin):
                 other_span = other.spans[i]
                 this_span = (span.start, span.end, str(span.style))
                 that_span = (other_span.start, other_span.end, str(other_span.style))
-                if this_span < that_span:
-                    return True
-                elif that_span < this_span:
-                    return False
+                if this_span == that_span:
+                    continue
+                return this_span < that_span
             return True
         elif isinstance(other, str):
             if other == self.plain:
