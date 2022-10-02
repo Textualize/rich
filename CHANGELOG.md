@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [12.6.0] - Unreleased
+## [12.6.0] - 2022-10-02
 
 ### Added
 
@@ -26,7 +26,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix mismatching default value of parameter `ensure_ascii` https://github.com/Textualize/rich/pull/2538
 - Remove unused height parameter in `Layout` class https://github.com/Textualize/rich/pull/2540
 - Fixed exception in Syntax.__rich_measure__ for empty files
-
 
 ### Changed
 
