@@ -420,11 +420,11 @@ Rich respects some standard environment variables.
 
 Setting the environment variable ``TERM`` to ``"dumb"`` or ``"unknown"`` will disable color/style and some features that require moving the cursor, such as progress bars.
 
-If the environment variable ``FORCE_COLOR`` is set, then color/styles will be enabled regardless of the value of ``TERM``. This is useful on CI systems which aren't terminals but can display ansi escape sequences none-the-less.
+If the environment variable ``FORCE_COLOR`` is set, then color/styles will be enabled regardless of the value of ``TERM``. This is useful on CI systems which aren't terminals but can none-the-less display ANSI escape sequences.
 
 If the environment variable ``NO_COLOR`` is set, Rich will disable all color in the output. This takes precedence over ``FORCE_COLOR``. See `no_color <https://no-color.org/>`_ for details.
 
 .. note::
-    The ``NO_COLOR`` environment variable removes *color* only. Styles such as bold / italic etc. are preserved.
+    The ``NO_COLOR`` environment variable removes *color* only. Styles such as dim, bold, italic, underline etc. are preserved.
 
 If ``width`` / ``height`` arguments are not explicitly provided as arguments to ``Console`` then the environment variables ``COLUMNS``/``LINES`` can be used to set the console width/height. ``JUPYTER_COLUMNS``/``JUPYTER_LINES`` behave similarly and are used in Jupyter.
