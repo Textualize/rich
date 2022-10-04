@@ -425,6 +425,6 @@ If the environment variable ``FORCE_COLOR`` is set, then color/styles will be en
 If the environment variable ``NO_COLOR`` is set, Rich will disable all color in the output. This takes precedence over ``FORCE_COLOR``. See `no_color <https://no-color.org/>`_ for details.
 
 .. note::
-    The ``NO_COLOR`` environment variable removes _color_ only. Styles such as bold / italic etc. are preserved.
+    The ``NO_COLOR`` environment variable removes *color* only. Styles such as bold / italic etc. are preserved.
 
 If ``width`` / ``height`` arguments are not explicitly provided as arguments to ``Console`` then the environment variables ``COLUMNS``/``LINES`` can be used to set the console width/height. ``JUPYTER_COLUMNS``/``JUPYTER_LINES`` behave similarly and are used in Jupyter.
