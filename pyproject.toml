@@ -28,7 +28,6 @@ include = ["rich/py.typed"]
 [tool.poetry.dependencies]
 python = "^3.7.13"
 typing-extensions = { version = ">=4.0.0, <5.0", python = "<3.9" }
-dataclasses = { version = ">=0.7,<0.9", python = "<3.7" }
 pygments = "^2.6.0"
 commonmark = "^0.9.0"
 ipywidgets = { version = "^7.5.1", optional = true }
