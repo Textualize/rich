@@ -3,7 +3,6 @@ from typing import IO, Iterable, Iterator, List, Optional, Type
 
 
 class NullFile(IO[str]):
-
     def close(self) -> None:
         pass
 
