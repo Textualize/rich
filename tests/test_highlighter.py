@@ -31,6 +31,16 @@ highlight_tests = [
         ],
     ),
     (
+        "<foo: 23>",
+        [
+            Span(0, 1, 'repr.tag_start'),
+            Span(1, 5, 'repr.tag_name'),
+            Span(5, 8, 'repr.tag_contents'),
+            Span(8, 9, 'repr.tag_end'),
+            Span(6, 8, 'repr.number')
+        ]
+    ),
+    (
         "False True None",
         [
             Span(0, 5, "repr.bool_false"),
