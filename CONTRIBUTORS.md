@@ -2,7 +2,7 @@
 
 The following people have contributed to the development of Rich:
 
-<!-- Add your name below, sort alphabetically by surname. Link to Github profile / your home page. -->
+<!-- Add your name below, sort alphabetically by surname. Link to GitHub profile / your home page. -->
 
 - [Patrick Arminio](https://github.com/patrick91)
 - [Gregory Beauregard](https://github.com/GBeauregard/pyffstream)
@@ -21,6 +21,7 @@ The following people have contributed to the development of Rich:
 - [Lanqing Huang](https://github.com/lqhuang)
 - [Finn Hughes](https://github.com/finnhughes)
 - [Josh Karpel](https://github.com/JoshKarpel)
+- [Hugo van Kemenade](https://github.com/hugovk)
 - [Andrew Kettmann](https://github.com/akettmann)
 - [Martin Larralde](https://github.com/althonos)
 - [Hedy Li](https://github.com/hedythedev)

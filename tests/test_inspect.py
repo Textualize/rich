@@ -13,11 +13,6 @@ from rich._inspect import (
 )
 from rich.console import Console
 
-skip_py36 = pytest.mark.skipif(
-    sys.version_info.minor == 6 and sys.version_info.major == 3,
-    reason="rendered differently on py3.6",
-)
-
 skip_py37 = pytest.mark.skipif(
     sys.version_info.minor == 7 and sys.version_info.major == 3,
     reason="rendered differently on py3.7",
@@ -89,7 +84,6 @@ class FooSubclass(Foo):
     pass
 
 
-@skip_py36
 def test_render():
     console = Console(width=100, file=io.StringIO(), legacy_windows=False)
 
@@ -118,7 +112,6 @@ def test_inspect_text():
     assert render("Hello") == expected
 
 
-@skip_py36
 @skip_py37
 @skip_pypy3
 def test_inspect_empty_dict():
@@ -194,7 +187,6 @@ def test_inspect_coroutine():
     assert render(coroutine).startswith(expected)
 
 
-@skip_py36
 def test_inspect_integer():
     expected = (
         "╭────── <class 'int'> ───────╮\n"
@@ -210,7 +202,6 @@ def test_inspect_integer():
     assert expected == render(1)
 
 
-@skip_py36
 def test_inspect_integer_with_value():
     expected = "╭────── <class 'int'> ───────╮\n│ int([x]) -> integer        │\n│ int(x, base=10) -> integer │\n│                            │\n│ ╭────────────────────────╮ │\n│ │ 1                      │ │\n│ ╰────────────────────────╯ │\n│                            │\n│ denominator = 1            │\n│        imag = 0            │\n│   numerator = 1            │\n│        real = 1            │\n╰────────────────────────────╯\n"
     value = render(1, value=True)
@@ -218,7 +209,6 @@ def test_inspect_integer_with_value():
     assert value == expected
 
 
-@skip_py36
 @skip_py37
 @skip_py310
 @skip_py311
@@ -255,7 +245,6 @@ def test_inspect_integer_with_methods_python38_and_python39():
     assert render(1, methods=True) == expected
 
 
-@skip_py36
 @skip_py37
 @skip_py38
 @skip_py39
@@ -297,7 +286,6 @@ def test_inspect_integer_with_methods_python310only():
     assert render(1, methods=True) == expected
 
 
-@skip_py36
 @skip_py37
 @skip_py38
 @skip_py39
@@ -341,7 +329,6 @@ def test_inspect_integer_with_methods_python311_and_above():
     assert render(1, methods=True) == expected
 
 
-@skip_py36
 @skip_py37
 @skip_pypy3
 def test_broken_call_attr():

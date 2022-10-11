@@ -642,7 +642,6 @@ def traverse(
             return Node(value_repr="...")
 
         obj_type = type(obj)
-        py_version = (sys.version_info.major, sys.version_info.minor)
         children: List[Node]
         reached_max_depth = max_depth is not None and depth >= max_depth
 
@@ -780,7 +779,7 @@ def traverse(
             is_dataclass(obj)
             and not _safe_isinstance(obj, type)
             and not fake_attributes
-            and (_is_dataclass_repr(obj) or py_version == (3, 6))
+            and _is_dataclass_repr(obj)
         ):
             push_visited(obj_id)
             children = []
