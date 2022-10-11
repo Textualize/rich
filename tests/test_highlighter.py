@@ -5,10 +5,10 @@ from typing import List
 import pytest
 
 from rich.highlighter import (
+    ISO8601Highlighter,
     JSONHighlighter,
     NullHighlighter,
     ReprHighlighter,
-    ISO8601Highlighter,
 )
 from rich.text import Span, Text
 
@@ -28,6 +28,26 @@ highlight_tests = [
             Span(0, 1, "repr.tag_start"),
             Span(1, 4, "repr.tag_name"),
             Span(4, 5, "repr.tag_end"),
+        ],
+    ),
+    (
+        "<foo: 23>",
+        [
+            Span(0, 1, "repr.tag_start"),
+            Span(1, 5, "repr.tag_name"),
+            Span(5, 8, "repr.tag_contents"),
+            Span(8, 9, "repr.tag_end"),
+            Span(6, 8, "repr.number"),
+        ],
+    ),
+    (
+        "<foo: <bar: 23>>",
+        [
+            Span(0, 1, "repr.tag_start"),
+            Span(1, 5, "repr.tag_name"),
+            Span(5, 15, "repr.tag_contents"),
+            Span(15, 16, "repr.tag_end"),
+            Span(12, 14, "repr.number"),
         ],
     ),
     (
