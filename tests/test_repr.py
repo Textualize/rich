@@ -1,15 +1,10 @@
-import pytest
 import sys
 from typing import Optional
 
-from rich.console import Console
+import pytest
+
 import rich.repr
-
-
-skip_py36 = pytest.mark.skipif(
-    sys.version_info.minor == 6 and sys.version_info.major == 3,
-    reason="rendered differently on py3.6",
-)
+from rich.console import Console
 
 skip_py37 = pytest.mark.skipif(
     sys.version_info.minor == 7 and sys.version_info.major == 3,
@@ -71,7 +66,6 @@ def test_rich_repr() -> None:
     assert (repr(Foo("hello", bar=3))) == "Foo('hello', 'hello', bar=3, egg=1)"
 
 
-@skip_py36
 @skip_py37
 def test_rich_repr_positional_only() -> None:
     _locals = locals().copy()
