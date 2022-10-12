@@ -33,6 +33,7 @@ The following people have contributed to the development of Rich:
 - [Michael Milton](https://github.com/multimeric)
 - [Martina Oefelein](https://github.com/oefe)
 - [Nathan Page](https://github.com/nathanrpage97)
+- [Dave Pearson](https://github.com/davep/)
 - [Avi Perl](https://github.com/avi-perl)
 - [Laurent Peuch](https://github.com/psycojoker)
 - [Olivier Philippon](https://github.com/DrBenton)
