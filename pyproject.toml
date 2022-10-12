@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rich"
-homepage = "https://github.com/willmcgugan/rich"
+homepage = "https://github.com/Textualize/rich"
 documentation = "https://rich.readthedocs.io/en/latest/"
 version = "13.0.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
