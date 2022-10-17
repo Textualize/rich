@@ -133,4 +133,7 @@ if __name__ == "__main__":  # pragma: no cover
         refresh_per_second=20,
     ) as live:
         while True:
-            sleep(0.1)
+            try:
+                sleep(0.1)
+            except KeyboardInterrupt:
+                break
