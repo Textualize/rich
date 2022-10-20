@@ -94,7 +94,7 @@ You can also pretty print JSON via the command line with the following::
 Low level output
 ----------------
 
-In additional to :meth:`~rich.console.Console.print` and :meth:`~rich.console.Console.log`, Rich has a :meth:`~rich.console.Console.out` method which provides a lower-level way of writing to the terminal. The out() method converts all the positional arguments to strings and won't pretty print, word wrap, or apply markup to the output, but can apply a basic style and will optionally do highlighting.
+In additional to :meth:`~rich.console.Console.print` and :meth:`~rich.console.Console.log`, Rich has an :meth:`~rich.console.Console.out` method which provides a lower-level way of writing to the terminal. The out() method converts all the positional arguments to strings and won't pretty print, word wrap, or apply markup to the output, but can apply a basic style and will optionally do highlighting.
 
 Here's an example::
 
