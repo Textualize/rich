@@ -122,7 +122,7 @@ Rich can display a status message with a 'spinner' animation that won't interfer
 
     python -m rich.status
 
-To display a status message, call :meth:`~rich.console.Console.status` with the status message (which may be a string, Text, or other renderable). The result is a context manager which starts and stop the status display around a block of code. Here's an example::
+To display a status message, call :meth:`~rich.console.Console.status` with the status message (which may be a string, Text, or other renderable). The result is a context manager which starts and stops the status display around a block of code. Here's an example::
 
     with console.status("Working..."):
         do_work()
