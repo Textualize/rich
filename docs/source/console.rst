@@ -58,7 +58,7 @@ You can also use :meth:`~rich.console.Console.print` to render objects that supp
 Logging
 -------
 
-The :meth:`~rich.console.Console.log` methods offers the same capabilities as print, but adds some features useful for debugging a running application. Logging writes the current time in a column to the left, and the file and line where the method was called to a column on the right. Here's an example::
+The :meth:`~rich.console.Console.log` method offers the same capabilities as print, but adds some features useful for debugging a running application. Logging writes the current time in a column to the left, and the file and line where the method was called to a column on the right. Here's an example::
 
     >>> console.log("Hello, World!")
 
@@ -94,7 +94,7 @@ You can also pretty print JSON via the command line with the following::
 Low level output
 ----------------
 
-In additional to :meth:`~rich.console.Console.print` and :meth:`~rich.console.Console.log`, Rich has a :meth:`~rich.console.Console.out` method which provides a lower-level way of writing to the terminal. The out() method converts all the positional arguments to strings and won't pretty print, word wrap, or apply markup to the output, but can apply a basic style and will optionally do highlighting.
+In additional to :meth:`~rich.console.Console.print` and :meth:`~rich.console.Console.log`, Rich has an :meth:`~rich.console.Console.out` method which provides a lower-level way of writing to the terminal. The out() method converts all the positional arguments to strings and won't pretty print, word wrap, or apply markup to the output, but can apply a basic style and will optionally do highlighting.
 
 Here's an example::
 
@@ -122,7 +122,7 @@ Rich can display a status message with a 'spinner' animation that won't interfer
 
     python -m rich.status
 
-To display a status message, call :meth:`~rich.console.Console.status` with the status message (which may be a string, Text, or other renderable). The result is a context manager which starts and stop the status display around a block of code. Here's an example::
+To display a status message, call :meth:`~rich.console.Console.status` with the status message (which may be a string, Text, or other renderable). The result is a context manager which starts and stops the status display around a block of code. Here's an example::
 
     with console.status("Working..."):
         do_work()
