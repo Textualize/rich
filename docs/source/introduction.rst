@@ -8,7 +8,7 @@ Use Rich to make your command line applications visually appealing and present d
 Requirements
 ------------
 
-Rich works with OSX, Linux and Windows.
+Rich works with macOS, Linux and Windows.
 
 On Windows both the (ancient) cmd.exe terminal is supported and the new `Windows Terminal <https://github.com/microsoft/terminal/releases>`_. The latter has much improved support for color and style.
 
