@@ -758,7 +758,7 @@ class Console:
         self._is_alt_screen = False
 
     def __repr__(self) -> str:
-        return f"<console width={self.width} {self._color_system}>"
+        return f"<console width={self.width} {self._color_system!s}>"
 
     @property
     def file(self) -> IO[str]:
