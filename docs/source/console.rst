@@ -58,7 +58,7 @@ You can also use :meth:`~rich.console.Console.print` to render objects that supp
 Logging
 -------
 
-The :meth:`~rich.console.Console.log` methods offers the same capabilities as print, but adds some features useful for debugging a running application. Logging writes the current time in a column to the left, and the file and line where the method was called to a column on the right. Here's an example::
+The :meth:`~rich.console.Console.log` method offers the same capabilities as print, but adds some features useful for debugging a running application. Logging writes the current time in a column to the left, and the file and line where the method was called to a column on the right. Here's an example::
 
     >>> console.log("Hello, World!")
 
