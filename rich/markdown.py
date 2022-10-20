@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, ClassVar, Dict, List, Optional, Type, Union
 
 from commonmark.blocks import Parser
@@ -598,8 +599,8 @@ if __name__ == "__main__":  # pragma: no cover
     if args.path == "-":
         markdown_body = sys.stdin.read()
     else:
-        with open(args.path, "rt", encoding="utf-8") as markdown_file:
-            markdown_body = markdown_file.read()
+        markdown_body = Path(args.path).read_text(encoding="utf-8")
+
     markdown = Markdown(
         markdown_body,
         justify="full" if args.justify else "left",
