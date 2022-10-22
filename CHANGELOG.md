@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [13.0.0] - Unreleased
 
+### Added
+
+- Added information about syntax object and stylize_range. https://github.com/Textualize/rich/pull/2605
+
 ### Changed
 
 - Bumped minimum Python version to 3.7 https://github.com/Textualize/rich/pull/2567
@@ -31,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix missing `mode` property on file wrapper breaking uploads via `requests` https://github.com/Textualize/rich/pull/2495
 - Fix mismatching default value of parameter `ensure_ascii` https://github.com/Textualize/rich/pull/2538
 - Remove unused height parameter in `Layout` class https://github.com/Textualize/rich/pull/2540
-- Fixed exception in Syntax.__rich_measure__ for empty files
+- Fixed exception in Syntax.**rich_measure** for empty files
 
 ### Changed
 
