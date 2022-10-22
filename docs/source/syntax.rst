@@ -44,6 +44,33 @@ Background color
 You can override the background color from the theme by supplying a ``background_color`` argument to the constructor. This should be a string in the same format a style definition accepts, .e.g "red", "#ff0000", "rgb(255,0,0)" etc. You may also set the special value "default" which will use the default background color set in the terminal.
 
 
+Stylize Range
+-------------
+
+With a syntax object you can stylize parts from the text. To achive this, you should use the method stylize_range.
+The method stylize_range recieve a Style object and two tuples as positions from text (start and end). This position is formed by Line/Row with 1-based (the first line is 1).
+And Column 0-based (the first line is 0).
+
+On the following example I want highlight the true word.
+
+    syntax = Syntax("example = True", "python")
+
+    syntax.stylize_range(Style(bgcolor="deep_pink4"), (1, 10), (1, 14))
+
+Be careful with text when this has line break (\n) because on each \n the line/row number is changed.
+
+On the following example I want put background color in number 456.
+
+    syntax = Syntax("123\n456\n789", "python")
+
+    syntax.stylize_range(Style(bgcolor="deep_pink4"), (2, 0), (2, 3))
+
+The image below is the code above been running.
+
+.. image:: ../images/sintaxy_with_styles_photo_001.png
+
+See thoses examples above at following link.`examples/sintaxy_with_styles.py <https://github.com/Textualize/rich/blob/master/examples/sintaxy_with_styles.py>`.
+
 Syntax CLI
 ----------
 
