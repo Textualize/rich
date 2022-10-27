@@ -8,22 +8,21 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
     defaults:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
       - name: Install and configure Poetry
         # TODO: workaround for https://github.com/snok/install-poetry/issues/94
-        uses: snok/install-poetry@v1.3.1
+        uses: snok/install-poetry@v1.3.3
         with:
-          version: 1.1.11
+          version: 1.1.15
           virtualenvs-in-project: true
       - name: Install dependencies
         run: poetry install
@@ -41,7 +40,7 @@ jobs:
           source $VENV
           pytest tests -v --cov=./rich --cov-report=xml:./coverage.xml --cov-report term-missing
       - name: Upload code coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
