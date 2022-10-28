@@ -687,8 +687,22 @@ class Console:
         self._emoji = emoji
         self._emoji_variant: Optional[EmojiVariant] = emoji_variant
         self._highlight = highlight
+
+        self._force_terminal = None
+        if force_terminal is not None:
+            self._force_terminal = force_terminal
+        else:
+            # If FORCE_COLOR env var has any value at all, we force terminal.
+            force_color = self._environ.get("FORCE_COLOR")
+            if force_color is not None:
+                self._force_terminal = True
+
         self.legacy_windows: bool = (
-            (detect_legacy_windows() and not self.is_jupyter)
+            (
+                detect_legacy_windows()
+                and not self.is_jupyter
+                and not self._force_terminal
+            )
             if legacy_windows is None
             else legacy_windows
         )
@@ -707,15 +721,6 @@ class Console:
         self._height = height
 
         self._color_system: Optional[ColorSystem]
-
-        self._force_terminal = None
-        if force_terminal is not None:
-            self._force_terminal = force_terminal
-        else:
-            # If FORCE_COLOR env var has any value at all, we force terminal.
-            force_color = self._environ.get("FORCE_COLOR")
-            if force_color is not None:
-                self._force_terminal = True
 
         self._file = file
         self.quiet = quiet

@@ -7,6 +7,7 @@ The following people have contributed to the development of Rich:
 - [Patrick Arminio](https://github.com/patrick91)
 - [Gregory Beauregard](https://github.com/GBeauregard/pyffstream)
 - [Dennis Brakhane](https://github.com/brakhane)
+- [David Brownell](https://github.com/davidbrownell)
 - [Darren Burns](https://github.com/darrenburns)
 - [Jim Crist-Harif](https://github.com/jcrist)
 - [Ed Davis](https://github.com/davised)
