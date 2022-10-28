@@ -20,6 +20,7 @@ The following people have contributed to the development of Rich:
 - [Kenneth Hoste](https://github.com/boegel)
 - [Lanqing Huang](https://github.com/lqhuang)
 - [Finn Hughes](https://github.com/finnhughes)
+- [Ionite](https://github.com/ionite34)
 - [Josh Karpel](https://github.com/JoshKarpel)
 - [Hugo van Kemenade](https://github.com/hugovk)
 - [Andrew Kettmann](https://github.com/akettmann)
