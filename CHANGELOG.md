@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [13.0.0] - Unreleased
 
+### Fixed
+
+- Handle passing `locals_max_length` and `locals_max_string` to `Traceback.from_exception`
+
 ### Changed
 
 - Bumped minimum Python version to 3.7 https://github.com/Textualize/rich/pull/2567

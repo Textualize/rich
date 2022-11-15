@@ -5,6 +5,7 @@ The following people have contributed to the development of Rich:
 <!-- Add your name below, sort alphabetically by surname. Link to GitHub profile / your home page. -->
 
 - [Patrick Arminio](https://github.com/patrick91)
+- [Gilad Barnea](https://github.com/giladbarnea)
 - [Gregory Beauregard](https://github.com/GBeauregard/pyffstream)
 - [Dennis Brakhane](https://github.com/brakhane)
 - [Darren Burns](https://github.com/darrenburns)
