@@ -290,7 +290,12 @@ class Traceback:
             Traceback: A Traceback instance that may be printed.
         """
         rich_traceback = cls.extract(
-            exc_type, exc_value, traceback, show_locals=show_locals
+            exc_type,
+            exc_value,
+            traceback,
+            show_locals=show_locals,
+            locals_max_length=locals_max_length,
+            locals_max_string=locals_max_string,
         )
         return cls(
             rich_traceback,
