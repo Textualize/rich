@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Handle passing `locals_max_length` and `locals_max_string` to `Traceback.from_exception`
+- Handle passing `locals_max_length` and `locals_max_string` to `Traceback.from_exception` https://github.com/Textualize/rich/pull/2650
 
 ### Changed
 
