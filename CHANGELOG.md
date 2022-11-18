@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Bumped minimum Python version to 3.7 https://github.com/Textualize/rich/pull/2567
 - Pretty-printing of "tagged" `__repr__` results is now greedy when matching tags https://github.com/Textualize/rich/pull/2565
+- `rich.progress.track()` will now show the elapsed time after finishing the task https://github.com/Textualize/rich/pull/2659
 
 ## [12.6.0] - 2022-10-02
 

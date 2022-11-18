@@ -151,7 +151,7 @@ def track(
                 pulse_style=pulse_style,
             ),
             TaskProgressColumn(show_speed=show_speed),
-            TimeRemainingColumn(),
+            TimeRemainingColumn(elapsed_when_finished=True),
         )
     )
     progress = Progress(
