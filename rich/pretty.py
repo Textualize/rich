@@ -371,6 +371,7 @@ class Pretty(JupyterMixin):
             indent_size=self.indent_size,
             max_length=self.max_length,
             max_string=self.max_string,
+            max_depth=self.max_depth,
             expand_all=self.expand_all,
         )
         text_width = (
