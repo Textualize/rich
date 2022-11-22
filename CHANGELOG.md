@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [13.0.0] - Unreleased
 
+### Fixed
+
+- Fix typing of the parameter `total` of `Progress.add_task`
+
 ### Changed
 
 - Bumped minimum Python version to 3.7 https://github.com/Textualize/rich/pull/2567
