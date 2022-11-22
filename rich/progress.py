@@ -1590,7 +1590,7 @@ class Progress(JupyterMixin):
         self,
         description: str,
         start: bool = True,
-        total: Optional[float] = 100.0,
+        total: Optional[Union[float, None]] = 100.0,
         completed: int = 0,
         visible: bool = True,
         **fields: Any,
@@ -1601,7 +1601,7 @@ class Progress(JupyterMixin):
             description (str): A description of the task.
             start (bool, optional): Start the task immediately (to calculate elapsed time). If set to False,
                 you will need to call `start` manually. Defaults to True.
-            total (float, optional): Number of total steps in the progress if known.
+            total (Union[float, None], optional): Number of total steps in the progress if known.
                 Set to None to render a pulsing animation. Defaults to 100.
             completed (int, optional): Number of steps completed so far. Defaults to 0.
             visible (bool, optional): Enable display of the task. Defaults to True.
