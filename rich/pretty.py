@@ -433,7 +433,7 @@ class Node:
     is_tuple: bool = False
     is_namedtuple: bool = False
     children: Optional[List["Node"]] = None
-    key_separator = ": "
+    key_separator: str = ": "
     separator: str = ", "
 
     def iter_tokens(self) -> Iterable[str]:
