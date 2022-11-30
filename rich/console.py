@@ -1,5 +1,4 @@
 import inspect
-import io
 import os
 import platform
 import sys
@@ -48,6 +47,7 @@ else:
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
 from ._export_format import CONSOLE_HTML_FORMAT, CONSOLE_SVG_FORMAT
+from ._fileno import get_fileno
 from ._log_render import FormatTimeCallable, LogRender
 from .align import Align, AlignMethod
 from .color import ColorSystem, blend_rgb
@@ -2006,12 +2006,11 @@ class Console:
                     if WINDOWS:
                         use_legacy_windows_render = False
                         if self.legacy_windows:
-                            try:
+                            fileno = get_fileno(self.file)
+                            if fileno is not None:
                                 use_legacy_windows_render = (
-                                    self.file.fileno() in _STD_STREAMS_OUTPUT
+                                    fileno in _STD_STREAMS_OUTPUT
                                 )
-                            except (ValueError, io.UnsupportedOperation):
-                                pass
 
                         if use_legacy_windows_render:
                             from rich._win32_console import LegacyWindowsTerm
