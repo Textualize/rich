@@ -1,5 +1,4 @@
 import inspect
-import io
 import os
 import platform
 import sys
@@ -2006,12 +2005,17 @@ class Console:
                     if WINDOWS:
                         use_legacy_windows_render = False
                         if self.legacy_windows:
-                            try:
-                                use_legacy_windows_render = (
-                                    self.file.fileno() in _STD_STREAMS_OUTPUT
-                                )
-                            except (ValueError, io.UnsupportedOperation):
-                                pass
+                            fileno = getattr(self.file, "fileno", None)
+                            if fileno is not None:
+                                try:
+                                    use_legacy_windows_render = (
+                                        fileno() in _STD_STREAMS_OUTPUT
+                                    )
+                                except Exception:
+                                    # `fileno` is documented as potentially rasing a OSError
+                                    # Alas, from the issues, there are so many poorly implemented file-like objects,
+                                    # that `fileno()` can raise just about anything.
+                                    pass
 
                         if use_legacy_windows_render:
                             from rich._win32_console import LegacyWindowsTerm
