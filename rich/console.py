@@ -47,6 +47,7 @@ else:
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
 from ._export_format import CONSOLE_HTML_FORMAT, CONSOLE_SVG_FORMAT
+from ._fileno import get_fileno
 from ._log_render import FormatTimeCallable, LogRender
 from .align import Align, AlignMethod
 from .color import ColorSystem, blend_rgb
@@ -2005,11 +2006,11 @@ class Console:
                     if WINDOWS:
                         use_legacy_windows_render = False
                         if self.legacy_windows:
-                            fileno = getattr(self.file, "fileno", None)
+                            fileno = get_fileno(self.file)
                             if fileno is not None:
                                 try:
                                     use_legacy_windows_render = (
-                                        fileno() in _STD_STREAMS_OUTPUT
+                                        fileno in _STD_STREAMS_OUTPUT
                                     )
                                 except Exception:
                                     # `fileno` is documented as potentially raising a OSError
