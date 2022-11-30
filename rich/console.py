@@ -2012,7 +2012,7 @@ class Console:
                                         fileno() in _STD_STREAMS_OUTPUT
                                     )
                                 except Exception:
-                                    # `fileno` is documented as potentially rasing a OSError
+                                    # `fileno` is documented as potentially raising a OSError
                                     # Alas, from the issues, there are so many poorly implemented file-like objects,
                                     # that `fileno()` can raise just about anything.
                                     pass
