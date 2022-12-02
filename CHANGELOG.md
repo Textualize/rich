@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Handling of broken `fileno` made more robust. Fixes https://github.com/Textualize/rich/issues/2645
+- Fixed missing `fileno` on FileProxy
 
 ### Added
 
