@@ -52,3 +52,6 @@ class FileProxy(io.TextIOBase):
         if output:
             self.__console.print(output)
         del self.__buffer[:]
+
+    def fileno(self) -> int:
+        return self.__file.fileno()

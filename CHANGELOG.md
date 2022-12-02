@@ -15,6 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed issue with `locals_max_length` parameter not being respected in Traceback https://github.com/Textualize/rich/issues/2649
+- Handling of broken `fileno` made more robust. Fixes https://github.com/Textualize/rich/issues/2645
+- Fixed missing `fileno` on FileProxy
+
+### Added
+
+- Add type annotation for key_separator of pretty.Node https://github.com/Textualize/rich/issues/2625
+
 
 ## [12.6.0] - 2022-10-02
 
