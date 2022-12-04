@@ -758,7 +758,7 @@ class Console:
         self._is_alt_screen = False
 
     def __repr__(self) -> str:
-        return f"<console width={self.width} {str(self._color_system)}>"
+        return f"<console width={self.width} {self._color_system!s}>"
 
     @property
     def file(self) -> IO[str]:
@@ -1523,7 +1523,7 @@ class Console:
             if text:
                 sep_text = Text(sep, justify=justify, end=end)
                 append(sep_text.join(text))
-                del text[:]
+                text.clear()
 
         for renderable in objects:
             renderable = rich_cast(renderable)

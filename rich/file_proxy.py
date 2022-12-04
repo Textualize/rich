@@ -34,7 +34,7 @@ class FileProxy(io.TextIOBase):
             line, new_line, text = text.partition("\n")
             if new_line:
                 lines.append("".join(buffer) + line)
-                del buffer[:]
+                buffer.clear()
             else:
                 buffer.append(line)
                 break

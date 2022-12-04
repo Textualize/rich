@@ -1337,7 +1337,7 @@ class Progress(JupyterMixin):
                 RuntimeWarning,
             )
             buffering = -1
-        elif _mode == "rt" or _mode == "r":
+        elif _mode in ("rt", "r"):
             if buffering == 0:
                 raise ValueError("can't have unbuffered text I/O")
             elif buffering == 1:
@@ -1358,7 +1358,7 @@ class Progress(JupyterMixin):
         reader = _Reader(handle, self, task_id, close_handle=True)
 
         # wrap the reader in a `TextIOWrapper` if text mode
-        if mode == "r" or mode == "rt":
+        if mode in ("r", "rt"):
             return io.TextIOWrapper(
                 reader,
                 encoding=encoding,
