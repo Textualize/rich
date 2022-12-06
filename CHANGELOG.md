@@ -23,10 +23,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Handling of broken `fileno` made more robust. Fixes https://github.com/Textualize/rich/issues/2645
 - Fixed missing `fileno` on FileProxy
 
+### Fixed
+
+- Fixed issue with parts of MAC address string getting replaced by emojis. https://github.com/Textualize/rich/issues/2686
+
 ### Added
 
 - Add type annotation for key_separator of pretty.Node https://github.com/Textualize/rich/issues/2625
-
 
 ## [12.6.0] - 2022-10-02
 
@@ -47,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix missing `mode` property on file wrapper breaking uploads via `requests` https://github.com/Textualize/rich/pull/2495
 - Fix mismatching default value of parameter `ensure_ascii` https://github.com/Textualize/rich/pull/2538
 - Remove unused height parameter in `Layout` class https://github.com/Textualize/rich/pull/2540
-- Fixed exception in Syntax.__rich_measure__ for empty files
+- Fixed exception in Syntax.**rich_measure** for empty files
 
 ### Changed
 

@@ -12,6 +12,7 @@ The following people have contributed to the development of Rich:
 - [Ed Davis](https://github.com/davised)
 - [Pete Davison](https://github.com/pd93)
 - [James Estevez](https://github.com/jstvz)
+- [Sertug Fidan] (https://github.com/SertugF)
 - [Oleksis Fraga](https://github.com/oleksis)
 - [Andy Gimblett](https://github.com/gimbo)
 - [Michał Górny](https://github.com/mgorny)
