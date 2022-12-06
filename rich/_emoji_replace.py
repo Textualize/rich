@@ -12,9 +12,12 @@ _EmojiSubMethod = Callable[[_ReSubCallable, str], str]  # Sub method of a compil
 def _emoji_replace(
     text: str,
     default_variant: Optional[str] = None,
-    _emoji_sub: _EmojiSubMethod = re.compile(r"(:(\S*?)(?:(?:\-)(emoji|text))?:)").sub,
+    _emoji_sub: _EmojiSubMethod = re.compile(r"(:(\S*?)(?:(?:\-)(emoji|text))?:)").sub, 
 ) -> str:
     """Replace emoji code in text."""
+    #if text is mac address then return text without replacing
+    if re.match(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$", text):
+        return text
     get_emoji = EMOJI.__getitem__
     variants = {"text": "\uFE0E", "emoji": "\uFE0F"}
     get_variant = variants.get
