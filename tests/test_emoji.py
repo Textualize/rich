@@ -18,6 +18,8 @@ def test_str_repr():
 def test_replace():
     assert Emoji.replace("my code is :pile_of_poo:") == "my code is 💩"
 
+def test_MACaddress():
+    assert Emoji.replace("08:00:27:cd:af:88") == "08:00:27:cd:af:88"
 
 def test_render():
     render_result = render(Emoji("pile_of_poo"))
