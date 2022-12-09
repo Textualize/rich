@@ -384,7 +384,7 @@ def test_capture_and_record(capsys):
     recorder = Console(record=True)
     recorder.print("ABC")
 
-    with recorder.capture() as capture:
+    with recorder.capture(echo=False) as capture:
         recorder.print("Hello")
 
     assert capture.get() == "Hello\n"
@@ -395,6 +395,26 @@ def test_capture_and_record(capsys):
     assert recorded_text == "ABC\nHello\n"
     assert capture.get() == "Hello\n"
     assert out == "ABC\n"
+
+
+def test_capture_and_record_multiple(capsys):
+    recorder = Console(record=True)
+
+    with recorder.capture(echo=False) as capture:
+        recorder.print("Hello")
+        recorder.print("World")
+
+    assert capture.get() == "Hello\nWorld\n"
+
+    with recorder.capture(echo=True) as capture:
+        recorder.print("Foo")
+        recorder.print("Bar")
+
+    assert capture.get() == "Foo\nBar\n"
+
+    out, err = capsys.readouterr()
+
+    assert out == "Foo\nBar\n"
 
 
 def test_input(monkeypatch, capsys):

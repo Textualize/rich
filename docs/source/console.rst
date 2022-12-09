@@ -313,10 +313,10 @@ Note that when writing to a file you may want to explicitly set the ``width`` ar
 Capturing output
 ----------------
 
-There may be situations where you want to *capture* the output from a Console rather than writing it directly to the terminal. You can do this with the :meth:`~rich.console.Console.capture` method which returns a context manager. On exit from this context manager, call :meth:`~rich.console.Capture.get` to return the string that would have been written to the terminal. Here's an example::
+There may be situations where you want to *capture* the output from a Console without writing it directly to the terminal. You can do this with the :meth:`~rich.console.Console.capture` method using echo parameter which returns a context manager. If echo value is set to True(default) text is captured and written to the terminal. When echo value is set to False text captured but not written to the terminal.  On exit from this context manager, call :meth:`~rich.console.Capture.get` to return the string that would have been written to the terminal. Here's an example::
 
     from rich.console import Console
-    console = Console()
+    console = Console(echo=False)
     with console.capture() as capture:
         console.print("[bold red]Hello[/] World")
     str_output = capture.get()
