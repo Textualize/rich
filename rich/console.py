@@ -2262,6 +2262,7 @@ class Console:
         code_format: str = CONSOLE_SVG_FORMAT,
         font_aspect_ratio: float = 0.61,
         unique_id: Optional[str] = None,
+        encapsulated: Optional[bool] = None,
     ) -> str:
         """
         Generate an SVG from the console contents (requires record=True in Console constructor).
@@ -2278,6 +2279,9 @@ class Console:
                 If you aren't specifying a different font inside ``code_format``, you probably don't need this.
             unique_id (str, optional): unique id that is used as the prefix for various elements (CSS styles, node
                 ids). If not set, this defaults to a computed value based on the recorded content.
+            encapsulated (bool, optional): whether to generate unique prefixes for various elements (CSS styles, node
+                ids) to approximate local scoping (useful, for example, when embedding multiple SVG exports in an XML
+                document).
         """
 
         from rich.cells import cell_len
@@ -2372,6 +2376,18 @@ class Console:
             segments = list(Segment.filter_control(self._record_buffer))
             if clear:
                 self._record_buffer.clear()
+
+        if unique_id is not None:
+            import warnings
+
+            msg = (
+                "'unique_id' parameter passed to SVG export.  This has the potential "
+                "to cause namespace collisions if the SVG is embedded in a document."
+            )
+            warnings.warn(msg)
+
+        if encapsulated is False:
+            unique_id = "terminal"
 
         if unique_id is None:
             unique_id = "terminal-" + str(
@@ -2514,6 +2530,7 @@ class Console:
         code_format: str = CONSOLE_SVG_FORMAT,
         font_aspect_ratio: float = 0.61,
         unique_id: Optional[str] = None,
+        encapsulated: Optional[bool] = True,
     ) -> None:
         """Generate an SVG file from the console contents (requires record=True in Console constructor).
 
@@ -2530,6 +2547,9 @@ class Console:
                 If you aren't specifying a different font inside ``code_format``, you probably don't need this.
             unique_id (str, optional): unique id that is used as the prefix for various elements (CSS styles, node
                 ids). If not set, this defaults to a computed value based on the recorded content.
+            encapsulated (bool, optional): whether to generate unique prefixes for various elements (CSS styles, node
+                ids) to approximate local scoping (useful, for example, when embedding multiple SVG exports in an XML
+                document).
         """
         svg = self.export_svg(
             title=title,
@@ -2538,6 +2558,7 @@ class Console:
             code_format=code_format,
             font_aspect_ratio=font_aspect_ratio,
             unique_id=unique_id,
+            encapsulated=encapsulated,
         )
         with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(svg)

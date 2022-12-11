@@ -554,6 +554,7 @@ def test_export_svg():
     assert svg == EXPECTED_SVG
 
 
+@pytest.mark.filterwarnings("ignore:'unique_id'")
 def test_export_svg_specified_unique_id():
     expected_svg = EXPECTED_SVG.replace("terminal-3526644552", "given-id")
     console = Console(record=True, width=100)
