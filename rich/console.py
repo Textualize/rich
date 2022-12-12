@@ -2381,8 +2381,9 @@ class Console:
             import warnings
 
             msg = (
-                "Using non-checksum prefix for SVG elements.  This has the potential "
-                "to cause namespace collisions if the SVG is embedded in a document."
+                "Using non-checksum prefix for SVG elements.  Non-unique prefixes have "
+                "the potential to cause namespace collisions when an exported SVG is "
+                "embedded into another document."
             )
             warnings.warn(msg)
 
