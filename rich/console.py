@@ -2377,11 +2377,11 @@ class Console:
             if clear:
                 self._record_buffer.clear()
 
-        if unique_id is not None:
+        if unique_id is not None or encapsulated is False:
             import warnings
 
             msg = (
-                "'unique_id' parameter passed to SVG export.  This has the potential "
+                "Using non-checksum prefix for SVG elements.  This has the potential "
                 "to cause namespace collisions if the SVG is embedded in a document."
             )
             warnings.warn(msg)
