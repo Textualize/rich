@@ -24,7 +24,6 @@ classifiers = [
 ]
 include = ["rich/py.typed"]
 
-
 [tool.poetry.dependencies]
 python = ">=3.7.0"
 typing-extensions = { version = ">=4.0.0, <5.0", python = "<3.9" }
@@ -32,11 +31,10 @@ pygments = "^2.6.0"
 commonmark = "^0.9.0"
 ipywidgets = { version = "^7.5.1", optional = true }
 
-
 [tool.poetry.extras]
 jupyter = ["ipywidgets"]
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"
 black = "^22.6"
 mypy = "^0.971"
@@ -48,7 +46,6 @@ asv = "^0.5.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
 
 [tool.mypy]
 files = ["rich"]
