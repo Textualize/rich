@@ -3,6 +3,7 @@
 - [Why does emoji break alignment in a Table or Panel?](#why-does-emoji-break-alignment-in-a-table-or-panel)
 - [Why does content in square brackets disappear?](#why-does-content-in-square-brackets-disappear)
 - [python -m rich.spinner shows extra lines](#python--m-rich.spinner-shows-extra-lines)
+- [How do I log a renderable?](#how-do-i-log-a-renderable)
 - [Strange colors in console output.](#strange-colors-in-console-output.)
 
 <a name="why-does-emoji-break-alignment-in-a-table-or-panel"></a>
@@ -30,6 +31,17 @@ See the docs on [console markup](https://rich.readthedocs.io/en/latest/markup.ht
 The spinner example is know to break on some terminals (Windows in particular).
 
 Some terminals don't display emoji with the correct width, which means Rich can't always align them accurately inside a panel.
+
+<a name="how-do-i-log-a-renderable"></a>
+## How do I log a renderable?
+
+Python's logging module is designed to work with strings. Consequently you won't be able to log Rich renderables (Table, Tree, etc) by calling `logger.debug` or other similar method.
+
+You could use the [capture](https://rich.readthedocs.io/en/latest/console.html#capturing-output) API to convert the renderable to a string and log that. However I would advise against it.
+
+Logging supports configurable back-ends, which means that a log message could go somewhere other than the terminal -- which may not correctly render the formatting and style produced by Rich.
+
+If you are only logging with a file-handler to stdout, then you probably don't need to use the logging module at all. Consider using [Console.log](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.log) which will render anything that you can print with Rich, with a timestamp.
 
 <a name="strange-colors-in-console-output."></a>
 ## Strange colors in console output.

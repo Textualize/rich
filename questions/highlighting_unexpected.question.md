@@ -2,6 +2,8 @@
 title: "Strange colors in console output."
 alt_titles:
   - "Why are numbers in cyan?"
+  - "Rich print seems to make decimals cyan"
+  - "Numbers get printed differently"
 ---
 
 Rich will highlight certain patterns in your output such as numbers, strings, and other objects like IP addresses.
