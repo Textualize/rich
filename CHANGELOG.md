@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Reversed `pre` and `code` tags in base HTML format https://github.com/Textualize/rich/pull/2642
+- Improved detection of `attrs` library, that isn't confused by the presence of the `attr` library.
 
 ### Changed
 
