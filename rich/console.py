@@ -2028,7 +2028,7 @@ class Console:
                             # https://github.com/python/cpython/issues/82052
                             # We need to avoid writing more than 32Kb in a single write, due to the above bug
                             write = self.file.write
-                            # Worse case scenario, every character is a bytes of utf-8
+                            # Worse case scenario, every character is 4 bytes of utf-8
                             MAX_WRITE = 32 * 1024 // 4
                             try:
                                 if len(text) <= MAX_WRITE:
