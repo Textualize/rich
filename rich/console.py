@@ -2034,7 +2034,7 @@ class Console:
                                 if len(text) <= MAX_WRITE:
                                     write(text)
                                 else:
-                                    batch: list[str] = []
+                                    batch: List[str] = []
                                     batch_append = batch.append
                                     size = 0
                                     for line in text.splitlines(True):
