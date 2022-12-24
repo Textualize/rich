@@ -5,7 +5,7 @@ try:
 except ImportError:
     print("This example requires attrs library")
     print("pip install attrs")
-    raise
+    raise SystemExit()
 
 
 @attr.define
