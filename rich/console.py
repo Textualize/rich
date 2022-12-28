@@ -2377,7 +2377,10 @@ class Console:
             if clear:
                 self._record_buffer.clear()
 
-        if unique_id is not None or encapsulated is False:
+        if encapsulated is False:
+            unique_id = "terminal"
+
+        if unique_id is not None:
             import warnings
 
             msg = (
@@ -2386,9 +2389,6 @@ class Console:
                 "exported SVG is embedded into another document."
             )
             warnings.warn(msg)
-
-        if encapsulated is False:
-            unique_id = "terminal"
 
         if unique_id is None:
             unique_id = "terminal-" + str(
