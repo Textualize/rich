@@ -36,6 +36,8 @@ For a video introduction to Rich see [calmcode.io](https://calmcode.io/rich/intr
 
 See what [people are saying about Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
+Use `pipx run rich` to try Rich in your terminal using [pipx](https://pypa.github.io/pipx/).
+
 ## Compatibility
 
 Rich works with Linux, OSX, and Windows. True color / emoji works with new Windows Terminal, classic terminal is limited to 16 colors. Rich requires Python 3.7 or later.

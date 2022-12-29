@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add type annotation for key_separator of pretty.Node https://github.com/Textualize/rich/issues/2625
-
+- Add support for `pipx run rich` to run a demo without a separate installation step
 
 ## [12.6.0] - 2022-10-02
 

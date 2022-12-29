@@ -206,8 +206,7 @@ Supports much of the *markdown* __syntax__!
     return table
 
 
-if __name__ == "__main__":  # pragma: no cover
-
+def main() -> None:  # pragma: no cover
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
@@ -272,3 +271,7 @@ Rich is maintained with [red]:heart:[/] by [link=https://www.textualize.io]Textu
         ),
         justify="center",
     )
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()

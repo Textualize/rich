@@ -21,6 +21,7 @@ The following people have contributed to the development of Rich:
 - [Lanqing Huang](https://github.com/lqhuang)
 - [Finn Hughes](https://github.com/finnhughes)
 - [Ionite](https://github.com/ionite34)
+- [Claudio Jolowicz](https://github.com/cjolowicz)
 - [Josh Karpel](https://github.com/JoshKarpel)
 - [Hugo van Kemenade](https://github.com/hugovk)
 - [Andrew Kettmann](https://github.com/akettmann)
