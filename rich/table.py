@@ -778,14 +778,14 @@ class Table(JupyterMixin):
                     _Segment(_box.head_vertical, border_style),
                 ),
                 (
-                    _Segment(_box.foot_left, border_style),
-                    _Segment(_box.foot_right, border_style),
-                    _Segment(_box.foot_vertical, border_style),
-                ),
-                (
                     _Segment(_box.mid_left, border_style),
                     _Segment(_box.mid_right, border_style),
                     _Segment(_box.mid_vertical, border_style),
+                ),
+                (
+                    _Segment(_box.foot_left, border_style),
+                    _Segment(_box.foot_right, border_style),
+                    _Segment(_box.foot_vertical, border_style),
                 ),
             ]
             if show_edge:
