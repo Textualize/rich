@@ -2025,13 +2025,31 @@ class Console:
                             # Either a non-std stream on legacy Windows, or modern Windows.
                             text = self._render_buffer(self._buffer[:])
                             # https://bugs.python.org/issue37871
+                            # https://github.com/python/cpython/issues/82052
+                            # We need to avoid writing more than 32Kb in a single write, due to the above bug
                             write = self.file.write
-                            for line in text.splitlines(True):
-                                try:
-                                    write(line)
-                                except UnicodeEncodeError as error:
-                                    error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
-                                    raise
+                            # Worse case scenario, every character is 4 bytes of utf-8
+                            MAX_WRITE = 32 * 1024 // 4
+                            try:
+                                if len(text) <= MAX_WRITE:
+                                    write(text)
+                                else:
+                                    batch: List[str] = []
+                                    batch_append = batch.append
+                                    size = 0
+                                    for line in text.splitlines(True):
+                                        if size + len(line) > MAX_WRITE and batch:
+                                            write("".join(batch))
+                                            batch.clear()
+                                            size = 0
+                                        batch_append(line)
+                                        size += len(line)
+                                    if batch:
+                                        write("".join(batch))
+                                        batch.clear()
+                            except UnicodeEncodeError as error:
+                                error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
+                                raise
                     else:
                         text = self._render_buffer(self._buffer[:])
                         try:
