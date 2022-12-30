@@ -11,18 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Reversed `pre` and `code` tags in base HTML format https://github.com/Textualize/rich/pull/2642
 - Improved detection of `attrs` library, that isn't confused by the presence of the `attr` library.
+- Fixed issue with `locals_max_length` parameter not being respected in Traceback https://github.com/Textualize/rich/issues/2649
+- Handling of broken `fileno` made more robust. Fixes https://github.com/Textualize/rich/issues/2645
+- Fixed missing `fileno` on FileProxy
 
 ### Changed
 
 - Bumped minimum Python version to 3.7 https://github.com/Textualize/rich/pull/2567
 - Pretty-printing of "tagged" `__repr__` results is now greedy when matching tags https://github.com/Textualize/rich/pull/2565
 - `progress.track` now supports deriving total from `__length_hint__`
-
-### Fixed
-
-- Fixed issue with `locals_max_length` parameter not being respected in Traceback https://github.com/Textualize/rich/issues/2649
-- Handling of broken `fileno` made more robust. Fixes https://github.com/Textualize/rich/issues/2645
-- Fixed missing `fileno` on FileProxy
 
 ### Added
 
@@ -1857,7 +1854,8 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[12.6.0]: https://github.com/textualize/rich/compare/v12.5.2...HEAD
+[13.0.0]: https://github.com/textualize/rich/compare/v12.6.0...HEAD
+[12.6.0]: https://github.com/textualize/rich/compare/v12.5.2...v12.6.0
 [12.5.2]: https://github.com/textualize/rich/compare/v12.5.1...v12.5.2
 [12.5.1]: https://github.com/textualize/rich/compare/v12.5.0...v12.5.1
 [12.5.0]: https://github.com/textualize/rich/compare/v12.4.4...v12.5.0
