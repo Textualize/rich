@@ -119,7 +119,7 @@ class Segment(NamedTuple):
 
         cell_size = get_character_cell_size
 
-        pos = int((cut / cell_length) * len(text))
+        pos = int((cut / cell_length) * (len(text) - 1))
 
         before = text[:pos]
         cell_pos = cell_len(before)
