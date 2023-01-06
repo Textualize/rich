@@ -303,7 +303,7 @@ class Segment(NamedTuple):
                         if include_new_lines:
                             cropped_line.append(new_line_segment)
                         yield cropped_line
-                        del line[:]
+                        line.clear()
             else:
                 append(segment)
         if line:

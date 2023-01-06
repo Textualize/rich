@@ -2,11 +2,12 @@ from typing import TYPE_CHECKING, Optional
 
 from .align import AlignMethod
 from .box import ROUNDED, Box
+from .cells import cell_len
 from .jupyter import JupyterMixin
 from .measure import Measurement, measure_renderables
 from .padding import Padding, PaddingDimensions
 from .segment import Segment
-from .style import StyleType
+from .style import Style, StyleType
 from .text import Text, TextType
 
 if TYPE_CHECKING:
@@ -149,9 +150,53 @@ class Panel(JupyterMixin):
         safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box
         box = self.box.substitute(options, safe=safe_box)
 
+        def align_text(
+            text: Text, width: int, align: str, character: str, style: Style
+        ) -> Text:
+            """Gets new aligned text.
+
+            Args:
+                text (Text): Title or subtitle text.
+                width (int): Desired width.
+                align (str): Alignment.
+                character (str): Character for alignment.
+                style (Style): Border style
+
+            Returns:
+                Text: New text instance
+            """
+            text = text.copy()
+            text.truncate(width)
+            excess_space = width - cell_len(text.plain)
+            if excess_space:
+                if align == "left":
+                    return Text.assemble(
+                        text,
+                        (character * excess_space, style),
+                        no_wrap=True,
+                        end="",
+                    )
+                elif align == "center":
+                    left = excess_space // 2
+                    return Text.assemble(
+                        (character * left, style),
+                        text,
+                        (character * (excess_space - left), style),
+                        no_wrap=True,
+                        end="",
+                    )
+                else:
+                    return Text.assemble(
+                        (character * excess_space, style),
+                        text,
+                        no_wrap=True,
+                        end="",
+                    )
+            return text
+
         title_text = self._title
         if title_text is not None:
-            title_text.style = border_style
+            title_text.stylize_before(border_style)
 
         child_width = (
             width - 2
@@ -180,7 +225,13 @@ class Panel(JupyterMixin):
         if title_text is None or width <= 4:
             yield Segment(box.get_top([width - 2]), border_style)
         else:
-            title_text.align(self.title_align, width - 4, character=box.top)
+            title_text = align_text(
+                title_text,
+                width - 4,
+                self.title_align,
+                box.top,
+                border_style,
+            )
             yield Segment(box.top_left + box.top, border_style)
             yield from console.render(title_text, child_options.update_width(width - 4))
             yield Segment(box.top + box.top_right, border_style)
@@ -194,12 +245,18 @@ class Panel(JupyterMixin):
 
         subtitle_text = self._subtitle
         if subtitle_text is not None:
-            subtitle_text.style = border_style
+            subtitle_text.stylize_before(border_style)
 
         if subtitle_text is None or width <= 4:
             yield Segment(box.get_bottom([width - 2]), border_style)
         else:
-            subtitle_text.align(self.subtitle_align, width - 4, character=box.bottom)
+            subtitle_text = align_text(
+                subtitle_text,
+                width - 4,
+                self.subtitle_align,
+                box.bottom,
+                border_style,
+            )
             yield Segment(box.bottom_left + box.bottom, border_style)
             yield from console.render(
                 subtitle_text, child_options.update_width(width - 4)

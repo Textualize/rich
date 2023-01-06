@@ -4,6 +4,7 @@ import os
 import platform
 import sys
 from dataclasses import dataclass, field
+from pathlib import Path
 from traceback import walk_tb
 from types import ModuleType, TracebackType
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Type, Union
@@ -290,7 +291,12 @@ class Traceback:
             Traceback: A Traceback instance that may be printed.
         """
         rich_traceback = cls.extract(
-            exc_type, exc_value, traceback, show_locals=show_locals
+            exc_type,
+            exc_value,
+            traceback,
+            show_locals=show_locals,
+            locals_max_length=locals_max_length,
+            locals_max_string=locals_max_string,
         )
         return cls(
             rich_traceback,
@@ -544,10 +550,7 @@ class Traceback:
             """
             code = code_cache.get(filename)
             if code is None:
-                with open(
-                    filename, "rt", encoding="utf-8", errors="replace"
-                ) as code_file:
-                    code = code_file.read()
+                code = Path(filename).read_text(encoding="utf-8", errors="replace")
                 code_cache[filename] = code
             return code
 

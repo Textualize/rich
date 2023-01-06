@@ -8,11 +8,11 @@ Use Rich to make your command line applications visually appealing and present d
 Requirements
 ------------
 
-Rich works with OSX, Linux and Windows.
+Rich works with macOS, Linux and Windows.
 
 On Windows both the (ancient) cmd.exe terminal is supported and the new `Windows Terminal <https://github.com/microsoft/terminal/releases>`_. The latter has much improved support for color and style.
 
-Rich requires Python 3.6.3 and above. Note that Python 3.6.0 is *not* supported due to lack of support for methods on NamedTuples.
+Rich requires Python 3.7.0 and above.
 
 .. note::
     PyCharm users will need to enable "emulate terminal" in output console option in run/debug configuration to see styled output.
@@ -28,7 +28,7 @@ Add the ``-U`` switch to update to the current version, if Rich is already insta
 
 If you intend to use Rich with Jupyter then there are some additional dependencies which you can install with the following command::
 
-    pip install rich[jupyter]
+    pip install "rich[jupyter]"
 
 
 Quick Start

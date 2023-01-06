@@ -30,7 +30,7 @@ from rich.repr import RichReprResult
 try:
     import attr as _attr_module
 
-    _has_attrs = True
+    _has_attrs = hasattr(_attr_module, "ib")
 except ImportError:  # pragma: no cover
     _has_attrs = False
 
@@ -371,6 +371,7 @@ class Pretty(JupyterMixin):
             indent_size=self.indent_size,
             max_length=self.max_length,
             max_string=self.max_string,
+            max_depth=self.max_depth,
             expand_all=self.expand_all,
         )
         text_width = (
@@ -433,7 +434,7 @@ class Node:
     is_tuple: bool = False
     is_namedtuple: bool = False
     children: Optional[List["Node"]] = None
-    key_separator = ": "
+    key_separator: str = ": "
     separator: str = ", "
 
     def iter_tokens(self) -> Iterable[str]:
@@ -642,7 +643,6 @@ def traverse(
             return Node(value_repr="...")
 
         obj_type = type(obj)
-        py_version = (sys.version_info.major, sys.version_info.minor)
         children: List[Node]
         reached_max_depth = max_depth is not None and depth >= max_depth
 
@@ -780,7 +780,7 @@ def traverse(
             is_dataclass(obj)
             and not _safe_isinstance(obj, type)
             and not fake_attributes
-            and (_is_dataclass_repr(obj) or py_version == (3, 6))
+            and _is_dataclass_repr(obj)
         ):
             push_visited(obj_id)
             children = []

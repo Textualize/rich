@@ -96,6 +96,8 @@ Lines
 
 By default, Tables will show a line under the header only. If you want to show lines between all rows add ``show_lines=True`` to the constructor.
 
+You can also force a line on the next row by setting ``end_section=True`` on the call to :meth:`~rich.table.Table.add_row`, or by calling the :meth:`~rich.table.Table.add_section` to add a line between the current and subsequent rows.
+
 
 Empty Tables
 ~~~~~~~~~~~~

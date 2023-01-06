@@ -2,7 +2,7 @@
 
 The following people have contributed to the development of Rich:
 
-<!-- Add your name below, sort alphabetically by surname. Link to Github profile / your home page. -->
+<!-- Add your name below, sort alphabetically by surname. Link to GitHub profile / your home page. -->
 
 - [Patrick Arminio](https://github.com/patrick91)
 - [Gregory Beauregard](https://github.com/GBeauregard/pyffstream)
@@ -20,7 +20,9 @@ The following people have contributed to the development of Rich:
 - [Kenneth Hoste](https://github.com/boegel)
 - [Lanqing Huang](https://github.com/lqhuang)
 - [Finn Hughes](https://github.com/finnhughes)
+- [Ionite](https://github.com/ionite34)
 - [Josh Karpel](https://github.com/JoshKarpel)
+- [Hugo van Kemenade](https://github.com/hugovk)
 - [Andrew Kettmann](https://github.com/akettmann)
 - [Martin Larralde](https://github.com/althonos)
 - [Hedy Li](https://github.com/hedythedev)
@@ -32,6 +34,7 @@ The following people have contributed to the development of Rich:
 - [Michael Milton](https://github.com/multimeric)
 - [Martina Oefelein](https://github.com/oefe)
 - [Nathan Page](https://github.com/nathanrpage97)
+- [Dave Pearson](https://github.com/davep/)
 - [Avi Perl](https://github.com/avi-perl)
 - [Laurent Peuch](https://github.com/psycojoker)
 - [Olivier Philippon](https://github.com/DrBenton)
@@ -55,3 +58,5 @@ The following people have contributed to the development of Rich:
 - [Motahhar Mokfi](https://github.com/motahhar)
 - [Tomer Shalev](https://github.com/tomers)
 - [Serkan UYSAL](https://github.com/uysalserkan)
+- [Zhe Huang](https://github.com/onlyacat)
+- [Ke Sun](https://github.com/ksun212)

@@ -462,6 +462,12 @@ class Table(JupyterMixin):
                 )
         self.rows.append(Row(style=style, end_section=end_section))
 
+    def add_section(self) -> None:
+        """Add a new section (draw a line after current row)."""
+
+        if self.rows:
+            self.rows[-1].end_section = True
+
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":

@@ -4,7 +4,7 @@ import sys
 from array import array
 from collections import UserDict, defaultdict
 from dataclasses import dataclass, field
-from typing import List, NamedTuple, Any
+from typing import Any, List, NamedTuple
 from unittest.mock import patch
 
 import attr
@@ -14,11 +14,6 @@ from rich.console import Console
 from rich.measure import Measurement
 from rich.pretty import Node, Pretty, _ipy_display_hook, install, pprint, pretty_repr
 from rich.text import Text
-
-skip_py36 = pytest.mark.skipif(
-    sys.version_info.minor == 6 and sys.version_info.major == 3,
-    reason="rendered differently on py3.6",
-)
 
 skip_py37 = pytest.mark.skipif(
     sys.version_info.minor == 7 and sys.version_info.major == 3,
@@ -289,7 +284,6 @@ def test_ansi_in_pretty_repr():
     assert result == "Hello World!\n"
 
 
-@skip_py36
 def test_broken_repr():
     class BrokenRepr:
         def __repr__(self):
@@ -301,7 +295,6 @@ def test_broken_repr():
     assert result == expected
 
 
-@skip_py36
 def test_broken_getattr():
     class BrokenAttr:
         def __getattr__(self, name):
@@ -618,7 +611,6 @@ def test_attrs_empty():
     assert result == expected
 
 
-@skip_py36
 @skip_py310
 @skip_py311
 def test_attrs_broken():
@@ -634,7 +626,6 @@ def test_attrs_broken():
     assert result == expected
 
 
-@skip_py36
 @skip_py37
 @skip_py38
 @skip_py39

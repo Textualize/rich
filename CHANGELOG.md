@@ -5,8 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [13.0.0] - 2022-12-30
 
-## [12.6.0] - Unreleased
+### Fixed
+
+- Reversed `pre` and `code` tags in base HTML format https://github.com/Textualize/rich/pull/2642
+- Improved detection of `attrs` library, that isn't confused by the presence of the `attr` library.
+- Fixed issue with `locals_max_length` parameter not being respected in Traceback https://github.com/Textualize/rich/issues/2649
+- Handling of broken `fileno` made more robust. Fixes https://github.com/Textualize/rich/issues/2645
+- Fixed missing `fileno` on FileProxy
+
+### Changed
+
+- Bumped minimum Python version to 3.7 https://github.com/Textualize/rich/pull/2567
+- Pretty-printing of "tagged" `__repr__` results is now greedy when matching tags https://github.com/Textualize/rich/pull/2565
+- `progress.track` now supports deriving total from `__length_hint__`
+
+### Added
+
+- Add type annotation for key_separator of pretty.Node https://github.com/Textualize/rich/issues/2625
+
+
+## [12.6.0] - 2022-10-02
 
 ### Added
 
@@ -14,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add support for `FORCE_COLOR` env var https://github.com/Textualize/rich/pull/2449
 - Allow a `max_depth` argument to be passed to the `install()` hook https://github.com/Textualize/rich/issues/2486
 - Document using `None` as name in `__rich_repr__` for tuple positional args https://github.com/Textualize/rich/pull/2379
+- Add `font_aspect_ratio` parameter in SVG export https://github.com/Textualize/rich/pull/2539/files
+- Added `Table.add_section` method. https://github.com/Textualize/rich/pull/2544
 
 ### Fixed
 
@@ -21,6 +43,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix NO_COLOR support on legacy Windows https://github.com/Textualize/rich/pull/2458
 - Fix pretty printer handling of cyclic references https://github.com/Textualize/rich/pull/2524
 - Fix missing `mode` property on file wrapper breaking uploads via `requests` https://github.com/Textualize/rich/pull/2495
+- Fix mismatching default value of parameter `ensure_ascii` https://github.com/Textualize/rich/pull/2538
+- Remove unused height parameter in `Layout` class https://github.com/Textualize/rich/pull/2540
+- Fixed exception in Syntax.__rich_measure__ for empty files
 
 ### Changed
 
@@ -1829,7 +1854,8 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[unreleased]: https://github.com/textualize/rich/compare/v12.5.2...HEAD
+[13.0.0]: https://github.com/textualize/rich/compare/v12.6.0...v13.0.0
+[12.6.0]: https://github.com/textualize/rich/compare/v12.5.2...v12.6.0
 [12.5.2]: https://github.com/textualize/rich/compare/v12.5.1...v12.5.2
 [12.5.1]: https://github.com/textualize/rich/compare/v12.5.0...v12.5.1
 [12.5.0]: https://github.com/textualize/rich/compare/v12.4.4...v12.5.0

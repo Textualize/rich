@@ -5,9 +5,6 @@ def test_null_file():
     file = NullFile()
     with file:
         assert file.write("abc") == 0
-        assert file.mode == ""
-        assert file.name == "NullFile"
-        assert not file.closed()
         assert file.close() is None
         assert not file.isatty()
         assert file.read() == ""

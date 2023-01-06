@@ -240,6 +240,15 @@ def test_print_json_ensure_ascii():
     assert result == expected
 
 
+def test_print_json_with_default_ensure_ascii():
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print_json(data={"foo": "💩"})
+    result = console.file.getvalue()
+    print(repr(result))
+    expected = '\x1b[1m{\x1b[0m\n  \x1b[1;34m"foo"\x1b[0m: \x1b[32m"💩"\x1b[0m\n\x1b[1m}\x1b[0m\n'
+    assert result == expected
+
+
 def test_print_json_indent_none():
     console = Console(file=io.StringIO(), color_system="truecolor")
     data = {"name": "apple", "count": 1}
@@ -519,7 +528,7 @@ def test_export_html():
     console = Console(record=True, width=100)
     console.print("[b]foo <script> 'test' [link=https://example.org]Click[/link]")
     html = console.export_html()
-    expected = '<!DOCTYPE html>\n<head>\n<meta charset="UTF-8">\n<style>\n.r1 {font-weight: bold}\n.r2 {color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold}\n.r3 {color: #008000; text-decoration-color: #008000; font-weight: bold}\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><span class="r1">foo &lt;</span><span class="r2">script</span><span class="r1">&gt; </span><span class="r3">&#x27;test&#x27;</span><span class="r1"> </span><a class="r1" href="https://example.org">Click</a>\n</pre>\n    </code>\n</body>\n</html>\n'
+    expected = '<!DOCTYPE html>\n<head>\n<meta charset="UTF-8">\n<style>\n.r1 {font-weight: bold}\n.r2 {color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold}\n.r3 {color: #008000; text-decoration-color: #008000; font-weight: bold}\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace">\n        <code><span class="r1">foo &lt;</span><span class="r2">script</span><span class="r1">&gt; </span><span class="r3">&#x27;test&#x27;</span><span class="r1"> </span><a class="r1" href="https://example.org">Click</a>\n</code>\n    </pre>\n</body>\n</html>\n'
     assert html == expected
 
 
@@ -527,11 +536,11 @@ def test_export_html_inline():
     console = Console(record=True, width=100)
     console.print("[b]foo [link=https://example.org]Click[/link]")
     html = console.export_html(inline_styles=True)
-    expected = '<!DOCTYPE html>\n<head>\n<meta charset="UTF-8">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><span style="font-weight: bold">foo </span><span style="font-weight: bold"><a href="https://example.org">Click</a></span>\n</pre>\n    </code>\n</body>\n</html>\n'
+    expected = '<!DOCTYPE html>\n<head>\n<meta charset="UTF-8">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace">\n        <code><span style="font-weight: bold">foo </span><span style="font-weight: bold"><a href="https://example.org">Click</a></span>\n</code>\n    </pre>\n</body>\n</html>\n'
     assert html == expected
 
 
-EXPECTED_SVG = '<svg class="rich-terminal" viewBox="0 0 1238 74.4" xmlns="http://www.w3.org/2000/svg">\n    <!-- Generated with Rich https://www.textualize.io -->\n    <style>\n\n    @font-face {\n        font-family: "Fira Code";\n        src: local("FiraCode-Regular"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");\n        font-style: normal;\n        font-weight: 400;\n    }\n    @font-face {\n        font-family: "Fira Code";\n        src: local("FiraCode-Bold"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");\n        font-style: bold;\n        font-weight: 700;\n    }\n\n    .terminal-614794459-matrix {\n        font-family: Fira Code, monospace;\n        font-size: 20px;\n        line-height: 24.4px;\n        font-variant-east-asian: full-width;\n    }\n\n    .terminal-614794459-title {\n        font-size: 18px;\n        font-weight: bold;\n        font-family: arial;\n    }\n\n    .terminal-614794459-r1 { fill: #608ab1;font-weight: bold }\n.terminal-614794459-r2 { fill: #c5c8c6 }\n    </style>\n\n    <defs>\n    <clipPath id="terminal-614794459-clip-terminal">\n      <rect x="0" y="0" width="1219.0" height="23.4" />\n    </clipPath>\n    \n    </defs>\n\n    <rect fill="#292929" stroke="rgba(255,255,255,0.35)" stroke-width="1" x="1" y="1" width="1236" height="72.4" rx="8"/><text class="terminal-614794459-title" fill="#c5c8c6" text-anchor="middle" x="618" y="27">Rich</text>\n            <g transform="translate(26,22)">\n            <circle cx="0" cy="0" r="7" fill="#ff5f57"/>\n            <circle cx="22" cy="0" r="7" fill="#febc2e"/>\n            <circle cx="44" cy="0" r="7" fill="#28c840"/>\n            </g>\n        \n    <g transform="translate(9, 41)" clip-path="url(#terminal-614794459-clip-terminal)">\n    <rect fill="#cc555a" x="0" y="1.5" width="36.6" height="24.65" shape-rendering="crispEdges"/>\n    <g class="terminal-614794459-matrix">\n    <text class="terminal-614794459-r1" x="0" y="20" textLength="36.6" clip-path="url(#terminal-614794459-line-0)">foo</text><text class="terminal-614794459-r2" x="48.8" y="20" textLength="61" clip-path="url(#terminal-614794459-line-0)">Click</text><text class="terminal-614794459-r2" x="1220" y="20" textLength="12.2" clip-path="url(#terminal-614794459-line-0)">\n</text>\n    </g>\n    </g>\n</svg>\n'
+EXPECTED_SVG = '<svg class="rich-terminal" viewBox="0 0 1238 74.4" xmlns="http://www.w3.org/2000/svg">\n    <!-- Generated with Rich https://www.textualize.io -->\n    <style>\n\n    @font-face {\n        font-family: "Fira Code";\n        src: local("FiraCode-Regular"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");\n        font-style: normal;\n        font-weight: 400;\n    }\n    @font-face {\n        font-family: "Fira Code";\n        src: local("FiraCode-Bold"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");\n        font-style: bold;\n        font-weight: 700;\n    }\n\n    .terminal-3526644552-matrix {\n        font-family: Fira Code, monospace;\n        font-size: 20px;\n        line-height: 24.4px;\n        font-variant-east-asian: full-width;\n    }\n\n    .terminal-3526644552-title {\n        font-size: 18px;\n        font-weight: bold;\n        font-family: arial;\n    }\n\n    .terminal-3526644552-r1 { fill: #608ab1;font-weight: bold }\n.terminal-3526644552-r2 { fill: #c5c8c6 }\n    </style>\n\n    <defs>\n    <clipPath id="terminal-3526644552-clip-terminal">\n      <rect x="0" y="0" width="1219.0" height="23.4" />\n    </clipPath>\n    \n    </defs>\n\n    <rect fill="#292929" stroke="rgba(255,255,255,0.35)" stroke-width="1" x="1" y="1" width="1236" height="72.4" rx="8"/><text class="terminal-3526644552-title" fill="#c5c8c6" text-anchor="middle" x="618" y="27">Rich</text>\n            <g transform="translate(26,22)">\n            <circle cx="0" cy="0" r="7" fill="#ff5f57"/>\n            <circle cx="22" cy="0" r="7" fill="#febc2e"/>\n            <circle cx="44" cy="0" r="7" fill="#28c840"/>\n            </g>\n        \n    <g transform="translate(9, 41)" clip-path="url(#terminal-3526644552-clip-terminal)">\n    <rect fill="#cc555a" x="0" y="1.5" width="36.6" height="24.65" shape-rendering="crispEdges"/>\n    <g class="terminal-3526644552-matrix">\n    <text class="terminal-3526644552-r1" x="0" y="20" textLength="36.6" clip-path="url(#terminal-3526644552-line-0)">foo</text><text class="terminal-3526644552-r2" x="48.8" y="20" textLength="61" clip-path="url(#terminal-3526644552-line-0)">Click</text><text class="terminal-3526644552-r2" x="1220" y="20" textLength="12.2" clip-path="url(#terminal-3526644552-line-0)">\n</text>\n    </g>\n    </g>\n</svg>\n'
 
 
 def test_export_svg():
@@ -543,6 +552,18 @@ def test_export_svg():
     print(repr(svg))
 
     assert svg == EXPECTED_SVG
+
+
+def test_export_svg_specified_unique_id():
+    expected_svg = EXPECTED_SVG.replace("terminal-3526644552", "given-id")
+    console = Console(record=True, width=100)
+    console.print(
+        "[b red on blue reverse]foo[/] [blink][link=https://example.org]Click[/link]"
+    )
+    svg = console.export_svg(unique_id="given-id")
+    print(repr(svg))
+
+    assert svg == expected_svg
 
 
 def test_save_svg():
@@ -568,7 +589,7 @@ def test_save_text():
 
 
 def test_save_html():
-    expected = "<!DOCTYPE html>\n<head>\n<meta charset=\"UTF-8\">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <code>\n        <pre style=\"font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\">foo\n</pre>\n    </code>\n</body>\n</html>\n"
+    expected = "<!DOCTYPE html>\n<head>\n<meta charset=\"UTF-8\">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <pre style=\"font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\">\n        <code>foo\n</code>\n    </pre>\n</body>\n</html>\n"
     console = Console(record=True, width=100)
     console.print("foo")
     with tempfile.TemporaryDirectory() as path:
