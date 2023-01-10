@@ -379,22 +379,33 @@ def test_capture():
         console.print("Hello")
     assert capture.get() == "Hello\n"
 
+    with console.capture(echo=False) as capture:
+        with pytest.raises(CaptureError):
+            capture.get()
+        console.print("World")
+    assert capture.get() == "World\n"
+
 
 def test_capture_and_record(capsys):
     recorder = Console(record=True)
-    recorder.print("ABC")
 
+    recorder.print("ABC")
     with recorder.capture() as capture:
         recorder.print("Hello")
 
     assert capture.get() == "Hello\n"
-
-    recorded_text = recorder.export_text()
-    out, err = capsys.readouterr()
-
-    assert recorded_text == "ABC\nHello\n"
+    assert recorder.export_text() == "ABC\nHello\nHello\n\n"
     assert capture.get() == "Hello\n"
-    assert out == "ABC\n"
+    assert capsys.readouterr() == ("ABC\nHello\n\n", "")
+
+    recorder.print("DEF")
+    with recorder.capture(echo=False) as capture:
+        recorder.print("World")
+
+    assert capture.get() == "World\n"
+    assert recorder.export_text() == "DEF\nWorld\n"
+    assert capture.get() == "World\n"
+    assert capsys.readouterr() == ("DEF\n", "")
 
 
 def test_input(monkeypatch, capsys):
