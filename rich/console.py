@@ -327,10 +327,10 @@ class Capture:
         console (Console): A console instance to capture output.
     """
 
-    def __init__(self, console: "Console", **kwargs) -> None:
+    def __init__(self, console: "Console", **kwargs: Any) -> None:
         self._console = console
         self._result: Optional[str] = None
-        self._echo = kwargs.get('echo', True)
+        self._echo = kwargs.get("echo", True)
 
     def __enter__(self) -> "Capture":
         self._console.begin_capture()
@@ -1083,7 +1083,7 @@ class Console:
         """Play a 'bell' sound (if supported by the terminal)."""
         self.control(Control.bell())
 
-    def capture(self, **kwargs) -> Capture:
+    def capture(self, **kwargs: Any) -> Capture:
         """A context manager to *capture* the result of print() or log() in a string,
         rather than writing it to the console.
 
