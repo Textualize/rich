@@ -195,7 +195,7 @@ class Panel(JupyterMixin):
             return text
 
         title_text = self._title
-        if title_text is not None:
+        if title_text is not None and not title_text.style:
             title_text.stylize_before(border_style)
 
         child_width = (
@@ -244,7 +244,7 @@ class Panel(JupyterMixin):
             yield new_line
 
         subtitle_text = self._subtitle
-        if subtitle_text is not None:
+        if subtitle_text is not None and not subtitle_text.style:
             subtitle_text.stylize_before(border_style)
 
         if subtitle_text is None or width <= 4:
