@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [13.0.2] - 2023-01-11
+
+### Fixed
+
+- Added logic for `Panel.__rich_console__` to check for existing title/subtitle styles before falling back on `border_style`. Fixes https://github.com/Textualize/rich/issues/2745
+
 ## [13.0.1] - 2023-01-06
 
 ### Fixed
@@ -1860,6 +1866,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.0.2]: https://github.com/textualize/rich/compare/v13.0.1...v13.0.2
 [13.0.1]: https://github.com/textualize/rich/compare/v13.0.0...v13.0.1
 [13.0.0]: https://github.com/textualize/rich/compare/v12.6.0...v13.0.0
 [12.6.0]: https://github.com/textualize/rich/compare/v12.5.2...v12.6.0
