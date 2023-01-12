@@ -60,3 +60,4 @@ The following people have contributed to the development of Rich:
 - [Serkan UYSAL](https://github.com/uysalserkan)
 - [Zhe Huang](https://github.com/onlyacat)
 - [Ke Sun](https://github.com/ksun212)
+- [Qiming Xu](https://github.com/xqm32)
