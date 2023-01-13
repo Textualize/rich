@@ -344,6 +344,27 @@ def test_rich_traceback_omit_optional_local_flag(
         assert frame_names == expected_frame_names
 
 
+def test_rich_traceback_from_exception_respects_locals_max():
+    console = Console(width=160, file=io.StringIO())
+    try:
+        local_string = "O" * 145
+        1 / 0
+    except Exception as e:
+        traceback = Traceback.from_exception(
+            e.__class__,
+            e,
+            e.__traceback__,
+            width=console.width,
+            show_locals=True,
+            locals_max_length=console.width,
+            locals_max_string=console.width,
+        )
+        console.print(traceback)
+    result = console.file.getvalue()
+    print(result)
+    assert "O'+" not in result
+
+
 if __name__ == "__main__":  # pragma: no cover
 
     expected = render(get_exception())

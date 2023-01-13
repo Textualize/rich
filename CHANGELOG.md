@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Handling of broken `fileno` made more robust. Fixes https://github.com/Textualize/rich/issues/2645
 - Fixed missing `fileno` on FileProxy
 
+### Fixed
+
+- Handle passing `locals_max_length` and `locals_max_string` to `Traceback.from_exception` https://github.com/Textualize/rich/pull/2650
+
 ### Changed
 
 - Bumped minimum Python version to 3.7 https://github.com/Textualize/rich/pull/2567
