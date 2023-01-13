@@ -5,7 +5,7 @@ Highlighting
 
 Rich will automatically highlight patterns in text, such as numbers, strings, collections, booleans, None, and a few more exotic patterns such as file paths, URLs and UUIDs.
 
-You can disable highlighting either by setting ``highlight=False`` on :meth:`~rich.console.Console.print` or :meth:`~rich.console.Console.log`, or by setting ``highlight=False`` on the :class:`~rich.console.Console` constructor which disables it everywhere. If you disable highlighting on the constructor, you can still selectively *enable* highlighting with ``highlight=True`` on print/log.
+You can disable highlighting either by setting ``highlight=False`` on :meth:`~rich.console.Console.print` or :meth:`~rich.console.Console.log`, or by setting ``highlight=False`` on the :class:`~rich.console.Console` constructor which disables it everywhere. If you disable highlighting on the constructor, you can still selectively *enable* highlighting with ``highlight=True`` on print / log.
 
 Custom Highlighters
 -------------------
