@@ -371,7 +371,7 @@ def test_control():
     assert console.file.getvalue() == "\x1b[2JBAR\n"
 
 
-def test_capture():
+def test_capture(capsys):
     console = Console()
     with console.capture() as capture:
         with pytest.raises(CaptureError):
@@ -379,11 +379,19 @@ def test_capture():
         console.print("Hello")
     assert capture.get() == "Hello\n"
 
+    sysout = capsys.readouterr()
+    assert sysout.err == ""
+    assert sysout.out == "Hello\n\n"
+
     with console.capture(echo=False) as capture:
         with pytest.raises(CaptureError):
             capture.get()
         console.print("World")
     assert capture.get() == "World\n"
+
+    sysout = capsys.readouterr()
+    assert sysout.err == ""
+    assert sysout.out == ""
 
 
 def test_capture_and_record(capsys):
