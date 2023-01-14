@@ -1,3 +1,4 @@
+import re
 import sys
 from functools import lru_cache
 from marshal import dumps, loads
@@ -5,12 +6,15 @@ from random import randint
 from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
 
 from . import errors
-from .color import Color, ColorParseError, ColorSystem, blend_rgb
+from .color import Color, ColorParseError, ColorSystem, RE_COLOR, blend_rgb
 from .repr import Result, rich_repr
 from .terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
 
 # Style instances and style definitions are often interchangeable
 StyleType = Union[str, "Style"]
+
+# Patterns for parsing style definitions
+RE_STYLE_DEFINITION = re.compile(f"({RE_COLOR.pattern})|\S+", re.VERBOSE)
 
 
 class _Bit:
@@ -516,7 +520,9 @@ class Style:
         attributes: Dict[str, Optional[Any]] = {}
         link: Optional[str] = None
 
-        words = iter(style_definition.split())
+        words = (
+            match.group() for match in RE_STYLE_DEFINITION.finditer(style_definition)
+        )
         for original_word in words:
             word = original_word.lower()
             if word == "on":
