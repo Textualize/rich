@@ -38,7 +38,7 @@ See what [people are saying about Rich](https://www.willmcgugan.com/blog/pages/p
 
 ## Compatibility
 
-Rich works with Linux, OSX, and Windows. True color / emoji works with new Windows Terminal, classic terminal is limited to 16 colors. Rich requires Python 3.7 or later.
+Rich works with Linux, OSX, and Windows. True color and emoji work on the new Windows Terminal, classic terminal is limited to 16 colors. Rich requires Python 3.7 or later.
 
 Rich works with [Jupyter notebooks](https://jupyter.org/) with no additional configuration required.
 
@@ -58,7 +58,7 @@ python -m rich
 
 ## Rich Print
 
-To effortlessly add rich output to your application, you can import the [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) method, which has the same signature as the builtin Python function. Try this:
+To effortlessly add rich output to your application, you can import the [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) method, which has the same signature as the built-in Python function. Try this:
 
 ```python
 from rich import print
@@ -89,13 +89,13 @@ from rich.console import Console
 console = Console()
 ```
 
-The Console object has a `print` method which has an intentionally similar interface to the builtin `print` function. Here's an example of use:
+The Console object has a `print` method that has an intentionally similar interface to the built-in `print` function. Here's an example of use:
 
 ```python
 console.print("Hello", "World!")
 ```
 
-As you might expect, this will print `"Hello World!"` to the terminal. Note that unlike the builtin `print` function, Rich will word-wrap your text to fit within the terminal width.
+As you might expect, this will print `"Hello World!"` to the terminal. Note that, unlike the built-in `print` function, Rich will word-wrap your text to fit within the terminal width.
 
 There are a few ways of adding color and style to your output. You can set a style for the entire output by adding a `style` keyword argument. Here's an example:
 
@@ -107,7 +107,7 @@ The output will be something like the following:
 
 ![Hello World](https://github.com/textualize/rich/raw/master/imgs/hello_world.png)
 
-That's fine for styling a line of text at a time. For more finely grained styling, Rich renders a special markup which is similar in syntax to [bbcode](https://en.wikipedia.org/wiki/BBCode). Here's an example:
+That's fine for styling a line of text at a time. For more finely-grained styling, Rich renders a special markup that is similar in syntax to [bbcode](https://en.wikipedia.org/wiki/BBCode). Here's an example:
 
 ```python
 console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i]way[/i].")
@@ -119,7 +119,7 @@ You can use a Console object to generate sophisticated output with minimal effor
 
 ## Rich Inspect
 
-Rich has an [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) function which can produce a report on any Python object, such as class, instance, or builtin.
+Rich has an [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect) function that can produce a report on any Python object, such as a class, instance, or built-in.
 
 ```python
 >>> my_list = ["foo", "bar"]
@@ -133,14 +133,14 @@ See the [inspect docs](https://rich.readthedocs.io/en/latest/reference/init.html
 
 # Rich Library
 
-Rich contains a number of builtin _renderables_ you can use to create elegant output in your CLI and help you debug your code.
+Rich contains a number of built-in _renderables_ you can use to create elegant output in your CLI and help you debug your code.
 
 Click the following headings for details:
 
 <details>
 <summary>Log</summary>
 
-The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default Rich will do syntax highlighting for Python structures and for repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
+The Console object has a `log()` method which has a similar interface to `print()`, but also renders a column for the current time and the file and line which made the call. By default, Rich will do syntax highlighting for Python structures and for repr strings. If you log a collection (i.e. a dict or a list) Rich will pretty print it so that it fits in the available space. Here's an example of some of these features.
 
 ```python
 from rich.console import Console
@@ -171,13 +171,13 @@ The above produces the following output:
 
 Note the `log_locals` argument, which outputs a table containing the local variables where the log method was called.
 
-The log method could be used for logging to the terminal for long running applications such as servers, but is also a very nice debugging aid.
+The log method could be used for logging into the terminal for long-running applications such as servers but is also a very nice debugging aid.
 
 </details>
 <details>
 <summary>Logging Handler</summary>
 
-You can also use the builtin [Handler class](https://rich.readthedocs.io/en/latest/logging.html) to format and colorize output from Python's logging module. Here's an example of the output:
+You can also use the built-in [Handler class](https://rich.readthedocs.io/en/latest/logging.html) to format and colorize output from Python's logging module. Here's an example of the output:
 
 ![Logging](https://github.com/textualize/rich/raw/master/imgs/logging.png)
 
@@ -186,7 +186,7 @@ You can also use the builtin [Handler class](https://rich.readthedocs.io/en/late
 <details>
 <summary>Emoji</summary>
 
-To insert an emoji in to console output place the name between two colons. Here's an example:
+To insert an emoji into the console output place the name between two colons. Here's an example:
 
 ```python
 >>> console.print(":smiley: :vampire: :pile_of_poo: :thumbs_up: :raccoon:")
@@ -242,7 +242,7 @@ This produces the following output:
 
 ![table](https://github.com/textualize/rich/raw/master/imgs/table.png)
 
-Note that console markup is rendered in the same way as `print()` and `log()`. In fact, anything that is renderable by Rich may be included in the headers / rows (even other tables).
+Note that console markup is rendered in the same way as `print()` and `log()`. In fact, anything that is renderable by Rich may be included in the headers/rows (even other tables).
 
 The `Table` class is smart enough to resize columns to fit the available width of the terminal, wrapping text as required. Here's the same example, with the terminal made smaller than the table above:
 
@@ -441,6 +441,6 @@ See also Rich's sister project, [Textual](https://github.com/Textualize/textual)
 
 For some examples of projects using Rich, see the [Rich Gallery](https://www.textualize.io/rich/gallery) on [Textualize.io](https://www.textualize.io).
 
-Would you like to add your own project to the gallery? You can! Follow [these instructions](https://www.textualize.io/gallery-instructions).
+Would you like to add your project to the gallery? You can! Follow [these instructions](https://www.textualize.io/gallery-instructions).
 
 <!-- This is a test, no need to translate -->

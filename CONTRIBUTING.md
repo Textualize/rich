@@ -2,8 +2,8 @@
 
 This project welcomes contributions in the form of Pull Requests.
 For clear bug-fixes / typos etc. just submit a PR.
-For new features or if there is any doubt in how to fix a bug, you might want
-to open an issue prior to starting work, or email willmcgugan+rich@gmail.com
+For new features or if there is any doubt about how to fix a bug, you might want
+to open an issue before starting work, or email willmcgugan+rich@gmail.com
 to discuss it first.
 
 ## Prerequisites
@@ -12,8 +12,8 @@ Rich uses [poetry](https://python-poetry.org/docs/) for packaging and
 dependency management. To start developing with Rich, install Poetry
 using the [recommended method](https://python-poetry.org/docs/#installation).
 
-Next, you'll need to create a _fork_ (your own personal copy) of the Rich repository, and clone that fork 
-on to your local machine. GitHub offers a great tutorial for this process [here](https://docs.github.com/en/get-started/quickstart/fork-a-repo).
+Next, you'll need to create a _fork_ (your copy) of the Rich repository, and clone that fork
+onto your local machine. GitHub offers a great tutorial for this process [here](https://docs.github.com/en/get-started/quickstart/fork-a-repo).
 After following this guide, you'll have a local copy of the Rich project installed.
 
 Enter the directory containing your copy of Rich (`cd rich`).
@@ -72,7 +72,7 @@ New code should ideally have tests and not break existing tests.
 
 The "Coverage Report" that gets printed to the terminal after the tests run can be used
 to identify lines of code that haven't been covered by tests.
-If any of the new lines you've added or modified appear in this report, you should strongly consider adding tests which exercise them.
+If any of the new lines you've added or modified appear in this report, you should strongly consider adding tests that exercise them.
 
 ### Type Checking
 
@@ -103,7 +103,7 @@ and use `make format` to format and write to the files.
 
 Consider whether the change you made would benefit from documentation - if the feature has any user impact at all, the answer is almost certainly yes!
 Documentation can be found in the `docs` directory.
-There are some additional dependencies required to build the documentation. 
+There are some additional dependencies required to build the documentation.
 These dependencies can be installed by running (from the `docs` directory):
 
 ```
@@ -148,7 +148,7 @@ If you've exhausted all options on trying to fix a failing check, feel free to l
 After the checks in your pull request pass, someone will review your code.
 There may be some discussion and, in most cases, a few iterations will be required to find a solution that works best.
 
-## Afterwards
+## Afterward
 
 When the pull request is approved, it will be merged into the `master` branch.
-Your change will only be available to users the next time Rich is released. 
+Your change will only be available to users the next time Rich is released.
