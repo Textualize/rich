@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [13.1.0] - 2023-01-14
 
-- Added locals_hide_dunder and locals_hide_sunder to Tracebacks, to hide double underscore and single underscore locals.
+### Fixed
+
+- Fixed wrong filenames in Jupyter tracebacks https://github.com/Textualize/rich/issues/2271
+
+### Added
+
+- Added locals_hide_dunder and locals_hide_sunder to Tracebacks, to hide double underscore and single underscore locals. https://github.com/Textualize/rich/pull/2754
 
 ## [13.0.1] - 2023-01-06
 

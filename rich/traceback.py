@@ -223,7 +223,7 @@ class Traceback:
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to 10.
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
-        locals_hide_dunder (bool, optional): Hide locals prefixed with double underscore. Defaults to False.
+        locals_hide_dunder (bool, optional): Hide locals prefixed with double underscore. Defaults to True.
         locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
         suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
         max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
@@ -249,7 +249,7 @@ class Traceback:
         show_locals: bool = False,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
-        locals_hide_dunder: bool = False,
+        locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
         indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
