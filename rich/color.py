@@ -3,7 +3,7 @@ import re
 from colorsys import rgb_to_hls
 from enum import IntEnum
 from functools import lru_cache
-from typing import TYPE_CHECKING, NamedTuple, Optional, Tuple
+from typing import TYPE_CHECKING, NamedTuple, Optional, Tuple, Pattern
 
 from ._palettes import EIGHT_BIT_PALETTE, STANDARD_PALETTE, WINDOWS_PALETTE
 from .color_triplet import ColorTriplet
@@ -289,7 +289,7 @@ class ColorParseError(Exception):
     """The color could not be parsed."""
 
 
-RE_COLOR = re.compile(
+RE_COLOR: Pattern[str] = re.compile(
     r"""^
 \#([0-9a-f]{6})$|
 color\(([0-9]{1,3})\)$|
