@@ -138,7 +138,8 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "tree.line": Style(),
     "markdown.paragraph": Style(),
     "markdown.text": Style(),
-    "markdown.emph": Style(italic=True),
+    "markdown.em": Style(italic=True),
+    "markdown.emph": Style(italic=True),  # For commonmark backwards compatibility
     "markdown.strong": Style(bold=True),
     "markdown.code": Style(bold=True, color="cyan", bgcolor="black"),
     "markdown.code_block": Style(dim=True, color="cyan", bgcolor="black"),

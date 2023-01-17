@@ -1,4 +1,6 @@
-from typing import Any, ClassVar, Dict, Iterable, List, Optional, Type, Union
+from __future__ import annotations
+
+from typing import ClassVar, Dict, Iterable, List, Optional, Type, Union
 
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
@@ -21,12 +23,12 @@ class MarkdownElement:
     new_line: ClassVar[bool] = True
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "MarkdownElement":
+    def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
         """Factory to create markdown element,
 
         Args:
             markdown (Markdown): The parent Markdown object.
-            token (Any): A node from markdown-it.
+            token (Token): A node from markdown-it.
 
         Returns:
             MarkdownElement: A new markdown element
@@ -108,7 +110,7 @@ class Paragraph(TextElement):
     justify: JustifyMethod
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: MarkdownElement) -> "Paragraph":
+    def create(cls, markdown: "Markdown", token: Token) -> "Paragraph":
         return cls(justify=markdown.justify or "left")
 
     def __init__(self, justify: JustifyMethod) -> None:
@@ -125,7 +127,7 @@ class Heading(TextElement):
     """A heading."""
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "Heading":
+    def create(cls, markdown: "Markdown", token: Token) -> "Heading":
         return cls(token.tag)
 
     def on_enter(self, context: "MarkdownContext") -> None:
@@ -162,7 +164,7 @@ class CodeBlock(TextElement):
     style_name = "markdown.code_block"
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "CodeBlock":
+    def create(cls, markdown: "Markdown", token: Token) -> "CodeBlock":
         node_info = token.info or ""
         lexer_name = node_info.partition(" ")[0]
         return cls(lexer_name or "default", markdown.code_theme)
@@ -225,10 +227,10 @@ class ListElement(MarkdownElement):
     """A list element."""
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "ListElement":
-        return cls(token.type, token.attrs.get("start", 1))
+    def create(cls, markdown: "Markdown", token: Token) -> "ListElement":
+        return cls(token.type, int(token.attrs.get("start", 1)))
 
-    def __init__(self, list_type: str, list_start: Optional[int]) -> None:
+    def __init__(self, list_type: str, list_start: int | None) -> None:
         self.items: List[ListItem] = []
         self.list_type = list_type
         self.list_start = list_start
@@ -301,8 +303,8 @@ class ListItem(TextElement):
 
 class Link(TextElement):
     @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "MarkdownElement":
-        return cls(token.content, token.attrs.get("href"))
+    def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
+        return cls(token.content, str(token.attrs.get("href", "#")))
 
     def __init__(self, text: str, href: str):
         self.text = Text(text)
@@ -315,7 +317,7 @@ class ImageItem(TextElement):
     new_line = False
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Any) -> "MarkdownElement":
+    def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
         """Factory to create markdown element,
 
         Args:
@@ -325,7 +327,7 @@ class ImageItem(TextElement):
         Returns:
             MarkdownElement: A new markdown element
         """
-        return cls(token.attrs.get("src"), markdown.hyperlinks)
+        return cls(str(token.attrs.get("src", "")), markdown.hyperlinks)
 
     def __init__(self, destination: str, hyperlinks: bool) -> None:
         self.destination = destination
@@ -425,11 +427,6 @@ class Markdown(JupyterMixin):
         "image": ImageItem,
     }
 
-    # Maps tag names to Rich style keys, if tag and key differ
-    tag_to_style_name = {
-        "em": "emph",
-    }
-
     inlines = {"em", "strong", "code", "strike"}
 
     def __init__(
@@ -451,9 +448,6 @@ class Markdown(JupyterMixin):
         self.hyperlinks = hyperlinks
         self.inline_code_lexer = inline_code_lexer
         self.inline_code_theme = inline_code_theme or code_theme
-
-    def _get_style_name_for_tag(self, tag: str) -> str:
-        return self.tag_to_style_name.get(tag, tag)
 
     def _flatten_tokens(self, tokens: Iterable[Token]) -> Iterable[Token]:
         """Flattens the token stream."""
@@ -510,9 +504,8 @@ class Markdown(JupyterMixin):
                 if self.hyperlinks:
                     context.leave_style()
                 else:
-                    element: Any = context.stack.pop()
-                    # TODO: I want to encapsulate the stuff below into the Link renderable
-                    #  but can't work out how to do it.
+                    element = context.stack.pop()
+                    assert isinstance(element, Link)
                     context.enter_style(link_style)
                     context.on_text(element.text.plain, node_type)
                     context.leave_style()
@@ -529,16 +522,14 @@ class Markdown(JupyterMixin):
                 if entering:
                     # If it's an opening inline token e.g. strong, em, etc.
                     # Then we move into a style context i.e. push to stack.
-                    style_name = self._get_style_name_for_tag(tag)
-                    context.enter_style(f"markdown.{style_name}")
+                    context.enter_style(f"markdown.{tag}")
                 elif exiting:
                     # If it's a closing inline style, then we pop the style
                     # off of the stack, to move out of the context of it...
                     context.leave_style()
                 else:
                     # If it's a self-closing inline style e.g. `code_inline`
-                    style_name = self._get_style_name_for_tag(tag)
-                    context.enter_style(f"markdown.{style_name}")
+                    context.enter_style(f"markdown.{tag}")
                     if token.content:
                         context.on_text(token.content, node_type)
                     context.leave_style()
