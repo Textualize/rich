@@ -1,35 +1,35 @@
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/rich/10.11.0)](https://pypi.org/project/rich/) [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
 
 [![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich)
-[![codecov](https://img.shields.io/codecov/c/github/Textualize/rich?label=codecov&logo=codecov)](https://codecov.io/gh/willmcgugan/rich)
+[![codecov](https://img.shields.io/codecov/c/github/Textualize/rich?label=codecov&logo=codecov)](https://codecov.io/gh/textualize/rich)
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
-![Logo](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
+![Logo](https://github.com/textualize/rich/raw/master/imgs/logo.svg)
 
-[English readme](https://github.com/willmcgugan/rich/blob/master/README.md)
- • [简体中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md)
- • [正體中文 readme](https://github.com/willmcgugan/rich/blob/master/README.zh-tw.md)
- • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md)
- • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md)
- • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md)
- • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md)
- • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md)
- • [Français readme](https://github.com/willmcgugan/rich/blob/master/README.fr.md)
- • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md)
- • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
- • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
- • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
- • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
- • [Indonesian readme](https://github.com/willmcgugan/rich/blob/master/README.id.md)
-  • [فارسی readme](https://github.com/willmcgugan/rich/blob/master/README.fa.md)
- • [Türkçe readme](https://github.com/willmcgugan/rich/blob/master/README.tr.md)
+[English readme](https://github.com/textualize/rich/blob/master/README.md)
+ • [简体中文 readme](https://github.com/textualize/rich/blob/master/README.cn.md)
+ • [正體中文 readme](https://github.com/textualize/rich/blob/master/README.zh-tw.md)
+ • [Lengua española readme](https://github.com/textualize/rich/blob/master/README.es.md)
+ • [Deutsche readme](https://github.com/textualize/rich/blob/master/README.de.md)
+ • [Läs på svenska](https://github.com/textualize/rich/blob/master/README.sv.md)
+ • [日本語 readme](https://github.com/textualize/rich/blob/master/README.ja.md)
+ • [한국어 readme](https://github.com/textualize/rich/blob/master/README.kr.md)
+ • [Français readme](https://github.com/textualize/rich/blob/master/README.fr.md)
+ • [Schwizerdütsch readme](https://github.com/textualize/rich/blob/master/README.de-ch.md)
+ • [हिन्दी readme](https://github.com/textualize/rich/blob/master/README.hi.md)
+ • [Português brasileiro readme](https://github.com/textualize/rich/blob/master/README.pt-br.md)
+ • [Italian readme](https://github.com/textualize/rich/blob/master/README.it.md)
+ • [Русский readme](https://github.com/textualize/rich/blob/master/README.ru.md)
+ • [Indonesian readme](https://github.com/textualize/rich/blob/master/README.id.md)
+  • [فارسی readme](https://github.com/textualize/rich/blob/master/README.fa.md)
+ • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
 
 Rich adalah library Python yang membantu _memperindah_ tampilan output suatu program di terminal.
 
 [Rich API](https://rich.readthedocs.io/en/latest/) dapat digunakan untuk mempermudah dalam penambahan gaya dan pewarnaan output di terminal. Rich juga mendukung fitur lain seperti pembuatan tabel, bar progress, penulisan markdown, penghighitan syntax source code, tracebacks, dan masih banyak lagi.
 
-![Features](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
+![Features](https://github.com/textualize/rich/raw/master/imgs/features.png)
 
 Sebagai pengenalan Rich saksikan video berikut [calmcode.io](https://calmcode.io/rich/introduction.html) oleh [@fishnets88](https://twitter.com/fishnets88).
 
@@ -65,7 +65,7 @@ from rich import print
 print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 ```
 
-![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/print.png)
+![Hello World](https://github.com/textualize/rich/raw/master/imgs/print.png)
 
 ## Rich REPL
 
@@ -76,7 +76,7 @@ Rich dapat diinstal ke dalam Python REPL sehingga setiap struktur data akan dita
 >>> pretty.install()
 ```
 
-![REPL](https://github.com/willmcgugan/rich/raw/master/imgs/repl.png)
+![REPL](https://github.com/textualize/rich/raw/master/imgs/repl.png)
 
 ## Penggunaan Console
 
@@ -104,7 +104,7 @@ console.print("Hello", "World!", style="bold red")
 
 Output dari perintah tersebut akan tampak sebagai berikut:
 
-![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/hello_world.png)
+![Hello World](https://github.com/textualize/rich/raw/master/imgs/hello_world.png)
 
 Melakukan perubahan tampilan teks output dalam satu waktu mungkin sudah baik. Tetapi untuk membuat tampilan lebih rapi, Rich mendukung fitur rendering menggunakan pemformatan spesial dimana syntaxnya serupa dengan [bbcode](https://en.wikipedia.org/wiki/BBCode). Berikut adalah contoh penerapannya:
 
@@ -112,7 +112,7 @@ Melakukan perubahan tampilan teks output dalam satu waktu mungkin sudah baik. Te
 console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i]way[/i].")
 ```
 
-![Console Markup](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
+![Console Markup](https://github.com/textualize/rich/raw/master/imgs/where_there_is_a_will.png)
 
 Anda dapat menggunakan console object untuk menciptakan keluaran yang indah dengan usaha yang sedikit. Kunjungi [Console API](https://rich.readthedocs.io/en/latest/console.html) untuk informasi lebih lengkap.
 
@@ -126,7 +126,7 @@ Rich memiliki fungsi [inspect](https://rich.readthedocs.io/en/latest/reference/i
 >>> inspect(my_list, methods=True)
 ```
 
-![Log](https://github.com/willmcgugan/rich/raw/master/imgs/inspect.png)
+![Log](https://github.com/textualize/rich/raw/master/imgs/inspect.png)
 
 Kunjungi [dokumentasi inspect](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) untuk detail lebih lanjut.
 
@@ -166,7 +166,7 @@ test_log()
 
 Perintah di atas akan menampilkan output sebagai berikut:
 
-![Log](https://github.com/willmcgugan/rich/raw/master/imgs/log.png)
+![Log](https://github.com/textualize/rich/raw/master/imgs/log.png)
 
 Sebagai catatan, argumen `log_locals` berupa tabel yang berisikan variabel lokal yang menunjukkan lokasi dimana log tersebut dipanggil.
 
@@ -178,7 +178,7 @@ Method log ini dapat digunakan untuk mencatat aktivitas terminal yang berjalan l
 
 Anda dapat juga menggunakan builtin [Handler class](https://rich.readthedocs.io/en/latest/logging.html) untuk memformat dan mewarnai output dari module logging Python. Berikut adalah contoh penerapannya:
 
-![Logging](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
+![Logging](https://github.com/textualize/rich/raw/master/imgs/logging.png)
 
 </details>
 
@@ -201,9 +201,9 @@ Mohon gunakan fitur ini dengan bijak.
 
 Rich mendukung perenderan [tabel](https://rich.readthedocs.io/en/latest/tables.html) secara fleksibel dengan karakter unicode. Terdapat variasi sangat besar untuk opsi pemformatan seperti pengaturan border, gaya tabel, perataan teks di dalam cell, dan lain sebagainya.
 
-![table movie](https://github.com/willmcgugan/rich/raw/master/imgs/table_movie.gif)
+![table movie](https://github.com/textualize/rich/raw/master/imgs/table_movie.gif)
 
-Animasi di atas dibuat dengan program [table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py) pada direktori examples.
+Animasi di atas dibuat dengan program [table_movie.py](https://github.com/textualize/rich/blob/master/examples/table_movie.py) pada direktori examples.
 
 Berikut adalah contoh tabel sederhana:
 
@@ -239,13 +239,13 @@ console.print(table)
 
 Program di atas akan menghasilkan output sebagai berikut:
 
-![tabel](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
+![tabel](https://github.com/textualize/rich/raw/master/imgs/table.png)
 
 Sebagai catatan console markup dirender sama seperti `print()` dan `log()`. Faktanya, untuk segala bentuk hal yang dapat dirender menggunakan Rich dapat disisipkan ke dalam header / baris (bahkan tabel lain).
 
 Class `Table` memiliki kemampuan yang baik untuk mengatur ukuran kolom supaya sesuai dengan lebar yang disediakan oleh terminal. Berikut adalah contoh penerapannya, dengan terminal memiliki ukuran yang lebih kecil dibandingkan tabel di atas:
 
-![table2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
+![table2](https://github.com/textualize/rich/raw/master/imgs/table2.png)
 
 </details>
 
@@ -265,13 +265,13 @@ for step in track(range(100)):
 
 Tidaklah sulit untuk menambahkan beberapa bar progress sekaligus. Berikut adalah contoh implementasi yang diambil dari file dokumentasi:
 
-![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
+![progress](https://github.com/textualize/rich/raw/master/imgs/progress.gif)
 
 Bagian kolom dapat dikonfigurasikan sesuai dengan kebutuhan. Built-in kolom juga memiliki fitur presentasi seleasi, ukuran file, kecepatan file, dan waktu sisa. Berikut adalah contoh menampilkan bar progress ketika mengunduh suatu file:
 
-![progress](https://github.com/willmcgugan/rich/raw/master/imgs/downloader.gif)
+![progress](https://github.com/textualize/rich/raw/master/imgs/downloader.gif)
 
-Untuk bereksperimen, periksa [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) yang dapat menampilkan beberapa progress bar  pengunduhan dari beberapa alamat URL sekaligus.
+Untuk bereksperimen, periksa [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) yang dapat menampilkan beberapa progress bar  pengunduhan dari beberapa alamat URL sekaligus.
 
 </details>
 
@@ -296,7 +296,7 @@ with console.status("[bold green]Working on tasks...") as status:
 
 Program di atas akan menghasilkan output sebagai berikut.
 
-![status](https://github.com/willmcgugan/rich/raw/master/imgs/status.gif)
+![status](https://github.com/textualize/rich/raw/master/imgs/status.gif)
 
 Animasi spinner tersebut diambil dari [cli-spinners](https://www.npmjs.com/package/cli-spinners). Anda dapat menentukan spinner yang hendak digunakan dengan menspesifikannya di parameter `spinner`. Jalankan perintah berikut untuk melihat parameter yang tersedia:
 
@@ -306,7 +306,7 @@ python -m rich.spinner
 
 Perintah di atas akan menghasilkan output sebagai berikut:
 
-![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
+![spinners](https://github.com/textualize/rich/raw/master/imgs/spinners.gif)
 
 </details>
 
@@ -323,9 +323,9 @@ python -m rich.tree
 
 Program di atas akan menghasilkan output sebagai berikut:
 
-![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
+![markdown](https://github.com/textualize/rich/raw/master/imgs/tree.png)
 
-Periksa contoh program [tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py) untuk menampilkan tampilan tree view dari direktori apapun, perintah ini serupa dengan `tree` pada linux.
+Periksa contoh program [tree.py](https://github.com/textualize/rich/blob/master/examples/tree.py) untuk menampilkan tampilan tree view dari direktori apapun, perintah ini serupa dengan `tree` pada linux.
 
 </details>
 
@@ -345,9 +345,9 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-Screenshot berikut merupakan output dari [contoh kolom](https://github.com/willmcgugan/rich/blob/master/examples/columns.py) yang menampilkan data yang diambil melalui API ke dalam bentuk kolom:
+Screenshot berikut merupakan output dari [contoh kolom](https://github.com/textualize/rich/blob/master/examples/columns.py) yang menampilkan data yang diambil melalui API ke dalam bentuk kolom:
 
-![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
+![columns](https://github.com/textualize/rich/raw/master/imgs/columns.png)
 
 </details>
 
@@ -370,7 +370,7 @@ console.print(markdown)
 
 Program di atas akan menghasilkan output seperti berikut:
 
-![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
+![markdown](https://github.com/textualize/rich/raw/master/imgs/markdown.png)
 
 </details>
 
@@ -405,7 +405,7 @@ console.print(syntax)
 
 Program di atas akan menghasilkan output sebagai berikut:
 
-![syntax](https://github.com/willmcgugan/rich/raw/master/imgs/syntax.png)
+![syntax](https://github.com/textualize/rich/raw/master/imgs/syntax.png)
 
 </details>
 
@@ -416,7 +416,7 @@ Rich dapat merender [tracebacks dengan indah](https://rich.readthedocs.io/en/lat
 
 Berikut adalah tampilannya pada OSX (serupa dengan Linux):
 
-![traceback](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
+![traceback](https://github.com/textualize/rich/raw/master/imgs/traceback.png)
 
 </details>
 
@@ -459,6 +459,6 @@ Berikut adalah beberpa projek yang menggunakan Rich:
   Library Python ringan untuk menambahkan deteksi objek secara real-time pada objek 2D pada suatu detektor.
 - [ansible/ansible-lint](https://github.com/ansible/ansible-lint) Sebuah ansible-lint untuk memeriksa playbooks yang digunakan sebagai practices and behaviour yang secara potensial dapat ditingkatkan.
 - [ansible-community/molecule](https://github.com/ansible-community/molecule) Ansible Molecule untuk framework testing
-- +[Lebih banyak lagi](https://github.com/willmcgugan/rich/network/dependents)!
+- +[Lebih banyak lagi](https://github.com/textualize/rich/network/dependents)!
 
 <!-- This is a test, no need to translate -->

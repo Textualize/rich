@@ -313,7 +313,7 @@ class Color(NamedTuple):
     """A triplet of color components, if an RGB color."""
 
     def __rich__(self) -> "Text":
-        """Dispays the actual color if Rich printed."""
+        """Displays the actual color if Rich printed."""
         from .style import Style
         from .text import Text
 
@@ -513,7 +513,7 @@ class Color(NamedTuple):
     def downgrade(self, system: ColorSystem) -> "Color":
         """Downgrade a color system to a system with fewer colors."""
 
-        if self.type in [ColorType.DEFAULT, system]:
+        if self.type in (ColorType.DEFAULT, system):
             return self
         # Convert to 8-bit color from truecolor color
         if system == ColorSystem.EIGHT_BIT and self.system == ColorSystem.TRUECOLOR:

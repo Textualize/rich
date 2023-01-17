@@ -1,20 +1,17 @@
-from functools import partial
 import inspect
-import sys
-
+from functools import partial
 from typing import (
     Any,
     Callable,
     Iterable,
     List,
     Optional,
-    overload,
-    Union,
     Tuple,
     Type,
     TypeVar,
+    Union,
+    overload,
 )
-
 
 T = TypeVar("T")
 
@@ -58,7 +55,7 @@ def auto(
                         if key is None:
                             append(repr(value))
                         else:
-                            if len(default) and default[0] == value:
+                            if default and default[0] == value:
                                 continue
                             append(f"{key}={value!r}")
                 else:

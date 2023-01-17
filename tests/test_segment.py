@@ -165,7 +165,7 @@ def test_divide():
     ]
 
 
-# https://github.com/willmcgugan/rich/issues/1755
+# https://github.com/textualize/rich/issues/1755
 def test_divide_complex():
     MAP = (
         "[on orange4]          [on green]XX[on orange4]          \n"
@@ -273,6 +273,11 @@ def test_divide_edge_2():
         ("💩X💩Y💩Z💩A💩", 4, (Segment("💩X "), Segment(" Y💩Z💩A💩"))),
         ("XYZABC", 4, (Segment("XYZA"), Segment("BC"))),
         ("XYZABC", 5, (Segment("XYZAB"), Segment("C"))),
+        (
+            "a1あ１１bcdaef",
+            9,
+            (Segment("a1あ１１b"), Segment("cdaef")),
+        ),
     ],
 )
 def test_split_cells_emoji(text, split, result):

@@ -209,6 +209,32 @@ def test_table_show_header_false_substitution(box, result):
     assert output == result
 
 
+def test_section():
+    table = Table("foo")
+    table.add_section()  # Null-op
+    table.add_row("row1")
+    table.add_row("row2", end_section=True)
+    table.add_row("row3")
+    table.add_row("row4")
+    table.add_section()
+    table.add_row("row5")
+    table.add_section()  # Null-op
+
+    console = Console(
+        width=80,
+        force_terminal=True,
+        color_system="truecolor",
+        legacy_windows=False,
+        record=True,
+    )
+    console.print(table)
+    output = console.export_text()
+    print(repr(output))
+    expected = "┏━━━━━━┓\n┃ foo  ┃\n┡━━━━━━┩\n│ row1 │\n│ row2 │\n├──────┤\n│ row3 │\n│ row4 │\n├──────┤\n│ row5 │\n└──────┘\n"
+
+    assert output == expected
+
+
 if __name__ == "__main__":
     render = render_tables()
     print(render)

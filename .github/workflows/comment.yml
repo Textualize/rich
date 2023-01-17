@@ -13,6 +13,7 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            Did I solve your problem? 
-
-            Why not buy the devs a [coffee](https://ko-fi.com/textualize) to say thanks?
+            I hope we solved your problem.
+            
+            If you like using Rich, you might also enjoy [Textual](https://textual.textualize.io)
+            

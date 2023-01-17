@@ -4,30 +4,30 @@
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
-![Logo](https://github.com/willmcgugan/rich/raw/master/imgs/logo.svg)
+![Logo](https://github.com/textualize/rich/raw/master/imgs/logo.svg)
 
-[English readme](https://github.com/willmcgugan/rich/blob/master/README.md)
- • [简体中文 readme](https://github.com/willmcgugan/rich/blob/master/README.cn.md)
- • [正體中文 readme](https://github.com/willmcgugan/rich/blob/master/README.zh-tw.md)
- • [Lengua española readme](https://github.com/willmcgugan/rich/blob/master/README.es.md)
- • [Deutsche readme](https://github.com/willmcgugan/rich/blob/master/README.de.md)
- • [Läs på svenska](https://github.com/willmcgugan/rich/blob/master/README.sv.md)
- • [日本語 readme](https://github.com/willmcgugan/rich/blob/master/README.ja.md)
- • [한국어 readme](https://github.com/willmcgugan/rich/blob/master/README.kr.md)
- • [Français readme](https://github.com/willmcgugan/rich/blob/master/README.fr.md)
- • [Schwizerdütsch readme](https://github.com/willmcgugan/rich/blob/master/README.de-ch.md)
- • [हिन्दी readme](https://github.com/willmcgugan/rich/blob/master/README.hi.md)
- • [Português brasileiro readme](https://github.com/willmcgugan/rich/blob/master/README.pt-br.md)
- • [Italian readme](https://github.com/willmcgugan/rich/blob/master/README.it.md)
- • [Русский readme](https://github.com/willmcgugan/rich/blob/master/README.ru.md)
-  • [فارسی readme](https://github.com/willmcgugan/rich/blob/master/README.fa.md)
- • [Türkçe readme](https://github.com/willmcgugan/rich/blob/master/README.tr.md)
+[English readme](https://github.com/textualize/rich/blob/master/README.md)
+ • [简体中文 readme](https://github.com/textualize/rich/blob/master/README.cn.md)
+ • [正體中文 readme](https://github.com/textualize/rich/blob/master/README.zh-tw.md)
+ • [Lengua española readme](https://github.com/textualize/rich/blob/master/README.es.md)
+ • [Deutsche readme](https://github.com/textualize/rich/blob/master/README.de.md)
+ • [Läs på svenska](https://github.com/textualize/rich/blob/master/README.sv.md)
+ • [日本語 readme](https://github.com/textualize/rich/blob/master/README.ja.md)
+ • [한국어 readme](https://github.com/textualize/rich/blob/master/README.kr.md)
+ • [Français readme](https://github.com/textualize/rich/blob/master/README.fr.md)
+ • [Schwizerdütsch readme](https://github.com/textualize/rich/blob/master/README.de-ch.md)
+ • [हिन्दी readme](https://github.com/textualize/rich/blob/master/README.hi.md)
+ • [Português brasileiro readme](https://github.com/textualize/rich/blob/master/README.pt-br.md)
+ • [Italian readme](https://github.com/textualize/rich/blob/master/README.it.md)
+ • [Русский readme](https://github.com/textualize/rich/blob/master/README.ru.md)
+  • [فارسی readme](https://github.com/textualize/rich/blob/master/README.fa.md)
+ • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
 
 Richは、 _リッチ_ なテキストや美しい書式設定をターミナルで行うためのPythonライブラリです。
 
 [Rich API](https://rich.readthedocs.io/en/latest/)を使用すると、ターミナルの出力に色やスタイルを簡単に追加することができます。 Richはきれいなテーブル、プログレスバー、マークダウン、シンタックスハイライトされたソースコード、トレースバックなどをすぐに生成・表示することもできます。
 
-![機能](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
+![機能](https://github.com/textualize/rich/raw/master/imgs/features.png)
 
 Richの紹介動画はこちらをご覧ください。 [calmcode.io](https://calmcode.io/rich/introduction.html) by [@fishnets88](https://twitter.com/fishnets88).
 
@@ -63,7 +63,7 @@ from rich import print
 print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 ```
 
-![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/print.png)
+![Hello World](https://github.com/textualize/rich/raw/master/imgs/print.png)
 
 ## Rich REPL
 
@@ -74,7 +74,7 @@ RichはPythonのREPLでインストールすることができ、データ構造
 >>> pretty.install()
 ```
 
-![REPL](https://github.com/willmcgugan/rich/raw/master/imgs/repl.png)
+![REPL](https://github.com/textualize/rich/raw/master/imgs/repl.png)
 
 ## Rich Inspect
 
@@ -113,7 +113,7 @@ console.print("Hello", "World!", style="bold red")
 
 以下のように出力されます:
 
-![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/hello_world.png)
+![Hello World](https://github.com/textualize/rich/raw/master/imgs/hello_world.png)
 
 この方法は一行のテキストを一度にスタイリングするのに適しています。
 より細かくスタイリングを行うために、Richは[bbcode](https://en.wikipedia.org/wiki/BBCode)に似た構文の特別なマークアップを表示することができます。
@@ -123,7 +123,7 @@ console.print("Hello", "World!", style="bold red")
 console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i]way[/i].")
 ```
 
-![Console Markup](https://github.com/willmcgugan/rich/raw/master/imgs/where_there_is_a_will.png)
+![Console Markup](https://github.com/textualize/rich/raw/master/imgs/where_there_is_a_will.png)
 
 ### Console logging
 
@@ -154,7 +154,7 @@ test_log()
 
 上の例では以下のような出力が得られます:
 
-![Log](https://github.com/willmcgugan/rich/raw/master/imgs/log.png)
+![Log](https://github.com/textualize/rich/raw/master/imgs/log.png)
 
 `log_locals`という引数についてですが、これは、logメソッドが呼び出されたローカル変数を含むテーブルを出力します。
 
@@ -164,7 +164,7 @@ logメソッドはサーバのような長時間稼働しているアプリケ�
 
 また、内蔵されている[Handler class](https://rich.readthedocs.io/en/latest/logging.html)を用いて、Pythonのloggingモジュールからの出力をフォーマットしたり、色付けしたりすることもできます。以下に出力の例を示します。
 
-![Logging](https://github.com/willmcgugan/rich/raw/master/imgs/logging.png)
+![Logging](https://github.com/textualize/rich/raw/master/imgs/logging.png)
 
 ## 絵文字(Emoji)
 
@@ -181,9 +181,9 @@ logメソッドはサーバのような長時間稼働しているアプリケ�
 
 Richはユニコードの枠を用いて柔軟に[テーブル](https://rich.readthedocs.io/en/latest/tables.html)を表示することができます。 罫線、スタイル、セルの配置などの書式設定のためのオプションが豊富にあります。
 
-![table movie](https://github.com/willmcgugan/rich/raw/master/imgs/table_movie.gif)
+![table movie](https://github.com/textualize/rich/raw/master/imgs/table_movie.gif)
 
-上のアニメーションは、examplesディレクトリの[table_movie.py](https://github.com/willmcgugan/rich/blob/master/examples/table_movie.py)で生成したものです。
+上のアニメーションは、examplesディレクトリの[table_movie.py](https://github.com/textualize/rich/blob/master/examples/table_movie.py)で生成したものです。
 
 もう少し簡単な表の例を示します:
 
@@ -219,14 +219,14 @@ console.print(table)
 
 これにより、以下のような出力が得られます:
 
-![table](https://github.com/willmcgugan/rich/raw/master/imgs/table.png)
+![table](https://github.com/textualize/rich/raw/master/imgs/table.png)
 
 コンソール上でのマークアップは`print()` や `log()` と同じように表示されることに注意してください。実際には、Rich が表示可能なものはすべてヘッダや行に含めることができます (それが他のテーブルであっても、です)。
 
 `Table`クラスは、ターミナルの利用可能な幅に合わせてカラムのサイズを変更したり、必要に応じてテキストを折り返したりするのに十分なスマートさを持っています。
 これは先ほどと同じ例で、ターミナルを上のテーブルよりも小さくしたものです。
 
-![table2](https://github.com/willmcgugan/rich/raw/master/imgs/table2.png)
+![table2](https://github.com/textualize/rich/raw/master/imgs/table2.png)
 
 ## プログレスバー
 
@@ -243,13 +243,13 @@ for step in track(range(100)):
 
 複数のプログレスバーを追加するのはそれほど大変ではありません。以下はドキュメントから抜粋した例です:
 
-![progress](https://github.com/willmcgugan/rich/raw/master/imgs/progress.gif)
+![progress](https://github.com/textualize/rich/raw/master/imgs/progress.gif)
 
 カラムには任意の詳細を表示するように設定することができます。組み込まれているカラムには、完了率、ファイルサイズ、ファイル速度、残り時間が含まれています。ここでは、進行中のダウンロードを表示する別の例を示します:
 
-![progress](https://github.com/willmcgugan/rich/raw/master/imgs/downloader.gif)
+![progress](https://github.com/textualize/rich/raw/master/imgs/downloader.gif)
 
-こちらを自分で試して見るには、進捗状況を表示しながら複数のURLを同時にダウンロードできる [examples/downloader.py](https://github.com/willmcgugan/rich/blob/master/examples/downloader.py) を参照してみてください。
+こちらを自分で試して見るには、進捗状況を表示しながら複数のURLを同時にダウンロードできる [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) を参照してみてください。
 
 ## ステータス
 
@@ -271,7 +271,7 @@ with console.status("[bold green]Working on tasks...") as status:
 
 これにより、ターミナルには以下のような出力が生成されます。
 
-![status](https://github.com/willmcgugan/rich/raw/master/imgs/status.gif)
+![status](https://github.com/textualize/rich/raw/master/imgs/status.gif)
 
 スピナーのアニメーションは [cli-spinners](https://www.npmjs.com/package/cli-spinners) から拝借しました。`spinner`パラメータを指定することでスピナーを選択することができます。以下のコマンドを実行して、利用可能な値を確認してください:
 
@@ -281,7 +281,7 @@ python -m rich.spinner
 
 上記コマンドは、ターミナルで以下のような出力を生成します:
 
-![spinners](https://github.com/willmcgugan/rich/raw/master/imgs/spinners.gif)
+![spinners](https://github.com/textualize/rich/raw/master/imgs/spinners.gif)
 
 ## ツリー
 
@@ -295,9 +295,9 @@ python -m rich.tree
 
 これにより、次のような出力が生成されます:
 
-![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/tree.png)
+![markdown](https://github.com/textualize/rich/raw/master/imgs/tree.png)
 
-linuxの `tree` コマンドと同様に、任意のディレクトリのツリー表示を行うスクリプトについては、[tree.py](https://github.com/willmcgugan/rich/blob/master/examples/tree.py)の例を参照してください。
+linuxの `tree` コマンドと同様に、任意のディレクトリのツリー表示を行うスクリプトについては、[tree.py](https://github.com/textualize/rich/blob/master/examples/tree.py)の例を参照してください。
 
 ## カラム
 
@@ -314,9 +314,9 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-以下のスクリーンショットは、APIから引っ張ってきたデータをカラムで表示する[columns example](https://github.com/willmcgugan/rich/blob/master/examples/columns.py)による出力です:
+以下のスクリーンショットは、APIから引っ張ってきたデータをカラムで表示する[columns example](https://github.com/textualize/rich/blob/master/examples/columns.py)による出力です:
 
-![columns](https://github.com/willmcgugan/rich/raw/master/imgs/columns.png)
+![columns](https://github.com/textualize/rich/raw/master/imgs/columns.png)
 
 ## マークダウン
 
@@ -336,7 +336,7 @@ console.print(markdown)
 
 これにより、以下のような出力が得られます:
 
-![markdown](https://github.com/willmcgugan/rich/raw/master/imgs/markdown.png)
+![markdown](https://github.com/textualize/rich/raw/master/imgs/markdown.png)
 
 ## シンタックスハイライト
 
@@ -368,7 +368,7 @@ console.print(syntax)
 
 これにより、以下のような出力が得られます:
 
-![syntax](https://github.com/willmcgugan/rich/raw/master/imgs/syntax.png)
+![syntax](https://github.com/textualize/rich/raw/master/imgs/syntax.png)
 
 ## トレースバック
 
@@ -376,7 +376,7 @@ Rich は [美しいトレースバック](https://rich.readthedocs.io/en/latest/
 
 OSXではこのような表示となります（Linuxでも似たような表示になります）:
 
-![traceback](https://github.com/willmcgugan/rich/raw/master/imgs/traceback.png)
+![traceback](https://github.com/textualize/rich/raw/master/imgs/traceback.png)
 
 ## Richを使用したプロジェクト
 
@@ -408,4 +408,4 @@ OSXではこのような表示となります（Linuxでも似たような表示
   Ansible-lint がplaybooksをチェックして、改善できる可能性のあるプラクティスや動作を確認します。
 - [ansible-community/molecule](https://github.com/ansible-community/molecule)
   Ansible Moleculeのテストフレームワーク
-- +[Many more](https://github.com/willmcgugan/rich/network/dependents)!
+- +[Many more](https://github.com/textualize/rich/network/dependents)!

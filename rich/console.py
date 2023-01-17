@@ -1,5 +1,4 @@
 import inspect
-import io
 import os
 import platform
 import sys
@@ -34,6 +33,8 @@ from typing import (
     cast,
 )
 
+from rich._null_file import NULL_FILE
+
 if sys.version_info >= (3, 8):
     from typing import Literal, Protocol, runtime_checkable
 else:
@@ -46,6 +47,7 @@ else:
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
 from ._export_format import CONSOLE_HTML_FORMAT, CONSOLE_SVG_FORMAT
+from ._fileno import get_fileno
 from ._log_render import FormatTimeCallable, LogRender
 from .align import Align, AlignMethod
 from .color import ColorSystem, blend_rgb
@@ -104,7 +106,11 @@ _STD_STREAMS = (_STDIN_FILENO, _STDOUT_FILENO, _STDERR_FILENO)
 _STD_STREAMS_OUTPUT = (_STDOUT_FILENO, _STDERR_FILENO)
 
 
-_TERM_COLORS = {"256color": ColorSystem.EIGHT_BIT, "16color": ColorSystem.STANDARD}
+_TERM_COLORS = {
+    "kitty": ColorSystem.EIGHT_BIT,
+    "256color": ColorSystem.EIGHT_BIT,
+    "16color": ColorSystem.STANDARD,
+}
 
 
 class ConsoleDimensions(NamedTuple):
@@ -516,7 +522,11 @@ def _is_jupyter() -> bool:  # pragma: no cover
         return False
     ipython = get_ipython()  # type: ignore[name-defined]
     shell = ipython.__class__.__name__
-    if "google.colab" in str(ipython.__class__) or shell == "ZMQInteractiveShell":
+    if (
+        "google.colab" in str(ipython.__class__)
+        or os.getenv("DATABRICKS_RUNTIME_VERSION")
+        or shell == "ZMQInteractiveShell"
+    ):
         return True  # Jupyter notebook or qtconsole
     elif shell == "TerminalInteractiveShell":
         return False  # Terminal running IPython
@@ -697,7 +707,16 @@ class Console:
         self._height = height
 
         self._color_system: Optional[ColorSystem]
-        self._force_terminal = force_terminal
+
+        self._force_terminal = None
+        if force_terminal is not None:
+            self._force_terminal = force_terminal
+        else:
+            # If FORCE_COLOR env var has any value at all, we force terminal.
+            force_color = self._environ.get("FORCE_COLOR")
+            if force_color is not None:
+                self._force_terminal = True
+
         self._file = file
         self.quiet = quiet
         self.stderr = stderr
@@ -739,13 +758,15 @@ class Console:
         self._is_alt_screen = False
 
     def __repr__(self) -> str:
-        return f"<console width={self.width} {str(self._color_system)}>"
+        return f"<console width={self.width} {self._color_system!s}>"
 
     @property
     def file(self) -> IO[str]:
         """Get the file object to write to."""
         file = self._file or (sys.stderr if self.stderr else sys.stdout)
         file = getattr(file, "rich_proxied_file", file)
+        if file is None:
+            file = NULL_FILE
         return file
 
     @file.setter
@@ -1502,7 +1523,7 @@ class Console:
             if text:
                 sep_text = Text(sep, justify=justify, end=end)
                 append(sep_text.join(text))
-                del text[:]
+                text.clear()
 
         for renderable in objects:
             renderable = rich_cast(renderable)
@@ -1701,7 +1722,7 @@ class Console:
         indent: Union[None, int, str] = 2,
         highlight: bool = True,
         skip_keys: bool = False,
-        ensure_ascii: bool = True,
+        ensure_ascii: bool = False,
         check_circular: bool = True,
         allow_nan: bool = True,
         default: Optional[Callable[[Any], Any]] = None,
@@ -1985,31 +2006,50 @@ class Console:
                     if WINDOWS:
                         use_legacy_windows_render = False
                         if self.legacy_windows:
-                            try:
+                            fileno = get_fileno(self.file)
+                            if fileno is not None:
                                 use_legacy_windows_render = (
-                                    self.file.fileno() in _STD_STREAMS_OUTPUT
+                                    fileno in _STD_STREAMS_OUTPUT
                                 )
-                            except (ValueError, io.UnsupportedOperation):
-                                pass
 
                         if use_legacy_windows_render:
                             from rich._win32_console import LegacyWindowsTerm
                             from rich._windows_renderer import legacy_windows_render
 
-                            legacy_windows_render(
-                                self._buffer[:], LegacyWindowsTerm(self.file)
-                            )
+                            buffer = self._buffer[:]
+                            if self.no_color and self._color_system:
+                                buffer = list(Segment.remove_color(buffer))
+
+                            legacy_windows_render(buffer, LegacyWindowsTerm(self.file))
                         else:
                             # Either a non-std stream on legacy Windows, or modern Windows.
                             text = self._render_buffer(self._buffer[:])
                             # https://bugs.python.org/issue37871
+                            # https://github.com/python/cpython/issues/82052
+                            # We need to avoid writing more than 32Kb in a single write, due to the above bug
                             write = self.file.write
-                            for line in text.splitlines(True):
-                                try:
-                                    write(line)
-                                except UnicodeEncodeError as error:
-                                    error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
-                                    raise
+                            # Worse case scenario, every character is 4 bytes of utf-8
+                            MAX_WRITE = 32 * 1024 // 4
+                            try:
+                                if len(text) <= MAX_WRITE:
+                                    write(text)
+                                else:
+                                    batch: List[str] = []
+                                    batch_append = batch.append
+                                    size = 0
+                                    for line in text.splitlines(True):
+                                        if size + len(line) > MAX_WRITE and batch:
+                                            write("".join(batch))
+                                            batch.clear()
+                                            size = 0
+                                        batch_append(line)
+                                        size += len(line)
+                                    if batch:
+                                        write("".join(batch))
+                                        batch.clear()
+                            except UnicodeEncodeError as error:
+                                error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
+                                raise
                     else:
                         text = self._render_buffer(self._buffer[:])
                         try:
@@ -2238,18 +2278,24 @@ class Console:
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
         code_format: str = CONSOLE_SVG_FORMAT,
+        font_aspect_ratio: float = 0.61,
+        unique_id: Optional[str] = None,
     ) -> str:
         """
         Generate an SVG from the console contents (requires record=True in Console constructor).
 
         Args:
-            path (str): The path to write the SVG to.
-            title (str): The title of the tab in the output image
+            title (str, optional): The title of the tab in the output image
             theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
-            code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
+            code_format (str, optional): Format string used to generate the SVG. Rich will inject a number of variables
                 into the string in order to form the final SVG output. The default template used and the variables
                 injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
+            font_aspect_ratio (float, optional): The width to height ratio of the font used in the ``code_format``
+                string. Defaults to 0.61, which is the width to height ratio of Fira Code (the default font).
+                If you aren't specifying a different font inside ``code_format``, you probably don't need this.
+            unique_id (str, optional): unique id that is used as the prefix for various elements (CSS styles, node
+                ids). If not set, this defaults to a computed value based on the recorded content.
         """
 
         from rich.cells import cell_len
@@ -2293,7 +2339,7 @@ class Console:
 
         width = self.width
         char_height = 20
-        char_width = char_height * 0.61
+        char_width = char_height * font_aspect_ratio
         line_height = char_height * 1.22
 
         margin_top = 1
@@ -2345,14 +2391,16 @@ class Console:
             if clear:
                 self._record_buffer.clear()
 
-        unique_id = "terminal-" + str(
-            zlib.adler32(
-                ("".join(segment.text for segment in segments)).encode(
-                    "utf-8", "ignore"
+        if unique_id is None:
+            unique_id = "terminal-" + str(
+                zlib.adler32(
+                    ("".join(repr(segment) for segment in segments)).encode(
+                        "utf-8",
+                        "ignore",
+                    )
+                    + title.encode("utf-8", "ignore")
                 )
-                + title.encode("utf-8", "ignore")
             )
-        )
         y = 0
         for y, line in enumerate(Segment.split_and_crop_lines(segments, length=width)):
             x = 0
@@ -2482,23 +2530,32 @@ class Console:
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
         code_format: str = CONSOLE_SVG_FORMAT,
+        font_aspect_ratio: float = 0.61,
+        unique_id: Optional[str] = None,
     ) -> None:
         """Generate an SVG file from the console contents (requires record=True in Console constructor).
 
         Args:
             path (str): The path to write the SVG to.
-            title (str): The title of the tab in the output image
+            title (str, optional): The title of the tab in the output image
             theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
-            code_format (str): Format string used to generate the SVG. Rich will inject a number of variables
+            code_format (str, optional): Format string used to generate the SVG. Rich will inject a number of variables
                 into the string in order to form the final SVG output. The default template used and the variables
                 injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
+            font_aspect_ratio (float, optional): The width to height ratio of the font used in the ``code_format``
+                string. Defaults to 0.61, which is the width to height ratio of Fira Code (the default font).
+                If you aren't specifying a different font inside ``code_format``, you probably don't need this.
+            unique_id (str, optional): unique id that is used as the prefix for various elements (CSS styles, node
+                ids). If not set, this defaults to a computed value based on the recorded content.
         """
         svg = self.export_svg(
             title=title,
             theme=theme,
             clear=clear,
             code_format=code_format,
+            font_aspect_ratio=font_aspect_ratio,
+            unique_id=unique_id,
         )
         with open(path, "wt", encoding="utf-8") as write_file:
             write_file.write(svg)

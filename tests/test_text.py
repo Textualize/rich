@@ -144,6 +144,13 @@ def test_stylize():
     assert text._spans == [Span(7, 11, "bold")]
 
 
+def test_stylize_before():
+    text = Text("Hello, World!")
+    text.stylize("bold", 0, 5)
+    text.stylize_before("italic", 2, 7)
+    assert text._spans == [Span(2, 7, "italic"), Span(0, 5, "bold")]
+
+
 def test_stylize_negative_index():
     text = Text("Hello, World!")
     text.stylize("bold", -6, -1)
@@ -758,7 +765,7 @@ def test_slice():
 
 
 def test_wrap_invalid_style():
-    # https://github.com/willmcgugan/rich/issues/987
+    # https://github.com/textualize/rich/issues/987
     console = Console(width=100, color_system="truecolor")
     a = "[#######.................] xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx [#######.................]"
     console.print(a, justify="full")

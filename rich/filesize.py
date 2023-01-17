@@ -2,7 +2,7 @@
 """Functions for reporting filesizes. Borrowed from https://github.com/PyFilesystem/pyfilesystem2
 
 The functions declared in this module should cover the different
-usecases needed to generate a string representation of a file size
+use cases needed to generate a string representation of a file size
 using several different units. Since there are many standards regarding
 file size units, three different functions have been implemented.
 

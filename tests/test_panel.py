@@ -63,9 +63,9 @@ def test_render_size():
     expected = [
         [
             Segment("╭─", Style()),
-            Segment(
-                "────────────────────────────────── Hello ───────────────────────────────────"
-            ),
+            Segment("──────────────────────────────────", Style()),
+            Segment(" Hello ", Style()),
+            Segment("───────────────────────────────────", Style()),
             Segment("─╮", Style()),
         ],
         [

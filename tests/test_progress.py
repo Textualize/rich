@@ -614,6 +614,7 @@ def test_wrap_file() -> None:
         with open(filename, "rb") as file:
             with rich.progress.wrap_file(file, total=total) as f:
                 assert f.read() == b"Hello, World!"
+                assert f.mode == "rb"
                 assert f.name == filename
             assert f.closed
             assert not f.handle.closed

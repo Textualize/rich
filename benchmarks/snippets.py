@@ -107,7 +107,7 @@ Richは、 _リッチ_ なテキストや美しい書式設定をターミナル
 
 [Rich API](https://rich.readthedocs.io/en/latest/)を使用すると、ターミナルの出力に色やスタイルを簡単に追加することができます。 Richはきれいなテーブル、プログレスバー、マークダウン、シンタックスハイライトされたソースコード、トレースバックなどをすぐに生成・表示することもできます。
 
-![機能](https://github.com/willmcgugan/rich/raw/master/imgs/features.png)
+![機能](https://github.com/textualize/rich/raw/master/imgs/features.png)
 
 Richの紹介動画はこちらをご覧ください。 [calmcode.io](https://calmcode.io/rich/introduction.html) by [@fishnets88](https://twitter.com/fishnets88).
 
@@ -143,7 +143,7 @@ from rich import print
 print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 ```
 
-![Hello World](https://github.com/willmcgugan/rich/raw/master/imgs/print.png)
+![Hello World](https://github.com/textualize/rich/raw/master/imgs/print.png)
 
 ## Rich REPL
 
@@ -154,7 +154,7 @@ RichはPythonのREPLでインストールすることができ、データ構造
 >>> pretty.install()
 ```
 
-![REPL](https://github.com/willmcgugan/rich/raw/master/imgs/repl.png)
+![REPL](https://github.com/textualize/rich/raw/master/imgs/repl.png)
 
 ## Rich Inspect
 
