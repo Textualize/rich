@@ -273,7 +273,24 @@ def install(
         rich_formatter = RichFormatter()
         ip.display_formatter.formatters["text/plain"] = rich_formatter
     except Exception:
-        sys.displayhook = display_hook
+        try:
+            from ptpython.repl import PythonRepl
+
+            def show_result(self: PythonRepl, result: object) -> None:
+                if self.enable_pager:
+                    formatted_text_output = self._format_result_output(result)
+                    self.print_paginated_formatted_text(formatted_text_output)
+                else:
+                    display_hook(result)
+
+                self.app.output.flush()
+
+                if self.insert_blank_line_after_output:
+                    self.app.output.write("\n")
+
+            PythonRepl.show_result = show_result
+        except ImportError:
+            sys.displayhook = display_hook
 
 
 class Pretty(JupyterMixin):
