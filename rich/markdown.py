@@ -148,7 +148,7 @@ class Heading(TextElement):
             # Draw a border around h1s
             yield Panel(
                 text,
-                box=box.DOUBLE,
+                box=box.HEAVY,
                 style="markdown.h1.border",
             )
         else:
@@ -304,7 +304,8 @@ class ListItem(TextElement):
 class Link(TextElement):
     @classmethod
     def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
-        return cls(token.content, str(token.attrs.get("href", "#")))
+        url = token.attrs.get("href", "#")
+        return cls(token.content, str(url))
 
     def __init__(self, text: str, href: str):
         self.text = Text(text)
@@ -493,24 +494,27 @@ class Markdown(JupyterMixin):
                 context.on_text(" ", node_type)
             elif node_type == "link_open":
                 href = str(token.attrs.get("href", ""))
-                link_style = console.get_style("markdown.link", default="none")
                 if self.hyperlinks:
+                    link_style = console.get_style("markdown.link_url", default="none")
                     link_style += Style(link=href)
                     context.enter_style(link_style)
                 else:
                     context.stack.push(Link.create(self, token))
             elif node_type == "link_close":
-                link_style = console.get_style("markdown.link", default="none")
                 if self.hyperlinks:
                     context.leave_style()
                 else:
                     element = context.stack.pop()
                     assert isinstance(element, Link)
+                    link_style = console.get_style("markdown.link", default="none")
                     context.enter_style(link_style)
                     context.on_text(element.text.plain, node_type)
                     context.leave_style()
                     context.on_text(" (", node_type)
-                    context.enter_style(link_style)
+                    link_url_style = console.get_style(
+                        "markdown.link_url", default="none"
+                    )
+                    context.enter_style(link_url_style)
                     context.on_text(element.href, node_type)
                     context.leave_style()
                     context.on_text(")", node_type)
