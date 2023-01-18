@@ -159,6 +159,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "markdown.h7": Style(italic=True, dim=True),
     "markdown.link": Style(color="bright_blue"),
     "markdown.link_url": Style(color="blue", underline=True),
+    "markdown.s": Style(strike=True),
     "iso8601.date": Style(color="blue"),
     "iso8601.time": Style(color="magenta"),
     "iso8601.timezone": Style(color="yellow"),

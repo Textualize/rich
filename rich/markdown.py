@@ -428,7 +428,7 @@ class Markdown(JupyterMixin):
         "image": ImageItem,
     }
 
-    inlines = {"em", "strong", "code", "strike"}
+    inlines = {"em", "strong", "code", "s"}
 
     def __init__(
         self,
@@ -440,7 +440,7 @@ class Markdown(JupyterMixin):
         inline_code_lexer: Optional[str] = None,
         inline_code_theme: Optional[str] = None,
     ) -> None:
-        parser = MarkdownIt().enable("table")
+        parser = MarkdownIt().enable("strikethrough")
         self.markup = markup
         self.parsed = parser.parse(markup)
         self.code_theme = code_theme
