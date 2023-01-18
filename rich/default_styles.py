@@ -142,7 +142,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "markdown.emph": Style(italic=True),  # For commonmark backwards compatibility
     "markdown.strong": Style(bold=True),
     "markdown.code": Style(bold=True, color="cyan", bgcolor="black"),
-    "markdown.code_block": Style(dim=True, color="cyan", bgcolor="black"),
+    "markdown.code_block": Style(color="cyan", bgcolor="black"),
     "markdown.block_quote": Style(color="magenta"),
     "markdown.list": Style(color="cyan"),
     "markdown.item": Style(),

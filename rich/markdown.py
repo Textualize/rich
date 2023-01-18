@@ -671,5 +671,7 @@ if __name__ == "__main__":  # pragma: no cover
         pydoc.pager(fileio.getvalue())
 
     else:
-        console = Console(force_terminal=args.force_color, width=args.width)
+        console = Console(
+            force_terminal=args.force_color, width=args.width, record=True
+        )
         console.print(markdown)
