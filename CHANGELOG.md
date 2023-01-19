@@ -1880,6 +1880,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.2.0]: https://github.com/textualize/rich/compare/v13.1.0...v13.2.0
 [13.1.0]: https://github.com/textualize/rich/compare/v13.0.1...v13.1.0
 [13.0.1]: https://github.com/textualize/rich/compare/v13.0.0...v13.0.1
 [13.0.0]: https://github.com/textualize/rich/compare/v12.6.0...v13.0.0
