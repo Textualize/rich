@@ -677,7 +677,7 @@ class TimeElapsedColumn(ProgressColumn):
     """Renders time elapsed."""
 
     def render(self, task: "Task") -> Text:
-        """Show time remaining."""
+        """Show time elapsed."""
         elapsed = task.finished_time if task.finished else task.elapsed
         if elapsed is None:
             return Text("-:--:--", style="progress.elapsed")
