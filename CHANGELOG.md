@@ -11,6 +11,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added `encoding` parameter in `Theme.read`
 
+
+## [13.2.0] - 2023-01-19
+
+### Changed
+
+- Switch Markdown parsing from commonmark to markdown-it-py https://github.com/Textualize/rich/pull/2439
+
+## [13.1.0] - 2023-01-14
+
+### Fixed
+
+- Fixed wrong filenames in Jupyter tracebacks https://github.com/Textualize/rich/issues/2271
+
+### Added
+
+- Added locals_hide_dunder and locals_hide_sunder to Tracebacks, to hide double underscore and single underscore locals. https://github.com/Textualize/rich/pull/2754
+
+### Changed
+
+- Tracebacks will now hide double underscore names from locals by default. Set `locals_hide_dunder=False` to restore previous behaviour.
+
 ## [13.0.1] - 2023-01-06
 
 ### Fixed
@@ -1866,6 +1887,8 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.2.0]: https://github.com/textualize/rich/compare/v13.1.0...v13.2.0
+[13.1.0]: https://github.com/textualize/rich/compare/v13.0.1...v13.1.0
 [13.0.1]: https://github.com/textualize/rich/compare/v13.0.0...v13.0.1
 [13.0.0]: https://github.com/textualize/rich/compare/v12.6.0...v13.0.0
 [12.6.0]: https://github.com/textualize/rich/compare/v12.5.2...v12.6.0

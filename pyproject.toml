@@ -2,7 +2,7 @@
 name = "rich"
 homepage = "https://github.com/Textualize/rich"
 documentation = "https://rich.readthedocs.io/en/latest/"
-version = "13.0.1"
+version = "13.2.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"
@@ -29,9 +29,8 @@ include = ["rich/py.typed"]
 python = ">=3.7.0"
 typing-extensions = { version = ">=4.0.0, <5.0", python = "<3.9" }
 pygments = "^2.6.0"
-commonmark = "^0.9.0"
 ipywidgets = { version = "^7.5.1", optional = true }
-
+markdown-it-py = "^2.1.0"
 
 [tool.poetry.extras]
 jupyter = ["ipywidgets"]
@@ -57,7 +56,7 @@ strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
 [[tool.mypy.overrides]]
-module = ["pygments.*", "IPython.*", "commonmark.*", "ipywidgets.*"]
+module = ["pygments.*", "IPython.*", "ipywidgets.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
