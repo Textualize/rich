@@ -1262,7 +1262,7 @@ jupyter = ["ipywidgets"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.0"
-content-hash = "740b0d83031ae28a700bc467571bc47baec5b22b002c8e95c862c183ae3fd5c1"
+content-hash = "06a6f15495265f2e76c6b59da9e2327386c894ce03f3c776fe037b7c83690488"
 
 [metadata.files]
 anyio = [
