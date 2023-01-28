@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed truecolor to eight bit color conversion
+- Fixed truecolor to eight bit color conversion https://github.com/Textualize/rich/pull/2785
 
 ## [13.3.0] - 2023-01-27
 
@@ -1898,6 +1898,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.3.1]: https://github.com/textualize/rich/compare/v13.3.0...v13.3.1
 [13.3.0]: https://github.com/textualize/rich/compare/v13.2.0...v13.3.0
 [13.2.0]: https://github.com/textualize/rich/compare/v13.1.0...v13.2.0
 [13.1.0]: https://github.com/textualize/rich/compare/v13.0.1...v13.1.0
