@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated test_cells to cover boundary cases of cell_len
+- Updated test_pick to cover untested inputs of pick_bool
 
 ## [13.3.1] - 2023-01-28
 
