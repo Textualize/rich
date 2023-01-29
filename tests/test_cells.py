@@ -4,6 +4,15 @@ from rich import cells
 def test_cell_len_long_string():
     # Long strings don't use cached cell length implementation
     assert cells.cell_len("abc" * 200) == 3 * 200
+    # Boundary case
+    assert cells.cell_len("a" * 512) == 512
+
+
+def test_cell_len_short_string():
+    # Short strings use cached cell length implementation
+    assert cells.cell_len("abc" * 100) == 3 * 100
+    # Boundary case
+    assert cells.cell_len("a" * 511) == 511
 
 
 def test_set_cell_size():
