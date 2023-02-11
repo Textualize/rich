@@ -45,3 +45,12 @@ def test_decode_example():
     print(repr(result))
     expected = "\x1b[1mC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:\x1b[0m In function '\x1b[1mmain\x1b[0m':\n\x1b[1mC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:3:5:\x1b[0m \x1b[1;35mwarning: \x1b[0munused variable '\x1b[1ma\x1b[0m' \n[\x1b[1;35m-Wunused-variable\x1b[0m]\n    3 | int \x1b[1;35ma\x1b[0m=1;\n      |     \x1b[1;35m^\x1b[0m\n"
     assert result == expected
+
+
+def test_decode_issue_2688():
+    ansi_bytes = (
+        b"\x1b[31mFound 4 errors in 2 files (checked 18 source files)\x1b(B\x1b[m\n"
+    )
+    text = Text.from_ansi(ansi_bytes.decode())
+
+    assert str(text) == "Found 4 errors in 2 files (checked 18 source files)"
