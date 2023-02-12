@@ -42,6 +42,7 @@ The following people have contributed to the development of Rich:
 - [Kyle Pollina](https://github.com/kylepollina)
 - [Sebastián Ramírez](https://github.com/tiangolo)
 - [Felipe Guedes](https://github.com/guedesfelipe)
+- [Min RK](https://github.com/minrk)
 - [Clément Robert](https://github.com/neutrinoceros)
 - [Brian Rutledge](https://github.com/bhrutledge)
 - [Tushar Sadhwani](https://github.com/tusharsadhwani)
