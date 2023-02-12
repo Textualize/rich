@@ -439,7 +439,10 @@ class LegacyWindowsTerm:
         SetConsoleTextAttribute(
             self._handle, attributes=ctypes.c_ushort(fore | (back << 4))
         )
-        self.write_text(text)
+        try:
+            self.write_text(text)
+        except:
+            self.write('zzzzzzzzzzzzzzzzzzzzzz')
         SetConsoleTextAttribute(self._handle, attributes=self._default_text)
 
     def move_cursor_to(self, new_position: WindowsCoordinates) -> None:
