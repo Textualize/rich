@@ -133,31 +133,6 @@ def _ipy_display_hook(
 
     console = console or get_console()
     if console.is_jupyter:
-        # Delegate rendering to IPython if the object (and IPython) supports it
-        #  https://ipython.readthedocs.io/en/stable/config/integrating.html#rich-display
-        ipython_repr_methods = [
-            "_repr_html_",
-            "_repr_markdown_",
-            "_repr_json_",
-            "_repr_latex_",
-            "_repr_jpeg_",
-            "_repr_png_",
-            "_repr_svg_",
-            "_repr_mimebundle_",
-        ]
-        for repr_method in ipython_repr_methods:
-            method = getattr(value, repr_method, None)
-            if inspect.ismethod(method):
-                # Calling the method ourselves isn't ideal. The interface for the `_repr_*_` methods
-                #  specifies that if they return None, then they should not be rendered
-                #  by the notebook.
-                try:
-                    repr_result = method()
-                except Exception:
-                    continue  # If the method raises, treat it as if it doesn't exist, try any others
-                if repr_result is not None:
-                    return  # Delegate rendering to IPython
-
         # When in a Jupyter notebook let's avoid the display of some specific classes,
         # as they result in the rendering of useless and noisy lines such as `<Figure size 432x288 with 1 Axes>`.
         # What does this do?
@@ -165,26 +140,30 @@ def _ipy_display_hook(
         if is_object_one_of_types(value, JUPYTER_CLASSES_TO_NOT_RENDER):
             return
 
-    # certain renderables should start on a new line
-    if _safe_isinstance(value, ConsoleRenderable):
-        console.line()
-
-    console.print(
-        value
-        if _safe_isinstance(value, RichRenderable)
-        else Pretty(
-            value,
-            overflow=overflow,
-            indent_guides=indent_guides,
-            max_length=max_length,
-            max_string=max_string,
-            max_depth=max_depth,
-            expand_all=expand_all,
-            margin=12,
-        ),
-        crop=crop,
-        new_line_start=True,
-    )
+    with console.capture() as capture:
+        # certain renderables should start on a new line
+        if _safe_isinstance(value, ConsoleRenderable):
+            console.line()
+        console.print(
+            value
+            if _safe_isinstance(value, RichRenderable)
+            else Pretty(
+                value,
+                overflow=overflow,
+                indent_guides=indent_guides,
+                max_length=max_length,
+                max_string=max_string,
+                max_depth=max_depth,
+                expand_all=expand_all,
+                margin=12,
+            ),
+            crop=crop,
+            new_line_start=True,
+            end="",
+        )
+    # strip trailing newline, not usually part of a text repr
+    # I'm not sure if this should be prevented at a lower level
+    return capture.get().rstrip("\n")
 
 
 def _safe_isinstance(

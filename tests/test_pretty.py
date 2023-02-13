@@ -78,16 +78,17 @@ def test_ipy_display_hook__multiple_special_reprs():
     console = Console(file=io.StringIO(), force_jupyter=True)
 
     class Thing:
+        def __repr__(self):
+            return "A Thing"
+
         def _repr_latex_(self):
             return None
 
         def _repr_html_(self):
             return "hello"
 
-    console.begin_capture()
-    _ipy_display_hook(Thing(), console=console)
-
-    assert console.end_capture() == ""
+    result = _ipy_display_hook(Thing(), console=console)
+    assert result == "A Thing"
 
 
 def test_ipy_display_hook__no_special_repr_methods():
@@ -97,11 +98,9 @@ def test_ipy_display_hook__no_special_repr_methods():
         def __repr__(self) -> str:
             return "hello"
 
-    console.begin_capture()
-    _ipy_display_hook(Thing(), console=console)
-
-    # No IPython special repr methods, so printed by Rich
-    assert console.end_capture() == "hello\n"
+    result = _ipy_display_hook(Thing(), console=console)
+    # should be repr as-is
+    assert result == "hello"
 
 
 def test_ipy_display_hook__special_repr_raises_exception():
@@ -121,17 +120,18 @@ def test_ipy_display_hook__special_repr_raises_exception():
         def _repr_html_(self):
             return "hello"
 
-    console.begin_capture()
-    _ipy_display_hook(Thing(), console=console)
+        def __repr__(self):
+            return "therepr"
 
-    assert console.end_capture() == ""
+    result = _ipy_display_hook(Thing(), console=console)
+    assert result == "therepr"
 
 
 def test_ipy_display_hook__console_renderables_on_newline():
     console = Console(file=io.StringIO(), force_jupyter=True)
     console.begin_capture()
-    _ipy_display_hook(Text("hello"), console=console)
-    assert console.end_capture() == "\nhello\n"
+    result = _ipy_display_hook(Text("hello"), console=console)
+    assert result == "\nhello"
 
 
 def test_ipy_display_hook__classes_to_not_render():
@@ -146,8 +146,8 @@ def test_ipy_display_hook__classes_to_not_render():
     with patch(
         "rich.pretty.JUPYTER_CLASSES_TO_NOT_RENDER", {class_fully_qualified_name}
     ):
-        _ipy_display_hook(Thing(), console=console)
-    assert console.end_capture() == ""
+        result = _ipy_display_hook(Thing(), console=console)
+    assert result is None
 
 
 def test_pretty():
