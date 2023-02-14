@@ -27,7 +27,7 @@
 
 Rich adalah library Python yang membantu _memperindah_ tampilan output suatu program di terminal.
 
-[Rich API](https://rich.readthedocs.io/en/latest/) dapat digunakan untuk mempermudah dalam penambahan gaya dan pewarnaan output di terminal. Rich juga mendukung fitur lain seperti pembuatan tabel, bar progress, penulisan markdown, penghighlightan syntax source code, tracebacks, dan masih banyak lagi.
+[Rich API](https://rich.readthedocs.io/en/latest/) dapat digunakan untuk mempermudah dalam penambahan gaya dan pewarnaan output di terminal. Rich juga mendukung fitur lain seperti pembuatan tabel, bar progress, penulisan markdown, penghilightan syntax source code, tracebacks, dan masih banyak lagi.
 
 ![Features](https://github.com/textualize/rich/raw/master/imgs/features.png)
 
