@@ -4,6 +4,7 @@ import linecache
 import os
 import platform
 import sys
+import re
 from dataclasses import dataclass, field
 from traceback import walk_tb
 from types import ModuleType, TracebackType
@@ -651,7 +652,7 @@ class Traceback:
 
             first = frame_index == 0
             frame_filename = frame.filename
-            suppressed = any(frame_filename.startswith(path) for path in self.suppress)
+            suppressed = any(re.match(path, frame_filename) for path in self.suppress)
 
             if os.path.exists(frame.filename):
                 text = Text.assemble(

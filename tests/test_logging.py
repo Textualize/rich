@@ -91,6 +91,37 @@ def test_exception_with_extra_lines():
     assert "division by zero" in render
 
 
+def test_exception_with_regex_suppress():
+    # Arrange
+    console = Console(file=io.StringIO(), width=100)
+    handler_with_tracebacks = RichHandler(
+        console=console,
+        rich_tracebacks=True,
+        tracebacks_suppress=["/.*test_logging.py"],
+    )
+    log.addHandler(handler_with_tracebacks)
+
+    def foo(n):
+        return bar(n)
+
+    def bar(n):
+        return foo(n)
+
+    # Act
+    try:
+        foo(1)
+    except RecursionError:
+        log.exception("message")
+
+    render = handler_with_tracebacks.console.file.getvalue()
+    print(render)
+
+    # Assert
+    assert "frames hidden" in render
+    assert render.count("def foo") == 0
+    assert render.count("def bar") == 0
+
+
 def test_exception_with_max_frames():
     # Arrange
     console = Console(file=io.StringIO(), width=100)
