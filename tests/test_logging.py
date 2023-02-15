@@ -91,6 +91,7 @@ def test_exception_with_extra_lines():
     assert "division by zero" in render
 
 
+@skip_win
 def test_exception_with_regex_suppress():
     # Arrange
     console = Console(file=io.StringIO(), width=100)
@@ -122,6 +123,7 @@ def test_exception_with_regex_suppress():
     assert render.count("def bar") == 0
 
 
+@skip_win
 def test_exception_with_max_frames():
     # Arrange
     console = Console(file=io.StringIO(), width=100)
