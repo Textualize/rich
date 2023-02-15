@@ -41,6 +41,7 @@ class RichHandler(Handler):
         tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to True.
         tracebacks_show_locals (bool, optional): Enable display of locals in tracebacks. Defaults to False.
         tracebacks_suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+        traceback_max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to 10.
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
@@ -79,6 +80,7 @@ class RichHandler(Handler):
         tracebacks_word_wrap: bool = True,
         tracebacks_show_locals: bool = False,
         tracebacks_suppress: Iterable[Union[str, ModuleType]] = (),
+        traceback_max_frames: int = 100,
         locals_max_length: int = 10,
         locals_max_string: int = 80,
         log_time_format: Union[str, FormatTimeCallable] = "[%x %X]",
@@ -104,6 +106,7 @@ class RichHandler(Handler):
         self.tracebacks_word_wrap = tracebacks_word_wrap
         self.tracebacks_show_locals = tracebacks_show_locals
         self.tracebacks_suppress = tracebacks_suppress
+        self.traceback_max_frames = traceback_max_frames
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
         self.keywords = keywords
@@ -147,6 +150,7 @@ class RichHandler(Handler):
                 locals_max_length=self.locals_max_length,
                 locals_max_string=self.locals_max_string,
                 suppress=self.tracebacks_suppress,
+                max_frames=self.traceback_max_frames,
             )
             message = record.getMessage()
             if self.formatter:

@@ -91,6 +91,36 @@ def test_exception_with_extra_lines():
     assert "division by zero" in render
 
 
+def test_exception_with_max_frames():
+    # Arrange
+    console = Console(file=io.StringIO(), width=100)
+    handler_with_tracebacks = RichHandler(
+        console=console,
+        rich_tracebacks=True,
+        traceback_max_frames=6,
+    )
+    log.addHandler(handler_with_tracebacks)
+
+    def foo(n):
+        return bar(n)
+
+    def bar(n):
+        return foo(n)
+
+    # Act
+    try:
+        foo(1)
+    except RecursionError:
+        log.exception("message")
+
+    render = handler_with_tracebacks.console.file.getvalue()
+    print(render)
+
+    # Assert
+    assert "frames hidden" in render
+    assert render.count("in foo") < 4
+
+
 def test_stderr_and_stdout_are_none(monkeypatch):
     # This test is specifically to handle cases when using pythonw on
     # windows and stderr and stdout are set to None.
