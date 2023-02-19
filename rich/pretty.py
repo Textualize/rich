@@ -793,6 +793,7 @@ def traverse(
                     close_brace=")",
                     children=children,
                     last=root,
+                    empty=f"{obj.__class__.__name__}()",
                 )
 
                 for last, field in loop_last(
