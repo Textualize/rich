@@ -175,6 +175,11 @@ class ExampleDataclass:
     last: int = field(default=1, repr=False)
 
 
+@dataclass
+class Empty:
+    pass
+
+
 def test_pretty_dataclass():
     dc = ExampleDataclass(1000, "Hello, World", 999, ["foo", "bar", "baz"])
     result = pretty_repr(dc, max_width=80)
@@ -193,6 +198,11 @@ def test_pretty_dataclass():
     result = pretty_repr(dc, max_width=80)
     print(repr(result))
     assert result == "ExampleDataclass(foo=1000, bar=..., baz=['foo', 'bar', 'baz'])"
+
+
+def test_empty_dataclass():
+    assert pretty_repr(Empty()) == "Empty()"
+    assert pretty_repr([Empty()]) == "[Empty()]"
 
 
 class StockKeepingUnit(NamedTuple):
