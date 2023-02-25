@@ -1,3 +1,5 @@
+import pytest
+
 from rich.ansi import AnsiDecoder
 from rich.console import Console
 from rich.style import Style
@@ -47,10 +49,22 @@ def test_decode_example():
     assert result == expected
 
 
-def test_decode_issue_2688():
-    ansi_bytes = (
-        b"\x1b[31mFound 4 errors in 2 files (checked 18 source files)\x1b(B\x1b[m\n"
-    )
+@pytest.mark.parametrize(
+    "ansi_bytes, expected_text",
+    [
+        # https://github.com/Textualize/rich/issues/2688
+        (
+            b"\x1b[31mFound 4 errors in 2 files (checked 18 source files)\x1b(B\x1b[m\n",
+            "Found 4 errors in 2 files (checked 18 source files)",
+        ),
+        # https://mail.python.org/pipermail/python-list/2007-December/424756.html
+        (b"Hallo", "Hallo"),
+        (b"\x1b(BHallo", "Hallo"),
+        (b"\x1b(JHallo", "Hallo"),
+        (b"\x1b(BHal\x1b(Jlo", "Hallo"),
+    ]
+)
+def test_decode_issue_2688(ansi_bytes, expected_text):
     text = Text.from_ansi(ansi_bytes.decode())
 
-    assert str(text) == "Found 4 errors in 2 files (checked 18 source files)"
+    assert str(text) == expected_text
