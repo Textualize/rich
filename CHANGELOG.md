@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed pretty printing of empty dataclass https://github.com/Textualize/rich/issues/2819
+- Filter ANSI character-encoding-change codes in `Text.from_ansi` parser
 
 ## [13.3.1] - 2023-01-28
 
