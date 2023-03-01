@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed pretty printing of empty dataclass https://github.com/Textualize/rich/issues/2819
+- Use `Console(stderr=True)` in `rich.traceback.install` to support io redirection.
 
 ## [13.3.1] - 2023-01-28
 
