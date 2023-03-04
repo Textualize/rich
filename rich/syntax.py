@@ -4,6 +4,7 @@ import re
 import sys
 import textwrap
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import (
     Any,
     Dict,
@@ -338,8 +339,7 @@ class Syntax(JupyterMixin):
         Returns:
             [Syntax]: A Syntax object that may be printed to the console
         """
-        with open(path, "rt", encoding=encoding) as code_file:
-            code = code_file.read()
+        code = Path(path).read_text(encoding=encoding)
 
         if not lexer:
             lexer = cls.guess_lexer(path, code=code)
