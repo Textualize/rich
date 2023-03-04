@@ -122,14 +122,14 @@ def _ipy_display_hook(
     max_string: Optional[int] = None,
     max_depth: Optional[int] = None,
     expand_all: bool = False,
-) -> None:
+) -> str | None:
     # needed here to prevent circular import:
     from ._inspect import is_object_one_of_types
     from .console import ConsoleRenderable
 
     # always skip rich generated jupyter renderables or None values
     if _safe_isinstance(value, JupyterRenderable) or value is None:
-        return
+        return None
 
     console = console or get_console()
     if console.is_jupyter:
@@ -138,7 +138,7 @@ def _ipy_display_hook(
         # What does this do?
         # --> if the class has "matplotlib.artist.Artist" in its hierarchy for example, we don't render it.
         if is_object_one_of_types(value, JUPYTER_CLASSES_TO_NOT_RENDER):
-            return
+            return None
 
     with console.capture() as capture:
         # certain renderables should start on a new line
