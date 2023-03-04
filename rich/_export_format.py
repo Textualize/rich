@@ -12,9 +12,7 @@ body {{
 </head>
 <html>
 <body>
-    <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
-        <code>{code}</code>
-    </pre>
+    <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><code>{code}</code></pre>
 </body>
 </html>
 """

@@ -53,11 +53,7 @@ class Span(NamedTuple):
     """Style associated with the span."""
 
     def __repr__(self) -> str:
-        return (
-            f"Span({self.start}, {self.end}, {self.style!r})"
-            if (isinstance(self.style, Style) and self.style._meta)
-            else f"Span({self.start}, {self.end}, {self.style!r})"
-        )
+        return f"Span({self.start}, {self.end}, {self.style!r})"
 
     def __bool__(self) -> bool:
         return self.end > self.start
