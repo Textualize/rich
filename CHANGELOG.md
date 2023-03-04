@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ## [13.3.2] - Unreleased
 
 ### Fixed
@@ -13,10 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix syntax error when building with nuitka https://github.com/Textualize/rich/pull/2635
 - Fixed pretty printing of empty dataclass https://github.com/Textualize/rich/issues/2819
 - Fixes superfluous spaces in html output https://github.com/Textualize/rich/issues/2832
+- Fixed duplicate output in Jupyter https://github.com/Textualize/rich/pulls/2804
 
 ### Added
 
 - Added Polish README
+
 ## [13.3.1] - 2023-01-28
 
 ### Fixed

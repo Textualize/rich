@@ -971,3 +971,11 @@ def test_force_color(env_value):
     # means is_terminal returns True.
     console = Console(file=io.StringIO(), _environ={"FORCE_COLOR": env_value})
     assert console.is_terminal
+
+
+def test_force_color_jupyter():
+    # FORCE_COLOR above doesn't happen in a Jupyter kernel
+    console = Console(
+        file=io.StringIO(), _environ={"FORCE_COLOR": "1"}, force_jupyter=True
+    )
+    assert not console.is_terminal
