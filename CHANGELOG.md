@@ -81,6 +81,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Handling of broken `fileno` made more robust. Fixes https://github.com/Textualize/rich/issues/2645
 - Fixed missing `fileno` on FileProxy
 
+### Fixed
+
+- Fix type of `spinner_style` argument in `Console.status` https://github.com/Textualize/rich/pull/2613.
+
 ### Changed
 
 - Bumped minimum Python version to 3.7 https://github.com/Textualize/rich/pull/2567

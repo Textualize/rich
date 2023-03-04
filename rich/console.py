@@ -1150,7 +1150,7 @@ class Console:
         status: RenderableType,
         *,
         spinner: str = "dots",
-        spinner_style: str = "status.spinner",
+        spinner_style: StyleType = "status.spinner",
         speed: float = 1.0,
         refresh_per_second: float = 12.5,
     ) -> "Status":
