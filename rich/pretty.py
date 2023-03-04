@@ -30,7 +30,7 @@ from rich.repr import RichReprResult
 try:
     import attr as _attr_module
 
-    _has_attrs = True
+    _has_attrs = hasattr(_attr_module, "ib")
 except ImportError:  # pragma: no cover
     _has_attrs = False
 
@@ -247,7 +247,7 @@ def install(
             )
             builtins._ = value  # type: ignore[attr-defined]
 
-    try:  # pragma: no cover
+    if "get_ipython" in globals():
         ip = get_ipython()  # type: ignore[name-defined]
         from IPython.core.formatters import BaseFormatter
 
@@ -272,7 +272,7 @@ def install(
         # replace plain text formatter with rich formatter
         rich_formatter = RichFormatter()
         ip.display_formatter.formatters["text/plain"] = rich_formatter
-    except Exception:
+    else:
         sys.displayhook = display_hook
 
 
@@ -371,6 +371,7 @@ class Pretty(JupyterMixin):
             indent_size=self.indent_size,
             max_length=self.max_length,
             max_string=self.max_string,
+            max_depth=self.max_depth,
             expand_all=self.expand_all,
         )
         text_width = (
@@ -433,7 +434,7 @@ class Node:
     is_tuple: bool = False
     is_namedtuple: bool = False
     children: Optional[List["Node"]] = None
-    key_separator = ": "
+    key_separator: str = ": "
     separator: str = ", "
 
     def iter_tokens(self) -> Iterable[str]:
@@ -792,6 +793,7 @@ def traverse(
                     close_brace=")",
                     children=children,
                     last=root,
+                    empty=f"{obj.__class__.__name__}()",
                 )
 
                 for last, field in loop_last(

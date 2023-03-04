@@ -5,13 +5,86 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [13.0.0] - Unreleased
+## [13.3.2] - Unreleased
+
+### Fixed
+
+- Reversed `pre` and `code` tags in base HTML format https://github.com/Textualize/rich/pull/2642
+- Fix syntax error when building with nuitka https://github.com/Textualize/rich/pull/2635
+- Fixed pretty printing of empty dataclass https://github.com/Textualize/rich/issues/2819
+
+### Added
+
+- Added Polish README
+
+### Changed
+
+- `rich.progress.track()` will now show the elapsed time after finishing the task https://github.com/Textualize/rich/pull/2659
+
+## [13.3.1] - 2023-01-28
+
+### Fixed
+
+- Fixed truecolor to eight bit color conversion https://github.com/Textualize/rich/pull/2785
+
+## [13.3.0] - 2023-01-27
+
+### Fixed
+
+- Fixed failing tests due to Pygments dependency https://github.com/Textualize/rich/issues/2757
+- Relaxed ipywidgets https://github.com/Textualize/rich/issues/2767
+
+### Added 
+
+- Added `encoding` parameter in `Theme.read`
+
+
+## [13.2.0] - 2023-01-19
+
+### Changed
+
+- Switch Markdown parsing from commonmark to markdown-it-py https://github.com/Textualize/rich/pull/2439
+
+## [13.1.0] - 2023-01-14
+
+### Fixed
+
+- Fixed wrong filenames in Jupyter tracebacks https://github.com/Textualize/rich/issues/2271
+
+### Added
+
+- Added locals_hide_dunder and locals_hide_sunder to Tracebacks, to hide double underscore and single underscore locals. https://github.com/Textualize/rich/pull/2754
+
+### Changed
+
+- Tracebacks will now hide double underscore names from locals by default. Set `locals_hide_dunder=False` to restore previous behaviour.
+
+## [13.0.1] - 2023-01-06
+
+### Fixed
+
+- Fixed issue with Segment.split_cells for mixed single and double cell widths
+
+## [13.0.0] - 2022-12-30
+
+### Fixed
+
+- Reversed `pre` and `code` tags in base HTML format https://github.com/Textualize/rich/pull/2642
+- Improved detection of `attrs` library, that isn't confused by the presence of the `attr` library.
+- Fixed issue with `locals_max_length` parameter not being respected in Traceback https://github.com/Textualize/rich/issues/2649
+- Handling of broken `fileno` made more robust. Fixes https://github.com/Textualize/rich/issues/2645
+- Fixed missing `fileno` on FileProxy
 
 ### Changed
 
 - Bumped minimum Python version to 3.7 https://github.com/Textualize/rich/pull/2567
 - Pretty-printing of "tagged" `__repr__` results is now greedy when matching tags https://github.com/Textualize/rich/pull/2565
-- `rich.progress.track()` will now show the elapsed time after finishing the task https://github.com/Textualize/rich/pull/2659
+- `progress.track` now supports deriving total from `__length_hint__`
+
+### Added
+
+- Add type annotation for key_separator of pretty.Node https://github.com/Textualize/rich/issues/2625
+
 
 ## [12.6.0] - 2022-10-02
 
@@ -1841,7 +1914,13 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[12.6.0]: https://github.com/textualize/rich/compare/v12.5.2...HEAD
+[13.3.1]: https://github.com/textualize/rich/compare/v13.3.0...v13.3.1
+[13.3.0]: https://github.com/textualize/rich/compare/v13.2.0...v13.3.0
+[13.2.0]: https://github.com/textualize/rich/compare/v13.1.0...v13.2.0
+[13.1.0]: https://github.com/textualize/rich/compare/v13.0.1...v13.1.0
+[13.0.1]: https://github.com/textualize/rich/compare/v13.0.0...v13.0.1
+[13.0.0]: https://github.com/textualize/rich/compare/v12.6.0...v13.0.0
+[12.6.0]: https://github.com/textualize/rich/compare/v12.5.2...v12.6.0
 [12.5.2]: https://github.com/textualize/rich/compare/v12.5.1...v12.5.2
 [12.5.1]: https://github.com/textualize/rich/compare/v12.5.0...v12.5.1
 [12.5.0]: https://github.com/textualize/rich/compare/v12.4.4...v12.5.0

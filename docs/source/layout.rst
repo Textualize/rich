@@ -74,6 +74,8 @@ Setting renderables
 
 The first position argument to ``Layout`` can be any Rich renderable, which will be sized to fit within the layout's area. Here's how we might divide the "right" layout in to two panels::
 
+    from rich.panel import Panel
+    
     layout["right"].split(
         Layout(Panel("Hello")),
         Layout(Panel("World!"))

@@ -1,5 +1,4 @@
 import inspect
-import io
 import os
 import platform
 import sys
@@ -48,6 +47,7 @@ else:
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
 from ._export_format import CONSOLE_HTML_FORMAT, CONSOLE_SVG_FORMAT
+from ._fileno import get_fileno
 from ._log_render import FormatTimeCallable, LogRender
 from .align import Align, AlignMethod
 from .color import ColorSystem, blend_rgb
@@ -758,7 +758,7 @@ class Console:
         self._is_alt_screen = False
 
     def __repr__(self) -> str:
-        return f"<console width={self.width} {str(self._color_system)}>"
+        return f"<console width={self.width} {self._color_system!s}>"
 
     @property
     def file(self) -> IO[str]:
@@ -1523,7 +1523,7 @@ class Console:
             if text:
                 sep_text = Text(sep, justify=justify, end=end)
                 append(sep_text.join(text))
-                del text[:]
+                text.clear()
 
         for renderable in objects:
             renderable = rich_cast(renderable)
@@ -2006,12 +2006,11 @@ class Console:
                     if WINDOWS:
                         use_legacy_windows_render = False
                         if self.legacy_windows:
-                            try:
+                            fileno = get_fileno(self.file)
+                            if fileno is not None:
                                 use_legacy_windows_render = (
-                                    self.file.fileno() in _STD_STREAMS_OUTPUT
+                                    fileno in _STD_STREAMS_OUTPUT
                                 )
-                            except (ValueError, io.UnsupportedOperation):
-                                pass
 
                         if use_legacy_windows_render:
                             from rich._win32_console import LegacyWindowsTerm
@@ -2026,13 +2025,31 @@ class Console:
                             # Either a non-std stream on legacy Windows, or modern Windows.
                             text = self._render_buffer(self._buffer[:])
                             # https://bugs.python.org/issue37871
+                            # https://github.com/python/cpython/issues/82052
+                            # We need to avoid writing more than 32Kb in a single write, due to the above bug
                             write = self.file.write
-                            for line in text.splitlines(True):
-                                try:
-                                    write(line)
-                                except UnicodeEncodeError as error:
-                                    error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
-                                    raise
+                            # Worse case scenario, every character is 4 bytes of utf-8
+                            MAX_WRITE = 32 * 1024 // 4
+                            try:
+                                if len(text) <= MAX_WRITE:
+                                    write(text)
+                                else:
+                                    batch: List[str] = []
+                                    batch_append = batch.append
+                                    size = 0
+                                    for line in text.splitlines(True):
+                                        if size + len(line) > MAX_WRITE and batch:
+                                            write("".join(batch))
+                                            batch.clear()
+                                            size = 0
+                                        batch_append(line)
+                                        size += len(line)
+                                    if batch:
+                                        write("".join(batch))
+                                        batch.clear()
+                            except UnicodeEncodeError as error:
+                                error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
+                                raise
                     else:
                         text = self._render_buffer(self._buffer[:])
                         try:

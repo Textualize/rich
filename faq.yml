@@ -1,0 +1,7 @@
+# FAQtory settings
+
+faq_url: "https://github.com/textualize/rich/blob/master/FAQ.md" # Replace this with the URL to your FAQ.md!
+
+questions_path: "./questions" # Where questions should be stored
+output_path: "./FAQ.md" # Where FAQ.md should be generated 
+templates_path: ".faq" # Path to templates
