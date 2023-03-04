@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Reversed `pre` and `code` tags in base HTML format https://github.com/Textualize/rich/pull/2642
+- Fix syntax error when building with nuitka https://github.com/Textualize/rich/pull/2635
 - Fixed pretty printing of empty dataclass https://github.com/Textualize/rich/issues/2819
 
 ### Added
