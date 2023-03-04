@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `rich.progress.track()` will now show the elapsed time after finishing the task https://github.com/Textualize/rich/pull/2659
+- Refactored Github Community files https://github.com/Textualize/rich/pull/2854
 
 ## [13.3.1] - 2023-01-28
 
