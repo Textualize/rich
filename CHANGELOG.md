@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed duplicate output in Jupyter https://github.com/Textualize/rich/pulls/2804
 - Filter ANSI character-encoding-change codes in `Text.from_ansi` parser
 - Fixes traceback failing when a frame filename is unreadable https://github.com/Textualize/rich/issues/2821
+- Fix for live update rendering console markup https://github.com/Textualize/rich/issues/2726
 
 ### Added
 
