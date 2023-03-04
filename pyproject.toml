@@ -48,7 +48,6 @@ asv = "^0.5.1"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-
 [tool.mypy]
 files = ["rich"]
 show_error_codes = true
@@ -64,3 +63,19 @@ testpaths = ["tests"]
 
 [tool.isort]
 profile = "black"
+
+[tool.coverage.run]
+omit = [
+    "rich/jupyter.py",
+    "rich/_windows.py",
+    "rich/_timer.py",
+    "rich/diagnose.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "@overload",
+    'if __name__ == "__main__":',
+]
