@@ -365,7 +365,7 @@ class Segment(NamedTuple):
             int: The length of the line.
         """
         _cell_len = cell_len
-        return sum(_cell_len(segment.text) for segment in line)
+        return sum(_cell_len(text) for text, style, control in line if not control)
 
     @classmethod
     def get_shape(cls, lines: List[List["Segment"]]) -> Tuple[int, int]:
@@ -727,7 +727,7 @@ console.print(text)"""
     console.print(Syntax(code, "python", line_numbers=True))
     console.print()
     console.print(
-        "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
+        "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the following:\n"
     )
     fragments = list(console.render(text))
     console.print(fragments)
