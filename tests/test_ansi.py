@@ -62,7 +62,7 @@ def test_decode_example():
         (b"\x1b(BHallo", "Hallo"),
         (b"\x1b(JHallo", "Hallo"),
         (b"\x1b(BHal\x1b(Jlo", "Hallo"),
-    ]
+    ],
 )
 def test_decode_issue_2688(ansi_bytes, expected_text):
     text = Text.from_ansi(ansi_bytes.decode())
