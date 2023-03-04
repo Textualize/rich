@@ -24,6 +24,7 @@
  • [Indonesian readme](https://github.com/textualize/rich/blob/master/README.id.md)
  • [فارسی readme](https://github.com/textualize/rich/blob/master/README.fa.md)
  • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
+ • [Polskie readme](https://github.com/textualize/rich/blob/master/README.pl.md)
 
 
 Bir Python kütüphanesi olan __rich__, terminal üzerinde gösterişli çıktılar almanızı sağlayan bir araçtır.
