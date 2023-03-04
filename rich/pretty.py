@@ -55,13 +55,6 @@ if TYPE_CHECKING:
     )
 
 
-JUPYTER_CLASSES_TO_NOT_RENDER = {
-    # Matplotlib "Artists" manage their own rendering in a Jupyter notebook, and we should not try to render them too.
-    # "Typically, all [Matplotlib] visible elements in a figure are subclasses of Artist."
-    "matplotlib.artist.Artist",
-}
-
-
 def _is_attr_object(obj: Any) -> bool:
     """Check if an object was created with attrs module."""
     return _has_attrs and _attr_module.has(type(obj))
@@ -124,7 +117,6 @@ def _ipy_display_hook(
     expand_all: bool = False,
 ) -> Union[str, None]:
     # needed here to prevent circular import:
-    from ._inspect import is_object_one_of_types
     from .console import ConsoleRenderable
 
     # always skip rich generated jupyter renderables or None values
@@ -132,13 +124,6 @@ def _ipy_display_hook(
         return None
 
     console = console or get_console()
-    if console.is_jupyter:
-        # When in a Jupyter notebook let's avoid the display of some specific classes,
-        # as they result in the rendering of useless and noisy lines such as `<Figure size 432x288 with 1 Axes>`.
-        # What does this do?
-        # --> if the class has "matplotlib.artist.Artist" in its hierarchy for example, we don't render it.
-        if is_object_one_of_types(value, JUPYTER_CLASSES_TO_NOT_RENDER):
-            return None
 
     with console.capture() as capture:
         # certain renderables should start on a new line

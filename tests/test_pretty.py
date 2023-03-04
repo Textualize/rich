@@ -5,7 +5,6 @@ from array import array
 from collections import UserDict, defaultdict
 from dataclasses import dataclass, field
 from typing import Any, List, NamedTuple
-from unittest.mock import patch
 
 import attr
 import pytest
@@ -132,22 +131,6 @@ def test_ipy_display_hook__console_renderables_on_newline():
     console.begin_capture()
     result = _ipy_display_hook(Text("hello"), console=console)
     assert result == "\nhello"
-
-
-def test_ipy_display_hook__classes_to_not_render():
-    console = Console(file=io.StringIO(), force_jupyter=True)
-    console.begin_capture()
-
-    class Thing:
-        def __repr__(self) -> str:
-            return "hello"
-
-    class_fully_qualified_name = f"{__name__}.{Thing.__qualname__}"
-    with patch(
-        "rich.pretty.JUPYTER_CLASSES_TO_NOT_RENDER", {class_fully_qualified_name}
-    ):
-        result = _ipy_display_hook(Thing(), console=console)
-    assert result is None
 
 
 def test_pretty():
