@@ -40,7 +40,7 @@ pytest = "^7.0.0"
 black = "^22.6"
 mypy = "^0.971"
 pytest-cov = "^3.0.0"
-attrs = "^21.4.0"
+attrs = "^22.2.0"
 pre-commit = "^2.17.0"
 asv = "^0.5.1"
 
