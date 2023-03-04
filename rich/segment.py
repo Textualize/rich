@@ -727,7 +727,7 @@ console.print(text)"""
     console.print(Syntax(code, "python", line_numbers=True))
     console.print()
     console.print(
-        "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
+        "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the following:\n"
     )
     fragments = list(console.render(text))
     console.print(fragments)
