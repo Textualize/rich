@@ -18,6 +18,7 @@ The following people have contributed to the development of Rich:
 - [Michał Górny](https://github.com/mgorny)
 - [Nok Lam Chan](https://github.com/noklam)
 - [Leron Gray](https://github.com/daddycocoaman)
+- [Andre Hora](https://github.com/andrehora)
 - [Kenneth Hoste](https://github.com/boegel)
 - [Lanqing Huang](https://github.com/lqhuang)
 - [Finn Hughes](https://github.com/finnhughes)
