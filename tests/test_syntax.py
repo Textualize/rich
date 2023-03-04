@@ -3,6 +3,7 @@ import os
 import sys
 import tempfile
 
+import pkg_resources
 import pytest
 from pygments.lexers import PythonLexer
 
@@ -19,6 +20,9 @@ from rich.syntax import (
 )
 
 from .render import render
+
+PYGMENTS_VERSION = pkg_resources.get_distribution("pygments").version
+OLD_PYGMENTS = PYGMENTS_VERSION == "2.13.0"
 
 CODE = '''\
 def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
@@ -98,6 +102,7 @@ def test_python_render_simple_passing_lexer_instance():
     assert rendered_syntax == expected
 
 
+@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
 def test_python_render_simple_indent_guides():
     syntax = Syntax(
         CODE,
@@ -114,6 +119,7 @@ def test_python_render_simple_indent_guides():
     assert rendered_syntax == expected
 
 
+@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
 def test_python_render_line_range_indent_guides():
     syntax = Syntax(
         CODE,
