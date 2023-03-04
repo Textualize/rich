@@ -342,6 +342,7 @@ class Traceback:
             locals_hide_dunder=locals_hide_dunder,
             locals_hide_sunder=locals_hide_sunder,
         )
+
         return cls(
             rich_traceback,
             width=width,
@@ -673,6 +674,10 @@ class Traceback:
             if not suppressed:
                 try:
                     code = read_code(frame.filename)
+                    if not code:
+                        # code may be an empty string if the file doesn't exist, OR
+                        # if the traceback filename is generated dynamically
+                        continue
                     lexer_name = self._guess_lexer(frame.filename, code)
                     syntax = Syntax(
                         code,
