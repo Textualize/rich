@@ -22,6 +22,7 @@
  • [Русский readme](https://github.com/textualize/rich/blob/master/README.ru.md)
   • [فارسی readme](https://github.com/textualize/rich/blob/master/README.fa.md)
  • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
+ • [Polskie readme](https://github.com/textualize/rich/blob/master/README.pl.md)
 
 Rich는 터미널에서 _풍부한(rich)_ 텍스트와 아름다운 서식을 지원하기 위한 파이썬 라이브러리입니다.
 

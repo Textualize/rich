@@ -247,7 +247,7 @@ def install(
             )
             builtins._ = value  # type: ignore[attr-defined]
 
-    try:  # pragma: no cover
+    if "get_ipython" in globals():
         ip = get_ipython()  # type: ignore[name-defined]
         from IPython.core.formatters import BaseFormatter
 
@@ -272,7 +272,7 @@ def install(
         # replace plain text formatter with rich formatter
         rich_formatter = RichFormatter()
         ip.display_formatter.formatters["text/plain"] = rich_formatter
-    except Exception:
+    else:
         sys.displayhook = display_hook
 
 
@@ -793,6 +793,7 @@ def traverse(
                     close_brace=")",
                     children=children,
                     last=root,
+                    empty=f"{obj.__class__.__name__}()",
                 )
 
                 for last, field in loop_last(

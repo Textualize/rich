@@ -22,6 +22,7 @@
  • [Русский readme](https://github.com/textualize/rich/blob/master/README.ru.md)
   • [فارسی readme](https://github.com/textualize/rich/blob/master/README.fa.md)
  • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
+ • [Polskie readme](https://github.com/textualize/rich/blob/master/README.pl.md)
 
 Rich 是一个 Python 库，可以为您在终端中提供富文本和精美格式。
 
