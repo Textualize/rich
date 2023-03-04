@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Polish README
 
+### Changed
+
+- `rich.progress.track()` will now show the elapsed time after finishing the task https://github.com/Textualize/rich/pull/2659
+
 ## [13.3.1] - 2023-01-28
 
 ### Fixed
