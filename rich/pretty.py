@@ -30,7 +30,7 @@ from rich.repr import RichReprResult
 try:
     import attr as _attr_module
 
-    _has_attrs = True
+    _has_attrs = hasattr(_attr_module, "ib")
 except ImportError:  # pragma: no cover
     _has_attrs = False
 
@@ -793,6 +793,7 @@ def traverse(
                     close_brace=")",
                     children=children,
                     last=root,
+                    empty=f"{obj.__class__.__name__}()",
                 )
 
                 for last, field in loop_last(
