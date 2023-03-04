@@ -38,6 +38,7 @@ The following people have contributed to the development of Rich:
 - [Dave Pearson](https://github.com/davep/)
 - [Avi Perl](https://github.com/avi-perl)
 - [Laurent Peuch](https://github.com/psycojoker)
+- [Ronny Pfannschmidt](https://github.com/RonnyPfannschmidt/)
 - [Olivier Philippon](https://github.com/DrBenton)
 - [Kylian Point](https://github.com/p0lux)
 - [Kyle Pollina](https://github.com/kylepollina)

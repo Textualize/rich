@@ -86,7 +86,7 @@ def install(
         Callable: The previous exception handler that was replaced.
 
     """
-    traceback_console = Console(file=sys.stderr) if console is None else console
+    traceback_console = Console(stderr=True) if console is None else console
 
     locals_hide_sunder = (
         True

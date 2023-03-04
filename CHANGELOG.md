@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reversed `pre` and `code` tags in base HTML format https://github.com/Textualize/rich/pull/2642
 - Fix syntax error when building with nuitka https://github.com/Textualize/rich/pull/2635
 - Fixed pretty printing of empty dataclass https://github.com/Textualize/rich/issues/2819
+- Use `Console(stderr=True)` in `rich.traceback.install` to support io redirection.
 - Fixes superfluous spaces in html output https://github.com/Textualize/rich/issues/2832
 - Fixed duplicate output in Jupyter https://github.com/Textualize/rich/pulls/2804
 
