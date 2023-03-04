@@ -21,6 +21,7 @@
  • [Русский readme](https://github.com/textualize/rich/blob/master/README.ru.md)
   • [فارسی readme](https://github.com/textualize/rich/blob/master/README.fa.md)
  • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
+ • [Polskie readme](https://github.com/textualize/rich/blob/master/README.pl.md)
 
 Rich é uma biblioteca Python para _rich_ text e formatação de estilos no terminal.
 
@@ -202,7 +203,7 @@ O Rich pode imprimir [tables](https://rich.readthedocs.io/en/latest/tables.html)
 
 A animação acima foi gerada com o arquivo [table_movie.py](https://github.com/textualize/rich/blob/master/examples/table_movie.py) da pasta de exemplos.
 
-Veja um exemplo mais simple:
+Veja um exemplo mais simples:
 
 ```python
 from rich.console import Console
@@ -238,9 +239,9 @@ Que gera o seguinte resultado:
 
 ![table](https://github.com/textualize/rich/raw/master/imgs/table.png)
 
-Observe que o markup é renderizado da mesma for que em `print()` e `log()`. De fato, tudo que é renderizável pelo Rich pode ser incluído nos cabeçalhos ou linhas (até mesmo outras tabelas).
+Observe que o markup é renderizado da mesma que em `print()` e `log()`. Na verdade, tudo que é renderizável pelo Rich pode ser incluído nos cabeçalhos ou linhas (até mesmo outras tabelas).
 
-A classe `Table` é inteligente o suficiente para ajustar o tamanho das colunas para caber na largura do terminal, quebrando o texto em novas linhas quando necessário. Veja a seguir o mesmo exemplo, só que desta vez com um terminal menor do que o tamanho original da tabela:
+A classe `Table` é inteligente o suficiente para ajustar o tamanho das colunas para caber na largura do terminal, quebrando o texto em novas linhas quando necessário. Veja o mesmo exemplo a seguir, só que desta vez com um terminal menor do que o tamanho original da tabela:
 
 ![table2](https://github.com/textualize/rich/raw/master/imgs/table2.png)
 
@@ -249,7 +250,7 @@ A classe `Table` é inteligente o suficiente para ajustar o tamanho das colunas 
 <details>
 <summary>Barra de Progresso</summary>
 
-O Rich consegue renderizar de forma eficiente multiplas barras de [progresso](https://rich.readthedocs.io/en/latest/progress.html) que podem ser usadas para rastrear o estado de processos longos.
+O Rich consegue renderizar de forma eficiente múltiplas [barras de progresso](https://rich.readthedocs.io/en/latest/progress.html) que podem ser usadas para rastrear o estado de processos longos.
 
 Uma forma simples de usar é passando o iterável para a função `track` e iterar normalmente sobre o retorno. Veja o exemplo a seguir:
 
@@ -260,7 +261,7 @@ for step in track(range(100)):
     do_step(step)
 ```
 
-Adicionar multiplas barras de progresso também é simples. Veja outro exemplo que existe na documentação:
+Adicionar múltiplas barras de progresso também é simples. Veja outro exemplo que existe na documentação:
 
 ![progress](https://github.com/textualize/rich/raw/master/imgs/progress.gif)
 
@@ -268,14 +269,14 @@ As colunas podem ser configuradas pra mostrar qualquer detalho necessário. As c
 
 ![progress](https://github.com/textualize/rich/raw/master/imgs/downloader.gif)
 
-Para testar isso no seu terminal, use o arquivo [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) para fazer o download de multiplas URLs simultaneamente, exibindo o progresso de cada download.
+Para testar isso no seu terminal, use o arquivo [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) para fazer o download de múltiplas URLs simultaneamente, exibindo o progresso de cada download.
 
 </details>
 
 <details>
 <summary>Status</summary>
 
-Em casos em que é dificil de calcular o progresso da tarefa, você pode usar o método [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) que exibe uma animação de um "spinner" e a mensagem. A animação não impede em nada o uso do `console`. Veja o exemplo a seguir:
+Em casos em que é dificil calcular o progresso da tarefa, você pode usar o método [status](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console.status) que exibe uma animação de um "spinner" e a mensagem. A animação não impede em nada o uso do `console`. Veja o exemplo a seguir:
 
 ```python
 from time import sleep
@@ -310,7 +311,7 @@ O comando acima deve exibir o seguinte no seu terminal:
 <details>
 <summary>Árvore</summary>
 
-O Rich pode renderizar [árvores](https://rich.readthedocs.io/en/latest/tree.html) com linhas de identação. Uma árvore é a forma ideal de exibir uma extrutura de arquivos ou qualquer outra apresentação hierárquica de dados.
+O Rich pode renderizar [árvores](https://rich.readthedocs.io/en/latest/tree.html) com linhas de identação. Uma árvore é a forma ideal de exibir uma estrutura de arquivos ou qualquer outra apresentação hierárquica de dados.
 
 Os titulos dos itens da árvore podem ser textos simples ou qualquer coisa que o Rich pode renderizar. Execute o comando a seguir para uma demonstração:
 
@@ -342,7 +343,7 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-O screenshot a seguir é do resultado do [exemplo de colunas](https://github.com/textualize/rich/blob/master/examples/columns.py) formatando em colunas os dados extraidos de uma API:
+O screenshot a seguir é do resultado do [exemplo de colunas](https://github.com/textualize/rich/blob/master/examples/columns.py) formatando em colunas os dados extraídos de uma API:
 
 ![columns](https://github.com/textualize/rich/raw/master/imgs/columns.png)
 
@@ -353,7 +354,7 @@ O screenshot a seguir é do resultado do [exemplo de colunas](https://github.com
 
 O Rich pode renderizar [markdown](https://rich.readthedocs.io/en/latest/markdown.html) e faz um bom trabalho de conversão do formato para o terminal.
 
-Para renderizar markdowm, importe a classe `Markdown` e instancie com a string que contem o código markdown. Depois, imprima o objeto no console. Por exemplo:
+Para renderizar markdowm, importe a classe `Markdown` e instancie com a string que contém o código markdown. Depois, imprima o objeto no console. Por exemplo:
 
 ```python
 from rich.console import Console
@@ -417,13 +418,13 @@ Veja o resultado disso no OSX (resultados semelhantes no Linux):
 
 </details>
 
-Todos os renderizaveis do Rich usam o [Protocolo do Console](https://rich.readthedocs.io/en/latest/protocol.html), que você pode usar para implementar o seu próprio conteúdo Rich.
+Todos os renderizáveis do Rich usam o [Protocolo do Console](https://rich.readthedocs.io/en/latest/protocol.html), que você pode usar para implementar o seu próprio conteúdo Rich.
 
 # Rich para empresas
 
 Disponível como parte da assinatura Tidelift.
 
-Os mantenedores do Rich e milhares de outros pacotes estão trabalhando com o Tidelift para disponibilizar suporte comercial e manutenção de projetos de código aberto usados nas suas aplicações. Economise tempo, reduza riscos e melhore a saúde do código enquanto paga os mantenedores dos pacotes exatos que você usa. [Mais detalhes.](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
+Os mantenedores do Rich e milhares de outros pacotes estão trabalhando com o Tidelift para disponibilizar suporte comercial e manutenção de projetos de código aberto usados nas suas aplicações. Economize tempo, reduza riscos e melhore a qualidade do código enquanto paga os mantenedores dos pacotes exatos que você usa. [Mais detalhes.](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
 
 # Projetos usando Rich
 

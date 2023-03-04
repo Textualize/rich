@@ -23,6 +23,7 @@
  • [Русский readme](https://github.com/textualize/rich/blob/master/README.ru.md)
  • [فارسی readme](https://github.com/textualize/rich/blob/master/README.fa.md)
  • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
+ • [Polskie readme](https://github.com/textualize/rich/blob/master/README.pl.md)
 
 ریچ یک کتاب خانه پایتون برای متن های _باشکوه_ و قالب بندی زیبا در ترمینال است.
 
