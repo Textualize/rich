@@ -1,3 +1,5 @@
+import pytest
+
 from rich.ansi import AnsiDecoder
 from rich.console import Console
 from rich.style import Style
@@ -45,3 +47,24 @@ def test_decode_example():
     print(repr(result))
     expected = "\x1b[1mC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:\x1b[0m In function '\x1b[1mmain\x1b[0m':\n\x1b[1mC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:3:5:\x1b[0m \x1b[1;35mwarning: \x1b[0munused variable '\x1b[1ma\x1b[0m' \n[\x1b[1;35m-Wunused-variable\x1b[0m]\n    3 | int \x1b[1;35ma\x1b[0m=1;\n      |     \x1b[1;35m^\x1b[0m\n"
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    "ansi_bytes, expected_text",
+    [
+        # https://github.com/Textualize/rich/issues/2688
+        (
+            b"\x1b[31mFound 4 errors in 2 files (checked 18 source files)\x1b(B\x1b[m\n",
+            "Found 4 errors in 2 files (checked 18 source files)",
+        ),
+        # https://mail.python.org/pipermail/python-list/2007-December/424756.html
+        (b"Hallo", "Hallo"),
+        (b"\x1b(BHallo", "Hallo"),
+        (b"\x1b(JHallo", "Hallo"),
+        (b"\x1b(BHal\x1b(Jlo", "Hallo"),
+    ],
+)
+def test_decode_issue_2688(ansi_bytes, expected_text):
+    text = Text.from_ansi(ansi_bytes.decode())
+
+    assert str(text) == expected_text
