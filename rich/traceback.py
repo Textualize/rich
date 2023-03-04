@@ -664,7 +664,13 @@ class Traceback:
                     style="pygments.text",
                 )
             else:
-                text = Text.assemble("in ", (frame.name, "pygments.function"))
+                text = Text.assemble(
+                    "in ",
+                    (frame.name, "pygments.function"),
+                    (":", "pygments.text"),
+                    (str(frame.lineno), "pygments.number"),
+                    style="pygments.text",
+                )
             if not frame.filename.startswith("<") and not first:
                 yield ""
             yield text

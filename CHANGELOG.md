@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use `Console(stderr=True)` in `rich.traceback.install` to support io redirection.
 - Fixes superfluous spaces in html output https://github.com/Textualize/rich/issues/2832
 - Fixed duplicate output in Jupyter https://github.com/Textualize/rich/pulls/2804
+- Fixes traceback failing when a frame filename is unreadable https://github.com/Textualize/rich/issues/2821
 
 ### Added
 
