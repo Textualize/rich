@@ -122,7 +122,7 @@ def _ipy_display_hook(
     max_string: Optional[int] = None,
     max_depth: Optional[int] = None,
     expand_all: bool = False,
-) -> str | None:
+) -> Union[str, None]:
     # needed here to prevent circular import:
     from ._inspect import is_object_one_of_types
     from .console import ConsoleRenderable
