@@ -234,6 +234,7 @@ class Syntax(JupyterMixin):
         dedent (bool, optional): Enable stripping of initial whitespace. Defaults to False.
         line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
         start_line (int, optional): Starting number for line numbers. Defaults to 1.
+        column_offset (int, optional): Starting column to begin rendering at. Defaults to 0.
         line_range (Tuple[int | None, int | None], optional): If given should be a tuple of the start and end line to render.
             A value of None in the tuple indicates the range is open in that direction.
         highlight_lines (Set[int]): A set of line numbers to highlight.
@@ -269,6 +270,7 @@ class Syntax(JupyterMixin):
         dedent: bool = False,
         line_numbers: bool = False,
         start_line: int = 1,
+        column_offset: int = 0,
         line_range: Optional[Tuple[Optional[int], Optional[int]]] = None,
         highlight_lines: Optional[Set[int]] = None,
         code_width: Optional[int] = None,
@@ -283,6 +285,7 @@ class Syntax(JupyterMixin):
         self.dedent = dedent
         self.line_numbers = line_numbers
         self.start_line = start_line
+        self.column_offset = column_offset
         self.line_range = line_range
         self.highlight_lines = highlight_lines or set()
         self.code_width = code_width
@@ -307,8 +310,9 @@ class Syntax(JupyterMixin):
         theme: Union[str, SyntaxTheme] = DEFAULT_THEME,
         dedent: bool = False,
         line_numbers: bool = False,
-        line_range: Optional[Tuple[int, int]] = None,
+        line_range: Optional[Tuple[Optional[int], Optional[int]]] = None,
         start_line: int = 1,
+        column_offset: int = 0,
         highlight_lines: Optional[Set[int]] = None,
         code_width: Optional[int] = None,
         tab_size: int = 4,
@@ -327,6 +331,7 @@ class Syntax(JupyterMixin):
             dedent (bool, optional): Enable stripping of initial whitespace. Defaults to True.
             line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
             start_line (int, optional): Starting number for line numbers. Defaults to 1.
+            column_offset (int, optional): Starting column to begin rendering at. Defaults to 0.
             line_range (Tuple[int, int], optional): If given should be a tuple of the start and end line to render.
             highlight_lines (Set[int]): A set of line numbers to highlight.
             code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
@@ -351,6 +356,7 @@ class Syntax(JupyterMixin):
             dedent=dedent,
             line_numbers=line_numbers,
             line_range=line_range,
+            column_offset=column_offset,
             start_line=start_line,
             highlight_lines=highlight_lines,
             code_width=code_width,
@@ -639,7 +645,12 @@ class Syntax(JupyterMixin):
         ends_on_nl, processed_code = self._process_code(self.code)
         text = self.highlight(processed_code, self.line_range)
 
-        if not self.line_numbers and not self.word_wrap and not self.line_range:
+        if (
+            not self.line_numbers
+            and not self.word_wrap
+            and not self.line_range
+            and not self.column_offset
+        ):
             if not ends_on_nl:
                 text.remove_suffix("\n")
             # Simple case of just rendering text
@@ -677,6 +688,21 @@ class Syntax(JupyterMixin):
             if line_offset > len(lines):
                 return
             lines = lines[line_offset:end_line]
+
+        if self.column_offset:
+            col_start = self.column_offset
+            col_end = col_start + self.code_width if self.code_width else None
+            line_sections = []
+            for line in lines:
+                if col_start > len(line):
+                    line_section = Text("")
+                else:
+                    if col_end is None:
+                        line_section = line[col_start:]
+                    else:
+                        line_section = line[col_start:col_end]
+                line_sections.append(line_section)
+            lines = line_sections
 
         if self.indent_guides and not options.ascii_only:
             style = (

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [13.4.0] - Unreleased
+
+### Added
+
+- `Syntax` now takes a `column_offset` argument that will make it render only the columns starting at the offset to the `code_width` if provided
+
 ## [13.3.2] - 2023-02-04
 
 ### Fixed

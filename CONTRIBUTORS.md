@@ -68,4 +68,4 @@ The following people have contributed to the development of Rich:
 - [Ke Sun](https://github.com/ksun212)
 - [Qiming Xu](https://github.com/xqm32)
 - [James Addison](https://github.com/jayaddison)
-
+- [Anthony Post](https://github.com/Ayehavgunne)
