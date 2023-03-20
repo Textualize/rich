@@ -1,8 +1,4 @@
-try:
-    import emoji
-except ImportError:
-    print("pip install emoji")
-    raise
+import emoji
 
 from emoji.unicode_codes import EMOJI_ALIAS_UNICODE
 
