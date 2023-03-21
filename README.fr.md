@@ -174,7 +174,7 @@ La méthode log peut être utilisée pour la journalisation vers le terminal pou
 <details>
 <summary>Journalisation</summary>
 
-Vous pouvez également utiliser la classe intégrée [Handler](https://rich.readthedocs.io/en/latest/logging.html) pour formater et coloriser les sorties du module de journalisation de Python. Voici un exemple de sortie :
+Vous pouvez également utiliser la classe intégrée [Handler](https://rich.readthedocs.io/en/latest/logging.html) pour formater et coloriser les textes de sortie du module de journalisation de Python. Voici un exemple de texte de sortie :
 
 ![Logging](https://github.com/textualize/rich/raw/master/imgs/logging.png)
 </details>
@@ -195,7 +195,7 @@ Veuillez utiliser cette fonction à bon escient.
 <details>
 <summary>Tableaux</summary>
 
-Rich peut rendre des [tableaux](https://rich.readthedocs.io/en/latest/tables.html) flexibles avec des caractères de boîte unicode. Il existe une grande variété d'options de formatage pour les bordures, les styles, l'alignement des cellules, etc.
+Rich peut rendre des [tableaux](https://rich.readthedocs.io/en/latest/tables.html) flexibles avec des caractères unicodes. Il existe une grande variété d'options de formatage pour les bordures, les styles, l'alignement des cellules, etc.
 
 ![table movie](https://github.com/textualize/rich/raw/master/imgs/table_movie.gif)
 
@@ -237,9 +237,9 @@ Cela produit le résultat suivant :
 
 ![table](https://github.com/textualize/rich/raw/master/imgs/table.png)
 
-Notez que les balises de la console sont rendues de la même manière que `print()` et `log()`. En fait, tout ce qui peut être rendu par Rich peut être inclus dans les en-têtes / lignes (même d'autres tables).
+Notez que les balises de la console sont rendues de la même manière que `print()` et `log()`. De fait, tout ce qui peut être rendu par Rich peut être inclus dans les en-têtes / lignes (même d'autres tables).
 
-La classe `Table` est suffisamment intelligente pour redimensionner les colonnes en fonction de la largeur disponible du terminal, en enveloppant le texte si nécessaire. Voici le même exemple, avec un terminal plus petit que le tableau ci-dessus :
+La classe `Table` est suffisamment intelligente pour redimensionner les colonnes en fonction de la largeur disponible du terminal, en enveloppant et en réduisant le texte si nécessaire. Voici le même exemple, avec un terminal plus petit que le tableau ci-dessus :
 
 ![table2](https://github.com/textualize/rich/raw/master/imgs/table2.png)
 </details>
@@ -247,9 +247,9 @@ La classe `Table` est suffisamment intelligente pour redimensionner les colonnes
 <details>
 <summary>Barres de progression</summary>
 
-Rich peut afficher plusieurs [barres de progression](https://rich.readthedocs.io/en/latest/progress.html) sans scintillement pour suivre les tâches de longue haleine.
+Rich peut afficher plusieurs [barres de progression](https://rich.readthedocs.io/en/latest/progress.html) sans scintillement pour suivre les tâches de longue périodes.
 
-Pour une utilisation basique, bouclez sur n'importe quelle séquence dans la fonction `track` et itérez sur le résultat. Voici un exemple :
+Pour une utilisation basique, créez une boucle sur n'importe quelle séquence dans la fonction `track` et itérez sur le résultat. Voici un exemple :
 
 ```python
 from rich.progress import track
@@ -266,7 +266,7 @@ Les colonnes peuvent être configurées pour afficher tous les détails que vous
 
 ![progress](https://github.com/textualize/rich/raw/master/imgs/downloader.gif)
 
-Pour l'essayer vous-même, voyez [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) qui peut télécharger plusieurs URL simultanément tout en affichant la progression.
+Pour l'essayer vous-même, testez [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) qui peut télécharger plusieurs URL simultanément tout en affichant la progression au fil du temps.
 
 </details>
 
@@ -293,7 +293,7 @@ Cela génère la sortie suivante dans le terminal.
 
 ![status](https://github.com/textualize/rich/raw/master/imgs/status.gif)
 
-Les animations des toupies ont été empruntées à [cli-spinners](https://www.npmjs.com/package/cli-spinners). Vous pouvez sélectionner un spinner en spécifiant le paramètre `spinner`. Exécutez la commande suivante pour voir les valeurs disponibles :
+Les animations des characteres d'animations ont été empruntées à [cli-spinners](https://www.npmjs.com/package/cli-spinners). Vous pouvez en sélectionner un en spécifiant le paramètre `spinner`. Exécutez la commande suivante pour voir les valeurs disponibles :
 
 ```
 python -m rich.spinner
@@ -326,7 +326,7 @@ Voir l'exemple [tree.py](https://github.com/textualize/rich/blob/master/examples
 <details>
 <summary>Colonnes</summary>
 
-Rich peut rendre le contenu en [colonnes](https://rich.readthedocs.io/en/latest/columns.html) avec une largeur égale ou optimale. Voici un clone très basique de la commande `ls` (MacOS / Linux) qui affiche une liste de répertoires en colonnes :
+Rich peut rendre du contenu en [colonnes](https://rich.readthedocs.io/en/latest/columns.html) avec une largeur égale ou optimale. Voici un clone très basique de la commande `ls` (MacOS / Linux) qui affiche une liste de répertoires en colonnes :
 
 ```python
 import os
@@ -365,7 +365,7 @@ console.print(markdown)
 Cela produira un résultat semblable à ce qui suit :
 
 ![markdown](https://github.com/textualize/rich/raw/master/imgs/markdown.png)
-
+ 
 </details>
 
 <details>
@@ -405,7 +405,7 @@ Cela produira le résultat suivant :
 <details>
 <summary>Tracebacks</summary>
 
-Rich peut rendre des [traçages d'erreurs](https://rich.readthedocs.io/en/latest/traceback.html) plus faciles à lire et montrent plus de code que les traçages d'erreurs standard de Python. Vous pouvez définir Rich comme le gestionnaire d'erreurs par défaut afin que toutes les exceptions non capturées soient rendues par Rich.
+Rich peut rendre des [traçages d'erreurs](https://rich.readthedocs.io/en/latest/traceback.html) plus faciles à lire et qui montrent plus de code que les traçages d'erreurs standard de Python. Vous pouvez définir Rich comme le gestionnaire d'erreurs par défaut afin que toutes les exceptions/erreurs non capturées soient rendues par Rich.
 
 Voici à quoi cela ressemble sous OSX (similaire sous Linux) :
 
@@ -419,7 +419,7 @@ Tous les éléments de rendu utilisent le [Console Protocol](https://rich.readth
 
 Disponible dans le cadre de l'abonnement Tidelift.
 
-Les mainteneurs de Rich et de milliers d'autres paquets collaborent avec Tidelift pour fournir un support et une maintenance commerciale pour les paquets open source que vous utilisez pour construire vos applications. Gagnez du temps, réduisez les risques et améliorez la qualité du code, tout en payant les mainteneurs des paquets que vous utilisez. [En savoir plus](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
+Les mainteneurs de Rich et de milliers d'autres paquets collaborent avec Tidelift pour fournir un support et une maintenance commerciale pour les paquets open source que vous utilisez pour construire vos applications. Gagnez du temps, réduisez les risques et améliorez votre qualité de code, tout en payant les mainteneurs des paquets que vous utilisez. [En savoir plus](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
 
 # Projets utilisant Rich
 
