@@ -26,7 +26,7 @@
 
 Rich est une bibliothèque Python pour le _rich_ texte et la mise en forme dans le terminal.
 
-L'[API Rich](https://rich.readthedocs.io/en/latest/) permet d'ajouter facilement de la couleur et du style sur la sortie du terminal. Rich peut également rendre de jolis tableaux, des barres de progression, du markdown, du code source avec de la coloration syntaxique, des traçeurs d'erreurs et bien d'autres choses encore, et ce dès le départ.
+L'[API Rich](https://rich.readthedocs.io/en/latest/) permet d'ajouter facilement de la couleur et du style sur le texte du terminal. Rich peut également rendre de jolis tableaux, des barres de progression, du markdown, du code source avec de la coloration syntaxique, des messages d'erreurs et bien d'autres choses encore, et ce dès le départ.
 
 ![Features](https://github.com/textualize/rich/raw/master/imgs/features.png)
 
@@ -68,7 +68,7 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ## Rich REPL
 
-Rich peut être installé dans le REPL de Python, de sorte que toutes les structures de données seront joliment affichées et mises en évidence.
+Rich peut être installé dans le REPL de Python, de sorte que toutes les structures de données soient joliment affichées et mises en évidence.
 
 ```python
 >>> from rich import pretty
@@ -79,7 +79,7 @@ Rich peut être installé dans le REPL de Python, de sorte que toutes les struct
 
 ## Utilisation de Console
 
-Pour mieux contrôler le contenu rich du terminal, importez et construisez un objet [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console)
+Pour mieux contrôler le contenu rich du terminal, importez et construisez une classe [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console)
 
 ```python
 from rich.console import Console
@@ -87,7 +87,7 @@ from rich.console import Console
 console = Console()
 ```
 
-L'objet Console possède une méthode `print` dont l'interface est intentionnellement similaire à celle de la fonction `print` native. Voici un exemple d'utilisation :
+La classe Console possède une méthode `print` dont l'interface est intentionnellement similaire à celle de la fonction `print` native. Voici un exemple d'utilisation :
 
 ```python
 console.print("Hello", "World!")
@@ -95,13 +95,13 @@ console.print("Hello", "World!")
 
 Comme vous pouvez vous y attendre, cela va afficher "Hello World !" sur le terminal. Notez que, contrairement à la fonction d'affichage intégrée, Rich mettra votre texte en forme pour qu'il tienne dans la largeur du terminal.
 
-Il y a plusieurs façons d'ajouter de la couleur et du style à votre sortie. Vous pouvez définir un style pour l'ensemble de la sortie en ajoutant un argument de mot-clé style. Voici un exemple :
+Il y a plusieurs façons d'ajouter de la couleur et du style à votre sortie de texte. Vous pouvez définir un style pour l'ensemble de la sortie de texte en ajoutant un argument de mot-clé style. Voici un exemple :
 
 ```python
 console.print("Hello", "World!", style="bold red")
 ```
 
-La sortie sera quelque chose comme ce qui suit :
+La sortie de texte sera quelque chose comme ce qui suit :
 
 ![Hello World](https://github.com/textualize/rich/raw/master/imgs/hello_world.png)
 
