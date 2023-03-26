@@ -645,6 +645,38 @@ class Style:
         style._meta = self._meta
         return style
 
+    @lru_cache(maxsize=128)
+    def reset(self, link: bool = True, meta: bool = True) -> "Style":
+        """Get a copy of this style with optionally link and meta reset to default.
+
+        Args:
+            link (bool, optional): Reset links. Defaults to True.
+            meta (bool, optional): Reset meta. Defaults to True.
+
+        Returns:
+            Style: New style object.
+        """
+        if self._null:
+            return NULL_STYLE
+        style: Style = self.__new__(Style)
+        style._ansi = self._ansi
+        style._style_definition = self._style_definition
+        style._color = self._color
+        style._bgcolor = self._bgcolor
+        style._attributes = self._attributes
+        style._set_attributes = self._set_attributes
+        if link:
+            style._link = None
+            style._link_id = ""
+        else:
+            style._link = self._link
+            style._link_id = f"{randint(0, 999999)}" if self._link else ""
+        style._hash = self._hash
+        style._null = False
+
+        style._meta = None if meta else self._meta
+        return style
+
     def update_link(self, link: Optional[str] = None) -> "Style":
         """Get a copy with a different value for link.
 
