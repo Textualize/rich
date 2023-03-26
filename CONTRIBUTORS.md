@@ -44,6 +44,7 @@ The following people have contributed to the development of Rich:
 - [Olivier Philippon](https://github.com/DrBenton)
 - [Kylian Point](https://github.com/p0lux)
 - [Kyle Pollina](https://github.com/kylepollina)
+- [Razvan Popescu](https://github.com/pom11)
 - [Sebastián Ramírez](https://github.com/tiangolo)
 - [Felipe Guedes](https://github.com/guedesfelipe)
 - [Min RK](https://github.com/minrk)
