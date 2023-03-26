@@ -433,6 +433,26 @@ class Text(JupyterMixin):
         )
         copy_self._spans[:] = self._spans
         return copy_self
+        
+    def format(self, *args, **kwargs) -> "Text":
+        """Return a new Text instance with formatted specified value(s) and insert them inside the string's placeholder."""
+        formatted = ""
+        if len(args)!=0:
+            formatted = self.plain.format(*args, **kwargs)
+        elif len(kwargs)!=0:
+            formatted = self.plain.format(**kwargs)
+        if formatted != self.plain and formatted!="":
+            sanitized_text = strip_control_codes(formatted)
+            return Text(
+                sanitized_text,
+                style=self.style,
+                justify=self.justify,
+                overflow=self.overflow,
+                no_wrap=self.no_wrap,
+                end=self.end,
+                tab_size=self.tab_size
+                )
+        return self.copy()
 
     def stylize(
         self,
