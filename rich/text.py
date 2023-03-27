@@ -1,4 +1,5 @@
 import re
+from string import Formatter
 from functools import partial, reduce
 from math import gcd
 from operator import itemgetter
@@ -433,32 +434,57 @@ class Text(JupyterMixin):
         )
         copy_self._spans[:] = self._spans
         return copy_self
-        
-    def format(self, *args, **kwargs) -> "Text":
-        """Return a new Text instance with formatted specified value(s) and insert them inside the string's placeholder."""
+
+    def format(self, **kwargs) -> "Text":
+        """Return a new Text instance with formatted specified value(s) and insert them inside the string's placeholder. Supports only string placeholders like {name}"""
         formatted = ""
-        if len(args)!=0:
-            formatted = self.plain.format(*args, **kwargs)
-        elif len(kwargs)!=0:
-            formatted = self.plain.format(**kwargs)
-        if formatted != self.plain and formatted!="":
-            sanitized_text = strip_control_codes(formatted)
+        extra_len = 0
+        parsed_len = 0
+        _strings = list(self._text)
+        _spans = [[s.start, s.end, s.style] for s in self._spans]
+        if len(kwargs) != 0:
+            _field_names = [
+                "{" + x[1] + f'{":"+x[2] if x[2]!="" else ""}' + "}"
+                for x in Formatter().parse(self.plain)
+                if x[1] != None and not x[1].isdigit() and x[1] != ""
+            ]
+            for _string in _strings:
+                _new_string = _string
+                _new_string = _string.format(**kwargs)
+                if _new_string != _string:
+                    _index = self.plain.index(_string, parsed_len)
+                    _span_index = [
+                        _i
+                        for _i, _s in enumerate(_spans)
+                        if _s[0] == _index + extra_len
+                    ]
+                    if len(_span_index) == 1:
+                        _span_index = _span_index[0]
+                        _spans[_span_index][1] = (
+                            _spans[_span_index][1] + len(_new_string) - len(_string)
+                        )
+                        extra_len = len(_new_string) - len(_string)
+                        for index in range(len(_spans[_span_index + 1 :])):
+                            _spans[index + _span_index + 1][0] += extra_len
+                            _spans[index + _span_index + 1][1] += extra_len
+                parsed_len += len(_string)
+                formatted += _new_string
+        if formatted != self.plain and formatted != "":
+            _spans = [Span(start=s[0], end=s[1], style=s[2]) for s in _spans]
             return Text(
-                sanitized_text,
+                formatted,
                 style=self.style,
                 justify=self.justify,
                 overflow=self.overflow,
                 no_wrap=self.no_wrap,
                 end=self.end,
-                tab_size=self.tab_size
-                )
+                tab_size=self.tab_size,
+                spans=_spans,
+            )
         return self.copy()
 
     def stylize(
-        self,
-        style: Union[str, Style],
-        start: int = 0,
-        end: Optional[int] = None,
+        self, style: Union[str, Style], start: int = 0, end: Optional[int] = None,
     ) -> None:
         """Apply a style to the text, or a portion of the text.
 
@@ -481,10 +507,7 @@ class Text(JupyterMixin):
             self._spans.append(Span(start, min(length, end), style))
 
     def stylize_before(
-        self,
-        style: Union[str, Style],
-        start: int = 0,
-        end: Optional[int] = None,
+        self, style: Union[str, Style], start: int = 0, end: Optional[int] = None,
     ) -> None:
         """Apply a style to the text, or a portion of the text. Styles will be applied before other styles already present.
 
@@ -1092,12 +1115,7 @@ class Text(JupyterMixin):
         overflow = self.overflow
         _Text = Text
         new_lines = Lines(
-            _Text(
-                text[start:end],
-                style=style,
-                justify=justify,
-                overflow=overflow,
-            )
+            _Text(text[start:end], style=style, justify=justify, overflow=overflow,)
             for start, end in line_ranges
         )
         if not self._spans:

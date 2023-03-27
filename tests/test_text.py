@@ -123,6 +123,13 @@ def test_copy():
     assert text == test_copy
     assert text is not test_copy
 
+def test_format():
+    text = Text.from_markup("Hello, [b]{title}[/] [red]{name}[/]!")
+    text_formatted = text.format(title="Mr.",name="World")
+    assert text is not text_formatted
+    assert str(text_formatted) == "Hello, Mr. World!"
+    assert text_formatted._spans == [Span(7, 10, "bold"), Span(11, 16, "red")]
+    assert text._spans is not text_formatted._spans
 
 def test_rstrip():
     text = Text("Hello, World!    ")
