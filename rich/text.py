@@ -435,40 +435,78 @@ class Text(JupyterMixin):
         copy_self._spans[:] = self._spans
         return copy_self
 
-    def format(self, **kwargs) -> "Text":
-        """Return a new Text instance with formatted specified value(s) and insert them inside the string's placeholder. Supports only string placeholders like {name}"""
+    def format(self, *args, **kwargs) -> "Text":
+        """Return a new Text instance with formatted specified value(s) and insert them inside the string's placeholder"""
+
+        initial_parsing = [x for x in Formatter().parse(self.plain)]
+        if len(initial_parsing) == 1 and initial_parsing[0][1] == None:
+            return self.copy()
         formatted = ""
-        extra_len = 0
         parsed_len = 0
-        _strings = list(self._text)
+        _args = list(args)
+        _kwargs = kwargs
         _spans = [[s.start, s.end, s.style] for s in self._spans]
-        if len(kwargs) != 0:
-            _field_names = [
-                "{" + x[1] + f'{":"+x[2] if x[2]!="" else ""}' + "}"
-                for x in Formatter().parse(self.plain)
-                if x[1] != None and not x[1].isdigit() and x[1] != ""
+        if len(_args) != 0 or len(kwargs) != 0:
+            _field_numbers = [
+                "{"
+                + x[1]
+                + f'{":"+x[2] if x[2]!="" and x[2]!=None else ""}'
+                + f'{"!"+x[3] if x[3]!="" and x[3]!=None else ""}'
+                + "}"
+                for x in initial_parsing
+                if x[1] != None and x[1].isdigit() and x[1] != ""
             ]
-            for _string in _strings:
-                _new_string = _string
-                _new_string = _string.format(**kwargs)
-                if _new_string != _string:
-                    _index = self.plain.index(_string, parsed_len)
-                    _span_index = [
-                        _i
-                        for _i, _s in enumerate(_spans)
-                        if _s[0] == _index + extra_len
+            _field_brackets = [
+                "{"
+                + x[1]
+                + f'{":"+x[2] if x[2]!="" and x[2]!=None else ""}'
+                + f'{"!"+x[3] if x[3]!="" and x[3]!=None else ""}'
+                + "}"
+                for x in initial_parsing
+                if x[1] != None and not x[1].isdigit() and x[1] == ""
+            ]
+            if len(_field_numbers) != 0 and len(_field_brackets) != 0:
+                raise TypeError(
+                    "Cannot switch from manual field specification to automatic field numbering"
+                )
+
+            for (
+                _literal_text,
+                _field_name,
+                _format_spec,
+                _conversion,
+            ) in initial_parsing:
+                extra_len = 0
+                _formatted = _literal_text
+                if _field_name != None:
+                    format_spec = (
+                        "" if _format_spec in [None, ""] else f":{_format_spec}"
+                    )
+                    conversion = "" if _conversion in [None, ""] else f"!{_conversion}"
+                    _to_replace = "{" + _field_name + format_spec + conversion + "}"
+                    _new_string = _to_replace.format(*tuple(_args), **_kwargs)
+                    if _to_replace in _field_brackets:
+                        _args.pop(0)
+                    _str_index = (formatted + _formatted + _to_replace).index(
+                        _to_replace, parsed_len
+                    )
+                    _spans_indices = [
+                        i for i, s in enumerate(_spans) if s[0] <= _str_index <= s[1]
                     ]
-                    if len(_span_index) == 1:
-                        _span_index = _span_index[0]
-                        _spans[_span_index][1] = (
-                            _spans[_span_index][1] + len(_new_string) - len(_string)
+                    for _span_index in _spans_indices:
+                        _spans[_span_index][0] += extra_len
+                        _spans[_span_index][1] += (
+                            extra_len + len(_new_string) - len(_to_replace)
                         )
-                        extra_len = len(_new_string) - len(_string)
-                        for index in range(len(_spans[_span_index + 1 :])):
-                            _spans[index + _span_index + 1][0] += extra_len
-                            _spans[index + _span_index + 1][1] += extra_len
-                parsed_len += len(_string)
-                formatted += _new_string
+                        extra_len = len(_new_string) - len(_to_replace)
+                        for _s in range(len(_spans[_span_index + 1 :])):
+                            _spans[_span_index + _s + 1][0] += extra_len
+                            _spans[_span_index + _s + 1][1] += extra_len
+                    _formatted += _new_string
+                    parsed_len += len(_to_replace)
+                formatted += _formatted
+                parsed_len += len(_literal_text)
+
         if formatted != self.plain and formatted != "":
             _spans = [Span(start=s[0], end=s[1], style=s[2]) for s in _spans]
             return Text(
