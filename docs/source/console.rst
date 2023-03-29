@@ -321,6 +321,14 @@ There may be situations where you want to *capture* the output from a Console ra
         console.print("[bold red]Hello[/] World")
     str_output = capture.get()
 
+If you wish to capture the output *and* write it to the terminal, set `echo=True` in the call to :meth:`~rich.console.Console.capture`::
+
+    from rich.console import Console
+    console = Console()
+    with console.capture(echo=True) as capture:
+        console.print("[bold red]Hello[/] World")
+    str_output = capture.get()
+
 An alternative way of capturing output is to set the Console file to a :py:class:`io.StringIO`. This is the recommended method if you are testing console output in unit tests. Here's an example::
 
     from io import StringIO

@@ -166,6 +166,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed hash issue in Styles class https://github.com/Textualize/rich/pull/2346
 - Fixed bug in `Segment.split_and_crop_lines`
 
+### Added
+
+- Add `echo` parameter to `Console.capture` https://github.com/Textualize/rich/pull/2347
+
 ## [12.4.4] - 2022-05-24
 
 ### Changed
