@@ -124,12 +124,96 @@ def test_copy():
     assert text is not test_copy
 
 def test_format():
-    text = Text.from_markup("Hello, [b]{title}[/] [red]{name}[/]!")
-    text_formatted = text.format(title="Mr.",name="World")
+    text = Text("Hello {name}",style="red on white")
+    text_formatted = text.format(name="pom11")
     assert text is not text_formatted
-    assert str(text_formatted) == "Hello, Mr. World!"
-    assert text_formatted._spans == [Span(7, 10, "bold"), Span(11, 16, "red")]
-    assert text._spans is not text_formatted._spans
+    assert text_formatted.spans == [Span(0, 11, 'red on white'), Span(6, 11, 'red on white')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello pom11"
+    text = Text("Hello {{name}} {{test}} welcome",style="red on white")
+    text_formatted = text.format(name="pom11",test="test2")
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 7, 'red on white'), Span(7, 12, 'red on white'), Span(12, 14, 'red on white'), Span(14, 19, 'red on white'), Span(19, 27, 'red on white')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello {name} {test} welcome"
+    text = Text.from_markup("Hello [b]{name}[/]")
+    text_formatted = text.format(name=Text.from_markup("[red]pom11[/]"))
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 11, ''), Span(6, 11, ''), Span(6, 11, 'red')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello pom11"
+    text = Text.from_markup("Hello [b]{name:.8}[/] [yellow]{greeting}[/] how [blue]{verb}[/] are you?")
+    text_formatted = text.format(name="pom11"*5,greeting="welcome",verb=Text.from_markup('[black on green]busy[/]'))
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 14, ''), Span(6, 14, ''), Span(6, 14, 'bold'), Span(14, 22, ''), Span(15, 22, ''), Span(15, 22, 'yellow'), Span(22, 31, ''), Span(27, 31, ''), Span(27, 31, 'black on green'), Span(31, 40, '')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello pom11pom welcome how busy are you?"
+    text = Text.from_ansi("Hello {name} {greeting}")
+    text_formatted = text.format(name=Text.from_markup(f"[black on white]{'pom11'*2}[/][red on white]{'pom11'*3}[/]"),greeting='welcome')
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 31, ''), Span(6, 31, ''), Span(6, 16, 'black on white'), Span(16, 31, 'red on white'), Span(31, 39, ''), Span(32, 39, ''), Span(32, 39, Style(color=Color('color(0)', ColorType.STANDARD, number=0), bgcolor=Color('color(5)', ColorType.STANDARD, number=5), bold=False, dim=False))]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello pom11pom11pom11pom11pom11 welcome"
+    text = Text("Hello {name} {greeting}  ",spans=[Span(0,15,"black on yellow"),Span(6,12,"black on magenta"),Span(15,16,"black on red")])
+    text_formatted = text.format(name="pom11"*5,greeting='welcome')
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 31, ''), Span(0, 6, 'black on yellow'), Span(6, 31, ''), Span(6, 31, 'black on magenta'), Span(31, 39, ''), Span(31, 32, 'black on yellow'), Span(32, 39, ''), Span(32, 39, 'black on yellow'), Span(32, 39, 'black on red'), Span(39, 41, '')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello pom11pom11pom11pom11pom11 welcome  "
+    text = Text.from_markup("Hello [b]{}[/] [red]{}[/]")
+    text_formatted = text.format("pom11",Text.from_markup("[black on cyan]welcome[/]"))
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 11, ''), Span(6, 11, ''), Span(6, 11, 'bold'), Span(11, 19, ''), Span(12, 19, ''), Span(12, 19, 'black on cyan')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello pom11 welcome"
+    text = Text.from_markup("Hello [b]{:2}[/] [red]{:3}[/] how are you?")
+    text_formatted = text.format("pom11","welcome")
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 11, ''), Span(6, 11, ''), Span(6, 11, 'bold'), Span(11, 19, ''), Span(12, 19, ''), Span(12, 19, 'red'), Span(19, 32, '')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello pom11 welcome how are you?"
+    text = Text.from_markup("Hello [b]{0}[/] [red]{1}[/]")
+    text_formatted = text.format("pom11","welcome")
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 11, ''), Span(6, 11, ''), Span(6, 11, 'bold'), Span(11, 19, ''), Span(12, 19, ''), Span(12, 19, 'red')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello pom11 welcome"
+    text = Text.from_markup("Hello [b]{1}[/] [red]{0}[/]")
+    text_formatted = text.format("pom11",Text("welcome"))
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 13, ''), Span(6, 13, ''), Span(13, 19, ''), Span(14, 19, ''), Span(14, 19, 'red')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello welcome pom11"
+    text = Text.from_markup("Hello [b]{}[/] [red]{}[/]")
+    text_formatted = text.format("pom11","welcome")
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 11, ''), Span(6, 11, ''), Span(6, 11, 'bold'), Span(11, 19, ''), Span(12, 19, ''), Span(12, 19, 'red')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello pom11 welcome"
+    text = Text.from_markup("Hello [b]{:^10.2f}[/] [red]{}[/]")
+    text_formatted = text.format(420.420,"welcome")
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 16, ''), Span(6, 16, ''), Span(6, 16, 'bold'), Span(16, 24, ''), Span(17, 24, ''), Span(17, 24, 'red')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello   420.42   welcome"
+    text = Text.from_markup("Hello [underline black on white]{0:0.0f}[/] [red]{1}[/]")
+    text_formatted = text.format(420.420,"welcome")
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 9, ''), Span(6, 9, ''), Span(6, 9, 'underline black on white'), Span(9, 17, ''), Span(10, 17, ''), Span(10, 17, 'red')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello 420 welcome"
+    text = Text.from_markup("Hello [b]{0:.2%}[/] [red]{1:.0%}[/]")
+    text_formatted = text.format(0.5,0.5)
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 12, ''), Span(6, 12, ''), Span(6, 12, 'bold'), Span(12, 16, ''), Span(13, 16, ''), Span(13, 16, 'red')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello 50.00% 50%"
+    text = Text.from_markup("Hello [b]{0:d}[/] [b]{0:x}[/] [b]{0:o}[/] [b]{0:b}[/]")
+    text_formatted = text.format(42)
+    assert text is not text_formatted
+    assert text_formatted.spans == [Span(0, 8, ''), Span(6, 8, ''), Span(6, 8, 'bold'), Span(8, 11, ''), Span(9, 11, ''), Span(9, 11, 'bold'), Span(11, 14, ''), Span(12, 14, ''), Span(12, 14, 'bold'), Span(14, 21, ''), Span(15, 21, ''), Span(15, 21, 'bold')]
+    assert text.spans is not text_formatted.spans
+    assert str(text_formatted) == "Hello 42 2a 52 101010"
 
 def test_rstrip():
     text = Text("Hello, World!    ")
