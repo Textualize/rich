@@ -979,3 +979,15 @@ def test_force_color_jupyter():
         file=io.StringIO(), _environ={"FORCE_COLOR": "1"}, force_jupyter=True
     )
     assert not console.is_terminal
+
+
+def test_force_color():
+    console = Console(
+        file=io.StringIO(),
+        _environ={
+            "FORCE_COLOR": "1",
+            "TERM": "xterm-256color",
+            "COLORTERM": "truecolor",
+        },
+    )
+    assert console.color_system in ("truecolor", "windows")

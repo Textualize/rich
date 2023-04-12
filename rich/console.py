@@ -952,6 +952,7 @@ class Console:
         force_color = self._environ.get("FORCE_COLOR")
         if force_color is not None:
             self._force_terminal = True
+            return True
 
         isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
         try:
@@ -2000,7 +2001,6 @@ class Console:
                     self._record_buffer.extend(self._buffer[:])
 
             if self._buffer_index == 0:
-
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
 
