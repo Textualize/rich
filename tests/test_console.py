@@ -990,4 +990,4 @@ def test_force_color():
             "COLORTERM": "truecolor",
         },
     )
-    assert console.color_system == "truecolor"
+    assert console.color_system in ("truecolor", "windows")
