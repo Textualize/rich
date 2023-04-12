@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed for `is_terminal` ignoring FORCE_COLOR
+- Fixed for `is_terminal` ignoring FORCE_COLOR https://github.com/Textualize/rich/pull/2923
 
 ## [13.3.3] - 2023-02-27
 
@@ -1936,6 +1936,8 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.3.4]: https://github.com/textualize/rich/compare/v13.3.3...v13.3.4
+[13.3.3]: https://github.com/textualize/rich/compare/v13.3.2...v13.3.3
 [13.3.2]: https://github.com/textualize/rich/compare/v13.3.1...v13.3.2
 [13.3.1]: https://github.com/textualize/rich/compare/v13.3.0...v13.3.1
 [13.3.0]: https://github.com/textualize/rich/compare/v13.2.0...v13.3.0
