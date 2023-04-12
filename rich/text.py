@@ -185,12 +185,12 @@ class Text(JupyterMixin):
         if not isinstance(other, Text):
             return NotImplemented
         return self.plain > other.plain
-    
+
     def __ne__(self, other: object) -> bool:
         if not isinstance(other, Text):
             return NotImplemented
         return self.plain != other.plain
-    
+
     def __ge__(self, other: object) -> bool:
         if not isinstance(other, Text):
             return NotImplemented
@@ -1113,7 +1113,6 @@ class Text(JupyterMixin):
         _Span = Span
 
         for span_start, span_end, style in self._spans:
-
             lower_bound = 0
             upper_bound = line_count
             start_line_no = (lower_bound + upper_bound) // 2
