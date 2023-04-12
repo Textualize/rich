@@ -65,12 +65,12 @@ def test_eq():
 
 
 def test_lt():
-    assert Text("foo") < Text("bar")
+    assert Text("bar") < Text("foo")
     assert Text("foo").__lt__(1) == NotImplemented
 
 
 def test_le():
-    assert Text("foo") <= Text("bar")
+    assert Text("bar") <= Text("foo")
     assert Text("foo") <= Text("foo")
     assert Text("foo").__le__(1) == NotImplemented
 
@@ -81,12 +81,12 @@ def test_ne():
 
 
 def test_gt():
-    assert Text("bar") > Text("foo")
+    assert Text("foo") > Text("bar")
     assert Text("foo").__gt__(1) == NotImplemented
 
 
 def test_ge():
-    assert Text("bar") >= Text("foo")
+    assert Text("foo") >= Text("bar")
     assert Text("foo") >= Text("foo")
     assert Text("foo").__ge__(1) == NotImplemented
 
