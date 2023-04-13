@@ -75,11 +75,6 @@ def test_le():
     assert Text("foo").__le__(1) == NotImplemented
 
 
-def test_ne():
-    assert Text("foo") != Text("bar")
-    assert Text("foo").__ne__(1) == NotImplemented
-
-
 def test_gt():
     assert Text("foo") > Text("bar")
     assert Text("foo").__gt__(1) == NotImplemented

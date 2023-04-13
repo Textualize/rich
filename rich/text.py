@@ -186,11 +186,6 @@ class Text(JupyterMixin):
             return NotImplemented
         return self.plain > other.plain
 
-    def __ne__(self, other: object) -> bool:
-        if not isinstance(other, Text):
-            return NotImplemented
-        return self.plain != other.plain and self._spans != other._spans
-
     def __ge__(self, other: object) -> bool:
         if not isinstance(other, Text):
             return NotImplemented
