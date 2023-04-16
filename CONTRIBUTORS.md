@@ -67,5 +67,6 @@ The following people have contributed to the development of Rich:
 - [Adrian Zuber](https://github.com/xadrianzetx)
 - [Ke Sun](https://github.com/ksun212)
 - [Qiming Xu](https://github.com/xqm32)
+- [L. Yeung](https://github.com/lewis-yeung)
 - [James Addison](https://github.com/jayaddison)
 - [Pierro](https://github.com/xpierroz)
