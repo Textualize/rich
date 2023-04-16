@@ -1428,7 +1428,8 @@ class Progress(JupyterMixin):
 
             if total is not None and total != task.total:
                 task.total = total
-                task._reset()
+                task.finished_time = None
+                task.finished_speed = None
             if advance is not None:
                 task.completed += advance
             if completed is not None:

@@ -69,3 +69,4 @@ The following people have contributed to the development of Rich:
 - [Qiming Xu](https://github.com/xqm32)
 - [James Addison](https://github.com/jayaddison)
 - [Pierro](https://github.com/xpierroz)
+- [HFrost0](https://github.com/HFrost0)
