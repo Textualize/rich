@@ -1200,7 +1200,7 @@ class Text(JupyterMixin):
             width (int): Maximum characters in a line.
 
         Returns:
-            Lines: List of lines.
+            Lines: Lines container.
         """
         lines: Lines = Lines()
         append = lines.append
