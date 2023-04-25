@@ -338,6 +338,37 @@ def test_progress_track() -> None:
     assert result == expected
 
 
+def test_progress_track_with_error_in_generator() -> None:
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=60,
+        color_system="truecolor",
+        legacy_windows=False,
+        _environ={},
+    )
+    progress = Progress(console=console, get_time=MockClock(auto=True))
+    expected_error = ValueError("Some Error")
+
+    def raise_value() -> None:
+        raise expected_error
+
+    with pytest.raises(ValueError) as exc_info, progress:
+        tuple(raise_value() for _ in progress.track(range(10)))
+
+    assert exc_info.value == expected_error
+    result = console.file.getvalue()
+    print(repr(result))
+    expected = "\x1b[?25l\r\x1b[2KWorking... \x1b[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[35m  0%\x1b[0m \x1b[36m-:--:--\x1b[0m\r\x1b[2KWorking... \x1b[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[35m  0%\x1b[0m \x1b[36m-:--:--\x1b[0m\r\x1b[2KWorking... \x1b[38;5;237m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m \x1b[35m  0%\x1b[0m \x1b[36m-:--:--\x1b[0m\n\x1b[?25h"
+
+    print(expected)
+    print(repr(expected))
+    print(result)
+    print(repr(result))
+
+    assert result == expected
+
+
 def test_columns() -> None:
 
     console = Console(

@@ -27,6 +27,7 @@ from typing import (
     NewType,
     Optional,
     Sequence,
+    Set,
     TextIO,
     Tuple,
     Type,
@@ -86,6 +87,11 @@ class _TrackThread(Thread):
 
         self.progress.update(self.task_id, completed=self.completed, refresh=True)
 
+    def stop(self) -> None:
+        """Stop this progress update thread."""
+        self.done.set()
+        self.join()
+
     def __enter__(self) -> "_TrackThread":
         self.start()
         return self
@@ -96,8 +102,7 @@ class _TrackThread(Thread):
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
-        self.done.set()
-        self.join()
+        self.stop()
 
 
 def track(
@@ -1098,6 +1103,7 @@ class Progress(JupyterMixin):
         self.get_time = get_time or self.console.get_time
         self.print = self.console.print
         self.log = self.console.log
+        self._track_threads: Set[_TrackThread] = set()
 
     @classmethod
     def get_default_columns(cls) -> Tuple[ProgressColumn, ...]:
@@ -1161,6 +1167,9 @@ class Progress(JupyterMixin):
 
     def stop(self) -> None:
         """Stop the progress display."""
+        for track_thread in self._track_threads:
+            track_thread.stop()
+        self._track_threads.clear()
         self.live.stop()
         if not self.console.is_interactive:
             self.console.print()
@@ -1207,9 +1216,18 @@ class Progress(JupyterMixin):
 
         if self.live.auto_refresh:
             with _TrackThread(self, task_id, update_period) as track_thread:
-                for value in sequence:
-                    yield value
-                    track_thread.completed += 1
+                try:
+                    self._track_threads.add(track_thread)
+                    for value in sequence:
+                        yield value
+                        track_thread.completed += 1
+                finally:
+                    try:
+                        self._track_threads.remove(track_thread)
+                    except KeyError:
+                        # happens if the Progress was already stopped
+                        # for example if there was an exception in a generator
+                        pass
         else:
             advance = self.advance
             refresh = self.refresh
