@@ -590,7 +590,6 @@ class Syntax(JupyterMixin):
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "Measurement":
-
         _, right, _, left = Padding.unpack(self.padding)
         padding = left + right
         if self.code_width is not None:
@@ -688,7 +687,7 @@ class Syntax(JupyterMixin):
             lines = (
                 Text("\n")
                 .join(lines)
-                .with_indent_guides(self.tab_size, style=style)
+                .with_indent_guides(self.tab_size, style=style + Style(italic=False))
                 .split("\n", allow_blank=True)
             )
 
@@ -830,7 +829,6 @@ def _get_code_index_for_syntax_position(
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     import argparse
     import sys
 
