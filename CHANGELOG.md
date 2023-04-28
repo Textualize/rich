@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed italic indent guides in SVG ouput
+- Fixed italic indent guides in SVG output
 
 ## [13.3.4] - 2023-04-12
 
