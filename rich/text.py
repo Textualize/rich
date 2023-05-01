@@ -691,7 +691,7 @@ class Text(JupyterMixin):
             if end:
                 yield _Segment(end)
             return
-        get_style = partial(console.get_style, default=Style.null())
+        get_style = console.get_style
 
         enumerated_spans = list(enumerate(self._spans, 1))
         style_map = {index: get_style(span.style) for index, span in enumerated_spans}
