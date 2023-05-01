@@ -6,6 +6,7 @@ from rich.console import Console, Group
 from rich.measure import Measurement
 from rich.style import Style
 from rich.text import Span, Text
+from rich.errors import MissingStyle
 
 
 def test_span():
@@ -768,7 +769,8 @@ def test_wrap_invalid_style():
     # https://github.com/textualize/rich/issues/987
     console = Console(width=100, color_system="truecolor")
     a = "[#######.................] xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx [#######.................]"
-    console.print(a, justify="full")
+    with pytest.raises(MissingStyle):
+        console.print(a, justify="full")
 
 
 def test_apply_meta():
