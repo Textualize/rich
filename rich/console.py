@@ -599,6 +599,7 @@ def detect_legacy_windows() -> bool:
 
 
 
+
 class Console:
     """A high level console interface.
 
@@ -1460,10 +1461,6 @@ class Console:
             return highlight_text
 
         return rich_text
-    
-    
-
- 
 
     def _collect_renderables(
         self,
