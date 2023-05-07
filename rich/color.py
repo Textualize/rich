@@ -20,7 +20,6 @@ if TYPE_CHECKING:  # pragma: no cover
 WINDOWS = platform.system() == "Windows"
 
 
-
 class ColorSystem(IntEnum):
     """One of the 3 color system supported by terminals."""
 
@@ -452,8 +451,10 @@ class Color(NamedTuple):
 
         color_match = RE_COLOR.match(color)
         if color_match is None:
-            closest_color = find_closest_words(color,ANSI_COLOR_NAMES)[0][0]
-            raise ColorParseError(f"{original_color!r} is not a valid color, did you mean {closest_color}?")
+            closest_color = find_closest_words(color, ANSI_COLOR_NAMES)[0][0]
+            raise ColorParseError(
+                f"{original_color!r} is not a valid color, did you mean {closest_color}?"
+            )
 
         color_24, color_8, color_rgb = color_match.groups()
         if color_24:
@@ -597,7 +598,6 @@ def blend_rgb(
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     from .console import Console
     from .table import Table
     from .text import Text

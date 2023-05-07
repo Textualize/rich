@@ -74,9 +74,6 @@ from .text import Text, TextType
 from .theme import Theme, ThemeStack
 
 
-
-
-
 if TYPE_CHECKING:
     from ._windows import WindowsConsoleFeatures
     from .live import Live
@@ -596,8 +593,6 @@ def get_windows_console_features() -> "WindowsConsoleFeatures":  # pragma: no co
 def detect_legacy_windows() -> bool:
     """Detect legacy Windows."""
     return WINDOWS and not get_windows_console_features().vt
-
-
 
 
 class Console:
@@ -4086,7 +4081,7 @@ class Console:
         except errors.StyleSyntaxError as error:
             if default is not None:
                 return self.get_style(default)
-            
+
             raise errors.MissingStyle(
                 f"Failed to get style {name!r}; {error}"
             ) from None

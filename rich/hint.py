@@ -1,5 +1,5 @@
 # Uses levenshtein distance to find similarly spelt words
-# Returns string separated by 'or' if multiple matches found 
+# Returns string separated by 'or' if multiple matches found
 def levenshtein_distance(s1, s2):
     if len(s1) < len(s2):
         s1, s2 = s2, s1
@@ -26,7 +26,7 @@ def levenshtein_distance(s1, s2):
 
 
 # Uses levenshtein distance to find similarly spelt words
-# Returns string separated by 'or' if multiple matches found 
+# Returns string separated by 'or' if multiple matches found
 def find_closest_words(user_word, correct_words):
     min_distance = float("inf")
     closest_words = []

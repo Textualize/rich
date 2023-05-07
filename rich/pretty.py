@@ -708,9 +708,9 @@ def traverse(
                         last=root,
                     )
 
-                    def iter_attrs() -> Iterable[
-                        Tuple[str, Any, Optional[Callable[[Any], str]]]
-                    ]:
+                    def iter_attrs() -> (
+                        Iterable[Tuple[str, Any, Optional[Callable[[Any], str]]]]
+                    ):
                         """Iterate over attr fields and values."""
                         for attr in attr_fields:
                             if attr.repr:

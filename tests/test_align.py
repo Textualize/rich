@@ -8,7 +8,6 @@ from rich.measure import Measurement
 
 
 def test_bad_align_legal():
-
     # Legal
     Align("foo", "left")
     Align("foo", "center")
