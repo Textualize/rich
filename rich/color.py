@@ -495,7 +495,8 @@ class Color(NamedTuple):
         color_match = RE_COLOR.match(color)
         if color_match is None:
             closest_color = find_closest_words(color,ANSI_COLOR_NAMES)
-            raise ColorParseError(f"{original_color!r} is not a valid color did you mean {closest_color}?")
+            newline = '\n'
+            raise ColorParseError(f"{original_color!r} is not a valid color {newline}Did you mean {closest_color}?")
 
         color_24, color_8, color_rgb = color_match.groups()
         if color_24:
