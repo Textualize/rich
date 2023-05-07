@@ -857,12 +857,12 @@ stlye_set = {"black",
    "gray89",
    "grey93",
    "gray93"}
-def find_closest_words(user_input, correct_words):
+
+def find_closest_words(user_word, correct_words):
     min_distance = float("inf")
     closest_words = []
-
     for word in correct_words:
-        distance = levenshtein_distance(user_input, word)
+        distance = levenshtein_distance(user_word, word)
 
         # If a new minimum distance is found, clear the closest words list and update min_distance
         if distance <= min_distance:
@@ -873,6 +873,13 @@ def find_closest_words(user_input, correct_words):
             closest_words.append(word)
 
     return (closest_words, min_distance)
+
+# def find_closest_words(user_input, correct_words):
+#     res = []
+#     for word in user_input.split(' '):
+#         res.append(find_closest_word(word, correct_words))
+#     return res
+
 class Console:
     """A high level console interface.
 
@@ -1737,45 +1744,46 @@ class Console:
     
     
 
-    def get_style(
-        self, name: Union[str, Style], *, default: Optional[Union[Style, str]] = None
-    ) -> Style:
-        """Get a Style instance by its theme name or parse a definition.
+    # def get_style(
+    #     self, name: Union[str, Style], *, default: Optional[Union[Style, str]] = None
+    # ) -> Style:
+    #     """Get a Style instance by its theme name or parse a definition.
 
-        Args:
-            name (str): The name of a style or a style definition.
+    #     Args:
+    #         name (str): The name of a style or a style definition.
 
-        Returns:
-            Style: A Style object.
+    #     Returns:
+    #         Style: A Style object.
 
-        Raises:
-            MissingStyle: If no style could be parsed from name.
+    #     Raises:
+    #         MissingStyle: If no style could be parsed from name.
 
-        """
-        if isinstance(name, Style):
-            return name
+    #     """
+    #     if isinstance(name, Style):
+    #         return name
 
-        try:
-            style = self._theme_stack.get(name)
-            if style is None:
-                style = Style.parse(name)
-            return style.copy() if style.link else style
-        except errors.StyleSyntaxError as error:
-            if default is not None:
-                return self.get_style(default)
+    #     try:
+    #         style = self._theme_stack.get(name)
+    #         if style is None:
+    #             style = Style.parse(name)
+    #         return style.copy() if style.link else style
+    #     except errors.StyleSyntaxError as error:
+    #         print("in here")
+    #         if default is not None:
+    #             return self.get_style(default)
             
-            #loads up default words from dictionary
-            # spell = SpellChecker()
-            # style_set = set(map(str.strip, open('C:/Users/julia/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0/LocalCache/local-packages/Python310/site-packages/rich/stylenames.txt')))
+    #         #loads up default words from dictionary
+    #         # spell = SpellChecker()
+    #         # style_set = set(map(str.strip, open('C:/Users/julia/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0/LocalCache/local-packages/Python310/site-packages/rich/stylenames.txt')))
     
-            # Get a list of `likely` options (not necessary, just wanted to see)
-            # print(spell.candidates(name))
-            # correctStyle = spell.correction(name)
-            (correctStyle, distance) = find_closest_words(name,stlye_set)
+    #         # Get a list of `likely` options (not necessary, just wanted to see)
+    #         # print(spell.candidates(name))
+    #         # correctStyle = spell.correction(name)
+    #         (correctStyle, distance) = find_closest_words(name,stlye_set)
 
-            raise errors.MissingStyle(
-                f"Failed to get style {name!r}; {error}, did you mean '{correctStyle}', with distance '{distance}'?"
-            ) from None
+    #         raise errors.MissingStyle(
+    #             f"Unable to get style {name!r}; {error}, did you mean '{correctStyle}', with distance '{distance}'?"
+    #         ) from None
 
     def _collect_renderables(
         self,
@@ -4394,13 +4402,28 @@ class Console:
             return name
 
         try:
+            print("a")
             style = self._theme_stack.get(name)
+            print("b")
             if style is None:
+                print("c")
                 style = Style.parse(name)
+            print("d")
             return style.copy() if style.link else style
         except errors.StyleSyntaxError as error:
+            print("in here")
             if default is not None:
                 return self.get_style(default)
+            
+            #loads up default words from dictionary
+            # spell = SpellChecker()
+            # style_set = set(map(str.strip, open('C:/Users/julia/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0/LocalCache/local-packages/Python310/site-packages/rich/stylenames.txt')))
+    
+            # Get a list of `likely` options (not necessary, just wanted to see)
+            # print(spell.candidates(name))
+            # correctStyle = spell.correction(name)
+            (correctStyle, distance) = find_closest_words(name,stlye_set)
+
             raise errors.MissingStyle(
                 f"Failed to get style {name!r}; {error}"
             ) from None
