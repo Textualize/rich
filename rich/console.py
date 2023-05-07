@@ -4090,15 +4090,6 @@ class Console:
             if default is not None:
                 return self.get_style(default)
             
-            #loads up default words from dictionary
-            # spell = SpellChecker()
-            # style_set = set(map(str.strip, open('C:/Users/julia/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0/LocalCache/local-packages/Python310/site-packages/rich/stylenames.txt')))
-    
-            # Get a list of `likely` options (not necessary, just wanted to see)
-            # print(spell.candidates(name))
-            # correctStyle = spell.correction(name)
-            
-
             raise errors.MissingStyle(
                 f"Failed to get style {name!r}; {error}"
             ) from None
