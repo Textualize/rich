@@ -440,8 +440,32 @@ See also Rich's sister project, [Textual](https://github.com/Textualize/textual)
 
 # Projects using Rich
 
-For some examples of projects using Rich, see the [Rich Gallery](https://www.textualize.io/rich/gallery) on [Textualize.io](https://www.textualize.io).
-
-Would you like to add your own project to the gallery? You can! Follow [these instructions](https://www.textualize.io/gallery-instructions).
+- [BrancoLab/BrainRender](https://github.com/BrancoLab/BrainRender)
+  A Python package for visualizing three-dimensional neuroanatomical data.
+- [Ciphey/Ciphey](https://github.com/Ciphey/Ciphey)
+  An automated decryption tool.
+- [emeryberger/scalene](https://github.com/emeryberger/scalene)
+  A high-performance and high-precision CPU and memory profiler for Python.
+- [hedythedev/StarCli](https://github.com/hedythedev/starcli)
+  Allows you to browse popular GitHub projects from your command line.
+- [intel/cve-bin-tool](https://github.com/intel/cve-bin-tool)
+  Searches for several common and vulnerable components (such as openssl, libpng, libxml2, expat, and a few others) to let you know if your system has any known library vulnerabilities.
+- [nf-core/tools](https://github.com/nf-core/tools)
+  A python package with helper tools for the nf-core community.
+- [cansarigol/pdbr](https://github.com/cansarigol/pdbr)
+  A pdb + Rich library for enhanced debugging.
+- [plant99/felicette](https://github.com/plant99/felicette)
+  Provides satellite imagery for dummies.
+- [seleniumbase/SeleniumBase](https://github.com/seleniumbase/SeleniumBase)
+  Lets you automate and test 10 times faster with Selenium and pytest. Stacks included.
+- [smacke/ffsubsync](https://github.com/smacke/ffsubsync)
+  Automatically synchronizes subtitles with video.
+- [tryolabs/norfair](https://github.com/tryolabs/norfair)
+  A lightweight Python library for adding real-time 2D object tracking to any detector.
+- [ansible/ansible-lint](https://github.com/ansible/ansible-lint)
+  Checks playbooks for practices and behaviors that could be improved.
+- [ansible-community/molecule](https://github.com/ansible-community/molecule)
+  A test framework for Ansible.
+- [Many more](https://github.com/textualize/rich/network/dependents) are available!
 
 <!-- This is a test, no need to translate -->
