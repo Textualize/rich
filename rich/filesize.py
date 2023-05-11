@@ -24,12 +24,7 @@ def _to_str(
     precision: int = 1,
     separator: str = " "
 ) -> str:
-    if size == 1:
-        return "1 byte"
-    elif size < base:
-        return "{:,} bytes".format(size)
-
-    for i, suffix in enumerate(suffixes, 2):  # noqa: B007
+    for i, suffix in enumerate(suffixes, 1):  # noqa: B007
         unit = base**i
         if size < unit:
             break
@@ -76,14 +71,16 @@ def decimal(
     Example:
         >>> filesize.decimal(30000)
         '30.0 kB'
-        >>> filesize.decimal(30000, precision=2, separator="")
-        '30.00kB'
+        >>> filesize.decimal(30000, separator="")
+        '30.0kB'
+        >>> filesize.decimal(361.3816634069428, precision=1)
+        '361.3 bytes'
 
     """
     return _to_str(
         size,
-        ("kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"),
+        ("bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"),
         1000,
         precision=precision,
-        separator=separator,
+        separator=separator
     )
