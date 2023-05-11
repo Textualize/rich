@@ -9,6 +9,7 @@ The following people have contributed to the development of Rich:
 - [Artur Borecki](https://github.com/pufereq)
 - [Dennis Brakhane](https://github.com/brakhane)
 - [Darren Burns](https://github.com/darrenburns)
+- [rlaphoenix](https://github.com/rlaphoenix)
 - [Jim Crist-Harif](https://github.com/jcrist)
 - [Ed Davis](https://github.com/davised)
 - [Pete Davison](https://github.com/pd93)

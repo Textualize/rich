@@ -13,16 +13,16 @@ See Also:
 
 __all__ = ["decimal"]
 
-from typing import Iterable, List, Optional, Tuple
+from typing import Iterable, Tuple, Union
 
 
 def _to_str(
-    size: int,
+    size: Union[float, int],
     suffixes: Iterable[str],
     base: int,
     *,
-    precision: Optional[int] = 1,
-    separator: Optional[str] = " ",
+    precision: int = 1,
+    separator: str = " "
 ) -> str:
     if size == 1:
         return "1 byte"
@@ -41,7 +41,7 @@ def _to_str(
     )
 
 
-def pick_unit_and_suffix(size: int, suffixes: List[str], base: int) -> Tuple[int, str]:
+def pick_unit_and_suffix(size: int, suffixes: Iterable[str], base: int) -> Tuple[int, str]:
     """Pick a suffix and base for the given size."""
     for i, suffix in enumerate(suffixes):
         unit = base**i
@@ -51,10 +51,10 @@ def pick_unit_and_suffix(size: int, suffixes: List[str], base: int) -> Tuple[int
 
 
 def decimal(
-    size: int,
+    size: Union[float, int],
     *,
-    precision: Optional[int] = 1,
-    separator: Optional[str] = " ",
+    precision: int = 1,
+    separator: str = " "
 ) -> str:
     """Convert a filesize in to a string (powers of 1000, SI prefixes).
 
@@ -66,7 +66,7 @@ def decimal(
     or used by **Mac OS X** since v10.6 to report file sizes.
 
     Arguments:
-        int (size): A file size.
+        float/int (size): A file size.
         int (precision): The number of decimal places to include (default = 1).
         str (separator): The string to separate the value from the units (default = " ").
 
