@@ -33,6 +33,9 @@ def _to_str(
     if size == int(size):
         precision = 0
 
+    if size == 1 and suffix == "bytes":
+        suffix = "byte"
+
     return "{:,.{precision}f}{separator}{}".format(
         size,
         suffix,
