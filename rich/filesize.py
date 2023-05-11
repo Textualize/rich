@@ -28,11 +28,16 @@ def _to_str(
         unit = base**i
         if size < unit:
             break
+
+    size = base * size / unit
+    if size == int(size):
+        precision = 0
+
     return "{:,.{precision}f}{separator}{}".format(
-        (base * size / unit),
+        size,
         suffix,
         precision=precision,
-        separator=separator,
+        separator=separator
     )
 
 

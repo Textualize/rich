@@ -5,7 +5,7 @@ def test_traditional():
     assert filesize.decimal(0) == "0 bytes"
     assert filesize.decimal(1) == "1 byte"
     assert filesize.decimal(2) == "2 bytes"
-    assert filesize.decimal(1000) == "1.0 kB"
+    assert filesize.decimal(1000) == "1 kB"
     assert filesize.decimal(1.5 * 1000 * 1000) == "1.5 MB"
     assert filesize.decimal(0, precision=2) == "0 bytes"
     assert filesize.decimal(1111, precision=0) == "1 kB"
