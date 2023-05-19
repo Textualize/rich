@@ -20,6 +20,7 @@ The following people have contributed to the development of Rich:
 - [Leron Gray](https://github.com/daddycocoaman)
 - [Andre Hora](https://github.com/andrehora)
 - [Kenneth Hoste](https://github.com/boegel)
+- [Tomáš Hrnčiar](https://github.com/hrnciar)
 - [Lanqing Huang](https://github.com/lqhuang)
 - [Finn Hughes](https://github.com/finnhughes)
 - [Ionite](https://github.com/ionite34)
