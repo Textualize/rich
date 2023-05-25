@@ -163,13 +163,26 @@ def install(
     try:  # pragma: no cover
         # if within ipython, use customized traceback
         ip = get_ipython()  # type: ignore[name-defined]
+        old_hooks = [ip._showtraceback, ip.showtraceback, ip.showsyntaxerror]
         ipy_excepthook_closure(ip)
-        return sys.excepthook
+        return old_hooks
     except Exception:
         # otherwise use default system hook
         old_excepthook = sys.excepthook
         sys.excepthook = excepthook
         return old_excepthook
+
+
+def uninstall(hooks):
+    try:  # pragma: no cover
+        # if within ipython, use customized traceback
+        ip = get_ipython()  # type: ignore[name-defined]
+        ip._showtraceback = hooks[0]
+        # add wrapper to capture tb_data
+        ip.showtraceback = hooks[1]
+        ip.showsyntaxerror = hooks[2]
+    except Exception:
+        sys.excepthook = hooks
 
 
 @dataclass
@@ -652,11 +665,13 @@ class Traceback:
 
             first = frame_index == 0
             frame_filename = frame.filename
-            suppressed = any(frame_filename.startswith(path) for path in self.suppress)
+            suppressed = any(frame_filename.startswith(path)
+                             for path in self.suppress)
 
             if os.path.exists(frame.filename):
                 text = Text.assemble(
-                    path_highlighter(Text(frame.filename, style="pygments.string")),
+                    path_highlighter(
+                        Text(frame.filename, style="pygments.string")),
                     (":", "pygments.text"),
                     (str(frame.lineno), "pygments.number"),
                     " in ",
