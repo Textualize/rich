@@ -711,11 +711,6 @@ class Console:
         self._force_terminal = None
         if force_terminal is not None:
             self._force_terminal = force_terminal
-        else:
-            # If FORCE_COLOR env var has any value at all, we force terminal.
-            force_color = self._environ.get("FORCE_COLOR")
-            if force_color is not None:
-                self._force_terminal = True
 
         self._file = file
         self.quiet = quiet
@@ -949,6 +944,16 @@ class Console:
             # Return False for Idle which claims to be a tty but can't handle ansi codes
             return False
 
+        if self.is_jupyter:
+            # return False for Jupyter, which may have FORCE_COLOR set
+            return False
+
+        # If FORCE_COLOR env var has any value at all, we assume a terminal.
+        force_color = self._environ.get("FORCE_COLOR")
+        if force_color is not None:
+            self._force_terminal = True
+            return True
+
         isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
         try:
             return False if isatty is None else isatty()
@@ -1146,7 +1151,7 @@ class Console:
         status: RenderableType,
         *,
         spinner: str = "dots",
-        spinner_style: str = "status.spinner",
+        spinner_style: StyleType = "status.spinner",
         speed: float = 1.0,
         refresh_per_second: float = 12.5,
     ) -> "Status":
@@ -1996,7 +2001,6 @@ class Console:
                     self._record_buffer.extend(self._buffer[:])
 
             if self._buffer_index == 0:
-
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
 

@@ -3,6 +3,7 @@ import os
 import sys
 import tempfile
 
+import pkg_resources
 import pytest
 from pygments.lexers import PythonLexer
 
@@ -19,6 +20,9 @@ from rich.syntax import (
 )
 
 from .render import render
+
+PYGMENTS_VERSION = pkg_resources.get_distribution("pygments").version
+OLD_PYGMENTS = PYGMENTS_VERSION == "2.13.0"
 
 CODE = '''\
 def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
@@ -98,6 +102,7 @@ def test_python_render_simple_passing_lexer_instance():
     assert rendered_syntax == expected
 
 
+@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
 def test_python_render_simple_indent_guides():
     syntax = Syntax(
         CODE,
@@ -110,10 +115,11 @@ def test_python_render_simple_indent_guides():
     )
     rendered_syntax = render(syntax)
     print(repr(rendered_syntax))
-    expected = '\x1b[34mdef\x1b[0m \x1b[32mloop_first_last\x1b[0m(values: Iterable[T]) -> Iterable[Tuple[\x1b[36mb\x1b[0m\n\x1b[2m│   \x1b[0m\x1b[33m"""Iterate and generate a tuple with a flag for first an\x1b[0m\n\x1b[2m│   \x1b[0miter_values = \x1b[36miter\x1b[0m(values)\n\x1b[2m│   \x1b[0m\x1b[34mtry\x1b[0m:\n\x1b[2m│   │   \x1b[0mprevious_value = \x1b[36mnext\x1b[0m(iter_values)\n\x1b[2m│   \x1b[0m\x1b[34mexcept\x1b[0m \x1b[36mStopIteration\x1b[0m:\n\x1b[2m│   │   \x1b[0m\x1b[34mreturn\x1b[0m\n\x1b[2m│   \x1b[0mfirst = \x1b[34mTrue\x1b[0m\n\x1b[2m│   \x1b[0m\x1b[34mfor\x1b[0m value \x1b[35min\x1b[0m iter_values:\n\x1b[2m│   │   \x1b[0m\x1b[34myield\x1b[0m first, \x1b[34mFalse\x1b[0m, previous_value\n\x1b[2m│   │   \x1b[0mfirst = \x1b[34mFalse\x1b[0m\n\x1b[2m│   │   \x1b[0mprevious_value = value\n\x1b[2m│   \x1b[0m\x1b[34myield\x1b[0m first, \x1b[34mTrue\x1b[0m, previous_value\n'
+    expected = '\x1b[34mdef\x1b[0m \x1b[32mloop_first_last\x1b[0m(values: Iterable[T]) -> Iterable[Tuple[\x1b[36mb\x1b[0m\n\x1b[2;37m│   \x1b[0m\x1b[33m"""Iterate and generate a tuple with a flag for first an\x1b[0m\n\x1b[2m│   \x1b[0miter_values = \x1b[36miter\x1b[0m(values)\n\x1b[2m│   \x1b[0m\x1b[34mtry\x1b[0m:\n\x1b[2m│   │   \x1b[0mprevious_value = \x1b[36mnext\x1b[0m(iter_values)\n\x1b[2m│   \x1b[0m\x1b[34mexcept\x1b[0m \x1b[36mStopIteration\x1b[0m:\n\x1b[2m│   │   \x1b[0m\x1b[34mreturn\x1b[0m\n\x1b[2m│   \x1b[0mfirst = \x1b[34mTrue\x1b[0m\n\x1b[2m│   \x1b[0m\x1b[34mfor\x1b[0m value \x1b[35min\x1b[0m iter_values:\n\x1b[2m│   │   \x1b[0m\x1b[34myield\x1b[0m first, \x1b[34mFalse\x1b[0m, previous_value\n\x1b[2m│   │   \x1b[0mfirst = \x1b[34mFalse\x1b[0m\n\x1b[2m│   │   \x1b[0mprevious_value = value\n\x1b[2m│   \x1b[0m\x1b[34myield\x1b[0m first, \x1b[34mTrue\x1b[0m, previous_value\n'
     assert rendered_syntax == expected
 
 
+@pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
 def test_python_render_line_range_indent_guides():
     syntax = Syntax(
         CODE,
@@ -127,7 +133,7 @@ def test_python_render_line_range_indent_guides():
     )
     rendered_syntax = render(syntax)
     print(repr(rendered_syntax))
-    expected = '\x1b[2m│   \x1b[0m\x1b[33m"""Iterate and generate a tuple with a flag for first an\x1b[0m\n\x1b[2m│   \x1b[0miter_values = \x1b[36miter\x1b[0m(values)\n'
+    expected = '\x1b[2;37m│   \x1b[0m\x1b[33m"""Iterate and generate a tuple with a flag for first an\x1b[0m\n\x1b[2m│   \x1b[0miter_values = \x1b[36miter\x1b[0m(values)\n'
     assert rendered_syntax == expected
 
 

@@ -5,6 +5,70 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [13.3.5] - 2023-04-27
+
+### Fixed
+
+- Fixed italic indent guides in SVG ouput
+
+## [13.3.4] - 2023-04-12
+
+### Fixed
+
+- Fixed for `is_terminal` ignoring FORCE_COLOR https://github.com/Textualize/rich/pull/2923
+
+## [13.3.3] - 2023-02-27
+
+### Added
+
+- Added Style.clear_meta_and_links
+
+## [13.3.2] - 2023-02-04
+
+### Fixed
+
+- Reversed `pre` and `code` tags in base HTML format https://github.com/Textualize/rich/pull/2642
+- Fix syntax error when building with nuitka https://github.com/Textualize/rich/pull/2635
+- Fixed pretty printing of empty dataclass https://github.com/Textualize/rich/issues/2819
+- Use `Console(stderr=True)` in `rich.traceback.install` to support io redirection.
+- Fixes superfluous spaces in html output https://github.com/Textualize/rich/issues/2832
+- Fixed duplicate output in Jupyter https://github.com/Textualize/rich/pulls/2804
+- Filter ANSI character-encoding-change codes in `Text.from_ansi` parser
+- Fixes traceback failing when a frame filename is unreadable https://github.com/Textualize/rich/issues/2821
+- Fix for live update rendering console markup https://github.com/Textualize/rich/issues/2726
+
+### Added
+
+- Added Polish README
+
+### Changed
+
+- `rich.progress.track()` will now show the elapsed time after finishing the task https://github.com/Textualize/rich/pull/2659
+
+## [13.3.1] - 2023-01-28
+
+### Fixed
+
+- Fixed truecolor to eight bit color conversion https://github.com/Textualize/rich/pull/2785
+
+## [13.3.0] - 2023-01-27
+
+### Fixed
+
+- Fixed failing tests due to Pygments dependency https://github.com/Textualize/rich/issues/2757
+- Relaxed ipywidgets https://github.com/Textualize/rich/issues/2767
+
+### Added 
+
+- Added `encoding` parameter in `Theme.read`
+
+
+## [13.2.0] - 2023-01-19
+
+### Changed
+
+- Switch Markdown parsing from commonmark to markdown-it-py https://github.com/Textualize/rich/pull/2439
+
 ## [13.1.0] - 2023-01-14
 
 ### Fixed
@@ -34,6 +98,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed issue with `locals_max_length` parameter not being respected in Traceback https://github.com/Textualize/rich/issues/2649
 - Handling of broken `fileno` made more robust. Fixes https://github.com/Textualize/rich/issues/2645
 - Fixed missing `fileno` on FileProxy
+
+### Fixed
+
+- Fix type of `spinner_style` argument in `Console.status` https://github.com/Textualize/rich/pull/2613.
 
 ### Changed
 
@@ -1874,6 +1942,13 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.3.5]: https://github.com/textualize/rich/compare/v13.3.4...v13.3.5
+[13.3.4]: https://github.com/textualize/rich/compare/v13.3.3...v13.3.4
+[13.3.3]: https://github.com/textualize/rich/compare/v13.3.2...v13.3.3
+[13.3.2]: https://github.com/textualize/rich/compare/v13.3.1...v13.3.2
+[13.3.1]: https://github.com/textualize/rich/compare/v13.3.0...v13.3.1
+[13.3.0]: https://github.com/textualize/rich/compare/v13.2.0...v13.3.0
+[13.2.0]: https://github.com/textualize/rich/compare/v13.1.0...v13.2.0
 [13.1.0]: https://github.com/textualize/rich/compare/v13.0.1...v13.1.0
 [13.0.1]: https://github.com/textualize/rich/compare/v13.0.0...v13.0.1
 [13.0.0]: https://github.com/textualize/rich/compare/v12.6.0...v13.0.0
