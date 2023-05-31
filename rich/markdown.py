@@ -5,6 +5,8 @@ from typing import ClassVar, Dict, Iterable, List, Optional, Type, Union
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
 
+from rich.table import Table
+
 from . import box
 from ._loop import loop_first
 from ._stack import Stack
@@ -223,6 +225,89 @@ class HorizontalRule(MarkdownElement):
         yield Rule(style=style)
 
 
+class TableElement(MarkdownElement):
+    def __init__(self) -> None:
+        self.header: TableHeaderElement | None = None
+        self.body: TableBodyElement | None = None
+
+    def on_child_close(
+        self, context: "MarkdownContext", child: "MarkdownElement"
+    ) -> bool:
+        if isinstance(child, TableHeaderElement):
+            self.header = child
+        elif isinstance(child, TableBodyElement):
+            self.body = child
+        else:
+            raise RuntimeError("Couldn't process markdown table.")
+        return False
+
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
+        table = Table()
+        for column in self.header.row.cells:
+            table.add_column(column.content)
+
+        for row in self.body.rows:
+            row = [element.content for element in row.cells]
+            table.add_row(*row)
+
+        yield table
+
+
+class TableHeaderElement(MarkdownElement):
+    """MarkdownElement corresponding to `thead_open` and `thead_close`."""
+
+    def __init__(self):
+        self.row: TableRowElement | None = None
+
+    def on_child_close(
+        self, context: "MarkdownContext", child: "MarkdownElement"
+    ) -> bool:
+        assert isinstance(child, TableRowElement)
+        self.row = child
+        return False
+
+
+class TableBodyElement(MarkdownElement):
+    """MarkdownElement corresponding to `tbody_open` and `tbody_close`."""
+
+    def __init__(self):
+        self.rows: list[TableRowElement] = []
+
+    def on_child_close(
+        self, context: "MarkdownContext", child: "MarkdownElement"
+    ) -> bool:
+        assert isinstance(child, TableRowElement)
+        self.rows.append(child)
+        return False
+
+
+class TableRowElement(MarkdownElement):
+    """MarkdownElement corresponding to `tr_open` and `tr_close`."""
+
+    def __init__(self):
+        self.cells: List[TableDataElement] = []
+
+    def on_child_close(
+        self, context: "MarkdownContext", child: "MarkdownElement"
+    ) -> bool:
+        assert isinstance(child, TableDataElement)
+        self.cells.append(child)
+        return False
+
+
+class TableDataElement(MarkdownElement):
+    """MarkdownElement corresponding to `td_open` and `td_close`
+    and `th_open` and `th_close`."""
+
+    def __init__(self):
+        self.content = ""
+
+    def on_text(self, context: "MarkdownContext", text: TextType) -> None:
+        self.content = text
+
+
 class ListElement(MarkdownElement):
     """A list element."""
 
@@ -426,6 +511,12 @@ class Markdown(JupyterMixin):
         "ordered_list_open": ListElement,
         "list_item_open": ListItem,
         "image": ImageItem,
+        "table_open": TableElement,
+        "tbody_open": TableBodyElement,
+        "thead_open": TableHeaderElement,
+        "tr_open": TableRowElement,
+        "td_open": TableDataElement,
+        "th_open": TableDataElement,
     }
 
     inlines = {"em", "strong", "code", "s"}
@@ -440,7 +531,7 @@ class Markdown(JupyterMixin):
         inline_code_lexer: Optional[str] = None,
         inline_code_theme: Optional[str] = None,
     ) -> None:
-        parser = MarkdownIt().enable("strikethrough")
+        parser = MarkdownIt().enable("strikethrough").enable("table")
         self.markup = markup
         self.parsed = parser.parse(markup)
         self.code_theme = code_theme
@@ -557,6 +648,7 @@ class Markdown(JupyterMixin):
                     if should_render:
                         if new_line:
                             yield _new_line_segment
+
                         yield from console.render(element, context.options)
                 elif self_closing:  # SELF-CLOSING tags (e.g. text, code, image)
                     context.stack.pop()
@@ -652,6 +744,7 @@ if __name__ == "__main__":  # pragma: no cover
     else:
         with open(args.path, "rt", encoding="utf-8") as markdown_file:
             markdown_body = markdown_file.read()
+
     markdown = Markdown(
         markdown_body,
         justify="full" if args.justify else "left",
