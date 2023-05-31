@@ -31,7 +31,7 @@ class MarkdownElement:
     new_line: ClassVar[bool] = True
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
+    def create(cls, markdown: Markdown, token: Token) -> MarkdownElement:
         """Factory to create markdown element,
 
         Args:
@@ -43,30 +43,28 @@ class MarkdownElement:
         """
         return cls()
 
-    def on_enter(self, context: "MarkdownContext") -> None:
+    def on_enter(self, context: MarkdownContext) -> None:
         """Called when the node is entered.
 
         Args:
             context (MarkdownContext): The markdown context.
         """
 
-    def on_text(self, context: "MarkdownContext", text: TextType) -> None:
+    def on_text(self, context: MarkdownContext, text: TextType) -> None:
         """Called when text is parsed.
 
         Args:
             context (MarkdownContext): The markdown context.
         """
 
-    def on_leave(self, context: "MarkdownContext") -> None:
+    def on_leave(self, context: MarkdownContext) -> None:
         """Called when the parser leaves the element.
 
         Args:
             context (MarkdownContext): [description]
         """
 
-    def on_child_close(
-        self, context: "MarkdownContext", child: "MarkdownElement"
-    ) -> bool:
+    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
         """Called when a child element is closed.
 
         This method allows a parent element to take over rendering of its children.
@@ -81,8 +79,8 @@ class MarkdownElement:
         return True
 
     def __rich_console__(
-        self, console: "Console", options: "ConsoleOptions"
-    ) -> "RenderResult":
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
         return ()
 
 
@@ -100,14 +98,14 @@ class TextElement(MarkdownElement):
 
     style_name = "none"
 
-    def on_enter(self, context: "MarkdownContext") -> None:
+    def on_enter(self, context: MarkdownContext) -> None:
         self.style = context.enter_style(self.style_name)
         self.text = Text(justify="left")
 
-    def on_text(self, context: "MarkdownContext", text: TextType) -> None:
+    def on_text(self, context: MarkdownContext, text: TextType) -> None:
         self.text.append(text, context.current_style if isinstance(text, str) else None)
 
-    def on_leave(self, context: "MarkdownContext") -> None:
+    def on_leave(self, context: MarkdownContext) -> None:
         context.leave_style()
 
 
@@ -118,7 +116,7 @@ class Paragraph(TextElement):
     justify: JustifyMethod
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Token) -> "Paragraph":
+    def create(cls, markdown: Markdown, token: Token) -> Paragraph:
         return cls(justify=markdown.justify or "left")
 
     def __init__(self, justify: JustifyMethod) -> None:
@@ -135,10 +133,10 @@ class Heading(TextElement):
     """A heading."""
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Token) -> "Heading":
+    def create(cls, markdown: Markdown, token: Token) -> Heading:
         return cls(token.tag)
 
-    def on_enter(self, context: "MarkdownContext") -> None:
+    def on_enter(self, context: MarkdownContext) -> None:
         self.text = Text()
         context.enter_style(self.style_name)
 
@@ -172,7 +170,7 @@ class CodeBlock(TextElement):
     style_name = "markdown.code_block"
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Token) -> "CodeBlock":
+    def create(cls, markdown: Markdown, token: Token) -> CodeBlock:
         node_info = token.info or ""
         lexer_name = node_info.partition(" ")[0]
         return cls(lexer_name or "text", markdown.code_theme)
@@ -199,9 +197,7 @@ class BlockQuote(TextElement):
     def __init__(self) -> None:
         self.elements: Renderables = Renderables()
 
-    def on_child_close(
-        self, context: "MarkdownContext", child: "MarkdownElement"
-    ) -> bool:
+    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
         self.elements.append(child)
         return False
 
@@ -343,17 +339,15 @@ class ListElement(MarkdownElement):
     """A list element."""
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Token) -> "ListElement":
+    def create(cls, markdown: Markdown, token: Token) -> ListElement:
         return cls(token.type, int(token.attrs.get("start", 1)))
 
     def __init__(self, list_type: str, list_start: int | None) -> None:
-        self.items: List[ListItem] = []
+        self.items: list[ListItem] = []
         self.list_type = list_type
         self.list_start = list_start
 
-    def on_child_close(
-        self, context: "MarkdownContext", child: "MarkdownElement"
-    ) -> bool:
+    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
         assert isinstance(child, ListItem)
         self.items.append(child)
         return False
@@ -381,9 +375,7 @@ class ListItem(TextElement):
     def __init__(self) -> None:
         self.elements: Renderables = Renderables()
 
-    def on_child_close(
-        self, context: "MarkdownContext", child: "MarkdownElement"
-    ) -> bool:
+    def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
         self.elements.append(child)
         return False
 
@@ -419,7 +411,7 @@ class ListItem(TextElement):
 
 class Link(TextElement):
     @classmethod
-    def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
+    def create(cls, markdown: Markdown, token: Token) -> MarkdownElement:
         url = token.attrs.get("href", "#")
         return cls(token.content, str(url))
 
@@ -434,7 +426,7 @@ class ImageItem(TextElement):
     new_line = False
 
     @classmethod
-    def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
+    def create(cls, markdown: Markdown, token: Token) -> MarkdownElement:
         """Factory to create markdown element,
 
         Args:
@@ -449,10 +441,10 @@ class ImageItem(TextElement):
     def __init__(self, destination: str, hyperlinks: bool) -> None:
         self.destination = destination
         self.hyperlinks = hyperlinks
-        self.link: Optional[str] = None
+        self.link: str | None = None
         super().__init__()
 
-    def on_enter(self, context: "MarkdownContext") -> None:
+    def on_enter(self, context: MarkdownContext) -> None:
         self.link = context.current_style.link
         self.text = Text(justify="left")
         super().on_enter(context)
@@ -476,7 +468,7 @@ class MarkdownContext:
         console: Console,
         options: ConsoleOptions,
         style: Style,
-        inline_code_lexer: Optional[str] = None,
+        inline_code_lexer: str | None = None,
         inline_code_theme: str = "monokai",
     ) -> None:
         self.console = console
@@ -484,7 +476,7 @@ class MarkdownContext:
         self.style_stack: StyleStack = StyleStack(style)
         self.stack: Stack[MarkdownElement] = Stack()
 
-        self._syntax: Optional[Syntax] = None
+        self._syntax: Syntax | None = None
         if inline_code_lexer is not None:
             self._syntax = Syntax("", inline_code_lexer, theme=inline_code_theme)
 
@@ -504,7 +496,7 @@ class MarkdownContext:
         else:
             self.stack.top.on_text(self, text)
 
-    def enter_style(self, style_name: Union[str, Style]) -> Style:
+    def enter_style(self, style_name: str | Style) -> Style:
         """Enter a style context."""
         style = self.console.get_style(style_name, default="none")
         self.style_stack.push(style)
@@ -531,7 +523,7 @@ class Markdown(JupyterMixin):
             highlighting, or None for no highlighting. Defaults to None.
     """
 
-    elements: ClassVar[Dict[str, Type[MarkdownElement]]] = {
+    elements: ClassVar[dict[str, type[MarkdownElement]]] = {
         "paragraph_open": Paragraph,
         "heading_open": Heading,
         "fence": CodeBlock,
@@ -556,17 +548,17 @@ class Markdown(JupyterMixin):
         self,
         markup: str,
         code_theme: str = "monokai",
-        justify: Optional[JustifyMethod] = None,
-        style: Union[str, Style] = "none",
+        justify: JustifyMethod | None = None,
+        style: str | Style = "none",
         hyperlinks: bool = True,
-        inline_code_lexer: Optional[str] = None,
-        inline_code_theme: Optional[str] = None,
+        inline_code_lexer: str | None = None,
+        inline_code_theme: str | None = None,
     ) -> None:
         parser = MarkdownIt().enable("strikethrough").enable("table")
         self.markup = markup
         self.parsed = parser.parse(markup)
         self.code_theme = code_theme
-        self.justify: Optional[JustifyMethod] = justify
+        self.justify: JustifyMethod | None = justify
         self.style = style
         self.hyperlinks = hyperlinks
         self.inline_code_lexer = inline_code_lexer
