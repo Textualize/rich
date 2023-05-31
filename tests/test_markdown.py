@@ -121,7 +121,7 @@ def test_markdown_table():
         """\
 | Year |                      Title                       | Director          |  Box Office (USD) |
 |------|:------------------------------------------------:|:------------------|------------------:|
-| 1982 |            E.T. the Extra-Terrestrial            | Steven Spielberg  |    $792.9 million |
+| 1982 |            *E.T. the Extra-Terrestrial*            | Steven Spielberg  |    $792.9 million |
 | 1980 |  Star Wars: Episode V – The Empire Strikes Back  | Irvin Kershner    |    $538.4 million |
 | 1983 |    Star Wars: Episode VI – Return of the Jedi    | Richard Marquand  |    $475.1 million |
 | 1981 |             Raiders of the Lost Ark              | Steven Spielberg  |    $389.9 million |
@@ -129,7 +129,7 @@ def test_markdown_table():
 """
     )
     result = render(markdown)
-    expected = "\n┏━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓\n┃\x1b[1m \x1b[0m\x1b[1mYear\x1b[0m\x1b[1m \x1b[0m┃\x1b[1m \x1b[0m\x1b[1m                    Title                     \x1b[0m\x1b[1m \x1b[0m┃\x1b[1m \x1b[0m\x1b[1mDirector        \x1b[0m\x1b[1m \x1b[0m┃\x1b[1m \x1b[0m\x1b[1mBox Office (USD)\x1b[0m\x1b[1m \x1b[0m┃\n┡━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩\n│ 1982 │           E.T. the Extra-Terrestrial           │ Steven Spielberg │   $792.9 million │\n│ 1980 │ Star Wars: Episode V – The Empire Strikes Back │ Irvin Kershner   │   $538.4 million │\n│ 1983 │   Star Wars: Episode VI – Return of the Jedi   │ Richard Marquand │   $475.1 million │\n│ 1981 │            Raiders of the Lost Ark             │ Steven Spielberg │   $389.9 million │\n│ 1984 │      Indiana Jones and the Temple of Doom      │ Steven Spielberg │   $333.1 million │\n└──────┴────────────────────────────────────────────────┴──────────────────┴──────────────────┘\n"
+    expected = "\n                                                                                               \n \x1b[1m \x1b[0m\x1b[1mYear\x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1m                    Title                     \x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1mDirector        \x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1mBox Office (USD)\x1b[0m\x1b[1m \x1b[0m \n ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ \n  1982   \x1b[3m          E.T. the Extra-Terrestrial          \x1b[0m   Steven Spielberg     $792.9 million  \n  1980   Star Wars: Episode V – The Empire Strikes Back   Irvin Kershner       $538.4 million  \n  1983     Star Wars: Episode VI – Return of the Jedi     Richard Marquand     $475.1 million  \n  1981              Raiders of the Lost Ark               Steven Spielberg     $389.9 million  \n  1984        Indiana Jones and the Temple of Doom        Steven Spielberg     $333.1 million  \n                                                                                               \n"
     assert result == expected
 
 

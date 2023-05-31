@@ -247,7 +247,7 @@ class TableElement(MarkdownElement):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        table = Table()
+        table = Table(box=box.SIMPLE_HEAVY)
 
         assert self.header is not None
         assert self.header.row is not None
@@ -331,7 +331,10 @@ class TableDataElement(MarkdownElement):
 
     def on_text(self, context: "MarkdownContext", text: TextType) -> None:
         plain = text.plain if isinstance(text, Text) else text
-        self.content = Text(plain, justify=self.justify)
+        style = text.style if isinstance(text, Text) else ""
+        self.content = Text(
+            plain, justify=self.justify, style=context.style_stack.current
+        )
 
 
 class ListElement(MarkdownElement):
