@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added support for tables in `Markdown` https://github.com/Textualize/rich/pull/2977
 
-
-
 ## [13.3.5] - 2023-04-27
 
 ### Fixed

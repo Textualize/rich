@@ -4,6 +4,7 @@ from typing import ClassVar, Dict, Iterable, List, Optional, Type, Union
 
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
+from typing_extensions import get_args
 
 from rich.table import Table
 
@@ -226,6 +227,8 @@ class HorizontalRule(MarkdownElement):
 
 
 class TableElement(MarkdownElement):
+    """MarkdownElement corresponding to `table_open`."""
+
     def __init__(self) -> None:
         self.header: TableHeaderElement | None = None
         self.body: TableBodyElement | None = None
@@ -305,11 +308,30 @@ class TableDataElement(MarkdownElement):
     """MarkdownElement corresponding to `td_open` and `td_close`
     and `th_open` and `th_close`."""
 
-    def __init__(self) -> None:
+    @classmethod
+    def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
+        style = str(token.attrs.get("style" "")) or ""
+
+        justify: JustifyMethod
+        if "text-align:right" in style:
+            justify = "right"
+        elif "text-align:center" in style:
+            justify = "center"
+        elif "text-align:left" in style:
+            justify = "left"
+        else:
+            justify = "default"
+
+        assert justify in get_args(JustifyMethod)
+        return cls(justify=justify)
+
+    def __init__(self, justify: JustifyMethod) -> None:
         self.content: TextType = ""
+        self.justify = justify
 
     def on_text(self, context: "MarkdownContext", text: TextType) -> None:
-        self.content = text
+        plain = text.plain if isinstance(text, Text) else text
+        self.content = Text(plain, justify=self.justify)
 
 
 class ListElement(MarkdownElement):
