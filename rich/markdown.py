@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import sys
 from typing import ClassVar, Dict, Iterable, List, Optional, Type, Union
 
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
 from typing_extensions import get_args
+
+if sys.version_info >= (3, 8):
+    from typing import get_args
+else:
+    from typing_extensions import get_args  # pragma: no cover
 
 from rich.table import Table
 
@@ -701,7 +707,6 @@ class Markdown(JupyterMixin):
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     import argparse
     import sys
 
