@@ -116,6 +116,23 @@ def test_inline_code():
     assert result == expected
 
 
+def test_markdown_table():
+    markdown = Markdown(
+        """\
+    | Year |                      Title                       | Director          |  Box Office (USD) |
+    |------|:------------------------------------------------:|:------------------|------------------:|
+    | 1982 |            E.T. the Extra-Terrestrial            | Steven Spielberg  |    $792.9 million |
+    | 1980 |  Star Wars: Episode V – The Empire Strikes Back  | Irvin Kershner    |    $538.4 million |
+    | 1983 |    Star Wars: Episode VI – Return of the Jedi    | Richard Marquand  |    $475.1 million |
+    | 1981 |             Raiders of the Lost Ark              | Steven Spielberg  |    $389.9 million |
+    | 1984 |       Indiana Jones and the Temple of Doom       | Steven Spielberg  |    $333.1 million |
+    """
+    )
+    result = render(markdown)
+    expected = "\x1b[48;2;39;40;34m                                                                                                    \x1b[0m\n\x1b[48;2;39;40;34m \x1b[0m\x1b[48;2;39;40;34m| Year |                      Title                       | Director          |  Box Office (USD) \x1b[0m\x1b[48;2;39;40;34m \x1b[0m\n\x1b[48;2;39;40;34m \x1b[0m\x1b[48;2;39;40;34m|------|:------------------------------------------------:|:------------------|------------------:\x1b[0m\x1b[48;2;39;40;34m \x1b[0m\n\x1b[48;2;39;40;34m \x1b[0m\x1b[48;2;39;40;34m| 1982 |            E.T. the Extra-Terrestrial            | Steven Spielberg  |    $792.9 million \x1b[0m\x1b[48;2;39;40;34m \x1b[0m\n\x1b[48;2;39;40;34m \x1b[0m\x1b[48;2;39;40;34m| 1980 |  Star Wars: Episode V – The Empire Strikes Back  | Irvin Kershner    |    $538.4 million \x1b[0m\x1b[48;2;39;40;34m \x1b[0m\n\x1b[48;2;39;40;34m \x1b[0m\x1b[48;2;39;40;34m| 1983 |    Star Wars: Episode VI – Return of the Jedi    | Richard Marquand  |    $475.1 million \x1b[0m\x1b[48;2;39;40;34m \x1b[0m\n\x1b[48;2;39;40;34m \x1b[0m\x1b[48;2;39;40;34m| 1981 |             Raiders of the Lost Ark              | Steven Spielberg  |    $389.9 million \x1b[0m\x1b[48;2;39;40;34m \x1b[0m\n\x1b[48;2;39;40;34m \x1b[0m\x1b[48;2;39;40;34m| 1984 |       Indiana Jones and the Temple of Doom       | Steven Spielberg  |    $333.1 million \x1b[0m\x1b[48;2;39;40;34m \x1b[0m\n\x1b[48;2;39;40;34m                                                                                                    \x1b[0m\n"
+    assert result == expected
+
+
 if __name__ == "__main__":
     markdown = Markdown(MARKDOWN)
     rendered = render(markdown)
