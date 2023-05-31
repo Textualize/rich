@@ -432,10 +432,10 @@ def open(
     Args:
         path (Union[str, PathLike[str], BinaryIO]): The path to the file to read, or a file-like object in binary mode.
         mode (str): The mode to use to open the file. Only supports "r", "rb" or "rt".
-        buffering (int): The buffering strategy to use, see :func:`io.open`.
-        encoding (str, optional): The encoding to use when reading in text mode, see :func:`io.open`.
-        errors (str, optional): The error handling strategy for decoding errors, see :func:`io.open`.
-        newline (str, optional): The strategy for handling newlines in text mode, see :func:`io.open`
+        buffering (int): The buffering strategy to use, see :func:`open`.
+        encoding (str, optional): The encoding to use when reading in text mode, see :func:`open`.
+        errors (str, optional): The error handling strategy for decoding errors, see :func:`open`.
+        newline (str, optional): The strategy for handling newlines in text mode, see :func:`open`
         total: (int, optional): Total number of bytes to read. Must be provided if reading from a file handle. Default for a path is os.stat(file).st_size.
         description (str, optional): Description of task show next to progress bar. Defaults to "Reading".
         auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
@@ -1309,10 +1309,10 @@ class Progress(JupyterMixin):
         Args:
             path (Union[str, PathLike[str]]): The path to the file to read.
             mode (str): The mode to use to open the file. Only supports "r", "rb" or "rt".
-            buffering (int): The buffering strategy to use, see :func:`io.open`.
-            encoding (str, optional): The encoding to use when reading in text mode, see :func:`io.open`.
-            errors (str, optional): The error handling strategy for decoding errors, see :func:`io.open`.
-            newline (str, optional): The strategy for handling newlines in text mode, see :func:`io.open`.
+            buffering (int): The buffering strategy to use, see :func:`open`.
+            encoding (str, optional): The encoding to use when reading in text mode, see :func:`open`.
+            errors (str, optional): The error handling strategy for decoding errors, see :func:`open`.
+            newline (str, optional): The strategy for handling newlines in text mode, see :func:`open`.
             total (int, optional): Total number of bytes to read. If none given, os.stat(path).st_size is used.
             task_id (TaskID): Task to track. Default is new task.
             description (str, optional): Description of task, if new task is created.
@@ -1353,7 +1353,7 @@ class Progress(JupyterMixin):
             self.update(task_id, total=total)
 
         # open the file in binary mode,
-        handle = io.open(file, "rb", buffering=buffering)
+        handle = open(file, "rb", buffering=buffering)
         reader = _Reader(handle, self, task_id, close_handle=True)
 
         # wrap the reader in a `TextIOWrapper` if text mode
