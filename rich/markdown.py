@@ -245,12 +245,16 @@ class TableElement(MarkdownElement):
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         table = Table()
+
+        assert self.header is not None
+        assert self.header.row is not None
         for column in self.header.row.cells:
             table.add_column(column.content)
 
+        assert self.body is not None
         for row in self.body.rows:
-            row = [element.content for element in row.cells]
-            table.add_row(*row)
+            row_content = [element.content for element in row.cells]
+            table.add_row(*row_content)
 
         yield table
 
@@ -258,7 +262,7 @@ class TableElement(MarkdownElement):
 class TableHeaderElement(MarkdownElement):
     """MarkdownElement corresponding to `thead_open` and `thead_close`."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.row: TableRowElement | None = None
 
     def on_child_close(
@@ -272,7 +276,7 @@ class TableHeaderElement(MarkdownElement):
 class TableBodyElement(MarkdownElement):
     """MarkdownElement corresponding to `tbody_open` and `tbody_close`."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.rows: list[TableRowElement] = []
 
     def on_child_close(
@@ -286,7 +290,7 @@ class TableBodyElement(MarkdownElement):
 class TableRowElement(MarkdownElement):
     """MarkdownElement corresponding to `tr_open` and `tr_close`."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.cells: List[TableDataElement] = []
 
     def on_child_close(
@@ -301,8 +305,8 @@ class TableDataElement(MarkdownElement):
     """MarkdownElement corresponding to `td_open` and `td_close`
     and `th_open` and `th_close`."""
 
-    def __init__(self):
-        self.content = ""
+    def __init__(self) -> None:
+        self.content: TextType = ""
 
     def on_text(self, context: "MarkdownContext", text: TextType) -> None:
         self.content = text
