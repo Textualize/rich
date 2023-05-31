@@ -5,7 +5,6 @@ from typing import ClassVar, Dict, Iterable, List, Optional, Type, Union
 
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
-from typing_extensions import get_args
 
 if sys.version_info >= (3, 8):
     from typing import get_args
