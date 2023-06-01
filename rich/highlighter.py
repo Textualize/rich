@@ -236,7 +236,7 @@ class CustomHighlighter(Highlighter):
     """Easily highlight words by passing a tuple of tuples as an argument
 
     Args:
-        highlights: a tuple of tuples in the form ((word1, color1), (word2, color2), ...)
+        highlights: a tuple of tuples in the form ((word1, color1), (word2, color2), ...) or a single tuple in the form (word, color)
     
     """
 
@@ -244,5 +244,10 @@ class CustomHighlighter(Highlighter):
         self.highlights = highlights
         
     def highlight(self, text):
-        for x, y in self.highlights:
-            text.highlight_regex(x, y)    
+        try:
+            for x, y in self.highlights:
+                text.highlight_regex(x, y)
+        
+        except ValueError:
+            x, y = self.highlights
+            text.highlight_regex(x, y)
