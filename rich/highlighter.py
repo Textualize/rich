@@ -230,3 +230,19 @@ if __name__ == "__main__":  # pragma: no cover
     import json
 
     console.print_json(json.dumps(obj={"name": "apple", "count": 1}), indent=None)
+
+    
+class CustomHighlighter(Highlighter):
+    """Easily highlight words by passing a tuple of tuples as an argument
+
+    Args:
+        highlights: a tuple of tuples in the form ((word1, color1), (word2, color2), ...)
+    
+    """
+
+    def __init__(self, highlights):
+        self.highlights = highlights
+        
+    def highlight(self, text):
+        for x, y in self.highlights:
+            text.highlight_regex(x, y)    
