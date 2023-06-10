@@ -31,6 +31,7 @@ The following people have contributed to the development of Rich:
 - [Hedy Li](https://github.com/hedythedev)
 - [Luka Mamukashvili](https://github.com/UltraStudioLTD)
 - [Alexander Mancevice](https://github.com/amancevice)
+- [Takashi Mangoe](https://github.com/t-mangoe)
 - [Will McGugan](https://github.com/willmcgugan)
 - [Paul McGuire](https://github.com/ptmcg)
 - [Antony Milne](https://github.com/AntonyMilneQB)

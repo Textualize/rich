@@ -308,6 +308,16 @@ def test_suppress():
         assert "foo" in traceback.suppress[1]
 
 
+def test_print_exception_no_border():
+    console = Console(width=100, file=io.StringIO())
+    try:
+        1 / 0
+    except Exception:
+        console.print_exception(no_border=True)
+    exception_text = console.file.getvalue()
+    assert "ZeroDivisionError" in exception_text
+
+
 @pytest.mark.parametrize(
     "rich_traceback_omit_for_level2,expected_frames_length,expected_frame_names",
     (
