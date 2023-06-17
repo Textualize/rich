@@ -11,13 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added `no_border` option to `console.print_exception`
 
-## [13.4.1] - 2023-06-31
+## [13.4.2] - 2023-06-12
+
+### Changed
+
+- Relaxed markdown-it-py dependency
+
+## [13.4.1] - 2023-05-31
 
 ### Fixed
 
 - Fixed typing extensions import in markdown https://github.com/Textualize/rich/issues/2979
 
-## [13.4.0] - 2023-06-31
+## [13.4.0] - 2023-05-31
 
 ### Added
 
@@ -76,7 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed failing tests due to Pygments dependency https://github.com/Textualize/rich/issues/2757
 - Relaxed ipywidgets https://github.com/Textualize/rich/issues/2767
 
-### Added 
+### Added
 
 - Added `encoding` parameter in `Theme.read`
 
@@ -1960,8 +1966,9 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[13.4.1]: https://github.com/textualize/rich/compare/v13.4.0...v13.4.1  
-[13.4.0]: https://github.com/textualize/rich/compare/v13.3.5...v13.4.0  
+[13.4.2]: https://github.com/textualize/rich/compare/v13.4.1...v13.4.2
+[13.4.1]: https://github.com/textualize/rich/compare/v13.4.0...v13.4.1
+[13.4.0]: https://github.com/textualize/rich/compare/v13.3.5...v13.4.0
 [13.3.5]: https://github.com/textualize/rich/compare/v13.3.4...v13.3.5
 [13.3.4]: https://github.com/textualize/rich/compare/v13.3.3...v13.3.4
 [13.3.3]: https://github.com/textualize/rich/compare/v13.3.2...v13.3.3
