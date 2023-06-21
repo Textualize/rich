@@ -38,7 +38,7 @@ jupyter = ["ipywidgets"]
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.0"
 black = "^22.6"
-mypy = "^0.971"
+mypy = "^1.4"
 pytest-cov = "^3.0.0"
 attrs = "^21.4.0"
 pre-commit = "^2.17.0"
