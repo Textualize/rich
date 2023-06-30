@@ -18,6 +18,13 @@ If you supply a list of choices, the prompt will loop until the user enters one 
     >>> from rich.prompt import Prompt
     >>> name = Prompt.ask("Enter your name", choices=["Paul", "Jessica", "Duncan"], default="Paul")
 
+By default this is case sensitive, but you can set `case_insensitive=True` to make it case sensitive::
+
+    >>> from rich.prompt import Prompt
+    >>> name = Prompt.ask("Enter your name", choices=["Paul", "Jessica", "Duncan"], default="Paul", case_insensitive=True)
+
+Now, it would accept "paul" or "Paul" as valid responses.
+
 In addition to :class:`~rich.prompt.Prompt` which returns strings, you can also use :class:`~rich.prompt.IntPrompt` which asks the user for an integer, and :class:`~rich.prompt.FloatPrompt` for floats.
 
 The :class:`~rich.prompt.Confirm` class is a specialized prompt which may be used to ask the user a simple yes / no question. Here's an example::
