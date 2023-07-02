@@ -178,6 +178,13 @@ class Text(JupyterMixin):
             return self.plain < other.plain
         return False
 
+    def __gt__(self, other: object) -> bool:
+        if isinstance(other, str):
+            return self.plain > other
+        elif isinstance(other, Text):
+            return self.plain > other.plain
+        return False
+
     def __contains__(self, other: object) -> bool:
         if isinstance(other, str):
             return other in self.plain
