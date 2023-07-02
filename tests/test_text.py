@@ -314,6 +314,19 @@ def test_append_text():
     assert text._spans == [Span(3, 6, "bold")]
 
 
+def test_append_tokens():
+    text = Text().append_tokens(
+        [("long text that will be wrapped with a control code \r\n.", "bold")]
+    )
+    assert str(text) == "long text that will be wrapped with a control code \n."
+    assert text._spans == [Span(0, 53, "bold")]
+
+    # Make sure it does not crash (Issue #3014)
+    console = Console(width=40, file=StringIO())
+    console.print(text)
+    assert console.file.getvalue() == "long text that will be wrapped with a \ncontrol code \n.\n"
+
+
 def test_end():
     console = Console(width=20, file=StringIO())
     text = Group(Text.from_markup("foo", end=" "), Text.from_markup("bar"))

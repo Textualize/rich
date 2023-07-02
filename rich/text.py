@@ -989,10 +989,11 @@ class Text(JupyterMixin):
         _Span = Span
         offset = len(self)
         for content, style in tokens:
-            append_text(content)
+            sanitized_content = strip_control_codes(content)
+            append_text(sanitized_content)
             if style is not None:
-                append_span(_Span(offset, offset + len(content), style))
-            offset += len(content)
+                append_span(_Span(offset, offset + len(sanitized_content), style))
+            offset += len(sanitized_content)
         self._length = offset
         return self
 
