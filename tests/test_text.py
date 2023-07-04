@@ -806,3 +806,25 @@ def test_markup_property():
         == "[bold]foo [italic]bar[/bold] baz[/italic]"
     )
     assert Text("[bold]foo").markup == "\\[bold]foo"
+
+
+def test_lt():
+    text = Text("foobar")
+    assert not (text < "foo")
+    assert not (text < "foo ")
+    assert text < "foobar!"
+    assert Text("bar") < text
+    assert not (text < None)
+    assert "foo" < text
+    assert not ("foobar" < text)
+
+
+def test_gt():
+    text = Text("foobar")
+    assert text > "foo"
+    assert text > "foo "
+    assert not (text > "foobar!")
+    assert not (Text("bar") > text)
+    assert not (None > text)
+    assert "foobar!" > text
+    assert not ("foobar" > text)
