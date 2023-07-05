@@ -23,6 +23,7 @@ The following people have contributed to the development of Rich:
 - [Lanqing Huang](https://github.com/lqhuang)
 - [Finn Hughes](https://github.com/finnhughes)
 - [Ionite](https://github.com/ionite34)
+- [Micael Jarniac](https://github.com/MicaelJarniac)
 - [Josh Karpel](https://github.com/JoshKarpel)
 - [Jan Katins](https://github.com/jankatins)
 - [Hugo van Kemenade](https://github.com/hugovk)
