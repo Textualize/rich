@@ -119,7 +119,7 @@ You may also add columns by specifying them in the positional arguments of the :
 
 This allows you to specify the text of the column only. If you want to set other attributes, such as width and style, you can add a :class:`~rich.table.Column` class. Here's an example::
 
-    from rich.table import Column
+    from rich.table import Column, Table
     table = Table(
         "Released",
         "Title",
