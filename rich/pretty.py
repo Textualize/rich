@@ -211,7 +211,7 @@ def install(
             )
             builtins._ = value  # type: ignore[attr-defined]
 
-    if "get_ipython" in globals():
+    if hasattr(builtins, "get_ipython"):
         ip = get_ipython()  # type: ignore[name-defined]
         from IPython.core.formatters import BaseFormatter
 
