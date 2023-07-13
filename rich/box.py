@@ -464,7 +464,6 @@ PLAIN_HEADED_SUBSTITUTIONS = {
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     from rich.columns import Columns
     from rich.panel import Panel
 
