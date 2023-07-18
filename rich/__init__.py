@@ -1,11 +1,15 @@
 """Rich text and beautiful formatting in the terminal."""
 
 import os
+import platform
 from typing import IO, TYPE_CHECKING, Any, Callable, Optional, Union
 
 from ._extension import load_ipython_extension  # noqa: F401
 
 __all__ = ["get_console", "reconfigure", "print", "inspect", "print_json"]
+
+if platform.system() == "Windows":
+	os.system("")
 
 if TYPE_CHECKING:
     from .console import Console
