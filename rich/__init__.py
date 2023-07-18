@@ -9,7 +9,7 @@ from ._extension import load_ipython_extension  # noqa: F401
 __all__ = ["get_console", "reconfigure", "print", "inspect", "print_json"]
 
 if platform.system() == "Windows":
-	os.system("")
+    os.system("")
 
 if TYPE_CHECKING:
     from .console import Console
