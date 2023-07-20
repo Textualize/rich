@@ -3604,7 +3604,7 @@ EMOJI = {
     "toothbrush": "🪥",
     "headstone": "🪦",
     "placard": "🪧",
-    "transgender_symbol": "⚧️"
+    "transgender_symbol": "⚧️",
     "transgender_flag": "🏳️‍⚧️",
     "calling": "📲",
     "money__mouth_face": "🤑",
