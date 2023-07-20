@@ -2046,7 +2046,7 @@ EMOJI = {
     "pinching_hand_medium-dark_skin_tone": "🤏🏾",
     "pinching_hand_medium_skin_tone": "🤏🏽",
     "pinching_hand_medium-light_skin_tone": "🤏🏼",
-    "pinching_hand_light_skin_tone": "🤏🏻"
+    "pinching_hand_light_skin_tone": "🤏🏻",
     "pinched_fingers": "🤌",
     "pinched_fingers_dark_skin_tone": "🤌🏿",
     "pinched_fingers_medium-dark_skin_tone": "🤌🏾",
