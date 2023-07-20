@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Relaxed markdown-it-py dependency
 
+### Added
+- Added emojis from Emoji Versions [13.0](https://emojipedia.org/emoji-13.0/), [13.1](https://emojipedia.org/emoji-13.1/), [14.0](https://emojipedia.org/emoji-14.0/) and [15.0](https://emojipedia.org/emoji-15.0/)
+
 ## [13.4.1] - 2023-05-31
 
 ### Fixed
