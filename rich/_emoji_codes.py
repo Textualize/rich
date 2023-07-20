@@ -813,7 +813,7 @@ EMOJI = {
     "elf_medium-dark_skin_tone": "🧝🏾",
     "elf_medium-light_skin_tone": "🧝🏼",
     "elf_medium_skin_tone": "🧝🏽",
-    "empty_nest": "🪹":,
+    "empty_nest": "🪹",
     "nest_with_eggs": "🪺",
     "envelope": "✉",
     "envelope_with_arrow": "📩",
