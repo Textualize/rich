@@ -1114,6 +1114,7 @@ EMOJI = {
     "input_symbols": "🔣",
     "jack-o-lantern": "🎃",
     "jeans": "👖",
+    "jellyfish": "🪼",
     "jigsaw": "🧩",
     "joker": "🃏",
     "joystick": "🕹",
