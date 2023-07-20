@@ -37,7 +37,7 @@ EMOJI = {
     "bermuda": "🇧🇲",
     "bhutan": "🇧🇹",
     "biting_lip": "🫦",
-    "black_bird": "🐦‍⬛"
+    "black_bird": "🐦‍⬛",
     "bolivia": "🇧🇴",
     "bosnia_&_herzegovina": "🇧🇦",
     "botswana": "🇧🇼",
