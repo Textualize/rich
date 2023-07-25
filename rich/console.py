@@ -327,9 +327,10 @@ class Capture:
         console (Console): A console instance to capture output.
     """
 
-    def __init__(self, console: "Console") -> None:
+    def __init__(self, console: "Console", echo: bool = True) -> None:
         self._console = console
         self._result: Optional[str] = None
+        self.echo = echo
 
     def __enter__(self) -> "Capture":
         self._console.begin_capture()
@@ -342,6 +343,9 @@ class Capture:
         exc_tb: Optional[TracebackType],
     ) -> None:
         self._result = self._console.end_capture()
+        if self.echo:
+            # print to the original console
+            self._console.print(self._result, end="")
 
     def get(self) -> str:
         """Get the result of the capture."""
@@ -1085,9 +1089,12 @@ class Console:
         """Play a 'bell' sound (if supported by the terminal)."""
         self.control(Control.bell())
 
-    def capture(self) -> Capture:
+    def capture(self, echo: bool = True) -> Capture:
         """A context manager to *capture* the result of print() or log() in a string,
-        rather than writing it to the console.
+        rather than writing it to the console depending on the echo argument.
+
+         Args:
+            echo (bool, optional): Echos captured string to terminal. Defaults to True.
 
         Example:
             >>> from rich.console import Console
@@ -1097,9 +1104,10 @@ class Console:
             >>> print(capture.get())
 
         Returns:
-            Capture: Context manager with disables writing to the terminal.
+            Capture: Context manager depending on echo argument disables writing to the terminal.
         """
-        capture = Capture(self)
+
+        capture = Capture(self, echo=echo)
         return capture
 
     def pager(
