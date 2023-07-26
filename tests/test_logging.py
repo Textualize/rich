@@ -122,7 +122,7 @@ def test_stderr_and_stdout_are_none(monkeypatch):
     assert "message" in actual_record.msg
 
 
-def test_markup_and_highlight():
+def test_markup_highlight_style():
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
@@ -160,6 +160,23 @@ def test_markup_and_highlight():
     render_plain = handler.console.file.getvalue()
     assert "FORMATTER" in render_plain
     assert log_message in render_plain
+
+    handler.console.file = io.StringIO()
+    log.error(log_message, extra={"style": "bold"})
+    render_fancy_bold = handler.console.file.getvalue()
+    assert "FORMATTER" in render_fancy_bold
+    assert log_message not in render_fancy_bold
+    assert "\x1b[1m" in render_fancy_bold
+
+    handler.console.file = io.StringIO()
+    log.error(log_message, extra={"style": "bold", "highlighter": None})
+    render_simple_bold = handler.console.file.getvalue()
+    assert "FORMATTER" in render_simple_bold
+    assert log_message in render_simple_bold 
+    assert "\x1b[1m" in render_simple_bold
+    
+    assert render_fancy_bold not in render_simple_bold
+    assert render_simple_bold not in render_fancy_bold
 
 
 if __name__ == "__main__":
