@@ -183,7 +183,11 @@ class RichHandler(Handler):
         """
         use_markup = getattr(record, "markup", self.markup)
         style = getattr(record, "style", "")
-        message_text = Text.from_markup(message,style=style) if use_markup else Text(message,style=style)
+        message_text = (
+            Text.from_markup(message, style=style)
+            if use_markup
+            else Text(message, style=style)
+        )
 
         highlighter = getattr(record, "highlighter", self.highlighter)
         if highlighter:
