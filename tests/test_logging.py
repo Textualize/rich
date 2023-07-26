@@ -155,26 +155,29 @@ def test_markup_highlight_style():
     assert log_message not in render_markup
     assert "red" not in render_markup
 
+    bold_ansi = "\x1b[1m"
+
     handler.console.file = io.StringIO()
     log.error(log_message, extra={"highlighter": None})
     render_plain = handler.console.file.getvalue()
     assert "FORMATTER" in render_plain
     assert log_message in render_plain
+    assert bold_ansi not in render_plain
 
     handler.console.file = io.StringIO()
     log.error(log_message, extra={"style": "bold"})
     render_fancy_bold = handler.console.file.getvalue()
     assert "FORMATTER" in render_fancy_bold
     assert log_message not in render_fancy_bold
-    assert "\x1b[1m" in render_fancy_bold
+    assert bold_ansi in render_fancy_bold
 
     handler.console.file = io.StringIO()
     log.error(log_message, extra={"style": "bold", "highlighter": None})
     render_simple_bold = handler.console.file.getvalue()
     assert "FORMATTER" in render_simple_bold
-    assert log_message in render_simple_bold 
-    assert "\x1b[1m" in render_simple_bold
-    
+    assert log_message in render_simple_bold
+    assert bold_ansi in render_simple_bold
+
     assert render_fancy_bold not in render_simple_bold
     assert render_simple_bold not in render_fancy_bold
 
