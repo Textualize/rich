@@ -97,6 +97,21 @@ class Span(NamedTuple):
             return self
         return Span(start, min(offset, end), style)
 
+    def add_padding(self, padding: int) -> "Span":
+        """Add spaces the the end of a span.
+
+        Args:
+            padding (int): Number of additional spaces.
+
+        Returns:
+            Span: A span.
+        """
+        if padding:
+            start, end, style = self
+            return Span(start, end + padding, style)
+        else:
+            return self
+
 
 class Text(JupyterMixin):
     """Text with color / style.
@@ -549,6 +564,27 @@ class Text(JupyterMixin):
                 style += get_style(span_style, default="")
         return style
 
+    def extend_style(self, spaces: int) -> None:
+        """Extend the Text and styles by a given number of spaces.
+
+        Args:
+            spaces (int): Number of spaces to add to the Text.
+        """
+        if not spaces:
+            return
+        spans = self.spans
+        new_spaces = " " * spaces
+        if spans:
+            end_offset = len(self)
+            self._spans = [
+                span.add_padding(spaces) if span.end >= end_offset else span
+                for span in spans
+            ]
+            self._text.append(new_spaces)
+            self._length += spaces
+        else:
+            self += new_spaces
+
     def highlight_regex(
         self,
         re_highlight: str,
@@ -793,15 +829,14 @@ class Text(JupyterMixin):
             parts = line.split("\t", include_separator=True)
             for part in parts:
                 if part.plain.endswith("\t"):
-                    part._text = [part.plain[:-1] + " "]
-                    append(part)
+                    part.right_crop(1)
                     pos += len(part)
-                    spaces = tab_size - ((pos - 1) % tab_size) - 1
+                    spaces = tab_size - ((pos - 1) % tab_size)
                     if spaces:
-                        append(" " * spaces, _style)
+                        part.extend_style(spaces)
                         pos += spaces
-                else:
-                    append(part)
+                append(part)
+
         self._text = [result.plain]
         self._length = len(self.plain)
         self._spans[:] = result._spans
@@ -1088,7 +1123,6 @@ class Text(JupyterMixin):
         _Span = Span
 
         for span_start, span_end, style in self._spans:
-
             lower_bound = 0
             upper_bound = line_count
             start_line_no = (lower_bound + upper_bound) // 2
