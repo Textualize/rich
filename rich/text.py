@@ -822,7 +822,7 @@ class Text(JupyterMixin):
         assert tab_size is not None
         result = self.blank_copy()
 
-        new_text: list[Text] = []
+        new_text: List[Text] = []
         append = new_text.append
 
         for line in self.split("\n", include_separator=True):
