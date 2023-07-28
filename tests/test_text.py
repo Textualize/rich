@@ -600,6 +600,11 @@ def test_tabs_to_spaces():
     text.expand_tabs()
     assert text.plain == "No Tabs"
 
+    text = Text("No Tabs", style="bold")
+    text.expand_tabs()
+    assert text.plain == "No Tabs"
+    assert text.style == "bold"
+
 
 @pytest.mark.parametrize(
     "markup,tab_size,expected_text,expected_spans",
@@ -649,12 +654,30 @@ def test_tabs_to_spaces():
             ],
         ),
         (
+            "[bold]X\tY",
+            8,
+            "X       Y",
+            [
+                Span(0, 8, "bold"),
+                Span(8, 9, "bold"),
+            ],
+        ),
+        (
             "[bold]💩\t💩",
             8,
             "💩      💩",
             [
                 Span(0, 7, "bold"),
                 Span(7, 8, "bold"),
+            ],
+        ),
+        (
+            "[bold]💩💩💩💩\t💩",
+            8,
+            "💩💩💩💩        💩",
+            [
+                Span(0, 12, "bold"),
+                Span(12, 13, "bold"),
             ],
         ),
     ],

@@ -821,28 +821,30 @@ class Text(JupyterMixin):
             tab_size = self.tab_size
         assert tab_size is not None
         result = self.blank_copy()
-        append = result.append
+
+        new_text: list[Text] = []
+        append = new_text.append
 
         for line in self.split("\n", include_separator=True):
-            cell_position = 0
             if "\t" not in line.plain:
                 append(line)
             else:
+                cell_position = 0
                 parts = line.split("\t", include_separator=True)
-                tab_parts: list[Text] = []
                 for part in parts:
                     if part.plain.endswith("\t"):
                         part._text[-1] = part._text[-1][:-1] + " "
                         cell_position += part.cell_len
                         tab_remainder = cell_position % tab_size
                         if tab_remainder:
-                            spaces = tab_size - (cell_position % tab_size)
+                            spaces = tab_size - tab_remainder
                             part.extend_style(spaces)
                             cell_position += spaces
                     else:
                         cell_position += part.cell_len
-                    tab_parts.append(part)
-                append(Text("").join(tab_parts))
+                    append(part)
+
+        result = Text("").join(new_text)
 
         self._text = [result.plain]
         self._length = len(self.plain)
