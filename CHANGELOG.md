@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Text.extend_style method.
 - Added Span.extend method.
 
+### Changed
+
+- Text.tab_size now defaults to `None` to indicate that Console.tab_size should be used.
+
 ## [13.4.2] - 2023-06-12
 
 ### Changed
