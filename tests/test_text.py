@@ -898,3 +898,19 @@ def test_markup_property():
         == "[bold]foo [italic]bar[/bold] baz[/italic]"
     )
     assert Text("[bold]foo").markup == "\\[bold]foo"
+
+
+def test_extend_style():
+    text = Text.from_markup("[red]foo[/red] [bold]bar")
+    text.extend_style(0)
+
+    assert text.plain == "foo bar"
+    assert text.spans == [Span(0, 3, "red"), Span(4, 7, "bold")]
+
+    text.extend_style(-1)
+    assert text.plain == "foo bar"
+    assert text.spans == [Span(0, 3, "red"), Span(4, 7, "bold")]
+
+    text.extend_style(2)
+    assert text.plain == "foo bar  "
+    assert text.spans == [Span(0, 3, "red"), Span(4, 9, "bold")]

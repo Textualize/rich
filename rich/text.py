@@ -565,12 +565,12 @@ class Text(JupyterMixin):
         return style
 
     def extend_style(self, spaces: int) -> None:
-        """Extend the Text and styles by a given number of spaces.
+        """Extend the Text given number of spaces where the spaces have the same style as the last character.
 
         Args:
             spaces (int): Number of spaces to add to the Text.
         """
-        if not spaces:
+        if spaces <= 0:
             return
         spans = self.spans
         new_spaces = " " * spaces
