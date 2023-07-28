@@ -97,18 +97,18 @@ class Span(NamedTuple):
             return self
         return Span(start, min(offset, end), style)
 
-    def add_padding(self, padding: int) -> "Span":
-        """Add spaces the the end of a span.
+    def extend(self, cells: int) -> "Span":
+        """Extend the span by the given number of cells.
 
         Args:
-            padding (int): Number of additional spaces.
+            cells (int): Additional space to add to end of span.
 
         Returns:
             Span: A span.
         """
-        if padding:
+        if cells:
             start, end, style = self
-            return Span(start, end + padding, style)
+            return Span(start, end + cells, style)
         else:
             return self
 
@@ -577,7 +577,7 @@ class Text(JupyterMixin):
         if spans:
             end_offset = len(self)
             self._spans[:] = [
-                span.add_padding(spaces) if span.end >= end_offset else span
+                span.extend(spaces) if span.end >= end_offset else span
                 for span in spans
             ]
             self._text.append(new_spaces)
