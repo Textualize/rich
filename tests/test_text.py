@@ -608,6 +608,7 @@ def test_tabs_to_spaces():
         ("\t", 4, "    ", []),
         ("\tbar", 4, "    bar", []),
         ("foo\tbar", 4, "foo bar", []),
+        ("foo\nbar\nbaz", 4, "foo\nbar\nbaz", []),
         (
             "[bold]foo\tbar",
             4,
@@ -617,13 +618,43 @@ def test_tabs_to_spaces():
                 Span(4, 7, "bold"),
             ],
         ),
-        ("[bold]\tbar", 4, "    bar", [Span(0, 4, "bold"), Span(4, 7, "bold")]),
+        (
+            "[bold]\tbar",
+            4,
+            "    bar",
+            [
+                Span(0, 4, "bold"),
+                Span(4, 7, "bold"),
+            ],
+        ),
         (
             "\t[bold]bar",
             4,
             "    bar",
             [
                 Span(4, 7, "bold"),
+            ],
+        ),
+        (
+            "[red]foo\tbar\n[green]egg\tbaz",
+            8,
+            "foo     bar\negg     baz",
+            [
+                Span(0, 8, "red"),
+                Span(8, 12, "red"),
+                Span(12, 20, "red"),
+                Span(12, 20, "green"),
+                Span(20, 23, "red"),
+                Span(20, 23, "green"),
+            ],
+        ),
+        (
+            "[bold]💩\t💩",
+            8,
+            "💩      💩",
+            [
+                Span(0, 7, "bold"),
+                Span(7, 8, "bold"),
             ],
         ),
     ],
@@ -634,7 +665,7 @@ def test_tabs_to_spaces_spans(
     """Test spans are correct after expand_tabs"""
     text = Text.from_markup(markup)
     text.expand_tabs(tab_size)
-    print(expected_spans)
+    print(text._spans)
     assert text.plain == expected_text
     assert text._spans == expected_spans
 

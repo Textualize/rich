@@ -817,7 +817,6 @@ class Text(JupyterMixin):
         """
         if "\t" not in self.plain:
             return
-        pos = 0
         if tab_size is None:
             tab_size = self.tab_size
         assert tab_size is not None
@@ -825,21 +824,25 @@ class Text(JupyterMixin):
         append = result.append
 
         for line in self.split("\n", include_separator=True):
-            parts = line.split("\t", include_separator=True)
-            tab_parts: list[Text] = []
-            for part in parts:
-                if part.plain.endswith("\t"):
-                    part._text[-1] = part._text[-1][:-1] + " "
-                    pos += part.cell_len
-                    tab_remainder = pos % tab_size
-                    if tab_remainder:
-                        spaces = tab_size - (pos % tab_size)
-                        part.extend_style(spaces)
-                        pos += spaces
-                else:
-                    pos += part.cell_len
-                tab_parts.append(part)
-            append(Text("").join(tab_parts))
+            cell_position = 0
+            if "\t" not in line.plain:
+                append(line)
+            else:
+                parts = line.split("\t", include_separator=True)
+                tab_parts: list[Text] = []
+                for part in parts:
+                    if part.plain.endswith("\t"):
+                        part._text[-1] = part._text[-1][:-1] + " "
+                        cell_position += part.cell_len
+                        tab_remainder = cell_position % tab_size
+                        if tab_remainder:
+                            spaces = tab_size - (cell_position % tab_size)
+                            part.extend_style(spaces)
+                            cell_position += spaces
+                    else:
+                        cell_position += part.cell_len
+                    tab_parts.append(part)
+                append(Text("").join(tab_parts))
 
         self._text = [result.plain]
         self._length = len(self.plain)
