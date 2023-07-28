@@ -123,7 +123,7 @@ class Text(JupyterMixin):
         overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
         no_wrap (bool, optional): Disable text wrapping, or None for default. Defaults to None.
         end (str, optional): Character to end text with. Defaults to "\\\\n".
-        tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
+        tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to None.
         spans (List[Span], optional). A list of predefined style spans. Defaults to None.
     """
 
@@ -148,7 +148,7 @@ class Text(JupyterMixin):
         overflow: Optional["OverflowMethod"] = None,
         no_wrap: Optional[bool] = None,
         end: str = "\n",
-        tab_size: Optional[int] = 8,
+        tab_size: Optional[int] = None,
         spans: Optional[List[Span]] = None,
     ) -> None:
         sanitized_text = strip_control_codes(text)
@@ -307,7 +307,7 @@ class Text(JupyterMixin):
             overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
             no_wrap (bool, optional): Disable text wrapping, or None for default. Defaults to None.
             end (str, optional): Character to end text with. Defaults to "\\\\n".
-            tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
+            tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to None.
         """
         from .ansi import AnsiDecoder
 
@@ -369,7 +369,7 @@ class Text(JupyterMixin):
             justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
             overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
             end (str, optional): Character to end text with. Defaults to "\\\\n".
-            tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to 8.
+            tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to None.
             meta (Dict[str, Any], optional). Meta data to apply to text, or None for no meta data. Default to None
 
         Returns:
@@ -576,14 +576,14 @@ class Text(JupyterMixin):
         new_spaces = " " * spaces
         if spans:
             end_offset = len(self)
-            self._spans = [
+            self._spans[:] = [
                 span.add_padding(spaces) if span.end >= end_offset else span
                 for span in spans
             ]
             self._text.append(new_spaces)
             self._length += spaces
         else:
-            self += new_spaces
+            self.plain += new_spaces
 
     def highlight_regex(
         self,
@@ -682,7 +682,7 @@ class Text(JupyterMixin):
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> Iterable[Segment]:
-        tab_size: int = console.tab_size or self.tab_size or 8
+        tab_size: int = console.tab_size if self.tab_size is None else self.tab_size
         justify = self.justify or options.justify or DEFAULT_JUSTIFY
 
         overflow = self.overflow or options.overflow or DEFAULT_OVERFLOW
@@ -824,18 +824,22 @@ class Text(JupyterMixin):
         result = self.blank_copy()
         append = result.append
 
-        _style = self.style
         for line in self.split("\n", include_separator=True):
             parts = line.split("\t", include_separator=True)
+            tab_parts: list[Text] = []
             for part in parts:
                 if part.plain.endswith("\t"):
-                    part.right_crop(1)
-                    pos += len(part)
-                    spaces = tab_size - ((pos - 1) % tab_size)
-                    if spaces:
+                    part._text[-1] = part._text[-1][:-1] + " "
+                    pos += part.cell_len
+                    tab_remainder = pos % tab_size
+                    if tab_remainder:
+                        spaces = tab_size - (pos % tab_size)
                         part.extend_style(spaces)
                         pos += spaces
-                append(part)
+                else:
+                    pos += part.cell_len
+                tab_parts.append(part)
+            append(Text("").join(tab_parts))
 
         self._text = [result.plain]
         self._length = len(self.plain)
@@ -967,7 +971,7 @@ class Text(JupyterMixin):
                 self._text.append(sanitized_text)
                 offset = len(self)
                 text_length = len(sanitized_text)
-                if style is not None:
+                if style:
                     self._spans.append(Span(offset, offset + text_length, style))
                 self._length += text_length
             elif isinstance(text, Text):
@@ -977,7 +981,7 @@ class Text(JupyterMixin):
                         "style must not be set when appending Text instance"
                     )
                 text_length = self._length
-                if text.style is not None:
+                if text.style:
                     self._spans.append(
                         _Span(text_length, text_length + len(text), text.style)
                     )
@@ -998,7 +1002,7 @@ class Text(JupyterMixin):
         """
         _Span = Span
         text_length = self._length
-        if text.style is not None:
+        if text.style:
             self._spans.append(_Span(text_length, text_length + len(text), text.style))
         self._text.append(text.plain)
         self._spans.extend(
@@ -1025,7 +1029,7 @@ class Text(JupyterMixin):
         offset = len(self)
         for content, style in tokens:
             append_text(content)
-            if style is not None:
+            if style:
                 append_span(_Span(offset, offset + len(content), style))
             offset += len(content)
         self._length = offset

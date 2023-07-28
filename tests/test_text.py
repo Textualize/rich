@@ -601,6 +601,44 @@ def test_tabs_to_spaces():
     assert text.plain == "No Tabs"
 
 
+@pytest.mark.parametrize(
+    "markup,tab_size,expected_text,expected_spans",
+    [
+        ("", 4, "", []),
+        ("\t", 4, "    ", []),
+        ("\tbar", 4, "    bar", []),
+        ("foo\tbar", 4, "foo bar", []),
+        (
+            "[bold]foo\tbar",
+            4,
+            "foo bar",
+            [
+                Span(0, 4, "bold"),
+                Span(4, 7, "bold"),
+            ],
+        ),
+        ("[bold]\tbar", 4, "    bar", [Span(0, 4, "bold"), Span(4, 7, "bold")]),
+        (
+            "\t[bold]bar",
+            4,
+            "    bar",
+            [
+                Span(4, 7, "bold"),
+            ],
+        ),
+    ],
+)
+def test_tabs_to_spaces_spans(
+    markup: str, tab_size: int, expected_text: str, expected_spans: list[Span]
+):
+    """Test spans are correct after expand_tabs"""
+    text = Text.from_markup(markup)
+    text.expand_tabs(tab_size)
+    print(expected_spans)
+    assert text.plain == expected_text
+    assert text._spans == expected_spans
+
+
 def test_markup_switch():
     """Test markup can be disabled."""
     console = Console(file=StringIO(), markup=False)
