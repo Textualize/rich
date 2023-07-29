@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed exception in Markdown with partial table https://github.com/Textualize/rich/issues/3053 
 - Fixed the HTML export template so that the `<html>` tag comes before the `<head>` tag https://github.com/Textualize/rich/issues/3021
 - Fixed issue with custom classes overwriting `__eq__` https://github.com/Textualize/rich/issues/2875
+- Fix rich.pretty.install breakage in iPython https://github.com/Textualize/rich/issues/3013
 
 ### Added
 
