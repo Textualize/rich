@@ -5,11 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [13.5.0] - Unreleased
+
+## Unreleased
 
 ### Fixed
 
+- Fixed Text.expand_tabs not expanding spans.
+- Fixed TimeElapsedColumn from showing negative.
+- Fix for escaping strings with a trailing backslash https://github.com/Textualize/rich/issues/2987
+- Fixed exception in Markdown with partial table https://github.com/Textualize/rich/issues/3053 
 - Fixed the HTML export template so that the `<html>` tag comes before the `<head>` tag https://github.com/Textualize/rich/issues/3021
+
+### Added
+
+- Added Text.extend_style method.
+- Added Span.extend method.
+
+### Changed
+
+- Text.tab_size now defaults to `None` to indicate that Console.tab_size should be used.
+
 
 ## [13.4.2] - 2023-06-12
 
