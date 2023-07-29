@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed TimeElapsedColumn from showing negative.
 - Fix for escaping strings with a trailing backslash https://github.com/Textualize/rich/issues/2987
 - Fixed exception in Markdown with partial table https://github.com/Textualize/rich/issues/3053 
+- Fixed the HTML export template so that the `<html>` tag comes before the `<head>` tag https://github.com/Textualize/rich/issues/3021
 
 ### Added
 
@@ -23,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Text.tab_size now defaults to `None` to indicate that Console.tab_size should be used.
+
 
 ## [13.4.2] - 2023-06-12
 
@@ -95,7 +97,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed failing tests due to Pygments dependency https://github.com/Textualize/rich/issues/2757
 - Relaxed ipywidgets https://github.com/Textualize/rich/issues/2767
 
-### Added 
+### Added
 
 - Added `encoding` parameter in `Theme.read`
 
