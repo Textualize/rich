@@ -64,6 +64,8 @@ def escape(
         return f"{backslashes}{backslashes}\\{text}"
 
     markup = _escape(escape_backslashes, markup)
+    if markup.endswith("\\"):
+        return markup + "\\"
     return markup
 
 
@@ -226,7 +228,6 @@ def render(
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     MARKUP = [
         "[red]Hello World[/red]",
         "[magenta]Hello [b]World[/b]",
