@@ -133,6 +133,14 @@ def test_markdown_table():
     assert result == expected
 
 
+def test_partial_table():
+    markdown = Markdown("| Simple | Table |\n| ------ | ----- ")
+    result = render(markdown)
+    print(repr(result))
+    expected = "\n                  \n \x1b[1m \x1b[0m\x1b[1mSimple\x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1mTable\x1b[0m\x1b[1m \x1b[0m \n ━━━━━━━━━━━━━━━━ \n                  \n"
+    assert result == expected
+
+
 if __name__ == "__main__":
     markdown = Markdown(MARKDOWN)
     rendered = render(markdown)

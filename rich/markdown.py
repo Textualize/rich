@@ -254,15 +254,14 @@ class TableElement(MarkdownElement):
     ) -> RenderResult:
         table = Table(box=box.SIMPLE_HEAVY)
 
-        assert self.header is not None
-        assert self.header.row is not None
-        for column in self.header.row.cells:
-            table.add_column(column.content)
+        if self.header is not None and self.header.row is not None:
+            for column in self.header.row.cells:
+                table.add_column(column.content)
 
-        assert self.body is not None
-        for row in self.body.rows:
-            row_content = [element.content for element in row.cells]
-            table.add_row(*row_content)
+        if self.body is not None:
+            for row in self.body.rows:
+                row_content = [element.content for element in row.cells]
+                table.add_row(*row_content)
 
         yield table
 
