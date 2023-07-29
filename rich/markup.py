@@ -64,8 +64,9 @@ def escape(
         return f"{backslashes}{backslashes}\\{text}"
 
     markup = _escape(escape_backslashes, markup)
-    if markup.endswith("\\"):
+    if markup.endswith("\\") and not markup.endswith("\\\\"):
         return markup + "\\"
+
     return markup
 
 
