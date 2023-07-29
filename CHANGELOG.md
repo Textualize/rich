@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## Unreleased
+
+### Fixed
+
+- Fixed Text.expand_tabs not expanding spans.
+
+### Added
+
+- Added Text.extend_style method.
+- Added Span.extend method.
+
+### Changed
+
+- Text.tab_size now defaults to `None` to indicate that Console.tab_size should be used.
+
 ## [13.4.2] - 2023-06-12
 
 ### Changed

@@ -1,4 +1,5 @@
 from io import StringIO
+from typing import List
 
 import pytest
 
@@ -600,6 +601,98 @@ def test_tabs_to_spaces():
     text.expand_tabs()
     assert text.plain == "No Tabs"
 
+    text = Text("No Tabs", style="bold")
+    text.expand_tabs()
+    assert text.plain == "No Tabs"
+    assert text.style == "bold"
+
+
+@pytest.mark.parametrize(
+    "markup,tab_size,expected_text,expected_spans",
+    [
+        ("", 4, "", []),
+        ("\t", 4, "    ", []),
+        ("\tbar", 4, "    bar", []),
+        ("foo\tbar", 4, "foo bar", []),
+        ("foo\nbar\nbaz", 4, "foo\nbar\nbaz", []),
+        (
+            "[bold]foo\tbar",
+            4,
+            "foo bar",
+            [
+                Span(0, 4, "bold"),
+                Span(4, 7, "bold"),
+            ],
+        ),
+        (
+            "[bold]\tbar",
+            4,
+            "    bar",
+            [
+                Span(0, 4, "bold"),
+                Span(4, 7, "bold"),
+            ],
+        ),
+        (
+            "\t[bold]bar",
+            4,
+            "    bar",
+            [
+                Span(4, 7, "bold"),
+            ],
+        ),
+        (
+            "[red]foo\tbar\n[green]egg\tbaz",
+            8,
+            "foo     bar\negg     baz",
+            [
+                Span(0, 8, "red"),
+                Span(8, 12, "red"),
+                Span(12, 20, "red"),
+                Span(12, 20, "green"),
+                Span(20, 23, "red"),
+                Span(20, 23, "green"),
+            ],
+        ),
+        (
+            "[bold]X\tY",
+            8,
+            "X       Y",
+            [
+                Span(0, 8, "bold"),
+                Span(8, 9, "bold"),
+            ],
+        ),
+        (
+            "[bold]💩\t💩",
+            8,
+            "💩      💩",
+            [
+                Span(0, 7, "bold"),
+                Span(7, 8, "bold"),
+            ],
+        ),
+        (
+            "[bold]💩💩💩💩\t💩",
+            8,
+            "💩💩💩💩        💩",
+            [
+                Span(0, 12, "bold"),
+                Span(12, 13, "bold"),
+            ],
+        ),
+    ],
+)
+def test_tabs_to_spaces_spans(
+    markup: str, tab_size: int, expected_text: str, expected_spans: List[Span]
+):
+    """Test spans are correct after expand_tabs"""
+    text = Text.from_markup(markup)
+    text.expand_tabs(tab_size)
+    print(text._spans)
+    assert text.plain == expected_text
+    assert text._spans == expected_spans
+
 
 def test_markup_switch():
     """Test markup can be disabled."""
@@ -806,3 +899,19 @@ def test_markup_property():
         == "[bold]foo [italic]bar[/bold] baz[/italic]"
     )
     assert Text("[bold]foo").markup == "\\[bold]foo"
+
+
+def test_extend_style():
+    text = Text.from_markup("[red]foo[/red] [bold]bar")
+    text.extend_style(0)
+
+    assert text.plain == "foo bar"
+    assert text.spans == [Span(0, 3, "red"), Span(4, 7, "bold")]
+
+    text.extend_style(-1)
+    assert text.plain == "foo bar"
+    assert text.spans == [Span(0, 3, "red"), Span(4, 7, "bold")]
+
+    text.extend_style(2)
+    assert text.plain == "foo bar  "
+    assert text.spans == [Span(0, 3, "red"), Span(4, 9, "bold")]
