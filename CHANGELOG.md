@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed Text.expand_tabs not expanding spans.
 - Fixed TimeElapsedColumn from showing negative.
 - Fix for escaping strings with a trailing backslash https://github.com/Textualize/rich/issues/2987
+- Fixed exception in Markdown with partial table https://github.com/Textualize/rich/issues/3053 
 
 ### Added
 
