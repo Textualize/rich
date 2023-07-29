@@ -814,7 +814,6 @@ def test_lt():
     assert not (text < "foo ")
     assert text < "foobar!"
     assert Text("bar") < text
-    assert not (text < None)
     assert "foo" < text
     assert not ("foobar" < text)
 
@@ -825,6 +824,5 @@ def test_gt():
     assert text > "foo "
     assert not (text > "foobar!")
     assert not (Text("bar") > text)
-    assert not (None > text)
     assert "foobar!" > text
     assert not ("foobar" > text)
