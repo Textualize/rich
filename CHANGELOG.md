@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed Text.expand_tabs not expanding spans.
+- Fixed TimeElapsedColumn from showing negative.
 
 ### Added
 
