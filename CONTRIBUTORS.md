@@ -51,6 +51,7 @@ The following people have contributed to the development of Rich:
 - [Clément Robert](https://github.com/neutrinoceros)
 - [Brian Rutledge](https://github.com/bhrutledge)
 - [Tushar Sadhwani](https://github.com/tusharsadhwani)
+- [Luca Salvarani](https://github.com/LukeSavefrogs)
 - [Paul Sanders](https://github.com/sanders41)
 - [Tim Savage](https://github.com/timsavage)
 - [Anthony Shaw](https://github.com/tonybaloney)
