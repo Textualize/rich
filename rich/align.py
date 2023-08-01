@@ -196,9 +196,8 @@ class Align(JupyterMixin):
         )
 
         def blank_lines(count: int) -> Iterable[Segment]:
-            if count > 0:
-                for _ in range(count):
-                    yield blank_line
+            for _ in range(count):
+                yield blank_line
 
         vertical_height = self.height or options.height
         iter_segments: Iterable[Segment]

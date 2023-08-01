@@ -1,4 +1,3 @@
-from itertools import zip_longest
 from typing import (
     Iterator,
     Iterable,
@@ -141,27 +140,19 @@ class Lines:
                 line.truncate(width, overflow=overflow)
                 line.pad_left(width - cell_len(line.plain))
         elif justify == "full":
-            for line_index, line in enumerate(self._lines):
-                if line_index == len(self._lines) - 1:
-                    break
+            for line_index, line in enumerate(self._lines[:-1]):
                 words = line.split(" ")
                 words_size = sum(cell_len(word.plain) for word in words)
                 num_spaces = len(words) - 1
-                spaces = [1 for _ in range(num_spaces)]
-                index = 0
-                if spaces:
-                    while words_size + num_spaces < width:
-                        spaces[len(spaces) - index - 1] += 1
-                        num_spaces += 1
-                        index = (index + 1) % len(spaces)
+                space, longer_spaces = divmod(width - words_size, num_spaces)
+                spaces = [space] * (num_spaces - longer_spaces) + [space + 1] * longer_spaces
+
                 tokens: List[Text] = []
-                for index, (word, next_word) in enumerate(
-                    zip_longest(words, words[1:])
-                ):
+                for word, space, next_word in zip(words, spaces, words[1:]):
                     tokens.append(word)
-                    if index < len(spaces):
-                        style = word.get_style_at_offset(console, -1)
-                        next_style = next_word.get_style_at_offset(console, 0)
-                        space_style = style if style == next_style else line.style
-                        tokens.append(Text(" " * spaces[index], style=space_style))
+                    style = word.get_style_at_offset(console, -1)
+                    next_style = next_word.get_style_at_offset(console, 0)
+                    space_style = style if style == next_style else line.style
+                    tokens.append(Text(" " * space, style=space_style))
+                tokens.append(words[-1])
                 self[line_index] = Text("").join(tokens)

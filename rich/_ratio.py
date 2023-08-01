@@ -132,10 +132,8 @@ def ratio_distribute(
     distributed_total: List[int] = []
     append = distributed_total.append
     if minimums is None:
-        _minimums = [0] * len(ratios)
-    else:
-        _minimums = minimums
-    for ratio, minimum in zip(ratios, _minimums):
+        minimums = [0] * len(ratios)
+    for ratio, minimum in zip(ratios, minimums):
         if total_ratio > 0:
             distributed = max(minimum, ceil(ratio * total_remaining / total_ratio))
         else:

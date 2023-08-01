@@ -8,13 +8,10 @@ re_word = re.compile(r"\s*\S+\s*")
 
 
 def words(text: str) -> Iterable[Tuple[int, int, str]]:
-    position = 0
-    word_match = re_word.match(text, position)
-    while word_match is not None:
+    for word_match in re_word.finditer(text):
         start, end = word_match.span()
         word = word_match.group(0)
         yield start, end, word
-        word_match = re_word.match(text, end)
 
 
 def divide_line(text: str, width: int, fold: bool = True) -> List[int]:

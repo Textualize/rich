@@ -148,7 +148,7 @@ class ProgressBar(JupyterMixin):
         current_time = (
             monotonic() if self.animation_time is None else self.animation_time
         )
-        segments = pulse_segments * (int(width / segment_count) + 2)
+        segments = pulse_segments * (width // segment_count + 2)
         offset = int(-current_time * 15) % segment_count
         segments = segments[offset : offset + width]
         yield from segments
@@ -176,8 +176,7 @@ class ProgressBar(JupyterMixin):
             if self.total and completed is not None
             else width * 2
         )
-        bar_count = complete_halves // 2
-        half_bar_count = complete_halves % 2
+        bar_count, half_bar_count = divmod(complete_halves, 2)
         style = console.get_style(self.style)
         is_finished = self.total is None or self.completed >= self.total
         complete_style = console.get_style(
