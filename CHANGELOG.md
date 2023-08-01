@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed Text.expand_tab assertion error
+- Fixed Text.expand_tabs assertion error
 
 ## [13.5.1] - 2023-07-31
 
