@@ -819,7 +819,9 @@ class Text(JupyterMixin):
             return
         if tab_size is None:
             tab_size = self.tab_size
-        assert tab_size is not None
+        if tab_size is None:
+            tab_size = 8
+
         result = self.blank_copy()
 
         new_text: List[Text] = []
