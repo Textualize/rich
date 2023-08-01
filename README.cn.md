@@ -36,7 +36,8 @@ Rich 是一个 Python 库，可以为您在终端中提供富文本和精美格�
 
 ## 兼容性
 
-Rich 适用于 Linux，OSX 和 Windows。真彩色/表情符号可与新的 Windows 终端一起使用，Windows 的经典终端仅限 8 种颜色。
+Rich 适用于 Linux，OSX 和 Windows。真彩色/表情符号可与新的 Windows 终端一起使用。
+> 同样支持Windows 的经典终端（表情符号可能不工作）
 
 Rich 还可以与 [Jupyter 笔记本](https://jupyter.org/)一起使用，而无需其他配置。
 
