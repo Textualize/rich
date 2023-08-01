@@ -64,6 +64,7 @@ The following people have contributed to the development of Rich:
 - [Tomer Shalev](https://github.com/tomers)
 - [Serkan UYSAL](https://github.com/uysalserkan)
 - [Zhe Huang](https://github.com/onlyacat)
+- [小白云](https://github.com/littlewhitecloud)
 - [Adrian Zuber](https://github.com/xadrianzetx)
 - [Ke Sun](https://github.com/ksun212)
 - [Qiming Xu](https://github.com/xqm32)
