@@ -1002,9 +1002,9 @@ class Task:
     def percentage(self) -> float:
         """float: Get progress of task as a percentage. If a None total was set, returns 0"""
         if not self.total:
-            return 0.0
-        completed = (self.completed / self.total) * 100.0
-        completed = min(100.0, max(0.0, completed))
+            return 0
+        completed = (self.completed / self.total) * 100
+        completed = min(100, max(0, completed))
         return completed
 
     @property

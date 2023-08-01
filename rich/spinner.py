@@ -70,7 +70,7 @@ class Spinner:
             self.start_time = time
 
         frame_no = ((time - self.start_time) * self.speed) / (
-            self.interval / 1000.0
+            self.interval / 1000
         ) + self.frame_no_offset
         frame = Text(
             self.frames[int(frame_no) % len(self.frames)], style=self.style or ""

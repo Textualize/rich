@@ -35,4 +35,4 @@ class ColorTriplet(NamedTuple):
             Tuple[float, float, float]: A tuple of three normalized colour components.
         """
         red, green, blue = self
-        return red / 255.0, green / 255.0, blue / 255.0
+        return red / 255, green / 255, blue / 255

@@ -127,7 +127,7 @@ def test_renderable_column():
 
 
 def test_spinner_column():
-    time = 1.0
+    time = 1
 
     def get_time():
         nonlocal time
@@ -141,7 +141,7 @@ def test_spinner_column():
     expected = "⣾"
     assert str(result) == expected
 
-    time += 1.0
+    time += 1
     column.spinner.update(speed=0.5)
     result = column.render(task)
     print(repr(result))
@@ -493,14 +493,14 @@ def test_reset() -> None:
 
 def test_progress_max_refresh() -> None:
     """Test max_refresh argument."""
-    time = 0.0
+    time = 0
 
     def get_time() -> float:
         nonlocal time
         try:
             return time
         finally:
-            time = time + 1.0
+            time += 1
 
     console = Console(
         color_system=None,
