@@ -1326,7 +1326,7 @@ class Progress(JupyterMixin):
         # normalize the mode (always rb, rt)
         _mode = "".join(sorted(mode, reverse=False))
         if _mode not in ("br", "rt", "r"):
-            raise ValueError("invalid mode {!r}".format(mode))
+            raise ValueError(f"invalid mode {mode!r}")
 
         # patch buffering to provide the same behaviour as the builtin `open`
         line_buffering = buffering == 1

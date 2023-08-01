@@ -37,7 +37,7 @@ def print_calendar(year):
 
         for week_day in cal.iterweekdays():
             table.add_column(
-                "{:.3}".format(calendar.day_name[week_day]), justify="right"
+                f"{calendar.day_name[week_day]:.3}", justify="right"
             )
 
         month_days = cal.monthdayscalendar(year, month)
