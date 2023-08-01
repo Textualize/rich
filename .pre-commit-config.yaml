@@ -35,9 +35,10 @@ repos:
     hooks:
       - id: black
         exclude: ^benchmarks/
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
     hooks:
       - id: isort
-        exclude: ^benchmarks/
+        name: isort (python)
+        language_version: '3.11'
         args: ["--profile", "black"]
