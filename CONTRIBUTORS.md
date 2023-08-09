@@ -16,6 +16,7 @@ The following people have contributed to the development of Rich:
 - [Aryaz Eghbali](https://github.com/AryazE)
 - [Oleksis Fraga](https://github.com/oleksis)
 - [Andy Gimblett](https://github.com/gimbo)
+- [Tom Gooding](https://github.com/TomJGooding)
 - [Michał Górny](https://github.com/mgorny)
 - [Nok Lam Chan](https://github.com/noklam)
 - [Leron Gray](https://github.com/daddycocoaman)
