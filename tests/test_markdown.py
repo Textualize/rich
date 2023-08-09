@@ -141,6 +141,32 @@ def test_partial_table():
     assert result == expected
 
 
+def test_table_with_empty_cells():
+    """Test a table with empty cells is rendered without extra newlines above.
+
+    Regression test for #3027 https://github.com/Textualize/rich/issues/3027
+    """
+    complete_table = Markdown(
+        """\
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+"""
+    )
+    table_with_empty_cells = Markdown(
+        """\
+| First Header  |               |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+|               | Content Cell  |
+"""
+    )
+    result = len(render(table_with_empty_cells).splitlines())
+    expected = len(render(complete_table).splitlines())
+    assert result == expected
+
+
 if __name__ == "__main__":
     markdown = Markdown(MARKDOWN)
     rendered = render(markdown)
