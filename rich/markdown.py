@@ -297,6 +297,8 @@ class TableBodyElement(MarkdownElement):
 class TableRowElement(MarkdownElement):
     """MarkdownElement corresponding to `tr_open` and `tr_close`."""
 
+    new_line = False
+
     def __init__(self) -> None:
         self.cells: List[TableDataElement] = []
 
@@ -311,6 +313,8 @@ class TableRowElement(MarkdownElement):
 class TableDataElement(MarkdownElement):
     """MarkdownElement corresponding to `td_open` and `td_close`
     and `th_open` and `th_close`."""
+
+    new_line = False
 
     @classmethod
     def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
