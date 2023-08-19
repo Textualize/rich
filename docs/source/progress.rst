@@ -234,7 +234,7 @@ Here's an example that reads a url from the internet::
 
 If you expect to be reading from multiple files, you can use :meth:`~rich.progress.Progress.open` or :meth:`~rich.progress.Progress.wrap_file` to add a file progress to an existing Progress instance.
 
-See `cp_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/cp_progress.py>` for a minimal clone of the ``cp`` command which shows a progress bar as the file is copied.
+See `cp_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/cp_progress.py>`_ for a minimal clone of the ``cp`` command which shows a progress bar as the file is copied.
 
 
 Multiple Progress
