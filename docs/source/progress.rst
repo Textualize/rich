@@ -58,7 +58,7 @@ The ``total`` value associated with a task is the number of steps that must be c
 Updating tasks
 ~~~~~~~~~~~~~~
 
-When you call :meth:`~rich.progress.Progress.add_task` you get back a `Task ID`. Use this ID to call :meth:`~rich.progress.Progress.update` whenever you have completed some work, or any information has changed. Typically you will need to update ``completed`` every time you have completed a step. You can do this by updated ``completed`` directly or by setting ``advance`` which will add to the current ``completed`` value.
+When you call :meth:`~rich.progress.Progress.add_task` you get back a `Task ID`. Use this ID to call :meth:`~rich.progress.Progress.update` whenever you have completed some work, or any information has changed. Typically you will need to update ``completed`` every time you have completed a step. You can do this by setting ``completed`` directly or by setting ``advance`` which will add to the current ``completed`` value.
 
 The :meth:`~rich.progress.Progress.update` method collects keyword arguments which are also associated with the task. Use this to supply any additional information you would like to render in the progress display. The additional arguments are stored in ``task.fields`` and may be referenced in :ref:`Column classes<Columns>`.
 
