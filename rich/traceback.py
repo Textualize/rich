@@ -39,6 +39,8 @@ from .syntax import Syntax
 from .text import Text
 from .theme import Theme
 
+from .box import ROUNDED, HORIZONTALS
+
 WINDOWS = platform.system() == "Windows"
 
 LOCALS_MAX_LENGTH = 10
@@ -254,6 +256,7 @@ class Traceback:
         indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
+        no_border: bool = False,
     ):
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
@@ -275,6 +278,7 @@ class Traceback:
         self.locals_max_string = locals_max_string
         self.locals_hide_dunder = locals_hide_dunder
         self.locals_hide_sunder = locals_hide_sunder
+        self.no_border = no_border
 
         self.suppress: Sequence[str] = []
         for suppress_entity in suppress:
@@ -490,6 +494,7 @@ class Traceback:
         theme = self.theme
         background_style = theme.get_background_style()
         token_style = theme.get_style_for_token
+        box_style = HORIZONTALS if self.no_border else ROUNDED
 
         traceback_theme = Theme(
             {
@@ -523,6 +528,7 @@ class Traceback:
                     border_style="traceback.border",
                     expand=True,
                     padding=(0, 1),
+                    box=box_style,
                 )
                 stack_renderable = Constrain(stack_renderable, self.width)
                 with console.use_theme(traceback_theme):
@@ -537,6 +543,7 @@ class Traceback:
                             expand=True,
                             padding=(0, 1),
                             width=self.width,
+                            box=box_style,
                         ),
                         self.width,
                     )
