@@ -11,6 +11,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added `no_border` option to `console.print_exception`
 
+## [13.5.2] - 2023-08-01
+
+### Fixed
+
+- Fixed Text.expand_tab assertion error
+
+## [13.5.1] - 2023-07-31
+
+### Fixed
+
+- Fix tilde character (`~`) not included in link regex when printing to console https://github.com/Textualize/rich/issues/3057
+
+## [13.5.0] - 2023-07-29
+
+### Fixed
+
+- Fixed Text.expand_tabs not expanding spans.
+- Fixed TimeElapsedColumn from showing negative.
+- Fix for escaping strings with a trailing backslash https://github.com/Textualize/rich/issues/2987
+- Fixed exception in Markdown with partial table https://github.com/Textualize/rich/issues/3053
+- Fixed the HTML export template so that the `<html>` tag comes before the `<head>` tag https://github.com/Textualize/rich/issues/3021
+- Fixed issue with custom classes overwriting `__eq__` https://github.com/Textualize/rich/issues/2875
+- Fix rich.pretty.install breakage in iPython https://github.com/Textualize/rich/issues/3013
+
+### Added
+
+- Added Text.extend_style method.
+- Added Span.extend method.
+
+### Changed
+
+- Text.tab_size now defaults to `None` to indicate that Console.tab_size should be used.
+
 ## [13.4.2] - 2023-06-12
 
 ### Changed
@@ -1966,6 +1999,9 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.5.2]: https://github.com/textualize/rich/compare/v13.5.1...v13.5.2
+[13.5.1]: https://github.com/textualize/rich/compare/v13.5.0...v13.5.1
+[13.5.0]: https://github.com/textualize/rich/compare/v13.4.2...v13.5.0
 [13.4.2]: https://github.com/textualize/rich/compare/v13.4.1...v13.4.2
 [13.4.1]: https://github.com/textualize/rich/compare/v13.4.0...v13.4.1
 [13.4.0]: https://github.com/textualize/rich/compare/v13.3.5...v13.4.0
