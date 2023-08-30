@@ -34,6 +34,7 @@ The following people have contributed to the development of Rich:
 - [Alexander Mancevice](https://github.com/amancevice)
 - [Will McGugan](https://github.com/willmcgugan)
 - [Paul McGuire](https://github.com/ptmcg)
+- [Dan Mills](https://github.com/evilhamsterman)
 - [Antony Milne](https://github.com/AntonyMilneQB)
 - [Michael Milton](https://github.com/multimeric)
 - [Martina Oefelein](https://github.com/oefe)
