@@ -70,6 +70,7 @@ def print(
     """
     from .console import Console
 
+    objects = tuple(str(o) for o in objects)
     write_console = get_console() if file is None else Console(file=file)
     return write_console.print(*objects, sep=sep, end=end)
 
