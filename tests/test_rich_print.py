@@ -4,6 +4,8 @@ import json
 import rich
 from rich.console import Console
 
+from dataclasses import dataclass
+
 
 def test_get_console():
     console = rich.get_console()
@@ -70,5 +72,22 @@ def test_rich_print_X():
         rich.print("fooX")
         rich.print("fooXX")
         assert output.getvalue() == "foo\nfooX\nfooXX\n"
+    finally:
+        console.file = backup_file
+
+def test_rich_print_dataclass_str():
+    console = rich.get_console()
+    output = io.StringIO()
+    backup_file = console.file
+    @dataclass
+    class test:
+        name: str = "foo"
+        def __str__(self) -> str:
+            return f"Name: {self.name}"
+    try:
+        t = test()
+        console.file = output
+        rich.print(t)
+        assert output.getvalue() == "Name: foo\n"
     finally:
         console.file = backup_file
