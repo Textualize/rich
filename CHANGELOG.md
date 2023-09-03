@@ -75,6 +75,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Style.clear_meta_and_links
 
+## [13.4.0] - Unreleased
+
+### Added
+
+- `Syntax` now takes a `column_offset` argument that will make it render only the columns starting at the offset to the `code_width` if provided
+
 ## [13.3.2] - 2023-02-04
 
 ### Fixed
