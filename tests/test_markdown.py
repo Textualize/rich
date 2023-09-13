@@ -121,7 +121,7 @@ def test_markdown_table():
         """\
 | Year |                      Title                       | Director          |  Box Office (USD) |
 |------|:------------------------------------------------:|:------------------|------------------:|
-| 1982 |            *E.T. the Extra-Terrestrial*            | Steven Spielberg  |    $792.9 million |
+| 1982 |            *E.T. the Extra-Terrestrial*          | Steven Spielberg  |    $792.9 million |
 | 1980 |  Star Wars: Episode V – The Empire Strikes Back  | Irvin Kershner    |    $538.4 million |
 | 1983 |    Star Wars: Episode VI – Return of the Jedi    | Richard Marquand  |    $475.1 million |
 | 1981 |             Raiders of the Lost Ark              | Steven Spielberg  |    $389.9 million |
@@ -129,7 +129,40 @@ def test_markdown_table():
 """
     )
     result = render(markdown)
-    expected = "\n                                                                                               \n \x1b[1m \x1b[0m\x1b[1mYear\x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1m                    Title                     \x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1mDirector        \x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1mBox Office (USD)\x1b[0m\x1b[1m \x1b[0m \n ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ \n  1982   \x1b[3m          E.T. the Extra-Terrestrial          \x1b[0m   Steven Spielberg     $792.9 million  \n  1980   Star Wars: Episode V – The Empire Strikes Back   Irvin Kershner       $538.4 million  \n  1983     Star Wars: Episode VI – Return of the Jedi     Richard Marquand     $475.1 million  \n  1981              Raiders of the Lost Ark               Steven Spielberg     $389.9 million  \n  1984        Indiana Jones and the Temple of Doom        Steven Spielberg     $333.1 million  \n                                                                                               \n"
+    expected = "\n                                                                                               \n \x1b[1m \x1b[0m\x1b[1mYear\x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1m                    Title                     \x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1mDirector        \x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1mBox Office (USD)\x1b[0m\x1b[1m \x1b[0m \n ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ \n  1982             \x1b[3mE.T. the Extra-Terrestrial\x1b[0m             Steven Spielberg     $792.9 million  \n  1980   Star Wars: Episode V – The Empire Strikes Back   Irvin Kershner       $538.4 million  \n  1983     Star Wars: Episode VI – Return of the Jedi     Richard Marquand     $475.1 million  \n  1981              Raiders of the Lost Ark               Steven Spielberg     $389.9 million  \n  1984        Indiana Jones and the Temple of Doom        Steven Spielberg     $333.1 million  \n                                                                                               \n"
+    assert result == expected
+
+
+def test_inline_styles_in_table():
+    """Regression test for https://github.com/Textualize/rich/issues/3115"""
+    markdown = Markdown(
+        """\
+| Year | This **column** displays _the_ movie _title_ ~~description~~ | Director          |  Box Office (USD) |
+|------|:----------------------------------------------------------:|:------------------|------------------:|
+| 1982 | *E.T. the Extra-Terrestrial* ([Wikipedia article](https://en.wikipedia.org/wiki/E.T._the_Extra-Terrestrial)) | Steven Spielberg  |    $792.9 million |
+| 1980 |  Star Wars: Episode V – The *Empire* **Strikes** ~~Back~~  | Irvin Kershner    |    $538.4 million |
+"""
+    )
+    result = render(markdown)
+    expected = "\n                                                                                                 \n \x1b[1m \x1b[0m\x1b[1mYear\x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1mThis \x1b[0m\x1b[1mcolumn\x1b[0m\x1b[1m displays \x1b[0m\x1b[1;3mthe\x1b[0m\x1b[1m movie \x1b[0m\x1b[1;3mtitle\x1b[0m\x1b[1m \x1b[0m\x1b[1;9mdescription\x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1mDirector        \x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1mBox Office (USD)\x1b[0m\x1b[1m \x1b[0m \n ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ \n  1982    \x1b[3mE.T. the Extra-Terrestrial\x1b[0m (\x1b]8;id=0;foo\x1b\\\x1b[4;34mWikipedia article\x1b[0m\x1b]8;;\x1b\\)    Steven Spielberg     $792.9 million  \n  1980    Star Wars: Episode V – The \x1b[3mEmpire\x1b[0m \x1b[1mStrikes\x1b[0m \x1b[9mBack\x1b[0m    Irvin Kershner       $538.4 million  \n                                                                                                 \n"
+    assert result == expected
+
+
+def test_inline_styles_with_justification():
+    """Regression test for https://github.com/Textualize/rich/issues/3115
+
+    In particular, this tests the interaction between the change that was made to fix
+    #3115 and column text justification.
+    """
+    markdown = Markdown(
+        """\
+| left | center | right |
+| :- | :-: | -: |
+| This is a long row | because it contains | a fairly long sentence. |
+| a*b* _c_ ~~d~~ e | a*b* _c_ ~~d~~ e | a*b* _c_ ~~d~~ e |"""
+    )
+    result = render(markdown)
+    expected = "\n                                                                      \n \x1b[1m \x1b[0m\x1b[1mleft              \x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1m      center       \x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1m                  right\x1b[0m\x1b[1m \x1b[0m \n ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ \n  This is a long row   because it contains   a fairly long sentence.  \n  a\x1b[3mb\x1b[0m \x1b[3mc\x1b[0m \x1b[9md\x1b[0m e                  a\x1b[3mb\x1b[0m \x1b[3mc\x1b[0m \x1b[9md\x1b[0m e                        a\x1b[3mb\x1b[0m \x1b[3mc\x1b[0m \x1b[9md\x1b[0m e  \n                                                                      \n"
     assert result == expected
 
 
