@@ -379,7 +379,7 @@ class Syntax(JupyterMixin):
             str: The name of the Pygments lexer that best matches the supplied path/code.
         """
         lexer: Optional[Lexer] = None
-        lexer_name = "default"
+        lexer_name = "text"
         if code:
             try:
                 lexer = guess_lexer_for_filename(path, code)
@@ -421,7 +421,7 @@ class Syntax(JupyterMixin):
         return style.color
 
     @property
-    def lexer(self) -> Optional[Lexer]:
+    def lexer(self) -> Lexer:
         """The lexer for this syntax, or None if no lexer was found.
 
         Tries to find the lexer by name if a string was passed to the constructor.
@@ -437,7 +437,12 @@ class Syntax(JupyterMixin):
                 tabsize=self.tab_size,
             )
         except ClassNotFound:
-            return None
+            return get_lexer_by_name(
+                "text",
+                stripnl=False,
+                ensurenl=True,
+                tabsize=self.tab_size,
+            )
 
     def highlight(
         self,

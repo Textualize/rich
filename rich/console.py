@@ -278,6 +278,7 @@ class ConsoleRenderable(Protocol):
 
 # A type that may be rendered by Console.
 RenderableType = Union[ConsoleRenderable, RichCast, str]
+"""A string or any object that may be rendered by Rich."""
 
 # The result of calling a __rich_console__ method.
 RenderResult = Iterable[Union[RenderableType, Segment]]
