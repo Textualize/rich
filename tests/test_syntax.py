@@ -356,7 +356,7 @@ def test_from_path_lexer_override_invalid_lexer():
     try:
         os.write(fh, b"import this\n")
         syntax = Syntax.from_path(path, lexer="blah")
-        assert syntax.lexer.name == "Text only"
+        assert syntax.lexer is None
         assert syntax.code == "import this\n"
     finally:
         os.remove(path)
