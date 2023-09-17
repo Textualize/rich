@@ -8,7 +8,6 @@ repos:
       - id: check-ast
       - id: check-builtin-literals
       - id: check-case-conflict
-      - id: check-docstring-first
       - id: check-merge-conflict
       - id: check-json
       - id: check-toml
@@ -40,5 +39,5 @@ repos:
     hooks:
       - id: isort
         name: isort (python)
-        language_version: '3.11'
+        language_version: "3.11"
         args: ["--profile", "black"]
