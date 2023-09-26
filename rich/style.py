@@ -729,8 +729,7 @@ class Style:
         text = text or str(self)
         sys.stdout.write(f"{self.render(text)}\n")
 
-    @lru_cache(maxsize=1024)
-    def _add(self, style: Optional["Style"]) -> "Style":
+    def _add_no_cache(self, style: Optional["Style"]) -> "Style":
         if style is None or style._null:
             return self
         if self._null:
@@ -754,8 +753,20 @@ class Style:
         new_style._hash = None
         return new_style
 
+    @lru_cache(maxsize=1024)
+    def _add(self, style: Optional["Style"]) -> "Style":
+        return self._add_no_cache(style)
+
     def __add__(self, style: Optional["Style"]) -> "Style":
-        combined_style = self._add(style)
+        if (
+            style is not None
+            and not style._link
+            and not self._link
+            and (self._link_id or style._link_id)
+        ):
+            combined_style = self._add_no_cache(style)
+        else:
+            combined_style = self._add(style)
         return combined_style.copy() if combined_style.link else combined_style
 
 
