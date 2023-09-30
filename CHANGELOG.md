@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed Text.expand_tabs assertion error
 
+### Changed
+
+- Move coverage configuration to `pyproject.toml`
+
 ## [13.5.1] - 2023-07-31
 
 ### Fixed
