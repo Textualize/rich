@@ -73,7 +73,6 @@ class Tree(JupyterMixin):
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-
         stack: List[Iterator[Tuple[bool, Tree]]] = []
         pop = stack.pop
         push = stack.append
@@ -196,7 +195,6 @@ class Tree(JupyterMixin):
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     from rich.console import Group
     from rich.markdown import Markdown
     from rich.panel import Panel
