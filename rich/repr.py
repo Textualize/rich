@@ -76,7 +76,7 @@ def auto(
                         param.POSITIONAL_OR_KEYWORD,
                         param.KEYWORD_ONLY,
                     ):
-                        if param.default == param.empty:
+                        if param.default is param.empty:
                             yield getattr(self, param.name)
                         else:
                             yield param.name, getattr(self, param.name), param.default

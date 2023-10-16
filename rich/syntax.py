@@ -439,6 +439,16 @@ class Syntax(JupyterMixin):
         except ClassNotFound:
             return None
 
+    @property
+    def default_lexer(self) -> Lexer:
+        """A Pygments Lexer to use if one is not specified or invalid."""
+        return get_lexer_by_name(
+            "text",
+            stripnl=False,
+            ensurenl=True,
+            tabsize=self.tab_size,
+        )
+
     def highlight(
         self,
         code: str,
@@ -467,7 +477,7 @@ class Syntax(JupyterMixin):
         )
         _get_theme_style = self._theme.get_style_for_token
 
-        lexer = self.lexer
+        lexer = self.lexer or self.default_lexer
 
         if lexer is None:
             text.append(code)
