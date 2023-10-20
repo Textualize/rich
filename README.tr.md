@@ -29,7 +29,7 @@
 
 Bir Python kütüphanesi olan __rich__, terminal üzerinde gösterişli çıktılar almanızı sağlayan bir araçtır.
 
-[Rich API](https://rich.readthedocs.io/en/latest/) kullanarak terminal çıktılarınıza sitil ekleyebilir ve renklendirebilirsiniz. Aynı zamanda tabloları, durum çubuklarını, markdown sitillerini, kaynak koddaki syntax gösterimlerini ve bir çok şeyi rich kullanarak yapabilirsiniz.
+[Rich API](https://rich.readthedocs.io/en/latest/) kullanarak terminal çıktılarınıza stil ekleyebilir ve renklendirebilirsiniz. Aynı zamanda tabloları, ilerleme çubuklarını, markdown stillerini, kaynak koddaki söz dizimi gösterimlerini ve bir çok şeyi rich kullanarak yapabilirsiniz.
 
 ![Features](https://github.com/textualize/rich/raw/master/imgs/features.png)
 
@@ -92,7 +92,7 @@ from rich.console import Console
 console = Console()
 ```
 
-Console objesi tıpkı Python içerisinde hazır gelen `print` methoduna benziyor, tabi bir kaç fazlası da var.
+Console objesi tıpkı Python içerisinde hazır gelen `print` methoduna benziyor, tabii daha fazlası da var.
 Kullanımı aşağıdaki örnek gibi olacaktır:
 
 ```python
@@ -111,7 +111,7 @@ Eğer çıktıyı değiştirmeseydim aşağıdaki gibi bir görüntü ile karş�
 
 ![Hello World](https://github.com/textualize/rich/raw/master/imgs/hello_world.png)
 
-Tek seferde bir yazıyı renklendirmek için kullanışlı bir yöntem olsa da, eğer çıktımızın sadece belirli bölgelerinde değişiklik yapacaksak [bbcode](https://en.wikipedia.org/wiki/BBCode) syntax'ını kullanmalıyız. Bunun içinde bir örnek:
+Tek seferde bir yazıyı renklendirmek için kullanışlı bir yöntem olsa da, eğer çıktımızın sadece belirli bölgelerinde değişiklik yapacaksak [bbcode](https://en.wikipedia.org/wiki/BBCode) söz dizimini kullanmalıyız. Bunun içinde bir örnek:
 
 ```python
 console.print("[bold red]Mustafa Kemal Atatürk[/bold red] [u](1881 - 10 Kasım 1938)[/u], [i]Türk asker ve devlet adamıdır[/i]. [bold cyan]Türk Kurtuluş Savaşı'nın başkomutanı ve Türkiye Cumhuriyeti'nin kurucusudur[/bold cyan].")
@@ -137,7 +137,7 @@ Rich [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlig
 
 # Rich Kütüphaneleri
 
-Rich içerisinde çok fazla sayıda terminal üzerinde kullandığınızda çıktılarınızı gösterişli kılacak yapıyalara sahiptir.
+Rich içerisinde çok fazla sayıda terminal üzerinde kullandığınızda çıktılarınızı gösterişli kılacak yapılara sahiptir.
 
 Bu yapıların detayları için ilgili başlıklara tıklayın:
 
@@ -196,7 +196,7 @@ Emojileri de kullanabilirsiniz, kullanımı markdown emojileri ile aynı.
 😃 🧛 💩 👍 🦝
 ```
 
-Bu özelliği doğru yerlerde kullanmakta fayda var tabi.
+Bu özelliği doğru yerlerde kullanmakta fayda var tabii.
 
 </details>
 
@@ -258,7 +258,7 @@ Note that console markup is rendered in the same way as `print()` and `log()`. I
 
 Uzun işlerinizi göstermek için Rich size birden fazla [progress](https://rich.readthedocs.io/en/latest/progress.html) bar sunuyor.
 
-Basit bir kullanımı için, her hangi bir adımınızı `track` fonksiyonu ile kapsayıp döngüye alın.
+Basit bir kullanım için, her hangi bir adımınızı `track` fonksiyonu ile kapsayıp döngüye alın.
 
 ```python
 from rich.progress import track
@@ -271,11 +271,11 @@ Aşağıdaki görsellerde de görüleceği üzere birden fazla kez progress bar 
 
 ![progress](https://github.com/textualize/rich/raw/master/imgs/progress.gif)
 
-Kolonlar kullanıcı tarafından ayarlanabilir, indirme hızını, dosya boyutunui yüzdesel olarak gösterimi gibi bir çok şekilde gösterim sağlayabilir.
+Kolonlar kullanıcı tarafından ayarlanabilir, indirme hızını, dosya boyutunu yüzdesel olarak gösterimi gibi bir çok şekilde gösterim sağlayabilir.
 
 ![progress](https://github.com/textualize/rich/raw/master/imgs/downloader.gif)
 
-Eğer size de denemek siterseniz [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) koduna bakarak ve çalıştırarak indirme yapabilirsiniz.
+Eğer size de denemek isterseniz [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) koduna bakarak ve çalıştırarak indirme yapabilirsiniz.
 
 </details>
 
@@ -419,9 +419,9 @@ Yukarıdaki kod parçası aşağıdaki gibi bir çıktı üretecektir.
 <details>
 <summary>Tracebacks</summary>
 
-Rich sahip oldukları ile güzel [tracebakcs](https://rich.readthedocs.io/en/latest/traceback.html)'ler yaratabilir. Böylece daha okunabilir ve daha kolay anlaşılabilen bir yapıya sahip olursunuz.
+Rich sahip oldukları ile güzel [traceback](https://rich.readthedocs.io/en/latest/traceback.html)'ler yaratabilir. Böylece daha okunabilir ve daha kolay anlaşılabilen bir yapıya sahip olursunuz.
 
-Burada OSX üzerinde (tıpkı Linux gibi) bir tracebacks çıktısı görüyorsunuz.
+Burada OSX üzerinde (tıpkı Linux gibi) bir traceback çıktısı görüyorsunuz.
 
 ![traceback](https://github.com/textualize/rich/raw/master/imgs/traceback.png)
 
