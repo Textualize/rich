@@ -1113,7 +1113,7 @@ class Progress(JupyterMixin):
 
             progress = Progress(
                 SpinnerColumn(),
-                *Progress.default_columns(),
+                *Progress.get_default_columns(),
                 "Elapsed:",
                 TimeElapsedColumn(),
             )
