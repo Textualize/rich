@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import sys
 from typing import ClassVar, Dict, Iterable, List, Optional, Type, Union
 
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
-from typing_extensions import get_args
+
+if sys.version_info >= (3, 8):
+    from typing import get_args
+else:
+    from typing_extensions import get_args  # pragma: no cover
 
 from rich.table import Table
 
@@ -170,7 +175,7 @@ class CodeBlock(TextElement):
     def create(cls, markdown: "Markdown", token: Token) -> "CodeBlock":
         node_info = token.info or ""
         lexer_name = node_info.partition(" ")[0]
-        return cls(lexer_name or "default", markdown.code_theme)
+        return cls(lexer_name or "text", markdown.code_theme)
 
     def __init__(self, lexer_name: str, theme: str) -> None:
         self.lexer_name = lexer_name
@@ -249,15 +254,14 @@ class TableElement(MarkdownElement):
     ) -> RenderResult:
         table = Table(box=box.SIMPLE_HEAVY)
 
-        assert self.header is not None
-        assert self.header.row is not None
-        for column in self.header.row.cells:
-            table.add_column(column.content)
+        if self.header is not None and self.header.row is not None:
+            for column in self.header.row.cells:
+                table.add_column(column.content)
 
-        assert self.body is not None
-        for row in self.body.rows:
-            row_content = [element.content for element in row.cells]
-            table.add_row(*row_content)
+        if self.body is not None:
+            for row in self.body.rows:
+                row_content = [element.content for element in row.cells]
+                table.add_row(*row_content)
 
         yield table
 
@@ -310,7 +314,7 @@ class TableDataElement(MarkdownElement):
 
     @classmethod
     def create(cls, markdown: "Markdown", token: Token) -> "MarkdownElement":
-        style = str(token.attrs.get("style" "")) or ""
+        style = str(token.attrs.get("style")) or ""
 
         justify: JustifyMethod
         if "text-align:right" in style:
@@ -326,15 +330,13 @@ class TableDataElement(MarkdownElement):
         return cls(justify=justify)
 
     def __init__(self, justify: JustifyMethod) -> None:
-        self.content: TextType = ""
+        self.content: Text = Text("", justify=justify)
         self.justify = justify
 
     def on_text(self, context: "MarkdownContext", text: TextType) -> None:
-        plain = text.plain if isinstance(text, Text) else text
-        style = text.style if isinstance(text, Text) else ""
-        self.content = Text(
-            plain, justify=self.justify, style=context.style_stack.current
-        )
+        text = Text(text) if isinstance(text, str) else text
+        text.stylize(context.current_style)
+        self.content.append_text(text)
 
 
 class ListElement(MarkdownElement):
@@ -701,7 +703,6 @@ class Markdown(JupyterMixin):
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     import argparse
     import sys
 
