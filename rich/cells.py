@@ -122,23 +122,20 @@ def set_cell_size(text: str, total: int) -> str:
 # TODO: This is inefficient
 # TODO: This might not work with CWJ type characters
 def chop_cells(text: str, max_size: int, position: int = 0) -> List[str]:
-    """Break text in to equal (cell) length strings, returning the characters in reverse
-    order"""
+    """Break text in to equal (cell) length strings"""
     _get_character_cell_size = get_character_cell_size
-    characters = [
-        (character, _get_character_cell_size(character)) for character in text
-    ]
     total_size = position
     lines: List[List[str]] = [[]]
     append = lines[-1].append
 
-    for character, size in reversed(characters):
-        if total_size + size > max_size:
+    for index, character in enumerate(text):
+        cell_width = _get_character_cell_size(character)
+        if total_size + cell_width > max_size:
             lines.append([character])
             append = lines[-1].append
-            total_size = size
+            total_size = cell_width
         else:
-            total_size += size
+            total_size += cell_width
             append(character)
 
     return ["".join(line) for line in lines]

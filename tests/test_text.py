@@ -449,6 +449,17 @@ def test_wrap_cjk_width_mid_character():
     ]
 
 
+def test_wrap_cjk_mixed():
+    text = Text("123ありがとうございました")
+    console = Console(width=20)  # let's ensure the width passed to wrap() wins.
+
+    wrapped_lines = text.wrap(console, width=8)
+    with console.capture() as capture:
+        console.print(wrapped_lines)
+
+    assert capture.get() == "123あり\nがとうご\nざいまし\nた\n"
+
+
 def test_wrap_long():
     text = Text("abracadabra", justify="left")
     lines = text.wrap(Console(), 4)

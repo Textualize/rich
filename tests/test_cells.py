@@ -1,4 +1,5 @@
 from rich import cells
+from rich.cells import chop_cells
 
 
 def test_cell_len_long_string():
@@ -40,3 +41,13 @@ def test_set_cell_size_infinite():
             )
             == size
         )
+
+
+def test_chop_cells():
+    text = "abcdefghijk"
+    assert chop_cells(text, 3) == ["abc", "def", "ghi", "jk"]
+
+
+def test_chop_cells_position():
+    text = "0123456"
+    assert chop_cells(text, 3, position=1) == ["123", "456"]
