@@ -450,6 +450,9 @@ def test_wrap_cjk_width_mid_character():
 
 
 def test_wrap_cjk_mixed():
+    """Regression test covering https://github.com/Textualize/rich/issues/3176 and
+    https://github.com/Textualize/textual/issues/3567 - double width characters could
+    result in text going missing when wrapping."""
     text = Text("123ありがとうございました")
     console = Console(width=20)  # let's ensure the width passed to wrap() wins.
 
