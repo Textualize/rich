@@ -984,7 +984,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added rich.live https://github.com/textualize/rich/pull/382
-- Added algin parameter to Rule and Console.rule
+- Added align parameter to Rule and Console.rule
 - Added rich.Status class and Console.status
 - Added getitem to Text
 - Added style parameter to Console.log
