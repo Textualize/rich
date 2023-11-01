@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import re
 from functools import lru_cache
-from typing import Callable, List
+from typing import Callable
 
 from ._cell_widths import CELL_WIDTHS
 
@@ -121,35 +123,43 @@ def set_cell_size(text: str, total: int) -> str:
 
 # TODO: This is inefficient
 # TODO: This might not work with CWJ type characters
-def fit_to_width(text: str, available_width: int) -> List[str]:
-    """Fit text within a cell width.
+def fit_to_width(
+    text: str, width: int, *, first_line_width: int | None = None
+) -> list[str]:
+    """Split text into lines such that each line fits within the available (cell) width.
 
     Args:
         text: The text to fit.
-        available_width: The width available.
+        width: The width available.
+        first_line_width: The width available on the first line.
 
     Returns:
         A list of strings such that each string in the list has cell width
         less than or equal to the available width.
     """
     _get_character_cell_size = get_character_cell_size
-    lines: List[List[str]] = [[]]
+    lines: list[list[str]] = [[]]
 
     start_new_line = lines.append
     append_to_last_line = lines[-1].append
 
-    current_line_width = 0
-    for index, character in enumerate(text):
+    total_width = 0
+
+    for character in text:
+        available_width = (
+            first_line_width if len(lines) == 1 and first_line_width else width
+        )
+
         cell_width = _get_character_cell_size(character)
-        char_doesnt_fit = current_line_width + cell_width > available_width
+        char_doesnt_fit = total_width + cell_width > available_width
 
         if char_doesnt_fit:
             start_new_line([character])
             append_to_last_line = lines[-1].append
-            current_line_width = cell_width
+            total_width = cell_width
         else:
             append_to_last_line(character)
-            current_line_width += cell_width
+            total_width += cell_width
 
     return ["".join(line) for line in lines]
 

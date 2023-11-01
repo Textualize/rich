@@ -30,9 +30,7 @@ def divide_line(text: str, width: int, fold: bool = True) -> List[int]:
         if line_position + word_length > width:
             if word_length > width:
                 if fold:
-                    chopped_words = fit_to_width(
-                        word, available_width=width, position=line_position
-                    )
+                    chopped_words = fit_to_width(word, width=width)
                     for last, line in loop_last(chopped_words):
                         if start:
                             append(start)
@@ -95,4 +93,4 @@ if __name__ == "__main__":  # pragma: no cover
 
     console = Console(width=10)
     console.print("12345 abcdefghijklmnopqrstuvwyxzABCDEFGHIJKLMNOPQRSTUVWXYZ 12345")
-    print(fit_to_width("abcdefghijklmnopqrstuvwxyz", 10, position=2))
+    print(fit_to_width("abcdefghijklmnopqrstuvwxyz", 10))

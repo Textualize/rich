@@ -59,3 +59,13 @@ def test_fit_to_width_mixed_width():
     """Mixed single and double-width characters."""
     text = "あ1り2が3と4う56"
     assert fit_to_width(text, 3) == ["あ1", "り2", "が3", "と4", "う5", "6"]
+
+
+def test_fit_to_width_first_line_width():
+    """Text being passed into this function is often appearing near the end
+    of a line in a document, and so the first line has a different amount of
+    width available."""
+    text = "あ1り2が3と4う56"
+    fitted_lines = fit_to_width(text, 3, first_line_width=2)
+    # Only 2 cells available on the 1st line, so the 1 gets folded to the 2nd line.
+    assert fitted_lines == ["あ", "1り", "2が", "3と", "4う", "56"]
