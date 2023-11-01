@@ -121,22 +121,35 @@ def set_cell_size(text: str, total: int) -> str:
 
 # TODO: This is inefficient
 # TODO: This might not work with CWJ type characters
-def chop_cells(text: str, max_size: int, position: int = 0) -> List[str]:
-    """Break text in to equal (cell) length strings"""
-    _get_character_cell_size = get_character_cell_size
-    total_size = position
-    lines: List[List[str]] = [[]]
-    append = lines[-1].append
+def fit_to_width(text: str, available_width: int) -> List[str]:
+    """Fit text within a cell width.
 
+    Args:
+        text: The text to fit.
+        available_width: The width available.
+
+    Returns:
+        A list of strings such that each string in the list has cell width
+        less than or equal to the available width.
+    """
+    _get_character_cell_size = get_character_cell_size
+    lines: List[List[str]] = [[]]
+
+    start_new_line = lines.append
+    append_to_last_line = lines[-1].append
+
+    current_line_width = 0
     for index, character in enumerate(text):
         cell_width = _get_character_cell_size(character)
-        if total_size + cell_width > max_size:
-            lines.append([character])
-            append = lines[-1].append
-            total_size = cell_width
+        char_doesnt_fit = current_line_width + cell_width > available_width
+
+        if char_doesnt_fit:
+            start_new_line([character])
+            append_to_last_line = lines[-1].append
+            current_line_width = cell_width
         else:
-            total_size += cell_width
-            append(character)
+            append_to_last_line(character)
+            current_line_width += cell_width
 
     return ["".join(line) for line in lines]
 
@@ -144,7 +157,7 @@ def chop_cells(text: str, max_size: int, position: int = 0) -> List[str]:
 if __name__ == "__main__":  # pragma: no cover
 
     print(get_character_cell_size("😽"))
-    for line in chop_cells("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", 8):
+    for line in fit_to_width("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", 8):
         print(line)
     for n in range(80, 1, -1):
         print(set_cell_size("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", n) + "|")

@@ -1,5 +1,5 @@
 from rich import cells
-from rich.cells import chop_cells
+from rich.cells import fit_to_width
 
 
 def test_cell_len_long_string():
@@ -43,11 +43,19 @@ def test_set_cell_size_infinite():
         )
 
 
-def test_chop_cells():
+def test_fit_to_width():
+    """Simple example of splitting cells into lines of width 3."""
     text = "abcdefghijk"
-    assert chop_cells(text, 3) == ["abc", "def", "ghi", "jk"]
+    assert fit_to_width(text, 3) == ["abc", "def", "ghi", "jk"]
 
 
-def test_chop_cells_position():
-    text = "0123456"
-    assert chop_cells(text, 3, position=1) == ["123", "456"]
+def test_fit_to_width_double_width_boundary():
+    """The available width lies within a double-width character."""
+    text = "ありがとう"
+    assert fit_to_width(text, 3) == ["あ", "り", "が", "と", "う"]
+
+
+def test_fit_to_width_mixed_width():
+    """Mixed single and double-width characters."""
+    text = "あ1り2が3と4う56"
+    assert fit_to_width(text, 3) == ["あ1", "り2", "が3", "と4", "う5", "6"]
