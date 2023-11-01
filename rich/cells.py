@@ -123,15 +123,15 @@ def set_cell_size(text: str, total: int) -> str:
 
 # TODO: This is inefficient
 # TODO: This might not work with CWJ type characters
-def fit_to_width(
-    text: str, width: int, *, first_line_width: int | None = None
+def fold_to_width(
+    text: str,
+    width: int,
 ) -> list[str]:
     """Split text into lines such that each line fits within the available (cell) width.
 
     Args:
-        text: The text to fit.
-        width: The width available.
-        first_line_width: The width available on the first line.
+        text: The text to fold such that it fits in the given width.
+        width: The width available (number of cells).
 
     Returns:
         A list of strings such that each string in the list has cell width
@@ -146,12 +146,8 @@ def fit_to_width(
     total_width = 0
 
     for character in text:
-        available_width = (
-            first_line_width if len(lines) == 1 and first_line_width else width
-        )
-
         cell_width = _get_character_cell_size(character)
-        char_doesnt_fit = total_width + cell_width > available_width
+        char_doesnt_fit = total_width + cell_width > width
 
         if char_doesnt_fit:
             start_new_line([character])
@@ -167,7 +163,7 @@ def fit_to_width(
 if __name__ == "__main__":  # pragma: no cover
 
     print(get_character_cell_size("😽"))
-    for line in fit_to_width("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", 8):
+    for line in fold_to_width("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", 8):
         print(line)
     for n in range(80, 1, -1):
         print(set_cell_size("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", n) + "|")

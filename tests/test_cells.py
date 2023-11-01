@@ -1,5 +1,5 @@
 from rich import cells
-from rich.cells import fit_to_width
+from rich.cells import fold_to_width
 
 
 def test_cell_len_long_string():
@@ -43,29 +43,19 @@ def test_set_cell_size_infinite():
         )
 
 
-def test_fit_to_width():
+def test_fold_to_width():
     """Simple example of splitting cells into lines of width 3."""
     text = "abcdefghijk"
-    assert fit_to_width(text, 3) == ["abc", "def", "ghi", "jk"]
+    assert fold_to_width(text, 3) == ["abc", "def", "ghi", "jk"]
 
 
-def test_fit_to_width_double_width_boundary():
+def test_fold_to_width_double_width_boundary():
     """The available width lies within a double-width character."""
     text = "ありがとう"
-    assert fit_to_width(text, 3) == ["あ", "り", "が", "と", "う"]
+    assert fold_to_width(text, 3) == ["あ", "り", "が", "と", "う"]
 
 
-def test_fit_to_width_mixed_width():
+def test_fold_to_width_mixed_width():
     """Mixed single and double-width characters."""
     text = "あ1り2が3と4う56"
-    assert fit_to_width(text, 3) == ["あ1", "り2", "が3", "と4", "う5", "6"]
-
-
-def test_fit_to_width_first_line_width():
-    """Text being passed into this function is often appearing near the end
-    of a line in a document, and so the first line has a different amount of
-    width available."""
-    text = "あ1り2が3と4う56"
-    fitted_lines = fit_to_width(text, 3, first_line_width=2)
-    # Only 2 cells available on the 1st line, so the 1 gets folded to the 2nd line.
-    assert fitted_lines == ["あ", "1り", "2が", "3と", "4う", "56"]
+    assert fold_to_width(text, 3) == ["あ1", "り2", "が3", "と4", "う5", "6"]

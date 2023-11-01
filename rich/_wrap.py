@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import re
-from typing import Iterable, List, Tuple
+from typing import Iterable
 
 from ._loop import loop_last
-from .cells import cell_len, fit_to_width
+from .cells import cell_len, fold_to_width
 
 re_word = re.compile(r"\s*\S+\s*")
 
 
-def words(text: str) -> Iterable[Tuple[int, int, str]]:
+def words(text: str) -> Iterable[tuple[int, int, str]]:
     """Yields each word from the text as a tuple containing (start_index, end_index, word)."""
     position = 0
     word_match = re_word.match(text, position)
@@ -18,37 +18,6 @@ def words(text: str) -> Iterable[Tuple[int, int, str]]:
         word = word_match.group(0)
         yield start, end, word
         word_match = re_word.match(text, end)
-
-
-def divide_line(text: str, width: int, fold: bool = True) -> List[int]:
-    divides: List[int] = []
-    append = divides.append
-    line_position = 0
-    _cell_len = cell_len
-    for start, _end, word in words(text):
-        word_length = _cell_len(word.rstrip())
-        if line_position + word_length > width:
-            if word_length > width:
-                if fold:
-                    chopped_words = fit_to_width(word, width=width)
-                    for last, line in loop_last(chopped_words):
-                        if start:
-                            append(start)
-
-                        if last:
-                            line_position = _cell_len(line)
-                        else:
-                            start += len(line)
-                else:
-                    if start:
-                        append(start)
-                    line_position = _cell_len(word)
-            elif line_position and start:
-                append(start)
-                line_position = _cell_len(word)
-        else:
-            line_position += _cell_len(word)
-    return divides
 
 
 def divide_line(text: str, width: int, fold: bool = True) -> list[int]:
@@ -62,30 +31,50 @@ def divide_line(text: str, width: int, fold: bool = True) -> list[int]:
         fold: If True, words longer than `width` will be folded onto a new line.
 
     Returns:
-        A list of cell offsets to break the line at.
+        A list of indices to break the line at.
     """
-
-    break_offsets: list[int] = []  # offsets to insert the breaks at
-    append = break_offsets.append
-    line_position = 0
+    break_positions: list[int] = []  # offsets to insert the breaks at
+    append = break_positions.append
+    cell_offset = 0
     _cell_len = cell_len
 
     for start, _end, word in words(text):
         word_length = _cell_len(word.rstrip())
-        remaining_space = width - line_position
+        remaining_space = width - cell_offset
         word_fits_remaining_space = remaining_space - word_length >= 0
-        if not word_fits_remaining_space:
+
+        if word_fits_remaining_space:
+            # Simplest case - the word fits within the remaining width for this line.
+            cell_offset += _cell_len(word)
+        else:
+            # Not enough space remaining for this word on the current line.
             if word_length > width:
                 # The word doesn't fit on any line, so we can't simply
                 # place it on the next line...
                 if fold:
-                    # ... fold the long word it across multiple lines
-
+                    # ... fold the long word across multiple lines.
                     # We need to fit as much as possible of the word into the remaining
                     # space on the current line.
+                    folded_word = fold_to_width(word, width=width)
+                    for last, line in loop_last(folded_word):
+                        if start:
+                            append(start)
+                        if last:
+                            cell_offset = _cell_len(line)
+                        else:
+                            start += len(line)
+                else:
+                    # Folding isn't allowed, so crop the word.
+                    if start:
+                        append(start)
+                    cell_offset = _cell_len(word)
+            elif cell_offset and start:
+                # The word doesn't fit within the remaining space on the current
+                # line, but it *can* fit on to the next (empty) line.
+                append(start)
+                cell_offset = _cell_len(word)
 
-                    # Take characters from the word until we run out of remaining space.
-                    pass
+    return break_positions
 
 
 if __name__ == "__main__":  # pragma: no cover
@@ -93,4 +82,11 @@ if __name__ == "__main__":  # pragma: no cover
 
     console = Console(width=10)
     console.print("12345 abcdefghijklmnopqrstuvwyxzABCDEFGHIJKLMNOPQRSTUVWXYZ 12345")
-    print(fit_to_width("abcdefghijklmnopqrstuvwxyz", 10))
+    print(fold_to_width("abcdefghijklmnopqrstuvwxyz", 10))
+
+    console = Console(width=20)
+    console.rule()
+    console.print("TextualはPythonの高速アプリケーション開発フレームワークです")
+
+    console.rule()
+    console.print("アプリケーションは1670万色を使用でき")
