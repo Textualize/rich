@@ -511,6 +511,39 @@ def test_wrap_long_words_2():
     ]
 
 
+def test_wrap_long_words_followed_by_other_words():
+    text = Text("123 12345678 123 123")
+    lines = text.wrap(Console(), 6)
+    assert lines._lines == [
+        Text("123 "),
+        Text("123456"),
+        Text("78 123"),
+        Text("123"),
+    ]
+
+
+def test_wrap_long_word_preceeded_by_word_of_full_line_length():
+    text = Text("123456 12345678 123 123")
+    lines = text.wrap(Console(), 6)
+    assert lines._lines == [
+        Text("123456"),
+        Text("123456"),
+        Text("78 123"),
+        Text("123"),
+    ]
+
+
+def test_wrap_multiple_consecutive_spaces():
+    text = Text("123456    12345678 123 123")
+    lines = text.wrap(Console(), 6)
+    assert lines._lines == [
+        Text("123456"),
+        Text("123456"),
+        Text("78 123"),
+        Text("123"),
+    ]
+
+
 def test_wrap_long_words_justify_left():
     text = Text("X 123456789", justify="left")
     lines = text.wrap(Console(), 4)
