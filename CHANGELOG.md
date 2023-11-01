@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Fixed
+
+- Some text goes missing during wrapping when it contains double width characters https://github.com/Textualize/rich/issues/3176
+
 ## [13.6.0] - 2023-09-30
 
 ### Added
