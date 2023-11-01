@@ -52,9 +52,7 @@ def divide_line(text: str, width: int, fold: bool = True) -> list[int]:
                 # The word doesn't fit on any line, so we can't simply
                 # place it on the next line...
                 if fold:
-                    # ... fold the long word across multiple lines.
-                    # We need to fit as much as possible of the word into the remaining
-                    # space on the current line.
+                    # Fold the word across multiple lines.
                     folded_word = chop_cells(word, width=width)
                     for last, line in loop_last(folded_word):
                         if start:
