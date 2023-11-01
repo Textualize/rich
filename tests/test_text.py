@@ -512,6 +512,9 @@ def test_wrap_long_words_2():
 
 
 def test_wrap_long_words_followed_by_other_words():
+    """After folding a word across multiple lines, we should continue from
+    the next word immediately after the folded word (don't take a newline
+    following completion of the folded word)."""
     text = Text("123 12345678 123 123")
     lines = text.wrap(Console(), 6)
     assert lines._lines == [
@@ -523,6 +526,9 @@ def test_wrap_long_words_followed_by_other_words():
 
 
 def test_wrap_long_word_preceeded_by_word_of_full_line_length():
+    """The width of the first word is the same as the available width.
+    Ensures that folding works correctly when there's no space available
+    on the current line."""
     text = Text("123456 12345678 123 123")
     lines = text.wrap(Console(), 6)
     assert lines._lines == [
@@ -534,6 +540,8 @@ def test_wrap_long_word_preceeded_by_word_of_full_line_length():
 
 
 def test_wrap_multiple_consecutive_spaces():
+    """Adding multiple consecutive spaces at the end of a line does not impact
+    the location at which a break will be added during the process of wrapping."""
     text = Text("123456    12345678 123 123")
     lines = text.wrap(Console(), 6)
     assert lines._lines == [
