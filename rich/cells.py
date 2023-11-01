@@ -121,8 +121,6 @@ def set_cell_size(text: str, total: int) -> str:
             start = pos
 
 
-# TODO: This is inefficient
-# TODO: This might not work with CWJ type characters
 def fold_to_width(
     text: str,
     width: int,
