@@ -121,7 +121,7 @@ def set_cell_size(text: str, total: int) -> str:
             start = pos
 
 
-def fold_to_width(
+def chop_cells(
     text: str,
     width: int,
 ) -> list[str]:
@@ -161,7 +161,7 @@ def fold_to_width(
 if __name__ == "__main__":  # pragma: no cover
 
     print(get_character_cell_size("😽"))
-    for line in fold_to_width("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", 8):
+    for line in chop_cells("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", 8):
         print(line)
     for n in range(80, 1, -1):
         print(set_cell_size("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", n) + "|")

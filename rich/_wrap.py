@@ -4,7 +4,7 @@ import re
 from typing import Iterable
 
 from ._loop import loop_last
-from .cells import cell_len, fold_to_width
+from .cells import cell_len, chop_cells
 
 re_word = re.compile(r"\s*\S+\s*")
 
@@ -55,7 +55,7 @@ def divide_line(text: str, width: int, fold: bool = True) -> list[int]:
                     # ... fold the long word across multiple lines.
                     # We need to fit as much as possible of the word into the remaining
                     # space on the current line.
-                    folded_word = fold_to_width(word, width=width)
+                    folded_word = chop_cells(word, width=width)
                     for last, line in loop_last(folded_word):
                         if start:
                             append(start)
@@ -82,7 +82,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     console = Console(width=10)
     console.print("12345 abcdefghijklmnopqrstuvwyxzABCDEFGHIJKLMNOPQRSTUVWXYZ 12345")
-    print(fold_to_width("abcdefghijklmnopqrstuvwxyz", 10))
+    print(chop_cells("abcdefghijklmnopqrstuvwxyz", 10))
 
     console = Console(width=20)
     console.rule()
