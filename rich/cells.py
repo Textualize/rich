@@ -138,7 +138,7 @@ def chop_cells(
     _get_character_cell_size = get_character_cell_size
     lines: list[list[str]] = [[]]
 
-    start_new_line = lines.append
+    append_new_line = lines.append
     append_to_last_line = lines[-1].append
 
     total_width = 0
@@ -148,7 +148,7 @@ def chop_cells(
         char_doesnt_fit = total_width + cell_width > width
 
         if char_doesnt_fit:
-            start_new_line([character])
+            append_new_line([character])
             append_to_last_line = lines[-1].append
             total_width = cell_width
         else:
