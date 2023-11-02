@@ -41,7 +41,7 @@ def divide_line(text: str, width: int, fold: bool = True) -> list[int]:
     for start, _end, word in words(text):
         word_length = _cell_len(word.rstrip())
         remaining_space = width - cell_offset
-        word_fits_remaining_space = remaining_space - word_length >= 0
+        word_fits_remaining_space = remaining_space >= word_length
 
         if word_fits_remaining_space:
             # Simplest case - the word fits within the remaining width for this line.
