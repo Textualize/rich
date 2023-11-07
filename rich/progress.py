@@ -681,7 +681,7 @@ class TimeElapsedColumn(ProgressColumn):
         elapsed = task.finished_time if task.finished else task.elapsed
         if elapsed is None:
             return Text("-:--:--", style="progress.elapsed")
-        delta = timedelta(seconds=int(elapsed))
+        delta = timedelta(seconds=max(0, int(elapsed)))
         return Text(str(delta), style="progress.elapsed")
 
 
@@ -1113,7 +1113,7 @@ class Progress(JupyterMixin):
 
             progress = Progress(
                 SpinnerColumn(),
-                *Progress.default_columns(),
+                *Progress.get_default_columns(),
                 "Elapsed:",
                 TimeElapsedColumn(),
             )

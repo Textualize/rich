@@ -1,13 +1,13 @@
 from itertools import zip_longest
 from typing import (
-    Iterator,
+    TYPE_CHECKING,
     Iterable,
+    Iterator,
     List,
     Optional,
+    TypeVar,
     Union,
     overload,
-    TypeVar,
-    TYPE_CHECKING,
 )
 
 if TYPE_CHECKING:
@@ -119,7 +119,7 @@ class Lines:
 
         Args:
             console (Console): Console instance.
-            width (int): Number of characters per line.
+            width (int): Number of cells available per line.
             justify (str, optional): Default justify method for text: "left", "center", "full" or "right". Defaults to "left".
             overflow (str, optional): Default overflow for text: "crop", "fold", or "ellipsis". Defaults to "fold".
 
