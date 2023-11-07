@@ -38,6 +38,11 @@ skip_py311 = pytest.mark.skipif(
     reason="rendered differently on py3.11",
 )
 
+skip_py312 = pytest.mark.skipif(
+    sys.version_info.minor == 12 and sys.version_info.major == 3,
+    reason="rendered differently on py3.12",
+)
+
 skip_pypy3 = pytest.mark.skipif(
     hasattr(sys, "pypy_version_info"),
     reason="rendered differently on pypy3",
@@ -135,6 +140,7 @@ def test_inspect_empty_dict():
     assert render({}).startswith(expected)
 
 
+@skip_py312
 @skip_py311
 @skip_pypy3
 def test_inspect_builtin_function_except_python311():
@@ -212,6 +218,7 @@ def test_inspect_integer_with_value():
 @skip_py37
 @skip_py310
 @skip_py311
+@skip_py312
 def test_inspect_integer_with_methods_python38_and_python39():
     expected = (
         "╭──────────────── <class 'int'> ─────────────────╮\n"
@@ -249,6 +256,7 @@ def test_inspect_integer_with_methods_python38_and_python39():
 @skip_py38
 @skip_py39
 @skip_py311
+@skip_py312
 def test_inspect_integer_with_methods_python310only():
     expected = (
         "╭──────────────── <class 'int'> ─────────────────╮\n"
@@ -290,7 +298,8 @@ def test_inspect_integer_with_methods_python310only():
 @skip_py38
 @skip_py39
 @skip_py310
-def test_inspect_integer_with_methods_python311_and_above():
+@skip_py312
+def test_inspect_integer_with_methods_python311():
     # to_bytes and from_bytes methods on int had minor signature change -
     # they now, as of 3.11, have default values for all of their parameters
     expected = (

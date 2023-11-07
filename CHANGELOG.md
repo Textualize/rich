@@ -5,11 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- Adds missing parameters to Panel.fit https://github.com/Textualize/rich/issues/3142
+
+## [13.6.0] - 2023-09-30
+
+### Added
+
+- Added Python 3.12 to classifiers.
+
+## [13.5.3] - 2023-09-17
+
+### Fixed
+
+- Markdown table rendering issue with inline styles and links https://github.com/Textualize/rich/issues/3115
+- Fix Markdown code blocks on a light background https://github.com/Textualize/rich/issues/3123
+
 ## [13.5.2] - 2023-08-01
 
 ### Fixed
 
-- Fixed Text.expand_tab assertion error
+- Fixed Text.expand_tabs assertion error
 
 ## [13.5.1] - 2023-07-31
 
@@ -971,7 +990,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added rich.live https://github.com/textualize/rich/pull/382
-- Added algin parameter to Rule and Console.rule
+- Added align parameter to Rule and Console.rule
 - Added rich.Status class and Console.status
 - Added getitem to Text
 - Added style parameter to Console.log
@@ -1994,6 +2013,8 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.6.0]: https://github.com/textualize/rich/compare/v13.5.3...v13.6.0
+[13.5.3]: https://github.com/textualize/rich/compare/v13.5.2...v13.5.3
 [13.5.2]: https://github.com/textualize/rich/compare/v13.5.1...v13.5.2
 [13.5.1]: https://github.com/textualize/rich/compare/v13.5.0...v13.5.1
 [13.5.0]: https://github.com/textualize/rich/compare/v13.4.2...v13.5.0 

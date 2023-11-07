@@ -82,7 +82,9 @@ class Panel(JupyterMixin):
         style: StyleType = "none",
         border_style: StyleType = "none",
         width: Optional[int] = None,
+        height: Optional[int] = None,
         padding: PaddingDimensions = (0, 1),
+        highlight: bool = False,
     ) -> "Panel":
         """An alternative constructor that sets expand=False."""
         return cls(
@@ -96,7 +98,9 @@ class Panel(JupyterMixin):
             style=style,
             border_style=border_style,
             width=width,
+            height=height,
             padding=padding,
+            highlight=highlight,
             expand=False,
         )
 

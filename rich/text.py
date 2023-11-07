@@ -38,6 +38,7 @@ DEFAULT_OVERFLOW: "OverflowMethod" = "fold"
 _re_whitespace = re.compile(r"\s+$")
 
 TextType = Union[str, "Text"]
+"""A plain string or a [Text][rich.text.Text] instance."""
 
 GetStyleCallable = Callable[[str], Optional[StyleType]]
 
@@ -270,7 +271,9 @@ class Text(JupyterMixin):
 
         Args:
             text (str): A string containing console markup.
+            style (Union[str, Style], optional): Base style for text. Defaults to "".
             emoji (bool, optional): Also render emoji code. Defaults to True.
+            emoji_variant (str, optional): Optional emoji variant, either "text" or "emoji". Defaults to None.
             justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
             overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
             end (str, optional): Character to end text with. Defaults to "\\\\n".
@@ -368,6 +371,7 @@ class Text(JupyterMixin):
             style (Union[str, Style], optional): Base style for text. Defaults to "".
             justify (str, optional): Justify method: "left", "center", "full", "right". Defaults to None.
             overflow (str, optional): Overflow method: "crop", "fold", "ellipsis". Defaults to None.
+            no_wrap (bool, optional): Disable text wrapping, or None for default. Defaults to None.
             end (str, optional): Character to end text with. Defaults to "\\\\n".
             tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to None.
             meta (Dict[str, Any], optional). Meta data to apply to text, or None for no meta data. Default to None
@@ -423,7 +427,7 @@ class Text(JupyterMixin):
         self._spans = spans[:]
 
     def blank_copy(self, plain: str = "") -> "Text":
-        """Return a new Text instance with copied meta data (but not the string or spans)."""
+        """Return a new Text instance with copied metadata (but not the string or spans)."""
         copy_self = Text(
             plain,
             style=self.style,
@@ -504,7 +508,7 @@ class Text(JupyterMixin):
     def apply_meta(
         self, meta: Dict[str, Any], start: int = 0, end: Optional[int] = None
     ) -> None:
-        """Apply meta data to the text, or a portion of the text.
+        """Apply metadata to the text, or a portion of the text.
 
         Args:
             meta (Dict[str, Any]): A dict of meta information.
@@ -633,9 +637,9 @@ class Text(JupyterMixin):
         """Highlight words with a style.
 
         Args:
-            words (Iterable[str]): Worlds to highlight.
+            words (Iterable[str]): Words to highlight.
             style (Union[str, Style]): Style to apply.
-            case_sensitive (bool, optional): Enable case sensitive matchings. Defaults to True.
+            case_sensitive (bool, optional): Enable case sensitive matching. Defaults to True.
 
         Returns:
             int: Number of words highlighted.
@@ -822,8 +826,6 @@ class Text(JupyterMixin):
         if tab_size is None:
             tab_size = 8
 
-        result = self.blank_copy()
-
         new_text: List[Text] = []
         append = new_text.append
 
@@ -898,6 +900,7 @@ class Text(JupyterMixin):
 
         Args:
             count (int): Width of padding.
+            character (str): The character to pad with. Must be a string of length 1.
         """
         assert len(character) == 1, "Character must be a string of length 1"
         if count:
@@ -1004,6 +1007,9 @@ class Text(JupyterMixin):
         """Append another Text instance. This method is more performant that Text.append, but
         only works for Text.
 
+        Args:
+            text (Text): The Text instance to append to this instance.
+
         Returns:
             Text: Returns self for chaining.
         """
@@ -1025,7 +1031,7 @@ class Text(JupyterMixin):
         """Append iterable of str and style. Style may be a Style instance or a str style definition.
 
         Args:
-            pairs (Iterable[Tuple[str, Optional[StyleType]]]): An iterable of tuples containing str content and style.
+            tokens (Iterable[Tuple[str, Optional[StyleType]]]): An iterable of tuples containing str content and style.
 
         Returns:
             Text: Returns self for chaining.
@@ -1203,8 +1209,7 @@ class Text(JupyterMixin):
 
         Args:
             console (Console): Console instance.
-            width (int): Number of characters per line.
-            emoji (bool, optional): Also render emoji code. Defaults to True.
+            width (int): Number of cells available per line.
             justify (str, optional): Justify method: "default", "left", "center", "full", "right". Defaults to "default".
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
             tab_size (int, optional): Default tab size. Defaults to 8.
