@@ -563,6 +563,17 @@ def test_wrap_long_words_justify_left():
     assert lines[3] == Text("9   ")
 
 
+def test_wrap_leading_and_trailing_whitespace():
+    text = Text("   123  456 789   ")
+    lines = text.wrap(Console(), 4)
+    assert lines._lines == [
+        Text("   1"),
+        Text("23  "),
+        Text("456 "),
+        Text("789 "),
+    ]
+
+
 def test_no_wrap_no_crop():
     text = Text("Hello World!" * 3)
 
