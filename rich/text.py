@@ -637,9 +637,9 @@ class Text(JupyterMixin):
         """Highlight words with a style.
 
         Args:
-            words (Iterable[str]): Worlds to highlight.
+            words (Iterable[str]): Words to highlight.
             style (Union[str, Style]): Style to apply.
-            case_sensitive (bool, optional): Enable case sensitive matchings. Defaults to True.
+            case_sensitive (bool, optional): Enable case sensitive matching. Defaults to True.
 
         Returns:
             int: Number of words highlighted.
