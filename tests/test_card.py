@@ -1,8 +1,8 @@
 import io
 import re
 
-from rich.console import Console, RenderableType
 from rich.__main__ import make_test_card
+from rich.console import Console, RenderableType
 
 from ._card_render import expected
 
@@ -29,6 +29,7 @@ def render(renderable: RenderableType) -> str:
 def test_card_render():
     card = make_test_card()
     result = render(card)
+    print(repr(result))
     assert result == expected
 
 
