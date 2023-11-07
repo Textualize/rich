@@ -57,5 +57,5 @@ def test_chop_cells_double_width_boundary():
 
 def test_chop_cells_mixed_width():
     """Mixed single and double-width characters."""
-    text = "あ1り2が3と4う56"
-    assert chop_cells(text, 3) == ["あ1", "り2", "が3", "と4", "う5", "6"]
+    text = "あ1り234が5と6う78"
+    assert chop_cells(text, 3) == ["あ1", "り2", "34", "が5", "と6", "う7", "8"]

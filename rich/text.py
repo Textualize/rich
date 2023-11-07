@@ -1204,7 +1204,7 @@ class Text(JupyterMixin):
 
         Args:
             console (Console): Console instance.
-            width (int): Number of single-width characters per line.
+            width (int): Number of cells available per line.
             emoji (bool, optional): Also render emoji code. Defaults to True.
             justify (str, optional): Justify method: "default", "left", "center", "full", "right". Defaults to "default".
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
