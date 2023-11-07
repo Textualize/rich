@@ -8,7 +8,6 @@ repos:
       - id: check-ast
       - id: check-builtin-literals
       - id: check-case-conflict
-      - id: check-docstring-first
       - id: check-merge-conflict
       - id: check-json
       - id: check-toml
@@ -27,7 +26,7 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
   - repo: https://github.com/hadialqattan/pycln
-    rev: v2.1.6
+    rev: v2.2.2
     hooks:
       - id: pycln
         args: [--all]
@@ -40,5 +39,6 @@ repos:
     rev: 5.12.0
     hooks:
       - id: isort
-        exclude: ^benchmarks/
+        name: isort (python)
+        language_version: "3.11"
         args: ["--profile", "black"]
