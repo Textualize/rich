@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Adds missing parameters to Panel.fit https://github.com/Textualize/rich/issues/3142
+
 ### Fixed
 
 - Some text goes missing during wrapping when it contains double width characters https://github.com/Textualize/rich/issues/3176
+- Ensure font is correctly inherited in exported HTML https://github.com/Textualize/rich/issues/3104
 
 ## [13.6.0] - 2023-09-30
 
