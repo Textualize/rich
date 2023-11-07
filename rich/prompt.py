@@ -307,7 +307,7 @@ class IntPrompt(PromptBase[int]):
     validate_error_message = "[prompt.invalid]Please enter a valid integer number"
 
 
-class FloatPrompt(PromptBase[int]):
+class FloatPrompt(PromptBase[float]):
     """A prompt that returns a float.
 
     Example:

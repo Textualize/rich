@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Ensure font is correctly inherited in exported HTML https://github.com/Textualize/rich/issues/3104
+- Fixed typing for `FloatPrompt`.
 
 ## [13.6.0] - 2023-09-30
 
