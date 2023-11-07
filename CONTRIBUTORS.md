@@ -7,6 +7,7 @@ The following people have contributed to the development of Rich:
 - [Patrick Arminio](https://github.com/patrick91)
 - [Gregory Beauregard](https://github.com/GBeauregard/pyffstream)
 - [Artur Borecki](https://github.com/pufereq)
+- [Pedro Aaron](https://github.com/paaaron)
 - [Dennis Brakhane](https://github.com/brakhane)
 - [Darren Burns](https://github.com/darrenburns)
 - [Jim Crist-Harif](https://github.com/jcrist)
@@ -71,3 +72,5 @@ The following people have contributed to the development of Rich:
 - [Qiming Xu](https://github.com/xqm32)
 - [James Addison](https://github.com/jayaddison)
 - [Pierro](https://github.com/xpierroz)
+- [Bernhard Wagner](https://github.com/bwagner)
+- [Aaron Beaudoin](https://github.com/AaronBeaudoin)
