@@ -114,7 +114,6 @@ def test_init_append_column():
 
 
 def test_rich_measure():
-
     console = Console()
     assert Table("test_header", width=-1).__rich_measure__(
         console, console.options

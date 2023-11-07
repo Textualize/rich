@@ -109,7 +109,6 @@ class Segment(NamedTuple):
     @classmethod
     @lru_cache(1024 * 16)
     def _split_cells(cls, segment: "Segment", cut: int) -> Tuple["Segment", "Segment"]:
-
         text, style, control = segment
         _Segment = Segment
 

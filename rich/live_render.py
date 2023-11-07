@@ -82,7 +82,6 @@ class LiveRender:
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-
         renderable = self.renderable
         style = console.get_style(self.style)
         lines = console.render_lines(renderable, options, style=style, pad=False)
