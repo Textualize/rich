@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Adds missing parameters to Panel.fit https://github.com/Textualize/rich/issues/3142
-- Adds a `case_insensitive` parameter to `prompt.Prompt`. This allows the `choices` list to be accepted without regard to case. Defaults to `False`. 
+- Adds a `case_sensitive` parameter to `prompt.Prompt`. This determines if the
+  response is treated as case-sensitive. Defaults to `True`.
 
 ### Fixed
 
@@ -48,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed Text.expand_tabs not expanding spans.
 - Fixed TimeElapsedColumn from showing negative.
 - Fix for escaping strings with a trailing backslash https://github.com/Textualize/rich/issues/2987
-- Fixed exception in Markdown with partial table https://github.com/Textualize/rich/issues/3053 
+- Fixed exception in Markdown with partial table https://github.com/Textualize/rich/issues/3053
 - Fixed the HTML export template so that the `<html>` tag comes before the `<head>` tag https://github.com/Textualize/rich/issues/3021
 - Fixed issue with custom classes overwriting `__eq__` https://github.com/Textualize/rich/issues/2875
 - Fix rich.pretty.install breakage in iPython https://github.com/Textualize/rich/issues/3013
@@ -2021,10 +2022,10 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 [13.5.3]: https://github.com/textualize/rich/compare/v13.5.2...v13.5.3
 [13.5.2]: https://github.com/textualize/rich/compare/v13.5.1...v13.5.2
 [13.5.1]: https://github.com/textualize/rich/compare/v13.5.0...v13.5.1
-[13.5.0]: https://github.com/textualize/rich/compare/v13.4.2...v13.5.0 
-[13.4.2]: https://github.com/textualize/rich/compare/v13.4.1...v13.4.2  
-[13.4.1]: https://github.com/textualize/rich/compare/v13.4.0...v13.4.1  
-[13.4.0]: https://github.com/textualize/rich/compare/v13.3.5...v13.4.0  
+[13.5.0]: https://github.com/textualize/rich/compare/v13.4.2...v13.5.0
+[13.4.2]: https://github.com/textualize/rich/compare/v13.4.1...v13.4.2
+[13.4.1]: https://github.com/textualize/rich/compare/v13.4.0...v13.4.1
+[13.4.0]: https://github.com/textualize/rich/compare/v13.3.5...v13.4.0
 [13.3.5]: https://github.com/textualize/rich/compare/v13.3.4...v13.3.5
 [13.3.4]: https://github.com/textualize/rich/compare/v13.3.3...v13.3.4
 [13.3.3]: https://github.com/textualize/rich/compare/v13.3.2...v13.3.3

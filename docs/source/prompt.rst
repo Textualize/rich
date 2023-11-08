@@ -18,10 +18,10 @@ If you supply a list of choices, the prompt will loop until the user enters one 
     >>> from rich.prompt import Prompt
     >>> name = Prompt.ask("Enter your name", choices=["Paul", "Jessica", "Duncan"], default="Paul")
 
-By default this is case sensitive, but you can set `case_insensitive=True` to make it case insensitive::
+By default this is case sensitive, but you can set `case_sensitive=False` to make it case insensitive::
 
     >>> from rich.prompt import Prompt
-    >>> name = Prompt.ask("Enter your name", choices=["Paul", "Jessica", "Duncan"], default="Paul", case_insensitive=True)
+    >>> name = Prompt.ask("Enter your name", choices=["Paul", "Jessica", "Duncan"], default="Paul", case_sensitive=False)
 
 Now, it would accept "paul" or "Paul" as valid responses.
 

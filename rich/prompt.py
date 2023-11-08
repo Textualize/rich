@@ -36,7 +36,7 @@ class PromptBase(Generic[PromptType]):
         console (Console, optional): A Console instance or None to use global console. Defaults to None.
         password (bool, optional): Enable password input. Defaults to False.
         choices (List[str], optional): A list of valid choices. Defaults to None.
-        case_insensitive (bool, optional): Enable case insensitive matching of choices. Defaults to False.
+        case_sensitive (bool, optional): Matching of choices should be case-sensitive. Defaults to True.
         show_default (bool, optional): Show default in prompt. Defaults to True.
         show_choices (bool, optional): Show choices in prompt. Defaults to True.
     """
@@ -58,7 +58,7 @@ class PromptBase(Generic[PromptType]):
         console: Optional[Console] = None,
         password: bool = False,
         choices: Optional[List[str]] = None,
-        case_insensitive: bool = False,
+        case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
     ) -> None:
@@ -71,7 +71,7 @@ class PromptBase(Generic[PromptType]):
         self.password = password
         if choices is not None:
             self.choices = choices
-        self.case_insensitive = case_insensitive
+        self.case_sensitive = case_sensitive
         self.show_default = show_default
         self.show_choices = show_choices
 
@@ -84,7 +84,7 @@ class PromptBase(Generic[PromptType]):
         console: Optional[Console] = None,
         password: bool = False,
         choices: Optional[List[str]] = None,
-        case_insensitive: bool = False,
+        case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
         default: DefaultType,
@@ -101,7 +101,7 @@ class PromptBase(Generic[PromptType]):
         console: Optional[Console] = None,
         password: bool = False,
         choices: Optional[List[str]] = None,
-        case_insensitive: bool = False,
+        case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
         stream: Optional[TextIO] = None,
@@ -116,7 +116,7 @@ class PromptBase(Generic[PromptType]):
         console: Optional[Console] = None,
         password: bool = False,
         choices: Optional[List[str]] = None,
-        case_insensitive: bool = False,
+        case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
         default: Any = ...,
@@ -132,7 +132,7 @@ class PromptBase(Generic[PromptType]):
             console (Console, optional): A Console instance or None to use global console. Defaults to None.
             password (bool, optional): Enable password input. Defaults to False.
             choices (List[str], optional): A list of valid choices. Defaults to None.
-            case_insensitive (bool, optional): Enable case insensitive matching of choices. Defaults to False.
+            case_sensitive (bool, optional): Matching of choices should be case-sensitive. Defaults to True.
             show_default (bool, optional): Show default in prompt. Defaults to True.
             show_choices (bool, optional): Show choices in prompt. Defaults to True.
             stream (TextIO, optional): Optional text file open for reading to get input. Defaults to None.
@@ -142,7 +142,7 @@ class PromptBase(Generic[PromptType]):
             console=console,
             password=password,
             choices=choices,
-            case_insensitive=case_insensitive,
+            case_sensitive=case_sensitive,
             show_default=show_default,
             show_choices=show_choices,
         )
@@ -220,9 +220,9 @@ class PromptBase(Generic[PromptType]):
             bool: True if choice was valid, otherwise False.
         """
         assert self.choices is not None
-        if self.case_insensitive:
-            return value.strip().lower() in [choice.lower() for choice in self.choices]
-        return value.strip() in self.choices
+        if self.case_sensitive:
+            return value.strip() in self.choices
+        return value.strip().lower() in [choice.lower() for choice in self.choices]
 
     def process_response(self, value: str) -> PromptType:
         """Process response from user, convert to prompt type.
@@ -246,7 +246,7 @@ class PromptBase(Generic[PromptType]):
             if not self.check_choice(value):
                 raise InvalidResponse(self.illegal_choice_message)
 
-            if self.case_insensitive:
+            if not self.case_sensitive:
                 # return the original choice, not the lower case version
                 return_value = self.response_type(
                     self.choices[
@@ -391,8 +391,8 @@ if __name__ == "__main__":  # pragma: no cover
 
         doggie = Prompt.ask(
             "What's the best Dog? (Case INSENSITIVE)",
-            choices=["BT", "Collie", "Labradoodle"],
-            case_insensitive=True,
+            choices=["Border Terrier", "Collie", "Labradoodle"],
+            case_sensitive=False,
         )
         print(f"doggie={doggie!r}")
 

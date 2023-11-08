@@ -29,7 +29,7 @@ def test_prompt_str_case_insensitive():
         console=console,
         choices=["foo", "bar"],
         default="baz",
-        case_insensitive=True,
+        case_sensitive=False,
         stream=io.StringIO(INPUT),
     )
     assert name == "foo"
