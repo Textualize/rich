@@ -1002,9 +1002,9 @@ class Task:
     def percentage(self) -> float:
         """float: Get progress of task as a percentage. If a None total was set, returns 0"""
         if not self.total:
-            return 0.0
-        completed = (self.completed / self.total) * 100.0
-        completed = min(100.0, max(0.0, completed))
+            return 0
+        completed = (self.completed / self.total) * 100
+        completed = min(100, max(0, completed))
         return completed
 
     @property
@@ -1326,7 +1326,7 @@ class Progress(JupyterMixin):
         # normalize the mode (always rb, rt)
         _mode = "".join(sorted(mode, reverse=False))
         if _mode not in ("br", "rt", "r"):
-            raise ValueError("invalid mode {!r}".format(mode))
+            raise ValueError(f"invalid mode {mode!r}")
 
         # patch buffering to provide the same behaviour as the builtin `open`
         line_buffering = buffering == 1
