@@ -521,7 +521,7 @@ class Markdown(JupyterMixin):
 
     Args:
         markup (str): A string containing markdown.
-        code_theme (str, optional): Pygments theme for code blocks. Defaults to "monokai".
+        code_theme (str, optional): Pygments theme for code blocks. Defaults to "monokai". See https://pygments.org/styles/ for more pygments.
         justify (JustifyMethod, optional): Justify value for paragraphs. Defaults to None.
         style (Union[str, Style], optional): Optional style to apply to markdown.
         hyperlinks (bool, optional): Enable hyperlinks. Defaults to ``True``.
