@@ -1206,7 +1206,7 @@ class Progress(JupyterMixin):
         if task_id is None:
             task_id = self.add_task(description, total=total, completed=completed)
         else:
-            self.update(task_id, total=total)
+            self.update(task_id, total=total, completed=completed)
 
         if self.live.auto_refresh:
             with _TrackThread(self, task_id, update_period) as track_thread:
