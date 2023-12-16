@@ -49,6 +49,7 @@ from ._emoji_replace import _emoji_replace
 from ._export_format import CONSOLE_HTML_FORMAT, CONSOLE_SVG_FORMAT
 from ._fileno import get_fileno
 from ._log_render import FormatTimeCallable, LogRender
+from ._pipes import SuppressBrokenPipeError
 from .align import Align, AlignMethod
 from .color import ColorSystem, blend_rgb
 from .control import Control
@@ -2062,7 +2063,8 @@ class Console:
                             error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
                             raise
 
-                    self.file.flush()
+                    with SuppressBrokenPipeError():
+                        self.file.flush()
                     del self._buffer[:]
 
     def _render_buffer(self, buffer: Iterable[Segment]) -> str:
