@@ -1,6 +1,7 @@
 import datetime
 import io
 import os
+import subprocess
 import sys
 import tempfile
 from typing import Optional, Tuple, Type, Union
@@ -991,3 +992,26 @@ def test_force_color():
         },
     )
     assert console.color_system in ("truecolor", "windows")
+
+
+def test_run_piped_to_head():
+    which_py = ["which", "python"]
+    python_path = subprocess.run(which_py, capture_output=True).stdout.decode()
+    print(f"{python_path=}")
+    # Command to run 'python -m rich'
+    rich_cmd = ["python", "-m", "rich"]
+    # Command to run 'head'
+    head_cmd = ["head", "-1"]
+    # Running 'python -m rich' and piping its output to 'head'
+    proc1 = subprocess.Popen(rich_cmd, stdout=subprocess.PIPE)
+    proc2 = subprocess.Popen(head_cmd, stdin=proc1.stdout, stdout=subprocess.PIPE)
+    # Close proc1's stdout to allow proc1 to receive a SIGPIPE if proc2 exits
+    proc1.stdout.close()
+    # Capture the output of 'head'
+    output, _ = proc2.communicate()
+    # Print the output
+    print(output.decode("utf-8"))
+    proc1.wait()
+    proc2.wait()
+    assert proc1.returncode == 1
+    assert proc2.returncode == 0
