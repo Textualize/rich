@@ -995,22 +995,17 @@ def test_force_color():
 
 
 def test_run_piped_to_head():
-    which_py = ["which", "python"]
-    python_path = subprocess.run(which_py, capture_output=True).stdout.decode()
-    print(f"{python_path=}")
-    # Command to run 'python -m rich'
-    rich_cmd = ["python", "-m", "rich"]
-    # Command to run 'head'
-    head_cmd = ["head", "-1"]
-    # Running 'python -m rich' and piping its output to 'head'
+    which_py, which_head = (["which", cmd] for cmd in ("python", "head"))
+    rich_cmd = "python -m rich".split()
+    for cmd in [which_py, which_head, rich_cmd]:
+        check = subprocess.run(cmd).returncode
+        if check != 0:
+            return  # Only test on suitable Unix platforms
+    head_cmd = "head -1".split()
     proc1 = subprocess.Popen(rich_cmd, stdout=subprocess.PIPE)
     proc2 = subprocess.Popen(head_cmd, stdin=proc1.stdout, stdout=subprocess.PIPE)
-    # Close proc1's stdout to allow proc1 to receive a SIGPIPE if proc2 exits
     proc1.stdout.close()
-    # Capture the output of 'head'
     output, _ = proc2.communicate()
-    # Print the output
-    print(output.decode("utf-8"))
     proc1.wait()
     proc2.wait()
     assert proc1.returncode == 1
