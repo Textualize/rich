@@ -16,8 +16,39 @@ To see how the progress display looks, try this from the command line::
 
     Progress works with Jupyter notebooks, with the caveat that auto-refresh is disabled. You will need to explicitly call :meth:`~rich.progress.Progress.refresh` or set ``refresh=True`` when calling :meth:`~rich.progress.Progress.update`. Or use the :func:`~rich.progress.track` function which does a refresh automatically on each loop.
 
+
 Basic Usage
 -----------
+
+The recommended way to use the ``Progress`` class is as a context manager. This encapsulates automatically starting and stopping the display:
+
+.. code-block:: python
+
+   from rich.progress import track
+
+   with track(sequence, description="Processing") as progress:
+       for item in progress:
+           # process each item
+
+Using a context manager ensures ``Progress`` will render correctly without needing to manually call ``start()`` and ``stop()``. 
+
+If you need more flexibility than ``track()`` provides, construct a ``Progress`` instance directly. Be sure to call ``start()`` first to initialize rendering:
+
+.. code-block:: python
+
+   from rich.progress import Progress
+
+   progress = Progress()
+   progress.start()
+
+   task1 = progress.add_task("[green]Downloading...", total=total_items)
+   task2 = progress.add_task("[red]Processing...", total=total_items)
+
+   while True:
+       progress.update(task1, advance=n_downloaded)
+       progress.update(task2, advance=n_processed)
+
+Without calling ``start()``, the ``Progress`` display will not update. Remember this if you see no output!
 
 For basic usage call the :func:`~rich.progress.track` function, which accepts a sequence (such as a list or range object) and an optional description of the job you are working on. The track function will yield values from the sequence and update the progress information on each iteration. Here's an example::
 
