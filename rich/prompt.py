@@ -307,7 +307,7 @@ class IntPrompt(PromptBase[int]):
     validate_error_message = "[prompt.invalid]Please enter a valid integer number"
 
 
-class FloatPrompt(PromptBase[int]):
+class FloatPrompt(PromptBase[float]):
     """A prompt that returns a float.
 
     Example:
@@ -346,7 +346,6 @@ class Confirm(PromptBase[bool]):
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     from rich import print
 
     if Confirm.ask("Run [i]prompt[/i] tests?", default=True):

@@ -151,7 +151,6 @@ if __name__ == "__main__":
 
     @dataclass
     class E:
-
         size: Optional[int] = None
         ratio: int = 1
         minimum_size: int = 1
