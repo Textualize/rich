@@ -181,7 +181,7 @@ class PromptBase(Generic[PromptType]):
         prompt.end = ""
 
         if self.show_choices and self.choices:
-            _choices = "/".join((self.choices))
+            _choices = "/".join(self.choices)
             choices = f"[{_choices}]"
             prompt.append(" ")
             prompt.append(choices, "prompt.choices")
@@ -324,7 +324,7 @@ class IntPrompt(PromptBase[int]):
     validate_error_message = "[prompt.invalid]Please enter a valid integer number"
 
 
-class FloatPrompt(PromptBase[int]):
+class FloatPrompt(PromptBase[float]):
     """A prompt that returns a float.
 
     Example:
