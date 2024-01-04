@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Adds missing parameters to Panel.fit https://github.com/Textualize/rich/issues/3142
+- Added a addtional parameter to prompt class (illegal_choice_message).
 
 ### Fixed
 
