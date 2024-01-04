@@ -13,17 +13,17 @@ You can set a default value which will be returned if the user presses return wi
     >>> from rich.prompt import Prompt
     >>> name = Prompt.ask("Enter your name", default="Paul Atreides")
 
-If you supply a list of choices, the prompt will loop until the user enters one of the supplied choices.::
+If you supply a list of choices, the prompt will loop until the user enters one of the supplied choices::
 
     >>> from rich.prompt import Prompt
     >>> name = Prompt.ask("Enter your name", choices=["Paul", "Jessica", "Duncan"], default="Paul")
 
-Additionally, if the user does not choose one of the supplied names a error message will be outputted.::
+Additionally, if the user does not choose one of the supplied names a error message will be outputted::
 
     >>> from rich.prompt import Prompt
     >>> name = Prompt.ask("Pick a name please", choices=("Paul", "Jessica", "Duncan"), illegal_choice_message="[prompt.invalid.choice]That name is not available")
 
-As seen above, this error message can be changed using the illegal message parameter. The error message may be given as a string (which may contain :ref:`console_markup` and emoji code) or as a :class:`~rich.text.Text` instance.::
+As seen above, this error message can be changed using the illegal message parameter. The error message may be given as a string (which may contain :ref:`console_markup` and emoji code) or as a :class:`~rich.text.Text` instance.
 
 In addition to :class:`~rich.prompt.Prompt` which returns strings, you can also use :class:`~rich.prompt.IntPrompt` which asks the user for an integer, and :class:`~rich.prompt.FloatPrompt` for floats.
 
