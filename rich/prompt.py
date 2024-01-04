@@ -38,7 +38,7 @@ class PromptBase(Generic[PromptType]):
         choices (List[str], optional): A list of valid choices. Defaults to None.
         show_default (bool, optional): Show default in prompt. Defaults to True.
         show_choices (bool, optional): Show choices in prompt. Defaults to True.
-        illegal_choice_message (str, optional): The message on a illegal choice. Defaults to [prompt.invalid.choice]Please select one of the available options
+        illegal_choice_message (TextType, optional): The message on a illegal choice. Defaults to [prompt.invalid.choice]Please select one of the available options
 
     """
 
@@ -145,6 +145,7 @@ class PromptBase(Generic[PromptType]):
             show_default (bool, optional): Show default in prompt. Defaults to True.
             show_choices (bool, optional): Show choices in prompt. Defaults to True.
             stream (TextIO, optional): Optional text file open for reading to get input. Defaults to None.
+            illegal_choice_message (TextType, optional): The message on a illegal choice. Defaults to [prompt.invalid.choice]Please select one of the available options.
         """
         _prompt = cls(
             prompt,
