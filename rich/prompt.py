@@ -38,14 +38,13 @@ class PromptBase(Generic[PromptType]):
         choices (List[str], optional): A list of valid choices. Defaults to None.
         show_default (bool, optional): Show default in prompt. Defaults to True.
         show_choices (bool, optional): Show choices in prompt. Defaults to True.
+        illegal_choice_message (str, optional): The message on a illegal choice. Defaults to [prompt.invalid.choice]Please select one of the available options
+
     """
 
     response_type: type = str
 
     validate_error_message = "[prompt.invalid]Please enter a valid value"
-    illegal_choice_message = (
-        "[prompt.invalid.choice]Please select one of the available options"
-    )
     prompt_suffix = ": "
 
     choices: Optional[List[str]] = None
@@ -59,8 +58,16 @@ class PromptBase(Generic[PromptType]):
         choices: Optional[List[str]] = None,
         show_default: bool = True,
         show_choices: bool = True,
+        illegal_choice_message: Optional[TextType] = (
+            "[prompt.invalid.choice]Please select one of the available options"
+        )
     ) -> None:
         self.console = console or get_console()
+        self.illegal_choice_message = (
+            Text.from_markup((illegal_choice_message), style="prompt")
+            if isinstance(illegal_choice_message, str)
+            else illegal_choice_message
+        )
         self.prompt = (
             Text.from_markup(prompt, style="prompt")
             if isinstance(prompt, str)
@@ -85,6 +92,9 @@ class PromptBase(Generic[PromptType]):
         show_choices: bool = True,
         default: DefaultType,
         stream: Optional[TextIO] = None,
+        illegal_choice_message: Optional[TextType] = (
+            "[prompt.invalid.choice]Please select one of the available options"
+        )
     ) -> Union[DefaultType, PromptType]:
         ...
 
@@ -100,6 +110,9 @@ class PromptBase(Generic[PromptType]):
         show_default: bool = True,
         show_choices: bool = True,
         stream: Optional[TextIO] = None,
+        illegal_choice_message: Optional[TextType] = (
+            "[prompt.invalid.choice]Please select one of the available options"
+        )
     ) -> PromptType:
         ...
 
@@ -115,6 +128,9 @@ class PromptBase(Generic[PromptType]):
         show_choices: bool = True,
         default: Any = ...,
         stream: Optional[TextIO] = None,
+        illegal_choice_message: Optional[TextType] = (
+            "[prompt.invalid.choice]Please select one of the available options"
+        )
     ) -> Any:
         """Shortcut to construct and run a prompt loop and return the result.
 
@@ -137,6 +153,7 @@ class PromptBase(Generic[PromptType]):
             choices=choices,
             show_default=show_default,
             show_choices=show_choices,
+            illegal_choice_message=illegal_choice_message,
         )
         return _prompt(default=default, stream=stream)
 
@@ -164,7 +181,7 @@ class PromptBase(Generic[PromptType]):
         prompt.end = ""
 
         if self.show_choices and self.choices:
-            _choices = "/".join(self.choices)
+            _choices = "/".join((self.choices))
             choices = f"[{_choices}]"
             prompt.append(" ")
             prompt.append(choices, "prompt.choices")
@@ -307,7 +324,7 @@ class IntPrompt(PromptBase[int]):
     validate_error_message = "[prompt.invalid]Please enter a valid integer number"
 
 
-class FloatPrompt(PromptBase[float]):
+class FloatPrompt(PromptBase[int]):
     """A prompt that returns a float.
 
     Example:
@@ -346,6 +363,7 @@ class Confirm(PromptBase[bool]):
 
 
 if __name__ == "__main__":  # pragma: no cover
+
     from rich import print
 
     if Confirm.ask("Run [i]prompt[/i] tests?", default=True):
