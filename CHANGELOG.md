@@ -10,8 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Исправлены опечатки в файле README.ru.md.
-- Исправлены стилистические ошибки перевода в файле README.ru.md.
+- Fixed typos in the file README.ru.md .
+- Fixed stylistic translation errors in the file README.ru.md .
 
 
 ## [13.7.0] - 2023-11-15
