@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Changed
 
-- Change word wrapping to not consume whitespace https://github.com/Textualize/rich/pull/3258
+- Add option to divide_line to not consume whitespace https://github.com/Textualize/rich/pull/3258
 
 ## [13.7.0] - 2023-11-15
 
