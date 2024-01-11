@@ -16,7 +16,6 @@ repos:
       - id: mixed-line-ending
       - id: check-vcs-permalinks
       - id: check-shebang-scripts-are-executable
-      - id: trailing-whitespace
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:

@@ -1103,6 +1103,8 @@ class Text(JupyterMixin):
     def divide(self, offsets: Iterable[int]) -> Lines:
         """Divide text in to a number of lines at given offsets.
 
+        The offsets are codepoint indices, not visual offsets.
+
         Args:
             offsets (Iterable[int]): Offsets used to divide text.
 
