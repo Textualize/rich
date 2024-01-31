@@ -20,6 +20,17 @@ If you supply a list of choices, the prompt will loop until the user enters one 
 
 In addition to :class:`~rich.prompt.Prompt` which returns strings, you can also use :class:`~rich.prompt.IntPrompt` which asks the user for an integer, and :class:`~rich.prompt.FloatPrompt` for floats.
 
+    >>> from rich.prompt import IntPrompt
+    >>> age = IntPrompt.ask("Enter your age")
+
+    >>> from rich.prompt import FloatPrompt
+    >>> height = FloatPrompt.ask("Enter your height")
+
+Paths and files can be asked for using :class:`~rich.prompt.PathPrompt`.
+
+    >>> from rich.prompt import PathPrompt
+    >>> path = PathPrompt.ask("Enter a path", exists=Fale)
+
 The :class:`~rich.prompt.Confirm` class is a specialized prompt which may be used to ask the user a simple yes / no question. Here's an example::
 
     >>> from rich.prompt import Confirm

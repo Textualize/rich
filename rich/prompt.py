@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Generic, List, Optional, TextIO, TypeVar, Union, overload
 
 from . import get_console
@@ -345,6 +346,83 @@ class Confirm(PromptBase[bool]):
         return value == self.choices[0]
 
 
+class PathPrompt(PromptBase[Path]):
+    """Prompt for a pathlib.Path.
+
+    Example:
+        new_path = PathPrompt.ask("enter a new path", exists=False)
+        existing_path = PathPrompt.ask("enter an existing path", exists=True)
+
+        existing_file = PathPrompt.ask("enter an existing file name", file=True)
+        existing_file = PathPrompt.ask("enter an existing dir name", directory=True)
+    """
+
+    validate_error_message = "[prompt.invalid]Please enter a valid path"
+
+    exists: bool = False
+    file: bool = False
+    directory: bool = False
+
+    @classmethod
+    def ask(
+        cls,
+        prompt: TextType = "",
+        *,
+        exists: bool = False,
+        directory: bool = False,
+        file: bool = False,
+        console: Optional[Console] = None,
+        password: bool = False,
+        choices: Optional[List[str]] = None,
+        show_default: bool = True,
+        show_choices: bool = True,
+        default: Any = ...,
+        stream: Optional[TextIO] = None,
+    ) -> Path:
+        """Shortcut to construct and run a prompt loop and return the result.
+
+        Example:
+            >>> filename = PathPrompt.ask("Enter a filename", exists=False)
+
+        Args:
+            prompt (TextType, optional): Prompt text. Defaults to "".
+            exists (bool, optional): Require path to exist. Defaults to False.
+            directory (bool, optional): Require path to be an existing directory. Defaults to False.
+            file (bool, optional): Require path to be an existing file. Defaults to False.
+            console (Console, optional): A Console instance or None to use global console. Defaults to None.
+            password (bool, optional): Enable password input. Defaults to False.
+            choices (List[str], optional): A list of valid choices. Defaults to None.
+            show_default (bool, optional): Show default in prompt. Defaults to True.
+            show_choices (bool, optional): Show choices in prompt. Defaults to True.
+            stream (TextIO, optional): Optional text file open for reading to get input. Defaults to None.
+        """
+        _prompt = cls(
+            prompt,
+            console=console,
+            password=password,
+            choices=choices,
+            show_default=show_default,
+            show_choices=show_choices,
+        )
+        _prompt.exists = exists
+        _prompt.file = file
+        _prompt.directory = directory
+        return _prompt(default=default, stream=stream)
+
+    def process_response(self, value: str) -> Path:
+        """Convert string to Path."""
+        path = Path(value)
+        if self.exists and not path.exists():
+            raise InvalidResponse("[prompt.invalid]Path does not exist")
+        if not self.exists and path.exists():
+            raise InvalidResponse("[prompt.invalid]Path already exists")
+        if self.file and not path.is_file():
+            raise InvalidResponse("[prompt.invalid]Path is not a file")
+        if self.directory and not path.is_dir():
+            raise InvalidResponse("[prompt.invalid]Path is not a directory")
+        return path
+
+
 if __name__ == "__main__":  # pragma: no cover
     from rich import print
 
@@ -357,6 +435,22 @@ if __name__ == "__main__":  # pragma: no cover
                 break
             print(":pile_of_poo: [prompt.invalid]Number must be between 1 and 10")
         print(f"number={result}")
+
+        while True:
+            result = FloatPrompt.ask(
+                ":rocket: Enter a float between [b]1[/b] and [b]10[/b]", default=5.0
+            )
+            if result >= 1 and result <= 10:
+                break
+            print(":pile_of_poo: [prompt.invalid]Number must be between 1 and 10")
+        print(f"number={result}")
+
+        while True:
+            path = PathPrompt.ask("Enter a non-existing path", exists=False)
+            if not path.exists():
+                break
+            print(":❄️: [prompt.invalid]Path already exists")
+        print(f"path={path!r}")
 
         while True:
             password = Prompt.ask(
