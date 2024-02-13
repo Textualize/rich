@@ -68,3 +68,17 @@ def test_decode_issue_2688(ansi_bytes, expected_text):
     text = Text.from_ansi(ansi_bytes.decode())
 
     assert str(text) == expected_text
+
+
+@pytest.mark.parametrize("code", [*"0123456789:;<=>?"])
+def test_strip_private_escape_sequences(code):
+    text = Text.from_ansi(f"\x1b{code}x")
+
+    console = Console(force_terminal=True)
+
+    with console.capture() as capture:
+        console.print(text)
+
+    expected = "x\n"
+
+    assert capture.get() == expected
