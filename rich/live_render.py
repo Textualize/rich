@@ -14,7 +14,9 @@ from .segment import ControlType, Segment
 from .style import StyleType
 from .text import Text
 
-VerticalOverflowMethod = Literal["crop", "ellipsis", "visible"]
+VerticalOverflowMethod = Literal[
+    "crop", "crop_top", "ellipsis", "ellipsis_top", "visible"
+]
 
 
 class LiveRender:
@@ -92,6 +94,9 @@ class LiveRender:
             if self.vertical_overflow == "crop":
                 lines = lines[: options.size.height]
                 shape = Segment.get_shape(lines)
+            elif self.vertical_overflow == "crop_top":
+                lines = lines[height - options.size.height :]
+                shape = Segment.get_shape(lines)
             elif self.vertical_overflow == "ellipsis":
                 lines = lines[: (options.size.height - 1)]
                 overflow_text = Text(
@@ -102,6 +107,17 @@ class LiveRender:
                     style="live.ellipsis",
                 )
                 lines.append(list(console.render(overflow_text)))
+                shape = Segment.get_shape(lines)
+            elif self.vertical_overflow == "ellipsis_top":
+                lines = lines[height - options.size.height + 1 :]
+                overflow_text = Text(
+                    "...",
+                    overflow="crop",
+                    justify="center",
+                    end="",
+                    style="live.ellipsis",
+                )
+                lines.insert(0, list(console.render(overflow_text)))
                 shape = Segment.get_shape(lines)
         self._shape = shape
 
