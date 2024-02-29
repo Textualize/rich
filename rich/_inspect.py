@@ -34,6 +34,8 @@ class Inspect(JupyterMixin):
         sort (bool, optional): Sort attributes alphabetically. Defaults to True.
         all (bool, optional): Show all attributes. Defaults to False.
         value (bool, optional): Pretty print value of object. Defaults to True.
+        attributes (bool, optional): Show object attributes. Defaults to True.
+        attributes_to_display (Collection[str], optional): List of attributes to display. Defaults to (). If empty, all attributes are displayed.
     """
 
     def __init__(
@@ -49,14 +51,18 @@ class Inspect(JupyterMixin):
         sort: bool = True,
         all: bool = True,
         value: bool = True,
+        attributes: bool = True,
+        attributes_to_display: Collection[str] = (),
     ) -> None:
         self.highlighter = ReprHighlighter()
         self.obj = obj
         self.title = title or self._make_title(obj)
         if all:
-            methods = private = dunder = True
+            methods = private = dunder = attributes = True
         self.help = help
         self.methods = methods
+        self.attributes = attributes
+        self.attributes_to_display = attributes_to_display
         self.docs = docs or help
         self.private = private or dunder
         self.dunder = dunder
@@ -204,6 +210,10 @@ class Inspect(JupyterMixin):
 
                     add_row(key_text, _signature_text)
             else:
+                if not self.attributes:
+                    continue
+                if self.attributes_to_display and key not in self.attributes_to_display:
+                    continue
                 add_row(key_text, Pretty(value, highlighter=highlighter))
         if items_table.row_count:
             yield items_table
