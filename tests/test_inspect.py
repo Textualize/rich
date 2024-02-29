@@ -49,9 +49,18 @@ skip_pypy3 = pytest.mark.skipif(
 )
 
 
-def render(obj, methods=False, value=False, width=50) -> str:
+def render(
+    obj, methods=False, value=False, width=50, attributes=True, attributes_to_display=()
+) -> str:
     console = Console(file=io.StringIO(), width=width, legacy_windows=False)
-    inspect(obj, console=console, methods=methods, value=value)
+    inspect(
+        obj,
+        console=console,
+        methods=methods,
+        value=value,
+        attributes=attributes,
+        attributes_to_display=attributes_to_display,
+    )
     return console.file.getvalue()
 
 
@@ -207,6 +216,25 @@ def test_inspect_integer():
     )
     assert expected == render(1)
 
+
+def test_inspect_integer_without_attributes():
+    expected = ("╭──────────────── <class 'int'> ─────────────────╮\n"
+                "│ int([x]) -> integer                            │\n"
+                "│ int(x, base=10) -> integer                     │\n"
+                "│                                                │\n"
+                "│ 62 attribute(s) not shown. Run                 │\n"
+                "│ inspect(inspect) for options.                  │\n"
+                "╰────────────────────────────────────────────────╯\n")
+    assert expected == render(1, attributes=False)
+
+def test_inspect_integer_with_denominator():
+    expected = ("╭────── <class 'int'> ───────╮\n"
+                "│ int([x]) -> integer        │\n"
+                "│ int(x, base=10) -> integer │\n"
+                "│                            │\n"
+                "│ denominator = 1            │\n"
+                "╰────────────────────────────╯\n")
+    assert expected == render(1, attributes=True, attributes_to_display=["denominator"])
 
 def test_inspect_integer_with_value():
     expected = "╭────── <class 'int'> ───────╮\n│ int([x]) -> integer        │\n│ int(x, base=10) -> integer │\n│                            │\n│ ╭────────────────────────╮ │\n│ │ 1                      │ │\n│ ╰────────────────────────╯ │\n│                            │\n│ denominator = 1            │\n│        imag = 0            │\n│   numerator = 1            │\n│        real = 1            │\n╰────────────────────────────╯\n"

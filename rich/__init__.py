@@ -1,7 +1,7 @@
 """Rich text and beautiful formatting in the terminal."""
 
 import os
-from typing import IO, TYPE_CHECKING, Any, Callable, Optional, Union
+from typing import IO, TYPE_CHECKING, Any, Callable, Optional, Union, Collection
 
 from ._extension import load_ipython_extension  # noqa: F401
 
@@ -130,11 +130,15 @@ def inspect(
     sort: bool = True,
     all: bool = False,
     value: bool = True,
+    attributes: bool = True,
+    attributes_to_display: Collection[str] = (),
 ) -> None:
     """Inspect any Python object.
 
     * inspect(<OBJECT>) to see summarized info.
     * inspect(<OBJECT>, methods=True) to see methods.
+    * inspect(<OBJECT>, attributes=True) to see attributes.
+    * inspect(<OBJECT>, attributes=True, attributes_to_display=["attr1", "attr2"]) to see only specified attributes.
     * inspect(<OBJECT>, help=True) to see full (non-abbreviated) help.
     * inspect(<OBJECT>, private=True) to see private attributes (single underscore).
     * inspect(<OBJECT>, dunder=True) to see attributes beginning with double underscore.
@@ -151,6 +155,8 @@ def inspect(
         sort (bool, optional): Sort attributes alphabetically. Defaults to True.
         all (bool, optional): Show all attributes. Defaults to False.
         value (bool, optional): Pretty print value. Defaults to True.
+        attributes (bool, optional): Show object attributes. Defaults to True.
+        attributes_to_display (Collection[str], optional): List of attributes to display. Defaults to (). If empty, all attributes are displayed.
     """
     _console = console or get_console()
     from rich._inspect import Inspect
@@ -169,6 +175,8 @@ def inspect(
         sort=sort,
         all=all,
         value=value,
+        attributes=attributes,
+        attributes_to_display=attributes_to_display,
     )
     _console.print(_inspect)
 
