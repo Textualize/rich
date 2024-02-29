@@ -142,6 +142,7 @@ def test_inspect_empty_dict():
 
 @skip_py312
 @skip_py311
+@skip_py312
 @skip_pypy3
 def test_inspect_builtin_function_except_python311():
     # Pre-3.11 Python versions - print builtin has no signature available
@@ -328,6 +329,56 @@ def test_inspect_integer_with_methods_python311():
         "│                    signed=False): Return the   │\n"
         "│                    integer represented by the  │\n"
         "│                    given array of bytes.       │\n"
+        "│         to_bytes = def to_bytes(length=1,      │\n"
+        "│                    byteorder='big', *,         │\n"
+        "│                    signed=False): Return an    │\n"
+        "│                    array of bytes representing │\n"
+        "│                    an integer.                 │\n"
+        "╰────────────────────────────────────────────────╯\n"
+    )
+    assert render(1, methods=True) == expected
+
+
+@skip_py37
+@skip_py38
+@skip_py39
+@skip_py310
+@skip_py311
+def test_inspect_integer_with_methods_python312_and_above():
+    # as_integer_ratio method on int had minor docstring change -
+    # they now, as of 3.12, are consistent across types
+    expected = (
+        "╭──────────────── <class 'int'> ─────────────────╮\n"
+        "│ int([x]) -> integer                            │\n"
+        "│ int(x, base=10) -> integer                     │\n"
+        "│                                                │\n"
+        "│      denominator = 1                           │\n"
+        "│             imag = 0                           │\n"
+        "│        numerator = 1                           │\n"
+        "│             real = 1                           │\n"
+        "│ as_integer_ratio = def as_integer_ratio():     │\n"
+        "│                    Return a pair of integers,  │\n"
+        "│                    whose ratio is equal to the │\n"
+        "│                    original int.               │\n"
+        "│        bit_count = def bit_count(): Number of  │\n"
+        "│                    ones in the binary          │\n"
+        "│                    representation of the       │\n"
+        "│                    absolute value of self.     │\n"
+        "│       bit_length = def bit_length(): Number of │\n"
+        "│                    bits necessary to represent │\n"
+        "│                    self in binary.             │\n"
+        "│        conjugate = def conjugate(...) Returns  │\n"
+        "│                    self, the complex conjugate │\n"
+        "│                    of any int.                 │\n"
+        "│       from_bytes = def from_bytes(bytes,       │\n"
+        "│                    byteorder='big', *,         │\n"
+        "│                    signed=False): Return the   │\n"
+        "│                    integer represented by the  │\n"
+        "│                    given array of bytes.       │\n"
+        "│       is_integer = def is_integer(): Returns   │\n"
+        "│                    True. Exists for duck type  │\n"
+        "│                    compatibility with          │\n"
+        "│                    float.is_integer.           │\n"
         "│         to_bytes = def to_bytes(length=1,      │\n"
         "│                    byteorder='big', *,         │\n"
         "│                    signed=False): Return an    │\n"
