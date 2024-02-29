@@ -29,6 +29,7 @@ from typing import (
     TextIO,
     Tuple,
     Type,
+    TypeVar,
     Union,
     cast,
 )
@@ -591,7 +592,10 @@ def detect_legacy_windows() -> bool:
     return WINDOWS and not get_windows_console_features().vt
 
 
-class Console:
+IOType = TypeVar("IOType", bound=IO[str])
+
+
+class Console(Generic[IOType]):
     """A high level console interface.
 
     Args:
@@ -641,7 +645,7 @@ class Console:
         soft_wrap: bool = False,
         theme: Optional[Theme] = None,
         stderr: bool = False,
-        file: Optional[IO[str]] = None,
+        file: Optional[IOType] = None,
         quiet: bool = False,
         width: Optional[int] = None,
         height: Optional[int] = None,
@@ -757,7 +761,7 @@ class Console:
         return f"<console width={self.width} {self._color_system!s}>"
 
     @property
-    def file(self) -> IO[str]:
+    def file(self) -> IOType:
         """Get the file object to write to."""
         file = self._file or (sys.stderr if self.stderr else sys.stdout)
         file = getattr(file, "rich_proxied_file", file)
@@ -766,7 +770,7 @@ class Console:
         return file
 
     @file.setter
-    def file(self, new_file: IO[str]) -> None:
+    def file(self, new_file: IOType) -> None:
         """Set a new file object."""
         self._file = new_file
 
