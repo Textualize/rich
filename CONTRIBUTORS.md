@@ -75,4 +75,5 @@ The following people have contributed to the development of Rich:
 - [James Addison](https://github.com/jayaddison)
 - [Pierro](https://github.com/xpierroz)
 - [Bernhard Wagner](https://github.com/bwagner)
+- [Mateusz Wozny](https://github.com/mateusz-wozny)
 - [Aaron Beaudoin](https://github.com/AaronBeaudoin)
