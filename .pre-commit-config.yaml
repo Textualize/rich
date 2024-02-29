@@ -30,8 +30,8 @@ repos:
     hooks:
       - id: pycln
         args: [--all]
-  - repo: https://github.com/psf/black
-    rev: 23.7.0
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 23.11.0
     hooks:
       - id: black
         exclude: ^benchmarks/
