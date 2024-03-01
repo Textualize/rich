@@ -14,6 +14,7 @@ from typing import (
     Iterable,
     List,
     Optional,
+    Self,
     Sequence,
     Tuple,
     Type,
@@ -29,7 +30,14 @@ from pygments.util import ClassNotFound
 from . import pretty
 from ._loop import loop_last
 from .columns import Columns
-from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, group
+from .console import (
+    Console,
+    ConsoleOptions,
+    ConsoleRenderable,
+    Group,
+    RenderResult,
+    group,
+)
 from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
 from .panel import Panel
@@ -197,6 +205,7 @@ class Stack:
     syntax_error: Optional[_SyntaxError] = None
     is_cause: bool = False
     frames: List[Frame] = field(default_factory=list)
+    grouped_traces: List["Trace"] = field(default_factory=list)
 
 
 @dataclass
@@ -417,6 +426,20 @@ class Traceback:
                     msg=exc_value.msg,
                 )
 
+
+            if isinstance(exc_value, BaseExceptionGroup):
+                for exception in exc_value.exceptions:
+                    stack.grouped_traces.append(cls.extract(
+                        exc_type=type(exception),
+                        exc_value=exception,
+                        traceback=exception.__traceback__,
+                        show_locals=show_locals,
+                        locals_max_length=locals_max_length,
+                        locals_max_string=locals_max_string,
+                        locals_hide_dunder=locals_hide_dunder,
+                        locals_hide_sunder=locals_hide_sunder,
+                    ))
+
             stacks.append(stack)
             append = stack.frames.append
 
@@ -484,9 +507,8 @@ class Traceback:
         trace = Trace(stacks=stacks)
         return trace
 
-    def __rich_console__(
-        self, console: Console, options: ConsoleOptions
-    ) -> RenderResult:
+
+    def _render_trace(self, console: Console, options: ConsoleOptions, trace: Trace, child_index: int | None = None) -> RenderResult:
         theme = self.theme
         background_style = theme.get_background_style()
         token_style = theme.get_style_for_token
@@ -514,11 +536,17 @@ class Traceback:
         )
 
         highlighter = ReprHighlighter()
-        for last, stack in loop_last(reversed(self.trace.stacks)):
+        for last, stack in loop_last(reversed(trace.stacks)):
+            is_exception_group = bool(stack.grouped_traces)
             if stack.frames:
+                traceback_title = "Traceback"
+                if is_exception_group:
+                    traceback_title = f"Exception Group {traceback_title}"
+                if child_index is not None:
+                    traceback_title += f" {child_index}"
                 stack_renderable: ConsoleRenderable = Panel(
                     self._render_stack(stack),
-                    title="[traceback.title]Traceback [dim](most recent call last)",
+                    title=f"[traceback.title]{traceback_title} [dim](most recent call last)",
                     style=background_style,
                     border_style="traceback.border",
                     expand=True,
@@ -544,6 +572,18 @@ class Traceback:
                     (f"{stack.exc_type}: ", "traceback.exc_type"),
                     highlighter(stack.syntax_error.msg),
                 )
+            elif stack.grouped_traces:
+                group_exception_renderable = Panel(
+                    Group(*[Group(*self._render_trace(console=console, options=options, trace=trace, child_index=index + 1)) for index, trace in enumerate(stack.grouped_traces)]),
+                    title=f"[exception_group.title]{stack.exc_type} [dim]{highlighter(stack.exc_value)}",
+                    style=background_style,
+                    border_style="exception_group.border",
+                    expand=True,
+                    padding=(0, 1),
+                )
+                group_exception_renderable = Constrain(group_exception_renderable, self.width)
+                with console.use_theme(traceback_theme):
+                    yield group_exception_renderable
             elif stack.exc_value:
                 yield Text.assemble(
                     (f"{stack.exc_type}: ", "traceback.exc_type"),
@@ -561,6 +601,11 @@ class Traceback:
                     yield Text.from_markup(
                         "\n[i]During handling of the above exception, another exception occurred:\n",
                     )
+
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> RenderResult:
+        return self._render_trace(console=console, options=options, trace=self.trace)
 
     @group()
     def _render_syntax_error(self, syntax_error: _SyntaxError) -> RenderResult:
