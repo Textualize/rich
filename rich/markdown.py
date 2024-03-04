@@ -197,11 +197,20 @@ class BlockQuote(TextElement):
     style_name = "markdown.block_quote"
 
     def __init__(self) -> None:
+        super().__init__()
         self.elements: Renderables = Renderables()
+        # Track if the previous element was a paragraph
+        self.previous_element_was_paragraph = False
 
     def on_child_close(
         self, context: "MarkdownContext", child: "MarkdownElement"
     ) -> bool:
+        if isinstance(child, Paragraph):
+            if self.previous_element_was_paragraph:
+                self.elements.append(Text(""))
+            self.previous_element_was_paragraph = True
+        else:
+            self.previous_element_was_paragraph = False
         self.elements.append(child)
         return False
 
