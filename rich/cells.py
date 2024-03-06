@@ -83,7 +83,10 @@ def _get_codepoint_cell_size(codepoint: int) -> int:
 
 
 def set_cell_size(text: str, total: int) -> str:
-    """Set the length of a string to fit within given number of cells."""
+    """Set the length of a string to fit within given number of cells.
+
+    The return value is guaranteed to have no trailing 0-width characters.
+    """
 
     if _is_single_cell_widths(text):
         size = len(text)
@@ -93,28 +96,25 @@ def set_cell_size(text: str, total: int) -> str:
 
     if total <= 0:
         return ""
-    cell_size = cell_len(text)
-    if cell_size == total:
+
+    _cell_size = get_character_cell_size
+    widths = [_cell_size(char) for char in text]
+    lengths = list(accumulate(widths))
+
+    total_length = lengths[-1]
+    if total_length == total:
         return text
-    if cell_size < total:
-        return text + " " * (total - cell_size)
+    if total_length < total:
+        return text + " " * (total - total_length)
 
-    start = 0
-    end = len(text)
-
-    # Binary search until we find the right size
-    while True:
-        pos = (start + end) // 2
-        before = text[: pos + 1]
-        before_len = cell_len(before)
-        if before_len == total + 1 and cell_len(before[-1]) == 2:
-            return before[:-1] + " "
-        if before_len == total:
-            return before
-        if before_len > total:
-            end = pos
-        else:
-            start = pos
+    idx = bisect.bisect_left(lengths, total)
+    if lengths[idx] == total:
+        return text[: idx + 1]
+    if idx == 0:
+        return " " * total
+    if lengths[idx - 1] < total:
+        return text[:idx] + " "
+    return text[:idx]
 
 
 def chop_cells(
@@ -156,8 +156,15 @@ def chop_cells(
 
 if __name__ == "__main__":  # pragma: no cover
     print(get_character_cell_size("😽"))
-    for line in chop_cells("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", 8):
+    for line in chop_cells(
+        """这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", 8
+    ):
         print(line)
     for n in range(80, 1, -1):
-        print(set_cell_size("""这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", n) + "|")
+        print(
+            set_cell_size(
+                """这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑。""", n
+            )
+            + "|"
+        )
         print("x" * n)
