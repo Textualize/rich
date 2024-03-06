@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import bisect
 import re
 from functools import lru_cache
+from itertools import accumulate
 from typing import Callable
 
-from ._cell_widths import CELL_WIDTHS
+from ._cell_widths import (
+    CELL_WIDTH_RANGE_ENDS,
+    CELL_WIDTH_RANGE_STARTS,
+    CELL_WIDTHS,
+)
 
 # Regex to match sequence of the most common character ranges
 _is_single_cell_widths = re.compile("^[\u0020-\u006f\u00a0\u02ff\u0370-\u0482]*$").match
@@ -68,22 +74,12 @@ def _get_codepoint_cell_size(codepoint: int) -> int:
         int: Number of cells (0, 1 or 2) occupied by that character.
     """
 
-    _table = CELL_WIDTHS
-    lower_bound = 0
-    upper_bound = len(_table) - 1
-    index = (lower_bound + upper_bound) // 2
-    while True:
-        start, end, width = _table[index]
-        if codepoint < start:
-            upper_bound = index - 1
-        elif codepoint > end:
-            lower_bound = index + 1
-        else:
-            return 0 if width == -1 else width
-        if upper_bound < lower_bound:
-            break
-        index = (lower_bound + upper_bound) // 2
-    return 1
+    idx = bisect.bisect_right(CELL_WIDTH_RANGE_STARTS, codepoint)
+    if codepoint <= CELL_WIDTH_RANGE_ENDS[idx - 1]:
+        width = CELL_WIDTHS[idx - 1]
+        return 0 if width == -1 else width
+    else:
+        return 1
 
 
 def set_cell_size(text: str, total: int) -> str:
