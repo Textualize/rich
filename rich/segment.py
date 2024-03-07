@@ -1,6 +1,7 @@
+import bisect
 from enum import IntEnum
 from functools import lru_cache
-from itertools import filterfalse
+from itertools import accumulate, filterfalse
 from logging import getLogger
 from operator import attrgetter
 from typing import (
@@ -115,35 +116,24 @@ class Segment(NamedTuple):
         cell_length = segment.cell_length
         if cut >= cell_length:
             return segment, _Segment("", style, control)
+        elif cut <= 0:
+            return _Segment("", style, control), segment
 
-        cell_size = get_character_cell_size
+        _cell_size = get_character_cell_size
+        widths = [_cell_size(char) for char in text]
+        lengths = list(accumulate(widths))
 
-        pos = int((cut / cell_length) * (len(text) - 1))
-
-        before = text[:pos]
-        cell_pos = cell_len(before)
-        if cell_pos == cut:
+        idx = bisect.bisect_left(lengths, cut)
+        if lengths[idx] == cut:
             return (
-                _Segment(before, style, control),
-                _Segment(text[pos:], style, control),
+                _Segment(text[:idx + 1], style, control),
+                _Segment(text[idx + 1:], style, control)
             )
-        while pos < len(text):
-            char = text[pos]
-            pos += 1
-            cell_pos += cell_size(char)
-            before = text[:pos]
-            if cell_pos == cut:
-                return (
-                    _Segment(before, style, control),
-                    _Segment(text[pos:], style, control),
-                )
-            if cell_pos > cut:
-                return (
-                    _Segment(before[: pos - 1] + " ", style, control),
-                    _Segment(" " + text[pos:], style, control),
-                )
-
-        raise AssertionError("Will never reach here")
+        else:  # Character at position idx + 1 has width 2.
+            return (
+                _Segment(text[:idx] + " ", style, control),
+                _Segment(" " + text[idx + 1:], style, control),
+            )
 
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
         """Split segment in to two segments at the specified column.
