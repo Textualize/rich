@@ -220,11 +220,24 @@ class SegmentSuite:
             Segment(line) for line in snippets.UNICODE_HEAVY_TEXT.splitlines()
         ]
 
+        self.single_segment = Segment("The quick ⚡️ brown fox 🦊 jumps over the lazy dog 🐶. " * 3)
+
     def time_divide_complex(self):
         list(Segment.divide(self.line, [5, 10, 20, 50, 108, 110, 118]))
 
     def time_divide_unicode_heavy(self):
         list(Segment.divide(self.unicode_segments, range(0, 2400, 5)))
+
+    def time__split_cells_overall(self):
+        s = self.single_segment
+        for cut in range(0, len(s) + 3, 2):
+            Segment._split_cells(s, cut)
+
+    def time__split_cells_early(self):
+        Segment._split_cells(self.single_segment, 35)
+
+    def time__split_cells_late(self):
+        Segment._split_cells(self.single_segment, 150)
 
 
 class CellSuite:
