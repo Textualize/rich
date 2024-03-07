@@ -126,13 +126,13 @@ class Segment(NamedTuple):
         idx = bisect.bisect_left(lengths, cut)
         if lengths[idx] == cut:
             return (
-                _Segment(text[:idx + 1], style, control),
-                _Segment(text[idx + 1:], style, control)
+                _Segment(text[: idx + 1], style, control),
+                _Segment(text[idx + 1 :], style, control),
             )
         else:  # Character at position idx + 1 has width 2.
             return (
                 _Segment(text[:idx] + " ", style, control),
-                _Segment(" " + text[idx + 1:], style, control),
+                _Segment(" " + text[idx + 1 :], style, control),
             )
 
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:

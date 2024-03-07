@@ -220,7 +220,9 @@ class SegmentSuite:
             Segment(line) for line in snippets.UNICODE_HEAVY_TEXT.splitlines()
         ]
 
-        self.single_segment = Segment("The quick ⚡️ brown fox 🦊 jumps over the lazy dog 🐶. " * 3)
+        self.single_segment = Segment(
+            "The quick ⚡️ brown fox 🦊 jumps over the lazy dog 🐶. " * 3
+        )
 
     def time_divide_complex(self):
         list(Segment.divide(self.line, [5, 10, 20, 50, 108, 110, 118]))
