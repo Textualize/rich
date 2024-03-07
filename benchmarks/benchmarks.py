@@ -52,7 +52,7 @@ class TextSuite:
         Text(snippets.UNICODE_HEAVY_TEXT).split()
 
     def time_divide_unicode_heavy(self):
-        Text(snippets.UNICODE_HEAVY_TEXT).divide(range(20, 100, 4))
+        Text(snippets.UNICODE_HEAVY_TEXT).divide(range(20, 1000, 40))
 
     def time_align_center_unicode_heavy(self):
         Text(snippets.UNICODE_HEAVY_TEXT).align(
