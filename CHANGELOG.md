@@ -5,14 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
-## [13.7.1] - 2024-01-09
+## [13.7.2] - 2024-03-07
 
 ### Fixed
 
 - Fixed typos in the file README.ru.md .
 - Fixed stylistic translation errors in the file README.ru.md .
 
+## [13.7.1] - 2023-02-28
+
+### Fixed
+
+- Updated the widths of some characters https://github.com/Textualize/rich/pull/3289
 
 ## [13.7.0] - 2023-11-15
 
@@ -2028,6 +2032,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.7.1]: https://github.com/textualize/rich/compare/v13.7.0...v13.7.1
 [13.7.0]: https://github.com/textualize/rich/compare/v13.6.0...v13.7.0
 [13.6.0]: https://github.com/textualize/rich/compare/v13.5.3...v13.6.0
 [13.5.3]: https://github.com/textualize/rich/compare/v13.5.2...v13.5.3
