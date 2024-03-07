@@ -594,7 +594,7 @@ class Segment(NamedTuple):
             cuts (Iterable[int]): Cell positions where to divide.
 
         Yields:
-            [Iterable[List[Segment]]]: An iterable of Segments in List.
+            Iterable[List[Segment]]: An iterable of Segments in List.
         """
         split_segments: List["Segment"] = []
         add_segment = split_segments.append

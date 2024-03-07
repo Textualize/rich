@@ -1,6 +1,8 @@
 from io import StringIO
+import sys
 
 from benchmarks import snippets
+from rich.cells import cell_len, set_cell_size
 from rich.color import Color, ColorSystem
 from rich.console import Console
 from rich.pretty import Pretty
@@ -50,7 +52,7 @@ class TextSuite:
         Text(snippets.UNICODE_HEAVY_TEXT).split()
 
     def time_divide_unicode_heavy(self):
-        self.text.divide(range(20, 100, 4))
+        Text(snippets.UNICODE_HEAVY_TEXT).divide(range(20, 100, 4))
 
     def time_align_center_unicode_heavy(self):
         Text(snippets.UNICODE_HEAVY_TEXT).align(
@@ -214,5 +216,22 @@ class SegmentSuite:
             Segment("There is a way"),
         ] * 2
 
-    def test_divide_complex(self):
+        self.unicode_segments = [
+            Segment(line) for line in snippets.UNICODE_HEAVY_TEXT.splitlines()
+        ]
+
+    def time_divide_complex(self):
         list(Segment.divide(self.line, [5, 10, 20, 50, 108, 110, 118]))
+
+    def time_divide_unicode_heavy(self):
+        list(Segment.divide(self.unicode_segments, range(0, 2400, 5)))
+
+
+class CellSuite:
+    def time_codepoint_widths(self):
+        for cp in range(sys.maxunicode + 1):
+            cell_len(chr(cp))
+
+    def time_set_cell_size(self):
+        for total in range(len(snippets.UNICODE_HEAVY_TEXT) // 2 + 2):
+            set_cell_size(snippets.UNICODE_HEAVY_TEXT, total)
