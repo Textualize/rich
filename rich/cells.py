@@ -2,15 +2,12 @@ from __future__ import annotations
 
 import bisect
 import re
+import sys
 from functools import lru_cache
 from itertools import accumulate
 from typing import Callable
 
-from ._cell_widths import (
-    CELL_WIDTH_RANGE_ENDS,
-    CELL_WIDTH_RANGE_STARTS,
-    CELL_WIDTHS,
-)
+from ._cell_widths import CELL_WIDTHS
 
 # Regex to match sequence of the most common character ranges
 _is_single_cell_widths = re.compile("^[\u0020-\u006f\u00a0\u02ff\u0370-\u0482]*$").match
@@ -73,10 +70,13 @@ def _get_codepoint_cell_size(codepoint: int) -> int:
     Returns:
         int: Number of cells (0, 1 or 2) occupied by that character.
     """
-
-    idx = bisect.bisect_right(CELL_WIDTH_RANGE_STARTS, codepoint)
-    if codepoint <= CELL_WIDTH_RANGE_ENDS[idx - 1]:
-        width = CELL_WIDTHS[idx - 1]
+    # We create the tuple as `(cp, sys.maxunicode + 2)` instead of just (cp,)
+    # because we want the index to always be on the right of the range that
+    # `cp` belongs to. E.g., `(1,)` won't be placed to the right of `(1, 31, -1)`
+    # but `(1, sys.maxunicode + 2)` will.
+    idx = bisect.bisect_right(CELL_WIDTHS, (codepoint, sys.maxunicode + 2))
+    _start, end, width = CELL_WIDTHS[idx - 1]
+    if codepoint <= end:
         return 0 if width == -1 else width
     else:
         return 1
