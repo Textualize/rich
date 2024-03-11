@@ -1,3 +1,4 @@
+import bisect
 import re
 from functools import partial, reduce
 from math import gcd
@@ -1140,35 +1141,17 @@ class Text(JupyterMixin):
         _Span = Span
 
         for span_start, span_end, style in self._spans:
-            lower_bound = 0
-            upper_bound = line_count
-            start_line_no = (lower_bound + upper_bound) // 2
+            if span_start == text_length:
+                start_line_no = end_line_no = line_count - 1
 
-            while True:
-                line_start, line_end = line_ranges[start_line_no]
-                if span_start < line_start:
-                    upper_bound = start_line_no - 1
-                elif span_start > line_end:
-                    lower_bound = start_line_no + 1
-                else:
-                    break
-                start_line_no = (lower_bound + upper_bound) // 2
-
-            if span_end < line_end:
-                end_line_no = start_line_no
             else:
-                end_line_no = lower_bound = start_line_no
-                upper_bound = line_count
+                start_line_no = bisect.bisect_right(divide_offsets, span_start) - 1
+                line_start, line_end = line_ranges[start_line_no]
 
-                while True:
-                    line_start, line_end = line_ranges[end_line_no]
-                    if span_end < line_start:
-                        upper_bound = end_line_no - 1
-                    elif span_end > line_end:
-                        lower_bound = end_line_no + 1
-                    else:
-                        break
-                    end_line_no = (lower_bound + upper_bound) // 2
+                if span_end < line_end:
+                    end_line_no = start_line_no
+                else:
+                    end_line_no = bisect.bisect_left(divide_offsets, span_end) - 1
 
             for line_no in range(start_line_no, end_line_no + 1):
                 line_start, line_end = line_ranges[line_no]
