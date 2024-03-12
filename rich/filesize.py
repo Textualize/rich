@@ -13,35 +13,38 @@ See Also:
 
 __all__ = ["decimal"]
 
-from typing import Iterable, List, Optional, Tuple
+from typing import Iterable, Tuple, Union
 
 
 def _to_str(
-    size: int,
+    size: Union[float, int],
     suffixes: Iterable[str],
     base: int,
     *,
-    precision: Optional[int] = 1,
-    separator: Optional[str] = " ",
+    precision: int = 1,
+    separator: str = " "
 ) -> str:
-    if size == 1:
-        return "1 byte"
-    elif size < base:
-        return "{:,} bytes".format(size)
-
-    for i, suffix in enumerate(suffixes, 2):  # noqa: B007
+    for i, suffix in enumerate(suffixes, 1):  # noqa: B007
         unit = base**i
         if size < unit:
             break
+
+    size = base * size / unit
+    if size == int(size):
+        precision = 0
+
+    if size == 1 and suffix == "bytes":
+        suffix = "byte"
+
     return "{:,.{precision}f}{separator}{}".format(
-        (base * size / unit),
+        size,
         suffix,
         precision=precision,
-        separator=separator,
+        separator=separator
     )
 
 
-def pick_unit_and_suffix(size: int, suffixes: List[str], base: int) -> Tuple[int, str]:
+def pick_unit_and_suffix(size: int, suffixes: Iterable[str], base: int) -> Tuple[int, str]:
     """Pick a suffix and base for the given size."""
     for i, suffix in enumerate(suffixes):
         unit = base**i
@@ -51,10 +54,10 @@ def pick_unit_and_suffix(size: int, suffixes: List[str], base: int) -> Tuple[int
 
 
 def decimal(
-    size: int,
+    size: Union[float, int],
     *,
-    precision: Optional[int] = 1,
-    separator: Optional[str] = " ",
+    precision: int = 1,
+    separator: str = " "
 ) -> str:
     """Convert a filesize in to a string (powers of 1000, SI prefixes).
 
@@ -66,7 +69,7 @@ def decimal(
     or used by **Mac OS X** since v10.6 to report file sizes.
 
     Arguments:
-        int (size): A file size.
+        float/int (size): A file size.
         int (precision): The number of decimal places to include (default = 1).
         str (separator): The string to separate the value from the units (default = " ").
 
@@ -76,14 +79,16 @@ def decimal(
     Example:
         >>> filesize.decimal(30000)
         '30.0 kB'
-        >>> filesize.decimal(30000, precision=2, separator="")
-        '30.00kB'
+        >>> filesize.decimal(30000, separator="")
+        '30.0kB'
+        >>> filesize.decimal(361.3816634069428, precision=1)
+        '361.3 bytes'
 
     """
     return _to_str(
         size,
-        ("kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"),
+        ("bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"),
         1000,
         precision=precision,
-        separator=separator,
+        separator=separator
     )
