@@ -437,11 +437,3 @@ See also [Rich CLI](https://github.com/textualize/rich-cli) for a command line a
 See also Rich's sister project, [Textual](https://github.com/Textualize/textual), which you can use to build sophisticated User Interfaces in the terminal.
 
 ![Textual screenshot](https://raw.githubusercontent.com/Textualize/textual/main/imgs/textual.png)
-
-# Projects using Rich
-
-For some examples of projects using Rich, see the [Rich Gallery](https://www.textualize.io/rich/gallery) on [Textualize.io](https://www.textualize.io).
-
-Would you like to add your own project to the gallery? You can! Follow [these instructions](https://www.textualize.io/gallery-instructions).
-
-<!-- This is a test, no need to translate -->
