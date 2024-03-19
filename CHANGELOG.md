@@ -106,6 +106,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Style.clear_meta_and_links
 
+## [13.3.3] - Unreleased
+
+### Added
+
+- Docs explaining the lexers in `Syntax` https://github.com/Textualize/rich/pull/2883
+
 ## [13.3.2] - 2023-02-04
 
 ### Fixed

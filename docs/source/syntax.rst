@@ -44,6 +44,14 @@ Background color
 You can override the background color from the theme by supplying a ``background_color`` argument to the constructor. This should be a string in the same format a style definition accepts, e.g. "red", "#ff0000", "rgb(255,0,0)" etc. You may also set the special value "default" which will use the default background color set in the terminal.
 
 
+Lexers support
+--------------
+
+In most cases, the second argument in the :class:`~rich.syntax.Syntax` constructor is the name of a lexer recognized as a `Pygments lexer <https://pygments.org/docs/api/#lexers>`_.
+While this interface is usually enough and provides support for all languages covered by Pygments, developers may want to create a custom lexer, although this can be done with a pygments entry point, it can be rather slow.
+The better approach is to create a custom lexer and supply an instance of it directly, any valid class inheriting from `The Pygments lexer <https://pygments.org/docs/api/#pygments.lexer>`_ should suffice.
+
+
 Syntax CLI
 ----------
 
