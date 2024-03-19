@@ -134,7 +134,11 @@ def _ipy_display_hook(
             if _safe_isinstance(value, RichRenderable)
             else Pretty(
                 value,
+                highlighter=console.highlighter,
+                indent_size=console.tab_size,
+                justify=console.options.justify,
                 overflow=overflow,
+                no_wrap=console.options.no_wrap,
                 indent_guides=indent_guides,
                 max_length=max_length,
                 max_string=max_string,
@@ -200,7 +204,11 @@ def install(
                 if _safe_isinstance(value, RichRenderable)
                 else Pretty(
                     value,
+                    highlighter=console.highlighter,
+                    indent_size=console.tab_size,
+                    justify=console.options.justify,
                     overflow=overflow,
+                    no_wrap=console.options.no_wrap,
                     indent_guides=indent_guides,
                     max_length=max_length,
                     max_string=max_string,
