@@ -8,28 +8,24 @@ on:
     types: [opened, edited, synchronize]
 
 jobs:
-  comment:
+  add-comment:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Check for Markdown files
+      - name: Check for Markdown and reStructuredText files
         run: |
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '\.(md|rst)$'; then
-            echo "Markdown files changed. Triggering comment action."
+            echo "Documentation files changed. Triggering comment action."
           else
-            echo "No Markdown files changed. Skipping comment action."
+            echo "No documentation changed. Skipping comment action."
             exit 78 # Exit with a neutral status code to indicate no action is needed
           fi
 
-      - name: Run script to comment
-        run: |
-          COMMENT="This pull request only makes changes to documentation files. Please use the [ci_skip] keyword in your commit messages to save on CI minutes."
-          curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          -d "{\"body\": \"$COMMENT\"}" \
-          "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/comments"
-
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.number }}
+          body: |
+            This commit only makes changes to documentation, please use [ci_skip] in future commit messages to save on CI minutes
