@@ -32,10 +32,10 @@ jobs:
       - name: Build Package
         run: poetry build
       - name: Publish to PyPI
-        run: poetry publish --repository testpypi --username __token__ --password pypi-AgENdGVzdC5weXBpLm9yZwIkMTEwZTJkMmYtYTAzYS00YzUwLTk3NWUtMmQyYmNhMDVmMWIxAAIqWzMsImY3OTZmZjE3LWVjMmQtNGEyYi1iYjViLWRmMDkyMzQ0YmFjYiJdAAAGIB33qstNekWQ4lqyzrhkfu1WUCRAdb-36N7D4jPf23-R
+        run: poetry publish --repository testpypi --username __token__ --password ${{ secrets.TESTPYPI_API_TOKEN }}
 
         # run: poetry publish --username ${{ secrets.PYPI_USERNAME }} --password ${{ secrets.PYPI_PASSWORD }}
         env:
           PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
           PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-          TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          TESTPYPI_API_TOKEN: ${{ secrets.TESTPYPI_API_TOKEN }}
