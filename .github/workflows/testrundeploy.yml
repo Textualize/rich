@@ -1,0 +1,16 @@
+name: Automated deployment on approval
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    environment:
+      name: deployment
+    steps:
+      - name: Deploy
+        run: echo "Deploying to production"
