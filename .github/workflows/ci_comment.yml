@@ -16,7 +16,6 @@ jobs:
           fetch-depth: 0
 
       - name: Add comment to PR
-        if: github.event_name == 'pull_request' && github.event.action == 'opened'
         uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
