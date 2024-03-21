@@ -114,8 +114,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# airspeed velocity
-benchmarks/env/
-benchmarks/html/
-
 sandbox/
