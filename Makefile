@@ -1,3 +1,5 @@
+setup:
+	python3 initial-setup.py
 test:
 	TERM=unknown pytest --cov-report term-missing --cov=rich tests/ -vv
 test-no-cov:
