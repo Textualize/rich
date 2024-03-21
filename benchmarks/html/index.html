@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>airspeed velocity</title>
+    <script type="text/javascript">
+      function js_load_failure() {
+        window.location = "error.html";
+      }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous" onerror="js_load_failure()"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js" integrity="sha512-eO1AKNIv7KSFl5n81oHCKnYLMi8UV4wWD1TcLYKNTssoECDuiGhoRsQkdiZkl8VUjoms2SeJY7zTSw5noGSqbQ==" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="js_load_failure()"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.time.min.js" integrity="sha512-lcRowrkiQvFli9HkuJ2Yr58iEwAtzhFNJ1Galsko4SJDhcZfUub8UxGlMQIsMvARiTqx2pm7g6COxJozihOixA==" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="js_load_failure()"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.selection.min.js" integrity="sha512-3EUG0t3qfbLaGN3FXO86i+57nvxHOXvIb/xMSKRrCuX/HXdn1bkbqwAeLd6U1PDmuEB2cnKhfM+SGLAVQbyjWQ==" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="js_load_failure()"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.categories.min.js" integrity="sha512-x4QGSZkQ57pNuICMFFevIhDer5NVB5eJCRmENlCdJukMs8xWFH8OHfzWQVSkl9VQ4+4upPPTkHSAewR6KNMjGA==" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="js_load_failure()"></script>
+    <script language="javascript" type="text/javascript" src="jquery.flot.axislabels.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flot-orderbars@1.0.0/js/jquery.flot.orderBars.js" integrity="sha256-OXNbT0b5b/TgglckAfR8VaJ2ezZv0dHoIeRKjYMKEr8=" crossorigin="anonymous" onerror="js_load_failure()"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stupidtable/1.0.1/stupidtable.min.js" integrity="sha512-GM3Ds3dUrgkpKVXc+4RxKbQDoeTemdlzXxn5d/QCOJT6EFdEufu1UTVBpIFDLd6YjIhSThNe+zpo1mwqzNq4GQ==" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="js_load_failure()"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js" integrity="sha512-8pbzenDolL1l5OPSsoURCx9TEdMFTaeFipASVrMYKhuYtly+k3tcsQYliOEKTmuB1t7yuzAiVo+yd7SJz+ijFQ==" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="js_load_failure()"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.1.1/dist/js/bootstrap.min.js" integrity="sha256-iY0FoX8s/FEg3c26R6iFw3jAtGbzDwcA5QJ1fiS0A6E=" crossorigin="anonymous" onerror="js_load_failure()"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.1.1/dist/css/bootstrap.min.css" integrity="sha256-6VA0SGkrc43SYPvX98q/LhHwm2APqX5us6Vuulsafps=" crossorigin="anonymous">
+
+    <script language="javascript" type="text/javascript"
+            src="asv.js">
+    </script>
+    <script language="javascript" type="text/javascript"
+            src="asv_ui.js">
+    </script>
+    <script language="javascript" type="text/javascript"
+            src="summarygrid.js">
+    </script>
+    <script language="javascript" type="text/javascript"
+            src="summarylist.js">
+    </script>
+    <script language="javascript" type="text/javascript"
+            src="graphdisplay.js">
+    </script>
+    <script language="javascript" type="text/javascript"
+            src="regressions.js">
+    </script>
+    <link href="asv.css" rel="stylesheet" type="text/css"/>
+    <link href="regressions.css" rel="stylesheet" type="text/css"/>
+    <link href="summarylist.css" rel="stylesheet" type="text/css"/>
+    <link rel="shortcut icon" href="swallow.ico"/>
+    <link rel="alternate" type="application/atom+xml" title="Regressions" href="regressions.xml"/>
+  </head>
+  <body>
+    <nav id="nav" class="navbar navbar-left navbar-default navbar-fixed-top" role="navigation">
+      <ul class="nav navbar-nav navbar-left">
+        <li>
+          <p class="navbar-text">
+            <a href="http://github.com/airspeed-velocity/asv/" class="navbar-link" target="_blank"><img src="swallow.png" width="22" height="22" alt="swallow"></img>airspeed velocity</a>
+            of an unladen
+            <a id="project-name" href="#" class="navbar-link" target="_blank">project</a>
+          </p>
+        </li>
+	<li id="nav-li-" class="active"><a href="#/">Benchmark grid</a></li>
+	<li id="nav-li-summarylist"><a href="#/summarylist">Benchmark list</a></li>
+	<li id="nav-li-regressions"><a href="#/regressions">Regressions</a></li>
+        <li id="nav-li-graphdisplay">
+          <span class="navbar-brand" id="title">
+            benchmark
+          </span>
+        </li>
+      </ul>
+    </nav>
+    <div id="summarygrid-display" style="position: absolute; left: 0; top: 55px; width: 100%; height: 100%">
+    </div>
+    <div id="summarylist-display" style="width: 100%; height: 100%">
+      <div id="summarylist-navigation" class="asv-navigation" style="position: absolute; left: 0; top: 55px; bottom: 0; width: 200px; overflow-y: scroll">
+      </div>
+      <div id="summarylist-body" style="position: absolute; left: 200px; top: 55px; bottom: 0px; right: 0px; overflow-y: scroll;">
+      </div>
+    </div>
+    <div id="graph-display" style="width: 100%; height: 100%;">
+      <div id="graphdisplay-navigation" class="asv-navigation" style="position: absolute; left: 0; top: 55px; bottom: 0; width: 200px; overflow-y: scroll">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            commits
+          </div>
+          <div class="panel-body">
+            <input id="range" type="text" class="form-control" size="24" readonly/>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            plot settings
+          </div>
+          <div class="panel-body">
+            <div class="btn-group-vertical" style="width: 100%" data-toggle="buttons">
+              <a id="log-scale" class="btn btn-default btn-xs" role="button"
+                 data-toggle="tooltip" data-placement="right"
+                 title="Use a logarithmic scale on the y-axis">
+                log scale
+              </a>
+              <a id="zoom-y-axis" class="btn btn-default btn-xs" role="button"
+                 data-toggle="tooltip" data-placement="right"
+                 title="Zoom y axis to the range of the data, rather than down to zero.">
+                zoom <i>y</i> axis
+              </a>
+              <a id="reference" class="btn btn-default btn-xs" role="button"
+                 data-toggle="tooltip" data-placement="right"
+                 title="Select a reference point">
+                reference
+              </a>
+              <a id="even-spacing" class="btn btn-default btn-xs" role="button"
+                 data-toggle="tooltip" data-placement="right"
+                 title="Space commits evenly, rather than by revision, along the x-axis">
+                even commit spacing
+              </a>
+              <a id="date-scale" class="btn btn-default btn-xs" role="button"
+                 data-toggle="tooltip" data-placement="right"
+                 title="Space commits by commit date along the x-axis">
+                date scale
+              </a>
+              <a id="show-legend" class="btn btn-default btn-xs" role="button"
+                 data-toggle="tooltip" data-placement="right"
+                 title="Show legend in the graph">
+                legend
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="position: absolute; left: 220px; top: 60px; bottom: 10px; right: 20px;">
+        <div id="graph">
+          <div style="position: absolute; top: 48px; left: 0; right: 0; bottom: 100px;">
+            <div id="main-graph" style="min-height: 100px; width: 100%; height: 100%"></div>
+          </div>
+          <div style="position: absolute; height: 100px; left: 0; right: 0; bottom: 0; padding-top: 24px">
+            <div id="overview" style="min-height: 100px; width: 100%; height: 100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="regressions-display" style="position: absolute; left: 0; top: 55px; width: 100%; height: 100%">
+      <div id="regressions-body">
+      </div>
+    </div>
+
+    <!-- A modal dialog box for displaying error messages -->
+    <div class="modal fade" id="error" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title alert alert-danger" id="myModalLabel">Error</h4>
+          </div>
+          <div class="modal-body" id="error-message">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
