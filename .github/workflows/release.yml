@@ -12,6 +12,8 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9"]
+    environment:
+      name: deployment
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
