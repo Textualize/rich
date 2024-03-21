@@ -31,6 +31,8 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       - name: Build Package
         run: poetry build
+      - name: Configure TestPyPI repository
+        run: poetry config repositories.testpypi https://test.pypi.org/legacy/
       - name: Publish to PyPI
         run: poetry publish --repository testpypi --username __token__ --password ${{ secrets.TESTPYPI_API_TOKEN }}
         # run: poetry publish --username ${{ secrets.PYPI_USERNAME }} --password ${{ secrets.PYPI_PASSWORD }}
