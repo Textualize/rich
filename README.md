@@ -26,6 +26,7 @@
  • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
  • [Polskie readme](https://github.com/textualize/rich/blob/master/README.pl.md)
 
+CHANGE
 
 Rich is a Python library for _rich_ text and beautiful formatting in the terminal.
 
