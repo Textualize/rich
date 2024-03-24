@@ -1,4 +1,4 @@
-from typing import cast, List, Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, List, Optional, Union, cast
 
 from ._spinners import SPINNERS
 from .measure import Measurement
@@ -6,7 +6,7 @@ from .table import Table
 from .text import Text
 
 if TYPE_CHECKING:
-    from .console import Console, ConsoleOptions, RenderResult, RenderableType
+    from .console import Console, ConsoleOptions, RenderableType, RenderResult
     from .style import StyleType
 
 
@@ -117,8 +117,8 @@ if __name__ == "__main__":  # pragma: no cover
     from time import sleep
 
     from .columns import Columns
-    from .panel import Panel
     from .live import Live
+    from .panel import Panel
 
     all_spinners = Columns(
         [

@@ -1,4 +1,4 @@
-from typing import cast, List, Optional, Tuple, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union, cast
 
 if TYPE_CHECKING:
     from .console import (
@@ -7,11 +7,11 @@ if TYPE_CHECKING:
         RenderableType,
         RenderResult,
     )
+
 from .jupyter import JupyterMixin
 from .measure import Measurement
-from .style import Style
 from .segment import Segment
-
+from .style import Style
 
 PaddingDimensions = Union[int, Tuple[int], Tuple[int, int], Tuple[int, int, int, int]]
 

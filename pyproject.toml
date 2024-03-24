@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Typing :: Typed",
 ]
-include = ["rich/py.typed"]
+include = ["rich-cs489-demo/py.typed"]
 
 
 [tool.poetry.dependencies]
@@ -51,7 +51,7 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.mypy]
-files = ["rich"]
+files = ["rich-cs489-demo"]
 show_error_codes = true
 strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
