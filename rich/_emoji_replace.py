@@ -1,7 +1,8 @@
-import re
 from typing import Callable, Match, Optional
+import re
 
 from ._emoji_codes import EMOJI
+
 
 _ReStringMatch = Match[str]  # regex match object
 _ReSubCallable = Callable[[_ReStringMatch], str]  # Callable invoked by re.sub

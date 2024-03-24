@@ -1,6 +1,6 @@
-from functools import lru_cache
 from math import sqrt
-from typing import TYPE_CHECKING, Sequence, Tuple
+from functools import lru_cache
+from typing import Sequence, Tuple, TYPE_CHECKING
 
 from .color_triplet import ColorTriplet
 
@@ -20,8 +20,8 @@ class Palette:
     def __rich__(self) -> "Table":
         from rich.color import Color
         from rich.style import Style
-        from rich.table import Table
         from rich.text import Text
+        from rich.table import Table
 
         table = Table(
             "index",
@@ -75,7 +75,6 @@ class Palette:
 if __name__ == "__main__":  # pragma: no cover
     import colorsys
     from typing import Iterable
-
     from rich.color import Color
     from rich.console import Console, ConsoleOptions
     from rich.segment import Segment

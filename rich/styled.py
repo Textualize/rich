@@ -5,7 +5,7 @@ from .segment import Segment
 from .style import StyleType
 
 if TYPE_CHECKING:
-    from .console import Console, ConsoleOptions, RenderableType, RenderResult
+    from .console import Console, ConsoleOptions, RenderResult, RenderableType
 
 
 class Styled:

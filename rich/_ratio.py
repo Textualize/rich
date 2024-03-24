@@ -1,7 +1,7 @@
 import sys
 from fractions import Fraction
 from math import ceil
-from typing import List, Optional, Sequence, cast
+from typing import cast, List, Optional, Sequence
 
 if sys.version_info >= (3, 8):
     from typing import Protocol

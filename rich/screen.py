@@ -1,11 +1,18 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional, TYPE_CHECKING
 
-from ._loop import loop_last
 from .segment import Segment
 from .style import StyleType
+from ._loop import loop_last
+
 
 if TYPE_CHECKING:
-    from .console import Console, ConsoleOptions, Group, RenderableType, RenderResult
+    from .console import (
+        Console,
+        ConsoleOptions,
+        RenderResult,
+        RenderableType,
+        Group,
+    )
 
 
 class Screen:

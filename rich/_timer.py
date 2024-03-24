@@ -3,8 +3,9 @@ Timer context manager, only used in debug.
 
 """
 
-import contextlib
 from time import time
+
+import contextlib
 from typing import Generator
 
 
