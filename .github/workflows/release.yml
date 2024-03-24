@@ -31,12 +31,18 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       - name: Build Package
         run: poetry build
-      - name: Configure TestPyPI repository
-        run: poetry config repositories.testpypi https://test.pypi.org/legacy/
-      - name: Publish to PyPI
-        run: poetry publish --repository testpypi --username __token__ --password ${{ secrets.TESTPYPI_API_TOKEN }}
-        # run: poetry publish --username ${{ secrets.PYPI_USERNAME }} --password ${{ secrets.PYPI_PASSWORD }}
-        env:
-          PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-          TESTPYPI_API_TOKEN: ${{ secrets.TESTPYPI_API_TOKEN }}
+      - name: Configure GitHub Packages repository
+        run: |
+          poetry config repositories.github https://pypi.pkg.github.com/Taseen08
+          poetry config http-basic.github Taseen08 ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish to GitHub Packages
+        run: poetry publish --repository github
+      # - name: Configure TestPyPI repository
+      #   run: poetry config repositories.testpypi https://test.pypi.org/legacy/
+      # - name: Publish to PyPI
+      #   run: poetry publish --repository testpypi --username __token__ --password ${{ secrets.TESTPYPI_API_TOKEN }}
+      #   # run: poetry publish --username ${{ secrets.PYPI_USERNAME }} --password ${{ secrets.PYPI_PASSWORD }}
+      #   env:
+      #     PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
+      #     PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      #     TESTPYPI_API_TOKEN: ${{ secrets.TESTPYPI_API_TOKEN }}
