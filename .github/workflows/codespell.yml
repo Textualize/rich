@@ -1,0 +1,10 @@
+name: codespell
+on: [pull_request, push]
+jobs:
+  codespell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install codespell
+      - run: codespell --ignore-words-list="ba,fo,hel,revered,womens"
+          --skip="./README.*.md,*.svg,*.ai,./benchmarks/snippets.py,./tests,./tools"

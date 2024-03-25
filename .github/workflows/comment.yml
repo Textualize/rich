@@ -1,0 +1,19 @@
+name: issues
+on:
+  issues:
+    types: [closed]
+jobs:
+  add-comment:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Did I solve your problem?
+        uses: peter-evans/create-or-update-comment@a35cf36e5301d70b76f316e867e7788a55a31dae
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            I hope we solved your problem.
+            
+            If you like using Rich, you might also enjoy [Textual](https://textual.textualize.io)
+            

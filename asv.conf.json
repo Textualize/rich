@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "project": "rich",
+  "project_url": "https://github.com/Textualize/rich",
+  "repo": ".",
+  "repo_subdir": "",
+  "install_command": [
+    "in-dir={env_dir} python -mpip install {wheel_file}"
+  ],
+  "uninstall_command": [
+    "return-code=any python -mpip uninstall -y {project}"
+  ],
+  "build_command": [
+    "pip install poetry",
+    "python setup.py build",
+    "PIP_NO_BUILD_ISOLATION=false python -mpip wheel --no-deps --no-index -w {build_cache_dir} {build_dir}"
+  ],
+  "branches": [
+    "master"
+  ],
+  "html_dir": "./benchmarks/html",
+  "results_dir": "./benchmarks/results",
+  "env_dir": "./benchmarks/env",
+  "dvcs": "git",
+  "environment_type": "virtualenv",
+  "install_timeout": 180,
+  "show_commit_url": "http://github.com/Textualize/rich/commit/",
+  "pythons": [
+    "3.10"
+  ],
+  "matrix": {
+    "setuptools": ["59.2.0"]
+  }
+}
