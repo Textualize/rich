@@ -40,10 +40,12 @@ jobs:
           devpi use ${{ secrets.DEVPI_SERVER_URL }}
           devpi login ${{ secrets.DEVPI_USERNAME }} --password=${{ secrets.DEVPI_PASSWORD }}
           devpi use ${{ secrets.DEVPI_USERNAME }}/${{ secrets.DEVPI_INDEX }}
-      - name: Publish Rich to Devpi server
-        run: devpi upload --from-dir dist/*
         env:
           DEVPI_SERVER_URL: ${{ secrets.DEVPI_SERVER_URL }}
           DEVPI_USERNAME: ${{ secrets.DEVPI_USERNAME }}
           DEVPI_PASSWORD: ${{ secrets.DEVPI_PASSWORD }}
           DEVPI_INDEX: ${{ secrets.DEVPI_INDEX }}
+      - name: Publish Rich to Devpi server
+        run: devpi upload --from-dir dist/*
+      - name: Remove Rich from Devpi server # free up space on EC2 instance
+        run: devpi remove rich
