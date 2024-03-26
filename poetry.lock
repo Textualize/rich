@@ -966,6 +966,21 @@ pytest = ">=4.6"
 testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtualenv"]
 
 [[package]]
+name = "pytest-testmon"
+version = "2.0.15"
+description = "selects tests affected by changed files and methods"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pytest-testmon-2.0.15.tar.gz", hash = "sha256:d08efd4fe46a267c146c84d5a27cbda0080387aeaf4007c309102cb581eedbf6"},
+    {file = "pytest_testmon-2.0.15-py3-none-any.whl", hash = "sha256:91c3b0cfb2f0f94cc9c429f2d279f8a97aaab91cc06eceaf7e33497666f52c94"},
+]
+
+[package.dependencies]
+coverage = ">=6,<8"
+pytest = ">=5,<8"
+
+[[package]]
 name = "pyyaml"
 version = "6.0.1"
 description = "YAML parser and emitter for Python"
@@ -1241,4 +1256,4 @@ jupyter = ["ipywidgets"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7.0"
-content-hash = "cc19278853d6af166f559134f389f8baca53f6075f6219400ff9bd4467eaf3ea"
+content-hash = "e75e6640cbcac9752d582f66bee97e613d7937e218eee17c5708192f09febe74"
