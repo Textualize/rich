@@ -1,0 +1,47 @@
+name: Copy HTML to Benchmarks Repository
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  update-benchmarks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v2
+        with:
+          path: "src"
+          ref: "master"
+          persist-credentials: false
+
+      - name: checkout dest
+        uses: actions/checkout@v2
+        with:
+          path: "dest"
+          ref: "main"
+          repository: "mahzabinrashid/rich-benchmarks"
+          token: ${{ secrets.BENCHMARK_TOKEN || github.token }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Copy common files to new repo
+        shell: bash
+        run: |
+          cp -R src/benchmarks/html/* dest/
+
+      - name: Commit and push changes to the target repository
+        run: |
+            cd dest
+            git config --local user.email "mahzabinrashidfariha@gmail.com"
+            git config --local user.name "mahzabinrashid"
+            git add .
+            git commit -m "Update HTML benchmarks"
+            git -c http.extraheader="AUTHORIZATION: bearer ${{ secrets.BENCHMARK_TOKEN }}" push
+  
+

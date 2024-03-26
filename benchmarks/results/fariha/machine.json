@@ -1,0 +1,9 @@
+{
+    "arch": "arm64",
+    "cpu": "Apple M2",
+    "machine": "fariha",
+    "num_cpu": "8",
+    "os": "Darwin 23.4.0",
+    "ram": "8589934592",
+    "version": 1
+}

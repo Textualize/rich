@@ -1,0 +1,24 @@
+name: Comment on PR for Markdown Changes
+
+on:
+  pull_request:
+    paths:
+      - '**/*.md'
+      - '**/*.rst'
+
+jobs:
+  add-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Add comment to PR
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.number }}
+          body: |
+            This commit makes changes to documentation, you can use [ci_skip] in future commit messages to save on CI minutes.

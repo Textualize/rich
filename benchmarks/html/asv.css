@@ -1,0 +1,161 @@
+/* Basic navigation */
+
+.asv-navigation {
+    padding: 2px;
+}
+
+nav ul li.active a {
+    height: 52px;
+}
+
+nav li.active span.navbar-brand {
+    background-color: #e7e7e7;
+    height: 52px;
+}
+
+nav li.active span.navbar-brand:hover {
+    background-color: #e7e7e7;
+}
+
+.navbar-default .navbar-link {
+    color: #2458D9;
+}
+
+.panel-body {
+    padding: 0;
+}
+
+.panel {
+    margin-bottom: 4px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border-radius: 0;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+.panel-default>.panel-heading,
+.panel-heading {
+    font-size: 12px;
+    font-weight:bold;
+    padding: 2px;
+    text-align: center;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    background-color: #eee;
+}
+
+.btn,
+.btn-group,
+.btn-group-vertical>.btn:first-child,
+.btn-group-vertical>.btn:last-child:not(:first-child),
+.btn-group-vertical>.btn:last-child {
+    border: none;
+    border-radius: 0px;
+    overflow: hidden;
+}
+
+.btn-default:focus, .btn-default:active, .btn-default.active {
+    border: none;
+    color: #fff;
+    background-color: #99bfcd;
+}
+
+#range {
+    font-family: monospace;
+    text-align: center;
+    background: #ffffff;
+}
+
+.form-control {
+    border: none;
+    border-radius: 0px;
+    font-size: 12px;
+    padding: 0px;
+}
+
+.tooltip-inner {
+    min-width: 100px;
+    max-width: 800px;
+    text-align: left;
+    white-space: pre-wrap;
+    font-family: monospace;
+}
+
+/* Benchmark tree */
+
+.nav-list {
+    font-size: 12px;
+    padding: 0;
+    padding-left: 15px;
+}
+
+.nav-list>li {
+    overflow-x: hidden;
+}
+
+.nav-list>li>a {
+    padding: 0;
+    padding-left: 5px;
+    color: #000;
+}
+
+.nav-list>li>a:focus {
+    color: #fff;
+    background-color: #99bfcd;
+    box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+}
+
+.nav-list>li>.nav-header {
+    white-space: nowrap;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.caret-right {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-left: 4px solid;
+    border-bottom: 4px solid transparent;
+    border-top: 4px solid transparent;
+}
+
+/* Summary page */
+
+.benchmark-group > h1 {
+    text-align: center;
+}
+
+.benchmark-container {
+    width: 300px;
+    height: 116px;
+    padding: 4px;
+    border-radius: 3px;
+}
+
+.benchmark-container:hover {
+    background-color: #eee;
+}
+
+.benchmark-plot {
+    width: 292px;
+    height: 88px;
+}
+
+.benchmark-text {
+    font-size: 12px;
+    color: #000;
+    width: 292px;
+    overflow: hidden;
+}
+
+#extra-buttons {
+    margin: 1em;
+}
+
+#extra-buttons a {
+    border: solid 1px #ccc;
+}
