@@ -26,12 +26,6 @@
  • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
  • [Polskie readme](https://github.com/textualize/rich/blob/master/README.pl.md)
 
-Test Addition!
-
-Test 2 - Codespell on push?
-
-Test 3 - How does the commit work without synchronize?
-
 Rich is a Python library for _rich_ text and beautiful formatting in the terminal.
 
 The [Rich API](https://rich.readthedocs.io/en/latest/) makes it easy to add color and style to terminal output. Rich can also render pretty tables, progress bars, markdown, syntax highlighted source code, tracebacks, and more — out of the box.
