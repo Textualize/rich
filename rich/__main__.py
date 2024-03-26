@@ -14,7 +14,7 @@ from rich.syntax import Syntax
 from rich.table import Table
 from rich.text import Text
 
-# change
+
 class ColorBox:
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
