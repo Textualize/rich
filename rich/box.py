@@ -136,7 +136,7 @@ class Box:
             left = self.head_row_left
             horizontal = self.head_row_horizontal
             cross = self.head_row_cross
-            right = self.head_row_left
+            right = self.head_row_right
         elif level == "row":
             left = self.row_left
             horizontal = self.row_horizontal
