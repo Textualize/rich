@@ -50,6 +50,7 @@ jobs:
           DEVPI_INDEX: ${{ secrets.DEVPI_INDEX }}
       - name: Publish Rich to Devpi server
         run: devpi upload --from-dir dist/*
+
       - name: Extract version
         id: get_version
         run: |
@@ -57,13 +58,8 @@ jobs:
         shell: bash
       - name: Create release description
         run: |
-          echo "RELEASE_TITLE=[${{ env.VERSION }}] - $(date +'%m/%d/%Y')" >> $GITHUB_ENV
-      - name: Generate release notes
-        id: generate_notes
-        run: |
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 $(git rev-list --tags --skip=1 --max-count=1))
-          RELEASE_NOTES=$(git log $PREVIOUS_TAG..HEAD --oneline)
-          echo "RELEASE_BODY=${RELEASE_TITLE}\n\n## Release Highlights\n\n${RELEASE_NOTES}" >> $GITHUB_ENV
+          echo "RELEASE_BODY=[${{ env.VERSION }}] - $(date +'%m/%d/%Y')" >> $GITHUB_ENV
+
       - name: Create Github release
         id: create_release
         uses: actions/create-release@v1.1.4
