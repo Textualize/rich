@@ -3,7 +3,7 @@
 Live Display
 ============
 
-Progress bars and status indicators use a *live* display to animate parts of the terminal. You can build custom live displays with the :class:`~rich.live.Live` class. 
+Progress bars and status indicators use a *live* display to animate parts of the terminal. You can build custom live displays with the :class:`~rich.live.Live` class.
 
 For a demonstration of a live display, run the following command::
 
@@ -72,7 +72,7 @@ You can also change the renderable on-the-fly by calling the :meth:`~rich.live.L
 Alternate screen
 ~~~~~~~~~~~~~~~~
 
-You can opt to show a Live display in the "alternate screen" by setting ``screen=True`` on the constructor. This will allow your live display to go full screen and restore the command prompt on exit. 
+You can opt to show a Live display in the "alternate screen" by setting ``screen=True`` on the constructor. This will allow your live display to go full screen and restore the command prompt on exit.
 
 You can use this feature in combination with :ref:`Layout` to display sophisticated terminal "applications".
 
@@ -80,7 +80,7 @@ Transient display
 ~~~~~~~~~~~~~~~~~
 
 Normally when you exit live context manager (or call :meth:`~rich.live.Live.stop`) the last refreshed item remains in the terminal with the cursor on the following line.
-You can also make the live display disappear on exit by setting ``transient=True`` on the Live constructor. 
+You can also make the live display disappear on exit by setting ``transient=True`` on the Live constructor.
 
 Auto refresh
 ~~~~~~~~~~~~
@@ -100,6 +100,7 @@ By default, the live display will display ellipsis if the renderable is too larg
 - "crop" Show renderable up to the terminal height. The rest is hidden.
 - "ellipsis" Similar to crop except last line of the terminal is replaced with "...". This is the default behavior.
 - "visible" Will allow the whole renderable to be shown. Note that the display cannot be properly cleared in this mode.
+- "tail" Show the trailing lines of the renderable, up to the terminal height.
 
 .. note::
 
