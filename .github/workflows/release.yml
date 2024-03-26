@@ -47,3 +47,23 @@ jobs:
           DEVPI_INDEX: ${{ secrets.DEVPI_INDEX }}
       - name: Publish Rich to Devpi server
         run: devpi upload --from-dir dist/*
+      - name: Extract version
+        id: get_version
+        run: |
+          echo "VERSION=$(poetry version -s)" >> $GITHUB_ENV
+        shell: bash
+      - name: Create release description
+        run: |
+          echo "RELEASE_BODY=[${{ env.VERSION }}] - $(date +'%m/%d/%Y')" >> $GITHUB_ENV
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
+          body: ${{ env.RELEASE_BODY }}
+          draft: false
+          prerelease: false
