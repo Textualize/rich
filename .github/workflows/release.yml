@@ -3,7 +3,7 @@ name: Build, Publish, and Release Rich
 on:
   push:
     branches:
-      - taseen
+      - master
     paths:
       - pyproject.toml
   workflow_dispatch:
@@ -33,6 +33,9 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       - name: Build Package
         run: poetry build
+
+      # PyPI release has been replaced by devpi release since
+      # we don't own the original PyPI and TestPyPI projects
       - name: Install devpi-client
         run: pip install devpi-client
       - name: Configure devpi-client
@@ -47,6 +50,7 @@ jobs:
           DEVPI_INDEX: ${{ secrets.DEVPI_INDEX }}
       - name: Publish Rich to Devpi server
         run: devpi upload --from-dir dist/*
+
       - name: Extract version
         id: get_version
         run: |
@@ -56,7 +60,7 @@ jobs:
         run: |
           echo "RELEASE_BODY=[${{ env.VERSION }}] - $(date +'%m/%d/%Y')" >> $GITHUB_ENV
 
-      - name: Create release
+      - name: Create Github release
         id: create_release
         uses: actions/create-release@v1.1.4
         env:
