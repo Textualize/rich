@@ -1,4 +1,4 @@
-name: Build and Publish Rich to PyPI
+name: Build and Publish Rich
 
 on:
   push:
