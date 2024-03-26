@@ -1,0 +1,66 @@
+name: Test create release
+
+on:
+  push:
+    branches:
+      - taseen
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    environment:
+      name: deployment
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1.3.3
+        with:
+          version: 1.3.1
+          virtualenvs-in-project: true
+      - name: Install dependencies
+        run: poetry install
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      - name: Build Package
+        run: poetry build
+      - name: Extract version
+        id: get_version
+        run: |
+          echo "VERSION=$(python -c 'import toml; pyproject = toml.load("pyproject.toml"); print(pyproject["tool"]["poetry"]["version"])')" >> $GITHUB_ENV
+          echo "::set-output name=version::$VERSION"
+        shell: bash
+      - name: Get the wheel and tar.gz file paths
+        id: get_file_paths
+        run: |
+          echo "WHEEL_PATH=$(ls dist/*.whl)" >> $GITHUB_ENV
+          echo "TAR_GZ_PATH=$(ls dist/*.tar.gz)" >> $GITHUB_ENV
+          echo "WHEEL_NAME=$(basename $(ls dist/*.whl))" >> $GITHUB_ENV
+          echo "TAR_GZ_NAME=$(basename $(ls dist/*.tar.gz))" >> $GITHUB_ENV
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          release_name: Release ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+      - name: Upload wheel file to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/${{ env.WHEEL_PATH }}
+          asset_name: ${{ env.WHEEL_NAME }}
+          asset_content_type: application/octet-stream
