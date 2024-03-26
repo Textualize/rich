@@ -49,7 +49,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.VERSION }}
-          release_name: Release ${{ steps.get_version.outputs.version }}
+          release_name: Release ${{ env.VERSION }}
           draft: false
           prerelease: false
       - name: Upload wheel file to Release
@@ -58,6 +58,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/${{ env.WHEEL_PATH }}
+          asset_path: ${{ env.WHEEL_PATH }}
           asset_name: ${{ env.WHEEL_NAME }}
           asset_content_type: application/octet-stream
