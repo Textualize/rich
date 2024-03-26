@@ -34,13 +34,17 @@ jobs:
         run: |
           echo "VERSION=$(poetry version -s)" >> $GITHUB_ENV
         shell: bash
-      - name: Get the wheel and tar.gz file paths
-        id: get_file_paths
+      # - name: Get the wheel and tar.gz file paths
+      #   id: get_file_paths
+      #   run: |
+      #     echo "WHEEL_PATH=$(ls dist/*.whl)" >> $GITHUB_ENV
+      #     echo "TAR_GZ_PATH=$(ls dist/*.tar.gz)" >> $GITHUB_ENV
+      #     echo "WHEEL_NAME=$(basename $(ls dist/*.whl))" >> $GITHUB_ENV
+      #     echo "TAR_GZ_NAME=$(basename $(ls dist/*.tar.gz))" >> $GITHUB_ENV
+
+      - name: Create release description
         run: |
-          echo "WHEEL_PATH=$(ls dist/*.whl)" >> $GITHUB_ENV
-          echo "TAR_GZ_PATH=$(ls dist/*.tar.gz)" >> $GITHUB_ENV
-          echo "WHEEL_NAME=$(basename $(ls dist/*.whl))" >> $GITHUB_ENV
-          echo "TAR_GZ_NAME=$(basename $(ls dist/*.tar.gz))" >> $GITHUB_ENV
+          echo "RELEASE_BODY=[${{ env.VERSION }}] - $(date +'%m/%d/%Y')" >> $GITHUB_ENV
 
       - name: Create release
         id: create_release
@@ -50,14 +54,15 @@ jobs:
         with:
           tag_name: ${{ env.VERSION }}
           release_name: Release ${{ env.VERSION }}
+          body: ${{ env.RELEASE_BODY }}
           draft: false
           prerelease: false
-      - name: Upload wheel file to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.WHEEL_PATH }}
-          asset_name: ${{ env.WHEEL_NAME }}
-          asset_content_type: application/octet-stream
+      # - name: Upload wheel file to Release
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ${{ env.WHEEL_PATH }}
+      #     asset_name: ${{ env.WHEEL_NAME }}
+      #     asset_content_type: application/octet-stream
