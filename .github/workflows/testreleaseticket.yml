@@ -7,13 +7,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-publish:
+  create-release:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.9"]
-    environment:
-      name: deployment
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -34,8 +32,7 @@ jobs:
       - name: Extract version
         id: get_version
         run: |
-          echo "VERSION=$(python -c 'import toml; pyproject = toml.load("pyproject.toml"); print(pyproject["tool"]["poetry"]["version"])')" >> $GITHUB_ENV
-          echo "::set-output name=version::$VERSION"
+          echo "VERSION=$(poetry version -s)" >> $GITHUB_ENV
         shell: bash
       - name: Get the wheel and tar.gz file paths
         id: get_file_paths
@@ -51,7 +48,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.get_version.outputs.version }}
+          tag_name: ${{ env.VERSION }}
           release_name: Release ${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: false
