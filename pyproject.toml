@@ -2,7 +2,7 @@
 name = "rich"
 homepage = "https://github.com/Taseen08/rich"
 documentation = "https://rich.readthedocs.io/en/latest/"
-version = "13.7.6"
+version = "13.7.8"
 description = "[Forked library created for Winter 2024 CS489 course project at the University of Waterloo] Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 authors = ["A S M Taseen <ataseen@uwaterloo.ca>"]
 license = "MIT"

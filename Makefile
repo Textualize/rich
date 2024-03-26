@@ -1,5 +1,6 @@
 setup:
-	python3 initial-setup.py
+	chmod +x initial-setup.sh
+	./initial-setup.sh
 test:
 	TERM=unknown pytest --cov-report term-missing --cov=rich tests/ -vv
 test-no-cov:
