@@ -3,7 +3,7 @@ name: Build, Publish, and Release Rich
 on:
   push:
     branches:
-      - master
+      - taseen
     paths:
       - pyproject.toml
   workflow_dispatch:

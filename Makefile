@@ -1,5 +1,6 @@
-setup:
-	python3 initial-setup.py
+setup-pre-commit:
+	chmod +x setup-pre-commit.sh
+	./setup-pre-commit.sh
 test:
 	TERM=unknown pytest --cov-report term-missing --cov=rich tests/ -vv
 test-no-cov:
