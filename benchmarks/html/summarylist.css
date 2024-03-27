@@ -1,0 +1,50 @@
+#summarylist-body {
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-top: 1em;
+    padding-bottom: 2em;
+}
+
+#summarylist-body table thead th {
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+#summarylist-body table thead th.desc:after {
+    content: ' \2191';
+}
+
+#summarylist-body table thead th.asc:after {
+    content: ' \2193';
+}
+
+#summarylist-body table.ignored {
+    padding-top: 1em;
+    color: #ccc;
+    background-color: #eee;
+}
+
+#summarylist-body table.ignored a {
+    color: #82abda;
+}
+
+#summarylist-body table tbody td.positive-change {
+    background-color: #fdd;
+}
+
+#summarylist-body table tbody td.negative-change {
+    background-color: #dfd;
+}
+
+#summarylist-body table tbody td.value {
+    white-space: nowrap;
+}
+
+#summarylist-body table tbody td.change a {
+    color: black;
+    white-space: nowrap;
+}
+
+#summarylist-body table tbody td.change-date {
+    white-space: nowrap;
+}

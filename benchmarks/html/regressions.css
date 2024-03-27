@@ -1,0 +1,44 @@
+#regressions-body {
+    margin-left: 2em;
+    margin-right: 2em;
+    margin-top: 1em;
+    margin-bottom: 2em;
+}
+
+#regressions-body table thead th {
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+#regressions-body table thead th.desc:after {
+    content: ' \2191';
+}
+
+#regressions-body table thead th.asc:after {
+    content: ' \2193';
+}
+
+#regressions-body table.ignored {
+    padding-top: 1em;
+    color: #ccc;
+    background-color: #eee;
+}
+
+#regressions-body table.ignored a {
+    color: #82abda;
+}
+
+#regressions-body .feed-div {
+    float: right;
+}
+
+#regressions-body table tbody td.date {
+    white-space: nowrap;
+}
+
+#regressions-body table button {
+    margin-top: -2px;
+    padding-top: 2px;
+    padding-bottom: 0px;
+    white-space: nowrap;
+}
