@@ -21,4 +21,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.number }}
           body: |
-            This commit makes changes to documentation, you can use [ci_skip] in future commit messages to save on CI minutes.
+            This commit makes changes to documentation, you can add [ci skip] to your future commit messages to save on CI minutes.
