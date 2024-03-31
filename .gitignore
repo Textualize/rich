@@ -117,3 +117,5 @@ venv.bak/
 # airspeed velocity
 benchmarks/env/
 benchmarks/html/
+
+sandbox/

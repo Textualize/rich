@@ -211,8 +211,12 @@ def install(
             )
             builtins._ = value  # type: ignore[attr-defined]
 
-    if hasattr(builtins, "get_ipython"):
+
+    try:
         ip = get_ipython()  # type: ignore[name-defined]
+    except NameError:
+        sys.displayhook = display_hook
+    else:
         from IPython.core.formatters import BaseFormatter
 
         class RichFormatter(BaseFormatter):  # type: ignore[misc]
@@ -236,8 +240,6 @@ def install(
         # replace plain text formatter with rich formatter
         rich_formatter = RichFormatter()
         ip.display_formatter.formatters["text/plain"] = rich_formatter
-    else:
-        sys.displayhook = display_hook
 
 
 class Pretty(JupyterMixin):
@@ -708,9 +710,9 @@ def traverse(
                         last=root,
                     )
 
-                    def iter_attrs() -> Iterable[
-                        Tuple[str, Any, Optional[Callable[[Any], str]]]
-                    ]:
+                    def iter_attrs() -> (
+                        Iterable[Tuple[str, Any, Optional[Callable[[Any], str]]]]
+                    ):
                         """Iterate over attr fields and values."""
                         for attr in attr_fields:
                             if attr.repr:
@@ -985,7 +987,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich import print
 
-    # print(Pretty(data, indent_guides=True, max_string=20))
+    print(Pretty(data, indent_guides=True, max_string=20))
 
     class Thing:
         def __repr__(self) -> str:
