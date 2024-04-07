@@ -22,7 +22,7 @@ The :meth:`~rich.console.Console.print_exception` method will print a traceback 
         console.print_exception(show_locals=True)
 
 The ``show_locals=True`` parameter causes Rich to display the value of local variables for each frame of the traceback.
- 
+
 See `exception.py <https://github.com/willmcgugan/rich/blob/master/examples/exception.py>`_ for a larger example.
 
 
@@ -63,7 +63,7 @@ Suppressing Frames
 
 If you are working with a framework (click, django etc), you may only be interested in seeing the code from your own application within the traceback. You can exclude framework code by setting the `suppress` argument on `Traceback`, `install`, `Console.print_exception`, and `RichHandler`, which should be a list of modules or str paths.
 
-Here's how you would exclude `click <https://click.palletsprojects.com/en/8.0.x/>`_ from Rich exceptions:: 
+Here's how you would exclude `click <https://click.palletsprojects.com/en/8.0.x/>`_ from Rich exceptions::
 
     import click
     from rich.traceback import install
@@ -96,3 +96,32 @@ Here's an example of printing a recursive error::
     except Exception:
         console.print_exception(max_frames=20)
 
+Rendering Rich Exceptions
+-------------------------
+
+You can create exceptions that implement :ref:`protocol`, which would be rendered when presented in a traceback.
+
+Here's an example that renders the exception's message in a :ref:`~rich.panel.Panel` with an ASCII box::
+
+    from rich.box import ASCII
+    from rich.console import Console
+    from rich.panel import Panel
+
+
+    class MyAwesomeException(Exception):
+        def __init__(self, message: str):
+            super().__init__(message)
+            self.message = message
+
+        def __rich__(self):
+            return Panel(self.message, title="My Awesome Exception", box=ASCII)
+
+
+    def do_something():
+        raise MyAwesomeException("Something went wrong")
+
+    console = Console()
+    try:
+        do_something()
+    except Exception:
+        console.print_exception()
