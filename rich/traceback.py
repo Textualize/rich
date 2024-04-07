@@ -28,6 +28,7 @@ from pygments.util import ClassNotFound
 
 from . import pretty
 from ._loop import loop_last
+from .abc import RichRenderable
 from .columns import Columns
 from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, group
 from .constrain import Constrain
@@ -194,6 +195,7 @@ class _SyntaxError:
 class Stack:
     exc_type: str
     exc_value: str
+    exc_renderable: Optional[RichRenderable] = None
     syntax_error: Optional[_SyntaxError] = None
     is_cause: bool = False
     frames: List[Frame] = field(default_factory=list)
@@ -416,6 +418,8 @@ class Traceback:
                     line=exc_value.text or "",
                     msg=exc_value.msg,
                 )
+            if isinstance(exc_value, RichRenderable):
+                stack.exc_renderable = exc_value
 
             stacks.append(stack)
             append = stack.frames.append
@@ -544,6 +548,19 @@ class Traceback:
                     (f"{stack.exc_type}: ", "traceback.exc_type"),
                     highlighter(stack.syntax_error.msg),
                 )
+            elif stack.exc_renderable:
+                exc_renderable = Constrain(stack.exc_renderable, self.width)
+                with console.use_theme(traceback_theme):
+                    try:
+                        segments = tuple(console.render(renderable=exc_renderable))
+                    except Exception:
+                        yield Text("<exception rich render failed>")
+                        yield Text.assemble(
+                            (f"{stack.exc_type}: ", "traceback.exc_type"),
+                            highlighter(stack.exc_value),
+                        )
+                    else:
+                        yield from segments
             elif stack.exc_value:
                 yield Text.assemble(
                     (f"{stack.exc_type}: ", "traceback.exc_type"),
@@ -722,7 +739,11 @@ if __name__ == "__main__":  # pragma: no cover
     from .console import Console
 
     console = Console()
-    import sys
+
+    class RichError(Exception):
+        def __rich_console__(self, console, options):
+            yield "[bold][red]ERROR[/]:[/] This is a [i]renderable[/] exception!"
+            yield Panel(self.args[0], expand=False, border_style="blue")
 
     def bar(a: Any) -> None:  # 这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑
         one = 1
@@ -746,7 +767,7 @@ if __name__ == "__main__":  # pragma: no cover
             try:
                 foo(0)
             except:
-                slfkjsldkfj  # type: ignore[name-defined]
+                raise RichError("Woah! Look at this text!")
         except:
             console.print_exception(show_locals=True)
 
