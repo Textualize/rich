@@ -911,6 +911,25 @@ class TransferSpeedColumn(ProgressColumn):
         return Text(f"{data_speed}/s", style="progress.data.speed")
 
 
+class IterationSpeedColumn(ProgressColumn):
+    """Renders iterations per second, e.g. '1.14 it/s'."""
+    
+    def render(self, task: Task) -> Text:
+        last_speed = task.last_speed if hasattr(task, 'last_speed') else None
+        if task.finished and last_speed is not None:
+            return Text(f"{last_speed} it/s", style="progress.data.speed")   
+        if task.speed is None:
+            return Text("", style="progress.data.speed")
+        unit, suffix = filesize.pick_unit_and_suffix(
+            int(task.speed),
+            ["", "×10³", "×10⁶", "×10⁹", "×10¹²"],
+            1000,
+        )
+        data_speed = task.speed / unit
+        task.last_speed = f"{data_speed:.1f}{suffix}"
+        return Text(f"{task.last_speed} it/s", style="progress.data.speed")
+
+
 class ProgressSample(NamedTuple):
     """Sample of progress for a given time."""
 
