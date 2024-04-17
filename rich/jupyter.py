@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from rich.console import ConsoleRenderable
 
 JUPYTER_HTML_FORMAT = """\
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">{code}</pre>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;margin-bottom:0px">{code}</pre>
 """
 
 
