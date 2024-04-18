@@ -60,6 +60,7 @@ def install(
     indent_guides: bool = True,
     suppress: Iterable[Union[str, ModuleType]] = (),
     max_frames: int = 100,
+    enable_link_path: bool = True,
 ) -> Callable[[Type[BaseException], BaseException, Optional[TracebackType]], Any]:
     """Install a rich traceback handler.
 
@@ -81,6 +82,7 @@ def install(
         locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
         suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+        enable_link_path (bool): Enable terminal link of paths in traceback. Defaults to True.
 
     Returns:
         Callable: The previous exception handler that was replaced.
@@ -116,6 +118,7 @@ def install(
                 indent_guides=indent_guides,
                 suppress=suppress,
                 max_frames=max_frames,
+                enable_link_path=enable_link_path,
             )
         )
 
@@ -227,6 +230,7 @@ class Traceback:
         locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
         suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
         max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
+        enable_link_path (bool): Enable terminal link of paths in traceback. Defaults to True.
 
     """
 
@@ -254,6 +258,7 @@ class Traceback:
         indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
+        enable_link_path: bool = True,
     ):
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
@@ -275,6 +280,7 @@ class Traceback:
         self.locals_max_string = locals_max_string
         self.locals_hide_dunder = locals_hide_dunder
         self.locals_hide_sunder = locals_hide_sunder
+        self.enable_link_path = enable_link_path
 
         self.suppress: Sequence[str] = []
         for suppress_entity in suppress:
@@ -308,6 +314,7 @@ class Traceback:
         indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
+        enable_link_path: bool = True,
     ) -> "Traceback":
         """Create a traceback from exception info
 
@@ -328,6 +335,7 @@ class Traceback:
             locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
             suppress (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
             max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
+            enable_link_path (bool): Enable terminal link of paths in traceback. Defaults to True.
 
         Returns:
             Traceback: A Traceback instance that may be printed.
@@ -357,6 +365,7 @@ class Traceback:
             locals_hide_sunder=locals_hide_sunder,
             suppress=suppress,
             max_frames=max_frames,
+            enable_link_path=enable_link_path,
         )
 
     @classmethod
@@ -655,9 +664,31 @@ class Traceback:
 
             if os.path.exists(frame.filename):
                 text = Text.assemble(
-                    path_highlighter(Text(frame.filename, style="pygments.string")),
+                    path_highlighter(
+                        Text(
+                            frame.filename,
+                            style=self.theme.get_style_for_token(String)
+                            + Style(
+                                link=(
+                                    f"file://{frame.filename}"
+                                    if self.enable_link_path
+                                    else None
+                                )
+                            ),
+                        )
+                    ),
                     (":", "pygments.text"),
-                    (str(frame.lineno), "pygments.number"),
+                    Text(
+                        str(frame.lineno),
+                        style=self.theme.get_style_for_token(Number)
+                        + Style(
+                            link=(
+                                f"file://{frame_filename}#{frame.lineno}"
+                                if self.enable_link_path
+                                else None
+                            )
+                        ),
+                    ),
                     " in ",
                     (frame.name, "pygments.function"),
                     style="pygments.text",
