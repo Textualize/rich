@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add enable_link_path for traceback.link and traceback.Traceback similar to logging.RichHandler
+- Add enable_link_path for traceback.link and traceback.Traceback similar to logging.RichHandler https://github.com/Textualize/rich/pull/3338
 
 ## [13.7.1] - 2024-02-28
 
