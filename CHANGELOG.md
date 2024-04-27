@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Exception objects that are `RichRenderable` are rendered, instead of using the class name and string representation https://github.com/Textualize/rich/pull/3325
 
-## [13.7.1] - 2023-02-28
+## [13.7.1] - 2024-02-28
 
 ### Fixed
 
