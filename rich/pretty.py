@@ -130,17 +130,19 @@ def _ipy_display_hook(
         if _safe_isinstance(value, ConsoleRenderable):
             console.line()
         console.print(
-            value
-            if _safe_isinstance(value, RichRenderable)
-            else Pretty(
-                value,
-                overflow=overflow,
-                indent_guides=indent_guides,
-                max_length=max_length,
-                max_string=max_string,
-                max_depth=max_depth,
-                expand_all=expand_all,
-                margin=12,
+            (
+                value
+                if _safe_isinstance(value, RichRenderable)
+                else Pretty(
+                    value,
+                    overflow=overflow,
+                    indent_guides=indent_guides,
+                    max_length=max_length,
+                    max_string=max_string,
+                    max_depth=max_depth,
+                    expand_all=expand_all,
+                    margin=12,
+                )
             ),
             crop=crop,
             new_line_start=True,
@@ -196,16 +198,18 @@ def install(
             assert console is not None
             builtins._ = None  # type: ignore[attr-defined]
             console.print(
-                value
-                if _safe_isinstance(value, RichRenderable)
-                else Pretty(
-                    value,
-                    overflow=overflow,
-                    indent_guides=indent_guides,
-                    max_length=max_length,
-                    max_string=max_string,
-                    max_depth=max_depth,
-                    expand_all=expand_all,
+                (
+                    value
+                    if _safe_isinstance(value, RichRenderable)
+                    else Pretty(
+                        value,
+                        overflow=overflow,
+                        indent_guides=indent_guides,
+                        max_length=max_length,
+                        max_string=max_string,
+                        max_depth=max_depth,
+                        expand_all=expand_all,
+                    )
                 ),
                 crop=crop,
             )
@@ -846,7 +850,7 @@ def traverse(
             pop_visited(obj_id)
         else:
             node = Node(value_repr=to_repr(obj), last=root)
-        node.is_tuple = _safe_isinstance(obj, tuple)
+        node.is_tuple = type(obj) == tuple
         node.is_namedtuple = _is_namedtuple(obj)
         return node
 
