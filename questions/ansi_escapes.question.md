@@ -1,5 +1,5 @@
 ---
-title: "Natively inserted ANSI escape sequence characters break alignment of Panel"
+title: "Natively inserted ANSI escape sequence characters break alignment of Panel."
 alt_titles:
   - "Escape codes break alignment."
 ---

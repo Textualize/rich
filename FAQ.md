@@ -2,7 +2,7 @@
 # Frequently Asked Questions
 - [How do I log a renderable?](#how-do-i-log-a-renderable)
 - [How do I render console markup in RichHandler?](#how-do-i-render-console-markup-in-richhandler)
-- [Natively inserted ANSI escape sequence characters break alignment of Panel](#natively-inserted-ansi-escape-sequence-characters-break-alignment-of-panel)
+- [Natively inserted ANSI escape sequence characters break alignment of Panel.](#natively-inserted-ansi-escape-sequence-characters-break-alignment-of-panel)
 - [python -m rich.spinner shows extra lines.](#python--m-richspinner-shows-extra-lines)
 - [Rich is automatically installing traceback handler.](#rich-is-automatically-installing-traceback-handler)
 - [Strange colors in console output.](#strange-colors-in-console-output)
@@ -28,7 +28,7 @@ Console markup won't work anywhere else, other than `RichHandler` -- which is wh
 See the docs if you want to [enable console markup](https://rich.readthedocs.io/en/latest/logging.html#logging-handler) in the logging handler.
 
 <a name="natively-inserted-ansi-escape-sequence-characters-break-alignment-of-panel"></a>
-## Natively inserted ANSI escape sequence characters break alignment of Panel
+## Natively inserted ANSI escape sequence characters break alignment of Panel.
 
 If you print ansi escape sequences for color and style you may find the output breaks your output.
 You may find that border characters in Panel and Table are in the wrong place, for example.
