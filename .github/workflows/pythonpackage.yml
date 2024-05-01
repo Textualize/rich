@@ -8,17 +8,20 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11.0", "3.12.0-rc.3"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        include:
+          - { os: ubuntu-latest, python-version: "3.7" }
+          - { os: windows-latest, python-version: "3.7" }
+          - { os: macos-12, python-version: "3.7" }
     defaults:
       run:
         shell: bash
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
       - name: Install and configure Poetry
         # TODO: workaround for https://github.com/snok/install-poetry/issues/94
         uses: snok/install-poetry@v1.3.3
