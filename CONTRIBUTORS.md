@@ -17,6 +17,7 @@ The following people have contributed to the development of Rich:
 - [James Estevez](https://github.com/jstvz)
 - [Aryaz Eghbali](https://github.com/AryazE)
 - [Oleksis Fraga](https://github.com/oleksis)
+- [Pradyun Gedam](https://github.com/pradyunsg)
 - [Andy Gimblett](https://github.com/gimbo)
 - [Michał Górny](https://github.com/mgorny)
 - [Nok Lam Chan](https://github.com/noklam)

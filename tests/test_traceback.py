@@ -248,6 +248,27 @@ def test_traceback_console_theme_applies():
     assert f"\\x1b[38;2;{r};{g};{b}mTraceback \\x1b[0m" in repr(result)
 
 
+def test_rich_exception():
+    class RichError(Exception):
+        def __rich_console__(self, console, options):
+            yield f"[bold][red]error[/red]:[/bold] [red]this is red[/red]"
+
+    console = Console(
+        width=100,
+        file=io.StringIO(),
+        color_system="truecolor",
+        legacy_windows=False,
+    )
+    try:
+        raise RichError()
+    except Exception:
+        console.print_exception()
+    result = console.file.getvalue()
+    print(result)
+    assert "\x1b[1;31merror\x1b[0m\x1b[1m:\x1b[0m" in result
+    assert "\x1b[31mthis is red\x1b[0m" in result
+
+
 def test_broken_str():
     class BrokenStr(Exception):
         def __str__(self):
@@ -261,6 +282,36 @@ def test_broken_str():
     result = console.file.getvalue()
     print(result)
     assert "<exception str() failed>" in result
+
+
+def test_broken_rich_exception():
+    class BrokenRichError(Exception):
+        def __rich_console__(self, console, options):
+            raise Exception("broken")
+
+    console = Console(width=100, file=io.StringIO())
+    try:
+        raise BrokenRichError()
+    except Exception:
+        console.print_exception()
+    result = console.file.getvalue()
+    print(result)
+    assert "<exception rich render failed>" in result
+
+
+def test_broken_rich_bad_markup():
+    class BrokenRichError(Exception):
+        def __rich_console__(self, console, options):
+            yield "[red]broken[/green]"
+
+    console = Console(width=100, file=io.StringIO())
+    try:
+        raise BrokenRichError()
+    except Exception:
+        console.print_exception()
+    result = console.file.getvalue()
+    print(result)
+    assert "<exception rich render failed>" in result
 
 
 def test_guess_lexer():
