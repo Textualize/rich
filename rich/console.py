@@ -76,6 +76,10 @@ if TYPE_CHECKING:
 
 JUPYTER_DEFAULT_COLUMNS = 115
 JUPYTER_DEFAULT_LINES = 100
+INTERACTIVE_DEFAULT_COLUMNS = 80
+INTERACTIVE_DEFAULT_LINES = 25
+NON_INTERACTIVE_DEFAULT_COLUMNS = 32767
+NON_INTERACTIVE_DEFAULT_LINES = 32767
 WINDOWS = platform.system() == "Windows"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
@@ -1001,7 +1005,9 @@ class Console:
             return ConsoleDimensions(self._width - self.legacy_windows, self._height)
 
         if self.is_dumb_terminal:
-            return ConsoleDimensions(80, 25)
+            return ConsoleDimensions(
+                INTERACTIVE_DEFAULT_COLUMNS, INTERACTIVE_DEFAULT_LINES
+            )
 
         width: Optional[int] = None
         height: Optional[int] = None
@@ -1028,8 +1034,13 @@ class Console:
             height = int(lines)
 
         # get_terminal_size can report 0, 0 if run from pseudo-terminal
-        width = width or 80
-        height = height or 25
+        if self.is_interactive:
+            width = width or INTERACTIVE_DEFAULT_COLUMNS
+            height = height or INTERACTIVE_DEFAULT_LINES
+        else:
+            width = NON_INTERACTIVE_DEFAULT_COLUMNS
+            height = NON_INTERACTIVE_DEFAULT_LINES
+
         return ConsoleDimensions(
             width - self.legacy_windows if self._width is None else self._width,
             height if self._height is None else self._height,

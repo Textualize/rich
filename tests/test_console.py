@@ -18,6 +18,10 @@ from rich.console import (
     ConsoleOptions,
     ScreenUpdate,
     group,
+    INTERACTIVE_DEFAULT_COLUMNS,
+    INTERACTIVE_DEFAULT_LINES,
+    NON_INTERACTIVE_DEFAULT_COLUMNS,
+    NON_INTERACTIVE_DEFAULT_LINES,
 )
 from rich.control import Control
 from rich.measure import measure_renderables
@@ -38,8 +42,8 @@ def test_dumb_terminal():
     console = Console(force_terminal=True, _environ={"TERM": "dumb"})
     assert console.color_system is None
     width, height = console.size
-    assert width == 80
-    assert height == 25
+    assert width == INTERACTIVE_DEFAULT_COLUMNS
+    assert height == INTERACTIVE_DEFAULT_LINES
 
 
 def test_soft_wrap():
@@ -136,22 +140,112 @@ def test_size():
 
 
 @pytest.mark.parametrize(
-    "is_windows,no_descriptor_size,stdin_size,stdout_size,stderr_size,expected_size",
+    "is_windows,is_interactive,no_descriptor_size,stdin_size,stdout_size,stderr_size,expected_size",
     [
         # on Windows we'll use `os.get_terminal_size()` without arguments...
-        (True, (133, 24), ValueError, ValueError, ValueError, (133, 24)),
-        (False, (133, 24), ValueError, ValueError, ValueError, (80, 25)),
+        (True, True, (133, 24), ValueError, ValueError, ValueError, (133, 24)),
+        (
+            False,
+            True,
+            (133, 24),
+            ValueError,
+            ValueError,
+            ValueError,
+            (INTERACTIVE_DEFAULT_COLUMNS, INTERACTIVE_DEFAULT_LINES),
+        ),
         # ...while on other OS we'll try to pass stdin, then stdout, then stderr to it:
-        (False, ValueError, (133, 24), ValueError, ValueError, (133, 24)),
-        (False, ValueError, ValueError, (133, 24), ValueError, (133, 24)),
-        (False, ValueError, ValueError, ValueError, (133, 24), (133, 24)),
-        (False, ValueError, ValueError, ValueError, ValueError, (80, 25)),
+        (False, True, ValueError, (133, 24), ValueError, ValueError, (133, 24)),
+        (False, True, ValueError, ValueError, (133, 24), ValueError, (133, 24)),
+        (False, True, ValueError, ValueError, ValueError, (133, 24), (133, 24)),
+        (
+            False,
+            True,
+            ValueError,
+            ValueError,
+            ValueError,
+            ValueError,
+            (INTERACTIVE_DEFAULT_COLUMNS, INTERACTIVE_DEFAULT_LINES),
+        ),
+        (
+            True,
+            False,
+            (133, 24),
+            ValueError,
+            ValueError,
+            ValueError,
+            (
+                NON_INTERACTIVE_DEFAULT_COLUMNS,
+                NON_INTERACTIVE_DEFAULT_LINES,
+            ),
+        ),
+        (
+            False,
+            False,
+            (133, 24),
+            ValueError,
+            ValueError,
+            ValueError,
+            (
+                NON_INTERACTIVE_DEFAULT_COLUMNS,
+                NON_INTERACTIVE_DEFAULT_LINES,
+            ),
+        ),
+        # ...while on other OS we'll try to pass stdin, then stdout, then stderr to it:
+        (
+            False,
+            False,
+            ValueError,
+            (133, 24),
+            ValueError,
+            ValueError,
+            (
+                NON_INTERACTIVE_DEFAULT_COLUMNS,
+                NON_INTERACTIVE_DEFAULT_LINES,
+            ),
+        ),
+        (
+            False,
+            False,
+            ValueError,
+            ValueError,
+            (133, 24),
+            ValueError,
+            (
+                NON_INTERACTIVE_DEFAULT_COLUMNS,
+                NON_INTERACTIVE_DEFAULT_LINES,
+            ),
+        ),
+        (
+            False,
+            False,
+            ValueError,
+            ValueError,
+            ValueError,
+            (133, 24),
+            (
+                NON_INTERACTIVE_DEFAULT_COLUMNS,
+                NON_INTERACTIVE_DEFAULT_LINES,
+            ),
+        ),
+        (
+            False,
+            False,
+            ValueError,
+            ValueError,
+            ValueError,
+            ValueError,
+            (
+                NON_INTERACTIVE_DEFAULT_COLUMNS,
+                NON_INTERACTIVE_DEFAULT_LINES,
+            ),
+        ),
     ],
 )
 @mock.patch("rich.console.os.get_terminal_size")
 def test_size_can_fall_back_to_std_descriptors(
     get_terminal_size_mock: mock.MagicMock,
     is_windows: bool,
+    is_interactive: bool,
     no_descriptor_size: Union[Tuple[int, int], Type[ValueError]],
     stdin_size: Union[Tuple[int, int], Type[ValueError]],
     stdout_size: Union[Tuple[int, int], Type[ValueError]],
@@ -173,6 +267,7 @@ def test_size_can_fall_back_to_std_descriptors(
 
     console = Console(legacy_windows=False)
     with mock.patch("rich.console.WINDOWS", new=is_windows):
+        console.is_interactive = is_interactive
         w, h = console.size
     assert (w, h) == expected_size
 
