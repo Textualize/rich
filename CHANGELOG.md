@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated the widths of some characters https://github.com/Textualize/rich/pull/3289
 
+### Added
+
+- Included a `name` attribute to the `Spinner` class https://github.com/Textualize/rich/pull/3359
+
 ## [13.7.0] - 2023-11-15
 
 ### Added
