@@ -20,6 +20,13 @@ class Tree(JupyterMixin):
         highlight (bool, optional): Highlight renderable (if str). Defaults to False.
     """
 
+    ASCII_GUIDES = ("    ", "|   ", "+-- ", "`-- ")
+    TREE_GUIDES = [
+        ("    ", "│   ", "├── ", "└── "),
+        ("    ", "┃   ", "┣━━ ", "┗━━ "),
+        ("    ", "║   ", "╠══ ", "╚══ "),
+    ]
+
     def __init__(
         self,
         label: RenderableType,
@@ -82,21 +89,15 @@ class Tree(JupyterMixin):
         guide_style = get_style(self.guide_style, default="") or null_style
         SPACE, CONTINUE, FORK, END = range(4)
 
-        ASCII_GUIDES = ("    ", "|   ", "+-- ", "`-- ")
-        TREE_GUIDES = [
-            ("    ", "│   ", "├── ", "└── "),
-            ("    ", "┃   ", "┣━━ ", "┗━━ "),
-            ("    ", "║   ", "╠══ ", "╚══ "),
-        ]
         _Segment = Segment
 
         def make_guide(index: int, style: Style) -> Segment:
             """Make a Segment for a level of the guide lines."""
             if options.ascii_only:
-                line = ASCII_GUIDES[index]
+                line = self.ASCII_GUIDES[index]
             else:
                 guide = 1 if style.bold else (2 if style.underline2 else 0)
-                line = TREE_GUIDES[0 if options.legacy_windows else guide][index]
+                line = self.TREE_GUIDES[0 if options.legacy_windows else guide][index]
             return _Segment(line, style)
 
         levels: List[Segment] = [make_guide(CONTINUE, guide_style)]
