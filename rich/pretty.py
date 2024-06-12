@@ -854,7 +854,12 @@ def traverse(
         node.is_namedtuple = _is_namedtuple(obj)
         return node
 
-    node = _traverse(_object, root=True)
+    try:
+        # Convert pydantic models into dictionaries
+        _object_pydantic = _object.model_dump()
+        node = _traverse(_object_pydantic, root=True)
+    except AttributeError:
+        node = _traverse(_object, root=True)
     return node
 
 
