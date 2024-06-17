@@ -3,9 +3,8 @@ from __future__ import absolute_import
 import linecache
 import os
 import platform
-import sys
+import itertools
 from dataclasses import dataclass, field
-from traceback import walk_tb
 from types import ModuleType, TracebackType
 from typing import (
     Any,
@@ -179,6 +178,8 @@ class Frame:
     name: str
     line: str = ""
     locals: Optional[Dict[str, pretty.Node]] = None
+    colno: Optional[int] = 0
+    end_colno: Optional[int] = 0
 
 
 @dataclass
@@ -434,7 +435,14 @@ class Traceback:
                         continue
                     yield key, value
 
-            for frame_summary, line_no in walk_tb(traceback):
+            while traceback is not None:
+                frame_summary, lineno = traceback.tb_frame, traceback.tb_lineno
+                positions_gen = frame_summary.f_code.co_positions()
+                position = next(
+                    itertools.islice(positions_gen, traceback.tb_lasti // 2, None)
+                )
+                traceback = traceback.tb_next
+
                 filename = frame_summary.f_code.co_filename
                 if filename and not filename.startswith("<"):
                     if not os.path.isabs(filename):
@@ -444,7 +452,9 @@ class Traceback:
 
                 frame = Frame(
                     filename=filename or "?",
-                    lineno=line_no,
+                    lineno=lineno,
+                    colno=position[2],
+                    end_colno=position[3],
                     name=frame_summary.f_code.co_name,
                     locals={
                         key: pretty.traverse(
@@ -699,6 +709,12 @@ class Traceback:
                         indent_guides=self.indent_guides,
                         dedent=False,
                     )
+                    if frame.colno is not None and frame.end_colno is not None:
+                        syntax.stylize_range(
+                            style="reverse",
+                            start=(frame.lineno, frame.colno),
+                            end=(frame.lineno, frame.end_colno),
+                        )
                     yield ""
                 except Exception as error:
                     yield Text.assemble(
