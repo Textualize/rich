@@ -178,8 +178,8 @@ class Frame:
     name: str
     line: str = ""
     locals: Optional[Dict[str, pretty.Node]] = None
-    colno: Optional[int] = 0
-    end_colno: Optional[int] = 0
+    colno: Optional[int] = None
+    end_colno: Optional[int] = None
 
 
 @dataclass
