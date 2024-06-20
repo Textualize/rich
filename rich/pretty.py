@@ -594,7 +594,7 @@ def traverse(
             obj_repr = f"{obj[:max_string]!r}+{truncated}"
         else:
             try:
-                obj_repr = repr(obj)
+                obj_repr = get_repr(obj)
             except Exception as error:
                 obj_repr = f"<repr-error {str(error)!r}>"
         return obj_repr
@@ -933,6 +933,11 @@ def pprint(
         ),
         soft_wrap=True,
     )
+
+
+def get_repr(obj: Any) -> str:
+    # Allow overriding the representation function from the outside.
+    return repr(obj)
 
 
 if __name__ == "__main__":  # pragma: no cover
