@@ -7,7 +7,7 @@ from collections import deque
 from dataclasses import dataclass, field
 from datetime import timedelta
 from io import RawIOBase, UnsupportedOperation
-from math import ceil
+from math import ceil, e
 from mmap import mmap
 from operator import length_hint
 from os import PathLike, stat
@@ -763,6 +763,7 @@ class TimeRemainingColumn(ProgressColumn):
     Args:
         compact (bool, optional): Render MM:SS when time remaining is less than an hour. Defaults to False.
         elapsed_when_finished (bool, optional): Render time elapsed when the task is finished. Defaults to False.
+        exponential_moving_average (bool, optional): Estimate using an exponential moving average instead of averaging the time over a past window. Defaults to False.
     """
 
     # Only refresh twice a second to prevent jitter
@@ -772,10 +773,12 @@ class TimeRemainingColumn(ProgressColumn):
         self,
         compact: bool = False,
         elapsed_when_finished: bool = False,
+        exponential_moving_average: bool = False,
         table_column: Optional[Column] = None,
     ):
         self.compact = compact
         self.elapsed_when_finished = elapsed_when_finished
+        self.exponential_moving_average = exponential_moving_average
         super().__init__(table_column=table_column)
 
     def render(self, task: "Task") -> Text:
@@ -784,7 +787,10 @@ class TimeRemainingColumn(ProgressColumn):
             task_time = task.finished_time
             style = "progress.elapsed"
         else:
-            task_time = task.time_remaining
+            if self.exponential_moving_average:
+                task_time = task.time_remaining_ema
+            else:
+                task_time = task.time_remaining
             style = "progress.remaining"
 
         if task.total is None:
@@ -958,6 +964,9 @@ class Task:
     stop_time: Optional[float] = field(default=None, init=False, repr=False)
     """Optional[float]: Time this task was stopped, or None if not stopped."""
 
+    speed_ema: Optional[float] = None
+    """Optional[float]: The current speed estimated using an exponential moving average."""
+
     finished_speed: Optional[float] = None
     """Optional[float]: The last speed for a finished task."""
 
@@ -1039,9 +1048,45 @@ class Task:
         estimate = ceil(remaining / speed)
         return estimate
 
+    def update_speed_ema(
+        self, update_completed: float, update_time: float, alpha: float = 0.1
+    ) -> None:
+        update_speed = update_completed / update_time
+        if self.speed_ema is None:
+            self.speed_ema = update_speed
+        else:
+            weight_old_speed = (1 - alpha) ** update_completed
+            self.speed_ema = 1 / (
+                (1 - weight_old_speed) / update_speed
+                + weight_old_speed / self.speed_ema
+            )  # Harmonic mean of the speeds
+
+    @property
+    def time_remaining_ema(self) -> Optional[float]:
+        """Optional[float]: Get estimated time to completion using an exponential moving average, or ``None`` if no data."""
+        if self.finished:
+            return 0.0
+        speed = self.speed_ema
+        if not speed:
+            return None
+        remaining = self.remaining
+        if remaining is None:
+            return None
+        estimate = remaining / speed
+        current_step_progress = 0.0
+        with self._lock:
+            progress = self._progress
+            if progress:
+                current_step_progress = self.get_time() - progress[-1].timestamp
+            elif self.start_time is not None:
+                current_step_progress = self.get_time() - self.start_time
+        current_step_progress = 1 / speed * (1 - e ** (-current_step_progress * speed))
+        return ceil(estimate - current_step_progress)
+
     def _reset(self) -> None:
         """Reset progress."""
         self._progress.clear()
+        self.speed_ema = None
         self.finished_time = None
         self.finished_speed = None
 
@@ -1054,6 +1099,7 @@ class Progress(JupyterMixin):
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
         refresh_per_second (Optional[float], optional): Number of times per second to refresh the progress information or None to use default (10). Defaults to None.
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
+        speed_estimate_alpha: (float, optional): Weight of latest step speed to compute the speed estimate with an exponential moving average. 1/n is used instead in the first few steps. Defaults to 0.1.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         redirect_stdout: (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
         redirect_stderr: (bool, optional): Enable redirection of stderr. Defaults to True.
@@ -1069,6 +1115,7 @@ class Progress(JupyterMixin):
         auto_refresh: bool = True,
         refresh_per_second: float = 10,
         speed_estimate_period: float = 30.0,
+        speed_estimate_alpha: float = 0.1,
         transient: bool = False,
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
@@ -1080,6 +1127,7 @@ class Progress(JupyterMixin):
         self._lock = RLock()
         self.columns = columns or self.get_default_columns()
         self.speed_estimate_period = speed_estimate_period
+        self.speed_estimate_alpha = speed_estimate_alpha
 
         self.disable = disable
         self.expand = expand
@@ -1442,12 +1490,23 @@ class Progress(JupyterMixin):
             current_time = self.get_time()
             old_sample_time = current_time - self.speed_estimate_period
             _progress = task._progress
+            update_time = None
+            if _progress:
+                update_time = current_time - _progress[-1].timestamp
+            elif task.start_time is not None:
+                update_time = current_time - task.start_time
 
             popleft = _progress.popleft
-            while _progress and _progress[0].timestamp < old_sample_time:
+            while len(_progress) > 1 and _progress[0].timestamp < old_sample_time:
                 popleft()
             if update_completed > 0:
                 _progress.append(ProgressSample(current_time, update_completed))
+            if update_completed > 0 and update_time is not None and update_time > 0:
+                task.update_speed_ema(
+                    update_completed,
+                    update_time,
+                    max(self.speed_estimate_alpha, 1 / (1 + completed_start)),
+                )
             if (
                 task.total is not None
                 and task.completed >= task.total
@@ -1512,13 +1571,25 @@ class Progress(JupyterMixin):
             update_completed = task.completed - completed_start
             old_sample_time = current_time - self.speed_estimate_period
             _progress = task._progress
+            update_time = None
+            if _progress:
+                update_time = current_time - _progress[-1].timestamp
+            elif task.start_time is not None:
+                update_time = current_time - task.start_time
 
             popleft = _progress.popleft
-            while _progress and _progress[0].timestamp < old_sample_time:
+            while len(_progress) > 1 and _progress[0].timestamp < old_sample_time:
                 popleft()
             while len(_progress) > 1000:
                 popleft()
             _progress.append(ProgressSample(current_time, update_completed))
+
+            if update_completed > 0 and update_time is not None and update_time > 0:
+                task.update_speed_ema(
+                    update_completed,
+                    update_time,
+                    max(self.speed_estimate_alpha, 1 / (1 + completed_start)),
+                )
             if (
                 task.total is not None
                 and task.completed >= task.total

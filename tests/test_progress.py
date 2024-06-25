@@ -93,6 +93,45 @@ def test_time_remaining_column():
     assert str(text) == "0:01:00"
 
 
+def test_time_remaining_column_ema():
+    class FakeTask(Task):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.speed_ema = 1.0
+
+    column = TimeRemainingColumn(exponential_moving_average=True)
+    task = Task(1, "test", 100, 20, _get_time=lambda: 1.0)
+    text = column(task)
+    assert str(text) == "-:--:--"
+
+    text = column(FakeTask(1, "test", 100, 40, _get_time=lambda: 1.0))
+    assert str(text) == "0:01:00"
+
+    task = FakeTask(1, "test", 100, 20, _get_time=lambda: 1.0)
+    task.start_time = 0.0
+    task.update_speed_ema(1, 10, 0.1)
+    text = column(task)
+    assert str(text) == "0:02:32"
+
+    time_cnt = 0
+
+    def incr_time() -> float:
+        nonlocal time_cnt
+        time_cnt += 1
+        return time_cnt
+
+    progress = Progress(get_time=incr_time)
+    task_id = progress.add_task("foo", total=100, start=False)
+    task = progress._tasks[task_id]
+    text = column(task)
+    assert str(text) == "-:--:--"
+    progress.start_task(task_id)
+    progress.advance(task_id, 1)
+    progress.update(task_id, advance=2)
+    text = column(task)
+    assert str(text) == "0:01:01"
+
+
 @pytest.mark.parametrize(
     "task_time, formatted",
     [
@@ -351,6 +390,7 @@ def test_columns() -> None:
         TextColumn("{task.description}"),
         BarColumn(bar_width=None),
         TimeRemainingColumn(),
+        TimeRemainingColumn(exponential_moving_average=True),
         TimeElapsedColumn(),
         FileSizeColumn(),
         TotalFileSizeColumn(),
@@ -377,7 +417,7 @@ def test_columns() -> None:
 
     result = replace_link_ids(console.file.getvalue())
     print(repr(result))
-    expected = "\x1b[?25ltest foo \x1b[38;5;237m━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:07\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m10 bytes\x1b[0m \x1b[32m0/10 bytes\x1b[0m \x1b[31m?\x1b[0m \x1b[32m 0/10\x1b[0m \x1b[32m 0 of 10\x1b[0m\ntest bar \x1b[38;5;237m━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:18\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m7 bytes \x1b[0m \x1b[32m0/7 bytes \x1b[0m \x1b[31m?\x1b[0m \x1b[32m0/7  \x1b[0m \x1b[32m0 of 7  \x1b[0m\r\x1b[2K\x1b[1A\x1b[2Kfoo\ntest foo \x1b[38;5;237m━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:07\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m10 bytes\x1b[0m \x1b[32m0/10 bytes\x1b[0m \x1b[31m?\x1b[0m \x1b[32m 0/10\x1b[0m \x1b[32m 0 of 10\x1b[0m\ntest bar \x1b[38;5;237m━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:18\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m7 bytes \x1b[0m \x1b[32m0/7 bytes \x1b[0m \x1b[31m?\x1b[0m \x1b[32m0/7  \x1b[0m \x1b[32m0 of 7  \x1b[0m\r\x1b[2K\x1b[1A\x1b[2K\x1b[2;36m[TIME]\x1b[0m\x1b[2;36m \x1b[0mhello                                                                    \ntest foo \x1b[38;5;237m━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:07\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m10 bytes\x1b[0m \x1b[32m0/10 bytes\x1b[0m \x1b[31m?\x1b[0m \x1b[32m 0/10\x1b[0m \x1b[32m 0 of 10\x1b[0m\ntest bar \x1b[38;5;237m━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:18\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m7 bytes \x1b[0m \x1b[32m0/7 bytes \x1b[0m \x1b[31m?\x1b[0m \x1b[32m0/7  \x1b[0m \x1b[32m0 of 7  \x1b[0m\r\x1b[2K\x1b[1A\x1b[2Kworld\ntest foo \x1b[38;5;237m━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:07\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m10 bytes\x1b[0m \x1b[32m0/10 bytes\x1b[0m \x1b[31m?\x1b[0m \x1b[32m 0/10\x1b[0m \x1b[32m 0 of 10\x1b[0m\ntest bar \x1b[38;5;237m━━━━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:18\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m7 bytes \x1b[0m \x1b[32m0/7 bytes \x1b[0m \x1b[31m?\x1b[0m \x1b[32m0/7  \x1b[0m \x1b[32m0 of 7  \x1b[0m\r\x1b[2K\x1b[1A\x1b[2Ktest foo \x1b[38;2;114;156;31m━━━━━━━\x1b[0m \x1b[36m0:00:00\x1b[0m \x1b[33m0:00:34\x1b[0m \x1b[32m12     \x1b[0m \x1b[32m10     \x1b[0m \x1b[32m12/10   \x1b[0m \x1b[31m1      \x1b[0m \x1b[32m12/10\x1b[0m \x1b[32m12 of 10\x1b[0m\n                                 \x1b[32mbytes  \x1b[0m \x1b[32mbytes  \x1b[0m \x1b[32mbytes   \x1b[0m \x1b[31mbyte/s \x1b[0m               \ntest bar \x1b[38;2;114;156;31m━━━━━━━\x1b[0m \x1b[36m0:00:00\x1b[0m \x1b[33m0:00:29\x1b[0m \x1b[32m16     \x1b[0m \x1b[32m7 bytes\x1b[0m \x1b[32m16/7    \x1b[0m \x1b[31m2      \x1b[0m \x1b[32m16/7 \x1b[0m \x1b[32m16 of 7 \x1b[0m\n                                 \x1b[32mbytes  \x1b[0m         \x1b[32mbytes   \x1b[0m \x1b[31mbytes/s\x1b[0m               \r\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2Ktest foo \x1b[38;2;114;156;31m━━━━━━━\x1b[0m \x1b[36m0:00:00\x1b[0m \x1b[33m0:00:34\x1b[0m \x1b[32m12     \x1b[0m \x1b[32m10     \x1b[0m \x1b[32m12/10   \x1b[0m \x1b[31m1      \x1b[0m \x1b[32m12/10\x1b[0m \x1b[32m12 of 10\x1b[0m\n                                 \x1b[32mbytes  \x1b[0m \x1b[32mbytes  \x1b[0m \x1b[32mbytes   \x1b[0m \x1b[31mbyte/s \x1b[0m               \ntest bar \x1b[38;2;114;156;31m━━━━━━━\x1b[0m \x1b[36m0:00:00\x1b[0m \x1b[33m0:00:29\x1b[0m \x1b[32m16     \x1b[0m \x1b[32m7 bytes\x1b[0m \x1b[32m16/7    \x1b[0m \x1b[31m2      \x1b[0m \x1b[32m16/7 \x1b[0m \x1b[32m16 of 7 \x1b[0m\n                                 \x1b[32mbytes  \x1b[0m         \x1b[32mbytes   \x1b[0m \x1b[31mbytes/s\x1b[0m               \n\x1b[?25h\r\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2K"
+    expected = "\x1b[?25ltest foo \x1b[38;5;237m━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:08\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m10     \x1b[0m \x1b[32m0/10   \x1b[0m \x1b[31m?\x1b[0m \x1b[32m 0/10\x1b[0m \x1b[32m 0 of  \x1b[0m\n                                                 \x1b[32mbytes  \x1b[0m \x1b[32mbytes  \x1b[0m         \x1b[32m10     \x1b[0m\ntest bar \x1b[38;5;237m━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:20\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m7 bytes\x1b[0m \x1b[32m0/7    \x1b[0m \x1b[31m?\x1b[0m \x1b[32m0/7  \x1b[0m \x1b[32m0 of 7 \x1b[0m\n                                                         \x1b[32mbytes  \x1b[0m                \r\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2Kfoo\ntest foo \x1b[38;5;237m━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:08\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m10     \x1b[0m \x1b[32m0/10   \x1b[0m \x1b[31m?\x1b[0m \x1b[32m 0/10\x1b[0m \x1b[32m 0 of  \x1b[0m\n                                                 \x1b[32mbytes  \x1b[0m \x1b[32mbytes  \x1b[0m         \x1b[32m10     \x1b[0m\ntest bar \x1b[38;5;237m━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:20\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m7 bytes\x1b[0m \x1b[32m0/7    \x1b[0m \x1b[31m?\x1b[0m \x1b[32m0/7  \x1b[0m \x1b[32m0 of 7 \x1b[0m\n                                                         \x1b[32mbytes  \x1b[0m                \r\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[2;36m[TIME]\x1b[0m\x1b[2;36m \x1b[0mhello                                                                    \ntest foo \x1b[38;5;237m━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:08\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m10     \x1b[0m \x1b[32m0/10   \x1b[0m \x1b[31m?\x1b[0m \x1b[32m 0/10\x1b[0m \x1b[32m 0 of  \x1b[0m\n                                                 \x1b[32mbytes  \x1b[0m \x1b[32mbytes  \x1b[0m         \x1b[32m10     \x1b[0m\ntest bar \x1b[38;5;237m━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:20\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m7 bytes\x1b[0m \x1b[32m0/7    \x1b[0m \x1b[31m?\x1b[0m \x1b[32m0/7  \x1b[0m \x1b[32m0 of 7 \x1b[0m\n                                                         \x1b[32mbytes  \x1b[0m                \r\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2Kworld\ntest foo \x1b[38;5;237m━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:08\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m10     \x1b[0m \x1b[32m0/10   \x1b[0m \x1b[31m?\x1b[0m \x1b[32m 0/10\x1b[0m \x1b[32m 0 of  \x1b[0m\n                                                 \x1b[32mbytes  \x1b[0m \x1b[32mbytes  \x1b[0m         \x1b[32m10     \x1b[0m\ntest bar \x1b[38;5;237m━━━━━━━\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[36m-:--:--\x1b[0m \x1b[33m0:00:20\x1b[0m \x1b[32m0 bytes\x1b[0m \x1b[32m7 bytes\x1b[0m \x1b[32m0/7    \x1b[0m \x1b[31m?\x1b[0m \x1b[32m0/7  \x1b[0m \x1b[32m0 of 7 \x1b[0m\n                                                         \x1b[32mbytes  \x1b[0m                \r\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2Ktest foo \x1b[38;2;114;156;31m━━━━━━\x1b[0m \x1b[36m0:00:…\x1b[0m \x1b[36m0:00:…\x1b[0m \x1b[33m0:00:…\x1b[0m \x1b[32m12    \x1b[0m \x1b[32m10     \x1b[0m \x1b[32m12/10 \x1b[0m \x1b[31m1      \x1b[0m \x1b[32m12/10\x1b[0m \x1b[32m12 of  \x1b[0m\n                                     \x1b[32mbytes \x1b[0m \x1b[32mbytes  \x1b[0m \x1b[32mbytes \x1b[0m \x1b[31mbyte/s \x1b[0m       \x1b[32m10     \x1b[0m\ntest bar \x1b[38;2;114;156;31m━━━━━━\x1b[0m \x1b[36m0:00:…\x1b[0m \x1b[36m0:00:…\x1b[0m \x1b[33m0:00:…\x1b[0m \x1b[32m16    \x1b[0m \x1b[32m7 bytes\x1b[0m \x1b[32m16/7  \x1b[0m \x1b[31m2      \x1b[0m \x1b[32m16/7 \x1b[0m \x1b[32m16 of 7\x1b[0m\n                                     \x1b[32mbytes \x1b[0m         \x1b[32mbytes \x1b[0m \x1b[31mbytes/s\x1b[0m              \r\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2Ktest foo \x1b[38;2;114;156;31m━━━━━━\x1b[0m \x1b[36m0:00:…\x1b[0m \x1b[36m0:00:…\x1b[0m \x1b[33m0:00:…\x1b[0m \x1b[32m12    \x1b[0m \x1b[32m10     \x1b[0m \x1b[32m12/10 \x1b[0m \x1b[31m1      \x1b[0m \x1b[32m12/10\x1b[0m \x1b[32m12 of  \x1b[0m\n                                     \x1b[32mbytes \x1b[0m \x1b[32mbytes  \x1b[0m \x1b[32mbytes \x1b[0m \x1b[31mbyte/s \x1b[0m       \x1b[32m10     \x1b[0m\ntest bar \x1b[38;2;114;156;31m━━━━━━\x1b[0m \x1b[36m0:00:…\x1b[0m \x1b[36m0:00:…\x1b[0m \x1b[33m0:00:…\x1b[0m \x1b[32m16    \x1b[0m \x1b[32m7 bytes\x1b[0m \x1b[32m16/7  \x1b[0m \x1b[31m2      \x1b[0m \x1b[32m16/7 \x1b[0m \x1b[32m16 of 7\x1b[0m\n                                     \x1b[32mbytes \x1b[0m         \x1b[32mbytes \x1b[0m \x1b[31mbytes/s\x1b[0m              \n\x1b[?25h\r\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2K"
 
     assert result == expected
 
