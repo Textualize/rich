@@ -1074,13 +1074,16 @@ class Task:
             return None
         estimate = remaining / speed
         current_step_progress = 0.0
-        with self._lock:
-            progress = self._progress
-            if progress:
-                current_step_progress = self.get_time() - progress[-1].timestamp
-            elif self.start_time is not None:
-                current_step_progress = self.get_time() - self.start_time
-        current_step_progress = 1 / speed * (1 - e ** (-current_step_progress * speed))
+        if self.stop_time is None:
+            with self._lock:
+                progress = self._progress
+                if progress:
+                    current_step_progress = self.get_time() - progress[-1].timestamp
+                elif self.start_time is not None:
+                    current_step_progress = self.get_time() - self.start_time
+            current_step_progress = (
+                1 / speed * (1 - e ** (-current_step_progress * speed))
+            )
         return ceil(estimate - current_step_progress)
 
     def _reset(self) -> None:
