@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 import linecache
 import os
-import platform
 import sys
 from dataclasses import dataclass, field
 from traceback import walk_tb
@@ -39,7 +38,7 @@ from .syntax import Syntax
 from .text import Text
 from .theme import Theme
 
-WINDOWS = platform.system() == "Windows"
+WINDOWS = sys.platform == "win32"
 
 LOCALS_MAX_LENGTH = 10
 LOCALS_MAX_STRING = 80

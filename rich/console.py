@@ -1,6 +1,5 @@
 import inspect
 import os
-import platform
 import sys
 import threading
 import zlib
@@ -76,7 +75,7 @@ if TYPE_CHECKING:
 
 JUPYTER_DEFAULT_COLUMNS = 115
 JUPYTER_DEFAULT_LINES = 100
-WINDOWS = platform.system() == "Windows"
+WINDOWS = sys.platform == "win32"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
