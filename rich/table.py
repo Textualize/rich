@@ -106,6 +106,9 @@ class Column:
     no_wrap: bool = False
     """bool: Prevent wrapping of text within the column. Defaults to ``False``."""
 
+    highlight: bool = False
+    """bool: Apply highlighter to column. Defaults to ``False``."""
+
     _index: int = 0
     """Index of column."""
 
@@ -821,6 +824,7 @@ class Table(JupyterMixin):
                     no_wrap=column.no_wrap,
                     overflow=column.overflow,
                     height=None,
+                    highlight=column.highlight,
                 )
                 lines = console.render_lines(
                     cell.renderable,
