@@ -1,5 +1,4 @@
 import os.path
-import platform
 import re
 import sys
 import textwrap
@@ -52,7 +51,7 @@ from .text import Text
 
 TokenType = Tuple[str, ...]
 
-WINDOWS = platform.system() == "Windows"
+WINDOWS = sys.platform == "win32"
 DEFAULT_THEME = "monokai"
 
 # The following styles are based on https://github.com/pygments/pygments/blob/master/pygments/formatters/terminal.py

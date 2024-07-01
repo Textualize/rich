@@ -1,7 +1,7 @@
 import io
 
 from rich.console import Console
-from rich.prompt import Prompt, IntPrompt, Confirm
+from rich.prompt import Confirm, IntPrompt, Prompt
 
 
 def test_prompt_str():
@@ -12,6 +12,24 @@ def test_prompt_str():
         console=console,
         choices=["foo", "bar"],
         default="baz",
+        stream=io.StringIO(INPUT),
+    )
+    assert name == "foo"
+    expected = "what is your name [foo/bar] (baz): Please select one of the available options\nwhat is your name [foo/bar] (baz): "
+    output = console.file.getvalue()
+    print(repr(output))
+    assert output == expected
+
+
+def test_prompt_str_case_insensitive():
+    INPUT = "egg\nFoO"
+    console = Console(file=io.StringIO())
+    name = Prompt.ask(
+        "what is your name",
+        console=console,
+        choices=["foo", "bar"],
+        default="baz",
+        case_sensitive=False,
         stream=io.StringIO(INPUT),
     )
     assert name == "foo"

@@ -1,6 +1,5 @@
 import inspect
 import os
-import platform
 import sys
 import threading
 import zlib
@@ -76,7 +75,7 @@ if TYPE_CHECKING:
 
 JUPYTER_DEFAULT_COLUMNS = 115
 JUPYTER_DEFAULT_LINES = 100
-WINDOWS = platform.system() == "Windows"
+WINDOWS = sys.platform == "win32"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
@@ -2166,7 +2165,7 @@ class Console:
 
         """
         text = self.export_text(clear=clear, styles=styles)
-        with open(path, "wt", encoding="utf-8") as write_file:
+        with open(path, "w", encoding="utf-8") as write_file:
             write_file.write(text)
 
     def export_html(
@@ -2272,7 +2271,7 @@ class Console:
             code_format=code_format,
             inline_styles=inline_styles,
         )
-        with open(path, "wt", encoding="utf-8") as write_file:
+        with open(path, "w", encoding="utf-8") as write_file:
             write_file.write(html)
 
     def export_svg(
@@ -2561,7 +2560,7 @@ class Console:
             font_aspect_ratio=font_aspect_ratio,
             unique_id=unique_id,
         )
-        with open(path, "wt", encoding="utf-8") as write_file:
+        with open(path, "w", encoding="utf-8") as write_file:
             write_file.write(svg)
 
 
