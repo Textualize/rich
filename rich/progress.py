@@ -78,7 +78,7 @@ class _TrackThread(Thread):
         update_period = self.update_period
         last_completed = 0
         wait = self.done.wait
-        while not wait(update_period) and self.progress.live._started:
+        while not wait(update_period) and self.progress.live.is_started:
             completed = self.completed
             if last_completed != completed:
                 advance(task_id, completed - last_completed)
