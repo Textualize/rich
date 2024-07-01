@@ -663,7 +663,7 @@ class Style:
         style._set_attributes = self._set_attributes
         style._link = None
         style._link_id = ""
-        style._hash = self._hash
+        style._hash = None
         style._null = False
         style._meta = None
         return style

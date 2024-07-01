@@ -54,7 +54,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "logging.level.notset": Style(dim=True),
     "logging.level.debug": Style(color="green"),
     "logging.level.info": Style(color="blue"),
-    "logging.level.warning": Style(color="red"),
+    "logging.level.warning": Style(color="yellow"),
     "logging.level.error": Style(color="red", bold=True),
     "logging.level.critical": Style(color="red", bold=True, reverse=True),
     "log.level": Style.null(),

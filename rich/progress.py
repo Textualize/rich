@@ -70,7 +70,7 @@ class _TrackThread(Thread):
         self.done = Event()
 
         self.completed = 0
-        super().__init__()
+        super().__init__(daemon=True)
 
     def run(self) -> None:
         task_id = self.task_id
@@ -78,7 +78,7 @@ class _TrackThread(Thread):
         update_period = self.update_period
         last_completed = 0
         wait = self.done.wait
-        while not wait(update_period):
+        while not wait(update_period) and self.progress.live.is_started:
             completed = self.completed
             if last_completed != completed:
                 advance(task_id, completed - last_completed)
@@ -1161,7 +1161,7 @@ class Progress(JupyterMixin):
     def stop(self) -> None:
         """Stop the progress display."""
         self.live.stop()
-        if not self.console.is_interactive:
+        if not self.console.is_interactive and not self.console.is_jupyter:
             self.console.print()
 
     def __enter__(self) -> "Progress":
@@ -1326,7 +1326,7 @@ class Progress(JupyterMixin):
         # normalize the mode (always rb, rt)
         _mode = "".join(sorted(mode, reverse=False))
         if _mode not in ("br", "rt", "r"):
-            raise ValueError("invalid mode {!r}".format(mode))
+            raise ValueError(f"invalid mode {mode!r}")
 
         # patch buffering to provide the same behaviour as the builtin `open`
         line_buffering = buffering == 1

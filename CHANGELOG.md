@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Fixed
+
+- Fixed `Table` rendering of box elements so "footer" elements truly appear at bottom of table, "mid" elements in main table body.
+- Fixed styles in Panel when Text objects are used for title https://github.com/Textualize/rich/pull/3401
+- Fix pretty repr for `collections.deque` https://github.com/Textualize/rich/pull/2864
+- Thread used in progress.track will exit if an exception occurs in a generator https://github.com/Textualize/rich/pull/3402
+- Progress track thread is now a daemon thread https://github.com/Textualize/rich/pull/3402
+- Fixed cached hash preservation upon clearing meta and links https://github.com/Textualize/rich/issues/2942
+
+### Changed
+
+- `RichHandler` errors and warnings will now use different colors (red and yellow) https://github.com/Textualize/rich/issues/2825
+- Removed the empty line printed in jupyter while using `Progress` https://github.com/Textualize/rich/pull/2616
+
+### Added
+
+- Adds a `case_sensitive` parameter to `prompt.Prompt`. This determines if the
+  response is treated as case-sensitive. Defaults to `True`.
+
+## [13.7.1] - 2024-02-28
+
+### Fixed
+
+- Updated the widths of some characters https://github.com/Textualize/rich/pull/3289
+
+## [13.7.0] - 2023-11-15
+
+### Added
+
+- Adds missing parameters to Panel.fit https://github.com/Textualize/rich/issues/3142
+
+### Fixed
+
+- Some text goes missing during wrapping when it contains double width characters https://github.com/Textualize/rich/issues/3176
+- Ensure font is correctly inherited in exported HTML https://github.com/Textualize/rich/issues/3104
+- Fixed typing for `FloatPrompt`.
+
 ## [13.6.0] - 2023-09-30
 
 ### Added
@@ -37,7 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed Text.expand_tabs not expanding spans.
 - Fixed TimeElapsedColumn from showing negative.
 - Fix for escaping strings with a trailing backslash https://github.com/Textualize/rich/issues/2987
-- Fixed exception in Markdown with partial table https://github.com/Textualize/rich/issues/3053 
+- Fixed exception in Markdown with partial table https://github.com/Textualize/rich/issues/3053
 - Fixed the HTML export template so that the `<html>` tag comes before the `<head>` tag https://github.com/Textualize/rich/issues/3021
 - Fixed issue with custom classes overwriting `__eq__` https://github.com/Textualize/rich/issues/2875
 - Fix rich.pretty.install breakage in iPython https://github.com/Textualize/rich/issues/3013
@@ -50,7 +89,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Text.tab_size now defaults to `None` to indicate that Console.tab_size should be used.
-
 
 ## [13.4.2] - 2023-06-12
 
@@ -105,6 +143,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added Polish README
+
 
 ### Changed
 
@@ -2007,14 +2046,16 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.7.1]: https://github.com/textualize/rich/compare/v13.7.0...v13.7.1
+[13.7.0]: https://github.com/textualize/rich/compare/v13.6.0...v13.7.0
 [13.6.0]: https://github.com/textualize/rich/compare/v13.5.3...v13.6.0
 [13.5.3]: https://github.com/textualize/rich/compare/v13.5.2...v13.5.3
 [13.5.2]: https://github.com/textualize/rich/compare/v13.5.1...v13.5.2
 [13.5.1]: https://github.com/textualize/rich/compare/v13.5.0...v13.5.1
-[13.5.0]: https://github.com/textualize/rich/compare/v13.4.2...v13.5.0 
-[13.4.2]: https://github.com/textualize/rich/compare/v13.4.1...v13.4.2  
-[13.4.1]: https://github.com/textualize/rich/compare/v13.4.0...v13.4.1  
-[13.4.0]: https://github.com/textualize/rich/compare/v13.3.5...v13.4.0  
+[13.5.0]: https://github.com/textualize/rich/compare/v13.4.2...v13.5.0
+[13.4.2]: https://github.com/textualize/rich/compare/v13.4.1...v13.4.2
+[13.4.1]: https://github.com/textualize/rich/compare/v13.4.0...v13.4.1
+[13.4.0]: https://github.com/textualize/rich/compare/v13.3.5...v13.4.0
 [13.3.5]: https://github.com/textualize/rich/compare/v13.3.4...v13.3.5
 [13.3.4]: https://github.com/textualize/rich/compare/v13.3.3...v13.3.4
 [13.3.3]: https://github.com/textualize/rich/compare/v13.3.2...v13.3.3

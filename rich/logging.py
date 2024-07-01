@@ -36,6 +36,7 @@ class RichHandler(Handler):
         markup (bool, optional): Enable console markup in log messages. Defaults to False.
         rich_tracebacks (bool, optional): Enable rich tracebacks with syntax highlighting and formatting. Defaults to False.
         tracebacks_width (Optional[int], optional): Number of characters used to render tracebacks, or None for full width. Defaults to None.
+        tracebacks_code_width (int, optional): Number of code characters used to render tracebacks, or None for full width. Defaults to 88.
         tracebacks_extra_lines (int, optional): Additional lines of code to render tracebacks, or None for full width. Defaults to None.
         tracebacks_theme (str, optional): Override pygments theme used in traceback.
         tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to True.
@@ -75,6 +76,7 @@ class RichHandler(Handler):
         markup: bool = False,
         rich_tracebacks: bool = False,
         tracebacks_width: Optional[int] = None,
+        tracebacks_code_width: int = 88,
         tracebacks_extra_lines: int = 3,
         tracebacks_theme: Optional[str] = None,
         tracebacks_word_wrap: bool = True,
@@ -107,6 +109,7 @@ class RichHandler(Handler):
         self.tracebacks_show_locals = tracebacks_show_locals
         self.tracebacks_suppress = tracebacks_suppress
         self.tracebacks_max_frames = tracebacks_max_frames
+        self.tracebacks_code_width = tracebacks_code_width
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
         self.keywords = keywords
@@ -143,6 +146,7 @@ class RichHandler(Handler):
                 exc_value,
                 exc_traceback,
                 width=self.tracebacks_width,
+                code_width=self.tracebacks_code_width,
                 extra_lines=self.tracebacks_extra_lines,
                 theme=self.tracebacks_theme,
                 word_wrap=self.tracebacks_word_wrap,

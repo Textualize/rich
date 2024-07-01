@@ -18,6 +18,7 @@ class Tree(JupyterMixin):
         guide_style (StyleType, optional): Style of the guide lines. Defaults to "tree.line".
         expanded (bool, optional): Also display children. Defaults to True.
         highlight (bool, optional): Highlight renderable (if str). Defaults to False.
+        hide_root (bool, optional): Hide the root node. Defaults to False.
     """
 
     def __init__(
@@ -72,7 +73,6 @@ class Tree(JupyterMixin):
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-
         stack: List[Iterator[Tuple[bool, Tree]]] = []
         pop = stack.pop
         push = stack.append
@@ -195,7 +195,6 @@ class Tree(JupyterMixin):
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     from rich.console import Group
     from rich.markdown import Markdown
     from rich.panel import Panel

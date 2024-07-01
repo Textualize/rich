@@ -17,9 +17,14 @@
 
 # -- Project information -----------------------------------------------------
 
+import sys
 
-import pkg_resources
 import sphinx_rtd_theme
+
+if sys.version_info >= (3, 8):
+    from importlib.metadata import Distribution
+else:
+    from importlib_metadata import Distribution
 
 html_theme = "sphinx_rtd_theme"
 
@@ -30,7 +35,7 @@ copyright = "Will McGugan"
 author = "Will McGugan"
 
 # The full version, including alpha/beta/rc tags
-release = pkg_resources.get_distribution("rich").version
+release = Distribution.from_name("rich").version
 
 
 # -- General configuration ---------------------------------------------------
