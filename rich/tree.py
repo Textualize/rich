@@ -18,6 +18,7 @@ class Tree(JupyterMixin):
         guide_style (StyleType, optional): Style of the guide lines. Defaults to "tree.line".
         expanded (bool, optional): Also display children. Defaults to True.
         highlight (bool, optional): Highlight renderable (if str). Defaults to False.
+        hide_root (bool, optional): Hide the root node. Defaults to False.
     """
 
     def __init__(

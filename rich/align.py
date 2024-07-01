@@ -240,6 +240,7 @@ class VerticalCenter(JupyterMixin):
 
     Args:
         renderable (RenderableType): A renderable object.
+        style (StyleType, optional): An optional style to apply to the background. Defaults to None.
     """
 
     def __init__(

@@ -3,7 +3,6 @@ import os
 import sys
 import tempfile
 
-import pkg_resources
 import pytest
 from pygments.lexers import PythonLexer
 
@@ -21,7 +20,12 @@ from rich.syntax import (
 
 from .render import render
 
-PYGMENTS_VERSION = pkg_resources.get_distribution("pygments").version
+if sys.version_info >= (3, 8):
+    from importlib.metadata import Distribution
+else:
+    from importlib_metadata import Distribution
+
+PYGMENTS_VERSION = Distribution.from_name("pygments").version
 OLD_PYGMENTS = PYGMENTS_VERSION == "2.13.0"
 
 CODE = '''\
