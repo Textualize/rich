@@ -10,7 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed `Table` rendering of box elements so "footer" elements truly appear at bottom of table, "mid" elements in main table body.
-- Fix styles in Panel when Text objects are used for title https://github.com/Textualize/rich/pull/3401
+- Fixed styles in Panel when Text objects are used for title https://github.com/Textualize/rich/pull/3401
+
+### Changed
+
+- `RichHandler` errors and warnings will now use different colors (red and yellow) https://github.com/Textualize/rich/issues/2825
 
 ## [13.7.1] - 2024-02-28
 
@@ -112,12 +116,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added Style.clear_meta_and_links
-
-## Unreleased
-
-### Fixed
-
-- `RichHandler` errors and warnings will now use different colors (red and yellow) https://github.com/Textualize/rich/issues/2825
 
 ## [13.3.2] - 2023-02-04
 
