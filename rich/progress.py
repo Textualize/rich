@@ -70,7 +70,7 @@ class _TrackThread(Thread):
         self.done = Event()
 
         self.completed = 0
-        super().__init__()
+        super().__init__(daemon=True)
 
     def run(self) -> None:
         task_id = self.task_id
@@ -78,7 +78,7 @@ class _TrackThread(Thread):
         update_period = self.update_period
         last_completed = 0
         wait = self.done.wait
-        while not wait(update_period):
+        while not wait(update_period) and self.progress.live.is_started:
             completed = self.completed
             if last_completed != completed:
                 advance(task_id, completed - last_completed)
@@ -104,6 +104,7 @@ def track(
     sequence: Union[Sequence[ProgressType], Iterable[ProgressType]],
     description: str = "Working...",
     total: Optional[float] = None,
+    completed: int = 0,
     auto_refresh: bool = True,
     console: Optional[Console] = None,
     transient: bool = False,
@@ -123,6 +124,7 @@ def track(
         sequence (Iterable[ProgressType]): A sequence (must support "len") you wish to iterate over.
         description (str, optional): Description of task show next to progress bar. Defaults to "Working".
         total: (float, optional): Total number of steps. Default is len(sequence).
+        completed (int, optional): Number of steps completed so far. Defaults to 0.
         auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         console (Console, optional): Console to write to. Default creates internal Console instance.
@@ -166,7 +168,7 @@ def track(
 
     with progress:
         yield from progress.track(
-            sequence, total=total, description=description, update_period=update_period
+            sequence, total=total, completed=completed, description=description, update_period=update_period
         )
 
 
@@ -1161,7 +1163,7 @@ class Progress(JupyterMixin):
     def stop(self) -> None:
         """Stop the progress display."""
         self.live.stop()
-        if not self.console.is_interactive:
+        if not self.console.is_interactive and not self.console.is_jupyter:
             self.console.print()
 
     def __enter__(self) -> "Progress":
@@ -1180,6 +1182,7 @@ class Progress(JupyterMixin):
         self,
         sequence: Union[Iterable[ProgressType], Sequence[ProgressType]],
         total: Optional[float] = None,
+        completed: int = 0,
         task_id: Optional[TaskID] = None,
         description: str = "Working...",
         update_period: float = 0.1,
@@ -1189,6 +1192,7 @@ class Progress(JupyterMixin):
         Args:
             sequence (Sequence[ProgressType]): A sequence of values you want to iterate over and track progress.
             total: (float, optional): Total number of steps. Default is len(sequence).
+            completed (int, optional): Number of steps completed so far. Defaults to 0.
             task_id: (TaskID): Task to track. Default is new task.
             description: (str, optional): Description of task, if new task is created.
             update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
@@ -1200,9 +1204,9 @@ class Progress(JupyterMixin):
             total = float(length_hint(sequence)) or None
 
         if task_id is None:
-            task_id = self.add_task(description, total=total)
+            task_id = self.add_task(description, total=total, completed=completed)
         else:
-            self.update(task_id, total=total)
+            self.update(task_id, total=total, completed=completed)
 
         if self.live.auto_refresh:
             with _TrackThread(self, task_id, update_period) as track_thread:
@@ -1326,7 +1330,7 @@ class Progress(JupyterMixin):
         # normalize the mode (always rb, rt)
         _mode = "".join(sorted(mode, reverse=False))
         if _mode not in ("br", "rt", "r"):
-            raise ValueError("invalid mode {!r}".format(mode))
+            raise ValueError(f"invalid mode {mode!r}")
 
         # patch buffering to provide the same behaviour as the builtin `open`
         line_buffering = buffering == 1

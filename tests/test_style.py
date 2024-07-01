@@ -251,3 +251,17 @@ def test_clear_meta_and_links():
     assert clear_style.bgcolor == Color.parse("black")
     assert clear_style.bold
     assert not clear_style.italic
+
+
+def test_clear_meta_and_links_clears_hash():
+    """Regression test for https://github.com/Textualize/rich/issues/2942."""
+
+    style = Style.parse("bold red on black link https://example.org") + Style.on(
+        click="CLICK"
+    )
+    hash(style)  # Force hash caching.
+
+    assert style._hash is not None
+
+    clear_style = style.clear_meta_and_links()
+    assert clear_style._hash is None
