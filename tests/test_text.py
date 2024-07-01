@@ -1,4 +1,5 @@
 from io import StringIO
+from typing import List
 
 import pytest
 
@@ -448,6 +449,20 @@ def test_wrap_cjk_width_mid_character():
     ]
 
 
+def test_wrap_cjk_mixed():
+    """Regression test covering https://github.com/Textualize/rich/issues/3176 and
+    https://github.com/Textualize/textual/issues/3567 - double width characters could
+    result in text going missing when wrapping."""
+    text = Text("123ありがとうございました")
+    console = Console(width=20)  # let's ensure the width passed to wrap() wins.
+
+    wrapped_lines = text.wrap(console, width=8)
+    with console.capture() as capture:
+        console.print(wrapped_lines)
+
+    assert capture.get() == "123あり\nがとうご\nざいまし\nた\n"
+
+
 def test_wrap_long():
     text = Text("abracadabra", justify="left")
     lines = text.wrap(Console(), 4)
@@ -496,6 +511,47 @@ def test_wrap_long_words_2():
     ]
 
 
+def test_wrap_long_words_followed_by_other_words():
+    """After folding a word across multiple lines, we should continue from
+    the next word immediately after the folded word (don't take a newline
+    following completion of the folded word)."""
+    text = Text("123 12345678 123 123")
+    lines = text.wrap(Console(), 6)
+    assert lines._lines == [
+        Text("123 "),
+        Text("123456"),
+        Text("78 123"),
+        Text("123"),
+    ]
+
+
+def test_wrap_long_word_preceeded_by_word_of_full_line_length():
+    """The width of the first word is the same as the available width.
+    Ensures that folding works correctly when there's no space available
+    on the current line."""
+    text = Text("123456 12345678 123 123")
+    lines = text.wrap(Console(), 6)
+    assert lines._lines == [
+        Text("123456"),
+        Text("123456"),
+        Text("78 123"),
+        Text("123"),
+    ]
+
+
+def test_wrap_multiple_consecutive_spaces():
+    """Adding multiple consecutive spaces at the end of a line does not impact
+    the location at which a break will be added during the process of wrapping."""
+    text = Text("123456    12345678 123 123")
+    lines = text.wrap(Console(), 6)
+    assert lines._lines == [
+        Text("123456"),
+        Text("123456"),
+        Text("78 123"),
+        Text("123"),
+    ]
+
+
 def test_wrap_long_words_justify_left():
     text = Text("X 123456789", justify="left")
     lines = text.wrap(Console(), 4)
@@ -505,6 +561,17 @@ def test_wrap_long_words_justify_left():
     assert lines[1] == Text("1234")
     assert lines[2] == Text("5678")
     assert lines[3] == Text("9   ")
+
+
+def test_wrap_leading_and_trailing_whitespace():
+    text = Text("   123  456 789   ")
+    lines = text.wrap(Console(), 4)
+    assert lines._lines == [
+        Text("   1"),
+        Text("23  "),
+        Text("456 "),
+        Text("789 "),
+    ]
 
 
 def test_no_wrap_no_crop():
@@ -599,6 +666,98 @@ def test_tabs_to_spaces():
     text = Text("No Tabs")
     text.expand_tabs()
     assert text.plain == "No Tabs"
+
+    text = Text("No Tabs", style="bold")
+    text.expand_tabs()
+    assert text.plain == "No Tabs"
+    assert text.style == "bold"
+
+
+@pytest.mark.parametrize(
+    "markup,tab_size,expected_text,expected_spans",
+    [
+        ("", 4, "", []),
+        ("\t", 4, "    ", []),
+        ("\tbar", 4, "    bar", []),
+        ("foo\tbar", 4, "foo bar", []),
+        ("foo\nbar\nbaz", 4, "foo\nbar\nbaz", []),
+        (
+            "[bold]foo\tbar",
+            4,
+            "foo bar",
+            [
+                Span(0, 4, "bold"),
+                Span(4, 7, "bold"),
+            ],
+        ),
+        (
+            "[bold]\tbar",
+            4,
+            "    bar",
+            [
+                Span(0, 4, "bold"),
+                Span(4, 7, "bold"),
+            ],
+        ),
+        (
+            "\t[bold]bar",
+            4,
+            "    bar",
+            [
+                Span(4, 7, "bold"),
+            ],
+        ),
+        (
+            "[red]foo\tbar\n[green]egg\tbaz",
+            8,
+            "foo     bar\negg     baz",
+            [
+                Span(0, 8, "red"),
+                Span(8, 12, "red"),
+                Span(12, 20, "red"),
+                Span(12, 20, "green"),
+                Span(20, 23, "red"),
+                Span(20, 23, "green"),
+            ],
+        ),
+        (
+            "[bold]X\tY",
+            8,
+            "X       Y",
+            [
+                Span(0, 8, "bold"),
+                Span(8, 9, "bold"),
+            ],
+        ),
+        (
+            "[bold]💩\t💩",
+            8,
+            "💩      💩",
+            [
+                Span(0, 7, "bold"),
+                Span(7, 8, "bold"),
+            ],
+        ),
+        (
+            "[bold]💩💩💩💩\t💩",
+            8,
+            "💩💩💩💩        💩",
+            [
+                Span(0, 12, "bold"),
+                Span(12, 13, "bold"),
+            ],
+        ),
+    ],
+)
+def test_tabs_to_spaces_spans(
+    markup: str, tab_size: int, expected_text: str, expected_spans: List[Span]
+):
+    """Test spans are correct after expand_tabs"""
+    text = Text.from_markup(markup)
+    text.expand_tabs(tab_size)
+    print(text._spans)
+    assert text.plain == expected_text
+    assert text._spans == expected_spans
 
 
 def test_markup_switch():
@@ -806,3 +965,19 @@ def test_markup_property():
         == "[bold]foo [italic]bar[/bold] baz[/italic]"
     )
     assert Text("[bold]foo").markup == "\\[bold]foo"
+
+
+def test_extend_style():
+    text = Text.from_markup("[red]foo[/red] [bold]bar")
+    text.extend_style(0)
+
+    assert text.plain == "foo bar"
+    assert text.spans == [Span(0, 3, "red"), Span(4, 7, "bold")]
+
+    text.extend_style(-1)
+    assert text.plain == "foo bar"
+    assert text.spans == [Span(0, 3, "red"), Span(4, 7, "bold")]
+
+    text.extend_style(2)
+    assert text.plain == "foo bar  "
+    assert text.spans == [Span(0, 3, "red"), Span(4, 9, "bold")]

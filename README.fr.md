@@ -26,7 +26,7 @@
 
 Rich est une bibliothèque Python pour le _rich_ texte et la mise en forme dans le terminal.
 
-L'[API Rich](https://rich.readthedocs.io/en/latest/) permet d'ajouter facilement de la couleur et du style sur la sortie du terminal. Rich peut également rendre de jolis tableaux, des barres de progression, du markdown, du code source avec de la coloration syntaxique, des traçeurs d'erreurs et bien d'autres choses encore, et ce dès le départ.
+L'[API Rich](https://rich.readthedocs.io/en/latest/) permet d'ajouter facilement de la couleur et du style sur le texte du terminal. Rich peut également rendre de jolis tableaux, des barres de progression, du markdown, du code source avec de la coloration syntaxique, des messages d'erreurs et bien d'autres choses encore, et ce dès le départ.
 
 ![Features](https://github.com/textualize/rich/raw/master/imgs/features.png)
 
@@ -68,7 +68,7 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ## Rich REPL
 
-Rich peut être installé dans le REPL de Python, de sorte que toutes les structures de données seront joliment affichées et mises en évidence.
+Rich peut être installé dans le REPL de Python, de sorte que toutes les structures de données soient joliment affichées et mises en évidence.
 
 ```python
 >>> from rich import pretty
@@ -79,7 +79,7 @@ Rich peut être installé dans le REPL de Python, de sorte que toutes les struct
 
 ## Utilisation de Console
 
-Pour mieux contrôler le contenu rich du terminal, importez et construisez un objet [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console)
+Pour mieux contrôler le contenu rich du terminal, importez et construisez une classe [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console)
 
 ```python
 from rich.console import Console
@@ -87,7 +87,7 @@ from rich.console import Console
 console = Console()
 ```
 
-L'objet Console possède une méthode `print` dont l'interface est intentionnellement similaire à celle de la fonction `print` native. Voici un exemple d'utilisation :
+La classe Console possède une méthode `print` dont l'interface est intentionnellement similaire à celle de la fonction `print` native. Voici un exemple d'utilisation :
 
 ```python
 console.print("Hello", "World!")
@@ -95,13 +95,13 @@ console.print("Hello", "World!")
 
 Comme vous pouvez vous y attendre, cela va afficher "Hello World !" sur le terminal. Notez que, contrairement à la fonction d'affichage intégrée, Rich mettra votre texte en forme pour qu'il tienne dans la largeur du terminal.
 
-Il y a plusieurs façons d'ajouter de la couleur et du style à votre sortie. Vous pouvez définir un style pour l'ensemble de la sortie en ajoutant un argument de mot-clé style. Voici un exemple :
+Il y a plusieurs façons d'ajouter de la couleur et du style à votre sortie de texte. Vous pouvez définir un style pour l'ensemble de la sortie de texte en ajoutant un argument de mot-clé style. Voici un exemple :
 
 ```python
 console.print("Hello", "World!", style="bold red")
 ```
 
-La sortie sera quelque chose comme ce qui suit :
+La sortie de texte sera quelque chose comme ce qui suit :
 
 ![Hello World](https://github.com/textualize/rich/raw/master/imgs/hello_world.png)
 
@@ -174,7 +174,7 @@ La méthode log peut être utilisée pour la journalisation vers le terminal pou
 <details>
 <summary>Journalisation</summary>
 
-Vous pouvez également utiliser la classe intégrée [Handler](https://rich.readthedocs.io/en/latest/logging.html) pour formater et coloriser les sorties du module de journalisation de Python. Voici un exemple de sortie :
+Vous pouvez également utiliser la classe intégrée [Handler](https://rich.readthedocs.io/en/latest/logging.html) pour formater et coloriser les textes de sortie du module de journalisation de Python. Voici un exemple de texte de sortie :
 
 ![Logging](https://github.com/textualize/rich/raw/master/imgs/logging.png)
 </details>
@@ -195,7 +195,7 @@ Veuillez utiliser cette fonction à bon escient.
 <details>
 <summary>Tableaux</summary>
 
-Rich peut rendre des [tableaux](https://rich.readthedocs.io/en/latest/tables.html) flexibles avec des caractères de boîte unicode. Il existe une grande variété d'options de formatage pour les bordures, les styles, l'alignement des cellules, etc.
+Rich peut rendre des [tableaux](https://rich.readthedocs.io/en/latest/tables.html) flexibles avec des caractères unicodes. Il existe une grande variété d'options de formatage pour les bordures, les styles, l'alignement des cellules, etc.
 
 ![table movie](https://github.com/textualize/rich/raw/master/imgs/table_movie.gif)
 
@@ -237,9 +237,9 @@ Cela produit le résultat suivant :
 
 ![table](https://github.com/textualize/rich/raw/master/imgs/table.png)
 
-Notez que les balises de la console sont rendues de la même manière que `print()` et `log()`. En fait, tout ce qui peut être rendu par Rich peut être inclus dans les en-têtes / lignes (même d'autres tables).
+Notez que les balises de la console sont rendues de la même manière que `print()` et `log()`. De fait, tout ce qui peut être rendu par Rich peut être inclus dans les en-têtes / lignes (même d'autres tables).
 
-La classe `Table` est suffisamment intelligente pour redimensionner les colonnes en fonction de la largeur disponible du terminal, en enveloppant le texte si nécessaire. Voici le même exemple, avec un terminal plus petit que le tableau ci-dessus :
+La classe `Table` est suffisamment intelligente pour redimensionner les colonnes en fonction de la largeur disponible du terminal, en enveloppant et en réduisant le texte si nécessaire. Voici le même exemple, avec un terminal plus petit que le tableau ci-dessus :
 
 ![table2](https://github.com/textualize/rich/raw/master/imgs/table2.png)
 </details>
@@ -247,9 +247,9 @@ La classe `Table` est suffisamment intelligente pour redimensionner les colonnes
 <details>
 <summary>Barres de progression</summary>
 
-Rich peut afficher plusieurs [barres de progression](https://rich.readthedocs.io/en/latest/progress.html) sans scintillement pour suivre les tâches de longue haleine.
+Rich peut afficher plusieurs [barres de progression](https://rich.readthedocs.io/en/latest/progress.html) sans scintillement pour suivre les tâches de longue périodes.
 
-Pour une utilisation basique, bouclez sur n'importe quelle séquence dans la fonction `track` et itérez sur le résultat. Voici un exemple :
+Pour une utilisation basique, créez une boucle sur n'importe quelle séquence dans la fonction `track` et itérez sur le résultat. Voici un exemple :
 
 ```python
 from rich.progress import track
@@ -266,7 +266,7 @@ Les colonnes peuvent être configurées pour afficher tous les détails que vous
 
 ![progress](https://github.com/textualize/rich/raw/master/imgs/downloader.gif)
 
-Pour l'essayer vous-même, voyez [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) qui peut télécharger plusieurs URL simultanément tout en affichant la progression.
+Pour l'essayer vous-même, testez [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) qui peut télécharger plusieurs URL simultanément tout en affichant la progression au fil du temps.
 
 </details>
 
@@ -293,7 +293,7 @@ Cela génère la sortie suivante dans le terminal.
 
 ![status](https://github.com/textualize/rich/raw/master/imgs/status.gif)
 
-Les animations des toupies ont été empruntées à [cli-spinners](https://www.npmjs.com/package/cli-spinners). Vous pouvez sélectionner un spinner en spécifiant le paramètre `spinner`. Exécutez la commande suivante pour voir les valeurs disponibles :
+Les animations des characteres d'animations ont été empruntées à [cli-spinners](https://www.npmjs.com/package/cli-spinners). Vous pouvez en sélectionner un en spécifiant le paramètre `spinner`. Exécutez la commande suivante pour voir les valeurs disponibles :
 
 ```
 python -m rich.spinner
@@ -326,7 +326,7 @@ Voir l'exemple [tree.py](https://github.com/textualize/rich/blob/master/examples
 <details>
 <summary>Colonnes</summary>
 
-Rich peut rendre le contenu en [colonnes](https://rich.readthedocs.io/en/latest/columns.html) avec une largeur égale ou optimale. Voici un clone très basique de la commande `ls` (MacOS / Linux) qui affiche une liste de répertoires en colonnes :
+Rich peut rendre du contenu en [colonnes](https://rich.readthedocs.io/en/latest/columns.html) avec une largeur égale ou optimale. Voici un clone très basique de la commande `ls` (MacOS / Linux) qui affiche une liste de répertoires en colonnes :
 
 ```python
 import os
@@ -365,7 +365,7 @@ console.print(markdown)
 Cela produira un résultat semblable à ce qui suit :
 
 ![markdown](https://github.com/textualize/rich/raw/master/imgs/markdown.png)
-
+ 
 </details>
 
 <details>
@@ -405,7 +405,7 @@ Cela produira le résultat suivant :
 <details>
 <summary>Tracebacks</summary>
 
-Rich peut rendre des [traçages d'erreurs](https://rich.readthedocs.io/en/latest/traceback.html) plus faciles à lire et montrent plus de code que les traçages d'erreurs standard de Python. Vous pouvez définir Rich comme le gestionnaire d'erreurs par défaut afin que toutes les exceptions non capturées soient rendues par Rich.
+Rich peut rendre des [traçages d'erreurs](https://rich.readthedocs.io/en/latest/traceback.html) plus faciles à lire et qui montrent plus de code que les traçages d'erreurs standard de Python. Vous pouvez définir Rich comme le gestionnaire d'erreurs par défaut afin que toutes les exceptions/erreurs non capturées soient rendues par Rich.
 
 Voici à quoi cela ressemble sous OSX (similaire sous Linux) :
 
@@ -419,7 +419,7 @@ Tous les éléments de rendu utilisent le [Console Protocol](https://rich.readth
 
 Disponible dans le cadre de l'abonnement Tidelift.
 
-Les mainteneurs de Rich et de milliers d'autres paquets collaborent avec Tidelift pour fournir un support et une maintenance commerciale pour les paquets open source que vous utilisez pour construire vos applications. Gagnez du temps, réduisez les risques et améliorez la qualité du code, tout en payant les mainteneurs des paquets que vous utilisez. [En savoir plus](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
+Les mainteneurs de Rich et de milliers d'autres paquets collaborent avec Tidelift pour fournir un support et une maintenance commerciale pour les paquets open source que vous utilisez pour construire vos applications. Gagnez du temps, réduisez les risques et améliorez votre qualité de code, tout en payant les mainteneurs des paquets que vous utilisez. [En savoir plus](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
 
 # Projets utilisant Rich
 

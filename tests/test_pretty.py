@@ -2,7 +2,7 @@ import collections
 import io
 import sys
 from array import array
-from collections import UserDict, defaultdict
+from collections import UserDict, defaultdict, deque
 from dataclasses import dataclass, field
 from typing import Any, List, NamedTuple
 
@@ -33,6 +33,10 @@ skip_py310 = pytest.mark.skipif(
 skip_py311 = pytest.mark.skipif(
     sys.version_info.minor == 11 and sys.version_info.major == 3,
     reason="rendered differently on py3.11",
+)
+skip_py312 = pytest.mark.skipif(
+    sys.version_info.minor == 12 and sys.version_info.major == 3,
+    reason="rendered differently on py3.12",
 )
 
 
@@ -488,6 +492,33 @@ def test_defaultdict():
     assert result == "defaultdict(<class 'int'>, {'foo': 2})"
 
 
+def test_deque():
+    test_deque = deque([1, 2, 3])
+    result = pretty_repr(test_deque)
+    assert result == "deque([1, 2, 3])"
+    test_deque = deque([1, 2, 3], maxlen=None)
+    result = pretty_repr(test_deque)
+    assert result == "deque([1, 2, 3])"
+    test_deque = deque([1, 2, 3], maxlen=5)
+    result = pretty_repr(test_deque)
+    assert result == "deque([1, 2, 3], maxlen=5)"
+    test_deque = deque([1, 2, 3], maxlen=0)
+    result = pretty_repr(test_deque)
+    assert result == "deque([], maxlen=0)"
+    test_deque = deque([])
+    result = pretty_repr(test_deque)
+    assert result == "deque([])"
+    test_deque = deque([], maxlen=None)
+    result = pretty_repr(test_deque)
+    assert result == "deque([])"
+    test_deque = deque([], maxlen=5)
+    result = pretty_repr(test_deque)
+    assert result == "deque([], maxlen=5)"
+    test_deque = deque([], maxlen=0)
+    result = pretty_repr(test_deque)
+    assert result == "deque([], maxlen=0)"
+
+
 def test_array():
     test_array = array("I", [1, 2, 3])
     result = pretty_repr(test_array)
@@ -606,6 +637,7 @@ def test_attrs_empty():
 
 @skip_py310
 @skip_py311
+@skip_py312
 def test_attrs_broken():
     @attr.define
     class Foo:

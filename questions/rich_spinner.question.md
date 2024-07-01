@@ -1,5 +1,5 @@
 ---
-title: "python -m rich.spinner shows extra lines"
+title: "python -m rich.spinner shows extra lines."
 ---
 
 The spinner example is know to break on some terminals (Windows in particular).

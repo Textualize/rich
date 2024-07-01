@@ -681,7 +681,7 @@ class TimeElapsedColumn(ProgressColumn):
         elapsed = task.finished_time if task.finished else task.elapsed
         if elapsed is None:
             return Text("-:--:--", style="progress.elapsed")
-        delta = timedelta(seconds=int(elapsed))
+        delta = timedelta(seconds=max(0, int(elapsed)))
         return Text(str(delta), style="progress.elapsed")
 
 
@@ -710,7 +710,6 @@ class TaskProgressColumn(TextColumn):
         table_column: Optional[Column] = None,
         show_speed: bool = False,
     ) -> None:
-
         self.text_format_no_percentage = text_format_no_percentage
         self.show_speed = show_speed
         super().__init__(
@@ -1114,7 +1113,7 @@ class Progress(JupyterMixin):
 
             progress = Progress(
                 SpinnerColumn(),
-                *Progress.default_columns(),
+                *Progress.get_default_columns(),
                 "Elapsed:",
                 TimeElapsedColumn(),
             )
@@ -1636,7 +1635,6 @@ class Progress(JupyterMixin):
 
 
 if __name__ == "__main__":  # pragma: no coverage
-
     import random
     import time
 
@@ -1689,7 +1687,6 @@ if __name__ == "__main__":  # pragma: no coverage
         console=console,
         transient=False,
     ) as progress:
-
         task1 = progress.add_task("[red]Downloading", total=1000)
         task2 = progress.add_task("[green]Processing", total=1000)
         task3 = progress.add_task("[yellow]Thinking", total=None)

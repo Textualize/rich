@@ -82,7 +82,9 @@ class Panel(JupyterMixin):
         style: StyleType = "none",
         border_style: StyleType = "none",
         width: Optional[int] = None,
+        height: Optional[int] = None,
         padding: PaddingDimensions = (0, 1),
+        highlight: bool = False,
     ) -> "Panel":
         """An alternative constructor that sets expand=False."""
         return cls(
@@ -96,7 +98,9 @@ class Panel(JupyterMixin):
             style=style,
             border_style=border_style,
             width=width,
+            height=height,
             padding=padding,
+            highlight=highlight,
             expand=False,
         )
 
@@ -140,7 +144,8 @@ class Panel(JupyterMixin):
             Padding(self.renderable, _padding) if any(_padding) else self.renderable
         )
         style = console.get_style(self.style)
-        border_style = style + console.get_style(self.border_style)
+        partial_border_style = console.get_style(self.border_style)
+        border_style = style + partial_border_style
         width = (
             options.max_width
             if self.width is None
@@ -196,7 +201,7 @@ class Panel(JupyterMixin):
 
         title_text = self._title
         if title_text is not None:
-            title_text.stylize_before(border_style)
+            title_text.stylize_before(partial_border_style)
 
         child_width = (
             width - 2
@@ -245,7 +250,7 @@ class Panel(JupyterMixin):
 
         subtitle_text = self._subtitle
         if subtitle_text is not None:
-            subtitle_text.stylize_before(border_style)
+            subtitle_text.stylize_before(partial_border_style)
 
         if subtitle_text is None or width <= 4:
             yield Segment(box.get_bottom([width - 2]), border_style)
