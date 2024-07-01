@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ## Unreleased
 
 ### Fixed
@@ -23,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed the empty line printed in jupyter while using `Progress` https://github.com/Textualize/rich/pull/2616
 - Running tests in environment with `FORCE_COLOR` or `NO_COLOR` environment variables
 - ansi decoder will now strip problematic private escape sequences (like `\x1b7`) https://github.com/Textualize/rich/pull/3278/
+- Tree's ASCII_GUIDES and TREE_GUIDES constants promoted to class attributes
 
 ### Added
 
