@@ -2,7 +2,7 @@ import collections
 import io
 import sys
 from array import array
-from collections import UserDict, defaultdict
+from collections import UserDict, defaultdict, deque
 from dataclasses import dataclass, field
 from typing import Any, List, NamedTuple
 
@@ -38,9 +38,13 @@ skip_py312 = pytest.mark.skipif(
     sys.version_info.minor == 12 and sys.version_info.major == 3,
     reason="rendered differently on py3.12",
 )
+skip_py313 = pytest.mark.skipif(
+    sys.version_info.minor == 13 and sys.version_info.major == 3,
+    reason="rendered differently on py3.13",
+)
 
 
-def test_install():
+def test_install() -> None:
     console = Console(file=io.StringIO())
     dh = sys.displayhook
     install(console)
@@ -49,7 +53,7 @@ def test_install():
     assert sys.displayhook is not dh
 
 
-def test_install_max_depth():
+def test_install_max_depth() -> None:
     console = Console(file=io.StringIO())
     dh = sys.displayhook
     install(console, max_depth=1)
@@ -58,7 +62,7 @@ def test_install_max_depth():
     assert sys.displayhook is not dh
 
 
-def test_ipy_display_hook__repr_html():
+def test_ipy_display_hook__repr_html() -> None:
     console = Console(file=io.StringIO(), force_jupyter=True)
 
     class Thing:
@@ -72,7 +76,7 @@ def test_ipy_display_hook__repr_html():
     assert console.end_capture() == ""
 
 
-def test_ipy_display_hook__multiple_special_reprs():
+def test_ipy_display_hook__multiple_special_reprs() -> None:
     """
     The case where there are multiple IPython special _repr_*_
     methods on the object, and one of them returns None but another
@@ -94,7 +98,7 @@ def test_ipy_display_hook__multiple_special_reprs():
     assert result == "A Thing"
 
 
-def test_ipy_display_hook__no_special_repr_methods():
+def test_ipy_display_hook__no_special_repr_methods() -> None:
     console = Console(file=io.StringIO(), force_jupyter=True)
 
     class Thing:
@@ -106,7 +110,7 @@ def test_ipy_display_hook__no_special_repr_methods():
     assert result == "hello"
 
 
-def test_ipy_display_hook__special_repr_raises_exception():
+def test_ipy_display_hook__special_repr_raises_exception() -> None:
     """
     When an IPython special repr method raises an exception,
     we treat it as if it doesn't exist and look for the next.
@@ -130,14 +134,14 @@ def test_ipy_display_hook__special_repr_raises_exception():
     assert result == "therepr"
 
 
-def test_ipy_display_hook__console_renderables_on_newline():
+def test_ipy_display_hook__console_renderables_on_newline() -> None:
     console = Console(file=io.StringIO(), force_jupyter=True)
     console.begin_capture()
     result = _ipy_display_hook(Text("hello"), console=console)
     assert result == "\nhello"
 
 
-def test_pretty():
+def test_pretty() -> None:
     test = {
         "foo": [1, 2, 3, (4, 5, {6}, 7, 8, {9}), {}],
         "bar": {"egg": "baz", "words": ["Hello World"] * 10},
@@ -167,7 +171,7 @@ class Empty:
     pass
 
 
-def test_pretty_dataclass():
+def test_pretty_dataclass() -> None:
     dc = ExampleDataclass(1000, "Hello, World", 999, ["foo", "bar", "baz"])
     result = pretty_repr(dc, max_width=80)
     print(repr(result))
@@ -187,7 +191,7 @@ def test_pretty_dataclass():
     assert result == "ExampleDataclass(foo=1000, bar=..., baz=['foo', 'bar', 'baz'])"
 
 
-def test_empty_dataclass():
+def test_empty_dataclass() -> None:
     assert pretty_repr(Empty()) == "Empty()"
     assert pretty_repr([Empty()]) == "[Empty()]"
 
@@ -200,7 +204,7 @@ class StockKeepingUnit(NamedTuple):
     reviews: List[str]
 
 
-def test_pretty_namedtuple():
+def test_pretty_namedtuple() -> None:
     console = Console(color_system=None)
     console.begin_capture()
 
@@ -227,17 +231,17 @@ def test_pretty_namedtuple():
     )
 
 
-def test_pretty_namedtuple_length_one_no_trailing_comma():
+def test_pretty_namedtuple_length_one_no_trailing_comma() -> None:
     instance = collections.namedtuple("Thing", ["name"])(name="Bob")
     assert pretty_repr(instance) == "Thing(name='Bob')"
 
 
-def test_pretty_namedtuple_empty():
+def test_pretty_namedtuple_empty() -> None:
     instance = collections.namedtuple("Thing", [])()
     assert pretty_repr(instance) == "Thing()"
 
 
-def test_pretty_namedtuple_custom_repr():
+def test_pretty_namedtuple_custom_repr() -> None:
     class Thing(NamedTuple):
         def __repr__(self):
             return "XX"
@@ -245,7 +249,7 @@ def test_pretty_namedtuple_custom_repr():
     assert pretty_repr(Thing()) == "XX"
 
 
-def test_pretty_namedtuple_fields_invalid_type():
+def test_pretty_namedtuple_fields_invalid_type() -> None:
     class LooksLikeANamedTupleButIsnt(tuple):
         _fields = "blah"
 
@@ -254,20 +258,20 @@ def test_pretty_namedtuple_fields_invalid_type():
     assert result == "()"  # Treated as tuple
 
 
-def test_pretty_namedtuple_max_depth():
+def test_pretty_namedtuple_max_depth() -> None:
     instance = {"unit": StockKeepingUnit("a", "b", 1.0, "c", ["d", "e"])}
     result = pretty_repr(instance, max_depth=1)
     assert result == "{'unit': StockKeepingUnit(...)}"
 
 
-def test_small_width():
+def test_small_width() -> None:
     test = ["Hello world! 12345"]
     result = pretty_repr(test, max_width=10)
     expected = "[\n    'Hello world! 12345'\n]"
     assert result == expected
 
 
-def test_ansi_in_pretty_repr():
+def test_ansi_in_pretty_repr() -> None:
     class Hello:
         def __repr__(self):
             return "Hello \x1b[38;5;239mWorld!"
@@ -281,7 +285,7 @@ def test_ansi_in_pretty_repr():
     assert result == "Hello World!\n"
 
 
-def test_broken_repr():
+def test_broken_repr() -> None:
     class BrokenRepr:
         def __repr__(self):
             1 / 0
@@ -292,7 +296,7 @@ def test_broken_repr():
     assert result == expected
 
 
-def test_broken_getattr():
+def test_broken_getattr() -> None:
     class BrokenAttr:
         def __getattr__(self, name):
             1 / 0
@@ -305,7 +309,7 @@ def test_broken_getattr():
     assert result == "BrokenAttr()"
 
 
-def test_reference_cycle_container():
+def test_reference_cycle_container() -> None:
     test = []
     test.append(test)
     res = pretty_repr(test)
@@ -323,7 +327,7 @@ def test_reference_cycle_container():
     assert res == "[1, [[2], [2]]]"
 
 
-def test_reference_cycle_namedtuple():
+def test_reference_cycle_namedtuple() -> None:
     class Example(NamedTuple):
         x: int
         y: Any
@@ -340,7 +344,7 @@ def test_reference_cycle_namedtuple():
     assert res == "Example(x=1, y=[Example(x=2, y=None), Example(x=2, y=None)])"
 
 
-def test_reference_cycle_dataclass():
+def test_reference_cycle_dataclass() -> None:
     @dataclass
     class Example:
         x: int
@@ -363,7 +367,7 @@ def test_reference_cycle_dataclass():
     assert res == "Example(x=1, y=[Example(x=2, y=None), Example(x=2, y=None)])"
 
 
-def test_reference_cycle_attrs():
+def test_reference_cycle_attrs() -> None:
     @attr.define
     class Example:
         x: int
@@ -386,7 +390,7 @@ def test_reference_cycle_attrs():
     assert res == "Example(x=1, y=[Example(x=2, y=None), Example(x=2, y=None)])"
 
 
-def test_reference_cycle_custom_repr():
+def test_reference_cycle_custom_repr() -> None:
     class Example:
         def __init__(self, x, y):
             self.x = x
@@ -413,7 +417,7 @@ def test_reference_cycle_custom_repr():
     assert res == "Example(x=1, y=[Example(x=2, y=None), Example(x=2, y=None)])"
 
 
-def test_max_depth():
+def test_max_depth() -> None:
     d = {}
     d["foo"] = {"fob": {"a": [1, 2, 3], "b": {"z": "x", "y": ["a", "b", "c"]}}}
 
@@ -435,7 +439,7 @@ def test_max_depth():
     )
 
 
-def test_max_depth_rich_repr():
+def test_max_depth_rich_repr() -> None:
     class Foo:
         def __init__(self, foo):
             self.foo = foo
@@ -456,7 +460,7 @@ def test_max_depth_rich_repr():
     )
 
 
-def test_max_depth_attrs():
+def test_max_depth_attrs() -> None:
     @attr.define
     class Foo:
         foo = attr.field()
@@ -471,7 +475,7 @@ def test_max_depth_attrs():
     )
 
 
-def test_max_depth_dataclass():
+def test_max_depth_dataclass() -> None:
     @dataclass
     class Foo:
         foo: object
@@ -486,28 +490,55 @@ def test_max_depth_dataclass():
     )
 
 
-def test_defaultdict():
+def test_defaultdict() -> None:
     test_dict = defaultdict(int, {"foo": 2})
     result = pretty_repr(test_dict)
     assert result == "defaultdict(<class 'int'>, {'foo': 2})"
 
 
-def test_array():
+def test_deque() -> None:
+    test_deque = deque([1, 2, 3])
+    result = pretty_repr(test_deque)
+    assert result == "deque([1, 2, 3])"
+    test_deque = deque([1, 2, 3], maxlen=None)
+    result = pretty_repr(test_deque)
+    assert result == "deque([1, 2, 3])"
+    test_deque = deque([1, 2, 3], maxlen=5)
+    result = pretty_repr(test_deque)
+    assert result == "deque([1, 2, 3], maxlen=5)"
+    test_deque = deque([1, 2, 3], maxlen=0)
+    result = pretty_repr(test_deque)
+    assert result == "deque(maxlen=0)"
+    test_deque = deque([])
+    result = pretty_repr(test_deque)
+    assert result == "deque()"
+    test_deque = deque([], maxlen=None)
+    result = pretty_repr(test_deque)
+    assert result == "deque()"
+    test_deque = deque([], maxlen=5)
+    result = pretty_repr(test_deque)
+    assert result == "deque(maxlen=5)"
+    test_deque = deque([], maxlen=0)
+    result = pretty_repr(test_deque)
+    assert result == "deque(maxlen=0)"
+
+
+def test_array() -> None:
     test_array = array("I", [1, 2, 3])
     result = pretty_repr(test_array)
     assert result == "array('I', [1, 2, 3])"
 
 
-def test_tuple_of_one():
+def test_tuple_of_one() -> None:
     assert pretty_repr((1,)) == "(1,)"
 
 
-def test_node():
+def test_node() -> None:
     node = Node("abc")
     assert pretty_repr(node) == "abc: "
 
 
-def test_indent_lines():
+def test_indent_lines() -> None:
     console = Console(width=100, color_system=None)
     console.begin_capture()
     console.print(Pretty([100, 200], indent_guides=True), width=8)
@@ -523,35 +554,35 @@ def test_indent_lines():
     assert result == expected
 
 
-def test_pprint():
+def test_pprint() -> None:
     console = Console(color_system=None)
     console.begin_capture()
     pprint(1, console=console)
     assert console.end_capture() == "1\n"
 
 
-def test_pprint_max_values():
+def test_pprint_max_values() -> None:
     console = Console(color_system=None)
     console.begin_capture()
     pprint([1, 2, 3, 4, 5, 6, 7, 8, 9, 0], console=console, max_length=2)
     assert console.end_capture() == "[1, 2, ... +8]\n"
 
 
-def test_pprint_max_items():
+def test_pprint_max_items() -> None:
     console = Console(color_system=None)
     console.begin_capture()
     pprint({"foo": 1, "bar": 2, "egg": 3}, console=console, max_length=2)
     assert console.end_capture() == """{'foo': 1, 'bar': 2, ... +1}\n"""
 
 
-def test_pprint_max_string():
+def test_pprint_max_string() -> None:
     console = Console(color_system=None)
     console.begin_capture()
     pprint(["Hello" * 20], console=console, max_string=8)
     assert console.end_capture() == """['HelloHel'+92]\n"""
 
 
-def test_tuples():
+def test_tuples() -> None:
     console = Console(color_system=None)
     console.begin_capture()
     pprint((1,), console=console)
@@ -566,7 +597,7 @@ def test_tuples():
     assert result == expected
 
 
-def test_newline():
+def test_newline() -> None:
     console = Console(color_system=None)
     console.begin_capture()
     console.print(Pretty((1,), insert_line=True, expand_all=True))
@@ -575,7 +606,7 @@ def test_newline():
     assert result == expected
 
 
-def test_empty_repr():
+def test_empty_repr() -> None:
     class Foo:
         def __repr__(self):
             return ""
@@ -583,7 +614,7 @@ def test_empty_repr():
     assert pretty_repr(Foo()) == ""
 
 
-def test_attrs():
+def test_attrs() -> None:
     @attr.define
     class Point:
         x: int
@@ -597,7 +628,7 @@ def test_attrs():
     assert result == expected
 
 
-def test_attrs_empty():
+def test_attrs_empty() -> None:
     @attr.define
     class Nada:
         pass
@@ -611,7 +642,8 @@ def test_attrs_empty():
 @skip_py310
 @skip_py311
 @skip_py312
-def test_attrs_broken():
+@skip_py313
+def test_attrs_broken() -> None:
     @attr.define
     class Foo:
         bar: int
@@ -627,7 +659,7 @@ def test_attrs_broken():
 @skip_py37
 @skip_py38
 @skip_py39
-def test_attrs_broken_310():
+def test_attrs_broken_310() -> None:
     @attr.define
     class Foo:
         bar: int
@@ -640,7 +672,7 @@ def test_attrs_broken_310():
     assert result == expected
 
 
-def test_user_dict():
+def test_user_dict() -> None:
     class D1(UserDict):
         pass
 
@@ -658,7 +690,7 @@ def test_user_dict():
     assert result == "FOO"
 
 
-def test_lying_attribute():
+def test_lying_attribute() -> None:
     """Test getattr doesn't break rich repr protocol"""
 
     class Foo:
@@ -670,7 +702,7 @@ def test_lying_attribute():
     assert "Foo" in result
 
 
-def test_measure_pretty():
+def test_measure_pretty() -> None:
     """Test measure respects expand_all"""
     # https://github.com/Textualize/rich/issues/1998
     console = Console()
@@ -680,7 +712,7 @@ def test_measure_pretty():
     assert measurement == Measurement(12, 12)
 
 
-def test_tuple_rich_repr():
+def test_tuple_rich_repr() -> None:
     """
     Test that can use None as key to have tuple positional values.
     """
@@ -692,7 +724,7 @@ def test_tuple_rich_repr():
     assert pretty_repr(Foo()) == "Foo((1,))"
 
 
-def test_tuple_rich_repr_default():
+def test_tuple_rich_repr_default() -> None:
     """
     Test that can use None as key to have tuple positional values and with a default.
     """
