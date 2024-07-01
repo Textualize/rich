@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `RichHandler` errors and warnings will now use different colors (red and yellow) https://github.com/Textualize/rich/issues/2825
 - Removed the empty line printed in jupyter while using `Progress` https://github.com/Textualize/rich/pull/2616
+- Running tests in environment with `FORCE_COLOR` or `NO_COLOR` environment variables
 
 ### Added
 
