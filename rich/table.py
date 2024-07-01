@@ -106,6 +106,9 @@ class Column:
     no_wrap: bool = False
     """bool: Prevent wrapping of text within the column. Defaults to ``False``."""
 
+    highlight: bool = False
+    """bool: Apply highlighter to column. Defaults to ``False``."""
+
     _index: int = 0
     """Index of column."""
 
@@ -365,6 +368,7 @@ class Table(JupyterMixin):
         footer: "RenderableType" = "",
         *,
         header_style: Optional[StyleType] = None,
+        highlight: Optional[bool] = None,
         footer_style: Optional[StyleType] = None,
         style: Optional[StyleType] = None,
         justify: "JustifyMethod" = "left",
@@ -384,6 +388,7 @@ class Table(JupyterMixin):
             footer (RenderableType, optional): Text or renderable for the footer.
                 Defaults to "".
             header_style (Union[str, Style], optional): Style for the header, or None for default. Defaults to None.
+            highlight (bool, optional): Whether to highlight the text. The default of None uses the value of the table (self) object.
             footer_style (Union[str, Style], optional): Style for the footer, or None for default. Defaults to None.
             style (Union[str, Style], optional): Style for the column cells, or None for default. Defaults to None.
             justify (JustifyMethod, optional): Alignment for cells. Defaults to "left".
@@ -401,6 +406,7 @@ class Table(JupyterMixin):
             header=header,
             footer=footer,
             header_style=header_style or "",
+            highlight=highlight if highlight is not None else self.highlight,
             footer_style=footer_style or "",
             style=style or "",
             justify=justify,
@@ -818,6 +824,7 @@ class Table(JupyterMixin):
                     no_wrap=column.no_wrap,
                     overflow=column.overflow,
                     height=None,
+                    highlight=column.highlight,
                 )
                 lines = console.render_lines(
                     cell.renderable,

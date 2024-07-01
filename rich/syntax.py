@@ -619,9 +619,7 @@ class Syntax(JupyterMixin):
     ) -> RenderResult:
         segments = Segments(self._get_syntax(console, options))
         if self.padding:
-            yield Padding(
-                segments, style=self._theme.get_background_style(), pad=self.padding
-            )
+            yield Padding(segments, style=self._get_base_style(), pad=self.padding)
         else:
             yield segments
 

@@ -16,13 +16,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Thread used in progress.track will exit if an exception occurs in a generator https://github.com/Textualize/rich/pull/3402
 - Progress track thread is now a daemon thread https://github.com/Textualize/rich/pull/3402
 - Fixed cached hash preservation upon clearing meta and links https://github.com/Textualize/rich/issues/2942
+- Fixed overriding the `background_color` of `Syntax` not including padding https://github.com/Textualize/rich/issues/3295
 
 ### Changed
 
 - `RichHandler` errors and warnings will now use different colors (red and yellow) https://github.com/Textualize/rich/issues/2825
 - Removed the empty line printed in jupyter while using `Progress` https://github.com/Textualize/rich/pull/2616
+- Running tests in environment with `FORCE_COLOR` or `NO_COLOR` environment variables
+- ansi decoder will now strip problematic private escape sequences (like `\x1b7`) https://github.com/Textualize/rich/pull/3278/
+- Tree's ASCII_GUIDES and TREE_GUIDES constants promoted to class attributes
+
+### Added
+
+- Adds a `case_sensitive` parameter to `prompt.Prompt`. This determines if the
+  response is treated as case-sensitive. Defaults to `True`.
 
 ## [13.7.1] - 2024-02-28
+
 
 ### Fixed
 
@@ -85,7 +95,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Text.tab_size now defaults to `None` to indicate that Console.tab_size should be used.
-
 
 ## [13.4.2] - 2023-06-12
 
