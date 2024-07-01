@@ -7,9 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-### Fixed 
+### Fixed
 
-- Improved detection of `attrs` library, that isn't confused by the presence of the `attr` library.
 - Fixed `Table` rendering of box elements so "footer" elements truly appear at bottom of table, "mid" elements in main table body.
 
 ## [13.7.1] - 2024-02-28
