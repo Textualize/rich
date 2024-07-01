@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed `Table` rendering of box elements so "footer" elements truly appear at bottom of table, "mid" elements in main table body.
 - Fixed styles in Panel when Text objects are used for title https://github.com/Textualize/rich/pull/3401
+- Fix pretty repr for `collections.deque` https://github.com/Textualize/rich/pull/2864
 
 ### Changed
 
@@ -116,12 +117,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added Style.clear_meta_and_links
-
-## Unreleased
-
-### Fixed
-
-- Fix pretty repr for `collections.deque` https://github.com/Textualize/rich/pull/2864
 
 ## [13.3.2] - 2023-02-04
 
