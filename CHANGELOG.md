@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed `Table` rendering of box elements so "footer" elements truly appear at bottom of table, "mid" elements in main table body.
+- Fix styles in Panel when Text objects are used for title https://github.com/Textualize/rich/pull/3401
 
 ## [13.7.1] - 2024-02-28
 
