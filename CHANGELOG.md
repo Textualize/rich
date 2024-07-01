@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `RichHandler` errors and warnings will now use different colors (red and yellow) https://github.com/Textualize/rich/issues/2825
 - Removed the empty line printed in jupyter while using `Progress` https://github.com/Textualize/rich/pull/2616
 
+### Added
+
+- Adds a `case_sensitive` parameter to `prompt.Prompt`. This determines if the
+  response is treated as case-sensitive. Defaults to `True`.
+
 ## [13.7.1] - 2024-02-28
 
 ### Fixed
@@ -32,8 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Adds missing parameters to Panel.fit https://github.com/Textualize/rich/issues/3142
-- Adds a `case_sensitive` parameter to `prompt.Prompt`. This determines if the
-  response is treated as case-sensitive. Defaults to `True`.
 
 ### Fixed
 
