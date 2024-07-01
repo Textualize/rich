@@ -124,7 +124,6 @@ def test_get_ansi_codes() -> None:
 
 
 def test_downgrade() -> None:
-
     assert Color.parse("color(9)").downgrade(0) == Color(
         "color(9)", ColorType.STANDARD, 9, None
     )

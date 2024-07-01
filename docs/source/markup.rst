@@ -71,7 +71,7 @@ Escaping is important if you construct console markup dynamically, with ``str.fo
     def greet(name):
         console.print(f"Hello {name}!")
 
-Calling ``greet("Will")`` will print a greeting, but if you were to call ``greet("[blink]Gotcha![/blink]"])`` then you will also get blinking text, which may not be desirable. The solution is to escape the arguments::
+Calling ``greet("Will")`` will print a greeting, but if you were to call ``greet("[blink]Gotcha![/blink]")`` then you will also get blinking text, which may not be desirable. The solution is to escape the arguments::
 
     from rich.markup import escape
     def greet(name):

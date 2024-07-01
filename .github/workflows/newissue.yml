@@ -8,13 +8,15 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: master
       - name: Install FAQtory
         run: pip install FAQtory
       - name: Run Suggest
-        run: faqtory suggest "${{ github.event.issue.title }}" > suggest.md
+        env:
+          TITLE: ${{ github.event.issue.title }}
+        run: faqtory suggest "$TITLE" > suggest.md   
       - name: Read suggest.md
         id: suggest
         uses: juliangruber/read-file-action@v1
