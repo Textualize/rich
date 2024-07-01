@@ -168,7 +168,11 @@ def track(
 
     with progress:
         yield from progress.track(
-            sequence, total=total, completed=completed, description=description, update_period=update_period
+            sequence,
+            total=total,
+            completed=completed,
+            description=description,
+            update_period=update_period,
         )
 
 
