@@ -646,7 +646,7 @@ def test_wrap_file_task_total() -> None:
         os.remove(filename)
 
 
-def test_task_progress_column_speed():
+def test_task_progress_column_speed() -> None:
     speed_text = TaskProgressColumn.render_speed(None)
     assert speed_text.plain == ""
 
