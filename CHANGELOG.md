@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix pretty repr for `collections.deque` https://github.com/Textualize/rich/pull/2864
 - Thread used in progress.track will exit if an exception occurs in a generator https://github.com/Textualize/rich/pull/3402
 - Progress track thread is now a daemon thread https://github.com/Textualize/rich/pull/3402
+- Fixed cached hash preservation upon clearing meta and links https://github.com/Textualize/rich/issues/2942
 
 ### Changed
 
