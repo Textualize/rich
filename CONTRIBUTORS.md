@@ -52,6 +52,7 @@ The following people have contributed to the development of Rich:
 - [Kylian Point](https://github.com/p0lux)
 - [Kyle Pollina](https://github.com/kylepollina)
 - [Sebastián Ramírez](https://github.com/tiangolo)
+- [Grant Ramsay](https://github.com/seapagan)
 - [Felipe Guedes](https://github.com/guedesfelipe)
 - [Min RK](https://github.com/minrk)
 - [Clément Robert](https://github.com/neutrinoceros)

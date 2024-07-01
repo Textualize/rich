@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Adds missing parameters to Panel.fit https://github.com/Textualize/rich/issues/3142
+- Adds a `case_sensitive` parameter to `prompt.Prompt`. This determines if the
+  response is treated as case-sensitive. Defaults to `True`.
 
 ### Fixed
 
@@ -84,7 +86,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Text.tab_size now defaults to `None` to indicate that Console.tab_size should be used.
-
 
 ## [13.4.2] - 2023-06-12
 
