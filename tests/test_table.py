@@ -1,6 +1,7 @@
 # encoding=utf-8
 
 import io
+from textwrap import dedent
 
 import pytest
 
@@ -230,6 +231,134 @@ def test_section():
     output = console.export_text()
     print(repr(output))
     expected = "┏━━━━━━┓\n┃ foo  ┃\n┡━━━━━━┩\n│ row1 │\n│ row2 │\n├──────┤\n│ row3 │\n│ row4 │\n├──────┤\n│ row5 │\n└──────┘\n"
+
+    assert output == expected
+
+
+@pytest.mark.parametrize(
+    "show_header,show_footer,expected",
+    [
+        (
+            False,
+            False,
+            dedent(
+                """
+                abbbbbcbbbbbbbbbcbbbbcbbbbbd
+                1Dec  2Skywalker2275M2375M 3
+                4May  5Solo     5275M5393M 6
+                ijjjjjkjjjjjjjjjkjjjjkjjjjjl
+                7Dec  8Last Jedi8262M81333M9
+                qrrrrrsrrrrrrrrrsrrrrsrrrrrt
+                """
+            ).lstrip(),
+        ),
+        (
+            True,
+            False,
+            dedent(
+                """
+                abbbbbcbbbbbbbbbcbbbbcbbbbbd
+                1Month2Nickname 2Cost2Gross3
+                efffffgfffffffffgffffgfffffh
+                4Dec  5Skywalker5275M5375M 6
+                4May  5Solo     5275M5393M 6
+                ijjjjjkjjjjjjjjjkjjjjkjjjjjl
+                7Dec  8Last Jedi8262M81333M9
+                qrrrrrsrrrrrrrrrsrrrrsrrrrrt
+                """
+            ).lstrip(),
+        ),
+        (
+            False,
+            True,
+            dedent(
+                """
+                abbbbbcbbbbbbbbbcbbbbcbbbbbd
+                1Dec  2Skywalker2275M2375M 3
+                4May  5Solo     5275M5393M 6
+                ijjjjjkjjjjjjjjjkjjjjkjjjjjl
+                4Dec  5Last Jedi5262M51333M6
+                mnnnnnonnnnnnnnnonnnnonnnnnp
+                7MONTH8NICKNAME 8COST8GROSS9
+                qrrrrrsrrrrrrrrrsrrrrsrrrrrt
+                """
+            ).lstrip(),
+        ),
+        (
+            True,
+            True,
+            dedent(
+                """
+                abbbbbcbbbbbbbbbcbbbbcbbbbbd
+                1Month2Nickname 2Cost2Gross3
+                efffffgfffffffffgffffgfffffh
+                4Dec  5Skywalker5275M5375M 6
+                4May  5Solo     5275M5393M 6
+                ijjjjjkjjjjjjjjjkjjjjkjjjjjl
+                4Dec  5Last Jedi5262M51333M6
+                mnnnnnonnnnnnnnnonnnnonnnnnp
+                7MONTH8NICKNAME 8COST8GROSS9
+                qrrrrrsrrrrrrrrrsrrrrsrrrrrt
+                """
+            ).lstrip(),
+        ),
+    ],
+)
+def test_placement_table_box_elements(show_header, show_footer, expected):
+    """Ensure box drawing characters correctly positioned."""
+
+    table = Table(
+        box=box.ASCII, show_header=show_header, show_footer=show_footer, padding=0
+    )
+
+    # content rows indicated by numerals, pure dividers by letters
+    table.box.__dict__.update(
+        top_left="a",
+        top="b",
+        top_divider="c",
+        top_right="d",
+        head_left="1",
+        head_vertical="2",
+        head_right="3",
+        head_row_left="e",
+        head_row_horizontal="f",
+        head_row_cross="g",
+        head_row_right="h",
+        mid_left="4",
+        mid_vertical="5",
+        mid_right="6",
+        row_left="i",
+        row_horizontal="j",
+        row_cross="k",
+        row_right="l",
+        foot_left="7",
+        foot_vertical="8",
+        foot_right="9",
+        foot_row_left="m",
+        foot_row_horizontal="n",
+        foot_row_cross="o",
+        foot_row_right="p",
+        bottom_left="q",
+        bottom="r",
+        bottom_divider="s",
+        bottom_right="t",
+    )
+
+    # add content - note headers title case, footers upper case
+    table.add_column("Month", "MONTH", width=5)
+    table.add_column("Nickname", "NICKNAME", width=9)
+    table.add_column("Cost", "COST", width=4)
+    table.add_column("Gross", "GROSS", width=5)
+
+    table.add_row("Dec", "Skywalker", "275M", "375M")
+    table.add_row("May", "Solo", "275M", "393M")
+    table.add_section()
+    table.add_row("Dec", "Last Jedi", "262M", "1333M")
+
+    console = Console(record=True, width=28)
+    console.print(table)
+    output = console.export_text()
+    print(repr(output))
 
     assert output == expected
 
