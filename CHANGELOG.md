@@ -117,6 +117,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added Style.clear_meta_and_links
 
+## Unreleased
+
+### Fixed
+
+- Fix pretty repr for `collections.deque` https://github.com/Textualize/rich/pull/2864
+
 ## [13.3.2] - 2023-02-04
 
 ### Fixed

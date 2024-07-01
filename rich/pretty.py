@@ -15,6 +15,7 @@ from typing import (
     Any,
     Callable,
     DefaultDict,
+    Deque,
     Dict,
     Iterable,
     List,
@@ -357,6 +358,12 @@ def _get_braces_for_defaultdict(_object: DefaultDict[Any, Any]) -> Tuple[str, st
     )
 
 
+def _get_braces_for_deque(_object: Deque[Any]) -> Tuple[str, str, str]:
+    if _object.maxlen is None:
+        return ("deque([", "])", "deque()")
+    return ("deque([", f"], maxlen={_object.maxlen})", f"deque(maxlen={_object.maxlen})")
+
+
 def _get_braces_for_array(_object: "array[Any]") -> Tuple[str, str, str]:
     return (f"array({_object.typecode!r}, [", "])", f"array({_object.typecode!r})")
 
@@ -366,7 +373,7 @@ _BRACES: Dict[type, Callable[[Any], Tuple[str, str, str]]] = {
     array: _get_braces_for_array,
     defaultdict: _get_braces_for_defaultdict,
     Counter: lambda _object: ("Counter({", "})", "Counter()"),
-    deque: lambda _object: ("deque([", "])", "deque()"),
+    deque: _get_braces_for_deque,
     dict: lambda _object: ("{", "}", "{}"),
     UserDict: lambda _object: ("{", "}", "{}"),
     frozenset: lambda _object: ("frozenset({", "})", "frozenset()"),
