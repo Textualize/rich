@@ -1,6 +1,5 @@
 import inspect
 import os
-import platform
 import sys
 import threading
 import zlib
@@ -76,7 +75,7 @@ if TYPE_CHECKING:
 
 JUPYTER_DEFAULT_COLUMNS = 115
 JUPYTER_DEFAULT_LINES = 100
-WINDOWS = platform.system() == "Windows"
+WINDOWS = sys.platform == "win32"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
@@ -278,6 +277,7 @@ class ConsoleRenderable(Protocol):
 
 # A type that may be rendered by Console.
 RenderableType = Union[ConsoleRenderable, RichCast, str]
+"""A string or any object that may be rendered by Rich."""
 
 # The result of calling a __rich_console__ method.
 RenderResult = Iterable[Union[RenderableType, Segment]]
@@ -711,11 +711,6 @@ class Console:
         self._force_terminal = None
         if force_terminal is not None:
             self._force_terminal = force_terminal
-        else:
-            # If FORCE_COLOR env var has any value at all, we force terminal.
-            force_color = self._environ.get("FORCE_COLOR")
-            if force_color is not None:
-                self._force_terminal = True
 
         self._file = file
         self.quiet = quiet
@@ -949,6 +944,16 @@ class Console:
             # Return False for Idle which claims to be a tty but can't handle ansi codes
             return False
 
+        if self.is_jupyter:
+            # return False for Jupyter, which may have FORCE_COLOR set
+            return False
+
+        # If FORCE_COLOR env var has any value at all, we assume a terminal.
+        force_color = self._environ.get("FORCE_COLOR")
+        if force_color is not None:
+            self._force_terminal = True
+            return True
+
         isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
         try:
             return False if isatty is None else isatty()
@@ -1146,7 +1151,7 @@ class Console:
         status: RenderableType,
         *,
         spinner: str = "dots",
-        spinner_style: str = "status.spinner",
+        spinner_style: StyleType = "status.spinner",
         speed: float = 1.0,
         refresh_per_second: float = 12.5,
     ) -> "Status":
@@ -1920,7 +1925,6 @@ class Console:
             end (str, optional): String to write at end of print data. Defaults to "\\\\n".
             style (Union[str, Style], optional): A style to apply to output. Defaults to None.
             justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
-            overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
             emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to None.
             markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to None.
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to None.
@@ -1996,7 +2000,6 @@ class Console:
                     self._record_buffer.extend(self._buffer[:])
 
             if self._buffer_index == 0:
-
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
 
@@ -2025,13 +2028,31 @@ class Console:
                             # Either a non-std stream on legacy Windows, or modern Windows.
                             text = self._render_buffer(self._buffer[:])
                             # https://bugs.python.org/issue37871
+                            # https://github.com/python/cpython/issues/82052
+                            # We need to avoid writing more than 32Kb in a single write, due to the above bug
                             write = self.file.write
-                            for line in text.splitlines(True):
-                                try:
-                                    write(line)
-                                except UnicodeEncodeError as error:
-                                    error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
-                                    raise
+                            # Worse case scenario, every character is 4 bytes of utf-8
+                            MAX_WRITE = 32 * 1024 // 4
+                            try:
+                                if len(text) <= MAX_WRITE:
+                                    write(text)
+                                else:
+                                    batch: List[str] = []
+                                    batch_append = batch.append
+                                    size = 0
+                                    for line in text.splitlines(True):
+                                        if size + len(line) > MAX_WRITE and batch:
+                                            write("".join(batch))
+                                            batch.clear()
+                                            size = 0
+                                        batch_append(line)
+                                        size += len(line)
+                                    if batch:
+                                        write("".join(batch))
+                                        batch.clear()
+                            except UnicodeEncodeError as error:
+                                error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
+                                raise
                     else:
                         text = self._render_buffer(self._buffer[:])
                         try:

@@ -1,5 +1,4 @@
 import os.path
-import platform
 import re
 import sys
 import textwrap
@@ -52,7 +51,7 @@ from .text import Text
 
 TokenType = Tuple[str, ...]
 
-WINDOWS = platform.system() == "Windows"
+WINDOWS = sys.platform == "win32"
 DEFAULT_THEME = "monokai"
 
 # The following styles are based on https://github.com/pygments/pygments/blob/master/pygments/formatters/terminal.py
@@ -439,6 +438,16 @@ class Syntax(JupyterMixin):
         except ClassNotFound:
             return None
 
+    @property
+    def default_lexer(self) -> Lexer:
+        """A Pygments Lexer to use if one is not specified or invalid."""
+        return get_lexer_by_name(
+            "text",
+            stripnl=False,
+            ensurenl=True,
+            tabsize=self.tab_size,
+        )
+
     def highlight(
         self,
         code: str,
@@ -467,7 +476,7 @@ class Syntax(JupyterMixin):
         )
         _get_theme_style = self._theme.get_style_for_token
 
-        lexer = self.lexer
+        lexer = self.lexer or self.default_lexer
 
         if lexer is None:
             text.append(code)
@@ -494,7 +503,10 @@ class Syntax(JupyterMixin):
 
                     # Skip over tokens until line start
                     while line_no < _line_start:
-                        _token_type, token = next(tokens)
+                        try:
+                            _token_type, token = next(tokens)
+                        except StopIteration:
+                            break
                         yield (token, None)
                         if token.endswith("\n"):
                             line_no += 1
@@ -587,7 +599,6 @@ class Syntax(JupyterMixin):
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "Measurement":
-
         _, right, _, left = Padding.unpack(self.padding)
         padding = left + right
         if self.code_width is not None:
@@ -671,6 +682,8 @@ class Syntax(JupyterMixin):
             line_offset = max(0, start_line - 1)
         lines: Union[List[Text], Lines] = text.split("\n", allow_blank=ends_on_nl)
         if self.line_range:
+            if line_offset > len(lines):
+                return
             lines = lines[line_offset:end_line]
 
         if self.indent_guides and not options.ascii_only:
@@ -683,7 +696,7 @@ class Syntax(JupyterMixin):
             lines = (
                 Text("\n")
                 .join(lines)
-                .with_indent_guides(self.tab_size, style=style)
+                .with_indent_guides(self.tab_size, style=style + Style(italic=False))
                 .split("\n", allow_blank=True)
             )
 
@@ -825,7 +838,6 @@ def _get_code_index_for_syntax_position(
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     import argparse
     import sys
 

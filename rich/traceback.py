@@ -1,13 +1,23 @@
 from __future__ import absolute_import
 
+import linecache
 import os
-import platform
 import sys
 from dataclasses import dataclass, field
-from pathlib import Path
 from traceback import walk_tb
 from types import ModuleType, TracebackType
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Type, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+)
 
 from pygments.lexers import guess_lexer_for_filename
 from pygments.token import Comment, Keyword, Name, Number, Operator, String
@@ -28,7 +38,7 @@ from .syntax import Syntax
 from .text import Text
 from .theme import Theme
 
-WINDOWS = platform.system() == "Windows"
+WINDOWS = sys.platform == "win32"
 
 LOCALS_MAX_LENGTH = 10
 LOCALS_MAX_STRING = 80
@@ -42,6 +52,10 @@ def install(
     theme: Optional[str] = None,
     word_wrap: bool = False,
     show_locals: bool = False,
+    locals_max_length: int = LOCALS_MAX_LENGTH,
+    locals_max_string: int = LOCALS_MAX_STRING,
+    locals_hide_dunder: bool = True,
+    locals_hide_sunder: Optional[bool] = None,
     indent_guides: bool = True,
     suppress: Iterable[Union[str, ModuleType]] = (),
     max_frames: int = 100,
@@ -59,6 +73,11 @@ def install(
             a theme appropriate for the platform.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
+        locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
+            Defaults to 10.
+        locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
+        locals_hide_dunder (bool, optional): Hide locals prefixed with double underscore. Defaults to True.
+        locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
         suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
 
@@ -66,7 +85,13 @@ def install(
         Callable: The previous exception handler that was replaced.
 
     """
-    traceback_console = Console(file=sys.stderr) if console is None else console
+    traceback_console = Console(stderr=True) if console is None else console
+
+    locals_hide_sunder = (
+        True
+        if (traceback_console.is_jupyter and locals_hide_sunder is None)
+        else locals_hide_sunder
+    )
 
     def excepthook(
         type_: Type[BaseException],
@@ -83,6 +108,10 @@ def install(
                 theme=theme,
                 word_wrap=word_wrap,
                 show_locals=show_locals,
+                locals_max_length=locals_max_length,
+                locals_max_string=locals_max_string,
+                locals_hide_dunder=locals_hide_dunder,
+                locals_hide_sunder=bool(locals_hide_sunder),
                 indent_guides=indent_guides,
                 suppress=suppress,
                 max_frames=max_frames,
@@ -193,6 +222,8 @@ class Traceback:
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to 10.
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
+        locals_hide_dunder (bool, optional): Hide locals prefixed with double underscore. Defaults to True.
+        locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
         suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
         max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
 
@@ -209,14 +240,17 @@ class Traceback:
     def __init__(
         self,
         trace: Optional[Trace] = None,
+        *,
         width: Optional[int] = 100,
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
-        indent_guides: bool = True,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
+        locals_hide_dunder: bool = True,
+        locals_hide_sunder: bool = False,
+        indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
     ):
@@ -238,6 +272,8 @@ class Traceback:
         self.indent_guides = indent_guides
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
+        self.locals_hide_dunder = locals_hide_dunder
+        self.locals_hide_sunder = locals_hide_sunder
 
         self.suppress: Sequence[str] = []
         for suppress_entity in suppress:
@@ -258,14 +294,17 @@ class Traceback:
         exc_type: Type[Any],
         exc_value: BaseException,
         traceback: Optional[TracebackType],
+        *,
         width: Optional[int] = 100,
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
         show_locals: bool = False,
-        indent_guides: bool = True,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
+        locals_hide_dunder: bool = True,
+        locals_hide_sunder: bool = False,
+        indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
     ) -> "Traceback":
@@ -284,6 +323,8 @@ class Traceback:
             locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
                 Defaults to 10.
             locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
+            locals_hide_dunder (bool, optional): Hide locals prefixed with double underscore. Defaults to True.
+            locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
             suppress (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
             max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
 
@@ -297,7 +338,10 @@ class Traceback:
             show_locals=show_locals,
             locals_max_length=locals_max_length,
             locals_max_string=locals_max_string,
+            locals_hide_dunder=locals_hide_dunder,
+            locals_hide_sunder=locals_hide_sunder,
         )
+
         return cls(
             rich_traceback,
             width=width,
@@ -308,6 +352,8 @@ class Traceback:
             indent_guides=indent_guides,
             locals_max_length=locals_max_length,
             locals_max_string=locals_max_string,
+            locals_hide_dunder=locals_hide_dunder,
+            locals_hide_sunder=locals_hide_sunder,
             suppress=suppress,
             max_frames=max_frames,
         )
@@ -318,9 +364,12 @@ class Traceback:
         exc_type: Type[BaseException],
         exc_value: BaseException,
         traceback: Optional[TracebackType],
+        *,
         show_locals: bool = False,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
+        locals_hide_dunder: bool = True,
+        locals_hide_sunder: bool = False,
     ) -> Trace:
         """Extract traceback information.
 
@@ -332,6 +381,8 @@ class Traceback:
             locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
                 Defaults to 10.
             locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
+            locals_hide_dunder (bool, optional): Hide locals prefixed with double underscore. Defaults to True.
+            locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
 
         Returns:
             Trace: A Trace instance which you can use to construct a `Traceback`.
@@ -368,6 +419,20 @@ class Traceback:
             stacks.append(stack)
             append = stack.frames.append
 
+            def get_locals(
+                iter_locals: Iterable[Tuple[str, object]]
+            ) -> Iterable[Tuple[str, object]]:
+                """Extract locals from an iterator of key pairs."""
+                if not (locals_hide_dunder or locals_hide_sunder):
+                    yield from iter_locals
+                    return
+                for key, value in iter_locals:
+                    if locals_hide_dunder and key.startswith("__"):
+                        continue
+                    if locals_hide_sunder and key.startswith("_"):
+                        continue
+                    yield key, value
+
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
                 if filename and not filename.startswith("<"):
@@ -375,6 +440,7 @@ class Traceback:
                         filename = os.path.join(_IMPORT_CWD, filename)
                 if frame_summary.f_locals.get("_rich_traceback_omit", False):
                     continue
+
                 frame = Frame(
                     filename=filename or "?",
                     lineno=line_no,
@@ -385,7 +451,7 @@ class Traceback:
                             max_length=locals_max_length,
                             max_string=locals_max_string,
                         )
-                        for key, value in frame_summary.f_locals.items()
+                        for key, value in get_locals(frame_summary.f_locals.items())
                     }
                     if show_locals
                     else None,
@@ -500,13 +566,14 @@ class Traceback:
         highlighter = ReprHighlighter()
         path_highlighter = PathHighlighter()
         if syntax_error.filename != "<stdin>":
-            text = Text.assemble(
-                (f" {syntax_error.filename}", "pygments.string"),
-                (":", "pygments.text"),
-                (str(syntax_error.lineno), "pygments.number"),
-                style="pygments.text",
-            )
-            yield path_highlighter(text)
+            if os.path.exists(syntax_error.filename):
+                text = Text.assemble(
+                    (f" {syntax_error.filename}", "pygments.string"),
+                    (":", "pygments.text"),
+                    (str(syntax_error.lineno), "pygments.number"),
+                    style="pygments.text",
+                )
+                yield path_highlighter(text)
         syntax_error_text = highlighter(syntax_error.line.rstrip())
         syntax_error_text.no_wrap = True
         offset = min(syntax_error.offset - 1, len(syntax_error_text))
@@ -537,7 +604,6 @@ class Traceback:
     def _render_stack(self, stack: Stack) -> RenderResult:
         path_highlighter = PathHighlighter()
         theme = self.theme
-        code_cache: Dict[str, str] = {}
 
         def read_code(filename: str) -> str:
             """Read files, and cache results on filename.
@@ -548,11 +614,7 @@ class Traceback:
             Returns:
                 str: Contents of file
             """
-            code = code_cache.get(filename)
-            if code is None:
-                code = Path(filename).read_text(encoding="utf-8", errors="replace")
-                code_cache[filename] = code
-            return code
+            return "".join(linecache.getlines(filename))
 
         def render_locals(frame: Frame) -> Iterable[ConsoleRenderable]:
             if frame.locals:
@@ -573,7 +635,6 @@ class Traceback:
 
         excluded = False
         for frame_index, frame in enumerate(stack.frames):
-
             if exclude_frames and frame_index in exclude_frames:
                 excluded = True
                 continue
@@ -591,14 +652,23 @@ class Traceback:
             frame_filename = frame.filename
             suppressed = any(frame_filename.startswith(path) for path in self.suppress)
 
-            text = Text.assemble(
-                path_highlighter(Text(frame.filename, style="pygments.string")),
-                (":", "pygments.text"),
-                (str(frame.lineno), "pygments.number"),
-                " in ",
-                (frame.name, "pygments.function"),
-                style="pygments.text",
-            )
+            if os.path.exists(frame.filename):
+                text = Text.assemble(
+                    path_highlighter(Text(frame.filename, style="pygments.string")),
+                    (":", "pygments.text"),
+                    (str(frame.lineno), "pygments.number"),
+                    " in ",
+                    (frame.name, "pygments.function"),
+                    style="pygments.text",
+                )
+            else:
+                text = Text.assemble(
+                    "in ",
+                    (frame.name, "pygments.function"),
+                    (":", "pygments.text"),
+                    (str(frame.lineno), "pygments.number"),
+                    style="pygments.text",
+                )
             if not frame.filename.startswith("<") and not first:
                 yield ""
             yield text
@@ -608,6 +678,10 @@ class Traceback:
             if not suppressed:
                 try:
                     code = read_code(frame.filename)
+                    if not code:
+                        # code may be an empty string if the file doesn't exist, OR
+                        # if the traceback filename is generated dynamically
+                        continue
                     lexer_name = self._guess_lexer(frame.filename, code)
                     syntax = Syntax(
                         code,
@@ -644,7 +718,6 @@ class Traceback:
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     from .console import Console
 
     console = Console()
@@ -668,7 +741,6 @@ if __name__ == "__main__":  # pragma: no cover
         bar(a)
 
     def error() -> None:
-
         try:
             try:
                 foo(0)

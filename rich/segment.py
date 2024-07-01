@@ -109,7 +109,6 @@ class Segment(NamedTuple):
     @classmethod
     @lru_cache(1024 * 16)
     def _split_cells(cls, segment: "Segment", cut: int) -> Tuple["Segment", "Segment"]:
-
         text, style, control = segment
         _Segment = Segment
 
@@ -119,7 +118,7 @@ class Segment(NamedTuple):
 
         cell_size = get_character_cell_size
 
-        pos = int((cut / cell_length) * len(text))
+        pos = int((cut / cell_length) * (len(text) - 1))
 
         before = text[:pos]
         cell_pos = cell_len(before)
@@ -365,7 +364,7 @@ class Segment(NamedTuple):
             int: The length of the line.
         """
         _cell_len = cell_len
-        return sum(_cell_len(segment.text) for segment in line)
+        return sum(_cell_len(text) for text, style, control in line if not control)
 
     @classmethod
     def get_shape(cls, lines: List[List["Segment"]]) -> Tuple[int, int]:
@@ -727,7 +726,7 @@ console.print(text)"""
     console.print(Syntax(code, "python", line_numbers=True))
     console.print()
     console.print(
-        "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the the following:\n"
+        "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the following:\n"
     )
     fragments = list(console.render(text))
     console.print(fragments)

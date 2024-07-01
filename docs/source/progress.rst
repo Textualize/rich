@@ -58,7 +58,7 @@ The ``total`` value associated with a task is the number of steps that must be c
 Updating tasks
 ~~~~~~~~~~~~~~
 
-When you call :meth:`~rich.progress.Progress.add_task` you get back a `Task ID`. Use this ID to call :meth:`~rich.progress.Progress.update` whenever you have completed some work, or any information has changed. Typically you will need to update ``completed`` every time you have completed a step. You can do this by updated ``completed`` directly or by setting ``advance`` which will add to the current ``completed`` value.
+When you call :meth:`~rich.progress.Progress.add_task` you get back a `Task ID`. Use this ID to call :meth:`~rich.progress.Progress.update` whenever you have completed some work, or any information has changed. Typically you will need to update ``completed`` every time you have completed a step. You can do this by setting ``completed`` directly or by setting ``advance`` which will add to the current ``completed`` value.
 
 The :meth:`~rich.progress.Progress.update` method collects keyword arguments which are also associated with the task. Use this to supply any additional information you would like to render in the progress display. The additional arguments are stored in ``task.fields`` and may be referenced in :ref:`Column classes<Columns>`.
 
@@ -82,7 +82,7 @@ Transient progress displays are useful if you want more minimal output in the te
 Indeterminate progress
 ~~~~~~~~~~~~~~~~~~~~~~
 
-When you add a task it is automatically *started*, which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. This may not work well if there is a long delay before you can start updating progress; you may need to wait for a response from a server or count files in a directory (for example). In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` or ``total=None`` which will display a pulsing animation that lets the user know something is working. This is know as an *indeterminate* progress bar. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
+When you add a task it is automatically *started*, which means it will show a progress bar at 0% and the time remaining will be calculated from the current time. This may not work well if there is a long delay before you can start updating progress; you may need to wait for a response from a server or count files in a directory (for example). In these cases you can call :meth:`~rich.progress.Progress.add_task` with ``start=False`` or ``total=None`` which will display a pulsing animation that lets the user know something is working. This is known as an *indeterminate* progress bar. When you have the number of steps you can call :meth:`~rich.progress.Progress.start_task` which will display the progress bar at 0%, then :meth:`~rich.progress.Progress.update` as normal.
 
 Auto refresh
 ~~~~~~~~~~~~
@@ -101,7 +101,7 @@ The progress bar(s) will use only as much of the width of the terminal as requir
 Columns
 ~~~~~~~
 
-You may customize the columns in the progress display with the positional arguments to the :class:`~rich.progress.Progress` constructor. The columns are specified as either a *format string* or a :class:`~rich.progress.ProgressColumn` object.
+You may customize the columns in the progress display with the positional arguments to the :class:`~rich.progress.Progress` constructor. The columns are specified as either a `format string <https://docs.python.org/3/library/string.html#formatspec>`_ or a :class:`~rich.progress.ProgressColumn` object.
 
 Format strings will be rendered with a single value `"task"` which will be a :class:`~rich.progress.Task` instance. For example ``"{task.description}"`` would display the task description in the column, and ``"{task.completed} of {task.total}"`` would display how many of the total steps have been completed. Additional fields passed via keyword arguments to `~rich.progress.Progress.update` are store in ``task.fields``. You can add them to a format string with the following syntax: ``"extra info: {task.fields[extra]}"``.
 
@@ -234,7 +234,7 @@ Here's an example that reads a url from the internet::
 
 If you expect to be reading from multiple files, you can use :meth:`~rich.progress.Progress.open` or :meth:`~rich.progress.Progress.wrap_file` to add a file progress to an existing Progress instance.
 
-See `cp_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/cp_progress.py>` for a minimal clone of the ``cp`` command which shows a progress bar as the file is copied.
+See `cp_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/cp_progress.py>`_ for a minimal clone of the ``cp`` command which shows a progress bar as the file is copied.
 
 
 Multiple Progress

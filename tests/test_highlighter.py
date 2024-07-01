@@ -133,6 +133,16 @@ highlight_tests = [
     (" https://example.org ", [Span(1, 20, "repr.url")]),
     (" http://example.org ", [Span(1, 19, "repr.url")]),
     (" http://example.org/index.html ", [Span(1, 30, "repr.url")]),
+    (" http://example.org/index.html#anchor ", [Span(1, 37, "repr.url")]),
+    (
+        " http://example.org/index.html?param1=value1 ",
+        [
+            Span(31, 37, "repr.attrib_name"),
+            Span(38, 44, "repr.attrib_value"),
+            Span(1, 44, "repr.url"),
+        ],
+    ),
+    (" http://example.org/~folder ", [Span(1, 27, "repr.url")]),
     ("No place like 127.0.0.1", [Span(14, 23, "repr.ipv4")]),
     ("''", [Span(0, 2, "repr.str")]),
     ("'hello'", [Span(0, 7, "repr.str")]),

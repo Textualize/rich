@@ -54,7 +54,7 @@ class Column:
         show_footer (bool, optional): Show a footer row. Defaults to False.
         show_edge (bool, optional): Draw a box around the outside of the table. Defaults to True.
         show_lines (bool, optional): Draw lines between every row. Defaults to False.
-        leading (bool, optional): Number of blank lines between rows (precludes ``show_lines``). Defaults to 0.
+        leading (int, optional): Number of blank lines between rows (precludes ``show_lines``). Defaults to 0.
         style (Union[str, Style], optional): Default style for the table. Defaults to "none".
         row_styles (List[Union, str], optional): Optional list of row styles, if more than one style is given then the styles will alternate. Defaults to None.
         header_style (Union[str, Style], optional): Style of the header. Defaults to "table.header".
@@ -167,7 +167,7 @@ class Table(JupyterMixin):
         show_footer (bool, optional): Show a footer row. Defaults to False.
         show_edge (bool, optional): Draw a box around the outside of the table. Defaults to True.
         show_lines (bool, optional): Draw lines between every row. Defaults to False.
-        leading (bool, optional): Number of blank lines between rows (precludes ``show_lines``). Defaults to 0.
+        leading (int, optional): Number of blank lines between rows (precludes ``show_lines``). Defaults to 0.
         style (Union[str, Style], optional): Default style for the table. Defaults to "none".
         row_styles (List[Union, str], optional): Optional list of row styles, if more than one style is given then the styles will alternate. Defaults to None.
         header_style (Union[str, Style], optional): Style of the header. Defaults to "table.header".
@@ -212,7 +212,6 @@ class Table(JupyterMixin):
         caption_justify: "JustifyMethod" = "center",
         highlight: bool = False,
     ) -> None:
-
         self.columns: List[Column] = []
         self.rows: List[Row] = []
         self.title = title
@@ -471,7 +470,6 @@ class Table(JupyterMixin):
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-
         if not self.columns:
             yield Segment("\n")
             return
@@ -685,7 +683,7 @@ class Table(JupyterMixin):
                     getattr(renderable, "vertical", None) or column.vertical,
                 )
         else:
-            for (style, renderable) in raw_cells:
+            for style, renderable in raw_cells:
                 yield _Cell(
                     style,
                     renderable,

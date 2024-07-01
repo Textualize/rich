@@ -210,6 +210,8 @@ class Live(JupyterMixin, RenderHook):
             renderable (RenderableType): New renderable to use.
             refresh (bool, optional): Refresh the display. Defaults to False.
         """
+        if isinstance(renderable, str):
+            renderable = self.console.render_str(renderable)
         with self._lock:
             self._renderable = renderable
             if refresh:
@@ -360,7 +362,7 @@ if __name__ == "__main__":  # pragma: no cover
                 table.add_column("Destination Currency")
                 table.add_column("Exchange Rate")
 
-                for ((source, dest), exchange_rate) in exchange_rate_dict.items():
+                for (source, dest), exchange_rate in exchange_rate_dict.items():
                     table.add_row(
                         source,
                         dest,

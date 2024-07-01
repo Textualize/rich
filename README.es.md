@@ -22,6 +22,7 @@
  • [Русский readme](https://github.com/textualize/rich/blob/master/README.ru.md)
   • [فارسی readme](https://github.com/textualize/rich/blob/master/README.fa.md)
  • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
+ • [Polskie readme](https://github.com/textualize/rich/blob/master/README.pl.md)
 
 Rich es un paquete de Python para texto _enriquecido_ y un hermoso formato en la terminal.
 
@@ -112,7 +113,7 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![Console Markup](https://github.com/textualize/rich/raw/master/imgs/where_there_is_a_will.png)
 
-Usted puede usar el objeto Console para generar salida sofisticada con mínimo esfuerzo. Ver la [API Console](https://rich.readthedocs.io/en/latest/console.html) docs para detalles.
+Usted puede usar el objeto Console para generar salida sofisticada con mínimo esfuerzo. Ver la documentación [API Console](https://rich.readthedocs.io/en/latest/console.html) para detalles.
 
 ## Rich Inspector
 
@@ -126,7 +127,7 @@ Rich tiene ua función [inspeccionar](https://rich.readthedocs.io/en/latest/refe
 
 ![Log](https://github.com/textualize/rich/raw/master/imgs/inspect.png)
 
-Ver la [docs inspector](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) para detalles.
+Ver la [documentación inspector](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) para detalles.
 
 # Paquete Rich
 

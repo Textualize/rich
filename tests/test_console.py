@@ -528,7 +528,8 @@ def test_export_html():
     console = Console(record=True, width=100)
     console.print("[b]foo <script> 'test' [link=https://example.org]Click[/link]")
     html = console.export_html()
-    expected = '<!DOCTYPE html>\n<head>\n<meta charset="UTF-8">\n<style>\n.r1 {font-weight: bold}\n.r2 {color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold}\n.r3 {color: #008000; text-decoration-color: #008000; font-weight: bold}\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace">\n        <code><span class="r1">foo &lt;</span><span class="r2">script</span><span class="r1">&gt; </span><span class="r3">&#x27;test&#x27;</span><span class="r1"> </span><a class="r1" href="https://example.org">Click</a>\n</code>\n    </pre>\n</body>\n</html>\n'
+    print(repr(html))
+    expected = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<style>\n.r1 {font-weight: bold}\n.r2 {color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold}\n.r3 {color: #008000; text-decoration-color: #008000; font-weight: bold}\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><code style="font-family:inherit"><span class="r1">foo &lt;</span><span class="r2">script</span><span class="r1">&gt; </span><span class="r3">&#x27;test&#x27;</span><span class="r1"> </span><a class="r1" href="https://example.org">Click</a>\n</code></pre>\n</body>\n</html>\n'
     assert html == expected
 
 
@@ -536,7 +537,8 @@ def test_export_html_inline():
     console = Console(record=True, width=100)
     console.print("[b]foo [link=https://example.org]Click[/link]")
     html = console.export_html(inline_styles=True)
-    expected = '<!DOCTYPE html>\n<head>\n<meta charset="UTF-8">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace">\n        <code><span style="font-weight: bold">foo </span><span style="font-weight: bold"><a href="https://example.org">Click</a></span>\n</code>\n    </pre>\n</body>\n</html>\n'
+    print(repr(html))
+    expected = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><code style="font-family:inherit"><span style="font-weight: bold">foo </span><span style="font-weight: bold"><a href="https://example.org">Click</a></span>\n</code></pre>\n</body>\n</html>\n'
     assert html == expected
 
 
@@ -589,14 +591,16 @@ def test_save_text():
 
 
 def test_save_html():
-    expected = "<!DOCTYPE html>\n<head>\n<meta charset=\"UTF-8\">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<html>\n<body>\n    <pre style=\"font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\">\n        <code>foo\n</code>\n    </pre>\n</body>\n</html>\n"
+    expected = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><code style="font-family:inherit">foo\n</code></pre>\n</body>\n</html>\n'
     console = Console(record=True, width=100)
     console.print("foo")
     with tempfile.TemporaryDirectory() as path:
         export_path = os.path.join(path, "example.html")
         console.save_html(export_path)
         with open(export_path, "rt") as html_file:
-            assert html_file.read() == expected
+            html = html_file.read()
+            print(repr(html))
+            assert html == expected
 
 
 def test_no_wrap():
@@ -967,3 +971,23 @@ def test_force_color(env_value):
     # means is_terminal returns True.
     console = Console(file=io.StringIO(), _environ={"FORCE_COLOR": env_value})
     assert console.is_terminal
+
+
+def test_force_color_jupyter():
+    # FORCE_COLOR above doesn't happen in a Jupyter kernel
+    console = Console(
+        file=io.StringIO(), _environ={"FORCE_COLOR": "1"}, force_jupyter=True
+    )
+    assert not console.is_terminal
+
+
+def test_force_color():
+    console = Console(
+        file=io.StringIO(),
+        _environ={
+            "FORCE_COLOR": "1",
+            "TERM": "xterm-256color",
+            "COLORTERM": "truecolor",
+        },
+    )
+    assert console.color_system in ("truecolor", "windows")
