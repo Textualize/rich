@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Updated the widths of some characters https://github.com/Textualize/rich/pull/3289
+- Thread used in progress.track will exit if an exception occurs in a generator
+- Progress track thread is now a daemon thread
 
 ## [13.7.0] - 2023-11-15
 
