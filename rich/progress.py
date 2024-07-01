@@ -70,7 +70,7 @@ class _TrackThread(Thread):
         self.done = Event()
 
         self.completed = 0
-        super().__init__()
+        super().__init__(daemon=True)
 
     def run(self) -> None:
         task_id = self.task_id
@@ -78,7 +78,7 @@ class _TrackThread(Thread):
         update_period = self.update_period
         last_completed = 0
         wait = self.done.wait
-        while not wait(update_period):
+        while not wait(update_period) and self.progress.live.is_started:
             completed = self.completed
             if last_completed != completed:
                 advance(task_id, completed - last_completed)

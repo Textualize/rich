@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `Table` rendering of box elements so "footer" elements truly appear at bottom of table, "mid" elements in main table body.
 - Fixed styles in Panel when Text objects are used for title https://github.com/Textualize/rich/pull/3401
 - Fix pretty repr for `collections.deque` https://github.com/Textualize/rich/pull/2864
+- Thread used in progress.track will exit if an exception occurs in a generator https://github.com/Textualize/rich/pull/3402
+- Progress track thread is now a daemon thread https://github.com/Textualize/rich/pull/3402
 
 ### Changed
 
