@@ -406,6 +406,23 @@ def test_syntax_measure():
     assert code.__rich_measure__(console, console.options) == Measurement(3, 24)
 
 
+def test_background_color_override_includes_padding():
+    """Regression test for https://github.com/Textualize/rich/issues/3295"""
+
+    syntax = Syntax(
+        "x = 1",
+        lexer="python",
+        padding=(1, 3),
+        background_color="red",
+    )
+    result = render(syntax)
+    print(repr(result))
+    assert (
+        result
+        == "\x1b[41m                                                                                                    \x1b[0m\n\x1b[41m   \x1b[0m\x1b[38;2;248;248;242;41mx\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;255;70;137;41m=\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;174;129;255;41m1\x1b[0m\x1b[41m                                                                                         \x1b[0m\x1b[41m   \x1b[0m\n\x1b[41m                                                                                                    \x1b[0m\n"
+    )
+
+
 if __name__ == "__main__":
     syntax = Panel.fit(
         Syntax(
