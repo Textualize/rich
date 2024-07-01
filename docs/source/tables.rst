@@ -50,13 +50,13 @@ Table Options
 
 There are a number of keyword arguments on the Table constructor you can use to define how a table should look.
 
-- ``title`` Sets the title of the table (text show above the table).
-- ``caption`` Sets the table caption (text show below the table).
+- ``title`` Sets the title of the table (text shown above the table).
+- ``caption`` Sets the table caption (text shown below the table).
 - ``width`` Sets the desired width of the table (disables automatic width calculation).
 - ``min_width`` Sets a minimum width for the table.
 - ``box`` Sets one of the :ref:`appendix_box` styles for the table grid, or ``None`` for no grid.
 - ``safe_box`` Set to ``True`` to force the table to generate ASCII characters rather than unicode.
-- ``padding`` An integer, or tuple of 1, 2, or 4 values to set the padding on cells.
+- ``padding`` An integer, or tuple of 1, 2, or 4 values to set the padding on cells (see :ref:`Padding`).
 - ``collapse_padding`` If True the padding of neighboring cells will be merged.
 - ``pad_edge`` Set to False to remove padding around the edge of the table.
 - ``expand`` Set to True to expand the table to the full available size.
@@ -119,7 +119,7 @@ You may also add columns by specifying them in the positional arguments of the :
 
 This allows you to specify the text of the column only. If you want to set other attributes, such as width and style, you can add a :class:`~rich.table.Column` class. Here's an example::
 
-    from rich.table import Column
+    from rich.table import Column, Table
     table = Table(
         "Released",
         "Title",

@@ -6,6 +6,8 @@ import pytest
 import rich.repr
 from rich.console import Console
 
+from inspect import Parameter
+
 skip_py37 = pytest.mark.skipif(
     sys.version_info.minor == 7 and sys.version_info.major == 3,
     reason="rendered differently on py3.7",
@@ -61,6 +63,38 @@ class Bar(Foo):
     __rich_repr__.angular = True
 
 
+class StupidClass:
+    def __init__(self, a):
+        self.a = a
+
+    def __eq__(self, other) -> bool:
+        if other is Parameter.empty:
+            return True
+        try:
+            return self.a == other.a
+        except Exception:
+            return False
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+
+class NotStupid:
+    pass
+
+
+@rich.repr.auto
+class Bird:
+    def __init__(
+        self, name, eats, fly=True, another=StupidClass(2), extinct=NotStupid()
+    ):
+        self.name = name
+        self.eats = eats
+        self.fly = fly
+        self.another = another
+        self.extinct = extinct
+
+
 def test_rich_repr() -> None:
     assert (repr(Foo("hello"))) == "Foo('hello', 'hello', egg=1)"
     assert (repr(Foo("hello", bar=3))) == "Foo('hello', 'hello', bar=3, egg=1)"
@@ -90,6 +124,12 @@ def test_rich_angular() -> None:
 
 def test_rich_repr_auto() -> None:
     assert repr(Egg("hello", egg=2)) == "Egg('hello', egg=2)"
+    stupid_class = StupidClass(9)
+    not_stupid = NotStupid()
+    assert (
+        repr(Bird("penguin", ["fish"], another=stupid_class, extinct=not_stupid))
+        == f"Bird('penguin', ['fish'], another={repr(stupid_class)}, extinct={repr(not_stupid)})"
+    )
 
 
 def test_rich_repr_auto_angular() -> None:
