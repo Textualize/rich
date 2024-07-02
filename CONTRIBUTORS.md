@@ -38,6 +38,7 @@ The following people have contributed to the development of Rich:
 - [Alexander Krasnikov](https://github.com/askras)
 - [Martin Larralde](https://github.com/althonos)
 - [Hedy Li](https://github.com/hedythedev)
+- [Louis Maddox](https://github.com/lmmx)
 - [Henry Mai](https://github.com/tanducmai)
 - [Luka Mamukashvili](https://github.com/UltraStudioLTD)
 - [Alexander Mancevice](https://github.com/amancevice)
