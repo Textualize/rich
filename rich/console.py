@@ -2003,7 +2003,11 @@ class Console:
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
 
-                    display(self._buffer, self._render_buffer(self._buffer[:]))
+                    content = self._render_buffer(self._buffer[:])
+                    # display() always prints a newline, so if we got no content then
+                    # we don't want a single newline appearing
+                    if content:
+                        display(self._buffer, content)
                     del self._buffer[:]
                 else:
                     if WINDOWS:
