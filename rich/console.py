@@ -1005,19 +1005,13 @@ class Console:
         width: Optional[int] = None
         height: Optional[int] = None
 
-        if WINDOWS:  # pragma: no cover
+        for file_descriptor in _STD_STREAMS_OUTPUT if WINDOWS else _STD_STREAMS:
             try:
-                width, height = os.get_terminal_size()
+                width, height = os.get_terminal_size(file_descriptor)
             except (AttributeError, ValueError, OSError):  # Probably not a terminal
                 pass
-        else:
-            for file_descriptor in _STD_STREAMS:
-                try:
-                    width, height = os.get_terminal_size(file_descriptor)
-                except (AttributeError, ValueError, OSError):
-                    pass
-                else:
-                    break
+            else:
+                break
 
         columns = self._environ.get("COLUMNS")
         if columns is not None and columns.isdigit():
