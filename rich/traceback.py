@@ -43,6 +43,7 @@ WINDOWS = platform.system() == "Windows"
 
 LOCALS_MAX_LENGTH = 10
 LOCALS_MAX_STRING = 80
+_UNINSTALL_CALLABLE = None
 
 
 def install(
@@ -165,24 +166,33 @@ def install(
         ip = get_ipython()  # type: ignore[name-defined]
         old_hooks = [ip._showtraceback, ip.showtraceback, ip.showsyntaxerror]
         ipy_excepthook_closure(ip)
-        return old_hooks
+
+        def _uninstall():
+            # if within ipython, use customized traceback
+            ip = get_ipython()  # type: ignore[name-defined]
+            ip._showtraceback = old_hooks[0]
+            # add wrapper to capture tb_data
+            ip.showtraceback = old_hooks[1]
+            ip.showsyntaxerror = old_hooks[2]
+
+        _UNINSTALL_CALLABLE = _uninstall
+        return _uninstall
     except Exception:
         # otherwise use default system hook
         old_excepthook = sys.excepthook
         sys.excepthook = excepthook
-        return old_excepthook
+
+        def _uninstall():
+            sys.excepthook = old_excepthook
+
+        _UNINSTALL_CALLABLE = _uninstall
+        return _uninstall
 
 
-def uninstall(hooks):
-    try:  # pragma: no cover
-        # if within ipython, use customized traceback
-        ip = get_ipython()  # type: ignore[name-defined]
-        ip._showtraceback = hooks[0]
-        # add wrapper to capture tb_data
-        ip.showtraceback = hooks[1]
-        ip.showsyntaxerror = hooks[2]
-    except Exception:
-        sys.excepthook = hooks
+def uninstall() -> None:
+    """Reset any installed traceback or except hook(s) if any."""
+    if _UNINSTALL_CALLABLE:
+        _UNINSTALL_CALLABLE()
 
 
 @dataclass
@@ -665,13 +675,11 @@ class Traceback:
 
             first = frame_index == 0
             frame_filename = frame.filename
-            suppressed = any(frame_filename.startswith(path)
-                             for path in self.suppress)
+            suppressed = any(frame_filename.startswith(path) for path in self.suppress)
 
             if os.path.exists(frame.filename):
                 text = Text.assemble(
-                    path_highlighter(
-                        Text(frame.filename, style="pygments.string")),
+                    path_highlighter(Text(frame.filename, style="pygments.string")),
                     (":", "pygments.text"),
                     (str(frame.lineno), "pygments.number"),
                     " in ",
