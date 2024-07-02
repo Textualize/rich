@@ -161,6 +161,7 @@ def install(
             *args, is_syntax=True, **kwargs
         )
 
+    global _UNINSTALL_CALLABLE
     try:  # pragma: no cover
         # if within ipython, use customized traceback
         ip = get_ipython()  # type: ignore[name-defined]
