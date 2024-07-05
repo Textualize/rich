@@ -9,16 +9,6 @@ from rich.console import Console
 from rich.theme import Theme
 from rich.traceback import Traceback, install
 
-# from .render import render
-
-try:
-    from ._exception_render import expected
-except ImportError:
-    expected = None
-
-
-CAPTURED_EXCEPTION = 'Traceback (most recent call last):\n╭──────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ File "/Users/textualize/projects/rich/tests/test_traceback.py", line 26, in test_handler        │\n│    23     try:                                                                                   │\n│    24         old_handler = install(console=console, line_numbers=False)                         │\n│    25         try:                                                                               │\n│  ❱ 26             1 / 0                                                                          │\n│    27         except Exception:                                                                  │\n│    28             exc_type, exc_value, traceback = sys.exc_info()                                │\n│    29             sys.excepthook(exc_type, exc_value, traceback)                                 │\n╰──────────────────────────────────────────────────────────────────────────────────────────────────╯\nZeroDivisionError: division by zero\n'
-
 
 def test_handler():
     console = Console(file=io.StringIO(), width=100, color_system=None)
@@ -68,11 +58,6 @@ def test_handler():
     finally:
         sys.excepthook = old_handler
         assert old_handler == expected_old_handler
-
-
-def text_exception_render():
-    exc_render = render(get_exception())
-    assert exc_render == expected
 
 
 def test_capture():
@@ -342,12 +327,3 @@ def test_rich_traceback_omit_optional_local_flag(
         assert len(frames) == expected_frames_length
         frame_names = [f.name for f in frames]
         assert frame_names == expected_frame_names
-
-
-if __name__ == "__main__":  # pragma: no cover
-    expected = render(get_exception())
-
-    with open("_exception_render.py", "wt") as fh:
-        exc_render = render(get_exception())
-        print(exc_render)
-        fh.write(f"expected={exc_render!r}")
