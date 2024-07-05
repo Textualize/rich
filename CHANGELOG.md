@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Adds a `case_sensitive` parameter to `prompt.Prompt`. This determines if the
   response is treated as case-sensitive. Defaults to `True`.
+- Add a new `column` object `IterationSpeedColumn`. https://github.com/Textualize/rich/pull/3332
 
 ## [13.7.1] - 2024-02-28
 
