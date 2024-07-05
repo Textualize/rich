@@ -920,7 +920,7 @@ class TransferSpeedColumn(ProgressColumn):
 class IterationSpeedColumn(ProgressColumn):
     """Renders iterations per second, e.g. '11.4 it/s'."""
     
-    def render(self, task: Task) -> Text:
+    def render(self, task: "Task") -> Text:
         last_speed = task.last_speed if hasattr(task, 'last_speed') else None
         if task.finished and last_speed is not None:
             return Text(f"{last_speed} it/s", style="progress.data.speed")   
