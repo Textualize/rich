@@ -3,7 +3,6 @@ import os
 import sys
 import tempfile
 
-import pkg_resources
 import pytest
 from pygments.lexers import PythonLexer
 
@@ -21,7 +20,12 @@ from rich.syntax import (
 
 from .render import render
 
-PYGMENTS_VERSION = pkg_resources.get_distribution("pygments").version
+if sys.version_info >= (3, 8):
+    from importlib.metadata import Distribution
+else:
+    from importlib_metadata import Distribution
+
+PYGMENTS_VERSION = Distribution.from_name("pygments").version
 OLD_PYGMENTS = PYGMENTS_VERSION == "2.13.0"
 
 CODE = '''\
@@ -400,6 +404,23 @@ def test_syntax_measure():
 
     code = Syntax("", "python", code_width=20, line_numbers=True)
     assert code.__rich_measure__(console, console.options) == Measurement(3, 24)
+
+
+def test_background_color_override_includes_padding():
+    """Regression test for https://github.com/Textualize/rich/issues/3295"""
+
+    syntax = Syntax(
+        "x = 1",
+        lexer="python",
+        padding=(1, 3),
+        background_color="red",
+    )
+    result = render(syntax)
+    print(repr(result))
+    assert (
+        result
+        == "\x1b[41m                                                                                                    \x1b[0m\n\x1b[41m   \x1b[0m\x1b[38;2;248;248;242;41mx\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;255;70;137;41m=\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;174;129;255;41m1\x1b[0m\x1b[41m                                                                                         \x1b[0m\x1b[41m   \x1b[0m\n\x1b[41m                                                                                                    \x1b[0m\n"
+    )
 
 
 if __name__ == "__main__":

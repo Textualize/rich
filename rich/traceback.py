@@ -1,8 +1,5 @@
-from __future__ import absolute_import
-
 import linecache
 import os
-import platform
 import sys
 from dataclasses import dataclass, field
 from traceback import walk_tb
@@ -39,7 +36,7 @@ from .syntax import Syntax
 from .text import Text
 from .theme import Theme
 
-WINDOWS = platform.system() == "Windows"
+WINDOWS = sys.platform == "win32"
 
 LOCALS_MAX_LENGTH = 10
 LOCALS_MAX_STRING = 80
@@ -49,6 +46,7 @@ def install(
     *,
     console: Optional[Console] = None,
     width: Optional[int] = 100,
+    code_width: Optional[int] = 88,
     extra_lines: int = 3,
     theme: Optional[str] = None,
     word_wrap: bool = False,
@@ -69,6 +67,7 @@ def install(
     Args:
         console (Optional[Console], optional): Console to write exception to. Default uses internal Console instance.
         width (Optional[int], optional): Width (in characters) of traceback. Defaults to 100.
+        code_width (Optional[int], optional): Code width (in characters) of traceback. Defaults to 88.
         extra_lines (int, optional): Extra lines of code. Defaults to 3.
         theme (Optional[str], optional): Pygments theme to use in traceback. Defaults to ``None`` which will pick
             a theme appropriate for the platform.
@@ -105,6 +104,7 @@ def install(
                 value,
                 traceback,
                 width=width,
+                code_width=code_width,
                 extra_lines=extra_lines,
                 theme=theme,
                 word_wrap=word_wrap,
@@ -215,6 +215,7 @@ class Traceback:
         trace (Trace, optional): A `Trace` object produced from `extract`. Defaults to None, which uses
             the last exception.
         width (Optional[int], optional): Number of characters used to traceback. Defaults to 100.
+        code_width (Optional[int], optional): Number of code characters used to traceback. Defaults to 88.
         extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
         theme (str, optional): Override pygments theme used in traceback.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
@@ -243,6 +244,7 @@ class Traceback:
         trace: Optional[Trace] = None,
         *,
         width: Optional[int] = 100,
+        code_width: Optional[int] = 88,
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
@@ -266,6 +268,7 @@ class Traceback:
             )
         self.trace = trace
         self.width = width
+        self.code_width = code_width
         self.extra_lines = extra_lines
         self.theme = Syntax.get_theme(theme or "ansi_dark")
         self.word_wrap = word_wrap
@@ -297,6 +300,7 @@ class Traceback:
         traceback: Optional[TracebackType],
         *,
         width: Optional[int] = 100,
+        code_width: Optional[int] = 88,
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
@@ -316,6 +320,7 @@ class Traceback:
             exc_value (BaseException): Exception value.
             traceback (TracebackType): Python Traceback object.
             width (Optional[int], optional): Number of characters used to traceback. Defaults to 100.
+            code_width (Optional[int], optional): Number of code characters used to traceback. Defaults to 88.
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
             theme (str, optional): Override pygments theme used in traceback.
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
@@ -346,6 +351,7 @@ class Traceback:
         return cls(
             rich_traceback,
             width=width,
+            code_width=code_width,
             extra_lines=extra_lines,
             theme=theme,
             word_wrap=word_wrap,
@@ -695,7 +701,7 @@ class Traceback:
                         ),
                         highlight_lines={frame.lineno},
                         word_wrap=self.word_wrap,
-                        code_width=88,
+                        code_width=self.code_width,
                         indent_guides=self.indent_guides,
                         dedent=False,
                     )

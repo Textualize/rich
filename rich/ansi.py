@@ -9,6 +9,7 @@ from .text import Text
 
 re_ansi = re.compile(
     r"""
+(?:\x1b[0-?])|
 (?:\x1b\](.*?)\x1b\\)|
 (?:\x1b([(@-Z\\-_]|\[[0-?]*[ -/]*[@-~]))
 """,
