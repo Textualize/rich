@@ -26,7 +26,14 @@ from pygments.util import ClassNotFound
 from . import pretty
 from ._loop import loop_last
 from .columns import Columns
-from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, group
+from .console import (
+    Console,
+    ConsoleOptions,
+    ConsoleRenderable,
+    OverflowMethod,
+    RenderResult,
+    group,
+)
 from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
 from .panel import Panel
@@ -53,8 +60,10 @@ def install(
     show_locals: bool = False,
     locals_max_length: int = LOCALS_MAX_LENGTH,
     locals_max_string: int = LOCALS_MAX_STRING,
+    locals_max_depth: Optional[int] = None,
     locals_hide_dunder: bool = True,
     locals_hide_sunder: Optional[bool] = None,
+    locals_overflow: Optional[OverflowMethod] = None,
     indent_guides: bool = True,
     suppress: Iterable[Union[str, ModuleType]] = (),
     max_frames: int = 100,
@@ -111,8 +120,10 @@ def install(
                 show_locals=show_locals,
                 locals_max_length=locals_max_length,
                 locals_max_string=locals_max_string,
+                locals_max_depth=locals_max_depth,
                 locals_hide_dunder=locals_hide_dunder,
                 locals_hide_sunder=bool(locals_hide_sunder),
+                locals_overflow=locals_overflow,
                 indent_guides=indent_guides,
                 suppress=suppress,
                 max_frames=max_frames,
@@ -251,8 +262,10 @@ class Traceback:
         show_locals: bool = False,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
+        locals_max_depth: Optional[int] = None,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
+        locals_overlow: Optional[OverflowMethod] = None,
         indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
@@ -276,8 +289,10 @@ class Traceback:
         self.indent_guides = indent_guides
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
+        self.locals_max_depth = locals_max_depth
         self.locals_hide_dunder = locals_hide_dunder
         self.locals_hide_sunder = locals_hide_sunder
+        self.locals_overflow = locals_overlow
 
         self.suppress: Sequence[str] = []
         for suppress_entity in suppress:
@@ -307,8 +322,10 @@ class Traceback:
         show_locals: bool = False,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
+        locals_max_depth: Optional[int] = None,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
+        locals_overflow: Optional[OverflowMethod] = None,
         indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
@@ -344,6 +361,7 @@ class Traceback:
             show_locals=show_locals,
             locals_max_length=locals_max_length,
             locals_max_string=locals_max_string,
+            locals_max_depth=locals_max_depth,
             locals_hide_dunder=locals_hide_dunder,
             locals_hide_sunder=locals_hide_sunder,
         )
@@ -359,8 +377,10 @@ class Traceback:
             indent_guides=indent_guides,
             locals_max_length=locals_max_length,
             locals_max_string=locals_max_string,
+            locals_max_depth=locals_max_depth,
             locals_hide_dunder=locals_hide_dunder,
             locals_hide_sunder=locals_hide_sunder,
+            locals_overlow=locals_overflow,
             suppress=suppress,
             max_frames=max_frames,
         )
@@ -375,6 +395,7 @@ class Traceback:
         show_locals: bool = False,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
+        locals_max_depth: Optional[int] = None,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
     ) -> Trace:
@@ -457,6 +478,7 @@ class Traceback:
                             value,
                             max_length=locals_max_length,
                             max_string=locals_max_string,
+                            max_depth=locals_max_depth,
                         )
                         for key, value in get_locals(frame_summary.f_locals.items())
                     }
@@ -631,6 +653,8 @@ class Traceback:
                     indent_guides=self.indent_guides,
                     max_length=self.locals_max_length,
                     max_string=self.locals_max_string,
+                    max_depth=self.locals_max_depth,
+                    overflow=self.locals_overflow,
                 )
 
         exclude_frames: Optional[range] = None
