@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Progress track thread is now a daemon thread https://github.com/Textualize/rich/pull/3402
 - Fixed cached hash preservation upon clearing meta and links https://github.com/Textualize/rich/issues/2942
 - Fixed overriding the `background_color` of `Syntax` not including padding https://github.com/Textualize/rich/issues/3295
+- Fixed pretty printing of dataclasses with uninitialized fields https://github.com/Textualize/rich/issues/3417
 
 ### Changed
 

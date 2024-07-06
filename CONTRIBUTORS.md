@@ -85,3 +85,4 @@ The following people have contributed to the development of Rich:
 - [Pierro](https://github.com/xpierroz)
 - [Bernhard Wagner](https://github.com/bwagner)
 - [Aaron Beaudoin](https://github.com/AaronBeaudoin)
+- [Collin Heist](https://github.com/CollinHeist/)
