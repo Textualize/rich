@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Adds a `case_sensitive` parameter to `prompt.Prompt`. This determines if the
   response is treated as case-sensitive. Defaults to `True`.
+- Expose locals_max_depth and locals_overflow in traceback.install
 
 ## [13.7.1] - 2024-02-28
 
