@@ -238,20 +238,20 @@ class Text(JupyterMixin):
 
         plain = self.plain
         markup_spans = [
-            (0, False, self.style),
-            *((span.start, False, span.style) for span in self._spans),
-            *((span.end, True, span.style) for span in self._spans),
-            (len(plain), True, self.style),
+            (0, True, self.style),
+            *((span.start, True, span.style) for span in self._spans),
+            *((span.end, False, span.style) for span in self._spans),
+            (len(plain), False, self.style),
         ]
         markup_spans.sort(key=itemgetter(0, 1))
         position = 0
         append = output.append
-        for offset, closing, style in markup_spans:
+        for offset, opening, style in markup_spans:
             if offset > position:
                 append(escape(plain[position:offset]))
                 position = offset
             if style:
-                append(f"[/{style}]" if closing else f"[{style}]")
+                append(f"[{style}]" if opening else f"[/{style}]")
         markup = "".join(output)
         return markup
 
