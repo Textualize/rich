@@ -10,13 +10,14 @@ from .styled import Styled
 
 GuideType = Tuple[str, str, str, str]
 
+
 class Tree(JupyterMixin):
     """A renderable for a tree structure.
 
     Attributes:
         ASCII_GUIDES (GuideType): Guide lines used when Console.ascii_only is True.
         TREE_GUIDES (List[GuideType, GuideType, GuideType]): Default guide lines.
-    
+
     Args:
         label (RenderableType): The renderable or str for the tree label.
         style (StyleType, optional): Style of this tree. Defaults to "tree".
