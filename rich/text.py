@@ -1235,8 +1235,16 @@ class Text(JupyterMixin):
             for line in new_lines:
                 line.rstrip_end(width)
             if wrap_justify:
+                new_lines = Lines(
+                    Text(line.plain.replace(" " * tab_size, "\t" * tab_size))
+                    for line in new_lines._lines
+                )
                 new_lines.justify(
                     console, width, justify=wrap_justify, overflow=wrap_overflow
+                )
+                new_lines = Lines(
+                    Text(line.plain.replace("\t" * tab_size, " " * tab_size))
+                    for line in new_lines._lines
                 )
             for line in new_lines:
                 line.truncate(width, overflow=wrap_overflow)
