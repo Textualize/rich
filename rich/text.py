@@ -1226,7 +1226,7 @@ class Text(JupyterMixin):
         lines = Lines()
         for line in self.split(allow_blank=True):
             if "\t" in line:
-                line.expand_tabs(tab_size)
+                line = Text(line.plain.replace("\t", "\t" * tab_size))
             if no_wrap:
                 new_lines = Lines([line])
             else:
@@ -1235,17 +1235,12 @@ class Text(JupyterMixin):
             for line in new_lines:
                 line.rstrip_end(width)
             if wrap_justify:
-                new_lines = Lines(
-                    Text(line.plain.replace(" " * tab_size, "\t" * tab_size))
-                    for line in new_lines._lines
-                )
                 new_lines.justify(
                     console, width, justify=wrap_justify, overflow=wrap_overflow
                 )
-                new_lines = Lines(
-                    Text(line.plain.replace("\t" * tab_size, " " * tab_size))
-                    for line in new_lines._lines
-                )
+            new_lines = Lines(
+                Text(line.plain.replace("\t" * tab_size, " " * tab_size)) for line in new_lines._lines
+            )
             for line in new_lines:
                 line.truncate(width, overflow=wrap_overflow)
             lines.extend(new_lines)
