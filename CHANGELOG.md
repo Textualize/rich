@@ -25,11 +25,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Running tests in environment with `FORCE_COLOR` or `NO_COLOR` environment variables
 - ansi decoder will now strip problematic private escape sequences (like `\x1b7`) https://github.com/Textualize/rich/pull/3278/
 - Tree's ASCII_GUIDES and TREE_GUIDES constants promoted to class attributes
+- Optimizes `_wrap.divide_line` by removing several `list` instantiations and
+  string slices.
 
 ### Added
 
 - Adds a `case_sensitive` parameter to `prompt.Prompt`. This determines if the
   response is treated as case-sensitive. Defaults to `True`.
+- Adds a `continuation_indent` argument to `text.Text`, which prefixes subsequent
+  wrapped lines with the specified number of spaces.
 
 ## [13.7.1] - 2024-02-28
 
