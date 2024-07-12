@@ -1239,7 +1239,8 @@ class Text(JupyterMixin):
                     console, width, justify=wrap_justify, overflow=wrap_overflow
                 )
             new_lines = Lines(
-                Text(line.plain.replace("\t" * tab_size, " " * tab_size)) for line in new_lines._lines
+                Text(line.plain.replace("\t" * tab_size, " " * tab_size))
+                for line in new_lines._lines
             )
             for line in new_lines:
                 line.truncate(width, overflow=wrap_overflow)
