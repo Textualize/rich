@@ -151,9 +151,15 @@ class Lines:
                 index = 0
                 if spaces:
                     while words_size + num_spaces < width:
-                        spaces[len(spaces) - index - 1] += 1
+                        word_index = len(spaces) - index - 1
+                        while cell_len(words[word_index].plain) == 0 and not words_size == 0:
+                            index = (index + 1) % len(spaces)
+                            word_index = len(spaces) - index - 1
+
+                        spaces[word_index] += 1
                         num_spaces += 1
                         index = (index + 1) % len(spaces)
+
                 tokens: List[Text] = []
                 for index, (word, next_word) in enumerate(
                     zip_longest(words, words[1:])
