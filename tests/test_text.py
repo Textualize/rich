@@ -401,6 +401,34 @@ def test_right_crop():
     assert text._spans == [Span(0, 3, "red")]
 
 
+def test_wrap_2():
+    text = Text("foo bar baz")
+    lines = text.wrap(Console(), 2)
+    print(repr(lines))
+    assert len(lines) == 6
+    assert lines[0] == Text("fo")
+    assert lines[1] == Text("o ")
+    assert lines[2] == Text("ba")
+    assert lines[3] == Text("r ")
+    assert lines[4] == Text("ba")
+    assert lines[5] == Text("z")
+
+
+def test_wrap_2_continuation_indent():
+    text = Text("foo bar baz", continuation_indent=4)
+    lines = text.wrap(Console(), 2)
+    print(repr(lines))
+    assert len(lines) == 8
+    assert lines[0] == Text("fo")
+    assert lines[1] == Text(" o")
+    assert lines[2] == Text(" b")
+    assert lines[3] == Text(" a")
+    assert lines[4] == Text(" r")
+    assert lines[5] == Text(" b")
+    assert lines[6] == Text(" a")
+    assert lines[7] == Text(" z")
+
+
 def test_wrap_3():
     text = Text("foo bar baz")
     lines = text.wrap(Console(), 3)
@@ -411,6 +439,20 @@ def test_wrap_3():
     assert lines[2] == Text("baz")
 
 
+def test_wrap_3_continuation_indent():
+    text = Text("foo bar baz", continuation_indent=4)
+    lines = text.wrap(Console(), 3)
+    print(repr(lines))
+    assert len(lines) == 7
+    assert lines[0] == Text("foo")
+    assert lines[1] == Text("  b")
+    assert lines[2] == Text("  a")
+    assert lines[3] == Text("  r")
+    assert lines[4] == Text("  b")
+    assert lines[5] == Text("  a")
+    assert lines[6] == Text("  z")
+
+
 def test_wrap_4():
     text = Text("foo bar baz", justify="left")
     lines = text.wrap(Console(), 4)
@@ -418,6 +460,31 @@ def test_wrap_4():
     assert lines[0] == Text("foo ")
     assert lines[1] == Text("bar ")
     assert lines[2] == Text("baz ")
+
+
+def test_wrap_7():
+    text = Text("foo bar baz", justify="left")
+    lines = text.wrap(Console(), 7)
+    assert len(lines) == 2
+    assert lines[0] == Text("foo bar")
+    assert lines[1] == Text("baz    ")
+
+
+def test_wrap_7_continuation_indent():
+    text = Text("foo bar baz", justify="left", continuation_indent=4)
+    lines = text.wrap(Console(), 7)
+    assert len(lines) == 2
+    assert lines[0] == Text("foo bar")
+    assert lines[1] == Text("    baz")
+
+
+def test_wrap_sentence():
+    text = Text("Where there is a Will, there is a Way.")
+    lines = text.wrap(Console(), 15)
+    assert len(lines) == 3
+    assert lines[0] == Text("Where there is ")
+    assert lines[1] == Text("a Will, there ")
+    assert lines[2] == Text("is a Way.")
 
 
 def test_wrap_wrapped_word_length_greater_than_available_width():

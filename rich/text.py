@@ -125,6 +125,7 @@ class Text(JupyterMixin):
         no_wrap (bool, optional): Disable text wrapping, or None for default. Defaults to None.
         end (str, optional): Character to end text with. Defaults to "\\\\n".
         tab_size (int): Number of spaces per tab, or ``None`` to use ``console.tab_size``. Defaults to None.
+        continuation_indent (int, optional): The number of spaces to prefix wrapped lines with. Defaults to 0.
         spans (List[Span], optional). A list of predefined style spans. Defaults to None.
     """
 
@@ -136,6 +137,7 @@ class Text(JupyterMixin):
         "no_wrap",
         "end",
         "tab_size",
+        "continuation_indent",
         "_spans",
         "_length",
     ]
@@ -150,6 +152,7 @@ class Text(JupyterMixin):
         no_wrap: Optional[bool] = None,
         end: str = "\n",
         tab_size: Optional[int] = None,
+        continuation_indent: int = 0,
         spans: Optional[List[Span]] = None,
     ) -> None:
         sanitized_text = strip_control_codes(text)
@@ -160,6 +163,7 @@ class Text(JupyterMixin):
         self.no_wrap = no_wrap
         self.end = end
         self.tab_size = tab_size
+        self.continuation_indent = continuation_indent
         self._spans: List[Span] = spans or []
         self._length: int = len(sanitized_text)
 
@@ -1203,6 +1207,7 @@ class Text(JupyterMixin):
         justify: Optional["JustifyMethod"] = None,
         overflow: Optional["OverflowMethod"] = None,
         tab_size: int = 8,
+        continuation_indent: Optional[int] = None,
         no_wrap: Optional[bool] = None,
     ) -> Lines:
         """Word wrap the text.
@@ -1213,6 +1218,7 @@ class Text(JupyterMixin):
             justify (str, optional): Justify method: "default", "left", "center", "full", "right". Defaults to "default".
             overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to None.
             tab_size (int, optional): Default tab size. Defaults to 8.
+            continuation_indent (int, optional): Number of spaces used for continuation indents. Defaults to None.
             no_wrap (bool, optional): Disable wrapping, Defaults to False.
 
         Returns:
@@ -1220,6 +1226,13 @@ class Text(JupyterMixin):
         """
         wrap_justify = justify or self.justify or DEFAULT_JUSTIFY
         wrap_overflow = overflow or self.overflow or DEFAULT_OVERFLOW
+
+        # The continuation indent cannot be respect if we're wrapping
+        # text to a smaller width, so clamp it to width - 1.
+        wrap_continuation_indent = min(
+            continuation_indent or self.continuation_indent,
+            max(width - 1, 0),
+        )
 
         no_wrap = pick_bool(no_wrap, self.no_wrap, False) or overflow == "ignore"
 
@@ -1230,8 +1243,15 @@ class Text(JupyterMixin):
             if no_wrap:
                 new_lines = Lines([line])
             else:
-                offsets = divide_line(str(line), width, fold=wrap_overflow == "fold")
+                offsets = divide_line(
+                    str(line),
+                    width,
+                    fold=wrap_overflow == "fold",
+                    continuation_indent=wrap_continuation_indent,
+                )
                 new_lines = line.divide(offsets)
+                for i in range(1, len(new_lines)):
+                    new_lines[i].pad_left(wrap_continuation_indent)
             for line in new_lines:
                 line.rstrip_end(width)
             if wrap_justify:
