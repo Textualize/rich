@@ -442,9 +442,13 @@ class Traceback:
 
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
-                if filename and not filename.startswith("<"):
-                    if not os.path.isabs(filename):
-                        filename = os.path.join(_IMPORT_CWD, filename)
+                if (
+                    filename
+                    and not filename.startswith("<")
+                    and not os.path.isabs(filename)
+                    and os.path.exists(filename)
+                ):
+                    filename = os.path.join(_IMPORT_CWD, filename)
                 if frame_summary.f_locals.get("_rich_traceback_omit", False):
                     continue
 
@@ -452,16 +456,18 @@ class Traceback:
                     filename=filename or "?",
                     lineno=line_no,
                     name=frame_summary.f_code.co_name,
-                    locals={
-                        key: pretty.traverse(
-                            value,
-                            max_length=locals_max_length,
-                            max_string=locals_max_string,
-                        )
-                        for key, value in get_locals(frame_summary.f_locals.items())
-                    }
-                    if show_locals
-                    else None,
+                    locals=(
+                        {
+                            key: pretty.traverse(
+                                value,
+                                max_length=locals_max_length,
+                                max_string=locals_max_string,
+                            )
+                            for key, value in get_locals(frame_summary.f_locals.items())
+                        }
+                        if show_locals
+                        else None
+                    ),
                 )
                 append(frame)
                 if frame_summary.f_locals.get("_rich_traceback_guard", False):
@@ -659,23 +665,14 @@ class Traceback:
             frame_filename = frame.filename
             suppressed = any(frame_filename.startswith(path) for path in self.suppress)
 
-            if os.path.exists(frame.filename):
-                text = Text.assemble(
-                    path_highlighter(Text(frame.filename, style="pygments.string")),
-                    (":", "pygments.text"),
-                    (str(frame.lineno), "pygments.number"),
-                    " in ",
-                    (frame.name, "pygments.function"),
-                    style="pygments.text",
-                )
-            else:
-                text = Text.assemble(
-                    "in ",
-                    (frame.name, "pygments.function"),
-                    (":", "pygments.text"),
-                    (str(frame.lineno), "pygments.number"),
-                    style="pygments.text",
-                )
+            text = Text.assemble(
+                path_highlighter(Text(frame.filename, style="pygments.string")),
+                (":", "pygments.text"),
+                (str(frame.lineno), "pygments.number"),
+                " in ",
+                (frame.name, "pygments.function"),
+                style="pygments.text",
+            )
             if not frame.filename.startswith("<") and not first:
                 yield ""
             yield text
@@ -730,7 +727,9 @@ if __name__ == "__main__":  # pragma: no cover
     console = Console()
     import sys
 
-    def bar(a: Any) -> None:  # 这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑
+    def bar(
+        a: Any,
+    ) -> None:  # 这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑
         one = 1
         print(one / a)
 
