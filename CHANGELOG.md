@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Fixed
+
+- `Frame.filename` no longer incorrectly set to an incorrect absolute path if the original path cannot be found.
+
+### Changed
+
+- Traceback filename/path is always shown, even if the file cannot be found.
+
 ## [13.9.2] - 2024-10-04
 
 ### Fixed
