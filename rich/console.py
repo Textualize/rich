@@ -1535,7 +1535,11 @@ class Console:
             if isinstance(renderable, str):
                 append_text(
                     self.render_str(
-                        renderable, emoji=emoji, markup=markup, highlighter=_highlighter
+                        renderable,
+                        emoji=emoji,
+                        markup=markup,
+                        highlight=highlight,
+                        highlighter=_highlighter,
                     )
                 )
             elif isinstance(renderable, Text):
