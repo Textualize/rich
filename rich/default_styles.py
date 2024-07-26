@@ -119,6 +119,8 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "traceback.title": Style(color="red", bold=True),
     "traceback.exc_type": Style(color="bright_red", bold=True),
     "traceback.exc_value": Style.null(),
+    "exception_group.title": Style(color="magenta", bold=True),
+    "exception_group.border": Style(color="magenta"),
     "traceback.offset": Style(color="bright_red", bold=True),
     "bar.back": Style(color="grey23"),
     "bar.complete": Style(color="rgb(249,38,114)"),
