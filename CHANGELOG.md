@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Progress track thread is now a daemon thread https://github.com/Textualize/rich/pull/3402
 - Fixed cached hash preservation upon clearing meta and links https://github.com/Textualize/rich/issues/2942
 - Fixed overriding the `background_color` of `Syntax` not including padding https://github.com/Textualize/rich/issues/3295
+- `Frame.filename` no longer incorrectly set to an incorrect absolute path if the original path cannot be found.
 
 ### Changed
 
@@ -25,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Running tests in environment with `FORCE_COLOR` or `NO_COLOR` environment variables
 - ansi decoder will now strip problematic private escape sequences (like `\x1b7`) https://github.com/Textualize/rich/pull/3278/
 - Tree's ASCII_GUIDES and TREE_GUIDES constants promoted to class attributes
+- Traceback filename/path is always shown, even if the file cannot be found.
 
 ### Added
 
