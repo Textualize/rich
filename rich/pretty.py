@@ -779,7 +779,7 @@ def traverse(
                 for last, field in loop_last(
                     field for field in fields(obj) if field.repr
                 ):
-                    child_node = _traverse(getattr(obj, field.name), depth=depth + 1)
+                    child_node = _traverse(getattr(obj, field.name, field.default), depth=depth + 1)
                     child_node.key_repr = field.name
                     child_node.last = last
                     child_node.key_separator = "="
