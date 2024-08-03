@@ -657,7 +657,7 @@ class BarColumn(ProgressColumn):
         pulse_style: StyleType = "bar.pulse",
         table_column: Optional[Column] = None,
     ) -> None:
-        self.bar_width = bar_width
+        self.bar_width = None if bar_width.lower == 'none' else bar_width
         self.style = style
         self.complete_style = complete_style
         self.finished_style = finished_style
