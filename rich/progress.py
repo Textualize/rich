@@ -1056,7 +1056,7 @@ class Progress(JupyterMixin):
     """Renders an auto-updating progress bar(s).
 
     Args:
-        console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
+        console (Console, optional): Optional Console instance. Defaults to an internal Console instance writing to stdout.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
         refresh_per_second (Optional[float], optional): Number of times per second to refresh the progress information or None to use default (10). Defaults to None.
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
