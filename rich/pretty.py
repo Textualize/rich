@@ -3,6 +3,7 @@ import collections
 import dataclasses
 import inspect
 import os
+import reprlib
 import sys
 from array import array
 from collections import Counter, UserDict, UserList, defaultdict, deque
@@ -78,7 +79,10 @@ def _is_dataclass_repr(obj: object) -> bool:
     # Digging in to a lot of internals here
     # Catching all exceptions in case something is missing on a non CPython implementation
     try:
-        return obj.__repr__.__code__.co_filename == dataclasses.__file__
+        return obj.__repr__.__code__.co_filename in (
+            dataclasses.__file__,
+            reprlib.__file__,
+        )
     except Exception:  # pragma: no coverage
         return False
 
