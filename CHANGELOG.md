@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Adds support for using `asyncio.Task` as an alternative to `threading.Thread` to handle live updates
 - Adds a `case_sensitive` parameter to `prompt.Prompt`. This determines if the
   response is treated as case-sensitive. Defaults to `True`.
 
