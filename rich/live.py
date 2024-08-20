@@ -3,6 +3,12 @@ from threading import Event, RLock, Thread
 from types import TracebackType
 from typing import IO, Any, Callable, List, Optional, TextIO, Type, cast
 
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self  # pragma: no cover
+
+
 from . import get_console
 from .console import Console, ConsoleRenderable, RenderableType, RenderHook
 from .control import Control
@@ -162,7 +168,7 @@ class Live(JupyterMixin, RenderHook):
                     if self.ipy_widget is not None and self.transient:
                         self.ipy_widget.close()  # pragma: no cover
 
-    def __enter__(self) -> "Live":
+    def __enter__(self) -> Self:
         self.start(refresh=self._renderable is not None)
         return self
 
