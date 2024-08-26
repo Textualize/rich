@@ -991,3 +991,28 @@ def test_force_color():
         },
     )
     assert console.color_system in ("truecolor", "windows")
+
+
+def test_reenable_highlighting() -> None:
+    console = Console(
+        file=io.StringIO(),
+        _environ={
+            "FORCE_COLOR": "1",
+            "TERM": "xterm-256color",
+            "COLORTERM": "truecolor",
+        },
+        highlight=False,
+    )
+    console.print("[1, 2, 3]")
+    console.print("[1, 2, 3]", highlight=True)
+    output = console.file.getvalue()
+    lines = output.splitlines()
+    print(repr(lines))
+    # First line not highlighted
+    assert lines[0] == "[1, 2, 3]"
+    # Second line highlighted
+
+    assert (
+        lines[1]
+        == "\x1b[1m[\x1b[0m\x1b[1;36m1\x1b[0m, \x1b[1;36m2\x1b[0m, \x1b[1;36m3\x1b[0m\x1b[1m]\x1b[0m"
+    )
