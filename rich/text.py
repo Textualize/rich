@@ -38,7 +38,7 @@ DEFAULT_OVERFLOW: "OverflowMethod" = "fold"
 _re_whitespace = re.compile(r"\s+$")
 
 TextType = Union[str, "Text"]
-"""A plain string or a [Text][rich.text.Text] instance."""
+"""A plain string or a :class:`Text` instance."""
 
 GetStyleCallable = Callable[[str], Optional[StyleType]]
 

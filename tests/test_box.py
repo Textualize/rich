@@ -1,7 +1,19 @@
 import pytest
 
 from rich.console import ConsoleOptions, ConsoleDimensions
-from rich.box import ASCII, DOUBLE, ROUNDED, HEAVY, SQUARE
+from rich.box import (
+    ASCII,
+    DOUBLE,
+    ROUNDED,
+    HEAVY,
+    SQUARE,
+    MINIMAL_HEAVY_HEAD,
+    MINIMAL,
+    SIMPLE_HEAVY,
+    SIMPLE,
+    HEAVY_EDGE,
+    HEAVY_HEAD,
+)
 
 
 def test_str():
@@ -36,7 +48,26 @@ def test_get_bottom():
     assert bottom == "┗━┻━━┻━━━┛"
 
 
-def test_box_substitute():
+def test_box_substitute_for_same_box():
+    options = ConsoleOptions(
+        ConsoleDimensions(80, 25),
+        legacy_windows=False,
+        min_width=1,
+        max_width=100,
+        is_terminal=True,
+        encoding="utf-8",
+        max_height=25,
+    )
+
+    assert ROUNDED.substitute(options) == ROUNDED
+    assert MINIMAL_HEAVY_HEAD.substitute(options) == MINIMAL_HEAVY_HEAD
+    assert SIMPLE_HEAVY.substitute(options) == SIMPLE_HEAVY
+    assert HEAVY.substitute(options) == HEAVY
+    assert HEAVY_EDGE.substitute(options) == HEAVY_EDGE
+    assert HEAVY_HEAD.substitute(options) == HEAVY_HEAD
+
+
+def test_box_substitute_for_different_box_legacy_windows():
     options = ConsoleOptions(
         ConsoleDimensions(80, 25),
         legacy_windows=True,
@@ -46,10 +77,29 @@ def test_box_substitute():
         encoding="utf-8",
         max_height=25,
     )
+
+    assert ROUNDED.substitute(options) == SQUARE
+    assert MINIMAL_HEAVY_HEAD.substitute(options) == MINIMAL
+    assert SIMPLE_HEAVY.substitute(options) == SIMPLE
     assert HEAVY.substitute(options) == SQUARE
+    assert HEAVY_EDGE.substitute(options) == SQUARE
+    assert HEAVY_HEAD.substitute(options) == SQUARE
 
-    options.legacy_windows = False
-    assert HEAVY.substitute(options) == HEAVY
 
-    options.encoding = "ascii"
+def test_box_substitute_for_different_box_ascii_encoding():
+    options = ConsoleOptions(
+        ConsoleDimensions(80, 25),
+        legacy_windows=True,
+        min_width=1,
+        max_width=100,
+        is_terminal=True,
+        encoding="ascii",
+        max_height=25,
+    )
+
+    assert ROUNDED.substitute(options) == ASCII
+    assert MINIMAL_HEAVY_HEAD.substitute(options) == ASCII
+    assert SIMPLE_HEAVY.substitute(options) == ASCII
     assert HEAVY.substitute(options) == ASCII
+    assert HEAVY_EDGE.substitute(options) == ASCII
+    assert HEAVY_HEAD.substitute(options) == ASCII

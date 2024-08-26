@@ -1010,3 +1010,30 @@ def test_run_piped_to_head():
     proc2.wait()
     assert proc1.returncode == 1
     assert proc2.returncode == 0
+
+    
+def test_reenable_highlighting() -> None:
+    """Check that when highlighting is disabled, it can be reenabled in print()"""
+    console = Console(
+        file=io.StringIO(),
+        _environ={
+            "FORCE_COLOR": "1",
+            "TERM": "xterm-256color",
+            "COLORTERM": "truecolor",
+        },
+        highlight=False,
+    )
+    console.print("[1, 2, 3]")
+    console.print("[1, 2, 3]", highlight=True)
+    output = console.file.getvalue()
+    lines = output.splitlines()
+    print(repr(lines))
+    # First line not highlighted
+    assert lines[0] == "[1, 2, 3]"
+    # Second line highlighted
+
+    assert (
+        lines[1]
+        == "\x1b[1m[\x1b[0m\x1b[1;36m1\x1b[0m, \x1b[1;36m2\x1b[0m, \x1b[1;36m3\x1b[0m\x1b[1m]\x1b[0m"
+    )
+

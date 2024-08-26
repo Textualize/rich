@@ -54,7 +54,7 @@ class Column:
         show_footer (bool, optional): Show a footer row. Defaults to False.
         show_edge (bool, optional): Draw a box around the outside of the table. Defaults to True.
         show_lines (bool, optional): Draw lines between every row. Defaults to False.
-        leading (bool, optional): Number of blank lines between rows (precludes ``show_lines``). Defaults to 0.
+        leading (int, optional): Number of blank lines between rows (precludes ``show_lines``). Defaults to 0.
         style (Union[str, Style], optional): Default style for the table. Defaults to "none".
         row_styles (List[Union, str], optional): Optional list of row styles, if more than one style is given then the styles will alternate. Defaults to None.
         header_style (Union[str, Style], optional): Style of the header. Defaults to "table.header".
@@ -105,6 +105,9 @@ class Column:
 
     no_wrap: bool = False
     """bool: Prevent wrapping of text within the column. Defaults to ``False``."""
+
+    highlight: bool = False
+    """bool: Apply highlighter to column. Defaults to ``False``."""
 
     _index: int = 0
     """Index of column."""
@@ -167,7 +170,7 @@ class Table(JupyterMixin):
         show_footer (bool, optional): Show a footer row. Defaults to False.
         show_edge (bool, optional): Draw a box around the outside of the table. Defaults to True.
         show_lines (bool, optional): Draw lines between every row. Defaults to False.
-        leading (bool, optional): Number of blank lines between rows (precludes ``show_lines``). Defaults to 0.
+        leading (int, optional): Number of blank lines between rows (precludes ``show_lines``). Defaults to 0.
         style (Union[str, Style], optional): Default style for the table. Defaults to "none".
         row_styles (List[Union, str], optional): Optional list of row styles, if more than one style is given then the styles will alternate. Defaults to None.
         header_style (Union[str, Style], optional): Style of the header. Defaults to "table.header".
@@ -365,6 +368,7 @@ class Table(JupyterMixin):
         footer: "RenderableType" = "",
         *,
         header_style: Optional[StyleType] = None,
+        highlight: Optional[bool] = None,
         footer_style: Optional[StyleType] = None,
         style: Optional[StyleType] = None,
         justify: "JustifyMethod" = "left",
@@ -384,6 +388,7 @@ class Table(JupyterMixin):
             footer (RenderableType, optional): Text or renderable for the footer.
                 Defaults to "".
             header_style (Union[str, Style], optional): Style for the header, or None for default. Defaults to None.
+            highlight (bool, optional): Whether to highlight the text. The default of None uses the value of the table (self) object.
             footer_style (Union[str, Style], optional): Style for the footer, or None for default. Defaults to None.
             style (Union[str, Style], optional): Style for the column cells, or None for default. Defaults to None.
             justify (JustifyMethod, optional): Alignment for cells. Defaults to "left".
@@ -401,6 +406,7 @@ class Table(JupyterMixin):
             header=header,
             footer=footer,
             header_style=header_style or "",
+            highlight=highlight if highlight is not None else self.highlight,
             footer_style=footer_style or "",
             style=style or "",
             justify=justify,
@@ -776,14 +782,14 @@ class Table(JupyterMixin):
                     _Segment(_box.head_vertical, border_style),
                 ),
                 (
-                    _Segment(_box.foot_left, border_style),
-                    _Segment(_box.foot_right, border_style),
-                    _Segment(_box.foot_vertical, border_style),
-                ),
-                (
                     _Segment(_box.mid_left, border_style),
                     _Segment(_box.mid_right, border_style),
                     _Segment(_box.mid_vertical, border_style),
+                ),
+                (
+                    _Segment(_box.foot_left, border_style),
+                    _Segment(_box.foot_right, border_style),
+                    _Segment(_box.foot_vertical, border_style),
                 ),
             ]
             if show_edge:
@@ -818,6 +824,7 @@ class Table(JupyterMixin):
                     no_wrap=column.no_wrap,
                     overflow=column.overflow,
                     height=None,
+                    highlight=column.highlight,
                 )
                 lines = console.render_lines(
                     cell.renderable,
