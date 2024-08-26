@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed superfluous space above Markdown tables https://github.com/Textualize/rich/pull/3469
 - Fixed issue with record and capture interaction https://github.com/Textualize/rich/pull/3470
 - Fixed control codes breaking in `append_tokens` https://github.com/Textualize/rich/pull/3471
+- Fixed exception pretty printing a dataclass with missing fields https://github.com/Textualize/rich/pull/3472
 
 ### Changed
 
