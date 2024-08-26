@@ -781,7 +781,9 @@ def traverse(
                 )
 
                 for last, field in loop_last(
-                    field for field in fields(obj) if field.repr
+                    field
+                    for field in fields(obj)
+                    if field.repr and hasattr(obj, field.name)
                 ):
                     child_node = _traverse(getattr(obj, field.name), depth=depth + 1)
                     child_node.key_repr = field.name
