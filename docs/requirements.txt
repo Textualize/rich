@@ -1,4 +1,4 @@
-alabaster==0.7.12
+alabaster==1.0.0
 Sphinx==7.3.7
 sphinx-rtd-theme==2.0.0
 sphinx-copybutton==0.5.1
