@@ -381,23 +381,6 @@ def test_capture():
     assert capture.get() == "Hello\n"
 
 
-def test_capture_and_record(capsys):
-    recorder = Console(record=True)
-    recorder.print("ABC")
-
-    with recorder.capture() as capture:
-        recorder.print("Hello")
-
-    assert capture.get() == "Hello\n"
-
-    recorded_text = recorder.export_text()
-    out, err = capsys.readouterr()
-
-    assert recorded_text == "ABC\nHello\n"
-    assert capture.get() == "Hello\n"
-    assert out == "ABC\n"
-
-
 def test_input(monkeypatch, capsys):
     def fake_input(prompt=""):
         console.file.write(prompt)
@@ -1038,3 +1021,24 @@ def test_brokenpipeerror() -> None:
     proc2.wait()
     assert proc1.returncode == 1
     assert proc2.returncode == 0
+
+
+def test_capture_and_record() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/2563"""
+
+    console = Console(record=True)
+    print("Before Capture started:")
+    console.print("[blue underline]Print 0")
+    with console.capture() as capture:
+        console.print("[blue underline]Print 1")
+        console.print("[blue underline]Print 2")
+        console.print("[blue underline]Print 3")
+        console.print("[blue underline]Print 4")
+
+    capture_content = capture.get()
+    print(repr(capture_content))
+    assert capture_content == "Print 1\nPrint 2\nPrint 3\nPrint 4\n"
+
+    recorded_content = console.export_text()
+    print(repr(recorded_content))
+    assert recorded_content == "Print 0\n"

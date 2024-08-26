@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed selective enabling of highlighting when disabled in the `Console` https://github.com/Textualize/rich/issues/3419
 - Fixed BrokenPipeError writing an error message https://github.com/Textualize/rich/pull/3468
 - Fixed superfluous space above Markdown tables https://github.com/Textualize/rich/pull/3469
+- Fixed issue with record and capture interaction https://github.com/Textualize/rich/pull/3470
 
 ### Changed
 
