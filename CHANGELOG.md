@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed cached hash preservation upon clearing meta and links https://github.com/Textualize/rich/issues/2942
 - Fixed overriding the `background_color` of `Syntax` not including padding https://github.com/Textualize/rich/issues/3295
 - Fixed pretty printing of dataclasses with a default repr in Python 3.13 https://github.com/Textualize/rich/pull/3455
+- Fixed selective enabling of highlighting when disabled in the `Console` https://github.com/Textualize/rich/issues/3419
+- Fixed BrokenPipeError writing an error message https://github.com/Textualize/rich/pull/3468
+- Fixed superfluous space above Markdown tables https://github.com/Textualize/rich/pull/3469
+- Fixed issue with record and capture interaction https://github.com/Textualize/rich/pull/3470
+- Fixed control codes breaking in `append_tokens` https://github.com/Textualize/rich/pull/3471
 
 ### Changed
 
@@ -31,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Adds a `case_sensitive` parameter to `prompt.Prompt`. This determines if the
   response is treated as case-sensitive. Defaults to `True`.
+- Added `Console.on_broken_pipe` https://github.com/Textualize/rich/pull/3468
 
 ## [13.7.1] - 2024-02-28
 

@@ -1041,6 +1041,7 @@ class Text(JupyterMixin):
         _Span = Span
         offset = len(self)
         for content, style in tokens:
+            content = strip_control_codes(content)
             append_text(content)
             if style:
                 append_span(_Span(offset, offset + len(content), style))
