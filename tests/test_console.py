@@ -994,6 +994,7 @@ def test_force_color():
 
 
 def test_reenable_highlighting() -> None:
+    """Check that when highlighting is disabled, it can be reenabled in print()"""
     console = Console(
         file=io.StringIO(),
         _environ={
