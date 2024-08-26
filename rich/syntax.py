@@ -1,5 +1,4 @@
 import os.path
-import platform
 import re
 import sys
 import textwrap
@@ -52,7 +51,7 @@ from .text import Text
 
 TokenType = Tuple[str, ...]
 
-WINDOWS = platform.system() == "Windows"
+WINDOWS = sys.platform == "win32"
 DEFAULT_THEME = "monokai"
 
 # The following styles are based on https://github.com/pygments/pygments/blob/master/pygments/formatters/terminal.py
@@ -620,9 +619,7 @@ class Syntax(JupyterMixin):
     ) -> RenderResult:
         segments = Segments(self._get_syntax(console, options))
         if self.padding:
-            yield Padding(
-                segments, style=self._theme.get_background_style(), pad=self.padding
-            )
+            yield Padding(segments, style=self._get_base_style(), pad=self.padding)
         else:
             yield segments
 

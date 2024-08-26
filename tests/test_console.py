@@ -1,6 +1,7 @@
 import datetime
 import io
 import os
+import subprocess
 import sys
 import tempfile
 from typing import Optional, Tuple, Type, Union
@@ -991,3 +992,49 @@ def test_force_color():
         },
     )
     assert console.color_system in ("truecolor", "windows")
+
+
+def test_reenable_highlighting() -> None:
+    """Check that when highlighting is disabled, it can be reenabled in print()"""
+    console = Console(
+        file=io.StringIO(),
+        _environ={
+            "FORCE_COLOR": "1",
+            "TERM": "xterm-256color",
+            "COLORTERM": "truecolor",
+        },
+        highlight=False,
+    )
+    console.print("[1, 2, 3]")
+    console.print("[1, 2, 3]", highlight=True)
+    output = console.file.getvalue()
+    lines = output.splitlines()
+    print(repr(lines))
+    # First line not highlighted
+    assert lines[0] == "[1, 2, 3]"
+    # Second line highlighted
+
+    assert (
+        lines[1]
+        == "\x1b[1m[\x1b[0m\x1b[1;36m1\x1b[0m, \x1b[1;36m2\x1b[0m, \x1b[1;36m3\x1b[0m\x1b[1m]\x1b[0m"
+    )
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
+def test_brokenpipeerror() -> None:
+    """Test BrokenPipe works as expected."""
+    which_py, which_head = (["which", cmd] for cmd in ("python", "head"))
+    rich_cmd = "python -m rich".split()
+    for cmd in [which_py, which_head, rich_cmd]:
+        check = subprocess.run(cmd).returncode
+        if check != 0:
+            return  # Only test on suitable Unix platforms
+    head_cmd = "head -1".split()
+    proc1 = subprocess.Popen(rich_cmd, stdout=subprocess.PIPE)
+    proc2 = subprocess.Popen(head_cmd, stdin=proc1.stdout, stdout=subprocess.PIPE)
+    proc1.stdout.close()
+    output, _ = proc2.communicate()
+    proc1.wait()
+    proc2.wait()
+    assert proc1.returncode == 1
+    assert proc2.returncode == 0
