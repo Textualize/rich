@@ -18,10 +18,10 @@ Sub-heading
 Paragraphs are separated
 by a blank line.
 
-Two spaces at the end of a line  
+Two spaces at the end of a line
 produces a line break.
 
-Text attributes _italic_, 
+Text attributes _italic_,
 **bold**, `monospace`.
 
 Horizontal rule:
@@ -171,6 +171,31 @@ def test_partial_table():
     result = render(markdown)
     print(repr(result))
     expected = "\n                  \n \x1b[1m \x1b[0m\x1b[1mSimple\x1b[0m\x1b[1m \x1b[0m \x1b[1m \x1b[0m\x1b[1mTable\x1b[0m\x1b[1m \x1b[0m \n ━━━━━━━━━━━━━━━━ \n                  \n"
+    assert result == expected
+
+
+def test_table_with_empty_cells() -> None:
+    """Test a table with empty cells is rendered without extra newlines above.
+    Regression test for #3027 https://github.com/Textualize/rich/issues/3027
+    """
+    complete_table = Markdown(
+        """\
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
+"""
+    )
+    table_with_empty_cells = Markdown(
+        """\
+| First Header  |               |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+|               | Content Cell  |
+"""
+    )
+    result = len(render(table_with_empty_cells).splitlines())
+    expected = len(render(complete_table).splitlines())
     assert result == expected
 
 
