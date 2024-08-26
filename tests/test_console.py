@@ -1011,7 +1011,7 @@ def test_run_piped_to_head():
     assert proc1.returncode == 1
     assert proc2.returncode == 0
 
-    
+
 def test_reenable_highlighting() -> None:
     """Check that when highlighting is disabled, it can be reenabled in print()"""
     console = Console(
@@ -1036,4 +1036,3 @@ def test_reenable_highlighting() -> None:
         lines[1]
         == "\x1b[1m[\x1b[0m\x1b[1;36m1\x1b[0m, \x1b[1;36m2\x1b[0m, \x1b[1;36m3\x1b[0m\x1b[1m]\x1b[0m"
     )
-
