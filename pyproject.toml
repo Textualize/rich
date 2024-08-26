@@ -57,6 +57,7 @@ show_error_codes = true
 strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 
+
 [[tool.mypy.overrides]]
 module = ["pygments.*", "IPython.*", "ipywidgets.*"]
 ignore_missing_imports = true
