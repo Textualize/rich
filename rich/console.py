@@ -2026,11 +2026,7 @@ class Console:
             self.on_broken_pipe()
 
     def _write_buffer(self) -> None:
-        """Check if the buffer may be rendered. Render it if it can (e.g. Console.quiet is False)
-        Rendering is supported on Windows, Unix and Jupyter environments. For
-        legacy Windows consoles, the win32 API is called directly.
-        This method will also record what it renders if recording is enabled via Console.record.
-        """
+        """Write the buffer to the output file."""
 
         with self._lock:
             if self.record:
