@@ -1,5 +1,4 @@
 import re
-
 from io import StringIO
 from typing import List
 
@@ -213,7 +212,9 @@ def test_highlight_regex():
     text = Text("Ada Lovelace, Alan Turing")
 
     count = text.highlight_regex(
-        re.compile(r"(?P<yellow>[A-Za-z]+)[ ]+(?P<red>[A-Za-z]+)(?P<NEVER_MATCH>NEVER_MATCH)*")
+        re.compile(
+            r"(?P<yellow>[A-Za-z]+)[ ]+(?P<red>[A-Za-z]+)(?P<NEVER_MATCH>NEVER_MATCH)*"
+        )
     )
 
     # The number of matched name should be 2
@@ -224,7 +225,6 @@ def test_highlight_regex():
         Span(14, 18, "yellow"),  # Alan
         Span(19, 25, "red"),  # Turing
     ]
-
 
 
 def test_highlight_regex_callable():
