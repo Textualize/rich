@@ -2029,7 +2029,7 @@ class Console:
         """Write the buffer to the output file."""
 
         with self._lock:
-            if self.record:
+            if self.record and not self._buffer_index:
                 with self._record_buffer_lock:
                     self._record_buffer.extend(self._buffer[:])
 
