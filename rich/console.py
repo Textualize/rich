@@ -2037,7 +2037,9 @@ class Console:
                 if self.is_jupyter:  # pragma: no cover
                     from .jupyter import display
 
-                    display(self._buffer, self._render_buffer(self._buffer[:]))
+                    output = self._render_buffer(self._buffer[:])
+                    if output and len(output) > 0:
+                        display(self._buffer, output)
                     del self._buffer[:]
                 else:
                     if WINDOWS:
