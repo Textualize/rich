@@ -967,8 +967,7 @@ def test_force_color_jupyter():
 
 @mock.patch("rich.jupyter.display")
 def test_capture_not_print_empty_line_jupyter(display: mock.MagicMock):
-    output = io.StringIO()
-    console = Console(file=output, force_jupyter=True)
+    console = Console(force_jupyter=True)
     with console.capture():
         pass
     display.assert_not_called()
