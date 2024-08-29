@@ -686,7 +686,8 @@ class Markdown(JupyterMixin):
                     new_line = element.new_line
 
 
-if __name__ == "__main__":  # pragma: no cover
+def _main() -> None:  # pragma: no cover
+    """Provide CLI interface for markdown rendering."""
     import argparse
     import sys
 
@@ -782,3 +783,7 @@ if __name__ == "__main__":  # pragma: no cover
             force_terminal=args.force_color, width=args.width, record=True
         )
         console.print(markdown)
+
+
+if __name__ == "__main__":
+    _main()

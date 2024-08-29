@@ -835,7 +835,8 @@ def _get_code_index_for_syntax_position(
     return newlines_offsets[line_index] + column_index
 
 
-if __name__ == "__main__":  # pragma: no cover
+def _main() -> None:  # pragma: no cover
+    """Provide CLI interface for syntax rendering."""
     import argparse
     import sys
 
@@ -953,3 +954,7 @@ if __name__ == "__main__":  # pragma: no cover
             highlight_lines={args.highlight_line},
         )
     console.print(syntax, soft_wrap=args.soft_wrap)
+
+
+if __name__ == "__main__":
+    _main()

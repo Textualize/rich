@@ -46,6 +46,11 @@ pre-commit = "^2.17.0"
 asv = "^0.5.1"
 importlib-metadata = { version = "*", python = "<3.8" }
 
+[tool.poetry.scripts]
+"rich.markdown" = "rich.markdown:_main"
+"rich.syntax" = "rich.syntax:_main"
+"rich.json" = "rich.json:_main"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

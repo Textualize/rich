@@ -51,7 +51,17 @@ You can use this class from the command line. Here's how you would syntax highli
 
     python -m rich.syntax syntax.py
 
+Rich additionally adds the ``rich.syntax`` command into your environment when installed. The following behaves identically to the above example::
+
+    rich.syntax syntax.py
+
 For the full list of arguments, run the following::
 
-    python -m rich.syntax -h
-    
+    rich.syntax -h
+
+This functionality can also be run directly with uvx or pipx using the following commands respectively::
+
+    uvx --from rich rich.syntax FILE
+
+    pipx run --spec rich rich.syntax FILE
+

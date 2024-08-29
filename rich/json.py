@@ -102,7 +102,8 @@ class JSON:
         return self.text
 
 
-if __name__ == "__main__":
+def _main() -> None:  # pragma: no cover
+    """Provide CLI interface for JSON rendering."""
     import argparse
     import sys
 
@@ -137,3 +138,7 @@ if __name__ == "__main__":
         sys.exit(-1)
 
     console.print(JSON(json_data, indent=args.indent), soft_wrap=True)
+
+
+if __name__ == "__main__":
+    _main()

@@ -24,6 +24,16 @@ You can also use the Markdown class from the command line. The following example
 
     python -m rich.markdown README.md
 
+Rich additionally adds the ``rich.markdown`` command into your environment when installed. The following behaves identically to the above example::
+
+    rich.markdown README.md
+
 Run the following to see the full list of arguments for the markdown command::
 
-    python -m rich.markdown -h
+    rich.markdown -h
+
+This functionality can also be run directly with uvx or pipx using the following commands respectively::
+
+    uvx --from rich rich.markdown FILE
+
+    pipx run --spec rich rich.markdown FILE

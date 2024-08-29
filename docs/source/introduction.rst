@@ -26,9 +26,15 @@ You can install Rich from PyPI with `pip` or your favorite package manager::
 
 Add the ``-U`` switch to update to the current version, if Rich is already installed.
 
-If you intend to use Rich with Jupyter then there are some additional dependencies which you can install with the following command::
+If you intend to use Rich with Jupyter, then there are some additional dependencies which you can install with the following command::
 
     pip install "rich[jupyter]"
+
+If you only wish to use rich's exported commands for displaying markdown, json, and syntax highlighting in your terminal, then you may instead install rich as an isolated tool with ``uv`` or ``pipx``::
+
+    uv tool install rich
+
+    pipx install rich
 
 
 Quick Start

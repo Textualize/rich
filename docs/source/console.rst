@@ -90,6 +90,16 @@ You can also pretty print JSON via the command line with the following::
 
     python -m rich.json cats.json
 
+Rich additionally adds the ``rich.json`` command into your environment when installed. The following behaves identically to the above example::
+
+    rich.json cats.json
+
+This functionality can also be run directly with pipx or uvx using the following commands::
+
+    uvx --from rich rich.json FILE
+
+    pipx run --spec rich rich.json FILE
+
 
 Low level output
 ----------------
