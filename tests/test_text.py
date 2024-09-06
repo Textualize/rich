@@ -1001,3 +1001,14 @@ def test_append_tokens() -> None:
     output = capture.get()
     print(repr(output))
     assert output == "long text that will be wrapped with a \ncontrol code \n\n"
+
+
+def test_append_loop_regression() -> None:
+    """Regression text for https://github.com/Textualize/rich/issues/3479"""
+    a = Text("one", "blue")
+    a.append(a)
+    assert a.plain == "oneone"
+
+    b = Text("two", "blue")
+    b.append_text(b)
+    assert b.plain == "twotwo"
