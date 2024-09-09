@@ -668,7 +668,10 @@ def test_attrs_broken_310() -> None:
     del foo.bar
     result = pretty_repr(foo)
     print(repr(result))
-    expected = "Foo(bar=AttributeError(\"'Foo' object has no attribute 'bar'\"))"
+    if sys.version_info >= (3, 13):
+        expected = "Foo(\n    bar=AttributeError(\"'tests.test_pretty.test_attrs_broken_310.<locals>.Foo' object has no attribute 'bar'\")\n)"
+    else:
+        expected = "Foo(bar=AttributeError(\"'Foo' object has no attribute 'bar'\"))"
     assert result == expected
 
 

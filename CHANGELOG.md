@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Added support for Python 3.13 https://github.com/Textualize/rich/pull/3481
 - Fixed infinite loop when appending Text to same instance https://github.com/Textualize/rich/pull/3480
 
 ## [13.8.0] - 2024-08-26
