@@ -767,7 +767,7 @@ class Traceback:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    install()
+    install(show_locals=True)
     import sys
 
     def bar(

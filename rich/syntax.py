@@ -221,7 +221,7 @@ class _SyntaxHighlightRange(NamedTuple):
     style: StyleType
     start: SyntaxPosition
     end: SyntaxPosition
-    before: bool = False
+    style_before: bool = False
 
 
 class Syntax(JupyterMixin):
@@ -793,7 +793,7 @@ class Syntax(JupyterMixin):
                 newlines_offsets, stylized_range.end
             )
             if start is not None and end is not None:
-                if stylized_range.before:
+                if stylized_range.style_before:
                     text.stylize_before(stylized_range.style, start, end)
                 else:
                     text.stylize(stylized_range.style, start, end)
