@@ -447,8 +447,7 @@ class Traceback:
 
                 last_instruction: Optional[Tuple[Tuple[int, int], Tuple[int, int]]]
                 last_instruction = None
-
-                if sys.version_info >= (3, 12):
+                if sys.version_info >= (3, 11):
                     try:
                         instruction_index = frame_summary.f_lasti // 2
                         instruction_position = next(
