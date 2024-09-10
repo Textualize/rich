@@ -181,7 +181,7 @@ class Frame:
     name: str
     line: str = ""
     locals: Optional[Dict[str, pretty.Node]] = None
-    last_instruction: Tuple[Tuple[int, int], Tuple[int, int]] | None = None
+    last_instruction: Optional[Tuple[Tuple[int, int], Tuple[int, int]]] = None
 
 
 @dataclass
