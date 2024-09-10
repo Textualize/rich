@@ -539,7 +539,7 @@ class Syntax(JupyterMixin):
         style: StyleType,
         start: SyntaxPosition,
         end: SyntaxPosition,
-        before: bool = False,
+        style_before: bool = False,
     ) -> None:
         """
         Adds a custom style on a part of the code, that will be applied to the syntax display when it's rendered.
@@ -549,8 +549,11 @@ class Syntax(JupyterMixin):
             style (StyleType): The style to apply.
             start (Tuple[int, int]): The start of the range, in the form `[line number, column index]`.
             end (Tuple[int, int]): The end of the range, in the form `[line number, column index]`.
+            style_before (bool): Apply the style before any existing styles.
         """
-        self._stylized_ranges.append(_SyntaxHighlightRange(style, start, end, before))
+        self._stylized_ranges.append(
+            _SyntaxHighlightRange(style, start, end, style_before)
+        )
 
     def _get_line_numbers_color(self, blend: float = 0.3) -> Color:
         background_style = self._theme.get_background_style() + self.background_style

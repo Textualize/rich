@@ -751,7 +751,7 @@ class Traceback:
                             style="traceback.error_range",
                             start=start,
                             end=end,
-                            before=True,
+                            style_before=True,
                         )
                     yield (
                         Columns(
