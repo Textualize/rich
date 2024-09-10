@@ -1,3 +1,4 @@
+import inspect
 import linecache
 import os
 import sys
@@ -448,27 +449,26 @@ class Traceback:
                 last_instruction: Optional[Tuple[Tuple[int, int], Tuple[int, int]]]
                 last_instruction = None
                 if sys.version_info >= (3, 11):
-                    try:
-                        instruction_index = frame_summary.f_lasti // 2
-                        instruction_position = next(
-                            islice(
-                                frame_summary.f_code.co_positions(),
-                                instruction_index,
-                                instruction_index + 1,
-                            )
+                    instruction_index = frame_summary.f_lasti // 2
+                    instruction_position = next(
+                        islice(
+                            frame_summary.f_code.co_positions(),
+                            instruction_index,
+                            instruction_index + 1,
                         )
-                    except Exception:
-                        pass
-                    else:
-                        if not any(
-                            position is None for position in instruction_position
-                        ):
-                            (
-                                start_line,
-                                end_line,
-                                start_column,
-                                end_column,
-                            ) = instruction_position
+                    )
+                    (
+                        start_line,
+                        end_line,
+                        start_column,
+                        end_column,
+                    ) = instruction_position
+                    if (
+                        start_line is not None
+                        and end_line is not None
+                        and start_column is not None
+                        and end_column is not None
+                    ):
                         last_instruction = (
                             (start_line, start_column),
                             (end_line, end_column),
@@ -492,6 +492,7 @@ class Traceback:
                                 max_string=locals_max_string,
                             )
                             for key, value in get_locals(frame_summary.f_locals.items())
+                            if not (inspect.isfunction(value) or inspect.isclass(value))
                         }
                         if show_locals
                         else None
