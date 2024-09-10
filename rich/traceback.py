@@ -2,6 +2,7 @@ import linecache
 import os
 import sys
 from dataclasses import dataclass, field
+from itertools import islice
 from traceback import walk_tb
 from types import ModuleType, TracebackType
 from typing import (
@@ -179,6 +180,7 @@ class Frame:
     name: str
     line: str = ""
     locals: Optional[Dict[str, pretty.Node]] = None
+    last_instruction: tuple[tuple[int, int], tuple[int, int]] | None = None
 
 
 @dataclass
@@ -442,6 +444,35 @@ class Traceback:
 
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
+
+                last_instruction: tuple[tuple[int, int], tuple[int, int]] | None = None
+                if hasattr(frame_summary, "f_lasti"):
+                    try:
+                        instruction_index = frame_summary.f_lasti // 2
+                        instruction_position = next(
+                            islice(
+                                frame_summary.f_code.co_positions(),
+                                instruction_index,
+                                instruction_index + 1,
+                            )
+                        )
+                    except Exception:
+                        pass
+                    else:
+                        if not any(
+                            position is None for position in instruction_position
+                        ):
+                            (
+                                start_line,
+                                end_line,
+                                start_column,
+                                end_column,
+                            ) = instruction_position
+                        last_instruction = (
+                            (start_line, start_column),
+                            (end_line, end_column),
+                        )
+
                 if filename and not filename.startswith("<"):
                     if not os.path.isabs(filename):
                         filename = os.path.join(_IMPORT_CWD, filename)
@@ -452,16 +483,19 @@ class Traceback:
                     filename=filename or "?",
                     lineno=line_no,
                     name=frame_summary.f_code.co_name,
-                    locals={
-                        key: pretty.traverse(
-                            value,
-                            max_length=locals_max_length,
-                            max_string=locals_max_string,
-                        )
-                        for key, value in get_locals(frame_summary.f_locals.items())
-                    }
-                    if show_locals
-                    else None,
+                    locals=(
+                        {
+                            key: pretty.traverse(
+                                value,
+                                max_length=locals_max_length,
+                                max_string=locals_max_string,
+                            )
+                            for key, value in get_locals(frame_summary.f_locals.items())
+                        }
+                        if show_locals
+                        else None
+                    ),
+                    last_instruction=last_instruction,
                 )
                 append(frame)
                 if frame_summary.f_locals.get("_rich_traceback_guard", False):
@@ -711,6 +745,14 @@ class Traceback:
                         (f"\n{error}", "traceback.error"),
                     )
                 else:
+                    if frame.last_instruction is not None:
+                        start, end = frame.last_instruction
+                        syntax.stylize_range(
+                            style="traceback.error_range",
+                            start=start,
+                            end=end,
+                            before=True,
+                        )
                     yield (
                         Columns(
                             [
@@ -725,12 +767,12 @@ class Traceback:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from .console import Console
-
-    console = Console()
+    install()
     import sys
 
-    def bar(a: Any) -> None:  # 这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑
+    def bar(
+        a: Any,
+    ) -> None:  # 这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑
         one = 1
         print(one / a)
 
@@ -748,12 +790,6 @@ if __name__ == "__main__":  # pragma: no cover
         bar(a)
 
     def error() -> None:
-        try:
-            try:
-                foo(0)
-            except:
-                slfkjsldkfj  # type: ignore[name-defined]
-        except:
-            console.print_exception(show_locals=True)
+        foo(0)
 
     error()
