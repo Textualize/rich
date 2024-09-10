@@ -180,7 +180,7 @@ class Frame:
     name: str
     line: str = ""
     locals: Optional[Dict[str, pretty.Node]] = None
-    last_instruction: tuple[tuple[int, int], tuple[int, int]] | None = None
+    last_instruction: Tuple[Tuple[int, int], Tuple[int, int]] | None = None
 
 
 @dataclass
@@ -445,8 +445,10 @@ class Traceback:
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
 
-                last_instruction: tuple[tuple[int, int], tuple[int, int]] | None = None
-                if hasattr(frame_summary, "f_lasti"):
+                last_instruction: Optional[Tuple[Tuple[int, int], Tuple[int, int]]]
+                last_instruction = None
+
+                if sys.version_info >= (3, 12):
                     try:
                         instruction_index = frame_summary.f_lasti // 2
                         instruction_position = next(
