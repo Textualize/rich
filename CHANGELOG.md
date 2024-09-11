@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Rich will display tracebacks with finely grained error locations on python 3.12+ https://github.com/Textualize/rich/pull/3486
+- Rich will display tracebacks with finely grained error locations on python 3.11+ https://github.com/Textualize/rich/pull/3486
 
 ## [13.8.1] - 2024-09-10
 
