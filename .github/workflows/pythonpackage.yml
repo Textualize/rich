@@ -10,10 +10,8 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        include:
-          - { os: ubuntu-latest, python-version: "3.7" }
-          - { os: windows-latest, python-version: "3.7" }
-          - { os: macos-12, python-version: "3.7" }
+        exclude:
+          - { os: windows-latest, python-version: "3.13" }
     defaults:
       run:
         shell: bash
