@@ -87,3 +87,4 @@ The following people have contributed to the development of Rich:
 - [Bernhard Wagner](https://github.com/bwagner)
 - [Aaron Beaudoin](https://github.com/AaronBeaudoin)
 - [Jonathan Helmus](https://github.com/jjhelmus)
+- [Marco Cattani](https://github.com/cattanimarco)
