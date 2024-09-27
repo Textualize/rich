@@ -40,7 +40,7 @@ class RichHandler(Handler):
         tracebacks_extra_lines (int, optional): Additional lines of code to render tracebacks, or None for full width. Defaults to None.
         tracebacks_theme (str, optional): Override pygments theme used in traceback.
         tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to True.
-        tracebacks_show_locals (bool, optional): Enable display of locals in tracebacks. Defaults to False.
+        tracebacks_show_locals (bool or int, optional): Enable display of locals in tracebacks. Defaults to False. If set to an integer, it limits the number of frames prioritizing frames closest to the error.
         tracebacks_suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
         tracebacks_max_frames (int, optional): Optional maximum number of frames returned by traceback.
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
@@ -80,7 +80,7 @@ class RichHandler(Handler):
         tracebacks_extra_lines: int = 3,
         tracebacks_theme: Optional[str] = None,
         tracebacks_word_wrap: bool = True,
-        tracebacks_show_locals: bool = False,
+        tracebacks_show_locals: Union[bool, int] = False,
         tracebacks_suppress: Iterable[Union[str, ModuleType]] = (),
         tracebacks_max_frames: int = 100,
         locals_max_length: int = 10,
