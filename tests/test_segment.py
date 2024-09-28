@@ -292,6 +292,25 @@ def test_split_cells_mixed() -> None:
     for position in range(1, test.cell_length):
         left, right = Segment.split_cells(test, position)
         assert cell_len(left.text) == position
+        assert cell_len(right.text) == test.cell_length - position
+
+
+def test_split_cells_doubles() -> None:
+    """Check that split cells splits on cell positions with all double width characters."""
+    test = Segment("早" * 20)
+    for position in range(1, test.cell_length):
+        left, right = Segment.split_cells(test, position)
+        assert cell_len(left.text) == position
+        assert cell_len(right.text) == test.cell_length - position
+
+
+def test_split_cells_single() -> None:
+    """Check that split cells splits on cell positions with all single width characters."""
+    test = Segment("A" * 20)
+    for position in range(1, test.cell_length):
+        left, right = Segment.split_cells(test, position)
+        assert cell_len(left.text) == position
+        assert cell_len(right.text) == test.cell_length - position
 
 
 def test_segment_lines_renderable():
