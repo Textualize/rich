@@ -129,7 +129,7 @@ class Segment(NamedTuple):
 
         cell_size = get_character_cell_size
 
-        pos = int((cut / cell_length) * (len(text) - 1)) - 1
+        pos = int((cut / cell_length) * (len(text))) - 1
         if pos < 0:
             pos = 0
 
