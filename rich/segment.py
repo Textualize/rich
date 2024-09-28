@@ -111,6 +111,13 @@ class Segment(NamedTuple):
     def _split_cells(cls, segment: "Segment", cut: int) -> Tuple["Segment", "Segment"]:
         """Split a segment in to two at a given cell position.
 
+        Note that splitting a double-width character, may result in that character turning
+        into two spaces.
+
+        Args:
+            segment (Segment): A segment to split.
+            cut (int): A cell position to cut on.
+
         Returns:
             A tuple of two segments.
         """
