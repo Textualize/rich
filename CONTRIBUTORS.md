@@ -87,6 +87,7 @@ The following people have contributed to the development of Rich:
 - [Pierro](https://github.com/xpierroz)
 - [Bernhard Wagner](https://github.com/bwagner)
 - [Aaron Beaudoin](https://github.com/AaronBeaudoin)
+- [Sam Woodward](https://github.com/PyWoody)
 - [L. Yeung](https://github.com/lewis-yeung)
 - [chthollyphile](https://github.com/chthollyphile)
 - [Jonathan Helmus](https://github.com/jjhelmus)
