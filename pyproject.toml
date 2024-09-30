@@ -63,6 +63,7 @@ enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 module = ["pygments.*", "IPython.*", "ipywidgets.*"]
 ignore_missing_imports = true
 
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 

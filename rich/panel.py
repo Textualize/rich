@@ -203,6 +203,8 @@ class Panel(JupyterMixin):
 
         title_text = self._title
         if title_text is not None:
+            if title_text.style is not None:
+                title_text.stylize_before(title_text.style)
             title_text.stylize_before(partial_border_style)
 
         child_width = (
