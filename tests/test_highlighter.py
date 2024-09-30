@@ -134,6 +134,7 @@ highlight_tests = [
     (" http://example.org ", [Span(1, 19, "repr.url")]),
     (" http://example.org/index.html ", [Span(1, 30, "repr.url")]),
     (" http://example.org/index.html#anchor ", [Span(1, 37, "repr.url")]),
+    ("https://www.youtube.com/@LinusTechTips", [Span(0, 38, "repr.url")]),
     (
         " http://example.org/index.html?param1=value1 ",
         [

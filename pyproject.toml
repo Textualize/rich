@@ -2,7 +2,7 @@
 name = "rich"
 homepage = "https://github.com/Textualize/rich"
 documentation = "https://rich.readthedocs.io/en/latest/"
-version = "13.7.1"
+version = "13.8.1"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"
@@ -21,6 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
 include = ["rich/py.typed"]
@@ -56,6 +57,7 @@ files = ["rich"]
 show_error_codes = true
 strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+
 
 [[tool.mypy.overrides]]
 module = ["pygments.*", "IPython.*", "ipywidgets.*"]

@@ -1,5 +1,4 @@
 import os.path
-import platform
 import re
 import sys
 import textwrap
@@ -52,7 +51,7 @@ from .text import Text
 
 TokenType = Tuple[str, ...]
 
-WINDOWS = platform.system() == "Windows"
+WINDOWS = sys.platform == "win32"
 DEFAULT_THEME = "monokai"
 
 # The following styles are based on https://github.com/pygments/pygments/blob/master/pygments/formatters/terminal.py
@@ -222,6 +221,7 @@ class _SyntaxHighlightRange(NamedTuple):
     style: StyleType
     start: SyntaxPosition
     end: SyntaxPosition
+    style_before: bool = False
 
 
 class Syntax(JupyterMixin):
@@ -535,7 +535,11 @@ class Syntax(JupyterMixin):
         return text
 
     def stylize_range(
-        self, style: StyleType, start: SyntaxPosition, end: SyntaxPosition
+        self,
+        style: StyleType,
+        start: SyntaxPosition,
+        end: SyntaxPosition,
+        style_before: bool = False,
     ) -> None:
         """
         Adds a custom style on a part of the code, that will be applied to the syntax display when it's rendered.
@@ -545,8 +549,11 @@ class Syntax(JupyterMixin):
             style (StyleType): The style to apply.
             start (Tuple[int, int]): The start of the range, in the form `[line number, column index]`.
             end (Tuple[int, int]): The end of the range, in the form `[line number, column index]`.
+            style_before (bool): Apply the style before any existing styles.
         """
-        self._stylized_ranges.append(_SyntaxHighlightRange(style, start, end))
+        self._stylized_ranges.append(
+            _SyntaxHighlightRange(style, start, end, style_before)
+        )
 
     def _get_line_numbers_color(self, blend: float = 0.3) -> Color:
         background_style = self._theme.get_background_style() + self.background_style
@@ -620,9 +627,7 @@ class Syntax(JupyterMixin):
     ) -> RenderResult:
         segments = Segments(self._get_syntax(console, options))
         if self.padding:
-            yield Padding(
-                segments, style=self._theme.get_background_style(), pad=self.padding
-            )
+            yield Padding(segments, style=self._get_base_style(), pad=self.padding)
         else:
             yield segments
 
@@ -788,7 +793,10 @@ class Syntax(JupyterMixin):
                 newlines_offsets, stylized_range.end
             )
             if start is not None and end is not None:
-                text.stylize(stylized_range.style, start, end)
+                if stylized_range.style_before:
+                    text.stylize_before(stylized_range.style, start, end)
+                else:
+                    text.stylize(stylized_range.style, start, end)
 
     def _process_code(self, code: str) -> Tuple[bool, str]:
         """

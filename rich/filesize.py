@@ -1,4 +1,3 @@
-# coding: utf-8
 """Functions for reporting filesizes. Borrowed from https://github.com/PyFilesystem/pyfilesystem2
 
 The functions declared in this module should cover the different
@@ -27,7 +26,7 @@ def _to_str(
     if size == 1:
         return "1 byte"
     elif size < base:
-        return "{:,} bytes".format(size)
+        return f"{size:,} bytes"
 
     for i, suffix in enumerate(suffixes, 2):  # noqa: B007
         unit = base**i
