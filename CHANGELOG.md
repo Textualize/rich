@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed issue with Segment._split_cells https://github.com/Textualize/rich/pull/3506
 
+### Added
+
+- Add a new `column` object `IterationSpeedColumn`. https://github.com/Textualize/rich/pull/3332
+
 ## [13.8.1] - 2024-09-10
 
 ### Fixed
