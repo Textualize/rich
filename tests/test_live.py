@@ -22,7 +22,6 @@ def create_capture_console(
 
 
 def test_live_state() -> None:
-
     with Live("") as live:
         assert live._started
         live.start()

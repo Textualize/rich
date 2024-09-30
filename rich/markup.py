@@ -113,7 +113,10 @@ def render(
 
     Args:
         markup (str): A string containing console markup.
+        style: (Union[str, Style]): The style to use.
         emoji (bool, optional): Also render emoji code. Defaults to True.
+        emoji_variant (str, optional): Optional emoji variant, either "text" or "emoji". Defaults to None.
+
 
     Raises:
         MarkupError: If there is a syntax error in the markup.

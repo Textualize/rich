@@ -1,10 +1,9 @@
-from __future__ import absolute_import
-
+import inspect
 import linecache
 import os
-import platform
 import sys
 from dataclasses import dataclass, field
+from itertools import islice
 from traceback import walk_tb
 from types import ModuleType, TracebackType
 from typing import (
@@ -39,7 +38,7 @@ from .syntax import Syntax
 from .text import Text
 from .theme import Theme
 
-WINDOWS = platform.system() == "Windows"
+WINDOWS = sys.platform == "win32"
 
 LOCALS_MAX_LENGTH = 10
 LOCALS_MAX_STRING = 80
@@ -49,6 +48,7 @@ def install(
     *,
     console: Optional[Console] = None,
     width: Optional[int] = 100,
+    code_width: Optional[int] = 88,
     extra_lines: int = 3,
     theme: Optional[str] = None,
     word_wrap: bool = False,
@@ -69,6 +69,7 @@ def install(
     Args:
         console (Optional[Console], optional): Console to write exception to. Default uses internal Console instance.
         width (Optional[int], optional): Width (in characters) of traceback. Defaults to 100.
+        code_width (Optional[int], optional): Code width (in characters) of traceback. Defaults to 88.
         extra_lines (int, optional): Extra lines of code. Defaults to 3.
         theme (Optional[str], optional): Pygments theme to use in traceback. Defaults to ``None`` which will pick
             a theme appropriate for the platform.
@@ -105,6 +106,7 @@ def install(
                 value,
                 traceback,
                 width=width,
+                code_width=code_width,
                 extra_lines=extra_lines,
                 theme=theme,
                 word_wrap=word_wrap,
@@ -179,6 +181,7 @@ class Frame:
     name: str
     line: str = ""
     locals: Optional[Dict[str, pretty.Node]] = None
+    last_instruction: Optional[Tuple[Tuple[int, int], Tuple[int, int]]] = None
 
 
 @dataclass
@@ -215,6 +218,7 @@ class Traceback:
         trace (Trace, optional): A `Trace` object produced from `extract`. Defaults to None, which uses
             the last exception.
         width (Optional[int], optional): Number of characters used to traceback. Defaults to 100.
+        code_width (Optional[int], optional): Number of code characters used to traceback. Defaults to 88.
         extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
         theme (str, optional): Override pygments theme used in traceback.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
@@ -243,6 +247,7 @@ class Traceback:
         trace: Optional[Trace] = None,
         *,
         width: Optional[int] = 100,
+        code_width: Optional[int] = 88,
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
@@ -266,6 +271,7 @@ class Traceback:
             )
         self.trace = trace
         self.width = width
+        self.code_width = code_width
         self.extra_lines = extra_lines
         self.theme = Syntax.get_theme(theme or "ansi_dark")
         self.word_wrap = word_wrap
@@ -297,6 +303,7 @@ class Traceback:
         traceback: Optional[TracebackType],
         *,
         width: Optional[int] = 100,
+        code_width: Optional[int] = 88,
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
@@ -316,6 +323,7 @@ class Traceback:
             exc_value (BaseException): Exception value.
             traceback (TracebackType): Python Traceback object.
             width (Optional[int], optional): Number of characters used to traceback. Defaults to 100.
+            code_width (Optional[int], optional): Number of code characters used to traceback. Defaults to 88.
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
             theme (str, optional): Override pygments theme used in traceback.
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
@@ -346,6 +354,7 @@ class Traceback:
         return cls(
             rich_traceback,
             width=width,
+            code_width=code_width,
             extra_lines=extra_lines,
             theme=theme,
             word_wrap=word_wrap,
@@ -436,6 +445,35 @@ class Traceback:
 
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
+
+                last_instruction: Optional[Tuple[Tuple[int, int], Tuple[int, int]]]
+                last_instruction = None
+                if sys.version_info >= (3, 11):
+                    instruction_index = frame_summary.f_lasti // 2
+                    instruction_position = next(
+                        islice(
+                            frame_summary.f_code.co_positions(),
+                            instruction_index,
+                            instruction_index + 1,
+                        )
+                    )
+                    (
+                        start_line,
+                        end_line,
+                        start_column,
+                        end_column,
+                    ) = instruction_position
+                    if (
+                        start_line is not None
+                        and end_line is not None
+                        and start_column is not None
+                        and end_column is not None
+                    ):
+                        last_instruction = (
+                            (start_line, start_column),
+                            (end_line, end_column),
+                        )
+
                 if filename and not filename.startswith("<"):
                     if not os.path.isabs(filename):
                         filename = os.path.join(_IMPORT_CWD, filename)
@@ -446,16 +484,20 @@ class Traceback:
                     filename=filename or "?",
                     lineno=line_no,
                     name=frame_summary.f_code.co_name,
-                    locals={
-                        key: pretty.traverse(
-                            value,
-                            max_length=locals_max_length,
-                            max_string=locals_max_string,
-                        )
-                        for key, value in get_locals(frame_summary.f_locals.items())
-                    }
-                    if show_locals
-                    else None,
+                    locals=(
+                        {
+                            key: pretty.traverse(
+                                value,
+                                max_length=locals_max_length,
+                                max_string=locals_max_string,
+                            )
+                            for key, value in get_locals(frame_summary.f_locals.items())
+                            if not (inspect.isfunction(value) or inspect.isclass(value))
+                        }
+                        if show_locals
+                        else None
+                    ),
+                    last_instruction=last_instruction,
                 )
                 append(frame)
                 if frame_summary.f_locals.get("_rich_traceback_guard", False):
@@ -636,7 +678,6 @@ class Traceback:
 
         excluded = False
         for frame_index, frame in enumerate(stack.frames):
-
             if exclude_frames and frame_index in exclude_frames:
                 excluded = True
                 continue
@@ -696,7 +737,7 @@ class Traceback:
                         ),
                         highlight_lines={frame.lineno},
                         word_wrap=self.word_wrap,
-                        code_width=88,
+                        code_width=self.code_width,
                         indent_guides=self.indent_guides,
                         dedent=False,
                     )
@@ -706,6 +747,14 @@ class Traceback:
                         (f"\n{error}", "traceback.error"),
                     )
                 else:
+                    if frame.last_instruction is not None:
+                        start, end = frame.last_instruction
+                        syntax.stylize_range(
+                            style="traceback.error_range",
+                            start=start,
+                            end=end,
+                            style_before=True,
+                        )
                     yield (
                         Columns(
                             [
@@ -720,13 +769,12 @@ class Traceback:
 
 
 if __name__ == "__main__":  # pragma: no cover
-
-    from .console import Console
-
-    console = Console()
+    install(show_locals=True)
     import sys
 
-    def bar(a: Any) -> None:  # 这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑
+    def bar(
+        a: Any,
+    ) -> None:  # 这是对亚洲语言支持的测试。面对模棱两可的想法，拒绝猜测的诱惑
         one = 1
         print(one / a)
 
@@ -744,13 +792,6 @@ if __name__ == "__main__":  # pragma: no cover
         bar(a)
 
     def error() -> None:
-
-        try:
-            try:
-                foo(0)
-            except:
-                slfkjsldkfj  # type: ignore[name-defined]
-        except:
-            console.print_exception(show_locals=True)
+        foo(0)
 
     error()

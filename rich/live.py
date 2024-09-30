@@ -37,7 +37,7 @@ class Live(JupyterMixin, RenderHook):
 
     Args:
         renderable (RenderableType, optional): The renderable to live display. Defaults to displaying nothing.
-        console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
+        console (Console, optional): Optional Console instance. Defaults to an internal Console instance writing to stdout.
         screen (bool, optional): Enable alternate screen mode. Defaults to False.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()` or `update()` with refresh flag. Defaults to True
         refresh_per_second (float, optional): Number of times per second to refresh the live display. Defaults to 4.
@@ -362,7 +362,7 @@ if __name__ == "__main__":  # pragma: no cover
                 table.add_column("Destination Currency")
                 table.add_column("Exchange Rate")
 
-                for ((source, dest), exchange_rate) in exchange_rate_dict.items():
+                for (source, dest), exchange_rate in exchange_rate_dict.items():
                     table.add_row(
                         source,
                         dest,

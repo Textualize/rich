@@ -1,5 +1,5 @@
-import platform
 import re
+import sys
 from colorsys import rgb_to_hls
 from enum import IntEnum
 from functools import lru_cache
@@ -15,7 +15,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from .text import Text
 
 
-WINDOWS = platform.system() == "Windows"
+WINDOWS = sys.platform == "win32"
 
 
 class ColorSystem(IntEnum):
@@ -592,7 +592,6 @@ def blend_rgb(
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     from .console import Console
     from .table import Table
     from .text import Text

@@ -55,10 +55,38 @@ Here's a simple example::
 The ``total`` value associated with a task is the number of steps that must be completed for the progress to reach 100%. A *step* in this context is whatever makes sense for your application; it could be number of bytes of a file read, or number of images processed, etc.
 
 
+Starting and stopping
+~~~~~~~~~~~~~~~~~~~~~
+
+The context manager is recommended if you can use it. If you don't use the context manager, be sure to call :meth:`~rich.progress.Progress.start` to start the progress display, and :meth:`~rich.progress.Progress.stop` to stop it.
+
+Here's an example that doesn't use the context manager::
+
+    import time
+
+    from rich.progress import Progress
+
+    progress = Progress()
+    progress.start()
+    try:
+        task1 = progress.add_task("[red]Downloading...", total=1000)
+        task2 = progress.add_task("[green]Processing...", total=1000)
+        task3 = progress.add_task("[cyan]Cooking...", total=1000)
+
+        while not progress.finished:
+            progress.update(task1, advance=0.5)
+            progress.update(task2, advance=0.3)
+            progress.update(task3, advance=0.9)
+            time.sleep(0.02)
+    finally:
+        progress.stop()
+
+Note the use of the try / finally, to ensure that ``stop()`` is called.
+
 Updating tasks
 ~~~~~~~~~~~~~~
 
-When you call :meth:`~rich.progress.Progress.add_task` you get back a `Task ID`. Use this ID to call :meth:`~rich.progress.Progress.update` whenever you have completed some work, or any information has changed. Typically you will need to update ``completed`` every time you have completed a step. You can do this by updated ``completed`` directly or by setting ``advance`` which will add to the current ``completed`` value.
+When you call :meth:`~rich.progress.Progress.add_task` you get back a `Task ID`. Use this ID to call :meth:`~rich.progress.Progress.update` whenever you have completed some work, or any information has changed. Typically you will need to update ``completed`` every time you have completed a step. You can do this by setting ``completed`` directly or by setting ``advance`` which will add to the current ``completed`` value.
 
 The :meth:`~rich.progress.Progress.update` method collects keyword arguments which are also associated with the task. Use this to supply any additional information you would like to render in the progress display. The additional arguments are stored in ``task.fields`` and may be referenced in :ref:`Column classes<Columns>`.
 
@@ -103,7 +131,7 @@ Columns
 
 You may customize the columns in the progress display with the positional arguments to the :class:`~rich.progress.Progress` constructor. The columns are specified as either a `format string <https://docs.python.org/3/library/string.html#formatspec>`_ or a :class:`~rich.progress.ProgressColumn` object.
 
-Format strings will be rendered with a single value `"task"` which will be a :class:`~rich.progress.Task` instance. For example ``"{task.description}"`` would display the task description in the column, and ``"{task.completed} of {task.total}"`` would display how many of the total steps have been completed. Additional fields passed via keyword arguments to `~rich.progress.Progress.update` are store in ``task.fields``. You can add them to a format string with the following syntax: ``"extra info: {task.fields[extra]}"``.
+Format strings will be rendered with a single value `"task"` which will be a :class:`~rich.progress.Task` instance. For example ``"{task.description}"`` would display the task description in the column, and ``"{task.completed} of {task.total}"`` would display how many of the total steps have been completed. Additional fields passed via keyword arguments to `~rich.progress.Progress.update` are stored in ``task.fields``. You can add them to a format string with the following syntax: ``"extra info: {task.fields[extra]}"``.
 
 The default columns are equivalent to the following::
 
@@ -234,7 +262,7 @@ Here's an example that reads a url from the internet::
 
 If you expect to be reading from multiple files, you can use :meth:`~rich.progress.Progress.open` or :meth:`~rich.progress.Progress.wrap_file` to add a file progress to an existing Progress instance.
 
-See `cp_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/cp_progress.py>` for a minimal clone of the ``cp`` command which shows a progress bar as the file is copied.
+See `cp_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/cp_progress.py>`_ for a minimal clone of the ``cp`` command which shows a progress bar as the file is copied.
 
 
 Multiple Progress

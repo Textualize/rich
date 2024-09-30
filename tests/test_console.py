@@ -1,6 +1,7 @@
 import datetime
 import io
 import os
+import subprocess
 import sys
 import tempfile
 from typing import Optional, Tuple, Type, Union
@@ -380,23 +381,6 @@ def test_capture():
     assert capture.get() == "Hello\n"
 
 
-def test_capture_and_record(capsys):
-    recorder = Console(record=True)
-    recorder.print("ABC")
-
-    with recorder.capture() as capture:
-        recorder.print("Hello")
-
-    assert capture.get() == "Hello\n"
-
-    recorded_text = recorder.export_text()
-    out, err = capsys.readouterr()
-
-    assert recorded_text == "ABC\nHello\n"
-    assert capture.get() == "Hello\n"
-    assert out == "ABC\n"
-
-
 def test_input(monkeypatch, capsys):
     def fake_input(prompt=""):
         console.file.write(prompt)
@@ -529,7 +513,7 @@ def test_export_html():
     console.print("[b]foo <script> 'test' [link=https://example.org]Click[/link]")
     html = console.export_html()
     print(repr(html))
-    expected = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<style>\n.r1 {font-weight: bold}\n.r2 {color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold}\n.r3 {color: #008000; text-decoration-color: #008000; font-weight: bold}\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><code><span class="r1">foo &lt;</span><span class="r2">script</span><span class="r1">&gt; </span><span class="r3">&#x27;test&#x27;</span><span class="r1"> </span><a class="r1" href="https://example.org">Click</a>\n</code></pre>\n</body>\n</html>\n'
+    expected = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<style>\n.r1 {font-weight: bold}\n.r2 {color: #ff00ff; text-decoration-color: #ff00ff; font-weight: bold}\n.r3 {color: #008000; text-decoration-color: #008000; font-weight: bold}\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><code style="font-family:inherit"><span class="r1">foo &lt;</span><span class="r2">script</span><span class="r1">&gt; </span><span class="r3">&#x27;test&#x27;</span><span class="r1"> </span><a class="r1" href="https://example.org">Click</a>\n</code></pre>\n</body>\n</html>\n'
     assert html == expected
 
 
@@ -538,7 +522,7 @@ def test_export_html_inline():
     console.print("[b]foo [link=https://example.org]Click[/link]")
     html = console.export_html(inline_styles=True)
     print(repr(html))
-    expected = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><code><span style="font-weight: bold">foo </span><span style="font-weight: bold"><a href="https://example.org">Click</a></span>\n</code></pre>\n</body>\n</html>\n'
+    expected = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><code style="font-family:inherit"><span style="font-weight: bold">foo </span><span style="font-weight: bold"><a href="https://example.org">Click</a></span>\n</code></pre>\n</body>\n</html>\n'
     assert html == expected
 
 
@@ -591,7 +575,7 @@ def test_save_text():
 
 
 def test_save_html():
-    expected = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<body>\n    <pre style=\"font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace\"><code>foo\n</code></pre>\n</body>\n</html>\n"
+    expected = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><code style="font-family:inherit">foo\n</code></pre>\n</body>\n</html>\n'
     console = Console(record=True, width=100)
     console.print("foo")
     with tempfile.TemporaryDirectory() as path:
@@ -991,3 +975,70 @@ def test_force_color():
         },
     )
     assert console.color_system in ("truecolor", "windows")
+
+
+def test_reenable_highlighting() -> None:
+    """Check that when highlighting is disabled, it can be reenabled in print()"""
+    console = Console(
+        file=io.StringIO(),
+        _environ={
+            "FORCE_COLOR": "1",
+            "TERM": "xterm-256color",
+            "COLORTERM": "truecolor",
+        },
+        highlight=False,
+    )
+    console.print("[1, 2, 3]")
+    console.print("[1, 2, 3]", highlight=True)
+    output = console.file.getvalue()
+    lines = output.splitlines()
+    print(repr(lines))
+    # First line not highlighted
+    assert lines[0] == "[1, 2, 3]"
+    # Second line highlighted
+
+    assert (
+        lines[1]
+        == "\x1b[1m[\x1b[0m\x1b[1;36m1\x1b[0m, \x1b[1;36m2\x1b[0m, \x1b[1;36m3\x1b[0m\x1b[1m]\x1b[0m"
+    )
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
+def test_brokenpipeerror() -> None:
+    """Test BrokenPipe works as expected."""
+    which_py, which_head = (["which", cmd] for cmd in ("python", "head"))
+    rich_cmd = "python -m rich".split()
+    for cmd in [which_py, which_head, rich_cmd]:
+        check = subprocess.run(cmd).returncode
+        if check != 0:
+            return  # Only test on suitable Unix platforms
+    head_cmd = "head -1".split()
+    proc1 = subprocess.Popen(rich_cmd, stdout=subprocess.PIPE)
+    proc2 = subprocess.Popen(head_cmd, stdin=proc1.stdout, stdout=subprocess.PIPE)
+    proc1.stdout.close()
+    output, _ = proc2.communicate()
+    proc1.wait()
+    proc2.wait()
+    assert proc1.returncode == 1
+    assert proc2.returncode == 0
+
+
+def test_capture_and_record() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/2563"""
+
+    console = Console(record=True)
+    print("Before Capture started:")
+    console.print("[blue underline]Print 0")
+    with console.capture() as capture:
+        console.print("[blue underline]Print 1")
+        console.print("[blue underline]Print 2")
+        console.print("[blue underline]Print 3")
+        console.print("[blue underline]Print 4")
+
+    capture_content = capture.get()
+    print(repr(capture_content))
+    assert capture_content == "Print 1\nPrint 2\nPrint 3\nPrint 4\n"
+
+    recorded_content = console.export_text()
+    print(repr(recorded_content))
+    assert recorded_content == "Print 0\n"

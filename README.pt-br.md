@@ -354,7 +354,7 @@ O screenshot a seguir é do resultado do [exemplo de colunas](https://github.com
 
 O Rich pode renderizar [markdown](https://rich.readthedocs.io/en/latest/markdown.html) e faz um bom trabalho de conversão do formato para o terminal.
 
-Para renderizar markdowm, importe a classe `Markdown` e instancie com a string que contém o código markdown. Depois, imprima o objeto no console. Por exemplo:
+Para renderizar markdown, importe a classe `Markdown` e instancie com a string que contém o código markdown. Depois, imprima o objeto no console. Por exemplo:
 
 ```python
 from rich.console import Console

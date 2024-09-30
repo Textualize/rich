@@ -108,7 +108,7 @@ class ProgressBar(JupyterMixin):
 
         for index in range(PULSE_SIZE):
             position = index / PULSE_SIZE
-            fade = 0.5 + cos((position * pi * 2)) / 2.0
+            fade = 0.5 + cos(position * pi * 2) / 2.0
             color = blend_rgb(fore_color, back_color, cross_fade=fade)
             append(_Segment(bar, _Style(color=from_triplet(color))))
         return segments
@@ -156,7 +156,6 @@ class ProgressBar(JupyterMixin):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-
         width = min(self.width or options.max_width, options.max_width)
         ascii = options.legacy_windows or options.ascii_only
         should_pulse = self.pulse or self.total is None

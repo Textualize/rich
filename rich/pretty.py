@@ -3,6 +3,7 @@ import collections
 import dataclasses
 import inspect
 import os
+import reprlib
 import sys
 from array import array
 from collections import Counter, UserDict, UserList, defaultdict, deque
@@ -15,6 +16,7 @@ from typing import (
     Any,
     Callable,
     DefaultDict,
+    Deque,
     Dict,
     Iterable,
     List,
@@ -77,7 +79,10 @@ def _is_dataclass_repr(obj: object) -> bool:
     # Digging in to a lot of internals here
     # Catching all exceptions in case something is missing on a non CPython implementation
     try:
-        return obj.__repr__.__code__.co_filename == dataclasses.__file__
+        return obj.__repr__.__code__.co_filename in (
+            dataclasses.__file__,
+            reprlib.__file__,
+        )
     except Exception:  # pragma: no coverage
         return False
 
@@ -130,17 +135,19 @@ def _ipy_display_hook(
         if _safe_isinstance(value, ConsoleRenderable):
             console.line()
         console.print(
-            value
-            if _safe_isinstance(value, RichRenderable)
-            else Pretty(
-                value,
-                overflow=overflow,
-                indent_guides=indent_guides,
-                max_length=max_length,
-                max_string=max_string,
-                max_depth=max_depth,
-                expand_all=expand_all,
-                margin=12,
+            (
+                value
+                if _safe_isinstance(value, RichRenderable)
+                else Pretty(
+                    value,
+                    overflow=overflow,
+                    indent_guides=indent_guides,
+                    max_length=max_length,
+                    max_string=max_string,
+                    max_depth=max_depth,
+                    expand_all=expand_all,
+                    margin=12,
+                )
             ),
             crop=crop,
             new_line_start=True,
@@ -196,16 +203,18 @@ def install(
             assert console is not None
             builtins._ = None  # type: ignore[attr-defined]
             console.print(
-                value
-                if _safe_isinstance(value, RichRenderable)
-                else Pretty(
-                    value,
-                    overflow=overflow,
-                    indent_guides=indent_guides,
-                    max_length=max_length,
-                    max_string=max_string,
-                    max_depth=max_depth,
-                    expand_all=expand_all,
+                (
+                    value
+                    if _safe_isinstance(value, RichRenderable)
+                    else Pretty(
+                        value,
+                        overflow=overflow,
+                        indent_guides=indent_guides,
+                        max_length=max_length,
+                        max_string=max_string,
+                        max_depth=max_depth,
+                        expand_all=expand_all,
+                    )
                 ),
                 crop=crop,
             )
@@ -353,6 +362,16 @@ def _get_braces_for_defaultdict(_object: DefaultDict[Any, Any]) -> Tuple[str, st
     )
 
 
+def _get_braces_for_deque(_object: Deque[Any]) -> Tuple[str, str, str]:
+    if _object.maxlen is None:
+        return ("deque([", "])", "deque()")
+    return (
+        "deque([",
+        f"], maxlen={_object.maxlen})",
+        f"deque(maxlen={_object.maxlen})",
+    )
+
+
 def _get_braces_for_array(_object: "array[Any]") -> Tuple[str, str, str]:
     return (f"array({_object.typecode!r}, [", "])", f"array({_object.typecode!r})")
 
@@ -362,7 +381,7 @@ _BRACES: Dict[type, Callable[[Any], Tuple[str, str, str]]] = {
     array: _get_braces_for_array,
     defaultdict: _get_braces_for_defaultdict,
     Counter: lambda _object: ("Counter({", "})", "Counter()"),
-    deque: lambda _object: ("deque([", "])", "deque()"),
+    deque: _get_braces_for_deque,
     dict: lambda _object: ("{", "}", "{}"),
     UserDict: lambda _object: ("{", "}", "{}"),
     frozenset: lambda _object: ("frozenset({", "})", "frozenset()"),
@@ -762,7 +781,9 @@ def traverse(
                 )
 
                 for last, field in loop_last(
-                    field for field in fields(obj) if field.repr
+                    field
+                    for field in fields(obj)
+                    if field.repr and hasattr(obj, field.name)
                 ):
                     child_node = _traverse(getattr(obj, field.name), depth=depth + 1)
                     child_node.key_repr = field.name
@@ -846,7 +867,7 @@ def traverse(
             pop_visited(obj_id)
         else:
             node = Node(value_repr=to_repr(obj), last=root)
-        node.is_tuple = _safe_isinstance(obj, tuple)
+        node.is_tuple = type(obj) == tuple
         node.is_namedtuple = _is_namedtuple(obj)
         return node
 
@@ -986,7 +1007,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     from rich import print
 
-    # print(Pretty(data, indent_guides=True, max_string=20))
+    print(Pretty(data, indent_guides=True, max_string=20))
 
     class Thing:
         def __repr__(self) -> str:

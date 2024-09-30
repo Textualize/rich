@@ -28,12 +28,12 @@ Alternatively, you can construct styled text by calling :meth:`~rich.text.Text.a
 
 If you would like to use text that is already formatted with ANSI codes, call :meth:`~rich.text.Text.from_ansi` to convert it to a ``Text`` object::
 
-    text = Text.from_ansi("\033[1mHello, World!\033[0m")
+    text = Text.from_ansi("\033[1;35mHello\033[0m, World!")
     console.print(text.spans)
 
-Since building Text instances from parts is a common requirement, Rich offers :meth:`~rich.text.Text.assemble` which will combine strings or pairs of string and Style, and return a Text instance. The follow example is equivalent to the code above::
+Since building Text instances from parts is a common requirement, Rich offers :meth:`~rich.text.Text.assemble` which will combine strings or pairs of string and Style, and return a Text instance. The following example is equivalent to the ANSI example above::
 
-    text = Text.assemble(("Hello", "bold magenta"), " World!")
+    text = Text.assemble(("Hello", "bold magenta"), ", World!")
     console.print(text)
 
 You can apply a style to given words in the text with :meth:`~rich.text.Text.highlight_words` or for ultimate control call :meth:`~rich.text.Text.highlight_regex` to highlight text matching a *regular expression*. 

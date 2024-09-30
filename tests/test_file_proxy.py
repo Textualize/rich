@@ -28,7 +28,6 @@ def test_flush():
 
 
 def test_new_lines():
-
     file = io.StringIO()
     console = Console(file=file)
     file_proxy = FileProxy(console, file)

@@ -11,7 +11,7 @@ jobs:
   send_notification:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Send notification to README Authors
       env:
         GITHUB_TOKEN: ${{ secrets.GHP_README_WORKFLOW }}

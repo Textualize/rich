@@ -2,7 +2,7 @@
 name = "rich"
 homepage = "https://github.com/Textualize/rich"
 documentation = "https://rich.readthedocs.io/en/latest/"
-version = "13.5.2"
+version = "13.8.1"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"
@@ -20,6 +20,8 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
 include = ["rich/py.typed"]
@@ -43,6 +45,7 @@ pytest-cov = "^3.0.0"
 attrs = "^21.4.0"
 pre-commit = "^2.17.0"
 asv = "^0.5.1"
+importlib-metadata = { version = "*", python = "<3.8" }
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -54,6 +57,7 @@ files = ["rich"]
 show_error_codes = true
 strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+
 
 [[tool.mypy.overrides]]
 module = ["pygments.*", "IPython.*", "ipywidgets.*"]

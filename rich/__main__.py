@@ -207,7 +207,6 @@ Supports much of the *markdown* __syntax__!
 
 
 if __name__ == "__main__":  # pragma: no cover
-
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
