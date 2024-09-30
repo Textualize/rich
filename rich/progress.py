@@ -39,10 +39,10 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Literal  # pragma: no cover
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
+if sys.version_info >= (3, 11):
     from typing import Self
+else:
+    from typing_extensions import Self  # pragma: no cover
 
 from . import filesize, get_console
 from .console import Console, Group, JustifyMethod, RenderableType
@@ -1175,7 +1175,7 @@ class Progress(JupyterMixin):
         if not self.console.is_interactive and not self.console.is_jupyter:
             self.console.print()
 
-    def __enter__(self) -> "Self":
+    def __enter__(self) -> Self:
         self.start()
         return self
 
