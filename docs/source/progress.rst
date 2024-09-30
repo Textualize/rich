@@ -131,7 +131,7 @@ Columns
 
 You may customize the columns in the progress display with the positional arguments to the :class:`~rich.progress.Progress` constructor. The columns are specified as either a `format string <https://docs.python.org/3/library/string.html#formatspec>`_ or a :class:`~rich.progress.ProgressColumn` object.
 
-Format strings will be rendered with a single value `"task"` which will be a :class:`~rich.progress.Task` instance. For example ``"{task.description}"`` would display the task description in the column, and ``"{task.completed} of {task.total}"`` would display how many of the total steps have been completed. Additional fields passed via keyword arguments to `~rich.progress.Progress.update` are store in ``task.fields``. You can add them to a format string with the following syntax: ``"extra info: {task.fields[extra]}"``.
+Format strings will be rendered with a single value `"task"` which will be a :class:`~rich.progress.Task` instance. For example ``"{task.description}"`` would display the task description in the column, and ``"{task.completed} of {task.total}"`` would display how many of the total steps have been completed. Additional fields passed via keyword arguments to `~rich.progress.Progress.update` are stored in ``task.fields``. You can add them to a format string with the following syntax: ``"extra info: {task.fields[extra]}"``.
 
 The default columns are equivalent to the following::
 
@@ -163,6 +163,7 @@ The following column objects are available:
 - :class:`~rich.progress.TransferSpeedColumn` Displays transfer speed (assumes the steps are bytes).
 - :class:`~rich.progress.SpinnerColumn` Displays a "spinner" animation.
 - :class:`~rich.progress.RenderableColumn` Displays an arbitrary Rich renderable in the column.
+- :class:`~rich.progress.IterationSpeedColumn` Displays iteration speed in it/s (iterations per second).
 
 To implement your own columns, extend the :class:`~rich.progress.ProgressColumn` class and use it as you would the other columns.
 

@@ -668,7 +668,10 @@ def test_attrs_broken_310() -> None:
     del foo.bar
     result = pretty_repr(foo)
     print(repr(result))
-    expected = "Foo(bar=AttributeError(\"'Foo' object has no attribute 'bar'\"))"
+    if sys.version_info >= (3, 13):
+        expected = "Foo(\n    bar=AttributeError(\"'tests.test_pretty.test_attrs_broken_310.<locals>.Foo' object has no attribute 'bar'\")\n)"
+    else:
+        expected = "Foo(bar=AttributeError(\"'Foo' object has no attribute 'bar'\"))"
     assert result == expected
 
 
@@ -734,3 +737,23 @@ def test_tuple_rich_repr_default() -> None:
             yield None, (1,), (1,)
 
     assert pretty_repr(Foo()) == "Foo()"
+
+
+def test_dataclass_no_attribute() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3417"""
+    from dataclasses import dataclass, field
+
+    @dataclass(eq=False)
+    class BadDataclass:
+        item: int = field(init=False)
+
+    # item is not provided
+    bad_data_class = BadDataclass()
+
+    console = Console()
+    with console.capture() as capture:
+        console.print(bad_data_class)
+
+    expected = "BadDataclass()\n"
+    result = capture.get()
+    assert result == expected

@@ -677,7 +677,7 @@ class Markdown(JupyterMixin):
                         and context.stack.top.on_child_close(context, element)
                     )
                     if should_render:
-                        if new_line:
+                        if new_line and node_type != "inline":
                             yield _new_line_segment
                         yield from console.render(element, context.options)
 

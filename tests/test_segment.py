@@ -2,6 +2,7 @@ from io import StringIO
 
 import pytest
 
+from rich.cells import cell_len
 from rich.segment import ControlType, Segment, SegmentLines, Segments
 from rich.style import Style
 
@@ -282,6 +283,34 @@ def test_divide_edge_2():
 )
 def test_split_cells_emoji(text, split, result):
     assert Segment(text).split_cells(split) == result
+
+
+def test_split_cells_mixed() -> None:
+    """Check that split cells splits on cell positions."""
+    # Caused https://github.com/Textualize/textual/issues/4996 in Textual
+    test = Segment("早乙女リリエル (CV: 徳井青）")
+    for position in range(1, test.cell_length):
+        left, right = Segment.split_cells(test, position)
+        assert cell_len(left.text) == position
+        assert cell_len(right.text) == test.cell_length - position
+
+
+def test_split_cells_doubles() -> None:
+    """Check that split cells splits on cell positions with all double width characters."""
+    test = Segment("早" * 20)
+    for position in range(1, test.cell_length):
+        left, right = Segment.split_cells(test, position)
+        assert cell_len(left.text) == position
+        assert cell_len(right.text) == test.cell_length - position
+
+
+def test_split_cells_single() -> None:
+    """Check that split cells splits on cell positions with all single width characters."""
+    test = Segment("A" * 20)
+    for position in range(1, test.cell_length):
+        left, right = Segment.split_cells(test, position)
+        assert cell_len(left.text) == position
+        assert cell_len(right.text) == test.cell_length - position
 
 
 def test_segment_lines_renderable():

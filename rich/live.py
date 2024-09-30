@@ -37,7 +37,7 @@ class Live(JupyterMixin, RenderHook):
 
     Args:
         renderable (RenderableType, optional): The renderable to live display. Defaults to displaying nothing.
-        console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
+        console (Console, optional): Optional Console instance. Defaults to an internal Console instance writing to stdout.
         screen (bool, optional): Enable alternate screen mode. Defaults to False.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()` or `update()` with refresh flag. Defaults to True
         refresh_per_second (float, optional): Number of times per second to refresh the live display. Defaults to 4.

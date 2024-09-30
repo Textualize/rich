@@ -109,16 +109,29 @@ class Segment(NamedTuple):
     @classmethod
     @lru_cache(1024 * 16)
     def _split_cells(cls, segment: "Segment", cut: int) -> Tuple["Segment", "Segment"]:
+        """Split a segment in to two at a given cell position.
+
+        Note that splitting a double-width character, may result in that character turning
+        into two spaces.
+
+        Args:
+            segment (Segment): A segment to split.
+            cut (int): A cell position to cut on.
+
+        Returns:
+            A tuple of two segments.
+        """
         text, style, control = segment
         _Segment = Segment
-
         cell_length = segment.cell_length
         if cut >= cell_length:
             return segment, _Segment("", style, control)
 
         cell_size = get_character_cell_size
 
-        pos = int((cut / cell_length) * (len(text) - 1))
+        pos = int((cut / cell_length) * (len(text))) - 1
+        if pos < 0:
+            pos = 0
 
         before = text[:pos]
         cell_pos = cell_len(before)
