@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed issue with Segment._split_cells https://github.com/Textualize/rich/pull/3506
+- Fix auto detection of terminal size on Windows https://github.com/Textualize/rich/pull/2916
 
 ### Added
 
