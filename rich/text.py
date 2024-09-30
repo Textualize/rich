@@ -600,7 +600,7 @@ class Text(JupyterMixin):
         translated to styles.
 
         Args:
-            re_highlight (Union[re.Pattern, str]): A regular expression.
+            re_highlight (Union[re.Pattern, str]): A regular expression object or string.
             style (Union[GetStyleCallable, StyleType]): Optional style to apply to whole match, or a callable
                 which accepts the matched text and returns a style. Defaults to None.
             style_prefix (str, optional): Optional prefix to add to style group names.
