@@ -1385,9 +1385,14 @@ class Console:
                 extra_lines = render_options.height - len(lines)
                 if extra_lines > 0:
                     pad_line = [
-                        [Segment(" " * render_options.max_width, style), Segment("\n")]
-                        if new_lines
-                        else [Segment(" " * render_options.max_width, style)]
+                        (
+                            [
+                                Segment(" " * render_options.max_width, style),
+                                Segment("\n"),
+                            ]
+                            if new_lines
+                            else [Segment(" " * render_options.max_width, style)]
+                        )
                     ]
                     lines.extend(pad_line * extra_lines)
 
@@ -1436,9 +1441,11 @@ class Console:
             rich_text.overflow = overflow
         else:
             rich_text = Text(
-                _emoji_replace(text, default_variant=self._emoji_variant)
-                if emoji_enabled
-                else text,
+                (
+                    _emoji_replace(text, default_variant=self._emoji_variant)
+                    if emoji_enabled
+                    else text
+                ),
                 justify=justify,
                 overflow=overflow,
                 style=style,
@@ -1535,7 +1542,11 @@ class Console:
             if isinstance(renderable, str):
                 append_text(
                     self.render_str(
-                        renderable, emoji=emoji, markup=markup, highlighter=_highlighter
+                        renderable,
+                        emoji=emoji,
+                        markup=markup,
+                        highlight=highlight,
+                        highlighter=_highlighter,
                     )
                 )
             elif isinstance(renderable, Text):
@@ -1985,6 +1996,20 @@ class Console:
             ):
                 buffer_extend(line)
 
+    def on_broken_pipe(self) -> None:
+        """This function is called when a `BrokenPipeError` is raised.
+
+        This can occur when piping Textual output in Linux and macOS.
+        The default implementation is to exit the app, but you could implement
+        this method in a subclass to change the behavior.
+
+        See https://docs.python.org/3/library/signal.html#note-on-sigpipe for details.
+        """
+        self.quiet = True
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, sys.stdout.fileno())
+        raise SystemExit(1)
+
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered. Render it if it can (e.g. Console.quiet is False)
         Rendering is supported on Windows, Unix and Jupyter environments. For
@@ -1994,8 +2019,17 @@ class Console:
         if self.quiet:
             del self._buffer[:]
             return
+
+        try:
+            self._write_buffer()
+        except BrokenPipeError:
+            self.on_broken_pipe()
+
+    def _write_buffer(self) -> None:
+        """Write the buffer to the output file."""
+
         with self._lock:
-            if self.record:
+            if self.record and not self._buffer_index:
                 with self._record_buffer_lock:
                     self._record_buffer.extend(self._buffer[:])
 
