@@ -591,7 +591,7 @@ class Text(JupyterMixin):
 
     def highlight_regex(
         self,
-        re_highlight: Union[re.Pattern, str],
+        re_highlight: Union[re.Pattern[str], str],
         style: Optional[Union[GetStyleCallable, StyleType]] = None,
         *,
         style_prefix: str = "",
