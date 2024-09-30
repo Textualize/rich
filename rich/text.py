@@ -173,7 +173,7 @@ class Text(JupyterMixin):
         return self.plain
 
     def __repr__(self) -> str:
-        return f"<text {self.plain!r} {self._spans!r}>"
+        return f"<text {self.plain!r} {self._spans!r} {self.style!r}>"
 
     def __add__(self, other: Any) -> "Text":
         if isinstance(other, (str, Text)):
