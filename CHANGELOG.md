@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Running tests in environment with `FORCE_COLOR` or `NO_COLOR` environment variables
 - ansi decoder will now strip problematic private escape sequences (like `\x1b7`) https://github.com/Textualize/rich/pull/3278/
 - Tree's ASCII_GUIDES and TREE_GUIDES constants promoted to class attributes
-- `rich.Text.highlight_regex` now expects a regular expression object https://github.com/Textualize/rich/pull/3347
+- `rich.Text.highlight_regex` now accepts a regular expression object https://github.com/Textualize/rich/pull/3347
 
 ### Added
 
