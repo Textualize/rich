@@ -1034,3 +1034,34 @@ def test_extend_style():
     text.extend_style(2)
     assert text.plain == "foo bar  "
     assert text.spans == [Span(0, 3, "red"), Span(4, 9, "bold")]
+
+
+def test_append_tokens() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3014"""
+
+    console = Console()
+    t = Text().append_tokens(
+        [
+            (
+                "long text that will be wrapped with a control code \r\n",
+                "red",
+            ),
+        ]
+    )
+    with console.capture() as capture:
+        console.print(t, width=40)
+
+    output = capture.get()
+    print(repr(output))
+    assert output == "long text that will be wrapped with a \ncontrol code \n\n"
+
+
+def test_append_loop_regression() -> None:
+    """Regression text for https://github.com/Textualize/rich/issues/3479"""
+    a = Text("one", "blue")
+    a.append(a)
+    assert a.plain == "oneone"
+
+    b = Text("two", "blue")
+    b.append_text(b)
+    assert b.plain == "twotwo"

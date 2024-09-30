@@ -39,6 +39,11 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Literal  # pragma: no cover
 
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self  # pragma: no cover
+
 from . import filesize, get_console
 from .console import Console, Group, JustifyMethod, RenderableType
 from .highlighter import Highlighter
@@ -917,6 +922,25 @@ class TransferSpeedColumn(ProgressColumn):
         return Text(f"{data_speed}/s", style="progress.data.speed")
 
 
+class IterationSpeedColumn(ProgressColumn):
+    """Renders iterations per second, e.g. '11.4 it/s'."""
+    
+    def render(self, task: "Task") -> Text:
+        last_speed = task.last_speed if hasattr(task, 'last_speed') else None
+        if task.finished and last_speed is not None:
+            return Text(f"{last_speed} it/s", style="progress.data.speed")   
+        if task.speed is None:
+            return Text("", style="progress.data.speed")
+        unit, suffix = filesize.pick_unit_and_suffix(
+            int(task.speed),
+            ["", "×10³", "×10⁶", "×10⁹", "×10¹²"],
+            1000,
+        )
+        data_speed = task.speed / unit
+        task.last_speed = f"{data_speed:.1f}{suffix}"
+        return Text(f"{task.last_speed} it/s", style="progress.data.speed")
+
+
 class ProgressSample(NamedTuple):
     """Sample of progress for a given time."""
 
@@ -1056,7 +1080,7 @@ class Progress(JupyterMixin):
     """Renders an auto-updating progress bar(s).
 
     Args:
-        console (Console, optional): Optional Console instance. Default will an internal Console instance writing to stdout.
+        console (Console, optional): Optional Console instance. Defaults to an internal Console instance writing to stdout.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
         refresh_per_second (Optional[float], optional): Number of times per second to refresh the progress information or None to use default (10). Defaults to None.
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
@@ -1170,7 +1194,7 @@ class Progress(JupyterMixin):
         if not self.console.is_interactive and not self.console.is_jupyter:
             self.console.print()
 
-    def __enter__(self) -> "Progress":
+    def __enter__(self) -> Self:
         self.start()
         return self
 

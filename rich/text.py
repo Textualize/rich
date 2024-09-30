@@ -1000,7 +1000,7 @@ class Text(JupyterMixin):
                 self._text.append(text.plain)
                 self._spans.extend(
                     _Span(start + text_length, end + text_length, style)
-                    for start, end, style in text._spans
+                    for start, end, style in text._spans.copy()
                 )
                 self._length += len(text)
         return self
@@ -1022,7 +1022,7 @@ class Text(JupyterMixin):
         self._text.append(text.plain)
         self._spans.extend(
             _Span(start + text_length, end + text_length, style)
-            for start, end, style in text._spans
+            for start, end, style in text._spans.copy()
         )
         self._length += len(text)
         return self
@@ -1043,6 +1043,7 @@ class Text(JupyterMixin):
         _Span = Span
         offset = len(self)
         for content, style in tokens:
+            content = strip_control_codes(content)
             append_text(content)
             if style:
                 append_span(_Span(offset, offset + len(content), style))
