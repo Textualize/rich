@@ -15,7 +15,6 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Operating System :: MacOS",
     "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -45,7 +44,6 @@ pytest-cov = "^3.0.0"
 attrs = "^21.4.0"
 pre-commit = "^2.17.0"
 asv = "^0.5.1"
-importlib-metadata = { version = "*", python = "<3.8" }
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

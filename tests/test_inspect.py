@@ -13,11 +13,6 @@ from rich._inspect import (
 )
 from rich.console import Console
 
-skip_py37 = pytest.mark.skipif(
-    sys.version_info.minor == 7 and sys.version_info.major == 3,
-    reason="rendered differently on py3.7",
-)
-
 skip_py38 = pytest.mark.skipif(
     sys.version_info.minor == 8 and sys.version_info.major == 3,
     reason="rendered differently on py3.8",
@@ -122,7 +117,6 @@ def test_inspect_text():
     assert render("Hello") == expected
 
 
-@skip_py37
 @skip_pypy3
 def test_inspect_empty_dict():
     expected = (
@@ -221,7 +215,6 @@ def test_inspect_integer_with_value():
     assert value == expected
 
 
-@skip_py37
 @skip_py310
 @skip_py311
 @skip_py312
@@ -259,7 +252,6 @@ def test_inspect_integer_with_methods_python38_and_python39():
     assert render(1, methods=True) == expected
 
 
-@skip_py37
 @skip_py38
 @skip_py39
 @skip_py311
@@ -302,7 +294,6 @@ def test_inspect_integer_with_methods_python310only():
     assert render(1, methods=True) == expected
 
 
-@skip_py37
 @skip_py38
 @skip_py39
 @skip_py310
@@ -347,7 +338,6 @@ def test_inspect_integer_with_methods_python311():
     assert render(1, methods=True) == expected
 
 
-@skip_py37
 @skip_pypy3
 def test_broken_call_attr():
     class NotCallable:
