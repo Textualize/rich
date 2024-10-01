@@ -11,6 +11,7 @@ from typing import (
     List,
     NamedTuple,
     Optional,
+    Pattern,
     Tuple,
     Union,
 )
@@ -591,7 +592,7 @@ class Text(JupyterMixin):
 
     def highlight_regex(
         self,
-        re_highlight: Union[re.Pattern[str], str],
+        re_highlight: Union[Pattern[str], str],
         style: Optional[Union[GetStyleCallable, StyleType]] = None,
         *,
         style_prefix: str = "",
