@@ -280,6 +280,9 @@ class _Reader(RawIOBase, BinaryIO):
     def write(self, s: Any) -> int:
         raise UnsupportedOperation("write")
 
+    def writelines(self, lines: Iterable[Any]) -> None:
+        raise UnsupportedOperation("writelines")
+
 
 class _ReadContext(ContextManager[_I], Generic[_I]):
     """A utility class to handle a context for both a reader and a progress."""

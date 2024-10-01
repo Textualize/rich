@@ -88,7 +88,7 @@ def display(segments: Iterable[Segment], text: str) -> None:
     try:
         from IPython.display import display as ipython_display
 
-        ipython_display(jupyter_renderable)
+        ipython_display(jupyter_renderable)  # type: ignore[no-untyped-call]
     except ModuleNotFoundError:
         # Handle the case where the Console has force_jupyter=True,
         # but IPython is not installed.

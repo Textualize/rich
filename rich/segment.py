@@ -617,7 +617,7 @@ class Segment(NamedTuple):
         while True:
             cut = next(iter_cuts, -1)
             if cut == -1:
-                return []
+                return
             if cut != 0:
                 break
             yield []

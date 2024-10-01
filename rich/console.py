@@ -89,15 +89,15 @@ class NoChange:
 NO_CHANGE = NoChange()
 
 try:
-    _STDIN_FILENO = sys.__stdin__.fileno()
+    _STDIN_FILENO = sys.__stdin__.fileno()  # type: ignore[union-attr]
 except Exception:
     _STDIN_FILENO = 0
 try:
-    _STDOUT_FILENO = sys.__stdout__.fileno()
+    _STDOUT_FILENO = sys.__stdout__.fileno()  # type: ignore[union-attr]
 except Exception:
     _STDOUT_FILENO = 1
 try:
-    _STDERR_FILENO = sys.__stderr__.fileno()
+    _STDERR_FILENO = sys.__stderr__.fileno()  # type: ignore[union-attr]
 except Exception:
     _STDERR_FILENO = 2
 
@@ -1302,7 +1302,7 @@ class Console:
 
         renderable = rich_cast(renderable)
         if hasattr(renderable, "__rich_console__") and not isclass(renderable):
-            render_iterable = renderable.__rich_console__(self, _options)  # type: ignore[union-attr]
+            render_iterable = renderable.__rich_console__(self, _options)
         elif isinstance(renderable, str):
             text_renderable = self.render_str(
                 renderable, highlight=_options.highlight, markup=_options.markup

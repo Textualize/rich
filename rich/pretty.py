@@ -227,7 +227,7 @@ def install(
     else:
         from IPython.core.formatters import BaseFormatter
 
-        class RichFormatter(BaseFormatter):  # type: ignore[misc]
+        class RichFormatter(BaseFormatter):
             pprint: bool = True
 
             def __call__(self, value: Any) -> Any:

@@ -1,4 +1,4 @@
-from typing import cast, List, Optional, Tuple, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
 if TYPE_CHECKING:
     from .console import (
@@ -7,11 +7,11 @@ if TYPE_CHECKING:
         RenderableType,
         RenderResult,
     )
+
 from .jupyter import JupyterMixin
 from .measure import Measurement
-from .style import Style
 from .segment import Segment
-
+from .style import Style
 
 PaddingDimensions = Union[int, Tuple[int], Tuple[int, int], Tuple[int, int, int, int]]
 
@@ -66,10 +66,10 @@ class Padding(JupyterMixin):
             _pad = pad[0]
             return (_pad, _pad, _pad, _pad)
         if len(pad) == 2:
-            pad_top, pad_right = cast(Tuple[int, int], pad)
+            pad_top, pad_right = pad
             return (pad_top, pad_right, pad_top, pad_right)
         if len(pad) == 4:
-            top, right, bottom, left = cast(Tuple[int, int, int, int], pad)
+            top, right, bottom, left = pad
             return (top, right, bottom, left)
         raise ValueError(f"1, 2 or 4 integers required for padding; {len(pad)} given")
 
