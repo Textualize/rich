@@ -46,7 +46,7 @@ class NullFile(IO[str]):
         return iter([""])
 
     def __enter__(self) -> IO[str]:
-        pass
+        return self
 
     def __exit__(
         self,

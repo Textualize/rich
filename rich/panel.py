@@ -175,6 +175,9 @@ class Panel(JupyterMixin):
             text = text.copy()
             text.truncate(width)
             excess_space = width - cell_len(text.plain)
+            if text.style:
+                text.stylize(console.get_style(text.style))
+
             if excess_space:
                 if align == "left":
                     return Text.assemble(
@@ -203,8 +206,6 @@ class Panel(JupyterMixin):
 
         title_text = self._title
         if title_text is not None:
-            if title_text.style is not None:
-                title_text.stylize_before(title_text.style)
             title_text.stylize_before(partial_border_style)
 
         child_width = (

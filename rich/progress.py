@@ -280,6 +280,9 @@ class _Reader(RawIOBase, BinaryIO):
     def write(self, s: Any) -> int:
         raise UnsupportedOperation("write")
 
+    def writelines(self, lines: Iterable[Any]) -> None:
+        raise UnsupportedOperation("writelines")
+
 
 class _ReadContext(ContextManager[_I], Generic[_I]):
     """A utility class to handle a context for both a reader and a progress."""
@@ -920,25 +923,6 @@ class TransferSpeedColumn(ProgressColumn):
             return Text("?", style="progress.data.speed")
         data_speed = filesize.decimal(int(speed))
         return Text(f"{data_speed}/s", style="progress.data.speed")
-
-
-class IterationSpeedColumn(ProgressColumn):
-    """Renders iterations per second, e.g. '11.4 it/s'."""
-    
-    def render(self, task: "Task") -> Text:
-        last_speed = task.last_speed if hasattr(task, 'last_speed') else None
-        if task.finished and last_speed is not None:
-            return Text(f"{last_speed} it/s", style="progress.data.speed")   
-        if task.speed is None:
-            return Text("", style="progress.data.speed")
-        unit, suffix = filesize.pick_unit_and_suffix(
-            int(task.speed),
-            ["", "×10³", "×10⁶", "×10⁹", "×10¹²"],
-            1000,
-        )
-        data_speed = task.speed / unit
-        task.last_speed = f"{data_speed:.1f}{suffix}"
-        return Text(f"{task.last_speed} it/s", style="progress.data.speed")
 
 
 class ProgressSample(NamedTuple):

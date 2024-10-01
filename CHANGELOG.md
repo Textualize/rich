@@ -5,22 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
+## [13.9.0]
 
 ### Changed
 
+- Dropped support for Python3.7 https://github.com/Textualize/rich/pull/3509
 - Rich will display tracebacks with finely grained error locations on python 3.11+ https://github.com/Textualize/rich/pull/3486
-
 
 ### Fixed
 
 - Fixed issue with Segment._split_cells https://github.com/Textualize/rich/pull/3506
 - Fix auto detection of terminal size on Windows https://github.com/Textualize/rich/pull/2916
-
-### Added
-
-- Add a new `column` object `IterationSpeedColumn`. https://github.com/Textualize/rich/pull/3332
+- `Text.style` now respected in Panel title/subtitle https://github.com/Textualize/rich/pull/3509
 
 ## [13.8.1] - 2024-09-10
 
@@ -2088,6 +2084,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.9.0]: https://github.com/textualize/rich/compare/v13.8.1...v13.9.0
 [13.8.1]: https://github.com/textualize/rich/compare/v13.8.0...v13.8.1
 [13.8.0]: https://github.com/textualize/rich/compare/v13.7.1...v13.8.0
 [13.7.1]: https://github.com/textualize/rich/compare/v13.7.0...v13.7.1
