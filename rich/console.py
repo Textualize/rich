@@ -1005,7 +1005,8 @@ class Console:
         width: Optional[int] = None
         height: Optional[int] = None
 
-        for file_descriptor in _STD_STREAMS_OUTPUT if WINDOWS else _STD_STREAMS:
+        streams = _STD_STREAMS_OUTPUT if WINDOWS else _STD_STREAMS
+        for file_descriptor in streams:
             try:
                 width, height = os.get_terminal_size(file_descriptor)
             except (AttributeError, ValueError, OSError):  # Probably not a terminal

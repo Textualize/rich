@@ -111,6 +111,7 @@ def test_title_text() -> None:
     console = Console(
         file=io.StringIO(),
         width=50,
+        height=20,
         legacy_windows=False,
         force_terminal=True,
         color_system="truecolor",
@@ -119,7 +120,7 @@ def test_title_text() -> None:
 
     result = console.file.getvalue()
     print(repr(result))
-    expected = "╭───────────────────────────────────\x1b[31m title \x1b[0m────────────────────────────────────╮\n│ Hello, World                                                                 │\n╰──────────────────────────────────\x1b[1;35m subtitle \x1b[0m──────────────────────────────────╯\n"
+    expected = "╭────────────────────\x1b[31m title \x1b[0m─────────────────────╮\n│ Hello, World                                   │\n╰───────────────────\x1b[1;35m subtitle \x1b[0m───────────────────╯\n"
     assert result == expected
 
 
