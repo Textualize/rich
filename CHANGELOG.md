@@ -7,16 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-
 ### Changed
 
+- Dropped support for Python3.7 https://github.com/Textualize/rich/pull/3509
 - Rich will display tracebacks with finely grained error locations on python 3.11+ https://github.com/Textualize/rich/pull/3486
-
 
 ### Fixed
 
 - Fixed issue with Segment._split_cells https://github.com/Textualize/rich/pull/3506
 - Fix auto detection of terminal size on Windows https://github.com/Textualize/rich/pull/2916
+- `Text.style` now respected in Panel title/subtitle https://github.com/Textualize/rich/pull/3509
 
 ## [13.8.1] - 2024-09-10
 

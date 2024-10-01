@@ -232,7 +232,7 @@ class Live(JupyterMixin, RenderHook):
                 else:
                     if self.ipy_widget is None:
                         self.ipy_widget = Output()
-                        display(self.ipy_widget)  # type: ignore[no-untyped-call]
+                        display(self.ipy_widget)
 
                     with self.ipy_widget:
                         self.ipy_widget.clear_output(wait=True)
