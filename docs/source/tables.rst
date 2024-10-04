@@ -142,6 +142,7 @@ There are a number of options you can set on a column to modify how it will look
 - ``max_width`` When set to an integer will prevent the column from growing beyond this amount.
 - ``ratio`` Defines a ratio to set the column width. For instance, if there are 3 columns with a total of 6 ratio, and ``ratio=2`` then the column will be a third of the available size.
 - ``no_wrap`` Set to True to prevent this column from wrapping.
+- ``highlight`` Set to True to enable automatic highlighting of cell contents.
 
 Vertical Alignment
 ~~~~~~~~~~~~~~~~~~
