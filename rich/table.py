@@ -451,7 +451,7 @@ class Table(JupyterMixin):
             ]
         for index, renderable in enumerate(cell_renderables):
             if index == len(columns):
-                column = Column(_index=index)
+                column = Column(_index=index, highlight=self.highlight)
                 for _ in self.rows:
                     add_cell(column, Text(""))
                 self.columns.append(column)
