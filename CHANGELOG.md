@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [13.9.2] - 2024-10-04
 
 ### Fixed
 
 - Fixed `Table` columns not highlighting when added by `add_row` https://github.com/Textualize/rich/issues/3517
+- Fixed an issue with Segment.split_cells reported in Textual https://github.com/Textualize/textual/issues/5090
 
 ## [13.9.1] - 2024-10-01
 
@@ -2096,6 +2097,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.9.2]: https://github.com/textualize/rich/compare/v13.9.1...v13.9.2
 [13.9.1]: https://github.com/textualize/rich/compare/v13.9.0...v13.9.1
 [13.9.0]: https://github.com/textualize/rich/compare/v13.8.1...v13.9.0
 [13.8.1]: https://github.com/textualize/rich/compare/v13.8.0...v13.8.1
