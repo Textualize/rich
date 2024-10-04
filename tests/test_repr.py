@@ -1,4 +1,3 @@
-import sys
 from typing import Optional
 
 import pytest
@@ -7,11 +6,6 @@ import rich.repr
 from rich.console import Console
 
 from inspect import Parameter
-
-skip_py37 = pytest.mark.skipif(
-    sys.version_info.minor == 7 and sys.version_info.major == 3,
-    reason="rendered differently on py3.7",
-)
 
 
 @rich.repr.auto
@@ -100,7 +94,6 @@ def test_rich_repr() -> None:
     assert (repr(Foo("hello", bar=3))) == "Foo('hello', 'hello', bar=3, egg=1)"
 
 
-@skip_py37
 def test_rich_repr_positional_only() -> None:
     _locals = locals().copy()
     exec(
