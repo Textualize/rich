@@ -288,11 +288,16 @@ def test_split_cells_emoji(text, split, result):
 def test_split_cells_mixed() -> None:
     """Check that split cells splits on cell positions."""
     # Caused https://github.com/Textualize/textual/issues/4996 in Textual
-    test = Segment("早乙女リリエル (CV: 徳井青）")
-    for position in range(1, test.cell_length):
-        left, right = Segment.split_cells(test, position)
-        assert cell_len(left.text) == position
-        assert cell_len(right.text) == test.cell_length - position
+    tests = [
+        Segment("早乙女リリエル (CV: 徳井青）"),
+        Segment("メイド・イン・きゅんクチュアリ☆"),
+        Segment("TVアニメ「メルクストーリア -無気力少年と瓶の中の少女-」 主題歌CD"),
+    ]
+    for test in tests:
+        for position in range(1, test.cell_length):
+            left, right = Segment.split_cells(test, position)
+            assert cell_len(left.text) == position
+            assert cell_len(right.text) == test.cell_length - position
 
 
 def test_split_cells_doubles() -> None:
