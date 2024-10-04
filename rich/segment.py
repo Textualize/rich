@@ -142,12 +142,12 @@ class Segment(NamedTuple):
                 )
             if out_by == -1 and cell_size(text[pos]) == 2:
                 return (
-                    _Segment(before[:pos] + " ", style, control),
+                    _Segment(text[:pos] + " ", style, control),
                     _Segment(" " + text[pos + 1 :], style, control),
                 )
-            if out_by == +1 and cell_size(text[pos]) == 2:
+            if out_by == +1 and cell_size(text[pos - 1]) == 2:
                 return (
-                    _Segment(before[: pos - 1] + " ", style, control),
+                    _Segment(text[: pos - 1] + " ", style, control),
                     _Segment(" " + text[pos:], style, control),
                 )
             if cell_pos < cut:
