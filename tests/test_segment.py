@@ -293,6 +293,9 @@ def test_split_cells_emoji(text, split, result):
         Segment("TVアニメ「メルクストーリア -無気力少年と瓶の中の少女-」 主題歌CD"),
         Segment("南無阿弥JKうらめしや?！     "),
         Segment("メルク (CV: 水瀬いのり)     "),
+        Segment(" メルク (CV: 水瀬いのり)     "),
+        Segment("  メルク (CV: 水瀬いのり)     "),
+        Segment("  メルク (CV: 水瀬いのり)      "),
     ],
 )
 def test_split_cells_mixed(segment: Segment) -> None:
