@@ -204,6 +204,28 @@ def test_print_text():
     assert console.file.getvalue() == "\x1B[1mfoo\x1B[0m\n"
 
 
+def test_print_with_keep_emojicodes():
+    console = Console(
+        file=io.StringIO(),
+        color_system="truecolor",
+        emoji=False,
+        strip_emoji_mode="keep",
+    )
+    console.print("Hi guys! :sparkles:", end="")
+    assert console.file.getvalue() == "Hi guys! :sparkles:"
+
+
+def test_print_with_removing_emojicodes():
+    console = Console(
+        file=io.StringIO(),
+        color_system="truecolor",
+        emoji=False,
+        strip_emoji_mode="strip",
+    )
+    console.print("Hi guys! :sparkles:", end="")
+    assert console.file.getvalue() == "Hi guys! "
+
+
 def test_print_text_multiple():
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print(Text("foo", style="bold"), Text("bar"), "baz")

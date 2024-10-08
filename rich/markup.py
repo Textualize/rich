@@ -1,9 +1,19 @@
 import re
 from ast import literal_eval
 from operator import attrgetter
-from typing import Callable, Iterable, List, Match, NamedTuple, Optional, Tuple, Union
+from typing import (
+    Callable,
+    Iterable,
+    List,
+    Literal,
+    Match,
+    NamedTuple,
+    Optional,
+    Tuple,
+    Union,
+)
 
-from ._emoji_replace import _emoji_replace
+from ._emoji_replace import process_emoji_in_text
 from .emoji import EmojiVariant
 from .errors import MarkupError
 from .style import Style
@@ -43,6 +53,7 @@ class Tag(NamedTuple):
 _ReStringMatch = Match[str]  # regex match object
 _ReSubCallable = Callable[[_ReStringMatch], str]  # Callable invoked by re.sub
 _EscapeSubMethod = Callable[[_ReSubCallable, str], str]  # Sub method of a compiled re
+_EmojiStripMode = Literal["keep", "strip"]
 
 
 def escape(
@@ -108,6 +119,7 @@ def render(
     style: Union[str, Style] = "",
     emoji: bool = True,
     emoji_variant: Optional[EmojiVariant] = None,
+    strip_emoji_mode: Optional[_EmojiStripMode] = None,
 ) -> Text:
     """Render console markup in to a Text instance.
 
@@ -116,7 +128,7 @@ def render(
         style: (Union[str, Style]): The style to use.
         emoji (bool, optional): Also render emoji code. Defaults to True.
         emoji_variant (str, optional): Optional emoji variant, either "text" or "emoji". Defaults to None.
-
+        strip_emoji_mode (str, optional): If emoji is False, strip emojicodes by either "keep" (keep the emojicodes), or "strip" (remove the emojicodes)
 
     Raises:
         MarkupError: If there is a syntax error in the markup.
@@ -124,10 +136,14 @@ def render(
     Returns:
         Text: A test instance.
     """
-    emoji_replace = _emoji_replace
+
+    def emoji_replace(markup: str, default_variant: Optional[str] = None) -> str:
+        strip_mode = None if emoji else strip_emoji_mode
+        return process_emoji_in_text(markup, default_variant, strip_mode=strip_mode)
+
     if "[" not in markup:
         return Text(
-            emoji_replace(markup, default_variant=emoji_variant) if emoji else markup,
+            emoji_replace(markup, default_variant=emoji_variant),
             style=style,
         )
     text = Text(style=style)

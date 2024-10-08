@@ -44,7 +44,7 @@ else:
     )  # pragma: no cover
 
 from . import errors, themes
-from ._emoji_replace import _emoji_replace
+from ._emoji_replace import process_emoji_in_text
 from ._export_format import CONSOLE_HTML_FORMAT, CONSOLE_SVG_FORMAT
 from ._fileno import get_fileno
 from ._log_render import FormatTimeCallable, LogRender
@@ -80,6 +80,7 @@ WINDOWS = sys.platform == "win32"
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
 OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
+EmojiStripMode = Literal["keep", "strip"]
 
 
 class NoChange:
@@ -614,6 +615,7 @@ class Console:
         markup (bool, optional): Boolean to enable :ref:`console_markup`. Defaults to True.
         emoji (bool, optional): Enable emoji code. Defaults to True.
         emoji_variant (str, optional): Optional emoji variant, either "text" or "emoji". Defaults to None.
+        strip_emoji_mode (str, optional): If emoji is False, strip emojicodes by either "keep" (keep the emojicodes), or "strip" (remove the emojicodes)
         highlight (bool, optional): Enable automatic highlighting. Defaults to True.
         log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
         log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
@@ -651,6 +653,7 @@ class Console:
         markup: bool = True,
         emoji: bool = True,
         emoji_variant: Optional[EmojiVariant] = None,
+        strip_emoji_mode: EmojiStripMode = "keep",
         highlight: bool = True,
         log_time: bool = True,
         log_path: bool = True,
@@ -686,6 +689,7 @@ class Console:
         self._markup = markup
         self._emoji = emoji
         self._emoji_variant: Optional[EmojiVariant] = emoji_variant
+        self._strip_emoji_mode = strip_emoji_mode
         self._highlight = highlight
         self.legacy_windows: bool = (
             (detect_legacy_windows() and not self.is_jupyter)
@@ -1424,6 +1428,7 @@ class Console:
         emoji_enabled = emoji or (emoji is None and self._emoji)
         markup_enabled = markup or (markup is None and self._markup)
         highlight_enabled = highlight or (highlight is None and self._highlight)
+        emoji_strip_mode = self._strip_emoji_mode if emoji_enabled is False else None
 
         if markup_enabled:
             rich_text = render_markup(
@@ -1431,16 +1436,17 @@ class Console:
                 style=style,
                 emoji=emoji_enabled,
                 emoji_variant=self._emoji_variant,
+                strip_emoji_mode=emoji_strip_mode,
             )
             rich_text.justify = justify
             rich_text.overflow = overflow
         else:
+            emojized_text = process_emoji_in_text(
+                text, default_variant=self._emoji_variant, strip_mode=emoji_strip_mode
+            )
+
             rich_text = Text(
-                (
-                    _emoji_replace(text, default_variant=self._emoji_variant)
-                    if emoji_enabled
-                    else text
-                ),
+                emojized_text,
                 justify=justify,
                 overflow=overflow,
                 style=style,
