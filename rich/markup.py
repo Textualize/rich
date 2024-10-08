@@ -119,7 +119,7 @@ def render(
     style: Union[str, Style] = "",
     emoji: bool = True,
     emoji_variant: Optional[EmojiVariant] = None,
-    strip_emoji_mode: _EmojiStripMode = "keep",
+    strip_emoji_mode: Optional[_EmojiStripMode] = None,
 ) -> Text:
     """Render console markup in to a Text instance.
 
