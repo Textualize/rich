@@ -474,9 +474,13 @@ class Traceback:
                             (end_line, end_column),
                         )
 
-                if filename and not filename.startswith("<"):
-                    if not os.path.isabs(filename):
-                        filename = os.path.join(_IMPORT_CWD, filename)
+                if (
+                    filename
+                    and not filename.startswith("<")
+                    and not os.path.isabs(filename)
+                    and os.path.exists(filename)
+                ):
+                    filename = os.path.join(_IMPORT_CWD, filename)
                 if frame_summary.f_locals.get("_rich_traceback_omit", False):
                     continue
 
@@ -695,23 +699,14 @@ class Traceback:
             frame_filename = frame.filename
             suppressed = any(frame_filename.startswith(path) for path in self.suppress)
 
-            if os.path.exists(frame.filename):
-                text = Text.assemble(
-                    path_highlighter(Text(frame.filename, style="pygments.string")),
-                    (":", "pygments.text"),
-                    (str(frame.lineno), "pygments.number"),
-                    " in ",
-                    (frame.name, "pygments.function"),
-                    style="pygments.text",
-                )
-            else:
-                text = Text.assemble(
-                    "in ",
-                    (frame.name, "pygments.function"),
-                    (":", "pygments.text"),
-                    (str(frame.lineno), "pygments.number"),
-                    style="pygments.text",
-                )
+            text = Text.assemble(
+                path_highlighter(Text(frame.filename, style="pygments.string")),
+                (":", "pygments.text"),
+                (str(frame.lineno), "pygments.number"),
+                " in ",
+                (frame.name, "pygments.function"),
+                style="pygments.text",
+            )
             if not frame.filename.startswith("<") and not first:
                 yield ""
             yield text

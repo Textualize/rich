@@ -1,7 +1,13 @@
+from __future__ import annotations
+
 import io
+import os
 import re
 import sys
-from typing import List
+import tempfile
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+from typing import Any, Iterable, List
 
 import pytest
 
@@ -358,3 +364,72 @@ def test_traceback_finely_grained() -> None:
         start, end = last_instruction
         print(start, end)
         assert start[0] == end[0]
+
+
+@dataclass(frozen=True)
+class FakeTraceback:
+    tb_frame: FakeFrameType
+    tb_lineno: int = 0
+    tb_next: FakeTraceback | None = None
+
+
+@dataclass(frozen=True)
+class FakeFrameType:
+    f_code: FakeCodeType
+    f_lasti: int = 0
+    f_locals: Mapping[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FakeCodeType:
+    co_filename: str
+    co_name: str = "co_name"
+
+    def co_positions(
+        self,
+    ) -> Iterable[tuple[int | None, int | None, int | None, int | None]]:
+        return [(None, None, None, None)]
+
+
+def test_traceback_non_existent_paths() -> None:
+    existing_absolute_file = tempfile.NamedTemporaryFile()
+    existing_relative_file = tempfile.NamedTemporaryFile(dir=".")
+    nonexisting_absolute_filename = "/absolute_nonexisting_file"
+    nonexisting_relative_filename = "relative_nonexisting_file"
+    traceback_filenames = [
+        # Existing absolute path should be unchanged.
+        existing_absolute_file.name,
+        # The relative path should be converted into an absolute path below.
+        os.path.basename(existing_relative_file.name),
+        # Nonexisting absolute path should be unchanged.
+        nonexisting_absolute_filename,
+        # Nonexisting relative path should be unchanged.
+        nonexisting_relative_filename,
+    ]
+    expected_traceback_filenames = [
+        existing_absolute_file.name,
+        # This is the absolute path, not the relative path as above.
+        existing_relative_file.name,
+        nonexisting_absolute_filename,
+        nonexisting_relative_filename,
+    ]
+    for traceback_filename, expected_traceback_filename in zip(
+        traceback_filenames, expected_traceback_filenames
+    ):
+        fake_traceback = FakeTraceback(
+            tb_frame=FakeFrameType(
+                f_code=FakeCodeType(
+                    co_filename=traceback_filename,
+                )
+            ),
+        )
+        rich_traceback = Traceback.extract(
+            exc_type=Exception,
+            exc_value=Exception(),
+            traceback=fake_traceback,
+        )
+        assert len(rich_traceback.stacks) == 1
+        stack = rich_traceback.stacks[0]
+        assert len(stack.frames) == 1
+        frame = stack.frames[0]
+        assert frame.filename == expected_traceback_filename
