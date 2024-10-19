@@ -7,7 +7,6 @@ import sys
 import tempfile
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from types import CodeType, FrameType, TracebackType
 from typing import Any, Iterable, List
 
 import pytest
