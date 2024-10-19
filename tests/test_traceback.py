@@ -304,16 +304,7 @@ def test_suppress():
     (
         # fmt: off
         [True, 3, ["test_rich_traceback_omit_optional_local_flag", "level1", "level3"]],
-        [
-            False,
-            4,
-            [
-                "test_rich_traceback_omit_optional_local_flag",
-                "level1",
-                "level2",
-                "level3",
-            ],
-        ],
+        [False, 4, ["test_rich_traceback_omit_optional_local_flag", "level1", "level2", "level3"]],
         # fmt: on
     ),
 )
