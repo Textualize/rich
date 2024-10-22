@@ -72,10 +72,9 @@ def test_is_single_cell_widths() -> None:
     BOX = "┌─┬┐│ ││├─┼┤│ ││├─┼┤├─┼┤│ ││└─┴┘"
 
     for character in BOX:
-        print(repr(character))
         assert _is_single_cell_widths(character)
 
-    for character in "💩":
+    for character in "💩😽":
         assert not _is_single_cell_widths(character)
 
     for character in "わさび":

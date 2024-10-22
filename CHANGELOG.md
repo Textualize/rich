@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed broken regex that may have resulted in poor performance.
+- Fixed broken regex that may have resulted in poor performance. https://github.com/Textualize/rich/pull/3535
 
 ## [13.9.2] - 2024-10-04
 
