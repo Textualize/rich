@@ -8,7 +8,7 @@ from ._cell_widths import CELL_WIDTHS
 
 # Regex to match sequence of the most common character ranges
 _is_single_cell_widths = re.compile(
-    "^[\u0020-\u007f\u00a0\u02ff\u0370-\u0482\u2500-\u25FF]*$"
+    "^[\u0020-\u007e\u00a0\u02ff\u0370-\u0482\u2500-\u25FF]*$"
 ).match
 
 

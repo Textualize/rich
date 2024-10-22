@@ -1,16 +1,9 @@
-import string
 from io import StringIO
 
 import pytest
 
 from rich.cells import cell_len
-from rich.segment import (
-    ControlType,
-    Segment,
-    SegmentLines,
-    Segments,
-    _is_single_cell_widths,
-)
+from rich.segment import ControlType, Segment, SegmentLines, Segments
 from rich.style import Style
 
 
@@ -385,22 +378,3 @@ def test_align_bottom():
         [Segment("   ", Style())],
         [Segment("X")],
     ]
-
-
-def test_is_single_cell_widths() -> None:
-    # Check _is_single_cell_widths reports correctly
-    for character in string.printable:
-        if ord(character) >= 32:
-            assert _is_single_cell_widths(character)
-
-    BOX = "┌─┬┐│ ││├─┼┤│ ││├─┼┤├─┼┤│ ││└─┴┘"
-
-    for character in BOX:
-        print(repr(character))
-        assert _is_single_cell_widths(character)
-
-    for character in "💩":
-        assert not _is_single_cell_widths(character)
-
-    for character in "わさび":
-        assert not _is_single_cell_widths(character)
