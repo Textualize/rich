@@ -739,7 +739,7 @@ class TaskProgressColumn(TextColumn):
         )
 
     @classmethod
-    def render_speed(cls, speed: Optional[float], units: str="it/s") -> Text:
+    def render_speed(cls, speed: Optional[float], units: str = "it/s") -> Text:
         """Render the speed in iterations per second or the supplied units.
 
         Args:
@@ -761,7 +761,9 @@ class TaskProgressColumn(TextColumn):
 
     def render(self, task: "Task") -> Text:
         if task.total is None and self.show_speed:
-            return self.render_speed(task.finished_speed or task.speed, units=self.speed_units)
+            return self.render_speed(
+                task.finished_speed or task.speed, units=self.speed_units
+            )
         text_format = (
             self.text_format_no_percentage if task.total is None else self.text_format
         )
