@@ -711,6 +711,7 @@ class TaskProgressColumn(TextColumn):
         highlighter (Optional[Highlighter], optional): Highlighter to apply to output. Defaults to None.
         table_column (Optional[Column], optional): Table Column to use. Defaults to None.
         show_speed (bool, optional): Show speed if total is unknown. Defaults to False.
+        speed_units (str, optional): Units of the speed. Defaults to it/s.
     """
 
     def __init__(
@@ -723,9 +724,11 @@ class TaskProgressColumn(TextColumn):
         highlighter: Optional[Highlighter] = None,
         table_column: Optional[Column] = None,
         show_speed: bool = False,
+        speed_units: str = "it/s",
     ) -> None:
         self.text_format_no_percentage = text_format_no_percentage
         self.show_speed = show_speed
+        self.speed_units = speed_units
         super().__init__(
             text_format=text_format,
             style=style,
@@ -736,11 +739,12 @@ class TaskProgressColumn(TextColumn):
         )
 
     @classmethod
-    def render_speed(cls, speed: Optional[float]) -> Text:
-        """Render the speed in iterations per second.
+    def render_speed(cls, speed: Optional[float], units: str = "it/s") -> Text:
+        """Render the speed in iterations per second or the supplied units.
 
         Args:
-            task (Task): A Task object.
+            speed (float): Current value of the speed.
+            units (str): Units of the speed. Defaults to it/s.
 
         Returns:
             Text: Text object containing the task speed.
@@ -753,11 +757,13 @@ class TaskProgressColumn(TextColumn):
             1000,
         )
         data_speed = speed / unit
-        return Text(f"{data_speed:.1f}{suffix} it/s", style="progress.percentage")
+        return Text(f"{data_speed:.1f}{suffix} {units}", style="progress.percentage")
 
     def render(self, task: "Task") -> Text:
         if task.total is None and self.show_speed:
-            return self.render_speed(task.finished_speed or task.speed)
+            return self.render_speed(
+                task.finished_speed or task.speed, units=self.speed_units
+            )
         text_format = (
             self.text_format_no_percentage if task.total is None else self.text_format
         )
@@ -923,6 +929,24 @@ class TransferSpeedColumn(ProgressColumn):
             return Text("?", style="progress.data.speed")
         data_speed = filesize.decimal(int(speed))
         return Text(f"{data_speed}/s", style="progress.data.speed")
+
+
+class SpeedColumn(ProgressColumn):
+    """Renders human readable speed.
+
+    Args:
+        table_column (Optional[Column], optional): Table Column to use. Defaults to None.
+        units (str, optional): Units of the speed. Defaults to it/s.
+    """
+
+    def __init__(self, *args, units: str = "it/s", **kwargs) -> None:
+        self.units = units
+        super().__init__(*args, **kwargs)
+
+    def render(self, task: "Task") -> Text:
+        """Show speed."""
+        speed = task.finished_speed or task.speed
+        return TaskProgressColumn.render_speed(speed, units=self.units)
 
 
 class ProgressSample(NamedTuple):
