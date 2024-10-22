@@ -1,5 +1,7 @@
+import string
+
 from rich import cells
-from rich.cells import chop_cells
+from rich.cells import _is_single_cell_widths, chop_cells
 
 
 def test_cell_len_long_string():
@@ -59,3 +61,21 @@ def test_chop_cells_mixed_width():
     """Mixed single and double-width characters."""
     text = "あ1り234が5と6う78"
     assert chop_cells(text, 3) == ["あ1", "り2", "34", "が5", "と6", "う7", "8"]
+
+
+def test_is_single_cell_widths() -> None:
+    # Check _is_single_cell_widths reports correctly
+    for character in string.printable:
+        if ord(character) >= 32:
+            assert _is_single_cell_widths(character)
+
+    BOX = "┌─┬┐│ ││├─┼┤│ ││├─┼┤├─┼┤│ ││└─┴┘"
+
+    for character in BOX:
+        assert _is_single_cell_widths(character)
+
+    for character in "💩😽":
+        assert not _is_single_cell_widths(character)
+
+    for character in "わさび":
+        assert not _is_single_cell_widths(character)

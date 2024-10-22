@@ -161,10 +161,14 @@ class Segment(NamedTuple):
         If the cut point falls in the middle of a 2-cell wide character then it is replaced
         by two spaces, to preserve the display width of the parent segment.
 
+        Args:
+            cut (int): Offset within the segment to cut.
+
         Returns:
             Tuple[Segment, Segment]: Two segments.
         """
         text, style, control = self
+        assert cut >= 0
 
         if _is_single_cell_widths(text):
             # Fast path with all 1 cell characters
