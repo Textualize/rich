@@ -925,6 +925,15 @@ class TransferSpeedColumn(ProgressColumn):
         return Text(f"{data_speed}/s", style="progress.data.speed")
 
 
+class SpeedColumn(ProgressColumn):
+    """Renders human readable speed."""
+
+    def render(self, task: "Task") -> Text:
+        """Show speed."""
+        speed = task.finished_speed or task.speed
+        return TaskProgressColumn.render_speed(speed)
+
+
 class ProgressSample(NamedTuple):
     """Sample of progress for a given time."""
 
