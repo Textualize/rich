@@ -711,6 +711,7 @@ class TaskProgressColumn(TextColumn):
         highlighter (Optional[Highlighter], optional): Highlighter to apply to output. Defaults to None.
         table_column (Optional[Column], optional): Table Column to use. Defaults to None.
         show_speed (bool, optional): Show speed if total is unknown. Defaults to False.
+        speed_units (str, optional): Units of the speed. Defaults to it/s.
     """
 
     def __init__(
@@ -723,9 +724,11 @@ class TaskProgressColumn(TextColumn):
         highlighter: Optional[Highlighter] = None,
         table_column: Optional[Column] = None,
         show_speed: bool = False,
+        speed_units: str = "it/s",
     ) -> None:
         self.text_format_no_percentage = text_format_no_percentage
         self.show_speed = show_speed
+        self.speed_units = speed_units
         super().__init__(
             text_format=text_format,
             style=style,
@@ -758,7 +761,7 @@ class TaskProgressColumn(TextColumn):
 
     def render(self, task: "Task") -> Text:
         if task.total is None and self.show_speed:
-            return self.render_speed(task.finished_speed or task.speed)
+            return self.render_speed(task.finished_speed or task.speed, units=self.speed_units)
         text_format = (
             self.text_format_no_percentage if task.total is None else self.text_format
         )
