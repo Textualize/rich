@@ -930,7 +930,12 @@ class TransferSpeedColumn(ProgressColumn):
 
 
 class SpeedColumn(ProgressColumn):
-    """Renders human readable speed."""
+    """Renders human readable speed.
+
+    Args:
+        table_column (Optional[Column], optional): Table Column to use. Defaults to None.
+        units (str, optional): Units of the speed. Defaults to it/s.
+    """
 
     def __init__(self, *args, units: str = "it/s", **kwargs) -> None:
         self.units = units
