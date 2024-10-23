@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [13.9.0] - 2024-10-01
 
+- Added possibility to have numerical choices in prompt
+
 ### Changed
 
 - Dropped support for Python3.7 https://github.com/Textualize/rich/pull/3509

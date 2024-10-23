@@ -39,6 +39,7 @@ class PromptBase(Generic[PromptType]):
         case_sensitive (bool, optional): Matching of choices should be case-sensitive. Defaults to True.
         show_default (bool, optional): Show default in prompt. Defaults to True.
         show_choices (bool, optional): Show choices in prompt. Defaults to True.
+        numeric_selection (bool, optional): Allow users to select choices by numbers. Defaults to False.
     """
 
     response_type: type = str
@@ -61,6 +62,7 @@ class PromptBase(Generic[PromptType]):
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
+        numeric_selection: bool = False,
     ) -> None:
         self.console = console or get_console()
         self.prompt = (
@@ -74,6 +76,7 @@ class PromptBase(Generic[PromptType]):
         self.case_sensitive = case_sensitive
         self.show_default = show_default
         self.show_choices = show_choices
+        self.numeric_selection = numeric_selection
 
     @classmethod
     @overload
@@ -87,10 +90,10 @@ class PromptBase(Generic[PromptType]):
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
+        numeric_selection: bool = False,
         default: DefaultType,
         stream: Optional[TextIO] = None,
-    ) -> Union[DefaultType, PromptType]:
-        ...
+    ) -> Union[DefaultType, PromptType]: ...
 
     @classmethod
     @overload
@@ -104,9 +107,9 @@ class PromptBase(Generic[PromptType]):
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
+        numeric_selection: bool = False,
         stream: Optional[TextIO] = None,
-    ) -> PromptType:
-        ...
+    ) -> PromptType: ...
 
     @classmethod
     def ask(
@@ -119,6 +122,7 @@ class PromptBase(Generic[PromptType]):
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
+        numeric_selection: bool = False,
         default: Any = ...,
         stream: Optional[TextIO] = None,
     ) -> Any:
@@ -135,6 +139,7 @@ class PromptBase(Generic[PromptType]):
             case_sensitive (bool, optional): Matching of choices should be case-sensitive. Defaults to True.
             show_default (bool, optional): Show default in prompt. Defaults to True.
             show_choices (bool, optional): Show choices in prompt. Defaults to True.
+            numeric_selection (bool, optional): Allow users to select choices by numbers. Defaults to False.
             stream (TextIO, optional): Optional text file open for reading to get input. Defaults to None.
         """
         _prompt = cls(
@@ -145,6 +150,7 @@ class PromptBase(Generic[PromptType]):
             case_sensitive=case_sensitive,
             show_default=show_default,
             show_choices=show_choices,
+            numeric_selection=numeric_selection,
         )
         return _prompt(default=default, stream=stream)
 
@@ -172,7 +178,12 @@ class PromptBase(Generic[PromptType]):
         prompt.end = ""
 
         if self.show_choices and self.choices:
-            _choices = "/".join(self.choices)
+            if self.numeric_selection:
+                _choices = ", ".join(
+                    [f"{i + 1}. {choice}" for i, choice in enumerate(self.choices)]
+                )
+            else:
+                _choices = "/".join(self.choices)
             choices = f"[{_choices}]"
             prompt.append(" ")
             prompt.append(choices, "prompt.choices")
@@ -237,6 +248,13 @@ class PromptBase(Generic[PromptType]):
             PromptType: The value to be returned from ask method.
         """
         value = value.strip()
+
+        if self.choices is not None and self.numeric_selection:
+            if value.isdigit():
+                index = int(value) - 1
+                if 0 <= index < len(self.choices):
+                    value = self.choices[index]
+
         try:
             return_value: PromptType = self.response_type(value)
         except ValueError:
@@ -268,14 +286,12 @@ class PromptBase(Generic[PromptType]):
         """Hook to display something before the prompt."""
 
     @overload
-    def __call__(self, *, stream: Optional[TextIO] = None) -> PromptType:
-        ...
+    def __call__(self, *, stream: Optional[TextIO] = None) -> PromptType: ...
 
     @overload
     def __call__(
         self, *, default: DefaultType, stream: Optional[TextIO] = None
-    ) -> Union[PromptType, DefaultType]:
-        ...
+    ) -> Union[PromptType, DefaultType]: ...
 
     def __call__(self, *, default: Any = ..., stream: Optional[TextIO] = None) -> Any:
         """Run the prompt loop.
@@ -388,6 +404,13 @@ if __name__ == "__main__":  # pragma: no cover
 
         fruit = Prompt.ask("Enter a fruit", choices=["apple", "orange", "pear"])
         print(f"fruit={fruit!r}")
+
+        vegetable = Prompt.ask(
+            "Enter a vegetable",
+            choices=["carrot", "onion", "celery"],
+            numeric_selection=True,
+        )
+        print(f"vegetable={vegetable!r}")
 
         doggie = Prompt.ask(
             "What's the best Dog? (Case INSENSITIVE)",
