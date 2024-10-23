@@ -52,7 +52,7 @@ def install(
     extra_lines: int = 3,
     theme: Optional[str] = None,
     word_wrap: bool = False,
-    show_locals: bool = False,
+    show_locals: Union[bool, int] = False,
     locals_max_length: int = LOCALS_MAX_LENGTH,
     locals_max_string: int = LOCALS_MAX_STRING,
     locals_hide_dunder: bool = True,
@@ -74,7 +74,7 @@ def install(
         theme (Optional[str], optional): Pygments theme to use in traceback. Defaults to ``None`` which will pick
             a theme appropriate for the platform.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
-        show_locals (bool, optional): Enable display of local variables. Defaults to False.
+        show_locals (Union[bool, int], optional): Enable display of local variables. Defaults to False. If int is given, limits the number of frames to those closest to the error.
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to 10.
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
@@ -222,7 +222,7 @@ class Traceback:
         extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
         theme (str, optional): Override pygments theme used in traceback.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
-        show_locals (bool, optional): Enable display of local variables. Defaults to False.
+        show_locals (bool, optional): Enable display of local variables. Defaults to False. If set to an integer, limits the number of frames to those closest to the error.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to 10.
@@ -251,7 +251,7 @@ class Traceback:
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
-        show_locals: bool = False,
+        show_locals: Union[bool, int] = False,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
         locals_hide_dunder: bool = True,
@@ -307,7 +307,7 @@ class Traceback:
         extra_lines: int = 3,
         theme: Optional[str] = None,
         word_wrap: bool = False,
-        show_locals: bool = False,
+        show_locals: Union[bool, int] = False,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
         locals_hide_dunder: bool = True,
@@ -327,7 +327,7 @@ class Traceback:
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
             theme (str, optional): Override pygments theme used in traceback.
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
-            show_locals (bool, optional): Enable display of local variables. Defaults to False.
+            show_locals (bool, optional): Enable display of local variables. Defaults to False. If set to an integer, limits the number of frames to those closest to the error.
             indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
             locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
                 Defaults to 10.
@@ -375,7 +375,7 @@ class Traceback:
         exc_value: BaseException,
         traceback: Optional[TracebackType],
         *,
-        show_locals: bool = False,
+        show_locals: Union[bool, int] = False,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
         locals_hide_dunder: bool = True,
@@ -387,7 +387,7 @@ class Traceback:
             exc_type (Type[BaseException]): Exception type.
             exc_value (BaseException): Exception value.
             traceback (TracebackType): Python Traceback object.
-            show_locals (bool, optional): Enable display of local variables. Defaults to False.
+            show_locals (bool, optional): Enable display of local variables. Defaults to False. If set to an integer, limits the number of frames to those closest to the error.
             locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
                 Defaults to 10.
             locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
@@ -443,7 +443,16 @@ class Traceback:
                         continue
                     yield key, value
 
-            for frame_summary, line_no in walk_tb(traceback):
+            if isinstance(show_locals, int):
+                n_frames = len(list(walk_tb(traceback)))
+                show_locals_for = [i for i in range(max(0, n_frames-show_locals), n_frames)]
+            elif show_locals:
+                show_locals_for = list(range(n_frames))
+            else:
+                show_locals_for = []
+            show_locals_for = set(show_locals_for)
+
+            for frame_number, (frame_summary, line_no) in enumerate(walk_tb(traceback)):
                 filename = frame_summary.f_code.co_filename
 
                 last_instruction: Optional[Tuple[Tuple[int, int], Tuple[int, int]]]
@@ -494,7 +503,7 @@ class Traceback:
                             for key, value in get_locals(frame_summary.f_locals.items())
                             if not (inspect.isfunction(value) or inspect.isclass(value))
                         }
-                        if show_locals
+                        if frame_number in show_locals_for
                         else None
                     ),
                     last_instruction=last_instruction,
