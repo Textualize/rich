@@ -13,6 +13,7 @@ _SINGLE_CELLS = frozenset(
         *map(chr, range(0x2500, 0x25FF + 1)),
     ]
 )
+
 _is_single_cell_widths = _SINGLE_CELLS.issuperset
 
 
@@ -29,9 +30,9 @@ def cached_cell_len(text: str) -> int:
     Returns:
         int: Get the number of cells required to display text.
     """
-    _get_size = get_character_cell_size
-    total_size = sum(_get_size(character) for character in text)
-    return total_size
+    if _is_single_cell_widths(text):
+        return len(text)
+    return sum(map(get_character_cell_size, text))
 
 
 def cell_len(text: str, _cell_len: Callable[[str], int] = cached_cell_len) -> int:
@@ -45,9 +46,9 @@ def cell_len(text: str, _cell_len: Callable[[str], int] = cached_cell_len) -> in
     """
     if len(text) < 512:
         return _cell_len(text)
-    _get_size = get_character_cell_size
-    total_size = sum(_get_size(character) for character in text)
-    return total_size
+    if _is_single_cell_widths(text):
+        return len(text)
+    return sum(map(get_character_cell_size, text))
 
 
 @lru_cache(maxsize=4096)
