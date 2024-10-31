@@ -1,15 +1,19 @@
 from __future__ import annotations
 
-import re
 from functools import lru_cache
 from typing import Callable
 
 from ._cell_widths import CELL_WIDTHS
 
-# Regex to match sequence of the most common character ranges
-_is_single_cell_widths = re.compile(
-    "^[\u0020-\u007e\u00a0-\u02ff\u0370-\u0482\u2500-\u25FF]*$"
-).match
+_SINGLE_CELLS = frozenset(
+    [
+        *map(chr, range(0x20, 0x7E + 1)),
+        *map(chr, range(0xA0, 0x02FF + 1)),
+        *map(chr, range(0x0370, 0x0482 + 1)),
+        *map(chr, range(0x2500, 0x25FF + 1)),
+    ]
+)
+_is_single_cell_widths = _SINGLE_CELLS.issuperset
 
 
 @lru_cache(4096)
