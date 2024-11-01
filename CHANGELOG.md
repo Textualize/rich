@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [13.9.4] - 2024-11-01
+
+### Changed
+
+- Optimizations to cell_len which may speed up Rich / Textual output https://github.com/Textualize/rich/pull/3546
+
 ## [13.9.3] - 2024-10-22
 
 ### Fixed
@@ -2104,6 +2110,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[13.9.4]: https://github.com/textualize/rich/compare/v13.9.3...v13.9.4
 [13.9.3]: https://github.com/textualize/rich/compare/v13.9.2...v13.9.3
 [13.9.2]: https://github.com/textualize/rich/compare/v13.9.1...v13.9.2
 [13.9.1]: https://github.com/textualize/rich/compare/v13.9.0...v13.9.1
