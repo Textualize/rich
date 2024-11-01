@@ -15,23 +15,14 @@ _SINGLE_CELL_UNICODE_RANGES: list[tuple[int, int]] = [
     (0x02800, 0x028FF),  # Braille
 ]
 
-
-def _make_single_cell_set() -> frozenset[str]:
-    """Combine ranges of ordinals in to a frozen set of strings.
-
-    Returns:
-        A frozenset of single cell characters.
-
-    """
-    character_range_lists = [
-        list(map(chr, range(_start, _end + 1)))
-        for _start, _end in _SINGLE_CELL_UNICODE_RANGES
-    ]
-    return frozenset(sum(character_range_lists, start=[]))
-
-
 # A set of characters that are a single cell wide
-_SINGLE_CELLS = _make_single_cell_set()
+_SINGLE_CELLS = frozenset(
+    [
+        character
+        for _start, _end in _SINGLE_CELL_UNICODE_RANGES
+        for character in map(chr, range(_start, _end + 1))
+    ]
+)
 
 # When called with a string this will return True if all
 # characters are single-cell, otherwise False
