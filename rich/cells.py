@@ -5,16 +5,37 @@ from typing import Callable
 
 from ._cell_widths import CELL_WIDTHS
 
-_SINGLE_CELLS = frozenset(
-    [
-        *map(chr, range(0x20, 0x7E + 1)),
-        *map(chr, range(0xA0, 0x02FF + 1)),
-        *map(chr, range(0x0370, 0x0482 + 1)),
-        *map(chr, range(0x2500, 0x25FF + 1)),
-    ]
-)
+# Ranges of unicode ordinals that produce a 1-cell wide character
+_SINGLE_CELL_UNICODE_RANGES: list[tuple[int, int]] = [
+    (0x20, 0x7E),  # Latin (excluding non-printable)
+    (0xA0, 0xAC),
+    (0xAE, 0x002FF),
+    (0x00370, 0x00482),  # Greek / Cyrillic
+    (0x02500, 0x025FC),  # Box drawing, box elements, geometric shapes
+    (0x02800, 0x028FF),  # Braille
+]
 
-_is_single_cell_widths = _SINGLE_CELLS.issuperset
+
+def _make_single_cell_set() -> frozenset[str]:
+    """Combine ranges of ordinals in to a frozen set of strings.
+
+    Returns:
+        A frozenset of single cell characters.
+
+    """
+    character_range_lists = [
+        list(map(chr, range(_start, _end + 1)))
+        for _start, _end in _SINGLE_CELL_UNICODE_RANGES
+    ]
+    return frozenset(sum(character_range_lists, start=[]))
+
+
+# A set of characters that are a single cell wide
+_SINGLE_CELLS = _make_single_cell_set()
+
+# When called with a string this will return True if all
+# characters are single-cell, otherwise False
+_is_single_cell_widths: Callable[[str], bool] = _SINGLE_CELLS.issuperset
 
 
 @lru_cache(4096)
@@ -61,20 +82,7 @@ def get_character_cell_size(character: str) -> int:
     Returns:
         int: Number of cells (0, 1 or 2) occupied by that character.
     """
-    return _get_codepoint_cell_size(ord(character))
-
-
-@lru_cache(maxsize=4096)
-def _get_codepoint_cell_size(codepoint: int) -> int:
-    """Get the cell size of a character.
-
-    Args:
-        codepoint (int): Codepoint of a character.
-
-    Returns:
-        int: Number of cells (0, 1 or 2) occupied by that character.
-    """
-
+    codepoint = ord(character)
     _table = CELL_WIDTHS
     lower_bound = 0
     upper_bound = len(_table) - 1
