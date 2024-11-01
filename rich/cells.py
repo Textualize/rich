@@ -6,6 +6,7 @@ from typing import Callable
 from ._cell_widths import CELL_WIDTHS
 
 # Ranges of unicode ordinals that produce a 1-cell wide character
+# This is non-exhaustive, but covers most common Western characters
 _SINGLE_CELL_UNICODE_RANGES: list[tuple[int, int]] = [
     (0x20, 0x7E),  # Latin (excluding non-printable)
     (0xA0, 0xAC),
