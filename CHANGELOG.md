@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [13.9.4] - 2024-11-01
 
+- Added possibility to have numerical choices in prompt
+
 ### Changed
 
 - Optimizations to cell_len which may speed up Rich / Textual output https://github.com/Textualize/rich/pull/3546
