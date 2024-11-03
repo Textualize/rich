@@ -1,11 +1,31 @@
 # encoding=utf-8
+import asyncio
 import time
-from typing import Optional
+from typing import Literal, Optional
 
 # import pytest
 from rich.console import Console
-from rich.live import Live
+from rich.live import Live, _AsyncioTaskRefresher, _ThreadRefresher
 from rich.text import Text
+
+
+def test_refresher() -> None:
+    def get_refresher(refresh_method: Literal["thread", "asyncio_task", "auto"]):
+        with Live("", refresh_method=refresh_method) as live:
+            return live._refresher
+
+    async def async_get_refresher(
+        refresh_method: Literal["thread", "asyncio_task", "auto"],
+    ):
+        return get_refresher(refresh_method)
+
+    assert isinstance(get_refresher("thread"), _ThreadRefresher)
+    assert isinstance(asyncio.run(async_get_refresher("thread")), _ThreadRefresher)
+    assert isinstance(
+        asyncio.run(async_get_refresher("asyncio_task")), _AsyncioTaskRefresher
+    )
+    assert isinstance(get_refresher("auto"), _ThreadRefresher)
+    assert isinstance(asyncio.run(async_get_refresher("auto")), _AsyncioTaskRefresher)
 
 
 def create_capture_console(
