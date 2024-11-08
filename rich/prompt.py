@@ -39,6 +39,7 @@ class PromptBase(Generic[PromptType]):
         case_sensitive (bool, optional): Matching of choices should be case-sensitive. Defaults to True.
         show_default (bool, optional): Show default in prompt. Defaults to True.
         show_choices (bool, optional): Show choices in prompt. Defaults to True.
+        choices_separator (str, optional): Separator for choices. Defaults to "/".
     """
 
     response_type: type = str
@@ -61,6 +62,7 @@ class PromptBase(Generic[PromptType]):
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
+        choices_separator: str = "/",
     ) -> None:
         self.console = console or get_console()
         self.prompt = (
@@ -74,6 +76,7 @@ class PromptBase(Generic[PromptType]):
         self.case_sensitive = case_sensitive
         self.show_default = show_default
         self.show_choices = show_choices
+        self.choices_separator = choices_separator
 
     @classmethod
     @overload
@@ -87,6 +90,7 @@ class PromptBase(Generic[PromptType]):
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
+        choices_separator: str = "/",
         default: DefaultType,
         stream: Optional[TextIO] = None,
     ) -> Union[DefaultType, PromptType]:
@@ -104,6 +108,7 @@ class PromptBase(Generic[PromptType]):
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
+        choices_separator: str = "/",
         stream: Optional[TextIO] = None,
     ) -> PromptType:
         ...
@@ -119,6 +124,7 @@ class PromptBase(Generic[PromptType]):
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
+        choices_separator: str = "/",
         default: Any = ...,
         stream: Optional[TextIO] = None,
     ) -> Any:
@@ -135,6 +141,7 @@ class PromptBase(Generic[PromptType]):
             case_sensitive (bool, optional): Matching of choices should be case-sensitive. Defaults to True.
             show_default (bool, optional): Show default in prompt. Defaults to True.
             show_choices (bool, optional): Show choices in prompt. Defaults to True.
+            choices_separator (str, optional): Separator for choices. Defaults to "/".
             stream (TextIO, optional): Optional text file open for reading to get input. Defaults to None.
         """
         _prompt = cls(
@@ -145,6 +152,7 @@ class PromptBase(Generic[PromptType]):
             case_sensitive=case_sensitive,
             show_default=show_default,
             show_choices=show_choices,
+            choices_separator=choices_separator,
         )
         return _prompt(default=default, stream=stream)
 
@@ -172,7 +180,7 @@ class PromptBase(Generic[PromptType]):
         prompt.end = ""
 
         if self.show_choices and self.choices:
-            _choices = "/".join(self.choices)
+            _choices = self.choices_separator.join(self.choices)
             choices = f"[{_choices}]"
             prompt.append(" ")
             prompt.append(choices, "prompt.choices")
