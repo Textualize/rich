@@ -131,7 +131,11 @@ class RichHandler(Handler):
 
     def emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
-        message = self.format(record)
+        try:
+            message = self.format(record)
+        except Exception:
+            self.handleError(record)
+
         traceback = None
         if (
             self.rich_tracebacks
