@@ -129,13 +129,9 @@ class RichHandler(Handler):
         )
         return level_text
 
-    def emit(self, record: LogRecord) -> None:
+    def _emit(self, record: LogRecord) -> None:
         """Invoked by logging."""
-        try:
-            message = self.format(record)
-        except Exception:
-            self.handleError(record)
-
+        message = self.format(record)
         traceback = None
         if (
             self.rich_tracebacks
@@ -182,6 +178,12 @@ class RichHandler(Handler):
                 self.console.print(log_renderable)
             except Exception:
                 self.handleError(record)
+
+    def emit(self, record: LogRecord) -> None:
+        try: 
+            return self._emit(record) 
+        except Exception: 
+            self.handleError(record)
 
     def render_message(self, record: LogRecord, message: str) -> "ConsoleRenderable":
         """Render message text in to Text.
