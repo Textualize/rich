@@ -292,7 +292,6 @@ class PromptBase(Generic[PromptType]):
             prompt = self.make_prompt(default)
             value = self.get_input(self.console, prompt, self.password, stream=stream)
             if ("readline" in sys.modules) and (value == ""):
-
                 print("")
             if value == "" and default != ...:
                 return default
