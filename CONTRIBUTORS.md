@@ -70,6 +70,7 @@ The following people have contributed to the development of Rich:
 - [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Aaron Stephens](https://github.com/aaronst)
 - [Karolina Surma](https://github.com/befeleme)
+- [Wei Jie Tan](https://github.com/PokkaKiyo)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
 - [Nils Vu](https://github.com/nilsvu)
 - [Arian Mollik Wasi](https://github.com/wasi-master)
@@ -91,4 +92,3 @@ The following people have contributed to the development of Rich:
 - [L. Yeung](https://github.com/lewis-yeung)
 - [chthollyphile](https://github.com/chthollyphile)
 - [Jonathan Helmus](https://github.com/jjhelmus)
-- [Tan Wei Jie](https://github.com/PokkaKiyo)
