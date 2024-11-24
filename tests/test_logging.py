@@ -1,7 +1,9 @@
+import datetime
 import io
 import os
 import logging
 from typing import Optional
+from unittest import mock
 
 import pytest
 
@@ -160,6 +162,51 @@ def test_markup_and_highlight():
     render_plain = handler.console.file.getvalue()
     assert "FORMATTER" in render_plain
     assert log_message in render_plain
+
+
+@pytest.mark.parametrize(
+    ["timezone", "expected_timestamp"],
+    [
+        (
+            datetime.UTC,
+            "2025-01-01T00:00:00+0000",
+        ),
+        (
+            datetime.timezone(-datetime.timedelta(hours=1)),
+            "2024-12-31T23:00:00-0100",
+        ),
+        (
+            datetime.timezone(datetime.timedelta(hours=2, minutes=30)),
+            "2025-01-01T02:30:00+0230",
+        ),
+    ],
+)
+@mock.patch("time.time", lambda: 1735689600)
+def test_timestamp(timezone, expected_timestamp):
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=140,
+        color_system=None,
+        _environ={},
+    )
+    handler_with_tracebacks = RichHandler(
+        console=console,
+        enable_link_path=False,
+        rich_tracebacks=True,
+        log_time_zone=timezone,
+    )
+    formatter = logging.Formatter(
+        "FORMATTER %(message)s", datefmt=r"%Y-%m-%dT%H:%M:%S%z"
+    )
+    handler_with_tracebacks.setFormatter(formatter)
+    log.addHandler(handler_with_tracebacks)
+    log.error("foo")
+
+    render = handler_with_tracebacks.console.file.getvalue()
+
+    assert "FORMATTER foo" in render
+    assert expected_timestamp in render
 
 
 if __name__ == "__main__":

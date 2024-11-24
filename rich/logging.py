@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, tzinfo
 from logging import Handler, LogRecord
 from pathlib import Path
 from types import ModuleType
@@ -47,6 +47,7 @@ class RichHandler(Handler):
             Defaults to 10.
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
         log_time_format (Union[str, TimeFormatterCallable], optional): If ``log_time`` is enabled, either string for strftime or callable that formats the time. Defaults to "[%x %X] ".
+        log_time_zone (datetime.tzinfo, optional): The timezone used to convert log message timestamps into "aware" datetime objects. Defaults to None.
         keywords (List[str], optional): List of words to highlight instead of ``RichHandler.KEYWORDS``.
     """
 
@@ -86,6 +87,7 @@ class RichHandler(Handler):
         locals_max_length: int = 10,
         locals_max_string: int = 80,
         log_time_format: Union[str, FormatTimeCallable] = "[%x %X]",
+        log_time_zone: Optional[tzinfo] = None,
         keywords: Optional[List[str]] = None,
     ) -> None:
         super().__init__(level=level)
@@ -112,6 +114,7 @@ class RichHandler(Handler):
         self.tracebacks_code_width = tracebacks_code_width
         self.locals_max_length = locals_max_length
         self.locals_max_string = locals_max_string
+        self.log_time_zone = log_time_zone
         self.keywords = keywords
 
     def get_level_text(self, record: LogRecord) -> Text:
@@ -224,7 +227,7 @@ class RichHandler(Handler):
         path = Path(record.pathname).name
         level = self.get_level_text(record)
         time_format = None if self.formatter is None else self.formatter.datefmt
-        log_time = datetime.fromtimestamp(record.created)
+        log_time = datetime.fromtimestamp(record.created, tz=self.log_time_zone)
 
         log_renderable = self._log_render(
             self.console,
