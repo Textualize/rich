@@ -831,10 +831,31 @@ class FileSizeColumn(ProgressColumn):
 class TotalFileSizeColumn(ProgressColumn):
     """Renders total filesize."""
 
+    def __init__(self, binary_units: bool = False, table_column: Optional[Column] = None) -> None:
+        self.binary_units = binary_units
+        super().__init__(table_column=table_column)
+
     def render(self, task: "Task") -> Text:
-        """Show data completed."""
-        data_size = filesize.decimal(int(task.total)) if task.total is not None else ""
-        return Text(data_size, style="progress.filesize.total")
+        """Show total data size."""
+        if task.total is not None:
+            total_size = int(task.total)
+
+            if self.binary_units:
+                unit, suffix = filesize.pick_unit_and_suffix(
+                    total_size, ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"], 1024
+                )
+            else:
+                unit, suffix = filesize.pick_unit_and_suffix(
+                    total_size, ["bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], 1000
+                )
+
+            size_in_unit = total_size / unit
+            precision = 0 if unit == 1 else 1
+            size_str = f"{size_in_unit:,.{precision}f} {suffix}"
+        else:
+            size_str = ""
+
+        return Text(size_str, style="progress.filesize.total")
 
 
 class MofNCompleteColumn(ProgressColumn):
