@@ -72,6 +72,7 @@ The following people have contributed to the development of Rich:
 - [Karolina Surma](https://github.com/befeleme)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
 - [Nils Vu](https://github.com/nilsvu)
+- [Alex Waite](https://github.com/aqw)
 - [Arian Mollik Wasi](https://github.com/wasi-master)
 - [Jan van Wijk](https://github.com/jdvanwijk)
 - [Handhika Yanuar Pratama](https://github.com/theDreamer911)
