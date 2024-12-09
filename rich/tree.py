@@ -43,6 +43,7 @@ class Tree(JupyterMixin):
         expanded: bool = True,
         highlight: bool = False,
         hide_root: bool = False,
+        end_new_line: bool = True,
     ) -> None:
         self.label = label
         self.style = style
@@ -51,6 +52,7 @@ class Tree(JupyterMixin):
         self.expanded = expanded
         self.highlight = highlight
         self.hide_root = hide_root
+        self.end_new_line = end_new_line
 
     def add(
         self,
@@ -79,6 +81,7 @@ class Tree(JupyterMixin):
             guide_style=self.guide_style if guide_style is None else guide_style,
             expanded=expanded,
             highlight=self.highlight if highlight is None else highlight,
+            end_new_line=True,
         )
         self.children.append(node)
         return node
@@ -155,7 +158,8 @@ class Tree(JupyterMixin):
                             post_style=remove_guide_styles,
                         )
                     yield from line
-                    yield new_line
+                    if self.end_new_line:
+                        yield new_line
                     if first and prefix:
                         prefix[-1] = make_guide(
                             SPACE if last else CONTINUE, prefix[-1].style or null_style
