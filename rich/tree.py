@@ -158,8 +158,11 @@ class Tree(JupyterMixin):
                             post_style=remove_guide_styles,
                         )
                     yield from line
-                    if self.end_new_line:
+
+                    # Equivalent of `if not last or (depth == 0) or (depth != 0 and self.end_new_line):`
+                    if not last or depth == 0 or self.end_new_line:
                         yield new_line
+
                     if first and prefix:
                         prefix[-1] = make_guide(
                             SPACE if last else CONTINUE, prefix[-1].style or null_style
