@@ -84,7 +84,7 @@ def _is_dataclass_repr(obj: object) -> bool:
     try:
         accepted = {dataclasses.__file__, reprlib.__file__}
         if IS_FROZEN:
-            accepted.update({'dataclasses.py', 'reprlib.py'})
+            accepted.update({"dataclasses.py", "reprlib.py"})
         return obj.__repr__.__code__.co_filename in accepted
     except Exception:  # pragma: no coverage
         return False
