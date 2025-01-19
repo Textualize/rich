@@ -22,7 +22,7 @@ class Panel(JupyterMixin):
 
     Args:
         renderable (RenderableType): A console renderable object.
-        box (Box, optional): A Box instance that defines the look of the border (see :ref:`appendix_box`. Defaults to box.ROUNDED.
+        box (Box): A Box instance that defines the look of the border (see :ref:`appendix_box`. Defaults to box.ROUNDED.
         title (Optional[TextType], optional): Optional title displayed in panel header. Defaults to None.
         title_align (AlignMethod, optional): Alignment of title. Defaults to "center".
         subtitle (Optional[TextType], optional): Optional subtitle displayed in panel footer. Defaults to None.
