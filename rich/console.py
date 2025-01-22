@@ -997,7 +997,7 @@ class Console:
         """
 
         if self._width is not None and self._height is not None:
-            return ConsoleDimensions(self._width - self.legacy_windows, self._height)
+            return ConsoleDimensions(self._width, self._height)
 
         if self.is_dumb_terminal:
             return ConsoleDimensions(80, 25)
