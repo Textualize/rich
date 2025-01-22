@@ -1,4 +1,7 @@
 import io
+from time import sleep
+
+import pytest
 
 from rich.console import Console
 from rich.prompt import Confirm, IntPrompt, Prompt
@@ -111,3 +114,27 @@ def test_prompt_confirm_default():
     output = console.file.getvalue()
     print(repr(output))
     assert output == expected
+
+
+def test_prompt_timeout_handling():
+    """Test that a timeout prints the correct message and returns default."""
+    console = Console(file=io.StringIO())
+    default_value = "Default"
+    result = Prompt.ask(
+        "Enter a value",
+        console=console,
+        timeout=0.1,
+        default=default_value
+    )
+    assert result == default_value
+
+
+def test_prompt_timeout_no_default():
+    """Test that a timeout with no default does not raise but returns an empty string."""
+    console = Console(file=io.StringIO())
+    result = Prompt.ask(
+        "Enter a value",
+        console=console,
+        timeout=0.1
+    )
+    assert result == ""
