@@ -822,10 +822,31 @@ class TimeRemainingColumn(ProgressColumn):
 class FileSizeColumn(ProgressColumn):
     """Renders completed filesize."""
 
+    def __init__(self, binary_units: bool = False, table_column: Optional[Column] = None) -> None:
+        self.binary_units = binary_units
+        super().__init__(table_column=table_column)
+
     def render(self, task: "Task") -> Text:
-        """Show data completed."""
-        data_size = filesize.decimal(int(task.completed))
-        return Text(data_size, style="progress.filesize")
+        """Show total data size."""
+        if task.total is not None:
+            total_size = int(task.total)
+
+            if self.binary_units:
+                unit, suffix = filesize.pick_unit_and_suffix(
+                    total_size, ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"], 1024
+                )
+            else:
+                unit, suffix = filesize.pick_unit_and_suffix(
+                    total_size, ["bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], 1000
+                )
+
+            size_in_unit = total_size / unit
+            precision = 0 if unit == 1 else 1
+            size_str = f"{size_in_unit:,.{precision}f} {suffix}"
+        else:
+            size_str = ""
+
+        return Text(size_str, style="progress.filesize.total")
 
 
 class TotalFileSizeColumn(ProgressColumn):
@@ -937,13 +958,32 @@ class DownloadColumn(ProgressColumn):
 class TransferSpeedColumn(ProgressColumn):
     """Renders human readable transfer speed."""
 
+    def __init__(self, binary_units: bool = False, table_column: Optional[Column] = None) -> None:
+        self.binary_units = binary_units
+        super().__init__(table_column=table_column)
+
     def render(self, task: "Task") -> Text:
         """Show data transfer speed."""
         speed = task.finished_speed or task.speed
         if speed is None:
             return Text("?", style="progress.data.speed")
-        data_speed = filesize.decimal(int(speed))
-        return Text(f"{data_speed}/s", style="progress.data.speed")
+
+        speed = int(speed)
+
+        if self.binary_units:
+            unit, suffix = filesize.pick_unit_and_suffix(
+                speed, ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"], 1024
+            )
+        else:
+            unit, suffix = filesize.pick_unit_and_suffix(
+                speed, ["bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], 1000
+            )
+
+        speed_in_unit = speed / unit
+        precision = 0 if unit == 1 else 1
+        speed_str = f"{speed_in_unit:,.{precision}f} {suffix}/s"
+
+        return Text(speed_str, style="progress.data.speed")
 
 
 class ProgressSample(NamedTuple):

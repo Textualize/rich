@@ -167,34 +167,49 @@ def test_download_progress_uses_binary_units() -> None:
 
 def test_filesize_column_uses_decimal_units() -> None:
     column = FileSizeColumn()
-    test_task = Task(1, "test", 1500, 0, _get_time=lambda: 1.0)
-    rendered_filesize = str(column.render(test_task))
-    expected = "1.5 kB"
-    assert rendered_filesize == expected
+    test_task = Task(1, "test", 1000, 500, _get_time=lambda: 1.0)
+    rendered_progress = str(column.render(test_task))
+    expected = "0.5/1.0 kB"
+    assert rendered_progress == expected
 
 
 def test_filesize_column_uses_binary_units() -> None:
     column = FileSizeColumn(binary_units=True)
-    test_task = Task(1, "test", 1500, 0, _get_time=lambda: 1.0)
-    rendered_filesize = str(column.render(test_task))
-    expected = "1.5 KiB"
-    assert rendered_filesize == expected
+    test_task = Task(1, "test", 1024, 512, _get_time=lambda: 1.0)
+    rendered_progress = str(column.render(test_task))
+    expected = "0.5/1.0 KiB"
+    assert rendered_progress == expected
 
 
 def test_total_filesize_column_uses_decimal_units() -> None:
     column = TotalFileSizeColumn()
-    test_task = Task(1, "test", 1500, 0, _get_time=lambda: 1.0)
-    rendered_total_filesize = str(column.render(test_task))
-    expected = "1.5 kB"
-    assert rendered_total_filesize == expected
+    test_task = Task(1, "test", 1000, 500, _get_time=lambda: 1.0)
+    rendered_progress = str(column.render(test_task))
+    expected = "0.5/1.0 kB"
+    assert rendered_progress == expected
 
 
 def test_total_filesize_column_uses_binary_units() -> None:
     column = TotalFileSizeColumn(binary_units=True)
-    test_task = Task(1, "test", 1500, 0, _get_time=lambda: 1.0)
-    rendered_total_filesize = str(column.render(test_task))
-    expected = "1.5 KiB"
-    assert rendered_total_filesize == expected
+    test_task = Task(1, "test", 1024, 512, _get_time=lambda: 1.0)
+    rendered_progress = str(column.render(test_task))
+    expected = "0.5/1.0 KiB"
+    assert rendered_progress == expected
+
+
+def test_transfer_speed_column_uses_decimal_units() -> None:
+    column = TransferSpeedColumn()
+    test_task = Task(1, "test", 1000, 500, _get_time=lambda: 1.0)
+    rendered_progress = str(column.render(test_task))
+    expected = "0.5 kB/s"
+    assert rendered_progress == expected
+
+def test_transfer_speed_column_with_binary_units() -> None:
+    column = TransferSpeedColumn(binary_units=True)
+    task = Task(1, "test", 1024, 512, _get_time=lambda: 1.0)
+    rendered_speed = str(column.render(task))
+    expected = "0.5 KiB/s"
+    assert rendered_speed == expected
 
 
 def test_task_ids():
