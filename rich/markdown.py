@@ -513,6 +513,7 @@ class Markdown(JupyterMixin):
             enabled. Defaults to None.
         inline_code_theme: (Optional[str], optional): Pygments theme for inline code
             highlighting, or None for no highlighting. Defaults to None.
+        breaks (bool, optional): Enable line breaks. Defaults to False.
     """
 
     elements: ClassVar[dict[str, type[MarkdownElement]]] = {
@@ -545,6 +546,7 @@ class Markdown(JupyterMixin):
         hyperlinks: bool = True,
         inline_code_lexer: str | None = None,
         inline_code_theme: str | None = None,
+        breaks: bool = False,
     ) -> None:
         parser = MarkdownIt().enable("strikethrough").enable("table")
         self.markup = markup
@@ -555,6 +557,7 @@ class Markdown(JupyterMixin):
         self.hyperlinks = hyperlinks
         self.inline_code_lexer = inline_code_lexer
         self.inline_code_theme = inline_code_theme or code_theme
+        self.breaks = breaks
 
     def _flatten_tokens(self, tokens: Iterable[Token]) -> Iterable[Token]:
         """Flattens the token stream."""
@@ -597,7 +600,7 @@ class Markdown(JupyterMixin):
             elif node_type == "hardbreak":
                 context.on_text("\n", node_type)
             elif node_type == "softbreak":
-                context.on_text(" ", node_type)
+                context.on_text("\n" if self.breaks else " ", node_type)
             elif node_type == "link_open":
                 href = str(token.attrs.get("href", ""))
                 if self.hyperlinks:

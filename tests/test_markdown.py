@@ -198,6 +198,14 @@ def test_table_with_empty_cells() -> None:
     expected = len(render(complete_table).splitlines())
     assert result == expected
 
+# write a test where markdown breaks is set to true
+def test_markdown_render_breaks():
+    markdown = Markdown("this is a  breaks test", breaks=True)
+    result = render(markdown)
+    print(repr(result))
+
+    expected = ('this is a  breaks test                                                                              \n')
+    assert result == expected
 
 if __name__ == "__main__":
     markdown = Markdown(MARKDOWN)
