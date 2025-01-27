@@ -92,7 +92,7 @@ Rich also includes an IPython extension that will do this same pretty install + 
 
     In [1]: %load_ext rich
 
-You can also have it load by default by adding `"rich"` to the ``c.InteractiveShellApp.extension`` variable in
+You can also have it load by default by adding `"rich"` to the ``c.InteractiveShellApp.extensions`` variable in
 `IPython Configuration <https://ipython.readthedocs.io/en/stable/config/intro.html>`_.
 
 Rich Inspect
