@@ -967,6 +967,14 @@ def test_force_color_jupyter():
     assert not console.is_terminal
 
 
+@mock.patch("rich.jupyter.display")
+def test_capture_not_print_empty_line_jupyter(display: mock.MagicMock):
+    console = Console(force_jupyter=True)
+    with console.capture():
+        pass
+    display.assert_not_called()
+    
+
 def test_force_color():
     console = Console(
         file=io.StringIO(),
