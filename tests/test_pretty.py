@@ -14,10 +14,6 @@ from rich.measure import Measurement
 from rich.pretty import Node, Pretty, _ipy_display_hook, install, pprint, pretty_repr
 from rich.text import Text
 
-skip_py37 = pytest.mark.skipif(
-    sys.version_info.minor == 7 and sys.version_info.major == 3,
-    reason="rendered differently on py3.7",
-)
 skip_py38 = pytest.mark.skipif(
     sys.version_info.minor == 8 and sys.version_info.major == 3,
     reason="rendered differently on py3.8",
@@ -656,7 +652,6 @@ def test_attrs_broken() -> None:
     assert result == expected
 
 
-@skip_py37
 @skip_py38
 @skip_py39
 def test_attrs_broken_310() -> None:
@@ -668,7 +663,10 @@ def test_attrs_broken_310() -> None:
     del foo.bar
     result = pretty_repr(foo)
     print(repr(result))
-    expected = "Foo(bar=AttributeError(\"'Foo' object has no attribute 'bar'\"))"
+    if sys.version_info >= (3, 13):
+        expected = "Foo(\n    bar=AttributeError(\"'tests.test_pretty.test_attrs_broken_310.<locals>.Foo' object has no attribute 'bar'\")\n)"
+    else:
+        expected = "Foo(bar=AttributeError(\"'Foo' object has no attribute 'bar'\"))"
     assert result == expected
 
 

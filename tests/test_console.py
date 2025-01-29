@@ -31,6 +31,8 @@ from rich.status import Status
 from rich.style import Style
 from rich.text import Text
 
+os.get_terminal_size
+
 
 def test_dumb_terminal():
     console = Console(force_terminal=True, _environ={})
@@ -140,7 +142,7 @@ def test_size():
     "is_windows,no_descriptor_size,stdin_size,stdout_size,stderr_size,expected_size",
     [
         # on Windows we'll use `os.get_terminal_size()` without arguments...
-        (True, (133, 24), ValueError, ValueError, ValueError, (133, 24)),
+        (True, (133, 24), ValueError, ValueError, ValueError, (80, 25)),
         (False, (133, 24), ValueError, ValueError, ValueError, (80, 25)),
         # ...while on other OS we'll try to pass stdin, then stdout, then stderr to it:
         (False, ValueError, (133, 24), ValueError, ValueError, (133, 24)),
@@ -157,8 +159,8 @@ def test_size_can_fall_back_to_std_descriptors(
     stdin_size: Union[Tuple[int, int], Type[ValueError]],
     stdout_size: Union[Tuple[int, int], Type[ValueError]],
     stderr_size: Union[Tuple[int, int], Type[ValueError]],
-    expected_size,
-):
+    expected_size: Tuple[int, int],
+) -> None:
     def get_terminal_size_mock_impl(fileno: int = None) -> Tuple[int, int]:
         value = {
             None: no_descriptor_size,

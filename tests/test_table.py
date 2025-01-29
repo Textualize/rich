@@ -363,6 +363,25 @@ def test_placement_table_box_elements(show_header, show_footer, expected):
     assert output == expected
 
 
+def test_columns_highlight_added_by_add_row() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3517"""
+    table = Table(show_header=False, highlight=True)
+    table.add_row("1", repr("FOO"))
+
+    assert table.columns[0].highlight == table.highlight
+    assert table.columns[1].highlight == table.highlight
+
+    console = Console(record=True)
+    console.print(table)
+    output = console.export_text(styles=True)
+    print(repr(output))
+
+    expected = (
+        "┌───┬───────┐\n│ \x1b[1;36m1\x1b[0m │ \x1b[32m'FOO'\x1b[0m │\n└───┴───────┘\n"
+    )
+    assert output == expected
+
+
 if __name__ == "__main__":
     render = render_tables()
     print(render)

@@ -1,13 +1,33 @@
 from __future__ import annotations
 
-import re
 from functools import lru_cache
 from typing import Callable
 
 from ._cell_widths import CELL_WIDTHS
 
-# Regex to match sequence of the most common character ranges
-_is_single_cell_widths = re.compile("^[\u0020-\u006f\u00a0\u02ff\u0370-\u0482]*$").match
+# Ranges of unicode ordinals that produce a 1-cell wide character
+# This is non-exhaustive, but covers most common Western characters
+_SINGLE_CELL_UNICODE_RANGES: list[tuple[int, int]] = [
+    (0x20, 0x7E),  # Latin (excluding non-printable)
+    (0xA0, 0xAC),
+    (0xAE, 0x002FF),
+    (0x00370, 0x00482),  # Greek / Cyrillic
+    (0x02500, 0x025FC),  # Box drawing, box elements, geometric shapes
+    (0x02800, 0x028FF),  # Braille
+]
+
+# A set of characters that are a single cell wide
+_SINGLE_CELLS = frozenset(
+    [
+        character
+        for _start, _end in _SINGLE_CELL_UNICODE_RANGES
+        for character in map(chr, range(_start, _end + 1))
+    ]
+)
+
+# When called with a string this will return True if all
+# characters are single-cell, otherwise False
+_is_single_cell_widths: Callable[[str], bool] = _SINGLE_CELLS.issuperset
 
 
 @lru_cache(4096)
@@ -23,9 +43,9 @@ def cached_cell_len(text: str) -> int:
     Returns:
         int: Get the number of cells required to display text.
     """
-    _get_size = get_character_cell_size
-    total_size = sum(_get_size(character) for character in text)
-    return total_size
+    if _is_single_cell_widths(text):
+        return len(text)
+    return sum(map(get_character_cell_size, text))
 
 
 def cell_len(text: str, _cell_len: Callable[[str], int] = cached_cell_len) -> int:
@@ -39,9 +59,9 @@ def cell_len(text: str, _cell_len: Callable[[str], int] = cached_cell_len) -> in
     """
     if len(text) < 512:
         return _cell_len(text)
-    _get_size = get_character_cell_size
-    total_size = sum(_get_size(character) for character in text)
-    return total_size
+    if _is_single_cell_widths(text):
+        return len(text)
+    return sum(map(get_character_cell_size, text))
 
 
 @lru_cache(maxsize=4096)
@@ -54,20 +74,7 @@ def get_character_cell_size(character: str) -> int:
     Returns:
         int: Number of cells (0, 1 or 2) occupied by that character.
     """
-    return _get_codepoint_cell_size(ord(character))
-
-
-@lru_cache(maxsize=4096)
-def _get_codepoint_cell_size(codepoint: int) -> int:
-    """Get the cell size of a character.
-
-    Args:
-        codepoint (int): Codepoint of a character.
-
-    Returns:
-        int: Number of cells (0, 1 or 2) occupied by that character.
-    """
-
+    codepoint = ord(character)
     _table = CELL_WIDTHS
     lower_bound = 0
     upper_bound = len(_table) - 1

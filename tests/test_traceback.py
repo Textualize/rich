@@ -327,3 +327,34 @@ def test_rich_traceback_omit_optional_local_flag(
         assert len(frames) == expected_frames_length
         frame_names = [f.name for f in frames]
         assert frame_names == expected_frame_names
+
+
+@pytest.mark.skipif(
+    sys.version_info.minor >= 11, reason="Not applicable after Python 3.11"
+)
+def test_traceback_finely_grained_missing() -> None:
+    """Before 3.11, the last_instruction should be None"""
+    try:
+        1 / 0
+    except:
+        traceback = Traceback()
+        last_instruction = traceback.trace.stacks[-1].frames[-1].last_instruction
+        assert last_instruction is None
+
+
+@pytest.mark.skipif(
+    sys.version_info.minor < 11, reason="Not applicable before Python 3.11"
+)
+def test_traceback_finely_grained() -> None:
+    """Check that last instruction is populated."""
+    try:
+        1 / 0
+    except:
+        traceback = Traceback()
+        last_instruction = traceback.trace.stacks[-1].frames[-1].last_instruction
+        assert last_instruction is not None
+        assert isinstance(last_instruction, tuple)
+        assert len(last_instruction) == 2
+        start, end = last_instruction
+        print(start, end)
+        assert start[0] == end[0]

@@ -175,6 +175,9 @@ class Panel(JupyterMixin):
             text = text.copy()
             text.truncate(width)
             excess_space = width - cell_len(text.plain)
+            if text.style:
+                text.stylize(console.get_style(text.style))
+
             if excess_space:
                 if align == "left":
                     return Text.assemble(

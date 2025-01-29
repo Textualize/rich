@@ -11,6 +11,7 @@ from typing import (
     List,
     NamedTuple,
     Optional,
+    Pattern,
     Tuple,
     Union,
 )
@@ -173,7 +174,7 @@ class Text(JupyterMixin):
         return self.plain
 
     def __repr__(self) -> str:
-        return f"<text {self.plain!r} {self._spans!r}>"
+        return f"<text {self.plain!r} {self._spans!r} {self.style!r}>"
 
     def __add__(self, other: Any) -> "Text":
         if isinstance(other, (str, Text)):
@@ -591,7 +592,7 @@ class Text(JupyterMixin):
 
     def highlight_regex(
         self,
-        re_highlight: str,
+        re_highlight: Union[Pattern[str], str],
         style: Optional[Union[GetStyleCallable, StyleType]] = None,
         *,
         style_prefix: str = "",
@@ -600,7 +601,7 @@ class Text(JupyterMixin):
         translated to styles.
 
         Args:
-            re_highlight (str): A regular expression.
+            re_highlight (Union[re.Pattern, str]): A regular expression object or string.
             style (Union[GetStyleCallable, StyleType]): Optional style to apply to whole match, or a callable
                 which accepts the matched text and returns a style. Defaults to None.
             style_prefix (str, optional): Optional prefix to add to style group names.
@@ -612,7 +613,9 @@ class Text(JupyterMixin):
         append_span = self._spans.append
         _Span = Span
         plain = self.plain
-        for match in re.finditer(re_highlight, plain):
+        if isinstance(re_highlight, str):
+            re_highlight = re.compile(re_highlight)
+        for match in re_highlight.finditer(plain):
             get_span = match.span
             if style:
                 start, end = get_span()
@@ -998,7 +1001,7 @@ class Text(JupyterMixin):
                 self._text.append(text.plain)
                 self._spans.extend(
                     _Span(start + text_length, end + text_length, style)
-                    for start, end, style in text._spans
+                    for start, end, style in text._spans.copy()
                 )
                 self._length += len(text)
         return self
@@ -1020,7 +1023,7 @@ class Text(JupyterMixin):
         self._text.append(text.plain)
         self._spans.extend(
             _Span(start + text_length, end + text_length, style)
-            for start, end, style in text._spans
+            for start, end, style in text._spans.copy()
         )
         self._length += len(text)
         return self
