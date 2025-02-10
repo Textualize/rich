@@ -73,23 +73,6 @@ def test_no_exception():
         tb = Traceback()
 
 
-def get_exception() -> Traceback:
-    def bar(a):
-        print(1 / a)
-
-    def foo(a):
-        bar(a)
-
-    try:
-        try:
-            foo(0)
-        except:
-            foobarbaz
-    except:
-        tb = Traceback()
-        return tb
-
-
 def test_print_exception():
     console = Console(width=100, file=io.StringIO())
     try:
