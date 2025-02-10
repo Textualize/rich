@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed type-hints for `locals_max_length` and `locals_max_string` in `Traceback` https://github.com/Textualize/rich/pull/3600
+- Fixed type-hints for `locals_max_length` and `locals_max_string` in `Traceback` https://github.com/Textualize/rich/pull/3630
 
 ## [13.9.4] - 2024-11-01
 
