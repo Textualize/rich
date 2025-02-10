@@ -12,6 +12,7 @@ The following people have contributed to the development of Rich:
 - [Dennis Brakhane](https://github.com/brakhane)
 - [Darren Burns](https://github.com/darrenburns)
 - [Ceyda Cinarel](https://github.com/cceyda)
+- [Ruan Cardoso Comelli](https://github.com/ruancomelli)
 - [Jim Crist-Harif](https://github.com/jcrist)
 - [Ed Davis](https://github.com/davised)
 - [Pete Davison](https://github.com/pd93)
