@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [13.9.5] - 2025-02-10
+
+### Fixed
+
+- Fixed type-hints for `locals_max_length` and `locals_max_string` in `Traceback` https://github.com/Textualize/rich/pull/3600
+
 ## [13.9.4] - 2024-11-01
 
 ### Changed
