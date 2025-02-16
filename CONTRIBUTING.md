@@ -18,14 +18,13 @@ After following this guide, you'll have a local copy of the Rich project install
 
 Enter the directory containing your copy of Rich (`cd rich`).
 
-Poetry can be used to create an isolated _virtual environment_ for the project:
+Create a new virtual environment, activate it, then install poetry
 
 ```
-poetry shell
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install poetry
 ```
-
-The first time we run `poetry shell`, such an isolated environment is created and forever associated with our project.
-Any time we wish to enter this virtual environment again, we simply run `poetry shell` again.
 
 Now we can install the dependencies of Rich into the virtual environment:
 
@@ -35,7 +34,7 @@ poetry install
 
 The rest of this guide assumes you're inside the virtual environment.
 If you're having difficulty running any of the commands that follow,
-ensure you're inside the virtual environment by running `poetry shell`.
+ensure you're inside the virtual environment.
 
 ## Developing
 
