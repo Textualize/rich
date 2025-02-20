@@ -14,7 +14,7 @@ from .segment import ControlType, Segment
 from .style import StyleType
 from .text import Text
 
-VerticalOverflowMethod = Literal["crop", "ellipsis", "visible"]
+VerticalOverflowMethod = Literal["crop", "crop_above", "ellipsis", "visible"]
 
 
 class LiveRender:
@@ -91,6 +91,9 @@ class LiveRender:
         if height > options.size.height:
             if self.vertical_overflow == "crop":
                 lines = lines[: options.size.height]
+                shape = Segment.get_shape(lines)
+            elif self.vertical_overflow == "crop_above":
+                lines = lines[-(options.size.height) :]
                 shape = Segment.get_shape(lines)
             elif self.vertical_overflow == "ellipsis":
                 lines = lines[: (options.size.height - 1)]
