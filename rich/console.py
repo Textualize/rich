@@ -683,6 +683,18 @@ class Console:
         self._emoji_variant: Optional[EmojiVariant] = emoji_variant
         self._highlight = highlight
 
+        self._force_terminal = None
+        if force_terminal is not None:
+            self._force_terminal = force_terminal
+
+        self._file = file
+        self.quiet = quiet
+        self.stderr = stderr
+
+        self.legacy_windows = (
+            self._detect_legacy_windows() if legacy_windows is None else legacy_windows
+        )
+
         if width is None:
             columns = self._environ.get("COLUMNS")
             if columns is not None and columns.isdigit():
@@ -697,19 +709,6 @@ class Console:
         self._height = height
 
         self._color_system: Optional[ColorSystem]
-
-        self._force_terminal = None
-        if force_terminal is not None:
-            self._force_terminal = force_terminal
-
-        self._file = file
-        self.quiet = quiet
-        self.stderr = stderr
-
-        self.legacy_windows = (
-            self._detect_legacy_windows() if legacy_windows is None else legacy_windows
-        )
-
         if color_system is None:
             self._color_system = None
         elif color_system == "auto":
