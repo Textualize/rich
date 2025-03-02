@@ -76,12 +76,10 @@ class Lines:
         return iter(self._lines)
 
     @overload
-    def __getitem__(self, index: int) -> "Text":
-        ...
+    def __getitem__(self, index: int) -> "Text": ...
 
     @overload
-    def __getitem__(self, index: slice) -> List["Text"]:
-        ...
+    def __getitem__(self, index: slice) -> List["Text"]: ...
 
     def __getitem__(self, index: Union[slice, int]) -> Union["Text", List["Text"]]:
         return self._lines[index]
@@ -137,7 +135,7 @@ class Lines:
                 line.pad_right(width - cell_len(line.plain))
         elif justify == "right":
             for line in self._lines:
-                line.rstrip()
+                line[:-1].rstrip() if line[-1] == Text(" ") else line.rstrip()
                 line.truncate(width, overflow=overflow)
                 line.pad_left(width - cell_len(line.plain))
         elif justify == "full":
