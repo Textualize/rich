@@ -585,11 +585,6 @@ def get_windows_console_features() -> "WindowsConsoleFeatures":  # pragma: no co
     return _windows_console_features
 
 
-def detect_legacy_windows() -> bool:
-    """Detect legacy Windows."""
-    return WINDOWS and not get_windows_console_features().vt
-
-
 class Console:
     """A high level console interface.
 
@@ -687,11 +682,6 @@ class Console:
         self._emoji = emoji
         self._emoji_variant: Optional[EmojiVariant] = emoji_variant
         self._highlight = highlight
-        self.legacy_windows: bool = (
-            (detect_legacy_windows() and not self.is_jupyter)
-            if legacy_windows is None
-            else legacy_windows
-        )
 
         if width is None:
             columns = self._environ.get("COLUMNS")
@@ -715,6 +705,10 @@ class Console:
         self._file = file
         self.quiet = quiet
         self.stderr = stderr
+
+        self.legacy_windows = (
+            self._detect_legacy_windows() if legacy_windows is None else legacy_windows
+        )
 
         if color_system is None:
             self._color_system = None
@@ -787,6 +781,16 @@ class Console:
     def _theme_stack(self) -> ThemeStack:
         """Get the thread local theme stack."""
         return self._thread_locals.theme_stack
+
+    def _detect_legacy_windows(self) -> bool:
+        """Detect legacy Windows."""
+        if not WINDOWS:
+            return False
+        if self.is_jupyter:
+            return False
+        if not self.is_terminal or self.is_dumb_terminal:
+            return False
+        return not get_windows_console_features().vt
 
     def _detect_color_system(self) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
