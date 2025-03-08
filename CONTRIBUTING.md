@@ -18,15 +18,7 @@ After following this guide, you'll have a local copy of the Rich project install
 
 Enter the directory containing your copy of Rich (`cd rich`).
 
-Create a new virtual environment, activate it, then install poetry
-
-```
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install poetry
-```
-
-Now we can install the dependencies of Rich into the virtual environment:
+Setup a new virtual environment will all dependencies using
 
 ```
 poetry install
