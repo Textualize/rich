@@ -289,6 +289,8 @@ class ColorParseError(Exception):
     """The color could not be parsed."""
 
 
+RE_SHORT_COLOR = re.compile(r"^\#([0-9a-f])([0-9a-f])([0-9a-f])$")
+
 RE_COLOR = re.compile(
     r"""^
 \#([0-9a-f]{6})$|
@@ -445,6 +447,10 @@ class Color(NamedTuple):
                 type=(ColorType.STANDARD if color_number < 16 else ColorType.EIGHT_BIT),
                 number=color_number,
             )
+
+        if short_match := RE_SHORT_COLOR.fullmatch(color):
+            r, g, b = short_match.groups()
+            color = f"#{r*2}{g*2}{b*2}"
 
         color_match = RE_COLOR.match(color)
         if color_match is None:
