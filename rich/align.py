@@ -79,13 +79,7 @@ class Align(JupyterMixin):
     ) -> "Align":
         """Align a renderable to the left."""
         return cls(
-            renderable,
-            "left",
-            style=style,
-            vertical=vertical,
-            pad=pad,
-            width=width,
-            height=height,
+            renderable, "left", style, vertical=vertical, pad=pad, width=width, height=height
         )
 
     @classmethod
@@ -101,13 +95,7 @@ class Align(JupyterMixin):
     ) -> "Align":
         """Align a renderable to the center."""
         return cls(
-            renderable,
-            "center",
-            style=style,
-            vertical=vertical,
-            pad=pad,
-            width=width,
-            height=height,
+            renderable, "center", style, vertical=vertical, pad=pad, width=width, height=height
         )
 
     @classmethod
@@ -123,13 +111,7 @@ class Align(JupyterMixin):
     ) -> "Align":
         """Align a renderable to the right."""
         return cls(
-            renderable,
-            "right",
-            style=style,
-            vertical=vertical,
-            pad=pad,
-            width=width,
-            height=height,
+            renderable, "right", style, vertical=vertical, pad=pad, width=width, height=height
         )
 
     def __rich_console__(
@@ -152,42 +134,31 @@ class Align(JupyterMixin):
 
         def generate_segments() -> Iterable[Segment]:
             if excess_space <= 0:
-                # Exact fit
                 for line in lines:
                     yield from line
                     yield new_line
+                return
 
-            elif align == "left":
-                # Pad on the right
-                pad = Segment(" " * excess_space, style) if self.pad else None
-                for line in lines:
-                    yield from line
-                    if pad:
-                        yield pad
-                    yield new_line
-
+            pad_right = None
+            if align == "left":
+                left = 0
+                pad_right = Segment(" " * excess_space, style) if self.pad else None
             elif align == "center":
-                # Pad left and right
                 left = excess_space // 2
-                pad = Segment(" " * left, style)
-                pad_right = (
-                    Segment(" " * (excess_space - left), style) if self.pad else None
-                )
-                for line in lines:
-                    if left:
-                        yield pad
-                    yield from line
-                    if pad_right:
-                        yield pad_right
-                    yield new_line
+                pad_right = Segment(" " * (excess_space - left), style) if self.pad else None
+            else:  # align == "right"
+                left = excess_space
+                pad_right = None
 
-            elif align == "right":
-                # Padding on left
-                pad = Segment(" " * excess_space, style)
-                for line in lines:
-                    yield pad
-                    yield from line
-                    yield new_line
+            left_pad = Segment(" " * left, style) if left > 0 else None
+            
+            for line in lines:
+                if left_pad:
+                    yield left_pad
+                yield from line
+                if pad_right:
+                    yield pad_right
+                yield new_line
 
         blank_line = (
             Segment(f"{' ' * (self.width or options.max_width)}\n", style)
@@ -196,39 +167,37 @@ class Align(JupyterMixin):
         )
 
         def blank_lines(count: int) -> Iterable[Segment]:
-            if count > 0:
-                for _ in range(count):
-                    yield blank_line
+            for _ in range(max(0, count)):
+                yield blank_line
 
         vertical_height = self.height or options.height
-        iter_segments: Iterable[Segment]
         if self.vertical and vertical_height is not None:
             if self.vertical == "top":
                 bottom_space = vertical_height - height
-                iter_segments = chain(generate_segments(), blank_lines(bottom_space))
+                segments = chain(generate_segments(), blank_lines(bottom_space))
             elif self.vertical == "middle":
                 top_space = (vertical_height - height) // 2
                 bottom_space = vertical_height - top_space - height
-                iter_segments = chain(
+                segments = chain(
                     blank_lines(top_space),
                     generate_segments(),
                     blank_lines(bottom_space),
                 )
-            else:  #  self.vertical == "bottom":
+            else:  # self.vertical == "bottom"
                 top_space = vertical_height - height
-                iter_segments = chain(blank_lines(top_space), generate_segments())
+                segments = chain(blank_lines(top_space), generate_segments())
         else:
-            iter_segments = generate_segments()
+            segments = generate_segments()
+            
         if self.style:
-            style = console.get_style(self.style)
-            iter_segments = Segment.apply_style(iter_segments, style)
-        yield from iter_segments
+            segments = Segment.apply_style(segments, console.get_style(self.style))
+            
+        yield from segments
 
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> Measurement:
-        measurement = Measurement.get(console, options, self.renderable)
-        return measurement
+        return Measurement.get(console, options, self.renderable)
 
 
 class VerticalCenter(JupyterMixin):
@@ -284,8 +253,7 @@ class VerticalCenter(JupyterMixin):
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> Measurement:
-        measurement = Measurement.get(console, options, self.renderable)
-        return measurement
+        return Measurement.get(console, options, self.renderable)
 
 
 if __name__ == "__main__":  # pragma: no cover
