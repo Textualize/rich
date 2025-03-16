@@ -30,12 +30,8 @@ T = TypeVar("T")
 class Renderables:
     """A list subclass which renders its contents to the console."""
 
-    def __init__(
-        self, renderables: Optional[Iterable["RenderableType"]] = None
-    ) -> None:
-        self._renderables: List["RenderableType"] = (
-            list(renderables) if renderables is not None else []
-        )
+    def __init__(self, renderables: Optional[Iterable["RenderableType"]] = None) -> None:
+        self._renderables = list(renderables or [])
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -67,7 +63,7 @@ class Lines:
     """A list subclass which can render to the console."""
 
     def __init__(self, lines: Iterable["Text"] = ()) -> None:
-        self._lines: List["Text"] = list(lines)
+        self._lines = list(lines)
 
     def __repr__(self) -> str:
         return f"Lines({self._lines!r})"
@@ -86,9 +82,8 @@ class Lines:
     def __getitem__(self, index: Union[slice, int]) -> Union["Text", List["Text"]]:
         return self._lines[index]
 
-    def __setitem__(self, index: int, value: "Text") -> "Lines":
+    def __setitem__(self, index: int, value: "Text") -> None:
         self._lines[index] = value
-        return self
 
     def __len__(self) -> int:
         return self._lines.__len__()
@@ -126,42 +121,37 @@ class Lines:
         """
         from .text import Text
 
-        if justify == "left":
-            for line in self._lines:
+        for line_index, line in enumerate(self._lines):
+            if justify == "left":
                 line.truncate(width, overflow=overflow, pad=True)
-        elif justify == "center":
-            for line in self._lines:
+            elif justify == "center":
                 line.rstrip()
                 line.truncate(width, overflow=overflow)
-                line.pad_left((width - cell_len(line.plain)) // 2)
-                line.pad_right(width - cell_len(line.plain))
-        elif justify == "right":
-            for line in self._lines:
+                padding = width - cell_len(line.plain)
+                line.pad_left(padding // 2)
+                line.pad_right(padding - padding // 2)
+            elif justify == "right":
                 line.rstrip()
                 line.truncate(width, overflow=overflow)
                 line.pad_left(width - cell_len(line.plain))
-        elif justify == "full":
-            for line_index, line in enumerate(self._lines):
-                if line_index == len(self._lines) - 1:
-                    break
+            elif justify == "full" and line_index < len(self._lines) - 1:
                 words = line.split(" ")
                 words_size = sum(cell_len(word.plain) for word in words)
                 num_spaces = len(words) - 1
-                spaces = [1 for _ in range(num_spaces)]
-                index = 0
-                if spaces:
-                    while words_size + num_spaces < width:
-                        spaces[len(spaces) - index - 1] += 1
-                        num_spaces += 1
-                        index = (index + 1) % len(spaces)
-                tokens: List[Text] = []
-                for index, (word, next_word) in enumerate(
-                    zip_longest(words, words[1:])
-                ):
+                if not num_spaces:
+                    continue
+                
+                spaces = [1] * num_spaces
+                remaining = width - words_size - num_spaces
+                for i in range(remaining):
+                    spaces[-(i % num_spaces) - 1] += 1
+
+                tokens = []
+                for i, (word, next_word) in enumerate(zip_longest(words, words[1:])):
                     tokens.append(word)
-                    if index < len(spaces):
+                    if i < len(spaces):
                         style = word.get_style_at_offset(console, -1)
                         next_style = next_word.get_style_at_offset(console, 0)
                         space_style = style if style == next_style else line.style
-                        tokens.append(Text(" " * spaces[index], style=space_style))
-                self[line_index] = Text("").join(tokens)
+                        tokens.append(Text(" " * spaces[i], style=space_style))
+                self._lines[line_index] = Text("").join(tokens)
