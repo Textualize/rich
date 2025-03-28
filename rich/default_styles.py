@@ -121,6 +121,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "traceback.exc_value": Style.null(),
     "traceback.offset": Style(color="bright_red", bold=True),
     "traceback.error_range": Style(underline=True, bold=True, dim=False),
+    "traceback.note": Style(color="green", bold=True),
     "bar.back": Style(color="grey23"),
     "bar.complete": Style(color="rgb(249,38,114)"),
     "bar.finished": Style(color="rgb(114,156,31)"),
