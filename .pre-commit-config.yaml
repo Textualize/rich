@@ -20,7 +20,6 @@ repos:
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:
-      - id: python-check-mock-methods
       - id: python-no-log-warn
       - id: python-use-type-annotations
       - id: rst-directive-colons

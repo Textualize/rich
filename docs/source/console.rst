@@ -420,11 +420,18 @@ Rich respects some standard environment variables.
 
 Setting the environment variable ``TERM`` to ``"dumb"`` or ``"unknown"`` will disable color/style and some features that require moving the cursor, such as progress bars.
 
-If the environment variable ``FORCE_COLOR`` is set, then color/styles will be enabled regardless of the value of ``TERM``. This is useful on CI systems which aren't terminals but can none-the-less display ANSI escape sequences.
+If the environment variable ``FORCE_COLOR`` is set and non-empty, then color/styles will be enabled regardless of the value of ``TERM``.
 
-If the environment variable ``NO_COLOR`` is set, Rich will disable all color in the output. This takes precedence over ``FORCE_COLOR``. See `no_color <https://no-color.org/>`_ for details.
+If the environment variable ``NO_COLOR`` is set, Rich will disable all color in the output. ``NO_COLOR`` takes precedence over ``FORCE_COLOR``. See `no_color <https://no-color.org/>`_ for details.
 
 .. note::
     The ``NO_COLOR`` environment variable removes *color* only. Styles such as dim, bold, italic, underline etc. are preserved.
 
-If ``width`` / ``height`` arguments are not explicitly provided as arguments to ``Console`` then the environment variables ``COLUMNS``/``LINES`` can be used to set the console width/height. ``JUPYTER_COLUMNS``/``JUPYTER_LINES`` behave similarly and are used in Jupyter.
+The environment variable ``TTY_COMPATIBLE`` is used to override Rich's auto-detection of terminal support. If ``TTY_COMPATIBLE`` is set to ``1`` then Rich will assume it is writing to a device which can handle escape sequences like a terminal. If ``TTY_COMPATIBLE`` is set to ``"0"``, then Rich will assume that it is not writing to a terminal. If the variable is not set, or set to a value other than "0" or "1", then Rich will attempt to auto-detect terminal support.
+
+.. note::
+    If you want Rich output in CI or Github Actions, then you should set ``TTY_COMPATIBLE=1``.
+
+Note that these variable set the default behavior. If you explicitly set ``force_terminal`` in the Console constructor, then this will take precedence over the environment variables.
+
+If ``width`` / ``height`` arguments are not explicitly provided as arguments to ``Console`` then the environment variables ``COLUMNS`` / ``LINES`` can be used to set the console width / height. ``JUPYTER_COLUMNS`` / ``JUPYTER_LINES`` behave similarly and are used in Jupyter.
