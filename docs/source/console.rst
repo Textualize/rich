@@ -427,11 +427,11 @@ If the environment variable ``NO_COLOR`` is set, Rich will disable all color in 
 .. note::
     The ``NO_COLOR`` environment variable removes *color* only. Styles such as dim, bold, italic, underline etc. are preserved.
 
-The environment variable ``TTY_COMPATIBLE`` is used to override Rich's auto-detection of terminal support. If ``TTY_COMPATIBLE`` is set to ``1`` then Rich will assume it is writing to a device which can handle escape sequences like a terminal. If ``TTY_COMPATIBLE`` is set to ``"0"``, then Rich will assume that it is not writing to a terminal. If the variable is not set, or set to a value other than "0" or "1", then Rich will attempt to auto-detect terminal support.
+The environment variable ``TTY_COMPATIBLE`` is used to override Rich's auto-detection of terminal support. If ``TTY_COMPATIBLE`` is set to ``1`` then Rich will assume it is writing to a device which can handle escape sequences like a terminal. If ``TTY_COMPATIBLE`` is set to ``"0"``, then Rich will assume that it is writing to a device that is *not* capable of displaying escape sequences (such as a regular file). If the variable is not set, or set to a value other than "0" or "1", then Rich will attempt to auto-detect terminal support.
 
 .. note::
     If you want Rich output in CI or Github Actions, then you should set ``TTY_COMPATIBLE=1``.
 
-Note that these variable set the default behavior. If you explicitly set ``force_terminal`` in the Console constructor, then this will take precedence over the environment variables.
-
 If ``width`` / ``height`` arguments are not explicitly provided as arguments to ``Console`` then the environment variables ``COLUMNS`` / ``LINES`` can be used to set the console width / height. ``JUPYTER_COLUMNS`` / ``JUPYTER_LINES`` behave similarly and are used in Jupyter.
+
+Note that environment variables set defaults in the Console object. If you explicitly set any variables in the constructor then these will take precedence.
