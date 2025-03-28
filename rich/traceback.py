@@ -191,6 +191,7 @@ class _SyntaxError:
     line: str
     lineno: int
     msg: str
+    notes: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -200,6 +201,7 @@ class Stack:
     syntax_error: Optional[_SyntaxError] = None
     is_cause: bool = False
     frames: List[Frame] = field(default_factory=list)
+    notes: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -403,6 +405,8 @@ class Traceback:
 
         from rich import _IMPORT_CWD
 
+        notes: List[str] = getattr(exc_value, "__notes__", None) or []
+
         def safe_str(_object: Any) -> str:
             """Don't allow exceptions from __str__ to propagate."""
             try:
@@ -415,6 +419,7 @@ class Traceback:
                 exc_type=safe_str(exc_type.__name__),
                 exc_value=safe_str(exc_value),
                 is_cause=is_cause,
+                notes=notes,
             )
 
             if isinstance(exc_value, SyntaxError):
@@ -424,13 +429,14 @@ class Traceback:
                     lineno=exc_value.lineno or 0,
                     line=exc_value.text or "",
                     msg=exc_value.msg,
+                    notes=notes,
                 )
 
             stacks.append(stack)
             append = stack.frames.append
 
             def get_locals(
-                iter_locals: Iterable[Tuple[str, object]]
+                iter_locals: Iterable[Tuple[str, object]],
             ) -> Iterable[Tuple[str, object]]:
                 """Extract locals from an iterator of key pairs."""
                 if not (locals_hide_dunder or locals_hide_sunder):
@@ -569,6 +575,7 @@ class Traceback:
                 stack_renderable = Constrain(stack_renderable, self.width)
                 with console.use_theme(traceback_theme):
                     yield stack_renderable
+
             if stack.syntax_error is not None:
                 with console.use_theme(traceback_theme):
                     yield Constrain(
@@ -593,6 +600,9 @@ class Traceback:
                 )
             else:
                 yield Text.assemble((f"{stack.exc_type}", "traceback.exc_type"))
+
+            for note in stack.notes:
+                yield Text.assemble(("[NOTE] ", "traceback.note"), highlighter(note))
 
             if not last:
                 if stack.is_cause:

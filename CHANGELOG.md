@@ -8,13 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-
 - Added env var `TTY_COMPATIBLE` to override auto-detection of TTY support (See console.rst for details). https://github.com/Textualize/rich/pull/3675
 
 ### Changed
 
 - An empty `NO_COLOR` env var is now considered disabled. https://github.com/Textualize/rich/pull/3675
 - An empty `FORCE_COLOR` env var is now considered disabled. https://github.com/Textualize/rich/pull/3675
+- Rich tracebacks will now render notes on Python 3.11 onwards (added with `Exception.add_note`) https://github.com/Textualize/rich/pull/3676
+
 
 ## [13.9.4] - 2024-11-01
 
