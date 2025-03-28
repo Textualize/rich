@@ -122,6 +122,7 @@ def track(
     update_period: float = 0.1,
     disable: bool = False,
     show_speed: bool = True,
+    expand: bool = False,
 ) -> Iterable[ProgressType]:
     """Track progress by iterating over a sequence.
 
@@ -141,6 +142,7 @@ def track(
         update_period (float, optional): Minimum time (in seconds) between calls to update(). Defaults to 0.1.
         disable (bool, optional): Disable display of progress.
         show_speed (bool, optional): Show speed if total isn't known. Defaults to True.
+        expand (bool, optional): Expand the progress display to fill the width of the console. Defaults to False.
     Returns:
         Iterable[ProgressType]: An iterable of the values in the sequence.
 
@@ -152,6 +154,7 @@ def track(
     columns.extend(
         (
             BarColumn(
+                bar_width=None if expand else 40,
                 style=style,
                 complete_style=complete_style,
                 finished_style=finished_style,
@@ -169,6 +172,7 @@ def track(
         get_time=get_time,
         refresh_per_second=refresh_per_second or 10,
         disable=disable,
+        expand=expand,
     )
 
     with progress:
@@ -320,6 +324,7 @@ def wrap_file(
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
     disable: bool = False,
+    expand: bool = False,
 ) -> ContextManager[BinaryIO]:
     """Read bytes from a file while tracking progress.
 
@@ -336,6 +341,7 @@ def wrap_file(
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.finished".
         pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
         disable (bool, optional): Disable display of progress.
+        expand (bool, optional): Expand the progress display to fill the width of the console. Defaults to False.
     Returns:
         ContextManager[BinaryIO]: A context manager yielding a progress reader.
 
@@ -347,6 +353,7 @@ def wrap_file(
     columns.extend(
         (
             BarColumn(
+                bar_width=None if expand else 40,
                 style=style,
                 complete_style=complete_style,
                 finished_style=finished_style,
@@ -364,6 +371,7 @@ def wrap_file(
         get_time=get_time,
         refresh_per_second=refresh_per_second or 10,
         disable=disable,
+        expand=expand,
     )
 
     reader = progress.wrap_file(file, total=total, description=description)
@@ -391,6 +399,7 @@ def open(
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
     disable: bool = False,
+    expand: bool = False,
 ) -> ContextManager[TextIO]:
     pass
 
@@ -416,6 +425,7 @@ def open(
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
     disable: bool = False,
+    expand: bool = False,
 ) -> ContextManager[BinaryIO]:
     pass
 
@@ -440,6 +450,7 @@ def open(
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
     disable: bool = False,
+    expand: bool = False,
 ) -> Union[ContextManager[BinaryIO], ContextManager[TextIO]]:
     """Read bytes from a file while tracking progress.
 
@@ -462,6 +473,7 @@ def open(
         pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
         disable (bool, optional): Disable display of progress.
         encoding (str, optional): The encoding to use when reading in text mode.
+        expand (bool, optional): Expand the progress display to fill the width of the console. Defaults to False.
 
     Returns:
         ContextManager[BinaryIO]: A context manager yielding a progress reader.
@@ -474,6 +486,7 @@ def open(
     columns.extend(
         (
             BarColumn(
+                bar_width=None if expand else 40,
                 style=style,
                 complete_style=complete_style,
                 finished_style=finished_style,
@@ -491,6 +504,7 @@ def open(
         get_time=get_time,
         refresh_per_second=refresh_per_second or 10,
         disable=disable,
+        expand=expand,
     )
 
     reader = progress.open(
