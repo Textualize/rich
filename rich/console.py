@@ -500,7 +500,7 @@ def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
     """
 
     def decorator(
-        method: Callable[..., Iterable[RenderableType]]
+        method: Callable[..., Iterable[RenderableType]],
     ) -> Callable[..., Group]:
         """Convert a method that returns an iterable of renderables in to a Group."""
 
@@ -933,11 +933,13 @@ class Console:
 
         Returns:
             bool: True if the console writing to a device capable of
-            understanding terminal codes, otherwise False.
+                understanding escape sequences, otherwise False.
         """
+        # If dev has explicitly set this value, return it
         if self._force_terminal is not None:
             return self._force_terminal
 
+        # Fudge for Idle
         if hasattr(sys.stdin, "__module__") and sys.stdin.__module__.startswith(
             "idlelib"
         ):
@@ -948,12 +950,22 @@ class Console:
             # return False for Jupyter, which may have FORCE_COLOR set
             return False
 
-        # If FORCE_COLOR env var has any value at all, we assume a terminal.
-        force_color = self._environ.get("FORCE_COLOR")
-        if force_color is not None:
-            self._force_terminal = True
+        environ = self._environ
+
+        tty_compatible = environ.get("TTY_COMPATIBLE", "")
+        # 0 indicates device is not tty compatible
+        if tty_compatible == "0":
+            return False
+        # 1 indicates device is tty compatible
+        if tty_compatible == "1":
             return True
 
+        # https://force-color.org/
+        force_color = environ.get("FORCE_COLOR")
+        if force_color is not None:
+            return force_color != ""
+
+        # Any other value defaults to auto detect
         isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
         try:
             return False if isatty is None else isatty()

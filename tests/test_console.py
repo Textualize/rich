@@ -34,7 +34,7 @@ from rich.text import Text
 os.get_terminal_size
 
 
-def test_dumb_terminal():
+def test_dumb_terminal() -> None:
     console = Console(force_terminal=True, _environ={})
     assert console.color_system is not None
 
@@ -45,14 +45,14 @@ def test_dumb_terminal():
     assert height == 25
 
 
-def test_soft_wrap():
+def test_soft_wrap() -> None:
     console = Console(file=io.StringIO(), width=20, soft_wrap=True)
     console.print("foo " * 10)
     assert console.file.getvalue() == "foo " * 20
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
-def test_16color_terminal():
+def test_16color_terminal() -> None:
     console = Console(
         force_terminal=True, _environ={"TERM": "xterm-16color"}, legacy_windows=False
     )
@@ -60,7 +60,7 @@ def test_16color_terminal():
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
-def test_truecolor_terminal():
+def test_truecolor_terminal() -> None:
     console = Console(
         force_terminal=True,
         legacy_windows=False,
@@ -70,7 +70,7 @@ def test_truecolor_terminal():
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
-def test_kitty_terminal():
+def test_kitty_terminal() -> None:
     console = Console(
         force_terminal=True,
         legacy_windows=False,
@@ -79,7 +79,7 @@ def test_kitty_terminal():
     assert console.color_system == "256"
 
 
-def test_console_options_update():
+def test_console_options_update() -> None:
     options = ConsoleOptions(
         ConsoleDimensions(80, 25),
         max_height=25,
@@ -103,7 +103,7 @@ def test_console_options_update():
     assert options_copy == options and options_copy is not options
 
 
-def test_console_options_update_height():
+def test_console_options_update_height() -> None:
     options = ConsoleOptions(
         ConsoleDimensions(80, 25),
         max_height=25,
@@ -120,7 +120,7 @@ def test_console_options_update_height():
     assert render_options.max_height == 12
 
 
-def test_init():
+def test_init() -> None:
     console = Console(color_system=None)
     assert console._color_system == None
     console = Console(color_system="standard")
@@ -128,7 +128,7 @@ def test_init():
     console = Console(color_system="auto")
 
 
-def test_size():
+def test_size() -> None:
     console = Console()
     w, h = console.size
     assert console.width == w
@@ -180,37 +180,37 @@ def test_size_can_fall_back_to_std_descriptors(
     assert (w, h) == expected_size
 
 
-def test_repr():
+def test_repr() -> None:
     console = Console()
     assert isinstance(repr(console), str)
     assert isinstance(str(console), str)
 
 
-def test_print():
+def test_print() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print("foo")
     assert console.file.getvalue() == "foo\n"
 
 
-def test_print_multiple():
+def test_print_multiple() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print("foo", "bar")
     assert console.file.getvalue() == "foo bar\n"
 
 
-def test_print_text():
+def test_print_text() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print(Text("foo", style="bold"))
-    assert console.file.getvalue() == "\x1B[1mfoo\x1B[0m\n"
+    assert console.file.getvalue() == "\x1b[1mfoo\x1b[0m\n"
 
 
-def test_print_text_multiple():
+def test_print_text_multiple() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print(Text("foo", style="bold"), Text("bar"), "baz")
-    assert console.file.getvalue() == "\x1B[1mfoo\x1B[0m bar baz\n"
+    assert console.file.getvalue() == "\x1b[1mfoo\x1b[0m bar baz\n"
 
 
-def test_print_json():
+def test_print_json() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print_json('[false, true, null, "foo"]', indent=4)
     result = console.file.getvalue()
@@ -219,13 +219,13 @@ def test_print_json():
     assert result == expected
 
 
-def test_print_json_error():
+def test_print_json_error() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     with pytest.raises(TypeError):
         console.print_json(["foo"], indent=4)
 
 
-def test_print_json_data():
+def test_print_json_data() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print_json(data=[False, True, None, "foo"], indent=4)
     result = console.file.getvalue()
@@ -234,7 +234,7 @@ def test_print_json_data():
     assert result == expected
 
 
-def test_print_json_ensure_ascii():
+def test_print_json_ensure_ascii() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print_json(data={"foo": "💩"}, ensure_ascii=False)
     result = console.file.getvalue()
@@ -243,7 +243,7 @@ def test_print_json_ensure_ascii():
     assert result == expected
 
 
-def test_print_json_with_default_ensure_ascii():
+def test_print_json_with_default_ensure_ascii() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print_json(data={"foo": "💩"})
     result = console.file.getvalue()
@@ -252,7 +252,7 @@ def test_print_json_with_default_ensure_ascii():
     assert result == expected
 
 
-def test_print_json_indent_none():
+def test_print_json_indent_none() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     data = {"name": "apple", "count": 1}
     console.print_json(data=data, indent=None)
@@ -261,7 +261,7 @@ def test_print_json_indent_none():
     assert result == expected
 
 
-def test_console_null_file(monkeypatch):
+def test_console_null_file(monkeypatch) -> None:
     # When stdout and stderr are null, Console.file should be replaced with NullFile
     monkeypatch.setattr("sys.stdout", None)
     monkeypatch.setattr("sys.stderr", None)
@@ -270,7 +270,7 @@ def test_console_null_file(monkeypatch):
     assert isinstance(console.file, NullFile)
 
 
-def test_log():
+def test_log() -> None:
     console = Console(
         file=io.StringIO(),
         width=80,
@@ -286,7 +286,7 @@ def test_log():
     assert result == expected
 
 
-def test_log_milliseconds():
+def test_log_milliseconds() -> None:
     def time_formatter(timestamp: datetime) -> Text:
         return Text("TIME")
 
@@ -298,13 +298,13 @@ def test_log_milliseconds():
     assert result == "TIME foo                                \n"
 
 
-def test_print_empty():
+def test_print_empty() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print()
     assert console.file.getvalue() == "\n"
 
 
-def test_markup_highlight():
+def test_markup_highlight() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print("'[bold]foo[/bold]'")
     assert (
@@ -313,13 +313,13 @@ def test_markup_highlight():
     )
 
 
-def test_print_style():
+def test_print_style() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print("foo", style="bold")
     assert console.file.getvalue() == "\x1b[1mfoo\x1b[0m\n"
 
 
-def test_show_cursor():
+def test_show_cursor() -> None:
     console = Console(
         file=io.StringIO(), force_terminal=True, legacy_windows=False, _environ={}
     )
@@ -329,31 +329,31 @@ def test_show_cursor():
     assert console.file.getvalue() == "\x1b[?25lfoo\n\x1b[?25h"
 
 
-def test_clear():
+def test_clear() -> None:
     console = Console(file=io.StringIO(), force_terminal=True, _environ={})
     console.clear()
     console.clear(home=False)
     assert console.file.getvalue() == "\033[2J\033[H" + "\033[2J"
 
 
-def test_clear_no_terminal():
+def test_clear_no_terminal() -> None:
     console = Console(file=io.StringIO())
     console.clear()
     console.clear(home=False)
     assert console.file.getvalue() == ""
 
 
-def test_get_style():
+def test_get_style() -> None:
     console = Console()
     console.get_style("repr.brace") == Style(bold=True)
 
 
-def test_get_style_default():
+def test_get_style_default() -> None:
     console = Console()
     console.get_style("foobar", default="red") == Style(color="red")
 
 
-def test_get_style_error():
+def test_get_style_error() -> None:
     console = Console()
     with pytest.raises(errors.MissingStyle):
         console.get_style("nosuchstyle")
@@ -361,20 +361,20 @@ def test_get_style_error():
         console.get_style("foo bar")
 
 
-def test_render_error():
+def test_render_error() -> None:
     console = Console()
     with pytest.raises(errors.NotRenderableError):
         list(console.render([], console.options))
 
 
-def test_control():
+def test_control() -> None:
     console = Console(file=io.StringIO(), force_terminal=True, _environ={})
     console.control(Control.clear())
     console.print("BAR")
     assert console.file.getvalue() == "\x1b[2JBAR\n"
 
 
-def test_capture():
+def test_capture() -> None:
     console = Console()
     with console.capture() as capture:
         with pytest.raises(CaptureError):
@@ -383,7 +383,7 @@ def test_capture():
     assert capture.get() == "Hello\n"
 
 
-def test_input(monkeypatch, capsys):
+def test_input(monkeypatch, capsys) -> None:
     def fake_input(prompt=""):
         console.file.write(prompt)
         return "bar"
@@ -395,7 +395,7 @@ def test_input(monkeypatch, capsys):
     assert user_input == "bar"
 
 
-def test_input_password(monkeypatch, capsys):
+def test_input_password(monkeypatch, capsys) -> None:
     def fake_input(prompt, stream=None):
         console.file.write(prompt)
         return "bar"
@@ -409,37 +409,37 @@ def test_input_password(monkeypatch, capsys):
     assert user_input == "bar"
 
 
-def test_status():
+def test_status() -> None:
     console = Console(file=io.StringIO(), force_terminal=True, width=20)
     status = console.status("foo")
     assert isinstance(status, Status)
 
 
-def test_justify_none():
+def test_justify_none() -> None:
     console = Console(file=io.StringIO(), force_terminal=True, width=20)
     console.print("FOO", justify=None)
     assert console.file.getvalue() == "FOO\n"
 
 
-def test_justify_left():
+def test_justify_left() -> None:
     console = Console(file=io.StringIO(), force_terminal=True, width=20, _environ={})
     console.print("FOO", justify="left")
     assert console.file.getvalue() == "FOO                 \n"
 
 
-def test_justify_center():
+def test_justify_center() -> None:
     console = Console(file=io.StringIO(), force_terminal=True, width=20, _environ={})
     console.print("FOO", justify="center")
     assert console.file.getvalue() == "        FOO         \n"
 
 
-def test_justify_right():
+def test_justify_right() -> None:
     console = Console(file=io.StringIO(), force_terminal=True, width=20, _environ={})
     console.print("FOO", justify="right")
     assert console.file.getvalue() == "                 FOO\n"
 
 
-def test_justify_renderable_none():
+def test_justify_renderable_none() -> None:
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
@@ -451,7 +451,7 @@ def test_justify_renderable_none():
     assert console.file.getvalue() == "╭───╮\n│FOO│\n╰───╯\n"
 
 
-def test_justify_renderable_left():
+def test_justify_renderable_left() -> None:
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
@@ -463,7 +463,7 @@ def test_justify_renderable_left():
     assert console.file.getvalue() == "╭───╮     \n│FOO│     \n╰───╯     \n"
 
 
-def test_justify_renderable_center():
+def test_justify_renderable_center() -> None:
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
@@ -475,7 +475,7 @@ def test_justify_renderable_center():
     assert console.file.getvalue() == "  ╭───╮   \n  │FOO│   \n  ╰───╯   \n"
 
 
-def test_justify_renderable_right():
+def test_justify_renderable_right() -> None:
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
@@ -495,14 +495,14 @@ class BrokenRenderable:
         pass
 
 
-def test_render_broken_renderable():
+def test_render_broken_renderable() -> None:
     console = Console()
     broken = BrokenRenderable()
     with pytest.raises(errors.NotRenderableError):
         list(console.render(broken, console.options))
 
 
-def test_export_text():
+def test_export_text() -> None:
     console = Console(record=True, width=100)
     console.print("[b]foo")
     text = console.export_text()
@@ -510,7 +510,7 @@ def test_export_text():
     assert text == expected
 
 
-def test_export_html():
+def test_export_html() -> None:
     console = Console(record=True, width=100)
     console.print("[b]foo <script> 'test' [link=https://example.org]Click[/link]")
     html = console.export_html()
@@ -519,7 +519,7 @@ def test_export_html():
     assert html == expected
 
 
-def test_export_html_inline():
+def test_export_html_inline() -> None:
     console = Console(record=True, width=100)
     console.print("[b]foo [link=https://example.org]Click[/link]")
     html = console.export_html(inline_styles=True)
@@ -531,7 +531,7 @@ def test_export_html_inline():
 EXPECTED_SVG = '<svg class="rich-terminal" viewBox="0 0 1238 74.4" xmlns="http://www.w3.org/2000/svg">\n    <!-- Generated with Rich https://www.textualize.io -->\n    <style>\n\n    @font-face {\n        font-family: "Fira Code";\n        src: local("FiraCode-Regular"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");\n        font-style: normal;\n        font-weight: 400;\n    }\n    @font-face {\n        font-family: "Fira Code";\n        src: local("FiraCode-Bold"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),\n                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");\n        font-style: bold;\n        font-weight: 700;\n    }\n\n    .terminal-3526644552-matrix {\n        font-family: Fira Code, monospace;\n        font-size: 20px;\n        line-height: 24.4px;\n        font-variant-east-asian: full-width;\n    }\n\n    .terminal-3526644552-title {\n        font-size: 18px;\n        font-weight: bold;\n        font-family: arial;\n    }\n\n    .terminal-3526644552-r1 { fill: #608ab1;font-weight: bold }\n.terminal-3526644552-r2 { fill: #c5c8c6 }\n    </style>\n\n    <defs>\n    <clipPath id="terminal-3526644552-clip-terminal">\n      <rect x="0" y="0" width="1219.0" height="23.4" />\n    </clipPath>\n    \n    </defs>\n\n    <rect fill="#292929" stroke="rgba(255,255,255,0.35)" stroke-width="1" x="1" y="1" width="1236" height="72.4" rx="8"/><text class="terminal-3526644552-title" fill="#c5c8c6" text-anchor="middle" x="618" y="27">Rich</text>\n            <g transform="translate(26,22)">\n            <circle cx="0" cy="0" r="7" fill="#ff5f57"/>\n            <circle cx="22" cy="0" r="7" fill="#febc2e"/>\n            <circle cx="44" cy="0" r="7" fill="#28c840"/>\n            </g>\n        \n    <g transform="translate(9, 41)" clip-path="url(#terminal-3526644552-clip-terminal)">\n    <rect fill="#cc555a" x="0" y="1.5" width="36.6" height="24.65" shape-rendering="crispEdges"/>\n    <g class="terminal-3526644552-matrix">\n    <text class="terminal-3526644552-r1" x="0" y="20" textLength="36.6" clip-path="url(#terminal-3526644552-line-0)">foo</text><text class="terminal-3526644552-r2" x="48.8" y="20" textLength="61" clip-path="url(#terminal-3526644552-line-0)">Click</text><text class="terminal-3526644552-r2" x="1220" y="20" textLength="12.2" clip-path="url(#terminal-3526644552-line-0)">\n</text>\n    </g>\n    </g>\n</svg>\n'
 
 
-def test_export_svg():
+def test_export_svg() -> None:
     console = Console(record=True, width=100)
     console.print(
         "[b red on blue reverse]foo[/] [blink][link=https://example.org]Click[/link]"
@@ -542,7 +542,7 @@ def test_export_svg():
     assert svg == EXPECTED_SVG
 
 
-def test_export_svg_specified_unique_id():
+def test_export_svg_specified_unique_id() -> None:
     expected_svg = EXPECTED_SVG.replace("terminal-3526644552", "given-id")
     console = Console(record=True, width=100)
     console.print(
@@ -554,7 +554,7 @@ def test_export_svg_specified_unique_id():
     assert svg == expected_svg
 
 
-def test_save_svg():
+def test_save_svg() -> None:
     console = Console(record=True, width=100)
     console.print(
         "[b red on blue reverse]foo[/] [blink][link=https://example.org]Click[/link]"
@@ -566,7 +566,7 @@ def test_save_svg():
             assert svg_file.read() == EXPECTED_SVG
 
 
-def test_save_text():
+def test_save_text() -> None:
     console = Console(record=True, width=100)
     console.print("foo")
     with tempfile.TemporaryDirectory() as path:
@@ -576,7 +576,7 @@ def test_save_text():
             assert text_file.read() == "foo\n"
 
 
-def test_save_html():
+def test_save_html() -> None:
     expected = '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<style>\n\nbody {\n    color: #000000;\n    background-color: #ffffff;\n}\n</style>\n</head>\n<body>\n    <pre style="font-family:Menlo,\'DejaVu Sans Mono\',consolas,\'Courier New\',monospace"><code style="font-family:inherit">foo\n</code></pre>\n</body>\n</html>\n'
     console = Console(record=True, width=100)
     console.print("foo")
@@ -589,13 +589,13 @@ def test_save_html():
             assert html == expected
 
 
-def test_no_wrap():
+def test_no_wrap() -> None:
     console = Console(width=10, file=io.StringIO())
     console.print("foo bar baz egg", no_wrap=True)
     assert console.file.getvalue() == "foo bar ba\n"
 
 
-def test_soft_wrap():
+def test_soft_wrap() -> None:
     console = Console(width=10, file=io.StringIO())
     console.print("foo bar baz egg", soft_wrap=True)
     assert console.file.getvalue() == "foo bar baz egg\n"
@@ -696,7 +696,7 @@ def test_console_style() -> None:
     assert result == expected
 
 
-def test_no_color():
+def test_no_color() -> None:
     console = Console(
         file=io.StringIO(), color_system="truecolor", force_terminal=True, no_color=True
     )
@@ -707,13 +707,13 @@ def test_no_color():
     assert result == expected
 
 
-def test_quiet():
+def test_quiet() -> None:
     console = Console(file=io.StringIO(), quiet=True)
     console.print("Hello, World!")
     assert console.file.getvalue() == ""
 
 
-def test_no_nested_live():
+def test_no_nested_live() -> None:
     console = Console()
     with pytest.raises(errors.LiveError):
         with console.status("foo"):
@@ -722,7 +722,7 @@ def test_no_nested_live():
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
-def test_screen():
+def test_screen() -> None:
     console = Console(
         color_system=None, force_terminal=True, force_interactive=True, _environ={}
     )
@@ -736,7 +736,7 @@ def test_screen():
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
-def test_screen_update():
+def test_screen_update() -> None:
     console = Console(
         width=20, height=4, color_system="truecolor", force_terminal=True, _environ={}
     )
@@ -751,12 +751,12 @@ def test_screen_update():
     assert result == expected
 
 
-def test_height():
+def test_height() -> None:
     console = Console(width=80, height=46)
     assert console.height == 46
 
 
-def test_columns_env():
+def test_columns_env() -> None:
     console = Console(_environ={"COLUMNS": "314"}, legacy_windows=False)
     assert console.width == 314
     # width take precedence
@@ -766,7 +766,7 @@ def test_columns_env():
     console = Console(width=40, _environ={"COLUMNS": "broken"}, legacy_windows=False)
 
 
-def test_lines_env():
+def test_lines_env() -> None:
     console = Console(_environ={"LINES": "220"})
     assert console.height == 220
     # height take precedence
@@ -776,7 +776,7 @@ def test_lines_env():
     console = Console(width=40, _environ={"LINES": "broken"})
 
 
-def test_screen_update_class():
+def test_screen_update_class() -> None:
     screen_update = ScreenUpdate([[Segment("foo")], [Segment("bar")]], 5, 10)
     assert screen_update.x == 5
     assert screen_update.y == 10
@@ -790,7 +790,7 @@ def test_screen_update_class():
     assert result == expected
 
 
-def test_is_alt_screen():
+def test_is_alt_screen() -> None:
     console = Console(force_terminal=True)
     if console.legacy_windows:
         return
@@ -800,7 +800,7 @@ def test_is_alt_screen():
     assert not console.is_alt_screen
 
 
-def test_set_console_title():
+def test_set_console_title() -> None:
     console = Console(force_terminal=True, _environ={})
     if console.legacy_windows:
         return
@@ -812,7 +812,7 @@ def test_set_console_title():
     assert result == "\x1b]0;hello\x07"
 
 
-def test_update_screen():
+def test_update_screen() -> None:
     console = Console(force_terminal=True, width=20, height=5, _environ={})
     if console.legacy_windows:
         return
@@ -828,7 +828,7 @@ def test_update_screen():
     assert result == expected
 
 
-def test_update_screen_lines():
+def test_update_screen_lines() -> None:
     console = Console(force_terminal=True, width=20, height=5)
     if console.legacy_windows:
         return
@@ -836,21 +836,21 @@ def test_update_screen_lines():
         console.update_screen_lines([])
 
 
-def test_update_options_markup():
+def test_update_options_markup() -> None:
     console = Console()
     options = console.options
     assert options.update(markup=False).markup == False
     assert options.update(markup=True).markup == True
 
 
-def test_print_width_zero():
+def test_print_width_zero() -> None:
     console = Console()
     with console.capture() as capture:
         console.print("Hello", width=0)
     assert capture.get() == ""
 
 
-def test_size_properties():
+def test_size_properties() -> None:
     console = Console(width=80, height=25, legacy_windows=False)
     assert console.size == ConsoleDimensions(80, 25)
     console.size = (10, 20)
@@ -861,7 +861,7 @@ def test_size_properties():
     assert console.size == ConsoleDimensions(5, 10)
 
 
-def test_print_newline_start():
+def test_print_newline_start() -> None:
     console = Console(width=80, height=25)
     console.begin_capture()
     console.print("Foo", new_line_start=True)
@@ -871,7 +871,7 @@ def test_print_newline_start():
     assert result == "Foo\n\nFoo\nbar\n\n"
 
 
-def test_is_terminal_broken_file():
+def test_is_terminal_broken_file() -> None:
     console = Console()
 
     def _mock_isatty():
@@ -883,12 +883,12 @@ def test_is_terminal_broken_file():
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="not relevant on Windows")
-def test_detect_color_system():
+def test_detect_color_system() -> None:
     console = Console(_environ={"TERM": "rxvt-unicode-256color"}, force_terminal=True)
     assert console._detect_color_system() == ColorSystem.EIGHT_BIT
 
 
-def test_reset_height():
+def test_reset_height() -> None:
     """Test height is reset when rendering complex renderables."""
 
     # https://github.com/Textualize/rich/issues/2042
@@ -914,7 +914,7 @@ def test_reset_height():
     assert result == expected
 
 
-def test_render_lines_height_minus_vertical_pad_is_negative():
+def test_render_lines_height_minus_vertical_pad_is_negative() -> None:
     # https://github.com/Textualize/textual/issues/389
     console = Console(
         force_terminal=True,
@@ -929,7 +929,7 @@ def test_render_lines_height_minus_vertical_pad_is_negative():
     console.render_lines(Padding("hello", pad=(1, 0)), options=options)
 
 
-def test_recording_no_stdout_and_no_stderr_files(monkeypatch):
+def test_recording_no_stdout_and_no_stderr_files(monkeypatch) -> None:
     # Rich should work even if there's no file available to write to.
     # For example, pythonw nullifies output streams.
     # Built-in print silently no-ops in pythonw.
@@ -942,7 +942,7 @@ def test_recording_no_stdout_and_no_stderr_files(monkeypatch):
     assert text == "hello world\n"
 
 
-def test_capturing_no_stdout_and_no_stderr_files(monkeypatch):
+def test_capturing_no_stdout_and_no_stderr_files(monkeypatch) -> None:
     monkeypatch.setattr("sys.stdout", None)
     monkeypatch.setattr("sys.stderr", None)
     console = Console()
@@ -952,14 +952,14 @@ def test_capturing_no_stdout_and_no_stderr_files(monkeypatch):
 
 
 @pytest.mark.parametrize("env_value", ["", "something", "0"])
-def test_force_color(env_value):
+def test_force_color(env_value) -> None:
     # Even though we use a non-tty file, the presence of FORCE_COLOR env var
     # means is_terminal returns True.
     console = Console(file=io.StringIO(), _environ={"FORCE_COLOR": env_value})
     assert console.is_terminal
 
 
-def test_force_color_jupyter():
+def test_force_color_jupyter() -> None:
     # FORCE_COLOR above doesn't happen in a Jupyter kernel
     console = Console(
         file=io.StringIO(), _environ={"FORCE_COLOR": "1"}, force_jupyter=True
@@ -967,7 +967,7 @@ def test_force_color_jupyter():
     assert not console.is_terminal
 
 
-def test_force_color():
+def test_force_color() -> None:
     console = Console(
         file=io.StringIO(),
         _environ={
@@ -1044,3 +1044,69 @@ def test_capture_and_record() -> None:
     recorded_content = console.export_text()
     print(repr(recorded_content))
     assert recorded_content == "Print 0\n"
+
+
+def test_tty_compatible() -> None:
+    """Check TTY_COMPATIBLE environment var."""
+
+    class FakeTTY:
+        """An file file-like which reports it is a TTY."""
+
+        def __init__(self) -> None:
+            self.called_isatty = False
+
+        def isatty(self) -> bool:
+            self.called_isatty = True
+            return True
+
+    class FakeFile:
+        """A file object that reports False for isatty"""
+
+        def __init__(self) -> None:
+            self.called_isatty = False
+
+        def isatty(self) -> bool:
+            self.called_isatty = True
+            return False
+
+    # Console file is not a TTY
+    console = Console(file=FakeFile())
+    # Not a TTY, so is_terminal should be False
+    assert not console.is_terminal
+    # Should have called isatty to auto-detect tty support
+    assert console.file.called_isatty
+
+    # Not a terminal
+    console = Console(file=FakeFile(), _environ={"TTY_COMPATIBLE": "1"})
+    # env TTY_COMPATIBLE=1 should report that it is a terminal
+    assert console.is_terminal
+    # Should not have called file.isattry
+    assert not console.file.called_isatty
+
+    # File is a fake TTY
+    console = Console(file=FakeTTY())
+    # Should report True
+    assert console.is_terminal
+    # SHould have auto-detected
+    assert console.file.called_isatty
+
+    # File is a fake TTY
+    console = Console(file=FakeTTY(), _environ={"TTY_COMPATIBLE": ""})
+    # Blank TTY_COMPATIBLE should auto-detect, so is_terminal is True
+    assert console.is_terminal
+    # Should have auto-detected
+    assert console.file.called_isatty
+
+    # File is a fake TTY
+    console = Console(file=FakeTTY(), _environ={"TTY_COMPATIBLE": "whatever"})
+    # Any pother value should auto-detect
+    assert console.is_terminal
+    # Should have auto-detected
+    assert console.file.called_isatty
+
+    # TTY_COMPATIBLE should override file.isattry
+    console = Console(file=FakeTTY(), _environ={"TTY_COMPATIBLE": "0"})
+    # Should report that it is *not* a terminal
+    assert not console.is_terminal
+    # Should not have auto-detected
+    assert not console.file.called_isatty
