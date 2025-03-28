@@ -358,3 +358,18 @@ def test_traceback_finely_grained() -> None:
         start, end = last_instruction
         print(start, end)
         assert start[0] == end[0]
+
+
+@pytest.mark.skipif(
+    sys.version_info.minor < 11, reason="Not supported before Python 3.11"
+)
+def test_notes() -> None:
+    """Check traceback captures __note__."""
+    try:
+        1 / 0
+    except Exception as error:
+        error.add_note("Hello")
+        error.add_note("World")
+        traceback = Traceback()
+
+        assert traceback.trace.stacks[0].notes == ["Hello", "World"]
