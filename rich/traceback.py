@@ -601,11 +601,8 @@ class Traceback:
             else:
                 yield Text.assemble((f"{stack.exc_type}", "traceback.exc_type"))
 
-            if stack.notes:
-                for note in stack.notes:
-                    yield Text.assemble(
-                        ("[NOTE] ", "traceback.note"), highlighter(note)
-                    )
+            for note in stack.notes:
+                yield Text.assemble(("[NOTE] ", "traceback.note"), highlighter(note))
 
             if not last:
                 if stack.is_cause:
