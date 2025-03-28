@@ -180,6 +180,17 @@ def test_size_can_fall_back_to_std_descriptors(
     assert (w, h) == expected_size
 
 
+def test_size_size_assigment():
+    console = Console()
+    econsole = Console(stderr=True)
+
+    assert (console.size, econsole.size)
+
+    econsole.size = console.size
+
+    assert (console.size, econsole.size)
+
+
 def test_repr():
     console = Console()
     assert isinstance(repr(console), str)
