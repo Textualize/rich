@@ -604,8 +604,7 @@ class Traceback:
             if stack.notes:
                 for note in stack.notes:
                     yield Text.assemble(
-                        Text.from_markup("[NOTE] ", style="traceback.note"),
-                        highlighter(note),
+                        ("[NOTE] ", "traceback.note"), highlighter(note)
                     )
 
             if not last:
