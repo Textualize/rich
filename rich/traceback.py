@@ -405,7 +405,7 @@ class Traceback:
 
         from rich import _IMPORT_CWD
 
-        notes: list[str] = getattr(exc_value, "__notes__", None) or []
+        notes: List[str] = getattr(exc_value, "__notes__", None) or []
 
         def safe_str(_object: Any) -> str:
             """Don't allow exceptions from __str__ to propagate."""
