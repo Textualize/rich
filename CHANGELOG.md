@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [UNRELEASED]
+
+### Added
+
+- `Live()`'s `visible_overflow` argument gains a new option of `"crop_above"` 
+https://github.com/Textualize/rich/pull/3637
 
 ## [13.9.4] - 2024-11-01
 
