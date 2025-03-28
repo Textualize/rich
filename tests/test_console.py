@@ -45,6 +45,12 @@ def test_dumb_terminal():
     assert height == 25
 
 
+def test_legacy_windows():
+    output = io.StringIO()
+    console = Console(file=output)
+    assert console.legacy_windows is False
+
+
 def test_soft_wrap():
     console = Console(file=io.StringIO(), width=20, soft_wrap=True)
     console.print("foo " * 10)
