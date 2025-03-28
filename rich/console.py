@@ -735,7 +735,9 @@ class Console:
         self.get_time = get_time or monotonic
         self.style = style
         self.no_color = (
-            no_color if no_color is not None else "NO_COLOR" in self._environ
+            no_color
+            if no_color is not None
+            else (self._environ.get("NO_COLOR", "") != "")
         )
         self.is_interactive = (
             (self.is_terminal and not self.is_dumb_terminal)
