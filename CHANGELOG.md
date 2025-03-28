@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Rich tracebacks will no render notes (added with Exception.add_note)
+- Rich tracebacks will no render notes (added with Exception.add_note) https://github.com/Textualize/rich/pull/3676
 
 ## [13.9.4] - 2024-11-01
 
