@@ -483,7 +483,7 @@ class Traceback:
 
                 last_instruction: Optional[Tuple[Tuple[int, int], Tuple[int, int]]]
                 last_instruction = None
-                if sys.version_info >= (3, 11):
+                if PYTHON_311:
                     instruction_index = frame_summary.f_lasti // 2
                     instruction_position = next(
                         islice(
@@ -637,19 +637,19 @@ class Traceback:
                 yield Text.assemble(("[NOTE] ", "traceback.note"), highlighter(note))
 
             if stack.is_group:
-                grouped_exceptions = []
-                for group_exception in reversed(stack.exceptions):
+                for group_no, group_exception in enumerate(stack.exceptions, 1):
+                    grouped_exceptions: list[Group] = []
                     for group_last, group_stack in loop_last(group_exception.stacks):
                         grouped_exceptions.append(render_stack(group_stack, group_last))
-                yield Constrain(
-                    Panel(
-                        Group(*grouped_exceptions),
-                        style=background_style,
-                        title="Sub-exceptions",
-                        border_style="traceback.group.border",
-                    ),
-                    self.width,
-                )
+                    yield Constrain(
+                        Panel(
+                            Group(*grouped_exceptions),
+                            style=background_style,
+                            title=f"Sub-exception #{group_no}",
+                            border_style="traceback.group.border",
+                        ),
+                        self.width,
+                    )
 
             if not last:
                 if stack.is_cause:
