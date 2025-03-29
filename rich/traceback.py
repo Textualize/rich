@@ -26,7 +26,7 @@ from pygments.token import Token
 from pygments.util import ClassNotFound
 
 from . import pretty
-from ._loop import loop_last
+from ._loop import loop_first_last, loop_last
 from .columns import Columns
 from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, group
 from .constrain import Constrain
@@ -34,7 +34,7 @@ from .highlighter import RegexHighlighter, ReprHighlighter
 from .panel import Panel
 from .scope import render_scope
 from .style import Style
-from .syntax import Syntax
+from .syntax import Syntax, SyntaxPosition
 from .text import Text
 from .theme import Theme
 
@@ -42,6 +42,34 @@ WINDOWS = sys.platform == "win32"
 
 LOCALS_MAX_LENGTH = 10
 LOCALS_MAX_STRING = 80
+
+
+def _iter_syntax_lines(
+    start: SyntaxPosition, end: SyntaxPosition
+) -> Iterable[Tuple[SyntaxPosition, SyntaxPosition]]:
+    """Yield start and end syntax positions per line.
+
+    Args:
+        start: Start position.
+        end: End position.
+
+    Returns:
+        Iterable of pairs of syntax positions.
+    """
+
+    line1, column1 = start
+    line2, column2 = end
+
+    if line1 == line2:
+        yield start, end
+    else:
+        for first, last, line_no in loop_first_last(range(line1, line2 + 1)):
+            if first:
+                yield (line_no, column1), (line_no, -1)
+            elif last:
+                yield (line_no, 0), (line_no, column2)
+            else:
+                yield (line_no, 0), (line_no, -1)
 
 
 def install(
@@ -759,12 +787,29 @@ class Traceback:
                 else:
                     if frame.last_instruction is not None:
                         start, end = frame.last_instruction
-                        syntax.stylize_range(
-                            style="traceback.error_range",
-                            start=start,
-                            end=end,
-                            style_before=True,
-                        )
+                        lines = code.splitlines()
+
+                        # Stylize a line at a time
+                        # So that indentation isn't underlined (which looks bad)
+                        for (line1, column1), (_, column2) in _iter_syntax_lines(
+                            start, end
+                        ):
+                            try:
+                                if column1 == 0:
+                                    line = lines[line1 - 1]
+                                    column1 = len(line) - len(line.lstrip())
+                                if column2 == -1:
+                                    column2 = len(lines[line1 - 1])
+                            except IndexError:
+                                # Being defensive here
+                                # If last_instruction reports a line out-of-bounds, we don't want to crash
+                                continue
+
+                            syntax.stylize_range(
+                                style="traceback.error_range",
+                                start=(line1, column1),
+                                end=(line1, column2),
+                            )
                     yield (
                         Columns(
                             [
