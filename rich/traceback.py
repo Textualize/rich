@@ -786,10 +786,10 @@ class Traceback:
                         ):
                             try:
                                 if column1 == 0:
-                                    line = lines[line1 - 1]
+                                    line = code_lines[line1 - 1]
                                     column1 = len(line) - len(line.lstrip())
                                 if column2 == -1:
-                                    column2 = len(lines[line1 - 1])
+                                    column2 = len(code_lines[line1 - 1])
                             except IndexError:
                                 # Being defensive here
                                 # If last_instruction reports a line out-of-bounds, we don't want to crash
