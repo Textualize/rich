@@ -686,17 +686,6 @@ class Traceback:
         path_highlighter = PathHighlighter()
         theme = self.theme
 
-        def read_code(filename: str) -> str:
-            """Read files, and cache results on filename.
-
-            Args:
-                filename (str): Filename to read
-
-            Returns:
-                str: Contents of file
-            """
-            return "".join(linecache.getlines(filename))
-
         def render_locals(frame: Frame) -> Iterable[ConsoleRenderable]:
             if frame.locals:
                 yield render_scope(
@@ -758,7 +747,8 @@ class Traceback:
                 continue
             if not suppressed:
                 try:
-                    code = read_code(frame.filename)
+                    code_lines = linecache.getlines(frame.filename)
+                    code = "".join(code_lines)
                     if not code:
                         # code may be an empty string if the file doesn't exist, OR
                         # if the traceback filename is generated dynamically
