@@ -46,30 +46,30 @@ LOCALS_MAX_STRING = 80
 
 def _iter_syntax_lines(
     start: SyntaxPosition, end: SyntaxPosition
-) -> Iterable[Tuple[SyntaxPosition, SyntaxPosition]]:
-    """Yield start and end syntax positions per line.
+) -> Iterable[Tuple[int, int, int]]:
+    """Yield start and end positions per line.
 
     Args:
         start: Start position.
         end: End position.
 
     Returns:
-        Iterable of pairs of syntax positions.
+        Iterable of (LINE, COLUMN1, COLUMN2).
     """
 
     line1, column1 = start
     line2, column2 = end
 
     if line1 == line2:
-        yield start, end
+        yield line1, column1, column2
     else:
         for first, last, line_no in loop_first_last(range(line1, line2 + 1)):
             if first:
-                yield (line_no, column1), (line_no, -1)
+                yield line_no, column1, -1
             elif last:
-                yield (line_no, 0), (line_no, column2)
+                yield line_no, 0, column2
             else:
-                yield (line_no, 0), (line_no, -1)
+                yield line_no, 0, -1
 
 
 def install(
@@ -777,13 +777,10 @@ class Traceback:
                 else:
                     if frame.last_instruction is not None:
                         start, end = frame.last_instruction
-                        lines = code.splitlines()
 
                         # Stylize a line at a time
                         # So that indentation isn't underlined (which looks bad)
-                        for (line1, column1), (_, column2) in _iter_syntax_lines(
-                            start, end
-                        ):
+                        for line1, column1, column2 in _iter_syntax_lines(start, end):
                             try:
                                 if column1 == 0:
                                     line = code_lines[line1 - 1]
