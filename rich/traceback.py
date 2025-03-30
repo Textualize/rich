@@ -636,10 +636,10 @@ class Traceback:
                     grouped_exceptions: List[Group] = []
                     for group_last, group_stack in loop_last(group_exception.stacks):
                         grouped_exceptions.append(render_stack(group_stack, group_last))
+                    yield ""
                     yield Constrain(
                         Panel(
                             Group(*grouped_exceptions),
-                            style=background_style,
                             title=f"Sub-exception #{group_no}",
                             border_style="traceback.group.border",
                         ),
