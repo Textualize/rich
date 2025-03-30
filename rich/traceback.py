@@ -50,8 +50,6 @@ WINDOWS = sys.platform == "win32"
 LOCALS_MAX_LENGTH = 10
 LOCALS_MAX_STRING = 80
 
-PYTHON_311 = sys.version_info > (3, 11)
-
 
 def install(
     *,
@@ -435,7 +433,7 @@ class Traceback:
                 notes=notes,
             )
 
-            if PYTHON_311:
+            if sys.version_info >= (3, 11):
                 if isinstance(exc_value, (BaseExceptionGroup, ExceptionGroup)):
                     stack.is_group = True
                     for exception in exc_value.exceptions:
@@ -483,7 +481,7 @@ class Traceback:
 
                 last_instruction: Optional[Tuple[Tuple[int, int], Tuple[int, int]]]
                 last_instruction = None
-                if PYTHON_311:
+                if sys.version_info >= (3, 11):
                     instruction_index = frame_summary.f_lasti // 2
                     instruction_position = next(
                         islice(
