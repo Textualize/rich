@@ -636,7 +636,7 @@ class Traceback:
 
             if stack.is_group:
                 for group_no, group_exception in enumerate(stack.exceptions, 1):
-                    grouped_exceptions: list[Group] = []
+                    grouped_exceptions: List[Group] = []
                     for group_last, group_stack in loop_last(group_exception.stacks):
                         grouped_exceptions.append(render_stack(group_stack, group_last))
                     yield Constrain(
