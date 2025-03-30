@@ -91,3 +91,4 @@ The following people have contributed to the development of Rich:
 - [L. Yeung](https://github.com/lewis-yeung)
 - [chthollyphile](https://github.com/chthollyphile)
 - [Jonathan Helmus](https://github.com/jjhelmus)
+- [Brandon Capener](https://github.com/bcapener)
