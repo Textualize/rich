@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - An empty `FORCE_COLOR` env var is now considered disabled. https://github.com/Textualize/rich/pull/3675
 - Rich tracebacks will now render notes on Python 3.11 onwards (added with `Exception.add_note`) https://github.com/Textualize/rich/pull/3676
 - Indentation in exceptions won't be underlined https://github.com/Textualize/rich/pull/3678
+- Rich tracebacks will now render Exception Groups https://github.com/Textualize/rich/pull/3677
 
 ## [13.9.4] - 2024-11-01
 
