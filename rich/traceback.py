@@ -26,7 +26,7 @@ from pygments.token import Token
 from pygments.util import ClassNotFound
 
 from . import pretty
-from ._loop import loop_last
+from ._loop import loop_first_last, loop_last
 from .columns import Columns
 from .console import (
     Console,
@@ -41,7 +41,7 @@ from .highlighter import RegexHighlighter, ReprHighlighter
 from .panel import Panel
 from .scope import render_scope
 from .style import Style
-from .syntax import Syntax
+from .syntax import Syntax, SyntaxPosition
 from .text import Text
 from .theme import Theme
 
@@ -49,6 +49,34 @@ WINDOWS = sys.platform == "win32"
 
 LOCALS_MAX_LENGTH = 10
 LOCALS_MAX_STRING = 80
+
+
+def _iter_syntax_lines(
+    start: SyntaxPosition, end: SyntaxPosition
+) -> Iterable[Tuple[int, int, int]]:
+    """Yield start and end positions per line.
+
+    Args:
+        start: Start position.
+        end: End position.
+
+    Returns:
+        Iterable of (LINE, COLUMN1, COLUMN2).
+    """
+
+    line1, column1 = start
+    line2, column2 = end
+
+    if line1 == line2:
+        yield line1, column1, column2
+    else:
+        for first, last, line_no in loop_first_last(range(line1, line2 + 1)):
+            if first:
+                yield line_no, column1, -1
+            elif last:
+                yield line_no, 0, column2
+            else:
+                yield line_no, 0, -1
 
 
 def install(
@@ -703,17 +731,6 @@ class Traceback:
         path_highlighter = PathHighlighter()
         theme = self.theme
 
-        def read_code(filename: str) -> str:
-            """Read files, and cache results on filename.
-
-            Args:
-                filename (str): Filename to read
-
-            Returns:
-                str: Contents of file
-            """
-            return "".join(linecache.getlines(filename))
-
         def render_locals(frame: Frame) -> Iterable[ConsoleRenderable]:
             if frame.locals:
                 yield render_scope(
@@ -775,7 +792,8 @@ class Traceback:
                 continue
             if not suppressed:
                 try:
-                    code = read_code(frame.filename)
+                    code_lines = linecache.getlines(frame.filename)
+                    code = "".join(code_lines)
                     if not code:
                         # code may be an empty string if the file doesn't exist, OR
                         # if the traceback filename is generated dynamically
@@ -804,12 +822,26 @@ class Traceback:
                 else:
                     if frame.last_instruction is not None:
                         start, end = frame.last_instruction
-                        syntax.stylize_range(
-                            style="traceback.error_range",
-                            start=start,
-                            end=end,
-                            style_before=True,
-                        )
+
+                        # Stylize a line at a time
+                        # So that indentation isn't underlined (which looks bad)
+                        for line1, column1, column2 in _iter_syntax_lines(start, end):
+                            try:
+                                if column1 == 0:
+                                    line = code_lines[line1 - 1]
+                                    column1 = len(line) - len(line.lstrip())
+                                if column2 == -1:
+                                    column2 = len(code_lines[line1 - 1])
+                            except IndexError:
+                                # Being defensive here
+                                # If last_instruction reports a line out-of-bounds, we don't want to crash
+                                continue
+
+                            syntax.stylize_range(
+                                style="traceback.error_range",
+                                start=(line1, column1),
+                                end=(line1, column2),
+                            )
                     yield (
                         Columns(
                             [
