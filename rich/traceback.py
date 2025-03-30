@@ -28,7 +28,14 @@ from pygments.util import ClassNotFound
 from . import pretty
 from ._loop import loop_first_last, loop_last
 from .columns import Columns
-from .console import Console, ConsoleOptions, ConsoleRenderable, RenderResult, group
+from .console import (
+    Console,
+    ConsoleOptions,
+    ConsoleRenderable,
+    Group,
+    RenderResult,
+    group,
+)
 from .constrain import Constrain
 from .highlighter import RegexHighlighter, ReprHighlighter
 from .panel import Panel
@@ -128,26 +135,25 @@ def install(
         value: BaseException,
         traceback: Optional[TracebackType],
     ) -> None:
-        traceback_console.print(
-            Traceback.from_exception(
-                type_,
-                value,
-                traceback,
-                width=width,
-                code_width=code_width,
-                extra_lines=extra_lines,
-                theme=theme,
-                word_wrap=word_wrap,
-                show_locals=show_locals,
-                locals_max_length=locals_max_length,
-                locals_max_string=locals_max_string,
-                locals_hide_dunder=locals_hide_dunder,
-                locals_hide_sunder=bool(locals_hide_sunder),
-                indent_guides=indent_guides,
-                suppress=suppress,
-                max_frames=max_frames,
-            )
+        exception_traceback = Traceback.from_exception(
+            type_,
+            value,
+            traceback,
+            width=width,
+            code_width=code_width,
+            extra_lines=extra_lines,
+            theme=theme,
+            word_wrap=word_wrap,
+            show_locals=show_locals,
+            locals_max_length=locals_max_length,
+            locals_max_string=locals_max_string,
+            locals_hide_dunder=locals_hide_dunder,
+            locals_hide_sunder=bool(locals_hide_sunder),
+            indent_guides=indent_guides,
+            suppress=suppress,
+            max_frames=max_frames,
         )
+        traceback_console.print(exception_traceback)
 
     def ipy_excepthook_closure(ip: Any) -> None:  # pragma: no cover
         tb_data = {}  # store information about showtraceback call
@@ -230,6 +236,8 @@ class Stack:
     is_cause: bool = False
     frames: List[Frame] = field(default_factory=list)
     notes: List[str] = field(default_factory=list)
+    is_group: bool = False
+    exceptions: List["Trace"] = field(default_factory=list)
 
 
 @dataclass
@@ -450,6 +458,22 @@ class Traceback:
                 notes=notes,
             )
 
+            if sys.version_info >= (3, 11):
+                if isinstance(exc_value, (BaseExceptionGroup, ExceptionGroup)):
+                    stack.is_group = True
+                    for exception in exc_value.exceptions:
+                        stack.exceptions.append(
+                            Traceback.extract(
+                                type(exception),
+                                exception,
+                                exception.__traceback__,
+                                show_locals=show_locals,
+                                locals_max_length=locals_max_length,
+                                locals_hide_dunder=locals_hide_dunder,
+                                locals_hide_sunder=locals_hide_sunder,
+                            )
+                        )
+
             if isinstance(exc_value, SyntaxError):
                 stack.syntax_error = _SyntaxError(
                     offset=exc_value.offset or 0,
@@ -558,6 +582,7 @@ class Traceback:
             break  # pragma: no cover
 
         trace = Trace(stacks=stacks)
+
         return trace
 
     def __rich_console__(
@@ -590,7 +615,9 @@ class Traceback:
         )
 
         highlighter = ReprHighlighter()
-        for last, stack in loop_last(reversed(self.trace.stacks)):
+
+        @group()
+        def render_stack(stack: Stack, last: bool) -> RenderResult:
             if stack.frames:
                 stack_renderable: ConsoleRenderable = Panel(
                     self._render_stack(stack),
@@ -632,6 +659,21 @@ class Traceback:
             for note in stack.notes:
                 yield Text.assemble(("[NOTE] ", "traceback.note"), highlighter(note))
 
+            if stack.is_group:
+                for group_no, group_exception in enumerate(stack.exceptions, 1):
+                    grouped_exceptions: List[Group] = []
+                    for group_last, group_stack in loop_last(group_exception.stacks):
+                        grouped_exceptions.append(render_stack(group_stack, group_last))
+                    yield ""
+                    yield Constrain(
+                        Panel(
+                            Group(*grouped_exceptions),
+                            title=f"Sub-exception #{group_no}",
+                            border_style="traceback.group.border",
+                        ),
+                        self.width,
+                    )
+
             if not last:
                 if stack.is_cause:
                     yield Text.from_markup(
@@ -641,6 +683,9 @@ class Traceback:
                     yield Text.from_markup(
                         "\n[i]During handling of the above exception, another exception occurred:\n",
                     )
+
+        for last, stack in loop_last(reversed(self.trace.stacks)):
+            yield render_stack(stack, last)
 
     @group()
     def _render_syntax_error(self, syntax_error: _SyntaxError) -> RenderResult:
