@@ -12,7 +12,7 @@ sphinx:
 formats: all
 
 build:
-  os: ubuntu-22.04
+  os: "ubuntu-24.04"
   tools:
     python: "3.12"
 
