@@ -125,9 +125,6 @@ def install(
             suppress=suppress,
             max_frames=max_frames,
         )
-
-        # REMOVE THIS LINE
-        traceback_console.print(exception_traceback.trace)
         traceback_console.print(exception_traceback)
 
     def ipy_excepthook_closure(ip: Any) -> None:  # pragma: no cover
