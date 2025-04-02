@@ -2,6 +2,11 @@ import sys
 from threading import Event, RLock, Thread
 from types import TracebackType
 from typing import IO, Any, Callable, List, Optional, TextIO, Type, cast
+import contextlib
+import time
+import signal
+import atexit
+import os
 
 from . import get_console
 from .console import Console, ConsoleRenderable, RenderableType, RenderHook
@@ -88,6 +93,16 @@ class Live(JupyterMixin, RenderHook):
             self.get_renderable(), vertical_overflow=vertical_overflow
         )
 
+        self._start_time: Optional[float] = None
+        self._stop_time: Optional[float] = None
+        self._refresh_count = 0
+        self._refresh_queue: List[Tuple[float, RenderableType]] = []
+        self._print_queue: List[Tuple[RenderableType, dict]] = []
+        self._queued_writes = True
+        self._closed = False
+        self._original_sigint_handler = None
+        self._exit_handler_added = False
+
     @property
     def is_started(self) -> bool:
         """Check if live display has been started."""
@@ -101,66 +116,106 @@ class Live(JupyterMixin, RenderHook):
         )
         return renderable or ""
 
-    def start(self, refresh: bool = False) -> None:
+    def _handle_sigint(self, sig, frame):
+        """Handle SIGINT (Ctrl+C) to ensure cursor is shown."""
+        # Restore cursor
+        if self.console.is_terminal:
+            self.console.show_cursor(True)
+        # Re-raise KeyboardInterrupt to allow program to exit
+        raise KeyboardInterrupt()
+
+    def _ensure_cursor_visible_at_exit(self):
+        """Ensure cursor is visible when program exits."""
+        if self.console.is_terminal:
+            self.console.show_cursor(True)
+
+    def start(self, refresh: bool = False) -> "Live":
         """Start live rendering display.
 
         Args:
             refresh (bool, optional): Also refresh. Defaults to False.
+
+        Returns:
+            Live: This instance
         """
         with self._lock:
+            if self._closed:
+                raise LiveError("Live display has been closed")
             if self._started:
-                return
-            self.console.set_live(self)
+                return self
+            # Set up signal handler for Ctrl+C
+            if not self._exit_handler_added:
+                atexit.register(self._ensure_cursor_visible_at_exit)
+                self._exit_handler_added = True
+            # Only set up SIGINT handler on platforms that support it (not Windows)
+            if os.name != "nt" and hasattr(signal, "SIGINT"):
+                self._original_sigint_handler = signal.signal(signal.SIGINT, self._handle_sigint)
+            
             self._started = True
-            if self._screen:
-                self._alt_screen = self.console.set_alt_screen(True)
+            self._start_time = self.console.get_time()
+            self.console.set_live(self)
+            self._alt_screen = self.console.set_alt_screen(True)
             self.console.show_cursor(False)
             self._enable_redirect_io()
             self.console.push_render_hook(self)
-            if refresh:
-                try:
-                    self.refresh()
-                except Exception:
-                    # If refresh fails, we want to stop the redirection of sys.stderr,
-                    # so the error stacktrace is properly displayed in the terminal.
-                    # (or, if the code that calls Rich captures the exception and wants to display something,
-                    # let this be displayed in the terminal).
-                    self.stop()
-                    raise
-            if self.auto_refresh:
+            self._live_render.set_renderable(self.renderable)
+            self.console.begin_live(
+                self._live_render, refresh=refresh, screen=self._screen, transient=True
+            )
+            if self._redirect_stdout:
+                self._stdout = Redirect(self.console, stdout=True, stderr=False)
+                self._stdout.__enter__()
+            if self._redirect_stderr:
+                self._stderr = Redirect(self.console, stdout=False, stderr=True)
+                self._stderr.__enter__()
+
+            if self.auto_refresh and not self._refresh_thread:
                 self._refresh_thread = _RefreshThread(self, self.refresh_per_second)
                 self._refresh_thread.start()
+            return self
 
     def stop(self) -> None:
         """Stop live rendering display."""
-        with self._lock:
-            if not self._started:
-                return
-            self.console.clear_live()
-            self._started = False
+        try:
+            with self._lock:
+                if not self._started:
+                    return
+                self._started = False
+                self._stop_time = self.console.get_time()
 
-            if self.auto_refresh and self._refresh_thread is not None:
-                self._refresh_thread.stop()
-                self._refresh_thread = None
-            # allow it to fully render on the last even if overflow
-            self.vertical_overflow = "visible"
-            with self.console:
-                try:
-                    if not self._alt_screen and not self.console.is_jupyter:
-                        self.refresh()
-                finally:
-                    self._disable_redirect_io()
-                    self.console.pop_render_hook()
-                    if not self._alt_screen and self.console.is_terminal:
-                        self.console.line()
-                    self.console.show_cursor(True)
-                    if self._alt_screen:
-                        self.console.set_alt_screen(False)
+                if self._redirect_stdout:
+                    self._stdout.__exit__(None, None, None)
+                    self._stdout = None  # type: ignore
+                if self._redirect_stderr:
+                    self._stderr.__exit__(None, None, None)
+                    self._stderr = None  # type: ignore
 
-                    if self.transient and not self._alt_screen:
-                        self.console.control(self._live_render.restore_cursor())
-                    if self.ipy_widget is not None and self.transient:
-                        self.ipy_widget.close()  # pragma: no cover
+                if self.console.is_jupyter:  # pragma: no cover
+                    try:
+                        import IPython.display
+
+                        if self.ipy_widget:
+                            IPython.display.display(IPython.display.Pretty(self.renderable))
+                    except ImportError:
+                        pass
+                else:
+                    cursor = self.console.show_cursor(True)
+                    if self.transient:
+                        self.console.end_live()
+                    else:
+                        # Set renderable to transient so it
+                        # will be displayed with refresh
+                        self.console.end_live(self.renderable)
+                
+                # Restore original signal handler
+                if os.name != "nt" and hasattr(signal, "SIGINT") and self._original_sigint_handler is not None:
+                    signal.signal(signal.SIGINT, self._original_sigint_handler)
+                    self._original_sigint_handler = None
+        except:
+            # Ensure cursor is visible even if an exception occurs during stop
+            if self.console.is_terminal:
+                self.console.show_cursor(True)
+            raise
 
     def __enter__(self) -> "Live":
         self.start(refresh=self._renderable is not None)
