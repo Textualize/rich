@@ -2673,3 +2673,15 @@ if __name__ == "__main__":  # pragma: no cover
             },
         }
     )
+
+    console.print_buffered(
+        "This is a buffered print with controlled buffering.",
+        end="\n",
+        flush=True,
+    )
+
+    console.print_progress(
+        "Processing...",
+        end="\r",
+        flush=True,
+    )
