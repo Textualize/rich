@@ -28,6 +28,7 @@ from .jupyter import JupyterMixin
 from .measure import Measurement
 from .segment import Segment
 from .style import Style, StyleType
+import unicodedata
 
 if TYPE_CHECKING:  # pragma: no cover
     from .console import Console, ConsoleOptions, JustifyMethod, OverflowMethod
@@ -1331,6 +1332,35 @@ class Text(JupyterMixin):
 
         new_text = text.blank_copy("\n").join(new_lines)
         return new_text
+
+
+def get_unicode_width(text: str) -> int:
+    """Calculate the visual width of a string containing Unicode characters.
+    
+    Args:
+        text (str): The text to measure.
+        
+    Returns:
+        int: The visual width of the text.
+        
+    Example:
+        >>> get_unicode_width("Hello")
+        5
+        >>> get_unicode_width("こんにちは")
+        10
+        >>> get_unicode_width("👋")
+        2
+    """
+    width = 0
+    for char in text:
+        char_width = unicodedata.east_asian_width(char)
+        if char_width in ('F', 'W'):  # Full-width or Wide characters
+            width += 2
+        elif char_width == 'A':  # Ambiguous characters
+            width += 2  # Treat as full-width
+        else:  # Narrow, Half-width, or Neutral characters
+            width += 1
+    return width
 
 
 if __name__ == "__main__":  # pragma: no cover

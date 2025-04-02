@@ -9,6 +9,7 @@ from typing import (
     Sequence,
     Tuple,
     Union,
+    Any,
 )
 
 from . import box, errors
@@ -22,7 +23,7 @@ from .padding import Padding, PaddingDimensions
 from .protocol import is_renderable
 from .segment import Segment
 from .style import Style, StyleType
-from .text import Text, TextType
+from .text import Text, TextType, get_unicode_width
 
 if TYPE_CHECKING:
     from .console import (
@@ -422,49 +423,30 @@ class Table(JupyterMixin):
 
     def add_row(
         self,
-        *renderables: Optional["RenderableType"],
+        *cells: Any,
         style: Optional[StyleType] = None,
         end_section: bool = False,
     ) -> None:
-        """Add a row of renderables.
-
+        """Add a row to the table.
+        
         Args:
-            *renderables (None or renderable): Each cell in a row must be a renderable object (including str),
-                or ``None`` for a blank cell.
-            style (StyleType, optional): An optional style to apply to the entire row. Defaults to None.
-            end_section (bool, optional): End a section and draw a line. Defaults to False.
-
-        Raises:
-            errors.NotRenderableError: If you add something that can't be rendered.
+            *cells: Cell contents.
+            style: Optional style to apply to the row.
+            end_section: End a section and draw a line. Defaults to False.
         """
-
-        def add_cell(column: Column, renderable: "RenderableType") -> None:
-            column._cells.append(renderable)
-
-        cell_renderables: List[Optional["RenderableType"]] = list(renderables)
-
-        columns = self.columns
-        if len(cell_renderables) < len(columns):
-            cell_renderables = [
-                *cell_renderables,
-                *[None] * (len(columns) - len(cell_renderables)),
-            ]
-        for index, renderable in enumerate(cell_renderables):
-            if index == len(columns):
-                column = Column(_index=index, highlight=self.highlight)
-                for _ in self.rows:
-                    add_cell(column, Text(""))
-                self.columns.append(column)
-            else:
-                column = columns[index]
-            if renderable is None:
-                add_cell(column, "")
-            elif is_renderable(renderable):
-                add_cell(column, renderable)
-            else:
-                raise errors.NotRenderableError(
-                    f"unable to render {type(renderable).__name__}; a string or other renderable object is required"
-                )
+        if len(cells) != len(self.columns):
+            raise ValueError(
+                f"Expected {len(self.columns)} cells, got {len(cells)}"
+            )
+        
+        # Calculate padding for each cell based on Unicode width
+        padded_cells = []
+        for cell, column in zip(cells, self.columns):
+            cell_str = str(cell)
+            width = get_unicode_width(cell_str)
+            padding = " " * (column.width - width) if hasattr(column, 'width') else ""
+            padded_cells.append(cell_str + padding)
+        
         self.rows.append(Row(style=style, end_section=end_section))
 
     def add_section(self) -> None:
