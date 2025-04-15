@@ -22,26 +22,20 @@ from typing import (
     Dict,
     Iterable,
     List,
+    Literal,
     Mapping,
     NamedTuple,
     Optional,
+    Protocol,
     TextIO,
     Tuple,
     Type,
     Union,
     cast,
+    runtime_checkable,
 )
 
 from rich._null_file import NULL_FILE
-
-if sys.version_info >= (3, 8):
-    from typing import Literal, Protocol, runtime_checkable
-else:
-    from typing_extensions import (
-        Literal,
-        Protocol,
-        runtime_checkable,
-    )  # pragma: no cover
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace

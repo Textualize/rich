@@ -14,6 +14,7 @@ from os import PathLike, stat
 from threading import Event, RLock, Thread
 from types import TracebackType
 from typing import (
+    TYPE_CHECKING,
     Any,
     BinaryIO,
     Callable,
@@ -23,6 +24,7 @@ from typing import (
     Generic,
     Iterable,
     List,
+    Literal,
     NamedTuple,
     NewType,
     Optional,
@@ -34,15 +36,11 @@ from typing import (
     Union,
 )
 
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal  # pragma: no cover
-
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self  # pragma: no cover
+if TYPE_CHECKING:
+    if sys.version_info >= (3, 11):
+        from typing import Self
+    else:
+        from typing_extensions import Self  # pragma: no cover
 
 from . import filesize, get_console
 from .console import Console, Group, JustifyMethod, RenderableType
@@ -1178,7 +1176,7 @@ class Progress(JupyterMixin):
         if not self.console.is_interactive and not self.console.is_jupyter:
             self.console.print()
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> "Self":
         self.start()
         return self
 
