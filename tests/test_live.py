@@ -87,7 +87,9 @@ def test_growing_display_overflow_ellipsis_message() -> None:
     console = create_capture_console(height=3)
     console.begin_capture()
     with Live(
-        console=console, auto_refresh=False, vertical_overflow=("ellipsis", "custom msg")
+        console=console,
+        auto_refresh=False,
+        vertical_overflow=("ellipsis", "custom msg"),
     ) as live:
         display = ""
         for step in range(5):

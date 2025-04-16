@@ -1,7 +1,19 @@
 import sys
 from threading import Event, RLock, Thread
 from types import TracebackType
-from typing import IO, Any, Callable, List, Literal, Optional, TextIO, Tuple, Type, Union, cast
+from typing import (
+    IO,
+    Any,
+    Callable,
+    List,
+    Literal,
+    Optional,
+    TextIO,
+    Tuple,
+    Type,
+    Union,
+    cast,
+)
 
 from . import get_console
 from .console import Console, ConsoleRenderable, RenderableType, RenderHook
@@ -59,7 +71,9 @@ class Live(JupyterMixin, RenderHook):
         transient: bool = False,
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
-        vertical_overflow: Union[VerticalOverflowMethod, Tuple[Literal["ellipsis"], str]]  = "ellipsis",
+        vertical_overflow: Union[
+            VerticalOverflowMethod, Tuple[Literal["ellipsis"], str]
+        ] = "ellipsis",
         get_renderable: Optional[Callable[[], RenderableType]] = None,
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
@@ -93,7 +107,7 @@ class Live(JupyterMixin, RenderHook):
         self._live_render = LiveRender(
             self.get_renderable(),
             vertical_overflow=vertical_overflow,
-            vertical_overflow_message=vertical_overflow_message
+            vertical_overflow_message=vertical_overflow_message,
         )
 
     @property
