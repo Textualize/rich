@@ -1,5 +1,6 @@
 import io
 import sys
+import time
 import typing
 import warnings
 from abc import ABC, abstractmethod
@@ -672,8 +673,45 @@ class BarColumn(ProgressColumn):
         self.pulse_style = pulse_style
         super().__init__(table_column=table_column)
 
-    def render(self, task: "Task") -> ProgressBar:
+    def render(self, task: "Task") -> Union[ProgressBar, Text]:
         """Gets a progress bar widget for a task."""
+        if task.should_show_indeterminate:
+            return self._render_indeterminate(task)
+        else:
+            return self._render_determinate(task)
+
+    def _render_indeterminate(self, task: "Task") -> Text:
+        """Render an indeterminate (pulsing) progress bar."""
+        width = self.bar_width
+        if width is None:
+            width = max(10, self.max_width - 10)
+        
+        current_time = time.time()
+        position = int((current_time * 2) % width)
+        
+        bar_text = " " * width
+        bar_chars = list(bar_text)
+        
+        # Create a moving indicator pattern
+        pattern_width = min(5, width // 3)
+        for i in range(pattern_width):
+            pos = (position + i) % width
+            bar_chars[pos] = "━"
+        
+        # Add direction indicators
+        if position % 2 == 0:
+            bar_chars[(position - 1) % width] = "<<"
+            bar_chars[(position + pattern_width) % width] = ">>"
+        else:
+            bar_chars[(position - 1) % width] = ">>"
+            bar_chars[(position + pattern_width) % width] = "<<"
+        
+        bar = "".join(bar_chars)
+        style = self.style or "bar.pulse"
+        return Text(bar, style=style)
+
+    def _render_determinate(self, task: "Task") -> ProgressBar:
+        """Render a determinate progress bar."""
         return ProgressBar(
             total=max(0, task.total) if task.total is not None else None,
             completed=max(0, task.completed),
@@ -862,6 +900,32 @@ class MofNCompleteColumn(ProgressColumn):
             f"{completed:{total_width}d}{self.separator}{total}",
             style="progress.download",
         )
+    
+class IndeterminateTaskProgressColumn(ProgressColumn):
+    """Renders task progress with a ? for indeterminate tasks."""
+    
+    def __init__(
+        self,
+        text_format: str = "{task.completed}/{task.total}",
+        text_format_indeterminate: str = "?/{task.expected_total}",
+        style: StyleType = "none",
+        table_column: Optional[Column] = None,
+    ) -> None:
+        self.text_format = text_format
+        self.text_format_indeterminate = text_format_indeterminate
+        self.style = style
+        super().__init__(table_column=table_column)
+    
+    def render(self, task: "Task") -> Text:
+        """Render the task progress with ? for indeterminate progress."""
+        if task.should_show_indeterminate:
+            expected = int(task.expected_total) if task.expected_total is not None else "?"
+            text = f"?/{expected}"
+        else:
+            total = int(task.total) if task.total is not None else "?"
+            text = f"{int(task.completed)}/{total}"
+        
+        return Text(text, style=self.style)
 
 
 class DownloadColumn(ProgressColumn):
@@ -982,6 +1046,12 @@ class Task:
     _lock: RLock = field(repr=False, default_factory=RLock)
     """Thread lock."""
 
+    indeterminate: bool = False
+    """bool: Whether this task is in indeterminate mode."""
+    
+    expected_total: Optional[float] = None
+    """Optional[float]: Expected total for display purposes in indeterminate mode."""
+
     def get_time(self) -> float:
         """float: Get the current time, in seconds."""
         return self._get_time()
@@ -1052,6 +1122,11 @@ class Task:
             return None
         estimate = ceil(remaining / speed)
         return estimate
+    
+    @property
+    def should_show_indeterminate(self) -> bool:
+        """Check if the task should display in indeterminate mode."""
+        return self.indeterminate or (self.total is None and self.start_time is not None)
 
     def _reset(self) -> None:
         """Reset progress."""
@@ -1422,6 +1497,8 @@ class Progress(JupyterMixin):
         advance: Optional[float] = None,
         description: Optional[str] = None,
         visible: Optional[bool] = None,
+        indeterminate: Optional[bool] = None,  
+        expected_total: Optional[float] = None,  
         refresh: bool = False,
         **fields: Any,
     ) -> None:
@@ -1434,6 +1511,8 @@ class Progress(JupyterMixin):
             advance (float, optional): Add a value to task.completed if not None.
             description (str, optional): Change task description if not None.
             visible (bool, optional): Set visible flag if not None.
+            indeterminate (bool, optional): Set indeterminate flag if not None.  
+            expected_total (float, optional): Set expected_total if not None. 
             refresh (bool): Force a refresh of progress information. Default is False.
             **fields (Any): Additional data fields required for rendering.
         """
@@ -1452,6 +1531,10 @@ class Progress(JupyterMixin):
                 task.description = description
             if visible is not None:
                 task.visible = visible
+            if indeterminate is not None:  
+                task.indeterminate = indeterminate
+            if expected_total is not None:  
+                task.expected_total = expected_total
             task.fields.update(fields)
             update_completed = task.completed - completed_start
 
@@ -1603,6 +1686,8 @@ class Progress(JupyterMixin):
         total: Optional[float] = 100.0,
         completed: int = 0,
         visible: bool = True,
+        indeterminate: bool = False,     
+        expected_total: Optional[float] = None,  
         **fields: Any,
     ) -> TaskID:
         """Add a new 'task' to the Progress display.
@@ -1615,6 +1700,8 @@ class Progress(JupyterMixin):
                 Set to None to render a pulsing animation. Defaults to 100.
             completed (int, optional): Number of steps completed so far. Defaults to 0.
             visible (bool, optional): Enable display of the task. Defaults to True.
+            indeterminate (bool, optional): Whether the task is indeterminate. Defaults to False. 
+            expected_total (float, optional): Expected total for display purposes. Defaults to None. 
             **fields (str): Additional data fields required for rendering.
 
         Returns:
@@ -1630,6 +1717,8 @@ class Progress(JupyterMixin):
                 fields=fields,
                 _get_time=self.get_time,
                 _lock=self._lock,
+                indeterminate=indeterminate,  
+                expected_total=expected_total, 
             )
             self._tasks[self._task_index] = task
             if start:
