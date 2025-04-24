@@ -52,6 +52,7 @@ from .align import Align, AlignMethod
 from .color import ColorSystem, blend_rgb
 from .control import Control
 from .emoji import EmojiVariant
+from .file_proxy import FileProxy
 from .highlighter import NullHighlighter, ReprHighlighter
 from .markup import render as render_markup
 from .measure import Measurement, measure_renderables
@@ -761,7 +762,10 @@ class Console:
     def file(self) -> IO[str]:
         """Get the file object to write to."""
         file = self._file or (sys.stderr if self.stderr else sys.stdout)
-        file = getattr(file, "rich_proxied_file", file)
+        console = getattr(file, "rich_proxy_console", None)
+        if console == self:  # respect FileProxy unless the target is ourself
+            file = cast(FileProxy, file)
+            file = file.rich_proxied_file
         if file is None:
             file = NULL_FILE
         return file
