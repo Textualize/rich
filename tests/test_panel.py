@@ -148,6 +148,30 @@ def test_title_text_with_border_color() -> None:
     assert result == expected
 
 
+def test_title_text_with_panel_background() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3569"""
+    panel = Panel(
+        "Hello, World",
+        style="on blue",
+        title=Text("title", style="red"),
+        subtitle=Text("subtitle", style="magenta bold"),
+    )
+    console = Console(
+        file=io.StringIO(),
+        width=50,
+        height=20,
+        legacy_windows=False,
+        force_terminal=True,
+        color_system="truecolor",
+    )
+    console.print(panel)
+
+    result = console.file.getvalue()
+    print(repr(result))
+    expected = "\x1b[44m╭─\x1b[0m\x1b[44m───────────────────\x1b[0m\x1b[31;44m title \x1b[0m\x1b[44m────────────────────\x1b[0m\x1b[44m─╮\x1b[0m\n\x1b[44m│\x1b[0m\x1b[44m \x1b[0m\x1b[44mHello, World\x1b[0m\x1b[44m                                  \x1b[0m\x1b[44m \x1b[0m\x1b[44m│\x1b[0m\n\x1b[44m╰─\x1b[0m\x1b[44m──────────────────\x1b[0m\x1b[1;35;44m subtitle \x1b[0m\x1b[44m──────────────────\x1b[0m\x1b[44m─╯\x1b[0m\n"
+    assert result == expected
+
+
 if __name__ == "__main__":
     expected = []
     for panel in tests:
