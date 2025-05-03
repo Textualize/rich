@@ -71,6 +71,7 @@ The following people have contributed to the development of Rich:
 - [Aaron Stephens](https://github.com/aaronst)
 - [Karolina Surma](https://github.com/befeleme)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
+- [Stan Ulbrych](https://github.com/stanfromireland)
 - [Nils Vu](https://github.com/nilsvu)
 - [Arian Mollik Wasi](https://github.com/wasi-master)
 - [Jan van Wijk](https://github.com/jdvanwijk)
