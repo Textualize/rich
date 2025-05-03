@@ -110,7 +110,7 @@ def test_inline_code():
         inline_code_theme="emacs",
     )
     result = render(markdown)
-    expected = "inline \x1b[1;38;2;170;34;255;48;2;248;248;248mimport\x1b[0m\x1b[38;2;0;0;0;48;2;248;248;248m \x1b[0m\x1b[1;38;2;0;0;255;48;2;248;248;248mthis\x1b[0m code                                                                             \n"
+    expected = "inline \x1b[1;38;2;170;34;255;48;2;248;248;248mimport\x1b[0m\x1b[38;2;187;187;187;48;2;248;248;248m \x1b[0m\x1b[1;38;2;0;0;255;48;2;248;248;248mthis\x1b[0m code                                                                             \n"
     print(result)
     print(repr(result))
     assert result == expected
