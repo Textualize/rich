@@ -146,8 +146,7 @@ class Panel(JupyterMixin):
             Padding(self.renderable, _padding) if any(_padding) else self.renderable
         )
         style = console.get_style(self.style)
-        partial_border_style = console.get_style(self.border_style)
-        border_style = style + partial_border_style
+        border_style = style + console.get_style(self.border_style)
         width = (
             options.max_width
             if self.width is None
@@ -206,7 +205,7 @@ class Panel(JupyterMixin):
 
         title_text = self._title
         if title_text is not None:
-            title_text.stylize_before(partial_border_style)
+            title_text.stylize_before(border_style)
 
         child_width = (
             width - 2
@@ -255,7 +254,7 @@ class Panel(JupyterMixin):
 
         subtitle_text = self._subtitle
         if subtitle_text is not None:
-            subtitle_text.stylize_before(partial_border_style)
+            subtitle_text.stylize_before(border_style)
 
         if subtitle_text is None or width <= 4:
             yield Segment(box.get_bottom([width - 2]), border_style)
