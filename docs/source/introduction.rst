@@ -12,7 +12,7 @@ Rich works with macOS, Linux and Windows.
 
 On Windows both the (ancient) cmd.exe terminal is supported and the new `Windows Terminal <https://github.com/microsoft/terminal/releases>`_. The latter has much improved support for color and style.
 
-Rich requires Python 3.7.0 and above.
+Rich requires Python 3.8.0 and above.
 
 .. note::
     PyCharm users will need to enable "emulate terminal" in output console option in run/debug configuration to see styled output.
