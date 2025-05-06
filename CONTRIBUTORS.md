@@ -92,3 +92,4 @@ The following people have contributed to the development of Rich:
 - [chthollyphile](https://github.com/chthollyphile)
 - [Jonathan Helmus](https://github.com/jjhelmus)
 - [Brandon Capener](https://github.com/bcapener)
+- [Samuel Colvin](https://github.com/samuelcolvin)
