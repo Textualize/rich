@@ -646,6 +646,7 @@ class Console:
         height: Optional[int] = None,
         style: Optional[StyleType] = None,
         no_color: Optional[bool] = None,
+        no_clear: bool = True,
         tab_size: int = 8,
         record: bool = False,
         markup: bool = True,
@@ -753,6 +754,7 @@ class Console:
         self._render_hooks: List[RenderHook] = []
         self._live: Optional["Live"] = None
         self._is_alt_screen = False
+        self._no_clear = no_clear
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {self._color_system!s}>"
