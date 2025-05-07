@@ -2,6 +2,9 @@ import io
 import sys
 import typing
 import warnings
+import signal
+import atexit
+import os
 from abc import ABC, abstractmethod
 from collections import deque
 from dataclasses import dataclass, field
@@ -1111,6 +1114,21 @@ class Progress(JupyterMixin):
         self.get_time = get_time or self.console.get_time
         self.print = self.console.print
         self.log = self.console.log
+        self._original_sigint_handler = None
+        self._exit_handler_added = False
+        
+    def _handle_sigint(self, sig, frame):
+        """Handle SIGINT (Ctrl+C) to ensure cursor is shown."""
+        # Restore cursor
+        if self.console.is_terminal:
+            self.console.show_cursor(True)
+        # Re-raise KeyboardInterrupt to allow program to exit
+        raise KeyboardInterrupt()
+
+    def _ensure_cursor_visible_at_exit(self):
+        """Ensure cursor is visible when program exits."""
+        if self.console.is_terminal:
+            self.console.show_cursor(True)
 
     @classmethod
     def get_default_columns(cls) -> Tuple[ProgressColumn, ...]:
@@ -1170,13 +1188,30 @@ class Progress(JupyterMixin):
     def start(self) -> None:
         """Start the progress display."""
         if not self.disable:
+            # Set up signal handler for Ctrl+C
+            if not self._exit_handler_added:
+                atexit.register(self._ensure_cursor_visible_at_exit)
+                self._exit_handler_added = True
+            # Only set up SIGINT handler on platforms that support it (not Windows)
+            if os.name != "nt" and hasattr(signal, "SIGINT"):
+                self._original_sigint_handler = signal.signal(signal.SIGINT, self._handle_sigint)
             self.live.start(refresh=True)
 
     def stop(self) -> None:
         """Stop the progress display."""
-        self.live.stop()
-        if not self.console.is_interactive and not self.console.is_jupyter:
-            self.console.print()
+        try:
+            self.live.stop()
+            if not self.console.is_interactive and not self.console.is_jupyter:
+                self.console.print()
+            # Restore original signal handler
+            if os.name != "nt" and hasattr(signal, "SIGINT") and self._original_sigint_handler is not None:
+                signal.signal(signal.SIGINT, self._original_sigint_handler)
+                self._original_sigint_handler = None
+        except:
+            # Ensure cursor is visible even if an exception occurs during stop
+            if self.console.is_terminal:
+                self.console.show_cursor(True)
+            raise
 
     def __enter__(self) -> Self:
         self.start()
@@ -1293,7 +1328,6 @@ class Progress(JupyterMixin):
 
     @typing.overload
     def open(
-        self,
         file: Union[str, "PathLike[str]", bytes],
         mode: Union[Literal["r"], Literal["rt"]],
         buffering: int = -1,
