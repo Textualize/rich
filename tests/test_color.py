@@ -39,6 +39,7 @@ def test_system() -> None:
     assert Color.parse("default").system == ColorSystem.STANDARD
     assert Color.parse("red").system == ColorSystem.STANDARD
     assert Color.parse("#ff0000").system == ColorSystem.TRUECOLOR
+    assert Color.parse("#f00").system == ColorSystem.TRUECOLOR
 
 
 def test_windows() -> None:
@@ -47,6 +48,7 @@ def test_windows() -> None:
 
 def test_truecolor() -> None:
     assert Color.parse("#ff0000").get_truecolor() == ColorTriplet(255, 0, 0)
+    assert Color.parse("#f00").get_truecolor() == ColorTriplet(255, 0, 0)
     assert Color.parse("red").get_truecolor() == ColorTriplet(128, 0, 0)
     assert Color.parse("color(1)").get_truecolor() == ColorTriplet(128, 0, 0)
     assert Color.parse("color(17)").get_truecolor() == ColorTriplet(0, 0, 95)
@@ -68,6 +70,9 @@ def test_parse_success() -> None:
         "color(100)", ColorType.EIGHT_BIT, 100, None
     )
     assert Color.parse("#112233") == Color(
+        "#112233", ColorType.TRUECOLOR, None, ColorTriplet(0x11, 0x22, 0x33)
+    )
+    assert Color.parse("#123") == Color(
         "#112233", ColorType.TRUECOLOR, None, ColorTriplet(0x11, 0x22, 0x33)
     )
     assert Color.parse("rgb(90,100,110)") == Color(
@@ -110,6 +115,8 @@ def test_parse_error() -> None:
         Color.parse("nosuchcolor")
     with pytest.raises(ColorParseError):
         Color.parse("#xxyyzz")
+    with pytest.raises(ColorParseError):
+        Color.parse("#xyz")
 
 
 def test_get_ansi_codes() -> None:
