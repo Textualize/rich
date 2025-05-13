@@ -6,8 +6,9 @@ from typing import List
 import pytest
 
 from rich.console import Console
+from rich.text import Span
 from rich.theme import Theme
-from rich.traceback import Traceback, install
+from rich.traceback import install, PathHighlighter, Traceback
 
 
 def test_handler():
@@ -373,3 +374,18 @@ def test_notes() -> None:
         traceback = Traceback()
 
         assert traceback.trace.stacks[0].notes == ["Hello", "World"]
+
+
+def test_path_highlighter() -> None:
+    """Check that PathHighlighter correctly highlights both win32 and *nix paths"""
+    path_highlighter = PathHighlighter()
+
+    assert path_highlighter("/foo/bar/baz").spans == [
+        Span(0, 9, "dim"),
+        Span(9, 12, "bold"),
+    ]
+
+    assert path_highlighter("'\\\\?\\C:\\foo\\bar\\baz").spans == [
+        Span(0, 16, "dim"),
+        Span(16, 19, "bold"),
+    ]
