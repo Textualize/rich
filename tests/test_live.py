@@ -83,6 +83,25 @@ def test_growing_display_overflow_ellipsis() -> None:
     )
 
 
+def test_growing_display_overflow_ellipsis_message() -> None:
+    console = create_capture_console(height=3)
+    console.begin_capture()
+    with Live(
+        console=console,
+        auto_refresh=False,
+        vertical_overflow=("ellipsis", "custom msg"),
+    ) as live:
+        display = ""
+        for step in range(5):
+            display += f"Step {step}\n"
+            live.update(display, refresh=True)
+    output = console.end_capture()
+    assert (
+        output
+        == "\x1b[?25lStep 0\n\r\x1b[2K\x1b[1A\x1b[2KStep 0\nStep 1\n\r\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2KStep 0\nStep 1\n                         custom msg                         \r\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2KStep 0\nStep 1\n                         custom msg                         \r\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2KStep 0\nStep 1\n                         custom msg                         \r\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2KStep 0\nStep 1\nStep 2\nStep 3\nStep 4\n\n\x1b[?25h"
+    )
+
+
 def test_growing_display_overflow_crop() -> None:
     console = create_capture_console(height=5)
     console.begin_capture()
