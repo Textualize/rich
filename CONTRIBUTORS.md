@@ -46,6 +46,7 @@ The following people have contributed to the development of Rich:
 - [Paul McGuire](https://github.com/ptmcg)
 - [Antony Milne](https://github.com/AntonyMilneQB)
 - [Michael Milton](https://github.com/multimeric)
+- [Zoltan Nagy](https://github.com/abesto)
 - [Martina Oefelein](https://github.com/oefe)
 - [Nathan Page](https://github.com/nathanrpage97)
 - [Dave Pearson](https://github.com/davep/)

@@ -246,7 +246,7 @@ class Trace:
 
 
 class PathHighlighter(RegexHighlighter):
-    highlights = [r"(?P<dim>.*/)(?P<bold>.+)"]
+    highlights = [r"(?P<dim>.*(/|\\))(?P<bold>.+)"]
 
 
 class Traceback:
