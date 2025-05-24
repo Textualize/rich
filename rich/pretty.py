@@ -5,6 +5,7 @@ import inspect
 import os
 import reprlib
 import sys
+from weakref import proxy, CallableProxyType, ReferenceError
 from array import array
 from collections import Counter, UserDict, UserList, defaultdict, deque
 from dataclasses import dataclass, fields, is_dataclass
@@ -163,6 +164,12 @@ def _safe_isinstance(
 ) -> bool:
     """isinstance can fail in rare cases, for example types with no __class__"""
     try:
+        if isinstance(obj, (proxy, CallableProxyType)):
+            try:
+                object.__getattribute__(obj, "__callback__")  # Check if proxy is alive
+                return isinstance(obj, class_or_tuple)
+            except ReferenceError:
+                return False
         return isinstance(obj, class_or_tuple)
     except Exception:
         return False
@@ -583,9 +590,15 @@ def traverse(
     max_string: Optional[int] = None,
     max_depth: Optional[int] = None,
 ) -> Node:
-    """Traverse object and generate a tree.
+    """Traverse object and generate a tree."""
+    # Add weakref proxy handling
+    if isinstance(_object, (proxy, CallableProxyType)):
+        try:
+            object.__getattribute__(_object, "__callback__")  # Check if alive
+        except ReferenceError:
+            return Node(value_repr=f"<weakproxy at 0x{id(_object):x}; dead>")
 
-    Args:
+    """Args:
         _object (Any): Object to be traversed.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
