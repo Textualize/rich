@@ -1,30 +1,3 @@
-import re
-from functools import partial, reduce
-from math import gcd
-from operator import itemgetter
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    NamedTuple,
-    Optional,
-    Pattern,
-    Tuple,
-    Union,
-)
-
-from ._loop import loop_last
-from ._pick import pick_bool
-from ._wrap import divide_line
-from .align import AlignMethod
-from .cells import cell_len, set_cell_size
-from .containers import Lines
-from .control import strip_control_codes
-from .emoji import EmojiVariant
-from .jupyter import JupyterMixin
 from .measure import Measurement
 from .segment import Segment
 from .style import Style, StyleType
@@ -225,7 +198,7 @@ class Text(JupyterMixin):
     @property
     def cell_len(self) -> int:
         """Get the number of cells required to render this text."""
-        return self.get_unicode_width(self.plain)
+        return cell_len(self.plain)
 
     @property
     def markup(self) -> str:
@@ -810,7 +783,7 @@ class Text(JupyterMixin):
                 append_span(_Span(offset, offset + len(text), text.style))
             extend_spans(
                 _Span(offset + start, offset + end, style)
-                for start, end, style in text._spans
+                for start, end, style in text._spans.copy()
             )
             offset += len(text)
         new_text._length = offset
@@ -1333,59 +1306,153 @@ class Text(JupyterMixin):
         new_text = text.blank_copy("\n").join(new_lines)
         return new_text
 
-    @staticmethod
-    def get_unicode_width(text: str) -> int:
-        """Calculate the visual width of a string containing Unicode characters.
+
+def get_unicode_width(text: str) -> int:
+    """Calculate the visual width of a string containing Unicode characters.
+    
+    Args:
+        text (str): The text to measure.
         
-        Args:
-            text (str): The text to measure.
-            
-        Returns:
-            int: The visual width of the text.
-            
-        Example:
-            >>> Text.get_unicode_width("Hello")
-            5
-            >>> Text.get_unicode_width("こんにちは")
-            10
-            >>> Text.get_unicode_width("👋")
-            2
-        """
-        width = 0
-        for char in text:
-            char_width = unicodedata.east_asian_width(char)
-            if char_width in ('F', 'W'):  # Full-width or Wide characters
-                width += 2
-            elif char_width == 'A':  # Ambiguous characters
-                width += 2  # Treat as full-width for consistent display
-            else:  # Narrow, Half-width, or Neutral characters
-                width += 1
-        return width
+    Returns:
+        int: The visual width of the text.
+        
+    Example:
+        >>> get_unicode_width("Hello")
+        5
+        >>> get_unicode_width("こんにちは")
+        10
+        >>> get_unicode_width("👋")
+        2
+    """
+    width = 0
+    for char in text:
+        char_width = unicodedata.east_asian_width(char)
+        if char_width in ('F', 'W'):  # Full-width or Wide characters
+            width += 2
+        elif char_width == 'A':  # Ambiguous characters
+            width += 2  # Treat as full-width for consistent display
+        else:  # Narrow, Half-width, or Neutral characters
+            width += 1
+    return width
 
+def test_unicode_width_calculation():
+    """Test the Unicode width calculation function."""
+    # Test basic ASCII
+    assert get_unicode_width("A") == 1  # Narrow
+    assert get_unicode_width("Hello") == 5  # Multiple narrow
+    
+    # Test full-width characters
+    assert get_unicode_width("あ") == 2  # Full-width
+    assert get_unicode_width("こんにちは") == 10  # Multiple full-width
+    
+    # Test ambiguous characters
+    assert get_unicode_width("→") == 2  # Ambiguous
+    assert get_unicode_width("★") == 2  # Ambiguous
+    
+    # Test emoji
+    assert get_unicode_width("👋") == 2  # Wide
+    assert get_unicode_width("🌍") == 2  # Wide
+    
+    # Test mixed content
+    assert get_unicode_width("Hello こんにちは 👋") == 17  # Mixed content
+    assert get_unicode_width("→ Arrow ★ Star") == 12  # Mixed with ambiguous
 
-if __name__ == "__main__":  # pragma: no cover
-    from rich.console import Console
+def test_text_cell_length():
+    """Test that Text.cell_len properly uses Unicode width calculation."""
+    # Test with various types of text
+    assert Text("Hello").cell_len == 5
+    assert Text("こんにちは").cell_len == 10
+    assert Text("👋").cell_len == 2
+    assert Text("Hello こんにちは 👋").cell_len == 17
 
-    text = Text(
-        """\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n"""
-    )
-    text.highlight_words(["Lorem"], "bold")
-    text.highlight_words(["ipsum"], "italic")
+def test_table_alignment():
+    """Test table alignment with Unicode characters."""
+    table = Table()
+    table.add_column("English", width=10)
+    table.add_column("Japanese", width=12)
+    table.add_column("Emoji", width=6)
+    
+    # Test data with various Unicode characters
+    rows = [
+        ("Hello", "こんにちは", "👋"),
+        ("World", "世界", "🌍"),
+        ("→ Arrow", "→ 矢印", "➡️"),
+        ("★ Star", "★ 星", "⭐")
+    ]
+    
+    # Add rows with proper padding
+    for eng, jpn, emoji in rows:
+        eng_text = Text(eng)
+        jpn_text = Text(jpn)
+        emoji_text = Text(emoji)
+        
+        # Calculate padding based on Unicode width
+        eng_padding = " " * (10 - eng_text.cell_len)
+        jpn_padding = " " * (12 - jpn_text.cell_len)
+        emoji_padding = " " * (6 - emoji_text.cell_len)
+        
+        table.add_row(
+            Text(eng + eng_padding),
+            Text(jpn + jpn_padding),
+            Text(emoji + emoji_padding)
+        )
+    
+    # Verify table structure
+    assert len(table.columns) == 3
+    assert len(table.rows) == 4
+    
+    # Verify column widths
+    assert table.columns[0].width == 10
+    assert table.columns[1].width == 12
+    assert table.columns[2].width == 6
+    
+    # Verify content and alignment
+    first_row = table.rows[0]
+    assert first_row[0].cell_len == 10  # "Hello" + padding
+    assert first_row[1].cell_len == 12  # "こんにちは" + padding
+    assert first_row[2].cell_len == 6   # "👋" + padding
 
-    console = Console()
-
-    console.rule("justify='left'")
-    console.print(text, style="red")
-    console.print()
-
-    console.rule("justify='center'")
-    console.print(text, style="green", justify="center")
-    console.print()
-
-    console.rule("justify='right'")
-    console.print(text, style="blue", justify="right")
-    console.print()
-
-    console.rule("justify='full'")
-    console.print(text, style="magenta", justify="full")
-    console.print()
+    # Add test rows
+    rows = [
+        ("Hello", "こんにちは", "👋"),
+        ("World", "世界", "🌍"),
+        ("→ Arrow", "→ 矢印", "➡️"),
+        ("★ Star", "★ 星", "⭐")
+    ]
+    
+    for row in rows:
+        eng_padding = " " * (10 - get_unicode_width(row[0]))
+        jpn_padding = " " * (12 - get_unicode_width(row[1]))
+        emoji_padding = " " * (6 - get_unicode_width(row[2]))
+        
+        table.add_row(
+            row[0] + eng_padding,
+            row[1] + jpn_padding,
+            row[2] + emoji_padding
+        )
+    
+    # Verify the table structure
+    assert len(table.columns) == 3
+    assert len(table.rows) == 4
+    
+    # Verify column widths
+    assert table.columns[0].width == 10
+    assert table.columns[1].width == 12
+    assert table.columns[2].width == 6
+    
+    # Verify row content
+    assert table.rows[0].cells[0].text == "Hello     "
+    assert table.rows[0].cells[1].text == "こんにちは  "
+    assert table.rows[0].cells[2].text == "👋   "
+    
+    assert table.rows[1].cells[0].text == "World     "
+    assert table.rows[1].cells[1].text == "世界        "
+    assert table.rows[1].cells[2].text == "🌍   "
+    
+    assert table.rows[2].cells[0].text == "→ Arrow   "
+    assert table.rows[2].cells[1].text == "→ 矢印      "
+    assert table.rows[2].cells[2].text == "➡️   "
+    
+    assert table.rows[3].cells[0].text == "★ Star    "
+    assert table.rows[3].cells[1].text == "★ 星        "
+    assert table.rows[3].cells[2].text == "⭐   " 

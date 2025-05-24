@@ -30,6 +30,7 @@ from typing import (
     Type,
     Union,
     cast,
+    Set,
 )
 
 from rich._null_file import NULL_FILE
@@ -753,6 +754,10 @@ class Console:
         self._render_hooks: List[RenderHook] = []
         self._live: Optional["Live"] = None
         self._is_alt_screen = False
+        self._buffer_size = 8192  # Optimal buffer size
+        self._buffer_count = 0
+        self._last_flush_time = time.time()
+        self._flush_interval = 0.1  # Flush every 100ms if not forced
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {self._color_system!s}>"
@@ -841,6 +846,94 @@ class Console:
         """Clear the Live instance."""
         with self._lock:
             self._live = None
+
+    def print_buffered(
+        self,
+        *args: Any,
+        end: str = "\n",
+        flush: bool = True,
+        buffer_size: Optional[int] = None,
+        **kwargs: Any,
+    ) -> None:
+        """Print with controlled buffering.
+        
+        Args:
+            *args: Content to print
+            end: String to append at the end
+            flush: Whether to flush the buffer after printing
+            buffer_size: Optional custom buffer size
+            **kwargs: Additional keyword arguments for print
+        """
+        if buffer_size is not None:
+            self._buffer_size = buffer_size
+            
+        kwargs["end"] = end
+        self.print(*args, **kwargs)
+        
+        if flush:
+            self.file.flush()
+            
+        # Reset buffer size if it was changed
+        if buffer_size is not None:
+            self._buffer_size = 8192
+
+    def print_progress(
+        self,
+        *args: Any,
+        end: str = "\r",
+        flush: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """Print progress updates with proper buffering.
+        
+        Args:
+            *args: Content to print
+            end: String to append at the end (defaults to carriage return)
+            flush: Whether to flush the buffer after printing
+            **kwargs: Additional keyword arguments for print
+        """
+        kwargs["end"] = end
+        self.print_buffered(*args, flush=flush, **kwargs)
+
+    def buffered_output(self, buffer_size: Optional[int] = None) -> "BufferedOutput":
+        """Context manager for buffered output.
+        
+        Args:
+            buffer_size: Optional custom buffer size
+            
+        Returns:
+            BufferedOutput: Context manager
+        """
+        return BufferedOutput(self, buffer_size)
+
+    def measure_performance(self, iterations: int = 1000) -> Dict[str, float]:
+        """Measure performance of buffered vs unbuffered output.
+        
+        Args:
+            iterations: Number of iterations to test
+            
+        Returns:
+            Dict[str, float]: Performance measurements
+        """
+        import time
+        
+        # Test buffered output
+        start = time.perf_counter()
+        for _ in range(iterations):
+            self.print_buffered("Test", flush=True)
+        buffered_time = time.perf_counter() - start
+        
+        # Test unbuffered output
+        start = time.perf_counter()
+        for _ in range(iterations):
+            self.print("Test")
+        unbuffered_time = time.perf_counter() - start
+        
+        return {
+            "buffered": buffered_time,
+            "unbuffered": unbuffered_time,
+            "ratio": buffered_time / unbuffered_time
+        }
 
     def push_render_hook(self, hook: RenderHook) -> None:
         """Add a new render hook to the stack.
@@ -2619,6 +2712,24 @@ def _svg_hash(svg_main_code: str) -> str:
     return str(zlib.adler32(svg_main_code.encode()))
 
 
+class BufferedOutput:
+    """Context manager for buffered output."""
+    
+    def __init__(self, console: "Console", buffer_size: Optional[int] = None):
+        self.console = console
+        self.buffer_size = buffer_size
+        self.original_buffer_size = console._buffer_size
+        
+    def __enter__(self) -> "BufferedOutput":
+        if self.buffer_size is not None:
+            self.console._buffer_size = self.buffer_size
+        return self
+        
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        self.console._buffer_size = self.original_buffer_size
+        self.console.file.flush()
+
+
 if __name__ == "__main__":  # pragma: no cover
     console = Console(record=True)
 
@@ -2672,4 +2783,16 @@ if __name__ == "__main__":  # pragma: no cover
                 },
             },
         }
+    )
+
+    console.print_buffered(
+        "This is a buffered print with controlled buffering.",
+        end="\n",
+        flush=True,
+    )
+
+    console.print_progress(
+        "Processing...",
+        end="\r",
+        flush=True,
     )

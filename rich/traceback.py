@@ -418,6 +418,8 @@ class Traceback:
         locals_max_string: int = LOCALS_MAX_STRING,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
+        _max_depth: int = 3,  # Add parameter to limit recursion depth
+        _current_depth: int = 0,  # Track current recursion depth
     ) -> Trace:
         """Extract traceback information.
 
@@ -431,6 +433,8 @@ class Traceback:
             locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
             locals_hide_dunder (bool, optional): Hide locals prefixed with double underscore. Defaults to True.
             locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
+            _max_depth (int, optional): Maximum recursion depth for nested exceptions. Defaults to 3.
+            _current_depth (int, optional): Current recursion depth. Defaults to 0.
 
         Returns:
             Trace: A Trace instance which you can use to construct a `Traceback`.
@@ -461,18 +465,25 @@ class Traceback:
             if sys.version_info >= (3, 11):
                 if isinstance(exc_value, (BaseExceptionGroup, ExceptionGroup)):
                     stack.is_group = True
-                    for exception in exc_value.exceptions:
-                        stack.exceptions.append(
-                            Traceback.extract(
-                                type(exception),
-                                exception,
-                                exception.__traceback__,
-                                show_locals=show_locals,
-                                locals_max_length=locals_max_length,
-                                locals_hide_dunder=locals_hide_dunder,
-                                locals_hide_sunder=locals_hide_sunder,
+                    # Check current recursion depth before processing nested exceptions
+                    if _current_depth < _max_depth:
+                        for exception in exc_value.exceptions:
+                            stack.exceptions.append(
+                                Traceback.extract(
+                                    type(exception),
+                                    exception,
+                                    exception.__traceback__,
+                                    show_locals=False,
+                                    locals_max_length=locals_max_length,
+                                    locals_max_string=locals_max_string,
+                                    locals_hide_dunder=locals_hide_dunder,
+                                    locals_hide_sunder=locals_hide_sunder,
+                                    _max_depth=_max_depth,
+                                    _current_depth=_current_depth + 1,  # Increment depth
+                                )
                             )
-                        )
+                    # If we've reached max depth, don't process nested exceptions
+                    # but still mark as a group so it's rendered properly
 
             if isinstance(exc_value, SyntaxError):
                 stack.syntax_error = _SyntaxError(
