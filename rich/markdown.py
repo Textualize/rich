@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import re
 from typing import ClassVar, Iterable
 
 from markdown_it import MarkdownIt
@@ -25,6 +26,7 @@ from .segment import Segment
 from .style import Style, StyleStack
 from .syntax import Syntax
 from .text import Text, TextType
+from .math_render import MathRenderer 
 
 
 class MarkdownElement:
@@ -513,6 +515,8 @@ class Markdown(JupyterMixin):
             enabled. Defaults to None.
         inline_code_theme: (Optional[str], optional): Pygments theme for inline code
             highlighting, or None for no highlighting. Defaults to None.
+        math_enabled (bool, optional): Enable math rendering. Defaults to True.
+        math_style (Style, optional): Style for math expressions. Defaults to None.
     """
 
     elements: ClassVar[dict[str, type[MarkdownElement]]] = {
@@ -545,6 +549,8 @@ class Markdown(JupyterMixin):
         hyperlinks: bool = True,
         inline_code_lexer: str | None = None,
         inline_code_theme: str | None = None,
+        math_enabled: bool = True,  
+        math_style: Style | None = None,  
     ) -> None:
         parser = MarkdownIt().enable("strikethrough").enable("table")
         self.markup = markup
@@ -556,6 +562,11 @@ class Markdown(JupyterMixin):
         self.inline_code_lexer = inline_code_lexer
         self.inline_code_theme = inline_code_theme or code_theme
 
+        # Math rendering support
+        self.math_enabled = math_enabled
+        self.math_style = math_style or Style(italic=True)
+        self.math_renderer = MathRenderer() if math_enabled else None
+
     def _flatten_tokens(self, tokens: Iterable[Token]) -> Iterable[Token]:
         """Flattens the token stream."""
         for token in tokens:
@@ -565,11 +576,74 @@ class Markdown(JupyterMixin):
                 yield from self._flatten_tokens(token.children)
             else:
                 yield token
+    
+    def _process_math_expressions(self, markup: str) -> str:
+        """Process LaTeX math expressions in the text.
+        
+        Args:
+            markup: Text that may contain math expressions
+            
+        Returns:
+            Text with math expressions processed for rendering
+        """
+        if not self.math_enabled or self.math_renderer is None:
+            return markup
+        
+        # Track positions where math expressions are found to replace later
+        replacements = []
+        
+        # Process block math ($$...$$)
+        block_pattern = re.compile(r'\$\$(.*?)\$\$', re.DOTALL)
+        
+        for match in block_pattern.finditer(markup):
+            expression = match.group(1).strip()
+            rendered_text = self.math_renderer.render_to_text(expression, self.math_style)
+            replacements.append((match.start(), match.end(), rendered_text, True))
+            
+        # Process inline math ($...$) - avoid $ used for money
+        inline_pattern = re.compile(r'\$([^\s$][^$]*?[^\s$])\$')
+        
+        for match in inline_pattern.finditer(markup):
+            expression = match.group(1)
+            rendered_text = self.math_renderer.render_to_text(expression, self.math_style)
+            replacements.append((match.start(), match.end(), rendered_text, False))
+        
+        # Apply replacements in reverse order to maintain positions
+        if not replacements:
+            return markup
+            
+        result = []
+        last_end = 0
+        
+        # Sort replacements by position
+        replacements.sort(key=lambda x: x[0])
+        
+        for start, end, rendered_text, is_block in replacements:
+            result.append(markup[last_end:start])
+            
+            if is_block:
+                result.append("\n\n")
+                result.append(str(rendered_text))
+                result.append("\n\n")
+            else:
+                result.append(str(rendered_text))
+                
+            last_end = end
+        
+        result.append(markup[last_end:])
+        return "".join(result)
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         """Render markdown to the console."""
+        # Process math expressions if enabled
+        if self.math_enabled and self.math_renderer is not None:
+            self.markup = self._process_math_expressions(self.markup)
+            # Re-parse the markup after math processing
+            parser = MarkdownIt().enable("strikethrough").enable("table")
+            self.parsed = parser.parse(self.markup)
+        
         style = console.get_style(self.style, default="none")
         options = options.update(height=None)
         context = MarkdownContext(
