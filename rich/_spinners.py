@@ -151,7 +151,7 @@ SPINNERS = {
     "boxBounce": {"interval": 120, "frames": "▖▘▝▗"},
     "boxBounce2": {"interval": 100, "frames": "▌▀▐▄"},
     "triangle": {"interval": 50, "frames": "◢◣◤◥"},
-    "arc": {"interval": 100, "frames": "◜◠◝◞◡◟"},
+    "arc": {"interval": 100, "frames": ["◜ ", "◠ ", " ◝", " ◞", "◡ ", "◟ "]},
     "circle": {"interval": 120, "frames": "◡⊙◠"},
     "squareCorners": {"interval": 180, "frames": "◰◳◲◱"},
     "circleQuarters": {"interval": 120, "frames": "◴◷◶◵"},
