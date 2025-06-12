@@ -19,7 +19,13 @@ Spinners are from:
     IN THE SOFTWARE.
 """
 
-SPINNERS = {
+from typing import TypedDict, Union
+
+SpinnerAnimationType = TypedDict(
+    "SpinnerAnimationType", {"interval": int, "frames": Union[str, list[str]]}
+)
+
+SPINNERS: dict[str, SpinnerAnimationType] = {
     "dots": {
         "interval": 80,
         "frames": "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏",
