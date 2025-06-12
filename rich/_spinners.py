@@ -18,10 +18,12 @@ Spinners are from:
     ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
     IN THE SOFTWARE.
 """
+
 from typing import TypedDict, Union
+
 SpinnerAnimationType = TypedDict(
-        "SpinnerAnimationType",
-        {"interval": int, "frames": Union[str, list[str]]})
+    "SpinnerAnimationType", {"interval": int, "frames": Union[str, list[str]]}
+)
 
 SPINNERS: dict[str, SpinnerAnimationType] = {
     "dots": {

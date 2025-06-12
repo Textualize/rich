@@ -32,7 +32,7 @@ class Spinner:
         *,
         style: Optional["StyleType"] = None,
         speed: float = 1.0,
-        custom_spinner: Optional["SpinnerAnimationType"] = None
+        custom_spinner: Optional["SpinnerAnimationType"] = None,
     ) -> None:
         if custom_spinner:
             spinner = custom_spinner

@@ -585,11 +585,11 @@ class SpinnerColumn(ProgressColumn):
         finished_text: TextType = " ",
         table_column: Optional[Column] = None,
         *,
-        custom_spinner: Optional[SpinnerAnimationType] = None
+        custom_spinner: Optional[SpinnerAnimationType] = None,
     ):
         self.spinner = Spinner(
-                spinner_name, style=style, speed=speed,
-                custom_spinner=custom_spinner)
+            spinner_name, style=style, speed=speed, custom_spinner=custom_spinner
+        )
         self.finished_text = (
             Text.from_markup(finished_text)
             if isinstance(finished_text, str)
