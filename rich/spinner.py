@@ -6,6 +6,7 @@ from .table import Table
 from .text import Text
 
 if TYPE_CHECKING:
+    from ._spinners import SpinnerAnimationType
     from .console import Console, ConsoleOptions, RenderResult, RenderableType
     from .style import StyleType
 
@@ -18,6 +19,7 @@ class Spinner:
         text (RenderableType, optional): A renderable to display at the right of the spinner (str or Text typically). Defaults to "".
         style (StyleType, optional): Style for spinner animation. Defaults to None.
         speed (float, optional): Speed factor for animation. Defaults to 1.0.
+        custom_spinner (SpinnerAnimationType, optional): Custom animation to use in spinner. Defaults to None
 
     Raises:
         KeyError: If name isn't one of the supported spinner animations.
@@ -30,11 +32,15 @@ class Spinner:
         *,
         style: Optional["StyleType"] = None,
         speed: float = 1.0,
+        custom_spinner: Optional["SpinnerAnimationType"] = None
     ) -> None:
-        try:
-            spinner = SPINNERS[name]
-        except KeyError:
-            raise KeyError(f"no spinner called {name!r}")
+        if custom_spinner:
+            spinner = custom_spinner
+        else:
+            try:
+                spinner = SPINNERS[name]
+            except KeyError:
+                raise KeyError(f"no spinner called {name!r}")
         self.text: "Union[RenderableType, Text]" = (
             Text.from_markup(text) if isinstance(text, str) else text
         )

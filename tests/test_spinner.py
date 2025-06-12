@@ -70,3 +70,29 @@ def test_spinner_markup():
     spinner = Spinner("dots", "[bold]spinning[/bold]")
     assert isinstance(spinner.text, Text)
     assert str(spinner.text) == "spinning"
+
+
+def test_custom_spinner_render():
+    time = 0.0
+
+    def get_time():
+        nonlocal time
+        return time
+
+    console = Console(
+        width=80, color_system=None, force_terminal=True, get_time=get_time
+    )
+    custom_spinner = {"interval": 50, "frames": "abc"}
+    console.begin_capture()
+    spinner = Spinner("custom", "Foo", custom_spinner=custom_spinner)
+    console.print(spinner)
+    time += 50 / 1000
+    console.print(spinner)
+    time += 50 / 1000
+    console.print(spinner)
+    time += 50 / 1000
+    console.print(spinner)
+    result = console.end_capture()
+    print(repr(result))
+    expected = "a Foo\nb Foo\nc Foo\na Foo\n"
+    assert result == expected

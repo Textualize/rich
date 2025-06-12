@@ -45,6 +45,7 @@ else:
     from typing_extensions import Self  # pragma: no cover
 
 from . import filesize, get_console
+from ._spinners import SpinnerAnimationType
 from .console import Console, Group, JustifyMethod, RenderableType
 from .highlighter import Highlighter
 from .jupyter import JupyterMixin
@@ -573,6 +574,7 @@ class SpinnerColumn(ProgressColumn):
         style (StyleType, optional): Style of spinner. Defaults to "progress.spinner".
         speed (float, optional): Speed factor of spinner. Defaults to 1.0.
         finished_text (TextType, optional): Text used when task is finished. Defaults to " ".
+        custom_spinner (SpinnerAnimationType, optional): Custom animation to use in spinner. Defaults to None
     """
 
     def __init__(
@@ -582,8 +584,12 @@ class SpinnerColumn(ProgressColumn):
         speed: float = 1.0,
         finished_text: TextType = " ",
         table_column: Optional[Column] = None,
+        *,
+        custom_spinner: Optional[SpinnerAnimationType] = None
     ):
-        self.spinner = Spinner(spinner_name, style=style, speed=speed)
+        self.spinner = Spinner(
+                spinner_name, style=style, speed=speed,
+                custom_spinner=custom_spinner)
         self.finished_text = (
             Text.from_markup(finished_text)
             if isinstance(finished_text, str)
