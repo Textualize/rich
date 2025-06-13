@@ -1,7 +1,19 @@
 import sys
 from threading import Event, RLock, Thread
 from types import TracebackType
-from typing import IO, Any, Callable, List, Optional, TextIO, Type, cast
+from typing import (
+    IO,
+    Any,
+    Callable,
+    List,
+    Literal,
+    Optional,
+    TextIO,
+    Tuple,
+    Type,
+    Union,
+    cast,
+)
 
 from . import get_console
 from .console import Console, ConsoleRenderable, RenderableType, RenderHook
@@ -44,7 +56,7 @@ class Live(JupyterMixin, RenderHook):
         transient (bool, optional): Clear the renderable on exit (has no effect when screen=True). Defaults to False.
         redirect_stdout (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
         redirect_stderr (bool, optional): Enable redirection of stderr. Defaults to True.
-        vertical_overflow (VerticalOverflowMethod, optional): How to handle renderable when it is too tall for the console. Defaults to "ellipsis".
+        vertical_overflow (VerticalOverflowMethod, optional): How to handle renderable when it is too tall for the console, pass `("ellipsis", "message ...")` for a custom message on overflow. Defaults to "ellipsis".
         get_renderable (Callable[[], RenderableType], optional): Optional callable to get renderable. Defaults to None.
     """
 
@@ -59,7 +71,9 @@ class Live(JupyterMixin, RenderHook):
         transient: bool = False,
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
-        vertical_overflow: VerticalOverflowMethod = "ellipsis",
+        vertical_overflow: Union[
+            VerticalOverflowMethod, Tuple[Literal["ellipsis"], str]
+        ] = "ellipsis",
         get_renderable: Optional[Callable[[], RenderableType]] = None,
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
@@ -82,10 +96,18 @@ class Live(JupyterMixin, RenderHook):
         self._refresh_thread: Optional[_RefreshThread] = None
         self.refresh_per_second = refresh_per_second
 
+        if isinstance(vertical_overflow, tuple):
+            vertical_overflow, vertical_overflow_message = vertical_overflow
+        else:
+            vertical_overflow_message = "..."
+
         self.vertical_overflow = vertical_overflow
+        self.vertical_overflow_message = vertical_overflow_message
         self._get_renderable = get_renderable
         self._live_render = LiveRender(
-            self.get_renderable(), vertical_overflow=vertical_overflow
+            self.get_renderable(),
+            vertical_overflow=vertical_overflow,
+            vertical_overflow_message=vertical_overflow_message,
         )
 
     @property

@@ -30,10 +30,12 @@ class LiveRender:
         renderable: RenderableType,
         style: StyleType = "",
         vertical_overflow: VerticalOverflowMethod = "ellipsis",
+        vertical_overflow_message: str = "...",
     ) -> None:
         self.renderable = renderable
         self.style = style
         self.vertical_overflow = vertical_overflow
+        self.vertical_overflow_message = vertical_overflow_message
         self._shape: Optional[Tuple[int, int]] = None
 
     def set_renderable(self, renderable: RenderableType) -> None:
@@ -95,7 +97,7 @@ class LiveRender:
             elif self.vertical_overflow == "ellipsis":
                 lines = lines[: (options.size.height - 1)]
                 overflow_text = Text(
-                    "...",
+                    self.vertical_overflow_message,
                     overflow="crop",
                     justify="center",
                     end="",
