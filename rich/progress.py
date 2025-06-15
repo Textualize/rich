@@ -39,7 +39,7 @@ from typing import (
 
 if TYPE_CHECKING:
     # Can be replaced with `from typing import Self` in Python 3.11+
-    from typing_extensions import Self
+    from typing_extensions import Self  # pragma: no cover
 
 from . import filesize, get_console
 from .console import Console, Group, JustifyMethod, RenderableType
