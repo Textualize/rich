@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Moved `typing_extensions` from runtime dependencies to dev dependencies
+- Removed `typing_extensions` from runtime dependencies https://github.com/Textualize/rich/pull/3763
 
 ## [14.0.0] - 2025-03-30
 
