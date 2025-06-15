@@ -25,6 +25,7 @@ from typing import (
     Generic,
     Iterable,
     List,
+    Literal,
     NamedTuple,
     NewType,
     Optional,
@@ -35,7 +36,6 @@ from typing import (
     TypeVar,
     Union,
 )
-from typing import Literal
 
 if TYPE_CHECKING:
     # Can be replaced with `from typing import Self` in Python 3.11+
