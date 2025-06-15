@@ -19,11 +19,7 @@ from rich.syntax import (
 )
 
 from .render import render
-
-if sys.version_info >= (3, 8):
-    from importlib.metadata import Distribution
-else:
-    from importlib_metadata import Distribution
+from importlib.metadata import Distribution
 
 PYGMENTS_VERSION = Distribution.from_name("pygments").version
 OLD_PYGMENTS = PYGMENTS_VERSION == "2.13.0"

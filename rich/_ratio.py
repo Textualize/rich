@@ -1,12 +1,6 @@
-import sys
 from fractions import Fraction
 from math import ceil
-from typing import cast, List, Optional, Sequence
-
-if sys.version_info >= (3, 8):
-    from typing import Protocol
-else:
-    from typing_extensions import Protocol  # pragma: no cover
+from typing import cast, List, Optional, Sequence, Protocol
 
 
 class Edge(Protocol):
