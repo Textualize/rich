@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import io
-import sys
 import typing
 import warnings
 from abc import ABC, abstractmethod
@@ -14,6 +15,7 @@ from os import PathLike, stat
 from threading import Event, RLock, Thread
 from types import TracebackType
 from typing import (
+    TYPE_CHECKING,
     Any,
     BinaryIO,
     Callable,
@@ -35,10 +37,9 @@ from typing import (
 )
 from typing import Literal
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self  # pragma: no cover
+if TYPE_CHECKING:
+    # Can be replaced with `from typing import Self` in Python 3.11+
+    from typing_extensions import Self
 
 from . import filesize, get_console
 from .console import Console, Group, JustifyMethod, RenderableType
