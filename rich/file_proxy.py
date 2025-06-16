@@ -22,6 +22,11 @@ class FileProxy(io.TextIOBase):
         """Get proxied file."""
         return self.__file
 
+    @property
+    def rich_proxy_console(self) -> "Console":
+        """Get the console being use to proxy this file."""
+        return self.__console
+
     def __getattr__(self, name: str) -> Any:
         return getattr(self.__file, name)
 
@@ -55,3 +60,6 @@ class FileProxy(io.TextIOBase):
 
     def fileno(self) -> int:
         return self.__file.fileno()
+
+    def isatty(self) -> bool:
+        return self.__file.isatty()
