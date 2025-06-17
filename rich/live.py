@@ -4,7 +4,7 @@ from types import TracebackType
 from typing import IO, Any, Callable, List, Optional, TextIO, Type, cast
 
 from . import get_console
-from .console import Console, ConsoleRenderable, RenderableType, RenderHook
+from .console import Console, ConsoleRenderable, Group, RenderableType, RenderHook
 from .control import Control
 from .file_proxy import FileProxy
 from .jupyter import JupyterMixin
@@ -110,8 +110,11 @@ class Live(JupyterMixin, RenderHook):
         with self._lock:
             if self._started:
                 return
-            self.console.set_live(self)
             self._started = True
+
+            if not self.console.set_live(self):
+                return
+
             if self._screen:
                 self._alt_screen = self.console.set_alt_screen(True)
             self.console.show_cursor(False)
@@ -136,8 +139,9 @@ class Live(JupyterMixin, RenderHook):
         with self._lock:
             if not self._started:
                 return
-            self.console.clear_live()
             self._started = False
+            if not self.console.clear_live():
+                return
 
             if self.auto_refresh and self._refresh_thread is not None:
                 self._refresh_thread.stop()
@@ -156,7 +160,6 @@ class Live(JupyterMixin, RenderHook):
                     self.console.show_cursor(True)
                     if self._alt_screen:
                         self.console.set_alt_screen(False)
-
                     if self.transient and not self._alt_screen:
                         self.console.control(self._live_render.restore_cursor())
                     if self.ipy_widget is not None and self.transient:
@@ -200,7 +203,11 @@ class Live(JupyterMixin, RenderHook):
         Returns:
             RenderableType: Displayed renderable.
         """
-        renderable = self.get_renderable()
+        live_stack = self.console._live_stack
+        if len(live_stack) == 1:
+            renderable = self.get_renderable()
+        else:
+            renderable = Group(*[live.get_renderable() for live in live_stack])
         return Screen(renderable) if self._alt_screen else renderable
 
     def update(self, renderable: RenderableType, *, refresh: bool = False) -> None:
