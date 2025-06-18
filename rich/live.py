@@ -87,6 +87,7 @@ class Live(JupyterMixin, RenderHook):
         self._live_render = LiveRender(
             self.get_renderable(), vertical_overflow=vertical_overflow
         )
+        self._nested = False
 
     @property
     def is_started(self) -> bool:
@@ -113,6 +114,7 @@ class Live(JupyterMixin, RenderHook):
             self._started = True
 
             if not self.console.set_live(self):
+                self._nested = True
                 return
 
             if self._screen:
@@ -140,7 +142,10 @@ class Live(JupyterMixin, RenderHook):
             if not self._started:
                 return
             self._started = False
-            if not self.console.clear_live():
+            self.console.clear_live()
+            if self._nested:
+                if not self.transient:
+                    self.console.print(self.renderable)
                 return
 
             if self.auto_refresh and self._refresh_thread is not None:
@@ -228,6 +233,11 @@ class Live(JupyterMixin, RenderHook):
         """Update the display of the Live Render."""
         with self._lock:
             self._live_render.set_renderable(self.renderable)
+            if self._nested:
+                if self.console._live_stack:
+                    self.console._live_stack[0].refresh()
+                return
+
             if self.console.is_jupyter:  # pragma: no cover
                 try:
                     from IPython.display import display

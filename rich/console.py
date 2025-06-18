@@ -840,16 +840,10 @@ class Console:
             self._live_stack.append(live)
             return len(self._live_stack) == 1
 
-    def clear_live(self) -> bool:
-        """Clear the Live instance. Used by the Live context manager (no need to call directly).
-
-        Returns:
-            Boolean that indicates if the last entry on the live stack was removed.
-
-        """
+    def clear_live(self) -> None:
+        """Clear the Live instance. Used by the Live context manager (no need to call directly)."""
         with self._lock:
             self._live_stack.pop()
-            return len(self._live_stack) == 0
 
     def push_render_hook(self, hook: RenderHook) -> None:
         """Add a new render hook to the stack.
