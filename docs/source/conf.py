@@ -17,14 +17,8 @@
 
 # -- Project information -----------------------------------------------------
 
-import sys
-
 import sphinx_rtd_theme
-
-if sys.version_info >= (3, 8):
-    from importlib.metadata import Distribution
-else:
-    from importlib_metadata import Distribution
+from importlib.metadata import Distribution
 
 html_theme = "sphinx_rtd_theme"
 
