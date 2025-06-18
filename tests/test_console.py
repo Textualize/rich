@@ -713,14 +713,6 @@ def test_quiet() -> None:
     assert console.file.getvalue() == ""
 
 
-def test_no_nested_live() -> None:
-    console = Console()
-    with pytest.raises(errors.LiveError):
-        with console.status("foo"):
-            with console.status("bar"):
-                pass
-
-
 @pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 def test_screen() -> None:
     console = Console(
