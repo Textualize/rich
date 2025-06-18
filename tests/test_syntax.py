@@ -423,6 +423,31 @@ def test_background_color_override_includes_padding():
     )
 
 
+def test_syntax_word_wrap_with_horizontal_padding():
+    """Regression test for https://github.com/Textualize/rich/issues/3727"""
+
+    EXAMPLE_CODE = """\
+    class ListViewExample(App):
+        def compose(self) -> ComposeResult:
+            yield ListView(
+                ListItem(Label("One")),
+                ListItem(Label("Two")),
+                ListItem(Label("Three")),
+            )
+            yield Footer()\
+    """
+    width = 32
+    console = Console(width=width, file=io.StringIO(), record=True)
+
+    syntax = Syntax(EXAMPLE_CODE, "python", word_wrap=True, padding=(0, 2))
+    console.print(syntax)
+    text_output = console.export_text()
+
+    assert "One" in text_output
+    assert "Two" in text_output
+    assert "Three" in text_output
+
+
 if __name__ == "__main__":
     syntax = Panel.fit(
         Syntax(
