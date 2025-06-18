@@ -751,7 +751,6 @@ class Console:
         )
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
-        # self._live: Optional["Live"] = None
         self._live_stack: list[Live] = []
         self._is_alt_screen = False
 

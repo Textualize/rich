@@ -209,10 +209,10 @@ class Live(JupyterMixin, RenderHook):
             RenderableType: Displayed renderable.
         """
         live_stack = self.console._live_stack
-        if len(live_stack) == 1:
-            renderable = self.get_renderable()
-        else:
+        if live_stack and self is live_stack[0]:
             renderable = Group(*[live.get_renderable() for live in live_stack])
+        else:
+            renderable = self.get_renderable()
         return Screen(renderable) if self._alt_screen else renderable
 
     def update(self, renderable: RenderableType, *, refresh: bool = False) -> None:
