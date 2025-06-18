@@ -211,6 +211,7 @@ class Live(JupyterMixin, RenderHook):
         live_stack = self.console._live_stack
         renderable: RenderableType
         if live_stack and self is live_stack[0]:
+            # The first Live instance will render everything in the Live stack
             renderable = Group(*[live.get_renderable() for live in live_stack])
         else:
             renderable = self.get_renderable()

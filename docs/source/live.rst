@@ -3,7 +3,7 @@
 Live Display
 ============
 
-Progress bars and status indicators use a *live* display to animate parts of the terminal. You can build custom live displays with the :class:`~rich.live.Live` class. 
+Progress bars and status indicators use a *live* display to animate parts of the terminal. You can build custom live displays with the :class:`~rich.live.Live` class.
 
 For a demonstration of a live display, run the following command::
 
@@ -72,7 +72,7 @@ You can also change the renderable on-the-fly by calling the :meth:`~rich.live.L
 Alternate screen
 ~~~~~~~~~~~~~~~~
 
-You can opt to show a Live display in the "alternate screen" by setting ``screen=True`` on the constructor. This will allow your live display to go full screen and restore the command prompt on exit. 
+You can opt to show a Live display in the "alternate screen" by setting ``screen=True`` on the constructor. This will allow your live display to go full screen and restore the command prompt on exit.
 
 You can use this feature in combination with :ref:`Layout` to display sophisticated terminal "applications".
 
@@ -80,7 +80,7 @@ Transient display
 ~~~~~~~~~~~~~~~~~
 
 Normally when you exit live context manager (or call :meth:`~rich.live.Live.stop`) the last refreshed item remains in the terminal with the cursor on the following line.
-You can also make the live display disappear on exit by setting ``transient=True`` on the Live constructor. 
+You can also make the live display disappear on exit by setting ``transient=True`` on the Live constructor.
 
 Auto refresh
 ~~~~~~~~~~~~
@@ -149,13 +149,10 @@ This feature is enabled by default, but you can disable by setting ``redirect_st
 Nesting Lives
 -------------
 
-Note that only a single live context may be active at any one time. The following will raise a :class:`~rich.errors.LiveError` because status also uses Live::
+If you create a Live instance within the context of an existing Live instance, then the content of the inner Live will be displayed below the outer Live.
 
-    with Live(table, console=console):
-        with console.status("working"):  # Will not work
-            do_work()
+Prior to version 14.0.0 this would have resulted in a :class:`~rich.errors.LiveError` exception.
 
-In practice this is rarely a problem because you can display any combination of renderables in a Live context.
 
 Examples
 --------
