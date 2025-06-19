@@ -14,6 +14,7 @@ from typing import (
     List,
     Optional,
     Sequence,
+    Set,
     Tuple,
     Type,
     Union,
@@ -418,6 +419,7 @@ class Traceback:
         locals_max_string: int = LOCALS_MAX_STRING,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
+        _visited_exceptions: Optional[Set[BaseException]] = None,
     ) -> Trace:
         """Extract traceback information.
 
@@ -443,6 +445,10 @@ class Traceback:
 
         notes: List[str] = getattr(exc_value, "__notes__", None) or []
 
+        grouped_exceptions: Set[BaseException] = (
+            set() if _visited_exceptions is None else _visited_exceptions
+        )
+
         def safe_str(_object: Any) -> str:
             """Don't allow exceptions from __str__ to propagate."""
             try:
@@ -462,6 +468,9 @@ class Traceback:
                 if isinstance(exc_value, (BaseExceptionGroup, ExceptionGroup)):
                     stack.is_group = True
                     for exception in exc_value.exceptions:
+                        if exception in grouped_exceptions:
+                            continue
+                        grouped_exceptions.add(exception)
                         stack.exceptions.append(
                             Traceback.extract(
                                 type(exception),
@@ -471,6 +480,7 @@ class Traceback:
                                 locals_max_length=locals_max_length,
                                 locals_hide_dunder=locals_hide_dunder,
                                 locals_hide_sunder=locals_hide_sunder,
+                                _visited_exceptions=grouped_exceptions,
                             )
                         )
 
@@ -561,23 +571,26 @@ class Traceback:
                 if frame_summary.f_locals.get("_rich_traceback_guard", False):
                     del stack.frames[:]
 
-            cause = getattr(exc_value, "__cause__", None)
-            if cause:
-                exc_type = cause.__class__
-                exc_value = cause
-                # __traceback__ can be None, e.g. for exceptions raised by the
-                # 'multiprocessing' module
-                traceback = cause.__traceback__
-                is_cause = True
-                continue
+            if not grouped_exceptions:
+                cause = getattr(exc_value, "__cause__", None)
+                if cause is not None and cause is not exc_value:
+                    exc_type = cause.__class__
+                    exc_value = cause
+                    # __traceback__ can be None, e.g. for exceptions raised by the
+                    # 'multiprocessing' module
+                    traceback = cause.__traceback__
+                    is_cause = True
+                    continue
 
-            cause = exc_value.__context__
-            if cause and not getattr(exc_value, "__suppress_context__", False):
-                exc_type = cause.__class__
-                exc_value = cause
-                traceback = cause.__traceback__
-                is_cause = False
-                continue
+                cause = exc_value.__context__
+                if cause is not None and not getattr(
+                    exc_value, "__suppress_context__", False
+                ):
+                    exc_type = cause.__class__
+                    exc_value = cause
+                    traceback = cause.__traceback__
+                    is_cause = False
+                    continue
             # No cover, code is reached but coverage doesn't recognize it.
             break  # pragma: no cover
 
