@@ -33,15 +33,7 @@ from typing import (
 )
 
 from rich._null_file import NULL_FILE
-
-if sys.version_info >= (3, 8):
-    from typing import Literal, Protocol, runtime_checkable
-else:
-    from typing_extensions import (
-        Literal,
-        Protocol,
-        runtime_checkable,
-    )  # pragma: no cover
+from typing import Literal, Protocol, runtime_checkable
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
@@ -751,7 +743,7 @@ class Console:
         )
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
-        self._live: Optional["Live"] = None
+        self._live_stack: List[Live] = []
         self._is_alt_screen = False
 
     def __repr__(self) -> str:
@@ -823,24 +815,26 @@ class Console:
         self._buffer_index -= 1
         self._check_buffer()
 
-    def set_live(self, live: "Live") -> None:
-        """Set Live instance. Used by Live context manager.
+    def set_live(self, live: "Live") -> bool:
+        """Set Live instance. Used by Live context manager (no need to call directly).
 
         Args:
             live (Live): Live instance using this Console.
+
+        Returns:
+            Boolean that indicates if the live is the topmost of the stack.
 
         Raises:
             errors.LiveError: If this Console has a Live context currently active.
         """
         with self._lock:
-            if self._live is not None:
-                raise errors.LiveError("Only one live display may be active at once")
-            self._live = live
+            self._live_stack.append(live)
+            return len(self._live_stack) == 1
 
     def clear_live(self) -> None:
-        """Clear the Live instance."""
+        """Clear the Live instance. Used by the Live context manager (no need to call directly)."""
         with self._lock:
-            self._live = None
+            self._live_stack.pop()
 
     def push_render_hook(self, hook: RenderHook) -> None:
         """Add a new render hook to the stack.
