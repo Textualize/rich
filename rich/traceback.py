@@ -468,7 +468,6 @@ class Traceback:
                     stack.is_group = True
                     for exception in exc_value.exceptions:
                         if exception in grouped_exceptions:
-                            stack.is_group = False
                             continue
                         grouped_exceptions.add(exception)
                         stack.exceptions.append(
