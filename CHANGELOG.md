@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed `typing_extensions` from runtime dependencies https://github.com/Textualize/rich/pull/3763
 - Live objects (including Progress) may now be nested https://github.com/Textualize/rich/pull/3768
 
+### Fixed
+
+- Fixed extraction of recursive exceptions https://github.com/Textualize/rich/pull/3772
+
 ## [14.0.0] - 2025-03-30
 
 ### Added
