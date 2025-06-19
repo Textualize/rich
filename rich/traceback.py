@@ -14,6 +14,7 @@ from typing import (
     List,
     Optional,
     Sequence,
+    Set,
     Tuple,
     Type,
     Union,
@@ -418,7 +419,7 @@ class Traceback:
         locals_max_string: int = LOCALS_MAX_STRING,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
-        _visited_exceptions: set[BaseException] | None = None,
+        _visited_exceptions: Optional[set[BaseException]] = None,
     ) -> Trace:
         """Extract traceback information.
 
@@ -444,7 +445,7 @@ class Traceback:
 
         notes: List[str] = getattr(exc_value, "__notes__", None) or []
 
-        grouped_exceptions: set[BaseException] = (
+        grouped_exceptions: Set[BaseException] = (
             set() if _visited_exceptions is None else _visited_exceptions
         )
 
