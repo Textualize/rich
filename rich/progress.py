@@ -29,7 +29,6 @@ from typing import (
     NamedTuple,
     NewType,
     Optional,
-    Sequence,
     TextIO,
     Tuple,
     Type,
@@ -103,7 +102,7 @@ class _TrackThread(Thread):
 
 
 def track(
-    sequence: Union[Sequence[ProgressType], Iterable[ProgressType]],
+    sequence: Iterable[ProgressType],
     description: str = "Working...",
     total: Optional[float] = None,
     completed: int = 0,
@@ -122,8 +121,10 @@ def track(
 ) -> Iterable[ProgressType]:
     """Track progress by iterating over a sequence.
 
+    You can also track progress of an iterable, which might require that you additionally specify ``total``.
+
     Args:
-        sequence (Iterable[ProgressType]): A sequence (must support "len") you wish to iterate over.
+        sequence (Iterable[ProgressType]): Values you wish to iterate over and track progress.
         description (str, optional): Description of task show next to progress bar. Defaults to "Working".
         total: (float, optional): Total number of steps. Default is len(sequence).
         completed (int, optional): Number of steps completed so far. Defaults to 0.
@@ -1189,7 +1190,7 @@ class Progress(JupyterMixin):
 
     def track(
         self,
-        sequence: Union[Iterable[ProgressType], Sequence[ProgressType]],
+        sequence: Iterable[ProgressType],
         total: Optional[float] = None,
         completed: int = 0,
         task_id: Optional[TaskID] = None,
@@ -1198,8 +1199,10 @@ class Progress(JupyterMixin):
     ) -> Iterable[ProgressType]:
         """Track progress by iterating over a sequence.
 
+        You can also track progress of an iterable, which might require that you additionally specify ``total``.
+
         Args:
-            sequence (Sequence[ProgressType]): A sequence of values you want to iterate over and track progress.
+            sequence (Iterable[ProgressType]): Values you want to iterate over and track progress.
             total: (float, optional): Total number of steps. Default is len(sequence).
             completed (int, optional): Number of steps completed so far. Defaults to 0.
             task_id: (TaskID): Task to track. Default is new task.
