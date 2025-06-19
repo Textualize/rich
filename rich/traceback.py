@@ -418,7 +418,7 @@ class Traceback:
         locals_max_string: int = LOCALS_MAX_STRING,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
-        _grouped_exceptions: set[BaseException] | None = None,
+        _visited_exceptions: set[BaseException] | None = None,
     ) -> Trace:
         """Extract traceback information.
 
@@ -445,7 +445,7 @@ class Traceback:
         notes: List[str] = getattr(exc_value, "__notes__", None) or []
 
         grouped_exceptions: set[BaseException] = (
-            set() if _grouped_exceptions is None else _grouped_exceptions
+            set() if _visited_exceptions is None else _visited_exceptions
         )
 
         def safe_str(_object: Any) -> str:
@@ -470,7 +470,6 @@ class Traceback:
                         if exception in grouped_exceptions:
                             stack.is_group = False
                             continue
-                        #     stack.is_group = False
                         grouped_exceptions.add(exception)
                         stack.exceptions.append(
                             Traceback.extract(
@@ -481,7 +480,7 @@ class Traceback:
                                 locals_max_length=locals_max_length,
                                 locals_hide_dunder=locals_hide_dunder,
                                 locals_hide_sunder=locals_hide_sunder,
-                                _grouped_exceptions=grouped_exceptions,
+                                _visited_exceptions=grouped_exceptions,
                             )
                         )
 
@@ -574,7 +573,7 @@ class Traceback:
 
             if not grouped_exceptions:
                 cause = getattr(exc_value, "__cause__", None)
-                if cause and cause is not exc_value:
+                if cause is not None and cause is not exc_value:
                     exc_type = cause.__class__
                     exc_value = cause
                     # __traceback__ can be None, e.g. for exceptions raised by the
@@ -584,7 +583,9 @@ class Traceback:
                     continue
 
                 cause = exc_value.__context__
-                if cause and not getattr(exc_value, "__suppress_context__", False):
+                if cause is not None and not getattr(
+                    exc_value, "__suppress_context__", False
+                ):
                     exc_type = cause.__class__
                     exc_value = cause
                     traceback = cause.__traceback__
