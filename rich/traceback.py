@@ -419,7 +419,7 @@ class Traceback:
         locals_max_string: int = LOCALS_MAX_STRING,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
-        _visited_exceptions: Optional[set[BaseException]] = None,
+        _visited_exceptions: Optional[Set[BaseException]] = None,
     ) -> Trace:
         """Extract traceback information.
 
