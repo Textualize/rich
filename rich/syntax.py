@@ -625,7 +625,16 @@ class Syntax(JupyterMixin):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        segments = Segments(self._get_syntax(console, options))
+        # Reduce available width by padding if necessary, otherwise content is clipped
+        inner_options = options
+        if self.padding:
+            _, pad_right, _, pad_left = Padding.unpack(self.padding)
+            if pad_left or pad_right:
+                inner_width = max(0, options.max_width - pad_left - pad_right)
+                inner_options = options.update_width(inner_width)
+
+        segments = Segments(self._get_syntax(console, inner_options))
+
         if self.padding:
             yield Padding(segments, style=self._get_base_style(), pad=self.padding)
         else:
