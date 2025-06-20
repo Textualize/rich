@@ -163,7 +163,6 @@ The following column objects are available:
 - :class:`~rich.progress.TransferSpeedColumn` Displays transfer speed (assumes the steps are bytes).
 - :class:`~rich.progress.SpinnerColumn` Displays a "spinner" animation.
 - :class:`~rich.progress.RenderableColumn` Displays an arbitrary Rich renderable in the column.
-- :class:`~rich.progress.IterationSpeedColumn` Displays iteration speed in it/s (iterations per second).
 
 To implement your own columns, extend the :class:`~rich.progress.ProgressColumn` class and use it as you would the other columns.
 
