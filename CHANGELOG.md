@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Addedd
 
-- Added `TTY_INTERACTIVE` environment variable to force interactive mode off or on.
+- Added `TTY_INTERACTIVE` environment variable to force interactive mode off or on https://github.com/Textualize/rich/pull/3777
 
 ## [14.0.0] - 2025-03-30
 
