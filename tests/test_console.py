@@ -1079,7 +1079,7 @@ def test_tty_compatible() -> None:
     console = Console(file=FakeTTY())
     # Should report True
     assert console.is_terminal
-    # SHould have auto-detected
+    # Should have auto-detected
     assert console.file.called_isatty
 
     # File is a fake TTY
