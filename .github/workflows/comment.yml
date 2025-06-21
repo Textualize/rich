@@ -13,7 +13,9 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            I hope we solved your problem.
+            I hope I solved your problem. Consider [sponsoring](https://github.com/sponsors/willmcgugan) me to help maintain this project!
             
             If you like using Rich, you might also enjoy [Textual](https://textual.textualize.io)
+
+            Will McGugan
             
