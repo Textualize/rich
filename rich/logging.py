@@ -76,7 +76,7 @@ class RichHandler(Handler):
         markup: bool = False,
         rich_tracebacks: bool = False,
         tracebacks_width: Optional[int] = None,
-        tracebacks_code_width: int = 88,
+        tracebacks_code_width: Optional[int] = 88,
         tracebacks_extra_lines: int = 3,
         tracebacks_theme: Optional[str] = None,
         tracebacks_word_wrap: bool = True,

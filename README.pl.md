@@ -82,7 +82,7 @@ Rich może zostać zainstalowany w REPL, żeby wszystkie struktury danych były 
 
 ## Używanie konsoli
 
-Dla większej kontroli nad bogatą zawartością terminala, zaimportuj i skonstruuj objekt [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console).
+Dla większej kontroli nad bogatą zawartością terminala, zaimportuj i skonstruuj obiekt [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console).
 
 ```python
 from rich.console import Console
@@ -90,7 +90,7 @@ from rich.console import Console
 console = Console()
 ```
 
-Objekt Console ma metodę `print`, mającą celowo podobny interfejs do wbudowanej funkcji `print`. Tu jest przykład użycia:
+Obiekt Console ma metodę `print`, mającą celowo podobny interfejs do wbudowanej funkcji `print`. Tu jest przykład użycia:
 
 ```python
 console.print("Hello", "World!")
@@ -116,11 +116,11 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ![Console Markup](https://github.com/textualize/rich/raw/master/imgs/where_there_is_a_will.png)
 
-Możesz użyć objektu Console, aby wygenerować skomplikowane wyjście bez problemu. Więcej informacji odnośnie Console API w [dokumentacji](https://rich.readthedocs.io/en/latest/console.html).
+Możesz użyć obiektu Console, aby wygenerować skomplikowane wyjście bez problemu. Więcej informacji odnośnie Console API w [dokumentacji](https://rich.readthedocs.io/en/latest/console.html).
 
 ## Rich Inspect
 
-Rich ma funkcję [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect), która może produkować raporty na jakimkolwiek objekcie Python, jak np. klasa, instancja, lub wbudowana funkcja.
+Rich ma funkcję [inspect](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect), która może produkować raporty na jakimkolwiek obiekcie Python, jak np. klasa, instancja, lub wbudowana funkcja.
 
 ```python
 >>> my_list = ["foo", "bar"]
@@ -141,7 +141,7 @@ Kliknij poniższe nagłówki, żeby poznać detale:
 <details>
 <summary>Log</summary>
 
-Objekt Console ma metodę `log()`, mającą podobny interfejs do `print()`, ale wyświetla również kolumnę zawierającą aktualny czas oraz plik i linijkę, która wywołała powyższą metodę. Domyślnie Rich podświetla składnię dla struktur Pythona i ciągów repr. Jeśli zlogujesz kolekcję (czyli listę `list` lub słownik `dict`), Rich ją ładnie wypisze tak, żeby zmieściła się w dostępnym miejscu. Poniżej znajduje się przykład tych funkcji.
+Obiekt Console ma metodę `log()`, mającą podobny interfejs do `print()`, ale wyświetla również kolumnę zawierającą aktualny czas oraz plik i linijkę, która wywołała powyższą metodę. Domyślnie Rich podświetla składnię dla struktur Pythona i ciągów repr. Jeśli zlogujesz kolekcję (czyli listę `list` lub słownik `dict`), Rich ją ładnie wypisze tak, żeby zmieściła się w dostępnym miejscu. Poniżej znajduje się przykład tych funkcji.
 
 ```python
 from rich.console import Console
@@ -170,7 +170,7 @@ Powyższy kod wyświetla poniższy tekst:
 
 ![Log](https://github.com/textualize/rich/raw/master/imgs/log.png)
 
-Istnieje argument `log_locals`, który wyświetla tabelę zawierającą zmienne lokalne z kąd wywołano metodę  log.
+Istnieje argument `log_locals`, który wyświetla tabelę zawierającą zmienne lokalne skąd wywołano metodę  log.
 
 Metoda log może być używana do logowania do terminala dla długo działających aplikacji takich jak serwery, ale jest również bardzo dobrą pomocą w debugowaniu.
 
@@ -178,7 +178,7 @@ Metoda log może być używana do logowania do terminala dla długo działający
 <details>
 <summary>Handler Logów</summary>
 
-Możesz także użyć wbudowanej [klasy Handler](https://rich.readthedocs.io/en/latest/logging.html), aby zformatować i pokolorować wyjście z modułu logging Pythona. Przykład poniżej:
+Możesz także użyć wbudowanej [klasy Handler](https://rich.readthedocs.io/en/latest/logging.html), aby sformatować i pokolorować wyjście z modułu logging Pythona. Przykład poniżej:
 
 ![Logging](https://github.com/textualize/rich/raw/master/imgs/logging.png)
 
@@ -379,7 +379,7 @@ Ten kod wyświetli tekst w stylu:
 <details>
 <summary>Podświetlanie kodu źródłowego</summary>
 
-Rich używa biblioteki [pygments](https://pygments.org/), żeby zaimplementować [podświetlanie kodu źródłowego](https://rich.readthedocs.io/en/latest/syntax.html). Użycie jest podobne do renderowania markdownu; skonstruuj objekt `Syntax` i wydrukuj go do konsoli. Przykład poniżej:
+Rich używa biblioteki [pygments](https://pygments.org/), żeby zaimplementować [podświetlanie kodu źródłowego](https://rich.readthedocs.io/en/latest/syntax.html). Użycie jest podobne do renderowania markdownu; skonstruuj obiekt `Syntax` i wydrukuj go do konsoli. Przykład poniżej:
 
 ```python
 from rich.console import Console

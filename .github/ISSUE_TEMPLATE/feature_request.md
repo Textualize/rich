@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+NOTE: If a feature could be implemented in a third-party library, then it is unlikely to be accepted as part of the core library.
+
 Consider posting in https://github.com/textualize/rich/discussions for feedback before raising a feature request.
 
 Have you checked the issues for a similar suggestions?

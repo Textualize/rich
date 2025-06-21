@@ -1,15 +1,10 @@
 from __future__ import annotations
 
 import sys
-from typing import ClassVar, Iterable
+from typing import ClassVar, Iterable, get_args
 
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
-
-if sys.version_info >= (3, 8):
-    from typing import get_args
-else:
-    from typing_extensions import get_args  # pragma: no cover
 
 from rich.table import Table
 
