@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 import re
 import sys
@@ -224,6 +226,17 @@ class _SyntaxHighlightRange(NamedTuple):
     style_before: bool = False
 
 
+class PaddingProperty:
+    """Descriptor to get and set padding."""
+
+    def __get__(self, obj: Syntax, objtype: Type[Syntax]) -> Tuple[int, int, int, int]:
+        """Space around the Syntax."""
+        return obj._padding
+
+    def __set__(self, obj: Syntax, padding: PaddingDimensions) -> None:
+        obj._padding = Padding.unpack(padding)
+
+
 class Syntax(JupyterMixin):
     """Construct a Syntax object to render syntax highlighted code.
 
@@ -298,14 +311,7 @@ class Syntax(JupyterMixin):
         self._theme = self.get_theme(theme)
         self._stylized_ranges: List[_SyntaxHighlightRange] = []
 
-    @property
-    def padding(self) -> tuple[int, int, int, int]:
-        """Padding around the Syntax."""
-        return self._padding
-
-    @padding.setter
-    def padding(self, padding: PaddingDimensions) -> None:
-        self._padding = Padding.unpack(padding)
+    padding = PaddingProperty()
 
     @classmethod
     def from_path(
