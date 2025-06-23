@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed extraction of recursive exceptions https://github.com/Textualize/rich/pull/3772
 
-### Addedd
+### Added
 
 - Added `TTY_INTERACTIVE` environment variable to force interactive mode off or on https://github.com/Textualize/rich/pull/3777
 
