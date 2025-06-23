@@ -419,6 +419,22 @@ def test_background_color_override_includes_padding() -> None:
     )
 
 
+def test_padding_plus_wrap() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3727"""
+    console = Console(width=24, file=io.StringIO(), legacy_windows=False)
+    syntax = Syntax(
+        "'Hello, World. This should wrap.'",
+        lexer="python",
+        padding=(0, 3),
+        word_wrap=True,
+    )
+    console.print(syntax)
+    output = console.file.getvalue()
+    print(repr(output))
+    expected = "   'Hello, World.       \n   This should wrap.'   \n"
+    assert output == expected
+
+
 if __name__ == "__main__":
     syntax = Panel.fit(
         Syntax(
