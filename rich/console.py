@@ -22,18 +22,20 @@ from typing import (
     Dict,
     Iterable,
     List,
+    Literal,
     Mapping,
     NamedTuple,
     Optional,
+    Protocol,
     TextIO,
     Tuple,
     Type,
     Union,
     cast,
+    runtime_checkable,
 )
 
 from rich._null_file import NULL_FILE
-from typing import Literal, Protocol, runtime_checkable
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
@@ -731,6 +733,14 @@ class Console:
             if no_color is not None
             else self._environ.get("NO_COLOR", "") != ""
         )
+        if force_interactive is None:
+            tty_interactive = self._environ.get("TTY_INTERACTIVE", None)
+            if tty_interactive is not None:
+                if tty_interactive == "0":
+                    force_interactive = False
+                elif tty_interactive == "1":
+                    force_interactive = True
+
         self.is_interactive = (
             (self.is_terminal and not self.is_dumb_terminal)
             if force_interactive is None
