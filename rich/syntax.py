@@ -386,8 +386,8 @@ class Syntax(JupyterMixin):
         is supplied, the lexer will be chosen based on the file extension..
 
         Args:
-             path (AnyStr): The path to the file containing the code you wish to know the lexer for.
-             code (str, optional): Optional string of code that will be used as a fallback if no lexer
+            path (AnyStr): The path to the file containing the code you wish to know the lexer for.
+            code (str, optional): Optional string of code that will be used as a fallback if no lexer
                 is found for the supplied path.
 
         Returns:
