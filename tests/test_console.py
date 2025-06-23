@@ -1038,6 +1038,31 @@ def test_capture_and_record() -> None:
     assert recorded_content == "Print 0\n"
 
 
+def test_tty_interactive() -> None:
+    """Check TTY_INTERACTIVE environment var."""
+
+    # Bytes file, not interactive
+    console = Console(file=io.BytesIO())
+    assert not console.is_interactive
+
+    # Bytes file, force interactive
+    console = Console(file=io.BytesIO(), _environ={"TTY_INTERACTIVE": "1"})
+    assert console.is_interactive
+
+    # Force tty compatible, should be interactive
+    console = Console(file=io.BytesIO(), _environ={"TTY_COMPATIBLE": "1"})
+    assert console.is_interactive
+
+    # Force tty compatible, force not interactive
+    console = Console(
+        file=io.BytesIO(), _environ={"TTY_COMPATIBLE": "1", "TTY_INTERACTIVE": "0"}
+    )
+
+    # Bytes file, Unknown value of TTY_INTERACTIVE should still auto-detect
+    console = Console(file=io.BytesIO(), _environ={"TTY_INTERACTIVE": "foo"})
+    assert not console.is_interactive
+
+
 def test_tty_compatible() -> None:
     """Check TTY_COMPATIBLE environment var."""
 

@@ -405,13 +405,13 @@ If Rich detects that it is not writing to a terminal it will strip control codes
 
 Letting Rich auto-detect terminals is useful as it will write plain text when you pipe output to a file or other application.
 
+.. _interactive_mode:
+
 Interactive mode
 ----------------
 
-Rich will remove animations such as progress bars and status indicators when not writing to a terminal as you probably don't want to write these out to a text file (for example). You can override this behavior by setting the ``force_interactive`` argument on the constructor. Set it to True to enable animations or False to disable them.
+Rich will remove animations such as progress bars and status indicators when not writing to a terminal as you probably don't want to write these out to a text file (for example). You can override this behavior by setting the ``force_interactive`` argument on the constructor. Set it to ``True`` to enable animations or ``False`` to disable them.
 
-.. note::
-    Some CI systems support ANSI color and style but not anything that moves the cursor or selectively refreshes parts of the terminal. For these you might want to set ``force_terminal`` to ``True`` and ``force_interactive`` to ``False``.
 
 Environment variables
 ---------------------
@@ -429,8 +429,11 @@ If the environment variable ``NO_COLOR`` is set, Rich will disable all color in 
 
 The environment variable ``TTY_COMPATIBLE`` is used to override Rich's auto-detection of terminal support. If ``TTY_COMPATIBLE`` is set to ``1`` then Rich will assume it is writing to a device which can handle escape sequences like a terminal. If ``TTY_COMPATIBLE`` is set to ``"0"``, then Rich will assume that it is writing to a device that is *not* capable of displaying escape sequences (such as a regular file). If the variable is not set, or set to a value other than "0" or "1", then Rich will attempt to auto-detect terminal support.
 
+The environment variable ``TTY_INTERACTIVE`` is used to override Rich's auto-detection of :ref:`interactive_mode`. If you set this to ``"0"``, it will disable interactive mode even if Rich thinks it is writing to a terminal. Set this to ``"1"`` to force interactive mode on. If this environment variable is not set, or set to any other value, then interactive mode will be auto-detected as normal.
+
 .. note::
-    If you want Rich output in CI or Github Actions, then you should set ``TTY_COMPATIBLE=1``.
+    If you want Rich output in CI or Github Actions, then you should set ``TTY_COMPATIBLE=1`` and ``TTY_INTERACTIVE=0``. The combination of both these variables tells rich that it can output escape sequences,
+    and also that there is no user interacting with the terminal -- so it won't bother animating progress bars.
 
 If ``width`` / ``height`` arguments are not explicitly provided as arguments to ``Console`` then the environment variables ``COLUMNS`` / ``LINES`` can be used to set the console width / height. ``JUPYTER_COLUMNS`` / ``JUPYTER_LINES`` behave similarly and are used in Jupyter.
 
