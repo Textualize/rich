@@ -2,6 +2,7 @@ import io
 import os
 import sys
 import tempfile
+from importlib.metadata import Distribution
 
 import pytest
 from pygments.lexers import PythonLexer
@@ -19,7 +20,6 @@ from rich.syntax import (
 )
 
 from .render import render
-from importlib.metadata import Distribution
 
 PYGMENTS_VERSION = Distribution.from_name("pygments").version
 OLD_PYGMENTS = PYGMENTS_VERSION == "2.13.0"
@@ -40,7 +40,7 @@ def loop_first_last(values: Iterable[T]) -> Iterable[Tuple[bool, bool, T]]:
     yield first, True, previous_value'''
 
 
-def test_blank_lines():
+def test_blank_lines() -> None:
     code = "\n\nimport this\n\n"
     syntax = Syntax(
         code, lexer="python", theme="ascii_light", code_width=30, line_numbers=True
@@ -53,7 +53,7 @@ def test_blank_lines():
     )
 
 
-def test_python_render():
+def test_python_render() -> None:
     syntax = Panel.fit(
         Syntax(
             CODE,
@@ -72,7 +72,7 @@ def test_python_render():
     assert rendered_syntax == expected
 
 
-def test_python_render_simple():
+def test_python_render_simple() -> None:
     syntax = Syntax(
         CODE,
         lexer="python",
@@ -87,7 +87,7 @@ def test_python_render_simple():
     assert rendered_syntax == expected
 
 
-def test_python_render_simple_passing_lexer_instance():
+def test_python_render_simple_passing_lexer_instance() -> None:
     syntax = Syntax(
         CODE,
         lexer=PythonLexer(),
@@ -103,7 +103,7 @@ def test_python_render_simple_passing_lexer_instance():
 
 
 @pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
-def test_python_render_simple_indent_guides():
+def test_python_render_simple_indent_guides() -> None:
     syntax = Syntax(
         CODE,
         lexer="python",
@@ -120,7 +120,7 @@ def test_python_render_simple_indent_guides():
 
 
 @pytest.mark.skipif(OLD_PYGMENTS, reason="Pygments changed their tokenizer")
-def test_python_render_line_range_indent_guides():
+def test_python_render_line_range_indent_guides() -> None:
     syntax = Syntax(
         CODE,
         lexer="python",
@@ -137,7 +137,7 @@ def test_python_render_line_range_indent_guides():
     assert rendered_syntax == expected
 
 
-def test_python_render_indent_guides():
+def test_python_render_indent_guides() -> None:
     syntax = Panel.fit(
         Syntax(
             CODE,
@@ -157,19 +157,19 @@ def test_python_render_indent_guides():
     assert rendered_syntax == expected
 
 
-def test_pygments_syntax_theme_non_str():
+def test_pygments_syntax_theme_non_str() -> None:
     from pygments.style import Style as PygmentsStyle
 
     style = PygmentsSyntaxTheme(PygmentsStyle())
     assert style.get_background_style().bgcolor == Color.parse("#ffffff")
 
 
-def test_pygments_syntax_theme():
+def test_pygments_syntax_theme() -> None:
     style = PygmentsSyntaxTheme("default")
     assert style.get_style_for_token("abc") == Style.parse("none")
 
 
-def test_get_line_color_none():
+def test_get_line_color_none() -> None:
     style = PygmentsSyntaxTheme("default")
     style._background_style = Style(bgcolor=None)
     syntax = Syntax(
@@ -185,7 +185,7 @@ def test_get_line_color_none():
     assert syntax._get_line_numbers_color() == Color.default()
 
 
-def test_highlight_background_color():
+def test_highlight_background_color() -> None:
     syntax = Syntax(
         CODE,
         lexer="python",
@@ -199,7 +199,7 @@ def test_highlight_background_color():
     assert syntax.highlight(CODE).style == Style.parse("on red")
 
 
-def test_get_number_styles():
+def test_get_number_styles() -> None:
     syntax = Syntax(CODE, "python", theme="monokai", line_numbers=True)
     console = Console(color_system="windows")
     assert syntax._get_number_styles(console=console) == (
@@ -209,7 +209,7 @@ def test_get_number_styles():
     )
 
 
-def test_get_style_for_token():
+def test_get_style_for_token() -> None:
     # from pygments.style import Style as PygmentsStyle
     # pygments_style = PygmentsStyle()
     from pygments.style import Token
@@ -230,7 +230,7 @@ def test_get_style_for_token():
     assert syntax._get_line_numbers_color() == Color.default()
 
 
-def test_option_no_wrap():
+def test_option_no_wrap() -> None:
     syntax = Syntax(
         CODE,
         lexer="python",
@@ -247,7 +247,7 @@ def test_option_no_wrap():
     assert rendered_syntax == expected
 
 
-def test_syntax_highlight_ranges():
+def test_syntax_highlight_ranges() -> None:
     syntax = Syntax(
         CODE,
         lexer="python",
@@ -302,7 +302,7 @@ def test_syntax_highlight_ranges():
     assert rendered_syntax == expected
 
 
-def test_ansi_theme():
+def test_ansi_theme() -> None:
     style = Style(color="red")
     theme = ANSISyntaxTheme({("foo", "bar"): style})
     assert theme.get_style_for_token(("foo", "bar", "baz")) == style
@@ -315,7 +315,7 @@ skip_windows_permission_error = pytest.mark.skipif(
 
 
 @skip_windows_permission_error
-def test_from_path():
+def test_from_path() -> None:
     fh, path = tempfile.mkstemp("example.py")
     try:
         os.write(fh, b"import this\n")
@@ -328,7 +328,7 @@ def test_from_path():
 
 
 @skip_windows_permission_error
-def test_from_path_unknown_lexer():
+def test_from_path_unknown_lexer() -> None:
     fh, path = tempfile.mkstemp("example.nosuchtype")
     try:
         os.write(fh, b"import this\n")
@@ -340,7 +340,7 @@ def test_from_path_unknown_lexer():
 
 
 @skip_windows_permission_error
-def test_from_path_lexer_override():
+def test_from_path_lexer_override() -> None:
     fh, path = tempfile.mkstemp("example.nosuchtype")
     try:
         os.write(fh, b"import this\n")
@@ -352,7 +352,7 @@ def test_from_path_lexer_override():
 
 
 @skip_windows_permission_error
-def test_from_path_lexer_override_invalid_lexer():
+def test_from_path_lexer_override_invalid_lexer() -> None:
     fh, path = tempfile.mkstemp("example.nosuchtype")
     try:
         os.write(fh, b"import this\n")
@@ -363,7 +363,7 @@ def test_from_path_lexer_override_invalid_lexer():
         os.remove(path)
 
 
-def test_syntax_guess_lexer():
+def test_syntax_guess_lexer() -> None:
     assert Syntax.guess_lexer("banana.py") == "python"
     assert Syntax.guess_lexer("banana.py", "import this") == "python"
     assert Syntax.guess_lexer("banana.html", "<a href='#'>hello</a>") == "html"
@@ -371,7 +371,7 @@ def test_syntax_guess_lexer():
     assert Syntax.guess_lexer("banana.html", "{{something|filter:3}}") == "html+django"
 
 
-def test_syntax_padding():
+def test_syntax_padding() -> None:
     syntax = Syntax("x = 1", lexer="python", padding=(1, 3))
     console = Console(
         width=20,
@@ -387,7 +387,7 @@ def test_syntax_padding():
     )
 
 
-def test_syntax_measure():
+def test_syntax_measure() -> None:
     console = Console()
     code = Syntax("Hello, World", "python")
     assert code.__rich_measure__(console, console.options) == Measurement(0, 12)
@@ -402,7 +402,7 @@ def test_syntax_measure():
     assert code.__rich_measure__(console, console.options) == Measurement(3, 24)
 
 
-def test_background_color_override_includes_padding():
+def test_background_color_override_includes_padding() -> None:
     """Regression test for https://github.com/Textualize/rich/issues/3295"""
 
     syntax = Syntax(
@@ -417,6 +417,22 @@ def test_background_color_override_includes_padding():
         result
         == "\x1b[41m                                                                                                    \x1b[0m\n\x1b[41m   \x1b[0m\x1b[38;2;248;248;242;41mx\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;255;70;137;41m=\x1b[0m\x1b[38;2;248;248;242;41m \x1b[0m\x1b[38;2;174;129;255;41m1\x1b[0m\x1b[41m                                                                                         \x1b[0m\x1b[41m   \x1b[0m\n\x1b[41m                                                                                                    \x1b[0m\n"
     )
+
+
+def test_padding_plus_wrap() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3727"""
+    console = Console(width=24, file=io.StringIO(), legacy_windows=False)
+    syntax = Syntax(
+        "'Hello, World. This should wrap.'",
+        lexer="python",
+        padding=(0, 3),
+        word_wrap=True,
+    )
+    console.print(syntax)
+    output = console.file.getvalue()
+    print(repr(output))
+    expected = "   'Hello, World.       \n   This should wrap.'   \n"
+    assert output == expected
 
 
 if __name__ == "__main__":
