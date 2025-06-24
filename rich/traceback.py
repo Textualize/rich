@@ -178,7 +178,9 @@ def install(
 
             # determine correct tb_offset
             compiled = tb_data.get("running_compiled_code", False)
-            tb_offset = tb_data.get("tb_offset", 1 if compiled else 0)
+            tb_offset = tb_data.get("tb_offset")
+            if tb_offset is None:
+                tb_offset = 1 if compiled else 0
             # remove ipython internal frames from trace with tb_offset
             for _ in range(tb_offset):
                 if tb is None:
