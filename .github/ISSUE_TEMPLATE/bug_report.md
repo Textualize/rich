@@ -15,6 +15,8 @@ WAIT! Is this a feature request?
 Rich isn't accepting new features. If it can be implemented in a third-party library, then that is what I recommend.
 
 Rich *may* accept enhancements to existing features, if they don't have a disruptive impact on the API.
+
+If you think your feature is exceptional, then please make your case in a discussion.
 -->
 
 **Describe the bug**
