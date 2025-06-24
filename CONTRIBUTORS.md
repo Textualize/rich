@@ -67,6 +67,7 @@ The following people have contributed to the development of Rich:
 - [Louis Sautier](https://github.com/sbraz)
 - [Tim Savage](https://github.com/timsavage)
 - [Anthony Shaw](https://github.com/tonybaloney)
+- [Damian Shaw](https://github.com/notatallshaw)
 - [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Aaron Stephens](https://github.com/aaronst)
 - [Karolina Surma](https://github.com/befeleme)
@@ -92,3 +93,4 @@ The following people have contributed to the development of Rich:
 - [chthollyphile](https://github.com/chthollyphile)
 - [Jonathan Helmus](https://github.com/jjhelmus)
 - [Brandon Capener](https://github.com/bcapener)
+- [Alex Zheng](https://github.com/alexzheng111)

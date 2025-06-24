@@ -26,7 +26,7 @@ def test_live_state() -> None:
         assert live._started
         live.start()
 
-        assert live.renderable == ""
+        assert live.get_renderable() == ""
 
         assert live._started
         live.stop()
