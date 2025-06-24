@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import sys
 from threading import Event, RLock, Thread
 from types import TracebackType
-from typing import IO, Any, Callable, List, Optional, TextIO, Type, cast
+from typing import IO, TYPE_CHECKING, Any, Callable, List, Optional, TextIO, Type, cast
 
 from . import get_console
 from .console import Console, ConsoleRenderable, Group, RenderableType, RenderHook
@@ -11,6 +13,10 @@ from .jupyter import JupyterMixin
 from .live_render import LiveRender, VerticalOverflowMethod
 from .screen import Screen
 from .text import Text
+
+if TYPE_CHECKING:
+    # Can be replaced with `from typing import Self` in Python 3.11+
+    from typing_extensions import Self  # pragma: no cover
 
 
 class _RefreshThread(Thread):
@@ -170,7 +176,7 @@ class Live(JupyterMixin, RenderHook):
                     if self.ipy_widget is not None and self.transient:
                         self.ipy_widget.close()  # pragma: no cover
 
-    def __enter__(self) -> "Live":
+    def __enter__(self) -> Self:
         self.start(refresh=self._renderable is not None)
         return self
 
