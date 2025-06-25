@@ -610,6 +610,8 @@ def traverse(
         else:
             try:
                 obj_repr = repr(obj)
+                if max_string is not None and len(obj_repr) > max_string:
+                    obj_repr = f"{obj_repr[:max_string]}..."
             except Exception as error:
                 obj_repr = f"<repr-error {str(error)!r}>"
         return obj_repr
