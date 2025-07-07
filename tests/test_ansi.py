@@ -1,5 +1,4 @@
 import pytest
-
 from rich.ansi import AnsiDecoder
 from rich.console import Console
 from rich.style import Style
@@ -68,6 +67,23 @@ def test_decode_issue_2688(ansi_bytes, expected_text):
     text = Text.from_ansi(ansi_bytes.decode())
 
     assert str(text) == expected_text
+
+
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        (
+            "\x1b[38;2;255;0;0mred\x1b[0m text",
+            Text("red text", spans=[Span(0, 3, Style.parse("#ff0000"))]),
+        ),
+        (
+            "\x1b[38:2::255:0:0mred\x1b[0m text",
+            Text("red text", spans=[Span(0, 3, Style.parse("#ff0000"))]),
+        ),
+    ],
+)
+def test_decode_sgr_rgb(text, expected):
+    assert Text.from_ansi(text) == expected
 
 
 @pytest.mark.parametrize("code", [*"0123456789:;<=>?"])
