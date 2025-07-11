@@ -164,7 +164,7 @@ class PygmentsSyntaxTheme(SyntaxTheme):
                 color = pygments_style["color"]
                 bgcolor = pygments_style["bgcolor"]
                 style = Style(
-                    color="#" + color if color else "#000000",
+                    color="#" + color if color else None,
                     bgcolor="#" + bgcolor if bgcolor else self._background_color,
                     bold=pygments_style["bold"],
                     italic=pygments_style["italic"],
