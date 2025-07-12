@@ -3,7 +3,7 @@ import pytest
 from rich.console import Console
 from rich.measure import Measurement
 from rich.rule import Rule
-from rich.spinner import Spinner
+from rich.spinner import Spinner, SpinnerInfo
 from rich.text import Text
 
 
@@ -70,3 +70,28 @@ def test_spinner_markup():
     spinner = Spinner("dots", "[bold]spinning[/bold]")
     assert isinstance(spinner.text, Text)
     assert str(spinner.text) == "spinning"
+
+
+def test_custom_spinner_render():
+    custom_spinner: SpinnerInfo = {
+        "interval": 80,
+        "frames": "abcdef",
+    }
+    time = 0.0
+
+    def get_time():
+        nonlocal time
+        return time
+
+    console = Console(
+        width=80, color_system=None, force_terminal=True, get_time=get_time
+    )
+    console.begin_capture()
+    spinner = Spinner(custom_spinner, "Foo")
+    console.print(spinner)
+    time += 80 / 1000
+    console.print(spinner)
+    result = console.end_capture()
+    print(repr(result))
+    expected = "a Foo\nb Foo\n"
+    assert result == expected

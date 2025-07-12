@@ -1,6 +1,6 @@
-from typing import TYPE_CHECKING, List, Optional, Union, cast
+from typing import TYPE_CHECKING, Optional, Union
 
-from ._spinners import SPINNERS
+from ._spinners import SPINNERS, SpinnerInfo
 from .measure import Measurement
 from .table import Table
 from .text import Text
@@ -10,11 +10,19 @@ if TYPE_CHECKING:
     from .style import StyleType
 
 
+# Explicitly export `SpinnerInfo` to avoid linter annoyances if other people
+# want to use our type definition.
+__all__ = [
+    "Spinner",
+    "SpinnerInfo",
+]
+
+
 class Spinner:
     """A spinner animation.
 
     Args:
-        name (str): Name of spinner (run python -m rich.spinner).
+        name (str | SpinnerInfo): Name of spinner (run python -m rich.spinner), or a dict of shape { "interval": float, "frames": str | list[str] }
         text (RenderableType, optional): A renderable to display at the right of the spinner (str or Text typically). Defaults to "".
         style (StyleType, optional): Style for spinner animation. Defaults to None.
         speed (float, optional): Speed factor for animation. Defaults to 1.0.
@@ -25,22 +33,26 @@ class Spinner:
 
     def __init__(
         self,
-        name: str,
+        name: str | SpinnerInfo,
         text: "RenderableType" = "",
         *,
         style: Optional["StyleType"] = None,
         speed: float = 1.0,
     ) -> None:
-        try:
-            spinner = SPINNERS[name]
-        except KeyError:
-            raise KeyError(f"no spinner called {name!r}")
+        if isinstance(name, str):
+            try:
+                spinner = SPINNERS[name]
+            except KeyError:
+                raise KeyError(f"no spinner called {name!r}")
+        else:
+            spinner = name
+
         self.text: "Union[RenderableType, Text]" = (
             Text.from_markup(text) if isinstance(text, str) else text
         )
         self.name = name
-        self.frames = cast(List[str], spinner["frames"])[:]
-        self.interval = cast(float, spinner["interval"])
+        self.frames = spinner["frames"][:]
+        self.interval = spinner["interval"]
         self.start_time: Optional[float] = None
         self.style = style
         self.speed = speed

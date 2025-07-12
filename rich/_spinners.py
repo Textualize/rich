@@ -19,7 +19,20 @@ Spinners are from:
     IN THE SOFTWARE.
 """
 
-SPINNERS = {
+from typing import TypedDict, List, Dict
+
+
+class SpinnerInfo(TypedDict):
+    interval: float
+    """Intended time per frame, in milliseconds"""
+    frames: List[str] | str
+    """
+    Frames of this spinner. If a single `str`, each character is a single
+    frame. If a `list[str]`, each list element is a single frame.
+    """
+
+
+SPINNERS: Dict[str, SpinnerInfo] = {
     "dots": {
         "interval": 80,
         "frames": "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏",
