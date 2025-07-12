@@ -19,13 +19,13 @@ Spinners are from:
     IN THE SOFTWARE.
 """
 
-from typing import TypedDict, List, Dict
+from typing import TypedDict, List, Dict, Union
 
 
 class SpinnerInfo(TypedDict):
     interval: float
     """Intended time per frame, in milliseconds"""
-    frames: List[str] | str
+    frames: Union[List[str], str]
     """
     Frames of this spinner. If a single `str`, each character is a single
     frame. If a `list[str]`, each list element is a single frame.
