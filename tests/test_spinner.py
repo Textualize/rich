@@ -3,7 +3,7 @@ import pytest
 from rich.console import Console
 from rich.measure import Measurement
 from rich.rule import Rule
-from rich.spinner import Spinner, SpinnerInfo
+from rich.spinner import Spinner, SpinnerAnimation
 from rich.text import Text
 
 
@@ -73,7 +73,7 @@ def test_spinner_markup():
 
 
 def test_custom_spinner_render():
-    custom_spinner: SpinnerInfo = {
+    custom_spinner: SpinnerAnimation = {
         "interval": 80,
         "frames": "abcdef",
     }

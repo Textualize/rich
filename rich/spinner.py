@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Optional, Union
 
-from ._spinners import SPINNERS, SpinnerInfo
+from ._spinners import SPINNERS, SpinnerAnimation
 from .measure import Measurement
 from .table import Table
 from .text import Text
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 # want to use our type definition.
 __all__ = [
     "Spinner",
-    "SpinnerInfo",
+    "SpinnerAnimation",
 ]
 
 
@@ -33,7 +33,7 @@ class Spinner:
 
     def __init__(
         self,
-        name: str | SpinnerInfo,
+        name: str | SpinnerAnimation,
         text: "RenderableType" = "",
         *,
         style: Optional["StyleType"] = None,

@@ -36,7 +36,7 @@ from typing import (
 )
 
 from rich._null_file import NULL_FILE
-from rich._spinners import SpinnerInfo
+from rich._spinners import SpinnerAnimation
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
@@ -1164,7 +1164,7 @@ class Console:
         self,
         status: RenderableType,
         *,
-        spinner: Union[str, SpinnerInfo] = "dots",
+        spinner: Union[str, SpinnerAnimation] = "dots",
         spinner_style: StyleType = "status.spinner",
         speed: float = 1.0,
         refresh_per_second: float = 12.5,
@@ -2182,9 +2182,9 @@ class Console:
             str: String containing console contents.
 
         """
-        assert (
-            self.record
-        ), "To export console contents set record=True in the constructor or instance"
+        assert self.record, (
+            "To export console contents set record=True in the constructor or instance"
+        )
 
         with self._record_buffer_lock:
             if styles:
@@ -2238,9 +2238,9 @@ class Console:
         Returns:
             str: String containing console contents as HTML.
         """
-        assert (
-            self.record
-        ), "To export console contents set record=True in the constructor or instance"
+        assert self.record, (
+            "To export console contents set record=True in the constructor or instance"
+        )
         fragments: List[str] = []
         append = fragments.append
         _theme = theme or DEFAULT_TERMINAL_THEME

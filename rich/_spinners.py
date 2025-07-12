@@ -22,7 +22,7 @@ Spinners are from:
 from typing import TypedDict, List, Dict, Union
 
 
-class SpinnerInfo(TypedDict):
+class SpinnerAnimation(TypedDict):
     interval: float
     """Intended time per frame, in milliseconds"""
     frames: Union[List[str], str]
@@ -32,7 +32,7 @@ class SpinnerInfo(TypedDict):
     """
 
 
-SPINNERS: Dict[str, SpinnerInfo] = {
+SPINNERS: Dict[str, SpinnerAnimation] = {
     "dots": {
         "interval": 80,
         "frames": "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏",

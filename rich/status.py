@@ -1,7 +1,7 @@
 from types import TracebackType
 from typing import Optional, Type, Union
 
-from ._spinners import SpinnerInfo
+from ._spinners import SpinnerAnimation
 from .console import Console, RenderableType
 from .jupyter import JupyterMixin
 from .live import Live
@@ -26,7 +26,7 @@ class Status(JupyterMixin):
         status: RenderableType,
         *,
         console: Optional[Console] = None,
-        spinner: Union[str, SpinnerInfo] = "dots",
+        spinner: Union[str, SpinnerAnimation] = "dots",
         spinner_style: StyleType = "status.spinner",
         speed: float = 1.0,
         refresh_per_second: float = 12.5,
@@ -55,7 +55,7 @@ class Status(JupyterMixin):
         self,
         status: Optional[RenderableType] = None,
         *,
-        spinner: Union[str, SpinnerInfo, None] = None,
+        spinner: Union[str, SpinnerAnimation, None] = None,
         spinner_style: Optional[StyleType] = None,
         speed: Optional[float] = None,
     ) -> None:
