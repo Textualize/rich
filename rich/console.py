@@ -36,6 +36,7 @@ from typing import (
 )
 
 from rich._null_file import NULL_FILE
+from rich._spinners import SpinnerInfo
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
@@ -1163,7 +1164,7 @@ class Console:
         self,
         status: RenderableType,
         *,
-        spinner: str = "dots",
+        spinner: Union[str, SpinnerInfo] = "dots",
         spinner_style: StyleType = "status.spinner",
         speed: float = 1.0,
         refresh_per_second: float = 12.5,
