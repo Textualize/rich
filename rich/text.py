@@ -326,6 +326,26 @@ class Text(JupyterMixin):
         )
         decoder = AnsiDecoder()
         result = joiner.join(line for line in decoder.decode(text))
+
+        # AnsiDecoder.decode() uses str.splitlines(), which discards trailing line break characters.
+        # If 'text' ends with one, restore the missing newline to 'result'.
+        # Note: '\r\n' is handled as its last character is '\n'.
+        # Source: https://docs.python.org/3/library/stdtypes.html#str.splitlines
+        line_break_chars = {
+            "\n",  # Line Feed
+            "\r",  # Carriage Return
+            "\v",  # Vertical Tab
+            "\f",  # Form Feed
+            "\x1c",  # File Separator
+            "\x1d",  # Group Separator
+            "\x1e",  # Record Separator
+            "\x85",  # Next Line (NEL)
+            "\u2028",  # Line Separator
+            "\u2029",  # Paragraph Separator
+        }
+        if text and text[-1] in line_break_chars:
+            result.append("\n")
+
         return result
 
     @classmethod
