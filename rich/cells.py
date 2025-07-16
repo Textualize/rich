@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import re
 from functools import lru_cache
 from typing import Callable
 
 from ._cell_widths import CELL_WIDTHS
+
+_RE_ANSI = re.compile(r"\x1b\[[0-9;]*m")
+
 
 # Ranges of unicode ordinals that produce a 1-cell wide character
 # This is non-exhaustive, but covers most common Western characters
@@ -43,6 +47,8 @@ def cached_cell_len(text: str) -> int:
     Returns:
         int: Get the number of cells required to display text.
     """
+    if "\x1b" in text:
+        text = _RE_ANSI.sub("", text)
     if _is_single_cell_widths(text):
         return len(text)
     return sum(map(get_character_cell_size, text))
@@ -59,6 +65,10 @@ def cell_len(text: str, _cell_len: Callable[[str], int] = cached_cell_len) -> in
     """
     if len(text) < 512:
         return _cell_len(text)
+
+    if "\x1b" in text:
+        text = _RE_ANSI.sub("", text)
+
     if _is_single_cell_widths(text):
         return len(text)
     return sum(map(get_character_cell_size, text))
