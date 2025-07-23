@@ -28,7 +28,6 @@ from typing import (
     List,
     Literal,
     NamedTuple,
-    NewType,
     Optional,
     TextIO,
     Tuple,
