@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from collections import deque
 from dataclasses import dataclass, field
 from datetime import timedelta
+from functools import partial
 from io import RawIOBase, UnsupportedOperation
 from math import ceil
 from mmap import mmap
@@ -51,14 +52,31 @@ from .style import StyleType
 from .table import Column, Table
 from .text import Text, TextType
 
-TaskID = NewType("TaskID", int)
-
 ProgressType = TypeVar("ProgressType")
 
 GetTimeCallable = Callable[[], float]
 
 
 _I = typing.TypeVar("_I", TextIO, BinaryIO)
+
+
+class TaskID(int):
+    def __new__(cls, task_id: int, prog_instance: Progress | type[Progress]):
+        return super().__new__(cls, task_id)
+
+    def __init__(self, task_id: int, prog_instance: Progress | type[Progress]):
+        self.remove = partial(prog_instance.remove_task, self)
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ):
+        self.remove()
 
 
 class _TrackThread(Thread):
@@ -1096,7 +1114,7 @@ class Progress(JupyterMixin):
         self.disable = disable
         self.expand = expand
         self._tasks: Dict[TaskID, Task] = {}
-        self._task_index: TaskID = TaskID(0)
+        self._task_index: TaskID = TaskID(0, self)
         self.live = Live(
             console=console or get_console(),
             auto_refresh=auto_refresh,
@@ -1635,7 +1653,7 @@ class Progress(JupyterMixin):
             if start:
                 self.start_task(self._task_index)
             new_task_index = self._task_index
-            self._task_index = TaskID(int(self._task_index) + 1)
+            self._task_index = TaskID(int(self._task_index) + 1, self)
         self.refresh()
         return new_task_index
 
