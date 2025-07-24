@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from collections import deque
 from dataclasses import dataclass, field
 from datetime import timedelta
-from functools import partial
 from io import RawIOBase, UnsupportedOperation
 from math import ceil
 from mmap import mmap
@@ -64,7 +63,7 @@ class TaskID(int):
         return super().__new__(cls, task_id)
 
     def __init__(self, task_id: int, prog_instance: Progress | type[Progress]):
-        self.remove = partial(prog_instance.remove_task, self)
+        self.prog = prog_instance
 
     def __enter__(self) -> Self:
         return self
@@ -75,7 +74,7 @@ class TaskID(int):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ):
-        self.remove()
+        self.prog.remove_task(self)
 
 
 class _TrackThread(Thread):
