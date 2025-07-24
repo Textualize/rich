@@ -59,10 +59,10 @@ _I = typing.TypeVar("_I", TextIO, BinaryIO)
 
 
 class TaskID(int):
-    def __new__(cls, task_id: int, prog_instance: Progress | type[Progress]):
+    def __new__(cls, task_id: int, prog_instance: Progress) -> Self:
         return super().__new__(cls, task_id)
 
-    def __init__(self, task_id: int, prog_instance: Progress | type[Progress]):
+    def __init__(self, task_id: int, prog_instance: Progress) -> None:
         self.prog = prog_instance
 
     def __enter__(self) -> Self:
@@ -73,7 +73,7 @@ class TaskID(int):
         exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         traceback: TracebackType | None,
-    ):
+    ) -> None:
         self.prog.remove_task(self)
 
 
