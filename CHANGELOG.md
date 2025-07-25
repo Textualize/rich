@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added `TTY_INTERACTIVE` environment variable to force interactive mode off or on https://github.com/Textualize/rich/pull/3777
+- Added Context Manager support for TaskID objects returned by Progress.add_task. Allowing for `with progress.add_task(...) as taskid: ...` which automatically removes the progress bar for that task upon exiting the current context.
 
 ## [14.0.0] - 2025-03-30
 
