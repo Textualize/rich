@@ -22,21 +22,9 @@ skip_py39 = pytest.mark.skipif(
     sys.version_info.minor == 9 and sys.version_info.major == 3,
     reason="rendered differently on py3.9",
 )
-skip_py310 = pytest.mark.skipif(
-    sys.version_info.minor == 10 and sys.version_info.major == 3,
-    reason="rendered differently on py3.10",
-)
-skip_py311 = pytest.mark.skipif(
-    sys.version_info.minor == 11 and sys.version_info.major == 3,
-    reason="rendered differently on py3.11",
-)
-skip_py312 = pytest.mark.skipif(
-    sys.version_info.minor == 12 and sys.version_info.major == 3,
-    reason="rendered differently on py3.12",
-)
-skip_py313 = pytest.mark.skipif(
-    sys.version_info.minor == 13 and sys.version_info.major == 3,
-    reason="rendered differently on py3.13",
+skip_py310_or_later = pytest.mark.skipif(
+    sys.version_info.minor >= 10 and sys.version_info.major == 3,
+    reason="rendered differently on py3.10 and later versions",
 )
 
 
@@ -635,10 +623,7 @@ def test_attrs_empty() -> None:
     assert result == expected
 
 
-@skip_py310
-@skip_py311
-@skip_py312
-@skip_py313
+@skip_py310_or_later
 def test_attrs_broken() -> None:
     @attr.define
     class Foo:
