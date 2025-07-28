@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed extraction of recursive exceptions https://github.com/Textualize/rich/pull/3772
 - Fixed padding applied to Syntax https://github.com/Textualize/rich/pull/3782
 - Fixed `Panel` title missing the panel background style https://github.com/Textualize/rich/issues/3569
+- Fixed parsing of SGR color codes using colons https://github.com/Textualize/rich/pull/3789 
 
 ### Added
 
