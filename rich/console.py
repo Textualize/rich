@@ -528,6 +528,16 @@ def _is_jupyter() -> bool:  # pragma: no cover
         return False  # Other type (?)
 
 
+def _is_marimo() -> bool:  # pragma: no cover
+    """Check if we're running in a marimo notebook."""
+    try:
+        import marimo
+
+        return marimo.running_in_notebook() is True
+    except (ImportError, AttributeError):
+        return False
+
+
 COLOR_SYSTEMS = {
     "standard": ColorSystem.STANDARD,
     "256": ColorSystem.EIGHT_BIT,
@@ -794,7 +804,7 @@ class Console:
 
     def _detect_color_system(self) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
-        if self.is_jupyter:
+        if self.is_jupyter or _is_marimo():
             return ColorSystem.TRUECOLOR
         if not self.is_terminal or self.is_dumb_terminal:
             return None
