@@ -20,7 +20,8 @@ Enter the directory containing your copy of Rich (`cd rich`).
 
 Poetry can be used to create an isolated _virtual environment_ for the project:
 
-```
+```bash
+poetry self add poetry-plugin-shell # (If using Poetry > 2.0.0))
 poetry shell
 ```
 
