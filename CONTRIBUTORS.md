@@ -74,6 +74,7 @@ The following people have contributed to the development of Rich:
 - [Damian Shaw](https://github.com/notatallshaw)
 - [Nicolas Simonds](https://github.com/0xDEC0DE)
 - [Aaron Stephens](https://github.com/aaronst)
+- [Stranger](https://github.com/Stranger-Jie)
 - [Karolina Surma](https://github.com/befeleme)
 - [Gabriele N. Tornetta](https://github.com/p403n1x87)
 - [Nils Vu](https://github.com/nilsvu)
