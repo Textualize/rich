@@ -6,7 +6,7 @@ from typing import Dict, Iterable, List, Optional, Tuple
 from .align import Align, AlignMethod
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .constrain import Constrain
-from .measure import Measurement
+from .measure import Measurement, measure_renderables
 from .padding import Padding, PaddingDimensions
 from .table import Table
 from .text import TextType
@@ -169,6 +169,28 @@ class Columns(JupyterMixin):
                 row = row[::-1]
             add_row(*row)
         yield table
+
+    def __rich_measure__(
+        self, console: "Console", options: "ConsoleOptions"
+    ) -> "Measurement":
+        title = self.title
+        _, right, _, left = Padding.unpack(self.padding)
+        padding = left + right
+        renderables = [*self.renderables, title] if title else [*self.renderables]
+
+        if self.width is None:
+            width = (
+                measure_renderables(
+                    console,
+                    options.update_width(options.max_width - padding - 2),
+                    renderables,
+                ).maximum
+                + padding
+                + 2
+            )
+        else:
+            width = self.width
+        return Measurement(width, width)
 
 
 if __name__ == "__main__":  # pragma: no cover
