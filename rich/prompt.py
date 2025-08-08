@@ -39,11 +39,11 @@ class PromptBase(Generic[PromptType]):
         case_sensitive (bool, optional): Matching of choices should be case-sensitive. Defaults to True.
         show_default (bool, optional): Show default in prompt. Defaults to True.
         show_choices (bool, optional): Show choices in prompt. Defaults to True.
+        validate_error_message (str, optional): Customised error message to display when input is invalid.
     """
 
     response_type: type = str
 
-    validate_error_message = "[prompt.invalid]Please enter a valid value"
     illegal_choice_message = (
         "[prompt.invalid.choice]Please select one of the available options"
     )
@@ -61,6 +61,7 @@ class PromptBase(Generic[PromptType]):
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
+        validate_error_message: str = "[prompt.invalid]Please enter a valid value"
     ) -> None:
         self.console = console or get_console()
         self.prompt = (
@@ -74,6 +75,7 @@ class PromptBase(Generic[PromptType]):
         self.case_sensitive = case_sensitive
         self.show_default = show_default
         self.show_choices = show_choices
+        self.validate_error_message = validate_error_message
 
     @classmethod
     @overload
@@ -89,6 +91,7 @@ class PromptBase(Generic[PromptType]):
         show_choices: bool = True,
         default: DefaultType,
         stream: Optional[TextIO] = None,
+        validate_error_message: str = "",
     ) -> Union[DefaultType, PromptType]:
         ...
 
@@ -105,6 +108,7 @@ class PromptBase(Generic[PromptType]):
         show_default: bool = True,
         show_choices: bool = True,
         stream: Optional[TextIO] = None,
+        validate_error_message: str = "",
     ) -> PromptType:
         ...
 
@@ -121,6 +125,7 @@ class PromptBase(Generic[PromptType]):
         show_choices: bool = True,
         default: Any = ...,
         stream: Optional[TextIO] = None,
+        validate_error_message: str = "",
     ) -> Any:
         """Shortcut to construct and run a prompt loop and return the result.
 
@@ -136,6 +141,7 @@ class PromptBase(Generic[PromptType]):
             show_default (bool, optional): Show default in prompt. Defaults to True.
             show_choices (bool, optional): Show choices in prompt. Defaults to True.
             stream (TextIO, optional): Optional text file open for reading to get input. Defaults to None.
+            validate_error_message (str, optional): Customised error message to display when input is invalid.
         """
         _prompt = cls(
             prompt,
@@ -145,6 +151,7 @@ class PromptBase(Generic[PromptType]):
             case_sensitive=case_sensitive,
             show_default=show_default,
             show_choices=show_choices,
+            validate_error_message=validate_error_message,
         )
         return _prompt(default=default, stream=stream)
 
@@ -322,7 +329,11 @@ class IntPrompt(PromptBase[int]):
     """
 
     response_type = int
-    validate_error_message = "[prompt.invalid]Please enter a valid integer number"
+    def __init__(self, *args, **kwargs):
+        if not kwargs.get("validate_error_message"):
+            kwargs["validate_error_message"] = "[prompt.invalid]Please enter a valid integer number"
+
+        super().__init__(*args, **kwargs)
 
 
 class FloatPrompt(PromptBase[float]):
@@ -334,7 +345,11 @@ class FloatPrompt(PromptBase[float]):
     """
 
     response_type = float
-    validate_error_message = "[prompt.invalid]Please enter a number"
+    def __init__(self, *args, **kwargs):
+        if not kwargs.get("validate_error_message"):
+            kwargs["validate_error_message"] = "[prompt.invalid]Please enter a valid number"
+
+        super().__init__(*args, **kwargs)
 
 
 class Confirm(PromptBase[bool]):
@@ -347,8 +362,13 @@ class Confirm(PromptBase[bool]):
     """
 
     response_type = bool
-    validate_error_message = "[prompt.invalid]Please enter Y or N"
     choices: List[str] = ["y", "n"]
+
+    def __init__(self, *args, **kwargs):
+        if not kwargs.get("validate_error_message"):
+            kwargs["validate_error_message"] = "[prompt.invalid]Please enter Y or N"
+
+        super().__init__(*args, **kwargs)
 
     def render_default(self, default: DefaultType) -> Text:
         """Render the default as (y) or (n) rather than True/False."""
