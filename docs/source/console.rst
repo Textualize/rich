@@ -136,6 +136,10 @@ Run the following command to see the available choices for ``spinner``::
 
     python -m rich.spinner
 
+You can use a custom spinner by providing a dictionary with the following properties
+
+* ``"interval"`` Intended time per frame of spinner
+* ``"frames"`` Frames of the spinner. If this is a single ``str``, each character is a single frame. If a ``list[str]`` is given, each list element is a single frame.
 
 Justify / Alignment
 -------------------
