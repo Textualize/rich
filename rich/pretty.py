@@ -67,6 +67,9 @@ def _get_attr_fields(obj: Any) -> Sequence["_attr_module.Attribute[Any]"]:
     return _attr_module.fields(type(obj)) if _has_attrs else []
 
 
+IS_FROZEN = getattr(sys, "frozen", False)
+
+
 def _is_dataclass_repr(obj: object) -> bool:
     """Check if an instance of a dataclass contains the default repr.
 
@@ -79,10 +82,10 @@ def _is_dataclass_repr(obj: object) -> bool:
     # Digging in to a lot of internals here
     # Catching all exceptions in case something is missing on a non CPython implementation
     try:
-        return obj.__repr__.__code__.co_filename in (
-            dataclasses.__file__,
-            reprlib.__file__,
-        )
+        accepted = {dataclasses.__file__, reprlib.__file__}
+        if IS_FROZEN:
+            accepted.update({"dataclasses.py", "reprlib.py"})
+        return obj.__repr__.__code__.co_filename in accepted
     except Exception:  # pragma: no coverage
         return False
 
