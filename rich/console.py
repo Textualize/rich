@@ -844,7 +844,8 @@ class Console:
     def clear_live(self) -> None:
         """Clear the Live instance. Used by the Live context manager (no need to call directly)."""
         with self._lock:
-            self._live_stack.pop()
+            if self._live_stack:
+                self._live_stack.pop()
 
     def push_render_hook(self, hook: RenderHook) -> None:
         """Add a new render hook to the stack.
