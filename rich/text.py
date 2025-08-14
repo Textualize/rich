@@ -1007,7 +1007,7 @@ class Text(JupyterMixin):
         return self
 
     def append_text(self, text: "Text") -> "Text":
-        """Append another Text instance. This method is more performant that Text.append, but
+        """Append another Text instance. This method is more performant than Text.append, but
         only works for Text.
 
         Args:
