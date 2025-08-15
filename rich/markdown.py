@@ -129,22 +129,23 @@ class Heading(TextElement):
 
     @classmethod
     def create(cls, markdown: Markdown, token: Token) -> Heading:
-        return cls(token.tag)
+        return cls(token.tag, justify=markdown.justify_headers or "center")
 
     def on_enter(self, context: MarkdownContext) -> None:
         self.text = Text()
         context.enter_style(self.style_name)
 
-    def __init__(self, tag: str) -> None:
+    def __init__(self, tag: str, justify: JustifyMethod) -> None:
         self.tag = tag
         self.style_name = f"markdown.{tag}"
+        self.justify = justify
         super().__init__()
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         text = self.text
-        text.justify = "center"
+        text.justify = self.justify
         if self.tag == "h1":
             # Draw a border around h1s
             yield Panel(
@@ -502,6 +503,7 @@ class Markdown(JupyterMixin):
         markup (str): A string containing markdown.
         code_theme (str, optional): Pygments theme for code blocks. Defaults to "monokai". See https://pygments.org/styles/ for code themes.
         justify (JustifyMethod, optional): Justify value for paragraphs. Defaults to None.
+        justify_headers (JustifyMethod, optional): Justify value for headers. Defaults to None.
         style (Union[str, Style], optional): Optional style to apply to markdown.
         hyperlinks (bool, optional): Enable hyperlinks. Defaults to ``True``.
         inline_code_lexer: (str, optional): Lexer to use if inline code highlighting is
@@ -536,6 +538,7 @@ class Markdown(JupyterMixin):
         markup: str,
         code_theme: str = "monokai",
         justify: JustifyMethod | None = None,
+        justify_headers: JustifyMethod | None = None,
         style: str | Style = "none",
         hyperlinks: bool = True,
         inline_code_lexer: str | None = None,
@@ -546,6 +549,7 @@ class Markdown(JupyterMixin):
         self.parsed = parser.parse(markup)
         self.code_theme = code_theme
         self.justify: JustifyMethod | None = justify
+        self.justify_headers: JustifyMethod | None = justify_headers
         self.style = style
         self.hyperlinks = hyperlinks
         self.inline_code_lexer = inline_code_lexer

@@ -199,6 +199,229 @@ def test_table_with_empty_cells() -> None:
     assert result == expected
 
 
+def test_header_justification_default():
+    """Test that headers are center-justified by default."""
+    markdown = Markdown(
+        """\
+# Main Title
+
+## Section Title
+
+### Subsection Title
+
+This is a paragraph.
+"""
+    )
+    result = render(markdown)
+    # Check that headers are centered (padding on both sides)
+    assert (
+        "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+        in result
+    )
+    assert (
+        "┃                                            \x1b[1mMain Title\x1b[0m                                            ┃"
+        in result
+    )
+    assert (
+        "                                           \x1b[1;4mSection Title\x1b[0m                                            "
+        in result
+    )
+    assert (
+        "                                          \x1b[1mSubsection Title\x1b[0m                                          "
+        in result
+    )
+
+
+def test_header_justification_left():
+    """Test left justification for headers."""
+    markdown = Markdown(
+        """\
+# Main Title
+
+## Section Title
+
+### Subsection Title
+
+This is a paragraph.
+""",
+        justify_headers="left",
+    )
+    result = render(markdown)
+    # Check that h1 is left-justified (no leading spaces in panel)
+    assert (
+        "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+        in result
+    )
+    assert (
+        "┃ \x1b[1mMain Title\x1b[0m                                                                                       ┃"
+        in result
+    )
+    # Check that h2 and h3 are left-justified
+    assert (
+        "\x1b[1;4mSection Title\x1b[0m                                                                                       "
+        in result
+    )
+    assert (
+        "\x1b[1mSubsection Title\x1b[0m                                                                                    "
+        in result
+    )
+
+
+def test_header_justification_right():
+    """Test right justification for headers."""
+    markdown = Markdown(
+        """\
+# Main Title
+
+## Section Title
+
+### Subsection Title
+
+This is a paragraph.
+""",
+        justify_headers="right",
+    )
+    result = render(markdown)
+    # Check that h1 is right-justified (trailing spaces in panel)
+    assert (
+        "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+        in result
+    )
+    assert (
+        "┃                                                                                       \x1b[1mMain Title\x1b[0m ┃"
+        in result
+    )
+    # Check that h2 and h3 are right-justified
+    assert (
+        "                                                                                       \x1b[1;4mSection Title\x1b[0m"
+        in result
+    )
+    assert (
+        "                                                                                    \x1b[1mSubsection Title\x1b[0m"
+        in result
+    )
+
+
+def test_header_justification_all_levels():
+    """Test header justification for all header levels."""
+    markdown = Markdown(
+        """\
+# H1 Header
+
+## H2 Header
+
+### H3 Header
+
+#### H4 Header
+
+##### H5 Header
+
+###### H6 Header
+
+Paragraph text.
+""",
+        justify_headers="left",
+    )
+    result = render(markdown)
+    # All headers should be left-justified
+    assert (
+        "┃ \x1b[1mH1 Header\x1b[0m                                                                                        ┃"
+        in result
+    )
+    assert (
+        "\x1b[1;4mH2 Header\x1b[0m                                                                                           "
+        in result
+    )
+    assert (
+        "\x1b[1mH3 Header\x1b[0m                                                                                           "
+        in result
+    )
+    assert (
+        "\x1b[1;2mH4 Header\x1b[0m                                                                                           "
+        in result
+    )
+    assert (
+        "\x1b[4mH5 Header\x1b[0m                                                                                           "
+        in result
+    )
+    assert (
+        "\x1b[3mH6 Header\x1b[0m                                                                                           "
+        in result
+    )
+
+
+def test_header_justification_independent_from_paragraph():
+    """Test that header justification works independently from paragraph justification."""
+    markdown = Markdown(
+        """\
+# Centered Header
+
+This paragraph should be left-justified while the header above is centered.
+
+## Another Centered Header
+
+This paragraph should be left-justified while the header above is centered.
+""",
+        justify_headers="center",
+        justify="left",
+    )
+    result = render(markdown)
+    # Headers should be centered
+    assert (
+        "┃                                         \x1b[1mCentered Header\x1b[0m                                          ┃"
+        in result
+    )
+    assert (
+        "                                      \x1b[1;4mAnother Centered Header\x1b[0m                                       "
+        in result
+    )
+    # Paragraphs should be left-justified
+    assert (
+        "This paragraph should be left-justified while the header above is centered.                         "
+        in result
+    )
+    assert (
+        "This paragraph should be left-justified while the header above is centered.                         "
+        in result
+    )
+
+
+def test_header_justification_mixed():
+    """Test mixed justification: right headers with center paragraphs."""
+    markdown = Markdown(
+        """\
+# Right Header
+
+This paragraph should be center-justified while the header above is right-justified.
+
+## Another Right Header
+
+This paragraph should also be center-justified.
+""",
+        justify_headers="right",
+        justify="center",
+    )
+    result = render(markdown)
+    # Headers should be right-justified
+    assert (
+        "┃                                                                                     \x1b[1mRight Header\x1b[0m ┃"
+        in result
+    )
+    assert (
+        "                                                                                \x1b[1;4mAnother Right Header\x1b[0m"
+        in result
+    )
+    # Paragraphs should be center-justified (check for padding on both sides)
+    assert (
+        "        This paragraph should be center-justified while the header above is right-justified.        "
+        in result
+    )
+    assert (
+        "                          This paragraph should also be center-justified.                           "
+        in result
+    )
+
+
 if __name__ == "__main__":
     markdown = Markdown(MARKDOWN)
     rendered = render(markdown)
