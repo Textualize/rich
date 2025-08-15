@@ -32,6 +32,43 @@ def test_decode():
     assert lines == expected
 
 
+def test_from_ansi_ending_newline():
+    """Test that ending line breaks are not removed but are restored as newlines."""
+    # Line break characters recognized by str.splitlines()
+    # Source: https://docs.python.org/3/library/stdtypes.html#str.splitlines
+    line_break_chars = {
+        "\n",  # Line Feed
+        "\r",  # Carriage Return
+        "\v",  # Vertical Tab
+        "\f",  # Form Feed
+        "\x1c",  # File Separator
+        "\x1d",  # Group Separator
+        "\x1e",  # Record Separator
+        "\x85",  # Next Line (NEL)
+        "\u2028",  # Line Separator
+        "\u2029",  # Paragraph Separator
+    }
+
+    # Test single-character line breaks
+    for c in line_break_chars:
+        input_string = f"Text{c}"
+        expected_output = input_string.replace(c, "\n")
+        assert Text.from_ansi(input_string).plain == expected_output
+
+    # Test '\r\n'
+    input_string = "Text\r\n"
+    expected_output = input_string.replace("\r\n", "\n")
+    assert Text.from_ansi(input_string).plain == expected_output
+
+    # Test string without ending line break
+    input_string = "No line break"
+    assert Text.from_ansi(input_string).plain == input_string
+
+    # Test empty string
+    input_string = ""
+    assert Text.from_ansi(input_string).plain == input_string
+
+
 def test_decode_example():
     ansi_bytes = b"\x1b[01m\x1b[KC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:\x1b[m\x1b[K In function '\x1b[01m\x1b[Kmain\x1b[m\x1b[K':\n\x1b[01m\x1b[KC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:3:5:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused variable '\x1b[01m\x1b[Ka\x1b[m\x1b[K' [\x1b[01;35m\x1b[K-Wunused-variable\x1b[m\x1b[K]\n    3 | int \x1b[01;35m\x1b[Ka\x1b[m\x1b[K=1;\n      |     \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n"
     ansi_text = ansi_bytes.decode("utf-8")
@@ -45,7 +82,7 @@ def test_decode_example():
         console.print(text)
     result = capture.get()
     print(repr(result))
-    expected = "\x1b[1mC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:\x1b[0m In function '\x1b[1mmain\x1b[0m':\n\x1b[1mC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:3:5:\x1b[0m \x1b[1;35mwarning: \x1b[0munused variable '\x1b[1ma\x1b[0m' \n[\x1b[1;35m-Wunused-variable\x1b[0m]\n    3 | int \x1b[1;35ma\x1b[0m=1;\n      |     \x1b[1;35m^\x1b[0m\n"
+    expected = "\x1b[1mC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:\x1b[0m In function '\x1b[1mmain\x1b[0m':\n\x1b[1mC:\\Users\\stefa\\AppData\\Local\\Temp\\tmp3ydingba:3:5:\x1b[0m \x1b[1;35mwarning: \x1b[0munused variable '\x1b[1ma\x1b[0m' \n[\x1b[1;35m-Wunused-variable\x1b[0m]\n    3 | int \x1b[1;35ma\x1b[0m=1;\n      |     \x1b[1;35m^\x1b[0m\n\n"
     assert result == expected
 
 
@@ -55,7 +92,7 @@ def test_decode_example():
         # https://github.com/Textualize/rich/issues/2688
         (
             b"\x1b[31mFound 4 errors in 2 files (checked 18 source files)\x1b(B\x1b[m\n",
-            "Found 4 errors in 2 files (checked 18 source files)",
+            "Found 4 errors in 2 files (checked 18 source files)\n",
         ),
         # https://mail.python.org/pipermail/python-list/2007-December/424756.html
         (b"Hallo", "Hallo"),
