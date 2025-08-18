@@ -1,3 +1,4 @@
+import sys
 from typing import Any, Generic, List, Optional, TextIO, TypeVar, Union, overload
 
 from . import get_console
@@ -290,6 +291,8 @@ class PromptBase(Generic[PromptType]):
             self.pre_prompt()
             prompt = self.make_prompt(default)
             value = self.get_input(self.console, prompt, self.password, stream=stream)
+            if ("readline" in sys.modules) and (value == ""):
+                print("")
             if value == "" and default != ...:
                 return default
             try:
