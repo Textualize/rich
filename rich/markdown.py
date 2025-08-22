@@ -144,7 +144,7 @@ class Heading(TextElement):
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         text = self.text
-        text.justify = "center"
+        text.justify = "left"
         if self.tag == "h1":
             # Draw a border around h1s
             yield Panel(
