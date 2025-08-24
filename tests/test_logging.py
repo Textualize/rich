@@ -160,9 +160,3 @@ def test_markup_and_highlight():
     render_plain = handler.console.file.getvalue()
     assert "FORMATTER" in render_plain
     assert log_message in render_plain
-
-
-if __name__ == "__main__":
-    render = make_log()
-    print(render)
-    print(repr(render))

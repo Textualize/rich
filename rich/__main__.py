@@ -207,6 +207,8 @@ Supports much of the *markdown* __syntax__!
 
 
 if __name__ == "__main__":  # pragma: no cover
+    from rich.panel import Panel
+
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
@@ -227,47 +229,17 @@ if __name__ == "__main__":  # pragma: no cover
     c = Console(record=True)
     c.print(test_card)
 
-    print(f"rendered in {pre_cache_taken}ms (cold cache)")
-    print(f"rendered in {taken}ms (warm cache)")
-
-    from rich.panel import Panel
-
     console = Console()
-
-    sponsor_message = Table.grid(padding=1)
-    sponsor_message.add_column(style="green", justify="right")
-    sponsor_message.add_column(no_wrap=True)
-
-    sponsor_message.add_row(
-        "Textualize",
-        "[u blue link=https://github.com/textualize]https://github.com/textualize",
-    )
-    sponsor_message.add_row(
-        "Twitter",
-        "[u blue link=https://twitter.com/willmcgugan]https://twitter.com/willmcgugan",
-    )
-
-    intro_message = Text.from_markup(
-        """\
-We hope you enjoy using Rich!
-
-Rich is maintained with [red]:heart:[/] by [link=https://www.textualize.io]Textualize.io[/]
-
-- Will McGugan"""
-    )
-
-    message = Table.grid(padding=2)
-    message.add_column()
-    message.add_column(no_wrap=True)
-    message.add_row(intro_message, sponsor_message)
-
+    console.print(f"[dim]rendered in [not dim]{pre_cache_taken}ms[/] (cold cache)")
+    console.print(f"[dim]rendered in [not dim]{taken}ms[/] (warm cache)")
+    console.print()
     console.print(
         Panel.fit(
-            message,
-            box=box.ROUNDED,
-            padding=(1, 2),
-            title="[b red]Thanks for trying out Rich!",
-            border_style="bright_blue",
-        ),
-        justify="center",
+            "[b magenta]Hope you enjoy using Rich![/]\n\n"
+            "Please consider sponsoring me if you get value from my work.\n\n"
+            "Even the price of a ☕ can brighten my day!\n\n"
+            "https://github.com/sponsors/willmcgugan",
+            border_style="red",
+            title="Help ensure Rich is maintained",
+        )
     )

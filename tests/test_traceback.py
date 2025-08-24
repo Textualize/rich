@@ -358,3 +358,42 @@ def test_traceback_finely_grained() -> None:
         start, end = last_instruction
         print(start, end)
         assert start[0] == end[0]
+
+
+@pytest.mark.skipif(
+    sys.version_info.minor < 11, reason="Not supported before Python 3.11"
+)
+def test_notes() -> None:
+    """Check traceback captures __note__."""
+    try:
+        1 / 0
+    except Exception as error:
+        error.add_note("Hello")
+        error.add_note("World")
+        traceback = Traceback()
+
+        assert traceback.trace.stacks[0].notes == ["Hello", "World"]
+
+
+def test_recursive_exception() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3708
+
+    Test this doesn't create an infinite loop.
+
+    """
+    console = Console()
+
+    def foo() -> None:
+        try:
+            raise RuntimeError("Hello")
+        except Exception as e:
+            raise e from e
+
+    def bar() -> None:
+        try:
+            foo()
+        except Exception as e:
+            assert e is e.__cause__
+            console.print_exception(show_locals=True)
+
+    bar()
