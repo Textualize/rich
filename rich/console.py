@@ -996,12 +996,13 @@ class Console:
     @property
     def options(self) -> ConsoleOptions:
         """Get default console options."""
+        size = self.size
         return ConsoleOptions(
-            max_height=self.size.height,
-            size=self.size,
+            max_height=size.height,
+            size=size,
             legacy_windows=self.legacy_windows,
             min_width=1,
-            max_width=self.width,
+            max_width=size.width,
             encoding=self.encoding,
             is_terminal=self.is_terminal,
         )
