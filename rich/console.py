@@ -1735,14 +1735,15 @@ class Console:
                     > 1
                 ):
                     new_segments.insert(0, Segment.line())
+            buffer_extend = self._buffer.extend
             if crop:
-                buffer_extend = self._buffer.extend
                 for line in Segment.split_and_crop_lines(
                     new_segments, self.width, pad=False
                 ):
                     buffer_extend(line)
             else:
-                self._buffer.extend(new_segments)
+                for line in Segment.split_lines(new_segments, include_new_lines=True):
+                    buffer_extend(line)
 
     def print_json(
         self,

@@ -247,17 +247,23 @@ class Segment(NamedTuple):
             return filterfalse(attrgetter("control"), segments)
 
     @classmethod
-    def split_lines(cls, segments: Iterable["Segment"]) -> Iterable[List["Segment"]]:
+    def split_lines(
+        cls,
+        segments: Iterable["Segment"],
+        include_new_lines: bool = False,
+    ) -> Iterable[List["Segment"]]:
         """Split a sequence of segments in to a list of lines.
 
         Args:
             segments (Iterable[Segment]): Segments potentially containing line feeds.
+            include_new_lines (bool): Include newline segments in results. Defaults to False.
 
         Yields:
             Iterable[List[Segment]]: Iterable of segment lists, one per line.
         """
         line: List[Segment] = []
         append = line.append
+        new_line_segment = cls.line()
 
         for segment in segments:
             if "\n" in segment.text and not segment.control:
@@ -267,6 +273,8 @@ class Segment(NamedTuple):
                     if _text:
                         append(cls(_text, style))
                     if new_line:
+                        if include_new_lines:
+                            line.append(new_line_segment)
                         yield line
                         line = []
                         append = line.append
@@ -292,6 +300,7 @@ class Segment(NamedTuple):
             length (int): Desired line length.
             style (Style, optional): Style to use for any padding.
             pad (bool): Enable padding of lines that are less than `length`.
+            include_new_lines (bool): Include newline segments in results. Defaults to True.
 
         Returns:
             Iterable[List[Segment]]: An iterable of lines of segments.
