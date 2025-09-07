@@ -47,6 +47,7 @@ The following people have contributed to the development of Rich:
 - [Antony Milne](https://github.com/AntonyMilneQB)
 - [Michael Milton](https://github.com/multimeric)
 - [Martina Oefelein](https://github.com/oefe)
+- [Igor Oleynik](https://github.com/KiGamji)
 - [Nathan Page](https://github.com/nathanrpage97)
 - [Dave Pearson](https://github.com/davep/)
 - [Avi Perl](https://github.com/avi-perl)

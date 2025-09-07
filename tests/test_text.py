@@ -641,6 +641,22 @@ def test_no_wrap_no_crop():
     )
 
 
+def test_no_wrap_no_strip_trailing_space():
+    """Test that Text.wrap doesn't strip trailing spaces from styled segments in no wrap mode."""
+    console = Console(width=40)
+
+    text = Text()
+    text.append("x" * 35)
+    text.append(" test ", style="white on blue")
+
+    lines = text.wrap(console, width=40, no_wrap=True)
+
+    assert len(lines) == 1
+    result_text = lines[0]
+
+    assert result_text.plain == "x" * 35 + " test "
+
+
 def test_fit():
     text = Text("Hello\nWorld")
     lines = text.fit(3)
