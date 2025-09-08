@@ -6,11 +6,27 @@ For new features or if there is any doubt in how to fix a bug, you might want
 to open an issue prior to starting work, or email willmcgugan+rich@gmail.com
 to discuss it first.
 
+
 ## Prerequisites
 
-Rich uses [poetry](https://python-poetry.org/docs/) for packaging and
-dependency management. To start developing with Rich, install Poetry
-using the [recommended method](https://python-poetry.org/docs/#installation).
+Rich uses [poetry](https://python-poetry.org/docs/) for packaging and dependency management.
+To start developing with Rich, you need to have Poetry installed. If you don't have Poetry, install it using the recommended method:
+
+**Windows PowerShell:**
+
+```powershell
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+```
+
+**macOS/Linux:**
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+For more details, see the [Poetry installation docs](https://python-poetry.org/docs/#installation).
+
+After installing Poetry, ensure it is available in your PATH. You may need to restart your terminal or follow any instructions provided by the installer.
 
 Next, you'll need to create a _fork_ (your own personal copy) of the Rich repository, and clone that fork 
 on to your local machine. GitHub offers a great tutorial for this process [here](https://docs.github.com/en/get-started/quickstart/fork-a-repo).
