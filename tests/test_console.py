@@ -210,6 +210,65 @@ def test_print_text_multiple() -> None:
     assert console.file.getvalue() == "\x1b[1mfoo\x1b[0m bar baz\n"
 
 
+def test_print_soft_wrap_no_styled_newlines() -> None:
+    """Test that style is not applied to newlines when soft wrapping."""
+
+    str1 = "line1\nline2\n"
+    str2 = "line5\nline6\n"
+    sep = "(sep1)\n(sep2)\n"
+    end = "(end1)\n(end2)\n"
+    style = "blue on white"
+
+    # All newlines should appear outside of ANSI style sequences.
+    expected = (
+        "\x1b[34;47mline1\x1b[0m\n"
+        "\x1b[34;47mline2\x1b[0m\n"
+        "\x1b[34;47m(sep1)\x1b[0m\n"
+        "\x1b[34;47m(sep2)\x1b[0m\n"
+        "\x1b[34;47mline5\x1b[0m\n"
+        "\x1b[34;47mline6\x1b[0m\n"
+        "\x1b[34;47m(end1)\x1b[0m\n"
+        "\x1b[34;47m(end2)\x1b[0m\n"
+    )
+
+    console = Console(color_system="truecolor")
+    with console.capture() as capture:
+        console.print(str1, str2, sep=sep, end=end, style=style, soft_wrap=True)
+    assert capture.get() == expected
+
+
+def test_print_word_wrap_no_styled_newlines() -> None:
+    """
+    Test that word wrapping does not insert styled newlines
+    or apply style to existing newlines.
+    """
+    str1 = "this\nwill word wrap\n"
+    str2 = "and\nso will this\n"
+    sep = "(sep1)\n(sep2)\n"
+    end = "(end1)\n(end2)\n"
+    style = "blue on white"
+
+    # All newlines should appear outside of ANSI style sequences.
+    expected = (
+        "\x1b[34;47mthis\x1b[0m\n"
+        "\x1b[34;47mwill word \x1b[0m\n"
+        "\x1b[34;47mwrap\x1b[0m\n"
+        "\x1b[34;47m(sep1)\x1b[0m\n"
+        "\x1b[34;47m(sep2)\x1b[0m\n"
+        "\x1b[34;47mand\x1b[0m\n"
+        "\x1b[34;47mso will \x1b[0m\n"
+        "\x1b[34;47mthis\x1b[0m\n"
+        "\x1b[34;47m(end1)\x1b[0m\n"
+        "\x1b[34;47m(end2)\x1b[0m\n"
+    )
+
+    # Set a width which will cause word wrapping.
+    console = Console(color_system="truecolor", width=10)
+    with console.capture() as capture:
+        console.print(str1, str2, sep=sep, end=end, style=style, soft_wrap=False)
+    assert capture.get() == expected
+
+
 def test_print_json() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print_json('[false, true, null, "foo"]', indent=4)
