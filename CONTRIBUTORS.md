@@ -61,6 +61,7 @@ The following people have contributed to the development of Rich:
 - [Min RK](https://github.com/minrk)
 - [Clément Robert](https://github.com/neutrinoceros)
 - [Brian Rutledge](https://github.com/bhrutledge)
+- [royiro](https://github.com/royiro10)
 - [Tushar Sadhwani](https://github.com/tusharsadhwani)
 - [Luca Salvarani](https://github.com/LukeSavefrogs)
 - [Paul Sanders](https://github.com/sanders41)
