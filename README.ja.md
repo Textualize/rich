@@ -232,7 +232,7 @@ console.print(table)
 
 ## プログレスバー
 
-Richでは複数のちらつきのないの[プログレスバー](https://rich.readthedocs.io/en/latest/progress.html)を表示して、長時間のタスクを追跡することができます。
+Richでは複数のちらつきのない[プログレスバー](https://rich.readthedocs.io/en/latest/progress.html)を表示して、長時間のタスクを追跡することができます。
 
 基本的な使い方としては、任意のシーケンスを `track` 関数でラップし、その結果を繰り返し処理します。以下に例を示します:
 
