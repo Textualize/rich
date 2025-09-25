@@ -87,6 +87,7 @@ The following people have contributed to the development of Rich:
 - [James Addison](https://github.com/jayaddison)
 - [Pierro](https://github.com/xpierroz)
 - [Bernhard Wagner](https://github.com/bwagner)
+- [Tony Seah](https://github.com/pkusnail)
 - [Aaron Beaudoin](https://github.com/AaronBeaudoin)
 - [Sam Woodward](https://github.com/PyWoody)
 - [L. Yeung](https://github.com/lewis-yeung)
