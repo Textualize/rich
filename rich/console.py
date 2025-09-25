@@ -548,31 +548,31 @@ class ConsoleThreadLocals(threading.local):
 
     def __getstate__(self):
         """Support for pickle serialization.
-        
+
         Returns the serializable state of the thread-local object.
         Note: This loses the thread-local nature, but allows serialization
         for caching and other use cases.
-        
+
         Returns:
             Dict[str, Any]: The serializable state containing theme_stack,
                            buffer, and buffer_index.
         """
         return {
-            'theme_stack': self.theme_stack,
-            'buffer': self.buffer.copy(),  # Create a copy to be safe
-            'buffer_index': self.buffer_index
+            "theme_stack": self.theme_stack,
+            "buffer": self.buffer.copy(),  # Create a copy to be safe
+            "buffer_index": self.buffer_index,
         }
-    
+
     def __setstate__(self, state):
         """Support for pickle deserialization.
-        
+
         Args:
             state (Dict[str, Any]): The state dictionary from __getstate__
         """
         # Restore the state
-        self.theme_stack = state['theme_stack']
-        self.buffer = state['buffer']
-        self.buffer_index = state['buffer_index']
+        self.theme_stack = state["theme_stack"]
+        self.buffer = state["buffer"]
+        self.buffer_index = state["buffer_index"]
 
 
 class RenderHook(ABC):
@@ -2638,36 +2638,37 @@ class Console:
         )
         with open(path, "w", encoding="utf-8") as write_file:
             write_file.write(svg)
-    
+
     def __getstate__(self):
         """Support for pickle serialization.
-        
+
         Returns the serializable state of the Console object.
         Note: Thread locks are recreated during deserialization.
-        
+
         Returns:
             Dict[str, Any]: The serializable state of the Console.
         """
         # Get all instance attributes except locks
         state = self.__dict__.copy()
-        
+
         # Remove the unpickleable locks
-        state.pop('_lock', None)
-        state.pop('_record_buffer_lock', None)
-        
+        state.pop("_lock", None)
+        state.pop("_record_buffer_lock", None)
+
         return state
-    
+
     def __setstate__(self, state):
         """Support for pickle deserialization.
-        
+
         Args:
             state (Dict[str, Any]): The state dictionary from __getstate__
         """
         # Restore the state
         self.__dict__.update(state)
-        
+
         # Recreate the locks
         import threading
+
         self._lock = threading.RLock()
         self._record_buffer_lock = threading.RLock()
 
