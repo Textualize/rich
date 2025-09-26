@@ -118,7 +118,7 @@ class ConsoleDimensions(NamedTuple):
 @dataclass
 class ConsoleOptions:
     """Options for __rich_console__ method."""
-
+    
     size: ConsoleDimensions
     """Size of console."""
     legacy_windows: bool
@@ -143,7 +143,7 @@ class ConsoleOptions:
     """Highlight override for render_str."""
     markup: Optional[bool] = None
     """Enable markup when rendering strings."""
-    height: Optional[int] = None
+    render_height: Optional[int] = None
 
     @property
     def ascii_only(self) -> bool:
@@ -194,7 +194,7 @@ class ConsoleOptions:
         if not isinstance(height, NoChange):
             if height is not None:
                 options.max_height = height
-            options.height = None if height is None else max(0, height)
+            options.render_height = None if height is None else max(0, height)
         return options
 
     def update_width(self, width: int) -> "ConsoleOptions":
@@ -212,40 +212,35 @@ class ConsoleOptions:
 
     def update_height(self, height: int) -> "ConsoleOptions":
         """Update the height, and return a copy.
-
         Args:
             height (int): New height
-
         Returns:
             ~ConsoleOptions: New Console options instance.
         """
         options = self.copy()
-        options.max_height = options.height = height
+        options.max_height = options.render_height = height
         return options
 
     def reset_height(self) -> "ConsoleOptions":
         """Return a copy of the options with height set to ``None``.
-
         Returns:
             ~ConsoleOptions: New console options instance.
         """
         options = self.copy()
-        options.height = None
+        options.render_height = None
         return options
 
     def update_dimensions(self, width: int, height: int) -> "ConsoleOptions":
         """Update the width and height, and return a copy.
-
         Args:
             width (int): New width (sets both min_width and max_width).
             height (int): New height.
-
         Returns:
             ~ConsoleOptions: New console options instance.
         """
         options = self.copy()
         options.min_width = options.max_width = max(0, width)
-        options.height = options.max_height = height
+        options.render_height = options.max_height = height
         return options
 
 
