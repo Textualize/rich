@@ -1,5 +1,7 @@
 """Tests for the highlighter classes."""
+
 import json
+import re
 from typing import List
 
 import pytest
@@ -11,6 +13,8 @@ from rich.highlighter import (
     ReprHighlighter,
 )
 from rich.text import Span, Text
+
+HEX_LITERAL_RE = re.compile(r"[+-]?0x[0-9a-f](?:_?[0-9a-f])*$", re.IGNORECASE)
 
 
 def test_wrong_type():
@@ -165,6 +169,38 @@ def test_highlight_regex(test: str, spans: List[Span]):
     highlighter.highlight(text)
     print(text.spans)
     assert text.spans == spans
+
+
+@pytest.mark.parametrize(
+    "literal, should_highlight",
+    [
+        ("0xFF", True),
+        ("0Xff", True),
+        ("-0x1A", True),
+        ("+0x2a", True),
+        ("0xdead_beef", True),
+        ("0xDEAD_BEEF", True),
+        ("(0x2A)", True),
+        (",0x2A", True),
+        ("1920x1080", False),
+        ("abc0x123", False),
+        ("eth0x1", False),
+        ("foo0xFFbar", False),
+        ("0xdead__beef", False),
+        ("0x_deadbeef", False),
+        ("0x123_", False),
+    ],
+)
+def test_hex_boundaries(literal: str, should_highlight: bool) -> None:
+    text = Text(literal)
+    highlighter = ReprHighlighter()
+    highlighter.highlight(text)
+    has_hex_highlight = any(
+        span.style == "repr.number"
+        and HEX_LITERAL_RE.fullmatch(text.plain[span.start : span.end])
+        for span in text.spans
+    )
+    assert has_hex_highlight is should_highlight
 
 
 def test_highlight_json_with_indent():
