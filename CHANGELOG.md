@@ -2147,6 +2147,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[14.1.0]: https://github.com/textualize/rich/compare/v14.1.0...v14.2.0
 [14.0.0]: https://github.com/textualize/rich/compare/v14.0.0...v14.1.0
 [14.0.0]: https://github.com/textualize/rich/compare/v13.9.4...v14.0.0
 [13.9.4]: https://github.com/textualize/rich/compare/v13.9.3...v13.9.4
