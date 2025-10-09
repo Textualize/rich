@@ -38,6 +38,10 @@ skip_py313 = pytest.mark.skipif(
     sys.version_info.minor == 13 and sys.version_info.major == 3,
     reason="rendered differently on py3.13",
 )
+skip_py314 = pytest.mark.skipif(
+    sys.version_info.minor == 14 and sys.version_info.major == 3,
+    reason="rendered differently on py3.14",
+)
 
 
 def test_install() -> None:
@@ -639,6 +643,7 @@ def test_attrs_empty() -> None:
 @skip_py311
 @skip_py312
 @skip_py313
+@skip_py314
 def test_attrs_broken() -> None:
     @attr.define
     class Foo:

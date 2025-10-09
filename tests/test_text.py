@@ -843,7 +843,12 @@ def test_assemble():
 def test_assemble_meta():
     text = Text.assemble("foo", ("bar", "bold"), meta={"foo": "bar"})
     assert str(text) == "foobar"
-    assert text._spans == [Span(3, 6, "bold"), Span(0, 6, Style(meta={"foo": "bar"}))]
+
+    spans = text._spans
+    expected = [Span(3, 6, "bold"), Span(0, 6, Style(meta={"foo": "bar"}))]
+
+    assert spans == expected
+
     console = Console()
     assert text.get_style_at_offset(console, 0).meta == {"foo": "bar"}
 
