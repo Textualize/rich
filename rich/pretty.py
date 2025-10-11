@@ -1,5 +1,6 @@
 import builtins
 import collections
+import pathlib
 import dataclasses
 import inspect
 import os
@@ -816,6 +817,12 @@ def traverse(
                     child_node.key_separator = "="
                     append(child_node)
             pop_visited(obj_id)
+        
+        # START of new code block
+        elif isinstance(obj, pathlib.Path):
+            node = Node(value_repr=repr(str(obj)))
+        # END of new code block
+
         elif _safe_isinstance(obj, _CONTAINERS):
             for container_type in _CONTAINERS:
                 if _safe_isinstance(obj, container_type):
