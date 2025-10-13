@@ -10,7 +10,7 @@
 [English readme](https://github.com/textualize/rich/blob/master/README.md)
  • [简体中文 readme](https://github.com/textualize/rich/blob/master/README.cn.md)
  • [正體中文 readme](https://github.com/textualize/rich/blob/master/README.zh-tw.md)
- • [Lengua española readme](https://github.com/textualize/rich/blob/master/README.es.md)
+ • [Español readme](https://github.com/textualize/rich/blob/master/README.es.md)
  • [Deutsche readme](https://github.com/textualize/rich/blob/master/README.de.md)
  • [Läs på svenska](https://github.com/textualize/rich/blob/master/README.sv.md)
  • [日本語 readme](https://github.com/textualize/rich/blob/master/README.ja.md)
@@ -37,7 +37,7 @@ Vea lo que [la gente dice sobre Rich](https://www.willmcgugan.com/blog/pages/pos
 
 ## Compatibilidad
 
-Rich funciona con Linux, OSX y Windows. True color / emoji funciona con la nueva Terminal de Windows, la terminal clásica está limitada a 8 colores. Rich requiere Python 3.6.3 o posterior.
+Rich funciona con Linux, macOS y Windows. True color / emoji funciona con la nueva Terminal de Windows; la terminal clásica está limitada a 16 colores. Rich requiere Python 3.8 o posterior.
 
 Rich funciona con [Jupyter notebooks](https://jupyter.org/) sin necesidad de configuración adicional.
 
