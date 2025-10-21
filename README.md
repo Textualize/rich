@@ -437,3 +437,27 @@ See also [Rich CLI](https://github.com/textualize/rich-cli) for a command line a
 See also Rich's sister project, [Textual](https://github.com/Textualize/textual), which you can use to build sophisticated User Interfaces in the terminal.
 
 ![textual-splash](https://github.com/user-attachments/assets/4caeb77e-48c0-4cf7-b14d-c53ded855ffd)
+
+### Quick Demo (Windows PowerShell)
+
+```powershell
+python -m venv .venv
+. .\.venv\Scripts\Activate.ps1
+pip install -U pip
+pip install -e .
+python - << "PY"
+from rich import print
+from rich.table import Table
+print("[bold green]Rich works![/]")
+t = Table(title="Sample Results"); t.add_column("Name"); t.add_column("Score", justify="right")
+t.add_row("Alpha","92"); t.add_row("Beta","87"); t.add_row("Gamma","95")
+print(t)
+PY
+
+**“Run Tests (dev setup)”**
+```md
+### Run Tests (dev setup)
+
+```bash
+pip install pytest attrs
+pytest -q
