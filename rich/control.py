@@ -29,13 +29,15 @@ CONTROL_CODES_FORMAT: Dict[int, Callable[..., str]] = {
     ControlType.BELL: lambda: "\x07",
     ControlType.CARRIAGE_RETURN: lambda: "\r",
     ControlType.HOME: lambda: "\x1b[H",
-    ControlType.CLEAR: lambda: "\x1b[2J",
+    ControlType.CLEAR: lambda param: f"\x1b[{param}J",
     ControlType.ENABLE_ALT_SCREEN: lambda: "\x1b[?1049h",
     ControlType.DISABLE_ALT_SCREEN: lambda: "\x1b[?1049l",
     ControlType.SHOW_CURSOR: lambda: "\x1b[?25h",
     ControlType.HIDE_CURSOR: lambda: "\x1b[?25l",
     ControlType.CURSOR_UP: lambda param: f"\x1b[{param}A",
     ControlType.CURSOR_DOWN: lambda param: f"\x1b[{param}B",
+    ControlType.CURSOR_PREV_LINE: lambda param: f"\x1b[{param}F",
+    ControlType.CURSOR_NEXT_LINE: lambda param: f"\x1b[{param}E",
     ControlType.CURSOR_FORWARD: lambda param: f"\x1b[{param}C",
     ControlType.CURSOR_BACKWARD: lambda param: f"\x1b[{param}D",
     ControlType.CURSOR_MOVE_TO_COLUMN: lambda param: f"\x1b[{param+1}G",
@@ -144,7 +146,7 @@ class Control:
     @classmethod
     def clear(cls) -> "Control":
         """Clear the screen."""
-        return cls(ControlType.CLEAR)
+        return cls((ControlType.CLEAR, 2))
 
     @classmethod
     def show_cursor(cls, show: bool) -> "Control":

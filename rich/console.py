@@ -55,7 +55,7 @@ from .protocol import rich_cast
 from .region import Region
 from .scope import render_scope
 from .screen import Screen
-from .segment import Segment
+from .segment import Segment, ControlType
 from .style import Style, StyleType
 from .styled import Styled
 from .terminal_theme import DEFAULT_TERMINAL_THEME, SVG_EXPORT_THEME, TerminalTheme
@@ -1395,6 +1395,13 @@ class Console:
                     render_height,
                 )
             )
+
+            for line in lines:
+                erase_control = Control(
+                    (ControlType.ERASE_IN_LINE, 0)
+                )
+                line.append(erase_control.segment)
+
             if render_options.height is not None:
                 extra_lines = render_options.height - len(lines)
                 if extra_lines > 0:
@@ -2043,6 +2050,12 @@ class Console:
         """Write the buffer to the output file."""
 
         with self._lock:
+            self._buffer.append(
+                Control(
+                    (ControlType.CLEAR, 0)
+                ).segment
+            )
+
             if self.record and not self._buffer_index:
                 with self._record_buffer_lock:
                     self._record_buffer.extend(self._buffer[:])
@@ -2062,7 +2075,6 @@ class Console:
                                 use_legacy_windows_render = (
                                     fileno in _STD_STREAMS_OUTPUT
                                 )
-
                         if use_legacy_windows_render:
                             from rich._win32_console import LegacyWindowsTerm
                             from rich._windows_renderer import legacy_windows_render

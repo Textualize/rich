@@ -51,6 +51,8 @@ class ControlType(IntEnum):
     CURSOR_MOVE_TO = 14
     ERASE_IN_LINE = 15
     SET_WINDOW_TITLE = 16
+    CURSOR_PREV_LINE = 17
+    CURSOR_NEXT_LINE = 18
 
 
 ControlCode = Union[
