@@ -47,12 +47,8 @@ class LiveRender:
         if self._shape is not None:
             _, height = self._shape
             if height > 1:
-                return Control(
-                    (ControlType.CURSOR_PREV_LINE, height - 1)
-                )
-            return Control(
-                ControlType.CARRIAGE_RETURN
-            )
+                return Control((ControlType.CURSOR_PREV_LINE, height - 1))
+            return Control(ControlType.CARRIAGE_RETURN)
         return Control()
 
     def restore_cursor(self) -> Control:

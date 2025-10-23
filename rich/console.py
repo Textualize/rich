@@ -1397,9 +1397,7 @@ class Console:
             )
 
             for line in lines:
-                erase_control = Control(
-                    (ControlType.ERASE_IN_LINE, 0)
-                )
+                erase_control = Control((ControlType.ERASE_IN_LINE, 0))
                 line.append(erase_control.segment)
 
             if render_options.height is not None:
@@ -2050,11 +2048,7 @@ class Console:
         """Write the buffer to the output file."""
 
         with self._lock:
-            self._buffer.append(
-                Control(
-                    (ControlType.CLEAR, 0)
-                ).segment
-            )
+            self._buffer.append(Control((ControlType.CLEAR, 0)).segment)
 
             if self.record and not self._buffer_index:
                 with self._record_buffer_lock:
