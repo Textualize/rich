@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Added `CURSOR_PREV_LINE` (`\e[nF`) and `CURSOR_PREV_LINE` (`\e[nG`) to `ControlType`.
+- Changed `Console.render_lines` to include `ControlType.ERASE_IN_LINE` at the end of each line. 
+- Changed `Console.render_lines` to include a `ControlType.CLEAR` sequence at the end of the last line, if present.
+- Changed `LiveRender.position_cursor`'s cursor-moving logic and removed line clearing from there.
+
+
+To achieve this, I had to introduce `\e[nF` (move to the start of n lines up) in `ControlType` and I also included the not-used `\e[nG` (move to the start of n lines down) for completeness. I also had to modify `ControlType.CLEAR` to accept a parameter and backfixed any cases where it was already used.
+
 ## [14.2.0] - 2025-10-09
 
 ### Changed
