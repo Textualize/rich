@@ -2,7 +2,7 @@
 name = "rich"
 homepage = "https://github.com/Textualize/rich"
 documentation = "https://rich.readthedocs.io/en/latest/"
-version = "14.1.0"
+version = "14.2.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 authors = ["Will McGugan <willmcgugan@gmail.com>"]
 license = "MIT"
@@ -21,6 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Typing :: Typed",
 ]
 include = ["rich/py.typed"]
@@ -42,7 +43,6 @@ mypy = "^1.11"
 pytest-cov = "^3.0.0"
 attrs = "^21.4.0"
 pre-commit = "^2.17.0"
-asv = "^0.5.1"
 typing-extensions = ">=4.0.0, <5.0"
 
 [build-system]

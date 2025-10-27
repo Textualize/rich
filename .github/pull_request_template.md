@@ -13,6 +13,12 @@ If there is any doubt, please open a discussion first.
 
 -->
 
+<!--
+*Are you contributing typo fixes?*
+
+If your PR solely consists of typos, at least one must be in the docs to warrant an addition to CONTRIBUTORS.md
+-->
+
 ## Type of changes
 
 - [ ] Bug fix
@@ -24,7 +30,7 @@ If there is any doubt, please open a discussion first.
 ## Checklist
 
 - [ ] I've run the latest [black](https://github.com/psf/black) with default args on new code.
-- [ ] I've updated CHANGELOG.md and CONTRIBUTORS.md where appropriate.
+- [ ] I've updated CHANGELOG.md and CONTRIBUTORS.md where appropriate (see note about typos above).
 - [ ] I've added tests for new code.
 - [ ] I accept that @willmcgugan may be pedantic in the code review.
 
