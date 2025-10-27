@@ -178,16 +178,17 @@ class Columns(JupyterMixin):
         padding = left + right
         renderables = [*self.renderables, title] if title else [*self.renderables]
 
+        maximum_width = sum(
+            measure_renderables(
+                console,
+                options.update_width(options.max_width - padding - 2),
+                [renderable],
+            ).maximum
+            for renderable in renderables
+        )
+
         if self.width is None:
-            width = (
-                measure_renderables(
-                    console,
-                    options.update_width(options.max_width - padding - 2),
-                    renderables,
-                ).maximum
-                + padding
-                + 2
-            )
+            width = maximum_width + padding + 2
         else:
             width = self.width
         return Measurement(width, width)
