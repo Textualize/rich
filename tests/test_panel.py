@@ -3,6 +3,7 @@ import io
 import pytest
 
 from rich.console import Console
+from rich.columns import Columns
 from rich.panel import Panel
 from rich.segment import Segment
 from rich.style import Style
@@ -16,6 +17,8 @@ tests = [
     Panel(Panel("Hello, World", padding=0), padding=0),
     Panel("Hello, World", title="FOO", padding=0),
     Panel("Hello, World", subtitle="FOO", padding=0),
+    Panel(Columns(["Hello", "World"]), padding=0),
+    Panel(Columns(["Hello", "World"]), expand=False, padding=0),
 ]
 
 expected = [
@@ -26,6 +29,8 @@ expected = [
     "╭────────────────────────────────────────────────╮\n│╭──────────────────────────────────────────────╮│\n││Hello, World                                  ││\n│╰──────────────────────────────────────────────╯│\n╰────────────────────────────────────────────────╯\n",
     "╭───────────────────── FOO ──────────────────────╮\n│Hello, World                                    │\n╰────────────────────────────────────────────────╯\n",
     "╭────────────────────────────────────────────────╮\n│Hello, World                                    │\n╰───────────────────── FOO ──────────────────────╯\n",
+    "╭────────────────────────────────────────────────╮\n│Hello World                                     │\n╰────────────────────────────────────────────────╯\n",
+    "╭──────────────╮\n│Hello World   │\n╰──────────────╯\n",
 ]
 
 
