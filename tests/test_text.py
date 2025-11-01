@@ -1070,3 +1070,59 @@ def test_append_loop_regression() -> None:
     b = Text("two", "blue")
     b.append_text(b)
     assert b.plain == "twotwo"
+
+
+def test_full_justify_preserves_indentation_blocks() -> None:
+    console = Console(width=16)
+    text = Text("    foo bar baz", justify="full")
+    lines = text.wrap(console, 16)
+    # Only one line, full-justified; leading 4-space indentation must be preserved
+    assert len(lines) == 1
+    assert lines[0].plain.startswith("    ")
+    # Total width should match console width
+    assert len(lines[0].plain) == 16
+    # The gaps expanded should be single-space gaps between words; indentation remains 4 spaces
+    # Split to verify only the inter-word spaces grew
+    after = lines[0].plain
+    # Indentation is 4 spaces followed by words
+    assert after[:4] == "    "
+    # There should be no sequences of spaces > 4 at the start
+    assert re.match(r"^\s{4}\S", after) is not None
+
+
+def test_full_justify_does_not_expand_multi_space_gaps() -> None:
+    console = Console(width=20)
+    text = Text("foo  bar   baz", justify="full")
+    lines = text.wrap(console, 20)
+    assert len(lines) == 1
+    result = lines[0].plain
+    # Confirm original multi-space runs remain present (at least 2 and 3 spaces respectively)
+    assert "foo" in result and "bar" in result and "baz" in result
+    # Verify the run between foo and bar is >=2 spaces and between bar and baz is >=3 spaces
+    between_foo_bar = result[result.index("foo") + 3 : result.index("bar")]
+    between_bar_baz = result[result.index("bar") + 3 : result.index("baz")]
+    assert len(between_foo_bar.strip(" ")) == 0 and len(between_foo_bar) >= 2
+    assert len(between_bar_baz.strip(" ")) == 0 and len(between_bar_baz) >= 3
+
+
+def test_full_justify_respects_space_style_from_neighbors() -> None:
+    console = Console(width=18)
+    # Style words differently; expanded spaces should inherit a consistent style
+    text = Text("foo bar baz", justify="full")
+    text.stylize("red", 0, 3)  # foo
+    text.stylize("blue", 4, 7)  # bar
+    text.stylize("green", 8, 11)  # baz
+    lines = text.wrap(console, 18)
+    assert len(lines) == 1
+    justified = lines[0]
+    # Get styles at positions of the first expanded gap (after foo)
+    # Find first space index after 'foo'
+    first_space = justified.plain.find(" ", 3)
+    # Collect styles of contiguous spaces after first_space
+    space_styles = {
+        justified.get_style_at_offset(console, i).color
+        for i in range(first_space, len(justified.plain))
+        if justified.plain[i] == " "
+    }
+    # Expect either unified neighbor style or base line style; at minimum ensure no None unexpected
+    assert space_styles

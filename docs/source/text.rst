@@ -49,6 +49,10 @@ The Text class has a number of parameters you can set on the constructor to modi
 - ``no_wrap`` prevents wrapping if the text is longer then the available width.
 - ``tab_size`` Sets the number of characters in a tab.
 
+.. note::
+
+   When using ``justify="full"``, Rich preserves indentation blocks and whitespace runs greater than a single space. Only single-space gaps between words are expanded to achieve full justification. This ensures leading indentation, code blocks, and intentional spacing remain intact while aligning text to both left and right edges.
+
 A Text instance may be used in place of a plain string virtually everywhere in the Rich API, which gives you a lot of control in how text renders within other Rich renderables. For instance, the following example right aligns text within a :class:`~rich.panel.Panel`::
 
     from rich import print

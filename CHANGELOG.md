@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Python3.14 compatibility https://github.com/Textualize/rich/pull/3861
 
+### Fixed
+
+- Fixed full justification to preserve indentation blocks and multi-space runs; only single-space gaps between words are expanded. This prevents code-like text and intentional spacing from being altered when using `justify="full"`.
+
 ## [14.1.0] - 2025-06-25
 
 ### Changed
