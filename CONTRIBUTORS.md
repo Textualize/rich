@@ -33,6 +33,7 @@ The following people have contributed to the development of Rich:
 - [JP Hutchins](https://github.com/JPhutchins)
 - [Ionite](https://github.com/ionite34)
 - [Josh Karpel](https://github.com/JoshKarpel)
+- [Pouya Karazmayan](https://github.com/AttackThwarter)
 - [Jan Katins](https://github.com/jankatins)
 - [Hugo van Kemenade](https://github.com/hugovk)
 - [Andrew Kettmann](https://github.com/akettmann)
