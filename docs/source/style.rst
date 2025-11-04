@@ -108,7 +108,7 @@ Style Themes
 
 If you reuse styles it can be a maintenance headache if you ever want to modify an attribute or color -- you would have to change every line where the style is used. Rich provides a :class:`~rich.theme.Theme` class which you can use to define custom styles that you can refer to by name. That way you only need to update your styles in one place.
 
-Style themes can make your code more semantic, for instance a style called ``"warning"`` better expresses intent that ``"italic magenta underline"``.
+Style themes can make your code more semantic, for instance a style called ``"warning"`` better expresses intent than ``"italic magenta underline"``.
 
 To use a style theme, construct a :class:`~rich.theme.Theme` instance and pass it to the :class:`~rich.console.Console` constructor. Here's an example::
 

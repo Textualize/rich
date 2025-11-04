@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os.path
 import re
 import sys
@@ -224,6 +226,17 @@ class _SyntaxHighlightRange(NamedTuple):
     style_before: bool = False
 
 
+class PaddingProperty:
+    """Descriptor to get and set padding."""
+
+    def __get__(self, obj: Syntax, objtype: Type[Syntax]) -> Tuple[int, int, int, int]:
+        """Space around the Syntax."""
+        return obj._padding
+
+    def __set__(self, obj: Syntax, padding: PaddingDimensions) -> None:
+        obj._padding = Padding.unpack(padding)
+
+
 class Syntax(JupyterMixin):
     """Construct a Syntax object to render syntax highlighted code.
 
@@ -293,10 +306,12 @@ class Syntax(JupyterMixin):
             Style(bgcolor=background_color) if background_color else Style()
         )
         self.indent_guides = indent_guides
-        self.padding = padding
+        self._padding = Padding.unpack(padding)
 
         self._theme = self.get_theme(theme)
         self._stylized_ranges: List[_SyntaxHighlightRange] = []
+
+    padding = PaddingProperty()
 
     @classmethod
     def from_path(
@@ -371,8 +386,8 @@ class Syntax(JupyterMixin):
         is supplied, the lexer will be chosen based on the file extension..
 
         Args:
-             path (AnyStr): The path to the file containing the code you wish to know the lexer for.
-             code (str, optional): Optional string of code that will be used as a fallback if no lexer
+            path (AnyStr): The path to the file containing the code you wish to know the lexer for.
+            code (str, optional): Optional string of code that will be used as a fallback if no lexer
                 is found for the supplied path.
 
         Returns:
@@ -607,7 +622,7 @@ class Syntax(JupyterMixin):
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "Measurement":
-        _, right, _, left = Padding.unpack(self.padding)
+        _, right, _, left = self.padding
         padding = left + right
         if self.code_width is not None:
             width = self.code_width + self._numbers_column_width + padding + 1
@@ -626,7 +641,7 @@ class Syntax(JupyterMixin):
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         segments = Segments(self._get_syntax(console, options))
-        if self.padding:
+        if any(self.padding):
             yield Padding(segments, style=self._get_base_style(), pad=self.padding)
         else:
             yield segments
@@ -640,15 +655,19 @@ class Syntax(JupyterMixin):
         Get the Segments for the Syntax object, excluding any vertical/horizontal padding
         """
         transparent_background = self._get_base_style().transparent_background
+        _pad_top, pad_right, _pad_bottom, pad_left = self.padding
+        horizontal_padding = pad_left + pad_right
         code_width = (
             (
                 (options.max_width - self._numbers_column_width - 1)
                 if self.line_numbers
                 else options.max_width
             )
+            - horizontal_padding
             if self.code_width is None
             else self.code_width
         )
+        code_width = max(0, code_width)
 
         ends_on_nl, processed_code = self._process_code(self.code)
         text = self.highlight(processed_code, self.line_range)

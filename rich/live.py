@@ -1,16 +1,22 @@
+from __future__ import annotations
+
 import sys
 from threading import Event, RLock, Thread
 from types import TracebackType
-from typing import IO, Any, Callable, List, Optional, TextIO, Type, cast
+from typing import IO, TYPE_CHECKING, Any, Callable, List, Optional, TextIO, Type, cast
 
 from . import get_console
-from .console import Console, ConsoleRenderable, RenderableType, RenderHook
+from .console import Console, ConsoleRenderable, Group, RenderableType, RenderHook
 from .control import Control
 from .file_proxy import FileProxy
 from .jupyter import JupyterMixin
 from .live_render import LiveRender, VerticalOverflowMethod
 from .screen import Screen
 from .text import Text
+
+if TYPE_CHECKING:
+    # Can be replaced with `from typing import Self` in Python 3.11+
+    from typing_extensions import Self  # pragma: no cover
 
 
 class _RefreshThread(Thread):
@@ -87,6 +93,7 @@ class Live(JupyterMixin, RenderHook):
         self._live_render = LiveRender(
             self.get_renderable(), vertical_overflow=vertical_overflow
         )
+        self._nested = False
 
     @property
     def is_started(self) -> bool:
@@ -110,8 +117,12 @@ class Live(JupyterMixin, RenderHook):
         with self._lock:
             if self._started:
                 return
-            self.console.set_live(self)
             self._started = True
+
+            if not self.console.set_live(self):
+                self._nested = True
+                return
+
             if self._screen:
                 self._alt_screen = self.console.set_alt_screen(True)
             self.console.show_cursor(False)
@@ -136,8 +147,12 @@ class Live(JupyterMixin, RenderHook):
         with self._lock:
             if not self._started:
                 return
-            self.console.clear_live()
             self._started = False
+            self.console.clear_live()
+            if self._nested:
+                if not self.transient:
+                    self.console.print(self.renderable)
+                return
 
             if self.auto_refresh and self._refresh_thread is not None:
                 self._refresh_thread.stop()
@@ -156,13 +171,12 @@ class Live(JupyterMixin, RenderHook):
                     self.console.show_cursor(True)
                     if self._alt_screen:
                         self.console.set_alt_screen(False)
-
                     if self.transient and not self._alt_screen:
                         self.console.control(self._live_render.restore_cursor())
                     if self.ipy_widget is not None and self.transient:
                         self.ipy_widget.close()  # pragma: no cover
 
-    def __enter__(self) -> "Live":
+    def __enter__(self) -> Self:
         self.start(refresh=self._renderable is not None)
         return self
 
@@ -200,7 +214,13 @@ class Live(JupyterMixin, RenderHook):
         Returns:
             RenderableType: Displayed renderable.
         """
-        renderable = self.get_renderable()
+        live_stack = self.console._live_stack
+        renderable: RenderableType
+        if live_stack and self is live_stack[0]:
+            # The first Live instance will render everything in the Live stack
+            renderable = Group(*[live.get_renderable() for live in live_stack])
+        else:
+            renderable = self.get_renderable()
         return Screen(renderable) if self._alt_screen else renderable
 
     def update(self, renderable: RenderableType, *, refresh: bool = False) -> None:
@@ -221,6 +241,11 @@ class Live(JupyterMixin, RenderHook):
         """Update the display of the Live Render."""
         with self._lock:
             self._live_render.set_renderable(self.renderable)
+            if self._nested:
+                if self.console._live_stack:
+                    self.console._live_stack[0].refresh()
+                return
+
             if self.console.is_jupyter:  # pragma: no cover
                 try:
                     from IPython.display import display
