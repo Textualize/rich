@@ -1,6 +1,6 @@
 import re
 from abc import ABC, abstractmethod
-from typing import List, Union
+from typing import ClassVar, List, Tuple, Union
 
 from .text import Span, Text
 
@@ -61,7 +61,7 @@ class NullHighlighter(Highlighter):
 class RegexHighlighter(Highlighter):
     """Applies highlighting from a list of regular expressions."""
 
-    highlights: List[str] = []
+    highlights: ClassVar[Tuple[Union[str, "re.Pattern[str]"], ...]] = tuple()
     base_style: str = ""
 
     def highlight(self, text: Text) -> None:
@@ -81,7 +81,7 @@ class ReprHighlighter(RegexHighlighter):
     """Highlights the text typically produced from ``__repr__`` methods."""
 
     base_style = "repr."
-    highlights = [
+    highlights: ClassVar[Tuple[Union[str, "re.Pattern[str]"], ...]] = (
         r"(?P<tag_start><)(?P<tag_name>[-\w.:|]*)(?P<tag_contents>[\w\W]*)(?P<tag_end>>)",
         r'(?P<attrib_name>[\w_]{1,50})=(?P<attrib_value>"?[\w_]+"?)?',
         r"(?P<brace>[][{}()])",
@@ -100,7 +100,7 @@ class ReprHighlighter(RegexHighlighter):
             r"(?<![\\\w])(?P<str>b?'''.*?(?<!\\)'''|b?'.*?(?<!\\)'|b?\"\"\".*?(?<!\\)\"\"\"|b?\".*?(?<!\\)\")",
             r"(?P<url>(file|https|http|ws|wss)://[-0-9a-zA-Z$_+!`(),.?/;:&=%#~@]*)",
         ),
-    ]
+    )
 
 
 class JSONHighlighter(RegexHighlighter):
@@ -111,14 +111,14 @@ class JSONHighlighter(RegexHighlighter):
     JSON_WHITESPACE = {" ", "\n", "\r", "\t"}
 
     base_style = "json."
-    highlights = [
+    highlights: ClassVar[Tuple[Union[str, "re.Pattern[str]"], ...]] = (
         _combine_regex(
             r"(?P<brace>[\{\[\(\)\]\}])",
             r"\b(?P<bool_true>true)\b|\b(?P<bool_false>false)\b|\b(?P<null>null)\b",
             r"(?P<number>(?<!\w)\-?[0-9]+\.?[0-9]*(e[\-\+]?\d+?)?\b|0x[0-9a-fA-F]*)",
             JSON_STR,
         ),
-    ]
+    )
 
     def highlight(self, text: Text) -> None:
         super().highlight(text)
@@ -146,7 +146,7 @@ class ISO8601Highlighter(RegexHighlighter):
     """
 
     base_style = "iso8601."
-    highlights = [
+    highlights: ClassVar[Tuple[Union[str, "re.Pattern[str]"], ...]] = (
         #
         # Dates
         #
@@ -195,7 +195,7 @@ class ISO8601Highlighter(RegexHighlighter):
         # Date and time, with optional fractional seconds and time zone (e.g., 2008-08-30T01:45:36 or 2008-08-30T01:45:36.123Z).
         # This is the XML Schema 'dateTime' type
         r"^(?P<date>(?P<year>-?(?:[1-9][0-9]*)?[0-9]{4})-(?P<month>1[0-2]|0[1-9])-(?P<day>3[01]|0[1-9]|[12][0-9]))T(?P<time>(?P<hour>2[0-3]|[01][0-9]):(?P<minute>[0-5][0-9]):(?P<second>[0-5][0-9])(?P<ms>\.[0-9]+)?)(?P<timezone>Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$",
-    ]
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover
