@@ -1073,14 +1073,14 @@ def test_append_loop_regression() -> None:
 
 
 def test_full_justify_preserves_indentation_blocks() -> None:
-    console = Console(width=16)
+    console = Console(width=20)
     text = Text("    foo bar baz", justify="full")
-    lines = text.wrap(console, 16)
+    lines = text.wrap(console, 20)
     # Only one line, full-justified; leading 4-space indentation must be preserved
     assert len(lines) == 1
     assert lines[0].plain.startswith("    ")
-    # Total width should match console width
-    assert len(lines[0].plain) == 16
+    # Total width should match console width (20 chars)
+    assert len(lines[0].plain) == 20
     # The gaps expanded should be single-space gaps between words; indentation remains 4 spaces
     # Split to verify only the inter-word spaces grew
     after = lines[0].plain
