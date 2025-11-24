@@ -1,0 +1,10 @@
+ERROR: file or directory not found: tests/test_markup_validator.py
+
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.0.1, pluggy-1.6.0
+rootdir: C:\Users\BAE\rich-1
+configfile: pyproject.toml
+plugins: anyio-4.10.0
+collected 0 items
+
+============================ no tests ran in 0.01s ============================
