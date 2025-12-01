@@ -414,6 +414,7 @@ def test_padding_width_with_collapse():
 
     assert table._get_padding_width(2) == 0, "Last: left=0 (collapsed), right=0 (edge)"
 
+
 if __name__ == "__main__":
     render = render_tables()
     print(render)
