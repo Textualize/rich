@@ -382,6 +382,38 @@ def test_columns_highlight_added_by_add_row() -> None:
     assert output == expected
 
 
+def test_padding_width_calculation():
+    """Test _get_padding_width with various configurations (Issue #3871)."""
+    from rich.table import Table
+
+    # Test with pad_edge=False (bug case)
+    table = Table(padding=(0, 1), pad_edge=False)
+    table.add_column("A")
+    table.add_column("B")
+    table.add_column("C")
+
+    assert table._get_padding_width(0) == 1, "First column: left=0, right=1"
+
+    assert table._get_padding_width(1) == 2, "Middle column: left=1, right=1"
+
+    assert table._get_padding_width(2) == 1, "Last column: left=1, right=0"
+
+
+def test_padding_width_with_collapse():
+    """Test _get_padding_width with collapse_padding=True (Issue #3871)."""
+    from rich.table import Table
+
+    table = Table(padding=(0, 1), collapse_padding=True, pad_edge=False)
+    table.add_column("A")
+    table.add_column("B")
+    table.add_column("C")
+
+    assert table._get_padding_width(0) == 1, "First: left=0, right=1"
+
+    assert table._get_padding_width(1) == 1, "Middle: left=0 (collapsed), right=1"
+
+    assert table._get_padding_width(2) == 0, "Last: left=0 (collapsed), right=0 (edge)"
+
 if __name__ == "__main__":
     render = render_tables()
     print(render)

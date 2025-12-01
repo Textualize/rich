@@ -699,9 +699,19 @@ class Table(JupyterMixin):
     def _get_padding_width(self, column_index: int) -> int:
         """Get extra width from padding."""
         _, pad_right, _, pad_left = self.padding
-        if self.collapse_padding:
-            if column_index > 0:
-                pad_left = max(0, pad_left - pad_right)
+
+        first_column = column_index == 0
+        last_column = column_index == len(self.columns) - 1
+
+        if self.collapse_padding and not first_column:
+            pad_left = max(0, pad_left - pad_right)
+
+        if not self.pad_edge:
+            if first_column:
+                pad_left = 0
+            if last_column:
+                pad_right = 0
+
         return pad_left + pad_right
 
     def _measure_column(

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [14.2.0] - 2025-10-09
 
+### Fixed
+
+- Fixed padding calculation in `Table` for first column when `pad_edge=False` [(#3871)](https://github.com/Textualize/rich/issues/3871)
+
 ### Changed
 
 - Python3.14 compatibility https://github.com/Textualize/rich/pull/3861
