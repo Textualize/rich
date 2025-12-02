@@ -59,6 +59,48 @@ def test_justify():
     assert result == "                 foo\n"
 
 
+def test_enable_link_path():
+    """Test that enable_link_path=False disables hyperlinks but keeps path text."""
+    console = Console(
+        file=io.StringIO(),
+        width=80,
+        force_terminal=True,
+        log_time_format="[TIME]",
+        color_system="truecolor",
+        legacy_windows=False,
+        enable_link_path=False,  # Disable hyperlinks
+    )
+    console.log("Test message")
+    output = console.file.getvalue()
+    
+    # Should NOT contain OSC 8 hyperlink escape sequences
+    assert "\x1b]8;" not in output
+    
+    # Should still contain the path text (filename)
+    assert "test_log.py" in output
+
+
+def test_enable_link_path_default():
+    """Test that enable_link_path defaults to True (hyperlinks enabled)."""
+    console = Console(
+        file=io.StringIO(),
+        width=80,
+        force_terminal=True,
+        log_time_format="[TIME]",
+        color_system="truecolor",
+        legacy_windows=False,
+        # enable_link_path not specified, should default to True
+    )
+    console.log("Test message")
+    output = console.file.getvalue()
+    
+    # Should contain OSC 8 hyperlink escape sequences
+    assert "\x1b]8;" in output
+    
+    # Should also contain the path text
+    assert "test_log.py" in output
+
+
 if __name__ == "__main__":
     render = render_log()
     print(render)

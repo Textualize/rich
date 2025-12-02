@@ -611,6 +611,7 @@ class Console:
         highlight (bool, optional): Enable automatic highlighting. Defaults to True.
         log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
         log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
+        enable_link_path (bool, optional): Boolean to enable terminal hyperlinks in file paths logged by :meth:`log`. Defaults to True.
         log_time_format (Union[str, TimeFormatterCallable], optional): If ``log_time`` is enabled, either string for strftime or callable that formats the time. Defaults to "[%X] ".
         highlighter (HighlighterType, optional): Default highlighter.
         legacy_windows (bool, optional): Enable legacy Windows mode, or ``None`` to auto detect. Defaults to ``None``.
@@ -648,6 +649,7 @@ class Console:
         highlight: bool = True,
         log_time: bool = True,
         log_path: bool = True,
+        enable_link_path: bool = True,
         log_time_format: Union[str, FormatTimeCallable] = "[%X]",
         highlighter: Optional["HighlighterType"] = ReprHighlighter(),
         legacy_windows: Optional[bool] = None,
@@ -723,6 +725,7 @@ class Console:
             show_path=log_path,
             time_format=log_time_format,
         )
+        self.enable_link_path = enable_link_path
         self.highlighter: HighlighterType = highlighter or _null_highlighter
         self.safe_box = safe_box
         self.get_datetime = get_datetime or datetime.now
@@ -1977,6 +1980,9 @@ class Console:
 
             filename, line_no, locals = self._caller_frame_info(_stack_offset)
             link_path = None if filename.startswith("<") else os.path.abspath(filename)
+            # Disable hyperlinks if enable_link_path is False, but keep the path text
+            if not self.enable_link_path:
+                link_path = None
             path = filename.rpartition(os.sep)[-1]
             if log_locals:
                 locals_map = {
