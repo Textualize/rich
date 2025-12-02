@@ -27,6 +27,12 @@ If your PR solely consists of typos, at least one must be in the docs to warrant
 - [ ] Tests
 - [ ] Other
 
+## AI?
+
+- [ ] AI was used to generate this PR
+
+AI generated PRs may be accepted, but only if @willmcgugan has responded on an issue or discussion.
+
 ## Checklist
 
 - [ ] I've run the latest [black](https://github.com/psf/black) with default args on new code.
@@ -36,4 +42,6 @@ If your PR solely consists of typos, at least one must be in the docs to warrant
 
 ## Description
 
-Please describe your changes here. If this fixes a bug, please link to the issue, if possible.
+Please describe your changes here.
+
+**Important:** Link to an issue or discussion regarding these changes. 
