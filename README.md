@@ -275,6 +275,26 @@ The columns may be configured to show any details you want. Built-in columns inc
 
 To try this out yourself, see [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) which can download multiple URLs simultaneously while displaying progress.
 
+#### tqdm compatibility shim
+
+If you need to redirect `tqdm` calls in third-party code to Rich at runtime, call `install_tqdm()` before the code imports `tqdm`:
+
+```python
+from rich.tqdm import install_tqdm
+
+install_tqdm()
+
+from tqdm import tqdm
+
+for _ in tqdm(range(10), desc="basic"):
+    ...
+```
+
+Runnable examples:
+
+- Basic replacement: `PYTHONPATH=. python examples/tqdm_adapter_basic.py`
+- Hidden reference overwrite (e.g. stashed `_hidden_tqdm`): `PYTHONPATH=. python examples/tqdm_adapter_hidden.py`
+
 </details>
 
 <details>

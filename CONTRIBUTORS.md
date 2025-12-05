@@ -41,6 +41,7 @@ The following people have contributed to the development of Rich:
 - [Hedy Li](https://github.com/hedythedev)
 - [Henry Mai](https://github.com/tanducmai)
 - [Luka Mamukashvili](https://github.com/UltraStudioLTD)
+- [Shane K2 Macaulay](https://github.com/K2)
 - [Alexander Mancevice](https://github.com/amancevice)
 - [Will McGugan](https://github.com/willmcgugan)
 - [Paul McGuire](https://github.com/ptmcg)
