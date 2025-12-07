@@ -382,6 +382,42 @@ def test_columns_highlight_added_by_add_row() -> None:
     assert output == expected
 
 
+def test_pad_edge_false_with_fixed_width_columns() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3892
+    
+    When pad_edge=False with fixed-width columns, the edge columns should not
+    have extra padding added to their width calculation.
+    """
+    output = io.StringIO()
+    console = Console(
+        width=60,
+        file=output,
+        force_terminal=True,
+        legacy_windows=False,
+        color_system=None,
+        _environ={},
+    )
+
+    table = Table(
+        Column('verb', width=5),
+        Column('noun', width=5),
+        Column('wh', width=2),
+        box=None,
+        pad_edge=False,
+        expand=False,
+        show_header=True,
+    )
+    table.add_row('hello', 'world', 'oh')
+    console.print(table)
+    
+    result = output.getvalue().rstrip('\n')
+    expected = '\n'.join([
+        'verb   noun   wh',
+        'hello  world  oh'
+    ])
+    assert result == expected
+
+
 if __name__ == "__main__":
     render = render_tables()
     print(render)

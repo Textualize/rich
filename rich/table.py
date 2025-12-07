@@ -702,6 +702,13 @@ class Table(JupyterMixin):
         if self.collapse_padding:
             if column_index > 0:
                 pad_left = max(0, pad_left - pad_right)
+        if not self.pad_edge:
+            first_column = column_index == 0
+            last_column = column_index == len(self.columns) - 1
+            if first_column:
+                pad_left = 0
+            if last_column:
+                pad_right = 0
         return pad_left + pad_right
 
     def _measure_column(
