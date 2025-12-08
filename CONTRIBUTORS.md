@@ -16,6 +16,7 @@ The following people have contributed to the development of Rich:
 - [Ed Davis](https://github.com/davised)
 - [Pete Davison](https://github.com/pd93)
 - [James Estevez](https://github.com/jstvz)
+- [Jeong, YunWon](https://github.com/youknowone)
 - [Jonathan Eunice](https://github.com/jonathan-3play)
 - [Aryaz Eghbali](https://github.com/AryazE)
 - [Oleksis Fraga](https://github.com/oleksis)
