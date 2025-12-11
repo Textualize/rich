@@ -675,6 +675,27 @@ def test_attrs_broken_310() -> None:
     assert result == expected
 
 
+def test_attrs_custom_repr() -> None:
+    @attr.define
+    class Foo:
+        x: int = 1
+        
+        def __repr__(self) -> str:
+            return "CustomFoo"
+
+    assert pretty_repr(Foo()) == "CustomFoo"
+
+
+def test_attrs_default_repr() -> None:
+    @attr.define
+    class Bar:
+        x: int = 5
+        y: str = "test"
+
+    result = pretty_repr(Bar())
+    assert result == "Bar(x=5, y='test')"
+
+
 def test_user_dict() -> None:
     class D1(UserDict):
         pass

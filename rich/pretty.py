@@ -67,6 +67,24 @@ def _get_attr_fields(obj: Any) -> Sequence["_attr_module.Attribute[Any]"]:
     return _attr_module.fields(type(obj)) if _has_attrs else []
 
 
+def _is_attr_repr(obj: object) -> bool:
+    """Check if an instance of an attrs class contains the default repr.
+
+    Args:
+        obj (object): An attrs instance.
+
+    Returns:
+        bool: True if the default repr is used, False if there is a custom repr.
+    """
+    if not _has_attrs:
+        return False
+    try:
+        # attrs-generated repr methods have a source file containing "<attrs generated repr"
+        return isinstance(type(obj).__repr__.__code__.co_filename, str) and "<attrs generated repr" in type(obj).__repr__.__code__.co_filename
+    except Exception:
+        return False
+
+
 def _is_dataclass_repr(obj: object) -> bool:
     """Check if an instance of a dataclass contains the default repr.
 
@@ -711,7 +729,7 @@ def traverse(
                     last=root,
                 )
             pop_visited(obj_id)
-        elif _is_attr_object(obj) and not fake_attributes:
+        elif _is_attr_object(obj) and not fake_attributes and _is_attr_repr(obj):
             push_visited(obj_id)
             children = []
             append = children.append
