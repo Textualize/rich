@@ -1,5 +1,6 @@
 import collections
 import io
+import contextlib
 import sys
 from array import array
 from collections import UserDict, defaultdict, deque
@@ -682,8 +683,18 @@ def test_attrs_custom_repr() -> None:
         
         def __repr__(self) -> str:
             return "CustomFoo"
+    # Compare built-in print() (REPL-like) with Console.print() output
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        print(Foo())
+    std_print = buf.getvalue()
 
-    assert pretty_repr(Foo()) == "CustomFoo"
+    console = Console(color_system=None)
+    console.begin_capture()
+    console.print(Foo())
+    console_out = console.end_capture()
+
+    assert console_out == std_print
 
 
 def test_attrs_default_repr() -> None:
@@ -691,9 +702,18 @@ def test_attrs_default_repr() -> None:
     class Bar:
         x: int = 5
         y: str = "test"
+    
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        print(Bar())
+    std_print = buf.getvalue()
 
-    result = pretty_repr(Bar())
-    assert result == "Bar(x=5, y='test')"
+    console = Console(color_system=None)
+    console.begin_capture()
+    console.print(Bar())
+    console_out = console.end_capture()
+
+    assert console_out == std_print
 
 
 def test_user_dict() -> None:
