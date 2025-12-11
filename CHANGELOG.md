@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Python3.14 compatibility https://github.com/Textualize/rich/pull/3861
 
+### Fixed
+
+- Custom repr is now respected in attrs classes within the REPL. 
+
 ## [14.1.0] - 2025-06-25
 
 ### Changed
