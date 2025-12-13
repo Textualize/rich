@@ -135,6 +135,16 @@ class Inspect(JupyterMixin):
         obj = self.obj
         keys = dir(obj)
         total_items = len(keys)
+
+        # When sort=False, prefer __dict__ order for instance attributes
+        if not self.sort and hasattr(obj, "__dict__"):
+            # Get instance attributes in insertion order
+            instance_keys = list(vars(obj).keys())
+            # Get remaining attributes from dir() that aren't in __dict__
+            class_keys = [key for key in keys if key not in instance_keys]
+            # Combine: instance attributes first (in order), then class attributes
+            keys = instance_keys + class_keys
+
         if not self.dunder:
             keys = [key for key in keys if not key.startswith("__")]
         if not self.private:

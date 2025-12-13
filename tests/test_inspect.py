@@ -501,3 +501,37 @@ def test_object_is_one_of_types(
     obj: object, types: Sequence[str], expected_result: bool
 ):
     assert is_object_one_of_types(obj, types) is expected_result
+
+
+def test_inspect_sort_parameter():
+    """Test that sort=False preserves insertion order of instance attributes."""
+
+    class Test:
+        def __init__(self):
+            self.c = 1
+            self.b = 2
+            self.a = 3
+
+    test = Test()
+
+    # Test sort=False preserves insertion order (c, b, a)
+    console = Console(width=50, file=io.StringIO(), legacy_windows=False)
+    inspect(test, console=console, sort=False, value=False, docs=False)
+    result_unsorted = console.file.getvalue()
+
+    # Check that 'c' appears before 'b' and 'b' appears before 'a'
+    pos_c = result_unsorted.find("c = 1")
+    pos_b = result_unsorted.find("b = 2")
+    pos_a = result_unsorted.find("a = 3")
+    assert pos_c < pos_b < pos_a, "sort=False should preserve insertion order"
+
+    # Test sort=True sorts alphabetically (a, b, c)
+    console = Console(width=50, file=io.StringIO(), legacy_windows=False)
+    inspect(test, console=console, sort=True, value=False, docs=False)
+    result_sorted = console.file.getvalue()
+
+    # Check that 'a' appears before 'b' and 'b' appears before 'c'
+    pos_a = result_sorted.find("a = 3")
+    pos_b = result_sorted.find("b = 2")
+    pos_c = result_sorted.find("c = 1")
+    assert pos_a < pos_b < pos_c, "sort=True should sort alphabetically"
