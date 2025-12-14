@@ -497,7 +497,28 @@ def test_object_types_mro_as_strings(obj: object, expected_result: Sequence[str]
         # fmt: on
     ),
 )
+
 def test_object_is_one_of_types(
     obj: object, types: Sequence[str], expected_result: bool
 ):
     assert is_object_one_of_types(obj, types) is expected_result
+
+def test_inspect_preserves_instance_attribute_order_when_sort_false():
+    class Example:
+        def __init__(self):
+            self.b = 1
+            self.a = 2
+
+    example = Example()
+
+    # Render inspect output with sort=False
+    output = render(example, methods=False, value=False, sort=False)
+
+    # Attribute order should be preserved: b then a
+    b_index = output.find("b = 1")
+    a_index = output.find("a = 2")
+
+    assert b_index != -1
+    assert a_index != -1
+    assert b_index < a_index
+

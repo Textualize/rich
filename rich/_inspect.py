@@ -133,7 +133,12 @@ class Inspect(JupyterMixin):
                 return (error, None)
 
         obj = self.obj
-        keys = dir(obj)
+        if not self.sort and hasattr(obj, "__dict__"):
+            # Preserve instance attribute insertion order
+            keys = list(obj.__dict__.keys())
+        else:
+            keys = dir(obj)
+
         total_items = len(keys)
         if not self.dunder:
             keys = [key for key in keys if not key.startswith("__")]
