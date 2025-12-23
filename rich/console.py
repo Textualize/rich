@@ -581,6 +581,12 @@ def get_windows_console_features() -> "WindowsConsoleFeatures":  # pragma: no co
 
 def detect_legacy_windows() -> bool:
     """Detect legacy Windows."""
+    try:
+        import ctypes  # noqa: F401
+    except ImportError:
+        # No ctypes doesn't mean no legacy windows,
+        # but legacy windows mode requires ctypes, so we force it off.
+        return False
     return WINDOWS and not get_windows_console_features().vt
 
 
