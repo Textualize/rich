@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Python3.14 compatibility https://github.com/Textualize/rich/pull/3861
 
+## [Unreleased]
+
+### Fixed
+- Fixed `Text.from_ansi()` removing trailing line break. https://github.com/Textualize/rich/issues/3577
+
 ## [14.1.0] - 2025-06-25
 
 ### Changed
