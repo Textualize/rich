@@ -27,7 +27,6 @@ from typing import (
     List,
     Literal,
     NamedTuple,
-    NewType,
     Optional,
     TextIO,
     Tuple,
@@ -51,14 +50,31 @@ from .style import StyleType
 from .table import Column, Table
 from .text import Text, TextType
 
-TaskID = NewType("TaskID", int)
-
 ProgressType = TypeVar("ProgressType")
 
 GetTimeCallable = Callable[[], float]
 
 
 _I = typing.TypeVar("_I", TextIO, BinaryIO)
+
+
+class TaskID(int):
+    def __new__(cls, task_id: int, prog_instance: Progress) -> Self:
+        return super().__new__(cls, task_id)
+
+    def __init__(self, task_id: int, prog_instance: Progress) -> None:
+        self.prog = prog_instance
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        self.prog.remove_task(self)
 
 
 class _TrackThread(Thread):
@@ -1096,7 +1112,7 @@ class Progress(JupyterMixin):
         self.disable = disable
         self.expand = expand
         self._tasks: Dict[TaskID, Task] = {}
-        self._task_index: TaskID = TaskID(0)
+        self._task_index: TaskID = TaskID(0, self)
         self.live = Live(
             console=console or get_console(),
             auto_refresh=auto_refresh,
@@ -1635,7 +1651,7 @@ class Progress(JupyterMixin):
             if start:
                 self.start_task(self._task_index)
             new_task_index = self._task_index
-            self._task_index = TaskID(int(self._task_index) + 1)
+            self._task_index = TaskID(int(self._task_index) + 1, self)
         self.refresh()
         return new_task_index
 
