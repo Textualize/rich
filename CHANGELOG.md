@@ -1,3 +1,8 @@
+### Added
+
+- Fixed `Live(transient=True)` leaving a blank line when the renderable produces no output.
+
+
 # Changelog
 
 All notable changes to this project will be documented in this file.

@@ -1,5 +1,4 @@
-from typing import Optional, Tuple, Literal
-
+from typing import Literal, Optional, Tuple
 
 from ._loop import loop_last
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
@@ -58,6 +57,17 @@ class LiveRender:
                 )
             )
         return Control()
+
+    def has_rendered_rows(self) -> bool:
+        """Check if there are any rendered rows.
+
+        Returns:
+            bool: True if there are rendered rows, False otherwise.
+        """
+        if self._shape is not None:
+            _, height = self._shape
+            return height > 0
+        return False
 
     def restore_cursor(self) -> Control:
         """Get control codes to clear the render and restore the cursor to its previous position.
