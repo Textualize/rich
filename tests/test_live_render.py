@@ -1,8 +1,9 @@
 import pytest
-from rich.live_render import LiveRender
+
 from rich.console import Console, ConsoleDimensions, ConsoleOptions
-from rich.style import Style
+from rich.live_render import LiveRender
 from rich.segment import Segment
+from rich.style import Style
 
 
 @pytest.fixture
@@ -26,6 +27,14 @@ def test_restore_cursor(live_render):
     assert str(live_render.restore_cursor()) == ""
     live_render._shape = (80, 2)
     assert str(live_render.restore_cursor()) == "\r\x1b[1A\x1b[2K\x1b[1A\x1b[2K"
+
+
+def test_has_rendered_rows(live_render):
+    assert live_render.has_rendered_rows() is False
+    live_render._shape = (80, 0)
+    assert live_render.has_rendered_rows() is False
+    live_render._shape = (80, 1)
+    assert live_render.has_rendered_rows() is True
 
 
 def test_rich_console(live_render):
