@@ -16,6 +16,13 @@ from typing import (
     Union,
 )
 
+# [导入分析]
+# - `IntEnum`: 用于定义控制码的类型枚举。
+# - `lru_cache`: 用于缓存计算结果，提高性能（如 _split_cells）。
+# - `filterfalse`: 用于过滤非控制码的 Segment。
+# - `getLogger`: 记录日志。
+# - `attrgetter`: 用于快速获取对象属性（如 is_control）。
+# - `typing`: 标准类型提示模块。
 from .cells import (
     _is_single_cell_widths,
     cached_cell_len,
@@ -23,18 +30,29 @@ from .cells import (
     get_character_cell_size,
     set_cell_size,
 )
+# [导入分析]
+# - `cells`: 处理字符单元格宽度（如全角字符）的模块。
 from .repr import Result, rich_repr
+# [导入分析]
+# - `repr`: 用于实现 `__rich_repr__` 方法，支持 `rich.print` 的自定义表示。
 from .style import Style
+# [导入分析]
+# - `style`: 样式对象。
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult
+# [导入分析]
+# - `TYPE_CHECKING`: 在类型检查时导入，避免运行时依赖。
 
 log = getLogger("rich")
 
 
 class ControlType(IntEnum):
-    """Non-printable control codes which typically translate to ANSI codes."""
-
+    """[枚举：控制码类型]
+    
+    定义了非打印的控制码，这些通常对应 ANSI 转义序列。
+    例如：响铃 (BELL)、清屏 (CLEAR)、移动光标 (CURSOR_MOVE_TO) 等。
+    """
     BELL = 1
     CARRIAGE_RETURN = 2
     HOME = 3
@@ -58,20 +76,24 @@ ControlCode = Union[
     Tuple[ControlType, Union[int, str]],
     Tuple[ControlType, int, int],
 ]
+# [类型别名]
+# 定义了控制码的多种可能形式：
+# 1. (ControlType,)
+# 2. (ControlType, int) 或 (ControlType, str)
+# 3. (ControlType, int, int)
 
 
 @rich_repr()
 class Segment(NamedTuple):
-    """A piece of text with associated style. Segments are produced by the Console render process and
-    are ultimately converted in to strings to be written to the terminal.
-
+    """[核心数据结构：文本片段]
+    
+    Rich 中最基本的数据单元。它封装了文本、样式和可能的控制码。
+    所有渲染操作最终都会生成一个 Segment 流，然后由 Console 转换为终端可识别的字符串。
+    
     Args:
-        text (str): A piece of text.
-        style (:class:`~rich.style.Style`, optional): An optional style to apply to the text.
-        control (Tuple[ControlCode], optional): Optional sequence of control codes.
-
-    Attributes:
-        cell_length (int): The cell length of this Segment.
+        text (str): 文本内容。
+        style (Style, optional): 应用于文本的样式。
+        control (Sequence[ControlCode], optional): 控制码序列。
     """
 
     text: str
@@ -80,15 +102,19 @@ class Segment(NamedTuple):
 
     @property
     def cell_length(self) -> int:
-        """The number of terminal cells required to display self.text.
-
-        Returns:
-            int: A number of cells.
+        """[属性：单元格长度]
+        
+        计算文本在终端中占用的字符单元格数。
+        对于控制码，长度为 0。
         """
         text, _style, control = self
         return 0 if control else cell_len(text)
 
     def __rich_repr__(self) -> Result:
+        """[协议：富表示]
+        
+        定义了如何被 `rich.print` 渲染。
+        """
         yield self.text
         if self.control is None:
             if self.style is not None:
@@ -98,28 +124,34 @@ class Segment(NamedTuple):
             yield self.control
 
     def __bool__(self) -> bool:
-        """Check if the segment contains text."""
+        """[布尔值转换]
+        
+        判断 Segment 是否包含文本内容。
+        """
         return bool(self.text)
 
     @property
     def is_control(self) -> bool:
-        """Check if the segment contains control codes."""
+        """[属性：是否为控制码]
+        
+        判断 Segment 是否包含控制码。
+        """
         return self.control is not None
 
     @classmethod
     @lru_cache(1024 * 16)
     def _split_cells(cls, segment: "Segment", cut: int) -> Tuple["Segment", "Segment"]:
-        """Split a segment in to two at a given cell position.
-
-        Note that splitting a double-width character, may result in that character turning
-        into two spaces.
-
+        """[核心算法：单元格分割]
+        
+        在指定的单元格位置分割 Segment。
+        处理了全角字符（2单元格宽）的复杂情况，确保分割后宽度正确。
+        
         Args:
-            segment (Segment): A segment to split.
-            cut (int): A cell position to cut on.
-
+            segment (Segment): 要分割的 Segment。
+            cut (int): 分割点（单元格位置）。
+            
         Returns:
-            A tuple of two segments.
+            Tuple[Segment, Segment]: 分割后的两个 Segment。
         """
         text, style, control = segment
         _Segment = Segment
@@ -156,22 +188,23 @@ class Segment(NamedTuple):
                 pos -= 1
 
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
-        """Split segment in to two segments at the specified column.
-
-        If the cut point falls in the middle of a 2-cell wide character then it is replaced
-        by two spaces, to preserve the display width of the parent segment.
-
+        """[方法：分割单元格]
+        
+        在指定位置分割 Segment。
+        如果分割点在双宽字符中间，会用两个空格替换，保持总宽度。
+        
         Args:
-            cut (int): Offset within the segment to cut.
-
+            cut (int): 分割点。
+            
         Returns:
-            Tuple[Segment, Segment]: Two segments.
+            Tuple[Segment, Segment]: 分割后的两个 Segment。
         """
         text, style, control = self
         assert cut >= 0
 
         if _is_single_cell_widths(text):
-            # Fast path with all 1 cell characters
+            # [优化：快速路径]
+            # 如果文本中所有字符都是单宽，直接按字符索引分割。
             if cut >= len(text):
                 return self, Segment("", style, control)
             return (
@@ -183,7 +216,10 @@ class Segment(NamedTuple):
 
     @classmethod
     def line(cls) -> "Segment":
-        """Make a new line segment."""
+        """[工厂方法：新行片段]
+        
+        创建一个表示换行符的 Segment。
+        """
         return cls("\n")
 
     @classmethod
@@ -193,17 +229,18 @@ class Segment(NamedTuple):
         style: Optional[Style] = None,
         post_style: Optional[Style] = None,
     ) -> Iterable["Segment"]:
-        """Apply style(s) to an iterable of segments.
-
-        Returns an iterable of segments where the style is replaced by ``style + segment.style + post_style``.
-
+        """[工具方法：应用样式]
+        
+        将样式应用到 Segment 流。
+        样式是叠加的：`style + segment.style + post_style`。
+        
         Args:
-            segments (Iterable[Segment]): Segments to process.
-            style (Style, optional): Base style. Defaults to None.
-            post_style (Style, optional): Style to apply on top of segment style. Defaults to None.
-
+            segments (Iterable[Segment]): 要处理的 Segment 流。
+            style (Style, optional): 基础样式。
+            post_style (Style, optional): 叠加在 segment.style 之上的样式。
+            
         Returns:
-            Iterable[Segments]: A new iterable of segments (possibly the same iterable).
+            Iterable[Segment]: 处理后的 Segment 流。
         """
         result_segments = segments
         if style:
@@ -231,15 +268,16 @@ class Segment(NamedTuple):
     def filter_control(
         cls, segments: Iterable["Segment"], is_control: bool = False
     ) -> Iterable["Segment"]:
-        """Filter segments by ``is_control`` attribute.
-
+        """[工具方法：过滤控制码]
+        
+        根据是否包含控制码来过滤 Segment。
+        
         Args:
-            segments (Iterable[Segment]): An iterable of Segment instances.
-            is_control (bool, optional): is_control flag to match in search.
-
+            segments (Iterable[Segment]): 要过滤的 Segment 流。
+            is_control (bool, optional): True 过滤出控制码，False 过滤出非控制码。
+            
         Returns:
-            Iterable[Segment]: And iterable of Segment instances.
-
+            Iterable[Segment]: 过滤后的 Segment 流。
         """
         if is_control:
             return filter(attrgetter("control"), segments)
@@ -248,13 +286,15 @@ class Segment(NamedTuple):
 
     @classmethod
     def split_lines(cls, segments: Iterable["Segment"]) -> Iterable[List["Segment"]]:
-        """Split a sequence of segments in to a list of lines.
-
+        """[工具方法：分割行]
+        
+        将包含换行符的 Segment 流分割成多行。
+        
         Args:
-            segments (Iterable[Segment]): Segments potentially containing line feeds.
-
+            segments (Iterable[Segment]): 可能包含换行符的 Segment 流。
+            
         Yields:
-            Iterable[List[Segment]]: Iterable of segment lists, one per line.
+            Iterable[List[Segment]]: 每一行的 Segment 列表。
         """
         line: List[Segment] = []
         append = line.append
@@ -284,17 +324,18 @@ class Segment(NamedTuple):
         pad: bool = True,
         include_new_lines: bool = True,
     ) -> Iterable[List["Segment"]]:
-        """Split segments in to lines, and crop lines greater than a given length.
-
+        """[工具方法：分割并裁剪行]
+        
+        将 Segment 流分割成行，并裁剪超出指定长度的行。
+        
         Args:
-            segments (Iterable[Segment]): An iterable of segments, probably
-                generated from console.render.
-            length (int): Desired line length.
-            style (Style, optional): Style to use for any padding.
-            pad (bool): Enable padding of lines that are less than `length`.
-
+            segments (Iterable[Segment]): 要处理的 Segment 流。
+            length (int): 目标行长度。
+            style (Style, optional): 填充用的样式。
+            pad (bool): 是否用空格填充短行。
+            
         Returns:
-            Iterable[List[Segment]]: An iterable of lines of segments.
+            Iterable[List[Segment]]: 处理后的行列表。
         """
         line: List[Segment] = []
         append = line.append
@@ -330,16 +371,18 @@ class Segment(NamedTuple):
         style: Optional[Style] = None,
         pad: bool = True,
     ) -> List["Segment"]:
-        """Adjust a line to a given width (cropping or padding as required).
-
+        """[工具方法：调整行长度]
+        
+        裁剪超出长度的行，或用空格填充不足的行。
+        
         Args:
-            segments (Iterable[Segment]): A list of segments in a single line.
-            length (int): The desired width of the line.
-            style (Style, optional): The style of padding if used (space on the end). Defaults to None.
-            pad (bool, optional): Pad lines with spaces if they are shorter than `length`. Defaults to True.
-
+            line (List[Segment]): 单行 Segment 列表。
+            length (int): 目标长度。
+            style (Style, optional): 填充用的样式。
+            pad (bool): 是否填充。
+            
         Returns:
-            List[Segment]: A line of segments with the desired length.
+            List[Segment]: 调整后的行。
         """
         line_length = sum(segment.cell_length for segment in line)
         new_line: List[Segment]
@@ -369,26 +412,30 @@ class Segment(NamedTuple):
 
     @classmethod
     def get_line_length(cls, line: List["Segment"]) -> int:
-        """Get the length of list of segments.
-
+        """[工具方法：获取行长度]
+        
+        计算一行 Segment 的总单元格长度（不含控制码）。
+        
         Args:
-            line (List[Segment]): A line encoded as a list of Segments (assumes no '\\\\n' characters),
-
+            line (List[Segment]): 单行 Segment 列表。
+            
         Returns:
-            int: The length of the line.
+            int: 总长度。
         """
         _cell_len = cell_len
         return sum(_cell_len(text) for text, style, control in line if not control)
 
     @classmethod
     def get_shape(cls, lines: List[List["Segment"]]) -> Tuple[int, int]:
-        """Get the shape (enclosing rectangle) of a list of lines.
-
+        """[工具方法：获取形状]
+        
+        计算一个 Segment 二维列表（多行）的包围矩形尺寸（宽度和高度）。
+        
         Args:
-            lines (List[List[Segment]]): A list of lines (no '\\\\n' characters).
-
+            lines (List[List[Segment]]): 多行 Segment 列表。
+            
         Returns:
-            Tuple[int, int]: Width and height in characters.
+            Tuple[int, int]: (宽度, 高度)。
         """
         get_line_length = cls.get_line_length
         max_width = max(get_line_length(line) for line in lines) if lines else 0
@@ -403,17 +450,19 @@ class Segment(NamedTuple):
         style: Optional[Style] = None,
         new_lines: bool = False,
     ) -> List[List["Segment"]]:
-        """Set the shape of a list of lines (enclosing rectangle).
-
+        """[工具方法：设置形状]
+        
+        将一个 Segment 二维列表调整为指定的宽度和高度。
+        
         Args:
-            lines (List[List[Segment]]): A list of lines.
-            width (int): Desired width.
-            height (int, optional): Desired height or None for no change.
-            style (Style, optional): Style of any padding added.
-            new_lines (bool, optional): Padded lines should include "\n". Defaults to False.
-
+            lines (List[List[Segment]]): 多行 Segment 列表。
+            width (int): 目标宽度。
+            height (int, optional): 目标高度，None 表示不改变。
+            style (Style, optional): 填充用的样式。
+            new_lines (bool): 填充行是否包含换行符。
+            
         Returns:
-            List[List[Segment]]: New list of lines.
+            List[List[Segment]]: 调整后的 Segment 二维列表。
         """
         _height = height or len(lines)
 
@@ -439,17 +488,20 @@ class Segment(NamedTuple):
         style: Style,
         new_lines: bool = False,
     ) -> List[List["Segment"]]:
-        """Aligns lines to top (adds extra lines to bottom as required).
-
+        """[布局工具：顶部对齐]
+        
+        将多行 Segment 列表在指定高度内顶部对齐。
+        如果行数不足，在底部填充空白行。
+        
         Args:
-            lines (List[List[Segment]]): A list of lines.
-            width (int): Desired width.
-            height (int, optional): Desired height or None for no change.
-            style (Style): Style of any padding added.
-            new_lines (bool, optional): Padded lines should include "\n". Defaults to False.
-
+            lines (List[List[Segment]]): 要对齐的多行 Segment 列表。
+            width (int): 填充行的宽度。
+            height (int): 目标高度。
+            style (Style): 填充行的样式。
+            new_lines (bool): 填充行是否包含换行符。
+            
         Returns:
-            List[List[Segment]]: New list of lines.
+            List[List["Segment"]]: 对齐后的 Segment 二维列表。
         """
         extra_lines = height - len(lines)
         if not extra_lines:
@@ -468,17 +520,20 @@ class Segment(NamedTuple):
         style: Style,
         new_lines: bool = False,
     ) -> List[List["Segment"]]:
-        """Aligns render to bottom (adds extra lines above as required).
-
+        """[布局工具：底部对齐]
+        
+        将多行 Segment 列表在指定高度内底部对齐。
+        如果行数不足，在顶部填充空白行。
+        
         Args:
-            lines (List[List[Segment]]): A list of lines.
-            width (int): Desired width.
-            height (int, optional): Desired height or None for no change.
-            style (Style): Style of any padding added. Defaults to None.
-            new_lines (bool, optional): Padded lines should include "\n". Defaults to False.
-
+            lines (List[List["Segment"]]): 要对齐的多行 Segment 列表。
+            width (int): 填充行的宽度。
+            height (int): 目标高度。
+            style (Style): 填充行的样式。
+            new_lines (bool): 填充行是否包含换行符。
+            
         Returns:
-            List[List[Segment]]: New list of lines.
+            List[List["Segment"]]: 对齐后的 Segment 二维列表。
         """
         extra_lines = height - len(lines)
         if not extra_lines:
@@ -497,17 +552,20 @@ class Segment(NamedTuple):
         style: Style,
         new_lines: bool = False,
     ) -> List[List["Segment"]]:
-        """Aligns lines to middle (adds extra lines to above and below as required).
-
+        """[布局工具：居中对齐]
+        
+        将多行 Segment 列表在指定高度内居中对齐。
+        如果行数不足，在顶部和底部平均填充空白行。
+        
         Args:
-            lines (List[List[Segment]]): A list of lines.
-            width (int): Desired width.
-            height (int, optional): Desired height or None for no change.
-            style (Style): Style of any padding added.
-            new_lines (bool, optional): Padded lines should include "\n". Defaults to False.
-
+            lines (List[List["Segment"]]): 要对齐的多行 Segment 列表。
+            width (int): 填充行的宽度。
+            height (int): 目标高度。
+            style (Style): 填充行的样式。
+            new_lines (bool): 填充行是否包含换行符。
+            
         Returns:
-            List[List[Segment]]: New list of lines.
+            List[List["Segment"]]: 对齐后的 Segment 二维列表。
         """
         extra_lines = height - len(lines)
         if not extra_lines:
@@ -521,13 +579,16 @@ class Segment(NamedTuple):
 
     @classmethod
     def simplify(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
-        """Simplify an iterable of segments by combining contiguous segments with the same style.
-
+        """[优化工具：简化 Segment 流]
+        
+        合并连续且样式相同的 Segment。
+        这可以减少 Segment 的数量，提高渲染效率。
+        
         Args:
-            segments (Iterable[Segment]): An iterable of segments.
-
+            segments (Iterable["Segment"]): 要简化的 Segment 流。
+            
         Returns:
-            Iterable[Segment]: A possibly smaller iterable of segments that will render the same way.
+            Iterable["Segment"]: 简化后的 Segment 流。
         """
         iter_segments = iter(segments)
         try:
@@ -548,13 +609,15 @@ class Segment(NamedTuple):
 
     @classmethod
     def strip_links(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
-        """Remove all links from an iterable of styles.
-
+        """[过滤工具：移除链接]
+        
+        从 Segment 流中移除所有链接（URL）。
+        
         Args:
-            segments (Iterable[Segment]): An iterable segments.
-
+            segments (Iterable["Segment"]): 要处理的 Segment 流。
+            
         Yields:
-            Segment: Segments with link removed.
+            "Segment": 移除链接后的 Segment。
         """
         for segment in segments:
             if segment.control or segment.style is None:
@@ -565,26 +628,30 @@ class Segment(NamedTuple):
 
     @classmethod
     def strip_styles(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
-        """Remove all styles from an iterable of segments.
-
+        """[过滤工具：移除样式]
+        
+        从 Segment 流中移除所有样式信息。
+        
         Args:
-            segments (Iterable[Segment]): An iterable segments.
-
+            segments (Iterable["Segment"]): 要处理的 Segment 流。
+            
         Yields:
-            Segment: Segments with styles replace with None
+            "Segment": 样式为 None 的 Segment。
         """
         for text, _style, control in segments:
             yield cls(text, None, control)
 
     @classmethod
     def remove_color(cls, segments: Iterable["Segment"]) -> Iterable["Segment"]:
-        """Remove all color from an iterable of segments.
-
+        """[过滤工具：移除颜色]
+        
+        从 Segment 流中移除所有颜色信息，但保留其他样式（如粗体、下划线）。
+        
         Args:
-            segments (Iterable[Segment]): An iterable segments.
-
+            segments (Iterable["Segment"]): 要处理的 Segment 流。
+            
         Yields:
-            Segment: Segments with colorless style.
+            "Segment": 无颜色的 Segment。
         """
 
         cache: Dict[Style, Style] = {}
@@ -602,13 +669,16 @@ class Segment(NamedTuple):
     def divide(
         cls, segments: Iterable["Segment"], cuts: Iterable[int]
     ) -> Iterable[List["Segment"]]:
-        """Divides an iterable of segments in to portions.
-
+        """[分割工具：按位置分割]
+        
+        在指定的单元格位置分割 Segment 流，返回多个 Segment 列表。
+        
         Args:
-            cuts (Iterable[int]): Cell positions where to divide.
-
+            segments (Iterable["Segment"]): 要分割的 Segment 流。
+            cuts (Iterable[int]): 分割点列表。
+            
         Yields:
-            [Iterable[List[Segment]]]: An iterable of Segments in List.
+            Iterable[List["Segment"]]: 分割后的 Segment 列表。
         """
         split_segments: List["Segment"] = []
         add_segment = split_segments.append
@@ -669,12 +739,10 @@ class Segment(NamedTuple):
 
 
 class Segments:
-    """A simple renderable to render an iterable of segments. This class may be useful if
-    you want to print segments outside of a __rich_console__ method.
-
-    Args:
-        segments (Iterable[Segment]): An iterable of segments.
-        new_lines (bool, optional): Add new lines between segments. Defaults to False.
+    """[简单渲染器：Segment 流包装器]
+    
+    一个简单的渲染器，用于在 `__rich_console__` 方法之外打印 Segment 流。
+    它将一个 Segment 流包装成一个可渲染对象。
     """
 
     def __init__(self, segments: Iterable[Segment], new_lines: bool = False) -> None:
@@ -694,13 +762,19 @@ class Segments:
 
 
 class SegmentLines:
-    def __init__(self, lines: Iterable[List[Segment]], new_lines: bool = False) -> None:
-        """A simple renderable containing a number of lines of segments. May be used as an intermediate
-        in rendering process.
+    """[简单渲染器：多行 Segment 包装器]
+    
+    一个简单的渲染器，用于处理多行 Segment 列表。
+    它将一个二维的 Segment 列表（多行）包装成一个可渲染对象。
+    这在渲染过程中可能作为中间步骤使用。
+    """
 
+    def __init__(self, lines: Iterable[List[Segment]], new_lines: bool = False) -> None:
+        """[构造函数]
+        
         Args:
-            lines (Iterable[List[Segment]]): Lists of segments forming lines.
-            new_lines (bool, optional): Insert new lines after each line. Defaults to False.
+            lines (Iterable[List[Segment]]): 多行 Segment 列表。
+            new_lines (bool, optional): 是否在每行后插入换行符。Defaults to False.
         """
         self.lines = list(lines)
         self.new_lines = new_lines
@@ -708,17 +782,30 @@ class SegmentLines:
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
+        """[渲染协议：核心方法]
+        
+        当 `rich.print` 或 `console.print` 遇到这个对象时，会调用此方法。
+        
+        Args:
+            console (Console): 当前的 Console 实例。
+            options (ConsoleOptions): 渲染选项。
+            
+        Yields:
+            RenderResult: 生成的 Segment 流。
+        """
         if self.new_lines:
             new_line = Segment.line()
             for line in self.lines:
-                yield from line
-                yield new_line
+                yield from line # 逐个生成该行的 Segment
+                yield new_line # 生成换行符
         else:
             for line in self.lines:
-                yield from line
+                yield from line # 逐个生成该行的 Segment
 
 
 if __name__ == "__main__":  # pragma: no cover
+    # [模块测试与演示]
+    # 这部分代码展示了 Segment 的工作原理，是学习 Rich 内部机制的好例子。
     from rich.console import Console
     from rich.syntax import Syntax
     from rich.text import Text
@@ -732,21 +819,33 @@ console.print(text)"""
 
     console = Console()
 
+    # [演示 1：标题]
     console.rule("rich.Segment")
+    
+    # [演示 2：介绍]
     console.print(
         "A Segment is the last step in the Rich render process before generating text with ANSI codes."
     )
+    
+    # [演示 3：展示代码]
     console.print("\nConsider the following code:\n")
     console.print(Syntax(code, "python", line_numbers=True))
+    
+    # [演示 4：渲染过程]
     console.print()
     console.print(
         "When you call [b]print()[/b], Rich [i]renders[/i] the object in to the following:\n"
     )
+    # [关键步骤]：调用 console.render 获取 Segment 流
     fragments = list(console.render(text))
-    console.print(fragments)
+    console.print(fragments) # 直接打印 Segment 对象（会显示其文本内容）
+    
+    # [演示 5：最终输出]
     console.print()
     console.print("The Segments are then processed to produce the following output:\n")
-    console.print(text)
+    console.print(text) # 最终的、带有样式的输出
+    
+    # [总结]
     console.print(
         "\nYou will only need to know this if you are implementing your own Rich renderables."
     )

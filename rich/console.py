@@ -1,3 +1,7 @@
+# [导入分析]
+# 该文件大量使用了 typing 模块（如 Protocol, Literal, TypeAlias 等），表明项目高度重视类型安全和静态检查。
+# 这符合高质量开源项目的规范，有助于 IDE 提示和减少运行时错误。
+
 import inspect
 import os
 import sys
@@ -67,21 +71,31 @@ if TYPE_CHECKING:
     from .live import Live
     from .status import Status
 
+# [常量定义]
+# 定义了 Jupyter 环境下的默认尺寸，以及判断当前操作系统的标志。
 JUPYTER_DEFAULT_COLUMNS = 115
 JUPYTER_DEFAULT_LINES = 100
 WINDOWS = sys.platform == "win32"
 
 HighlighterType = Callable[[Union[str, "Text"]], "Text"]
+# [类型别名优化]
+# 使用 Literal 类型限制了参数只能取特定的字符串值，这在编译期就能防止拼写错误。
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
 OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
 
 
 class NoChange:
+    """[标记类设计]
+    这是一个特殊的哨兵类，用于区分“用户传入了 None”和“用户没有传入参数”的情况。
+    在 ConsoleOptions.update 方法中作为默认值非常关键。
+    """
     pass
 
 
 NO_CHANGE = NoChange()
 
+# [系统资源初始化]
+# 获取标准输入、输出、错误的文件描述符。这是 Python 与操作系统底层交互的基础。
 try:
     _STDIN_FILENO = sys.__stdin__.fileno()  # type: ignore[union-attr]
 except Exception:
@@ -99,6 +113,9 @@ _STD_STREAMS = (_STDIN_FILENO, _STDOUT_FILENO, _STDERR_FILENO)
 _STD_STREAMS_OUTPUT = (_STDOUT_FILENO, _STDERR_FILENO)
 
 
+# [策略数据映射]
+# 定义了不同终端类型（TERM环境变量）对应的色彩支持能力。
+# 这体现了策略模式的数据准备阶段。
 _TERM_COLORS = {
     "kitty": ColorSystem.EIGHT_BIT,
     "256color": ColorSystem.EIGHT_BIT,
@@ -107,8 +124,11 @@ _TERM_COLORS = {
 
 
 class ConsoleDimensions(NamedTuple):
-    """Size of the terminal."""
-
+    """[数据结构分析]
+    使用 NamedTuple 定义不可变的数据结构。
+    优点：轻量、内存占用小、可以作为字典键、自带字段访问方式（.width）。
+    用途：存储终端的宽和高。
+    """
     width: int
     """The width of the console in 'cells'."""
     height: int
@@ -117,7 +137,14 @@ class ConsoleDimensions(NamedTuple):
 
 @dataclass
 class ConsoleOptions:
-    """Options for __rich_console__ method."""
+    """[核心配置类 - 设计模式：参数对象 / 不可变链式构建]
+    
+    该类封装了渲染过程中的所有上下文配置（尺寸、编码、对齐方式等）。
+    
+    关键设计点：
+    1. 所有的 update 方法都返回一个新的 ConsoleOptions 实例（self.copy()）。
+    2. 这意味着原配置对象不会被修改，保证了渲染过程中的线程安全和状态一致性。
+    """
 
     size: ConsoleDimensions
     """Size of console."""
@@ -147,14 +174,16 @@ class ConsoleOptions:
 
     @property
     def ascii_only(self) -> bool:
-        """Check if renderables should use ascii only."""
+        """[逻辑判断属性]
+        根据编码快速判断是否只支持 ASCII 字符。
+        如果不是以 'utf' 开头的编码，通常被视为不支持宽字符（如中文）。
+        """
         return not self.encoding.startswith("utf")
 
     def copy(self) -> "ConsoleOptions":
-        """Return a copy of the options.
-
-        Returns:
-            ConsoleOptions: a copy of self.
+        """[对象创建模式：原型模式]
+        创建当前对象的浅拷贝。
+        由于 dataclass 主要包含基本数据类型，浅拷贝足够。
         """
         options: ConsoleOptions = ConsoleOptions.__new__(ConsoleOptions)
         options.__dict__ = self.__dict__.copy()
@@ -173,7 +202,13 @@ class ConsoleOptions:
         markup: Union[Optional[bool], NoChange] = NO_CHANGE,
         height: Union[Optional[int], NoChange] = NO_CHANGE,
     ) -> "ConsoleOptions":
-        """Update values, return a copy."""
+        """[流式接口 / 链式调用]
+        允许在不修改原对象的情况下更新配置。
+        使用 NoChange 哨兵类作为默认值，解决了 None 无法作为“不修改”标识的问题。
+        
+        示例用法：
+            new_options = options.update(width=80, justify="center")
+        """
         options = self.copy()
         if not isinstance(width, NoChange):
             options.min_width = options.max_width = max(0, width)
@@ -198,51 +233,29 @@ class ConsoleOptions:
         return options
 
     def update_width(self, width: int) -> "ConsoleOptions":
-        """Update just the width, return a copy.
-
-        Args:
-            width (int): New width (sets both min_width and max_width)
-
-        Returns:
-            ~ConsoleOptions: New console options instance.
+        """[便捷方法]
+        封装了更新宽度的常用操作，减少代码重复。
         """
         options = self.copy()
         options.min_width = options.max_width = max(0, width)
         return options
 
     def update_height(self, height: int) -> "ConsoleOptions":
-        """Update the height, and return a copy.
-
-        Args:
-            height (int): New height
-
-        Returns:
-            ~ConsoleOptions: New Console options instance.
-        """
+        """[便捷方法]"""
         options = self.copy()
         options.max_height = options.height = height
         return options
 
     def reset_height(self) -> "ConsoleOptions":
-        """Return a copy of the options with height set to ``None``.
-
-        Returns:
-            ~ConsoleOptions: New console options instance.
+        """[状态重置]
+        将高度重置为 None（通常意味着自动高度）。
         """
         options = self.copy()
         options.height = None
         return options
 
     def update_dimensions(self, width: int, height: int) -> "ConsoleOptions":
-        """Update the width and height, and return a copy.
-
-        Args:
-            width (int): New width (sets both min_width and max_width).
-            height (int): New height.
-
-        Returns:
-            ~ConsoleOptions: New console options instance.
-        """
+        """[便捷方法]"""
         options = self.copy()
         options.min_width = options.max_width = max(0, width)
         options.height = options.max_height = height
@@ -251,7 +264,13 @@ class ConsoleOptions:
 
 @runtime_checkable
 class RichCast(Protocol):
-    """An object that may be 'cast' to a console renderable."""
+    """[接口定义：Protocol（协议）]
+    
+    Python 的 Protocol 是静态鸭子类型。只要一个类实现了 __rich__ 方法，
+    静态类型检查器（如 mypy）就会认为它是 RichCast 的子类。
+    
+    这是 Rich 库扩展性的核心：允许任何自定义对象通过实现 __rich__ 方法变成可渲染对象。
+    """
 
     def __rich__(
         self,
@@ -261,7 +280,12 @@ class RichCast(Protocol):
 
 @runtime_checkable
 class ConsoleRenderable(Protocol):
-    """An object that supports the console protocol."""
+    """[核心渲染接口]
+    所有需要在终端上渲染的复杂对象（表格、进度条等）都必须实现此接口。
+    
+    方法：
+        __rich_console__: 传入 Console 实例和配置，返回渲染结果（Segment 流）。
+    """
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -271,20 +295,31 @@ class ConsoleRenderable(Protocol):
 
 # A type that may be rendered by Console.
 RenderableType = Union[ConsoleRenderable, RichCast, str]
-"""A string or any object that may be rendered by Rich."""
+"""[类型别名]
+定义了所有可渲染类型的联合类型。
+这使得 Console.print() 方法可以接受字符串、表格、或任何实现了协议的对象。
+"""
 
 # The result of calling a __rich_console__ method.
 RenderResult = Iterable[Union[RenderableType, Segment]]
+"""[生成器类型别名]
+渲染结果通常是一个生成器，按需产生 Segment，避免内存中一次性构建巨大的字符串。"""
 
 _null_highlighter = NullHighlighter()
 
 
 class CaptureError(Exception):
-    """An error in the Capture context manager."""
+    """[自定义异常]
+    用于在 Capture 上下文管理器中发生错误时抛出。
+    """
+    pass
 
 
 class NewLine:
-    """A renderable to generate new line(s)"""
+    """[基础渲染组件]
+    一个最简单的 Renderable，用于生成指定数量的换行符。
+    体现了“万物皆可渲染”的设计思想。
+    """
 
     def __init__(self, count: int = 1) -> None:
         self.count = count
@@ -296,7 +331,10 @@ class NewLine:
 
 
 class ScreenUpdate:
-    """Render a list of lines at a given offset."""
+    """[底层控制渲染]
+    用于直接在屏幕的指定 绘制一组行。
+    这通常用于实现复杂的动画或局部刷新效果。
+    """
 
     def __init__(self, lines: List[List[Segment]], x: int, y: int) -> None:
         self._lines = lines
@@ -308,17 +346,22 @@ class ScreenUpdate:
     ) -> RenderResult:
         x = self.x
         move_to = Control.move_to
+        # [算法逻辑]
+        # 遍历所有行，先输出“移动光标”控制序列，再输出该行的内容。
         for offset, line in enumerate(self._lines, self.y):
             yield move_to(x, offset)
             yield from line
 
 
 class Capture:
-    """Context manager to capture the result of printing to the console.
-    See :meth:`~rich.console.Console.capture` for how to use.
-
-    Args:
-        console (Console): A console instance to capture output.
+    """[上下文管理器：输出捕获]
+    
+    功能：拦截 Console 的输出，不打印到屏幕，而是保存为字符串。
+    实现：
+        __enter__: 开启捕获模式。
+        __exit__: 结束捕获并获取结果。
+    
+    应用场景：单元测试、生成文本报告。
     """
 
     def __init__(self, console: "Console") -> None:
@@ -335,6 +378,7 @@ class Capture:
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
+        # 即使发生异常，也会尝试结束捕获并保存已输出的部分
         self._result = self._console.end_capture()
 
     def get(self) -> str:
@@ -347,7 +391,11 @@ class Capture:
 
 
 class ThemeContext:
-    """A context manager to use a temporary theme. See :meth:`~rich.console.Console.use_theme` for usage."""
+    """[上下文管理器：临时主题切换]
+    
+    允许在 `with` 块内临时应用一个新的主题，退出后自动恢复原主题。
+    这是栈式管理的典型应用（ThemeStack）。
+    """
 
     def __init__(self, console: "Console", theme: Theme, inherit: bool = True) -> None:
         self.console = console
@@ -368,7 +416,14 @@ class ThemeContext:
 
 
 class PagerContext:
-    """A context manager that 'pages' content. See :meth:`~rich.console.Console.pager` for usage."""
+    """[上下文管理器：分页显示]
+    
+    当内容超过一屏时，调用系统的分页器（如 Linux 的 less 或 more）进行显示。
+    
+    逻辑：
+        1. 进入时：开启缓冲。
+        2. 退出时：将缓冲区内容转换为文本，传给 SystemPager。
+    """
 
     def __init__(
         self,
@@ -393,6 +448,8 @@ class PagerContext:
         exc_tb: Optional[TracebackType],
     ) -> None:
         if exc_type is None:
+            # [线程安全]
+            # 使用锁确保在提取 buffer 时不会有其他线程干扰。
             with self._console._lock:
                 buffer: List[Segment] = self._console._buffer[:]
                 del self._console._buffer[:]
@@ -407,7 +464,13 @@ class PagerContext:
 
 
 class ScreenContext:
-    """A context manager that enables an alternative screen. See :meth:`~rich.console.Console.screen` for usage."""
+    """[上下文管理器：备用屏幕]
+    
+    开启备用屏幕模式（类似 vim 或 top 的全屏模式）。
+    
+    原理：使用 ANSI 转义序列切换终端缓冲区。
+    退出时必须恢复原状，否则用户的终端会“乱码”或看不到历史命令。
+    """
 
     def __init__(
         self, console: "Console", hide_cursor: bool, style: StyleType = ""
@@ -448,17 +511,18 @@ class ScreenContext:
         exc_tb: Optional[TracebackType],
     ) -> None:
         if self._changed:
+            # [资源清理]
+            # 无论是否发生异常，都要确保切回主屏幕并恢复光标。
             self.console.set_alt_screen(False)
             if self.hide_cursor:
                 self.console.show_cursor(True)
 
 
 class Group:
-    """Takes a group of renderables and returns a renderable object that renders the group.
-
-    Args:
-        renderables (Iterable[RenderableType]): An iterable of renderable objects.
-        fit (bool, optional): Fit dimension of group to contents, or fill available space. Defaults to True.
+    """[设计模式：组合模式]
+    
+    将多个 Renderable 组合成一个大的 Renderable。
+    这样，一个复杂的界面（包含表头、表格、进度条）可以被看作一个单一的对象进行渲染。
     """
 
     def __init__(self, *renderables: "RenderableType", fit: bool = True) -> None:
@@ -475,6 +539,10 @@ class Group:
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "Measurement":
+        """[尺寸测量协议]
+        如果 fit=True，Group 的大小由内部元素的大小决定。
+        如果 fit=False，Group 强行填满父容器提供的最大空间。
+        """
         if self.fit:
             return measure_renderables(console, options, self.renderables)
         else:
@@ -483,16 +551,18 @@ class Group:
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> RenderResult:
+        # [委托模式]
+        # 简单地将渲染请求转发给内部的每一个 renderable。
         yield from self.renderables
 
 
 def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
-    """A decorator that turns an iterable of renderables in to a group.
-
-    Args:
-        fit (bool, optional): Fit dimension of group to contents, or fill available space. Defaults to True.
+    """[装饰器工厂]
+    
+    这是一个高级装饰器，用于将一个生成 renderable 的函数转换为返回 Group 对象的函数。
+    
+    用途：简化代码，允许开发者写生成器函数来定义 UI 布局，而不需要手动构造 Group 对象。
     """
-
     def decorator(
         method: Callable[..., Iterable[RenderableType]],
     ) -> Callable[..., Group]:
@@ -509,13 +579,25 @@ def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
 
 
 def _is_jupyter() -> bool:  # pragma: no cover
-    """Check if we're running in a Jupyter notebook."""
+    """[环境检测：运行环境识别]
+    
+    动态检测代码是否运行在 Jupyter Notebook 或 Google Colab 等环境中。
+    
+    实现原理：
+    1. 尝试访问 `get_ipython` 这个全局变量（IPython 内核注入的）。
+    2. 如果不存在，说明不是在 IPython 环境中运行。
+    3. 如果存在，进一步检查 IPython Shell 的类名，区分是 Notebook 界面还是终端界面。
+    """
     try:
         get_ipython  # type: ignore[name-defined]
     except NameError:
         return False
     ipython = get_ipython()  # type: ignore[name-defined]
     shell = ipython.__class__.__name__
+    
+    # [策略判断]
+    # ZMQInteractiveShell 通常对应 Jupyter Notebook 或 Jupyter QtConsole。
+    # google.colab 是 Colab 特有的判断。
     if (
         "google.colab" in str(ipython.__class__)
         or os.getenv("DATABRICKS_RUNTIME_VERSION")
@@ -535,20 +617,39 @@ COLOR_SYSTEMS = {
     "windows": ColorSystem.WINDOWS,
 }
 
+# [字典推导式]
+# 反转 COLOR_SYSTEMS 字典，方便从枚举值反向查找字符串名称。
 _COLOR_SYSTEMS_NAMES = {system: name for name, system in COLOR_SYSTEMS.items()}
 
 
 @dataclass
 class ConsoleThreadLocals(threading.local):
-    """Thread local values for Console context."""
+    """[设计模式：线程局部存储]
+    
+    继承自 `threading.local`，使得存储在其中的变量在每个线程中都有独立的副本。
+    
+    作用：
+    Rich 的 Console 实例可能会在多线程环境中共享。
+    如果不使用 TLS，多个线程同时调用 `print` 可能会互相干扰缓冲区或主题栈。
+    通过 TLS，确保每个线程拥有独立的 `buffer`（输出缓冲）和 `theme_stack`（样式堆栈）。
+    """
 
     theme_stack: ThemeStack
+    # [默认工厂]
+    # 使用 field(default_factory=list) 是为了避免所有线程共享同一个 list 对象。
     buffer: List[Segment] = field(default_factory=list)
     buffer_index: int = 0
 
 
 class RenderHook(ABC):
-    """Provides hooks in to the render process."""
+    """[设计模式：观察者模式 / 钩子机制]
+    
+    定义了一个抽象接口，允许用户在渲染流程中插入自定义逻辑。
+    
+    应用场景：
+    比如用户想要在每次渲染前统一修改某些内容，或者收集渲染统计信息，
+    可以实现这个接口并注册到 Console 中。
+    """
 
     @abstractmethod
     def process_renderables(
@@ -564,12 +665,19 @@ class RenderHook(ABC):
         Returns:
             List[ConsoleRenderable]: A replacement list of renderables.
         """
+        # [子类必须实现]
+        pass
 
 
 _windows_console_features: Optional["WindowsConsoleFeatures"] = None
 
 
 def get_windows_console_features() -> "WindowsConsoleFeatures":  # pragma: no cover
+    """[单例模式变种 / 延迟加载]
+    
+    使用模块级全局变量缓存 Windows 控制台特性。
+    避免每次调用都去查询系统 API，提高性能。
+    """
     global _windows_console_features
     if _windows_console_features is not None:
         return _windows_console_features
@@ -580,46 +688,27 @@ def get_windows_console_features() -> "WindowsConsoleFeatures":  # pragma: no co
 
 
 def detect_legacy_windows() -> bool:
-    """Detect legacy Windows."""
+    """[环境检测：旧版 Windows 判断]
+    
+    判断是否运行在旧的 Windows 控制台（不支持 ANSI 转义序列）。
+    旧版 Windows 需要特殊的 API 调用来设置颜色。
+    """
     return WINDOWS and not get_windows_console_features().vt
 
 
 class Console:
-    """A high level console interface.
-
-    Args:
-        color_system (str, optional): The color system supported by your terminal,
-            either ``"standard"``, ``"256"`` or ``"truecolor"``. Leave as ``"auto"`` to autodetect.
-        force_terminal (Optional[bool], optional): Enable/disable terminal control codes, or None to auto-detect terminal. Defaults to None.
-        force_jupyter (Optional[bool], optional): Enable/disable Jupyter rendering, or None to auto-detect Jupyter. Defaults to None.
-        force_interactive (Optional[bool], optional): Enable/disable interactive mode, or None to auto detect. Defaults to None.
-        soft_wrap (Optional[bool], optional): Set soft wrap default on print method. Defaults to False.
-        theme (Theme, optional): An optional style theme object, or ``None`` for default theme.
-        stderr (bool, optional): Use stderr rather than stdout if ``file`` is not specified. Defaults to False.
-        file (IO, optional): A file object where the console should write to. Defaults to stdout.
-        quiet (bool, Optional): Boolean to suppress all output. Defaults to False.
-        width (int, optional): The width of the terminal. Leave as default to auto-detect width.
-        height (int, optional): The height of the terminal. Leave as default to auto-detect height.
-        style (StyleType, optional): Style to apply to all output, or None for no style. Defaults to None.
-        no_color (Optional[bool], optional): Enabled no color mode, or None to auto detect. Defaults to None.
-        tab_size (int, optional): Number of spaces used to replace a tab character. Defaults to 8.
-        record (bool, optional): Boolean to enable recording of terminal output,
-            required to call :meth:`export_html`, :meth:`export_svg`, and :meth:`export_text`. Defaults to False.
-        markup (bool, optional): Boolean to enable :ref:`console_markup`. Defaults to True.
-        emoji (bool, optional): Enable emoji code. Defaults to True.
-        emoji_variant (str, optional): Optional emoji variant, either "text" or "emoji". Defaults to None.
-        highlight (bool, optional): Enable automatic highlighting. Defaults to True.
-        log_time (bool, optional): Boolean to enable logging of time by :meth:`log` methods. Defaults to True.
-        log_path (bool, optional): Boolean to enable the logging of the caller by :meth:`log`. Defaults to True.
-        log_time_format (Union[str, TimeFormatterCallable], optional): If ``log_time`` is enabled, either string for strftime or callable that formats the time. Defaults to "[%X] ".
-        highlighter (HighlighterType, optional): Default highlighter.
-        legacy_windows (bool, optional): Enable legacy Windows mode, or ``None`` to auto detect. Defaults to ``None``.
-        safe_box (bool, optional): Restrict box options that don't render on legacy Windows.
-        get_datetime (Callable[[], datetime], optional): Callable that gets the current time as a datetime.datetime object (used by Console.log),
-            or None for datetime.now.
-        get_time (Callable[[], time], optional): Callable that gets the current time in seconds, default uses time.monotonic.
+    """[核心类：Console]
+    
+    Rich 库的门面类，封装了所有终端交互的高级接口。
+    
+    设计特点：
+    1. 参数高度可配置：支持自动检测或手动强制指定终端类型、颜色、尺寸等。
+    2. 兼容性强：处理了 Windows、Jupyter、标准终端等多种环境差异。
+    3. 依赖注入：允许注入文件对象、时间获取函数等，便于单元测试。
     """
 
+    # [默认环境变量源]
+    # 允许在测试时注入假的 _environ，实现环境隔离。
     _environ: Mapping[str, str] = os.environ
 
     def __init__(
@@ -660,9 +749,12 @@ class Console:
         if _environ is not None:
             self._environ = _environ
 
+        # [环境判断：Jupyter]
+        # 如果没有强制指定，则自动检测。如果是 Jupyter，设置默认宽高。
         self.is_jupyter = _is_jupyter() if force_jupyter is None else force_jupyter
         if self.is_jupyter:
             if width is None:
+                # [优先级：环境变量 > 代码常量]
                 jupyter_columns = self._environ.get("JUPYTER_COLUMNS")
                 if jupyter_columns is not None and jupyter_columns.isdigit():
                     width = int(jupyter_columns)
@@ -681,6 +773,9 @@ class Console:
         self._emoji = emoji
         self._emoji_variant: Optional[EmojiVariant] = emoji_variant
         self._highlight = highlight
+        
+        # [兼容性处理：Windows]
+        # 自动检测是否为旧版 Windows，除非手动指定。
         self.legacy_windows: bool = (
             (detect_legacy_windows() and not self.is_jupyter)
             if legacy_windows is None
@@ -688,10 +783,12 @@ class Console:
         )
 
         if width is None:
+            # [环境变量读取：COLUMNS]
             columns = self._environ.get("COLUMNS")
             if columns is not None and columns.isdigit():
-                width = int(columns) - self.legacy_windows
+                width = int(columns) - self.legacy_windows # 旧版 Windows 可能会导致边距问题
         if height is None:
+            # [环境变量读取：LINES]
             lines = self._environ.get("LINES")
             if lines is not None and lines.isdigit():
                 height = int(lines)
@@ -710,6 +807,7 @@ class Console:
         self.quiet = quiet
         self.stderr = stderr
 
+        # [颜色系统初始化]
         if color_system is None:
             self._color_system = None
         elif color_system == "auto":
@@ -717,22 +815,38 @@ class Console:
         else:
             self._color_system = COLOR_SYSTEMS[color_system]
 
+        # [并发控制]
+        # 使用可重入锁 (RLock)，因为同一个线程可能会递归调用渲染方法。
         self._lock = threading.RLock()
+        
+        # [日志渲染器初始化]
         self._log_render = LogRender(
             show_time=log_time,
             show_path=log_path,
             time_format=log_time_format,
         )
+        
+        # [依赖注入：高亮器]
+        # 允许自定义语法高亮逻辑。
         self.highlighter: HighlighterType = highlighter or _null_highlighter
         self.safe_box = safe_box
+        
+        # [依赖注入：时间获取函数]
+        # 默认使用系统时间，但可以注入 Mock 时间用于测试。
         self.get_datetime = get_datetime or datetime.now
         self.get_time = get_time or monotonic
+        
         self.style = style
+        
+        # [环境变量：NO_COLOR]
+        # 遵循 NO_COLOR 标准 https://no-color.org/
         self.no_color = (
             no_color
             if no_color is not None
             else self._environ.get("NO_COLOR", "") != ""
         )
+        
+        # [交互模式判断]
         if force_interactive is None:
             tty_interactive = self._environ.get("TTY_INTERACTIVE", None)
             if tty_interactive is not None:
@@ -747,6 +861,8 @@ class Console:
             else force_interactive
         )
 
+        # [线程局部存储初始化]
+        # 初始化每个线程独有的缓冲区和主题栈。
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals(
             theme_stack=ThemeStack(themes.DEFAULT if theme is None else theme)
@@ -757,11 +873,21 @@ class Console:
         self._is_alt_screen = False
 
     def __repr__(self) -> str:
+        """[对象表示]
+        提供简洁的对象描述，便于调试。
+        """
         return f"<console width={self.width} {self._color_system!s}>"
 
     @property
     def file(self) -> IO[str]:
-        """Get the file object to write to."""
+        """[属性：输出文件对象]
+        
+        逻辑：
+        1. 如果显式指定了 file，使用它。
+        2. 否则，根据 stderr 标志选择 sys.stderr 或 sys.stdout。
+        3. 检查是否有 rich_proxied_file (用于代理输出，如捕获模式)。
+        4. 最终兜底使用 NULL_FILE (丢弃所有输出)。
+        """
         file = self._file or (sys.stderr if self.stderr else sys.stdout)
         file = getattr(file, "rich_proxied_file", file)
         if file is None:
@@ -770,17 +896,23 @@ class Console:
 
     @file.setter
     def file(self, new_file: IO[str]) -> None:
-        """Set a new file object."""
+        """[属性设置器]
+        允许动态修改输出目标。
+        """
         self._file = new_file
 
     @property
     def _buffer(self) -> List[Segment]:
-        """Get a thread local buffer."""
+        """[属性：线程局部缓冲区]
+        
+        通过装饰器隐藏了线程局部变量的实现细节，
+        外部使用时就像访问普通属性一样，但实际获取的是当前线程的 buffer。
+        """
         return self._thread_locals.buffer
 
     @property
     def _buffer_index(self) -> int:
-        """Get a thread local buffer."""
+        """[属性：线程局部缓冲区索引]"""
         return self._thread_locals.buffer_index
 
     @_buffer_index.setter
@@ -789,11 +921,20 @@ class Console:
 
     @property
     def _theme_stack(self) -> ThemeStack:
-        """Get the thread local theme stack."""
+        """[属性：线程局部主题栈]"""
         return self._thread_locals.theme_stack
 
     def _detect_color_system(self) -> Optional[ColorSystem]:
-        """Detect color system from env vars."""
+        """[算法：颜色系统探测]
+        
+        自动检测终端支持的颜色等级（标准16色、256色、真彩色）。
+        
+        检测优先级：
+        1. Jupyter 环境 -> Truecolor
+        2. 非终端或哑终端 -> None (无颜色)
+        3. Windows -> 检查 API 支持 Truecolor 或 8-bit
+        4. Linux/Mac -> 检查 COLORTERM 和 TERM 环境变量
+        """
         if self.is_jupyter:
             return ColorSystem.TRUECOLOR
         if not self.is_terminal or self.is_dumb_terminal:
@@ -809,75 +950,88 @@ class Console:
             )
         else:
             color_term = self._environ.get("COLORTERM", "").strip().lower()
+            # COLORTERM=truecolor 或 24bit 是现代终端支持真彩色的标志
             if color_term in ("truecolor", "24bit"):
                 return ColorSystem.TRUECOLOR
             term = self._environ.get("TERM", "").strip().lower()
+            # 解析 TERM 变量，如 "xterm-256color"
             _term_name, _hyphen, colors = term.rpartition("-")
             color_system = _TERM_COLORS.get(colors, ColorSystem.STANDARD)
             return color_system
 
     def _enter_buffer(self) -> None:
-        """Enter in to a buffer context, and buffer all output."""
+        """[状态管理：进入缓冲模式]
+        
+        增加缓冲区索引。索引大于0意味着当前处于“捕获”或“分页”等不应立即输出的状态。
+        """
         self._buffer_index += 1
 
     def _exit_buffer(self) -> None:
-        """Leave buffer context, and render content if required."""
+        """[状态管理：退出缓冲模式]
+        
+        减少索引，并触发缓冲区内容的检查和渲染。
+        """
         self._buffer_index -= 1
         self._check_buffer()
 
     def set_live(self, live: "Live") -> bool:
-        """Set Live instance. Used by Live context manager (no need to call directly).
-
-        Args:
-            live (Live): Live instance using this Console.
-
+        """[状态管理：设置 Live 显示]
+        
+        用于 Live 上下文管理器。实现了一个栈结构，支持 Live 嵌套（虽然通常不推荐）。
+        
         Returns:
-            Boolean that indicates if the live is the topmost of the stack.
-
-        Raises:
-            errors.LiveError: If this Console has a Live context currently active.
+            Boolean: 如果是栈底（第一个 Live），返回 True，表示需要初始化。
         """
         with self._lock:
             self._live_stack.append(live)
             return len(self._live_stack) == 1
 
     def clear_live(self) -> None:
-        """Clear the Live instance. Used by the Live context manager (no need to call directly)."""
+        """[状态管理：清除 Live 显示]"""
         with self._lock:
             self._live_stack.pop()
 
     def push_render_hook(self, hook: RenderHook) -> None:
-        """Add a new render hook to the stack.
-
-        Args:
-            hook (RenderHook): Render hook instance.
+        """[扩展点：注册渲染钩子]
+        
+        将自定义的渲染逻辑推入栈中。渲染时会依次调用栈中的钩子。
         """
         with self._lock:
             self._render_hooks.append(hook)
 
     def pop_render_hook(self) -> None:
-        """Pop the last renderhook from the stack."""
+        """[扩展点：移除渲染钩子]"""
         with self._lock:
             self._render_hooks.pop()
 
     def __enter__(self) -> "Console":
-        """Own context manager to enter buffer context."""
+        """[上下文管理器协议]
+        
+        允许使用 `with Console() as console:` 语法。
+        作用是开启缓冲模式，确保 `with` 块内的输出可以被捕获或统一处理。
+        """
         self._enter_buffer()
         return self
 
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
-        """Exit buffer context."""
+        """[上下文管理器协议]
+        
+        退出时结束缓冲模式，渲染内容。
+        """
         self._exit_buffer()
 
     def begin_capture(self) -> None:
-        """Begin capturing console output. Call :meth:`end_capture` to exit capture mode and return output."""
+        """[功能：开始捕获]
+        
+        手动开启捕获模式，通常配合 `end_capture` 使用。
+        """
         self._enter_buffer()
 
     def end_capture(self) -> str:
-        """End capture mode and return captured string.
-
+        """[功能：结束捕获并获取结果]
+        
         Returns:
-            str: Console output.
+            str: 渲染后的字符串。
         """
         render_result = self._render_buffer(self._buffer)
         del self._buffer[:]
@@ -885,40 +1039,38 @@ class Console:
         return render_result
 
     def push_theme(self, theme: Theme, *, inherit: bool = True) -> None:
-        """Push a new theme on to the top of the stack, replacing the styles from the previous theme.
-        Generally speaking, you should call :meth:`~rich.console.Console.use_theme` to get a context manager, rather
-        than calling this method directly.
-
+        """[状态管理：压入主题]
+        
+        将新主题压入栈顶。后续的渲染将使用新主题的样式。
+        
         Args:
-            theme (Theme): A theme instance.
-            inherit (bool, optional): Inherit existing styles. Defaults to True.
+            inherit: 如果为 True，新主题将继承旧主题的未定义样式；否则完全覆盖。
         """
         self._theme_stack.push_theme(theme, inherit=inherit)
 
     def pop_theme(self) -> None:
-        """Remove theme from top of stack, restoring previous theme."""
+        """[状态管理：弹出主题]"""
         self._theme_stack.pop_theme()
 
     def use_theme(self, theme: Theme, *, inherit: bool = True) -> ThemeContext:
-        """Use a different theme for the duration of the context manager.
-
-        Args:
-            theme (Theme): Theme instance to user.
-            inherit (bool, optional): Inherit existing console styles. Defaults to True.
-
-        Returns:
-            ThemeContext: [description]
+        """[设计模式：上下文管理器工厂]
+        
+        返回一个 ThemeContext 对象，支持 `with` 语法临时切换主题。
+        这比手动调用 push/pop 更安全，因为它保证了 `__exit__` 时一定会 pop。
+        
+        示例：
+            with console.use_theme(some_theme):
+                console.print("Styled with some_theme")
+            # 这里自动恢复原主题
         """
         return ThemeContext(self, theme, inherit)
 
     @property
     def color_system(self) -> Optional[str]:
-        """Get color system string.
-
-        Returns:
-            Optional[str]: "standard", "256" or "truecolor".
+        """[属性：颜色系统名称]
+        
+        将内部枚举值转换为外部可读的字符串。
         """
-
         if self._color_system is not None:
             return _COLOR_SYSTEMS_NAMES[self._color_system]
         else:
@@ -926,12 +1078,12 @@ class Console:
 
     @property
     def encoding(self) -> str:
-        """Get the encoding of the console file, e.g. ``"utf-8"``.
-
-        Returns:
-            str: A standard encoding string.
+        """[属性：编码格式]
+        
+        动态获取当前输出文件的编码，默认为 utf-8。
         """
         return (getattr(self.file, "encoding", "utf-8") or "utf-8").lower()
+
 
     @property
     def is_terminal(self) -> bool:
@@ -941,44 +1093,49 @@ class Console:
             bool: True if the console writing to a device capable of
                 understanding escape sequences, otherwise False.
         """
-        # If dev has explicitly set this value, return it
+        # [优先级 1：开发者强制指定]
+        # 如果在初始化时显式设置了 force_terminal，则直接使用，忽略所有检测。
         if self._force_terminal is not None:
             return self._force_terminal
 
-        # Fudge for Idle
+        # [兼容性处理：Python IDLE]
+        # IDLE 环境 stdin 模块名以 idlelib 开头。
+        # 虽然 IDLE 有时会被误判为 TTY，但它不支持 ANSI 转义序列，必须强制返回 False。
         if hasattr(sys.stdin, "__module__") and sys.stdin.__module__.startswith(
             "idlelib"
         ):
-            # Return False for Idle which claims to be a tty but can't handle ansi codes
             return False
 
+        # [优先级 2：Jupyter 环境]
+        # Jupyter 环境通常不是通过直接输出 ANSI 码渲染的（它有自己的渲染协议），所以返回 False。
         if self.is_jupyter:
-            # return False for Jupyter, which may have FORCE_COLOR set
             return False
 
         environ = self._environ
 
+        # [环境变量检测：TTY_COMPATIBLE]
+        # 允许用户通过环境变量显式告诉 Rich 当前是否兼容 TTY。
         tty_compatible = environ.get("TTY_COMPATIBLE", "")
-        # 0 indicates device is not tty compatible
         if tty_compatible == "0":
             return False
-        # 1 indicates device is tty compatible
         if tty_compatible == "1":
             return True
 
-        # https://force-color.org/
+        # [标准检测：FORCE_COLOR]
+        # 遵循 force-color.org 标准。如果设置了该环境变量，通常意味着强制启用颜色。
         force_color = environ.get("FORCE_COLOR")
         if force_color is not None:
             return force_color != ""
 
-        # Any other value defaults to auto detect
+        # [优先级 3：系统自动检测]
+        # 调用文件对象的 isatty() 方法。这是判断输出是否指向终端（非文件/管道）的最标准方法。
         isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
         try:
             return False if isatty is None else isatty()
         except ValueError:
-            # in some situation (at the end of a pytest run for example) isatty() can raise
-            # ValueError: I/O operation on closed file
-            # return False because we aren't in a terminal anymore
+            # [异常处理]
+            # 在某些边缘情况（如 pytest 结束时，文件描述符已关闭），isatty() 可能抛出 ValueError。
+            # 此时视为非终端环境。
             return False
 
     @property
@@ -989,13 +1146,20 @@ class Console:
             bool: True if writing to a dumb terminal, otherwise False.
 
         """
+        # [环境变量检测：TERM]
+        # 检查 TERM 环境变量是否为 "dumb" 或 "unknown"。
+        # Dumb terminal 指的是那些不支持任何光标移动、颜色清除等高级功能的终端。
         _term = self._environ.get("TERM", "")
         is_dumb = _term.lower() in ("dumb", "unknown")
         return self.is_terminal and is_dumb
 
     @property
     def options(self) -> ConsoleOptions:
-        """Get default console options."""
+        """[属性：渲染配置快照]
+        
+        获取基于当前 Console 状态的渲染配置对象。
+        该对象是不可变的（或者说是当前状态的快照），传递给渲染逻辑使用。
+        """
         size = self.size
         return ConsoleOptions(
             max_height=size.height,
@@ -1009,30 +1173,43 @@ class Console:
 
     @property
     def size(self) -> ConsoleDimensions:
-        """Get the size of the console.
-
-        Returns:
-            ConsoleDimensions: A named tuple containing the dimensions.
+        """[核心算法：尺寸获取策略]
+        
+        智能获取终端的宽和高，具有多层回退机制。
+        
+        策略顺序：
+        1. 显式设置 (_width, _height)
+        2. 环境变量 (COLUMNS, LINES)
+        3. 系统调用 (os.get_terminal_size)
+        4. 硬编码默认值 (80x25)
         """
 
+        # 1. 检查是否已显式设置尺寸
         if self._width is not None and self._height is not None:
+            # [兼容性修正]
+            # 旧版 Windows 可能在边缘绘制字符，所以宽度需要减去 1。
             return ConsoleDimensions(self._width - self.legacy_windows, self._height)
 
+        # 2. 针对哑终端的默认值
         if self.is_dumb_terminal:
             return ConsoleDimensions(80, 25)
 
         width: Optional[int] = None
         height: Optional[int] = None
 
+        # 3. 系统调用获取尺寸
+        # Windows 只需要检查标准输出/错误，Linux/Mac 通常需要检查标准输入。
         streams = _STD_STREAMS_OUTPUT if WINDOWS else _STD_STREAMS
         for file_descriptor in streams:
             try:
+                # os.get_terminal_size 会查询内核的终端窗口大小
                 width, height = os.get_terminal_size(file_descriptor)
             except (AttributeError, ValueError, OSError):  # Probably not a terminal
                 pass
             else:
                 break
 
+        # 4. 环境变量覆盖（优先级高于系统调用）
         columns = self._environ.get("COLUMNS")
         if columns is not None and columns.isdigit():
             width = int(columns)
@@ -1040,7 +1217,8 @@ class Console:
         if lines is not None and lines.isdigit():
             height = int(lines)
 
-        # get_terminal_size can report 0, 0 if run from pseudo-terminal
+        # 5. 最终兜底默认值
+        # get_terminal_size 在伪终端下可能返回 (0, 0)，需要兜底。
         width = width or 80
         height = height or 25
         return ConsoleDimensions(
@@ -1096,22 +1274,23 @@ class Console:
         self._height = height
 
     def bell(self) -> None:
-        """Play a 'bell' sound (if supported by the terminal)."""
+        """Play a 'bell' sound (if supported by the terminal).
+        
+        发送响铃控制字符 (\a)。
+        """
         self.control(Control.bell())
 
     def capture(self) -> Capture:
-        """A context manager to *capture* the result of print() or log() in a string,
-        rather than writing it to the console.
-
+        """[上下文管理器工厂：输出捕获]
+        
+        创建一个上下文管理器，用于拦截 print() 或 log() 的输出，将其转换为字符串而不是写到屏幕。
+        
+        应用场景：单元测试、生成日志文本。
+        
         Example:
-            >>> from rich.console import Console
-            >>> console = Console()
             >>> with console.capture() as capture:
-            ...     console.print("[bold magenta]Hello World[/]")
-            >>> print(capture.get())
-
-        Returns:
-            Capture: Context manager with disables writing to the terminal.
+            ...     console.print("Hello")
+            >>> text = capture.get()
         """
         capture = Capture(self)
         return capture
@@ -1119,23 +1298,15 @@ class Console:
     def pager(
         self, pager: Optional[Pager] = None, styles: bool = False, links: bool = False
     ) -> PagerContext:
-        """A context manager to display anything printed within a "pager". The pager application
-        is defined by the system and will typically support at least pressing a key to scroll.
-
+        """[上下文管理器工厂：分页器]
+        
+        将输出内容通过系统分页器（如 less, more）显示。
+        当内容很长，超过一屏时非常有用。
+        
         Args:
-            pager (Pager, optional): A pager object, or None to use :class:`~rich.pager.SystemPager`. Defaults to None.
-            styles (bool, optional): Show styles in pager. Defaults to False.
-            links (bool, optional): Show links in pager. Defaults to False.
-
-        Example:
-            >>> from rich.console import Console
-            >>> from rich.__main__ import make_test_card
-            >>> console = Console()
-            >>> with console.pager():
-                    console.print(make_test_card())
-
-        Returns:
-            PagerContext: A context manager.
+            pager: 自定义分页器对象，默认使用系统分页器。
+            styles: 是否在分页器中显示颜色样式（有些分页器不支持 ANSI 颜色）。
+            links: 是否显示链接。
         """
         return PagerContext(self, pager=pager, styles=styles, links=links)
 
@@ -1145,17 +1316,18 @@ class Console:
         Args:
             count (int, optional): Number of new lines. Defaults to 1.
         """
-
         assert count >= 0, "count must be >= 0"
+        # [复用组件] 通过渲染 NewLine 对象来实现换行
         self.print(NewLine(count))
 
     def clear(self, home: bool = True) -> None:
         """Clear the screen.
 
         Args:
-            home (bool, optional): Also move the cursor to 'home' position. Defaults to True.
+            home (bool, optional): Also move the cursor to 'home' position (top-left). Defaults to True.
         """
         if home:
+            # [控制序列] 发送清屏并移动光标到左上角的指令
             self.control(Control.clear(), Control.home())
         else:
             self.control(Control.clear())
@@ -1169,17 +1341,12 @@ class Console:
         speed: float = 1.0,
         refresh_per_second: float = 12.5,
     ) -> "Status":
-        """Display a status and spinner.
-
-        Args:
-            status (RenderableType): A status renderable (str or Text typically).
-            spinner (str, optional): Name of spinner animation (see python -m rich.spinner). Defaults to "dots".
-            spinner_style (StyleType, optional): Style of spinner. Defaults to "status.spinner".
-            speed (float, optional): Speed factor for spinner animation. Defaults to 1.0.
-            refresh_per_second (float, optional): Number of refreshes per second. Defaults to 12.5.
-
+        """[UI 组件：状态指示器]
+        
+        创建一个带有旋转动画的状态栏。通常用于长时间任务（如下载、处理）的反馈。
+        
         Returns:
-            Status: A Status object that may be used as a context manager.
+            Status: 返回的 Status 对象可以用作上下文管理器，任务结束自动清除。
         """
         from .status import Status
 
@@ -1195,9 +1362,8 @@ class Console:
 
     def show_cursor(self, show: bool = True) -> bool:
         """Show or hide the cursor.
-
-        Args:
-            show (bool, optional): Set visibility of the cursor.
+        
+        [UI 控制] 在全屏应用或动画显示期间，通常需要隐藏光标以避免闪烁干扰。
         """
         if self.is_terminal:
             self.control(Control.show_cursor(show))
@@ -1205,18 +1371,17 @@ class Console:
         return False
 
     def set_alt_screen(self, enable: bool = True) -> bool:
-        """Enables alternative screen mode.
-
-        Note, if you enable this mode, you should ensure that is disabled before
-        the application exits. See :meth:`~rich.Console.screen` for a context manager
-        that handles this for you.
-
+        """[终端控制：备用屏幕模式]
+        
+        开启备用屏幕缓冲区。
+        这类似于 Vim 或 top 命令运行时的效果：原有屏幕内容被保存，显示新的全屏内容。
+        退出时，原有内容会恢复。
+        
         Args:
-            enable (bool, optional): Enable (True) or disable (False) alternate screen. Defaults to True.
-
+            enable: True 开启，False 关闭（恢复原屏幕）。
+            
         Returns:
-            bool: True if the control codes were written.
-
+            bool: 是否成功写入控制码。
         """
         changed = False
         if self.is_terminal and not self.legacy_windows:
@@ -1227,39 +1392,14 @@ class Console:
 
     @property
     def is_alt_screen(self) -> bool:
-        """Check if the alt screen was enabled.
-
-        Returns:
-            bool: True if the alt screen was enabled, otherwise False.
-        """
+        """Check if the alt screen was enabled."""
         return self._is_alt_screen
 
     def set_window_title(self, title: str) -> bool:
-        """Set the title of the console terminal window.
-
-        Warning: There is no means within Rich of "resetting" the window title to its
-        previous value, meaning the title you set will persist even after your application
-        exits.
-
-        ``fish`` shell resets the window title before and after each command by default,
-        negating this issue. Windows Terminal and command prompt will also reset the title for you.
-        Most other shells and terminals, however, do not do this.
-
-        Some terminals may require configuration changes before you can set the title.
-        Some terminals may not support setting the title at all.
-
-        Other software (including the terminal itself, the shell, custom prompts, plugins, etc.)
-        may also set the terminal window title. This could result in whatever value you write
-        using this method being overwritten.
-
-        Args:
-            title (str): The new title of the terminal window.
-
-        Returns:
-            bool: True if the control code to change the terminal title was
-                written, otherwise False. Note that a return value of True
-                does not guarantee that the window title has actually changed,
-                since the feature may be unsupported/disabled in some terminals.
+        """[终端控制：设置窗口标题]
+        
+        修改终端窗口的标题栏文字。
+        注意：不是所有终端都支持此功能，且某些 Shell（如 fish）会自动重置标题。
         """
         if self.is_terminal:
             self.control(Control.title(title))
@@ -1269,12 +1409,11 @@ class Console:
     def screen(
         self, hide_cursor: bool = True, style: Optional[StyleType] = None
     ) -> "ScreenContext":
-        """Context manager to enable and disable 'alternative screen' mode.
-
-        Args:
-            hide_cursor (bool, optional): Also hide the cursor. Defaults to False.
-            style (Style, optional): Optional style for screen. Defaults to None.
-
+        """[上下文管理器工厂：全屏模式]
+        
+        返回一个上下文管理器，进入时开启备用屏幕，退出时自动恢复。
+        比直接调用 set_alt_screen 更安全，因为它利用了 Python 的 with 语句保证清理。
+        
         Returns:
             ~ScreenContext: Context which enables alternate screen on enter, and disables it on exit.
         """
@@ -1283,16 +1422,13 @@ class Console:
     def measure(
         self, renderable: RenderableType, *, options: Optional[ConsoleOptions] = None
     ) -> Measurement:
-        """Measure a renderable. Returns a :class:`~rich.measure.Measurement` object which contains
-        information regarding the number of characters required to print the renderable.
-
-        Args:
-            renderable (RenderableType): Any renderable or string.
-            options (Optional[ConsoleOptions], optional): Options to use when measuring, or None
-                to use default options. Defaults to None.
-
+        """[布局算法：测量]
+        
+        测量一个对象渲染出来需要多少宽度（最小/最大）。
+        这对于动态布局（比如表格自动调整列宽）至关重要。
+        
         Returns:
-            Measurement: A measurement of the renderable.
+            Measurement: 包含 minimum 和 maximum 宽度的对象。
         """
         measurement = Measurement.get(self, options or self.options, renderable)
         return measurement
@@ -1300,35 +1436,43 @@ class Console:
     def render(
         self, renderable: RenderableType, options: Optional[ConsoleOptions] = None
     ) -> Iterable[Segment]:
-        """Render an object in to an iterable of `Segment` instances.
-
-        This method contains the logic for rendering objects with the console protocol.
-        You are unlikely to need to use it directly, unless you are extending the library.
-
-        Args:
-            renderable (RenderableType): An object supporting the console protocol, or
-                an object that may be converted to a string.
-            options (ConsoleOptions, optional): An options object, or None to use self.options. Defaults to None.
-
-        Returns:
-            Iterable[Segment]: An iterable of segments that may be rendered.
+        """[核心引擎：渲染器]
+        
+        这是 Rich 最核心的方法，负责将任意对象（实现了 __rich_console__ 或字符串）
+        转换为终端可绘制的 Segment（文本片段+样式）流。
+        
+        逻辑流程：
+        1. 检查宽度是否合法，防止无限递归。
+        2. 尝试将对象转换为 Rich 内部对象 (rich_cast)。
+        3. 检查对象是否实现了 __rich_console__ 协议。
+        4. 如果是字符串，将其转换为 Text 对象。
+        5. 递归渲染：如果对象返回的不是 Segment，而是另一个 Renderable，则递归调用 render。
         """
 
         _options = options or self.options
+        # [防护性编程]
+        # 如果最大宽度小于 1，说明没有空间渲染，直接返回空迭代器，防止后续逻辑出错。
         if _options.max_width < 1:
-            # No space to render anything. This prevents potential recursion errors.
             return
         render_iterable: RenderResult
 
+        # [协议适配：Rich Cast]
+        # 尝试将普通对象转换为可渲染对象。
         renderable = rich_cast(renderable)
+        
+        # [分支 1：实现了 __rich_console__ 协议的对象]
+        # 使用 isinstance 检查是因为 renderable 可能是类本身（未实例化），类通常没有渲染逻辑（除非是静态方法）。
         if hasattr(renderable, "__rich_console__") and not isclass(renderable):
             render_iterable = renderable.__rich_console__(self, _options)
+        # [分支 2：字符串]
         elif isinstance(renderable, str):
+            # 字符串需要先经过 render_str 处理（解析标签代码、高亮等）
             text_renderable = self.render_str(
                 renderable, highlight=_options.highlight, markup=_options.markup
             )
             render_iterable = text_renderable.__rich_console__(self, _options)
         else:
+            # [分支 3：无法识别的对象]
             raise errors.NotRenderableError(
                 f"Unable to render {renderable!r}; "
                 "A str, Segment or object with __rich_console__ method is required"
@@ -1338,17 +1482,24 @@ class Console:
             iter_render = iter(render_iterable)
         except TypeError:
             raise errors.NotRenderableError(
-                f"object {render_iterable!r} is not renderable"
+                f"object {render_iter!r} is not renderable"
             )
         _Segment = Segment
+        # [状态重置]
+        # 每次开始新一轮渲染时，重置高度限制，防止嵌套渲染时高度被无限累积。
         _options = _options.reset_height()
+        
+        # [递归生成器逻辑]
         for render_output in iter_render:
+            # 情况 A：输出已经是最终的 Segment，直接 yield
             if isinstance(render_output, _Segment):
                 yield render_output
+            # 情况 B：输出还是 Renderable（嵌套组件），递归调用 render
+            # 这允许复杂的组件（如表格）包含简单的组件（如文本）或另一个表格
             else:
                 yield from self.render(render_output, _options)
 
-    def render_lines(
+        def render_lines(
         self,
         renderable: RenderableType,
         options: Optional[ConsoleOptions] = None,
@@ -1357,24 +1508,20 @@ class Console:
         pad: bool = True,
         new_lines: bool = False,
     ) -> List[List[Segment]]:
-        """Render objects in to a list of lines.
-
-        The output of render_lines is useful when further formatting of rendered console text
-        is required, such as the Panel class which draws a border around any renderable object.
-
-        Args:
-            renderable (RenderableType): Any object renderable in the console.
-            options (Optional[ConsoleOptions], optional): Console options, or None to use self.options. Default to ``None``.
-            style (Style, optional): Optional style to apply to renderables. Defaults to ``None``.
-            pad (bool, optional): Pad lines shorter than render width. Defaults to ``True``.
-            new_lines (bool, optional): Include "\n" characters at end of lines.
-
-        Returns:
-            List[List[Segment]]: A list of lines, where a line is a list of Segment objects.
-        """
-        with self._lock:
+        #[核心算法：渲染行生成器]
+        
+        #将任意可渲染对象转换为“二维列表”：List[List[Segment]]。
+        #这个二维结构直接对应终端屏幕的布局（外层是行，内层是该行的片段）。
+        
+        #应用场景：
+        #Panel（面板）、Table（表格）等需要预先知道内容精确布局的组件，会调用此方法获取内容后再绘制边框。
+       
+         with self._lock:
             render_options = options or self.options
+            # 1. 调用核心 render 方法生成 Segment 流
             _rendered = self.render(renderable, render_options)
+            
+            # 2. 应用全局样式（如果指定）
             if style:
                 _rendered = Segment.apply_style(_rendered, style)
 
@@ -1382,27 +1529,34 @@ class Console:
             if render_height is not None:
                 render_height = max(0, render_height)
 
+            # 3. [关键步骤：分段与裁剪]
+            # Segment.split_and_crop_lines 将扁平的 Segment 流切分成行，并处理换行、溢出裁剪。
+            # islice 用于限制输出的高度。
             lines = list(
                 islice(
                     Segment.split_and_crop_lines(
                         _rendered,
                         render_options.max_width,
                         include_new_lines=new_lines,
-                        pad=pad,
+                        pad=pad, # 是否在行尾填充空格
                         style=style,
                     ),
                     None,
                     render_height,
                 )
             )
+            
+            # 4. [填充处理]
+            # 如果指定了固定高度，且实际行数不足，需要填充空行。
             if render_options.height is not None:
                 extra_lines = render_options.height - len(lines)
                 if extra_lines > 0:
+                    # 构造一个充满空格的行
                     pad_line = [
                         (
                             [
                                 Segment(" " * render_options.max_width, style),
-                                Segment("\n"),
+                                Segment("\n"), # 根据 new_lines 参数决定是否加换行符
                             ]
                             if new_lines
                             else [Segment(" " * render_options.max_width, style)]
@@ -1424,27 +1578,20 @@ class Console:
         highlight: Optional[bool] = None,
         highlighter: Optional[HighlighterType] = None,
     ) -> "Text":
-        """Convert a string to a Text instance. This is called automatically if
-        you print or log a string.
-
-        Args:
-            text (str): Text to render.
-            style (Union[str, Style], optional): Style to apply to rendered text.
-            justify (str, optional): Justify method: "default", "left", "center", "full", or "right". Defaults to ``None``.
-            overflow (str, optional): Overflow method: "crop", "fold", or "ellipsis". Defaults to ``None``.
-            emoji (Optional[bool], optional): Enable emoji, or ``None`` to use Console default.
-            markup (Optional[bool], optional): Enable markup, or ``None`` to use Console default.
-            highlight (Optional[bool], optional): Enable highlighting, or ``None`` to use Console default.
-            highlighter (HighlighterType, optional): Optional highlighter to apply.
-        Returns:
-            ConsoleRenderable: Renderable object.
-
+        """[工厂方法：字符串标准化]
+        
+        将普通 Python 字符串转换为 Rich 内部的 `Text` 对象。
+        这是连接用户输入和 Rich 渲染引擎的桥梁。
         """
+        # [参数默认值处理]
+        # 如果参数为 None，则继承 Console 实例的默认配置。
         emoji_enabled = emoji or (emoji is None and self._emoji)
         markup_enabled = markup or (markup is None and self._markup)
         highlight_enabled = highlight or (highlight is None and self._highlight)
 
         if markup_enabled:
+            # [路径 A：解析 Markup 标签]
+            # 如果启用了 markup，解析 [bold]text[/] 类似的标签。
             rich_text = render_markup(
                 text,
                 style=style,
@@ -1454,6 +1601,8 @@ class Console:
             rich_text.justify = justify
             rich_text.overflow = overflow
         else:
+            # [路径 B：纯文本处理]
+            # 仅处理 Emoji 替换，不解析标签。
             rich_text = Text(
                 (
                     _emoji_replace(text, default_variant=self._emoji_variant)
@@ -1465,10 +1614,12 @@ class Console:
                 style=style,
             )
 
+        # [高亮处理]
+        # 如果启用了高亮，使用指定的 highlighter（如 ReprHighlighter）处理文本。
         _highlighter = (highlighter or self.highlighter) if highlight_enabled else None
         if _highlighter is not None:
             highlight_text = _highlighter(str(rich_text))
-            highlight_text.copy_styles(rich_text)
+            highlight_text.copy_styles(rich_text) # 保留原有样式，只覆盖高亮部分
             return highlight_text
 
         return rich_text
@@ -1476,27 +1627,23 @@ class Console:
     def get_style(
         self, name: Union[str, Style], *, default: Optional[Union[Style, str]] = None
     ) -> Style:
-        """Get a Style instance by its theme name or parse a definition.
-
-        Args:
-            name (str): The name of a style or a style definition.
-
-        Returns:
-            Style: A Style object.
-
-        Raises:
-            MissingStyle: If no style could be parsed from name.
-
+        """[服务：样式解析器]
+        
+        根据名称或定义字符串获取 Style 对象。
+        它是 Theme（主题）系统的对外接口。
         """
         if isinstance(name, Style):
             return name
 
         try:
+            # 1. 优先从主题栈中查找命名的样式
             style = self._theme_stack.get(name)
             if style is None:
+                # 2. 如果主题中没找到，尝试解析为内联样式定义（如 "bold red"）
                 style = Style.parse(name)
             return style.copy() if style.link else style
         except errors.StyleSyntaxError as error:
+            # 3. 异常回退：如果解析失败且有默认值，尝试解析默认值
             if default is not None:
                 return self.get_style(default)
             raise errors.MissingStyle(
@@ -1514,19 +1661,14 @@ class Console:
         markup: Optional[bool] = None,
         highlight: Optional[bool] = None,
     ) -> List[ConsoleRenderable]:
-        """Combine a number of renderables and text into one renderable.
-
-        Args:
-            objects (Iterable[Any]): Anything that Rich can render.
-            sep (str): String to write between print data.
-            end (str): String to write at end of print data.
-            justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
-            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default.
-            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default.
-            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default.
-
-        Returns:
-            List[ConsoleRenderable]: A list of things to render.
+        """[预处理：参数归一化与分组]
+        
+        将 `print()` 接收到的任意参数列表转换为统一的 `ConsoleRenderable` 列表。
+        
+        关键逻辑：
+        1. 字符串会被转换并**批量合并**（应用 sep 分隔符）。
+        2. 非字符串对象（如 Table）会被独立处理。
+        3. 这种分离策略避免了将大对象（如 Table）错误地转换为字符串。
         """
         renderables: List[ConsoleRenderable] = []
         _append = renderables.append
@@ -1534,17 +1676,17 @@ class Console:
         append_text = text.append
 
         append = _append
+        # [对齐处理包装]
         if justify in ("left", "center", "right"):
-
             def align_append(renderable: RenderableType) -> None:
                 _append(Align(renderable, cast(AlignMethod, justify)))
-
             append = align_append
 
         _highlighter: HighlighterType = _null_highlighter
         if highlight or (highlight is None and self._highlight):
             _highlighter = self.highlighter
 
+        # [辅助函数：将积攒的文本合并并添加到输出列表]
         def check_text() -> None:
             if text:
                 sep_text = Text(sep, justify=justify, end=end)
@@ -1554,6 +1696,7 @@ class Console:
         for renderable in objects:
             renderable = rich_cast(renderable)
             if isinstance(renderable, str):
+                # [类型：字符串] -> 转换为 Text 并加入待合并列表
                 append_text(
                     self.render_str(
                         renderable,
@@ -1564,18 +1707,24 @@ class Console:
                     )
                 )
             elif isinstance(renderable, Text):
+                # [类型：Text] -> 加入待合并列表
                 append_text(renderable)
             elif isinstance(renderable, ConsoleRenderable):
+                # [类型：Renderable] -> 先清空之前的文本缓存，再加入该对象
                 check_text()
                 append(renderable)
             elif is_expandable(renderable):
+                # [类型：可展开对象] (如字典, 列表) -> 使用 Pretty 打印
                 check_text()
                 append(Pretty(renderable, highlighter=_highlighter))
             else:
+                # [类型：其他] -> 转字符串并加入待合并列表
                 append_text(_highlighter(str(renderable)))
 
+        # [收尾]：循环结束后，处理最后剩余的文本
         check_text()
 
+        # [全局样式应用]
         if self.style is not None:
             style = self.get_style(self.style)
             renderables = [Styled(renderable, style) for renderable in renderables]
@@ -1590,13 +1739,9 @@ class Console:
         style: Union[str, Style] = "rule.line",
         align: AlignMethod = "center",
     ) -> None:
-        """Draw a line with optional centered title.
-
-        Args:
-            title (str, optional): Text to render over the rule. Defaults to "".
-            characters (str, optional): Character(s) to form the line. Defaults to "─".
-            style (str, optional): Style of line. Defaults to "rule.line".
-            align (str, optional): How to align the title, one of "left", "center", or "right". Defaults to "center".
+        """[UI 组件：分割线]
+        
+        绘制一条水平分割线，并可选择在中间显示标题。
         """
         from .rule import Rule
 
@@ -1604,13 +1749,14 @@ class Console:
         self.print(rule)
 
     def control(self, *control: Control) -> None:
-        """Insert non-printing control codes.
-
-        Args:
-            control_codes (str): Control codes, such as those that may move the cursor.
+        """[底层控制：非打印字符注入]
+        
+        直接向缓冲区写入控制序列（如移动光标、清屏），不经过正常的渲染流程。
+        这主要用于低级的状态变更。
         """
         if not self.is_dumb_terminal:
             with self:
+                # 提取 Control 对象中的 Segment 并写入缓冲区
                 self._buffer.extend(_control.segment for _control in control)
 
     def out(
@@ -1621,26 +1767,22 @@ class Console:
         style: Optional[Union[str, Style]] = None,
         highlight: Optional[bool] = None,
     ) -> None:
-        """Output to the terminal. This is a low-level way of writing to the terminal which unlike
-        :meth:`~rich.console.Console.print` won't pretty print, wrap text, or apply markup, but will
-        optionally apply highlighting and a basic style.
-
-        Args:
-            sep (str, optional): String to write between print data. Defaults to " ".
-            end (str, optional): String to write at end of print data. Defaults to "\\\\n".
-            style (Union[str, Style], optional): A style to apply to output. Defaults to None.
-            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use
-                console default. Defaults to ``None``.
+        """[低级输出：原始打印]
+        
+        与 `print` 不同，此方法不会自动换行、不会自动折行、不会解析 Markup。
+        它只是简单地连接字符串并可选地应用高亮。
+        
+        相当于 Rich 版本的 `sys.stdout.write`。
         """
         raw_output: str = sep.join(str(_object) for _object in objects)
         self.print(
             raw_output,
             style=style,
             highlight=highlight,
-            emoji=False,
-            markup=False,
-            no_wrap=True,
-            overflow="ignore",
+            emoji=False, # 强制关闭 emoji
+            markup=False, # 强制关闭 markup
+            no_wrap=True, # 强制不换行
+            overflow="ignore", # 忽略溢出
             crop=False,
             end=end,
         )
@@ -1663,28 +1805,24 @@ class Console:
         soft_wrap: Optional[bool] = None,
         new_line_start: bool = False,
     ) -> None:
-        """Print to the console.
-
-        Args:
-            objects (positional args): Objects to log to the terminal.
-            sep (str, optional): String to write between print data. Defaults to " ".
-            end (str, optional): String to write at end of print data. Defaults to "\\\\n".
-            style (Union[str, Style], optional): A style to apply to output. Defaults to None.
-            justify (str, optional): Justify method: "default", "left", "right", "center", or "full". Defaults to ``None``.
-            overflow (str, optional): Overflow method: "ignore", "crop", "fold", or "ellipsis". Defaults to None.
-            no_wrap (Optional[bool], optional): Disable word wrapping. Defaults to None.
-            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to ``None``.
-            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to ``None``.
-            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to ``None``.
-            width (Optional[int], optional): Width of output, or ``None`` to auto-detect. Defaults to ``None``.
-            crop (Optional[bool], optional): Crop output to width of terminal. Defaults to True.
-            soft_wrap (bool, optional): Enable soft wrap mode which disables word wrapping and cropping of text or ``None`` for
-                Console default. Defaults to ``None``.
-            new_line_start (bool, False): Insert a new line at the start if the output contains more than one line. Defaults to ``False``.
+        """[主入口：打印方法]
+        
+        这是用户最常用的方法。它编排了从参数收集到最终缓冲区写入的全过程。
+        
+        流程：
+        1. 参数预处理与默认值覆盖。
+        2. 进入渲染上下文（加锁，处理缓冲区）。
+        3. 收集并转换 Renderables。
+        4. 执行 Render Hooks（渲染钩子）。
+        5. 更新渲染选项。
+        6. 循环渲染每个对象为 Segment。
+        7. 写入缓冲区。
         """
         if not objects:
             objects = (NewLine(),)
 
+        # [Soft Wrap 模式处理]
+        # Soft wrap 意味着终端自己处理换行，Rich 不插入硬换行符。
         if soft_wrap is None:
             soft_wrap = self.soft_wrap
         if soft_wrap:
@@ -1693,8 +1831,12 @@ class Console:
             if overflow is None:
                 overflow = "ignore"
             crop = False
+            
+        # [快照] 复制钩子列表，防止迭代过程中被修改
         render_hooks = self._render_hooks[:]
+        
         with self:
+            # 1. 收集和归一化对象
             renderables = self._collect_renderables(
                 objects,
                 sep,
@@ -1704,8 +1846,12 @@ class Console:
                 markup=markup,
                 highlight=highlight,
             )
+            
+            # 2. 执行渲染钩子（允许外部插件修改即将渲染的内容）
             for hook in render_hooks:
                 renderables = hook.process_renderables(renderables)
+                
+            # 3. 准备渲染选项（更新宽高等参数）
             render_options = self.options.update(
                 justify=justify,
                 overflow=overflow,
@@ -1719,29 +1865,40 @@ class Console:
             new_segments: List[Segment] = []
             extend = new_segments.extend
             render = self.render
+            
+            # 4. 渲染循环
+            # 将每个 Renderable 转换为 Segment 流
             if style is None:
                 for renderable in renderables:
                     extend(render(renderable, render_options))
             else:
+                # 如果指定了全局样式，应用到所有 segment 上
                 for renderable in renderables:
                     extend(
                         Segment.apply_style(
                             render(renderable, render_options), self.get_style(style)
                         )
                     )
+            
+            # 5. [自动换行前缀]
+            # 如果内容包含多行，且要求 new_line_start，则在开头插入一个换行符
             if new_line_start:
                 if (
                     len("".join(segment.text for segment in new_segments).splitlines())
                     > 1
                 ):
                     new_segments.insert(0, Segment.line())
+            
+            # 6. 写入缓冲区
             if crop:
+                # [模式：裁剪] 使用 split_and_crop_lines 将 segment 转换为行并裁剪超出宽度的部分
                 buffer_extend = self._buffer.extend
                 for line in Segment.split_and_crop_lines(
                     new_segments, self.width, pad=False
                 ):
                     buffer_extend(line)
             else:
+                # [模式：不裁剪] 直接将 Segment 流写入缓冲区
                 self._buffer.extend(new_segments)
 
     def print_json(
@@ -1758,24 +1915,15 @@ class Console:
         default: Optional[Callable[[Any], Any]] = None,
         sort_keys: bool = False,
     ) -> None:
-        """Pretty prints JSON. Output will be valid JSON.
-
-        Args:
-            json (Optional[str]): A string containing JSON.
-            data (Any): If json is not supplied, then encode this data.
-            indent (Union[None, int, str], optional): Number of spaces to indent. Defaults to 2.
-            highlight (bool, optional): Enable highlighting of output: Defaults to True.
-            skip_keys (bool, optional): Skip keys not of a basic type. Defaults to False.
-            ensure_ascii (bool, optional): Escape all non-ascii characters. Defaults to False.
-            check_circular (bool, optional): Check for circular references. Defaults to True.
-            allow_nan (bool, optional): Allow NaN and Infinity values. Defaults to True.
-            default (Callable, optional): A callable that converts values that can not be encoded
-                in to something that can be JSON encoded. Defaults to None.
-            sort_keys (bool, optional): Sort dictionary keys. Defaults to False.
+        """[便捷方法：JSON 美化打印]
+        
+        专门用于将 JSON 数据或 Python 对象转换为带语法高亮、易读的 JSON 格式输出。
+        底层使用了 rich.json.JSON 渲染器。
         """
         from rich.json import JSON
 
         if json is None:
+            # [路径 A：从对象生成]
             json_renderable = JSON.from_data(
                 data,
                 indent=indent,
@@ -1788,6 +1936,7 @@ class Console:
                 sort_keys=sort_keys,
             )
         else:
+            # [路径 B：从字符串解析]
             if not isinstance(json, str):
                 raise TypeError(
                     f"json must be str. Did you mean print_json(data={json!r}) ?"
@@ -1803,6 +1952,7 @@ class Console:
                 default=default,
                 sort_keys=sort_keys,
             )
+        # JSON 通常比较长，推荐使用 soft_wrap
         self.print(json_renderable, soft_wrap=True)
 
     def update_screen(
@@ -1812,51 +1962,57 @@ class Console:
         region: Optional[Region] = None,
         options: Optional[ConsoleOptions] = None,
     ) -> None:
-        """Update the screen at a given offset.
-
+        """[TUI 核心方法：局部屏幕刷新]
+        
+        仅更新屏幕的特定区域，而不是重绘整个屏幕。
+        这对于制作高性能的终端用户界面（TUI）至关重要。
+        
         Args:
-            renderable (RenderableType): A Rich renderable.
-            region (Region, optional): Region of screen to update, or None for entire screen. Defaults to None.
-            x (int, optional): x offset. Defaults to 0.
-            y (int, optional): y offset. Defaults to 0.
-
+            region: 指定更新的矩形区域。
+            
         Raises:
-            errors.NoAltScreen: If the Console isn't in alt screen mode.
-
+            errors.NoAltScreen: 如果不在备用屏幕模式下，不允许调用此方法。
         """
         if not self.is_alt_screen:
             raise errors.NoAltScreen("Alt screen must be enabled to call update_screen")
         render_options = options or self.options
         if region is None:
+            # [全屏更新]
             x = y = 0
             render_options = render_options.update_dimensions(
                 render_options.max_width, render_options.height or self.height
             )
         else:
+            # [局部更新]
             x, y, width, height = region
             render_options = render_options.update_dimensions(width, height)
 
+        # 1. 渲染为行
         lines = self.render_lines(renderable, options=render_options)
+        # 2. 将行写到指定坐标
         self.update_screen_lines(lines, x, y)
+
 
     def update_screen_lines(
         self, lines: List[List[Segment]], x: int = 0, y: int = 0
     ) -> None:
-        """Update lines of the screen at a given offset.
-
-        Args:
-            lines (List[List[Segment]]): Rendered lines (as produced by :meth:`~rich.Console.render_lines`).
-            x (int, optional): x offset (column no). Defaults to 0.
-            y (int, optional): y offset (column no). Defaults to 0.
-
-        Raises:
-            errors.NoAltScreen: If the Console isn't in alt screen mode.
+        """[TUI 核心方法：局部刷新]
+        
+        将渲染好的行直接更新到屏幕的指定位置，而不重绘整个屏幕。
+        这对于高性能的终端界面（如进度条、全屏应用）至关重要，可以减少闪烁。
+        
+        实现原理：
+        1. 创建一个 ScreenUpdate 对象（包含移动光标和内容的指令）。
+        2. 将其渲染为 Segment 流。
+        3. 直接写入缓冲区并立即刷新。
         """
         if not self.is_alt_screen:
             raise errors.NoAltScreen("Alt screen must be enabled to call update_screen")
+        # [封装] 将行列表和坐标封装为可渲染对象
         screen_update = ScreenUpdate(lines, x, y)
         segments = self.render(screen_update)
         self._buffer.extend(segments)
+        # [立即刷新] 确保显示立即生效，不等待缓冲区满
         self._check_buffer()
 
     def print_exception(
@@ -1870,16 +2026,10 @@ class Console:
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
     ) -> None:
-        """Prints a rich render of the last exception and traceback.
-
-        Args:
-            width (Optional[int], optional): Number of characters used to render code. Defaults to 100.
-            extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
-            theme (str, optional): Override pygments theme used in traceback
-            word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
-            show_locals (bool, optional): Enable display of local variables. Defaults to False.
-            suppress (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
-            max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
+        """[工具方法：异常美化]
+        
+        自动捕获当前的异常堆栈信息，并使用 Rich 的 Traceback 组件进行彩色渲染。
+        极大地提升了调试体验，比黑白回溯易读得多。
         """
         from .traceback import Traceback
 
@@ -1899,33 +2049,33 @@ class Console:
         offset: int,
         currentframe: Callable[[], Optional[FrameType]] = inspect.currentframe,
     ) -> Tuple[str, int, Dict[str, Any]]:
-        """Get caller frame information.
-
+        """[反射工具：获取调用者信息]
+        
+        这是一个静态方法，用于向上遍历调用栈，获取调用 `log` 方法的代码位置。
+        
         Args:
-            offset (int): the caller offset within the current frame stack.
-            currentframe (Callable[[], Optional[FrameType]], optional): the callable to use to
-                retrieve the current frame. Defaults to ``inspect.currentframe``.
-
+            offset: 栈偏移量。例如 offset=1 表示上一级（调用 log 的地方）。
+            currentframe: 注入依赖，默认使用 inspect.currentframe。
+                        允许在测试时 Mock 这个函数，避免实际操作栈帧。
+                        
         Returns:
-            Tuple[str, int, Dict[str, Any]]: A tuple containing the filename, the line number and
-                the dictionary of local variables associated with the caller frame.
-
-        Raises:
-            RuntimeError: If the stack offset is invalid.
+            (文件名, 行号, 局部变量字典)
         """
-        # Ignore the frame of this local helper
+        # 忽略本 helper 函数的一帧
         offset += 1
 
         frame = currentframe()
         if frame is not None:
-            # Use the faster currentframe where implemented
+            # [路径 A：高性能栈遍历]
+            # 直接操作 frame 对象（f_back）比 inspect.stack() 快得多。
             while offset and frame is not None:
                 frame = frame.f_back
                 offset -= 1
             assert frame is not None
             return frame.f_code.co_filename, frame.f_lineno, frame.f_locals
         else:
-            # Fallback to the slower stack
+            # [路径 B：兼容性回退]
+            # 某些实现（如 PyPy 或某些优化环境）可能不支持 currentframe，回退到 inspect.stack()。
             frame_info = inspect.stack()[offset]
             return frame_info.filename, frame_info.lineno, frame_info.frame.f_locals
 
@@ -1942,20 +2092,10 @@ class Console:
         log_locals: bool = False,
         _stack_offset: int = 1,
     ) -> None:
-        """Log rich content to the terminal.
-
-        Args:
-            objects (positional args): Objects to log to the terminal.
-            sep (str, optional): String to write between print data. Defaults to " ".
-            end (str, optional): String to write at end of print data. Defaults to "\\\\n".
-            style (Union[str, Style], optional): A style to apply to output. Defaults to None.
-            justify (str, optional): One of "left", "right", "center", or "full". Defaults to ``None``.
-            emoji (Optional[bool], optional): Enable emoji code, or ``None`` to use console default. Defaults to None.
-            markup (Optional[bool], optional): Enable markup, or ``None`` to use console default. Defaults to None.
-            highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use console default. Defaults to None.
-            log_locals (bool, optional): Boolean to enable logging of locals where ``log()``
-                was called. Defaults to False.
-            _stack_offset (int, optional): Offset of caller from end of call stack. Defaults to 1.
+        """[功能：增强型日志]
+        
+        类似于 `print`，但会自动添加时间戳、文件路径和行号。
+        这是 Rich 区别于普通 print 的重要功能。
         """
         if not objects:
             objects = (NewLine(),)
@@ -1963,6 +2103,7 @@ class Console:
         render_hooks = self._render_hooks[:]
 
         with self:
+            # 1. 收集可渲染对象
             renderables = self._collect_renderables(
                 objects,
                 sep,
@@ -1975,9 +2116,13 @@ class Console:
             if style is not None:
                 renderables = [Styled(renderable, style) for renderable in renderables]
 
+            # 2. [反射] 获取调用者的文件名、行号和局部变量
             filename, line_no, locals = self._caller_frame_info(_stack_offset)
             link_path = None if filename.startswith("<") else os.path.abspath(filename)
             path = filename.rpartition(os.sep)[-1]
+            
+            # 3. [局部变量打印]
+            # 如果开启 log_locals，将调用处的局部变量渲染出来，方便调试。
             if log_locals:
                 locals_map = {
                     key: value
@@ -1986,6 +2131,8 @@ class Console:
                 }
                 renderables.append(render_scope(locals_map, title="[i]locals"))
 
+            # 4. [日志格式化]
+            # 使用 _log_render 将内容包装成带时间、路径的格式
             renderables = [
                 self._log_render(
                     self,
@@ -2011,13 +2158,16 @@ class Console:
                 buffer_extend(line)
 
     def on_broken_pipe(self) -> None:
-        """This function is called when a `BrokenPipeError` is raised.
-
-        This can occur when piping Textual output in Linux and macOS.
-        The default implementation is to exit the app, but you could implement
-        this method in a subclass to change the behavior.
-
-        See https://docs.python.org/3/library/signal.html#note-on-sigpipe for details.
+        """[异常处理：管道破裂]
+        
+        当用户通过管道 `|` 将 Rich 的输出传给其他程序（如 `less` 或 `head`），
+        且接收程序提前退出时，会触发 BrokenPipeError。
+        
+        默认行为：
+        1. 设置 quiet=True 停止输出。
+        2. 重定向 stdout 到 /dev/null。
+        3. 退出程序。
+        这是处理 Unix 管道的标准做法。
         """
         self.quiet = True
         devnull = os.open(os.devnull, os.O_WRONLY)
@@ -2025,10 +2175,10 @@ class Console:
         raise SystemExit(1)
 
     def _check_buffer(self) -> None:
-        """Check if the buffer may be rendered. Render it if it can (e.g. Console.quiet is False)
-        Rendering is supported on Windows, Unix and Jupyter environments. For
-        legacy Windows consoles, the win32 API is called directly.
-        This method will also record what it renders if recording is enabled via Console.record.
+        """[状态检查：缓冲区刷新门卫]
+        
+        检查当前是否可以刷新缓冲区（例如不在 quiet 模式）。
+        如果可以，则调用 _write_buffer。
         """
         if self.quiet:
             del self._buffer[:]
@@ -2040,21 +2190,30 @@ class Console:
             self.on_broken_pipe()
 
     def _write_buffer(self) -> None:
-        """Write the buffer to the output file."""
-
+        """[底层核心：物理写入]
+        
+        将内存中的 Segment 列表转换为最终字符串，并写入文件对象。
+        处理了 Jupyter、Windows Legacy、Windows Modern 和 Unix 等多种环境差异。
+        """
         with self._lock:
+            # 1. [录制功能]
+            # 如果开启了 record，且在顶层缓冲区（非嵌套），将 Segment 复制到录制缓冲区。
             if self.record and not self._buffer_index:
                 with self._record_buffer_lock:
                     self._record_buffer.extend(self._buffer[:])
 
+            # 2. [仅在最顶层缓冲区时才实际输出]
             if self._buffer_index == 0:
                 if self.is_jupyter:  # pragma: no cover
+                    # [环境：Jupyter]
+                    # Jupyter 有特殊的 HTML 显示协议，不能直接 write text
                     from .jupyter import display
 
                     display(self._buffer, self._render_buffer(self._buffer[:]))
                     del self._buffer[:]
                 else:
                     if WINDOWS:
+                        # [环境：Windows]
                         use_legacy_windows_render = False
                         if self.legacy_windows:
                             fileno = get_fileno(self.file)
@@ -2064,6 +2223,8 @@ class Console:
                                 )
 
                         if use_legacy_windows_render:
+                            # [分支：Windows Legacy API]
+                            # 旧版 Windows 不支持 ANSI，必须调用 Win32 API 设置颜色
                             from rich._win32_console import LegacyWindowsTerm
                             from rich._windows_renderer import legacy_windows_render
 
@@ -2073,18 +2234,22 @@ class Console:
 
                             legacy_windows_render(buffer, LegacyWindowsTerm(self.file))
                         else:
-                            # Either a non-std stream on legacy Windows, or modern Windows.
+                            # [分支：Windows Modern / Unix]
+                            # 使用 ANSI 转义序列输出
                             text = self._render_buffer(self._buffer[:])
-                            # https://bugs.python.org/issue37871
-                            # https://github.com/python/cpython/issues/82052
-                            # We need to avoid writing more than 32Kb in a single write, due to the above bug
+                            
+                            # [Bug 修复：Python 写入限制]
+                            # Python 在 Windows 上对单次 write 的大小有限制（约 32KB）。
+                            # 参见: https://bugs.python.org/issue37871
+                            # 必须分批写入，否则数据会丢失。
                             write = self.file.write
-                            # Worse case scenario, every character is 4 bytes of utf-8
+                            # 估算最坏情况：每个字符 4 字节 (UTF-8)
                             MAX_WRITE = 32 * 1024 // 4
                             try:
                                 if len(text) <= MAX_WRITE:
                                     write(text)
                                 else:
+                                    # [分块写入逻辑]
                                     batch: List[str] = []
                                     batch_append = batch.append
                                     size = 0
@@ -2102,6 +2267,7 @@ class Console:
                                 error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
                                 raise
                     else:
+                        # [环境：Unix/Linux/macOS]
                         text = self._render_buffer(self._buffer[:])
                         try:
                             self.file.write(text)
@@ -2109,20 +2275,31 @@ class Console:
                             error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
                             raise
 
+                    # [刷新] 确保数据从缓冲区刷入设备
                     self.file.flush()
+                    # 清空已写入的缓冲区
                     del self._buffer[:]
 
     def _render_buffer(self, buffer: Iterable[Segment]) -> str:
-        """Render buffered output, and clear buffer."""
+        """[转换核心：Segment -> String]
+        
+        将抽象的 Segment 对象列表转换为具体的字符串。
+        这是样式生效的地方：Style 对象被转换为 ANSI 转义序列。
+        """
         output: List[str] = []
         append = output.append
         color_system = self._color_system
         legacy_windows = self.legacy_windows
         not_terminal = not self.is_terminal
+        
+        # [全局过滤：No Color]
+        # 如果设置了 no_color，移除所有样式相关的 Segment
         if self.no_color and color_system:
             buffer = Segment.remove_color(buffer)
+            
         for text, style, control in buffer:
             if style:
+                # [关键] 调用 Style.render 将样式转为控制码
                 append(
                     style.render(
                         text,
@@ -2131,6 +2308,7 @@ class Console:
                     )
                 )
             elif not (not_terminal and control):
+                # 如果不是控制字符，或者是终端环境，直接追加文本
                 append(text)
 
         rendered = "".join(output)
@@ -2145,23 +2323,15 @@ class Console:
         password: bool = False,
         stream: Optional[TextIO] = None,
     ) -> str:
-        """Displays a prompt and waits for input from the user. The prompt may contain color / style.
-
-        It works in the same way as Python's builtin :func:`input` function and provides elaborate line editing and history features if Python's builtin :mod:`readline` module is previously loaded.
-
-        Args:
-            prompt (Union[str, Text]): Text to render in the prompt.
-            markup (bool, optional): Enable console markup (requires a str prompt). Defaults to True.
-            emoji (bool, optional): Enable emoji (requires a str prompt). Defaults to True.
-            password: (bool, optional): Hide typed text. Defaults to False.
-            stream: (TextIO, optional): Optional file to read input from (rather than stdin). Defaults to None.
-
-        Returns:
-            str: Text read from stdin.
+        """[交互工具：增强版 Input]
+        
+        类似 Python 内置的 input()，但支持 Rich 的颜色、Markup 和 Emoji。
         """
         if prompt:
+            # 打印提示符（不换行）
             self.print(prompt, markup=markup, emoji=emoji, end="")
         if password:
+            # [安全] 使用 getpass 隐藏输入
             result = getpass("", stream=stream)
         else:
             if stream:
@@ -2171,16 +2341,12 @@ class Console:
         return result
 
     def export_text(self, *, clear: bool = True, styles: bool = False) -> str:
-        """Generate text from console contents (requires record=True argument in constructor).
-
+        """[导出功能：转为文本]
+        
+        将之前录制的输出（需要 record=True）导出为纯文本。
+        
         Args:
-            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
-            styles (bool, optional): If ``True``, ansi escape codes will be included. ``False`` for plain text.
-                Defaults to ``False``.
-
-        Returns:
-            str: String containing console contents.
-
+            styles: 如果为 True，保留 ANSI 颜色码（使得文本在支持颜色的终端里看仍有颜色）。
         """
         assert (
             self.record
@@ -2188,11 +2354,13 @@ class Console:
 
         with self._record_buffer_lock:
             if styles:
+                # [带样式] 拼接 text 和 style.render(text) 的结果
                 text = "".join(
                     (style.render(text) if style else text)
                     for text, style, _ in self._record_buffer
                 )
             else:
+                # [纯文本] 仅提取 text 字段，忽略 control
                 text = "".join(
                     segment.text
                     for segment in self._record_buffer
@@ -2203,14 +2371,9 @@ class Console:
         return text
 
     def save_text(self, path: str, *, clear: bool = True, styles: bool = False) -> None:
-        """Generate text from console and save to a given location (requires record=True argument in constructor).
-
-        Args:
-            path (str): Path to write text files.
-            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
-            styles (bool, optional): If ``True``, ansi style codes will be included. ``False`` for plain text.
-                Defaults to ``False``.
-
+        """[导出功能：保存文本]
+        
+        将控制台内容保存到指定路径的文件中。
         """
         text = self.export_text(clear=clear, styles=styles)
         with open(path, "w", encoding="utf-8") as write_file:
@@ -2224,72 +2387,74 @@ class Console:
         code_format: Optional[str] = None,
         inline_styles: bool = False,
     ) -> str:
-        """Generate HTML from console contents (requires record=True argument in constructor).
-
+        """[导出功能：转为 HTML]
+        
+        将终端输出转换为 HTML 页面。这对于生成文档或分享日志非常有用。
+        
         Args:
-            theme (TerminalTheme, optional): TerminalTheme object containing console colors.
-            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
-            code_format (str, optional): Format string to render HTML. In addition to '{foreground}',
-                '{background}', and '{code}', should contain '{stylesheet}' if inline_styles is ``False``.
-            inline_styles (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
-                larger but easier to cut and paste markup. If ``False``, styles will be embedded in a style tag.
-                Defaults to False.
-
-        Returns:
-            str: String containing console contents as HTML.
+            theme: 指定颜色主题，将终端颜色映射为 CSS 颜色。
+            inline_styles: 如果为 True，样式写在 <span style=""> 中；否则写在 <style> 标签中。
         """
         assert (
             self.record
         ), "To export console contents set record=True in the constructor or instance"
         fragments: List[str] = []
         append = fragments.append
+        # [默认主题]
         _theme = theme or DEFAULT_TERMINAL_THEME
         stylesheet = ""
 
-        render_code_format = CONSOLE_HTML_FORMAT if code_format is None else code_format
+            # [延续 export_html 的后半部分]
+    render_code_format = CONSOLE_HTML_FORMAT if code_format is None else code_format
 
-        with self._record_buffer_lock:
-            if inline_styles:
-                for text, style, _ in Segment.filter_control(
-                    Segment.simplify(self._record_buffer)
-                ):
-                    text = escape(text)
-                    if style:
-                        rule = style.get_html_style(_theme)
-                        if style.link:
-                            text = f'<a href="{style.link}">{text}</a>'
-                        text = f'<span style="{rule}">{text}</span>' if rule else text
-                    append(text)
-            else:
-                styles: Dict[str, int] = {}
-                for text, style, _ in Segment.filter_control(
-                    Segment.simplify(self._record_buffer)
-                ):
-                    text = escape(text)
-                    if style:
-                        rule = style.get_html_style(_theme)
-                        style_number = styles.setdefault(rule, len(styles) + 1)
-                        if style.link:
-                            text = f'<a class="r{style_number}" href="{style.link}">{text}</a>'
-                        else:
-                            text = f'<span class="r{style_number}">{text}</span>'
-                    append(text)
-                stylesheet_rules: List[str] = []
-                stylesheet_append = stylesheet_rules.append
-                for style_rule, style_number in styles.items():
-                    if style_rule:
-                        stylesheet_append(f".r{style_number} {{{style_rule}}}")
-                stylesheet = "\n".join(stylesheet_rules)
+    with self._record_buffer_lock:
+        # [分支 A：内联样式模式]
+        if inline_styles:
+            for text, style, _ in Segment.filter_control(
+                Segment.simplify(self._record_buffer)
+            ):
+                text = escape(text) # HTML 转义
+                if style:
+                    rule = style.get_html_style(_theme)
+                    if style.link:
+                        text = f'<a href="{style.link}">{text}</a>'
+                    # 直接将 CSS 写入 style 属性，文件体积大但兼容性好
+                    text = f'<span style="{rule}">{text}</span>' if rule else text
+                append(text)
+        # [分支 B：类样式模式]
+        else:
+            styles: Dict[str, int] = {}
+            # 收集所有唯一的样式规则，并分配编号（r1, r2...）
+            for text, style, _ in Segment.filter_control(
+                Segment.simplify(self._record_buffer)
+            ):
+                text = escape(text)
+                if style:
+                    rule = style.get_html_style(_theme)
+                    style_number = styles.setdefault(rule, len(styles) + 1)
+                    if style.link:
+                        text = f'<a class="r{style_number}" href="{style.link}">{text}</a>'
+                    else:
+                        text = f'<span class="r{style_number}">{text}</span>'
+                append(text)
+            # 生成 <style> 标签内容
+            stylesheet_rules: List[str] = []
+            stylesheet_append = stylesheet_rules.append
+            for style_rule, style_number in styles.items():
+                if style_rule:
+                    stylesheet_append(f".r{style_number} {{{style_rule}}}")
+            stylesheet = "\n".join(stylesheet_rules)
 
-            rendered_code = render_code_format.format(
-                code="".join(fragments),
-                stylesheet=stylesheet,
-                foreground=_theme.foreground_color.hex,
-                background=_theme.background_color.hex,
-            )
-            if clear:
-                del self._record_buffer[:]
-        return rendered_code
+        # [模板填充]
+        rendered_code = render_code_format.format(
+            code="".join(fragments),
+            stylesheet=stylesheet,
+            foreground=_theme.foreground_color.hex,
+            background=_theme.background_color.hex,
+        )
+        if clear:
+            del self._record_buffer[:]
+        rendered_code
 
     def save_html(
         self,
@@ -2300,18 +2465,9 @@ class Console:
         code_format: str = CONSOLE_HTML_FORMAT,
         inline_styles: bool = False,
     ) -> None:
-        """Generate HTML from console contents and write to a file (requires record=True argument in constructor).
-
-        Args:
-            path (str): Path to write html file.
-            theme (TerminalTheme, optional): TerminalTheme object containing console colors.
-            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
-            code_format (str, optional): Format string to render HTML. In addition to '{foreground}',
-                '{background}', and '{code}', should contain '{stylesheet}' if inline_styles is ``False``.
-            inline_styles (bool, optional): If ``True`` styles will be inlined in to spans, which makes files
-                larger but easier to cut and paste markup. If ``False``, styles will be embedded in a style tag.
-                Defaults to False.
-
+        """[导出功能：保存 HTML]
+        
+        将录制的内容渲染为 HTML 并写入文件。
         """
         html = self.export_html(
             theme=theme,
@@ -2332,32 +2488,31 @@ class Console:
         font_aspect_ratio: float = 0.61,
         unique_id: Optional[str] = None,
     ) -> str:
-        """
-        Generate an SVG from the console contents (requires record=True in Console constructor).
-
-        Args:
-            title (str, optional): The title of the tab in the output image
-            theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
-            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
-            code_format (str, optional): Format string used to generate the SVG. Rich will inject a number of variables
-                into the string in order to form the final SVG output. The default template used and the variables
-                injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
-            font_aspect_ratio (float, optional): The width to height ratio of the font used in the ``code_format``
-                string. Defaults to 0.61, which is the width to height ratio of Fira Code (the default font).
-                If you aren't specifying a different font inside ``code_format``, you probably don't need this.
-            unique_id (str, optional): unique id that is used as the prefix for various elements (CSS styles, node
-                ids). If not set, this defaults to a computed value based on the recorded content.
+        """[核心渲染引擎：SVG 矢量图生成]
+        
+        这是 Rich 最复杂的导出功能之一。它将终端文本精确地转换为 SVG 矢量图形。
+        
+        挑战：
+        1. 坐标映射：将文本的行列号转换为 SVG 的 x,y 像素坐标。
+        2. 背景渲染：终端的背景色通常是矩形容器，需要单独绘制。
+        3. 字体处理：需要考虑字符宽高比，以及全角字符（如中文）的宽度计算。
         """
 
         from rich.cells import cell_len
 
+        # [性能优化：样式缓存]
+        # 避免为每个字符生成重复的 CSS 类。
         style_cache: Dict[Style, str] = {}
 
         def get_svg_style(style: Style) -> str:
-            """Convert a Style to CSS rules for SVG."""
+            """[转换器：Style -> CSS]
+            
+            将 Rich 内部的 Style 对象转换为 SVG/CSS 属性字符串。
+            """
             if style in style_cache:
                 return style_cache[style]
             css_rules = []
+            # [颜色处理]：处理前景色和背景色，考虑默认值和反转色
             color = (
                 _theme.foreground_color
                 if (style.color is None or style.color.is_default)
@@ -2373,6 +2528,8 @@ class Console:
             if style.dim:
                 color = blend_rgb(color, bgcolor, 0.4)
             css_rules.append(f"fill: {color.hex}")
+            
+            # [字体样式处理]
             if style.bold:
                 css_rules.append("font-weight: bold")
             if style.italic:
@@ -2388,10 +2545,12 @@ class Console:
 
         _theme = theme or SVG_EXPORT_THEME
 
+        # [布局参数计算]
+        # SVG 不像终端那样有“字符”单位，必须转换为像素。
         width = self.width
-        char_height = 20
-        char_width = char_height * font_aspect_ratio
-        line_height = char_height * 1.22
+        char_height = 20  # 假设每个字符高 20px
+        char_width = char_height * font_aspect_ratio # 宽度由宽高比决定 (0.61 近似 Fira Code)
+        line_height = char_height * 1.22 # 行高略大于字高
 
         margin_top = 1
         margin_right = 1
@@ -2415,13 +2574,13 @@ class Console:
 
         def escape_text(text: str) -> str:
             """HTML escape text and replace spaces with nbsp."""
+            # [细节处理]：普通空格在 HTML 中会折叠，必须用 &nbsp; 保持对齐
             return escape(text).replace(" ", "&#160;")
 
         def make_tag(
             name: str, content: Optional[str] = None, **attribs: object
         ) -> str:
-            """Make a tag from name, content, and attributes."""
-
+            """[辅助函数：XML 标签生成器]"""
             def stringify(value: object) -> str:
                 if isinstance(value, (float)):
                     return format(value, "g")
@@ -2442,6 +2601,7 @@ class Console:
             if clear:
                 self._record_buffer.clear()
 
+        # [ID 生成]：确保 SVG 内部 ID 唯一，避免多次导出冲突
         if unique_id is None:
             unique_id = "terminal-" + str(
                 zlib.adler32(
@@ -2452,17 +2612,22 @@ class Console:
                     + title.encode("utf-8", "ignore")
                 )
             )
+            
         y = 0
+        # [主渲染循环]
         for y, line in enumerate(Segment.split_and_crop_lines(segments, length=width)):
             x = 0
             for text, style, _control in line:
                 style = style or Style()
                 rules = get_svg_style(style)
+                # [CSS 类复用]：相同的样式共用一个 CSS 类
                 if rules not in classes:
                     classes[rules] = style_no
                     style_no += 1
                 class_name = f"r{classes[rules]}"
 
+                # [背景色渲染]
+                # SVG 文本没有背景色属性，需要画一个 <rect> 在文字下面
                 if style.reverse:
                     has_background = True
                     background = (
@@ -2479,34 +2644,38 @@ class Console:
                         else style.bgcolor.get_truecolor(_theme).hex
                     )
 
-                text_length = cell_len(text)
+                text_length = cell_len(text) # 使用 cell_len 处理全角字符宽度
                 if has_background:
                     text_backgrounds.append(
                         make_tag(
-                            "rect",
+                            "rect", # 矩形标签
                             fill=background,
-                            x=x * char_width,
-                            y=y * line_height + 1.5,
-                            width=char_width * text_length,
-                            height=line_height + 0.25,
-                            shape_rendering="crispEdges",
+                            x=x * char_width, # 像素坐标 X
+                            y=y * line_height + 1.5, # 像素坐标 Y
+                            width=char_width * text_length, # 矩形宽度
+                            height=line_height + 0.25, # 矩形高度
+                            shape_rendering="crispEdges", # 锐化边缘，防止模糊
                         )
                     )
 
                 if text != " " * len(text):
+                    # [文本渲染]
                     text_group.append(
                         make_tag(
                             "text",
                             escape_text(text),
                             _class=f"{unique_id}-{class_name}",
                             x=x * char_width,
-                            y=y * line_height + char_height,
+                            y=y * line_height + char_height, # 基线对齐
                             textLength=char_width * len(text),
+                            # [裁剪路径]：防止文本溢出到背景块之外（特别是对于特殊字符）
                             clip_path=f"url(#{unique_id}-line-{y})",
                         )
                     )
                 x += cell_len(text)
 
+        # [剪切路径定义]
+        # 为每一行定义一个剪切区域，防止溢出
         line_offsets = [line_no * line_height + 1.5 for line_no in range(y)]
         lines = "\n".join(
             f"""<clipPath id="{unique_id}-line-{line_no}">
@@ -2515,14 +2684,18 @@ class Console:
             for line_no, offset in enumerate(line_offsets)
         )
 
+        # [样式表生成]
         styles = "\n".join(
             f".{unique_id}-r{rule_no} {{ {css} }}" for css, rule_no in classes.items()
         )
         backgrounds = "".join(text_backgrounds)
         matrix = "".join(text_group)
 
+        # [画布尺寸计算]
         terminal_width = ceil(width * char_width + padding_width)
         terminal_height = (y + 1) * line_height + padding_height
+        
+        # [UI 装饰：窗口边框]
         chrome = make_tag(
             "rect",
             fill=_theme.background_color.hex,
@@ -2532,9 +2705,10 @@ class Console:
             y=margin_top,
             width=terminal_width,
             height=terminal_height,
-            rx=8,
+            rx=8, # 圆角
         )
 
+        # [UI 装饰：标题栏]
         title_color = _theme.foreground_color.hex
         if title:
             chrome += make_tag(
@@ -2546,6 +2720,7 @@ class Console:
                 x=terminal_width // 2,
                 y=margin_top + char_height + 6,
             )
+        # [UI 装饰：macOS 风格的红黄绿按钮]
         chrome += f"""
             <g transform="translate(26,22)">
             <circle cx="0" cy="0" r="7" fill="#ff5f57"/>
@@ -2554,6 +2729,7 @@ class Console:
             </g>
         """
 
+        # [模板填充与返回]
         svg = code_format.format(
             unique_id=unique_id,
             char_width=char_width,
@@ -2584,22 +2760,7 @@ class Console:
         font_aspect_ratio: float = 0.61,
         unique_id: Optional[str] = None,
     ) -> None:
-        """Generate an SVG file from the console contents (requires record=True in Console constructor).
-
-        Args:
-            path (str): The path to write the SVG to.
-            title (str, optional): The title of the tab in the output image
-            theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
-            clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
-            code_format (str, optional): Format string used to generate the SVG. Rich will inject a number of variables
-                into the string in order to form the final SVG output. The default template used and the variables
-                injected by Rich can be found by inspecting the ``console.CONSOLE_SVG_FORMAT`` variable.
-            font_aspect_ratio (float, optional): The width to height ratio of the font used in the ``code_format``
-                string. Defaults to 0.61, which is the width to height ratio of Fira Code (the default font).
-                If you aren't specifying a different font inside ``code_format``, you probably don't need this.
-            unique_id (str, optional): unique id that is used as the prefix for various elements (CSS styles, node
-                ids). If not set, this defaults to a computed value based on the recorded content.
-        """
+        """[导出功能：保存 SVG]"""
         svg = self.export_svg(
             title=title,
             theme=theme,
@@ -2613,18 +2774,17 @@ class Console:
 
 
 def _svg_hash(svg_main_code: str) -> str:
-    """Returns a unique hash for the given SVG main code.
-
-    Args:
-        svg_main_code (str): The content we're going to inject in the SVG envelope.
-
-    Returns:
-        str: a hash of the given content
+    """[辅助函数：哈希生成]
+    
+    使用 Adler32 算法生成内容的哈希值。
+    Adler32 比 MD5/SHA 更快，虽然安全性较低，但在这里用于生成唯一 ID 已经足够。
     """
     return str(zlib.adler32(svg_main_code.encode()))
 
 
 if __name__ == "__main__":  # pragma: no cover
+    # [模块测试入口]
+    # 当直接运行此文件时，执行以下测试代码。
     console = Console(record=True)
 
     console.log(
@@ -2642,8 +2802,19 @@ if __name__ == "__main__":  # pragma: no cover
         },
     )
 
+        # [功能演示：日志输出]
+    # 使用 console.log() 打印信息。
+    # 区别：log() 会自动在输出前添加“时间戳”、“文件路径”和“行号”，非常适合调试和记录程序运行状态。
     console.log("Hello, World!", "{'a': 1}", repr(console))
 
+    # [功能演示：结构化数据美化打印]
+    # 使用 console.print() 打印一个复杂的嵌套字典。
+    # 
+    # 核心特性：
+    # 1. 自动检测类型：识别出这是一个 dict。
+    # 2. 递归渲染：深入到多层嵌套结构中。
+    # 3. 语法高亮：字典的键、字符串值、布尔值会有不同的颜色，极大提升可读性。
+    # 4. 自动缩进：根据层级自动对齐。
     console.print(
         {
             "name": None,
