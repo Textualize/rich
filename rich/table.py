@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field, replace
 from __future__ import annotations  # 关键：延迟类型评估
 from rich.console import Console, ConsoleOptions, RenderResult  # 确保类型导入
-
+from typing import Iterable, List
 class Table(JupyterMixin):
     def _render(
         self,
@@ -454,6 +454,20 @@ class Table(JupyterMixin):
         #2. 自动扩列：如果传入的数据多于列数，自动创建新的 Column 对象来容纳数据。
         #3. 类型校验：确保数据是可渲染的 (Renderable)。
        
+            def add_rows(self, rows: Iterable[Iterable[Any]]) -> None:
+       
+         #[优化功能] 批量添加多行数据到表格中。
+        
+         #Args:
+            # rows (Iterable[Iterable[Any]]): 包含多行数据的可迭代对象，
+                                          # 每一行是一个可迭代的单元格数据。
+        
+         #Example:
+            # table.add_rows([["Name", "Age"], ["Alice", 24], ["Bob", 19]])
+       
+                for row in rows:
+                    self.add_row(*row)
+
 
             def add_cell(column: Column, renderable: "RenderableType") -> None:
                 column._cells.append(renderable)
