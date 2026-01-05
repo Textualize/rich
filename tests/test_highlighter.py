@@ -51,6 +51,34 @@ highlight_tests = [
         ],
     ),
     (
+        "<A> <B>",
+        [
+            Span(0, 1, "repr.tag_start"),
+            Span(1, 2, "repr.tag_name"),
+            Span(2, 3, "repr.tag_end"),
+            Span(4, 5, "repr.tag_start"),
+            Span(5, 6, "repr.tag_name"),
+            Span(6, 7, "repr.tag_end"),
+        ],
+    ),
+    (
+        "(<class 'int'>, <class 'int'>)",
+        [
+            Span(1, 2, "repr.tag_start"),
+            Span(2, 7, "repr.tag_name"),
+            Span(7, 13, "repr.tag_contents"),
+            Span(13, 14, "repr.tag_end"),
+            Span(16, 17, "repr.tag_start"),
+            Span(17, 22, "repr.tag_name"),
+            Span(22, 28, "repr.tag_contents"),
+            Span(28, 29, "repr.tag_end"),
+            Span(0, 1, "repr.brace"),
+            Span(29, 30, "repr.brace"),
+            Span(8, 13, "repr.str"),
+            Span(23, 28, "repr.str"),
+        ],
+    ),
+    (
         "False True None",
         [
             Span(0, 5, "repr.bool_false"),
