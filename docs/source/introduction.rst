@@ -30,6 +30,12 @@ If you intend to use Rich with Jupyter then there are some additional dependenci
 
     pip install "rich[jupyter]"
 
+Demo
+----
+
+To check if Rich was installed correctly, and to see a little of what Rich can do, run the following from the command line::
+
+    python -m rich
 
 Quick Start
 -----------

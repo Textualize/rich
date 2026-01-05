@@ -13,7 +13,11 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            I hope we solved your problem.
+            I hope I helped!
             
-            If you like using Rich, you might also enjoy [Textual](https://textual.textualize.io)
+            Consider [sponsoring](https://github.com/sponsors/willmcgugan) my work on Rich. I give tech support for free, in addition to maintaining Rich and Textual.
+            
+            If you like using Rich, you might also enjoy [Textual](https://textual.textualize.io).
+
+            Will McGugan
             

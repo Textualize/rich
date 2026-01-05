@@ -5,16 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [14.2.0] - 2025-10-09
+
+### Changed
+
+- Python3.14 compatibility https://github.com/Textualize/rich/pull/3861
+
+## [14.1.0] - 2025-06-25
 
 ### Changed
 
 - Removed `typing_extensions` from runtime dependencies https://github.com/Textualize/rich/pull/3763
 - Live objects (including Progress) may now be nested https://github.com/Textualize/rich/pull/3768
+- Added padding property to Syntax which returns a tuple of four integers https://github.com/Textualize/rich/pull/3782
 
 ### Fixed
 
 - Fixed extraction of recursive exceptions https://github.com/Textualize/rich/pull/3772
+- Fixed padding applied to Syntax https://github.com/Textualize/rich/pull/3782
+- Fixed `Panel` title missing the panel background style https://github.com/Textualize/rich/issues/3569
+
+### Added
+
+- Added `TTY_INTERACTIVE` environment variable to force interactive mode off or on https://github.com/Textualize/rich/pull/3777
 
 ## [14.0.0] - 2025-03-30
 
@@ -2134,6 +2147,8 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[14.1.0]: https://github.com/textualize/rich/compare/v14.1.0...v14.2.0
+[14.0.0]: https://github.com/textualize/rich/compare/v14.0.0...v14.1.0
 [14.0.0]: https://github.com/textualize/rich/compare/v13.9.4...v14.0.0
 [13.9.4]: https://github.com/textualize/rich/compare/v13.9.3...v13.9.4
 [13.9.3]: https://github.com/textualize/rich/compare/v13.9.2...v13.9.3
