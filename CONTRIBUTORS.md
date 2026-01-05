@@ -94,3 +94,4 @@ The following people have contributed to the development of Rich:
 - [Jonathan Helmus](https://github.com/jjhelmus)
 - [Brandon Capener](https://github.com/bcapener)
 - [Alex Zheng](https://github.com/alexzheng111)
+- [Rushi Balapure](https://github.com/Rushi-Balapure)
