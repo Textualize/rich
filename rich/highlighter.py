@@ -1,6 +1,6 @@
 import re
 from abc import ABC, abstractmethod
-from typing import List, Union
+from typing import ClassVar, Union
 
 from .text import Span, Text
 
@@ -61,7 +61,7 @@ class NullHighlighter(Highlighter):
 class RegexHighlighter(Highlighter):
     """Applies highlighting from a list of regular expressions."""
 
-    highlights: List[str] = []
+    highlights: ClassVar[tuple[str | re.Pattern[str], ...]] = ()
     base_style: str = ""
 
     def highlight(self, text: Text) -> None:
