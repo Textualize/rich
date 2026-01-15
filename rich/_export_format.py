@@ -1,5 +1,6 @@
 CONSOLE_HTML_FORMAT = """\
 <!DOCTYPE html>
+<!-- @generated with Rich https://www.textualize.io -->
 <html>
 <head>
 <meta charset="UTF-8">
@@ -19,7 +20,7 @@ body {{
 
 CONSOLE_SVG_FORMAT = """\
 <svg class="rich-terminal" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg">
-    <!-- Generated with Rich https://www.textualize.io -->
+    <!-- @generated with Rich https://www.textualize.io -->
     <style>
 
     @font-face {{
