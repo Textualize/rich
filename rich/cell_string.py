@@ -25,6 +25,45 @@ _SINGLE_CELLS = frozenset(
 _is_single_cell_widths: Callable[[str], bool] = _SINGLE_CELLS.issuperset
 
 
+class CellTable(NamedTuple):
+    """Contains unicode data required to measure the cell widths of glyphs."""
+
+    unicode_version: str
+    widths: Sequence[tuple[int, int, int]]
+    narrow_to_wide: frozenset[int]
+
+    def get_cell_size(self, character: str) -> None:
+        pass
+
+
+def get_character_cell_size(character: str, cell_table: CellTable | None) -> int:
+    """Get the cell size of a character.
+
+    Args:
+        character (str): A single character.
+
+    Returns:
+        int: Number of cells (0, 1 or 2) occupied by that character.
+    """
+    codepoint = ord(character)
+    _table = CELL_WIDTHS
+    lower_bound = 0
+    upper_bound = len(_table) - 1
+    index = (lower_bound + upper_bound) // 2
+    while True:
+        start, end, width = _table[index]
+        if codepoint < start:
+            upper_bound = index - 1
+        elif codepoint > end:
+            lower_bound = index + 1
+        else:
+            return 0 if width == -1 else width
+        if upper_bound < lower_bound:
+            break
+        index = (lower_bound + upper_bound) // 2
+    return 1
+
+
 def _bisearch(codepoint: int, table: Sequence[tuple[int, int, int]]) -> int:
     """Binary search a codepoint table.
 
