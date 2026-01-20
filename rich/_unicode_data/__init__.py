@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import bisect
 import os
+import sys
 
-try:
-    from functools import cache  # type: ignore[attr-defined]
-except ImportError:
-    # No cache in Python 3.8, lru_cache works here too
+if sys.version_info == (3, 8):
     from functools import lru_cache as cache
+else:
+    from functools import cache
 
 from importlib import import_module
 from typing import TYPE_CHECKING, cast
@@ -55,7 +55,7 @@ def _parse_version(version: str) -> tuple[int, int, int]:
     return triple
 
 
-@cache  # type: ignore[misc]
+@cache
 def load(unicode_version: str = "auto") -> CellTable:
     """Load a cell table for the given unicode version.
 
