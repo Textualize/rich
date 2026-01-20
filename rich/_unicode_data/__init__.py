@@ -69,17 +69,19 @@ def load(unicode_version: str = "auto") -> CellTable:
     if unicode_version == "latest":
         version = VERSIONS[-1]
     else:
-        if unicode_version in VERSION_SET:
-            version = unicode_version
-        else:
-            unicode_version_integers = _parse_version(unicode_version)
-            insert_position = bisect.bisect_left(
-                VERSION_ORDER, unicode_version_integers
-            )
+        try:
+            version_numbers = _parse_version(unicode_version)
+        except ValueError:
+            version_numbers = _parse_version(VERSIONS[-1])
+        major, minor, patch = version_numbers
+        version = f"{major}.{minor}.{patch}"
+        if version not in VERSION_SET:
+            insert_position = bisect.bisect_left(VERSION_ORDER, version_numbers)
             version = VERSIONS[max(0, insert_position - 1)]
 
     version_path_component = version.replace(".", "-")
     module_name = f".unicode{version_path_component}"
     module = import_module(module_name, "rich._unicode_data")
-    assert isinstance(module.cell_table, CellTable)
+    if TYPE_CHECKING:
+        assert isinstance(module.cell_table, CellTable)
     return module.cell_table
