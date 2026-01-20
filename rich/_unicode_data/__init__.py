@@ -2,7 +2,13 @@ from __future__ import annotations
 
 import bisect
 import os
-from functools import cache
+
+try:
+    from functools import cache
+except ImportError:
+    # No cache in Python 3.8, lru_cache works here too
+    from functools import lru_cache as cache
+
 from importlib import import_module
 from typing import TYPE_CHECKING, cast
 
