@@ -2,6 +2,7 @@ import io
 
 from rich.console import Console
 from rich.prompt import Confirm, IntPrompt, Prompt
+from unittest.mock import patch
 
 
 def test_prompt_str():
@@ -111,3 +112,17 @@ def test_prompt_confirm_default():
     output = console.file.getvalue()
     print(repr(output))
     assert output == expected
+
+
+def test_prompt_password_space():
+    INPUT = "Secret123 "
+    console = Console(file=io.StringIO())
+    # getpass(...) runs only on stdin, not arbitrary stream, so we monkeypatch it
+    with patch("rich.console.getpass") as mock_getpass:
+        mock_getpass.return_value = INPUT
+        password = Prompt.ask(
+            "Enter your password:",
+            console=console,
+            password=True,
+        )
+    assert password == INPUT

@@ -236,7 +236,8 @@ class PromptBase(Generic[PromptType]):
         Returns:
             PromptType: The value to be returned from ask method.
         """
-        value = value.strip()
+        if not self.password:
+            value = value.strip()
         try:
             return_value: PromptType = self.response_type(value)
         except ValueError:
