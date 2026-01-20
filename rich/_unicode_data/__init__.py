@@ -4,10 +4,10 @@ import bisect
 import os
 import sys
 
-if sys.version_info == (3, 8):
-    from functools import lru_cache as cache
-else:
+if sys.version_info >= (3, 9):
     from functools import cache
+else:
+    from functools import lru_cache as cache
 
 from importlib import import_module
 from typing import TYPE_CHECKING, cast
