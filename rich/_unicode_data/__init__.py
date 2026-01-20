@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import bisect
 import os
 from functools import cache
 from importlib import import_module
+from typing import TYPE_CHECKING
 
 from rich._unicode_data._versions import VERSIONS
-from rich.cell_string import CellTable
+
+if TYPE_CHECKING:
+    from rich.cell_string import CellTable
 
 VERSION_ORDER = sorted(
     [
@@ -44,14 +49,14 @@ def _parse_version(version: str) -> tuple[int, int, int]:
 
 
 @cache
-def load(unicode_version: str | None) -> CellTable:
+def load(unicode_version: str = "auto") -> CellTable:
     """Load a cell table for the given unicode version.
 
     Args:
         unicode_version: Unicode version, or `None` to auto-detect.
 
     """
-    if unicode_version is None:
+    if unicode_version == "auto":
         unicode_version = os.environ.get("UNICODE_VERSION", "latest")
         try:
             _parse_version(unicode_version)
