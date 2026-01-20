@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import lru_cache
 from operator import itemgetter
 from typing import Callable, Generator, Iterator, NamedTuple, Sequence
