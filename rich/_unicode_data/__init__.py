@@ -4,7 +4,7 @@ import bisect
 import os
 
 try:
-    from functools import cache
+    from functools import cache  # type: ignore[attr-defined]
 except ImportError:
     # No cache in Python 3.8, lru_cache works here too
     from functools import lru_cache as cache
@@ -55,7 +55,7 @@ def _parse_version(version: str) -> tuple[int, int, int]:
     return triple
 
 
-@cache
+@cache  # type: ignore[misc]
 def load(unicode_version: str = "auto") -> CellTable:
     """Load a cell table for the given unicode version.
 

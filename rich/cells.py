@@ -6,7 +6,7 @@ from typing import Callable, Generator, Iterator, NamedTuple, Sequence
 
 from rich._unicode_data import load as load_cell_table
 
-CellSpan = tuple[int, int, int]
+CellSpan = "tuple[int, int, int]"
 
 _span_get_cell_len = itemgetter(2)
 
