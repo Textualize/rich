@@ -38,7 +38,7 @@ class CellTable(NamedTuple):
 
     unicode_version: str
     widths: Sequence[tuple[int, int, int]]
-    narrow_to_wide: frozenset[int]
+    narrow_to_wide: frozenset[str]
 
     def __hash__(self) -> int:
         return hash(self.unicode_version)
@@ -104,12 +104,14 @@ def cell_len(text: str, unicode_version: str = "auto") -> int:
     Returns:
         Length of string in terminal cells.
     """
+
     if _is_single_cell_widths(text):
         return len(text)
 
     # "\u200d" is zero width joiner
     # "\ufe0f" is variation selector 16
     if "\u200d" not in text and "\ufe0f" not in text:
+        # Simplest case with no unicode stuff that changes the size
         return sum(
             get_character_cell_size(character, unicode_version) for character in text
         )

@@ -3,7 +3,13 @@ import string
 import pytest
 
 from rich import cells
-from rich.cells import CellSpan, _is_single_cell_widths, chop_cells, split_graphemes
+from rich.cells import (
+    CellSpan,
+    _is_single_cell_widths,
+    cell_len,
+    chop_cells,
+    split_graphemes,
+)
 
 
 def test_cell_len_long_string():
@@ -91,14 +97,24 @@ def test_is_single_cell_widths() -> None:
         ("ab", [(0, 1, 1), (1, 2, 1)], 2),
         ("💩", [(0, 1, 2)], 2),
         ("わさび", [(0, 1, 2), (1, 2, 2), (2, 3, 2)], 6),
-        ("👩\u200d🔧", [(0, 3, 2)], 2),
+        (
+            "👩\u200d🔧",
+            [(0, 3, 2)],
+            2,
+        ),  # 3 code points for female mechanic: female, joiner, spanner
         ("a👩\u200d🔧", [(0, 1, 1), (1, 4, 2)], 3),
         ("a👩\u200d🔧b", [(0, 1, 1), (1, 4, 2), (4, 5, 1)], 4),
+        ("⬇", [(0, 1, 1)], 1),
+        ("⬇️", [(0, 2, 2)], 2),  # Variation selector, makes it double width
+        ("♻", [(0, 1, 1)], 1),
+        ("♻️", [(0, 2, 2)], 2),
+        ("♻♻️", [(0, 1, 1), (1, 3, 2)], 3),
     ],
 )
 def test_split_graphemes(
     text: str, expected_spans: list[CellSpan], expected_cell_length: int
 ):
     spans, cell_length = split_graphemes(text)
+    assert cell_len(text) == expected_cell_length
     assert spans == expected_spans
     assert cell_length == expected_cell_length

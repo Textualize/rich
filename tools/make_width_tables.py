@@ -20,9 +20,9 @@ with open(path, "wt") as init_file:
     init_file.write(init)
 
 
-narrow_to_wide: set[int] = set()
+narrow_to_wide: set[str] = set()
 for start, end in VS16_NARROW_TO_WIDE["9.0.0"]:
-    narrow_to_wide.update(range(start, end))
+    narrow_to_wide.update(chr(codepoint) for codepoint in range(start, end + 1))
 
 for version in UNICODE_VERSIONS:
     table: list[tuple[int, int, int]] = []
