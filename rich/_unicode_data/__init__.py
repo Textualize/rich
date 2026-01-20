@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 from rich._unicode_data._versions import VERSIONS
 
 if TYPE_CHECKING:
-    from rich.cell_string import CellTable
+    from rich.cells import CellTable
 
 VERSION_ORDER = sorted(
     [
