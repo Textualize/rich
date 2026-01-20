@@ -4,7 +4,7 @@ import bisect
 import os
 from functools import cache
 from importlib import import_module
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from rich._unicode_data._versions import VERSIONS
 
@@ -19,7 +19,7 @@ VERSION_ORDER = sorted(
         for version in VERSIONS
     ]
 )
-VERSION_SET = frozenset(VERSION_ORDER)
+VERSION_SET = frozenset(VERSIONS)
 
 
 def _parse_version(version: str) -> tuple[int, int, int]:
@@ -34,6 +34,7 @@ def _parse_version(version: str) -> tuple[int, int, int]:
     Returns:
         A tuple of 3 integers.
     """
+    version_integers: tuple[int, ...]
     try:
         version_integers = tuple(
             map(int, version.split(".")),
@@ -43,8 +44,8 @@ def _parse_version(version: str) -> tuple[int, int, int]:
             f"unicode version string {version!r} is badly formatted"
         ) from None
     while len(version_integers) < 3:
-        version_integers = (version_integers, 0)
-    triple = version_integers[:3]
+        version_integers = version_integers + (0,)
+    triple = cast("tuple[int, int, int]", version_integers[:3])
     return triple
 
 
@@ -80,4 +81,5 @@ def load(unicode_version: str = "auto") -> CellTable:
     version_path_component = version.replace(".", "-")
     module_name = f".unicode{version_path_component}"
     module = import_module(module_name, "rich._unicode_data")
+    assert isinstance(module.cell_table, CellTable)
     return module.cell_table

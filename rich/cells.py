@@ -424,7 +424,7 @@ class CellString:
         if self._singles:
             return reversed(self._text)
 
-        def iterate_text(text: str, spans: "list[CellSpan]"):
+        def iterate_text(text: str, spans: "list[CellSpan]") -> Generator[str]:
             for start, end, _ in reversed(spans):
                 yield text[start:end]
 
