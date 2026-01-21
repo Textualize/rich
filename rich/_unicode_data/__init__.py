@@ -4,7 +4,7 @@ import bisect
 import os
 import sys
 
-if sys.version_info >= (3, 9):
+if sys.version_info[:2] >= (3, 9):
     from functools import cache
 else:
     from functools import lru_cache as cache
