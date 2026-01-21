@@ -1,10 +1,8 @@
-[tool.poetry]
+[project]
 name = "rich"
-homepage = "https://github.com/Textualize/rich"
-documentation = "https://rich.readthedocs.io/en/latest/"
 version = "15.0.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
-authors = ["Will McGugan <willmcgugan@gmail.com>"]
+authors = [{name = "Will McGugan", email = "willmcgugan@gmail.com"}]
 license = "MIT"
 readme = "README.md"
 classifiers = [
@@ -15,6 +13,7 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Operating System :: MacOS",
     "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -23,29 +22,34 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Typing :: Typed",
 ]
-include = ["rich/py.typed"]
+requires-python = ">=3.9.0"
+dependencies = [
+    "pygments>=2.13.0,<3.0.0",
+    "markdown-it-py>=2.2.0",
+]
 
+[project.optional-dependencies]
+jupyter = [
+    "ipywidgets>=7.5.1,<9",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.9.0"
-pygments = "^2.13.0"
-ipywidgets = { version = ">=7.5.1,<9", optional = true }
-markdown-it-py = ">=2.2.0"
+[project.urls]
+homepage = "https://github.com/Textualize/rich"
+documentation = "https://rich.readthedocs.io/en/latest/"
 
-[tool.poetry.extras]
-jupyter = ["ipywidgets"]
-
-[tool.poetry.dev-dependencies]
-pytest = "^7.0.0"
-black = "^22.6"
-mypy = "^1.11"
-pytest-cov = "^3.0.0"
-attrs = "^21.4.0"
-pre-commit = "^2.17.0"
-typing-extensions = ">=4.0.0, <5.0"
+[dependency-groups]
+dev = [
+    "pytest~=7.0",
+    "black~=22.6",
+    "mypy~=1.11",
+    "pytest-cov~=3.0",
+    "attrs~=21.4",
+    "pre-commit~=2.17",
+    "typing-extensions~=4.0",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=2.2.0"]
 build-backend = "poetry.core.masonry.api"
 
 
