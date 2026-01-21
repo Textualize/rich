@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from rich._unicode_data import _parse_version, load
