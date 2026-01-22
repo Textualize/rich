@@ -61,7 +61,7 @@ class NullHighlighter(Highlighter):
 class RegexHighlighter(Highlighter):
     """Applies highlighting from a list of regular expressions."""
 
-    highlights: ClassVar[tuple[str | re.Pattern[str], ...]] = ()
+    highlights: ClassVar[tuple[str, ...]] = ()
     base_style: str = ""
 
     def highlight(self, text: Text) -> None:
