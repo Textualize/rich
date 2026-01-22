@@ -9,10 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added support for some multi-codepopint glpyhs (will fix alignment issues for these characters)
-- Added support for `UNICODE_VERSION` environment variable
+- Added support for some multi-codepopint glpyhs (will fix alignment issues for these characters) https://github.com/Textualize/rich/pull/3930
+- Added support for `UNICODE_VERSION` environment variable https://github.com/Textualize/rich/pull/3930
 
+### Changed
 
+- `cells.cell_len` now has a `unicode_version` parameter (that you probably should never change) https://github.com/Textualize/rich/pull/3930
 
 ## [14.2.0] - 2025-10-09
 
