@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added support for some multi-codepopint glpyhs (will fix alignment issues for these characters) https://github.com/Textualize/rich/pull/3930
+- Added support for some multi-codepopint glyphs (will fix alignment issues for these characters) https://github.com/Textualize/rich/pull/3930
 - Added support for `UNICODE_VERSION` environment variable https://github.com/Textualize/rich/pull/3930
 
 ### Changed
