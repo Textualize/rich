@@ -76,7 +76,7 @@ def get_character_cell_size(character: str, unicode_version: str = "auto") -> in
 
 
 @lru_cache(4096)
-def cached_cell_len(text: str) -> int:
+def cached_cell_len(text: str, unicode_version: str = "auto") -> int:
     """Get the number of cells required to display text.
 
     This method always caches, which may use up a lot of memory. It is recommended to use
@@ -84,16 +84,30 @@ def cached_cell_len(text: str) -> int:
 
     Args:
         text (str): Text to display.
+        unicode_version: Unicode version, `"auto"` to auto detect, `"latest"` for the latest unicode version.
 
     Returns:
         int: Get the number of cells required to display text.
     """
-    if _is_single_cell_widths(text):
-        return len(text)
-    return sum(map(get_character_cell_size, text))
+    return _cell_len(text, unicode_version)
 
 
 def cell_len(text: str, unicode_version: str = "auto") -> int:
+    """Get the cell length of a string (length as it appears in the terminal).
+
+    Args:
+        text: String to measure.
+        unicode_version: Unicode version, `"auto"` to auto detect, `"latest"` for the latest unicode version.
+
+    Returns:
+        Length of string in terminal cells.
+    """
+    if len(text) < 512:
+        return cached_cell_len(text, unicode_version)
+    return _cell_len(text, unicode_version)
+
+
+def _cell_len(text: str, unicode_version: str) -> int:
     """Get the cell length of a string (length as it appears in the terminal).
 
     Args:
