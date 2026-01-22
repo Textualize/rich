@@ -10,8 +10,25 @@ from rich.cells import (
     _is_single_cell_widths,
     cell_len,
     chop_cells,
+    get_character_cell_size,
     split_graphemes,
+    split_text,
 )
+
+
+@pytest.mark.parametrize(
+    "character,size",
+    [
+        ("\0", 0),
+        ("\u200d", 0),
+        ("a", 1),
+        ("💩", 2),
+        (chr(917999 + 1), 0),
+    ],
+)
+def test_get_character_cell_size(character: str, size: int) -> None:
+    """Test single character cell size."""
+    assert get_character_cell_size(character) == size
 
 
 def test_cell_len_long_string():
@@ -53,6 +70,50 @@ def test_set_cell_size_infinite():
             )
             == size
         )
+
+
+FM = "👩\u200d🔧"
+
+
+@pytest.mark.parametrize(
+    "text,offset,left,right",
+    [
+        # Edge cases
+        ("", -1, "", ""),
+        ("x", -1, "", "x"),
+        ("x", 1, "x", ""),
+        ("x", 2, "x", ""),
+        ("", 0, "", ""),
+        ("", 1, "", ""),
+        ("a", 0, "", "a"),
+        ("a", 1, "a", ""),
+        # Check simple double width character
+        ("💩", 0, "", "💩"),
+        ("💩", 1, " ", " "),  # Split in the middle of a double wide results in spaces
+        ("💩", 2, "💩", ""),
+        ("💩x", 1, " ", " x"),
+        ("💩x", 2, "💩", "x"),
+        ("💩x", 3, "💩x", ""),
+        # Check same for multi-codepoint emoji
+        (FM, 0, "", FM),
+        (FM, 1, " ", " "),  # Split in the middle of a double wide results in spaces
+        (FM, 2, FM, ""),
+        (FM + "x", 1, " ", " x"),
+        (FM + "x", 2, FM, "x"),
+        (FM + "x", 3, FM + "x", ""),
+        # Edge cases
+        ("xxxxxxxxxxxxxxx💩💩", 10, "xxxxxxxxxx", "xxxxx💩💩"),
+        ("xxxxxxxxxxxxxxx💩💩", 15, "xxxxxxxxxxxxxxx", "💩💩"),
+        ("xxxxxxxxxxxxxxx💩💩", 16, "xxxxxxxxxxxxxxx ", " 💩"),
+        ("💩💩", 3, "💩 ", " "),
+        ("💩💩xxxxxxxxxx", 2, "💩", "💩xxxxxxxxxx"),
+        ("💩💩xxxxxxxxxx", 3, "💩 ", " xxxxxxxxxx"),
+        ("💩💩xxxxxxxxxx", 4, "💩💩", "xxxxxxxxxx"),
+    ],
+)
+def test_split_text(text: str, offset: int, left: str, right: str) -> None:
+    """Check that split_text works on grapheme boundaries"""
+    assert split_text(text, offset) == (left, right)
 
 
 def test_chop_cells():

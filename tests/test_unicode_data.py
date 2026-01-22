@@ -2,7 +2,13 @@ from __future__ import annotations
 
 import pytest
 
-from rich._unicode_data import _parse_version, load
+from rich._unicode_data import VERSIONS, _parse_version, load
+
+
+def test_load():
+    """Test all verions may be loaded."""
+    for version in VERSIONS:
+        load(version)
 
 
 @pytest.mark.parametrize(

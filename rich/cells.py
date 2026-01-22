@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from operator import itemgetter
-from typing import Callable, Generator, Iterator, NamedTuple, Sequence, Tuple
+from typing import Callable, NamedTuple, Sequence, Tuple
 
 from rich._unicode_data import load as load_cell_table
 
@@ -42,9 +42,6 @@ class CellTable(NamedTuple):
     widths: Sequence[tuple[int, int, int]]
     narrow_to_wide: frozenset[str]
 
-    def __hash__(self) -> int:
-        return hash(self.unicode_version)
-
 
 @lru_cache(maxsize=4096)
 def get_character_cell_size(character: str, unicode_version: str = "auto") -> int:
@@ -59,7 +56,7 @@ def get_character_cell_size(character: str, unicode_version: str = "auto") -> in
     """
     codepoint = ord(character)
     table = load_cell_table(unicode_version).widths
-    if codepoint < table[0][0] or codepoint > table[-1][1]:
+    if codepoint > table[-1][1]:
         return 0
     lower_bound = 0
     upper_bound = len(table) - 1
@@ -211,7 +208,7 @@ def _split_text(
     Returns:
         Tuple to two split strings.
     """
-    if cell_position == 0:
+    if cell_position <= 0:
         return "", text
 
     spans, cell_length = split_graphemes(text, unicode_version)
@@ -222,6 +219,8 @@ def _split_text(
 
     while True:
         if left_size == cell_position:
+            if offset >= len(spans):
+                return text, ""
             split_index = spans[offset][0]
             return text[:split_index], text[split_index:]
         if left_size < cell_position:
@@ -230,8 +229,8 @@ def _split_text(
                 return text[:start] + " ", " " + text[end:]
             offset += 1
             left_size += cell_size
-        else:
-            start, end, cell_size = spans[offset]
+        else:  # left_size > cell_position
+            start, end, cell_size = spans[offset - 1]
             if left_size - cell_size < cell_position:
                 return text[:start] + " ", " " + text[end:]
             offset -= 1
@@ -312,162 +311,3 @@ def chop_cells(text: str, width: int, unicode_version: str = "auto") -> list[str
         lines.append(text[line_offset:])
 
     return lines
-
-
-class CellString:
-    """A string-like object that takes graphemes into account."""
-
-    def __init__(
-        self,
-        text: str,
-        *,
-        cell_length: int | None = None,
-        spans: "list[CellSpan] | None" = None,
-        unicode_version: str = "auto",
-    ):
-        """
-
-        Args:
-            text: The plain text.
-            cell_length: The cell length (as it appears in the terminal), if known.
-            spans: List of spans which divide the text in to atomic units (single glyphs).
-            unicode_version: Unicode version, `"auto"` to auto detect, `"latest"` for the latest unicode version.
-        """
-        self._text = text
-        self._singles: bool = _is_single_cell_widths(text)
-        if cell_length is None:
-            self._cell_length = len(text) if self._singles else None
-        else:
-            self._cell_length = cell_length
-        self._spans: "list[CellSpan] | None" = spans
-        self._unicode_version = unicode_version
-
-    @property
-    def text(self) -> str:
-        """The raw text."""
-        return self._text
-
-    @property
-    def spans(self) -> "list[CellSpan]":
-        if self._spans is None:
-            if self._singles:
-                self._spans = [
-                    (index, index + 1, 1) for index in range(len(self._text))
-                ]
-            else:
-                self._spans, self._cell_length = split_graphemes(
-                    self._text, self._unicode_version
-                )
-        return self._spans
-
-    @property
-    def cell_length(self) -> int:
-        """The 'cell' length (length as displayed in the terminal)."""
-        if self._cell_length is None:
-            self._cell_length = cell_len(self._text)
-        return self._cell_length
-
-    @property
-    def glyphs(self) -> list[str]:
-        """List of strings that make up atomic glyph."""
-        text = self._text
-        glyphs = [text[start:end] for start, end, _ in self.spans]
-        return glyphs
-
-    @property
-    def glyph_widths(self) -> list[tuple[str, int]]:
-        """List of strings that make up atomic glyph, and corresponding cell width."""
-        text = self._text
-        glyph_widths = [
-            (text[start:end], cell_length) for start, end, cell_length in self.spans
-        ]
-        return glyph_widths
-
-    def __bool__(self) -> bool:
-        return bool(self._text)
-
-    def __hash__(self) -> int:
-        return hash(self._text)
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, CellString):
-            return self._text == other._text
-        return NotImplemented
-
-    def __add__(self, other: "CellString") -> "CellString":
-        if self._singles and other._singles:
-            return CellString(self._text + other._text)
-        spans: "list[CellSpan] | None"
-        if self._spans is not None and other._spans is not None:
-            self_length = len(self._text)
-            spans = [
-                *self._spans,
-                *[
-                    (start + self_length, end + self_length, cell_length)
-                    for start, end, cell_length in other.spans
-                ],
-            ]
-        else:
-            spans = None
-        return CellString(self._text + other._text, spans=spans)
-
-    def __iter__(self) -> Iterator[str]:
-        if self._singles:
-            return iter(self._text)
-
-        def iterate_text(text: str, spans: "list[CellSpan]") -> Generator[str]:
-            """Generator for the"""
-            for start, end, _ in spans:
-                yield text[start:end]
-
-        return iter(iterate_text(self._text, self.spans))
-
-    def __reversed__(self) -> Iterator[str]:
-        if self._singles:
-            return reversed(self._text)
-
-        def iterate_text(text: str, spans: "list[CellSpan]") -> Generator[str]:
-            for start, end, _ in reversed(spans):
-                yield text[start:end]
-
-        return iter(iterate_text(self._text, self.spans))
-
-    def __getitem__(self, index: int | slice) -> str:
-        if self._singles:
-            # Trivial case of single cell character strings
-            return self._text[index]
-        if isinstance(index, int):
-            # Single span is easy
-            start, end, _cell_length = self.spans[index]
-            return self._text[start:end]
-
-        start, stop, stride = index.indices(len(self.spans))
-        if stride == 1:
-            # Fast path for a stride of 1
-            start_offset = self.spans[start][0]
-            stop_offset = self.spans[stop][1]
-            return self._text[start_offset:stop_offset]
-        else:
-            # More involved case of a stride > 1
-            span_offset = start
-            output: list[str] = []
-            while span_offset <= stop:
-                start_offset, end_offset, _ = self.spans[span_offset]
-                output.append(self._text[start_offset:end_offset])
-                span_offset += stride
-            return "".join(output)
-
-
-if __name__ == "__main__":
-    from rich import print
-
-    print(CellString("Hello World").glyphs)
-
-    print(CellString("Female mechanic: 👩\u200d🔧").glyphs)
-    print(CellString("Female mechanic: 👩\u200d🔧").glyph_widths)
-
-    left, right = split_text("Hello 👩\u200d🔧 World", 9)
-    print(repr(left))
-    print(repr(right))
-    print(left)
-    print(right)
