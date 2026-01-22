@@ -437,3 +437,9 @@ See also [Rich CLI](https://github.com/textualize/rich-cli) for a command line a
 See also Rich's sister project, [Textual](https://github.com/Textualize/textual), which you can use to build sophisticated User Interfaces in the terminal.
 
 ![textual-splash](https://github.com/user-attachments/assets/4caeb77e-48c0-4cf7-b14d-c53ded855ffd)
+
+# Toad
+
+[Toad](https://github.com/batrachianai/toad) is a unified interface for agentic coding. Built with Rich and Textual.
+
+![toad](https://github.com/user-attachments/assets/6678b707-1aeb-420f-99ad-abfcd4356771)

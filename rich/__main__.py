@@ -238,8 +238,9 @@ if __name__ == "__main__":  # pragma: no cover
             "[b magenta]Hope you enjoy using Rich![/]\n\n"
             "Please consider sponsoring me if you get value from my work.\n\n"
             "Even the price of a ☕ can brighten my day!\n\n"
-            "https://github.com/sponsors/willmcgugan",
-            border_style="red",
+            "[cyan]https://github.com/sponsors/willmcgugan[/cyan]",
+            border_style="green",
             title="Help ensure Rich is maintained",
+            padding=(1, 2),
         )
     )
