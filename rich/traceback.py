@@ -1,4 +1,3 @@
-import inspect
 import linecache
 import os
 import sys
@@ -562,7 +561,6 @@ class Traceback:
                                 max_string=locals_max_string,
                             )
                             for key, value in get_locals(frame_summary.f_locals.items())
-                            if not (inspect.isfunction(value) or inspect.isclass(value))
                         }
                         if show_locals
                         else None

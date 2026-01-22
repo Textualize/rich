@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [14.3.0]
+## Unreleased
 
 ### Added
 
@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `cells.cell_len` now has a `unicode_version` parameter (that you probably should never change) https://github.com/Textualize/rich/pull/3930
+- Restore showing functions and classes in locals
 
 ## [14.2.0] - 2025-10-09
 
