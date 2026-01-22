@@ -1,7 +1,34 @@
+from __future__ import annotations
+
 import string
 
+import pytest
+
 from rich import cells
-from rich.cells import _is_single_cell_widths, chop_cells
+from rich.cells import (
+    CellSpan,
+    _is_single_cell_widths,
+    cell_len,
+    chop_cells,
+    get_character_cell_size,
+    split_graphemes,
+    split_text,
+)
+
+
+@pytest.mark.parametrize(
+    "character,size",
+    [
+        ("\0", 0),
+        ("\u200d", 0),
+        ("a", 1),
+        ("💩", 2),
+        (chr(917999 + 1), 0),
+    ],
+)
+def test_get_character_cell_size(character: str, size: int) -> None:
+    """Test single character cell size."""
+    assert get_character_cell_size(character) == size
 
 
 def test_cell_len_long_string():
@@ -45,6 +72,50 @@ def test_set_cell_size_infinite():
         )
 
 
+FM = "👩\u200d🔧"
+
+
+@pytest.mark.parametrize(
+    "text,offset,left,right",
+    [
+        # Edge cases
+        ("", -1, "", ""),
+        ("x", -1, "", "x"),
+        ("x", 1, "x", ""),
+        ("x", 2, "x", ""),
+        ("", 0, "", ""),
+        ("", 1, "", ""),
+        ("a", 0, "", "a"),
+        ("a", 1, "a", ""),
+        # Check simple double width character
+        ("💩", 0, "", "💩"),
+        ("💩", 1, " ", " "),  # Split in the middle of a double wide results in spaces
+        ("💩", 2, "💩", ""),
+        ("💩x", 1, " ", " x"),
+        ("💩x", 2, "💩", "x"),
+        ("💩x", 3, "💩x", ""),
+        # Check same for multi-codepoint emoji
+        (FM, 0, "", FM),
+        (FM, 1, " ", " "),  # Split in the middle of a double wide results in spaces
+        (FM, 2, FM, ""),
+        (FM + "x", 1, " ", " x"),
+        (FM + "x", 2, FM, "x"),
+        (FM + "x", 3, FM + "x", ""),
+        # Edge cases
+        ("xxxxxxxxxxxxxxx💩💩", 10, "xxxxxxxxxx", "xxxxx💩💩"),
+        ("xxxxxxxxxxxxxxx💩💩", 15, "xxxxxxxxxxxxxxx", "💩💩"),
+        ("xxxxxxxxxxxxxxx💩💩", 16, "xxxxxxxxxxxxxxx ", " 💩"),
+        ("💩💩", 3, "💩 ", " "),
+        ("💩💩xxxxxxxxxx", 2, "💩", "💩xxxxxxxxxx"),
+        ("💩💩xxxxxxxxxx", 3, "💩 ", " xxxxxxxxxx"),
+        ("💩💩xxxxxxxxxx", 4, "💩💩", "xxxxxxxxxx"),
+    ],
+)
+def test_split_text(text: str, offset: int, left: str, right: str) -> None:
+    """Check that split_text works on grapheme boundaries"""
+    assert split_text(text, offset) == (left, right)
+
+
 def test_chop_cells():
     """Simple example of splitting cells into lines of width 3."""
     text = "abcdefghijk"
@@ -79,3 +150,34 @@ def test_is_single_cell_widths() -> None:
 
     for character in "わさび":
         assert not _is_single_cell_widths(character)
+
+
+@pytest.mark.parametrize(
+    "text,expected_spans,expected_cell_length",
+    [
+        ("", [], 0),
+        ("a", [(0, 1, 1)], 1),
+        ("ab", [(0, 1, 1), (1, 2, 1)], 2),
+        ("💩", [(0, 1, 2)], 2),
+        ("わさび", [(0, 1, 2), (1, 2, 2), (2, 3, 2)], 6),
+        (
+            "👩\u200d🔧",
+            [(0, 3, 2)],
+            2,
+        ),  # 3 code points for female mechanic: female, joiner, spanner
+        ("a👩\u200d🔧", [(0, 1, 1), (1, 4, 2)], 3),
+        ("a👩\u200d🔧b", [(0, 1, 1), (1, 4, 2), (4, 5, 1)], 4),
+        ("⬇", [(0, 1, 1)], 1),
+        ("⬇️", [(0, 2, 2)], 2),  # Variation selector, makes it double width
+        ("♻", [(0, 1, 1)], 1),
+        ("♻️", [(0, 2, 2)], 2),
+        ("♻♻️", [(0, 1, 1), (1, 3, 2)], 3),
+    ],
+)
+def test_split_graphemes(
+    text: str, expected_spans: list[CellSpan], expected_cell_length: int
+):
+    spans, cell_length = split_graphemes(text)
+    assert cell_len(text) == expected_cell_length
+    assert spans == expected_spans
+    assert cell_length == expected_cell_length

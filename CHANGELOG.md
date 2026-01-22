@@ -9,7 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- IPython now respects when a `Console` instance is passed to `pretty.install` https://github.com/Textualize/rich/pull/3915
 - Fixed extraneous blank line on non-interactive disabled `Progress` https://github.com/Textualize/rich/pull/3905
+
+### Added
+
+- Added support for some multi-codepopint glyphs (will fix alignment issues for these characters) https://github.com/Textualize/rich/pull/3930
+- Added support for `UNICODE_VERSION` environment variable https://github.com/Textualize/rich/pull/3930
+- Added `last_render_height` property to LiveRender https://github.com/Textualize/rich/pull/3934
+- Expose locals_max_depth and locals_overflow in traceback.install https://github.com/Textualize/rich/pull/3906/
+
+### Changed
+
+- `cells.cell_len` now has a `unicode_version` parameter (that you probably should never change) https://github.com/Textualize/rich/pull/3930
+- Live will not write a new line if there was nothing rendered https://github.com/Textualize/rich/pull/3934
 
 ## [14.2.0] - 2025-10-09
 
@@ -2153,6 +2166,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[14.2.0]: https://github.com/textualize/rich/compare/v14.2.0...v14.3.0
 [14.1.0]: https://github.com/textualize/rich/compare/v14.1.0...v14.2.0
 [14.0.0]: https://github.com/textualize/rich/compare/v14.0.0...v14.1.0
 [14.0.0]: https://github.com/textualize/rich/compare/v13.9.4...v14.0.0

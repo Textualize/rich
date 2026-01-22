@@ -8,7 +8,7 @@ from .table import Table
 from .text import Text, TextType
 
 if TYPE_CHECKING:
-    from .console import ConsoleRenderable
+    from .console import ConsoleRenderable, OverflowMethod
 
 
 def render_scope(
@@ -19,6 +19,8 @@ def render_scope(
     indent_guides: bool = False,
     max_length: Optional[int] = None,
     max_string: Optional[int] = None,
+    max_depth: Optional[int] = None,
+    overflow: Optional["OverflowMethod"] = None,
 ) -> "ConsoleRenderable":
     """Render python variables in a given scope.
 
@@ -30,6 +32,8 @@ def render_scope(
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
         max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to None.
+        max_depth (int, optional): Maximum depths of locals before truncating, or None to disable. Defaults to None.
+        overflow (OverflowMethod, optional): How to handle overflowing locals, or None to disable. Defaults to None.
 
     Returns:
         ConsoleRenderable: A renderable object.
@@ -57,6 +61,8 @@ def render_scope(
                 indent_guides=indent_guides,
                 max_length=max_length,
                 max_string=max_string,
+                max_depth=max_depth,
+                overflow=overflow,
             ),
         )
     return Panel.fit(
