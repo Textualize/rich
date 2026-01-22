@@ -69,7 +69,7 @@ def load(unicode_version: str = "auto") -> CellTable:
             _parse_version(unicode_version)
         except ValueError:
             # The environment variable is invalid
-            # Fallback to using the latest version seems s
+            # Fallback to using the latest version seems reasonable
             unicode_version = "latest"
 
     if unicode_version == "latest":
