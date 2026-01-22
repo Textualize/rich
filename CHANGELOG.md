@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+
 ### Fixed
 
 - IPython now respects when a `Console` instance is passed to `pretty.install` https://github.com/Textualize/rich/pull/3915
@@ -16,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for some multi-codepopint glyphs (will fix alignment issues for these characters) https://github.com/Textualize/rich/pull/3930
 - Added support for `UNICODE_VERSION` environment variable https://github.com/Textualize/rich/pull/3930
 - Added `last_render_height` property to LiveRender https://github.com/Textualize/rich/pull/3934
+- Expose locals_max_depth and locals_overflow in traceback.install https://github.com/Textualize/rich/pull/3906/
 
 ### Changed
 
