@@ -525,6 +525,16 @@ def test_wrap_long():
     assert lines[2] == Text("bra ")
 
 
+def test_wrap_long_multi_codepoint():
+    female_mechanic = "👩\u200d🔧"
+    text = Text(female_mechanic * 5, justify="left")
+    lines = text.wrap(Console(), 4)
+    assert len(lines) == 3
+    assert lines[0] == Text(female_mechanic * 2)
+    assert lines[1] == Text(female_mechanic * 2)
+    assert lines[2] == Text(female_mechanic + "  ")
+
+
 def test_wrap_overflow():
     text = Text("Some more words")
     lines = text.wrap(Console(), 4, overflow="ellipsis")
@@ -602,6 +612,18 @@ def test_wrap_multiple_consecutive_spaces():
         Text("123456"),
         Text("78 123"),
         Text("123"),
+    ]
+
+
+def test_wrap_multi_codepoint():
+    """Test wrapping of multi-codepoint characters."""
+    female_mechanic = "👩\u200d🔧"
+    text = Text(female_mechanic * 6 + " " + female_mechanic * 4)
+    lines = text.wrap(Console(), 12)
+    print(repr(lines))
+    assert lines._lines == [
+        Text(female_mechanic * 6),
+        Text(female_mechanic * 4),
     ]
 
 
