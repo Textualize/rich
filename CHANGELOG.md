@@ -11,11 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added support for some multi-codepopint glyphs (will fix alignment issues for these characters) https://github.com/Textualize/rich/pull/3930
 - Added support for `UNICODE_VERSION` environment variable https://github.com/Textualize/rich/pull/3930
+- Added `last_render_height` property to LiveRender https://github.com/Textualize/rich/pull/3934
 
 ### Changed
 
 - `cells.cell_len` now has a `unicode_version` parameter (that you probably should never change) https://github.com/Textualize/rich/pull/3930
-- Live will not write a new line if there was nothing rendered
+- Live will not write a new line if there was nothing rendered https://github.com/Textualize/rich/pull/3934
 
 ## [14.2.0] - 2025-10-09
 
