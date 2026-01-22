@@ -43,7 +43,7 @@ for version in UNICODE_VERSIONS:
 
 from rich.cells import CellTable
 
-cell_table = {cell_table!r}
+cell_table = CellTable({cell_table.unicode_version!r}, {cell_table.widths!r}, frozenset({sorted(cell_table.narrow_to_wide)!r}))
 """
     version_path = version.replace(".", "-")
     path = Path(f"../rich/_unicode_data/unicode{version_path}.py").resolve().absolute()
