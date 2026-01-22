@@ -116,26 +116,24 @@ def cell_len(text: str, unicode_version: str = "auto") -> int:
         )
 
     cell_table = load_cell_table(unicode_version)
-    codepoint_count = len(text)
     total_width = 0
-    index = 0
     last_measured_character: str | None = None
 
     SPECIAL = {"\u200d", "\ufe0f"}
 
-    while index < codepoint_count:
-        if (character := text[index]) in SPECIAL:
+    iter_characters = iter(text)
+
+    for character in iter_characters:
+        if character in SPECIAL:
             if character == "\u200d":
-                index += 2
+                next(iter_characters)
             elif last_measured_character:
                 total_width += last_measured_character in cell_table.narrow_to_wide
                 last_measured_character = None
-                index += 1
         else:
             if character_width := get_character_cell_size(character, unicode_version):
                 last_measured_character = character
                 total_width += character_width
-            index += 1
 
     return total_width
 
