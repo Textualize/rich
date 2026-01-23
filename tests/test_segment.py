@@ -34,6 +34,21 @@ def test_split_lines():
     assert list(Segment.split_lines(lines)) == [[Segment("Hello")], [Segment("World")]]
 
 
+def test_split_lines_terminator():
+    lines = [Segment("Hello\nWorld")]
+    assert list(Segment.split_lines_terminator(lines)) == [
+        ([Segment("Hello")], True),
+        ([Segment("World")], False),
+    ]
+
+
+def test_split_lines_terminator_single_line():
+    lines = [Segment("Hello")]
+    assert list(Segment.split_lines_terminator(lines)) == [
+        ([Segment("Hello")], False),
+    ]
+
+
 def test_split_and_crop_lines():
     assert list(
         Segment.split_and_crop_lines([Segment("Hello\nWorld!\n"), Segment("foo")], 4)
