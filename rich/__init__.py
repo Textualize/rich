@@ -148,7 +148,7 @@ def inspect(
         docs (bool, optional): Also render doc strings. Defaults to True.
         private (bool, optional): Show private attributes (beginning with underscore). Defaults to False.
         dunder (bool, optional): Show attributes starting with double underscore. Defaults to False.
-        sort (bool, optional): Sort attributes alphabetically. Defaults to True.
+        sort (bool, optional):  Sort attributes alphabetically, callables at the top, leading and trailing underscores ignored. Defaults to True.
         all (bool, optional): Show all attributes. Defaults to False.
         value (bool, optional): Pretty print value. Defaults to True.
     """
