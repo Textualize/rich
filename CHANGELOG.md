@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed extraneous blank line on non-interactive disabled `Progress` https://github.com/Textualize/rich/pull/3905
 - Fixed extra padding on first cell in columns https://github.com/Textualize/rich/pull/3935
 - Fixed trailing whitespace removed when soft_wrap=True https://github.com/Textualize/rich/pull/3937
+- Fixed style new-lines when soft_wrap = True and a print style is set https://github.com/Textualize/rich/pull/3938
 
 ### Added
 
