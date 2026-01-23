@@ -2,6 +2,7 @@
 # Frequently Asked Questions
 - [How do I log a renderable?](#how-do-i-log-a-renderable)
 - [How do I render console markup in RichHandler?](#how-do-i-render-console-markup-in-richhandler)
+- [Incorrect highlights in printed output](#incorrect-highlights-in-printed-output)
 - [Natively inserted ANSI escape sequence characters break alignment of Panel.](#natively-inserted-ansi-escape-sequence-characters-break-alignment-of-panel)
 - [python -m rich.spinner shows extra lines.](#python--m-richspinner-shows-extra-lines)
 - [Rich is automatically installing traceback handler.](#rich-is-automatically-installing-traceback-handler)
@@ -26,6 +27,20 @@ If you are only logging with a file-handler to stdout, then you probably don't n
 Console markup won't work anywhere else, other than `RichHandler` -- which is why they are disabled by default.
 
 See the docs if you want to [enable console markup](https://rich.readthedocs.io/en/latest/logging.html#logging-handler) in the logging handler.
+
+<a name="incorrect-highlights-in-printed-output"></a>
+## Incorrect highlights in printed output
+
+Rich's default highlighter will highlight a number of common patterns, useful for debugging.
+Occasionally you may find that it highlights text incorrectly.
+This may be unavoidable, as Rich only sees text and can only make a best guess at what it means.
+
+If this happens, consider disabling highlighting, or write a custom highlighter that better reflects the text you are writing. See the docs for details...
+
+https://rich.readthedocs.io/en/latest/highlighting.html
+
+Issues and PRs for highlighters will only be accepted for clearly broken regular expressions.
+This is because a fix for your needs can break the highlighting for someone else.
 
 <a name="natively-inserted-ansi-escape-sequence-characters-break-alignment-of-panel"></a>
 ## Natively inserted ANSI escape sequence characters break alignment of Panel.
