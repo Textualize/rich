@@ -1723,12 +1723,13 @@ class Console:
                 for renderable in renderables:
                     extend(render(renderable, render_options))
             else:
+                render_style = self.get_style(style)
+                new_line = Segment.line()
                 for renderable in renderables:
-                    extend(
-                        Segment.apply_style(
-                            render(renderable, render_options), self.get_style(style)
-                        )
-                    )
+                    for line in Segment.split_lines(render(renderable, render_options)):
+                        extend(Segment.apply_style(line, render_style))
+                        new_segments.append(new_line)
+
             if new_line_start:
                 if (
                     len("".join(segment.text for segment in new_segments).splitlines())
