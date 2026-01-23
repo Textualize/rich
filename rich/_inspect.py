@@ -29,7 +29,7 @@ class Inspect(JupyterMixin):
         docs (bool, optional): Also render doc strings. Defaults to True.
         private (bool, optional): Show private attributes (beginning with underscore). Defaults to False.
         dunder (bool, optional): Show attributes starting with double underscore. Defaults to False.
-        sort (bool, optional): Sort attributes alphabetically. Defaults to True.
+        sort (bool, optional): Sort attributes alphabetically, callables at the top, leading and trailing underscores ignored. Defaults to True.
         all (bool, optional): Show all attributes. Defaults to False.
         value (bool, optional): Pretty print value of object. Defaults to True.
     """
@@ -101,6 +101,10 @@ class Inspect(JupyterMixin):
         signature_text = self.highlighter(_signature)
 
         qualname = name or getattr(obj, "__qualname__", name)
+        if not isinstance(qualname, str):
+            qualname = getattr(obj, "__name__", name)
+            if not isinstance(qualname, str):
+                qualname = name
 
         # If obj is a module, there may be classes (which are callable) to display
         if inspect.isclass(obj):

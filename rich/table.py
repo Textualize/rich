@@ -485,6 +485,7 @@ class Table(JupyterMixin):
             max_width = self.width
 
         extra_width = self._extra_width
+
         widths = self._calculate_column_widths(
             console, options.update_width(max_width - extra_width)
         )
@@ -530,6 +531,7 @@ class Table(JupyterMixin):
             self._measure_column(console, options, column) for column in columns
         ]
         widths = [_range.maximum or 1 for _range in width_ranges]
+
         get_padding_width = self._get_padding_width
         extra_width = self._extra_width
         if self.expand:
@@ -699,9 +701,17 @@ class Table(JupyterMixin):
     def _get_padding_width(self, column_index: int) -> int:
         """Get extra width from padding."""
         _, pad_right, _, pad_left = self.padding
+
         if self.collapse_padding:
-            if column_index > 0:
-                pad_left = max(0, pad_left - pad_right)
+            pad_left = 0
+            pad_right = abs(pad_left - pad_right)
+
+        if not self.pad_edge:
+            if column_index == 0:
+                pad_left = 0
+            if column_index == len(self.columns) - 1:
+                pad_right = 0
+
         return pad_left + pad_right
 
     def _measure_column(
@@ -717,7 +727,6 @@ class Table(JupyterMixin):
             return Measurement(0, 0)
 
         padding_width = self._get_padding_width(column._index)
-
         if column.width is not None:
             # Fixed width column
             return Measurement(
@@ -754,6 +763,7 @@ class Table(JupyterMixin):
             self._get_cells(console, column_index, column)
             for column_index, column in enumerate(self.columns)
         )
+
         row_cells: List[Tuple[_Cell, ...]] = list(zip(*_column_cells))
         _box = (
             self.box.substitute(
