@@ -691,7 +691,6 @@ class Text(JupyterMixin):
     ) -> Iterable[Segment]:
         tab_size: int = console.tab_size if self.tab_size is None else self.tab_size
         justify = self.justify or options.justify or DEFAULT_JUSTIFY
-
         overflow = self.overflow or options.overflow or DEFAULT_OVERFLOW
 
         lines = self.wrap(
@@ -1232,12 +1231,15 @@ class Text(JupyterMixin):
             if "\t" in line:
                 line.expand_tabs(tab_size)
             if no_wrap:
+                if overflow == "ignore":
+                    lines.append(line)
+                    continue
                 new_lines = Lines([line])
             else:
                 offsets = divide_line(str(line), width, fold=wrap_overflow == "fold")
                 new_lines = line.divide(offsets)
-            for line in new_lines:
-                line.rstrip_end(width)
+                for line in new_lines:
+                    line.rstrip_end(width)
             if wrap_justify:
                 new_lines.justify(
                     console, width, justify=wrap_justify, overflow=wrap_overflow

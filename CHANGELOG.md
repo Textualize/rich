@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - IPython now respects when a `Console` instance is passed to `pretty.install` https://github.com/Textualize/rich/pull/3915
 - Fixed extraneous blank line on non-interactive disabled `Progress` https://github.com/Textualize/rich/pull/3905
 - Fixed extra padding on first cell in columns https://github.com/Textualize/rich/pull/3935
+- Fixed trailing whitespace removed when soft_wrap=True https://github.com/Textualize/rich/pull/3937
 
 ### Added
 
@@ -33,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed exception when callling `inspect` on objects with unusual `__qualname__` attribute https://github.com/Textualize/rich/pull/3894
+- Fixed exception when calling `inspect` on objects with unusual `__qualname__` attribute https://github.com/Textualize/rich/pull/3894
 
 ## [14.1.0] - 2025-06-25
 
