@@ -1726,9 +1726,12 @@ class Console:
                 render_style = self.get_style(style)
                 new_line = Segment.line()
                 for renderable in renderables:
-                    for line in Segment.split_lines(render(renderable, render_options)):
+                    for line, add_new_line in Segment.split_lines_terminator(
+                        render(renderable, render_options)
+                    ):
                         extend(Segment.apply_style(line, render_style))
-                        new_segments.append(new_line)
+                        if add_new_line:
+                            new_segments.append(new_line)
 
             if new_line_start:
                 if (
