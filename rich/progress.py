@@ -46,7 +46,7 @@ from .highlighter import Highlighter
 from .jupyter import JupyterMixin
 from .live import Live
 from .progress_bar import ProgressBar
-from .spinner import Spinner
+from .spinner import Spinner, SpinnerAnimation
 from .style import StyleType
 from .table import Column, Table
 from .text import Text, TextType
@@ -575,7 +575,7 @@ class SpinnerColumn(ProgressColumn):
 
     def __init__(
         self,
-        spinner_name: str = "dots",
+        spinner_name: Union[str, SpinnerAnimation] = "dots",
         style: Optional[StyleType] = "progress.spinner",
         speed: float = 1.0,
         finished_text: TextType = " ",
@@ -591,7 +591,7 @@ class SpinnerColumn(ProgressColumn):
 
     def set_spinner(
         self,
-        spinner_name: str,
+        spinner_name: Union[str, SpinnerAnimation],
         spinner_style: Optional[StyleType] = "progress.spinner",
         speed: float = 1.0,
     ) -> None:
