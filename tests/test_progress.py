@@ -565,6 +565,30 @@ def test_no_output_if_progress_is_disabled() -> None:
     assert result == expected
 
 
+def test_no_output_if_progress_is_disabled_non_interactive() -> None:
+    console = Console(
+        file=io.StringIO(),
+        force_interactive=False,
+        width=60,
+        color_system="truecolor",
+        legacy_windows=False,
+        _environ={},
+    )
+    progress = Progress(
+        console=console,
+        disable=True,
+    )
+    test = ["foo", "bar", "baz"]
+    expected_values = iter(test)
+    with progress:
+        for value in progress.track(test, description="test"):
+            assert value == next(expected_values)
+    result = console.file.getvalue()
+    print(repr(result))
+    expected = ""
+    assert result == expected
+
+
 def test_open() -> None:
     console = Console(
         file=io.StringIO(),

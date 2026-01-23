@@ -1172,9 +1172,10 @@ class Progress(JupyterMixin):
 
     def stop(self) -> None:
         """Stop the progress display."""
-        self.live.stop()
-        if not self.console.is_interactive and not self.console.is_jupyter:
-            self.console.print()
+        if not self.disable:
+            self.live.stop()
+            if not self.console.is_interactive and not self.console.is_jupyter:
+                self.console.print()
 
     def __enter__(self) -> Self:
         self.start()
