@@ -382,6 +382,30 @@ def test_columns_highlight_added_by_add_row() -> None:
     assert output == expected
 
 
+def test_padding_width():
+    """Regression test for https://github.com/Textualize/rich/issues/3871
+
+    Padding should be even between cells/
+
+    """
+
+    table = Table.grid(padding=(0, 1))
+
+    for _ in range(3):
+        table.add_column(width=3)
+
+    for row in range(1):
+        table.add_row(*["a" * 3 for _ in range(3)])
+
+    console = Console(record=True)
+    console.print(table)
+    output = console.export_text(styles=True)
+
+    print(repr(output))
+    expected = "aaa aaa aaa\n"
+    assert output == expected
+
+
 if __name__ == "__main__":
     render = render_tables()
     print(render)
