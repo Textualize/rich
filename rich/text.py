@@ -1105,7 +1105,7 @@ class Text(JupyterMixin):
         return lines
 
     def divide(self, offsets: Iterable[int]) -> Lines:
-        """Divide text in to a number of lines at given offsets.
+        """Divide text into a number of lines at given offsets.
 
         Args:
             offsets (Iterable[int]): Offsets used to divide text.

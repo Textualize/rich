@@ -155,7 +155,7 @@ def _cell_len(text: str, unicode_version: str) -> int:
 def split_graphemes(
     text: str, unicode_version: str = "auto"
 ) -> "tuple[list[CellSpan], int]":
-    """Divide text in to spans that define a single grapheme.
+    """Divide text into spans that define a single grapheme.
 
     Args:
         text: String to split.
