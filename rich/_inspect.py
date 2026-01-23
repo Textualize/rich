@@ -101,6 +101,10 @@ class Inspect(JupyterMixin):
         signature_text = self.highlighter(_signature)
 
         qualname = name or getattr(obj, "__qualname__", name)
+        if not isinstance(qualname, str):
+            qualname = getattr(obj, "__name__", name)
+            if not isinstance(qualname, str):
+                qualname = name
 
         # If obj is a module, there may be classes (which are callable) to display
         if inspect.isclass(obj):

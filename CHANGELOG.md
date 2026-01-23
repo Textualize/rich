@@ -31,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Python3.14 compatibility https://github.com/Textualize/rich/pull/3861
 
+### Fixed
+
+- Fixed exception when callling `inspect` on objects with unusual `__qualname__` attribute https://github.com/Textualize/rich/pull/3894
+
 ## [14.1.0] - 2025-06-25
 
 ### Changed
