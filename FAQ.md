@@ -1,5 +1,6 @@
 
 # Frequently Asked Questions
+- [Extra space, not enough space, in Jupyter output](#extra-space-not-enough-space-in-jupyter-output)
 - [How do I log a renderable?](#how-do-i-log-a-renderable)
 - [How do I render console markup in RichHandler?](#how-do-i-render-console-markup-in-richhandler)
 - [Incorrect highlights in printed output](#incorrect-highlights-in-printed-output)
@@ -9,6 +10,22 @@
 - [Strange colors in console output.](#strange-colors-in-console-output)
 - [Why does content in square brackets disappear?](#why-does-content-in-square-brackets-disappear)
 - [Why does emoji break alignment in a Table or Panel?](#why-does-emoji-break-alignment-in-a-table-or-panel)
+
+<a name="extra-space-not-enough-space-in-jupyter-output"></a>
+## Extra space, not enough space, in Jupyter output
+
+There are many different implementations of Jupyter, from different venders.
+
+Different notebook software may render Rich's output differently, due to how the CSS is constructed.
+Adding or removing space, may make the output look good on your software, but break somewhere else.
+
+I have been adding and removing new lines for jupyter since Rich added support, and I am reluctant to continue to do that, *unless* there is some supporting evidence that Rich is doing the wrong thing.
+I'm afraid that making it look better for your software isn't evidence.
+
+Without that evidence, I may close issues and PRs for this issue.
+I will accept PRs, if sufficient research has been done regarding not breaking other Jupyter implementations (but that is a high bar).
+
+Thanks for undertstanding.
 
 <a name="how-do-i-log-a-renderable"></a>
 ## How do I log a renderable?
