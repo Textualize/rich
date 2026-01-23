@@ -112,10 +112,14 @@ class Paragraph(TextElement):
 
     @classmethod
     def create(cls, markdown: Markdown, token: Token) -> Paragraph:
-        return cls(justify=markdown.justify or "left")
+        return cls(
+            justify=markdown.justify or "left",
+            visible=not getattr(token, "hidden", False),
+        )
 
-    def __init__(self, justify: JustifyMethod) -> None:
+    def __init__(self, justify: JustifyMethod, visible: bool = True) -> None:
         self.justify = justify
+        self.visible = visible
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
@@ -364,6 +368,10 @@ class ListItem(TextElement):
 
     def on_child_close(self, context: MarkdownContext, child: MarkdownElement) -> bool:
         self.elements.append(child)
+        # FIX: If the child is a visible paragraph (loose list), add a blank line
+        if getattr(child, "visible", False):
+            # Text(" ") creates exactly one new line of height
+            self.elements.append(Text(" "))
         return False
 
     def render_bullet(self, console: Console, options: ConsoleOptions) -> RenderResult:
