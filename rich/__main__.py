@@ -234,10 +234,9 @@ if __name__ == "__main__":  # pragma: no cover
     console.print(f"[dim]rendered in [not dim]{taken}ms[/] (warm cache)")
     console.print()
     console.print(
-        Panel.fit(
+        Panel(
             "[b magenta]Hope you enjoy using Rich![/]\n\n"
-            "Please consider sponsoring me if you get value from my work.\n\n"
-            "Even the price of a ☕ can brighten my day!\n\n"
+            "Consider sponsoring to ensure this project is maintained.\n\n"
             "[cyan]https://github.com/sponsors/willmcgugan[/cyan]",
             border_style="green",
             title="Help ensure Rich is maintained",
