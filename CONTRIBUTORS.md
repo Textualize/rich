@@ -69,6 +69,7 @@ The following people have contributed to the development of Rich:
 - [Paul Sanders](https://github.com/sanders41)
 - [Louis Sautier](https://github.com/sbraz)
 - [Tim Savage](https://github.com/timsavage)
+- [Ryan Sharafuddin](https://github.com/RyanSharafuddin)
 - [Anthony Shaw](https://github.com/tonybaloney)
 - [Damian Shaw](https://github.com/notatallshaw)
 - [Nicolas Simonds](https://github.com/0xDEC0DE)

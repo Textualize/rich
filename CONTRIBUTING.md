@@ -129,7 +129,7 @@ and over time can reduce development overhead quite considerably.
 
 ## Creating A Pull Request
 
-Once your happy with your change and have ensured that all steps above have been followed (and checks have passed), you can create a pull request.
+Once you're happy with your change and have ensured that all steps above have been followed (and checks have passed), you can create a pull request.
 GitHub offers a guide on how to do this [here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork).
 Please ensure that you include a good description of what your change does in your pull request, and link it to any relevant issues or discussions.
 
