@@ -1493,7 +1493,7 @@ class Progress(JupyterMixin):
             start (bool, optional): Start the task after reset. Defaults to True.
             total (float, optional): New total steps in task, or None to use current total. Defaults to None.
             completed (int, optional): Number of steps completed. Defaults to 0.
-            visible (bool, optional): Enable display of the task. Defaults to True.
+            visible (bool, optional): Set visibility of the task. If not provided, visibility is unchanged. Defaults to None.
             description (str, optional): Change task description if not None. Defaults to None.
             **fields (str): Additional data fields required for rendering.
         """
