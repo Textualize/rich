@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed characters out of unicode range reporting a cell size if 0
+- Fixed characters out of unicode range reporting a cell size if 0 https://github.com/Textualize/rich/pull/3944
 
 ## [14.3.0] - 2025-01-24
 
