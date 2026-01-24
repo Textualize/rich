@@ -27,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `cells.cell_len` now has a `unicode_version` parameter (that you probably should never change) https://github.com/Textualize/rich/pull/3930
 - Live will not write a new line if there was nothing rendered https://github.com/Textualize/rich/pull/3934
+- Changed style of Markdown headers
+- Changed style of Markdown tables, added `markdown.table.header` and `markdown.table.border` styles
+- Changed style of Markdown rules
 
 ## [14.2.0] - 2025-10-09
 
