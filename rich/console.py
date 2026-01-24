@@ -34,6 +34,7 @@ from typing import (
     cast,
     runtime_checkable,
 )
+from os import PathLike
 
 from rich._null_file import NULL_FILE
 
@@ -2206,11 +2207,11 @@ class Console:
                 del self._record_buffer[:]
         return text
 
-    def save_text(self, path: str, *, clear: bool = True, styles: bool = False) -> None:
+    def save_text(self, path: Union[str, PathLike[str]], *, clear: bool = True, styles: bool = False) -> None:
         """Generate text from console and save to a given location (requires record=True argument in constructor).
 
         Args:
-            path (str): Path to write text files.
+            path (Union[str, PathLike[str]]): Path to write text files.
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             styles (bool, optional): If ``True``, ansi style codes will be included. ``False`` for plain text.
                 Defaults to ``False``.
@@ -2297,7 +2298,7 @@ class Console:
 
     def save_html(
         self,
-        path: str,
+        path: Union[str, PathLike[str]],
         *,
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
@@ -2307,7 +2308,7 @@ class Console:
         """Generate HTML from console contents and write to a file (requires record=True argument in constructor).
 
         Args:
-            path (str): Path to write html file.
+            path (Union[str, PathLike[str]]): Path to write html file.
             theme (TerminalTheme, optional): TerminalTheme object containing console colors.
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             code_format (str, optional): Format string to render HTML. In addition to '{foreground}',
@@ -2579,7 +2580,7 @@ class Console:
 
     def save_svg(
         self,
-        path: str,
+        path: Union[str, PathLike[str]],
         *,
         title: str = "Rich",
         theme: Optional[TerminalTheme] = None,
@@ -2591,7 +2592,7 @@ class Console:
         """Generate an SVG file from the console contents (requires record=True in Console constructor).
 
         Args:
-            path (str): The path to write the SVG to.
+            path (Union[str, PathLike[str]]): The path to write the SVG to.
             title (str, optional): The title of the tab in the output image
             theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
