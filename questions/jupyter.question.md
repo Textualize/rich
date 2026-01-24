@@ -5,7 +5,7 @@ alt_titles:
   - "Not enough space in Jupyter"
 ---
 
-There are many different implementations of Jupyter, from different venders.
+There are many different implementations of Jupyter, from different vendors.
 
 Different notebook software may render Rich's output differently, due to how the CSS is constructed.
 Adding or removing space, may make the output look good on your software, but break somewhere else.

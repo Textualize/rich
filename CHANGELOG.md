@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [14.3.0] - 2025-01-24
 
 ### Fixed
 
@@ -27,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `cells.cell_len` now has a `unicode_version` parameter (that you probably should never change) https://github.com/Textualize/rich/pull/3930
 - Live will not write a new line if there was nothing rendered https://github.com/Textualize/rich/pull/3934
+- Changed style of Markdown headers https://github.com/Textualize/rich/pull/3942
+- Changed style of Markdown tables, added `markdown.table.header` and `markdown.table.border` styles https://github.com/Textualize/rich/pull/3942
+- Changed style of Markdown rules https://github.com/Textualize/rich/pull/3942
 
 ## [14.2.0] - 2025-10-09
 
@@ -2174,9 +2177,9 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[14.2.0]: https://github.com/textualize/rich/compare/v14.2.0...v14.3.0
-[14.1.0]: https://github.com/textualize/rich/compare/v14.1.0...v14.2.0
-[14.0.0]: https://github.com/textualize/rich/compare/v14.0.0...v14.1.0
+[14.3.0]: https://github.com/textualize/rich/compare/v14.2.0...v14.3.0
+[14.2.0]: https://github.com/textualize/rich/compare/v14.1.0...v14.2.0
+[14.1.0]: https://github.com/textualize/rich/compare/v14.0.0...v14.1.0
 [14.0.0]: https://github.com/textualize/rich/compare/v13.9.4...v14.0.0
 [13.9.4]: https://github.com/textualize/rich/compare/v13.9.3...v13.9.4
 [13.9.3]: https://github.com/textualize/rich/compare/v13.9.2...v13.9.3
