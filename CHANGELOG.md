@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [14.3.1] - 2025-01-24
+
+### Fixed
+
+- Fixed characters out of unicode range reporting a cell size if 0
+
 ## [14.3.0] - 2025-01-24
 
 ### Fixed
@@ -2177,6 +2183,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
+[14.3.1]: https://github.com/textualize/rich/compare/v14.3.0...v14.3.1
 [14.3.0]: https://github.com/textualize/rich/compare/v14.2.0...v14.3.0
 [14.2.0]: https://github.com/textualize/rich/compare/v14.1.0...v14.2.0
 [14.1.0]: https://github.com/textualize/rich/compare/v14.0.0...v14.1.0

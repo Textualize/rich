@@ -57,7 +57,7 @@ def get_character_cell_size(character: str, unicode_version: str = "auto") -> in
     codepoint = ord(character)
     table = load_cell_table(unicode_version).widths
     if codepoint > table[-1][1]:
-        return 0
+        return 1
     lower_bound = 0
     upper_bound = len(table) - 1
     index = (lower_bound + upper_bound) // 2

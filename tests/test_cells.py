@@ -181,3 +181,9 @@ def test_split_graphemes(
     assert cell_len(text) == expected_cell_length
     assert spans == expected_spans
     assert cell_length == expected_cell_length
+
+
+def test_nerd_font():
+    """Regression test for https://github.com/Textualize/rich/issues/3943"""
+    # Not allocated by unicode, but used by nerd fonts
+    assert cell_len("\U000f024d") == 1
