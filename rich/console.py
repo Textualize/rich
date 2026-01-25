@@ -2564,7 +2564,7 @@ class Console:
             char_height=char_height,
             line_height=line_height,
             terminal_width=char_width * width - 1,
-            terminal_height=(y + 1) * line_height - 1,
+            terminal_height=(y + 1) * line_height - 1 + padding_bottom,
             width=terminal_width + margin_width,
             height=terminal_height + margin_height,
             terminal_x=margin_left + padding_left,
