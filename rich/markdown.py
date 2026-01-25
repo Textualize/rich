@@ -556,6 +556,15 @@ class Markdown(JupyterMixin):
         inline_code_theme: str | None = None,
     ) -> None:
         parser = MarkdownIt().enable("strikethrough").enable("table")
+        # Allow file:// URLs in links
+        original_validate = parser.validateLink
+
+        def validate_link(url: str) -> bool:
+            if url.lower().startswith("file://"):
+                return True
+            return original_validate(url)
+
+        parser.validateLink = validate_link
         self.markup = markup
         self.parsed = parser.parse(markup)
         self.code_theme = code_theme
