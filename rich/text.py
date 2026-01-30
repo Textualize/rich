@@ -1231,9 +1231,6 @@ class Text(JupyterMixin):
             if "\t" in line:
                 line.expand_tabs(tab_size)
             if no_wrap:
-                if overflow == "ignore":
-                    lines.append(line)
-                    continue
                 new_lines = Lines([line])
             else:
                 offsets = divide_line(str(line), width, fold=wrap_overflow == "fold")
@@ -1244,9 +1241,13 @@ class Text(JupyterMixin):
                 new_lines.justify(
                     console, width, justify=wrap_justify, overflow=wrap_overflow
                 )
-            for line in new_lines:
-                line.truncate(width, overflow=wrap_overflow)
-            lines.extend(new_lines)
+            if overflow == "ignore":
+                # When overflow is ignored (soft_wrap), don't truncate
+                lines.extend(new_lines)
+            else:
+                for line in new_lines:
+                    line.truncate(width, overflow=wrap_overflow)
+                lines.extend(new_lines)
         return lines
 
     def fit(self, width: int) -> Lines:
