@@ -150,7 +150,9 @@ def _cell_len(text: str, unicode_version: str) -> int:
     while index < character_count:
         character = text[index]
         if character in SPECIAL:
-            if character == "\ufe0f" and last_measured_character:
+            if character == "\u200d":
+                index += 1
+            elif character == "\ufe0f" and last_measured_character:
                 total_width += last_measured_character in cell_table.narrow_to_wide
                 last_measured_character = None
         else:
