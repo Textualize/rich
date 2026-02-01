@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed solo ZWJ crash
-- Fixed control codes reporting width of 1
+- Fixed solo ZWJ crash https://github.com/Textualize/rich/pull/3953
+- Fixed control codes reporting width of 1 https://github.com/Textualize/rich/pull/3953
 
 ## [14.3.1] - 2026-01-24
 
