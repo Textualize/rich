@@ -140,7 +140,10 @@ def _cell_len(text: str, unicode_version: str) -> int:
     for character in iter_characters:
         if character in SPECIAL:
             if character == "\u200d":
-                next(iter_characters)
+                try:
+                    next(iter_characters)
+                except StopIteration:
+                    break
             elif last_measured_character:
                 total_width += last_measured_character in cell_table.narrow_to_wide
                 last_measured_character = None
