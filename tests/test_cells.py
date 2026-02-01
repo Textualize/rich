@@ -187,3 +187,20 @@ def test_nerd_font():
     """Regression test for https://github.com/Textualize/rich/issues/3943"""
     # Not allocated by unicode, but used by nerd fonts
     assert cell_len("\U000f024d") == 1
+
+
+def test_zwj():
+    """Test special case of zero width joiners"""
+    assert cell_len("") == 0
+    assert cell_len("\u200d") == 0
+    assert cell_len("1\u200d") == 1
+    # This sequence should really produce 2, but it aligns with with wcwidth
+    # What gets written to the terminal is anybody's guess, I've seen multiple variations
+    assert cell_len("1\u200d2") == 1
+
+
+def test_non_printable():
+    """Non printable characters should report a width of 0."""
+    for ordinal in range(31):
+        character = chr(ordinal)
+        assert cell_len(character) == 0
