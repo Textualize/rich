@@ -2095,6 +2095,7 @@ class Console:
                                         write(text[start : start + MAX_WRITE])
                                         start += MAX_WRITE
                             except UnicodeEncodeError as error:
+                                del self._buffer[:]
                                 error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
                                 raise
                     else:
@@ -2102,6 +2103,7 @@ class Console:
                         try:
                             self.file.write(text)
                         except UnicodeEncodeError as error:
+                            del self._buffer[:]
                             error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
                             raise
 
