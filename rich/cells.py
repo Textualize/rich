@@ -69,7 +69,7 @@ def get_character_cell_size(character: str, unicode_version: str = "auto") -> in
     upper_bound = len(table) - 1
 
     while lower_bound <= upper_bound:
-        index = (lower_bound + upper_bound) >> 1  # Faster than // 2
+        index = (lower_bound + upper_bound) >> 1
         entry = table[index]
         start = entry[0]
 
