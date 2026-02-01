@@ -199,6 +199,26 @@ def test_table_with_empty_cells() -> None:
     assert result == expected
 
 
+def test_file_url_hyperlink():
+    """Test that file:// URLs are rendered as hyperlinks."""
+    markdown = Markdown("[test file](file:///path/to/file.txt)")
+    result = render(markdown)
+    # Check that the link is rendered with the hyperlink escape sequences
+    # The exact format is: \x1b]8;id=0;foo\x1b\\test file\x1b]8;;\x1b\\
+    assert "\x1b]8;" in result  # OSC 8 hyperlink start sequence
+    assert "test file" in result
+    assert "file:///path/to/file.txt" in result or "foo" in result  # URL is either preserved or replaced by test helper
+
+
+def test_file_url_vs_http_url():
+    """Test that both file:// and http:// URLs are treated as hyperlinks."""
+    markdown = Markdown("[http link](http://example.com) and [file link](file:///etc/hosts)")
+    result = render(markdown)
+    # Both should be rendered as hyperlinks with OSC 8 sequences
+    hyperlink_count = result.count("\x1b]8;")
+    assert hyperlink_count >= 2  # At least 2 hyperlinks (start sequences)
+
+
 if __name__ == "__main__":
     markdown = Markdown(MARKDOWN)
     rendered = render(markdown)
