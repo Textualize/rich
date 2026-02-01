@@ -1010,6 +1010,20 @@ def test_wrap_invalid_style():
     console.print(a, justify="full")
 
 
+def test_wrap_justify_with_overflow_ignore():
+    """Regression test for https://github.com/Textualize/rich/issues/3948
+    
+    Text should still be justified when overflow=ignore (soft_wrap=True).
+    """
+    console = Console(width=40)
+    text = Text("Short text", justify="center")
+    lines = text.wrap(console, 40, overflow="ignore")
+    assert len(lines) == 1
+    # The text should be centered (padded with spaces)
+    line_str = str(lines[0])
+    assert line_str == "Short text".center(40)
+
+
 def test_apply_meta():
     text = Text("foobar")
     text.apply_meta({"foo": "bar"}, 1, 3)
