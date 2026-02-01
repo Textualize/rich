@@ -59,28 +59,22 @@ def get_character_cell_size(character: str, unicode_version: str = "auto") -> in
         return 0
     table = load_cell_table(unicode_version).widths
 
-    # Fast path: codepoint beyond table range
     last_entry = table[-1]
     if codepoint > last_entry[1]:
         return 1
 
-    # Binary search with fewer tuple unpacks
     lower_bound = 0
     upper_bound = len(table) - 1
 
     while lower_bound <= upper_bound:
         index = (lower_bound + upper_bound) >> 1
-        entry = table[index]
-        start = entry[0]
-
+        start, end, width = table[index]
         if codepoint < start:
             upper_bound = index - 1
-        elif codepoint > entry[1]:  # end
+        elif codepoint > end:
             lower_bound = index + 1
         else:
-            # Found: codepoint is in range [start, end]
-            return entry[2]
-
+            return width
     return 1
 
 
