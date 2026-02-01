@@ -55,23 +55,32 @@ def get_character_cell_size(character: str, unicode_version: str = "auto") -> in
         int: Number of cells (0, 1 or 2) occupied by that character.
     """
     codepoint = ord(character)
+    if codepoint and codepoint < 32 or 0x07F <= codepoint < 0x0A0:
+        return 0
     table = load_cell_table(unicode_version).widths
-    if codepoint > table[-1][1]:
+
+    # Fast path: codepoint beyond table range
+    last_entry = table[-1]
+    if codepoint > last_entry[1]:
         return 1
+
+    # Binary search with fewer tuple unpacks
     lower_bound = 0
     upper_bound = len(table) - 1
-    index = (lower_bound + upper_bound) // 2
-    while True:
-        start, end, width = table[index]
+
+    while lower_bound <= upper_bound:
+        index = (lower_bound + upper_bound) >> 1  # Faster than // 2
+        entry = table[index]
+        start = entry[0]
+
         if codepoint < start:
             upper_bound = index - 1
-        elif codepoint > end:
+        elif codepoint > entry[1]:  # end
             lower_bound = index + 1
         else:
-            return 0 if width == -1 else width
-        if upper_bound < lower_bound:
-            break
-        index = (lower_bound + upper_bound) // 2
+            # Found: codepoint is in range [start, end]
+            return entry[2]
+
     return 1
 
 
@@ -135,19 +144,20 @@ def _cell_len(text: str, unicode_version: str) -> int:
 
     SPECIAL = {"\u200d", "\ufe0f"}
 
-    iter_characters = iter(text)
+    index = 0
+    character_count = len(text)
 
-    for character in iter_characters:
+    while index < character_count:
+        character = text[index]
         if character in SPECIAL:
-            if character == "\u200d":
-                next(iter_characters)
-            elif last_measured_character:
+            if character == "\ufe0f" and last_measured_character:
                 total_width += last_measured_character in cell_table.narrow_to_wide
                 last_measured_character = None
         else:
             if character_width := get_character_cell_size(character, unicode_version):
                 last_measured_character = character
                 total_width += character_width
+        index += 1
 
     return total_width
 
