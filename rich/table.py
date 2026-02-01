@@ -4,6 +4,7 @@ from typing import (
     Dict,
     Iterable,
     List,
+    Mapping,
     NamedTuple,
     Optional,
     Sequence,
@@ -437,34 +438,131 @@ class Table(JupyterMixin):
             errors.NotRenderableError: If you add something that can't be rendered.
         """
 
-        def add_cell(column: Column, renderable: "RenderableType") -> None:
-            column._cells.append(renderable)
-
-        cell_renderables: List[Optional["RenderableType"]] = list(renderables)
-
         columns = self.columns
-        if len(cell_renderables) < len(columns):
-            cell_renderables = [
-                *cell_renderables,
-                *[None] * (len(columns) - len(cell_renderables)),
-            ]
-        for index, renderable in enumerate(cell_renderables):
-            if index == len(columns):
+        row_count = len(self.rows)
+        renderable_count = len(renderables)
+        max_columns = max(renderable_count, len(columns))
+        for index in range(max_columns):
+            if index >= len(columns):
                 column = Column(_index=index, highlight=self.highlight)
-                for _ in self.rows:
-                    add_cell(column, Text(""))
+                if row_count:
+                    column._cells.extend(Text("") for _ in range(row_count))
                 self.columns.append(column)
             else:
                 column = columns[index]
+            renderable = renderables[index] if index < renderable_count else None
             if renderable is None:
-                add_cell(column, "")
+                column._cells.append("")
             elif is_renderable(renderable):
-                add_cell(column, renderable)
+                column._cells.append(renderable)
             else:
                 raise errors.NotRenderableError(
                     f"unable to render {type(renderable).__name__}; a string or other renderable object is required"
                 )
         self.rows.append(Row(style=style, end_section=end_section))
+
+    def add_rows(
+        self,
+        rows: Iterable[Sequence[Optional["RenderableType"]]],
+        *,
+        styles: Optional[Iterable[Optional[StyleType]]] = None,
+        end_sections: Optional[Iterable[bool]] = None,
+    ) -> None:
+        """Add multiple rows of renderables."""
+        row_sequences = [tuple(row) for row in rows]
+        if not row_sequences:
+            return
+        columns = self.columns
+        existing_row_count = len(self.rows)
+        max_columns = max(
+            max(len(row) for row in row_sequences),
+            len(columns),
+        )
+        for index in range(max_columns):
+            if index >= len(columns):
+                column = Column(_index=index, highlight=self.highlight)
+                if existing_row_count:
+                    column._cells.extend(Text("") for _ in range(existing_row_count))
+                columns.append(column)
+        for index, column in enumerate(columns):
+            if index >= max_columns:
+                break
+            column_cells: List["RenderableType"] = []
+            append_cell = column_cells.append
+            for row in row_sequences:
+                renderable = row[index] if index < len(row) else None
+                if renderable is None:
+                    append_cell("")
+                elif is_renderable(renderable):
+                    append_cell(renderable)
+                else:
+                    raise errors.NotRenderableError(
+                        f"unable to render {type(renderable).__name__}; a string or other renderable object is required"
+                    )
+            column._cells.extend(column_cells)
+        style_iter = iter(styles) if styles is not None else None
+        end_section_iter = iter(end_sections) if end_sections is not None else None
+        append_row = self.rows.append
+        for _ in row_sequences:
+            style = next(style_iter, None) if style_iter is not None else None
+            end_section = (
+                next(end_section_iter, False)
+                if end_section_iter is not None
+                else False
+            )
+            append_row(Row(style=style, end_section=end_section))
+
+    def add_row_dict(
+        self,
+        row: Mapping[str, Optional["RenderableType"]],
+        *,
+        style: Optional[StyleType] = None,
+        end_section: bool = False,
+        default: Optional["RenderableType"] = None,
+    ) -> None:
+        """Add a row from a mapping of column headers to renderables."""
+        columns = self.columns
+        header_to_index = {
+            column.header: index
+            for index, column in enumerate(columns)
+            if isinstance(column.header, str)
+        }
+        for header in row.keys():
+            if header not in header_to_index:
+                self.add_column(header=header)
+                header_to_index[header] = len(self.columns) - 1
+        renderables: List[Optional["RenderableType"]] = [default] * len(self.columns)
+        for header, renderable in row.items():
+            index = header_to_index.get(header)
+            if index is None:
+                continue
+            renderables[index] = renderable
+        self.add_row(*renderables, style=style, end_section=end_section)
+
+    def __iadd__(
+        self,
+        renderables: Union[
+            "RenderableType",
+            Sequence[Optional["RenderableType"]],
+            Iterable[Sequence[Optional["RenderableType"]]],
+        ],
+    ) -> "Table":
+        if is_renderable(renderables):
+            self.add_row(renderables)
+            return self
+        if isinstance(renderables, Mapping):
+            self.add_row_dict(renderables)
+            return self
+        if (
+            isinstance(renderables, (list, tuple))
+            and renderables
+            and all(isinstance(item, (list, tuple)) for item in renderables)
+        ):
+            self.add_rows(renderables)
+            return self
+        if isinstance(renderables, Iterable):
+            self.add_row(*renderables)
+        return self
 
     def add_section(self) -> None:
         """Add a new section (draw a line after current row)."""
@@ -732,19 +830,19 @@ class Table(JupyterMixin):
                 column.width + padding_width, column.width + padding_width
             ).with_maximum(max_width)
         # Flexible column, we need to measure contents
-        min_widths: List[int] = []
-        max_widths: List[int] = []
-        append_min = min_widths.append
-        append_max = max_widths.append
+        min_width = 1
+        max_width_content = 0
+        has_cells = False
         get_render_width = Measurement.get
         for cell in self._get_cells(console, column._index, column):
             _min, _max = get_render_width(console, options, cell.renderable)
-            append_min(_min)
-            append_max(_max)
+            min_width = max(min_width, _min)
+            max_width_content = max(max_width_content, _max)
+            has_cells = True
 
         measurement = Measurement(
-            max(min_widths) if min_widths else 1,
-            max(max_widths) if max_widths else max_width,
+            min_width,
+            max_width_content if has_cells else max_width,
         ).with_maximum(max_width)
         measurement = measurement.clamp(
             None if column.min_width is None else column.min_width + padding_width,
@@ -763,7 +861,7 @@ class Table(JupyterMixin):
             for column_index, column in enumerate(self.columns)
         )
 
-        row_cells: List[Tuple[_Cell, ...]] = list(zip(*_column_cells))
+        row_cells = zip(*_column_cells)
         _box = (
             self.box.substitute(
                 options, safe=pick_bool(self.safe_box, console.safe_box)
@@ -810,6 +908,7 @@ class Table(JupyterMixin):
         get_row_style = self.get_row_style
         get_style = console.get_style
 
+        row_count = len(self.rows) + int(show_header) + int(show_footer)
         for index, (first, last, row_cell) in enumerate(loop_first_last(row_cells)):
             header_row = first and show_header
             footer_row = last and show_footer
@@ -843,8 +942,6 @@ class Table(JupyterMixin):
                 max_height = max(max_height, len(lines))
                 cells.append(lines)
 
-            row_height = max(len(cell) for cell in cells)
-
             def align_cell(
                 cell: List[List[Segment]],
                 vertical: "VerticalAlignMethod",
@@ -857,10 +954,10 @@ class Table(JupyterMixin):
                     vertical = "top"
 
                 if vertical == "top":
-                    return _Segment.align_top(cell, width, row_height, style)
+                    return _Segment.align_top(cell, width, max_height, style)
                 elif vertical == "middle":
-                    return _Segment.align_middle(cell, width, row_height, style)
-                return _Segment.align_bottom(cell, width, row_height, style)
+                    return _Segment.align_middle(cell, width, max_height, style)
+                return _Segment.align_bottom(cell, width, max_height, style)
 
             cells[:] = [
                 _Segment.set_shape(
@@ -916,7 +1013,7 @@ class Table(JupyterMixin):
             if _box and (show_lines or leading or end_section):
                 if (
                     not last
-                    and not (show_footer and index >= len(row_cells) - 2)
+                    and not (show_footer and index >= row_count - 2)
                     and not (show_header and header_row)
                 ):
                     if leading:

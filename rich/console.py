@@ -2089,19 +2089,11 @@ class Console:
                                 if len(text) <= MAX_WRITE:
                                     write(text)
                                 else:
-                                    batch: List[str] = []
-                                    batch_append = batch.append
-                                    size = 0
-                                    for line in text.splitlines(True):
-                                        if size + len(line) > MAX_WRITE and batch:
-                                            write("".join(batch))
-                                            batch.clear()
-                                            size = 0
-                                        batch_append(line)
-                                        size += len(line)
-                                    if batch:
-                                        write("".join(batch))
-                                        batch.clear()
+                                    text_length = len(text)
+                                    start = 0
+                                    while start < text_length:
+                                        write(text[start : start + MAX_WRITE])
+                                        start += MAX_WRITE
                             except UnicodeEncodeError as error:
                                 error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
                                 raise

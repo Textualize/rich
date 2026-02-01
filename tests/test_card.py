@@ -1,6 +1,10 @@
 import io
 import re
 
+import pytest
+
+pytest.importorskip("markdown_it")
+
 from rich.__main__ import make_test_card
 from rich.console import Console, RenderableType
 

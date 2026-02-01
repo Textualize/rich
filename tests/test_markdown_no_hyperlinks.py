@@ -66,6 +66,10 @@ foobar
 import io
 import re
 
+import pytest
+
+pytest.importorskip("markdown_it")
+
 from rich.console import Console, RenderableType
 from rich.markdown import Markdown
 
