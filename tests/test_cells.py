@@ -204,3 +204,76 @@ def test_non_printable():
     for ordinal in range(31):
         character = chr(ordinal)
         assert cell_len(character) == 0
+
+
+CA_FLAG = "\U0001F1E8\U0001F1E6"  # 🇨🇦 Canada flag
+GB_FLAG = "\U0001F1EC\U0001F1E7"  # 🇬🇧 Great Britain flag
+FAMILY = "\U0001F468\u200D\U0001F469\u200D\U0001F467"  # 👨‍👩‍👧 family ZWJ sequence
+WAVE_SKIN = "\U0001F44B\U0001F3FD"  # 👋🏽 wave with skin tone
+HEART_VS16 = "\u2764\uFE0F"  # ❤️ heart with VS-16
+
+
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        (CA_FLAG, 2),
+        (GB_FLAG, 2),
+        (CA_FLAG + GB_FLAG, 4),
+        (FAMILY, 2),
+        (WAVE_SKIN, 2),
+        (HEART_VS16, 2),
+        ("e\u0301", 1),  # é combining acute accent
+        # 👨‍👩‍👧‍👦 family ZWJ sequence (4 members)
+        ("\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466", 2),
+        ("\U0001F3FB", 2),  # 🏻 skin tone modifier alone
+        ("\U0001F1E8", 2),  # 🇨 single regional indicator alone
+        ("\uFE0F", 0),  # VS-16 variation selector alone
+        ("\u20E3", 0),  # ⃣ combining enclosing keycap alone
+    ],
+)
+def test_cell_len_grapheme_clusters(text: str, expected: int) -> None:
+    assert cell_len(text) == expected
+
+
+@pytest.mark.parametrize(
+    "text,expected_spans,expected_cell_length",
+    [
+        (CA_FLAG, [(0, 2, 2)], 2),
+        (CA_FLAG + GB_FLAG, [(0, 2, 2), (2, 4, 2)], 4),
+        (WAVE_SKIN, [(0, 2, 2)], 2),
+        ("a" + CA_FLAG + "b", [(0, 1, 1), (1, 3, 2), (3, 4, 1)], 4),
+        ("e\u0301", [(0, 2, 1)], 1),  # é combining acute accent
+    ],
+)
+def test_split_graphemes_clusters(
+    text: str,
+    expected_spans: list[CellSpan],
+    expected_cell_length: int,
+) -> None:
+    spans, cell_length = split_graphemes(text)
+    assert spans == expected_spans
+    assert cell_length == expected_cell_length
+
+
+@pytest.mark.parametrize(
+    "text,offset,left,right",
+    [
+        (CA_FLAG, 0, "", CA_FLAG),
+        (CA_FLAG, 1, " ", " "),
+        (CA_FLAG, 2, CA_FLAG, ""),
+        (CA_FLAG + "x", 2, CA_FLAG, "x"),
+        (FAMILY + "x", 2, FAMILY, "x"),
+    ],
+)
+def test_split_text_grapheme_clusters(
+    text: str, offset: int, left: str, right: str
+) -> None:
+    assert split_text(text, offset) == (left, right)
+
+
+def test_chop_cells_grapheme_clusters():
+    assert chop_cells(CA_FLAG + GB_FLAG, 3) == [CA_FLAG, GB_FLAG]
+    assert chop_cells(CA_FLAG + "x" + GB_FLAG, 3) == [
+        CA_FLAG + "x",
+        GB_FLAG,
+    ]
