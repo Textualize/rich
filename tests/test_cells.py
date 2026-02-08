@@ -204,3 +204,27 @@ def test_non_printable():
     for ordinal in range(31):
         character = chr(ordinal)
         assert cell_len(character) == 0
+
+
+def test_ansi_escape_sequences():
+    """Test that ANSI escape sequences don't cause infinite loops.
+
+    Regression test for https://github.com/Textualize/rich/issues/3958
+    Prior to the fix, this would hang indefinitely because zero-width
+    characters at the start or when spans is empty would not increment
+    the index, causing an infinite loop in split_graphemes.
+    """
+    # Example from the issue - should not hang
+    text = '\x1b[38;5;249mi\x1b[0m\x1b[38;5;249mf\x1b[0m\x1b[38;5;249m(\x1b[0m\x1b[38;5;249mq\x1b[0m\x1b[38;5;249m(\x1b[0build/client/assets/g'
+    spans, cell_length = split_graphemes(text)
+    # Should complete without hanging
+    assert cell_length >= 0
+
+    # Simpler test cases - should not hang
+    assert cell_len('\x1b[38;5;249mi\x1b[0m') >= 0
+    assert cell_len('\x1b[0m') >= 0
+
+    # ANSI escape at the start - should not hang
+    text_start = '\x1b[0mhello'
+    spans_start, length_start = split_graphemes(text_start)
+    assert length_start >= 0

@@ -203,10 +203,12 @@ def split_graphemes(
             last_measured_character = character
             spans.append((index, index := index + 1, character_width))
             total_width += character_width
-        elif spans:
+        else:
             # zero width characters are associated with the previous character
-            start, _end, cell_length = spans[-1]
-            spans[-1] = (start, index := index + 1, cell_length)
+            if spans:
+                start, _end, cell_length = spans[-1]
+                spans[-1] = (start, index + 1, cell_length)
+            index += 1
 
     return (spans, total_width)
 
