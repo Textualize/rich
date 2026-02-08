@@ -375,6 +375,47 @@ def test_notes() -> None:
         assert traceback.trace.stacks[0].notes == ["Hello", "World"]
 
 
+def test_notes_chained_exceptions() -> None:
+    """Check that __notes__ are attributed to the correct exception in a chain.
+
+    Regression test for https://github.com/Textualize/rich/issues/3960
+    """
+    try:
+        try:
+            raise ValueError("original error")
+        except ValueError as exc:
+            raise RuntimeError("wrapped error") from exc
+    except RuntimeError as exc:
+        exc.add_note("Note on outer only")
+        traceback = Traceback()
+
+        # stacks[0] is the outermost exception, stacks[1] is the inner cause
+        assert traceback.trace.stacks[0].notes == ["Note on outer only"]
+        assert traceback.trace.stacks[1].notes == []
+
+
+def test_notes_on_each_chained_exception() -> None:
+    """Check that each exception in a chain gets its own notes.
+
+    Regression test for https://github.com/Textualize/rich/issues/3960
+    """
+    try:
+        try:
+            inner = ValueError("inner error")
+            inner.add_note("Note on inner")
+            raise inner
+        except ValueError as exc:
+            outer = RuntimeError("outer error")
+            outer.add_note("Note on outer")
+            raise outer from exc
+    except RuntimeError as exc:
+        traceback = Traceback()
+
+        # stacks[0] is the outermost exception, stacks[1] is the inner cause
+        assert traceback.trace.stacks[0].notes == ["Note on outer"]
+        assert traceback.trace.stacks[1].notes == ["Note on inner"]
+
+
 def test_recursive_exception() -> None:
     """Regression test for https://github.com/Textualize/rich/issues/3708
 
