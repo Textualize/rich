@@ -207,6 +207,10 @@ def split_graphemes(
             # zero width characters are associated with the previous character
             start, _end, cell_length = spans[-1]
             spans[-1] = (start, index := index + 1, cell_length)
+        else:
+            # zero width character at start of text with no previous character to associate with
+            # skip it to avoid infinite loop
+            index += 1
 
     return (spans, total_width)
 

@@ -204,3 +204,26 @@ def test_non_printable():
     for ordinal in range(31):
         character = chr(ordinal)
         assert cell_len(character) == 0
+
+
+def test_ansi_at_start():
+    """Test that ANSI escape sequences at start of string don't cause infinite loop.
+    Regression test for issue #3958.
+    """
+    from rich.cells import split_graphemes
+
+    # ANSI escape sequences have zero width and should not cause infinite loop
+    # when they appear at the start of a string
+    text = '\x1b[38;5;249mi\x1b[0m\x1b[38;5;249mf\x1b[0m'
+    spans, total_width = split_graphemes(text)
+
+    # Should complete without hanging (previously caused infinite loop)
+    assert total_width >= 0
+    assert isinstance(spans, list)
+
+    # Test another case with ANSI at start
+    text2 = '\x1b[0mtest'
+    spans2, total_width2 = split_graphemes(text2)
+    # Should complete without hanging
+    assert total_width2 > 0
+    assert isinstance(spans2, list)
