@@ -1231,9 +1231,6 @@ class Text(JupyterMixin):
             if "\t" in line:
                 line.expand_tabs(tab_size)
             if no_wrap:
-                if overflow == "ignore":
-                    lines.append(line)
-                    continue
                 new_lines = Lines([line])
             else:
                 offsets = divide_line(str(line), width, fold=wrap_overflow == "fold")

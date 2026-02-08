@@ -406,6 +406,58 @@ def test_padding_width():
     assert output == expected
 
 
+def test_soft_wrap_title_justify():
+    """Test that table title justification is preserved when soft_wrap=True.
+    Regression test for issue #3948.
+    """
+    console = Console(width=25, force_terminal=True, legacy_windows=False)
+
+    # Test center justify (default)
+    table_center = Table(title="The Title", title_justify="center")
+    table_center.add_column("Column 1")
+    table_center.add_column("Column 2")
+
+    # Test right justify
+    table_right = Table(title="The Title", title_justify="right")
+    table_right.add_column("Column 1")
+    table_right.add_column("Column 2")
+
+    # Test left justify
+    table_left = Table(title="The Title", title_justify="left")
+    table_left.add_column("Column 1")
+    table_left.add_column("Column 2")
+
+    # Render with soft_wrap=True
+    console_sw = Console(width=25, force_terminal=True, legacy_windows=False, record=True)
+    console_sw.print(table_center, soft_wrap=True)
+    output_center = console_sw.export_text()
+
+    console_sw = Console(width=25, force_terminal=True, legacy_windows=False, record=True)
+    console_sw.print(table_right, soft_wrap=True)
+    output_right = console_sw.export_text()
+
+    console_sw = Console(width=25, force_terminal=True, legacy_windows=False, record=True)
+    console_sw.print(table_left, soft_wrap=True)
+    output_left = console_sw.export_text()
+
+    # Check that center title is centered (has leading spaces)
+    title_line_center = output_center.split('\n')[0]
+    assert title_line_center.strip() == "The Title"
+    assert title_line_center.startswith(" "), "Center-justified title should have leading spaces"
+
+    # Check that right title is right-aligned (has more leading spaces)
+    title_line_right = output_right.split('\n')[0]
+    assert title_line_right.strip() == "The Title"
+    leading_spaces_right = len(title_line_right) - len(title_line_right.lstrip())
+    leading_spaces_center = len(title_line_center) - len(title_line_center.lstrip())
+    assert leading_spaces_right > leading_spaces_center, "Right-justified title should have more leading spaces than center"
+
+    # Check that left title has no leading spaces
+    title_line_left = output_left.split('\n')[0]
+    assert title_line_left.strip() == "The Title"
+    assert not title_line_left.startswith(" "), "Left-justified title should not have leading spaces"
+
+
 if __name__ == "__main__":
     render = render_tables()
     print(render)
