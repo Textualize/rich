@@ -1683,7 +1683,13 @@ class Console:
             new_line_start (bool, False): Insert a new line at the start if the output contains more than one line. Defaults to ``False``.
         """
         if not objects:
-            objects = (NewLine(),)
+            # When objects is empty, only print newline if end is "\n" (default)
+            # Otherwise, just print the end character (matching print() behavior)
+            if end == "\n":
+                objects = (NewLine(),)
+            else:
+                # Create empty object so that only the end character is printed
+                objects = (Text(""),)
 
         if soft_wrap is None:
             soft_wrap = self.soft_wrap

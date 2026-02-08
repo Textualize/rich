@@ -1127,3 +1127,33 @@ def test_tty_compatible() -> None:
     assert not console.is_terminal
     # Should not have auto-detected
     assert not console.file.called_isatty
+
+
+def test_print_empty_with_end():
+    """Test that console.print() with empty args respects end parameter.
+    Regression test for issue #3701.
+    """
+    console = Console(file=io.StringIO(), legacy_windows=False)
+
+    # Test with custom end parameter
+    console.print(end="!")
+    output = console.file.getvalue()
+    assert output == "!", f"Expected '!' but got {output!r}"
+
+    # Test with empty end parameter
+    console = Console(file=io.StringIO(), legacy_windows=False)
+    console.print(end="")
+    output = console.file.getvalue()
+    assert output == "", f"Expected empty string but got {output!r}"
+
+    # Test with default end parameter (newline)
+    console = Console(file=io.StringIO(), legacy_windows=False)
+    console.print()
+    output = console.file.getvalue()
+    assert output == "\n", f"Expected newline but got {output!r}"
+
+    # Test with content and custom end
+    console = Console(file=io.StringIO(), legacy_windows=False)
+    console.print("test", end="!")
+    output = console.file.getvalue()
+    assert output == "test!", f"Expected 'test!' but got {output!r}"
