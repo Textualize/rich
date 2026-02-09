@@ -40,30 +40,20 @@ class Column:
     """Defines a column within a ~Table.
 
     Args:
-        title (Union[str, Text], optional): The title of the table rendered at the top. Defaults to None.
-        caption (Union[str, Text], optional): The table caption rendered below. Defaults to None.
-        width (int, optional): The width in characters of the table, or ``None`` to automatically fit. Defaults to None.
-        min_width (Optional[int], optional): The minimum width of the table, or ``None`` for no minimum. Defaults to None.
-        box (box.Box, optional): One of the constants in box.py used to draw the edges (see :ref:`appendix_box`), or ``None`` for no box lines. Defaults to box.HEAVY_HEAD.
-        safe_box (Optional[bool], optional): Disable box characters that don't display on windows legacy terminal with *raster* fonts. Defaults to True.
-        padding (PaddingDimensions, optional): Padding for cells (top, right, bottom, left). Defaults to (0, 1).
-        collapse_padding (bool, optional): Enable collapsing of padding around cells. Defaults to False.
-        pad_edge (bool, optional): Enable padding of edge cells. Defaults to True.
-        show_header (bool, optional): Show a header row. Defaults to True.
-        show_footer (bool, optional): Show a footer row. Defaults to False.
-        show_edge (bool, optional): Draw a box around the outside of the table. Defaults to True.
-        show_lines (bool, optional): Draw lines between every row. Defaults to False.
-        leading (int, optional): Number of blank lines between rows (precludes ``show_lines``). Defaults to 0.
-        style (Union[str, Style], optional): Default style for the table. Defaults to "none".
-        row_styles (List[Union, str], optional): Optional list of row styles, if more than one style is given then the styles will alternate. Defaults to None.
-        header_style (Union[str, Style], optional): Style of the header. Defaults to "table.header".
-        footer_style (Union[str, Style], optional): Style of the footer. Defaults to "table.footer".
-        border_style (Union[str, Style], optional): Style of the border. Defaults to None.
-        title_style (Union[str, Style], optional): Style of the title. Defaults to None.
-        caption_style (Union[str, Style], optional): Style of the caption. Defaults to None.
-        title_justify (str, optional): Justify method for title. Defaults to "center".
-        caption_justify (str, optional): Justify method for caption. Defaults to "center".
-        highlight (bool, optional): Highlight cell contents (if str). Defaults to False.
+        header (RenderableType): Renderable for the header (typically a string). Defaults to "".
+        footer (RenderableType): Renderable for the footer (typically a string). Defaults to "".
+        header_style (Union[str, Style], optional): The style of the header. Defaults to "".
+        footer_style (Union[str, Style], optional): The style of the footer. Defaults to "".
+        style (Union[str, Style], optional): The style of the column. Defaults to "".
+        justify (str, optional): How to justify text within the column ("left", "center", "right", or "full"). Defaults to "left".
+        vertical (str, optional): How to vertically align content ("top", "middle", or "bottom"). Defaults to "top".
+        overflow (str, optional): Overflow method. Defaults to "ellipsis".
+        width (int, optional): Width of the column, or ``None`` to auto calculate width. Defaults to None.
+        min_width (int, optional): Minimum width of column, or ``None`` for no minimum. Defaults to None.
+        max_width (int, optional): Maximum width of column, or ``None`` for no maximum. Defaults to None.
+        ratio (int, optional): Ratio to use when calculating column width, or ``None`` to adapt to column contents. Defaults to None.
+        no_wrap (bool, optional): Prevent wrapping of text within the column. Defaults to False.
+        highlight (bool, optional): Apply highlighter to column. Defaults to False.
     """
 
     header: "RenderableType" = ""
