@@ -98,6 +98,7 @@ def install(
     locals_overflow: Optional[OverflowMethod] = None,
     indent_guides: bool = True,
     suppress: Iterable[Union[str, ModuleType]] = (),
+    hide: Iterable[Union[str, ModuleType]] = (),
     max_frames: int = 100,
 ) -> Callable[[Type[BaseException], BaseException, Optional[TracebackType]], Any]:
     """Install a rich traceback handler.
@@ -123,6 +124,7 @@ def install(
         locals_overflow (OverflowMethod, optional): How to handle overflowing locals, or None to disable. Defaults to None.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
         suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+        hide (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to completely hide from traceback.
 
     Returns:
         Callable: The previous exception handler that was replaced.
@@ -159,6 +161,7 @@ def install(
             locals_overflow=locals_overflow,
             indent_guides=indent_guides,
             suppress=suppress,
+            hide=hide,
             max_frames=max_frames,
         )
         traceback_console.print(exception_traceback)
@@ -280,6 +283,7 @@ class Traceback:
         locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
         locals_overflow (OverflowMethod, optional): How to handle overflowing locals, or None to disable. Defaults to None.
         suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+        hide (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to completely hide from traceback.
         max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
 
     """
@@ -310,6 +314,7 @@ class Traceback:
         locals_overlow: Optional[OverflowMethod] = None,
         indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
+        hide: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
     ):
         if trace is None:
@@ -347,6 +352,18 @@ class Traceback:
                 path = suppress_entity
             path = os.path.normpath(os.path.abspath(path))
             self.suppress.append(path)
+
+        self.hide: Sequence[str] = []
+        for hide_entity in hide:
+            if not isinstance(hide_entity, str):
+                assert (
+                    hide_entity.__file__ is not None
+                ), f"{hide_entity!r} must be a module with '__file__' attribute"
+                path = os.path.dirname(hide_entity.__file__)
+            else:
+                path = hide_entity
+            path = os.path.normpath(os.path.abspath(path))
+            self.hide.append(path)
         self.max_frames = max(4, max_frames) if max_frames > 0 else 0
 
     @classmethod
@@ -370,6 +387,7 @@ class Traceback:
         locals_overflow: Optional[OverflowMethod] = None,
         indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
+        hide: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
     ) -> "Traceback":
         """Create a traceback from exception info
@@ -393,6 +411,7 @@ class Traceback:
             locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
             locals_overflow (OverflowMethod, optional): How to handle overflowing locals, or None to disable. Defaults to None.
             suppress (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+            hide (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to completely hide from traceback.
             max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
 
         Returns:
@@ -426,6 +445,7 @@ class Traceback:
             locals_hide_sunder=locals_hide_sunder,
             locals_overlow=locals_overflow,
             suppress=suppress,
+            hide=hide,
             max_frames=max_frames,
         )
 
@@ -806,6 +826,10 @@ class Traceback:
             first = frame_index == 0
             frame_filename = frame.filename
             suppressed = any(frame_filename.startswith(path) for path in self.suppress)
+
+            hidden = any(frame_filename.startswith(path) for path in self.hide)
+            if hidden:
+                continue
 
             if os.path.exists(frame.filename):
                 text = Text.assemble(

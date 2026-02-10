@@ -293,6 +293,27 @@ def test_suppress():
         assert "foo" in traceback.suppress[1]
 
 
+def test_hide():
+    try:
+        1 / 0
+    except Exception:
+        traceback = Traceback(hide=[pytest, "foo"])
+        assert len(traceback.hide) == 2
+        assert "pytest" in traceback.hide[0]
+        assert "foo" in traceback.hide[1]
+
+
+def test_hide_removes_frames():
+    console = Console(width=100, file=io.StringIO())
+    try:
+        1 / 0
+    except Exception:
+        console.print_exception(hide=[__file__])
+    exception_text = console.file.getvalue()
+    assert "ZeroDivisionError" in exception_text
+    assert "test_traceback.py" not in exception_text
+
+
 @pytest.mark.parametrize(
     "rich_traceback_omit_for_level2,expected_frames_length,expected_frame_names",
     (
