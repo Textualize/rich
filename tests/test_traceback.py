@@ -397,3 +397,27 @@ def test_recursive_exception() -> None:
             console.print_exception(show_locals=True)
 
     bar()
+
+
+def test_show_border_true():
+    console = Console(width=100, file=io.StringIO())
+    try:
+        1 / 0
+    except Exception:
+        console.print_exception()
+    exception_text = console.file.getvalue()
+    assert "╭" in exception_text
+    assert "╰" in exception_text
+
+
+def test_show_border_false():
+    console = Console(width=100, file=io.StringIO())
+    try:
+        1 / 0
+    except Exception:
+        console.print_exception(show_border=False)
+    exception_text = console.file.getvalue()
+    assert "╭" not in exception_text
+    assert "╰" not in exception_text
+    assert "Traceback" in exception_text
+    assert "ZeroDivisionError" in exception_text

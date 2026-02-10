@@ -1873,6 +1873,7 @@ class Console:
         show_locals: bool = False,
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
+        show_border: bool = True,
     ) -> None:
         """Prints a rich render of the last exception and traceback.
 
@@ -1884,6 +1885,7 @@ class Console:
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
             suppress (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
             max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
+            show_border (bool, optional): Show a border around the traceback. Defaults to True.
         """
         from .traceback import Traceback
 
@@ -1895,6 +1897,7 @@ class Console:
             show_locals=show_locals,
             suppress=suppress,
             max_frames=max_frames,
+            show_border=show_border,
         )
         self.print(traceback)
 
@@ -2512,12 +2515,9 @@ class Console:
                 x += cell_len(text)
 
         line_offsets = [line_no * line_height + 1.5 for line_no in range(y)]
-        lines = "\n".join(
-            f"""<clipPath id="{unique_id}-line-{line_no}">
+        lines = "\n".join(f"""<clipPath id="{unique_id}-line-{line_no}">
     {make_tag("rect", x=0, y=offset, width=char_width * width, height=line_height + 0.25)}
-            </clipPath>"""
-            for line_no, offset in enumerate(line_offsets)
-        )
+            </clipPath>""" for line_no, offset in enumerate(line_offsets))
 
         styles = "\n".join(
             f".{unique_id}-r{rule_no} {{ {css} }}" for css, rule_no in classes.items()
