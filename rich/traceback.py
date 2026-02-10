@@ -99,6 +99,7 @@ def install(
     indent_guides: bool = True,
     suppress: Iterable[Union[str, ModuleType]] = (),
     max_frames: int = 100,
+    relative_to: Optional[str] = None,
 ) -> Callable[[Type[BaseException], BaseException, Optional[TracebackType]], Any]:
     """Install a rich traceback handler.
 
@@ -123,6 +124,7 @@ def install(
         locals_overflow (OverflowMethod, optional): How to handle overflowing locals, or None to disable. Defaults to None.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
         suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+        relative_to (str, optional): Optional path prefix to strip from displayed filenames. Defaults to None.
 
     Returns:
         Callable: The previous exception handler that was replaced.
@@ -160,6 +162,7 @@ def install(
             indent_guides=indent_guides,
             suppress=suppress,
             max_frames=max_frames,
+            relative_to=relative_to,
         )
         traceback_console.print(exception_traceback)
 
@@ -281,6 +284,7 @@ class Traceback:
         locals_overflow (OverflowMethod, optional): How to handle overflowing locals, or None to disable. Defaults to None.
         suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
         max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
+        relative_to (str, optional): Optional path prefix to strip from displayed filenames. Defaults to None.
 
     """
 
@@ -311,6 +315,7 @@ class Traceback:
         indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
+        relative_to: Optional[str] = None,
     ):
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
@@ -335,6 +340,12 @@ class Traceback:
         self.locals_hide_dunder = locals_hide_dunder
         self.locals_hide_sunder = locals_hide_sunder
         self.locals_overflow = locals_overlow
+
+        self.relative_to: Optional[str] = (
+            os.path.normpath(os.path.abspath(relative_to)) + os.sep
+            if relative_to is not None
+            else None
+        )
 
         self.suppress: Sequence[str] = []
         for suppress_entity in suppress:
@@ -371,6 +382,7 @@ class Traceback:
         indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
+        relative_to: Optional[str] = None,
     ) -> "Traceback":
         """Create a traceback from exception info
 
@@ -394,6 +406,7 @@ class Traceback:
             locals_overflow (OverflowMethod, optional): How to handle overflowing locals, or None to disable. Defaults to None.
             suppress (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
             max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
+            relative_to (str, optional): Optional path prefix to strip from displayed filenames. Defaults to None.
 
         Returns:
             Traceback: A Traceback instance that may be printed.
@@ -427,6 +440,7 @@ class Traceback:
             locals_overlow=locals_overflow,
             suppress=suppress,
             max_frames=max_frames,
+            relative_to=relative_to,
         )
 
     @classmethod
@@ -807,9 +821,13 @@ class Traceback:
             frame_filename = frame.filename
             suppressed = any(frame_filename.startswith(path) for path in self.suppress)
 
+            display_filename = frame.filename
+            if self.relative_to and frame.filename.startswith(self.relative_to):
+                display_filename = frame.filename[len(self.relative_to) :]
+
             if os.path.exists(frame.filename):
                 text = Text.assemble(
-                    path_highlighter(Text(frame.filename, style="pygments.string")),
+                    path_highlighter(Text(display_filename, style="pygments.string")),
                     (":", "pygments.text"),
                     (str(frame.lineno), "pygments.number"),
                     " in ",

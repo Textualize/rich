@@ -1,4 +1,5 @@
 import io
+import os
 import re
 import sys
 from typing import List
@@ -397,3 +398,25 @@ def test_recursive_exception() -> None:
             console.print_exception(show_locals=True)
 
     bar()
+
+
+def test_relative_to():
+    console = Console(width=100, file=io.StringIO())
+    try:
+        1 / 0
+    except Exception:
+        console.print_exception(relative_to=os.path.dirname(os.path.dirname(__file__)))
+    exception_text = console.file.getvalue()
+    assert "test_traceback.py" in exception_text
+    # The full absolute path should not appear
+    assert os.path.dirname(__file__) not in exception_text
+
+
+def test_relative_to_source_renders():
+    console = Console(width=100, file=io.StringIO())
+    try:
+        1 / 0
+    except Exception:
+        console.print_exception(relative_to=os.path.dirname(os.path.dirname(__file__)))
+    exception_text = console.file.getvalue()
+    assert "1 / 0" in exception_text
