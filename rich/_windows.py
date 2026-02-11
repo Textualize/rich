@@ -24,6 +24,8 @@ try:
 
     from rich._win32_console import (
         ENABLE_VIRTUAL_TERMINAL_PROCESSING,
+        STDERR,
+        STDOUT,
         GetConsoleMode,
         GetStdHandle,
         LegacyWindowsError,
@@ -43,22 +45,26 @@ else:
         Returns:
             WindowsConsoleFeatures: An instance of WindowsConsoleFeatures.
         """
-        handle = GetStdHandle()
-        try:
-            console_mode = GetConsoleMode(handle)
-            success = True
-        except LegacyWindowsError:
-            console_mode = 0
-            success = False
-        vt = bool(success and console_mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING)
-        truecolor = False
-        if vt:
-            win_version = sys.getwindowsversion()
-            truecolor = win_version.major > 10 or (
-                win_version.major == 10 and win_version.build >= 15063
-            )
-        features = WindowsConsoleFeatures(vt=vt, truecolor=truecolor)
-        return features
+        for h in (STDOUT, STDERR):
+            handle = GetStdHandle(h)
+            try:
+                console_mode = GetConsoleMode(handle)
+                success = True
+            except LegacyWindowsError:
+                console_mode = 0
+                success = False
+            if not success:
+                continue
+            vt = bool(console_mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+            truecolor = False
+            if vt:
+                win_version = sys.getwindowsversion()
+                truecolor = win_version.major > 10 or (
+                    win_version.major == 10 and win_version.build >= 15063
+                )
+            features = WindowsConsoleFeatures(vt=vt, truecolor=truecolor)
+            return features
+        return WindowsConsoleFeatures()
 
 
 if __name__ == "__main__":
