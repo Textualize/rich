@@ -344,6 +344,26 @@ def test_split_cells_single() -> None:
         assert cell_len(right.text) == test.cell_length - position
 
 
+def test_split_cells_non_unit_width() -> None:
+    """Check that split cells handles non-unit cell widths correctly.
+
+    Regression test for https://github.com/Textualize/rich/issues/3299
+    """
+    # Wide chars followed by zero-width chars
+    segment = Segment("\U0001f98a\U0001f98a\U0001f98a\n\n\n\n\n\n")
+    for position in range(0, segment.cell_length + 1):
+        left, right = Segment._split_cells(segment, position)
+        assert cell_len(left.text) == position
+        assert cell_len(right.text) == segment.cell_length - position
+
+    # Wide chars followed by single-width chars
+    segment = Segment("\U0001f98a\U0001f98a\U0001f98aabcdef")
+    for position in range(0, segment.cell_length + 1):
+        left, right = Segment._split_cells(segment, position)
+        assert cell_len(left.text) == position
+        assert cell_len(right.text) == segment.cell_length - position
+
+
 def test_segment_lines_renderable():
     lines = [[Segment("hello"), Segment(" "), Segment("world")], [Segment("foo")]]
     segment_lines = SegmentLines(lines)
