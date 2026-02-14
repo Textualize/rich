@@ -100,3 +100,4 @@ The following people have contributed to the development of Rich:
 - [Brandon Capener](https://github.com/bcapener)
 - [Alex Zheng](https://github.com/alexzheng111)
 - [Sebastian Speitel](https://github.com/SebastianSpeitel)
+- [Satyendhran](https://github.com/satyendhran)

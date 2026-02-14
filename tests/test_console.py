@@ -612,6 +612,14 @@ def test_unicode_error() -> None:
         assert False, "didn't raise UnicodeEncodeError"
 
 
+def test_unicode_error_clears_buffer() -> None:
+    with tempfile.TemporaryFile("wt", encoding="ascii") as tmpfile:
+        console = Console(file=tmpfile)
+        with pytest.raises(UnicodeEncodeError):
+            console.print(":vampire:")
+        assert console._buffer == []
+
+
 def test_bell() -> None:
     console = Console(force_terminal=True, _environ={})
     console.begin_capture()

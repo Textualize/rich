@@ -307,11 +307,21 @@ class Traceback:
         locals_max_depth: Optional[int] = None,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
-        locals_overlow: Optional[OverflowMethod] = None,
+        locals_overflow: Optional[OverflowMethod] = None,
         indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
+        **kwargs: Any,
     ):
+        if "locals_overlow" in kwargs:
+            if locals_overflow is not None:
+                raise TypeError(
+                    "locals_overflow and locals_overlow are mutually exclusive"
+                )
+            locals_overflow = kwargs.pop("locals_overlow")
+        if kwargs:
+            unexpected = ", ".join(sorted(kwargs.keys()))
+            raise TypeError(f"Unexpected keyword arguments: {unexpected}")
         if trace is None:
             exc_type, exc_value, traceback = sys.exc_info()
             if exc_type is None or exc_value is None or traceback is None:
@@ -334,15 +344,17 @@ class Traceback:
         self.locals_max_depth = locals_max_depth
         self.locals_hide_dunder = locals_hide_dunder
         self.locals_hide_sunder = locals_hide_sunder
-        self.locals_overflow = locals_overlow
+        self.locals_overflow = locals_overflow
 
         self.suppress: Sequence[str] = []
         for suppress_entity in suppress:
             if not isinstance(suppress_entity, str):
-                assert (
-                    suppress_entity.__file__ is not None
-                ), f"{suppress_entity!r} must be a module with '__file__' attribute"
-                path = os.path.dirname(suppress_entity.__file__)
+                module_path = getattr(suppress_entity, "__file__", None)
+                if module_path is None:
+                    raise TypeError(
+                        f"{suppress_entity!r} must be a module with '__file__' attribute"
+                    )
+                path = os.path.dirname(module_path)
             else:
                 path = suppress_entity
             path = os.path.normpath(os.path.abspath(path))
@@ -424,7 +436,7 @@ class Traceback:
             locals_max_depth=locals_max_depth,
             locals_hide_dunder=locals_hide_dunder,
             locals_hide_sunder=locals_hide_sunder,
-            locals_overlow=locals_overflow,
+            locals_overflow=locals_overflow,
             suppress=suppress,
             max_frames=max_frames,
         )
