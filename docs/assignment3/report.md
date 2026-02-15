@@ -58,6 +58,22 @@ Lizard columns: NLOC = non-comment lines of code, CCN = cyclomatic complexity nu
 4. Are exceptions taken into account in the given measurements?
 5. Is the documentation clear w.r.t. all the possible outcomes?
 
+## Function 1: **rich_console** (Panel)
+
+In @141-275 @ `rich/panel.py`
+
+1. **Did the tool and our manual count match?**
+   - The tool (lizard) reports cyclomatic complexity 16 for this function. Cyclomatic complexity is the number of independent paths through the code (each if, else, loop, or condition adds one).
+   - Filip counted by hand: every if/elif/else, every ternary (condition ? a : b), and the conditions inside the inner helper `align_text`. Counted 16. So the tool and our manual count give the same result.
+
+2. **Is the function only complex, or also long?** It is both. The function is 80 non-comment lines (135 lines in total in the file). The complexity (16) comes from many branches: for example, whether there is padding or not, how the width is chosen, whether the panel has a title or not, whether it has a subtitle or not, and whether the title/subtitle are left-, center-, or right-aligned. So the code is not extremely long, but it has a lot of decision points.
+
+3. **What does the function do?** This function draws a Panel: a bordered box that can wrap any content (text, tables, etc.) in the terminal. It can show an optional title in the top border and an optional subtitle in the bottom border. It “yields” (produces) the small pieces (segments) that the Rich library then turns into visible output. So its job is to decide what to draw (top border with or without title, content lines with left and right borders, bottom border with or without subtitle) and hand those pieces to the console.
+
+4. **Do we count exceptions (try/except)?** In this function there are no try/except blocks. So when we count branches, we only count if/else and similar. The tool (lizard) and our manual count therefore agree, we did not have to decide how to count exception handlers here.
+
+5. **Is the documentation clear about all the different outcomes?** The inner helper `align_text` has a short docstring that explains its role. The main function does not have a docstring that lists every branch (for example, all three alignment options or when the title or subtitle are present or missing). To understand all possible outcomes, we had to read the code. So the docs help a bit, but they are not enough on their own for someone who wants to see every path the code can take.
+
 ## Refactoring
 
 Plan for refactoring complex code:
