@@ -38,6 +38,18 @@ Did it build and run as documented?
 
 ## Complexity
 
+**Five functions chosen (from lizard Warnings; core library only, excluding third-party/generated):** We chose the **five with the lowest CCN** that still triggered a lizard Warning (CCN > 15 or length > 1000), so that manual cyclomatic complexity count, DIY branch instrumentation, and coverage improvement are easier to verify by hand for this assignment.
+
+| NLOC | CCN | token | PARAM | length | location                                               |
+| ---- | --- | ----- | ----- | ------ | ------------------------------------------------------ |
+| 80   | 16  | 499   | 3     | 135    | `__rich_console__` @141-275 @ `rich/panel.py` (Panel)  |
+| 52   | 17  | 348   | 9     | 55     | `__call__` @32-86 @ `rich/_log_render.py` (Log render) |
+| 47   | 17  | 379   | 5     | 57     | `justify` @111-167 @ `rich/containers.py` (Containers) |
+| 29   | 17  | 220   | 2     | 59     | `ratio_resolve` @14-72 @ `rich/_ratio.py` (Ratio)      |
+| 34   | 17  | 213   | 1     | 37     | `stop` @145-181 @ `rich/live.py` (Live)                |
+
+Lizard columns: NLOC = non-comment lines of code, CCN = cyclomatic complexity number, token = tokens, PARAM = parameter count, length = length in lines.
+
 1. What are your results for five complex functions?
    - Did all methods (tools vs. manual count) get the same result?
    - Are the results clear?
