@@ -78,7 +78,10 @@ In @141-275 @ `rich/panel.py`
 
 Plan for refactoring complex code:
 
-Estimated impact of refactoring (lower CC, but other drawbacks?).
+**Function 1 (Panel `__rich_console__`):** Move the inner function `align_text` out.
+
+The inner function `align_text` (left/center/right and the `if excess_space` / `if text.style` branches) can become a private method on the class, e.g. `_align_text(...)`, or a module-level helper. Then `__rich_console__` no longer “contains” those branches for cyclomatic complexity, the main method just calls it.
+Estimated impact of refactoring (lower CC, but other drawbacks?): **Lower CC** in the main method. **Possible drawbacks:** one extra method to maintain; behaviour unchanged.
 
 Carried out refactoring (optional, P+):
 
