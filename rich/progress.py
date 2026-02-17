@@ -1054,6 +1054,7 @@ class Task:
     def _reset(self) -> None:
         """Reset progress."""
         self._progress.clear()
+        self.stop_time = None
         self.finished_time = None
         self.finished_speed = None
 

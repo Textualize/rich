@@ -487,6 +487,35 @@ def test_reset() -> None:
     assert not task._progress
 
 
+def test_reset_after_stop() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3705
+
+    Elapsed time should resume from zero after reset() on a stopped task.
+    """
+    elapsed_time = 0.0
+
+    def get_time() -> float:
+        return elapsed_time
+
+    progress = Progress(get_time=get_time)
+    task_id = progress.add_task("test", total=100)
+    task = progress.tasks[task_id]
+
+    # Advance and stop the task
+    elapsed_time = 5.0
+    progress.advance(task_id, 50)
+    progress.stop_task(task_id)
+    assert task.elapsed == 5.0  # stopped at 5 seconds
+
+    # Reset and restart
+    elapsed_time = 10.0
+    progress.reset(task_id, start=True)
+
+    # Elapsed should reflect time since reset, not since original start
+    elapsed_time = 12.0
+    assert task.elapsed == 2.0  # 12.0 - 10.0 = 2.0 since reset
+
+
 def test_progress_max_refresh() -> None:
     """Test max_refresh argument."""
     time = 0.0
