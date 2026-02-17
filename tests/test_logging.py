@@ -1,6 +1,7 @@
 import io
 import os
 import logging
+import re
 from typing import Optional
 
 import pytest
@@ -160,3 +161,28 @@ def test_markup_and_highlight():
     render_plain = handler.console.file.getvalue()
     assert "FORMATTER" in render_plain
     assert log_message in render_plain
+
+
+def test_timezone_format():
+    """Regression test for https://github.com/Textualize/rich/issues/3877
+
+    RichHandler should produce timezone-aware datetimes so %z works in
+    log_time_format.
+    """
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=120,
+        color_system=None,
+    )
+    handler = RichHandler(console=console, log_time_format="%Y-%m-%dT%H:%M:%S%z")
+    log = logging.getLogger("test_tz")
+    log.addHandler(handler)
+    log.setLevel(logging.INFO)
+
+    log.info("timezone test")
+    output = console.file.getvalue()
+    # The timezone offset should be present (e.g., +0000, -0500, +0530)
+    assert re.search(r"[+-]\d{4}", output), f"No timezone offset found in: {output!r}"
+
+    log.removeHandler(handler)
