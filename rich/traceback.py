@@ -542,29 +542,30 @@ class Traceback:
                 last_instruction = None
                 if sys.version_info >= (3, 11):
                     instruction_index = frame_summary.f_lasti // 2
-                    instruction_position = next(
-                        islice(
-                            frame_summary.f_code.co_positions(),
-                            instruction_index,
-                            instruction_index + 1,
+                    if instruction_index >= 0:
+                        instruction_position = next(
+                            islice(
+                                frame_summary.f_code.co_positions(),
+                                instruction_index,
+                                instruction_index + 1,
+                            )
                         )
-                    )
-                    (
-                        start_line,
-                        end_line,
-                        start_column,
-                        end_column,
-                    ) = instruction_position
-                    if (
-                        start_line is not None
-                        and end_line is not None
-                        and start_column is not None
-                        and end_column is not None
-                    ):
-                        last_instruction = (
-                            (start_line, start_column),
-                            (end_line, end_column),
-                        )
+                        (
+                            start_line,
+                            end_line,
+                            start_column,
+                            end_column,
+                        ) = instruction_position
+                        if (
+                            start_line is not None
+                            and end_line is not None
+                            and start_column is not None
+                            and end_column is not None
+                        ):
+                            last_instruction = (
+                                (start_line, start_column),
+                                (end_line, end_column),
+                            )
 
                 if filename and not filename.startswith("<"):
                     if not os.path.isabs(filename):

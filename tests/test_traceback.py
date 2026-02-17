@@ -361,6 +361,41 @@ def test_traceback_finely_grained() -> None:
 
 
 @pytest.mark.skipif(
+    sys.version_info.minor < 11, reason="Not applicable before Python 3.11"
+)
+def test_traceback_negative_lasti() -> None:
+    """f_lasti can be -1 (e.g. during KeyboardInterrupt). Should not crash."""
+    # https://github.com/Textualize/rich/issues/3607
+    from unittest.mock import patch
+
+    try:
+        1 / 0
+    except:
+        tb = sys.exc_info()[2]
+        real_walk_tb = __import__("traceback").walk_tb
+
+        def walk_tb_negative_lasti(tb):
+            for frame, lineno in real_walk_tb(tb):
+                # Replace with a mock frame that has f_lasti = -1
+                from unittest.mock import MagicMock
+
+                mock_frame = MagicMock(wraps=frame)
+                mock_frame.f_lasti = -1
+                mock_frame.f_code = frame.f_code
+                mock_frame.f_locals = frame.f_locals
+                yield mock_frame, lineno
+
+        with patch("rich.traceback.walk_tb", walk_tb_negative_lasti):
+            traceback = Traceback()
+            # Should not raise ValueError from islice()
+            last_instruction = (
+                traceback.trace.stacks[-1].frames[-1].last_instruction
+            )
+            # With negative f_lasti, last_instruction should be None
+            assert last_instruction is None
+
+
+@pytest.mark.skipif(
     sys.version_info.minor < 11, reason="Not supported before Python 3.11"
 )
 def test_notes() -> None:
