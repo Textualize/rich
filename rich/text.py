@@ -326,6 +326,8 @@ class Text(JupyterMixin):
         )
         decoder = AnsiDecoder()
         result = joiner.join(line for line in decoder.decode(text))
+        if text.endswith("\n"):
+            result.append("\n")
         return result
 
     @classmethod
