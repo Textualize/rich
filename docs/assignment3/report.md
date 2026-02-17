@@ -45,7 +45,7 @@ Did it build and run as documented?
 | 80   | 16  | 499   | 3     | 135    | `__rich_console__` @141-275 @ `rich/panel.py` (Panel)  |
 | 52   | 17  | 348   | 9     | 55     | `__call__` @32-86 @ `rich/_log_render.py` (Log render) |
 | 47   | 17  | 379   | 5     | 57     | `justify` @111-167 @ `rich/containers.py` (Containers) |
-| 29   | 17  | 220   | 2     | 59     | `ratio_resolve` @14-72 @ `rich/_ratio.py` (Ratio)      |
+| 29   | 17  | 220   | 2     | 59     | `__rich_console__` @156-198 @ `rich/progress_bar.py` (Progress bar) |
 | 34   | 17  | 213   | 1     | 37     | `stop` @145-181 @ `rich/live.py` (Live)                |
 
 Lizard columns: NLOC = non-comment lines of code, CCN = cyclomatic complexity number, token = tokens, PARAM = parameter count, length = length in lines.
@@ -91,6 +91,28 @@ In @111-167 @ `rich/containers.py`
 
 5. **Is the documentation clear about all the different outcomes?** The docstring explains what the funstion does generally, but leaves out some details. For example, knowledge of overflow modes is assumed, as they are named but not explained. Another thing not documented is that 'full' skips the last line and therefore the last line defaults to the left justification. 
 
+## Function 4: **rich_console** (Progress bar)
+In @156-198 @ `rich/progress_bar.py`
+
+1. **Did the tool and our manual count match?**
+   - Lizard reports cyclomatic complexity 21 for this function. 
+   - Jingze manually counted 21: a base complexity of 1, plus contributions from explicit control flow (if) of 9, and boolean/ternary operators of 11. The counts matched.
+2. **Is the function only complex, or also long?** 
+   
+   It is only complex, not long. The function only has about 40 lines of actual executable code. However, it has a high logic density. Almost every line performs a calculation involving a conditional check or an iteration.
+3. **What does the function do?** 
+   
+   This is the core rendering method for the `ProgressBar` widget. It generates the `Segment` objects (text + style) that the console displays.
+
+   It handles determining the width and mode (ASCII/Unicode) and deciding whether to show a "Pulse" animation (for indeterminate progress) or a standard bar; furthermore, it calculates exactly how many "full bars", "half bars", and "empty spaces" are needed based on the completion percentage, while selecting the correct colors and styles for each part (completed, finished, remaining).
+
+4. **Do we count exceptions (try/except)?** 
+   
+   No. There are no try/except blocks in this function.
+
+5. **Is the documentation clear about all the different outcomes?** 
+
+   The class has a docstring, but this specific method does not. The logic for handling "half bars" and the specific condition for when to draw the "remaining" empty bar (only when color is enabled) is implicit in the code and not explained in documentation.
 
 ## Refactoring
 
