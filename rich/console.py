@@ -2164,7 +2164,13 @@ class Console:
             str: Text read from stdin.
         """
         if prompt:
-            self.print(prompt, markup=markup, emoji=emoji, end="")
+            prompt_end = getattr(prompt, "end", "\n")
+            self.print(
+                prompt,
+                markup=markup,
+                emoji=emoji,
+                end="" if prompt_end == "\n" else prompt_end,
+            )
         if password:
             result = getpass("", stream=stream)
         else:

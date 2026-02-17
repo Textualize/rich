@@ -409,6 +409,39 @@ def test_input_password(monkeypatch, capsys) -> None:
     assert user_input == "bar"
 
 
+def test_input_prompt_end(monkeypatch, capsys) -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3643
+
+    Console.input() should respect the end attribute of a Text prompt.
+    """
+
+    def fake_input(prompt=""):
+        console.file.write(prompt)
+        return "bar"
+
+    monkeypatch.setattr("builtins.input", fake_input)
+    console = Console()
+
+    # String prompt: end="" (default behavior, cursor stays on same line)
+    user_input = console.input(prompt="foo:")
+    assert capsys.readouterr().out == "foo:"
+    assert user_input == "bar"
+
+    # Text prompt with custom end: should use that end value
+    from rich.text import Text
+
+    prompt_text = Text("enter value", end=": ")
+    user_input = console.input(prompt=prompt_text)
+    assert capsys.readouterr().out == "enter value: "
+    assert user_input == "bar"
+
+    # Text prompt with default end ("\n"): should use "" to keep cursor on same line
+    prompt_text_default = Text("enter value")
+    user_input = console.input(prompt=prompt_text_default)
+    assert capsys.readouterr().out == "enter value"
+    assert user_input == "bar"
+
+
 def test_status() -> None:
     console = Console(file=io.StringIO(), force_terminal=True, width=20)
     status = console.status("foo")
