@@ -1,4 +1,5 @@
 import io
+import weakref
 
 from rich.abc import RichRenderable
 from rich.console import Console
@@ -82,3 +83,20 @@ def test_cast_recursive():
     console = Console(file=io.StringIO())
     console.print(A())
     assert console.file.getvalue() == "<B>\n"
+
+
+def test_rich_cast_dead_weakref_proxy():
+    """Regression test for https://github.com/Textualize/rich/issues/3656
+
+    Dead weakref.proxy objects should render via repr() instead of raising.
+    """
+
+    class Obj:
+        pass
+
+    proxy = weakref.proxy(Obj())  # referent is immediately GC'd
+
+    console = Console(file=io.StringIO(), color_system=None)
+    console.print(proxy)
+    output = console.file.getvalue()
+    assert "weakproxy" in output

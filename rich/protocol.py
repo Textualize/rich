@@ -28,15 +28,19 @@ def rich_cast(renderable: object) -> "RenderableType":
     from rich.console import RenderableType
 
     rich_visited_set: Set[type] = set()  # Prevent potential infinite loop
-    while hasattr(renderable, "__rich__") and not isclass(renderable):
-        # Detect object which claim to have all the attributes
-        if hasattr(renderable, _GIBBERISH):
-            return repr(renderable)
-        cast_method = getattr(renderable, "__rich__")
-        renderable = cast_method()
-        renderable_type = type(renderable)
-        if renderable_type in rich_visited_set:
-            break
-        rich_visited_set.add(renderable_type)
+    try:
+        while hasattr(renderable, "__rich__") and not isclass(renderable):
+            # Detect object which claim to have all the attributes
+            if hasattr(renderable, _GIBBERISH):
+                return repr(renderable)
+            cast_method = getattr(renderable, "__rich__")
+            renderable = cast_method()
+            renderable_type = type(renderable)
+            if renderable_type in rich_visited_set:
+                break
+            rich_visited_set.add(renderable_type)
+    except ReferenceError:
+        # Dead weakref.proxy objects raise ReferenceError on attribute access
+        return repr(renderable)
 
     return cast(RenderableType, renderable)
