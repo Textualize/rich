@@ -1127,3 +1127,30 @@ def test_tty_compatible() -> None:
     assert not console.is_terminal
     # Should not have auto-detected
     assert not console.file.called_isatty
+
+
+def test_buffer_cleared_on_unicode_encode_error():
+    """Regression test for https://github.com/Textualize/rich/issues/3907
+
+    When a UnicodeEncodeError occurs during buffer write, the buffer should
+    be cleared so it doesn't cause a second crash during cleanup.
+    """
+
+    class LimitedEncodingFile(io.StringIO):
+        @property
+        def encoding(self):
+            return "ascii"
+
+        def write(self, text):
+            # Raise on non-ASCII characters
+            text.encode("ascii")
+            return super().write(text)
+
+    file = LimitedEncodingFile()
+    console = Console(file=file, force_terminal=True)
+
+    with pytest.raises(UnicodeEncodeError):
+        console.print("Hello \U0001f30d")
+
+    # Buffer should be cleared after the error
+    assert len(console._buffer) == 0

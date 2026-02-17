@@ -2104,6 +2104,7 @@ class Console:
                                         batch.clear()
                             except UnicodeEncodeError as error:
                                 error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
+                                del self._buffer[:]
                                 raise
                     else:
                         text = self._render_buffer(self._buffer[:])
@@ -2111,6 +2112,7 @@ class Console:
                             self.file.write(text)
                         except UnicodeEncodeError as error:
                             error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
+                            del self._buffer[:]
                             raise
 
                     self.file.flush()
