@@ -406,6 +406,32 @@ def test_padding_width():
     assert output == expected
 
 
+def test_table_title_justify_soft_wrap():
+    """Regression test for https://github.com/Textualize/rich/issues/3948
+
+    Table title should respect title_justify when printed with soft_wrap=True.
+    """
+    table = Table(title="The Title", title_justify="center")
+    table.add_column("Column 1")
+    table.add_column("Column 2")
+
+    # Without soft_wrap
+    f1 = io.StringIO()
+    Console(file=f1, width=60, force_terminal=True, color_system=None).print(table)
+    normal_title = f1.getvalue().splitlines()[0]
+
+    # With soft_wrap
+    f2 = io.StringIO()
+    Console(file=f2, width=60, force_terminal=True, color_system=None).print(
+        table, soft_wrap=True
+    )
+    soft_wrap_title = f2.getvalue().splitlines()[0]
+
+    # Both should have centered title (leading spaces)
+    assert normal_title == soft_wrap_title
+    assert normal_title.startswith(" ")
+
+
 if __name__ == "__main__":
     render = render_tables()
     print(render)
