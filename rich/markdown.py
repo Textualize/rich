@@ -556,6 +556,9 @@ class Markdown(JupyterMixin):
         inline_code_theme: str | None = None,
     ) -> None:
         parser = MarkdownIt().enable("strikethrough").enable("table")
+        # Allow all URL schemes (file://, data:, etc.) since Rich renders
+        # to a terminal, not a browser, so there is no XSS risk.
+        parser.validateLink = lambda url: True
         self.markup = markup
         self.parsed = parser.parse(markup)
         self.code_theme = code_theme

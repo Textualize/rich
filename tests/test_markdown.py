@@ -199,6 +199,20 @@ def test_table_with_empty_cells() -> None:
     assert result == expected
 
 
+def test_file_url_hyperlink():
+    """file:// URLs should be recognized as valid hyperlinks."""
+    # https://github.com/Textualize/rich/issues/3786
+    console = Console(
+        width=100, file=io.StringIO(), color_system="truecolor", legacy_windows=False
+    )
+    md = Markdown("[hello](file:///tmp/test)", hyperlinks=True)
+    console.print(md)
+    raw_output = console.file.getvalue()
+    # Must be rendered as an actual OSC 8 hyperlink, not literal text
+    assert "\x1b]8;" in raw_output, "file:// URL not rendered as hyperlink"
+    assert "file:///tmp/test" in raw_output
+
+
 if __name__ == "__main__":
     markdown = Markdown(MARKDOWN)
     rendered = render(markdown)
