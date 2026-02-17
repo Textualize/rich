@@ -1,3 +1,5 @@
+import io
+
 import pytest
 from rich.live_render import LiveRender
 from rich.console import Console, ConsoleDimensions, ConsoleOptions
@@ -43,3 +45,20 @@ def test_rich_console(live_render):
     live_render.style = "red"
     rich_console = live_render.__rich_console__(Console(), options)
     assert [Segment("my string", Style.parse("red"))] == list(rich_console)
+
+
+def test_rich_console_markup_not_leaked():
+    """Markup should work in LiveRender even when options have markup=False."""
+    # https://github.com/Textualize/rich/issues/3751
+    live_render = LiveRender(renderable="[bold]hello[/bold]")
+    console = Console(
+        file=io.StringIO(), force_terminal=True, color_system="truecolor"
+    )
+    # Simulate options from a print(markup=False) call
+    options = console.options.update(markup=False, highlight=False)
+    segments = list(live_render.__rich_console__(console, options))
+    text = "".join(seg.text for seg in segments)
+    # With the fix, markup is reset to console default (None → True),
+    # so "[bold]" is interpreted as markup, not shown literally
+    assert "[bold]" not in text
+    assert "hello" in text

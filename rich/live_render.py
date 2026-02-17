@@ -88,6 +88,9 @@ class LiveRender:
     ) -> RenderResult:
         renderable = self.renderable
         style = console.get_style(self.style)
+        # Reset markup and highlight to console defaults so that transient
+        # settings from print() calls don't leak into the live display.
+        options = options.update(markup=None, highlight=None)
         lines = console.render_lines(renderable, options, style=style, pad=False)
         shape = Segment.get_shape(lines)
 
