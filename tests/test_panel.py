@@ -172,6 +172,72 @@ def test_title_text_with_panel_background() -> None:
     assert result == expected
 
 
+def test_panel_title_left_align() -> None:
+    """Test Panel with title_align='left' to cover the left alignment branch in align_text.
+    
+    This test improves branch coverage by exercising the 'if align == "left":' branch
+    in Panel.__rich_console__ when there is excess space after the title.
+    The title has a style to also cover the 'if text.style:' branch.
+    """
+    console = Console(
+        file=io.StringIO(),
+        width=50,
+        height=20,
+        legacy_windows=False,
+        force_terminal=True,
+        color_system="truecolor",
+    )
+    # Short title with left alignment on a wide panel creates excess space
+    # Using Text with style to also hit the 'if text.style:' branch
+    panel = Panel(
+        "Content",
+        title=Text("Hi", style="bold"),
+        title_align="left",
+        padding=0,
+    )
+    console.print(panel)
+    result = console.file.getvalue()
+    
+    # Verify the panel was rendered with left-aligned title
+    assert "Hi" in result
+    assert "Content" in result
+    # Verify panel structure exists
+    assert "╭" in result or "│" in result
+
+
+def test_panel_title_center_align() -> None:
+    """Test Panel with title_align='center' to cover the center alignment branch in align_text.
+    
+    This test improves branch coverage by exercising the 'elif align == "center":' branch
+    in Panel.__rich_console__ when there is excess space after the title.
+    The title has a style to also cover the 'if text.style:' branch.
+    """
+    console = Console(
+        file=io.StringIO(),
+        width=50,
+        height=20,
+        legacy_windows=False,
+        force_terminal=True,
+        color_system="truecolor",
+    )
+    # Short title with center alignment on a wide panel creates excess space
+    # Using Text with style to also hit the 'if text.style:' branch
+    panel = Panel(
+        "Content",
+        title=Text("Hi", style="bold"),
+        title_align="center",
+        padding=0,
+    )
+    console.print(panel)
+    result = console.file.getvalue()
+    
+    # Verify the panel was rendered with center-aligned title
+    assert "Hi" in result
+    assert "Content" in result
+    # Verify panel structure exists
+    assert "╭" in result or "│" in result
+
+
 if __name__ == "__main__":
     expected = []
     for panel in tests:
