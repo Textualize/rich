@@ -555,7 +555,12 @@ class Markdown(JupyterMixin):
         inline_code_lexer: str | None = None,
         inline_code_theme: str | None = None,
     ) -> None:
-        parser = MarkdownIt().enable("strikethrough").enable("table")
+        parser = (
+            MarkdownIt()
+            .enable("strikethrough")
+            .enable("table")
+            .disable("html_inline")
+        )
         self.markup = markup
         self.parsed = parser.parse(markup)
         self.code_theme = code_theme

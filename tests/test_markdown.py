@@ -199,6 +199,17 @@ def test_table_with_empty_cells() -> None:
     assert result == expected
 
 
+def test_angle_brackets_not_swallowed():
+    """Regression test for https://github.com/Textualize/rich/issues/3565
+
+    Text that looks like HTML tags (e.g. 0<foo or foo>10) should not be
+    silently dropped.
+    """
+    md = Markdown("Do something if 0<foo or foo>10")
+    output = render(md)
+    assert "0<foo or foo>10" in output
+
+
 if __name__ == "__main__":
     markdown = Markdown(MARKDOWN)
     rendered = render(markdown)
