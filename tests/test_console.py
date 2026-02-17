@@ -1127,3 +1127,24 @@ def test_tty_compatible() -> None:
     assert not console.is_terminal
     # Should not have auto-detected
     assert not console.file.called_isatty
+
+
+def test_print_empty_with_end():
+    """Regression test for https://github.com/Textualize/rich/issues/3701
+
+    console.print(end="!") should output "!" like Python's print(end="!").
+    """
+    # print(end="!") should output just "!"
+    file = io.StringIO()
+    Console(file=file, color_system=None).print(end="!")
+    assert file.getvalue() == "!"
+
+    # print() should output just "\n"
+    file = io.StringIO()
+    Console(file=file, color_system=None).print()
+    assert file.getvalue() == "\n"
+
+    # print(end="") should output nothing
+    file = io.StringIO()
+    Console(file=file, color_system=None).print(end="")
+    assert file.getvalue() == ""
