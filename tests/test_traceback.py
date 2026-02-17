@@ -397,3 +397,23 @@ def test_recursive_exception() -> None:
             console.print_exception(show_locals=True)
 
     bar()
+
+
+@pytest.mark.skipif(
+    sys.version_info.minor < 11, reason="Not supported before Python 3.11"
+)
+def test_notes_chained_exceptions() -> None:
+    """Check notes are only shown on the exception that has them, not all in the chain."""
+    try:
+        try:
+            raise ValueError("original error")
+        except ValueError as ve:
+            raise RuntimeError("wrapped error") from ve
+    except RuntimeError as error:
+        error.add_note("Note on RuntimeError only")
+        traceback = Traceback()
+
+        # The outermost exception (RuntimeError) is first in stacks
+        assert traceback.trace.stacks[0].notes == ["Note on RuntimeError only"]
+        # The inner exception (ValueError) should have no notes
+        assert traceback.trace.stacks[1].notes == []
