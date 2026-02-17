@@ -204,3 +204,19 @@ def test_non_printable():
     for ordinal in range(31):
         character = chr(ordinal)
         assert cell_len(character) == 0
+
+
+def test_split_graphemes_ansi_escape():
+    """Regression test for https://github.com/Textualize/rich/issues/3958
+
+    ANSI escape characters (\\x1b) have cell width 0 and caused an infinite
+    loop in split_graphemes when they appeared before any measured character.
+    """
+    spans, cell_length = split_graphemes("\x1bHello")
+    assert cell_length == 5
+
+    spans, cell_length = split_graphemes("\x1b")
+    assert cell_length == 0
+
+    spans, cell_length = split_graphemes("\x1b[31mHello\x1b[0m")
+    assert cell_length > 0

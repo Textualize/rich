@@ -197,6 +197,9 @@ def split_graphemes(
                         cell_length += 1
                         total_width += 1
                     spans[-1] = (start, index, cell_length)
+            else:
+                # variation selector with no preceding character, skip
+                index += 1
             continue
 
         if character_width := get_character_cell_size(character, unicode_version):
@@ -207,6 +210,9 @@ def split_graphemes(
             # zero width characters are associated with the previous character
             start, _end, cell_length = spans[-1]
             spans[-1] = (start, index := index + 1, cell_length)
+        else:
+            # zero width character with no preceding span, just skip it
+            index += 1
 
     return (spans, total_width)
 
