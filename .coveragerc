@@ -1,5 +1,9 @@
 [run]
-omit = rich/jupyter.py
+branch = True
+source =
+    rich
+omit =
+    rich/jupyter.py
     rich/_windows.py
     rich/_timer.py
     rich/diagnose.py

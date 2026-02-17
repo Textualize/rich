@@ -91,6 +91,20 @@ def test_get_pulse_segments():
     ]
     assert segments == expected
 
+def test_coverage_gap_no_color():
+    console = Console(file=open("os.devnull", "w"), no_color=True)
+    bar = ProgressBar(total=100, completed=50)
+    
+    segments = list(bar.__rich_console__(console, console.options))
+    
+    assert len(segments) > 0
+
+def test_coverage_gap_zero_remaining():
+    console = Console(file=open("os.devnull", "w"), force_terminal=True)
+    
+    bar = ProgressBar(total=100, completed=90, width=10)
+    
+    list(bar.__rich_console__(console, console.options))
 
 if __name__ == "__main__":
     bar = ProgressBar(completed=11, width=50)
