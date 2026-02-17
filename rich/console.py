@@ -741,11 +741,23 @@ class Console:
                 elif tty_interactive == "1":
                     force_interactive = True
 
-        self.is_interactive = (
-            (self.is_terminal and not self.is_dumb_terminal)
-            if force_interactive is None
-            else force_interactive
-        )
+        if force_interactive is not None:
+            self.is_interactive = force_interactive
+        else:
+            # FORCE_COLOR enables color output but does not imply interactive
+            # terminal capability (cursor movement, etc). When is_terminal is
+            # True only because of FORCE_COLOR, is_interactive should be False.
+            _force_color_only = (
+                self._force_terminal is None
+                and self._environ.get("TTY_COMPATIBLE") is None
+                and self._environ.get("FORCE_COLOR") is not None
+                and self._environ.get("FORCE_COLOR") != ""
+            )
+            self.is_interactive = (
+                self.is_terminal
+                and not self.is_dumb_terminal
+                and not _force_color_only
+            )
 
         self._record_buffer_lock = threading.RLock()
         self._thread_locals = ConsoleThreadLocals(

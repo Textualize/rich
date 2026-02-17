@@ -1063,6 +1063,22 @@ def test_tty_interactive() -> None:
     assert not console.is_interactive
 
 
+def test_force_color_not_interactive() -> None:
+    """FORCE_COLOR should enable colors but not interactivity."""
+    # https://github.com/Textualize/rich/issues/3632
+    console = Console(file=io.BytesIO(), _environ={"FORCE_COLOR": "1"})
+    assert console.is_terminal  # colors enabled
+    assert not console.is_interactive  # but not interactive
+    assert console.color_system is not None
+
+    # TTY_COMPATIBLE + FORCE_COLOR should still be interactive
+    console2 = Console(
+        file=io.BytesIO(),
+        _environ={"FORCE_COLOR": "1", "TTY_COMPATIBLE": "1"},
+    )
+    assert console2.is_interactive
+
+
 def test_tty_compatible() -> None:
     """Check TTY_COMPATIBLE environment var."""
 
