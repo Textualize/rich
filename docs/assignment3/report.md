@@ -74,6 +74,31 @@ In @141-275 @ `rich/panel.py`
 
 5. **Is the documentation clear about all the different outcomes?** The inner helper `align_text` has a short docstring that explains its role. The main function does not have a docstring that lists every branch (for example, all three alignment options or when the title or subtitle are present or missing). To understand all possible outcomes, we had to read the code. So the docs help a bit, but they are not enough on their own for someone who wants to see every path the code can take.
 
+## Function 4: **ratio_resolve** (Ratio)
+In @14-72 @ `rich/_ratio.py`
+
+1. **Did the tool and our manual count match?**
+   - Lizard reports cyclomatic complexity 17 for this function. 
+   - Jingze manually counted 17: a base complexity of 1, plus contributions from explicit control flow (while, if, and for loops) of 5, comprehensions/generators of 6, and boolean/ternary operators of 5. The counts matched.
+2. **Is the function only complex, or also long?** 
+   
+   It is only complex, not long. The function only has about 25 lines of actual executable code. However, it has a high logic density. Almost every line performs a calculation involving a conditional check or an iteration.
+3. **What does the function do?** 
+   
+   The function implements a layout resolution algorithm. Its purpose is to divide the `total` space among a list of `Edge` objects.
+
+   It handles complex constraints: some edges have fixed sizes, some have minimum sizes, and others expand based on ratios. The algorithm iterates to resolve flexible edges, ensuring that if an edge shrinks below its minimum, it gets locked to that minimum, triggering a recalculation of the remaining space.
+
+4. **Do we count exceptions (try/except)?** 
+   
+   No. There are no try/except blocks in this function.
+
+5. **Is the documentation clear about all the different outcomes?** 
+
+   The docstring is clear about the goal and the primary edge case (where the sum of minimums exceeds the total).
+
+   However, it doesn’t explain what happens inside the loop. it doesn’t explain how the ratio-based sizes are turned into whole numbers, or how the function deals with rounding in the final step (via `Fraction` and a carried `remainder` in the final pass). One must read the code to understand these specific behaviors.
+
 ## Refactoring
 
 Plan for refactoring complex code:
