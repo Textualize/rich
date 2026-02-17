@@ -627,6 +627,19 @@ def test_wrap_multi_codepoint():
     ]
 
 
+def test_wrap_no_break_space():
+    """NO-BREAK SPACE (U+00A0) should not be treated as a word break."""
+    # https://github.com/Textualize/rich/issues/3545
+    # When the NBSP word fits, it stays on one line
+    text = Text("hello\u00a0world foo")
+    lines = text.wrap(Console(), 12)
+    assert lines[0].plain.startswith("hello\xa0world")
+    # When it doesn't fit on the line, it should NOT break at the NBSP.
+    # Instead it folds mid-word, keeping NBSP inside the word.
+    lines2 = text.wrap(Console(), 8)
+    assert "hello\xa0wo" in lines2[0].plain
+
+
 def test_wrap_long_words_justify_left():
     text = Text("X 123456789", justify="left")
     lines = text.wrap(Console(), 4)

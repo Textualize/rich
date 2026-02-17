@@ -6,7 +6,7 @@ from typing import Iterable
 from ._loop import loop_last
 from .cells import cell_len, chop_cells
 
-re_word = re.compile(r"\s*\S+\s*")
+re_word = re.compile(r"[^\S\xa0]*[\S\xa0]+[^\S\xa0]*")
 
 
 def words(text: str) -> Iterable[tuple[int, int, str]]:
