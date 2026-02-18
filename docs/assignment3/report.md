@@ -40,13 +40,13 @@ Did it build and run as documented?
 
 **Five functions chosen (from lizard Warnings; core library only, excluding third-party/generated):** We chose the **five with the lowest CCN** that still triggered a lizard Warning (CCN > 15 or length > 1000), so that manual cyclomatic complexity count, DIY branch instrumentation, and coverage improvement are easier to verify by hand for this assignment.
 
-| NLOC | CCN | token | PARAM | length | location                                               |
-| ---- | --- | ----- | ----- | ------ | ------------------------------------------------------ |
-| 80   | 16  | 499   | 3     | 135    | `__rich_console__` @141-275 @ `rich/panel.py` (Panel)  |
-| 52   | 17  | 348   | 9     | 55     | `__call__` @32-86 @ `rich/_log_render.py` (Log render) |
-| 47   | 17  | 379   | 5     | 57     | `justify` @111-167 @ `rich/containers.py` (Containers) |
+| NLOC | CCN | token | PARAM | length | location                                                            |
+| ---- | --- | ----- | ----- | ------ | ------------------------------------------------------------------- |
+| 80   | 16  | 499   | 3     | 135    | `__rich_console__` @141-275 @ `rich/panel.py` (Panel)               |
+| 52   | 17  | 348   | 9     | 55     | `__call__` @32-86 @ `rich/_log_render.py` (Log render)              |
+| 47   | 17  | 379   | 5     | 57     | `justify` @111-167 @ `rich/containers.py` (Containers)              |
 | 29   | 17  | 220   | 2     | 59     | `__rich_console__` @156-198 @ `rich/progress_bar.py` (Progress bar) |
-| 34   | 17  | 213   | 1     | 37     | `stop` @145-181 @ `rich/live.py` (Live)                |
+| 34   | 17  | 213   | 1     | 37     | `stop` @145-181 @ `rich/live.py` (Live)                             |
 
 Lizard columns: NLOC = non-comment lines of code, CCN = cyclomatic complexity number, token = tokens, PARAM = parameter count, length = length in lines.
 
@@ -74,7 +74,6 @@ In @141-275 @ `rich/panel.py`
 
 5. **Is the documentation clear about all the different outcomes?** The inner helper `align_text` has a short docstring that explains its role. The main function does not have a docstring that lists every branch (for example, all three alignment options or when the title or subtitle are present or missing). To understand all possible outcomes, we had to read the code. So the docs help a bit, but they are not enough on their own for someone who wants to see every path the code can take.
 
-
 ## Function 3: **justify** (Containers)
 
 In @111-167 @ `rich/containers.py`
@@ -85,32 +84,34 @@ In @111-167 @ `rich/containers.py`
 
 2. **Is the function only complex, or also long?** It is more complex than long. The function is 47 non-comment lines (57 lines in total in the file). The complexity (17) comes from many branches responsinble for justification: the nature of justification gives us four branches to begin with: left, right, center and full. Full justification has more branches as it's correctness depends on spaces in the text. The code is not very long, but it has a lot of decision points.
 
-3. **What does the function do?** This function justifies and overflows text according to a given width. It uses one of four alignment strategies: left, right, center or full. 
+3. **What does the function do?** This function justifies and overflows text according to a given width. It uses one of four alignment strategies: left, right, center or full.
 
 4. **Do we count exceptions (try/except)?** In this function there are no try/except blocks. So when we count branches, we only count if/else and similar. The tool (lizard) and our manual count therefore agree, we did not have to decide how to count exception handlers here.
 
-5. **Is the documentation clear about all the different outcomes?** The docstring explains what the funstion does generally, but leaves out some details. For example, knowledge of overflow modes is assumed, as they are named but not explained. Another thing not documented is that 'full' skips the last line and therefore the last line defaults to the left justification. 
+5. **Is the documentation clear about all the different outcomes?** The docstring explains what the funstion does generally, but leaves out some details. For example, knowledge of overflow modes is assumed, as they are named but not explained. Another thing not documented is that 'full' skips the last line and therefore the last line defaults to the left justification.
 
 ## Function 4: **rich_console** (Progress bar)
+
 In @156-198 @ `rich/progress_bar.py`
 
 1. **Did the tool and our manual count match?**
-   - Lizard reports cyclomatic complexity 21 for this function. 
+   - Lizard reports cyclomatic complexity 21 for this function.
    - Jingze manually counted 21: a base complexity of 1, plus contributions from explicit control flow (if) of 9, and boolean/ternary operators of 11. The counts matched.
-2. **Is the function only complex, or also long?** 
-   
+2. **Is the function only complex, or also long?**
+
    It is only complex, not long. The function only has about 40 lines of actual executable code. However, it has a high logic density. Almost every line performs a calculation involving a conditional check or an iteration.
-3. **What does the function do?** 
-   
+
+3. **What does the function do?**
+
    This is the core rendering method for the `ProgressBar` widget. It generates the `Segment` objects (text + style) that the console displays.
 
    It handles determining the width and mode (ASCII/Unicode) and deciding whether to show a "Pulse" animation (for indeterminate progress) or a standard bar; furthermore, it calculates exactly how many "full bars", "half bars", and "empty spaces" are needed based on the completion percentage, while selecting the correct colors and styles for each part (completed, finished, remaining).
 
-4. **Do we count exceptions (try/except)?** 
-   
+4. **Do we count exceptions (try/except)?**
+
    No. There are no try/except blocks in this function.
 
-5. **Is the documentation clear about all the different outcomes?** 
+5. **Is the documentation clear about all the different outcomes?**
 
    The class has a docstring, but this specific method does not. The logic for handling "half bars" and the specific condition for when to draw the "remaining" empty bar (only when color is enabled) is implicit in the code and not explained in documentation.
 
@@ -132,7 +133,7 @@ This strategy is quite obvious with this function. Justification has 4 modes and
 
 **Function 4 (ProgressBar `__rich_console__`):** Extract character selection, calculation, and rendering logic.
 
- Currently, the function mixes configuration (ASCII checks), business logic (width and progress calculation), and presentation (yielding segments) in one large block. Extracting these into 3 separate private methods (`_get_bar_characters`, `_calculate_bar_dimensions`, `_generate_segments`) will reduce the main function's cyclomatic complexity from to ~4. Most of the remaining complexity will be in `_generate_segments` because it contains lots of `if`, but it should stay at a reasonable level (under 10).
+Currently, the function mixes configuration (ASCII checks), business logic (width and progress calculation), and presentation (yielding segments) in one large block. Extracting these into 3 separate private methods (`_get_bar_characters`, `_calculate_bar_dimensions`, `_generate_segments`) will reduce the main function's cyclomatic complexity from to ~4. Most of the remaining complexity will be in `_generate_segments` because it contains lots of `if`, but it should stay at a reasonable level (under 10).
 
 Estimated impact of refactoring (lower CC, but other drawbacks?): Significantly lower CC in the main method. Possible drawbacks: increases the total number of methods in the class; requires passing multiple arguments (state) between the new private methods.
 
@@ -186,13 +187,7 @@ Number of test cases added: two per team member (P) or at least four (P+).
 
 ## Self-assessment: Way of working
 
-Current state according to the Essence standard: ...
-
-Was the self-assessment unanimous? Any doubts about certain items?
-
-How have you improved so far?
-
-Where is potential for improvement?
+Current state according to the Essence standard: **In Use**, all checklist items are met (practices and tools used for real work, regularly inspected, adapted to context, supported by the team, feedback procedures in place, and they support communication). We improved since the first assignment; the second assignment had the best coordination. For this third assignment, the tight time frame made it harder to coordinate and split tasks, so better upfront planning is our main area for improvement.
 
 ## Overall experience
 
