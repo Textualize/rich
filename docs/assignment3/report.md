@@ -203,6 +203,20 @@ The results are largely consistent with `coverage.py`’s branch coverage output
 
 **After (coverage.py):** `justify` **98%**, or **100%** based on diy-coverage tool. File total: **99%** (up from 98%). 
 
+### Function 4: Progress Bar `rich_console` (Jingze)
+
+**Before (baseline):** `rich_console` 86% branch coverage.  DIY: 12/14 branches covered (86%), 2 missed.
+
+**Tests added:**
+
+[Test file](https://github.com/DD2480-2026-Group-8/rich-Assignment-3/blob/master/tests/test_bar.py).
+
+- `test_coverage_gap_no_color` — Renders the progress bar on a console initialised with no_color=True to ensure the non-color branch is executed.
+
+- `test_coverage_gap_zero_remaining` — Renders the progress bar with specific dimensions (width 10, 90% complete) to trigger the edge case where `remaining_bars` becomes zero during rendering.
+
+**After:** `rich_console` **100%** both on coverage.py and diy-coverage tool. 
+
 Number of test cases added: two per team member (P) or at least four (P+).
 
 ## Self-assessment: Way of working
