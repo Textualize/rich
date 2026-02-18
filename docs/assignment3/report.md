@@ -151,7 +151,7 @@ This strategy is quite obvious with this function. Justification has 4 modes and
 
 Currently, the function mixes configuration (ASCII checks), business logic (width and progress calculation), and presentation (yielding segments) in one large block. Extracting these into 3 separate private methods (`_get_bar_characters`, `_calculate_bar_dimensions`, `_generate_segments`) will reduce the main function's cyclomatic complexity from to ~4. Most of the remaining complexity will be in `_generate_segments` because it contains lots of `if`, but it should stay at a reasonable level (under 10).
 
-**Estimated impact of refactoring** (lower CC, but other drawbacks?): Significantly lower CC in the main method. Possible drawbacks: increases the total number of methods in the class; requires passing multiple arguments (state) between the new private methods.
+Estimated impact of refactoring (lower CC, but other drawbacks?): Significantly lower CC in the main method. Possible drawbacks: increases the total number of methods in the class; requires passing multiple arguments (state) between the new private methods.
 
 **Function 5 (`divide_line`):** Split the long-word handling into two smaller helpers.
 
