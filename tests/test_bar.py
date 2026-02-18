@@ -1,3 +1,4 @@
+import io
 from rich.console import Console
 from rich.progress_bar import ProgressBar
 from rich.segment import Segment
@@ -92,19 +93,22 @@ def test_get_pulse_segments():
     assert segments == expected
 
 def test_coverage_gap_no_color():
-    console = Console(file=open("os.devnull", "w"), no_color=True)
-    bar = ProgressBar(total=100, completed=50)
+    console = Console(file=io.StringIO(), no_color=True)
+    bar = ProgressBar(total=100, completed=50, width=10)
     
     segments = list(bar.__rich_console__(console, console.options))
-    
-    assert len(segments) > 0
+    text_content = "".join(seg.text for seg in segments)
+    assert len(text_content) == 5
 
 def test_coverage_gap_zero_remaining():
-    console = Console(file=open("os.devnull", "w"), force_terminal=True)
+    console = Console(file=io.StringIO(), force_terminal=True, legacy_windows=False, _environ={})
     
     bar = ProgressBar(total=100, completed=90, width=10)
     
-    list(bar.__rich_console__(console, console.options))
+    segments = list(bar.__rich_console__(console, console.options))
+    text_content = "".join(seg.text for seg in segments)
+    assert text_content == "━━━━━━━━━╺"
+
 
 if __name__ == "__main__":
     bar = ProgressBar(completed=11, width=50)
