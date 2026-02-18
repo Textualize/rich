@@ -129,7 +129,7 @@ The inner function `align_text` (left/center/right and the `if excess_space` / `
 
 This strategy is quite obvious with this function. Justification has 4 modes and all of them are performed in one function right now. Extracting these branches into 4 separate methods (`_justify_left`, `_justify_right`, `_justify_center` `_justify_full`) will leave us with cyclomatic complexity of ~5. `_justify_full` will still be the most complex, but its CCN should be under 10.
 
-**Estimated impact of refactoring** (lower CC, but other drawbacks?): **Lower CC** in the main method. **Possible drawbacks:** four extra method to maintain; behaviour unchanged.
+**Estimated impact of refactoring** (lower CC, but other drawbacks?): **Lower CC** in the main method. **Possible drawbacks:** four extra method to maintain; new tests needed, behaviour unchanged.
 
 **Function 4 (ProgressBar `__rich_console__`):** Extract character selection, calculation, and rendering logic.
 
@@ -188,6 +188,20 @@ The results are largely consistent with `coverage.py`’s branch coverage output
 - `test_panel_title_center_align` — Panel with `title_align="center"` and styled title. Covers the `"center"` branch and `if text.style:`.
 
 **After (coverage.py):** `__rich_console__` **100%**, `align_text` **81%** (75% branch). File total: **97%** (up from 71%). Remaining gap in `align_text`: "no excess space" and "other alignment" edge cases.
+
+
+### Function 3: Containers `justify` (Anna)
+
+**Before (baseline):** `justify` 97% total (92% branch). DIY: 11/13 branches covered (84.6%), 2 missed (no spaces and text is smaller than width).
+
+**Tests added:**
+
+[Test file](https://github.com/DD2480-2026-Group-8/rich-Assignment-3/blob/master/tests/test_containers.py).
+
+- `test_justify_full_no_spaces` — Justifies text with no space with `justify="full"`.
+- `test_justify_text_shorter_than_width` — Justifies text with `justify="full"` with given width higher than the width of text, extra padding added.
+
+**After (coverage.py):** `justify` **98%**, or **100%** based on diy-coverage tool. File total: **99%** (up from 98%). 
 
 Number of test cases added: two per team member (P) or at least four (P+).
 
