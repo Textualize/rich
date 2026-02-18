@@ -145,31 +145,35 @@ git diff ...
 
 ### Tools
 
-Document your experience in using a "new"/different coverage tool.
+We used **coverage.py** as our coverage tool to measure branch coverage.
 
-How well was the tool documented? Was it possible/easy/difficult to
-integrate it with your build environment?
+The tool is well documented: the official docs clearly explain common workflows (running tests under coverage, generating terminal/HTML reports, enabling branch coverage, and configuration via `.coveragerc`). Integration with our build environment was straightforward. We installed it in our Python virtual environment, ran the test suite with `coverage run --branch -m pytest`, and generated reports with `coverage html`.
+
 
 ### Your own coverage tool
 
-Show a patch (or link to a branch) that shows the instrumented code to
-gather coverage measurements.
-
-The patch is probably too long to be copied here, so please add
-the git command that is used to obtain the patch instead:
-
-git diff ...
+Git command: `git diff diy-coverage -- rich/panel.py rich/_log_render.py rich/containers.py rich/progress_bar.py rich/live.py`
 
 What kinds of constructs does your tool support, and how accurate is
 its output?
+
+Our tool measures **branch coverage** at the function level. It instruments and tracks all explicit control-flow structures such as `if–else` statements and loop branches. However, it does not currently account for ternary operators.
+
+The tool correctly identifies all major `if–else` paths in the selected functions. Based on manual inspection and comparison with our expected branch structure, we cconsider its output accurate for explicit branching logic.
 
 ### Evaluation
 
 1. How detailed is your coverage measurement?
 
+Our coverage measurement is branch-based at the function level. For each selected function, we manually identified all explicit branches (mainly `if–else` statements and loop entries) and instrumented them individually. The tool records how many times each branch is executed, allowing us to determine whether a branch is covered or missed.
+
 2. What are the limitations of your own tool?
 
+The main limitation is that the tool only supports explicit control-flow constructs such as `if–else` statements and loops. It does not detect implicit branches introduced by ternary operators. Additionally, the instrumentation is manual and limited to selected functions, so it does not scale well to large codebases. The reporting format is also relatively simple compared to professional coverage tools.
+
 3. Are the results of your tool consistent with existing coverage tools?
+
+The results are largely consistent with `coverage.py`’s branch coverage output. The number of covered and missed `if–else` branches matches our manual expectations.
 
 ## Coverage improvement
 
