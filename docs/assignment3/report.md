@@ -149,7 +149,6 @@ We used **coverage.py** as our coverage tool to measure branch coverage.
 
 The tool is well documented: the official docs clearly explain common workflows (running tests under coverage, generating terminal/HTML reports, enabling branch coverage, and configuration via `.coveragerc`). Integration with our build environment was straightforward. We installed it in our Python virtual environment, ran the test suite with `coverage run --branch -m pytest`, and generated reports with `coverage html`.
 
-
 ### Your own coverage tool
 
 Git command: `git diff diy-coverage -- rich/panel.py rich/_log_render.py rich/containers.py rich/progress_bar.py rich/live.py`
@@ -177,15 +176,18 @@ The results are largely consistent with `coverage.py`’s branch coverage output
 
 ## Coverage improvement
 
-Show the comments that describe the requirements for the coverage.
+### Function 1: Panel `__rich_console__` (Filip)
 
-Report of old coverage: [link]
+**Before (baseline):** `__rich_console__` 78% total (57% branch), `align_text` 62% total (50% branch). DIY: 11/14 branches covered (78.6%), 3 missed (`align == "left"`, other alignment, no excess space).
 
-Report of new coverage: [link]
+**Tests added:**
 
-Test cases added:
+[Test file](https://github.com/DD2480-2026-Group-8/rich-Assignment-3/blob/master/tests/test_panel.py).
 
-git diff ...
+- `test_panel_title_left_align` — Panel with `title_align="left"` and styled title. Covers the `"left"` branch and `if text.style:`.
+- `test_panel_title_center_align` — Panel with `title_align="center"` and styled title. Covers the `"center"` branch and `if text.style:`.
+
+**After (coverage.py):** `__rich_console__` **100%**, `align_text` **81%** (75% branch). File total: **97%** (up from 71%). Remaining gap in `align_text`: "no excess space" and "other alignment" edge cases.
 
 Number of test cases added: two per team member (P) or at least four (P+).
 
