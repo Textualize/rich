@@ -187,8 +187,10 @@ The results are largely consistent with `coverage.py`’s branch coverage output
 - `test_panel_title_left_align` — Panel with `title_align="left"` and styled title. Covers the `"left"` branch and `if text.style:`.
 - `test_panel_title_center_align` — Panel with `title_align="center"` and styled title. Covers the `"center"` branch and `if text.style:`.
 
-**After (coverage.py):** `__rich_console__` **100%**, `align_text` **81%** (75% branch). File total: **97%** (up from 71%). Remaining gap in `align_text`: "no excess space" and "other alignment" edge cases.
+**After (coverage.py):** `__rich_console__` **100%**, `align_text` **81%** (75% branch). File total: **97%** (up from 71%).
+**After (DIY):** 12/14 branches covered (**85.7%**), 2 still missed (other alignment, no excess space).
 
+Note: coverage.py treats `align_text` as a separate function, so `__rich_console__` shows 100%. Our DIY tool counts all 14 branches (including those inside `align_text`) together, so the 2 missed branches from `align_text` bring the DIY total to 85.7%. The missed branches are the same in both tools.
 
 ### Function 3: Containers `justify` (Anna)
 
@@ -201,11 +203,11 @@ The results are largely consistent with `coverage.py`’s branch coverage output
 - `test_justify_full_no_spaces` — Justifies text with no space with `justify="full"`.
 - `test_justify_text_shorter_than_width` — Justifies text with `justify="full"` with given width higher than the width of text, extra padding added.
 
-**After (coverage.py):** `justify` **98%**, or **100%** based on diy-coverage tool. File total: **99%** (up from 98%). 
+**After (coverage.py):** `justify` **98%**, or **100%** based on diy-coverage tool. File total: **99%** (up from 98%).
 
 ### Function 4: Progress Bar `rich_console` (Jingze)
 
-**Before (baseline):** `rich_console` 86% branch coverage.  DIY: 12/14 branches covered (86%), 2 missed.
+**Before (baseline):** `rich_console` 86% branch coverage. DIY: 12/14 branches covered (86%), 2 missed.
 
 **Tests added:**
 
@@ -215,7 +217,7 @@ The results are largely consistent with `coverage.py`’s branch coverage output
 
 - `test_coverage_gap_zero_remaining` — Renders the progress bar with specific dimensions (width 10, 90% complete) to trigger the edge case where `remaining_bars` becomes zero during rendering.
 
-**After:** `rich_console` **100%** both on coverage.py and diy-coverage tool. 
+**After:** `rich_console` **100%** both on coverage.py and diy-coverage tool.
 
 Number of test cases added: two per team member (P) or at least four (P+).
 
