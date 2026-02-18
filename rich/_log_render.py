@@ -150,7 +150,7 @@ class LogRender:
         return output
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":  
     from rich.console import Console
 
     c = Console()

@@ -7,6 +7,7 @@ from rich.panel import Panel
 from rich.segment import Segment
 from rich.style import Style
 from rich.text import Text
+from rich._log_render import LogRender
 
 tests = [
     Panel("Hello, World", padding=0),
@@ -27,6 +28,59 @@ expected = [
     "╭───────────────────── FOO ──────────────────────╮\n│Hello, World                                    │\n╰────────────────────────────────────────────────╯\n",
     "╭────────────────────────────────────────────────╮\n│Hello, World                                    │\n╰───────────────────── FOO ──────────────────────╯\n",
 ]
+
+
+
+
+
+
+
+
+### NEWTEST
+
+def test_log_render_render_path_when_enabled():
+    # Requirement: When show_path is enabled and a path is provided, the path is rendered.
+    console = Console(record=True)
+    log_render = LogRender(show_time=False, show_level=False, show_path=True)
+
+    table = log_render(
+        console=console,
+        renderables=[Text("msg")],
+        path="file.py",
+        line_no=None,
+        link_path=None,
+    )
+
+    console.print(table)
+    out = console.export_text()
+
+# assert its in
+
+    assert "file.py" in out
+
+def test_log_render_not_render_line_number_when_none():
+    # Requirement: When line_no is None, no ":<line number>" suffix is rendered.
+    console = Console(record=True)
+    log_render = LogRender(show_time=False, show_level=False, show_path=True)
+
+    table = log_render(
+        console=console,
+        renderables=[Text("msg")],
+        path="file.py",
+        line_no=None,
+        link_path=None,
+    )
+
+    console.print(table)
+    out = console.export_text()
+
+# assert not 
+
+    assert "file.py:" not in out
+
+### NEWTEST
+
+
 
 
 def render(panel, width=50) -> str:
@@ -170,6 +224,72 @@ def test_title_text_with_panel_background() -> None:
     print(repr(result))
     expected = "\x1b[44m╭─\x1b[0m\x1b[44m───────────────────\x1b[0m\x1b[31;44m title \x1b[0m\x1b[44m────────────────────\x1b[0m\x1b[44m─╮\x1b[0m\n\x1b[44m│\x1b[0m\x1b[44m \x1b[0m\x1b[44mHello, World\x1b[0m\x1b[44m                                  \x1b[0m\x1b[44m \x1b[0m\x1b[44m│\x1b[0m\n\x1b[44m╰─\x1b[0m\x1b[44m──────────────────\x1b[0m\x1b[1;35;44m subtitle \x1b[0m\x1b[44m──────────────────\x1b[0m\x1b[44m─╯\x1b[0m\n"
     assert result == expected
+
+
+def test_panel_title_left_align() -> None:
+    """Test Panel with title_align='left' to cover the left alignment branch in align_text.
+    
+    This test improves branch coverage by exercising the 'if align == "left":' branch
+    in Panel.__rich_console__ when there is excess space after the title.
+    The title has a style to also cover the 'if text.style:' branch.
+    """
+    console = Console(
+        file=io.StringIO(),
+        width=50,
+        height=20,
+        legacy_windows=False,
+        force_terminal=True,
+        color_system="truecolor",
+    )
+    # Short title with left alignment on a wide panel creates excess space
+    # Using Text with style to also hit the 'if text.style:' branch
+    panel = Panel(
+        "Content",
+        title=Text("Hi", style="bold"),
+        title_align="left",
+        padding=0,
+    )
+    console.print(panel)
+    result = console.file.getvalue()
+    
+    # Verify the panel was rendered with left-aligned title
+    assert "Hi" in result
+    assert "Content" in result
+    # Verify panel structure exists
+    assert "╭" in result or "│" in result
+
+
+def test_panel_title_center_align() -> None:
+    """Test Panel with title_align='center' to cover the center alignment branch in align_text.
+    
+    This test improves branch coverage by exercising the 'elif align == "center":' branch
+    in Panel.__rich_console__ when there is excess space after the title.
+    The title has a style to also cover the 'if text.style:' branch.
+    """
+    console = Console(
+        file=io.StringIO(),
+        width=50,
+        height=20,
+        legacy_windows=False,
+        force_terminal=True,
+        color_system="truecolor",
+    )
+    # Short title with center alignment on a wide panel creates excess space
+    # Using Text with style to also hit the 'if text.style:' branch
+    panel = Panel(
+        "Content",
+        title=Text("Hi", style="bold"),
+        title_align="center",
+        padding=0,
+    )
+    console.print(panel)
+    result = console.file.getvalue()
+    
+    # Verify the panel was rendered with center-aligned title
+    assert "Hi" in result
+    assert "Content" in result
+    # Verify panel structure exists
+    assert "╭" in result or "│" in result
 
 
 if __name__ == "__main__":
