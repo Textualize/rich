@@ -187,7 +187,7 @@ def split_graphemes(
             if character == "\u200d":
                 # zero width joiner
                 index += 1
-                if index != codepoint_count:
+                if index < codepoint_count:
                     index += 1
                 if spans:
                     start, _end, cell_length = spans[-1]
