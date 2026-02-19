@@ -99,14 +99,19 @@ def _cell_len(text: str, unicode_version: str) -> int:
 def split_graphemes(
     text: str, unicode_version: str = "auto"
 ) -> "tuple[list[CellSpan], int]":
-    """Divide text into spans that define a single grapheme.
+    """Divide text into spans that define a single grapheme, and additionally return the cell length of the whole string.
+
+    The returned spans will cover every index in the string, with no gaps. It is possible for some graphemes to have a cell length of zero.
+    This can occur for nonsense strings like two zero width joiners, or for control codes that don't contribute to the grapheme size.
 
     Args:
         text: String to split.
         unicode_version: Unicode version, `"auto"` to auto detect, `"latest"` for the latest unicode version.
 
     Returns:
-        List of spans.
+        A tuple of a list of *spans* and the cell length of the entire string. A span is a list of tuples
+            of three values consisting of (<START>, <END>, <CELL LENGTH>), where START and END are string indices,
+            and CELL LENGTH is the cell length of the single grapheme.
     """
 
     total_width = 0
@@ -123,7 +128,6 @@ def split_graphemes(
                 start, _end, cell_length = spans[-1]
                 spans[-1] = (start, pos + grapheme_len, cell_length)
         pos += grapheme_len
-
     return (spans, total_width)
 
 
