@@ -140,9 +140,12 @@ def test_chop_cells_mixed_width():
         ("", []),
         ("\x1b", []),
         ("\x1b\x1b", []),
+        ("\x1b\x1b\x1b", []),
+        ("\x1b\x1b\x1b\x1b", []),
     ],
 )
 def test_chop_cells_zero_width(text: str, expected: list) -> None:
+    """Test zer width characters being chopped."""
     assert chop_cells(text, 3) == expected
 
 
@@ -191,6 +194,11 @@ def test_is_single_cell_widths() -> None:
             [(0, 1, 0)],
             0,
         ),  # Variation selector 16, without anything to change should have zero width
+        (
+            "\ufe0f\ufe0f",
+            [(0, 2, 0)],
+            0,
+        ),  # 2 X variation selector 16, without anything to change should have zero width
         (
             "\u200d",
             [(0, 1, 0)],
