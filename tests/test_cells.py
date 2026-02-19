@@ -172,6 +172,8 @@ def test_is_single_cell_widths() -> None:
         ("♻", [(0, 1, 1)], 1),
         ("♻️", [(0, 2, 2)], 2),
         ("♻♻️", [(0, 1, 1), (1, 3, 2)], 3),
+        ("\x1b", [], 0),
+        ("\x1b\x1b", [], 0),
     ],
 )
 def test_split_graphemes(
