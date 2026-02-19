@@ -187,7 +187,7 @@ def test_is_single_cell_widths() -> None:
         ("♻", [(0, 1, 1)], 1),
         ("♻️", [(0, 2, 2)], 2),
         ("♻♻️", [(0, 1, 1), (1, 3, 2)], 3),
-        ("\x1b", [(0, 1, 0)], 0),  # One escape sahould have zero width
+        ("\x1b", [(0, 1, 0)], 0),  # One escape should have zero width
         ("\x1b\x1b", [(0, 2, 0)], 0),  # Two escapes should have zero width
         (
             "\ufe0f",
