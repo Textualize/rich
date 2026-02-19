@@ -206,6 +206,7 @@ def test_non_printable():
         assert cell_len(character) == 0
 
 
+@pytest.mark.timeout(2)
 def test_non_printable_at_grapheme_start():
     """Test non printable characters
     tests regression in 14.3.2 https://github.com/Textualize/rich/issues/3958
