@@ -203,7 +203,7 @@ def test_is_single_cell_widths() -> None:
             "\u200d",
             [(0, 1, 0)],
             0,
-        ),  # A zero width joiner within noting prior should have zero width
+        ),  # A zero width joiner with nothing prior should have zero width
         (
             "\u200d\u200d",
             [(0, 2, 0)],
