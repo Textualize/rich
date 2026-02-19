@@ -46,7 +46,7 @@ Did it build and run as documented?
 | 52   | 17  | 348   | 9     | 55     | `__call__` @32-86 @ `rich/_log_render.py` (Log render)              |
 | 47   | 17  | 379   | 5     | 57     | `justify` @111-167 @ `rich/containers.py` (Containers)              |
 | 29   | 17  | 220   | 2     | 59     | `__rich_console__` @156-198 @ `rich/progress_bar.py` (Progress bar) |
-| 34   | 17  | 213   | 1     | 37     | `stop` @145-181 @ `rich/live.py` (Live)                             |
+| 42   | 11  | 238   | 3     | 65     | `divide_line` @39-103 @ `rich/_wrap.py` (Wrap)                      |
 
 Lizard columns: NLOC = non-comment lines of code, CCN = cyclomatic complexity number, token = tokens, PARAM = parameter count, length = length in lines.
 
@@ -115,6 +115,22 @@ In @156-198 @ `rich/progress_bar.py`
 
    The class has a docstring, but this specific method does not. The logic for handling "half bars" and the specific condition for when to draw the "remaining" empty bar (only when color is enabled) is implicit in the code and not explained in documentation.
 
+## Function 5: **divide_line** (Wrap)
+
+In @39-103 @ `rich/_wrap.py`
+
+1. **Did the tool and our manual count match?**
+   - The lizard tool reports a CC of 11 for this function.
+   - I counted by hand for the for loops, if/elif/else, and the "and" compound in the elif. Counted 11 total, so the tool and my count give the same result.
+
+2. **Is the function only complex, or also long?** It is more complex than long. The function is 42/65 lines in total in the file. The high CC in regards to length means the logic is very dense, meaning that almost every line is some logical check
+
+3. **What does the function do?** This function determines where to insert line breaks in a string of text so it fits within a given width. The high CC is necessary, because it has to handle words that fit within remaining space, words that don't fit on the current line but fit on the next, words longer than the entire width (either folded/cropped), and whether the word appears at the start of the string or middle of the string
+
+4. **Do we count exceptions (try/except)?** In this function there are no try/except blocks
+
+5. **Is the documentation clear about all the different outcomes?** The docstring describes the inputs and return value clearly, but does not describe out the different cases (ex: fold vs. no-fold, oversized words). To understand all possible outcomes, someone has to trace through the code. Also, it isn't mentioned that one of the else branches is unreachable, and essentially dead code so they probably weren't aware of that
+
 ## Refactoring
 
 Plan for refactoring complex code:
@@ -135,7 +151,20 @@ This strategy is quite obvious with this function. Justification has 4 modes and
 
 Currently, the function mixes configuration (ASCII checks), business logic (width and progress calculation), and presentation (yielding segments) in one large block. Extracting these into 3 separate private methods (`_get_bar_characters`, `_calculate_bar_dimensions`, `_generate_segments`) will reduce the main function's cyclomatic complexity from to ~4. Most of the remaining complexity will be in `_generate_segments` because it contains lots of `if`, but it should stay at a reasonable level (under 10).
 
-Estimated impact of refactoring (lower CC, but other drawbacks?): Significantly lower CC in the main method. Possible drawbacks: increases the total number of methods in the class; requires passing multiple arguments (state) between the new private methods.
+**Estimated impact of refactoring** (lower CC, but other drawbacks?): Significantly lower CC in the main method. Possible drawbacks: increases the total number of methods in the class; requires passing multiple arguments (state) between the new private methods.
+
+**Function 5 (`divide_line`):** Split the long-word handling into two smaller helpers.
+
+Right now `divide_line` does everything, because it loops over words, decides if a word fits, and also contains all the logic for what to do when a word is too long and the entire fold loop. This makes the function hard to read because the "what do I do when I have an oversized word" logic is buried inside the main loop.
+
+The fix for this is to extrat that logic out:
+
+- `_fold_long_word(word, start, width, break_positions) -> int` will take a word that is too wide and splits it into chunks, inserting break positions along the way. Returns the new `cell_offset` value 
+- `_handle_overlong_word(word, start, width, fold, break_positions) -> int` will decide whether to fold or crop, then calls `_fold_long_word` or handles the crop case 
+
+After this, `divide_line` just loops over words and calls `_handle_overlong_word` when needed. The main loop becomes way more readable, and CC drops from 11 to 5 (**55% reduction**). In addition, each helper can be tested independently
+
+**Estimated impact:** Lower CC and easier to test in isolation. The only tradeoff is three functions instead of one, but each one now has a clear job and is much more modular
 
 Carried out refactoring (optional, P+):
 
@@ -218,6 +247,22 @@ Note: coverage.py treats `align_text` as a separate function, so `__rich_console
 - `test_coverage_gap_zero_remaining` — Renders the progress bar with specific dimensions (width 10, 90% complete) to trigger the edge case where `remaining_bars` becomes zero during rendering.
 
 **After:** `rich_console` **100%** both on coverage.py and diy-coverage tool.
+
+### Function 5: `_wrap.py` `divide_line` (Louisa)
+
+**Before (baseline):** `divide_line` not directly tested. DIY: 5/11 branches covered (45%), 6 missed 
+
+**Tests added:**
+
+[Test file](https://github.com/DD2480-2026-Group-8/rich-Assignment-3/blob/master/tests/test_wrap.py).
+
+- `test_four_chunk_fold` — passes a 10 character long word into a line of width 3, which forces 4 chunks. This covers the middle and final iterations of the fold loop
+- `test_fold_after_prefix` — puts a short word before the long one so the long word no longer starts at position 0. Covers the branch that adds a break before folding begins
+- `test_no_fold_long_word_beginning` — oversized word with `fold=False` at position 0, so no break inserted.
+- `test_no_fold_long_word_mid_sentence` — `fold=False` with text before the long word. Covers the branch that inserts a single break before the overlong word
+
+**After (coverage.py):** `divide_line` **88%**. File total: **88%** (up from 45%).
+**After (DIY):** 10/11 branches covered (**90%**). Branch 10 is dead code and cannot be covered --> `cell_offset == 0` means the full line width is available, so the word would already be handled by Branch 0, so this never will run
 
 Number of test cases added: two per team member (P) or at least four (P+).
 
