@@ -144,7 +144,7 @@ def test_chop_cells_mixed_width():
         ("\x1b\x1b\x1b\x1b", []),
     ],
 )
-def test_chop_cells_zero_width(text: str, expected: list) -> None:
+def test_chop_cells_zero_width(text: str, expected: list[str]) -> None:
     """Test zer width characters being chopped."""
     assert chop_cells(text, 3) == expected
 
