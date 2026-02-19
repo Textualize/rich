@@ -10,6 +10,7 @@
 - [Strange colors in console output.](#strange-colors-in-console-output)
 - [Why does content in square brackets disappear?](#why-does-content-in-square-brackets-disappear)
 - [Why does emoji break alignment in a Table or Panel?](#why-does-emoji-break-alignment-in-a-table-or-panel)
+- [Why do Chinese characters not align properly?](#why-do-chinese-characters-not-align-properly)
 
 <a name="extra-space-not-enough-space-in-jupyter-output"></a>
 ## Extra space, not enough space, in Jupyter output
@@ -107,6 +108,53 @@ Rich has no way of knowing how wide a character will be on any given terminal. T
 There are also *multiple codepoints* characters, such as country flags, and emoji modifiers, which produce wildly different results across terminal emulators.
 
 Fortunately, most characters will work just fine. But you may have to avoid using the emojis that break alignment. You will get good results if you stick to emoji released on or before version 9 of the Unicode database,
+
+<a name="why-do-chinese-characters-not-align-properly"></a>
+## Why do Chinese characters not align properly?
+
+Chinese characters (and other CJK characters) are typically displayed as "wide" characters, taking up two columns in the terminal. This can sometimes cause alignment issues in Tables, Panels, and other containers.
+
+### Solutions
+
+1. **Ensure UTF-8 encoding**: Make sure your terminal and Python environment are using UTF-8 encoding:
+
+```python
+from rich.console import Console
+console = Console(encoding="utf-8")
+```
+
+2. **Use a CJK-compatible terminal**: Some terminals handle CJK characters better than others. Recommended terminals include:
+   - **Windows**: Windows Terminal (not the legacy cmd.exe)
+   - **macOS**: iTerm2 or Terminal.app
+   - **Linux**: GNOME Terminal, Konsole, or Alacritty
+
+3. **Set appropriate fonts**: Use fonts that properly support CJK characters, such as:
+   - Microsoft YaHei (Windows)
+   - PingFang SC (macOS)
+   - Noto Sans CJK (Linux)
+
+4. **Check terminal width calculation**: If you're still seeing alignment issues, you can check how your terminal calculates character widths:
+
+```python
+from rich.console import Console
+console = Console()
+console.print("中文测试")  # Should display 4 columns wide
+```
+
+5. **Use Rich's `force_terminal` option**: If Rich incorrectly detects your terminal capabilities, you can force true color support:
+
+```python
+from rich.console import Console
+console = Console(force_terminal=True)
+```
+
+### Note on Windows
+
+Windows Terminal supports CJK characters well, but the legacy Windows console (cmd.exe) has limited support. If you must use cmd.exe, you may need to:
+- Change the code page to UTF-8: `chcp 65001`
+- Use a TrueType font like "SimHei" or "Microsoft YaHei"
+
+For best results on Windows, use Windows Terminal which is available from the Microsoft Store.
 
 <hr>
 
