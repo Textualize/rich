@@ -91,6 +91,7 @@ The following people have contributed to the development of Rich:
 - [Qiming Xu](https://github.com/xqm32)
 - [James Addison](https://github.com/jayaddison)
 - [Pierro](https://github.com/xpierroz)
+- [Christopher Pinard](https://github.com/slaarti)
 - [Bernhard Wagner](https://github.com/bwagner)
 - [Aaron Beaudoin](https://github.com/AaronBeaudoin)
 - [Sam Woodward](https://github.com/PyWoody)

@@ -194,6 +194,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure font is correctly inherited in exported HTML https://github.com/Textualize/rich/issues/3104
 - Fixed typing for `FloatPrompt`.
 
+### Changed
+
+- Swap open-vs-close tag order when converting Text to markup.
+
 ## [13.6.0] - 2023-09-30
 
 ### Added
