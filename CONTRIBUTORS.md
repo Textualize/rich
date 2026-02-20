@@ -21,6 +21,7 @@ The following people have contributed to the development of Rich:
 - [Oleksis Fraga](https://github.com/oleksis)
 - [Andy Gimblett](https://github.com/gimbo)
 - [Kai Giokas](https://github.com/kaisforza)
+- [Khojiev Jasur](https://github.com/jasur-py)
 - [Tom Gooding](https://github.com/TomJGooding)
 - [Michał Górny](https://github.com/mgorny)
 - [Nok Lam Chan](https://github.com/noklam)
