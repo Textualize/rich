@@ -755,7 +755,7 @@ class Traceback:
             # No extension, look at first line to see if it is a hashbang
             # Note, this is an educated guess and not a guarantee
             # If it fails, the only downside is that the code is highlighted strangely
-            new_line_index = code.index("\n")
+            new_line_index = code.find("\n")
             first_line = code[:new_line_index] if new_line_index != -1 else code
             if first_line.startswith("#!") and "python" in first_line.lower():
                 return "python"
