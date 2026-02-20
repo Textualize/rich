@@ -2261,8 +2261,14 @@ class Console:
                     if style:
                         rule = style.get_html_style(_theme)
                         if style.link:
-                            text = f'<a href="{style.link}">{text}</a>'
-                        text = f'<span style="{rule}">{text}</span>' if rule else text
+                            if rule:
+                                text = (
+                                    f'<a style="{rule}" href="{style.link}">{text}</a>'
+                                )
+                            else:
+                                text = f'<a href="{style.link}">{text}</a>'
+                        elif rule:
+                            text = f'<span style="{rule}">{text}</span>'
                     append(text)
             else:
                 styles: Dict[str, int] = {}

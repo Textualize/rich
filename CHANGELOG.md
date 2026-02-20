@@ -92,6 +92,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Indentation in exceptions won't be underlined https://github.com/Textualize/rich/pull/3678
 - Rich tracebacks will now render Exception Groups https://github.com/Textualize/rich/pull/3677
 
+## [13.9.5] - 2024-12-03
+
+### Fixed
+
+- When using inline HTML styles, directly apply rules to anchors https://github.com/Textualize/rich/pull/3580
+
 ## [13.9.4] - 2024-11-01
 
 ### Changed

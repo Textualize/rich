@@ -15,6 +15,7 @@ The following people have contributed to the development of Rich:
 - [Jim Crist-Harif](https://github.com/jcrist)
 - [Ed Davis](https://github.com/davised)
 - [Pete Davison](https://github.com/pd93)
+- [Christophe Dufaza](https://github.com/dottspina)
 - [James Estevez](https://github.com/jstvz)
 - [Jonathan Eunice](https://github.com/jonathan-3play)
 - [Aryaz Eghbali](https://github.com/AryazE)
