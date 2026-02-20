@@ -406,6 +406,29 @@ def test_padding_width():
     assert output == expected
 
 
+def test_title_justify_with_soft_wrap():
+    """Regression test for https://github.com/Textualize/rich/issues/3948
+    
+    Table title should be centered when soft_wrap=True.
+    """
+    table = Table(title="The Title", title_justify="center")
+    table.add_column("Column 1")
+    table.add_column("Column 2")
+    
+    console = Console(record=True, width=40, force_terminal=True)
+    console.print(table, soft_wrap=True)
+    output = console.export_text()
+    
+    lines = output.split("\n")
+    # The title line should be centered (not left-aligned)
+    title_line = lines[0]
+    # Check that "The Title" is centered by verifying leading whitespace
+    # A centered title in a 40-char wide console should have leading spaces
+    assert title_line.strip() == "The Title"
+    # The title should NOT start at position 0 (should be centered)
+    assert title_line.startswith(" ")
+
+
 if __name__ == "__main__":
     render = render_tables()
     print(render)
