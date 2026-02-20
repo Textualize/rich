@@ -27,8 +27,6 @@ poetry install
 ```
 
 The rest of this guide assumes you're inside the virtual environment.
-If you're having difficulty running any of the commands that follow,
-ensure you're inside the virtual environment by running `poetry shell`.
 
 ## Developing
 
