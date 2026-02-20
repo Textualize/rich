@@ -307,7 +307,7 @@ class Traceback:
         locals_max_depth: Optional[int] = None,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
-        locals_overlow: Optional[OverflowMethod] = None,
+        locals_overflow: Optional[OverflowMethod] = None,
         indent_guides: bool = True,
         suppress: Iterable[Union[str, ModuleType]] = (),
         max_frames: int = 100,
@@ -334,7 +334,7 @@ class Traceback:
         self.locals_max_depth = locals_max_depth
         self.locals_hide_dunder = locals_hide_dunder
         self.locals_hide_sunder = locals_hide_sunder
-        self.locals_overflow = locals_overlow
+        self.locals_overflow = locals_overflow
 
         self.suppress: Sequence[str] = []
         for suppress_entity in suppress:
@@ -424,7 +424,7 @@ class Traceback:
             locals_max_depth=locals_max_depth,
             locals_hide_dunder=locals_hide_dunder,
             locals_hide_sunder=locals_hide_sunder,
-            locals_overlow=locals_overflow,
+            locals_overflow=locals_overflow,
             suppress=suppress,
             max_frames=max_frames,
         )
