@@ -285,6 +285,8 @@ class Live(JupyterMixin, RenderHook):
             with self._lock:
                 reset = (
                     Control.home()
+                ) if self.console._no_clear else (
+                    Control.home()
                     if self._alt_screen
                     else self._live_render.position_cursor()
                 )
