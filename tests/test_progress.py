@@ -170,6 +170,17 @@ def test_task_ids():
     assert progress.task_ids == [0, 1, 2, 4]
 
 
+def test_task_advance():
+    progress = make_progress()
+
+    task = progress.tasks[-1]
+    task_initial_complete = task.completed
+
+    advance_amount = 50
+    progress.update(task.id, advance=advance_amount)
+    assert progress.tasks[-1].completed == task_initial_complete + advance_amount
+
+
 def test_finished():
     progress = make_progress()
     assert not progress.finished
