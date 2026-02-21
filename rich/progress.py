@@ -1502,6 +1502,7 @@ class Progress(JupyterMixin):
             task = self._tasks[task_id]
             task._reset()
             task.start_time = current_time if start else None
+            task.stop_time = None  
             if total is not None:
                 task.total = total
             task.completed = completed
