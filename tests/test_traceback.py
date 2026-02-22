@@ -375,6 +375,25 @@ def test_notes() -> None:
         assert traceback.trace.stacks[0].notes == ["Hello", "World"]
 
 
+@pytest.mark.skipif(
+    sys.version_info < (3, 11), reason="ExceptionNotes are only available in Python 3.11+"
+)
+def test_notes_chained_exception() -> None:
+    """Notes should only appear on the exception that has them, not on all exceptions in the chain."""
+    try:
+        try:
+            raise ValueError("original error")
+        except ValueError as exc:
+            raise RuntimeError("wrapped error") from exc
+    except RuntimeError as exc:
+        exc.add_note("note on RuntimeError only")
+        traceback = Traceback()
+
+        # stacks[0] is the outermost (RuntimeError), stacks[1] is the cause (ValueError)
+        assert traceback.trace.stacks[0].notes == ["note on RuntimeError only"]
+        assert traceback.trace.stacks[1].notes == []
+
+
 def test_recursive_exception() -> None:
     """Regression test for https://github.com/Textualize/rich/issues/3708
 
