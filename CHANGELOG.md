@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed `@auto` to be safe with `tuple`-valued positionals https://github.com/Textualize/rich/pull/4014
+- Fixed `@auto` to be safe with `tuple`-valued positionals https://github.com/Textualize/rich/issues/4016
 
 ## [14.3.3] - 2026-02-19
 
