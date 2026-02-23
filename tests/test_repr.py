@@ -124,6 +124,9 @@ def test_rich_repr_auto() -> None:
         == f"Bird('penguin', ['fish'], another={repr(stupid_class)}, extinct={repr(not_stupid)})"
     )
 
+def test_rich_repr_auto_with_tuples() -> None:
+    assert repr(Egg(('hello', 'world'), egg=2)) == "Egg(('hello', 'world'), egg=2)"
+
 
 def test_rich_repr_auto_angular() -> None:
     assert repr(AngularEgg("hello", egg=2)) == "<AngularEgg 'hello' egg=2>"

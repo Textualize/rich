@@ -71,13 +71,13 @@ def auto(
                 signature = inspect.signature(self.__init__)
                 for name, param in signature.parameters.items():
                     if param.kind == param.POSITIONAL_ONLY:
-                        yield getattr(self, name)
+                        yield None, getattr(self, name)
                     elif param.kind in (
                         param.POSITIONAL_OR_KEYWORD,
                         param.KEYWORD_ONLY,
                     ):
                         if param.default is param.empty:
-                            yield getattr(self, param.name)
+                            yield None, getattr(self, param.name)
                         else:
                             yield param.name, getattr(self, param.name), param.default
             except Exception as error:
