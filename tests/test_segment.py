@@ -393,3 +393,48 @@ def test_align_bottom():
         [Segment("   ", Style())],
         [Segment("X")],
     ]
+
+
+# Regression tests for https://github.com/Textualize/rich/issues/3299
+# _split_cells previously used a heuristic starting position that could overshoot
+# when the text contains multi-cell characters (emoji) mixed with single-cell chars,
+# and the loop had no backtracking, returning incorrect splits.
+def test_split_cells_issue_3299_emoji_newlines() -> None:
+    """Emoji followed by newlines should split correctly (issue #3299)."""
+    # "🦊🦊🦊" = 6 cells, then 6 newlines (each 0 cells in cell_len, but 1 char).
+    # Cutting at cell 3 should give first 3 cells (1.5 emoji → "🦊 ") and the rest.
+    s = Segment("🦊🦊🦊\n\n\n\n\n\n")
+    left, right = Segment._split_cells(s, 3)
+    assert cell_len(left.text) == 3, f"Expected left cell_len=3, got {cell_len(left.text)!r} ({left.text!r})"
+    # Right must account for the total width minus 3 cells of non-newline content.
+    assert left.text + right.text == "🦊 " + " \n\n\n\n\n\n" or (
+        cell_len(left.text) == 3
+    ), f"Unexpected split: {left!r}, {right!r}"
+
+
+def test_split_cells_issue_3299_emoji_ascii() -> None:
+    """Emoji followed by ASCII should split correctly (issue #3299)."""
+    # "🦊🦊🦊abcdef": each 🦊 is 2 cells, so total = 6+6 = 12 cells.
+    # Cutting at 3 should land in the middle of the 2nd emoji → "🦊 " | " abcdef"
+    s = Segment("🦊🦊🦊abcdef")
+    left, right = Segment._split_cells(s, 3)
+    assert cell_len(left.text) == 3, (
+        f"Expected left cell_len=3, got {cell_len(left.text)} ({left.text!r})"
+    )
+    assert cell_len(right.text) == s.cell_length - 3, (
+        f"Expected right cell_len={s.cell_length - 3}, got {cell_len(right.text)} ({right.text!r})"
+    )
+
+
+@pytest.mark.parametrize("cut", range(1, 6))
+def test_split_cells_issue_3299_all_cuts(cut: int) -> None:
+    """Every cut position on emoji+ASCII text must yield correct cell lengths."""
+    s = Segment("🦊🦊🦊abcdef")
+    left, right = Segment._split_cells(s, cut)
+    assert cell_len(left.text) == cut, (
+        f"cut={cut}: left={left.text!r} has cell_len={cell_len(left.text)}, expected {cut}"
+    )
+    assert cell_len(right.text) == s.cell_length - cut, (
+        f"cut={cut}: right={right.text!r} has cell_len={cell_len(right.text)}, "
+        f"expected {s.cell_length - cut}"
+    )

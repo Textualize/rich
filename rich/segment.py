@@ -127,33 +127,34 @@ class Segment(NamedTuple):
         if cut >= cell_length:
             return segment, _Segment("", style, control)
 
+        if cut <= 0:
+            return _Segment("", style, control), segment
+
         cell_size = get_character_cell_size
 
-        pos = int((cut / cell_length) * len(text))
-
-        while True:
-            before = text[:pos]
-            cell_pos = cell_len(before)
-            out_by = cell_pos - cut
-            if not out_by:
+        # Walk character-by-character, accumulating cell widths.
+        # This is O(n) but is always correct regardless of mixed character widths
+        # (e.g. emoji/CJK mixed with ASCII), unlike the previous heuristic which
+        # could land past the cut point and fail to backtrack.
+        # See https://github.com/Textualize/rich/issues/3299
+        cell_pos = 0
+        for pos, char in enumerate(text):
+            char_width = cell_size(char)
+            if cell_pos + char_width == cut:
                 return (
-                    _Segment(before, style, control),
-                    _Segment(text[pos:], style, control),
+                    _Segment(text[: pos + 1], style, control),
+                    _Segment(text[pos + 1 :], style, control),
                 )
-            if out_by == -1 and cell_size(text[pos]) == 2:
+            if cell_pos + char_width > cut:
+                # The cut falls inside a double-width character: replace it with spaces.
                 return (
                     _Segment(text[:pos] + " ", style, control),
                     _Segment(" " + text[pos + 1 :], style, control),
                 )
-            if out_by == +1 and cell_size(text[pos - 1]) == 2:
-                return (
-                    _Segment(text[: pos - 1] + " ", style, control),
-                    _Segment(" " + text[pos:], style, control),
-                )
-            if cell_pos < cut:
-                pos += 1
-            else:
-                pos -= 1
+            cell_pos += char_width
+
+        # Fallback: should not be reached given cell_length check above.
+        return segment, _Segment("", style, control)
 
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
         """Split segment in to two segments at the specified column.
