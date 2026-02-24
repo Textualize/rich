@@ -9,6 +9,7 @@ from typing import Any, List, NamedTuple
 import attr
 import pytest
 
+import rich.repr
 from rich.console import Console
 from rich.measure import Measurement
 from rich.pretty import Node, Pretty, _ipy_display_hook, install, pprint, pretty_repr
@@ -737,6 +738,20 @@ def test_tuple_rich_repr_default() -> None:
             yield None, (1,), (1,)
 
     assert pretty_repr(Foo()) == "Foo()"
+
+
+def test_auto_tuple_positional_only_repr() -> None:
+    class ClassA:
+        pass
+
+    @rich.repr.auto
+    class PosOnlyTuple:
+        def __init__(self, pair, /):
+            self.pair = pair
+
+    result = pretty_repr(PosOnlyTuple((ClassA(), ClassA())))
+    assert result.startswith("PosOnlyTuple(")
+    assert "ClassA object" in result
 
 
 def test_dataclass_no_attribute() -> None:

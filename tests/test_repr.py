@@ -110,6 +110,27 @@ class PosOnly:
     assert repr(p) == "PosOnly(1)"
 
 
+def test_rich_repr_positional_only_tuple() -> None:
+    class ClassA:
+        pass
+
+    _locals = locals().copy()
+    exec(
+        """\
+@rich.repr.auto
+class PosOnlyTuple:
+    def __init__(self, pair, /):
+        self.pair = pair
+    """,
+        globals(),
+        _locals,
+    )
+    p = _locals["PosOnlyTuple"]((ClassA(), ClassA()))
+    result = repr(p)
+    assert result.startswith("PosOnlyTuple((")
+    assert "ClassA object" in result
+
+
 def test_rich_angular() -> None:
     assert (repr(Bar("hello"))) == "<Bar 'hello' 'hello' egg=1>"
     assert (repr(Bar("hello", bar=3))) == "<Bar 'hello' 'hello' bar=3 egg=1>"
