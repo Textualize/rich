@@ -297,3 +297,20 @@ Example
 -------
 
 See `downloader.py <https://github.com/willmcgugan/rich/blob/master/examples/downloader.py>`_ for a realistic application of a progress display. This script can download multiple concurrent files with a progress bar, transfer speed and file size.
+
+TaskProgressColumn
+~~~~~~~~~~~~~~~~~~
+
+The ``TaskProgressColumn`` displays the percentage of task completion.
+
+It is typically used to show how much of a task has been completed relative to
+its total value. This column is included in the default progress columns and is
+useful when tracking long-running tasks.
+
+Example::
+
+    from rich.progress import Progress, TaskProgressColumn
+
+    progress = Progress(
+        TaskProgressColumn(),
+    )
