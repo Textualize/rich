@@ -410,3 +410,36 @@ if __name__ == "__main__":
     render = render_tables()
     print(render)
     print(repr(render))
+
+
+def test_table_title_justify_with_soft_wrap():
+    """Regression test for https://github.com/Textualize/rich/issues/3948
+
+    Table title should be centered (or justified as specified) even when
+    soft_wrap is True.
+    """
+    table = Table(title="The Title", title_justify="center")
+    table.add_column("Column 1")
+    table.add_column("Column 2")
+    table.add_row("a", "b")
+
+    console = Console(width=40, record=True)
+
+    # Without soft_wrap
+    console.print(table)
+    normal_output = console.export_text()
+
+    # With soft_wrap
+    console = Console(width=40, record=True)
+    console.print(table, soft_wrap=True)
+    soft_wrap_output = console.export_text()
+
+    # Title line should be the same (centered) in both cases
+    normal_title_line = normal_output.splitlines()[0]
+    soft_wrap_title_line = soft_wrap_output.splitlines()[0]
+
+    assert "The Title" in normal_title_line
+    assert "The Title" in soft_wrap_title_line
+    # Both should have leading spaces (centered)
+    assert normal_title_line.lstrip() != normal_title_line, "Title should be centered (have leading spaces)"
+    assert soft_wrap_title_line.lstrip() != soft_wrap_title_line, "Title should be centered with soft_wrap too"

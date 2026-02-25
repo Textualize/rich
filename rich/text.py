@@ -1232,7 +1232,12 @@ class Text(JupyterMixin):
                 line.expand_tabs(tab_size)
             if no_wrap:
                 if overflow == "ignore":
-                    lines.append(line)
+                    new_lines = Lines([line])
+                    if wrap_justify:
+                        new_lines.justify(
+                            console, width, justify=wrap_justify, overflow=wrap_overflow
+                        )
+                    lines.extend(new_lines)
                     continue
                 new_lines = Lines([line])
             else:
