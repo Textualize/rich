@@ -117,6 +117,7 @@ with LiveProgress:
         overall_task_id, description="[bold green]%s apps installed, done!" % len(apps)
     )
 
+    # final update and closing of the main progress
     LiveProgress.update(progress_group, refresh=True)
     LiveProgress.stop()
 
