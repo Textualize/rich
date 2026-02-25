@@ -88,7 +88,8 @@ overall_task_id = overall_progress.add_task("", total=len(apps))
 # use own live instance as context manager with group of progress bars,
 # which allows for running multiple different progress bars in parallel,
 # and dynamically showing/hiding them
-with Live(progress_group):
+LiveProgress = Live(progress_group)
+with LiveProgress:
     for idx, (name, step_times) in enumerate(apps):
         # update message on overall progress bar
         top_descr = "[bold #AAAAAA](%d out of %d apps installed)" % (idx, len(apps))
@@ -115,3 +116,7 @@ with Live(progress_group):
     overall_progress.update(
         overall_task_id, description="[bold green]%s apps installed, done!" % len(apps)
     )
+
+    LiveProgress.update(progress_group, refresh=True)
+    LiveProgress.stop()
+
