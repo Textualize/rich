@@ -287,7 +287,7 @@ if __name__ == "__main__":  # pragma: no cover
         log.debug("in divide")
         try:
             number / divisor
-        except:
+        except Exception:
             log.exception("An error of some kind occurred!")
 
     divide()

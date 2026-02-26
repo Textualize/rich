@@ -83,9 +83,9 @@ def get_exception() -> Traceback:
     try:
         try:
             foo(0)
-        except:
+        except Exception:
             foobarbaz
-    except:
+    except Exception:
         tb = Traceback()
         return tb
 
@@ -336,7 +336,7 @@ def test_traceback_finely_grained_missing() -> None:
     """Before 3.11, the last_instruction should be None"""
     try:
         1 / 0
-    except:
+    except Exception:
         traceback = Traceback()
         last_instruction = traceback.trace.stacks[-1].frames[-1].last_instruction
         assert last_instruction is None
@@ -349,7 +349,7 @@ def test_traceback_finely_grained() -> None:
     """Check that last instruction is populated."""
     try:
         1 / 0
-    except:
+    except Exception:
         traceback = Traceback()
         last_instruction = traceback.trace.stacks[-1].frames[-1].last_instruction
         assert last_instruction is not None
