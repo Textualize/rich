@@ -219,7 +219,7 @@ ANSI_COLOR_NAMES = {
     "orchid1": 213,
     "orange1": 214,
     "sandy_brown": 215,
-    "brown": 130,
+    "brown": 94,
     "light_salmon1": 216,
     "light_pink1": 217,
     "pink1": 218,
