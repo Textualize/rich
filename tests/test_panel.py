@@ -16,6 +16,9 @@ tests = [
     Panel(Panel("Hello, World", padding=0), padding=0),
     Panel("Hello, World", title="FOO", padding=0),
     Panel("Hello, World", subtitle="FOO", padding=0),
+    Panel("Hello, World", box=None, padding=0),
+    Panel("Hello, World", box=None, expand=False, padding=0),
+    Panel.fit("Hello, World", box=None, padding=0),
 ]
 
 expected = [
@@ -26,6 +29,9 @@ expected = [
     "╭────────────────────────────────────────────────╮\n│╭──────────────────────────────────────────────╮│\n││Hello, World                                  ││\n│╰──────────────────────────────────────────────╯│\n╰────────────────────────────────────────────────╯\n",
     "╭───────────────────── FOO ──────────────────────╮\n│Hello, World                                    │\n╰────────────────────────────────────────────────╯\n",
     "╭────────────────────────────────────────────────╮\n│Hello, World                                    │\n╰───────────────────── FOO ──────────────────────╯\n",
+    "Hello, World                                      \n\n",
+    "Hello, World\n\n",
+    "Hello, World\n\n",
 ]
 
 

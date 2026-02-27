@@ -40,7 +40,7 @@ class Panel(JupyterMixin):
     def __init__(
         self,
         renderable: "RenderableType",
-        box: Box = ROUNDED,
+        box: Optional[Box] = ROUNDED,
         *,
         title: Optional[TextType] = None,
         title_align: AlignMethod = "center",
@@ -74,7 +74,7 @@ class Panel(JupyterMixin):
     def fit(
         cls,
         renderable: "RenderableType",
-        box: Box = ROUNDED,
+        box: Optional[Box] = ROUNDED,
         *,
         title: Optional[TextType] = None,
         title_align: AlignMethod = "center",
@@ -154,7 +154,7 @@ class Panel(JupyterMixin):
         )
 
         safe_box: bool = console.safe_box if self.safe_box is None else self.safe_box
-        box = self.box.substitute(options, safe=safe_box)
+        box = self.box.substitute(options, safe=safe_box) if self.box else None
 
         def align_text(
             text: Text, width: int, align: str, character: str, style: Style
@@ -207,72 +207,85 @@ class Panel(JupyterMixin):
         if title_text is not None:
             title_text.stylize_before(border_style)
 
+        has_box = box is not None
+        border_width = 2 if has_box else 0
+
         child_width = (
-            width - 2
+            width - border_width
             if self.expand
             else console.measure(
-                renderable, options=options.update_width(width - 2)
+                renderable, options=options.update_width(width - border_width)
             ).maximum
         )
         child_height = self.height or options.height or None
         if child_height:
-            child_height -= 2
+            child_height -= border_width
         if title_text is not None:
             child_width = min(
-                options.max_width - 2, max(child_width, title_text.cell_len + 2)
+                options.max_width - border_width,
+                max(child_width, title_text.cell_len + 2),
             )
 
-        width = child_width + 2
+        width = child_width + border_width
         child_options = options.update(
             width=child_width, height=child_height, highlight=self.highlight
         )
         lines = console.render_lines(renderable, child_options, style=style)
 
-        line_start = Segment(box.mid_left, border_style)
-        line_end = Segment(f"{box.mid_right}", border_style)
         new_line = Segment.line()
-        if title_text is None or width <= 4:
-            yield Segment(box.get_top([width - 2]), border_style)
-        else:
-            title_text = align_text(
-                title_text,
-                width - 4,
-                self.title_align,
-                box.top,
-                border_style,
-            )
-            yield Segment(box.top_left + box.top, border_style)
-            yield from console.render(title_text, child_options.update_width(width - 4))
-            yield Segment(box.top + box.top_right, border_style)
 
-        yield new_line
-        for line in lines:
-            yield line_start
-            yield from line
-            yield line_end
+        if has_box:
+            line_start = Segment(box.mid_left, border_style)
+            line_end = Segment(f"{box.mid_right}", border_style)
+            if title_text is None or width <= 4:
+                yield Segment(box.get_top([width - 2]), border_style)
+            else:
+                title_text = align_text(
+                    title_text,
+                    width - 4,
+                    self.title_align,
+                    box.top,
+                    border_style,
+                )
+                yield Segment(box.top_left + box.top, border_style)
+                yield from console.render(
+                    title_text, child_options.update_width(width - 4)
+                )
+                yield Segment(box.top + box.top_right, border_style)
             yield new_line
+            for line in lines:
+                yield line_start
+                yield from line
+                yield line_end
+                yield new_line
+        else:
+            for line in lines:
+                yield from line
+                yield new_line
 
         subtitle_text = self._subtitle
         if subtitle_text is not None:
             subtitle_text.stylize_before(border_style)
 
-        if subtitle_text is None or width <= 4:
-            yield Segment(box.get_bottom([width - 2]), border_style)
+        if has_box:
+            if subtitle_text is None or width <= 4:
+                yield Segment(box.get_bottom([width - 2]), border_style)
+            else:
+                subtitle_text = align_text(
+                    subtitle_text,
+                    width - 4,
+                    self.subtitle_align,
+                    box.bottom,
+                    border_style,
+                )
+                yield Segment(box.bottom_left + box.bottom, border_style)
+                yield from console.render(
+                    subtitle_text, child_options.update_width(width - 4)
+                )
+                yield Segment(box.bottom + box.bottom_right, border_style)
+            yield new_line
         else:
-            subtitle_text = align_text(
-                subtitle_text,
-                width - 4,
-                self.subtitle_align,
-                box.bottom,
-                border_style,
-            )
-            yield Segment(box.bottom_left + box.bottom, border_style)
-            yield from console.render(
-                subtitle_text, child_options.update_width(width - 4)
-            )
-            yield Segment(box.bottom + box.bottom_right, border_style)
-
-        yield new_line
+            yield new_line
 
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
@@ -282,15 +295,16 @@ class Panel(JupyterMixin):
         padding = left + right
         renderables = [self.renderable, _title] if _title else [self.renderable]
 
+        border_width = 2 if self.box else 0
         if self.width is None:
             width = (
                 measure_renderables(
                     console,
-                    options.update_width(options.max_width - padding - 2),
+                    options.update_width(options.max_width - padding - border_width),
                     renderables,
                 ).maximum
                 + padding
-                + 2
+                + border_width
             )
         else:
             width = self.width
