@@ -1,6 +1,7 @@
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/rich)](https://pypi.org/project/rich/) [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
+
 [![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich)
-[![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
-[![codecov](https://codecov.io/gh/Textualize/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/Textualize/rich)
+[![codecov](https://img.shields.io/codecov/c/github/Textualize/rich?label=codecov&logo=codecov)](https://codecov.io/gh/Textualize/rich)
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
@@ -9,7 +10,7 @@
 [English readme](https://github.com/textualize/rich/blob/master/README.md)
  • [简体中文 readme](https://github.com/textualize/rich/blob/master/README.cn.md)
  • [正體中文 readme](https://github.com/textualize/rich/blob/master/README.zh-tw.md)
- • [Lengua española readme](https://github.com/textualize/rich/blob/master/README.es.md)
+ • [Español readme](https://github.com/textualize/rich/blob/master/README.es.md)
  • [Deutsche readme](https://github.com/textualize/rich/blob/master/README.de.md)
  • [Läs på svenska](https://github.com/textualize/rich/blob/master/README.sv.md)
  • [日本語 readme](https://github.com/textualize/rich/blob/master/README.ja.md)
@@ -36,7 +37,7 @@ Vea lo que [la gente dice sobre Rich](https://www.willmcgugan.com/blog/pages/pos
 
 ## Compatibilidad
 
-Rich funciona con Linux, OSX y Windows. True color / emoji funciona con la nueva Terminal de Windows, la terminal clásica está limitada a 8 colores. Rich requiere Python 3.6.3 o posterior.
+Rich funciona con Linux, macOS y Windows. True color / emoji funciona con la nueva Terminal de Windows; la terminal clásica está limitada a 16 colores. Rich requiere Python 3.8 o posterior.
 
 Rich funciona con [Jupyter notebooks](https://jupyter.org/) sin necesidad de configuración adicional.
 

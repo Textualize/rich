@@ -163,7 +163,6 @@ The following column objects are available:
 - :class:`~rich.progress.TransferSpeedColumn` Displays transfer speed (assumes the steps are bytes).
 - :class:`~rich.progress.SpinnerColumn` Displays a "spinner" animation.
 - :class:`~rich.progress.RenderableColumn` Displays an arbitrary Rich renderable in the column.
-- :class:`~rich.progress.IterationSpeedColumn` Displays iteration speed in it/s (iterations per second).
 
 To implement your own columns, extend the :class:`~rich.progress.ProgressColumn` class and use it as you would the other columns.
 
@@ -264,6 +263,28 @@ Here's an example that reads a url from the internet::
 If you expect to be reading from multiple files, you can use :meth:`~rich.progress.Progress.open` or :meth:`~rich.progress.Progress.wrap_file` to add a file progress to an existing Progress instance.
 
 See `cp_progress.py <https://github.com/willmcgugan/rich/blob/master/examples/cp_progress.py>`_ for a minimal clone of the ``cp`` command which shows a progress bar as the file is copied.
+
+
+Nesting Progress bars
+---------------------
+
+If you create a new progress bar within the context of an existing progress bar (with the context manager or `track` function), then Rich will display the inner progress bar(s) under the initial bar.
+
+Here's an example that nests progress bars::
+
+    from rich.progress import track
+    from time import sleep
+
+
+    for count in track(range(10)):
+        for letter in track("ABCDEF", transient=True):
+            print(f"Stage {count}{letter}")
+            sleep(0.1)
+        sleep(0.1)
+
+The inner loop creates a new progress bar below the first, but both can update.
+
+Note that if you nest progress bars like this, then the nested bars will updating according to the `refresh_per_second` attribute of the outer bar.
 
 
 Multiple Progress

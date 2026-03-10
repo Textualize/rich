@@ -49,7 +49,6 @@ class Column:
         padding (PaddingDimensions, optional): Padding for cells (top, right, bottom, left). Defaults to (0, 1).
         collapse_padding (bool, optional): Enable collapsing of padding around cells. Defaults to False.
         pad_edge (bool, optional): Enable padding of edge cells. Defaults to True.
-        expand (bool, optional): Expand the table to fit the available space if ``True``, otherwise the table width will be auto-calculated. Defaults to False.
         show_header (bool, optional): Show a header row. Defaults to True.
         show_footer (bool, optional): Show a footer row. Defaults to False.
         show_edge (bool, optional): Draw a box around the outside of the table. Defaults to True.
@@ -485,6 +484,7 @@ class Table(JupyterMixin):
             max_width = self.width
 
         extra_width = self._extra_width
+
         widths = self._calculate_column_widths(
             console, options.update_width(max_width - extra_width)
         )
@@ -530,6 +530,7 @@ class Table(JupyterMixin):
             self._measure_column(console, options, column) for column in columns
         ]
         widths = [_range.maximum or 1 for _range in width_ranges]
+
         get_padding_width = self._get_padding_width
         extra_width = self._extra_width
         if self.expand:
@@ -699,9 +700,17 @@ class Table(JupyterMixin):
     def _get_padding_width(self, column_index: int) -> int:
         """Get extra width from padding."""
         _, pad_right, _, pad_left = self.padding
+
         if self.collapse_padding:
-            if column_index > 0:
-                pad_left = max(0, pad_left - pad_right)
+            pad_left = 0
+            pad_right = abs(pad_left - pad_right)
+
+        if not self.pad_edge:
+            if column_index == 0:
+                pad_left = 0
+            if column_index == len(self.columns) - 1:
+                pad_right = 0
+
         return pad_left + pad_right
 
     def _measure_column(
@@ -717,7 +726,6 @@ class Table(JupyterMixin):
             return Measurement(0, 0)
 
         padding_width = self._get_padding_width(column._index)
-
         if column.width is not None:
             # Fixed width column
             return Measurement(
@@ -754,6 +762,7 @@ class Table(JupyterMixin):
             self._get_cells(console, column_index, column)
             for column_index, column in enumerate(self.columns)
         )
+
         row_cells: List[Tuple[_Cell, ...]] = list(zip(*_column_cells))
         _box = (
             self.box.substitute(
@@ -929,7 +938,6 @@ class Table(JupyterMixin):
 if __name__ == "__main__":  # pragma: no cover
     from rich.console import Console
     from rich.highlighter import ReprHighlighter
-    from rich.table import Table as Table
 
     from ._timer import timer
 

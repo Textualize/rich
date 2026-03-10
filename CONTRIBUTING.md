@@ -6,26 +6,21 @@ For new features or if there is any doubt in how to fix a bug, you might want
 to open an issue prior to starting work, or email willmcgugan+rich@gmail.com
 to discuss it first.
 
+See also [AI_POLICY.md](https://github.com/Textualize/rich/blob/master/AI_POLICY.md) if you will be using AI.
+
 ## Prerequisites
 
 Rich uses [poetry](https://python-poetry.org/docs/) for packaging and
 dependency management. To start developing with Rich, install Poetry
 using the [recommended method](https://python-poetry.org/docs/#installation).
 
-Next, you'll need to create a _fork_ (your own personal copy) of the Rich repository, and clone that fork 
+Next, you'll need to create a _fork_ (your own personal copy) of the Rich repository, and clone that fork
 on to your local machine. GitHub offers a great tutorial for this process [here](https://docs.github.com/en/get-started/quickstart/fork-a-repo).
 After following this guide, you'll have a local copy of the Rich project installed.
 
 Enter the directory containing your copy of Rich (`cd rich`).
 
-Poetry can be used to create an isolated _virtual environment_ for the project:
-
-```
-poetry shell
-```
-
-The first time we run `poetry shell`, such an isolated environment is created and forever associated with our project.
-Any time we wish to enter this virtual environment again, we simply run `poetry shell` again.
+Next create and activate a [virtual environment](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#create-and-use-virtual-environments) for Rich.
 
 Now we can install the dependencies of Rich into the virtual environment:
 
@@ -103,7 +98,7 @@ and use `make format` to format and write to the files.
 
 Consider whether the change you made would benefit from documentation - if the feature has any user impact at all, the answer is almost certainly yes!
 Documentation can be found in the `docs` directory.
-There are some additional dependencies required to build the documentation. 
+There are some additional dependencies required to build the documentation.
 These dependencies can be installed by running (from the `docs` directory):
 
 ```
@@ -136,7 +131,7 @@ and over time can reduce development overhead quite considerably.
 
 ## Creating A Pull Request
 
-Once your happy with your change and have ensured that all steps above have been followed (and checks have passed), you can create a pull request.
+Once you're happy with your change and have ensured that all steps above have been followed (and checks have passed), you can create a pull request.
 GitHub offers a guide on how to do this [here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork).
 Please ensure that you include a good description of what your change does in your pull request, and link it to any relevant issues or discussions.
 
@@ -151,4 +146,4 @@ There may be some discussion and, in most cases, a few iterations will be requir
 ## Afterwards
 
 When the pull request is approved, it will be merged into the `master` branch.
-Your change will only be available to users the next time Rich is released. 
+Your change will only be available to users the next time Rich is released.

@@ -1,6 +1,6 @@
 import re
 from abc import ABC, abstractmethod
-from typing import List, Union
+from typing import ClassVar, Sequence, Union
 
 from .text import Span, Text
 
@@ -61,8 +61,8 @@ class NullHighlighter(Highlighter):
 class RegexHighlighter(Highlighter):
     """Applies highlighting from a list of regular expressions."""
 
-    highlights: List[str] = []
-    base_style: str = ""
+    highlights: ClassVar[Sequence[str]] = []
+    base_style: ClassVar[str] = ""
 
     def highlight(self, text: Text) -> None:
         """Highlight :class:`rich.text.Text` using regular expressions.
@@ -81,7 +81,7 @@ class ReprHighlighter(RegexHighlighter):
     """Highlights the text typically produced from ``__repr__`` methods."""
 
     base_style = "repr."
-    highlights = [
+    highlights: ClassVar[Sequence[str]] = [
         r"(?P<tag_start><)(?P<tag_name>[-\w.:|]*)(?P<tag_contents>[\w\W]*)(?P<tag_end>>)",
         r'(?P<attrib_name>[\w_]{1,50})=(?P<attrib_value>"?[\w_]+"?)?',
         r"(?P<brace>[][{}()])",
@@ -110,8 +110,8 @@ class JSONHighlighter(RegexHighlighter):
     JSON_STR = r"(?<![\\\w])(?P<str>b?\".*?(?<!\\)\")"
     JSON_WHITESPACE = {" ", "\n", "\r", "\t"}
 
-    base_style = "json."
-    highlights = [
+    base_style: ClassVar[str] = "json."
+    highlights: ClassVar[Sequence[str]] = [
         _combine_regex(
             r"(?P<brace>[\{\[\(\)\]\}])",
             r"\b(?P<bool_true>true)\b|\b(?P<bool_false>false)\b|\b(?P<null>null)\b",
@@ -145,8 +145,8 @@ class ISO8601Highlighter(RegexHighlighter):
     Regex reference: https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s07.html
     """
 
-    base_style = "iso8601."
-    highlights = [
+    base_style: ClassVar[str] = "iso8601."
+    highlights: ClassVar[Sequence[str]] = [
         #
         # Dates
         #

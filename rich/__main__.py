@@ -207,6 +207,8 @@ Supports much of the *markdown* __syntax__!
 
 
 if __name__ == "__main__":  # pragma: no cover
+    from rich.panel import Panel
+
     console = Console(
         file=io.StringIO(),
         force_terminal=True,
@@ -227,47 +229,17 @@ if __name__ == "__main__":  # pragma: no cover
     c = Console(record=True)
     c.print(test_card)
 
-    print(f"rendered in {pre_cache_taken}ms (cold cache)")
-    print(f"rendered in {taken}ms (warm cache)")
-
-    from rich.panel import Panel
-
     console = Console()
-
-    sponsor_message = Table.grid(padding=1)
-    sponsor_message.add_column(style="green", justify="right")
-    sponsor_message.add_column(no_wrap=True)
-
-    sponsor_message.add_row(
-        "Textualize",
-        "[u blue link=https://github.com/textualize]https://github.com/textualize",
-    )
-    sponsor_message.add_row(
-        "Twitter",
-        "[u blue link=https://twitter.com/willmcgugan]https://twitter.com/willmcgugan",
-    )
-
-    intro_message = Text.from_markup(
-        """\
-We hope you enjoy using Rich!
-
-Rich is maintained with [red]:heart:[/] by [link=https://www.textualize.io]Textualize.io[/]
-
-- Will McGugan"""
-    )
-
-    message = Table.grid(padding=2)
-    message.add_column()
-    message.add_column(no_wrap=True)
-    message.add_row(intro_message, sponsor_message)
-
+    console.print(f"[dim]rendered in [not dim]{pre_cache_taken}ms[/] (cold cache)")
+    console.print(f"[dim]rendered in [not dim]{taken}ms[/] (warm cache)")
+    console.print()
     console.print(
-        Panel.fit(
-            message,
-            box=box.ROUNDED,
+        Panel(
+            "[b magenta]Hope you enjoy using Rich![/]\n\n"
+            "Consider sponsoring to ensure this project is maintained.\n\n"
+            "[cyan]https://github.com/sponsors/willmcgugan[/cyan]",
+            border_style="green",
+            title="Help ensure Rich is maintained",
             padding=(1, 2),
-            title="[b red]Thanks for trying out Rich!",
-            border_style="bright_blue",
-        ),
-        justify="center",
+        )
     )

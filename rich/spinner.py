@@ -1,4 +1,4 @@
-from typing import cast, List, Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, List, Optional, Union, cast
 
 from ._spinners import SPINNERS
 from .measure import Measurement
@@ -6,7 +6,7 @@ from .table import Table
 from .text import Text
 
 if TYPE_CHECKING:
-    from .console import Console, ConsoleOptions, RenderResult, RenderableType
+    from .console import Console, ConsoleOptions, RenderableType, RenderResult
     from .style import StyleType
 
 
@@ -117,22 +117,16 @@ class Spinner:
 if __name__ == "__main__":  # pragma: no cover
     from time import sleep
 
-    from .columns import Columns
-    from .panel import Panel
+    from .console import Group
     from .live import Live
 
-    all_spinners = Columns(
-        [
+    all_spinners = Group(
+        *[
             Spinner(spinner_name, text=Text(repr(spinner_name), style="green"))
             for spinner_name in sorted(SPINNERS.keys())
-        ],
-        column_first=True,
-        expand=True,
+        ]
     )
 
-    with Live(
-        Panel(all_spinners, title="Spinners", border_style="blue"),
-        refresh_per_second=20,
-    ) as live:
+    with Live(all_spinners, refresh_per_second=20) as live:
         while True:
             sleep(0.1)

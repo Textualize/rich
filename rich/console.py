@@ -22,26 +22,20 @@ from typing import (
     Dict,
     Iterable,
     List,
+    Literal,
     Mapping,
     NamedTuple,
     Optional,
+    Protocol,
     TextIO,
     Tuple,
     Type,
     Union,
     cast,
+    runtime_checkable,
 )
 
 from rich._null_file import NULL_FILE
-
-if sys.version_info >= (3, 8):
-    from typing import Literal, Protocol, runtime_checkable
-else:
-    from typing_extensions import (
-        Literal,
-        Protocol,
-        runtime_checkable,
-    )  # pragma: no cover
 
 from . import errors, themes
 from ._emoji_replace import _emoji_replace
@@ -500,7 +494,7 @@ def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
     """
 
     def decorator(
-        method: Callable[..., Iterable[RenderableType]]
+        method: Callable[..., Iterable[RenderableType]],
     ) -> Callable[..., Group]:
         """Convert a method that returns an iterable of renderables in to a Group."""
 
@@ -735,8 +729,18 @@ class Console:
         self.get_time = get_time or monotonic
         self.style = style
         self.no_color = (
-            no_color if no_color is not None else "NO_COLOR" in self._environ
+            no_color
+            if no_color is not None
+            else self._environ.get("NO_COLOR", "") != ""
         )
+        if force_interactive is None:
+            tty_interactive = self._environ.get("TTY_INTERACTIVE", None)
+            if tty_interactive is not None:
+                if tty_interactive == "0":
+                    force_interactive = False
+                elif tty_interactive == "1":
+                    force_interactive = True
+
         self.is_interactive = (
             (self.is_terminal and not self.is_dumb_terminal)
             if force_interactive is None
@@ -749,7 +753,7 @@ class Console:
         )
         self._record_buffer: List[Segment] = []
         self._render_hooks: List[RenderHook] = []
-        self._live: Optional["Live"] = None
+        self._live_stack: List[Live] = []
         self._is_alt_screen = False
 
     def __repr__(self) -> str:
@@ -821,24 +825,26 @@ class Console:
         self._buffer_index -= 1
         self._check_buffer()
 
-    def set_live(self, live: "Live") -> None:
-        """Set Live instance. Used by Live context manager.
+    def set_live(self, live: "Live") -> bool:
+        """Set Live instance. Used by Live context manager (no need to call directly).
 
         Args:
             live (Live): Live instance using this Console.
+
+        Returns:
+            Boolean that indicates if the live is the topmost of the stack.
 
         Raises:
             errors.LiveError: If this Console has a Live context currently active.
         """
         with self._lock:
-            if self._live is not None:
-                raise errors.LiveError("Only one live display may be active at once")
-            self._live = live
+            self._live_stack.append(live)
+            return len(self._live_stack) == 1
 
     def clear_live(self) -> None:
-        """Clear the Live instance."""
+        """Clear the Live instance. Used by the Live context manager (no need to call directly)."""
         with self._lock:
-            self._live = None
+            self._live_stack.pop()
 
     def push_render_hook(self, hook: RenderHook) -> None:
         """Add a new render hook to the stack.
@@ -933,11 +939,13 @@ class Console:
 
         Returns:
             bool: True if the console writing to a device capable of
-            understanding terminal codes, otherwise False.
+                understanding escape sequences, otherwise False.
         """
+        # If dev has explicitly set this value, return it
         if self._force_terminal is not None:
             return self._force_terminal
 
+        # Fudge for Idle
         if hasattr(sys.stdin, "__module__") and sys.stdin.__module__.startswith(
             "idlelib"
         ):
@@ -948,12 +956,22 @@ class Console:
             # return False for Jupyter, which may have FORCE_COLOR set
             return False
 
-        # If FORCE_COLOR env var has any value at all, we assume a terminal.
-        force_color = self._environ.get("FORCE_COLOR")
-        if force_color is not None:
-            self._force_terminal = True
+        environ = self._environ
+
+        tty_compatible = environ.get("TTY_COMPATIBLE", "")
+        # 0 indicates device is not tty compatible
+        if tty_compatible == "0":
+            return False
+        # 1 indicates device is tty compatible
+        if tty_compatible == "1":
             return True
 
+        # https://force-color.org/
+        force_color = environ.get("FORCE_COLOR")
+        if force_color is not None:
+            return force_color != ""
+
+        # Any other value defaults to auto detect
         isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
         try:
             return False if isatty is None else isatty()
@@ -978,12 +996,13 @@ class Console:
     @property
     def options(self) -> ConsoleOptions:
         """Get default console options."""
+        size = self.size
         return ConsoleOptions(
-            max_height=self.size.height,
-            size=self.size,
+            max_height=size.height,
+            size=size,
             legacy_windows=self.legacy_windows,
             min_width=1,
-            max_width=self.width,
+            max_width=size.width,
             encoding=self.encoding,
             is_terminal=self.is_terminal,
         )
@@ -1704,12 +1723,16 @@ class Console:
                 for renderable in renderables:
                     extend(render(renderable, render_options))
             else:
+                render_style = self.get_style(style)
+                new_line = Segment.line()
                 for renderable in renderables:
-                    extend(
-                        Segment.apply_style(
-                            render(renderable, render_options), self.get_style(style)
-                        )
-                    )
+                    for line, add_new_line in Segment.split_lines_terminator(
+                        render(renderable, render_options)
+                    ):
+                        extend(Segment.apply_style(line, render_style))
+                        if add_new_line:
+                            new_segments.append(new_line)
+
             if new_line_start:
                 if (
                     len("".join(segment.text for segment in new_segments).splitlines())
