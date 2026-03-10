@@ -92,9 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Indentation in exceptions won't be underlined https://github.com/Textualize/rich/pull/3678
 - Rich tracebacks will now render Exception Groups https://github.com/Textualize/rich/pull/3677
 
-### Fixed
-
-- Fixed empty line being printed after Progress context is exited on notebooks(vscode) https://github.com/Textualize/rich/pull/3562
+## [13.9.4] - 2024-11-01
 
 ### Changed
 
