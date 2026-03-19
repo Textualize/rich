@@ -691,7 +691,6 @@ class Text(JupyterMixin):
     ) -> Iterable[Segment]:
         tab_size: int = console.tab_size if self.tab_size is None else self.tab_size
         justify = self.justify or options.justify or DEFAULT_JUSTIFY
-
         overflow = self.overflow or options.overflow or DEFAULT_OVERFLOW
 
         lines = self.wrap(
@@ -1007,7 +1006,7 @@ class Text(JupyterMixin):
         return self
 
     def append_text(self, text: "Text") -> "Text":
-        """Append another Text instance. This method is more performant that Text.append, but
+        """Append another Text instance. This method is more performant than Text.append, but
         only works for Text.
 
         Args:
@@ -1105,7 +1104,7 @@ class Text(JupyterMixin):
         return lines
 
     def divide(self, offsets: Iterable[int]) -> Lines:
-        """Divide text in to a number of lines at given offsets.
+        """Divide text into a number of lines at given offsets.
 
         Args:
             offsets (Iterable[int]): Offsets used to divide text.
@@ -1232,12 +1231,15 @@ class Text(JupyterMixin):
             if "\t" in line:
                 line.expand_tabs(tab_size)
             if no_wrap:
+                if overflow == "ignore":
+                    lines.append(line)
+                    continue
                 new_lines = Lines([line])
             else:
                 offsets = divide_line(str(line), width, fold=wrap_overflow == "fold")
                 new_lines = line.divide(offsets)
-            for line in new_lines:
-                line.rstrip_end(width)
+                for line in new_lines:
+                    line.rstrip_end(width)
             if wrap_justify:
                 new_lines.justify(
                     console, width, justify=wrap_justify, overflow=wrap_overflow

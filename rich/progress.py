@@ -1064,7 +1064,7 @@ class Progress(JupyterMixin):
     Args:
         console (Console, optional): Optional Console instance. Defaults to an internal Console instance writing to stdout.
         auto_refresh (bool, optional): Enable auto refresh. If disabled, you will need to call `refresh()`.
-        refresh_per_second (Optional[float], optional): Number of times per second to refresh the progress information or None to use default (10). Defaults to None.
+        refresh_per_second (float, optional): Number of times per second to refresh the progress information. Defaults to 10.
         speed_estimate_period: (float, optional): Period (in seconds) used to calculate the speed estimate. Defaults to 30.
         transient: (bool, optional): Clear the progress on exit. Defaults to False.
         redirect_stdout: (bool, optional): Enable redirection of stdout, so ``print`` may be used. Defaults to True.
@@ -1172,9 +1172,10 @@ class Progress(JupyterMixin):
 
     def stop(self) -> None:
         """Stop the progress display."""
-        self.live.stop()
-        if not self.console.is_interactive and not self.console.is_jupyter:
-            self.console.print()
+        if not self.disable:
+            self.live.stop()
+            if not self.console.is_interactive and not self.console.is_jupyter:
+                self.console.print()
 
     def __enter__(self) -> Self:
         self.start()
@@ -1492,7 +1493,7 @@ class Progress(JupyterMixin):
             start (bool, optional): Start the task after reset. Defaults to True.
             total (float, optional): New total steps in task, or None to use current total. Defaults to None.
             completed (int, optional): Number of steps completed. Defaults to 0.
-            visible (bool, optional): Enable display of the task. Defaults to True.
+            visible (bool, optional): Set visible flag if not None.
             description (str, optional): Change task description if not None. Defaults to None.
             **fields (str): Additional data fields required for rendering.
         """

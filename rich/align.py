@@ -28,6 +28,20 @@ class Align(JupyterMixin):
 
     Raises:
         ValueError: if ``align`` is not one of the expected values.
+
+    Example:
+        .. code-block:: python
+
+            from rich.console import Console
+            from rich.align import Align
+            from rich.panel import Panel
+
+            console = Console()
+            # Create a panel 20 characters wide
+            p = Panel("Hello, [b]World[/b]!", style="on green", width=20)
+
+            # Renders the panel centered in the terminal
+            console.print(Align(p, align="center"))
     """
 
     def __init__(

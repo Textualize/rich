@@ -5,11 +5,60 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [14.3.3] - 2026-02-19
+
+### Fixed
+
+- Fixed infinite loop with `cells.split_graphemes` https://github.com/Textualize/rich/pull/4006
+
+## [14.3.2] - 2026-02-01
+
+### Fixed
+
+- Fixed solo ZWJ crash https://github.com/Textualize/rich/pull/3953
+- Fixed control codes reporting width of 1 https://github.com/Textualize/rich/pull/3953
+
+## [14.3.1] - 2026-01-24
+
+### Fixed
+
+- Fixed characters out of unicode range reporting a cell size if 0 https://github.com/Textualize/rich/pull/3944
+
+## [14.3.0] - 2026-01-24
+
+### Fixed
+
+- IPython now respects when a `Console` instance is passed to `pretty.install` https://github.com/Textualize/rich/pull/3915
+- Fixed extraneous blank line on non-interactive disabled `Progress` https://github.com/Textualize/rich/pull/3905
+- Fixed extra padding on first cell in columns https://github.com/Textualize/rich/pull/3935
+- Fixed trailing whitespace removed when soft_wrap=True https://github.com/Textualize/rich/pull/3937
+- Fixed style new-lines when soft_wrap = True and a print style is set https://github.com/Textualize/rich/pull/3938
+
+### Added
+
+- Added support for some multi-codepopint glyphs (will fix alignment issues for these characters) https://github.com/Textualize/rich/pull/3930
+- Added support for `UNICODE_VERSION` environment variable https://github.com/Textualize/rich/pull/3930
+- Added `last_render_height` property to LiveRender https://github.com/Textualize/rich/pull/3934
+- Expose locals_max_depth and locals_overflow in traceback.install https://github.com/Textualize/rich/pull/3906/
+- Added `Segment.split_lines_terminator` https://github.com/Textualize/rich/pull/3938
+
+### Changed
+
+- `cells.cell_len` now has a `unicode_version` parameter (that you probably should never change) https://github.com/Textualize/rich/pull/3930
+- Live will not write a new line if there was nothing rendered https://github.com/Textualize/rich/pull/3934
+- Changed style of Markdown headers https://github.com/Textualize/rich/pull/3942
+- Changed style of Markdown tables, added `markdown.table.header` and `markdown.table.border` styles https://github.com/Textualize/rich/pull/3942
+- Changed style of Markdown rules https://github.com/Textualize/rich/pull/3942
+
 ## [14.2.0] - 2025-10-09
 
 ### Changed
 
 - Python3.14 compatibility https://github.com/Textualize/rich/pull/3861
+
+### Fixed
+
+- Fixed exception when calling `inspect` on objects with unusual `__qualname__` attribute https://github.com/Textualize/rich/pull/3894
 
 ## [14.1.0] - 2025-06-25
 
@@ -2147,8 +2196,10 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-[14.1.0]: https://github.com/textualize/rich/compare/v14.1.0...v14.2.0
-[14.0.0]: https://github.com/textualize/rich/compare/v14.0.0...v14.1.0
+[14.3.1]: https://github.com/textualize/rich/compare/v14.3.0...v14.3.1
+[14.3.0]: https://github.com/textualize/rich/compare/v14.2.0...v14.3.0
+[14.2.0]: https://github.com/textualize/rich/compare/v14.1.0...v14.2.0
+[14.1.0]: https://github.com/textualize/rich/compare/v14.0.0...v14.1.0
 [14.0.0]: https://github.com/textualize/rich/compare/v13.9.4...v14.0.0
 [13.9.4]: https://github.com/textualize/rich/compare/v13.9.3...v13.9.4
 [13.9.3]: https://github.com/textualize/rich/compare/v13.9.2...v13.9.3

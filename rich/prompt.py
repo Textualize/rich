@@ -262,7 +262,7 @@ class PromptBase(Generic[PromptType]):
             value (str): String entered by user.
             error (InvalidResponse): Exception instance the initiated the error.
         """
-        self.console.print(error)
+        self.console.print(error, markup=True)
 
     def pre_prompt(self) -> None:
         """Hook to display something before the prompt."""

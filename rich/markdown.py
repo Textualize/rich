@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from dataclasses import dataclass
 from typing import ClassVar, Iterable, get_args
 
 from markdown_it import MarkdownIt
@@ -14,7 +15,6 @@ from ._stack import Stack
 from .console import Console, ConsoleOptions, JustifyMethod, RenderResult
 from .containers import Renderables
 from .jupyter import JupyterMixin
-from .panel import Panel
 from .rule import Rule
 from .segment import Segment
 from .style import Style, StyleStack
@@ -124,8 +124,23 @@ class Paragraph(TextElement):
         yield self.text
 
 
+@dataclass
+class HeadingFormat:
+    justify: JustifyMethod = "left"
+    style: str = ""
+
+
 class Heading(TextElement):
     """A heading."""
+
+    LEVEL_ALIGN: ClassVar[dict[str, JustifyMethod]] = {
+        "h1": "center",
+        "h2": "left",
+        "h3": "left",
+        "h4": "left",
+        "h5": "left",
+        "h6": "left",
+    }
 
     @classmethod
     def create(cls, markdown: Markdown, token: Token) -> Heading:
@@ -143,20 +158,10 @@ class Heading(TextElement):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        text = self.text
-        text.justify = "center"
-        if self.tag == "h1":
-            # Draw a border around h1s
-            yield Panel(
-                text,
-                box=box.HEAVY,
-                style="markdown.h1.border",
-            )
-        else:
-            # Styled text for h2 and beyond
-            if self.tag == "h2":
-                yield Text("")
-            yield text
+        text = self.text.copy()
+        heading_justify = self.LEVEL_ALIGN.get(self.tag, "left")
+        text.justify = heading_justify
+        yield text
 
 
 class CodeBlock(TextElement):
@@ -219,7 +224,8 @@ class HorizontalRule(MarkdownElement):
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         style = console.get_style("markdown.hr", default="none")
-        yield Rule(style=style)
+        yield Rule(style=style, characters="-")
+        yield Text()
 
 
 class TableElement(MarkdownElement):
@@ -241,11 +247,19 @@ class TableElement(MarkdownElement):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        table = Table(box=box.SIMPLE_HEAVY)
+        table = Table(
+            box=box.SIMPLE,
+            pad_edge=False,
+            style="markdown.table.border",
+            show_edge=True,
+            collapse_padding=True,
+        )
 
         if self.header is not None and self.header.row is not None:
             for column in self.header.row.cells:
-                table.add_column(column.content)
+                heading = column.content.copy()
+                heading.stylize("markdown.table.header")
+                table.add_column(heading)
 
         if self.body is not None:
             for row in self.body.rows:

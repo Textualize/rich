@@ -33,7 +33,7 @@ If you intend to use Rich with Jupyter then there are some additional dependenci
 Demo
 ----
 
-To check if Rich was installed correctly, and to see a little of what Rich can do, run the following from the command line::
+To verify that Rich is installed correctly and to see a quick demonstration of its features, run the following command in your terminal::
 
     python -m rich
 

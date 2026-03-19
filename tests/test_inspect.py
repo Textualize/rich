@@ -404,6 +404,19 @@ def test_inspect_module_with_class():
     assert render(module, methods=True) == expected
 
 
+def test_qualname_in_slots():
+    from functools import lru_cache
+
+    @lru_cache
+    class Klass:
+        __slots__ = ("__qualname__",)
+
+    try:
+        inspect(Klass)
+    except Exception as e:
+        assert False, f"Class with __qualname__ in __slots__ shouldn't raise {e}"
+
+
 @pytest.mark.parametrize(
     "special_character,expected_replacement",
     (
