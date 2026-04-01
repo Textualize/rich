@@ -108,7 +108,7 @@ class Control:
     def move_to_column(cls, x: int, y: int = 0) -> "Control":
         """Move to the given column, optionally add offset to row.
 
-        Returns:
+        Args:
             x (int): absolute x (column)
             y (int): optional y offset (row)
 

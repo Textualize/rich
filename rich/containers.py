@@ -28,7 +28,7 @@ T = TypeVar("T")
 
 
 class Renderables:
-    """A list subclass which renders its contents to the console."""
+    """A list-like container which renders its contents to the console."""
 
     def __init__(
         self, renderables: Optional[Iterable["RenderableType"]] = None
@@ -57,6 +57,11 @@ class Renderables:
         return Measurement(_min, _max)
 
     def append(self, renderable: "RenderableType") -> None:
+        """Append a renderable to the list.
+
+        Args:
+            renderable (RenderableType): Any renderable object.
+        """
         self._renderables.append(renderable)
 
     def __iter__(self) -> Iterable["RenderableType"]:
@@ -64,7 +69,7 @@ class Renderables:
 
 
 class Lines:
-    """A list subclass which can render to the console."""
+    """A list-like container of Text lines which can render to the console."""
 
     def __init__(self, lines: Iterable["Text"] = ()) -> None:
         self._lines: List["Text"] = list(lines)
@@ -76,12 +81,10 @@ class Lines:
         return iter(self._lines)
 
     @overload
-    def __getitem__(self, index: int) -> "Text":
-        ...
+    def __getitem__(self, index: int) -> "Text": ...
 
     @overload
-    def __getitem__(self, index: slice) -> List["Text"]:
-        ...
+    def __getitem__(self, index: slice) -> List["Text"]: ...
 
     def __getitem__(self, index: Union[slice, int]) -> Union["Text", List["Text"]]:
         return self._lines[index]
@@ -100,12 +103,30 @@ class Lines:
         yield from self._lines
 
     def append(self, line: "Text") -> None:
+        """Append a line to the end of the list.
+
+        Args:
+            line (Text): A Text instance to append.
+        """
         self._lines.append(line)
 
     def extend(self, lines: Iterable["Text"]) -> None:
+        """Extend the list by appending all lines from an iterable.
+
+        Args:
+            lines (Iterable[Text]): An iterable of Text instances.
+        """
         self._lines.extend(lines)
 
     def pop(self, index: int = -1) -> "Text":
+        """Remove and return a line at the given index.
+
+        Args:
+            index (int, optional): Index of line to remove. Defaults to -1 (last).
+
+        Returns:
+            Text: The removed Text instance.
+        """
         return self._lines.pop(index)
 
     def justify(

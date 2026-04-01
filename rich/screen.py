@@ -4,14 +4,12 @@ from .segment import Segment
 from .style import StyleType
 from ._loop import loop_last
 
-
 if TYPE_CHECKING:
     from .console import (
         Console,
         ConsoleOptions,
         RenderResult,
         RenderableType,
-        Group,
     )
 
 
@@ -19,8 +17,9 @@ class Screen:
     """A renderable that fills the terminal screen and crops excess.
 
     Args:
-        renderable (RenderableType): Child renderable.
+        *renderables (RenderableType): One or more child renderables.
         style (StyleType, optional): Optional background style. Defaults to None.
+        application_mode (bool, optional): Enable application mode, using newline-carriage return instead of just newline. Defaults to False.
     """
 
     renderable: "RenderableType"

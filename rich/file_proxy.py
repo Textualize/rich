@@ -26,6 +26,17 @@ class FileProxy(io.TextIOBase):
         return getattr(self.__file, name)
 
     def write(self, text: str) -> int:
+        """Write text to the console via the proxy.
+
+        Args:
+            text (str): Text to write.
+
+        Returns:
+            int: Number of characters written.
+
+        Raises:
+            TypeError: If text is not a string.
+        """
         if not isinstance(text, str):
             raise TypeError(f"write() argument must be str, not {type(text).__name__}")
         buffer = self.__buffer
@@ -48,6 +59,7 @@ class FileProxy(io.TextIOBase):
         return len(text)
 
     def flush(self) -> None:
+        """Flush the internal buffer to the console."""
         output = "".join(self.__buffer)
         if output:
             self.__console.print(output)

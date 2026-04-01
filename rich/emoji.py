@@ -7,7 +7,6 @@ from .style import Style
 from ._emoji_codes import EMOJI
 from ._emoji_replace import _emoji_replace
 
-
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult
 
@@ -22,7 +21,7 @@ class NoEmoji(Exception):
 class Emoji(JupyterMixin):
     __slots__ = ["name", "style", "_char", "variant"]
 
-    VARIANTS = {"text": "\uFE0E", "emoji": "\uFE0F"}
+    VARIANTS = {"text": "\ufe0e", "emoji": "\ufe0f"}
 
     def __init__(
         self,
@@ -34,7 +33,8 @@ class Emoji(JupyterMixin):
 
         Args:
             name (str): Name of emoji.
-            style (Union[str, Style], optional): Optional style. Defaults to None.
+            style (Union[str, Style], optional): Optional style. Defaults to "none".
+            variant (Optional[EmojiVariant], optional): Optional emoji variant, either "emoji" or "text". Defaults to None.
 
         Raises:
             NoEmoji: If the emoji doesn't exist.
@@ -82,7 +82,7 @@ if __name__ == "__main__":  # pragma: no cover
     console = Console(record=True)
 
     columns = Columns(
-        (f":{name}: {name}" for name in sorted(EMOJI.keys()) if "\u200D" not in name),
+        (f":{name}: {name}" for name in sorted(EMOJI.keys()) if "\u200d" not in name),
         column_first=True,
     )
 

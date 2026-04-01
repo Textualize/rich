@@ -27,7 +27,7 @@ class Highlighter(ABC):
             TypeError: If not called with text or str.
 
         Returns:
-            Text: A test instance with highlighting applied.
+            Text: A text instance with highlighting applied.
         """
         if isinstance(text, str):
             highlight_text = Text(text)

@@ -131,12 +131,10 @@ class ProgressBar(JupyterMixin):
         Args:
             console (Console): Console instance.
             width (int): Width in characters of pulse animation.
-
-        Returns:
-            RenderResult: [description]
+            ascii (bool, optional): Use ASCII characters only. Defaults to False.
 
         Yields:
-            Iterator[Segment]: Segments to render pulse
+            Segment: Segments to render pulse.
         """
         fore_style = console.get_style(self.pulse_style, default="white")
         back_style = console.get_style(self.style, default="black")
