@@ -35,3 +35,22 @@ def test_new_lines():
     assert file.getvalue() == "-\n"
     file_proxy.flush()
     assert file.getvalue() == "-\n-\n"
+
+
+def test_isatty_delegates_to_proxied_file():
+    """FileProxy.isatty() must delegate to the underlying file.
+
+    io.TextIOBase.isatty() always returns False, so without an explicit
+    override the result would be wrong when the proxied file is a tty.
+    Regression test for https://github.com/Textualize/rich/issues/4041
+    """
+    tty_file = io.StringIO()
+    tty_file.isatty = lambda: True  # type: ignore[method-assign]
+
+    non_tty_file = io.StringIO()
+    # StringIO.isatty() already returns False, but be explicit
+    non_tty_file.isatty = lambda: False  # type: ignore[method-assign]
+
+    console = Console()
+    assert FileProxy(console, tty_file).isatty() is True
+    assert FileProxy(console, non_tty_file).isatty() is False
