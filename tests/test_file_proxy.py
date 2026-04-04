@@ -35,3 +35,19 @@ def test_new_lines():
     assert file.getvalue() == "-\n"
     file_proxy.flush()
     assert file.getvalue() == "-\n-\n"
+
+
+def test_isatty_delegates_to_proxied_file():
+    """FileProxy.isatty() should delegate to the underlying file."""
+    import unittest.mock
+
+    console = Console()
+    mock_file = unittest.mock.MagicMock()
+    mock_file.isatty.return_value = True
+    file_proxy = FileProxy(console, mock_file)
+    assert file_proxy.isatty() is True
+    mock_file.isatty.assert_called_once()
+
+    # Verify False case also delegates correctly
+    mock_file.isatty.return_value = False
+    assert file_proxy.isatty() is False
