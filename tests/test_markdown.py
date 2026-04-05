@@ -73,7 +73,8 @@ import io
 import re
 
 from rich.console import Console, RenderableType
-from rich.markdown import Markdown
+from rich.markdown import Markdown, TableDataElement
+from rich.text import Span, Text
 
 re_link_ids = re.compile(r"id=[\d\.\-]*?;.*?\x1b")
 
@@ -197,6 +198,18 @@ def test_table_with_empty_cells() -> None:
     result = len(render(table_with_empty_cells).splitlines())
     expected = len(render(complete_table).splitlines())
     assert result == expected
+
+
+def test_table_data_element_preserves_existing_text_spans() -> None:
+    cell = TableDataElement(justify="left")
+    context = type("Context", (), {"current_style": "markdown.code"})()
+    text = Text("hello")
+    text.stylize("repr.str", 0, 5)
+
+    cell.on_text(context, text)
+
+    assert cell.content.plain == "hello"
+    assert cell.content.spans == [Span(0, 5, "repr.str")]
 
 
 if __name__ == "__main__":
