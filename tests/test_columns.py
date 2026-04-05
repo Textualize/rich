@@ -71,6 +71,19 @@ def test_render():
     assert render() == expected
 
 
+def test_columns_respect_markup_and_emoji_overrides() -> None:
+    console = Console(file=io.StringIO(), width=60, legacy_windows=False)
+    console.print(
+        Columns(["[bold]Hello[/bold]", ":warning:"]),
+        markup=False,
+        emoji=False,
+    )
+
+    result = console.file.getvalue()
+    assert "[bold]Hello[/bold]" in result
+    assert ":warning:" in result
+
+
 if __name__ == "__main__":
     result = render()
     print(result)

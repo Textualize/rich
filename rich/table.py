@@ -491,14 +491,22 @@ class Table(JupyterMixin):
         table_width = sum(widths) + extra_width
 
         render_options = options.update(
-            width=table_width, highlight=self.highlight, height=None
+            width=table_width,
+            highlight=pick_bool(options.highlight, self.highlight),
+            height=None,
         )
 
         def render_annotation(
             text: TextType, style: StyleType, justify: "JustifyMethod" = "center"
         ) -> "RenderResult":
             render_text = (
-                console.render_str(text, style=style, highlight=False)
+                console.render_str(
+                    text,
+                    style=style,
+                    emoji=render_options.emoji,
+                    markup=render_options.markup,
+                    highlight=render_options.highlight,
+                )
                 if isinstance(text, str)
                 else text
             )
@@ -833,7 +841,7 @@ class Table(JupyterMixin):
                     no_wrap=column.no_wrap,
                     overflow=column.overflow,
                     height=None,
-                    highlight=column.highlight,
+                    highlight=pick_bool(options.highlight, column.highlight),
                 )
                 lines = console.render_lines(
                     cell.renderable,

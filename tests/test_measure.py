@@ -34,3 +34,11 @@ def test_clamp():
     assert measurement.clamp(None, 50) == Measurement(20, 50)
     assert measurement.clamp(30, None) == Measurement(30, 100)
     assert measurement.clamp(None, None) == Measurement(20, 100)
+
+
+def test_measurement_respects_markup_and_emoji_overrides() -> None:
+    console = Console()
+    text = "[bold]:warning:[/bold]"
+    options = console.options.update(markup=False, emoji=False)
+
+    assert Measurement.get(console, options, text) == Measurement(len(text), len(text))

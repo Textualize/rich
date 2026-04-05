@@ -51,6 +51,17 @@ def test_soft_wrap() -> None:
     assert console.file.getvalue() == "foo " * 20
 
 
+def test_nested_render_respects_markup_and_emoji_overrides() -> None:
+    class NestedRenderable:
+        def __rich_console__(self, console, options):
+            yield "[bold]:warning:[/bold]"
+
+    console = Console(file=io.StringIO(), legacy_windows=False)
+    console.print(NestedRenderable(), markup=False, emoji=False)
+
+    assert console.file.getvalue() == "[bold]:warning:[/bold]\n"
+
+
 @pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 def test_16color_terminal() -> None:
     console = Console(

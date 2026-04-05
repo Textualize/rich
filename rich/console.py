@@ -139,6 +139,8 @@ class ConsoleOptions:
     """Overflow value override for renderable."""
     no_wrap: Optional[bool] = False
     """Disable wrapping for text."""
+    emoji: Optional[bool] = None
+    """Emoji override for render_str."""
     highlight: Optional[bool] = None
     """Highlight override for render_str."""
     markup: Optional[bool] = None
@@ -169,6 +171,7 @@ class ConsoleOptions:
         justify: Union[Optional[JustifyMethod], NoChange] = NO_CHANGE,
         overflow: Union[Optional[OverflowMethod], NoChange] = NO_CHANGE,
         no_wrap: Union[Optional[bool], NoChange] = NO_CHANGE,
+        emoji: Union[Optional[bool], NoChange] = NO_CHANGE,
         highlight: Union[Optional[bool], NoChange] = NO_CHANGE,
         markup: Union[Optional[bool], NoChange] = NO_CHANGE,
         height: Union[Optional[int], NoChange] = NO_CHANGE,
@@ -187,6 +190,8 @@ class ConsoleOptions:
             options.overflow = overflow
         if not isinstance(no_wrap, NoChange):
             options.no_wrap = no_wrap
+        if not isinstance(emoji, NoChange):
+            options.emoji = emoji
         if not isinstance(highlight, NoChange):
             options.highlight = highlight
         if not isinstance(markup, NoChange):
@@ -1325,7 +1330,10 @@ class Console:
             render_iterable = renderable.__rich_console__(self, _options)
         elif isinstance(renderable, str):
             text_renderable = self.render_str(
-                renderable, highlight=_options.highlight, markup=_options.markup
+                renderable,
+                emoji=_options.emoji,
+                highlight=_options.highlight,
+                markup=_options.markup,
             )
             render_iterable = text_renderable.__rich_console__(self, _options)
         else:
@@ -1712,6 +1720,7 @@ class Console:
                 width=min(width, self.width) if width is not None else NO_CHANGE,
                 height=height,
                 no_wrap=no_wrap,
+                emoji=emoji,
                 markup=markup,
                 highlight=highlight,
             )

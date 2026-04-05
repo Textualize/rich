@@ -128,3 +128,10 @@ def test_repr():
 def test_error():
     with pytest.raises(ValueError):
         Rule(characters="")
+
+
+def test_rule_respects_markup_and_emoji_overrides() -> None:
+    console = Console(width=60, file=io.StringIO(), legacy_windows=False, _environ={})
+    console.print(Rule("[bold]:warning:[/bold]"), markup=False, emoji=False)
+
+    assert "[bold]:warning:[/bold]" in console.file.getvalue()

@@ -102,6 +102,19 @@ def test_not_renderable():
         table.add_row(Foo())
 
 
+def test_table_title_respects_markup_and_emoji_overrides() -> None:
+    console = Console(width=80, file=io.StringIO(), legacy_windows=False, _environ={})
+    table = Table(title="[bold]:warning:[/bold]")
+    table.add_column("Column")
+    table.add_row("value")
+
+    console.print(table, markup=False, emoji=False)
+
+    result = console.file.getvalue()
+    normalized = result.replace("\n", "").replace(" ", "")
+    assert "[bold]:warning:[/bold]" in normalized
+
+
 def test_init_append_column():
     header_names = ["header1", "header2", "header3"]
     test_columns = [

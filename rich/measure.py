@@ -97,7 +97,10 @@ class Measurement(NamedTuple):
             return Measurement(0, 0)
         if isinstance(renderable, str):
             renderable = console.render_str(
-                renderable, markup=options.markup, highlight=False
+                renderable,
+                emoji=options.emoji,
+                markup=options.markup,
+                highlight=False,
             )
         renderable = rich_cast(renderable)
         if is_renderable(renderable):
