@@ -131,7 +131,12 @@ class Segment(NamedTuple):
 
         pos = int((cut / cell_length) * len(text))
 
-        while True:
+        max_iterations = len(text) + 2  # safety guard against infinite loops
+        for _ in range(max_iterations):
+            if pos < 0:
+                pos = 0
+            if pos > len(text):
+                pos = len(text)
             before = text[:pos]
             cell_pos = cell_len(before)
             out_by = cell_pos - cut
@@ -140,12 +145,12 @@ class Segment(NamedTuple):
                     _Segment(before, style, control),
                     _Segment(text[pos:], style, control),
                 )
-            if out_by == -1 and cell_size(text[pos]) == 2:
+            if out_by == -1 and pos < len(text) and cell_size(text[pos]) == 2:
                 return (
                     _Segment(text[:pos] + " ", style, control),
                     _Segment(" " + text[pos + 1 :], style, control),
                 )
-            if out_by == +1 and cell_size(text[pos - 1]) == 2:
+            if out_by == +1 and pos > 0 and cell_size(text[pos - 1]) == 2:
                 return (
                     _Segment(text[: pos - 1] + " ", style, control),
                     _Segment(" " + text[pos:], style, control),
@@ -154,6 +159,12 @@ class Segment(NamedTuple):
                 pos += 1
             else:
                 pos -= 1
+
+        # Fallback: could not find exact cut position, split at closest
+        return (
+            _Segment(text[:pos], style, control),
+            _Segment(text[pos:], style, control),
+        )
 
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
         """Split segment in to two segments at the specified column.
