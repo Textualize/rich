@@ -467,8 +467,6 @@ class Traceback:
 
         from rich import _IMPORT_CWD
 
-        notes: List[str] = getattr(exc_value, "__notes__", None) or []
-
         grouped_exceptions: Set[BaseException] = (
             set() if _visited_exceptions is None else _visited_exceptions
         )
@@ -481,6 +479,7 @@ class Traceback:
                 return "<exception str() failed>"
 
         while True:
+            notes: List[str] = getattr(exc_value, "__notes__", None) or []
             stack = Stack(
                 exc_type=safe_str(exc_type.__name__),
                 exc_value=safe_str(exc_value),

@@ -397,3 +397,59 @@ def test_recursive_exception() -> None:
             console.print_exception(show_locals=True)
 
     bar()
+
+
+def test_notes_dont_leak_across_chained_exceptions():
+    """Test that __notes__ from one exception don't appear on chained exceptions.
+
+    Regression test for https://github.com/Textualize/rich/issues/3960
+    """
+    console = Console(width=100, file=io.StringIO())
+
+    try:
+        try:
+            try:
+                raise ValueError("outer")
+            except ValueError as e:
+                e.__notes__ = ["note on outer"]
+                raise RuntimeError("inner") from e
+        except RuntimeError as e:
+            e.__notes__ = ["note on inner"]
+            raise
+    except RuntimeError:
+        console.print_exception()
+
+    output = console.file.getvalue()
+
+    # The inner (RuntimeError) should only have "note on inner"
+    # The outer (ValueError) should only have "note on outer"
+    # They should NOT have each other's notes
+
+    # Find the section for RuntimeError and ValueError
+    # RuntimeError comes first (it's the outermost), ValueError is the cause
+    lines = output.split("\n")
+
+    # Track which notes appear near which exception
+    runtime_error_lines = []
+    value_error_lines = []
+    current_section = None
+
+    for line in lines:
+        if "RuntimeError" in line:
+            current_section = "runtime"
+        elif "ValueError" in line:
+            current_section = "value"
+
+        if "note on" in line:
+            if current_section == "runtime":
+                runtime_error_lines.append(line.strip())
+            elif current_section == "value":
+                value_error_lines.append(line.strip())
+
+    # RuntimeError should have its own note but NOT ValueError's note
+    assert any("note on inner" in l for l in runtime_error_lines), f"RuntimeError should have 'note on inner', got: {runtime_error_lines}"
+    assert not any("note on outer" in l for l in runtime_error_lines), f"RuntimeError should NOT have 'note on outer', got: {runtime_error_lines}"
+
+    # ValueError should have its own note but NOT RuntimeError's note
+    assert any("note on outer" in l for l in value_error_lines), f"ValueError should have 'note on outer', got: {value_error_lines}"
+    assert not any("note on inner" in l for l in value_error_lines), f"ValueError should NOT have 'note on inner', got: {value_error_lines}"
