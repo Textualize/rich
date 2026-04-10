@@ -563,19 +563,23 @@ class RenderHook(ABC):
 _windows_console_features: Optional["WindowsConsoleFeatures"] = None
 
 
-def get_windows_console_features() -> "WindowsConsoleFeatures":  # pragma: no cover
+def get_windows_console_features(
+    file: Optional[IO[str]] = None,
+) -> "WindowsConsoleFeatures":  # pragma: no cover
     global _windows_console_features
     if _windows_console_features is not None:
         return _windows_console_features
     from ._windows import get_windows_console_features
 
-    _windows_console_features = get_windows_console_features()
+    fileno = get_fileno(file) if file is not None else None
+
+    _windows_console_features = get_windows_console_features(fileno)
     return _windows_console_features
 
 
-def detect_legacy_windows() -> bool:
+def detect_legacy_windows(file: Optional[IO[str]] = None) -> bool:
     """Detect legacy Windows."""
-    return WINDOWS and not get_windows_console_features().vt
+    return WINDOWS and not get_windows_console_features(file).vt
 
 
 class Console:
@@ -675,24 +679,6 @@ class Console:
         self._emoji = emoji
         self._emoji_variant: Optional[EmojiVariant] = emoji_variant
         self._highlight = highlight
-        self.legacy_windows: bool = (
-            (detect_legacy_windows() and not self.is_jupyter)
-            if legacy_windows is None
-            else legacy_windows
-        )
-
-        if width is None:
-            columns = self._environ.get("COLUMNS")
-            if columns is not None and columns.isdigit():
-                width = int(columns) - self.legacy_windows
-        if height is None:
-            lines = self._environ.get("LINES")
-            if lines is not None and lines.isdigit():
-                height = int(lines)
-
-        self.soft_wrap = soft_wrap
-        self._width = width
-        self._height = height
 
         self._color_system: Optional[ColorSystem]
 
@@ -703,13 +689,6 @@ class Console:
         self._file = file
         self.quiet = quiet
         self.stderr = stderr
-
-        if color_system is None:
-            self._color_system = None
-        elif color_system == "auto":
-            self._color_system = self._detect_color_system()
-        else:
-            self._color_system = COLOR_SYSTEMS[color_system]
 
         self._lock = threading.RLock()
         self._log_render = LogRender(
@@ -749,6 +728,32 @@ class Console:
         self._render_hooks: List[RenderHook] = []
         self._live_stack: List[Live] = []
         self._is_alt_screen = False
+
+        self.legacy_windows: bool = (
+            (detect_legacy_windows(self.file) and not self.is_jupyter)
+            if legacy_windows is None
+            else legacy_windows
+        )
+
+        if width is None:
+            columns = self._environ.get("COLUMNS")
+            if columns is not None and columns.isdigit():
+                width = int(columns) - self.legacy_windows
+        if height is None:
+            lines = self._environ.get("LINES")
+            if lines is not None and lines.isdigit():
+                height = int(lines)
+
+        self.soft_wrap = soft_wrap
+        self._width = width
+        self._height = height
+
+        if color_system is None:
+            self._color_system = None
+        elif color_system == "auto":
+            self._color_system = self._detect_color_system()
+        else:
+            self._color_system = COLOR_SYSTEMS[color_system]
 
     def __repr__(self) -> str:
         return f"<console width={self.width} {self._color_system!s}>"
@@ -795,7 +800,7 @@ class Console:
         if WINDOWS:  # pragma: no cover
             if self.legacy_windows:  # pragma: no cover
                 return ColorSystem.WINDOWS
-            windows_console_features = get_windows_console_features()
+            windows_console_features = get_windows_console_features(self.file)
             return (
                 ColorSystem.TRUECOLOR
                 if windows_console_features.truecolor
