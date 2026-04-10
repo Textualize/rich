@@ -10,7 +10,19 @@ from typing import Any
 windll: Any = None
 if sys.platform == "win32":
     windll = ctypes.LibraryLoader(ctypes.WinDLL)
+    # `type: ignore` is needed only on Windows and mypy reports unused-ignore when not in an if
+    try:
+        STDOUT_FILENO = sys.__stdout__.fileno()  # type: ignore[union-attr]
+    except Exception:
+        STDOUT_FILENO = 1
+    try:
+        STDERR_FILENO = sys.__stderr__.fileno()  # type: ignore[union-attr]
+    except Exception:
+        STDERR_FILENO = 2
 else:
+    # mypy does not realize that anything past the raise is unreachable and reports undefined name
+    STDOUT_FILENO = 1
+    STDERR_FILENO = 2
     raise ImportError(f"{__name__} can only be imported on Windows")
 
 import time
@@ -20,15 +32,6 @@ from typing import IO, NamedTuple, Type, cast
 from rich._fileno import get_fileno
 from rich.color import ColorSystem
 from rich.style import Style
-
-try:
-    STDOUT_FILENO = sys.__stdout__.fileno()  # type: ignore[union-attr]
-except Exception:
-    STDOUT_FILENO = 1
-try:
-    STDERR_FILENO = sys.__stderr__.fileno()  # type: ignore[union-attr]
-except Exception:
-    STDERR_FILENO = 2
 
 STDOUT = -11
 STDERR = -12
