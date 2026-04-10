@@ -17,11 +17,26 @@ import time
 from ctypes import Structure, byref, wintypes
 from typing import IO, NamedTuple, Type, cast
 
+from rich._fileno import get_fileno
 from rich.color import ColorSystem
 from rich.style import Style
 
+try:
+    STDOUT_FILENO = sys.__stdout__.fileno()  # type: ignore[union-attr]
+except Exception:
+    STDOUT_FILENO = 1
+try:
+    STDERR_FILENO = sys.__stderr__.fileno()  # type: ignore[union-attr]
+except Exception:
+    STDERR_FILENO = 2
+
 STDOUT = -11
+STDERR = -12
 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4
+FILENO_TO_HANDLE = {
+    STDOUT_FILENO: STDOUT,
+    STDERR_FILENO: STDERR,
+}
 
 COORD = wintypes._COORD
 
@@ -360,7 +375,7 @@ class LegacyWindowsTerm:
     ]
 
     def __init__(self, file: "IO[str]") -> None:
-        handle = GetStdHandle(STDOUT)
+        handle = GetStdHandle(FILENO_TO_HANDLE.get(get_fileno(file), STDOUT))
         self._handle = handle
         default_text = GetConsoleScreenBufferInfo(handle).wAttributes
         self._default_text = default_text

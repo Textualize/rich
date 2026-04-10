@@ -1,5 +1,6 @@
 import sys
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -24,6 +25,8 @@ try:
 
     from rich._win32_console import (
         ENABLE_VIRTUAL_TERMINAL_PROCESSING,
+        FILENO_TO_HANDLE,
+        STDOUT,
         GetConsoleMode,
         GetStdHandle,
         LegacyWindowsError,
@@ -31,19 +34,23 @@ try:
 
 except (AttributeError, ImportError, ValueError):
     # Fallback if we can't load the Windows DLL
-    def get_windows_console_features() -> WindowsConsoleFeatures:
+    def get_windows_console_features(
+        fileno: Optional[int] = None,
+    ) -> WindowsConsoleFeatures:
         features = WindowsConsoleFeatures()
         return features
 
 else:
 
-    def get_windows_console_features() -> WindowsConsoleFeatures:
+    def get_windows_console_features(
+        fileno: Optional[int] = None,
+    ) -> WindowsConsoleFeatures:
         """Get windows console features.
 
         Returns:
             WindowsConsoleFeatures: An instance of WindowsConsoleFeatures.
         """
-        handle = GetStdHandle()
+        handle = GetStdHandle(FILENO_TO_HANDLE.get(fileno, STDOUT))
         try:
             console_mode = GetConsoleMode(handle)
             success = True
