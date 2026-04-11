@@ -37,6 +37,7 @@ def test_new_lines():
     file_proxy.flush()
     assert file.getvalue() == "-\n-\n"
 
+
 def test_isatty() -> None:
     console = Console()
 
