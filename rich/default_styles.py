@@ -165,6 +165,7 @@ DEFAULT_STYLES: Dict[str, Style] = {
     "markdown.s": Style(strike=True),
     "markdown.table.border": Style(color="cyan"),
     "markdown.table.header": Style(color="cyan", bold=False),
+    "markdown.kbd": Style(bold=True, color="bright_yellow"),
     "iso8601.date": Style(color="blue"),
     "iso8601.time": Style(color="magenta"),
     "iso8601.timezone": Style(color="yellow"),

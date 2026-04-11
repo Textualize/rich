@@ -192,6 +192,12 @@ def test_print() -> None:
     assert console.file.getvalue() == "foo\n"
 
 
+def test_print_empty_with_end() -> None:
+    console = Console(file=io.StringIO(), color_system="truecolor")
+    console.print(end="!")
+    assert console.file.getvalue() == "!"
+
+
 def test_print_multiple() -> None:
     console = Console(file=io.StringIO(), color_system="truecolor")
     console.print("foo", "bar")
@@ -400,9 +406,9 @@ def test_input_password(monkeypatch, capsys) -> None:
         console.file.write(prompt)
         return "bar"
 
-    import rich.console
+    import getpass
 
-    monkeypatch.setattr(rich.console, "getpass", fake_input)
+    monkeypatch.setattr(getpass, "getpass", fake_input)
     console = Console()
     user_input = console.input(prompt="foo:", password=True)
     assert capsys.readouterr().out == "foo:"

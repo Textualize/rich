@@ -7,6 +7,7 @@ import textwrap
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import (
+    TYPE_CHECKING,
     Any,
     Dict,
     Iterable,
@@ -38,13 +39,15 @@ from pygments.token import (
 )
 from pygments.util import ClassNotFound
 
+if TYPE_CHECKING:
+    from .console import Console, ConsoleOptions, JustifyMethod, RenderResult
+
 from rich.containers import Lines
 from rich.padding import Padding, PaddingDimensions
 
 from ._loop import loop_first
 from .cells import cell_len
 from .color import Color, blend_rgb
-from .console import Console, ConsoleOptions, JustifyMethod, RenderResult
 from .jupyter import JupyterMixin
 from .measure import Measurement
 from .segment import Segment, Segments

@@ -1,17 +1,13 @@
-import inspect
 import os
 import sys
 import threading
-import zlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import wraps
-from getpass import getpass
-from html import escape
-from inspect import isclass
 from itertools import islice
 from math import ceil
+from os import PathLike
 from time import monotonic
 from types import FrameType, ModuleType, TracebackType
 from typing import (
@@ -50,10 +46,8 @@ from .highlighter import NullHighlighter, ReprHighlighter
 from .markup import render as render_markup
 from .measure import Measurement, measure_renderables
 from .pager import Pager, SystemPager
-from .pretty import Pretty, is_expandable
 from .protocol import rich_cast
 from .region import Region
-from .scope import render_scope
 from .screen import Screen
 from .segment import Segment
 from .style import Style, StyleType
@@ -1326,7 +1320,7 @@ class Console:
         render_iterable: RenderResult
 
         renderable = rich_cast(renderable)
-        if hasattr(renderable, "__rich_console__") and not isclass(renderable):
+        if hasattr(renderable, "__rich_console__") and not isinstance(renderable, type):
             render_iterable = renderable.__rich_console__(self, _options)
         elif isinstance(renderable, str):
             text_renderable = self.render_str(
@@ -1533,6 +1527,14 @@ class Console:
         Returns:
             List[ConsoleRenderable]: A list of things to render.
         """
+
+        def is_expandable(obj: object) -> bool:
+            """Check if an object is expandable by pretty printer."""
+            # Permit lazy loading
+            from .pretty import is_expandable as _is_expandable
+
+            return _is_expandable(obj)
+
         renderables: List[ConsoleRenderable] = []
         _append = renderables.append
         text: List[Text] = []
@@ -1575,6 +1577,8 @@ class Console:
                 append(renderable)
             elif is_expandable(renderable):
                 check_text()
+                from .pretty import Pretty
+
                 append(Pretty(renderable, highlighter=_highlighter))
             else:
                 append_text(_highlighter(str(renderable)))
@@ -1688,7 +1692,10 @@ class Console:
             new_line_start (bool, False): Insert a new line at the start if the output contains more than one line. Defaults to ``False``.
         """
         if not objects:
-            objects = (NewLine(),)
+            if end == "\n":
+                objects = (NewLine(),)
+            else:
+                objects = ("",)
 
         if soft_wrap is None:
             soft_wrap = self.soft_wrap
@@ -1905,15 +1912,14 @@ class Console:
 
     @staticmethod
     def _caller_frame_info(
-        offset: int,
-        currentframe: Callable[[], Optional[FrameType]] = inspect.currentframe,
+        offset: int, currentframe: Optional[Callable[[], Optional[FrameType]]] = None
     ) -> Tuple[str, int, Dict[str, Any]]:
         """Get caller frame information.
 
         Args:
             offset (int): the caller offset within the current frame stack.
             currentframe (Callable[[], Optional[FrameType]], optional): the callable to use to
-                retrieve the current frame. Defaults to ``inspect.currentframe``.
+                retrieve the current frame. Defaults to None, which will use ``inspect.currentframe()``.
 
         Returns:
             Tuple[str, int, Dict[str, Any]]: A tuple containing the filename, the line number and
@@ -1925,17 +1931,22 @@ class Console:
         # Ignore the frame of this local helper
         offset += 1
 
-        frame = currentframe()
+        if currentframe is None:
+            import inspect
+
+            frame = inspect.currentframe()
+        else:
+            frame = currentframe()
         if frame is not None:
-            # Use the faster currentframe where implemented
             while offset and frame is not None:
                 frame = frame.f_back
                 offset -= 1
             assert frame is not None
             return frame.f_code.co_filename, frame.f_lineno, frame.f_locals
         else:
-            # Fallback to the slower stack
-            frame_info = inspect.stack()[offset]
+            from inspect import stack
+
+            frame_info = stack()[offset]
             return frame_info.filename, frame_info.lineno, frame_info.frame.f_locals
 
     def log(
@@ -1988,6 +1999,8 @@ class Console:
             link_path = None if filename.startswith("<") else os.path.abspath(filename)
             path = filename.rpartition(os.sep)[-1]
             if log_locals:
+                from .scope import render_scope
+
                 locals_map = {
                     key: value
                     for key, value in locals.items()
@@ -2171,7 +2184,9 @@ class Console:
         if prompt:
             self.print(prompt, markup=markup, emoji=emoji, end="")
         if password:
-            result = getpass("", stream=stream)
+            import getpass as _getpass_mod
+
+            result = _getpass_mod.getpass("", stream=stream)
         else:
             if stream:
                 result = stream.readline()
@@ -2211,11 +2226,17 @@ class Console:
                 del self._record_buffer[:]
         return text
 
-    def save_text(self, path: str, *, clear: bool = True, styles: bool = False) -> None:
+    def save_text(
+        self,
+        path: Union[str, PathLike[str]],
+        *,
+        clear: bool = True,
+        styles: bool = False,
+    ) -> None:
         """Generate text from console and save to a given location (requires record=True argument in constructor).
 
         Args:
-            path (str): Path to write text files.
+            path (Union[str, PathLike[str]]): Path to write text files.
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             styles (bool, optional): If ``True``, ansi style codes will be included. ``False`` for plain text.
                 Defaults to ``False``.
@@ -2247,6 +2268,8 @@ class Console:
         Returns:
             str: String containing console contents as HTML.
         """
+        from html import escape
+
         assert (
             self.record
         ), "To export console contents set record=True in the constructor or instance"
@@ -2302,7 +2325,7 @@ class Console:
 
     def save_html(
         self,
-        path: str,
+        path: Union[str, PathLike[str]],
         *,
         theme: Optional[TerminalTheme] = None,
         clear: bool = True,
@@ -2312,7 +2335,7 @@ class Console:
         """Generate HTML from console contents and write to a file (requires record=True argument in constructor).
 
         Args:
-            path (str): Path to write html file.
+            path (Union[str, PathLike[str]]): Path to write html file.
             theme (TerminalTheme, optional): TerminalTheme object containing console colors.
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``.
             code_format (str, optional): Format string to render HTML. In addition to '{foreground}',
@@ -2357,6 +2380,9 @@ class Console:
             unique_id (str, optional): unique id that is used as the prefix for various elements (CSS styles, node
                 ids). If not set, this defaults to a computed value based on the recorded content.
         """
+
+        import zlib
+        from html import escape
 
         from rich.cells import cell_len
 
@@ -2584,7 +2610,7 @@ class Console:
 
     def save_svg(
         self,
-        path: str,
+        path: Union[str, PathLike[str]],
         *,
         title: str = "Rich",
         theme: Optional[TerminalTheme] = None,
@@ -2596,7 +2622,7 @@ class Console:
         """Generate an SVG file from the console contents (requires record=True in Console constructor).
 
         Args:
-            path (str): The path to write the SVG to.
+            path (Union[str, PathLike[str]]): The path to write the SVG to.
             title (str, optional): The title of the tab in the output image
             theme (TerminalTheme, optional): The ``TerminalTheme`` object to use to style the terminal
             clear (bool, optional): Clear record buffer after exporting. Defaults to ``True``
@@ -2619,18 +2645,6 @@ class Console:
         )
         with open(path, "w", encoding="utf-8") as write_file:
             write_file.write(svg)
-
-
-def _svg_hash(svg_main_code: str) -> str:
-    """Returns a unique hash for the given SVG main code.
-
-    Args:
-        svg_main_code (str): The content we're going to inject in the SVG envelope.
-
-    Returns:
-        str: a hash of the given content
-    """
-    return str(zlib.adler32(svg_main_code.encode()))
 
 
 if __name__ == "__main__":  # pragma: no cover

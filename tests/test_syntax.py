@@ -7,13 +7,13 @@ from importlib.metadata import Distribution
 import pytest
 from pygments.lexers import PythonLexer
 
+from rich.console import Console
 from rich.measure import Measurement
 from rich.panel import Panel
 from rich.style import Style
 from rich.syntax import (
     ANSISyntaxTheme,
     Color,
-    Console,
     PygmentsSyntaxTheme,
     Syntax,
     _SyntaxHighlightRange,

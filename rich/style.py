@@ -1,8 +1,9 @@
 import sys
 from functools import lru_cache
+from itertools import count
 from operator import attrgetter
 from pickle import dumps, loads
-from random import randint
+from random import getrandbits
 from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
 
 from . import errors
@@ -16,6 +17,9 @@ _hash_getter = attrgetter(
 
 # Style instances and style definitions are often interchangeable
 StyleType = Union[str, "Style"]
+
+
+_id_generator = count(getrandbits(24))
 
 
 class _Bit:
@@ -195,7 +199,7 @@ class Style:
         self._link = link
         self._meta = None if meta is None else dumps(meta)
         self._link_id = (
-            f"{randint(0, 999999)}{hash(self._meta)}" if (link or meta) else ""
+            f"{next(_id_generator)}{hash(self._meta)}" if (link or meta) else ""
         )
         self._hash: Optional[int] = None
         self._null = not (self._set_attributes or color or bgcolor or link or meta)
@@ -245,7 +249,7 @@ class Style:
         style._attributes = 0
         style._link = None
         style._meta = dumps(meta)
-        style._link_id = f"{randint(0, 999999)}{hash(style._meta)}"
+        style._link_id = f"{next(_id_generator)}{hash(style._meta)}"
         style._hash = None
         style._null = not (meta)
         return style
@@ -483,7 +487,7 @@ class Style:
         style._attributes = self._attributes
         style._set_attributes = self._set_attributes
         style._link = self._link
-        style._link_id = f"{randint(0, 999999)}" if self._link else ""
+        style._link_id = f"{next(_id_generator)}" if self._link else ""
         style._null = False
         style._meta = None
         style._hash = None
@@ -635,7 +639,7 @@ class Style:
         style._attributes = self._attributes
         style._set_attributes = self._set_attributes
         style._link = self._link
-        style._link_id = f"{randint(0, 999999)}" if self._link else ""
+        style._link_id = f"{next(_id_generator)}" if self._link else ""
         style._hash = self._hash
         style._null = False
         style._meta = self._meta
@@ -681,7 +685,7 @@ class Style:
         style._attributes = self._attributes
         style._set_attributes = self._set_attributes
         style._link = link
-        style._link_id = f"{randint(0, 999999)}" if link else ""
+        style._link_id = f"{next(_id_generator)}" if link else ""
         style._hash = None
         style._null = False
         style._meta = self._meta

@@ -1,18 +1,24 @@
+from __future__ import annotations
+
 import logging
+import os
 from datetime import datetime
 from logging import Handler, LogRecord
-from pathlib import Path
 from types import ModuleType
-from typing import ClassVar, Iterable, List, Optional, Type, Union
+from typing import TYPE_CHECKING, ClassVar, Iterable, List, Optional, Type, Union
+
+if TYPE_CHECKING:
+    from ._log_render import FormatTimeCallable
+    from .console import Console, ConsoleRenderable
+    from .highlighter import Highlighter
+    from .traceback import Traceback
 
 from rich._null_file import NullFile
 
 from . import get_console
-from ._log_render import FormatTimeCallable, LogRender
-from .console import Console, ConsoleRenderable
-from .highlighter import Highlighter, ReprHighlighter
+from ._log_render import LogRender
+from .highlighter import ReprHighlighter
 from .text import Text
-from .traceback import Traceback
 
 
 class RichHandler(Handler):
@@ -141,6 +147,8 @@ class RichHandler(Handler):
             exc_type, exc_value, exc_traceback = record.exc_info
             assert exc_type is not None
             assert exc_value is not None
+            from .traceback import Traceback
+
             traceback = Traceback.from_exception(
                 exc_type,
                 exc_value,
@@ -179,7 +187,7 @@ class RichHandler(Handler):
             except Exception:
                 self.handleError(record)
 
-    def render_message(self, record: LogRecord, message: str) -> "ConsoleRenderable":
+    def render_message(self, record: LogRecord, message: str) -> ConsoleRenderable:
         """Render message text in to Text.
 
         Args:
@@ -209,8 +217,8 @@ class RichHandler(Handler):
         *,
         record: LogRecord,
         traceback: Optional[Traceback],
-        message_renderable: "ConsoleRenderable",
-    ) -> "ConsoleRenderable":
+        message_renderable: ConsoleRenderable,
+    ) -> ConsoleRenderable:
         """Render log for display.
 
         Args:
@@ -221,7 +229,7 @@ class RichHandler(Handler):
         Returns:
             ConsoleRenderable: Renderable to display log.
         """
-        path = Path(record.pathname).name
+        path = os.path.basename(record.pathname)
         level = self.get_level_text(record)
         time_format = None if self.formatter is None else self.formatter.datefmt
         log_time = datetime.fromtimestamp(record.created)

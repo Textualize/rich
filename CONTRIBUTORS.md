@@ -100,4 +100,5 @@ The following people have contributed to the development of Rich:
 - [Brandon Capener](https://github.com/bcapener)
 - [Alex Zheng](https://github.com/alexzheng111)
 - [Sebastian Speitel](https://github.com/SebastianSpeitel)
+- [Kevin Turcios](https://github.com/KRRT7)
 - [Jakub Kuczys](https://github.com/Jackenmen)

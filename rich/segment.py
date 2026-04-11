@@ -1,7 +1,6 @@
 from enum import IntEnum
 from functools import lru_cache
 from itertools import filterfalse
-from logging import getLogger
 from operator import attrgetter
 from typing import (
     TYPE_CHECKING,
@@ -28,8 +27,6 @@ from .style import Style
 
 if TYPE_CHECKING:
     from .console import Console, ConsoleOptions, RenderResult
-
-log = getLogger("rich")
 
 
 class ControlType(IntEnum):
