@@ -1,5 +1,6 @@
 import io
 import sys
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -35,3 +36,15 @@ def test_new_lines():
     assert file.getvalue() == "-\n"
     file_proxy.flush()
     assert file.getvalue() == "-\n-\n"
+
+def test_isatty() -> None:
+    console = Console()
+
+    mock_tty = MagicMock()
+    mock_tty.isatty.return_value = True
+    proxy = FileProxy(console, mock_tty)
+    assert proxy.isatty() is True
+    mock_non_tty = MagicMock()
+    mock_non_tty.isatty.return_value = False
+    proxy = FileProxy(console, mock_non_tty)
+    assert proxy.isatty() is False
