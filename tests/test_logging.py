@@ -1,6 +1,7 @@
 import io
-import os
 import logging
+import os
+import re
 from typing import Optional
 
 import pytest
@@ -160,3 +161,30 @@ def test_markup_and_highlight():
     render_plain = handler.console.file.getvalue()
     assert "FORMATTER" in render_plain
     assert log_message in render_plain
+
+
+def test_log_time_format_with_timezone():
+    """%z in log_time_format should produce a non-empty UTC-offset string."""
+    console = Console(
+        file=io.StringIO(),
+        force_terminal=True,
+        width=140,
+        color_system=None,
+        _environ={},
+    )
+    handler = RichHandler(
+        console=console,
+        log_time_format="%Y-%m-%dT%H:%M:%S%z",
+        enable_link_path=False,
+    )
+    logger = logging.getLogger("rich.tz_test")
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+
+    logger.info("tz test")
+
+    output = console.file.getvalue()
+    # The output should contain a timestamp with a UTC offset like +0300 or -0500
+    assert re.search(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{4}", output), (
+        f"Expected timezone offset in output, got: {output!r}"
+    )
