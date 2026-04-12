@@ -35,3 +35,10 @@ def test_new_lines():
     assert file.getvalue() == "-\n"
     file_proxy.flush()
     assert file.getvalue() == "-\n-\n"
+
+
+def test_isatty_delegates_to_proxied_file():
+    file = io.StringIO()
+    console = Console(file=file)
+    file_proxy = FileProxy(console, file)
+    assert file_proxy.isatty() == file.isatty()
