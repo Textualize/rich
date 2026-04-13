@@ -1,6 +1,6 @@
-import subprocess
 from pathlib import Path
 
+import black
 from wcwidth import list_versions
 from wcwidth.table_vs16 import VS16_NARROW_TO_WIDE
 from wcwidth.table_wide import WIDE_EASTASIAN
@@ -9,6 +9,12 @@ from wcwidth.table_zero import ZERO_WIDTH
 from rich.cells import CellTable
 
 UNICODE_VERSIONS: list[str] = list_versions()
+
+_black_mode = black.Mode()
+
+
+def format_with_black(file_path: Path) -> None:
+    black.format_file_in_place(file_path, fast=False, mode=_black_mode)
 
 
 path = Path("../rich/_unicode_data/_versions.py").resolve().absolute()
@@ -19,7 +25,7 @@ VERSIONS = {UNICODE_VERSIONS!r}
 with open(path, "wt") as init_file:
     init_file.write(init)
 
-subprocess.run(f"black {path}", shell=True)
+format_with_black(path)
 
 
 narrow_to_wide: set[str] = set()
@@ -50,4 +56,4 @@ cell_table = CellTable({cell_table.unicode_version!r}, {cell_table.widths!r}, fr
     with open(path, "wt") as file_out:
         file_out.write(table_file)
 
-    subprocess.run(f"black {path}", shell=True)
+    format_with_black(path)
