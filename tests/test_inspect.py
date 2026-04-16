@@ -48,6 +48,10 @@ skip_py314 = pytest.mark.skipif(
     reason="rendered differently on py3.14",
 )
 
+skip_py315 = pytest.mark.skipif(
+    sys.version_info.minor == 15 and sys.version_info.major == 3,
+    reason="rendered differently on py3.15",
+)
 
 skip_pypy3 = pytest.mark.skipif(
     hasattr(sys, "pypy_version_info"),
@@ -145,6 +149,7 @@ def test_inspect_empty_dict():
     assert render({}).startswith(expected)
 
 
+@skip_py315
 @skip_py314
 @skip_py313
 @skip_py312
@@ -169,13 +174,35 @@ def test_inspect_builtin_function_except_python311():
 @pytest.mark.skipif(
     sys.version_info < (3, 11), reason="print builtin signature only available on 3.11+"
 )
+@skip_py315  # 3.15 renamed *args to *objects
 @skip_pypy3
 def test_inspect_builtin_function_only_python311():
-    # On 3.11, the print builtin *does* have a signature, unlike in prior versions
+    # On 3.11-3.14, the print builtin *does* have a signature with *args
     expected = (
         "╭────────── <built-in function print> ───────────╮\n"
         "│ def print(*args, sep=' ', end='\\n', file=None, │\n"
         "│ flush=False):                                  │\n"
+        "│                                                │\n"
+        "│ Prints the values to a stream, or to           │\n"
+        "│ sys.stdout by default.                         │\n"
+        "│                                                │\n"
+        "│ 30 attribute(s) not shown. Run                 │\n"
+        "│ inspect(inspect) for options.                  │\n"
+        "╰────────────────────────────────────────────────╯\n"
+    )
+    assert render(print) == expected
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 15), reason="print builtin uses *objects from 3.15+"
+)
+@skip_pypy3
+def test_inspect_builtin_function_only_python315():
+    # On 3.15+, the variadic parameter was renamed from *args to *objects
+    expected = (
+        "╭────────── <built-in function print> ───────────╮\n"
+        "│ def print(*objects, sep=' ', end='\\n',         │\n"
+        "│ file=None, flush=False):                       │\n"
         "│                                                │\n"
         "│ Prints the values to a stream, or to           │\n"
         "│ sys.stdout by default.                         │\n"
