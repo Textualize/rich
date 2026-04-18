@@ -1265,7 +1265,7 @@ class Progress(JupyterMixin):
                 total_bytes = self._tasks[task_id].total
         if total_bytes is None:
             raise ValueError(
-                f"unable to get the total number of bytes, please specify 'total'"
+                "unable to get the total number of bytes, please specify 'total'"
             )
 
         # update total of task or create new task

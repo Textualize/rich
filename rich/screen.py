@@ -11,7 +11,6 @@ if TYPE_CHECKING:
         ConsoleOptions,
         RenderResult,
         RenderableType,
-        Group,
     )
 
 

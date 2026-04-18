@@ -2576,7 +2576,7 @@ class Console:
                 x=terminal_width // 2,
                 y=margin_top + char_height + 6,
             )
-        chrome += f"""
+        chrome += """
             <g transform="translate(26,22)">
             <circle cx="0" cy="0" r="7" fill="#ff5f57"/>
             <circle cx="22" cy="0" r="7" fill="#febc2e"/>
