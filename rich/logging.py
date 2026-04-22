@@ -198,6 +198,15 @@ class RichHandler(Handler):
             ConsoleRenderable: Renderable to display log message.
         """
         use_markup = getattr(record, "markup", self.markup)
+
+        encoding = getattr(self.console.file, "encoding", None)
+        errors = getattr(self.console.file, "errors", None) or "strict"
+        if encoding and errors == "strict":
+            try:
+                message.encode(encoding)
+            except UnicodeEncodeError:
+                message = message.encode(encoding, "backslashreplace").decode(encoding)
+
         message_text = Text.from_markup(message) if use_markup else Text(message)
 
         highlighter = getattr(record, "highlighter", self.highlighter)
