@@ -375,6 +375,52 @@ def test_notes() -> None:
         assert traceback.trace.stacks[0].notes == ["Hello", "World"]
 
 
+@pytest.mark.skipif(
+    sys.version_info.minor < 11, reason="Not supported before Python 3.11"
+)
+def test_notes_isolated_per_exception_in_chain() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3960
+
+    __notes__ added to one exception in a chain must not leak onto other
+    exceptions in the chain. Matches CPython's traceback module behavior.
+    """
+    # __cause__ chain (explicit ``raise ... from ...``)
+    try:
+        try:
+            raise ValueError("inner")
+        except ValueError as exc:
+            raise RuntimeError("outer") from exc
+    except RuntimeError as err:
+        err.add_note("note-on-outer-only")
+        traceback = Traceback()
+
+    stacks = traceback.trace.stacks
+    # stacks[0] is the outermost (RuntimeError), stacks[1] is the cause
+    # (ValueError). The note must appear only on the outer stack.
+    assert stacks[0].exc_type == "RuntimeError"
+    assert stacks[0].notes == ["note-on-outer-only"]
+    assert stacks[1].exc_type == "ValueError"
+    assert stacks[1].notes == []
+
+    # __context__ chain (implicit chaining) with a note only on the inner
+    # exception in source order (the context). The outer should have no notes.
+    try:
+        try:
+            err = ValueError("context-inner")
+            err.add_note("note-on-context-only")
+            raise err
+        except ValueError:
+            raise RuntimeError("context-outer")
+    except RuntimeError:
+        traceback = Traceback()
+
+    stacks = traceback.trace.stacks
+    assert stacks[0].exc_type == "RuntimeError"
+    assert stacks[0].notes == []
+    assert stacks[1].exc_type == "ValueError"
+    assert stacks[1].notes == ["note-on-context-only"]
+
+
 def test_recursive_exception() -> None:
     """Regression test for https://github.com/Textualize/rich/issues/3708
 

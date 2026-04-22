@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Fixed
+
+- Fixed `__notes__` from the outermost exception being shown on every exception in a chain; notes are now rendered only on the specific exception they were added to https://github.com/Textualize/rich/issues/3960
+
 ## [14.3.3] - 2026-02-19
 
 ### Fixed

@@ -467,8 +467,6 @@ class Traceback:
 
         from rich import _IMPORT_CWD
 
-        notes: List[str] = getattr(exc_value, "__notes__", None) or []
-
         grouped_exceptions: Set[BaseException] = (
             set() if _visited_exceptions is None else _visited_exceptions
         )
@@ -481,6 +479,12 @@ class Traceback:
                 return "<exception str() failed>"
 
         while True:
+            # Read __notes__ from the current exception in the chain, not the
+            # outermost one. Fixes https://github.com/Textualize/rich/issues/3960
+            # where notes from the outer exception leaked onto every inner
+            # exception via the shared list reference.
+            notes: List[str] = getattr(exc_value, "__notes__", None) or []
+
             stack = Stack(
                 exc_type=safe_str(exc_type.__name__),
                 exc_value=safe_str(exc_value),
