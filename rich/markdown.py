@@ -208,7 +208,9 @@ class BlockQuote(TextElement):
         lines = console.render_lines(self.elements, render_options, style=self.style)
         style = self.style
         new_line = Segment("\n")
-        padding = Segment("▌ ", style)
+        quote_bar = "| " if options.legacy_windows or options.ascii_only else "▌ "
+        padding = Segment(quote_bar, style)
+
         for line in lines:
             yield padding
             yield from line
