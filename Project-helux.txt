@@ -1,0 +1,969 @@
+Welcome to Project Helix
+Develop test cases and golden solutions for software engineering tasks where current state-of-the-art models struggle.
+
+Your work becomes the bar models are graded against.
+
+What you'll do
+Work with industry-grade codebases
+
+Real GitHub PRs from complex repos with meaningful impact.
+
+Refine solutions to hard problems
+
+Build reference implementations that follow best practices.
+
+Develop automated tests
+
+Tests that fail without your solution and pass with it.
+Getting started
+Three things to complete before claiming your first task.
+
+1
+Join the Slack channels
+You'll receive an email invite to the Handshake AI Fellowship Slack workspace. Join and bookmark both channels:
+
+helix-tasking — a collaborative space to ask questions and engage with the community of fellows.
+helix-announcements — for announcements from the project team.
+2
+Join Project Helix on the Annotations Platform
+You'll receive an email to join Project Helix. Click View Project, create a Handshake account if needed, then follow the steps to set up a Stripe account for payouts.
+
+Open Annotations Platform
+
+3
+Set up time tracking
+All time is tracked through the Handshake platform. Open your claimed task before you start working — this begins tracking. Don't leave it running while idle. The 8-hour cap per task covers all time on a task, including revisions. If your first pass is approaching 7 hours, flag it to the team.
+
+Off-platform work
+The project runs mostly off-platform, but you need to join to link everything in the system.
+
+Key links
+Annotations Platform — Join Project Helix, claim tasks, submit work, track time.
+Slack — helix-tasking (questions and community), helix-announcements (team updates).
+Support — Lost time form, pay dispute form.
+Step 1 — Create files in .helix/
+Validate the PR first
+Before touching Docker or writing any files, review the existing-solution PR to confirm the task is worth working on.
+
+Do not skip this step
+Many fellows jump straight into Docker setup without validating the PR. If the PR turns out to be invalid, all that work is wasted. Check the PR now — before you write a single file.
+
+- Open the existing-solution PR1 and review the diff.
+- Count the lines of real logic changed2 — ignore lock files, generated code, and formatting-only changes.
+- Decide3: if the logic changes are **fewer than 25 LOC** or **more than 500 LOC**, **flag the task** and do not proceed. Otherwise, continue to Docker setup below.
+
+1. Navigate to the PR from the task page
+
+2. Only meaningful code changes count
+
+3. Flagging frees the task for reassignment
+
+Flag, don't force it
+If the PR is outside the 25–500 LOC range, flag it immediately. Do not proceed with Docker setup or golden-solution work on a flagged task.
+
+Create files in .helix/
+The goal here is to validate that we're able to successfully run the tests in this repository. In order to reduce variations based on operating system, library versions, etc, we're using Docker to ensure a consistent environment.
+
+Your job is to add three files inside the .helix/ folder that let us create a stable environment to run tests.
+
+Dockerfile.helix
+A Dockerfile that pins the base language of the repo at the point in time of the PR, along with any additional dependencies required to run the test suite (e.g. pytest, jest, vitest).
+
+GIT — MANDATORY
+The Dockerfile MUST install git as a system dependency (e.g. apt-get install -y git). Many build tools, package managers, and version plugins require git to be present.
+
+SSL CERTIFICATES — MANDATORY
+The Dockerfile MUST also install SSL certificates. If you are running a Debian/Ubuntu based image, add ca-certificates to the apt-get install line (e.g. RUN apt-get update && apt-get install -y ca-certificates). If using an Alpine based image (anything with a '-slim' suffix), use RUN apk add --no-cache ca-certificates instead.
+
+run-tests-eval.sh
+A Bash script that runs the repo's test suite. It must handle two modes:
+
+- No arguments1 — run **all** tests in the repo.
+- With arguments2 — accept comma-separated file paths and run only those tests.
+
+1. Default mode for full validation
+
+2. Used by the evaluation harness for targeted runs
+
+The script runs tests directly (e.g. pytest, jest, vitest) — it must not invoke Docker itself.
+
+Example: joke2k__faker__2264 /.helix/run-tests-eval.sh
+No Docker inside the script
+run-tests-eval.sh should call the test runner directly (e.g. pytest tests/). The CI workflow handles Docker — your script just runs tests.
+
+If the repo has many flaky tests, you may prune them so that every test that runs also passes.
+
+metadata.json
+A placeholder metadata file that will be filled in during Step 6 of the Core Workflow. For now, create the file with the initial structure specified in the prompt below.
+
+Only required files
+The .helix/ folder must contain only the three required files: Dockerfile.helix, run-tests-eval.sh, and metadata.json. Do not add any extra files or modify other files in the repo. Remove any additional files from .helix/ before submitting.
+
+Starter prompt for Cursor
+We recommend using an LLM to help write the script. Here's a starter prompt you can adapt:
+
+I need to create the .helix/ folder for this repo with three files:
+
+1. Dockerfile.helix
+   - Use a base image matching the repo's language and version at the current commit.
+   - Install all dependencies needed to run the test suite (e.g. pytest, jest, vitest).
+   - MANDATORY: Install `git` as a system dependency (e.g. `apt-get install -y git`). Many build tools, package managers, and version plugins require git to be present.
+   - SSL CERTIFICATES — MANDATORY:
+     - The Dockerfile MUST install SSL certificates (ca-certificates package).
+     - For Debian/Ubuntu images: add ca-certificates to the apt-get install line.
+     - For Alpine images (anything with a '-slim' suffix): use `RUN apk add --no-cache ca-certificates`.
+   - Copy the repo contents into the image.
+
+2. run-tests-eval.sh
+   - When called with NO arguments, run ALL tests in the repo.
+   - When called WITH comma-separated file paths, run ONLY those test files.
+   - Call the test runner directly (e.g. pytest, jest) — do NOT use docker commands.
+   - The script must be executable (chmod +x).
+
+3. metadata.json
+   - Create a placeholder JSON file with this exact initial structure:
+[{"instance_id":"handshake","task_title":"handshake","problem_statement":"","hints":"","repo":"handshake","repo_path_or_url":"handshake","FAIL_TO_PASS":"","PASS_TO_PASS":"","language":"handshake","docker_file":"handshake","run_script":"handshake","task_type":"handshake","task_category":"handshake","repo_category":"handshake","version":"handshake","container_mem":"handshake","container_memswap":"handshake","container_network_needed":"handshake"}]
+
+Look at the repo's existing test setup and dependencies to determine the correct base image, dependencies, and test command.
+
+Copy
+Reference
+Example repo (no .helix yet): Textualize__rich__3942 — root has no .helix; .github/workflows/helix-validation.yml is present.
+Example .helix files: joke2k__faker__2264 /.helix.
+Step 2 — Test locally
+Before opening a PR, verify your script works locally. From the repo root:
+
+1
+Build the Docker image
+docker build -f .helix/Dockerfile.helix -t helix-tests .
+
+2
+Run all tests (no arguments)
+docker run --rm -t helix-tests ./.helix/run-tests-eval.sh
+
+3
+Run specific tests (with file paths)
+docker run --rm -t helix-tests ./.helix/run-tests-eval.sh tests/example_test1.py,tests/example_test2.py
+
+[Replace the filepaths with the location of tests in your repository.]
+
+4
+Confirm both modes pass
+Both modes should exit cleanly before you push.
+
+Debugging build failures
+If the Docker build fails, check that your Dockerfile.helix uses the correct base image and installs all required dependencies. Compare against the repo's CI config or dependency files (e.g. requirements.txt, package.json, Gemfile) for clues.
+Step 3 — Open PR & validate
+Once you've verified that run-tests-eval.sh runs cleanly in Docker, open a Pull Request for review.
+
+Create your branch
+Use the branch name docker-golden-solution:
+
+git checkout -b docker-golden-solution
+
+Copy
+Open a PR
+PR title: Prefix with [DOCKER SEEDING].
+PR body: Can be left empty.
+Example PR title
+[DOCKER SEEDING] Add Docker config and run scripts
+
+What the workflow checks
+When you open the PR, the GitHub Actions workflow runs automatically. It validates two things:
+
+1. Validate .helix required files1 — confirms the required files exist in `.helix/`.
+2. Build & run tests2 — builds the Docker image and runs your test script inside it.
+
+1. Checks for Dockerfile.helix, run-tests-eval.sh, and metadata.json
+
+2. Runs your script in a clean container
+
+Branch matters
+The validation workflow triggers on pull_request to the docker-golden-solution branch. Please make sure you use this branch.
+
+After checks pass
+Do not submit early
+Submit only after ALL PR checks have passed. If checks are cancelled or have not passed, do not submit. Wait for every check to complete with a green checkmark.
+
+Checks still pending?
+If checks show 'Some checks haven't completed yet' with pending items marked as 'Required', wait for them to finish. Do not merge or submit while checks are still running.
+
+PR showing pending required checks that haven't completed yet
+Wait for all required checks to complete before merging.
+Once all checks pass, merge your PR. Then submit a screenshot of your merged PR along with any feedback on the annotation platform.
+
+Debugging failures
+If a check fails, open the GitHub Actions run and expand the failed step to see the log.
+
+GitHub Actions run detail (why a check failed):
+
+GitHub Actions log showing failed step and error
+Expand the failed step to see the error (e.g. pytest: command not found, exit code 127).
+Fix the script and push again until both checks pass. Once all checks pass, merge your PR.
+
+PR status when checks fail (merging blocked):
+
+PR with some checks failed, merging blocked
+Validate .helix required files passed; Build & run tests failed. Use the Actions trace to debug.
+PR status when all checks pass (ready to merge):
+
+All checks passed
+Both Helix Validation jobs passed — merge your PR.
+Core workflow
+The Project Helix workflow has seven steps. Use the sidebar to navigate each step in order.
+
+Overview
+- Steps 1–41 — Claim a task, understand the repo, set up Docker, and build your golden solution.
+- Steps 5–72 — Write fail-to-pass tests, create metadata & LLM prompt, and submit your PR.
+
+1. Setup and solution development
+
+2. Testing, metadata, and submission
+
+Before you start
+Verify environment setup first
+Before starting core workflow, verify that your Environment Setup PR checks have passed and the PR is merged. If checks have not passed: raise it in the Slack group with your Task ID + PR link, and pause work on that task. You can work on another task in the meantime.
+
+Time and tools
+Plan for 5–8 hours per task. There is an 8-hour cap per task and a 40-hour weekly cap.
+
+You'll use the Handshake AI platform, GitHub, and your local IDE. Communication runs through Slack (helix-tasking, helix-announcements).
+
+Docker seeding tasks
+Some tasks are Docker Seeding Tasks — the repo has no Docker setup yet. If your task is designated that way, follow the Env Setup workflow first, then continue from Step 4.
+
+Commit structure
+Every PR must have exactly three commits on your golden-solution branch, in this order:
+
+1. `[sol]`1 — Golden solution feature code.
+2. `[f2p]`2 — All fail-to-pass test cases.
+3. `[meta]`3 — metadata.json file.
+
+1. Required — your fix or feature implementation
+
+2. Required — tests that prove your fix works
+
+3. Required — LLM prompt and test file paths
+
+Optional: use [dep] for dependency updates to baseline the repo (before [sol]).
+
+Strict commit limit
+Extra commits beyond [sol], [f2p], and [meta] will result in the task being sent back. All commits related to .helix script files must be made on the docker-golden-solution branch — not on golden-solution.
+Step 1 — Claim a task
+1
+Browse tasks
+Open the HAI task page. Filter by repo or language and click a task to preview the repo.
+
+2
+Evaluate the PR
+Spend a few minutes reviewing the PR before claiming. Look at diff size, test coverage, and PR body quality.
+
+3
+Claim it
+When you're confident the task is a good fit, claim it.
+
+Before you claim
+Spend a few minutes reviewing the PR:
+
+- Diff size1 — Is it a meaningful amount of code (not trivial, not overwhelming)?
+- Test coverage2 — Does the PR include or suggest tests you can turn into F2P?
+- PR body3 — Is the problem and approach clear enough to build a good LLM prompt?
+
+1. Target 25–500 SLOC of real logic changes
+
+2. You'll need these for Step 5
+
+3. This becomes your problem_statement in Step 6
+
+If it looks overwhelming or trivially simple, skip it and pick another.
+
+Too simple? If the fix is trivially simple and making it more complex would over-complicate the code, claim it, flag it to the team, and submit with NA in the relevant fields.
+Need to abandon? Click Exit → Abandon to free the task for someone else.
+Claiming locks the task
+Only claim tasks you fully intend to complete.
+
+Flagging PRs
+PRs can be flagged during both Environment Setup and Core Workflow. Always review the PR at claim time to decide if it should be flagged.
+
+Flag the PR if it is invalid — even if it was not flagged in an earlier stage.
+Do not proceed with golden-solution work if a PR is flagged.
+Do not spend more than 30 minutes evaluating whether to flag a PR.
+Time accountability
+Overclaiming time or ignoring flags may lead to removal from the project.
+
+How to Explore & Claim a Task
+Step 2 — Understand the repo
+Each task is a GitHub repo frozen at the commit immediately before the original PR was merged. Your job is to re-implement that fix, ideally better than the original.
+
+Learn the codebase
+Clone the repo and spend time understanding it:
+
+- Run it locally1 — Get the app or CLI running so you know how it's used.
+- Run existing tests2 — Confirm the test suite passes and you know the commands.
+- Read the code3 — Understand overall organization, key modules, and where the fix will land.
+
+1. Hands-on context beats reading alone
+
+2. You'll need the exact test command for your RunScript
+
+3. Focus on the area the PR touches
+
+Don't rush this. The time you invest here saves time in every subsequent step.
+
+Review the existing solution
+The repo has a branch called existing-solution with a PR into main. Use it as a reference only:
+
+- Problem1 — What is the PR solving? What's the current vs expected behavior?
+- Approach2 — How does the original solution work? What would you keep or improve?
+- Tests3 — What tests did they add? You'll adapt these into your F2P set.
+
+1. This informs your problem_statement later
+
+2. Your golden solution should be at least as good
+
+3. Start collecting F2P candidates early
+
+Do not edit existing-solution or copy it wholesale; you're producing your own implementation.
+
+Poor fit or overwhelming?
+If after reviewing the repo you feel the task is a poor fit or genuinely overwhelming, flag it with the task ID to the project team on Slack and abandon it. It's better to skip early than to struggle through a mismatched task.
+Step 3 — Docker setup & validation
+Every repository includes a .helix/ folder in the repo root or in the [Docker Seeding] pull request with three files: Dockerfile.helix, run-tests-eval.sh, and metadata.json. Always use this — do not use external Docker images.
+
+Required system dependencies
+The Dockerfile must install both git and ca-certificates as system dependencies. Without these, many build tools, package managers, and HTTPS operations will fail inside the container.
+
+Merge the Docker Seeding PR
+If your repo has a [Docker Seeding] pull request, ensure all checks have passed and merge it before proceeding. The .helix/ folder must be on main before you start building your solution.
+
+Before merging, leave a review on the PR. This can be something simple — for example, "All validation checks passed." Then approve and merge.
+
+Don't skip this
+If the Docker Seeding PR is still open, merge it now. Later steps assume that a Dockerfile.helix exists in the .helix/ folder on the main branch.
+
+All checks passed on the Docker Seeding PR
+All checks passed — merge your Docker Seeding PR before continuing.
+Checkout main
+Before building, make sure you're on main:
+
+git checkout main
+
+Copy
+Build and validate
+1
+Build the Docker image
+From the repo root, build the test image:
+
+docker build -f .helix/Dockerfile.helix -t helix-tests .
+
+2
+Run tests to verify the environment
+Run the RunScript to confirm the environment works:
+
+docker run --entrypoint './.helix/run-tests-eval.sh' -t helix-tests
+
+You don't need every test to pass — you just need to confirm that tests can run. If the environment builds and executes tests, you're in good shape.
+
+3
+Try running specific tests
+You can run individual tests to further verify the environment:
+
+docker run --entrypoint './.helix/run-tests-eval.sh' -t helix-tests tests/unit-test1,tests/unit-test2
+
+4
+Move on when confident
+Once you've confirmed that the Docker environment can build and run tests successfully, proceed to Step 4.
+
+Validate pass-to-pass tests
+Now investigate the pass-to-pass tests for this task.
+
+What are pass-to-pass tests?
+Pass-to-pass tests are existing tests from the repository's test suite — they are not created or modified by the existing-solution branch. They must pass both before and after the feature code is applied, serving as regression checks to ensure new code doesn't break unrelated functionality.
+
+How to find them: Compare the existing-solution branch to main. Any test files that were not touched by that branch but exercise related areas of the codebase are your pass-to-pass candidates.
+
+Run them using the Docker image and run script to confirm they pass reliably:
+
+docker run --entrypoint './.helix/run-tests-eval.sh' -t helix-tests tests/passing-test1,tests/passing-test2
+
+Copy
+Flaky tests mean a bad task
+If any pass-to-pass tests fail intermittently or inconsistently, this task has flaky tests and is not ideal. Drop it and select a new task.
+
+Updating Docker during your golden solution
+If you discover Docker issues (missing dependencies, broken test commands, etc.) while working on your golden-solution branch, do not fix them in your [sol] commit. Docker fixes must be merged into the default branch first so the validation system can use them.
+
+1
+Switch to the default branch
+Leave your golden-solution branch and check out the default branch:
+
+git checkout main && git pull
+
+2
+Create a docker-golden-solution branch
+Create a dedicated branch for the Docker fix:
+
+git checkout -b docker-golden-solution
+
+3
+Fix the Docker issue
+Make the necessary changes to .helix/Dockerfile.helix, .helix/run-tests-eval.sh, or other Docker-related files.
+
+4
+Open a PR and merge
+Push and open a PR into main. Wait for all Helix Validation checks to pass, then merge.
+
+5
+Rebase your golden-solution branch
+Switch back to your golden-solution branch and rebase onto the updated default branch:
+
+git checkout golden-solution && git rebase main
+
+Never modify Docker files in golden-solution commits
+Never modify .helix/Dockerfile.helix or .helix/run-tests-eval.sh in your golden-solution commits. The validation system uses the base commit's Docker setup, so Docker fixes must be merged into main first.
+Step 4 — Develop the solution
+1
+Create your branch
+Create a new branch off the default branch named golden-solution.
+
+2
+Apply existing patches
+Apply patches from the existing-solution branch so you have the full diff in your working tree.
+
+3
+Improve the solution
+Use the existing solution as your starting point: keep what's strong, improve code quality, readability, or edge-case handling as you see fit.
+
+4
+Commit feature code only
+Your first commit must contain only the feature code — no new tests yet. Temporarily remove any test additions from the patch before committing.
+
+git checkout <default-branch>  # e.g. main, master, dev
+git pull
+git checkout -b golden-solution
+
+Copy
+After implementing the feature (and removing test changes from the commit):
+
+git commit -am "[sol] feature code"
+
+Copy
+Developing a Golden Solution
+Step 5 — Write fail-to-pass tests
+Now that [sol] is committed, add the tests. Start from the tests that came with the original PR; include all of them, then add any extra cases you see fit.
+
+Test requirements
+Every test must:
+
+- Fail on the base commit1 (main before your solution).
+- Pass after your `[sol]` commit2.
+
+1. This proves the test targets the actual bug or missing feature
+
+2. This proves your solution fixes it
+
+If a test passes both before and after, it's not a fail-to-pass test — update or replace it.
+
+Undo test removal and commit
+In Step 4 you removed test changes before committing. Undo that removal, then:
+
+git commit -am "[f2p] fail to pass tests"
+git push origin golden-solution
+
+Copy
+Verify your branch state
+Run git log --oneline to confirm your branch has exactly two commits in this order:
+
+$ git log --oneline
+
+a1b2c3d  [f2p] fail to pass tests
+e4f5g6h  [sol] golden solution
+
+Copy
+Check your work
+Your branch has exactly two commits: [sol] feature code, then [f2p] test code. No merge commits, no extra commits. Next: fill in the metadata file and validate (Step 6).
+Step 6 — Metadata
+Fields & Commit
+Problem Statement
+File Paths
+The metadata.json file already exists in .helix/. Open it and fill in the fields:
+
+[
+  {
+    "problem_statement": "",
+    "problem_statement_variant": "",
+    "hints": "",
+    "FAIL_TO_PASS": "",
+    "PASS_TO_PASS": ""
+  }
+]
+
+Copy
+- problem_statement1 — Your LLM prompt (see Problem Statement tab for guidance on writing it).
+- problem_statement_variant2 — A more ambiguous restatement of the problem (see Problem Statement tab for guidance).
+- hints3 — Additional context that helps narrow the solution. Include relevant file paths, function names, or error messages.
+- FAIL_TO_PASS4 — Comma-separated list of fail-to-pass test file paths.
+- PASS_TO_PASS5 — Comma-separated list of pass-to-pass test file paths.
+
+1. The only input the agent receives — make it count
+
+2. Same task, described less precisely
+
+3. Never leave this empty
+
+4. Tests that fail before your fix and pass after
+
+5. Tests that should pass both before and after
+
+Commit the metadata file
+Commit using the [meta] convention:
+
+git add .helix/metadata.json
+git commit -m "[meta] add metadata.json"
+git push origin golden-solution
+
+Copy
+Commit metadata.json
+Make sure metadata.json is committed inside .helix/ alongside your Dockerfile.helix and run-tests-eval.sh. Your branch should now have three commits: [sol], [f2p], and [meta].
+The problem_statement or problem_statement_variant are the only context the agent receives. Think of it as briefing an engineer who already has access to the repo — you're giving them a clear task description, not a tutorial. Assume the reader has working knowledge of the codebase; you don't need to explain how the project works or spell out every detail. Let the length match the task: a small bug fix might only need 2–3 sentences, while a multi-step refactor could run a paragraph or two.
+
+Guiding principles
+Be concise — Don't restate things visible in the diff. Skip headers or sections that don't add real information.
+
+Constrain when it matters — If the agent shouldn't touch certain files or interfaces, say so. If the constraints are obvious from context, leave them out.
+
+Use precise language — Words like "properly" and "correctly" don't give the agent anything to act on. Describe the specific behavior you want.
+
+Assume codebase familiarity — Don't explain the project architecture or how modules connect. The agent can read the code. Focus on what to change and why.
+
+Examples
+Each example shows both fields so you can see how the same task reads at two levels of specificity.
+
+Small bug fix
+Feature addition
+Name new classes, interfaces, and methods explicitly
+If your golden solution introduces net-new business logic — a new class, interface, trait, or public method — the agent has no way to guess the name you chose. Even with perfect logic, if the agent names a class ThreadLocalLogger and your tests import TaggedLogger, every test fails on the import line. The agent isn't wrong; the prompt didn't tell it what to call things.
+
+Whenever your FAIL_TO_PASS tests import or reference a symbol that doesn't already exist on main, name that symbol in the problem statement.
+
+Name things, don't implement them
+Naming new symbols is not a license to leak the solution. Give the agent the contract — the name, the shape (interface vs. class vs. method), the signature, and what it returns — but not the implementation.
+
+ 
+
+Do say:
+
+"Introduce a Copyable interface with a single copy() method that returns the same type, and have TaggedLogger implement it."
+
+ 
+
+Don't say:
+
+"In copy(), construct a new TaggedLogger, deep-copy the internal tags map into it using ConcurrentHashMap, and return the new instance."
+
+ 
+
+The second version tells the agent exactly how to fix the bug. At that point you're not evaluating whether the model can solve the problem — you're evaluating whether it can transcribe your instructions. Stop at the names and signatures the tests need; let the agent figure out the body.
+
+Example: missing name causes test failures
+Specify the path for net-new files
+Naming a new symbol isn't enough if it lives in a brand-new file — the agent also has to guess where to put it. If your golden solution adds Copyable.kt to a new misk-logging-api module and your tests import it from misk.logging.api.Copyable, an agent that drops the file into the existing misk-logging package will fail every import.
+
+Whenever your golden solution introduces a new file — especially in a new package, module, or directory that doesn't exist on main — state the destination path explicitly in the problem statement. You don't need to justify the layout; just tell the agent where the file goes.
+
+Do say: "Add the new Copyable interface as misk-logging-api/src/main/kotlin/misk/logging/api/Copyable.kt in a new misk-logging-api module."
+
+Don't say: "Add a Copyable interface somewhere appropriate." (The agent will pick a path, and it almost certainly won't match yours, breaking every test import.)
+
+Avoid template padding
+Don't pad either field with rigid headers like ## Title, ## Current Behavior, ## Expected Behavior. Here's what the small bug example above looks like with template padding:
+
+## Title Fix: Transaction mode config ignored during migration batch
+
+## Current Behavior When running database migrations using DataSource.runMigrations() in TypeORM, the migrationsTransactionMode option set in the DataSource configuration is being ignored. For example, if you configure your DataSource like this: [...20 more lines...]
+
+## Expected Behavior [...15 more lines...]
+
+## Context / Constraints / Edge Cases [...]
+
+Three sentences of prose communicates more than a wall of headers. If you find yourself reaching for a template, you're probably over-explaining.
+Step 7 — Create PR & submit
+Submit a PR from golden-solution into main with exactly three commits: [sol], [f2p], and [meta]. Title: [GOLDEN SOLUTION] + the original PR title.
+
+PR body
+Your PR description should clearly explain three things: the problem1, your approach2, and your testing strategy3. A well-documented PR makes it much easier to write a high-quality LLM prompt.
+
+1. What issue does the original PR address? What was broken or missing?
+
+2. What did you change and why? How does your golden solution differ from the original?
+
+3. What tests did you write or modify? What behaviors do they verify?
+
+Think of the PR as your notes
+This description should be able to validate the problem_statement in metadata.json. The clearer you write it, the more confident you will be about your problem statement.
+
+Validate with Helix Pre-Validation
+When you open the PR, the Helix Pre-Validation GitHub Action runs automatically. You do not need to validate inside Docker manually — just confirm the workflow passes.
+
+1
+Open the PR
+Open the PR from golden-solution into main.
+
+2
+Check the Checks tab
+Navigate to the Checks tab on the PR page.
+
+3
+Find the workflow
+Find the Helix Pre-Validation workflow run.
+
+4
+Confirm it passes
+Confirm it shows a green checkmark.
+
+GitHub PR checks showing Golden Solution Validation passed with a green checkmark
+Golden Solution Validation passed — the PR is ready to merge.
+GitHub PR checks showing 2 skipped and 2 pending checks with no successful checks
+Checks skipped or stalled — do not merge. Investigate why checks are not running.
+No local Docker needed
+The Helix Pre-Validation workflow handles all validation for you. If it passes, you're good to go.
+
+Common failure modes
+If the workflow fails, click into the execution logs to identify the error. The validation system uses three commits: base commit (the most recent commit on the default branch), [sol] (your golden solution), and [f2p] (your fail-to-pass tests).
+
+Here are the most common errors and how to fix them:
+
+GIT_RESET_FAILED — Commit could not be checked out
+GIT_APPLY_FAILED — Patch could not be applied
+P2P_TESTS_FAILED — Pass-to-pass tests failed on base commit
+F2P_TESTS_SHOULD_FAIL — Fail-to-pass tests passed when they shouldn't have
+GOLDEN_VALIDATION_FAILED — Tests failed with the solution applied
+Commit tips
+git update-index --chmod=+x .helix/run-tests-eval.sh
+git add .helix
+git commit -m "your message"
+
+Copy
+When working on the docker-golden-solution branch (during Environment Setup), always use git update-index to set the executable bit on run-tests-eval.sh before committing.
+
+Submit on HAI
+On the HAI platform, submit a screenshot of your validation checks passing.
+What makes a good PR
+Use this when evaluating source PRs for Helix task quality. The ideal task has meaningful complexity, clean verifiability through tests, and enough context that a fellow can understand the problem without spending days just figuring out what's going on.
+
+What to look for
+Lines of code changed1 — Target 25–500 SLOC. Under 25 is usually trivial. Over 1000 is too large for a fellow to digest and work with effectively. Check the actual diff; lock file changes and boilerplate don't count.
+
+1. Check the actual diff — generated code doesn't count
+
+Existing, separated tests2 — The PR should include new tests in a dedicated test file. Not test modifications only, but new tests that exist because of this feature or fix.
+
+2. You'll need these for F2P tests
+
+Strong PR body3 — The original author explains the problem, the approach, and the testing strategy. A well-documented PR makes it much easier to write a high-quality LLM prompt later.
+
+3. This becomes the foundation for the problem_statement
+
+Watch out for these
+Good
+PR adds a new caching layer with 3 new test files covering cache hits, misses, and eviction. Diff is 180 SLOC of real logic. PR body explains the performance problem and the approach.
+
+Bad
+PR upgrades lodash from 4.17.20 to 4.17.21. Diff is 2000 lines but it's all lock file changes. No new tests because the goal is just to keep everything working.
+
+High SLOC from generated code or dependency upgrades doesn't mean meaningful complexity. Look at the actual logic changes.
+
+Awkward test changes — If the test changes are just updating function call signatures to match a refactor, they aren't real F2P tests. There's no meaningful new behavior being verified.
+Reviewer Guide
+Platform Basics
+Env Setup Review
+Full Solution Review
+Feedback and scoring
+Giving feedback
+Below every field in a task you'll see a speech bubble icon. Click it to open the feedback panel for that specific field. When adding feedback, select a type and write a clear explanation.
+
+Feedback types
+Approve — The field meets all requirements
+Request Changes — The field needs fixes before it can be accepted
+Comment — General observation that doesn't block approval
+Approve vs Request Changes
+Use Approve when the task meets quality standards across all fields
+Use Request Changes when there are issues the fellow needs to fix
+Always provide specific, actionable feedback explaining what needs to change
+Writing good feedback
+Be specific — reference exact files, lines, or values that need fixing
+Be actionable — tell the fellow what to do, not just what's wrong
+Be constructive — explain why something matters
+Scoring rubric
+Rate each task from 1–5:
+
+Score	Meaning	File Paths	Problem Statement	Test Case Coverage
+5	Exceptional	All paths verified	Model-readable, no leakage, all requirements explicit	F2P tests cover the core bug/feature, P2P tests comprehensive
+4	Good	All paths exist, minor formatting issues	Valid and clear, missing one non-critical detail	F2P tests valid, P2P tests cover main cases
+3	Acceptable	One path close but not exact	Understandable, one minor issue	F2P tests exist but miss an edge case
+2	Below standard	Multiple paths missing	Contains Git/PR references or too vague	F2P tests trivial or don't target the actual fix
+1	Unacceptable	Fabricated paths	Not a prompt at all — changelog or placeholder	No meaningful test coverage or tests unrelated to the task
+Troubleshooting guide
+Reference for common issues and resolutions across the Helix workflow.
+
+1. Pre-Validation Failure Reference
+If you encounter pre-validation failures, use the sections below to diagnose and resolve them.
+
+1.1 Docker Build Fails
+Common cause: missing git configuration in the Dockerfile.
+
+Add the following line to your Dockerfile.helix to resolve authentication issues:
+
+RUN git config --unset-all http.https://github.com/.extraheader || true
+
+Copy
+Place this line before any git operations in your Dockerfile. After editing, push to the docker-golden-solution branch, merge it, and rebase to continue your work.
+
+Ensure the .github/workflows folder contains the build-push-gar.yml file (see Section 3 below). Without it, you will encounter a "manifest unknown" error.
+
+Example Dockerfile.helix
+1.2 P2P Failed on Base
+P2P is designed to pass on base. If it fails:
+
+Ensure there are no live tests included.
+Skip tests unrelated to your task.
+Review the runscript for missing dependencies if the issue persists.
+1.3 Git Application Failed
+Ensure your commits are based on the current main branch.
+Confirm all git-related steps are included and correctly ordered in the runscript.
+Ensure that your changes on each commit do not conflict with each other (make updates to the same files).
+1.4 F2P Failed on Base
+Your F2P test cases are passing on the base code, which is not the expected behavior.
+
+Ensure there is a real bug being fixed by your solution.
+Add edge cases to your F2P tests so they correctly fail on the base code.
+1.5 F2P Failed on Golden Solution
+Your golden solution does not fully resolve the issue.
+
+Review your golden solution to ensure it completely addresses the bug.
+Add additional edge case tests alongside existing ones from the existing-solution branch to improve coverage.
+2. Understanding Pass@
+You do not need to worry about Pass@ during development. Here is how it works:
+
+1
+Approval
+2
+Automated build
+3
+Stumping the model
+4
+Trajectory generated
+Until a failure is generated, focus on:
+
+Building a strong, complete solution.
+Fixing any remaining issues.
+Ensuring quality and completeness of your implementation.
+Writing stronger, more comprehensive F2P tests to increase the chances of stumping the model.
+3. Required GitHub Workflow Files
+Your main branch must contain a .github/workflows folder with exactly these three files and exactly the content shown below.
+
+File 1: build-push-gar.yml
+name: Build and Push to GAR
+
+on:
+  push:
+    branches: [master, main]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-push:
+    uses: handshake-coding/handshake-orchestration/.github/workflows/build-push-gar.yml@main
+
+Copy
+File 2: golden-solution-validation.yml
+name: Golden Solution Validation
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  prevalidate:
+    if: github.head_ref == 'golden-solution' || github.event_name == 'workflow_dispatch'
+    uses: handshake-coding/handshake-orchestration/.github/workflows/golden-solution-validation.yml@main
+    secrets: inherit
+
+Copy
+File 3: helix-validation.yml
+name: Helix Validation
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    if: github.event_name == 'workflow_dispatch' ||
+      (github.base_ref == github.event.repository.default_branch &&
+      github.head_ref == 'docker-golden-solution')
+    uses: handshake-coding/handshake-orchestration/.github/workflows/helix-validation.yml@main
+    secrets: inherit
+
+Copy
+Exact match required
+There must be exactly these three files in the .github/workflows directory. File names must match exactly and content must be identical to the above.
+
+4. Pull Request Requirements
+4.1 Docker & Runscript Changes (docker-golden-solution branch)
+For PRs that contain Docker and runscript changes:
+
+The PR must be created strictly from the docker-golden-solution branch. PRs from any other branch will not trigger the required validations.
+Two checks are required: Helix Validation / validate / Validate .helix required files and Helix Validation / validate / Build & run pass@ compatible tests.
+Expected result when all checks pass:
+
+All checks passed — 1 skipped and 2 successful checks
+All checks have passed (1 skipped, 2 successful) — Golden Solution Validation skipped, both Helix Validation checks green.
+4.2 Golden Solution Changes (golden-solution branch)
+For PRs containing Golden Solution changes:
+
+The PR must be created strictly from the golden-solution branch.
+Commits and the content of commits must follow HELIX requirements.
+Only one check is required: Golden Solution Validation / prevalidate.
+Expected result when validation is pending:
+
+Golden Solution Validation successful, Helix Validation checks pending
+1 skipped, 2 expected, 1 successful — Golden Solution Validation successful, Helix Validation checks pending (waiting for status).
+Helix Validation stuck at 'Waiting for status'
+This is not an error and not a blocker. Only the Golden Solution Validation / prevalidate check is required for golden-solution PRs.
+
+5. Docker Seeding Workflow
+Some repos do not have Docker infrastructure yet. If your task is flagged as a Docker Seeding Task (the repo has no .helix folder), complete this workflow first, then return to the Core Workflow at Step 4.
+
+5.1 What You Need to Create
+Add a .helix folder at the repo root containing three files:
+
+Dockerfile.helix — Pins the repo's language and dependencies at the current commit.
+run-tests-eval.sh — Runs the test suite in two modes: all tests, or specific files.
+metadata.json — Task metadata file.
+5.2 Dockerfile.helix Requirements
+Use a base image matching the repo's language and version at the current commit.
+Install all dependencies needed to run the test suite (e.g. pytest, jest, vitest).
+Always include git and ca-certificates in your install step. The CI workflow runs git inside the container — omitting these causes "git: command not found" and SSL certificate errors. Use the package manager that matches your base image (apt-get for Debian/Ubuntu, yum or dnf for Amazon Linux/RHEL, apk for Alpine).
+Add the git config unset line to prevent HTTPS auth issues inside the container.
+Copy the repo contents into the image.
+5.3 run-tests-eval.sh Requirements
+No arguments — run ALL tests in the repo (default mode for full validation).
+With arguments — accept comma-separated file paths and run only those tests (used by the evaluation harness).
+Call the test runner directly (e.g. pytest, jest). Do not invoke Docker inside the script — the CI workflow handles Docker.
+The script must be executable. Commit it with permission mode 100755:
+chmod +x .helix/run-tests-eval.sh
+
+Copy
+Do not skip tests
+Do not skip any tests from the existing solution branch. Never edit anything in the existing-solution branch. If the repo has many flaky tests, you may prune them so that every test that runs also passes.
+
+5.4 Common Errors & Fixes
+Error 1: Permission Denied (exit code 126)
+Error 2: git Not Found (exit code 127)
+5.5 Opening the PR
+1
+Create the branch
+2
+Open a PR
+3
+Wait for validation
+4
+Fix failures if needed
+5
+Merge and submit
+6. Submit Issues
+6.1 Submit button is disabled after checks pass
+1
+Re-run the workflow
+2
+Wait and refresh
+3
+Check for stale runs
+4
+Escalate if needed
+6.2 Problem statement mismatch error
+If you receive: "The problem_statement you pasted into the form does not match the one in .helix/metadata.json on the golden-solution branch" — and you are certain the text is identical:
+
+Copy both versions into an online diff checker (e.g. diffchecker.com) to confirm they are truly identical.
+Check for hidden whitespace, trailing line breaks, or encoding differences.
+If confirmed identical and the error persists, post your Task ID in the issues thread. This is a known platform-side false positive requiring admin resolution.
+6.3 "Needs Fixing" with no feedback visible
+If your task is returned with a "Needs Fixing" status but no reviewer feedback appears:
+
+Check whether the task is in read-only mode. If it is, no action is needed — this is expected. Wait for feedback to appear before making any changes.
+If the task is not in read-only mode and the submit button says "Address feedback under Needs Attention" but nothing is visible there, this is a platform bug.
+Post your Task ID in the review bugs thread. An admin will need to resolve it on the backend.
+Do not resubmit
+Do not resubmit or make changes until visible feedback is available.
+
+7. Invalid Tasks
+7.1 How to submit an invalid task
+1
+Fill all fields
+2
+Submit the task
+3
+Post in the thread
+4
+Hold the task
+Active task limit
+Do not claim additional tasks beyond your allowed active task limit while holding invalid ones.
+
+7.2 Submit button is disabled on an invalid task
+If the submit button is greyed out because GitHub Actions checks have not passed:
+
+Do not attempt to fix or pass the checks.
+Post the Task ID in the invalid tasks thread and wait for admin resolution.
+It is safe to hold the task while waiting.
+8. General Notes & Reminders
+Do not make any changes to main except for Docker and runscript files. If other changes were made, revert them and restore main to its original state.
+Do not tag individuals directly in Helix screening for Helix-related questions. Use the designated group channels.
+Most common issues have been discussed in previous threads. Check those threads before escalating.
+For onboarding and environment setup, refer to the Environment Setup section of this guide.
+Fixing incorrectly merged changes
+If you claim a task and find that a previous fellow has incorrectly merged changes into main (e.g. a golden solution commit, extra workflow files, or a large unrelated diff), fix it:
+
+On your docker-golden-solution branch, create a new commit that removes the incorrectly merged files
+Open a PR from docker-golden-solution into main and merge it
+Rebase your golden-solution branch on top of the updated main and continue your work
+Task status lookup
+Enter your task ID below to check its current review status. Statuses include Pending evaluation, Accepted, and Rejected.
+Quick check
+Use this list before you hit Submit on the HAI platform. Cross off each item so you don't miss a step.
+
+Work through each of the following...
+
+Checklist
+0 of 8 complete
+
+
+Exactly three commits on golden-solution: [sol], [f2p], then [meta]
+No merge commits, no extra commits. Solution → tests → metadata.
+
+F2P tests fail on base commit and pass on [sol] commit
+Base commit = most recent commit on the default branch.
+
+Docker validation passes for both F2P and P2P test paths
+Validated inside the container, not only locally.
+
+metadata.json is complete with correct test paths and commit hashes
+FAIL_TO_PASS and PASS_TO_PASS paths, base commit, golden commit, test commit.
+
+LLM prompt is self-contained and describes WHAT to fix without revealing HOW
+A senior engineer could implement from the prompt alone.
+
+PR title follows [GOLDEN SOLUTION] + original PR title format
+Exact prefix required for validation to trigger.
+
+PR body documents Problem, Solution Approach, and Testing Strategy
+This serves as author notes to validate the problem_statement in metadata.json.
+
+HAI platform fields filled and screenshot of passing validation attached
+Screenshot proves Helix Pre-Validation checks passed on the PR.
