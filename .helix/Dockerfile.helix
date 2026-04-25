@@ -1,0 +1,19 @@
+FROM python:3.14-slim
+
+WORKDIR /workspace
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    ca-certificates \
+    curl \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN git config --unset-all http.https://github.com/.extraheader || true
+
+RUN python -m pip install --no-cache-dir "poetry==2.1.3" && \
+    poetry config virtualenvs.create false
+
+COPY . /workspace
+
+RUN poetry lock --no-interaction --no-ansi
+RUN poetry install --no-interaction --no-ansi
