@@ -1133,3 +1133,15 @@ def test_tty_compatible() -> None:
     assert not console.is_terminal
     # Should not have auto-detected
     assert not console.file.called_isatty
+
+
+def test_is_jupyter_in_jupyterlite(monkeypatch):
+    monkeypatch.setattr(
+        "rich.console.get_ipython",
+        type("Interpreter", (object,), {"__module__": "pyodide_kernel.interpreter"}),
+        raising=False,
+    )
+
+    console = Console(file=io.StringIO(), force_jupyter=None)
+
+    assert console.is_jupyter
