@@ -116,6 +116,15 @@ def test_from_ansi():
     assert text._spans == [Span(0, 11, Style(bold=True))]
 
 
+def test_from_ansi_crlf():
+    text = Text.from_ansi("Hello, \033[1mWorld!\r\nNext\033[0m")
+    assert str(text) == "Hello, World!\nNext"
+    assert text._spans == [
+        Span(7, 13, Style(bold=True)),
+        Span(14, 18, Style(bold=True)),
+    ]
+
+
 def test_copy():
     text = Text()
     text.append("Hello", "bold")

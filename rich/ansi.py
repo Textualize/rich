@@ -132,6 +132,7 @@ class AnsiDecoder:
         Yields:
             Text: Marked up Text.
         """
+        terminal_text = terminal_text.replace("\r\n", "\n")
         for line in re.split(r"(?<=\n)", terminal_text):
             yield self.decode_line(line.rstrip("\n"))
 
