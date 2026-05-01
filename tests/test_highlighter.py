@@ -461,3 +461,31 @@ def test_highlight_iso8601_regex(test: str, spans: List[Span]):
     highlighter.highlight(text)
     print(text.spans)
     assert text.spans == spans
+
+
+def test_highlighter_preserves_link_across_spans():
+    """Ensure a link with highlighted text tokens renders as a single link.
+
+    A hyperlink whose text contains tokens the ReprHighlighter recognises
+    (UUID, path, filename) must render as a single clickable link.
+    """
+    from rich.console import Console
+
+    markup = (
+        "Error in job [link=https://www.example.com/issues/42]"
+        "78351748-9b32-4e08-ad3e-7e9ff124d541: see /var/log/myapp.log"
+        "[/link] for details"
+    )
+
+    console = Console(highlight=True)
+    text = console.render_str(markup)
+
+    link_ids = {
+        seg.style._link_id
+        for seg in console.render(text)
+        if seg.style and seg.style.link
+    }
+
+    assert (
+        len(link_ids) == 1
+    ), f"Expected a single link_id across all highlighted spans, got {len(link_ids)}"
