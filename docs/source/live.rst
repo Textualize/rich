@@ -149,7 +149,31 @@ This feature is enabled by default, but you can disable by setting ``redirect_st
 Nesting Lives
 -------------
 
-If you create a Live instance within the context of an existing Live instance, then the content of the inner Live will be displayed below the outer Live.
+If you create a Live instance within the context of another Live instance,
+the inner display will appear below the outer one.
+
+.. note::
+
+    While nesting ``Live`` instances is supported, it can be a bit confusing in practice
+    since each instance manages its own refresh cycle. This is especially noticeable
+    when both displays update frequently.
+
+    If you only need to update content dynamically, it is often simpler to work
+    with a single ``Live`` instance and update its renderable instead.
+
+Example::
+
+    from rich.live import Live
+    from rich.table import Table
+    import time
+
+    table = Table()
+    table.add_column("Step")
+
+    with Live(table, refresh_per_second=4):
+        for i in range(5):
+            table.add_row(f"Step {i}")
+            time.sleep(0.5)
 
 Prior to version 14.0.0 this would have resulted in a :class:`~rich.errors.LiveError` exception.
 
