@@ -461,3 +461,36 @@ def test_highlight_iso8601_regex(test: str, spans: List[Span]):
     highlighter.highlight(text)
     print(text.spans)
     assert text.spans == spans
+
+
+def test_highlighter_preserves_link_across_spans():
+    """Regression test for https://github.com/Textualize/rich/issues/4109.
+
+    Applying ReprHighlighter to text that already has a hyperlink must not
+    fragment the link into multiple clickable regions.  Every rendered segment
+    that carries a link must share the same link_id as the original.
+    """
+    from io import StringIO
+
+    from rich.console import Console
+    from rich.style import Style
+
+    uuid = "12345678-1234-5678-1234-567812345678"
+    link_style = Style(link="https://example.com")
+    text = Text(uuid, style=link_style)
+
+    highlighter = ReprHighlighter()
+    highlighter.highlight(text)
+
+    console = Console(file=StringIO(), highlight=False)
+    segments = list(text.render(console))
+
+    original_link_id = link_style.link_id
+    link_ids = {
+        seg.style.link_id
+        for seg in segments
+        if seg.style is not None and seg.style.link
+    }
+    assert link_ids == {original_link_id}, (
+        f"Expected single link_id {original_link_id!r}, got {link_ids!r}"
+    )

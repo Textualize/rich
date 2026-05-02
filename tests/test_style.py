@@ -265,3 +265,36 @@ def test_clear_meta_and_links_clears_hash():
 
     clear_style = style.clear_meta_and_links()
     assert clear_style._hash is None
+
+
+def test_add_preserves_link_id():
+    """Regression test for https://github.com/Textualize/rich/issues/4109.
+
+    Adding a style without a link on top of a style with a link must preserve
+    the original link_id so the terminal sees one continuous hyperlink.
+    """
+    link_style = Style(link="https://example.com")
+    highlight_style = Style(color="red")
+    combined = link_style + highlight_style
+    assert combined.link_id == link_style.link_id
+
+
+def test_add_distinct_link_ids_for_equal_link_styles():
+    """Regression test for https://github.com/Textualize/rich/issues/4109.
+
+    Two Style objects that share the same URL but were constructed separately
+    must produce distinct link_ids when combined, even if the LRU cache
+    considers them equal by hash/eq.
+    """
+    style_a = Style(link="https://example.com")
+    style_b = Style(link="https://example.com")
+    # They are equal by value but carry distinct link_ids.
+    assert style_a == style_b
+    assert style_a.link_id != style_b.link_id
+
+    highlight = Style(color="red")
+    combined_a = style_a + highlight
+    combined_b = style_b + highlight
+    assert combined_a.link_id == style_a.link_id
+    assert combined_b.link_id == style_b.link_id
+    assert combined_a.link_id != combined_b.link_id

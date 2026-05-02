@@ -730,7 +730,7 @@ class Style:
         sys.stdout.write(f"{self.render(text)}\n")
 
     @lru_cache(maxsize=1024)
-    def _add(self, style: Optional["Style"]) -> "Style":
+    def _add(self, style: Optional["Style"], link_id: str) -> "Style":
         if style is None or style._null:
             return self
         if self._null:
@@ -745,7 +745,7 @@ class Style:
         )
         new_style._set_attributes = self._set_attributes | style._set_attributes
         new_style._link = style._link or self._link
-        new_style._link_id = style._link_id or self._link_id
+        new_style._link_id = link_id
         new_style._null = style._null
         if self._meta and style._meta:
             new_style._meta = dumps({**self.meta, **style.meta})
@@ -755,8 +755,8 @@ class Style:
         return new_style
 
     def __add__(self, style: Optional["Style"]) -> "Style":
-        combined_style = self._add(style)
-        return combined_style.copy() if combined_style.link else combined_style
+        link_id = (style._link_id if style is not None else "") or self._link_id
+        return self._add(style, link_id)
 
 
 NULL_STYLE = Style()
