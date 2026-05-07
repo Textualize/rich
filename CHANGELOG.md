@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `Text.from_ansi` removing newlines https://github.com/Textualize/rich/pull/4076
 - Fixed `FileProxy.isatty` not proxying https://github.com/Textualize/rich/pull/4077
 - Fixed inline code in Markdown tables cells https://github.com/Textualize/rich/pull/4079
+- Fixed `AnsiDecoder` dropping text on lines with CRLF (`\r\n`) endings https://github.com/Textualize/rich/issues/3577
 
 ## [14.3.4] - 2026-04-11
 
