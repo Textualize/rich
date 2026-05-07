@@ -149,7 +149,7 @@ class AnsiDecoder:
         _Style = Style
         text = Text()
         append = text.append
-        line = line.rsplit("\r", 1)[-1]
+        line = line.rstrip("\r").rsplit("\r", 1)[-1]
         for plain_text, sgr, osc in _ansi_tokenize(line):
             if plain_text:
                 append(plain_text, self.style or None)
