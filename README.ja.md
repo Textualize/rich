@@ -25,21 +25,21 @@
  • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
  • [Polskie readme](https://github.com/textualize/rich/blob/master/README.pl.md)
 
-Richは、 _リッチ_ なテキストや美しい書式設定をターミナルで行うためのPythonライブラリです。
+リッチは、 _リッチ_ なテキストや美しい書式設定をターミナルで行うためのPythonライブラリです。
 
-[Rich API](https://rich.readthedocs.io/en/latest/)を使用すると、ターミナルの出力に色やスタイルを簡単に追加することができます。 Richはきれいなテーブル、プログレスバー、マークダウン、シンタックスハイライトされたソースコード、トレースバックなどをすぐに生成・表示することもできます。
+[Rich API](https://rich.readthedocs.io/en/latest/)を使用すると、ターミナルの出力に色やスタイルを簡単に追加することができます。 リッチはきれいなテーブル、プログレスバー、マークダウン、シンタックスハイライトされたソースコード、トレースバックなどをすぐに生成・表示することもできます。
 
 ![機能](https://github.com/textualize/rich/raw/master/imgs/features.png)
 
-Richの紹介動画はこちらをご覧ください。 [calmcode.io](https://calmcode.io/rich/introduction.html) by [@fishnets88](https://twitter.com/fishnets88).
+リッチの紹介動画はこちらをご覧ください。 [calmcode.io](https://calmcode.io/rich/introduction.html) by [@fishnets88](https://twitter.com/fishnets88).
 
-[Richについての人々の感想を見る。](https://www.willmcgugan.com/blog/pages/post/rich-tweets/)
+[リッチについての人々の感想を見る。](https://www.willmcgugan.com/blog/pages/post/rich-tweets/)
 
 ## 互換性
 
-RichはLinux、OSX、Windowsに対応しています。True colorと絵文字は新しい Windows ターミナルで動作しますが、古いターミナルでは8色に制限されています。Richを使用するにはPythonのバージョンは3.6.3以降が必要です。
+リッチはLinux、OSX、Windowsに対応しています。True colorと絵文字は新しい Windows ターミナルで動作しますが、古いターミナルでは8色に制限されています。リッチを使用するにはPythonのバージョンは3.6.3以降が必要です。
 
-Richは追加の設定を行わずとも、[Jupyter notebooks](https://jupyter.org/)で動作します。
+リッチは追加の設定を行わずとも、[Jupyter notebooks](https://jupyter.org/)で動作します。
 
 ## インストール
 
@@ -69,7 +69,7 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ## Rich REPL
 
-RichはPythonのREPLでインストールすることができ、データ構造がきれいに表示され、ハイライトされます。
+リッチはPythonのREPLでインストールすることができ、データ構造がきれいに表示され、ハイライトされます。
 
 ```python
 >>> from rich import pretty
@@ -80,7 +80,7 @@ RichはPythonのREPLでインストールすることができ、データ構造
 
 ## Rich Inspect
 
-RichにはPythonオブジェクトやクラス、インスタンス、組み込み関数などに関するレポートを作成することができる、[inspect関数](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect)があります。
+リッチにはPythonオブジェクトやクラス、インスタンス、組み込み関数などに関するレポートを作成することができる、[inspect関数](https://rich.readthedocs.io/en/latest/reference/init.html?highlight=inspect#rich.inspect)があります。
 
 ```python
 >>> from rich import inspect
@@ -118,7 +118,7 @@ console.print("Hello", "World!", style="bold red")
 ![Hello World](https://github.com/textualize/rich/raw/master/imgs/hello_world.png)
 
 この方法は一行のテキストを一度にスタイリングするのに適しています。
-より細かくスタイリングを行うために、Richは[bbcode](https://en.wikipedia.org/wiki/BBCode)に似た構文の特別なマークアップを表示することができます。
+より細かくスタイリングを行うために、リッチは[bbcode](https://en.wikipedia.org/wiki/BBCode)に似た構文の特別なマークアップを表示することができます。
 これはその例です:
 
 ```python
@@ -129,7 +129,7 @@ console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i
 
 ### Console logging
 
-Consoleオブジェクトには `log()` メソッドがあり、これは `print()` と同じインターフェイスを持ちますが、現在の時刻と呼び出しを行ったファイルと行数についてもカラムに表示します。デフォルトでは、RichはPythonの構造体とrepr文字列のシンタックスハイライトを行います。もしコレクション(例: dictやlist)をログに記録した場合、Richはそれを利用可能なスペースに収まるようにきれいに表示します。以下に、これらの機能のいくつかの例を示します。
+Consoleオブジェクトには `log()` メソッドがあり、これは `print()` と同じインターフェイスを持ちますが、現在の時刻と呼び出しを行ったファイルと行数についてもカラムに表示します。デフォルトでは、リッチはPythonの構造体とrepr文字列のシンタックスハイライトを行います。もしコレクション(例: dictやlist)をログに記録した場合、リッチはそれを利用可能なスペースに収まるようにきれいに表示します。以下に、これらの機能のいくつかの例を示します。
 
 ```python
 from rich.console import Console
@@ -181,7 +181,7 @@ logメソッドはサーバのような長時間稼働しているアプリケ�
 
 ## テーブル
 
-Richはユニコードの枠を用いて柔軟に[テーブル](https://rich.readthedocs.io/en/latest/tables.html)を表示することができます。 罫線、スタイル、セルの配置などの書式設定のためのオプションが豊富にあります。
+リッチはユニコードの枠を用いて柔軟に[テーブル](https://rich.readthedocs.io/en/latest/tables.html)を表示することができます。 罫線、スタイル、セルの配置などの書式設定のためのオプションが豊富にあります。
 
 ![table movie](https://github.com/textualize/rich/raw/master/imgs/table_movie.gif)
 
@@ -223,7 +223,7 @@ console.print(table)
 
 ![table](https://github.com/textualize/rich/raw/master/imgs/table.png)
 
-コンソール上でのマークアップは`print()` や `log()` と同じように表示されることに注意してください。実際には、Rich が表示可能なものはすべてヘッダや行に含めることができます (それが他のテーブルであっても、です)。
+コンソール上でのマークアップは`print()` や `log()` と同じように表示されることに注意してください。実際には、リッチ が表示可能なものはすべてヘッダや行に含めることができます (それが他のテーブルであっても、です)。
 
 `Table`クラスは、ターミナルの利用可能な幅に合わせてカラムのサイズを変更したり、必要に応じてテキストを折り返したりするのに十分なスマートさを持っています。
 これは先ほどと同じ例で、ターミナルを上のテーブルよりも小さくしたものです。
@@ -287,9 +287,9 @@ python -m rich.spinner
 
 ## ツリー
 
-Richはガイドライン付きの[ツリー](https://rich.readthedocs.io/en/latest/tree.html)を表示することができます。ツリーはファイル構造などの階層データを表示するのに適しています。
+リッチはガイドライン付きの[ツリー](https://rich.readthedocs.io/en/latest/tree.html)を表示することができます。ツリーはファイル構造などの階層データを表示するのに適しています。
 
-ツリーのラベルは、シンプルなテキストや、Richが表示できるものであれば何でも表示することができます。以下を実行してデモを行います:
+ツリーのラベルは、シンプルなテキストや、リッチが表示できるものであれば何でも表示することができます。以下を実行してデモを行います:
 
 ```
 python -m rich.tree
@@ -303,7 +303,7 @@ linuxの `tree` コマンドと同様に、任意のディレクトリのツリ�
 
 ## カラム
 
-Rich は、コンテンツをきれいな [カラム](https://rich.readthedocs.io/en/latest/columns.html) で等幅、または最適な幅で表示することができます。これは(MacOS / Linux) の `ls` コマンドのとても基本的なクローンで、ディレクトリ一覧をカラムで表示します。
+リッチ は、コンテンツをきれいな [カラム](https://rich.readthedocs.io/en/latest/columns.html) で等幅、または最適な幅で表示することができます。これは(MacOS / Linux) の `ls` コマンドのとても基本的なクローンで、ディレクトリ一覧をカラムで表示します。
 
 ```python
 import os
@@ -322,7 +322,7 @@ print(Columns(directory))
 
 ## マークダウン
 
-Richは[マークダウン](https://rich.readthedocs.io/en/latest/markdown.html)を使用することができ、フォーマットをターミナル向けに変換するための良い仕事をしてくれます。
+リッチは[マークダウン](https://rich.readthedocs.io/en/latest/markdown.html)を使用することができ、フォーマットをターミナル向けに変換するための良い仕事をしてくれます。
 
 マークダウンを使用するには、`Markdown`クラスをインポートし、マークダウンコードを含む文字列で構成します。そしてそれをコンソールに表示します。これは例です:
 
@@ -342,7 +342,7 @@ console.print(markdown)
 
 ## シンタックスハイライト
 
-Richは [シンタックスハイライト](https://rich.readthedocs.io/en/latest/syntax.html) を実装するために [pygments](https://pygments.org/) ライブラリを使用しています。使い方はマークダウンを使用するのと似ています。 `Syntax` オブジェクトを構築してコンソールに表示します。以下にその例を示します:
+リッチは [シンタックスハイライト](https://rich.readthedocs.io/en/latest/syntax.html) を実装するために [pygments](https://pygments.org/) ライブラリを使用しています。使い方はマークダウンを使用するのと似ています。 `Syntax` オブジェクトを構築してコンソールに表示します。以下にその例を示します:
 
 ```python
 from rich.console import Console
@@ -374,15 +374,15 @@ console.print(syntax)
 
 ## トレースバック
 
-Rich は [美しいトレースバック](https://rich.readthedocs.io/en/latest/traceback.html) を表示することができ、通常のPythonのトレースバックよりも読みやすく、より多くのコードを表示することができます。Richをデフォルトのトレースバックハンドラとして設定することで、捕捉されなかった例外はすべてRichによって表示されるようになります。
+リッチ は [美しいトレースバック](https://rich.readthedocs.io/en/latest/traceback.html) を表示することができ、通常のPythonのトレースバックよりも読みやすく、より多くのコードを表示することができます。リッチをデフォルトのトレースバックハンドラとして設定することで、捕捉されなかった例外はすべてリッチによって表示されるようになります。
 
 OSXではこのような表示となります（Linuxでも似たような表示になります）:
 
 ![traceback](https://github.com/textualize/rich/raw/master/imgs/traceback.png)
 
-## Richを使用したプロジェクト
+## リッチを使用したプロジェクト
 
-ここでは、Richを使用したいくつかのプロジェクトを紹介します:
+ここでは、リッチを使用したいくつかのプロジェクトを紹介します:
 
 - [BrancoLab/BrainRender](https://github.com/BrancoLab/BrainRender)
   3次元の神経解剖学的データを可視化するpythonパッケージ
