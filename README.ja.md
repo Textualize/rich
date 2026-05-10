@@ -49,7 +49,7 @@ Richは追加の設定を行わずとも、[Jupyter notebooks](https://jupyter.o
 python -m pip install rich
 ```
 
-以下のコマンドを実行して、ターミナルRichの出力をテストできます:
+以下のコマンドを実行して、ターミナルでRichの出力をテストできます:
 
 ```sh
 python -m rich
