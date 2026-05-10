@@ -57,7 +57,7 @@ python -m rich
 
 ## Richのprint関数
 
-簡単にリッチな出力をアプリケーションに追加するには、Pythonの組み込み関数と同じ名前を持つ [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) メソッドをインポートすることで実現できます。こちらを試してみてください:
+簡単にRichな出力をアプリケーションに追加するには、Pythonの組み込み関数と同じ名前を持つ [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) メソッドをインポートすることで実現できます。こちらを試してみてください:
 
 ```python
 from rich import print
@@ -89,7 +89,7 @@ RichにはPythonオブジェクトやクラス、インスタンス、組み込�
 
 ## Consoleの使い方
 
-リッチなターミナルコンテンツをより制御していくには、[Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console) オブジェクトをインポートして構築していきます。
+Richなターミナルコンテンツをより制御していくには、[Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console) オブジェクトをインポートして構築していきます。
 
 
 ```python
