@@ -1,11 +1,13 @@
 import io
 import os
 import logging
+import re
 from typing import Optional
 
 import pytest
 
 from rich.console import Console
+from rich.highlighter import ReprHighlighter
 from rich.logging import RichHandler
 
 handler = RichHandler(
@@ -160,3 +162,23 @@ def test_markup_and_highlight():
     render_plain = handler.console.file.getvalue()
     assert "FORMATTER" in render_plain
     assert log_message in render_plain
+
+
+def test_handler_uses_console_highlighter_when_not_overridden():
+    class HashHighlighter(ReprHighlighter):
+        highlights = [
+            *ReprHighlighter.highlights,
+            re.compile(r"\b(?P<git_hash>FOO)\b"),
+        ]
+
+    console = Console(highlighter=HashHighlighter())
+    handler = RichHandler(console=console)
+    record = logging.LogRecord("rich", logging.INFO, __file__, 1, "message", (), None)
+
+    rendered = handler.render_message(record, "A git hash FOO")
+
+    assert rendered.plain == "A git hash FOO"
+    assert len(rendered.spans) == 1
+    assert rendered.spans[0].start == 11
+    assert rendered.spans[0].end == 14
+    assert rendered.spans[0].style == "repr.git_hash"
