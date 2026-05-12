@@ -126,32 +126,25 @@ class Segment(NamedTuple):
 
         cell_size = get_character_cell_size
 
-        pos = int((cut / cell_length) * len(text))
+        # Walk through characters tracking cell position,
+        # avoids the heuristic + while-loop which fails on
+        # non-unit-width characters (emoji, CJK, etc.)
+        cell_pos = 0
+        for i, char in enumerate(text):
+            char_cells = cell_size(char)
+            if cell_pos + char_cells > cut:
+                if char_cells == 2:
+                    return (
+                        _Segment(text[:i] + " ", style, control),
+                        _Segment(" " + text[i + 1 :], style, control),
+                    )
+                return (
+                    _Segment(text[:i], style, control),
+                    _Segment(text[i:], style, control),
+                )
+            cell_pos += char_cells
 
-        while True:
-            before = text[:pos]
-            cell_pos = cell_len(before)
-            out_by = cell_pos - cut
-            if not out_by:
-                return (
-                    _Segment(before, style, control),
-                    _Segment(text[pos:], style, control),
-                )
-            if out_by == -1 and cell_size(text[pos]) == 2:
-                return (
-                    _Segment(text[:pos] + " ", style, control),
-                    _Segment(" " + text[pos + 1 :], style, control),
-                )
-            if out_by == +1 and cell_size(text[pos - 1]) == 2:
-                return (
-                    _Segment(text[: pos - 1] + " ", style, control),
-                    _Segment(" " + text[pos:], style, control),
-                )
-            if cell_pos < cut:
-                pos += 1
-            else:
-                pos -= 1
-
+        return segment, _Segment("", style, control)
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
         """Split segment in to two segments at the specified column.
 
