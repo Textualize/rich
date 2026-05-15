@@ -130,9 +130,19 @@ class Inspect(JupyterMixin):
             return (callable(value), key.strip("_").lower())
 
         def safe_getattr(attr_name: str) -> Tuple[Any, Any]:
-            """Get attribute or any exception."""
+            """Get attribute or any exception.
+
+            Falls back to ``inspect.getattr_static`` if ``getattr`` raises
+            ``AttributeError``, so that descriptors which signal "no such
+            attribute" (e.g. SWIG bindings, lazy properties) are still surfaced.
+            """
             try:
                 return (None, getattr(obj, attr_name))
+            except AttributeError:
+                try:
+                    return (None, inspect.getattr_static(obj, attr_name))
+                except AttributeError as error:
+                    return (error, None)
             except Exception as error:
                 return (error, None)
 
