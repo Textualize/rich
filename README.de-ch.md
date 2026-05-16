@@ -33,7 +33,6 @@ D [Rich API](https://rich.readthedocs.io/en/latest/) machts ganz eifach zom Farb
 
 E Video Iifüärig öber Rich geds onder [calmcode.io](https://calmcode.io/rich/introduction.html) vo [@fishnets88](https://twitter.com/fishnets88).
 
-Lueg was [anderi öber Rich säged](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
 ## Kompatibilität
 

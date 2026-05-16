@@ -33,7 +33,6 @@ Rich 是一款提供終端機介面中 _豐富的_ 文字效果及精美的格�
 
 關於 Rich 的介紹，請參見 [@fishnets88](https://twitter.com/fishnets88) 在 [calmcode.io](https://calmcode.io/rich/introduction.html) 錄製的影片。
 
-[看看其他人對於 Rich 的討論](https://www.willmcgugan.com/blog/pages/post/rich-tweets/)。
 
 ## 相容性
 

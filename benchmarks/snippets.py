@@ -111,7 +111,6 @@ Richは、 _リッチ_ なテキストや美しい書式設定をターミナル
 
 Richの紹介動画はこちらをご覧ください。 [calmcode.io](https://calmcode.io/rich/introduction.html) by [@fishnets88](https://twitter.com/fishnets88).
 
-[Richについての人々の感想を見る。](https://www.willmcgugan.com/blog/pages/post/rich-tweets/)
 
 ## 互換性
 

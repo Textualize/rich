@@ -33,7 +33,6 @@ La [API Rich](https://rich.readthedocs.io/en/latest/) facilita la adición de co
 
 Para ver un vídeo de introducción a Rich, consulte [calmcode.io](https://calmcode.io/rich/introduction.html) de [@fishnets88](https://twitter.com/fishnets88).
 
-Vea lo que [la gente dice sobre Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
 ## Compatibilidad
 

@@ -35,7 +35,6 @@ Rich to bilbioteka Pythona dla tekstów _rich_ i pięknego formatowania w termin
 
 Wprowadzenie wideo do Richa na [calmcode.io](https://calmcode.io/rich/introduction.html) stworzonym przez [@fishnets88](https://twitter.com/fishnets88).
 
-Zobacz co [inni mówią o Richu](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
 ## Kompatybilność
 
