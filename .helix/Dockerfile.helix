@@ -1,0 +1,26 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    git \
+    ca-certificates \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY . /app
+
+RUN pip install --upgrade pip setuptools wheel
+
+# Install package directly
+RUN pip install -e .
+
+# Install test tools
+RUN pip install pytest pytest-xdist attrs
+
+# Install optional requirements if present
+RUN if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+RUN if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+
+CMD ["bash"]
