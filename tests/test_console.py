@@ -1008,7 +1008,7 @@ def test_brokenpipeerror() -> None:
     """Test BrokenPipe works as expected."""
 
     # We write enough output to hopefully keep the writing process busy and give
-    # enough time for the reading process to exist, creating a BrokenPipeError.
+    # enough time for the reading process to exit, creating a BrokenPipeError.
     writer = (
         "from rich.console import Console\n"
         "console = Console(force_terminal=True, width=240)\n"
