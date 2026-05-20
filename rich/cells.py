@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from functools import lru_cache
 from operator import itemgetter
-from typing import Callable, NamedTuple, Sequence, Tuple
+from typing import Callable, NamedTuple, Sequence
 
 from rich._unicode_data import load as load_cell_table
 
-CellSpan = Tuple[int, int, int]
+CellSpan = tuple[int, int, int]
 
 _span_get_cell_len = itemgetter(2)
 
@@ -160,7 +160,7 @@ def _cell_len(text: str, unicode_version: str) -> int:
 
 def split_graphemes(
     text: str, unicode_version: str = "auto"
-) -> "tuple[list[CellSpan], int]":
+) -> tuple[list[CellSpan], int]:
     """Divide text into spans that define a single grapheme, and additionally return the cell length of the whole string.
 
     The returned spans will cover every index in the string, with no gaps. It is possible for some graphemes to have a cell length of zero.
