@@ -1,0 +1,19 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install system dependencies and poetry
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir poetry
+
+# Copy the repository files
+COPY . .
+
+# Configure poetry to not use a virtualenv inside the container, 
+# then install all dependencies (including dev/test tools like attr)
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-root \
+    && pip install --no-cache-dir pytest .
