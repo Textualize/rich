@@ -1,7 +1,0 @@
-rich
-====
-
-.. automodule:: rich
-    :members:
-    
-

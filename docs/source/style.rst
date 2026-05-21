@@ -147,6 +147,276 @@ To see the default theme, run the following commands::
     python -m rich.default_styles
 
 
+Default Styles
+--------------
+
+Rich ships with a comprehensive set of built-in styles used throughout its
+various modules. These styles are stored in :class:`~rich.default_styles.DEFAULT_STYLES`
+and can be used by passing the style name as a string to any Rich API that
+accepts a ``style`` parameter (e.g., ``console.print("[warning]Text[/warning]")``).
+
+The following table lists all available default style names grouped by their
+area of use:
+
+.. list-table::
+    :header-rows: 1
+    :widths: 30 70
+
+    * - Style Name
+      - Description
+    * - **Basic**
+      -
+    * - ``"none"``
+      - No styling (null style)
+    * - ``"reset"``
+      - Resets all color and style attributes to terminal defaults
+    * - ``"dim"``
+      - Reduced intensity (subtle/bright text)
+    * - ``"bright"``
+      - Full intensity (no dimming)
+    * - ``"bold"``
+      - Bold text weight
+    * - ``"strong"``
+      - Strong emphasis (bold)
+    * - ``"code"``
+      - Code-like appearance (bold + reverse)
+    * - ``"italic"``
+      - Italic text style
+    * - ``"emphasize"``
+      - Emphasis (italic)
+    * - ``"underline"``
+      - Underlined text
+    * - ``"blink"``
+      - Slow blinking text
+    * - ``"blink2"``
+      - Rapid blinking text
+    * - ``"reverse"``
+      - Reversed foreground/background colors
+    * - ``"strike"``
+      - Strikethrough text
+    * - ``"black"`` / ``"red"`` / ``"green"`` / ``"yellow"`` / ``"magenta"`` / ``"cyan"`` / ``"white"``
+      - Basic ANSI foreground colors
+    * - **Inspect** (used by :func:`~rich.inspect.inspect`)
+      -
+    * - ``"inspect.attr"``
+      - Regular attribute names
+    * - ``"inspect.attr.dunder"``
+      - Dunder (dunder) attribute names
+    * - ``"inspect.callable"``
+      - Callable/function names
+    * - ``"inspect.async_def"``
+      - Async function definitions
+    * - ``"inspect.def"``
+      - Regular function definitions
+    * - ``"inspect.class"``
+      - Class names
+    * - ``"inspect.error"``
+      - Error/exception types
+    * - ``"inspect.equals"``
+      - Equals sign in output
+    * - ``"inspect.help"``
+      - Help text / documentation
+    * - ``"inspect.value.border"``
+      - Border around inspect values
+    * - **JSON Rendering**
+      -
+    * - ``"json.brace"``
+      - JSON braces ``{`` and ``}``
+    * - ``"json.bool_true"`` / ``"json.bool_false"``
+      - Boolean literals
+    * - ``"json.null"``
+      - Null literal
+    * - ``"json.number"``
+      - Numeric values
+    * - ``"json.str"``
+      - String values
+    * - ``"json.key"``
+      - Object keys
+    * - **Logging**
+      -
+    * - ``"logging.keyword"``
+      - ``levelname`` in log records (e.g., "INFO", "DEBUG")
+    * - ``"logging.level.notset"`` / ``"debug"`` / ``"info"`` / ``"warning"`` / ``"error"`` / ``"critical"``
+      - Styles for each log level
+    * - ``"log.level"``
+      - Log level indicator (general)
+    * - ``"log.time"``
+      - Timestamp in log output
+    * - ``"log.message"``
+      - Log message text
+    * - ``"log.path"``
+      - File path in log output
+    * - **Layout / Tree**
+      -
+    * - ``"layout.tree.row"``
+      - Tree structure row styling
+    * - ``"layout.tree.column"``
+      - Tree column styling
+    * - ``"tree"``
+      - General tree styling
+    * - ``"tree.line"``
+      - Tree connecting lines
+    * - **Live / Progress**
+      -
+    * - ``"live.ellipsis"``
+      - Ellipsis shown during live updates
+    * - ``"progress.description"``
+      - Task description text
+    * - ``"progress.filesize"`` / ``"progress.filesize.total"``
+      - File size displays
+    * - ``"progress.download"``
+      - Download progress text
+    * - ``"progress.elapsed"``
+      - Elapsed time display
+    * - ``"progress.percentage"``
+      - Percentage complete
+    * - ``"progress.remaining"``
+      - Remaining time display
+    * - ``"progress.data.speed"``
+      - Data transfer speed
+    * - ``"progress.spinner"``
+      - Spinner character for progress
+    * - ``"bar.back"`` / ``"bar.complete"`` / ``"bar.finished"`` / ``"bar.pulse"``
+      - Progress bar segments
+    * - ``"status.spinner"``
+      - Spinner for status display
+    * - **Repr / Inspect Output**
+      -
+    * - ``"repr.ellipsis"``
+      - Truncation indicator ``...``
+    * - ``"repr.indent"``
+      - Indentation markers
+    * - ``"repr.error"``
+      - Error values
+    * - ``"repr.str"``
+      - String representations
+    * - ``"repr.brace"`` / ``"repr.comma"``
+      - Braces and commas in repr
+    * - ``"repr.ipv4"`` / ``"repr.ipv6"`` / ``"repr.eui48"`` / ``"repr.eui64"``
+      - Network address formats
+    * - ``"repr.tag_start"`` / ``"repr.tag_name"`` / ``"repr.tag_contents"`` / ``"repr.tag_end"``
+      - XML/HTML tag elements
+    * - ``"repr.attrib_name"`` / ``"repr.attrib_equal"`` / ``"repr.attrib_value"``
+      - Attribute name/value pairs in repr
+    * - ``"repr.number"`` / ``"repr.number_complex"``
+      - Numeric values in repr
+    * - ``"repr.bool_true"`` / ``"repr.bool_false"``
+      - Boolean literals in repr
+    * - ``"repr.none"``
+      - None value in repr
+    * - ``"repr.url"``
+      - URL strings in repr
+    * - ``"repr.uuid"``
+      - UUID strings in repr
+    * - ``"repr.call"``
+      - Callable invocation display
+    * - ``"repr.path"`` / ``"repr.filename"``
+      - File path display in repr
+    * - **Markdown Rendering**
+      -
+    * - ``"markdown.paragraph"`` / ``"markdown.text"``
+      - Paragraph and body text
+    * - ``"markdown.em"`` / ``"markdown.emph"``
+      - Emphasis/italic text
+    * - ``"markdown.strong"``
+      - Strong/bold text
+    * - ``"markdown.code"`` / ``"markdown.code_block"``
+      - Inline and block code
+    * - ``"markdown.block_quote"``
+      - Block quote text
+    * - ``"markdown.list"`` / ``"markdown.item"`` / ``"markdown.item.bullet"`` / ``"markdown.item.number"``
+      - List and list item rendering
+    * - ``"markdown.h1"`` to ``"markdown.h7"`` / ``"markdown.h1.border"``
+      - Heading styles (levels 1-7)
+    * - ``"markdown.hr"``
+      - Horizontal rule
+    * - ``"markdown.link"`` / ``"markdown.link_url"``
+      - Link text and URL styling
+    * - ``"markdown.s"``
+      - Strikethrough text
+    * - ``"markdown.table.border"`` / ``"markdown.table.header"``
+      - Table rendering styles
+    * - ``"markdown.kbd"``
+      - Keyboard input text
+    * - **Rule / Separator**
+      -
+    * - ``"rule.line"``
+      - Horizontal rule line
+    * - ``"rule.text"``
+      - Rule text content
+    * - **Scope**
+      -
+    * - ``"scope.border"``
+      - Scope border styling
+    * - ``"scope.key"`` / ``"scope.key.special"``
+      - Scope key names
+    * - ``"scope.equals"``
+      - Equals sign in scope display
+    * - **Table**
+      -
+    * - ``"table.header"`` / ``"table.footer"``
+      - Table header and footer rows
+    * - ``"table.cell"``
+      - General table cell content
+    * - ``"table.title"``
+      - Table caption/title
+    * - ``"table.caption"``
+      - Table caption (italic + dim)
+    * - **Traceback**
+      -
+    * - ``"traceback.error"``
+      - Error message text in tracebacks
+    * - ``"traceback.border"`` / ``"traceback.border.syntax_error"``
+      - Border styling for traceback boxes
+    * - ``"traceback.text"``
+      - General traceback text
+    * - ``"traceback.title"``
+      - Title of traceback block
+    * - ``"traceback.exc_type"``
+      - Exception type name
+    * - ``"traceback.exc_value"``
+      - Exception message value
+    * - ``"traceback.offset"``
+      - Line number offset display
+    * - ``"traceback.error_range"``
+      - Error range highlight
+    * - ``"traceback.note"``
+      - Note附加信息
+    * - ``"traceback.group.border"``
+      - Exception group border
+    * - **Prompt**
+      -
+    * - ``"prompt"``
+      - General prompt styling
+    * - ``"prompt.choices"``
+      - Choice options in prompts
+    * - ``"prompt.default"``
+      - Default selection in prompts
+    * - ``"prompt.invalid"`` / ``"prompt.invalid.choice"``
+      - Invalid input feedback
+    * - **ISO 8601 Date/Time**
+      -
+    * - ``"iso8601.date"`` / ``"iso8601.time"`` / ``"iso8601.timezone"``
+      - Date, time, and timezone formatting
+    * - **Pretty Print**
+      -
+    * - ``"pretty"``
+      - General pretty-printed output
+    * - **Status**
+      -
+    * - ``"status.spinner"``
+      - Spinner animation character
+
+.. note::
+    To preview all default styles rendered in your terminal, run::
+
+        python -m rich.default_styles
+
+    You can also override any default style by passing a custom :class:`~rich.theme.Theme`
+    to the :class:`~rich.console.Console` constructor, or by modifying
+    ``DEFAULT_STYLES`` directly (though this is discouraged — theme overrides
+    via the ``Theme`` class are the intended extensibility point).
+
 Loading Themes
 ~~~~~~~~~~~~~~
 

@@ -1,9 +1,0 @@
-{
-    "arch": "arm64",
-    "cpu": "Apple M1 Pro",
-    "machine": "darrenburns-2022-mbp",
-    "num_cpu": "10",
-    "os": "Darwin 21.2.0",
-    "ram": "17179869184",
-    "version": 1
-}
