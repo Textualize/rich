@@ -1,12 +1,15 @@
 import io
 import os
 import logging
+from pathlib import Path
 from typing import Optional
 
 import pytest
 
 from rich.console import Console
 from rich.logging import RichHandler
+from rich._log_render import LogRender
+from rich.text import Text
 
 handler = RichHandler(
     console=Console(
@@ -120,6 +123,33 @@ def test_stderr_and_stdout_are_none(monkeypatch):
 
     assert actual_record is not None
     assert "message" in actual_record.msg
+
+
+def test_link_path_uri_format():
+    """link_path must use file:/// (3 slashes) and forward slashes.
+    Regression test for https://github.com/Textualize/rich/issues/4093
+    """
+    console = Console(file=io.StringIO(), _environ={})
+    render = LogRender()
+    abs_path = str(Path(__file__).resolve())
+    table = render(
+        console,
+        renderables=[Text("msg")],
+        path="test_logging.py",
+        line_no=1,
+        link_path=abs_path,
+    )
+    expected_uri = Path(abs_path).as_uri()
+
+    path_cell = table.columns[-1]._cells[0]
+    assert isinstance(path_cell, Text)
+    link_styles = [span.style for span in path_cell._spans if "link" in str(span.style)]
+    assert any(expected_uri in str(s) for s in link_styles), (
+        f"Expected {expected_uri!r} in link styles, got {link_styles!r}"
+    )
+    assert not any("file://" + abs_path in str(s) for s in link_styles), (
+        "file:// (two slashes) should not appear in link styles"
+    )
 
 
 def test_markup_and_highlight():
