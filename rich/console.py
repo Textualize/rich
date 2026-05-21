@@ -786,6 +786,14 @@ class Console:
         """Get the thread local theme stack."""
         return self._thread_locals.theme_stack
 
+    @staticmethod
+    def enable_readline():
+        """Load :mod:`readline` globally, if available."""
+        try:
+            import readline
+        except ImportError:
+            pass
+
     def _detect_color_system(self) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
         if self.is_jupyter:
@@ -2176,17 +2184,23 @@ class Console:
         Returns:
             str: Text read from stdin.
         """
-        if prompt:
-            self.print(prompt, markup=markup, emoji=emoji, end="")
+        if prompt and not stream and not WINDOW and self.file == sys.stdout:
+            with self.capture() as capture:
+                self.print(prompt, markup=markup, emoji=emoji, end="")
+            rendered = capture.get()
+        else:
+            if prompt:
+                self.print(prompt, markup=markup, emoji=emoji, end="")
+            rendered = ""
         if password:
             import getpass as _getpass_mod
 
-            result = _getpass_mod.getpass("", stream=stream)
+            result = _getpass_mod.getpass(rendered, stream=stream)
         else:
             if stream:
                 result = stream.readline()
             else:
-                result = input()
+                result = input(rendered)
         return result
 
     def export_text(self, *, clear: bool = True, styles: bool = False) -> str:
