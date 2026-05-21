@@ -2186,7 +2186,8 @@ class Console:
             if stream:
                 result = stream.readline()
             else:
-                result = input()
+                # Fix readline support: pass a non-empty string
+                result = input(" \b")  # SPACE + BACKSPACE
         return result
 
     def export_text(self, *, clear: bool = True, styles: bool = False) -> str:
