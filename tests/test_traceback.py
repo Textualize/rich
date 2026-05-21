@@ -375,6 +375,24 @@ def test_notes() -> None:
         assert traceback.trace.stacks[0].notes == ["Hello", "World"]
 
 
+def test_notes_chained_exceptions() -> None:
+    """Check __notes__ are only shown on the exception that has them.
+    Regression test for https://github.com/Textualize/rich/issues/3960
+    """
+    try:
+        try:
+            raise ValueError("inner")
+        except ValueError as exc:
+            raise RuntimeError("outer") from exc
+    except RuntimeError as exc:
+        exc.add_note("only on outer")
+        traceback = Traceback()
+
+    stacks = traceback.trace.stacks
+    assert stacks[0].notes == ["only on outer"]  # RuntimeError (outermost)
+    assert stacks[1].notes == []                 # ValueError (inner, no notes)
+
+
 def test_recursive_exception() -> None:
     """Regression test for https://github.com/Textualize/rich/issues/3708
 
