@@ -461,3 +461,63 @@ def test_highlight_iso8601_regex(test: str, spans: List[Span]):
     highlighter.highlight(text)
     print(text.spans)
     assert text.spans == spans
+
+
+# ---------------------------------------------------------------------------
+# ReprHighlighter tag-regex regression tests (issue #4035)
+# ---------------------------------------------------------------------------
+
+
+def test_repr_highlighter_does_not_merge_adjacent_tags():
+    """Adjacent tags must produce independent spans, not one merged span."""
+    from rich.highlighter import ReprHighlighter
+    from rich.text import Text
+
+    text = Text("<a>content1</a><b>content2</b>")
+    highlighter = ReprHighlighter()
+    highlighter.highlight(text)
+
+    # The tag spans must not extend from the first '<' to the last '>'
+    for span in text.spans:
+        # No individual span should cover the entire string
+        assert span.end - span.start < len(text), (
+            f"Span {span} covers the whole string — greedy regex merging still happening"
+        )
+
+    # There must be at least 2 separate tag_start highlights (one per tag)
+    tag_start_spans = [s for s in text.spans if "tag_start" in s.style]
+    assert len(tag_start_spans) >= 2, (
+        f"Expected ≥2 tag_start spans, got {len(tag_start_spans)}; full spans: {text.spans}"
+    )
+
+
+def test_repr_highlighter_single_tag_unchanged():
+    """A single tag (no adjacent neighbours) must still be highlighted correctly."""
+    from rich.highlighter import ReprHighlighter
+    from rich.text import Text
+
+    text = Text("<function foo at 0x7f123>")
+    highlighter = ReprHighlighter()
+    highlighter.highlight(text)
+
+    tag_name_spans = [s for s in text.spans if "tag_name" in s.style]
+    assert tag_name_spans, "Expected at least one tag_name span"
+    # The tag name should be 'function'
+    matched_name = str(text)[tag_name_spans[0].start:tag_name_spans[0].end]
+    assert matched_name == "function", f"Unexpected tag name: {matched_name!r}"
+
+
+def test_repr_highlighter_tag_with_attributes():
+    """A tag with attribute text like <class name='Foo'> must be fully matched."""
+    from rich.highlighter import ReprHighlighter
+    from rich.text import Text
+
+    raw = "<class name='Foo'>"
+    text = Text(raw)
+    highlighter = ReprHighlighter()
+    highlighter.highlight(text)
+
+    tag_name_spans = [s for s in text.spans if "tag_name" in s.style]
+    assert tag_name_spans, "Expected a tag_name span"
+    matched = str(text)[tag_name_spans[0].start:tag_name_spans[0].end]
+    assert matched == "class", f"Unexpected tag_name: {matched!r}"
