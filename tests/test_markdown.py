@@ -199,6 +199,22 @@ def test_table_with_empty_cells() -> None:
     assert result == expected
 
 
+def test_inline_code_in_table_cells() -> None:
+    """Test inline code in table cells.
+
+    Regression test for https://github.com/Textualize/rich/issues/4038
+
+    """
+    markdown = Markdown(
+        "| Col |\n|---|\n| `print('hello');` |\n",
+        inline_code_theme="monokai",
+        inline_code_lexer="python",
+    )
+    result = render(markdown)
+    expected = "\n\x1b[36m                 \x1b[0m\n\x1b[36m \x1b[0m\x1b[36mCol\x1b[0m\x1b[1m            \x1b[0m\x1b[36m \x1b[0m\n\x1b[36m ─────────────── \x1b[0m\n\x1b[36m \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mprint\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m(\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34m'\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34mhello\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34m'\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m)\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m;\x1b[0m\x1b[36m \x1b[0m\n\x1b[36m                 \x1b[0m\n"
+    assert result == expected
+
+
 if __name__ == "__main__":
     markdown = Markdown(MARKDOWN)
     rendered = render(markdown)

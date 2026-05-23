@@ -5,19 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
-# Unreleased
+## Unreleased
 
 ### Changed
 
-- Dropped support for Python3.9
 - `console.get_windows_console_features` and `console.detect_legacy_windows` now have an optional `file` parameter https://github.com/Textualize/rich/pull/4072
 
 ### Fixed
 
-- Fixed empty print ignoring the `end` parameter
 - Fixed the auto-detection of `Console.legacy_windows` for the stderr stream, when stdout is redirected https://github.com/Textualize/rich/pull/4072
 - Fixed legacy Windows rendering for the stderr stream https://github.com/Textualize/rich/pull/4072
+
+## [15.0.0] - 2026-04-12
+
+### Changed
+
+- Breaking change: Dropped support for Python3.8
+
+### Fixed
+
+- Fixed empty print ignoring the `end` parameter https://github.com/Textualize/rich/pull/4075
+- Fixed `Text.from_ansi` removing newlines https://github.com/Textualize/rich/pull/4076
+- Fixed `FileProxy.isatty` not proxying https://github.com/Textualize/rich/pull/4077
+- Fixed inline code in Markdown tables cells https://github.com/Textualize/rich/pull/4079
 
 ## [14.3.4] - 2026-04-11
 
@@ -2217,7 +2227,7 @@ Major version bump for a breaking change to `Text.stylize signature`, which corr
 
 - First official release, API still to be stabilized
 
-
+[15.0.0]: https://github.com/textualize/rich/compare/v14.3.4...v15.0.0
 [14.3.4]: https://github.com/textualize/rich/compare/v14.3.3...v14.3.4
 [14.3.3]: https://github.com/textualize/rich/compare/v14.3.2...v14.3.3
 [14.3.2]: https://github.com/textualize/rich/compare/v14.3.1...v14.3.2
