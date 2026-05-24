@@ -2,7 +2,6 @@
 
 [![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich)
 [![codecov](https://img.shields.io/codecov/c/github/Textualize/rich?label=codecov&logo=codecov)](https://codecov.io/gh/Textualize/rich)
-[![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
 ![Logo](https://github.com/textualize/rich/raw/master/imgs/logo.svg)
