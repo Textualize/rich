@@ -126,31 +126,30 @@ class Segment(NamedTuple):
 
         cell_size = get_character_cell_size
 
-        pos = int((cut / cell_length) * len(text))
-
-        while True:
-            before = text[:pos]
-            cell_pos = cell_len(before)
-            out_by = cell_pos - cut
-            if not out_by:
-                return (
-                    _Segment(before, style, control),
-                    _Segment(text[pos:], style, control),
-                )
-            if out_by == -1 and cell_size(text[pos]) == 2:
+        # Walk the string character-by-character, accumulating cell widths.
+        # The previous heuristic (pos = int((cut / cell_length) * len(text)))
+        # produced an incorrect initial position for strings that mix wide
+        # (2-cell) characters with 1-cell characters, and the non-backtracking
+        # while-loop could not recover from that, leading to wrong split points.
+        # See: https://github.com/Textualize/rich/issues/3299
+        cell_pos = 0
+        for pos, char in enumerate(text):
+            char_width = cell_size(char)
+            if cell_pos + char_width > cut:
+                # The cut falls inside a double-width character; replace it
+                # with a space on each side to preserve total display width.
                 return (
                     _Segment(text[:pos] + " ", style, control),
                     _Segment(" " + text[pos + 1 :], style, control),
                 )
-            if out_by == +1 and cell_size(text[pos - 1]) == 2:
+            cell_pos += char_width
+            if cell_pos == cut:
                 return (
-                    _Segment(text[: pos - 1] + " ", style, control),
-                    _Segment(" " + text[pos:], style, control),
+                    _Segment(text[: pos + 1], style, control),
+                    _Segment(text[pos + 1 :], style, control),
                 )
-            if cell_pos < cut:
-                pos += 1
-            else:
-                pos -= 1
+        # Fallback (should not be reached given cut < cell_length guard above)
+        return segment, _Segment("", style, control)
 
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
         """Split segment in to two segments at the specified column.
