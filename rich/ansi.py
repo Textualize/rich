@@ -132,6 +132,10 @@ class AnsiDecoder:
         Yields:
             Text: Marked up Text.
         """
+        # Normalize CRLF to LF so that \r before \n is treated as a line
+        # ending rather than a standalone carriage return (which decode_line
+        # would strip via rsplit, losing the preceding text).
+        terminal_text = terminal_text.replace("\r\n", "\n")
         for line in re.split(r"(?<=\n)", terminal_text):
             yield self.decode_line(line.rstrip("\n"))
 

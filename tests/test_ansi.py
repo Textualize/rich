@@ -102,3 +102,21 @@ def test_decode_newlines():
     assert Text.from_ansi("Hello\nWorld\n").plain == "Hello\nWorld\n"
     assert Text.from_ansi("Hello\nWorld\n\n").plain == "Hello\nWorld\n\n"
     assert Text.from_ansi("\nHello\nWorld\n\n").plain == "\nHello\nWorld\n\n"
+
+
+def test_decode_crlf():
+    """Test CRLF line endings are handled correctly.
+
+    Regression test for https://github.com/Textualize/rich/issues/4090
+    """
+    assert Text.from_ansi("Hello\r\n").plain == "Hello\n"
+    assert Text.from_ansi("Hello\r\nWorld\r\n").plain == "Hello\nWorld\n"
+    assert Text.from_ansi("Hello\r\nWorld").plain == "Hello\nWorld"
+    assert Text.from_ansi("\r\nHello\r\n").plain == "\nHello\n"
+    assert Text.from_ansi("Hello\r\n\r\nWorld\r\n").plain == "Hello\n\nWorld\n"
+    # Mixed LF and CRLF
+    assert Text.from_ansi("Line1\nLine2\r\nLine3\n").plain == "Line1\nLine2\nLine3\n"
+    # ANSI codes with CRLF
+    assert Text.from_ansi("\x1b[31mRed\r\n\x1b[0mNormal\r\n").plain == "Red\nNormal\n"
+    # Standalone CR (cursor movement) should still work
+    assert Text.from_ansi("Hello\rWorld").plain == "World"
