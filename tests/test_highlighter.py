@@ -461,3 +461,25 @@ def test_highlight_iso8601_regex(test: str, spans: List[Span]):
     highlighter.highlight(text)
     print(text.spans)
     assert text.spans == spans
+
+def test_repr_highlighter_adjacent_tags():
+    from rich.highlighter import ReprHighlighter
+
+    highlighter = ReprHighlighter()
+
+    text = highlighter("<a>content1</a><b>content2</b>")
+
+    tag_contents_spans = [
+        span for span in text.spans
+        if span.style == "repr.tag_contents"
+    ]
+
+    assert len(tag_contents_spans) == 2
+
+    assert [
+      (span.start, span.end)
+       for span in tag_contents_spans
+    ] == [
+       (2, 14),
+       (17, 29),
+    ]
