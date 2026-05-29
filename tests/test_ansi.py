@@ -102,3 +102,8 @@ def test_decode_newlines():
     assert Text.from_ansi("Hello\nWorld\n").plain == "Hello\nWorld\n"
     assert Text.from_ansi("Hello\nWorld\n\n").plain == "Hello\nWorld\n\n"
     assert Text.from_ansi("\nHello\nWorld\n\n").plain == "\nHello\nWorld\n\n"
+
+    # Regression test for CRLF line endings
+    assert Text.from_ansi("Hello\r\nWorld").plain == "Hello\nWorld"
+    assert Text.from_ansi("\r\nHello\r\n").plain == "\nHello\n"
+    assert Text.from_ansi("Hello\r\n\r\nWorld").plain == "Hello\n\nWorld"
