@@ -757,7 +757,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed pretty printing of objects with fo magic with **getattr** https://github.com/textualize/rich/issues/1492
+- Fixed pretty printing of objects with no magic with **getattr** https://github.com/textualize/rich/issues/1492
 
 ## [10.9.0] - 2021-08-29
 
