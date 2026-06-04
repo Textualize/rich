@@ -50,6 +50,7 @@ The following people have contributed to the development of Rich:
 - [Michael Milton](https://github.com/multimeric)
 - [Martina Oefelein](https://github.com/oefe)
 - [Joel Ostblom](https://github.com/joelostblom)
+- [Nisha Muthurajan](https://github.com/nisha-muthurajan)
 - [Nathan Page](https://github.com/nathanrpage97)
 - [Dave Pearson](https://github.com/davep/)
 - [Avi Perl](https://github.com/avi-perl)

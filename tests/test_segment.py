@@ -328,15 +328,14 @@ def test_split_cells_mixed(segment: Segment) -> None:
         assert cell_len(right.text) == segment.cell_length - position
 
 
-
 def test_split_cells_emoji():
     """Regression test for #3299 — non-unit chars in _split_cells."""
     # cut=3 falls inside fox2 (cells 2-3), so fox2 becomes two spaces
     s = Segment("🦊🦊🦊\n\n\n\n\n\n")
     left, right = Segment._split_cells(s, 3)
-    assert left.text == "🦊 "        # one fox + padding space
-    assert left.cell_length == 3      # emoji(2) + space(1)
-    assert right.text.startswith(" ") # padding space on right side
+    assert left.text == "🦊 "  # one fox + padding space
+    assert left.cell_length == 3  # emoji(2) + space(1)
+    assert right.text.startswith(" ")  # padding space on right side
     assert right.text.count("🦊") == 1  # fox3 still on right
 
     # cut=3 inside fox2 again, abcdef goes to right
@@ -420,5 +419,3 @@ def test_align_bottom():
         [Segment("   ", Style())],
         [Segment("X")],
     ]
-
-

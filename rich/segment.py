@@ -120,7 +120,7 @@ class Segment(NamedTuple):
         """
         text, style, control = segment
         _Segment = Segment
-        
+
         cell_length = segment.cell_length
         if cut >= cell_length:
             return segment, _Segment("", style, control)
@@ -135,7 +135,7 @@ class Segment(NamedTuple):
                 if cell_pos + char_width == cut + 1 and char_width == 2:
                     return (
                         _Segment(text[:pos] + " ", style, control),
-                        _Segment(" " + text[pos + 1:], style, control),
+                        _Segment(" " + text[pos + 1 :], style, control),
                     )
                 return (
                     _Segment(text[:pos], style, control),
@@ -144,9 +144,6 @@ class Segment(NamedTuple):
             cell_pos += char_width
 
         return segment, _Segment("", style, control)
-
-        
-        
 
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
         """Split segment in to two segments at the specified column.
