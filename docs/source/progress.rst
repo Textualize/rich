@@ -161,6 +161,7 @@ The following column objects are available:
 - :class:`~rich.progress.TotalFileSizeColumn` Displays total file size (assumes the steps are bytes).
 - :class:`~rich.progress.DownloadColumn` Displays download progress (assumes the steps are bytes).
 - :class:`~rich.progress.TransferSpeedColumn` Displays transfer speed (assumes the steps are bytes).
+- :class:`~rich.progress.IterationSpeedColumn` Displays iteration speed (e.g. ``1.2 it/s``), or seconds per iteration for slow tasks (e.g. ``2.0 s/it``). Accepts a ``unit`` parameter for custom labels.
 - :class:`~rich.progress.SpinnerColumn` Displays a "spinner" animation.
 - :class:`~rich.progress.RenderableColumn` Displays an arbitrary Rich renderable in the column.
 
