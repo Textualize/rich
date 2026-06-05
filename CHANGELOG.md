@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added `IterationSpeedColumn` to display iteration speed (e.g. `1.2 it/s`), with tqdm-style inversion for slow tasks (e.g. `2.0 s/it`), and an optional `unit` parameter for custom labels. https://github.com/Textualize/rich/issues/926
+- Added `IterationSpeedColumn` to display iteration speed (e.g. `1.2 it/s`), with tqdm-style inversion for slow tasks (e.g. `2.0 s/it`), and an optional `unit` parameter for custom labels.
 - Enhanced `TaskProgressColumn.render_speed` with slow-task inversion and a `style` parameter.
 
 ## [15.0.0] - 2026-04-12
