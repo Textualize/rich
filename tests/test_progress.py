@@ -14,6 +14,7 @@ from rich.progress import (
     BarColumn,
     DownloadColumn,
     FileSizeColumn,
+    IterationSpeedColumn,
     MofNCompleteColumn,
     Progress,
     RenderableColumn,
@@ -682,6 +683,34 @@ def test_task_progress_column_speed() -> None:
 
     speed_text = TaskProgressColumn.render_speed(8888888)
     assert speed_text.plain == "8.9×10⁶ it/s"
+
+    speed_text = TaskProgressColumn.render_speed(0.5)
+    assert speed_text.plain == "2.0 s/it"
+
+    speed_text = TaskProgressColumn.render_speed(0.1)
+    assert speed_text.plain == "10.0 s/it"
+
+
+def test_iteration_speed_column() -> None:
+    column = IterationSpeedColumn()
+    task = Task(TaskID(1), "test", 100, 50, _get_time=lambda: 1.0)
+
+    assert column.render(task).plain == ""
+
+    task.finished_speed = 5.0
+    assert column.render(task).plain == "5.0 it/s"
+
+    task.finished_speed = 0.5
+    assert column.render(task).plain == "2.0 s/it"
+
+    assert column.render(task).style == "progress.data.speed"
+
+    column = IterationSpeedColumn(unit="sample")
+    task.finished_speed = 5.0
+    assert column.render(task).plain == "5.0 sample/s"
+
+    task.finished_speed = 0.5
+    assert column.render(task).plain == "2.0 s/sample"
 
 
 if __name__ == "__main__":
