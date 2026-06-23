@@ -30,13 +30,13 @@ A [API do Rich](https://rich.readthedocs.io/en/latest/) permite adicionar cores 
 
 ![Funcões](https://github.com/textualize/rich/raw/main/imgs/features.png)
 
-Para mais detalhes, veja um vídeo de introdução so Rich em [calmcode.io](https://calmcode.io/rich/introduction.html) por [@fishnets88](https://twitter.com/fishnets88).
+Para mais detalhes, veja um vídeo de introdução ao Rich em [calmcode.io](https://calmcode.io/rich/introduction.html) por [@fishnets88](https://twitter.com/fishnets88).
 
 Veja aqui [o que estão falando sobre o Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
 ## Compatibilidade
 
-Rich funciona no Linux, OSX e Windows. True color / emoji funciona no novo Terminal do Windows, o terminal classico é limitado a 16 cores. Rich requer Python 3.6.3 ou superior.
+Rich funciona no Linux, macOS e Windows. True color / emoji funciona no novo Terminal do Windows, o terminal classico é limitado a 16 cores. Rich requer Python 3.8 ou superior.
 
 Rich funciona com [Jupyter notebooks](https://jupyter.org/) sem a necessidade de configurações adicionais.
 
@@ -56,7 +56,7 @@ python -m rich
 
 ## Print do Rich
 
-Para adicionar as as funções de formatação do rich na sua aplicação de forma fácil, simplesmente importe o metodo [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) que tem a mesma assinatura da função nativa do Python. Por exemplo:
+Para adicionar as funções de formatação do rich na sua aplicação de forma fácil, simplesmente importe o metodo [rich print](https://rich.readthedocs.io/en/latest/introduction.html#quick-start) que tem a mesma assinatura da função nativa do Python. Por exemplo:
 
 ```python
 from rich import print
@@ -68,7 +68,7 @@ print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 
 ## REPL do Rich
 
-O Rich pode ser instalado no REPL do Python fazendo com que qualquer estrutura de dados seja exibida formatada e com highlights.
+O Rich pode ser instalado no REPL do Python fazendo com que qualquer estrutura de dados seja exibida formatada e destacada.
 
 ```python
 >>> from rich import pretty
@@ -79,7 +79,7 @@ O Rich pode ser instalado no REPL do Python fazendo com que qualquer estrutura d
 
 ## Usando o Console
 
-Para ter mais controle sobre a formatação do conteudo no terminal, importe e instancie um objeto do [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console).
+Para ter mais controle sobre a formatação do contéudo no terminal, importe e instancie um objeto do [Console](https://rich.readthedocs.io/en/latest/reference/console.html#rich.console.Console).
 
 ```python
 from rich.console import Console
@@ -240,7 +240,7 @@ Que gera o seguinte resultado:
 
 ![table](https://github.com/textualize/rich/raw/main/imgs/table.png)
 
-Observe que o markup é renderizado da mesma que em `print()` e `log()`. Na verdade, tudo que é renderizável pelo Rich pode ser incluído nos cabeçalhos ou linhas (até mesmo outras tabelas).
+Observe que o markup é renderizado da mesma forma que em `print()` e `log()`. Na verdade, tudo que é renderizável pelo Rich pode ser incluído nos cabeçalhos ou linhas (até mesmo outras tabelas).
 
 A classe `Table` é inteligente o suficiente para ajustar o tamanho das colunas para caber na largura do terminal, quebrando o texto em novas linhas quando necessário. Veja o mesmo exemplo a seguir, só que desta vez com um terminal menor do que o tamanho original da tabela:
 
@@ -266,7 +266,7 @@ Adicionar múltiplas barras de progresso também é simples. Veja outro exemplo 
 
 ![progress](https://github.com/textualize/rich/raw/main/imgs/progress.gif)
 
-As colunas podem ser configuradas pra mostrar qualquer detalho necessário. As colunas nativas incluem a porcentagem completa, tamanho de arquivo, velocidade do arquivo e tempo restante. O exemplo a seguir mostra o progresso de um download:
+As colunas podem ser configuradas pra mostrar qualquer detalhe necessário. As colunas nativas incluem a porcentagem completa, tamanho de arquivo, velocidade do arquivo e tempo restante. O exemplo a seguir mostra o progresso de um download:
 
 ![progress](https://github.com/textualize/rich/raw/main/imgs/downloader.gif)
 
@@ -312,7 +312,7 @@ O comando acima deve exibir o seguinte no seu terminal:
 <details>
 <summary>Árvore</summary>
 
-O Rich pode renderizar [árvores](https://rich.readthedocs.io/en/latest/tree.html) com linhas de identação. Uma árvore é a forma ideal de exibir uma estrutura de arquivos ou qualquer outra apresentação hierárquica de dados.
+O Rich pode renderizar [árvores](https://rich.readthedocs.io/en/latest/tree.html) com linhas de indentação. Uma árvore é a forma ideal de exibir uma estrutura de arquivos ou qualquer outra apresentação hierárquica de dados.
 
 Os titulos dos itens da árvore podem ser textos simples ou qualquer coisa que o Rich pode renderizar. Execute o comando a seguir para uma demonstração:
 
@@ -421,41 +421,20 @@ Veja o resultado disso no OSX (resultados semelhantes no Linux):
 
 Todos os renderizáveis do Rich usam o [Protocolo do Console](https://rich.readthedocs.io/en/latest/protocol.html), que você pode usar para implementar o seu próprio conteúdo Rich.
 
-# Rich para empresas
+# Rich CLI
 
-Disponível como parte da assinatura Tidelift.
+Veja também o [Rich CLI](https://github.com/textualize/rich-cli) um aplicativo de linha de comando desenvolvido com o Rich. Realce a sintaxe do código, visualize arquivos Markdown, exiba arquivos CSV em tabelas e muito mais, diretamente do prompt de comando.
 
-Os mantenedores do Rich e milhares de outros pacotes estão trabalhando com o Tidelift para disponibilizar suporte comercial e manutenção de projetos de código aberto usados nas suas aplicações. Economize tempo, reduza riscos e melhore a qualidade do código enquanto paga os mantenedores dos pacotes exatos que você usa. [Mais detalhes.](https://tidelift.com/subscription/pkg/pypi-rich?utm_source=pypi-rich&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
+![Rich CLI](https://raw.githubusercontent.com/Textualize/rich-cli/main/imgs/rich-cli-splash.jpg)
 
-# Projetos usando Rich
+# Textual
 
-Aqui estão alguns projetos que usam o Rich:
+Veja também o projeto irmão do Rich, [Textual](https://github.com/Textualize/textual), o qual você pode utilizar para construir sofisticadas interfaces de usuário no terminal.
 
-- [BrancoLab/BrainRender](https://github.com/BrancoLab/BrainRender)
-  a python package for the visualization of three dimensional neuro-anatomical data
-  um pacote python para visualisação tridimensional de dados neuro-atômicos.
-- [Ciphey/Ciphey](https://github.com/Ciphey/Ciphey)
-  ferramenta de descriptografia autoatizada.
-- [emeryberger/scalene](https://github.com/emeryberger/scalene)
-  um analisador de CPU e memória de alta performance e alta precisão para Python
-- [hedythedev/StarCli](https://github.com/hedythedev/starcli)
-  Explore projetos de destaque no GitHub pela linha de comando do terminal
-- [intel/cve-bin-tool](https://github.com/intel/cve-bin-tool)
-  Essa ferramenta verifica a vulnerabilidade de diversos componentes populares (openssl, libpng, libxml2, expat e outros) presentes no seu sistema e alerta para possíveis vulnerabilidades conhecidas.
-- [nf-core/tools](https://github.com/nf-core/tools)
-  pacote Python com ferramentas auxiliares par a comunidade nf-core.
-- [cansarigol/pdbr](https://github.com/cansarigol/pdbr)
-  pdb + Rich para auxiliar no debug
-- [plant99/felicette](https://github.com/plant99/felicette)
-  Imagem de satélites para iniciantes.
-- [seleniumbase/SeleniumBase](https://github.com/seleniumbase/SeleniumBase)
-  Automatize & teste 10x mais rápido com Selenium & pytest. Baterias inclusas.
-- [smacke/ffsubsync](https://github.com/smacke/ffsubsync)
-  Automagicamente sincronize legendas com vídeos.
-- [tryolabs/norfair](https://github.com/tryolabs/norfair)
-  Biblioteca Python para adicionar rastreio em tempo real de objetos 2D em qualquer detector.
-- [ansible/ansible-lint](https://github.com/ansible/ansible-lint) Ansible-lint verifica boas práticas e comportamento que podem ser melhorados.
-- [ansible-community/molecule](https://github.com/ansible-community/molecule) Framework de test para Ansible Molecule
-- +[Muitos outros](https://github.com/textualize/rich/network/dependents)!
+![textual-splash](https://github.com/user-attachments/assets/4caeb77e-48c0-4cf7-b14d-c53ded855ffd)
 
-<!-- This is a test, no need to translate -->
+# Toad
+
+[Toad](https://github.com/batrachianai/toad) é uma interface unificada para agentes de código. Criado com Rich e Textual.
+
+![toad](https://github.com/user-attachments/assets/6678b707-1aeb-420f-99ad-abfcd4356771)
