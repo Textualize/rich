@@ -382,6 +382,23 @@ def test_inspect_swig_edge_case():
         assert False, f"Object with no __class__ shouldn't raise {e}"
 
 
+def test_inspect_getattr_static_fallback():
+    """Issue #3794 - Properties that raise AttributeError fall back to
+    inspect.getattr_static so the descriptor is shown instead of the error."""
+
+    class Thing:
+        @property
+        def maybe(self):
+            raise AttributeError("not available on this instance")
+
+        def __dir__(self):
+            return ["maybe"]
+
+    rendered = render(Thing())
+    assert "AttributeError" not in rendered
+    assert "property" in rendered
+
+
 def test_inspect_module_with_class():
     def function():
         pass
