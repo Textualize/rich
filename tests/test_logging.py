@@ -160,3 +160,43 @@ def test_markup_and_highlight():
     render_plain = handler.console.file.getvalue()
     assert "FORMATTER" in render_plain
     assert log_message in render_plain
+
+
+def test_unicode_surrogate_message_is_escaped(tmp_path) -> None:
+    log_path = tmp_path / "rich-unicode.log"
+    actual_record: Optional[logging.LogRecord] = None
+
+    with log_path.open("w", encoding="utf-8", errors="strict") as log_file:
+        console = Console(file=log_file, force_terminal=False, _environ={})
+        handler = RichHandler(
+            console=console,
+            show_time=False,
+            show_level=False,
+            show_path=False,
+        )
+
+        def mock_handle_error(record):
+            nonlocal actual_record
+            actual_record = record
+
+        handler.handleError = mock_handle_error
+
+        logger = logging.getLogger("rich.unicode_surrogate")
+        previous_handlers = logger.handlers[:]
+        previous_propagate = logger.propagate
+        previous_level = logger.level
+
+        logger.handlers = [handler]
+        logger.propagate = False
+        logger.setLevel("INFO")
+
+        try:
+            logger.info("\udcf1")
+            log_file.flush()
+        finally:
+            logger.handlers = previous_handlers
+            logger.propagate = previous_propagate
+            logger.setLevel(previous_level)
+
+    assert actual_record is None
+    assert "\\udcf1" in log_path.read_text(encoding="utf-8")
