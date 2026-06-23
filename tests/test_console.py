@@ -1006,17 +1006,30 @@ def test_reenable_highlighting() -> None:
 @pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 def test_brokenpipeerror() -> None:
     """Test BrokenPipe works as expected."""
-    which_py, which_head = (["which", cmd] for cmd in ("python", "head"))
-    rich_cmd = "python -m rich".split()
-    for cmd in [which_py, which_head, rich_cmd]:
-        check = subprocess.run(cmd).returncode
-        if check != 0:
-            return  # Only test on suitable Unix platforms
-    head_cmd = "head -1".split()
-    proc1 = subprocess.Popen(rich_cmd, stdout=subprocess.PIPE)
-    proc2 = subprocess.Popen(head_cmd, stdin=proc1.stdout, stdout=subprocess.PIPE)
+
+    # We write enough output to hopefully keep the writing process busy and give
+    # enough time for the reading process to exit, creating a BrokenPipeError.
+    writer = (
+        "from rich.console import Console\n"
+        "console = Console(force_terminal=True, width=240)\n"
+        "payload = 'X' * 200\n"
+        "for index in range(10000):\n"
+        "    console.print(f'{index:06d} {payload}')\n"
+    )
+    reader = "import sys; sys.stdin.buffer.read(1)"
+    proc1 = subprocess.Popen(
+        [sys.executable, "-c", writer],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+    )
+    proc2 = subprocess.Popen(
+        [sys.executable, "-c", reader],
+        stdin=proc1.stdout,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+    )
     proc1.stdout.close()
-    output, _ = proc2.communicate()
+    proc2.communicate()
     proc1.wait()
     proc2.wait()
     assert proc1.returncode == 1
