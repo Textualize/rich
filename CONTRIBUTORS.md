@@ -98,6 +98,7 @@ The following people have contributed to the development of Rich:
 - [chthollyphile](https://github.com/chthollyphile)
 - [Jonathan Helmus](https://github.com/jjhelmus)
 - [Brandon Capener](https://github.com/bcapener)
+- [Florent Xicluna](https://github.com/florentx)
 - [Alex Zheng](https://github.com/alexzheng111)
 - [Sebastian Speitel](https://github.com/SebastianSpeitel)
 - [Kevin Turcios](https://github.com/KRRT7)
