@@ -507,7 +507,7 @@ class Style:
         Returns:
             `Style`: A Style instance.
         """
-        if style_definition.strip() == "none" or not style_definition:
+        if str(style_definition).strip() == "none" or not style_definition:
             return cls.null()
 
         STYLE_ATTRIBUTES = cls.STYLE_ATTRIBUTES
