@@ -590,7 +590,7 @@ class Console:
         soft_wrap (Optional[bool], optional): Set soft wrap default on print method. Defaults to False.
         theme (Theme, optional): An optional style theme object, or ``None`` for default theme.
         stderr (bool, optional): Use stderr rather than stdout if ``file`` is not specified. Defaults to False.
-        file (IO, optional): A file object where the console should write to. Defaults to stdout.
+        file (IO, optional): A file object where the console should write to. Defaults to standard output (sys.stdout) if not provided.
         quiet (bool, Optional): Boolean to suppress all output. Defaults to False.
         width (int, optional): The width of the terminal. Leave as default to auto-detect width.
         height (int, optional): The height of the terminal. Leave as default to auto-detect height.
