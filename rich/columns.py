@@ -64,7 +64,14 @@ class Columns(JupyterMixin):
     ) -> RenderResult:
         render_str = console.render_str
         renderables = [
-            render_str(renderable) if isinstance(renderable, str) else renderable
+            render_str(
+                renderable,
+                markup=options.markup,
+                emoji=options.emoji,
+                highlight=False,
+            )
+            if isinstance(renderable, str)
+            else renderable
             for renderable in self.renderables
         ]
         if not renderables:

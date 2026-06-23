@@ -34,3 +34,13 @@ def test_clamp():
     assert measurement.clamp(None, 50) == Measurement(20, 50)
     assert measurement.clamp(30, None) == Measurement(30, 100)
     assert measurement.clamp(None, None) == Measurement(20, 100)
+
+
+def test_measurement_emoji_propagation():
+    console = Console()
+    options = console.options
+
+    m_emoji = Measurement.get(console, options.update(emoji=True), ":1234:")
+    m_no_emoji = Measurement.get(console, options.update(emoji=False), ":1234:")
+
+    assert m_emoji.maximum < m_no_emoji.maximum

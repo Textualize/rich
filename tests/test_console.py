@@ -841,6 +841,24 @@ def test_update_options_markup() -> None:
     assert options.update(markup=True).markup == True
 
 
+def test_update_options_emoji() -> None:
+    console = Console()
+    options = console.options
+    assert options.update(emoji=False).emoji == False
+    assert options.update(emoji=True).emoji == True
+
+
+def test_print_emoji() -> None:
+    console = Console()
+    with console.capture() as capture:
+        console.print(":1234:", emoji=True)
+    assert "🔢" in capture.get()
+
+    with console.capture() as capture:
+        console.print(":1234:", emoji=False)
+    assert ":1234:" in capture.get()
+
+
 def test_print_width_zero() -> None:
     console = Console()
     with console.capture() as capture:

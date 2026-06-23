@@ -410,3 +410,31 @@ if __name__ == "__main__":
     render = render_tables()
     print(render)
     print(repr(render))
+
+
+def test_table_emoji_propagation():
+    console = Console()
+    table = Table()
+    table.add_row(":1234:")
+
+    with console.capture() as capture:
+        console.print(table, emoji=True)
+    assert "🔢" in capture.get()
+
+    with console.capture() as capture:
+        console.print(table, emoji=False)
+    assert ":1234:" in capture.get()
+
+
+def test_table_markup_propagation():
+    console = Console(force_terminal=True, _environ={})
+    table = Table()
+    table.add_row("[blue]text[/blue]")
+
+    with console.capture() as capture:
+        console.print(table, markup=True)
+    assert "\x1b[34mtext\x1b[0m" in capture.get()
+
+    with console.capture() as capture:
+        console.print(table, markup=False)
+    assert "[blue]text[/blue]" in capture.get()

@@ -128,3 +128,29 @@ def test_repr():
 def test_error():
     with pytest.raises(ValueError):
         Rule(characters="")
+
+
+def test_rule_emoji_propagation():
+    console = Console()
+    rule = Rule(title=":1234:")
+
+    with console.capture() as capture:
+        console.print(rule, emoji=True)
+    assert "🔢" in capture.get()
+
+    with console.capture() as capture:
+        console.print(rule, emoji=False)
+    assert ":1234:" in capture.get()
+
+
+def test_rule_markup_propagation():
+    console = Console(force_terminal=True, _environ={})
+    rule = Rule(title="[blue]text[/blue]")
+
+    with console.capture() as capture:
+        console.print(rule, markup=True)
+    assert "\x1b[34mtext\x1b[0m" in capture.get()
+
+    with console.capture() as capture:
+        console.print(rule, markup=False)
+    assert "[blue]text[/blue]" in capture.get()

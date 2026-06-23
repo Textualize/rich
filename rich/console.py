@@ -137,6 +137,8 @@ class ConsoleOptions:
     """Highlight override for render_str."""
     markup: Optional[bool] = None
     """Enable markup when rendering strings."""
+    emoji: Optional[bool] = None
+    """Enable emoji code."""
     height: Optional[int] = None
 
     @property
@@ -165,6 +167,7 @@ class ConsoleOptions:
         no_wrap: Union[Optional[bool], NoChange] = NO_CHANGE,
         highlight: Union[Optional[bool], NoChange] = NO_CHANGE,
         markup: Union[Optional[bool], NoChange] = NO_CHANGE,
+        emoji: Union[Optional[bool], NoChange] = NO_CHANGE,
         height: Union[Optional[int], NoChange] = NO_CHANGE,
     ) -> "ConsoleOptions":
         """Update values, return a copy."""
@@ -185,6 +188,8 @@ class ConsoleOptions:
             options.highlight = highlight
         if not isinstance(markup, NoChange):
             options.markup = markup
+        if not isinstance(emoji, NoChange):
+            options.emoji = emoji
         if not isinstance(height, NoChange):
             if height is not None:
                 options.max_height = height
@@ -1319,7 +1324,10 @@ class Console:
             render_iterable = renderable.__rich_console__(self, _options)
         elif isinstance(renderable, str):
             text_renderable = self.render_str(
-                renderable, highlight=_options.highlight, markup=_options.markup
+                renderable,
+                highlight=_options.highlight,
+                markup=_options.markup,
+                emoji=_options.emoji,
             )
             render_iterable = text_renderable.__rich_console__(self, _options)
         else:
@@ -1721,6 +1729,7 @@ class Console:
                 no_wrap=no_wrap,
                 markup=markup,
                 highlight=highlight,
+                emoji=emoji,
             )
 
             new_segments: List[Segment] = []
@@ -2018,7 +2027,12 @@ class Console:
             new_segments: List[Segment] = []
             extend = new_segments.extend
             render = self.render
-            render_options = self.options
+            render_options = self.options.update(
+                justify=justify,
+                emoji=emoji,
+                markup=markup,
+                highlight=highlight,
+            )
             for renderable in renderables:
                 extend(render(renderable, render_options))
             buffer_extend = self._buffer.extend

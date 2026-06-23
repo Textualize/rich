@@ -75,3 +75,29 @@ if __name__ == "__main__":
     result = render()
     print(result)
     print(repr(result))
+
+
+def test_columns_emoji_propagation():
+    console = Console()
+    columns = Columns([":1234:"])
+
+    with console.capture() as capture:
+        console.print(columns, emoji=True)
+    assert "🔢" in capture.get()
+
+    with console.capture() as capture:
+        console.print(columns, emoji=False)
+    assert ":1234:" in capture.get()
+
+
+def test_columns_markup_propagation():
+    console = Console(force_terminal=True, _environ={})
+    columns = Columns(["[blue]text[/blue]"])
+
+    with console.capture() as capture:
+        console.print(columns, markup=True)
+    assert "\x1b[34mtext\x1b[0m" in capture.get()
+
+    with console.capture() as capture:
+        console.print(columns, markup=False)
+    assert "[blue]text[/blue]" in capture.get()

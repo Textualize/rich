@@ -65,7 +65,13 @@ class Rule(JupyterMixin):
         if isinstance(self.title, Text):
             title_text = self.title
         else:
-            title_text = console.render_str(self.title, style="rule.text")
+            title_text = console.render_str(
+                self.title,
+                style="rule.text",
+                markup=options.markup,
+                emoji=options.emoji,
+                highlight=False,
+            )
 
         title_text.plain = title_text.plain.replace("\n", " ")
         title_text.expand_tabs()
