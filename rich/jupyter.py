@@ -83,6 +83,12 @@ def _render_segments(segments: Iterable[Segment]) -> str:
 
 def display(segments: Iterable[Segment], text: str) -> None:
     """Render segments to Jupyter."""
+    segments = list(segments)
+    if not segments and not text:
+        # display() always prints a newline, so if there is no content then
+        # we don't want a single newline appearing.
+        # See https://github.com/Textualize/rich/issues/3274
+        return None
     html = _render_segments(segments)
     jupyter_renderable = JupyterRenderable(html, text)
     try:

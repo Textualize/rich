@@ -30,3 +30,22 @@ def test_jupyter_lines_env():
     console = Console(
         width=40, _environ={"JUPYTER_LINES": "broken"}, force_jupyter=True
     )
+
+
+def test_jupyter_capture(monkeypatch):
+    # If inside a capture, ipython's display shouldn't be called,
+    # or we would get spurious newlines.
+    # See https://github.com/Textualize/rich/issues/3274
+    called = False
+
+    def mock_display(*args, **kwargs):
+        nonlocal called
+        called = True
+
+    monkeypatch.setattr("IPython.display.display", mock_display)
+    console = Console(force_jupyter=True)
+    with console.capture():
+        console.print("foo")
+    assert not called
+    console.print("foo")
+    assert called
