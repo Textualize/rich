@@ -86,19 +86,35 @@ def test_strip_private_escape_sequences(code):
     assert capture.get() == expected
 
 
-def test_decode_newlines():
-    """Test newlines are preserved.
+@pytest.mark.parametrize("line_break", ["\n", "\r\n"])
+def test_decode_line_breaks(line_break: str) -> None:
+    """Test line breaks are preserved and converted to newlines.
     Regression test for https://github.com/Textualize/rich/issues/3577
     """
     assert Text.from_ansi("").plain == ""
-    assert Text.from_ansi("\n").plain == "\n"
-    assert Text.from_ansi("\n\n").plain == "\n\n"
+    assert Text.from_ansi(f"{line_break}").plain == "\n"
+    assert Text.from_ansi(f"{line_break}{line_break}").plain == "\n\n"
     assert Text.from_ansi("Hello").plain == "Hello"
-    assert Text.from_ansi("\nHello").plain == "\nHello"
-    assert Text.from_ansi("Hello\n").plain == "Hello\n"
-    assert Text.from_ansi("Hello\n\n").plain == "Hello\n\n"
-    assert Text.from_ansi("Hello\nWorld").plain == "Hello\nWorld"
-    assert Text.from_ansi("Hello\n\nWorld").plain == "Hello\n\nWorld"
-    assert Text.from_ansi("Hello\nWorld\n").plain == "Hello\nWorld\n"
-    assert Text.from_ansi("Hello\nWorld\n\n").plain == "Hello\nWorld\n\n"
-    assert Text.from_ansi("\nHello\nWorld\n\n").plain == "\nHello\nWorld\n\n"
+    assert Text.from_ansi(f"{line_break}Hello").plain == "\nHello"
+    assert Text.from_ansi(f"Hello{line_break}").plain == "Hello\n"
+    assert Text.from_ansi(f"Hello{line_break}{line_break}").plain == "Hello\n\n"
+    assert Text.from_ansi(f"Hello{line_break}World").plain == "Hello\nWorld"
+    assert (
+        Text.from_ansi(f"Hello{line_break}{line_break}World").plain == "Hello\n\nWorld"
+    )
+    assert (
+        Text.from_ansi(f"Hello{line_break}World{line_break}").plain == "Hello\nWorld\n"
+    )
+    assert (
+        Text.from_ansi(f"Hello{line_break}World{line_break}{line_break}").plain
+        == "Hello\nWorld\n\n"
+    )
+    assert (
+        Text.from_ansi(
+            f"{line_break}Hello{line_break}World{line_break}{line_break}"
+        ).plain
+        == "\nHello\nWorld\n\n"
+    )
+
+    # Include a mixture of line break types
+    assert Text.from_ansi(f"Hello{line_break}\n\r\nWorld").plain == "Hello\n\n\nWorld"
