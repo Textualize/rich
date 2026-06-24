@@ -215,6 +215,20 @@ def test_inline_code_in_table_cells() -> None:
     assert result == expected
 
 
+def test_markdown_blockquote_uses_safe_prefix_on_legacy_windows():
+    console = Console(
+        width=40,
+        file=io.StringIO(),
+        color_system=None,
+        legacy_windows=True,
+        _environ={},
+    )
+    console.print(Markdown("> hello"))
+    output = console.file.getvalue()
+    assert "| hello" in output
+    assert "▌" not in output
+
+
 if __name__ == "__main__":
     markdown = Markdown(MARKDOWN)
     rendered = render(markdown)
