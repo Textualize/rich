@@ -10,6 +10,11 @@ Then you can import the console from anywhere in your project like this::
 
     from my_project.console import console
 
+You can also get a global console instance from the package-level API::
+
+    import rich
+    console = rich.get_console()
+
 The console object handles the mechanics of generating ANSI escape sequences for color and style. It will auto-detect the capabilities of the terminal and convert colors if necessary.
 
 
