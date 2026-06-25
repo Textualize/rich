@@ -410,6 +410,180 @@ Rich 可以渲染出漂亮的[栈回溯信息](https://rich.readthedocs.io/en/la
 
 所有的 Rich 可渲染对象都采用了 [Console Protocol](https://rich.readthedocs.io/en/latest/protocol.html) 协议，你可以用该协议实现你独有的 Rich 内容。
 
+## 中文使用示例
+
+以下是专门针对中文用户的示例，展示 Rich 如何处理中文字符和格式化：
+
+<details>
+<summary>中文表格示例</summary>
+
+Rich 可以完美渲染包含中文字符的表格：
+
+```python
+from rich.console import Console
+from rich.table import Table
+
+console = Console()
+
+table = Table(show_header=True, header_style="bold magenta")
+table.add_column("项目名称", style="cyan", width=20)
+table.add_column("负责人", style="green", width=12)
+table.add_column("进度", justify="right", width=10)
+table.add_column("状态", justify="center", width=10)
+
+table.add_row("电商平台重构", "张三", "85%", "[green]进行中[/green]")
+table.add_row("数据可视化大屏", "李四", "100%", "[blue]已完成[/blue]")
+table.add_row("移动端适配", "王五", "30%", "[yellow]待开始[/yellow]")
+table.add_row("性能优化", "赵六", "60%", "[red]延期[/red]")
+
+console.print(table)
+```
+
+输出效果：
+
+```
+┏━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━┳━━━━━━━━┓
+┃ 项目名称     ┃ 负责人 ┃   进度 ┃  状态  ┃
+┣━━━━━━━━━━━━━━╋━━━━━━━━╋━━━━━━━━╋━━━━━━━━┫
+┃ 电商平台重构 ┃ 张三   ┃    85% ┃ 进行中 ┃
+┃ 数据可视化大屏 ┃ 李四 ┃   100% ┃ 已完成 ┃
+┃ 移动端适配   ┃ 王五   ┃    30% ┃ 待开始 ┃
+┃ 性能优化     ┃ 赵六   ┃    60% ┃  延期  ┃
+┗━━━━━━━━━━━━━━┻━━━━━━━━┻━━━━━━━━┻━━━━━━━━┛
+```
+
+</details>
+
+<details>
+<summary>中文进度条示例</summary>
+
+使用 Rich 显示中文进度信息：
+
+```python
+from rich.progress import track
+import time
+
+# 模拟数据处理任务
+for i in track(range(100), description="[cyan]正在处理数据..."):
+    time.sleep(0.05)
+
+# 多任务进度
+from rich.progress import Progress
+
+with Progress() as progress:
+    task1 = progress.add_task("[red]下载文件...", total=100)
+    task2 = progress.add_task("[green]处理数据...", total=100)
+    task3 = progress.add_task("[cyan]保存结果...", total=100)
+    
+    while not progress.finished:
+        progress.update(task1, advance=0.5)
+        progress.update(task2, advance=0.3)
+        progress.update(task3, advance=0.9)
+        time.sleep(0.05)
+```
+
+</details>
+
+<details>
+<summary>中文 Markdown 渲染</summary>
+
+Rich 可以渲染包含中文的 Markdown：
+
+```python
+from rich.console import Console
+from rich.markdown import Markdown
+
+console = Console()
+
+markdown_text = """
+# 欢迎使用 Rich
+
+Rich 是一个 **Python** 库，可以为您在终端中提供：
+
+- ✅ 富文本和精美格式
+- ✅ 漂亮的表格和进度条
+- ✅ Markdown 渲染
+- ✅ 语法高亮
+
+## 代码示例
+
+```python
+print("你好，世界！")
+```
+
+> 💡 **提示**：Rich 完美支持中文字符！
+"""
+
+markdown = Markdown(markdown_text)
+console.print(markdown)
+```
+
+</details>
+
+<details>
+<summary>中文文本样式</summary>
+
+Rich 支持丰富的中文文本样式：
+
+```python
+from rich.console import Console
+
+console = Console()
+
+# 基础样式
+console.print("[bold red]错误：[/bold red] 文件未找到")
+console.print("[bold green]成功：[/bold green] 操作已完成")
+console.print("[bold yellow]警告：[/bold yellow] 磁盘空间不足")
+
+# 组合样式
+console.print("[bold cyan]信息：[/bold cyan] 正在处理 [underline]重要数据[/underline]")
+
+# 背景色
+console.print("[black on green] 通过 [/black on green] 所有测试")
+console.print("[white on red] 失败 [/white on red] 部分测试")
+```
+
+</details>
+
+<details>
+<summary>中文树形结构</summary>
+
+使用 Rich 展示中文目录结构：
+
+```python
+from rich.console import Console
+from rich.tree import Tree
+
+console = Console()
+
+tree = Tree("[bold cyan]项目目录[/bold cyan]")
+tree.add("[blue]📁 src[/blue]")
+tree.add("[blue]📁 docs[/blue]")
+tree.add("[blue]📁 tests[/blue]")
+
+src_tree = tree.add("[blue]📁 src[/blue]")
+src_tree.add("[green]📄 main.py[/green]")
+src_tree.add("[green]📄 utils.py[/green]")
+src_tree.add("[green]📄 config.py[/green]")
+
+console.print(tree)
+```
+
+输出效果：
+
+```
+项目目录
+├── 📁 src
+├── 📁 docs
+├── 📁 tests
+└── 📁 src
+    ├── 📄 main.py
+    ├── 📄 utils.py
+    └── 📄 config.py
+```
+
+</details>
+
 ## 使用 Rich 的项目
 
 这里是一些使用 Rich 的项目:
