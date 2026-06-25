@@ -144,6 +144,7 @@ class AnsiDecoder:
         Returns:
             Text: A Text instance marked up according to ansi codes.
         """
+
         from_ansi = Color.from_ansi
         from_rgb = Color.from_rgb
         _Style = Style
@@ -163,7 +164,7 @@ class AnsiDecoder:
                 # Ignore invalid codes, because we want to be lenient
                 codes = [
                     min(255, int(_code) if _code else 0)
-                    for _code in sgr.split(";")
+                    for _code in sgr.replace("::", ";").replace(":", ";").split(";")
                     if _code.isdigit() or _code == ""
                 ]
                 iter_codes = iter(codes)
