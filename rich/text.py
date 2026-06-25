@@ -69,7 +69,7 @@ class Span(NamedTuple):
             return self, None
 
         start, end, style = self
-        span1 = Span(start, min(end, offset), style)
+        span1 = Span(start, offset, style)
         span2 = Span(span1.end, end, style)
         return span1, span2
 
@@ -97,7 +97,7 @@ class Span(NamedTuple):
         start, end, style = self
         if offset >= end:
             return self
-        return Span(start, min(offset, end), style)
+        return Span(start, offset, style)
 
     def extend(self, cells: int) -> "Span":
         """Extend the span by the given number of cells.
