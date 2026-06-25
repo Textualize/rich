@@ -292,7 +292,7 @@ class Live(JupyterMixin, RenderHook):
         elif (
             not self._started and not self.transient
         ):  # if it is finished render the final output for files or dumb_terminals
-            renderables = [*renderables, self._live_render]
+            pass
 
         return renderables
 
