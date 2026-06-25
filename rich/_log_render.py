@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Iterable, List, Optional, TYPE_CHECKING, Union, Callable
+from pathlib import Path
 
 
 from .text import Text, TextType
@@ -71,15 +72,26 @@ class LogRender:
         row.append(Renderables(renderables))
         if self.show_path and path:
             path_text = Text()
+
+            uri = ""
+            if link_path:
+                try:
+                    uri = Path(link_path).absolute().as_uri()
+                except ValueError:
+                    uri = ""
+
             path_text.append(
-                path, style=f"link file://{link_path}" if link_path else ""
+                path,
+                style=f"link {uri}" if uri else "",
             )
-            if line_no:
+
+            if line_no is not None:
                 path_text.append(":")
                 path_text.append(
                     f"{line_no}",
-                    style=f"link file://{link_path}#{line_no}" if link_path else "",
+                    style=f"link {uri}#{line_no}" if uri else "",
                 )
+
             row.append(path_text)
 
         output.add_row(*row)
