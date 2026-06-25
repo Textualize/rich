@@ -96,6 +96,7 @@ class RichHandler(Handler):
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
+        self._highlighter = highlighter
         self.highlighter = highlighter or self.HIGHLIGHTER_CLASS()
         self._log_render = LogRender(
             show_time=show_time,
@@ -200,7 +201,10 @@ class RichHandler(Handler):
         use_markup = getattr(record, "markup", self.markup)
         message_text = Text.from_markup(message) if use_markup else Text(message)
 
-        highlighter = getattr(record, "highlighter", self.highlighter)
+        if "highlighter" in record.__dict__:
+            highlighter = record.highlighter
+        else:
+            highlighter = self._highlighter or self.console.highlighter
         if highlighter:
             message_text = highlighter(message_text)
 
