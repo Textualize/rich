@@ -133,7 +133,7 @@ class AnsiDecoder:
             Text: Marked up Text.
         """
         for line in re.split(r"(?<=\n)", terminal_text):
-            yield self.decode_line(line.rstrip("\n"))
+            yield self.decode_line(line.rstrip("\r\n"))
 
     def decode_line(self, line: str) -> Text:
         """Decode a line containing ansi codes.
