@@ -11,6 +11,7 @@ from rich.cells import (
     cell_len,
     chop_cells,
     get_character_cell_size,
+    set_cell_size,
     split_graphemes,
     split_text,
 )
@@ -252,3 +253,31 @@ def test_non_printable():
     for ordinal in range(31):
         character = chr(ordinal)
         assert cell_len(character) == 0
+
+
+def test_cell_len_edge_cases() -> None:
+    """cell_len for empty strings, ZWJ sequences, and mixed CJK."""
+    assert cell_len("") == 0
+    assert cell_len("👩\u200d🔧") == 2
+    assert cell_len("👩\u200d👩\u200d👧\u200d👧") == 2
+    assert cell_len("あ1り2") == 6
+
+
+def test_set_cell_size_edge_cases() -> None:
+    """set_cell_size for empty strings and exact-boundary cases."""
+    assert set_cell_size("", 0) == ""
+    assert set_cell_size("", 3) == "   "
+    assert set_cell_size("foo", 3) == "foo"
+    assert set_cell_size("あい", 4) == "あい"
+    assert set_cell_size("あ1り2", 6) == "あ1り2"
+    assert set_cell_size("👩\u200d🔧", 2) == "👩\u200d🔧"
+    assert set_cell_size("👩\u200d🔧", 1) == " "
+
+
+def test_chop_cells_edge_cases() -> None:
+    """chop_cells for empty strings, ZWJ sequences, and mixed CJK boundaries."""
+    assert chop_cells("", 3) == []
+    assert chop_cells("👩\u200d🔧", 2) == ["👩\u200d🔧"]
+    assert chop_cells("👩\u200d🔧👩\u200d🔧", 2) == ["👩\u200d🔧", "👩\u200d🔧"]
+    assert chop_cells("あ1り2", 3) == ["あ1", "り2"]
+    assert chop_cells("あ1り2", 6) == ["あ1り2"]
