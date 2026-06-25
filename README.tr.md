@@ -35,7 +35,6 @@ Bir Python kütüphanesi olan __rich__, terminal üzerinde gösterişli çıktı
 
 Rich'e video ile göz atmak için [@fishnets88](https://twitter.com/fishnets88) tarafından oluşturulan [calmcode.io](https://calmcode.io/rich/introduction.html) sitesine bakabilirsiniz.
 
-İnsanların [rich hakkında yazdıkları son yazılar](https://www.willmcgugan.com/blog/pages/post/rich-tweets).
 
 ## Uyumluluk
 

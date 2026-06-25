@@ -32,7 +32,6 @@ A [API do Rich](https://rich.readthedocs.io/en/latest/) permite adicionar cores 
 
 Para mais detalhes, veja um vídeo de introdução so Rich em [calmcode.io](https://calmcode.io/rich/introduction.html) por [@fishnets88](https://twitter.com/fishnets88).
 
-Veja aqui [o que estão falando sobre o Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
 ## Compatibilidade
 

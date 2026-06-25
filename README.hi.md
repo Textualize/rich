@@ -35,7 +35,6 @@ Rich टर्मिनल में _समृद्ध_ पाठ और स�
 Rich के वीडियो परिचय के लिए देखें [@fishnets88](https://twitter.com/fishnets88) द्वारा बनाई गई [calmcode.io](https://calmcode.io/rich/introduction.html)।
 
 
-देखें [लोग रिच के बारे में क्या कह रहे हैं](https://www.willmcgugan.com/blog/pages/post/rich-tweets/)।
 
 ## अनुकूलता
 
