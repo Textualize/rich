@@ -51,6 +51,7 @@ WINDOWS = sys.platform == "win32"
 
 LOCALS_MAX_LENGTH = 10
 LOCALS_MAX_STRING = 80
+_UNINSTALL_CALLABLE = None
 
 
 def _iter_syntax_lines(
@@ -206,16 +207,39 @@ def install(
             *args, is_syntax=True, **kwargs
         )
 
+    global _UNINSTALL_CALLABLE
     try:  # pragma: no cover
         # if within ipython, use customized traceback
         ip = get_ipython()  # type: ignore[name-defined]
+        old_hooks = [ip._showtraceback, ip.showtraceback, ip.showsyntaxerror]
         ipy_excepthook_closure(ip)
-        return sys.excepthook
+
+        def _uninstall():
+            # if within ipython, use customized traceback
+            ip = get_ipython()  # type: ignore[name-defined]
+            ip._showtraceback = old_hooks[0]
+            # add wrapper to capture tb_data
+            ip.showtraceback = old_hooks[1]
+            ip.showsyntaxerror = old_hooks[2]
+
+        _UNINSTALL_CALLABLE = _uninstall
+        return _uninstall
     except Exception:
         # otherwise use default system hook
         old_excepthook = sys.excepthook
         sys.excepthook = excepthook
-        return old_excepthook
+
+        def _uninstall():
+            sys.excepthook = old_excepthook
+
+        _UNINSTALL_CALLABLE = _uninstall
+        return _uninstall
+
+
+def uninstall() -> None:
+    """Reset any installed traceback or except hook(s) if any."""
+    if _UNINSTALL_CALLABLE:
+        _UNINSTALL_CALLABLE()
 
 
 @dataclass
