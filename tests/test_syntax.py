@@ -436,9 +436,7 @@ def test_padding_plus_wrap() -> None:
 
 
 def test_word_wrap_without_line_numbers_with_line_range() -> None:
-    console = Console(
-        width=14, file=io.StringIO(), legacy_windows=False, record=True
-    )
+    console = Console(width=14, file=io.StringIO(), legacy_windows=False, record=True)
     syntax = Syntax(
         "first line should not appear\n"
         "second line wraps around here\n"
