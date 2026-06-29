@@ -743,14 +743,51 @@ class Syntax(JupyterMixin):
             highlight_number_style,
         ) = self._get_number_styles(console)
 
-        for line_no, line in enumerate(lines, self.start_line + line_offset):
-            if self.word_wrap:
-                wrapped_lines = console.render_lines(
-                    line,
-                    render_options.update(height=None, justify="left"),
+        if self.word_wrap and not self.line_numbers:
+            text = Text("\n").join(lines)
+            for wrapped_text_line in text.wrap(
+                console,
+                render_options.max_width,
+                justify="left",
+                overflow=render_options.overflow,
+                tab_size=self.tab_size,
+                no_wrap=render_options.no_wrap,
+            ):
+                yield from _Segment.adjust_line_length(
+                    list(
+                        _Segment.apply_style(
+                            wrapped_text_line.render(console), background_style
+                        )
+                    ),
+                    render_options.max_width,
                     style=background_style,
                     pad=not transparent_background,
                 )
+                yield new_line
+            return
+
+        for line_no, line in enumerate(lines, self.start_line + line_offset):
+            if self.word_wrap:
+                wrapped_lines = [
+                    _Segment.adjust_line_length(
+                        list(
+                            _Segment.apply_style(
+                                wrapped_line.render(console), background_style
+                            )
+                        ),
+                        render_options.max_width,
+                        style=background_style,
+                        pad=not transparent_background,
+                    )
+                    for wrapped_line in line.wrap(
+                        console,
+                        render_options.max_width,
+                        justify="left",
+                        overflow=render_options.overflow,
+                        tab_size=self.tab_size,
+                        no_wrap=render_options.no_wrap,
+                    )
+                ]
             else:
                 segments = list(line.render(console, end=""))
                 if options.no_wrap:
@@ -769,7 +806,7 @@ class Syntax(JupyterMixin):
                 wrapped_line_left_pad = _Segment(
                     " " * numbers_column_width + " ", background_style
                 )
-                for first, wrapped_line in loop_first(wrapped_lines):
+                for first, wrapped_segments in loop_first(wrapped_lines):
                     if first:
                         line_column = str(line_no).rjust(numbers_column_width - 2) + " "
                         if highlight_line(line_no):
@@ -780,11 +817,11 @@ class Syntax(JupyterMixin):
                             yield _Segment(line_column, number_style)
                     else:
                         yield wrapped_line_left_pad
-                    yield from wrapped_line
+                    yield from wrapped_segments
                     yield new_line
             else:
-                for wrapped_line in wrapped_lines:
-                    yield from wrapped_line
+                for wrapped_segments in wrapped_lines:
+                    yield from wrapped_segments
                     yield new_line
 
     def _apply_stylized_ranges(self, text: Text) -> None:
