@@ -758,12 +758,26 @@ class Syntax(JupyterMixin):
 
         for line_no, line in enumerate(lines, self.start_line + line_offset):
             if self.word_wrap:
-                wrapped_lines = console.render_lines(
-                    line,
-                    render_options.update(height=None, justify="left"),
-                    style=background_style,
-                    pad=not transparent_background,
-                )
+                wrapped_lines = [
+                    _Segment.adjust_line_length(
+                        list(
+                            _Segment.apply_style(
+                                wrapped_line.render(console), background_style
+                            )
+                        ),
+                        render_options.max_width,
+                        style=background_style,
+                        pad=not transparent_background,
+                    )
+                    for wrapped_line in line.wrap(
+                        console,
+                        render_options.max_width,
+                        justify="left",
+                        overflow=render_options.overflow,
+                        tab_size=self.tab_size,
+                        no_wrap=render_options.no_wrap,
+                    )
+                ]
             else:
                 segments = list(line.render(console, end=""))
                 if options.no_wrap:
