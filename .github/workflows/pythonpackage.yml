@@ -57,6 +57,6 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
       - name: Install dependencies
-        run: uv pip install --system -e . --group dev
+        run: uv pip install --system -e . --group test
       - name: Test with pytest
         run: python -m pytest tests -v
