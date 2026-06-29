@@ -693,15 +693,18 @@ class Syntax(JupyterMixin):
                     text, options=options.update(width=code_width)
                 )
             else:
-                syntax_lines = console.render_lines(
-                    text,
-                    options.update(width=code_width, height=None, justify="left"),
-                    style=self.background_style,
-                    pad=True,
-                    new_lines=True,
-                )
-                for syntax_line in syntax_lines:
-                    yield from syntax_line
+                for line in text.split("\n", allow_blank=True):
+                    line_style = console.get_style(line.style, default=Style.null())
+                    yield from Segment.adjust_line_length(
+                        list(
+                            Segment.apply_style(
+                                line.render(console), self.background_style
+                            )
+                        ),
+                        code_width,
+                        style=line_style,
+                    )
+                    yield Segment.line()
             return
 
         start_line, end_line = self.line_range or (None, None)
