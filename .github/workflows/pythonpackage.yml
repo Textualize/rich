@@ -17,16 +17,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
       - name: Install dependencies
-        run: >
-          uv pip install --system -e .
-          "attrs==21.4.0"
-          "black==22.12.0"
-          "markdown-it-py==3.0.0"
-          "mypy==1.14.1"
-          "pygments==2.19.2"
-          "pytest==7.4.4"
-          "pytest-cov==3.0.0"
-          "typing-extensions==4.13.2"
+        run: uv pip install --system -e . --group dev
       - name: Format check with black
         run: python -m black --check .
       - name: Typecheck with mypy
@@ -66,12 +57,6 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
       - name: Install dependencies
-        run: >
-          uv pip install --system -e .
-          "attrs==21.4.0"
-          "markdown-it-py==3.0.0"
-          "pygments==2.19.2"
-          "pytest==7.4.4"
-          "typing-extensions==4.13.2"
+        run: uv pip install --system -e . --group dev
       - name: Test with pytest
         run: python -m pytest tests -v
