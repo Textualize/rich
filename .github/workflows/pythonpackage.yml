@@ -38,6 +38,7 @@ jobs:
           env_vars: OS,PYTHON
 
   build:
+    needs: quality
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
