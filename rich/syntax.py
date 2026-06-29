@@ -526,9 +526,10 @@ class Syntax(JupyterMixin):
                             _token_type, token = next(tokens)
                         except StopIteration:
                             break
-                        yield (token, None)
                         if token.endswith("\n"):
                             line_no += 1
+                    if line_no:
+                        yield ("\n" * line_no, None)
                     # Generate spans until line end
                     for token_type, token in tokens:
                         yield (token, _get_theme_style(token_type))

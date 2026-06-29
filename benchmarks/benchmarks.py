@@ -142,6 +142,23 @@ class SyntaxLargeNoWrapSuite:
         self.console.print(self.syntax, width=80)
 
 
+class SyntaxLineRangeSuite:
+    def setup(self):
+        self.console = Console(
+            file=StringIO(), color_system="truecolor", legacy_windows=False
+        )
+        self.syntax = Syntax(
+            code=snippets.PYTHON_SNIPPET * 120,
+            lexer="python",
+            word_wrap=False,
+            line_numbers=False,
+            line_range=(3000, 3060),
+        )
+
+    def time_text_wide_terminal_line_range(self):
+        self.console.print(self.syntax, width=80)
+
+
 class TableSuite:
     def time_table_no_wrapping(self):
         self._print_table(width=100)
