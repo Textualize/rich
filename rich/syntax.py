@@ -743,6 +743,19 @@ class Syntax(JupyterMixin):
             highlight_number_style,
         ) = self._get_number_styles(console)
 
+        if self.word_wrap and not self.line_numbers:
+            text = Text("\n").join(lines)
+            syntax_lines = console.render_lines(
+                text,
+                render_options.update(height=None, justify="left"),
+                style=background_style,
+                pad=not transparent_background,
+                new_lines=True,
+            )
+            for syntax_line in syntax_lines:
+                yield from syntax_line
+            return
+
         for line_no, line in enumerate(lines, self.start_line + line_offset):
             if self.word_wrap:
                 wrapped_lines = console.render_lines(

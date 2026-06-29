@@ -435,6 +435,29 @@ def test_padding_plus_wrap() -> None:
     assert output == expected
 
 
+def test_word_wrap_without_line_numbers_with_line_range() -> None:
+    console = Console(
+        width=14, file=io.StringIO(), legacy_windows=False, record=True
+    )
+    syntax = Syntax(
+        "first line should not appear\n"
+        "second line wraps around here\n"
+        "third line stays\n"
+        "fourth line should not appear",
+        lexer="text",
+        word_wrap=True,
+        line_numbers=False,
+        line_range=(2, 3),
+    )
+
+    console.print(syntax)
+
+    assert (
+        console.export_text()
+        == "second line   \nwraps around  \nhere          \nthird line    \nstays         \n"
+    )
+
+
 if __name__ == "__main__":
     syntax = Panel.fit(
         Syntax(
