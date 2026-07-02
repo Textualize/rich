@@ -1,15 +1,15 @@
 test:
-	TERM=unknown pytest --cov-report term-missing --cov=rich tests/ -vv
+	TERM=unknown uv run pytest --cov-report term-missing --cov=rich tests/ -vv
 test-no-cov:
-	TERM=unknown pytest tests/ -vv
+	TERM=unknown uv run pytest tests/ -vv
 format-check:
-	black --check .
+	uv run black --check .
 format:
-	black .
+	uv run black .
 typecheck:
-	mypy -p rich --no-incremental
+	uv run mypy -p rich --no-incremental
 typecheck-report:
-	mypy -p rich --html-report mypy_report
+	uv run mypy -p rich --html-report mypy_report
 .PHONY: docs
 docs:
-	cd docs; make html
+	uv run --group docs sphinx-build -M html docs/source docs/build
