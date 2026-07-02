@@ -18,6 +18,7 @@ build:
 
 python:
   install:
-    - requirements: docs/requirements.txt
-    - method: pip
-      path: .
+    - method: uv
+      command: sync
+      groups:
+        - docs

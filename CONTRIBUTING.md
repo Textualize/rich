@@ -10,9 +10,9 @@ See also [AI_POLICY.md](https://github.com/Textualize/rich/blob/master/AI_POLICY
 
 ## Prerequisites
 
-Rich uses [poetry](https://python-poetry.org/docs/) for packaging and
-dependency management. To start developing with Rich, install Poetry
-using the [recommended method](https://python-poetry.org/docs/#installation).
+Rich uses [uv](https://docs.astral.sh/uv/) for packaging and
+dependency management. To start developing with Rich, install uv
+using the [recommended method](https://docs.astral.sh/uv/getting-started/installation/).
 
 Next, you'll need to create a _fork_ (your own personal copy) of the Rich repository, and clone that fork
 on to your local machine. GitHub offers a great tutorial for this process [here](https://docs.github.com/en/get-started/quickstart/fork-a-repo).
@@ -20,17 +20,14 @@ After following this guide, you'll have a local copy of the Rich project install
 
 Enter the directory containing your copy of Rich (`cd rich`).
 
-Next create and activate a [virtual environment](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#create-and-use-virtual-environments) for Rich.
-
-Now we can install the dependencies of Rich into the virtual environment:
+Now we can create a virtual environment and install Rich's dependencies:
 
 ```
-poetry install
+uv sync
 ```
 
-The rest of this guide assumes you're inside the virtual environment.
-If you're having difficulty running any of the commands that follow,
-ensure you're inside the virtual environment by running `poetry shell`.
+The rest of this guide assumes commands are run through `uv run`, or inside
+the virtual environment created by uv.
 
 ## Developing
 
@@ -60,7 +57,7 @@ make test
 Or if you don't have `make`, run the following:
 
 ```
-pytest --cov-report term-missing --cov=rich tests/ -vv
+uv run pytest --cov-report term-missing --cov=rich tests/ -vv
 ```
 
 New code should ideally have tests and not break existing tests.
@@ -81,7 +78,7 @@ make typecheck
 Or if you don't have `make`:
 
 ```
-mypy -p rich --config-file= --ignore-missing-imports --no-implicit-optional --warn-unreachable
+uv run mypy -p rich --config-file= --ignore-missing-imports --no-implicit-optional --warn-unreachable
 ```
 
 Please add type annotations for all new code, and ensure that type checking succeeds before creating a pull request.
@@ -99,13 +96,13 @@ and use `make format` to format and write to the files.
 Consider whether the change you made would benefit from documentation - if the feature has any user impact at all, the answer is almost certainly yes!
 Documentation can be found in the `docs` directory.
 There are some additional dependencies required to build the documentation.
-These dependencies can be installed by running (from the `docs` directory):
+These dependencies can be installed by running:
 
 ```
-pip install -r requirements.txt
+uv sync --group docs
 ```
 
-After updating the documentation, you can build them (from the project root directory) by running:
+After updating the documentation, you can build them by running:
 
 ```
 make docs
