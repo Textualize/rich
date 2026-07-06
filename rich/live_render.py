@@ -1,11 +1,4 @@
-import sys
-from typing import Optional, Tuple
-
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal  # pragma: no cover
-
+from typing import Literal, Optional, Tuple
 
 from ._loop import loop_last
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
@@ -35,6 +28,17 @@ class LiveRender:
         self.style = style
         self.vertical_overflow = vertical_overflow
         self._shape: Optional[Tuple[int, int]] = None
+
+    @property
+    def last_render_height(self) -> int:
+        """The number of lines in the last render (may be 0 if nothing was rendered).
+
+        Returns:
+            Height in lines
+        """
+        if self._shape is None:
+            return 0
+        return self._shape[1]
 
     def set_renderable(self, renderable: RenderableType) -> None:
         """Set a new renderable.

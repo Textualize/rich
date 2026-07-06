@@ -1,35 +1,36 @@
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/rich)](https://pypi.org/project/rich/) [![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
+
 [![Downloads](https://pepy.tech/badge/rich/month)](https://pepy.tech/project/rich)
-[![PyPI version](https://badge.fury.io/py/rich.svg)](https://badge.fury.io/py/rich)
-[![codecov](https://codecov.io/gh/Textualize/rich/branch/master/graph/badge.svg)](https://codecov.io/gh/Textualize/rich)
+[![codecov](https://img.shields.io/codecov/c/github/Textualize/rich?label=codecov&logo=codecov)](https://codecov.io/gh/Textualize/rich)
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
-![Logo](https://github.com/textualize/rich/raw/master/imgs/logo.svg)
+![Logo](https://github.com/textualize/rich/raw/main/imgs/logo.svg)
 
-[English readme](https://github.com/textualize/rich/blob/master/README.md)
- • [简体中文 readme](https://github.com/textualize/rich/blob/master/README.cn.md)
- • [正體中文 readme](https://github.com/textualize/rich/blob/master/README.zh-tw.md)
- • [Lengua española readme](https://github.com/textualize/rich/blob/master/README.es.md)
- • [Deutsche readme](https://github.com/textualize/rich/blob/master/README.de.md)
- • [Läs på svenska](https://github.com/textualize/rich/blob/master/README.sv.md)
- • [日本語 readme](https://github.com/textualize/rich/blob/master/README.ja.md)
- • [한국어 readme](https://github.com/textualize/rich/blob/master/README.kr.md)
- • [Français readme](https://github.com/textualize/rich/blob/master/README.fr.md)
- • [Schwizerdütsch readme](https://github.com/textualize/rich/blob/master/README.de-ch.md)
- • [हिन्दी readme](https://github.com/textualize/rich/blob/master/README.hi.md)
- • [Português brasileiro readme](https://github.com/textualize/rich/blob/master/README.pt-br.md)
- • [Italian readme](https://github.com/textualize/rich/blob/master/README.it.md)
- • [Русский readme](https://github.com/textualize/rich/blob/master/README.ru.md)
-  • [فارسی readme](https://github.com/textualize/rich/blob/master/README.fa.md)
- • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
- • [Polskie readme](https://github.com/textualize/rich/blob/master/README.pl.md)
+[English readme](https://github.com/textualize/rich/blob/main/README.md)
+ • [简体中文 readme](https://github.com/textualize/rich/blob/main/README.cn.md)
+ • [正體中文 readme](https://github.com/textualize/rich/blob/main/README.zh-tw.md)
+ • [Lengua española readme](https://github.com/textualize/rich/blob/main/README.es.md)
+ • [Deutsche readme](https://github.com/textualize/rich/blob/main/README.de.md)
+ • [Läs på svenska](https://github.com/textualize/rich/blob/main/README.sv.md)
+ • [日本語 readme](https://github.com/textualize/rich/blob/main/README.ja.md)
+ • [한국어 readme](https://github.com/textualize/rich/blob/main/README.kr.md)
+ • [Français readme](https://github.com/textualize/rich/blob/main/README.fr.md)
+ • [Schwizerdütsch readme](https://github.com/textualize/rich/blob/main/README.de-ch.md)
+ • [हिन्दी readme](https://github.com/textualize/rich/blob/main/README.hi.md)
+ • [Português brasileiro readme](https://github.com/textualize/rich/blob/main/README.pt-br.md)
+ • [Italian readme](https://github.com/textualize/rich/blob/main/README.it.md)
+ • [Русский readme](https://github.com/textualize/rich/blob/main/README.ru.md)
+  • [فارسی readme](https://github.com/textualize/rich/blob/main/README.fa.md)
+ • [Türkçe readme](https://github.com/textualize/rich/blob/main/README.tr.md)
+ • [Polskie readme](https://github.com/textualize/rich/blob/main/README.pl.md)
 
 Rich टर्मिनल में _समृद्ध_ पाठ और सुंदर स्वरूपण के लिए एक Python संग्रह है।
 
 
 [Rich API](https://rich.readthedocs.io/en/latest/) टर्मिनल उत्पादन में रंग और शैली डालना आसान बनाता है। Rich सुंदर सारणियाँ, प्रगति सूचक डंडे, markdown, रचनाक्रम चिन्हांकित स्त्रोत कोड, ट्रेसबैक आदि प्रस्तुत कर सकता है - बिना कुछ बदले।
 
-![Features](https://github.com/textualize/rich/raw/master/imgs/features.png)
+![Features](https://github.com/textualize/rich/raw/main/imgs/features.png)
 
 Rich के वीडियो परिचय के लिए देखें [@fishnets88](https://twitter.com/fishnets88) द्वारा बनाई गई [calmcode.io](https://calmcode.io/rich/introduction.html)।
 
@@ -65,7 +66,7 @@ from rich import print
 print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 ```
 
-![Hello World](https://github.com/textualize/rich/raw/master/imgs/print.png)
+![Hello World](https://github.com/textualize/rich/raw/main/imgs/print.png)
 
 ## Rich REPL
 
@@ -75,7 +76,7 @@ Rich को Python REPL में स्थापित किया जा स�
 >>> pretty.install()
 ```
 
-![REPL](https://github.com/textualize/rich/raw/master/imgs/repl.png)
+![REPL](https://github.com/textualize/rich/raw/main/imgs/repl.png)
 
 ## कॉनसोल (Console) का इस्तेमाल करना
 
@@ -101,7 +102,7 @@ console.print("Hello", "World!", style="bold red")
 ```
 
 उत्पादन कुछ इस प्रकार का होगा:
-![Hello World](https://github.com/textualize/rich/raw/master/imgs/hello_world.png)
+![Hello World](https://github.com/textualize/rich/raw/main/imgs/hello_world.png)
 
 
 ये एक बारी में एक पंक्ति का शैलीकरण करने के लिए तो ठीक है। अधिक बारीकी से शैलीकरण करने के लिए, Rich एक विशेष मार्कअप को प्रदर्शित करता है जो रचनाक्रम में [bbcode](https://en.wikipedia.org/wiki/BBCode) से मिलता-जुलता है। इसका एक उदाहरण:
@@ -110,7 +111,7 @@ console.print("Hello", "World!", style="bold red")
 console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i]way[/i].")
 ```
 
-![Console Markup](https://github.com/textualize/rich/raw/master/imgs/where_there_is_a_will.png)
+![Console Markup](https://github.com/textualize/rich/raw/main/imgs/where_there_is_a_will.png)
 
 कम-से-कम मेहनत में परिष्कृत उत्पादन उत्पन्न करने के लिए आप एक Console वस्तु का उपयोग कर सकते हैं। अधिक जानकारी के लिए आप [Console API](https://rich.readthedocs.io/en/latest/console.html) का प्रलेख पढ़ सकते हैं।
 
@@ -123,7 +124,7 @@ Rich में एक [inspect](https://rich.readthedocs.io/en/latest/reference/
 >>> inspect(my_list, methods=True)
 ```
 
-![Log](https://github.com/textualize/rich/raw/master/imgs/inspect.png)
+![Log](https://github.com/textualize/rich/raw/main/imgs/inspect.png)
 
 अधिक जानकारी के लिए [inspect का प्रलेखन](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) पढ़ें।
 
@@ -164,7 +165,7 @@ test_log()
 
 उपर्युक्त कोड से निम्न उत्पादन उत्पन्न होता है:
 
-![Log](https://github.com/textualize/rich/raw/master/imgs/log.png)
+![Log](https://github.com/textualize/rich/raw/main/imgs/log.png)
 
 ध्यान दें `log_levels` तर्क की तरफ, जो एक सारणी उत्पादित करता है जिसमे लॉग फलन के आवाहन के स्थान के स्थानिये चर युक्त हैं।
 
@@ -176,7 +177,7 @@ test_log()
 
 Python के `logging` मापांक से आए हुए उत्पादन का संरूपण एवं रंगीकरण करने के लिए आप अंतर्निहित [Handler वर्ग](https://rich.readthedocs.io/en/latest/logging.html) का भी इस्तेमाल कर सकते हैं। उत्पादन का एक उपहरण प्रस्तुत है:
 
-![Logging](https://github.com/textualize/rich/raw/master/imgs/logging.png)
+![Logging](https://github.com/textualize/rich/raw/main/imgs/logging.png)
 
 </details>
 
@@ -197,9 +198,9 @@ Console उत्पादन में इमोजी डालने के �
 
 Rich यूनिकोड डिब्बा अक्षरों की सहायता से लचीली [सारणियाँ](https://rich.readthedocs.io/en/latest/tables.html) प्रदर्शित कर सकता है। सीमाएँ, शैलियाँ, कक्ष संरेखण आदि के लिए कई सारे स्वरूपण विकल्प उपलब्ध हैं।
 
-![table movie](https://github.com/textualize/rich/raw/master/imgs/table_movie.gif)
+![table movie](https://github.com/textualize/rich/raw/main/imgs/table_movie.gif)
 
-उपर्युक्त अनुप्राणन examples डायरेक्टरी के [table_movie.py](https://github.com/textualize/rich/blob/master/examples/table_movie.py) से बनाया गया है।
+उपर्युक्त अनुप्राणन examples डायरेक्टरी के [table_movie.py](https://github.com/textualize/rich/blob/main/examples/table_movie.py) से बनाया गया है।
 
 इससे सरल संचिका का उदाहरण:
 ```python
@@ -234,13 +235,13 @@ console.print(table)
 
 इससे निम्नलिखित उत्पादन उत्पन्न होता है:
 
-![table](https://github.com/textualize/rich/raw/master/imgs/table.png)
+![table](https://github.com/textualize/rich/raw/main/imgs/table.png)
 
 ध्यान दें की कॉनसोल मार्कअप `print()` और `log()` की तरह ही प्रदर्शित होते हैं। वास्तव में, कोई भी वस्तु जो Rich के द्वारा प्रदर्शनीय है वह शीर्षकों / पंक्तियों (दूसरी संचिकाओं में भी) में युक्त किया जा सकता है।
 
 `Table` वर्ग इतनी बुद्धिमान है की वह टर्मिनल की उपलब्ध चौड़ाई में फ़साने के लिए स्तंभों का आकार बदल सकता है, आवश्यकता के अनुसार पाठ को लपेटते हुए। यह वही उदाहरण है, टर्मिनल को उपर्युक्त संचिका से छोटा रखते हुए:
 
-![table2](https://github.com/textualize/rich/raw/master/imgs/table2.png)
+![table2](https://github.com/textualize/rich/raw/main/imgs/table2.png)
 
 </details>
 
@@ -258,12 +259,12 @@ for step in track(range(100)):
 ```
 
 अनेक प्रगति सूचक डंडे जोड़ने इससे अधिक कठिन नहीं है। ये रहा एक उदाहरण जो प्रलेखन से उठाया गया है:
-![progress](https://github.com/textualize/rich/raw/master/imgs/progress.gif)
+![progress](https://github.com/textualize/rich/raw/main/imgs/progress.gif)
 
 स्तंभों का विन्यास इस प्रकार किया जा सकता है की आपकी इच्छानुसार विवरण दिखाए जाएँ। अंतर्निहित स्तंभ में प्रतिशत पूरा, संचिका आकार, संचिका गति तथा शेष समय युक्त होते हैं। ये रहा एक और उदाहरण एक चालू डाउनलोड को दर्शाते हुए।
-![progress](https://github.com/textualize/rich/raw/master/imgs/downloader.gif)
+![progress](https://github.com/textualize/rich/raw/main/imgs/downloader.gif)
 
-इसे स्वयं आजमाने के लिए, देखें [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) जो अनेक URL एक साथ डाउनलोड करते हुए प्रगति दर्शाता है।
+इसे स्वयं आजमाने के लिए, देखें [examples/downloader.py](https://github.com/textualize/rich/blob/main/examples/downloader.py) जो अनेक URL एक साथ डाउनलोड करते हुए प्रगति दर्शाता है।
 </details>
 
 <details>
@@ -285,7 +286,7 @@ with console.status("[bold green]Working on tasks...") as status:
 ```
 
 इससे टर्मिनल में निम्नलिखित उत्पादन उत्पन्न होता है:
-![status](https://github.com/textualize/rich/raw/master/imgs/status.gif)
+![status](https://github.com/textualize/rich/raw/main/imgs/status.gif)
 
 स्पिनर अनुप्राणन [cli-spinners](https://www.npmjs.com/package/cli-spinners) से उधारे गए थे। आप `spinner` प्राचल को उल्लिखित करके स्पिनर चुन सकते हैं। उपलब्ध विकल्प देखने के लिए निम्नलिखित आदेश चलकर देखें:
 ```
@@ -293,7 +294,7 @@ python -m rich.spinner
 ```
 
 उपर्युक्त आदेश टर्मिनल में निम्नलिखित उत्पादन उतपन्न करता है:
-![spinners](https://github.com/textualize/rich/raw/master/imgs/spinners.gif)
+![spinners](https://github.com/textualize/rich/raw/main/imgs/spinners.gif)
 
 </details>
 
@@ -309,9 +310,9 @@ python -m rich.tree
 
 इससे निम्न उत्पादन उत्पन्न होता है:
 
-![markdown](https://github.com/textualize/rich/raw/master/imgs/tree.png)
+![markdown](https://github.com/textualize/rich/raw/main/imgs/tree.png)
 
-देखें उदाहरण [tree.py](https://github.com/textualize/rich/blob/master/examples/tree.py) एक क्रमादेश के लिए जो किसी भी डायरेक्टरी का वृक्ष दृश्य (ट्री व्यू) दर्शाएगा, लिनक्स के `tree` आदेश के समान।
+देखें उदाहरण [tree.py](https://github.com/textualize/rich/blob/main/examples/tree.py) एक क्रमादेश के लिए जो किसी भी डायरेक्टरी का वृक्ष दृश्य (ट्री व्यू) दर्शाएगा, लिनक्स के `tree` आदेश के समान।
 
 </details>
 
@@ -332,8 +333,8 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-निम्न स्क्रीनशॉट [स्तंभों के उदाहरण](https://github.com/textualize/rich/blob/master/examples/columns.py) का उत्पादन है जो एक API से खींचे गए डेटा को स्तंभों में प्रदर्शित करता है:
-![columns](https://github.com/textualize/rich/raw/master/imgs/columns.png)
+निम्न स्क्रीनशॉट [स्तंभों के उदाहरण](https://github.com/textualize/rich/blob/main/examples/columns.py) का उत्पादन है जो एक API से खींचे गए डेटा को स्तंभों में प्रदर्शित करता है:
+![columns](https://github.com/textualize/rich/raw/main/imgs/columns.png)
 
 </details>
 
@@ -356,7 +357,7 @@ console.print(markdown)
 
 इससे कुछ इस प्रकार का उत्पादन उत्पन्न होगा:
 
-![markdown](https://github.com/textualize/rich/raw/master/imgs/markdown.png)
+![markdown](https://github.com/textualize/rich/raw/main/imgs/markdown.png)
 
 </details>
 
@@ -391,7 +392,7 @@ console.print(syntax)
 This will produce the following output:
 इससे निम्न उत्पादन उत्पन्न होता है:
 
-![syntax](https://github.com/textualize/rich/raw/master/imgs/syntax.png)
+![syntax](https://github.com/textualize/rich/raw/main/imgs/syntax.png)
 
 </details>
 
@@ -401,7 +402,7 @@ This will produce the following output:
 Rich [खूबसूरत ट्रेसबैक](https://rich.readthedocs.io/en/latest/traceback.html) दर्शा सकता है जो पढ़ने में आसान तथा मानक Python ट्रेसबैकों से अधिक कोड दिखाता है। आप Rich को व्यक्तीक्रम ट्रेसबैक संचालक भी निर्धारित कार सकते हैं ताकि सभी बेपकड़ अपवाद Rich के द्वारा प्रदर्शित हों।
 
 OSX (Linux पर समान) पर यह कुछ इस प्रकार दिखता है:
-![traceback](https://github.com/textualize/rich/raw/master/imgs/traceback.png)
+![traceback](https://github.com/textualize/rich/raw/main/imgs/traceback.png)
 
 </details>
 

@@ -1,5 +1,4 @@
 alabaster==1.0.0
-Sphinx==7.3.7
-sphinx-rtd-theme==2.0.0
-sphinx-copybutton==0.5.1
-importlib-metadata; python_version < '3.8'
+Sphinx==8.2.3
+sphinx-rtd-theme==3.0.2
+sphinx-copybutton==0.5.2

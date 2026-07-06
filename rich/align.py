@@ -1,11 +1,5 @@
-import sys
 from itertools import chain
-from typing import TYPE_CHECKING, Iterable, Optional
-
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal  # pragma: no cover
+from typing import TYPE_CHECKING, Iterable, Optional, Literal
 
 from .constrain import Constrain
 from .jupyter import JupyterMixin
@@ -34,6 +28,20 @@ class Align(JupyterMixin):
 
     Raises:
         ValueError: if ``align`` is not one of the expected values.
+
+    Example:
+        .. code-block:: python
+
+            from rich.console import Console
+            from rich.align import Align
+            from rich.panel import Panel
+
+            console = Console()
+            # Create a panel 20 characters wide
+            p = Panel("Hello, [b]World[/b]!", style="on green", width=20)
+
+            # Renders the panel centered in the terminal
+            console.print(Align(p, align="center"))
     """
 
     def __init__(

@@ -234,7 +234,7 @@ def install(
                 if self.pprint:
                     return _ipy_display_hook(
                         value,
-                        console=get_console(),
+                        console=console,
                         overflow=overflow,
                         indent_guides=indent_guides,
                         max_length=max_length,

@@ -1,11 +1,5 @@
-import sys
 import time
-from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Union
-
-if sys.version_info >= (3, 8):
-    from typing import Final
-else:
-    from typing_extensions import Final  # pragma: no cover
+from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Union, Final
 
 from .segment import ControlCode, ControlType, Segment
 

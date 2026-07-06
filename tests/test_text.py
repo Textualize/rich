@@ -525,6 +525,16 @@ def test_wrap_long():
     assert lines[2] == Text("bra ")
 
 
+def test_wrap_long_multi_codepoint():
+    female_mechanic = "👩\u200d🔧"
+    text = Text(female_mechanic * 5, justify="left")
+    lines = text.wrap(Console(), 4)
+    assert len(lines) == 3
+    assert lines[0] == Text(female_mechanic * 2)
+    assert lines[1] == Text(female_mechanic * 2)
+    assert lines[2] == Text(female_mechanic + "  ")
+
+
 def test_wrap_overflow():
     text = Text("Some more words")
     lines = text.wrap(Console(), 4, overflow="ellipsis")
@@ -602,6 +612,18 @@ def test_wrap_multiple_consecutive_spaces():
         Text("123456"),
         Text("78 123"),
         Text("123"),
+    ]
+
+
+def test_wrap_multi_codepoint():
+    """Test wrapping of multi-codepoint characters."""
+    female_mechanic = "👩\u200d🔧"
+    text = Text(female_mechanic * 6 + " " + female_mechanic * 4)
+    lines = text.wrap(Console(), 12)
+    print(repr(lines))
+    assert lines._lines == [
+        Text(female_mechanic * 6),
+        Text(female_mechanic * 4),
     ]
 
 
@@ -843,7 +865,12 @@ def test_assemble():
 def test_assemble_meta():
     text = Text.assemble("foo", ("bar", "bold"), meta={"foo": "bar"})
     assert str(text) == "foobar"
-    assert text._spans == [Span(3, 6, "bold"), Span(0, 6, Style(meta={"foo": "bar"}))]
+
+    spans = text._spans
+    expected = [Span(3, 6, "bold"), Span(0, 6, Style(meta={"foo": "bar"}))]
+
+    assert spans == expected
+
     console = Console()
     assert text.get_style_at_offset(console, 0).meta == {"foo": "bar"}
 
@@ -1065,3 +1092,38 @@ def test_append_loop_regression() -> None:
     b = Text("two", "blue")
     b.append_text(b)
     assert b.plain == "twotwo"
+
+
+def test_soft_wrap() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3841
+
+    Soft wrap should not strip trailing whitespace.
+
+    """
+    console = Console(color_system="standard", width=80, force_terminal=True)
+    text = Text(" Hello World ", style="white on blue")
+
+    with console.capture() as capture:
+        console.print(text, soft_wrap=True)
+
+    output = capture.get()
+    print(repr(output))
+    expected = "\x1b[37;44m Hello World \x1b[0m\n"
+    assert output == expected
+
+
+def test_soft_wrap_styled() -> None:
+    """Regression test for https://github.com/Textualize/rich/issues/3838
+
+    If soft_wrap is True and a style is set, we don't want to style the new lines.
+    """
+    console = Console(color_system="standard", width=80, force_terminal=True)
+    with console.capture() as capture:
+        console.print("soft wrap is on", style="blue on white", soft_wrap=True)
+        console.print("Next line")
+
+    output = capture.get()
+    print(repr(output))
+    # Background is reset before \n
+    expected = "\x1b[34;47msoft wrap is on\x1b[0m\nNext line\n"
+    assert output == expected
