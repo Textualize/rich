@@ -690,6 +690,9 @@ def test_task_progress_column_speed() -> None:
     speed_text = TaskProgressColumn.render_speed(0.1)
     assert speed_text.plain == "10.0 s/it"
 
+    speed_text = TaskProgressColumn.render_speed(0.0)
+    assert speed_text.plain == "0.0 it/s"
+
 
 def test_iteration_speed_column() -> None:
     column = IterationSpeedColumn()

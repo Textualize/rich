@@ -752,7 +752,7 @@ class TaskProgressColumn(TextColumn):
         """
         if speed is None:
             return Text("", style=style)
-        if speed < 1:
+        if 0 < speed < 1:
             return Text(f"{1 / speed:.1f} s/{unit}", style=style)
         scale, suffix = filesize.pick_unit_and_suffix(
             int(speed),
