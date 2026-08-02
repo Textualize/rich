@@ -734,24 +734,33 @@ class TaskProgressColumn(TextColumn):
         )
 
     @classmethod
-    def render_speed(cls, speed: Optional[float]) -> Text:
-        """Render the speed in iterations per second.
+    def render_speed(
+        cls,
+        speed: Optional[float],
+        style: StyleType = "progress.percentage",
+        unit: str = "it",
+    ) -> Text:
+        """Render the speed in iterations per second, or seconds per iteration for slow tasks.
 
         Args:
-            task (Task): A Task object.
+            speed (Optional[float]): Speed in iterations per second, or None if unknown.
+            style (StyleType, optional): Style to apply. Defaults to "progress.percentage".
+            unit (str, optional): Unit label for iterations. Defaults to "it".
 
         Returns:
             Text: Text object containing the task speed.
         """
         if speed is None:
-            return Text("", style="progress.percentage")
-        unit, suffix = filesize.pick_unit_and_suffix(
+            return Text("", style=style)
+        if 0 < speed < 1:
+            return Text(f"{1 / speed:.1f} s/{unit}", style=style)
+        scale, suffix = filesize.pick_unit_and_suffix(
             int(speed),
             ["", "×10³", "×10⁶", "×10⁹", "×10¹²"],
             1000,
         )
-        data_speed = speed / unit
-        return Text(f"{data_speed:.1f}{suffix} it/s", style="progress.percentage")
+        data_speed = speed / scale
+        return Text(f"{data_speed:.1f}{suffix} {unit}/s", style=style)
 
     def render(self, task: "Task") -> Text:
         if task.total is None and self.show_speed:
@@ -767,6 +776,24 @@ class TaskProgressColumn(TextColumn):
         if self.highlighter:
             self.highlighter.highlight(text)
         return text
+
+
+class IterationSpeedColumn(ProgressColumn):
+    """Renders iteration speed, e.g. '1.2 it/s', or seconds per iteration for slow tasks, e.g. '2.0 s/it'.
+
+    Args:
+        unit (str, optional): Unit label for iterations. Defaults to "it".
+    """
+
+    def __init__(self, unit: str = "it", table_column: Optional[Column] = None) -> None:
+        self.unit = unit
+        super().__init__(table_column=table_column)
+
+    def render(self, task: "Task") -> Text:
+        speed = task.finished_speed or task.speed
+        return TaskProgressColumn.render_speed(
+            speed, style="progress.data.speed", unit=self.unit
+        )
 
 
 class TimeRemainingColumn(ProgressColumn):
