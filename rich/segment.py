@@ -120,37 +120,49 @@ class Segment(NamedTuple):
         """
         text, style, control = segment
         _Segment = Segment
+
         cell_length = segment.cell_length
         if cut >= cell_length:
             return segment, _Segment("", style, control)
 
         cell_size = get_character_cell_size
 
-        pos = int((cut / cell_length) * len(text))
+        # Cheap initial guess assuming ~1 cell per character, then correct
+        # by walking from the guess toward the answer (not from index 0).
+        pos = min(cut, len(text) - 1)
+        cell_pos = sum(cell_size(character) for character in text[:pos])
 
-        while True:
-            before = text[:pos]
-            cell_pos = cell_len(before)
-            out_by = cell_pos - cut
-            if not out_by:
-                return (
-                    _Segment(before, style, control),
-                    _Segment(text[pos:], style, control),
-                )
-            if out_by == -1 and cell_size(text[pos]) == 2:
+        if cell_pos + cell_size(text[pos]) > cut:
+            # Guess overshot - walk left while an earlier position also overshoots.
+            while pos > 0:
+                prev_width = cell_size(text[pos - 1])
+                prev_cell_pos = cell_pos - prev_width
+                if prev_cell_pos + prev_width > cut:
+                    pos -= 1
+                    cell_pos = prev_cell_pos
+                else:
+                    break
+        else:
+            # Guess undershot - walk right until we find the crossing point.
+            while pos < len(text) - 1:
+                cell_pos += cell_size(text[pos])
+                pos += 1
+                if cell_pos + cell_size(text[pos]) > cut:
+                    break
+
+        char_width = cell_size(text[pos])
+        if cell_pos + char_width > cut:
+            if cell_pos + char_width == cut + 1 and char_width == 2:
                 return (
                     _Segment(text[:pos] + " ", style, control),
                     _Segment(" " + text[pos + 1 :], style, control),
                 )
-            if out_by == +1 and cell_size(text[pos - 1]) == 2:
-                return (
-                    _Segment(text[: pos - 1] + " ", style, control),
-                    _Segment(" " + text[pos:], style, control),
-                )
-            if cell_pos < cut:
-                pos += 1
-            else:
-                pos -= 1
+            return (
+                _Segment(text[:pos], style, control),
+                _Segment(text[pos:], style, control),
+            )
+
+        return segment, _Segment("", style, control)
 
     def split_cells(self, cut: int) -> Tuple["Segment", "Segment"]:
         """Split segment in to two segments at the specified column.

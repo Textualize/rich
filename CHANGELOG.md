@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed `Segment._split_cells` not handling non-unit width characters correctly https://github.com/Textualize/rich/issues/3299
+- Fixed empty print ignoring the `end` parameter https://github.com/Textualize/rich/pull/4075
+- Fixed `Text.from_ansi` removing newlines https://github.com/Textualize/rich/pull/4076
+- Fixed `FileProxy.isatty` not proxying https://github.com/Textualize/rich/pull/4077
+- Fixed inline code in Markdown tables cells https://github.com/Textualize/rich/pull/4079
+
+### Changed
+
+- Breaking change: Dropped support for Python3.8
+
+### Fixed
+
 - Fixed empty print ignoring the `end` parameter https://github.com/Textualize/rich/pull/4075
 - Fixed `Text.from_ansi` removing newlines https://github.com/Textualize/rich/pull/4076
 - Fixed `FileProxy.isatty` not proxying https://github.com/Textualize/rich/pull/4077
