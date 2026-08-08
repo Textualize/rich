@@ -126,22 +126,41 @@ class Segment(NamedTuple):
             return segment, _Segment("", style, control)
 
         cell_size = get_character_cell_size
-        cell_size = get_character_cell_size
-        cell_pos = 0
 
-        for pos, char in enumerate(text):
-            char_width = cell_size(char)
-            if cell_pos + char_width > cut:
-                if cell_pos + char_width == cut + 1 and char_width == 2:
-                    return (
-                        _Segment(text[:pos] + " ", style, control),
-                        _Segment(" " + text[pos + 1 :], style, control),
-                    )
+        # Cheap initial guess assuming ~1 cell per character, then correct
+        # by walking from the guess toward the answer (not from index 0).
+        pos = min(cut, len(text) - 1)
+        cell_pos = sum(cell_size(character) for character in text[:pos])
+
+        if cell_pos + cell_size(text[pos]) > cut:
+            # Guess overshot - walk left while an earlier position also overshoots.
+            while pos > 0:
+                prev_width = cell_size(text[pos - 1])
+                prev_cell_pos = cell_pos - prev_width
+                if prev_cell_pos + prev_width > cut:
+                    pos -= 1
+                    cell_pos = prev_cell_pos
+                else:
+                    break
+        else:
+            # Guess undershot - walk right until we find the crossing point.
+            while pos < len(text) - 1:
+                cell_pos += cell_size(text[pos])
+                pos += 1
+                if cell_pos + cell_size(text[pos]) > cut:
+                    break
+
+        char_width = cell_size(text[pos])
+        if cell_pos + char_width > cut:
+            if cell_pos + char_width == cut + 1 and char_width == 2:
                 return (
-                    _Segment(text[:pos], style, control),
-                    _Segment(text[pos:], style, control),
+                    _Segment(text[:pos] + " ", style, control),
+                    _Segment(" " + text[pos + 1 :], style, control),
                 )
-            cell_pos += char_width
+            return (
+                _Segment(text[:pos], style, control),
+                _Segment(text[pos:], style, control),
+            )
 
         return segment, _Segment("", style, control)
 
