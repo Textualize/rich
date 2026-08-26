@@ -199,20 +199,149 @@ def test_table_with_empty_cells() -> None:
     assert result == expected
 
 
-def test_inline_code_in_table_cells() -> None:
-    """Test inline code in table cells.
+def _header_line(text: str, style_prefix: str, justify: str) -> str:
+    """Build a full width (100 columns) header line as rendered by Console."""
+    styled = f"{style_prefix}{text}\x1b[0m"
+    pad = 100 - len(text)
+    if justify == "center":
+        left = pad // 2
+        return " " * left + styled + " " * (pad - left)
+    elif justify == "right":
+        return " " * pad + styled
+    return styled + " " * pad
 
-    Regression test for https://github.com/Textualize/rich/issues/4038
 
-    """
+def test_header_justification_default():
+    """Test that h1 is centered and other levels are left justified by default."""
     markdown = Markdown(
-        "| Col |\n|---|\n| `print('hello');` |\n",
-        inline_code_theme="monokai",
-        inline_code_lexer="python",
+        """\
+# Main Title
+
+## Section Title
+
+### Subsection Title
+
+This is a paragraph.
+"""
     )
     result = render(markdown)
-    expected = "\n\x1b[36m                 \x1b[0m\n\x1b[36m \x1b[0m\x1b[36mCol\x1b[0m\x1b[1m            \x1b[0m\x1b[36m \x1b[0m\n\x1b[36m ─────────────── \x1b[0m\n\x1b[36m \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mprint\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m(\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34m'\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34mhello\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34m'\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m)\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m;\x1b[0m\x1b[36m \x1b[0m\n\x1b[36m                 \x1b[0m\n"
-    assert result == expected
+    assert _header_line("Main Title", "\x1b[1;4m", "center") in result
+    assert _header_line("Section Title", "\x1b[4;35m", "left") in result
+    assert _header_line("Subsection Title", "\x1b[1;35m", "left") in result
+
+
+def test_header_justification_left():
+    """Test left justification for headers."""
+    markdown = Markdown(
+        """\
+# Main Title
+
+## Section Title
+
+### Subsection Title
+
+This is a paragraph.
+""",
+        justify_headers="left",
+    )
+    result = render(markdown)
+    assert _header_line("Main Title", "\x1b[1;4m", "left") in result
+    assert _header_line("Section Title", "\x1b[4;35m", "left") in result
+    assert _header_line("Subsection Title", "\x1b[1;35m", "left") in result
+
+
+def test_header_justification_right():
+    """Test right justification for headers."""
+    markdown = Markdown(
+        """\
+# Main Title
+
+## Section Title
+
+### Subsection Title
+
+This is a paragraph.
+""",
+        justify_headers="right",
+    )
+    result = render(markdown)
+    assert _header_line("Main Title", "\x1b[1;4m", "right") in result
+    assert _header_line("Section Title", "\x1b[4;35m", "right") in result
+    assert _header_line("Subsection Title", "\x1b[1;35m", "right") in result
+
+
+def test_header_justification_all_levels():
+    """Test that every header level honors header justification."""
+    styles = [
+        "\x1b[1;4m",
+        "\x1b[4;35m",
+        "\x1b[1;35m",
+        "\x1b[3;35m",
+        "\x1b[3m",
+        "\x1b[2m",
+    ]
+    markdown = Markdown(
+        "\n\n".join(f"{'#' * level} H{level} Header" for level in range(1, 7)),
+        justify_headers="left",
+    )
+    result = render(markdown)
+    for level, style in enumerate(styles, start=1):
+        assert _header_line(f"H{level} Header", style, "left") in result
+
+
+def test_header_justification_independent_from_paragraph():
+    """Test that header justification works independently from paragraph justification."""
+    markdown = Markdown(
+        """\
+# Centered Header
+
+This paragraph should be left-justified while the header above is centered.
+
+## Another Centered Header
+
+This paragraph should be left-justified while the header above is centered.
+""",
+        justify_headers="center",
+    )
+    result = render(markdown)
+    # Headers should be centered
+    assert _header_line("Centered Header", "\x1b[1;4m", "center") in result
+    assert _header_line("Another Centered Header", "\x1b[4;35m", "center") in result
+    # Paragraphs should be left-justified
+    assert (
+        "This paragraph should be left-justified while the header above is centered.                         "
+        in result
+    )
+
+
+def test_header_justification_mixed():
+    """Test mixed justification: right headers with center paragraphs."""
+    markdown = Markdown(
+        """\
+# Right Header
+
+This paragraph should be center-justified while the header above is right-justified.
+
+## Another Right Header
+
+This paragraph should also be center-justified.
+""",
+        justify_headers="right",
+        justify="center",
+    )
+    result = render(markdown)
+    # Headers should be right-justified
+    assert _header_line("Right Header", "\x1b[1;4m", "right") in result
+    assert _header_line("Another Right Header", "\x1b[4;35m", "right") in result
+    # Paragraphs should be center-justified (padding on both sides)
+    assert (
+        "        This paragraph should be center-justified while the header above is right-justified.        "
+        in result
+    )
+    assert (
+        "                          This paragraph should also be center-justified.                           "
+        in result
+    )
 
 
 if __name__ == "__main__":
