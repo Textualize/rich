@@ -293,6 +293,32 @@ def test_highlight_words():
     assert count == 4
 
 
+def test_highlight_words_preserves_link_in_output():
+    """Ensure a link with highlighted words is emitted as a single OSC 8 link.
+
+    Regression test for Textualize/rich#3526.
+    """
+    file = StringIO()
+    console = Console(
+        file=file,
+        force_terminal=True,
+        color_system="truecolor",
+        legacy_windows=False,
+        no_color=False,
+    )
+    text = Text(
+        "This is a link isn't it",
+        style=console.get_style("green").update_link("https://example.com"),
+    )
+    text.highlight_words(["link"], style="bold")
+    console.print(text)
+
+    links = set(re.findall(r"\x1b\]8;id=([^;]+);([^\x1b]*)\x1b\\", file.getvalue()))
+    assert len(links) == 1
+    [(_, url)] = links
+    assert url == "https://example.com"
+
+
 def test_set_length():
     text = Text("Hello")
     text.set_length(5)

@@ -489,3 +489,32 @@ def test_highlighter_preserves_link_across_spans():
     assert (
         len(link_ids) == 1
     ), f"Expected a single link_id across all highlighted spans, got {len(link_ids)}"
+
+
+def test_highlighter_preserves_link_in_output():
+    """Ensure a highlighted link is emitted as a single OSC 8 link."""
+    import io
+    import re
+
+    from rich.console import Console
+
+    markup = (
+        "Error in job [link=https://www.example.com/issues/42]"
+        "78351748-9b32-4e08-ad3e-7e9ff124d541: see /var/log/myapp.log"
+        "[/link] for details"
+    )
+
+    file = io.StringIO()
+    console = Console(
+        file=file,
+        force_terminal=True,
+        color_system="truecolor",
+        legacy_windows=False,
+        no_color=False,
+    )
+    console.print(markup, highlight=True)
+
+    links = set(re.findall(r"\x1b\]8;id=([^;]+);([^\x1b]*)\x1b\\", file.getvalue()))
+    assert len(links) == 1
+    [(_, url)] = links
+    assert url == "https://www.example.com/issues/42"
