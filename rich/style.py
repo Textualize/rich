@@ -487,7 +487,7 @@ class Style:
         style._attributes = self._attributes
         style._set_attributes = self._set_attributes
         style._link = self._link
-        style._link_id = f"{next(_id_generator)}" if self._link else ""
+        style._link_id = self._link_id
         style._null = False
         style._meta = None
         style._hash = None

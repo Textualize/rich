@@ -491,7 +491,8 @@ def test_highlighter_preserves_link_across_spans():
     ), f"Expected a single link_id across all highlighted spans, got {len(link_ids)}"
 
 
-def test_highlighter_preserves_link_in_output():
+@pytest.mark.parametrize("no_color", [False, True])
+def test_highlighter_preserves_link_in_output(no_color: bool):
     """Ensure a highlighted link is emitted as a single OSC 8 link."""
     import io
     import re
@@ -510,7 +511,7 @@ def test_highlighter_preserves_link_in_output():
         force_terminal=True,
         color_system="truecolor",
         legacy_windows=False,
-        no_color=False,
+        no_color=no_color,
     )
     console.print(markup, highlight=True)
 

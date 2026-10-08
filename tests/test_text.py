@@ -293,7 +293,8 @@ def test_highlight_words():
     assert count == 4
 
 
-def test_highlight_words_preserves_link_in_output():
+@pytest.mark.parametrize("no_color", [False, True])
+def test_highlight_words_preserves_link_in_output(no_color: bool):
     """Ensure a link with highlighted words is emitted as a single OSC 8 link.
 
     Regression test for Textualize/rich#3526.
@@ -304,7 +305,7 @@ def test_highlight_words_preserves_link_in_output():
         force_terminal=True,
         color_system="truecolor",
         legacy_windows=False,
-        no_color=False,
+        no_color=no_color,
     )
     text = Text(
         "This is a link isn't it",
