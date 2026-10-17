@@ -615,13 +615,15 @@ class Segment(NamedTuple):
             Segment: Segments with colorless style.
         """
 
-        cache: Dict[Style, Style] = {}
+        # Style equality ignores link_id, so include it in the key
+        cache: Dict[Tuple[Style, str], Style] = {}
         for text, style, control in segments:
             if style:
-                colorless_style = cache.get(style)
+                cache_key = (style, style.link_id)
+                colorless_style = cache.get(cache_key)
                 if colorless_style is None:
                     colorless_style = style.without_color
-                    cache[style] = colorless_style
+                    cache[cache_key] = colorless_style
                 yield cls(text, colorless_style, control)
             else:
                 yield cls(text, None, control)

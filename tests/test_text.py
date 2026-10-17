@@ -294,6 +294,74 @@ def test_highlight_words():
     assert count == 4
 
 
+@pytest.mark.parametrize("no_color", [False, True])
+def test_highlight_words_preserves_link_in_output(no_color: bool):
+    """Ensure a link with highlighted words is emitted as a single OSC 8 link.
+
+    Regression test for Textualize/rich#3526.
+    """
+    file = StringIO()
+    console = Console(
+        file=file,
+        force_terminal=True,
+        color_system="truecolor",
+        legacy_windows=False,
+        no_color=no_color,
+    )
+    text = Text(
+        "This is a link isn't it",
+        style=console.get_style("green").update_link("https://example.com"),
+    )
+    text.highlight_words(["link"], style="bold")
+    console.print(text)
+
+    links = set(re.findall(r"\x1b\]8;id=([^;]+);([^\x1b]*)\x1b\\", file.getvalue()))
+    assert len(links) == 1
+    [(_, url)] = links
+    assert url == "https://example.com"
+
+
+def test_render_keeps_distinct_links_separate():
+    """Ensure equal styles with distinct links render with distinct link IDs."""
+    first_link = Style(link="https://example.org")
+    second_link = Style(link="https://example.org")
+    text = Text()
+    text.append("first", first_link)
+    text.append(" gap ")
+    text.append("last", second_link)
+
+    link_ids = [
+        segment.style.link_id
+        for segment in text.render(Console())
+        if segment.style and segment.style.link
+    ]
+    assert link_ids == [first_link.link_id, second_link.link_id]
+
+
+@pytest.mark.parametrize("no_color", [False, True])
+def test_render_keeps_distinct_links_separate_in_output(no_color: bool):
+    """Ensure equal styles with distinct links are emitted as separate OSC 8 links."""
+    file = StringIO()
+    console = Console(
+        file=file,
+        force_terminal=True,
+        color_system="truecolor",
+        legacy_windows=False,
+        no_color=no_color,
+    )
+    text = Text()
+    text.append("first", Style(color="red", link="https://example.org"))
+    text.append(" gap ")
+    text.append("last", Style(color="red", link="https://example.org"))
+    console.print(text)
+
+    link_ids = re.findall(
+        r"\x1b\]8;id=([^;]+);https://example\.org\x1b\\", file.getvalue()
+    )
+    assert len(link_ids) == 2
+    assert link_ids[0] != link_ids[1]
+
+
 def test_set_length():
     text = Text("Hello")
     text.set_length(5)

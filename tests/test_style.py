@@ -265,3 +265,55 @@ def test_clear_meta_and_links_clears_hash():
 
     clear_style = style.clear_meta_and_links()
     assert clear_style._hash is None
+
+
+def test_add_distinct_link_ids_for_equal_link_styles():
+    """Regression test for the cache-conflation issue when lru_cache was introduced.
+
+    Two Style(link=...) objects with the same URL are equal by hash and
+    comparison, but carry different _link_id values. Combining each with a base
+    style must yield combined styles with distinct _link_ids; the lru_cache
+    must not cause the second result to inherit the first's _link_id.
+    """
+    s1 = Style(link="https://example.com")
+    s2 = Style(link="https://example.com")
+    assert s1 == s2  # same hash and content
+    assert s1.link_id != s2.link_id  # but distinct link ids
+
+    base = Style(bold=True)
+    assert (base + s1).link_id != (base + s2).link_id
+
+
+def test_add_preserves_link_id_with_identical_meta():
+    """Test that add preserves link_id.
+
+    Two Style.from_meta() calls with identical content share the same hash, so
+    they collide in _add's lru_cache. Each must still produce a combined style
+    that carries its own distinct link_id.
+    """
+    meta = {"click": "something"}
+    s1 = Style.from_meta(meta)
+    s2 = Style.from_meta(meta)
+    assert s1.link_id != s2.link_id  # precondition: distinct ids
+
+    base = Style(color="red")
+    assert (base + s1).link_id == s1.link_id
+    assert (base + s2).link_id == s2.link_id
+
+
+def test_add_distinct_link_ids_with_identical_meta():
+    """Test that adding with distinct link_id's will produce distinct list_id's.
+
+    Regression test for Textualize/textual#1587.
+
+    Two Style.from_meta() calls with identical content produce styles with different
+    _link_id values. Combining each with a base style must keep those ids distinct.
+    The cache must not cause the second result to inherit the first's link_id.
+    """
+    meta = {"click": "something"}
+    s1 = Style.from_meta(meta)
+    s2 = Style.from_meta(meta)
+    assert s1.link_id != s2.link_id  # precondition: distinct ids
+
+    base = Style(color="red")
+    assert (base + s1).link_id != (base + s2).link_id
