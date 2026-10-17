@@ -751,18 +751,20 @@ class Text(JupyterMixin):
         stack_append = stack.append
         stack_pop = stack.remove
 
-        style_cache: Dict[Tuple[Style, ...], Style] = {}
+        # Style equality ignores link_id, so include link_ids in the key
+        style_cache: Dict[Tuple[Tuple[Style, ...], Tuple[str, ...]], Style] = {}
         style_cache_get = style_cache.get
         combine = Style.combine
 
         def get_current_style() -> Style:
             """Construct current style from stack."""
             styles = tuple(style_map[_style_id] for _style_id in sorted(stack))
-            cached_style = style_cache_get(styles)
+            cache_key = (styles, tuple(style.link_id for style in styles))
+            cached_style = style_cache_get(cache_key)
             if cached_style is not None:
                 return cached_style
             current_style = combine(styles)
-            style_cache[styles] = current_style
+            style_cache[cache_key] = current_style
             return current_style
 
         for (offset, leaving, style_id), (next_offset, _, _) in zip(spans, spans[1:]):
