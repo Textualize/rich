@@ -10,18 +10,36 @@ from typing import Any
 windll: Any = None
 if sys.platform == "win32":
     windll = ctypes.LibraryLoader(ctypes.WinDLL)
+    # `type: ignore` is needed only on Windows and mypy reports unused-ignore when not in an if
+    try:
+        STDOUT_FILENO = sys.__stdout__.fileno()  # type: ignore[union-attr]
+    except Exception:
+        STDOUT_FILENO = 1
+    try:
+        STDERR_FILENO = sys.__stderr__.fileno()  # type: ignore[union-attr]
+    except Exception:
+        STDERR_FILENO = 2
 else:
+    # mypy does not realize that anything past the raise is unreachable and reports undefined name
+    STDOUT_FILENO = 1
+    STDERR_FILENO = 2
     raise ImportError(f"{__name__} can only be imported on Windows")
 
 import time
 from ctypes import Structure, byref, wintypes
 from typing import IO, NamedTuple, Type, cast
 
+from rich._fileno import get_fileno
 from rich.color import ColorSystem
 from rich.style import Style
 
 STDOUT = -11
+STDERR = -12
 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4
+FILENO_TO_HANDLE = {
+    STDOUT_FILENO: STDOUT,
+    STDERR_FILENO: STDERR,
+}
 
 COORD = wintypes._COORD
 
@@ -360,7 +378,7 @@ class LegacyWindowsTerm:
     ]
 
     def __init__(self, file: "IO[str]") -> None:
-        handle = GetStdHandle(STDOUT)
+        handle = GetStdHandle(FILENO_TO_HANDLE.get(get_fileno(file), STDOUT))
         self._handle = handle
         default_text = GetConsoleScreenBufferInfo(handle).wAttributes
         self._default_text = default_text
