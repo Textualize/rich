@@ -560,21 +560,27 @@ class RenderHook(ABC):
         """
 
 
-_windows_console_features: Optional["WindowsConsoleFeatures"] = None
+_windows_console_features: Dict[int, "WindowsConsoleFeatures"] = {}
 
 
 def get_windows_console_features(
     file: Optional[IO[str]] = None,
 ) -> "WindowsConsoleFeatures":  # pragma: no cover
+    fileno = get_fileno(file) if file is not None else None
+    # Normalize to the only two streams that we can get Windows console features from
+    # so that our `_windows_console_features` cache works correctly.
+    # This is equivalent to what _windows.get_windows_console_features() does.
+    std_fileno = _STDERR_FILENO if fileno == _STDERR_FILENO else _STDOUT_FILENO
+
     global _windows_console_features
-    if _windows_console_features is not None:
-        return _windows_console_features
+    features = _windows_console_features.get(std_fileno)
+    if features is not None:
+        return features
     from ._windows import get_windows_console_features
 
-    fileno = get_fileno(file) if file is not None else None
-
-    _windows_console_features = get_windows_console_features(fileno)
-    return _windows_console_features
+    features = get_windows_console_features(std_fileno)
+    _windows_console_features[std_fileno] = features
+    return features
 
 
 def detect_legacy_windows(file: Optional[IO[str]] = None) -> bool:
