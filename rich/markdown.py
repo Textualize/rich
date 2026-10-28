@@ -144,23 +144,23 @@ class Heading(TextElement):
 
     @classmethod
     def create(cls, markdown: Markdown, token: Token) -> Heading:
-        return cls(token.tag)
+        return cls(token.tag, justify=markdown.justify_headers)
 
     def on_enter(self, context: MarkdownContext) -> None:
         self.text = Text()
         context.enter_style(self.style_name)
 
-    def __init__(self, tag: str) -> None:
+    def __init__(self, tag: str, justify: JustifyMethod | None = None) -> None:
         self.tag = tag
         self.style_name = f"markdown.{tag}"
+        self.justify = justify
         super().__init__()
 
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         text = self.text.copy()
-        heading_justify = self.LEVEL_ALIGN.get(self.tag, "left")
-        text.justify = heading_justify
+        text.justify = self.justify or self.LEVEL_ALIGN.get(self.tag, "left")
         yield text
 
 
@@ -523,6 +523,8 @@ class Markdown(JupyterMixin):
             enabled. Defaults to None.
         inline_code_theme: (Optional[str], optional): Pygments theme for inline code
             highlighting, or None for no highlighting. Defaults to None.
+        justify_headers (JustifyMethod, optional): Justify value for headers. Keyword-only.
+            Defaults to None.
     """
 
     elements: ClassVar[dict[str, type[MarkdownElement]]] = {
@@ -555,12 +557,15 @@ class Markdown(JupyterMixin):
         hyperlinks: bool = True,
         inline_code_lexer: str | None = None,
         inline_code_theme: str | None = None,
+        *,
+        justify_headers: JustifyMethod | None = None,
     ) -> None:
         parser = MarkdownIt().enable("strikethrough").enable("table")
         self.markup = markup
         self.parsed = parser.parse(markup)
         self.code_theme = code_theme
         self.justify: JustifyMethod | None = justify
+        self.justify_headers: JustifyMethod | None = justify_headers
         self.style = style
         self.hyperlinks = hyperlinks
         self.inline_code_lexer = inline_code_lexer
