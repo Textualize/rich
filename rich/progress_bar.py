@@ -1,7 +1,7 @@
 import math
 from functools import lru_cache
 from time import monotonic
-from typing import Iterable, List, Optional
+from typing import Iterable
 
 from .color import Color, blend_rgb
 from .color_triplet import ColorTriplet
@@ -27,20 +27,20 @@ class ProgressBar(JupyterMixin):
         complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.finished".
         pulse_style (StyleType, optional): Style for pulsing bars. Defaults to "bar.pulse".
-        animation_time (Optional[float], optional): Time in seconds to use for animation, or None to use system time.
+        animation_time (float | None, optional): Time in seconds to use for animation, or None to use system time.
     """
 
     def __init__(
         self,
-        total: Optional[float] = 100.0,
+        total: float | None = 100.0,
         completed: float = 0,
-        width: Optional[int] = None,
+        width: int | None = None,
         pulse: bool = False,
         style: StyleType = "bar.back",
         complete_style: StyleType = "bar.complete",
         finished_style: StyleType = "bar.finished",
         pulse_style: StyleType = "bar.pulse",
-        animation_time: Optional[float] = None,
+        animation_time: float | None = None,
     ):
         self.total = total
         self.completed = completed
@@ -52,13 +52,13 @@ class ProgressBar(JupyterMixin):
         self.pulse_style = pulse_style
         self.animation_time = animation_time
 
-        self._pulse_segments: Optional[List[Segment]] = None
+        self._pulse_segments: list[Segment] | None = None
 
     def __repr__(self) -> str:
         return f"<Bar {self.completed!r} of {self.total!r}>"
 
     @property
-    def percentage_completed(self) -> Optional[float]:
+    def percentage_completed(self) -> float | None:
         """Calculate percentage complete."""
         if self.total is None:
             return None
@@ -74,14 +74,14 @@ class ProgressBar(JupyterMixin):
         color_system: str,
         no_color: bool,
         ascii: bool = False,
-    ) -> List[Segment]:
+    ) -> list[Segment]:
         """Get a list of segments to render a pulse animation.
 
         Returns:
-            List[Segment]: A list of segments, one segment per character.
+            list[Segment]: A list of segments, one segment per character.
         """
         bar = "-" if ascii else "━"
-        segments: List[Segment] = []
+        segments: list[Segment] = []
         if color_system not in ("standard", "eight_bit", "truecolor") or no_color:
             segments += [Segment(bar, fore_style)] * (PULSE_SIZE // 2)
             segments += [Segment(" " if no_color else bar, back_style)] * (
@@ -113,7 +113,7 @@ class ProgressBar(JupyterMixin):
             append(_Segment(bar, _Style(color=from_triplet(color))))
         return segments
 
-    def update(self, completed: float, total: Optional[float] = None) -> None:
+    def update(self, completed: float, total: float | None = None) -> None:
         """Update progress with new values.
 
         Args:
@@ -163,7 +163,7 @@ class ProgressBar(JupyterMixin):
             yield from self._render_pulse(console, width, ascii=ascii)
             return
 
-        completed: Optional[float] = (
+        completed: float | None = (
             min(self.total, max(0, self.completed)) if self.total is not None else None
         )
 

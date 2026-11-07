@@ -1,6 +1,6 @@
 import inspect
 from inspect import cleandoc, getdoc, getfile, isclass, ismodule, signature
-from typing import Any, Collection, Iterable, Optional, Tuple, Type, Union
+from typing import Any, Collection, Iterable
 
 from .console import Group, RenderableType
 from .control import escape_control_codes
@@ -38,7 +38,7 @@ class Inspect(JupyterMixin):
         self,
         obj: Any,
         *,
-        title: Optional[TextType] = None,
+        title: TextType | None = None,
         help: bool = False,
         methods: bool = False,
         docs: bool = True,
@@ -79,7 +79,7 @@ class Inspect(JupyterMixin):
             padding=(0, 1),
         )
 
-    def _get_signature(self, name: str, obj: Any) -> Optional[Text]:
+    def _get_signature(self, name: str, obj: Any) -> Text | None:
         """Get a signature for a callable."""
         try:
             _signature = str(signature(obj)) + ":"
@@ -88,7 +88,7 @@ class Inspect(JupyterMixin):
         except TypeError:
             return None
 
-        source_filename: Optional[str] = None
+        source_filename: str | None = None
         try:
             source_filename = getfile(obj)
         except (OSError, TypeError):
@@ -125,11 +125,11 @@ class Inspect(JupyterMixin):
     def _render(self) -> Iterable[RenderableType]:
         """Render object."""
 
-        def sort_items(item: Tuple[str, Any]) -> Tuple[bool, str]:
+        def sort_items(item: tuple[str, Any]) -> tuple[bool, str]:
             key, (_error, value) = item
             return (callable(value), key.strip("_").lower())
 
-        def safe_getattr(attr_name: str) -> Tuple[Any, Any]:
+        def safe_getattr(attr_name: str) -> tuple[Any, Any]:
             """Get attribute or any exception."""
             try:
                 return (None, getattr(obj, attr_name))
@@ -215,7 +215,7 @@ class Inspect(JupyterMixin):
                 f"Run [b][magenta]inspect[/]([not b]inspect[/])[/b] for options."
             )
 
-    def _get_formatted_doc(self, object_: Any) -> Optional[str]:
+    def _get_formatted_doc(self, object_: Any) -> str | None:
         """
         Extract the docstring of an object, process it and returns it.
         The processing consists in cleaning up the docstring's indentation,
@@ -226,7 +226,7 @@ class Inspect(JupyterMixin):
             object_ (Any): the object to get the docstring from.
 
         Returns:
-            Optional[str]: the processed docstring, or None if no docstring was found.
+            str | None: the processed docstring, or None if no docstring was found.
         """
         docs = getdoc(object_)
         if docs is None:
@@ -237,7 +237,7 @@ class Inspect(JupyterMixin):
         return escape_control_codes(docs)
 
 
-def get_object_types_mro(obj: Union[object, Type[Any]]) -> Tuple[type, ...]:
+def get_object_types_mro(obj: object | type[Any]) -> tuple[type, ...]:
     """Returns the MRO of an object's class, or of the object itself if it's a class."""
     if not hasattr(obj, "__mro__"):
         # N.B. we cannot use `if type(obj) is type` here because it doesn't work with

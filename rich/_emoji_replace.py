@@ -1,5 +1,5 @@
 import re
-from typing import Callable, Match, Optional
+from typing import Callable, Match
 
 _ReStringMatch = Match[str]  # regex match object
 _ReSubCallable = Callable[[_ReStringMatch], str]  # Callable invoked by re.sub
@@ -8,7 +8,7 @@ _EmojiSubMethod = Callable[[_ReSubCallable, str], str]  # Sub method of a compil
 
 def _emoji_replace(
     text: str,
-    default_variant: Optional[str] = None,
+    default_variant: str | None = None,
     _emoji_sub: _EmojiSubMethod = re.compile(r"(:(\S*?)(?:(?:\-)(emoji|text))?:)").sub,
 ) -> str:
     """Replace emoji code in text."""

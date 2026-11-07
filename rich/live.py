@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 from threading import Event, RLock, Thread
 from types import TracebackType
-from typing import IO, TYPE_CHECKING, Any, Callable, List, Optional, TextIO, Type, cast
+from typing import IO, TYPE_CHECKING, Any, Callable, TextIO, cast
 
 from . import get_console
 from .console import Console, ConsoleRenderable, Group, RenderableType, RenderHook
@@ -56,9 +56,9 @@ class Live(JupyterMixin, RenderHook):
 
     def __init__(
         self,
-        renderable: Optional[RenderableType] = None,
+        renderable: RenderableType | None = None,
         *,
-        console: Optional[Console] = None,
+        console: Console | None = None,
         screen: bool = False,
         auto_refresh: bool = True,
         refresh_per_second: float = 4,
@@ -66,7 +66,7 @@ class Live(JupyterMixin, RenderHook):
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
         vertical_overflow: VerticalOverflowMethod = "ellipsis",
-        get_renderable: Optional[Callable[[], RenderableType]] = None,
+        get_renderable: Callable[[], RenderableType] | None = None,
     ) -> None:
         assert refresh_per_second > 0, "refresh_per_second must be > 0"
         self._renderable = renderable
@@ -76,16 +76,16 @@ class Live(JupyterMixin, RenderHook):
 
         self._redirect_stdout = redirect_stdout
         self._redirect_stderr = redirect_stderr
-        self._restore_stdout: Optional[IO[str]] = None
-        self._restore_stderr: Optional[IO[str]] = None
+        self._restore_stdout: IO[str] | None = None
+        self._restore_stderr: IO[str] | None = None
 
         self._lock = RLock()
-        self.ipy_widget: Optional[Any] = None
+        self.ipy_widget: Any | None = None
         self.auto_refresh = auto_refresh
         self._started: bool = False
         self.transient = True if screen else transient
 
-        self._refresh_thread: Optional[_RefreshThread] = None
+        self._refresh_thread: _RefreshThread | None = None
         self.refresh_per_second = refresh_per_second
 
         self.vertical_overflow = vertical_overflow
@@ -186,9 +186,9 @@ class Live(JupyterMixin, RenderHook):
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         self.stop()
 
@@ -276,8 +276,8 @@ class Live(JupyterMixin, RenderHook):
                     self.console.print(Control())
 
     def process_renderables(
-        self, renderables: List[ConsoleRenderable]
-    ) -> List[ConsoleRenderable]:
+        self, renderables: list[ConsoleRenderable]
+    ) -> list[ConsoleRenderable]:
         """Process renderables to restore cursor and display progress."""
         self._live_render.vertical_overflow = self.vertical_overflow
         if self.console.is_interactive:
@@ -301,7 +301,6 @@ if __name__ == "__main__":  # pragma: no cover
     import random
     import time
     from itertools import cycle
-    from typing import Dict, List, Tuple
 
     from .align import Align
     from .console import Console
@@ -369,7 +368,7 @@ if __name__ == "__main__":  # pragma: no cover
         "VND",
     ]
     with Live(console=console) as live_table:
-        exchange_rate_dict: Dict[Tuple[str, str], float] = {}
+        exchange_rate_dict: dict[tuple[str, str], float] = {}
 
         for index in range(100):
             select_exchange = exchanges[index % len(exchanges)]

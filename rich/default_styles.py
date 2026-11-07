@@ -1,8 +1,6 @@
-from typing import Dict
-
 from .style import Style
 
-DEFAULT_STYLES: Dict[str, Style] = {
+DEFAULT_STYLES: dict[str, Style] = {
     "none": Style.null(),
     "reset": Style(
         color="default",

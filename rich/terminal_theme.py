@@ -1,19 +1,17 @@
-from typing import List, Optional, Tuple
-
 from .color_triplet import ColorTriplet
 from .palette import Palette
 
-_ColorTuple = Tuple[int, int, int]
+_ColorTuple = tuple[int, int, int]
 
 
 class TerminalTheme:
     """A color theme used when exporting console content.
 
     Args:
-        background (Tuple[int, int, int]): The background color.
-        foreground (Tuple[int, int, int]): The foreground (text) color.
-        normal (List[Tuple[int, int, int]]): A list of 8 normal intensity colors.
-        bright (List[Tuple[int, int, int]], optional): A list of 8 bright colors, or None
+        background (tuple[int, int, int]): The background color.
+        foreground (tuple[int, int, int]): The foreground (text) color.
+        normal (list[tuple[int, int, int]]): A list of 8 normal intensity colors.
+        bright (list[tuple[int, int, int]], optional): A list of 8 bright colors, or None
             to repeat normal intensity. Defaults to None.
     """
 
@@ -21,8 +19,8 @@ class TerminalTheme:
         self,
         background: _ColorTuple,
         foreground: _ColorTuple,
-        normal: List[_ColorTuple],
-        bright: Optional[List[_ColorTuple]] = None,
+        normal: list[_ColorTuple],
+        bright: list[_ColorTuple] | None = None,
     ) -> None:
         self.background_color = ColorTriplet(*background)
         self.foreground_color = ColorTriplet(*foreground)

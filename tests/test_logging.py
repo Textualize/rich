@@ -1,7 +1,6 @@
 import io
-import os
 import logging
-from typing import Optional
+import os
 
 import pytest
 
@@ -101,7 +100,7 @@ def test_stderr_and_stdout_are_none(monkeypatch):
 
     console = Console(_environ={})
     target_handler = RichHandler(console=console)
-    actual_record: Optional[logging.LogRecord] = None
+    actual_record: logging.LogRecord | None = None
 
     def mock_handle_error(record):
         nonlocal actual_record

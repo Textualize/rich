@@ -1,7 +1,6 @@
 import io
 import re
 import sys
-from typing import List
 
 import pytest
 
@@ -305,7 +304,7 @@ def test_suppress():
 def test_rich_traceback_omit_optional_local_flag(
     rich_traceback_omit_for_level2: bool,
     expected_frames_length: int,
-    expected_frame_names: List[str],
+    expected_frame_names: list[str],
 ):
     def level1():
         return level2()

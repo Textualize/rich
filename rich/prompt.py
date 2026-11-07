@@ -1,4 +1,4 @@
-from typing import Any, Generic, List, Optional, TextIO, TypeVar, Union, overload
+from typing import Any, Generic, TextIO, TypeVar, overload
 
 from . import get_console
 from .console import Console
@@ -17,7 +17,7 @@ class InvalidResponse(PromptError):
     and provide an error message.
 
     Args:
-        message (Union[str, Text]): Error message.
+        message (str | Text): Error message.
     """
 
     def __init__(self, message: TextType) -> None:
@@ -35,7 +35,7 @@ class PromptBase(Generic[PromptType]):
         prompt (TextType, optional): Prompt text. Defaults to "".
         console (Console, optional): A Console instance or None to use global console. Defaults to None.
         password (bool, optional): Enable password input. Defaults to False.
-        choices (List[str], optional): A list of valid choices. Defaults to None.
+        choices (list[str], optional): A list of valid choices. Defaults to None.
         case_sensitive (bool, optional): Matching of choices should be case-sensitive. Defaults to True.
         show_default (bool, optional): Show default in prompt. Defaults to True.
         show_choices (bool, optional): Show choices in prompt. Defaults to True.
@@ -49,15 +49,15 @@ class PromptBase(Generic[PromptType]):
     )
     prompt_suffix = ": "
 
-    choices: Optional[List[str]] = None
+    choices: list[str] | None = None
 
     def __init__(
         self,
         prompt: TextType = "",
         *,
-        console: Optional[Console] = None,
+        console: Console | None = None,
         password: bool = False,
-        choices: Optional[List[str]] = None,
+        choices: list[str] | None = None,
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
@@ -81,15 +81,15 @@ class PromptBase(Generic[PromptType]):
         cls,
         prompt: TextType = "",
         *,
-        console: Optional[Console] = None,
+        console: Console | None = None,
         password: bool = False,
-        choices: Optional[List[str]] = None,
+        choices: list[str] | None = None,
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
         default: DefaultType,
-        stream: Optional[TextIO] = None,
-    ) -> Union[DefaultType, PromptType]: ...
+        stream: TextIO | None = None,
+    ) -> DefaultType | PromptType: ...
 
     @classmethod
     @overload
@@ -97,13 +97,13 @@ class PromptBase(Generic[PromptType]):
         cls,
         prompt: TextType = "",
         *,
-        console: Optional[Console] = None,
+        console: Console | None = None,
         password: bool = False,
-        choices: Optional[List[str]] = None,
+        choices: list[str] | None = None,
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
-        stream: Optional[TextIO] = None,
+        stream: TextIO | None = None,
     ) -> PromptType: ...
 
     @classmethod
@@ -111,14 +111,14 @@ class PromptBase(Generic[PromptType]):
         cls,
         prompt: TextType = "",
         *,
-        console: Optional[Console] = None,
+        console: Console | None = None,
         password: bool = False,
-        choices: Optional[List[str]] = None,
+        choices: list[str] | None = None,
         case_sensitive: bool = True,
         show_default: bool = True,
         show_choices: bool = True,
         default: Any = ...,
-        stream: Optional[TextIO] = None,
+        stream: TextIO | None = None,
     ) -> Any:
         """Shortcut to construct and run a prompt loop and return the result.
 
@@ -129,7 +129,7 @@ class PromptBase(Generic[PromptType]):
             prompt (TextType, optional): Prompt text. Defaults to "".
             console (Console, optional): A Console instance or None to use global console. Defaults to None.
             password (bool, optional): Enable password input. Defaults to False.
-            choices (List[str], optional): A list of valid choices. Defaults to None.
+            choices (list[str], optional): A list of valid choices. Defaults to None.
             case_sensitive (bool, optional): Matching of choices should be case-sensitive. Defaults to True.
             show_default (bool, optional): Show default in prompt. Defaults to True.
             show_choices (bool, optional): Show choices in prompt. Defaults to True.
@@ -194,7 +194,7 @@ class PromptBase(Generic[PromptType]):
         console: Console,
         prompt: TextType,
         password: bool,
-        stream: Optional[TextIO] = None,
+        stream: TextIO | None = None,
     ) -> str:
         """Get input from user.
 
@@ -266,14 +266,14 @@ class PromptBase(Generic[PromptType]):
         """Hook to display something before the prompt."""
 
     @overload
-    def __call__(self, *, stream: Optional[TextIO] = None) -> PromptType: ...
+    def __call__(self, *, stream: TextIO | None = None) -> PromptType: ...
 
     @overload
     def __call__(
-        self, *, default: DefaultType, stream: Optional[TextIO] = None
-    ) -> Union[PromptType, DefaultType]: ...
+        self, *, default: DefaultType, stream: TextIO | None = None
+    ) -> PromptType | DefaultType: ...
 
-    def __call__(self, *, default: Any = ..., stream: Optional[TextIO] = None) -> Any:
+    def __call__(self, *, default: Any = ..., stream: TextIO | None = None) -> Any:
         """Run the prompt loop.
 
         Args:
@@ -344,7 +344,7 @@ class Confirm(PromptBase[bool]):
 
     response_type = bool
     validate_error_message = "[prompt.invalid]Please enter Y or N"
-    choices: List[str] = ["y", "n"]
+    choices: list[str] = ["y", "n"]
 
     def render_default(self, default: DefaultType) -> Text:
         """Render the default as (y) or (n) rather than True/False."""

@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import TYPE_CHECKING, Iterable, Optional, Literal
+from typing import TYPE_CHECKING, Iterable, Literal
 
 from .constrain import Constrain
 from .jupyter import JupyterMixin
@@ -21,7 +21,7 @@ class Align(JupyterMixin):
         renderable (RenderableType): A console renderable.
         align (AlignMethod): One of "left", "center", or "right""
         style (StyleType, optional): An optional style to apply to the background.
-        vertical (Optional[VerticalAlignMethod], optional): Optional vertical align, one of "top", "middle", or "bottom". Defaults to None.
+        vertical (VerticalAlignMethod | None, optional): Optional vertical align, one of "top", "middle", or "bottom". Defaults to None.
         pad (bool, optional): Pad the right with spaces. Defaults to True.
         width (int, optional): Restrict contents to given width, or None to use default width. Defaults to None.
         height (int, optional): Set height of align renderable, or None to fit to contents. Defaults to None.
@@ -48,12 +48,12 @@ class Align(JupyterMixin):
         self,
         renderable: "RenderableType",
         align: AlignMethod = "left",
-        style: Optional[StyleType] = None,
+        style: StyleType | None = None,
         *,
-        vertical: Optional[VerticalAlignMethod] = None,
+        vertical: VerticalAlignMethod | None = None,
         pad: bool = True,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
+        width: int | None = None,
+        height: int | None = None,
     ) -> None:
         if align not in ("left", "center", "right"):
             raise ValueError(
@@ -78,12 +78,12 @@ class Align(JupyterMixin):
     def left(
         cls,
         renderable: "RenderableType",
-        style: Optional[StyleType] = None,
+        style: StyleType | None = None,
         *,
-        vertical: Optional[VerticalAlignMethod] = None,
+        vertical: VerticalAlignMethod | None = None,
         pad: bool = True,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
+        width: int | None = None,
+        height: int | None = None,
     ) -> "Align":
         """Align a renderable to the left."""
         return cls(
@@ -100,12 +100,12 @@ class Align(JupyterMixin):
     def center(
         cls,
         renderable: "RenderableType",
-        style: Optional[StyleType] = None,
+        style: StyleType | None = None,
         *,
-        vertical: Optional[VerticalAlignMethod] = None,
+        vertical: VerticalAlignMethod | None = None,
         pad: bool = True,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
+        width: int | None = None,
+        height: int | None = None,
     ) -> "Align":
         """Align a renderable to the center."""
         return cls(
@@ -122,12 +122,12 @@ class Align(JupyterMixin):
     def right(
         cls,
         renderable: "RenderableType",
-        style: Optional[StyleType] = None,
+        style: StyleType | None = None,
         *,
-        vertical: Optional[VerticalAlignMethod] = None,
+        vertical: VerticalAlignMethod | None = None,
         pad: bool = True,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
+        width: int | None = None,
+        height: int | None = None,
     ) -> "Align":
         """Align a renderable to the right."""
         return cls(
@@ -254,7 +254,7 @@ class VerticalCenter(JupyterMixin):
     def __init__(
         self,
         renderable: "RenderableType",
-        style: Optional[StyleType] = None,
+        style: StyleType | None = None,
     ) -> None:
         self.renderable = renderable
         self.style = style

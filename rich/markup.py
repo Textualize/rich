@@ -1,7 +1,7 @@
 import re
 from ast import literal_eval
 from operator import attrgetter
-from typing import Callable, Iterable, List, Match, NamedTuple, Optional, Tuple, Union
+from typing import Callable, Iterable, Match, NamedTuple
 
 from ._emoji_replace import _emoji_replace
 from .emoji import EmojiVariant
@@ -22,7 +22,7 @@ class Tag(NamedTuple):
 
     name: str
     """The tag name. e.g. 'bold'."""
-    parameters: Optional[str]
+    parameters: str | None
     """Any additional parameters after the name."""
 
     def __str__(self) -> str:
@@ -70,7 +70,7 @@ def escape(
     return markup
 
 
-def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
+def _parse(markup: str) -> Iterable[tuple[int, str | None, Tag | None]]:
     """Parse markup in to an iterable of tuples of (position, text, tag).
 
     Args:
@@ -105,15 +105,15 @@ def _parse(markup: str) -> Iterable[Tuple[int, Optional[str], Optional[Tag]]]:
 
 def render(
     markup: str,
-    style: Union[str, Style] = "",
+    style: str | Style = "",
     emoji: bool = True,
-    emoji_variant: Optional[EmojiVariant] = None,
+    emoji_variant: EmojiVariant | None = None,
 ) -> Text:
     """Render console markup in to a Text instance.
 
     Args:
         markup (str): A string containing console markup.
-        style: (Union[str, Style]): The style to use.
+        style: (str | Style): The style to use.
         emoji (bool, optional): Also render emoji code. Defaults to True.
         emoji_variant (str, optional): Optional emoji variant, either "text" or "emoji". Defaults to None.
 
@@ -134,16 +134,16 @@ def render(
     append = text.append
     normalize = Style.normalize
 
-    style_stack: List[Tuple[int, Tag]] = []
+    style_stack: list[tuple[int, Tag]] = []
     pop = style_stack.pop
 
-    spans: List[Span] = []
+    spans: list[Span] = []
     append_span = spans.append
 
     _Span = Span
     _Tag = Tag
 
-    def pop_style(style_name: str) -> Tuple[int, Tag]:
+    def pop_style(style_name: str) -> tuple[int, Tag]:
         """Pop tag matching given style name."""
         for index, (_, tag) in enumerate(reversed(style_stack), 1):
             if tag.name == style_name:

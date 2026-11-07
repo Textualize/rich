@@ -1,4 +1,4 @@
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from .jupyter import JupyterMixin
 from .measure import Measurement
@@ -15,7 +15,7 @@ class Constrain(JupyterMixin):
         width (int, optional): The maximum width (in characters) to render. Defaults to 80.
     """
 
-    def __init__(self, renderable: "RenderableType", width: Optional[int] = 80) -> None:
+    def __init__(self, renderable: "RenderableType", width: int | None = 80) -> None:
         self.renderable = renderable
         self.width = width
 

@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 from logging import Handler, LogRecord
 from types import ModuleType
-from typing import TYPE_CHECKING, ClassVar, Iterable, List, Optional, Type, Union
+from typing import TYPE_CHECKING, ClassVar, Iterable
 
 if TYPE_CHECKING:
     from ._log_render import FormatTimeCallable
@@ -30,7 +30,7 @@ class RichHandler(Handler):
         under your control. If a dependency writes messages containing square brackets, it may not produce the intended output.
 
     Args:
-        level (Union[int, str], optional): Log level. Defaults to logging.NOTSET.
+        level (int | str, optional): Log level. Defaults to logging.NOTSET.
         console (:class:`~rich.console.Console`, optional): Optional console instance to write logs.
             Default will use a global console instance writing to stdout.
         show_time (bool, optional): Show a column for the time. Defaults to True.
@@ -41,22 +41,22 @@ class RichHandler(Handler):
         highlighter (Highlighter, optional): Highlighter to style log messages, or None to use ReprHighlighter. Defaults to None.
         markup (bool, optional): Enable console markup in log messages. Defaults to False.
         rich_tracebacks (bool, optional): Enable rich tracebacks with syntax highlighting and formatting. Defaults to False.
-        tracebacks_width (Optional[int], optional): Number of characters used to render tracebacks, or None for full width. Defaults to None.
+        tracebacks_width (int | None, optional): Number of characters used to render tracebacks, or None for full width. Defaults to None.
         tracebacks_code_width (int, optional): Number of code characters used to render tracebacks, or None for full width. Defaults to 88.
         tracebacks_extra_lines (int, optional): Additional lines of code to render tracebacks, or None for full width. Defaults to None.
         tracebacks_theme (str, optional): Override pygments theme used in traceback.
         tracebacks_word_wrap (bool, optional): Enable word wrapping of long tracebacks lines. Defaults to True.
         tracebacks_show_locals (bool, optional): Enable display of locals in tracebacks. Defaults to False.
-        tracebacks_suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+        tracebacks_suppress (Sequence[str | ModuleType]): Optional sequence of modules or paths to exclude from traceback.
         tracebacks_max_frames (int, optional): Optional maximum number of frames returned by traceback.
         locals_max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to 10.
         locals_max_string (int, optional): Maximum length of string before truncating, or None to disable. Defaults to 80.
-        log_time_format (Union[str, TimeFormatterCallable], optional): If ``log_time`` is enabled, either string for strftime or callable that formats the time. Defaults to "[%x %X] ".
-        keywords (List[str], optional): List of words to highlight instead of ``RichHandler.KEYWORDS``.
+        log_time_format (str | TimeFormatterCallable, optional): If ``log_time`` is enabled, either string for strftime or callable that formats the time. Defaults to "[%x %X] ".
+        keywords (list[str], optional): List of words to highlight instead of ``RichHandler.KEYWORDS``.
     """
 
-    KEYWORDS: ClassVar[Optional[List[str]]] = [
+    KEYWORDS: ClassVar[list[str] | None] = [
         "GET",
         "POST",
         "HEAD",
@@ -66,33 +66,33 @@ class RichHandler(Handler):
         "TRACE",
         "PATCH",
     ]
-    HIGHLIGHTER_CLASS: ClassVar[Type[Highlighter]] = ReprHighlighter
+    HIGHLIGHTER_CLASS: ClassVar[type[Highlighter]] = ReprHighlighter
 
     def __init__(
         self,
-        level: Union[int, str] = logging.NOTSET,
-        console: Optional[Console] = None,
+        level: int | str = logging.NOTSET,
+        console: Console | None = None,
         *,
         show_time: bool = True,
         omit_repeated_times: bool = True,
         show_level: bool = True,
         show_path: bool = True,
         enable_link_path: bool = True,
-        highlighter: Optional[Highlighter] = None,
+        highlighter: Highlighter | None = None,
         markup: bool = False,
         rich_tracebacks: bool = False,
-        tracebacks_width: Optional[int] = None,
-        tracebacks_code_width: Optional[int] = 88,
+        tracebacks_width: int | None = None,
+        tracebacks_code_width: int | None = 88,
         tracebacks_extra_lines: int = 3,
-        tracebacks_theme: Optional[str] = None,
+        tracebacks_theme: str | None = None,
         tracebacks_word_wrap: bool = True,
         tracebacks_show_locals: bool = False,
-        tracebacks_suppress: Iterable[Union[str, ModuleType]] = (),
+        tracebacks_suppress: Iterable[str | ModuleType] = (),
         tracebacks_max_frames: int = 100,
         locals_max_length: int = 10,
         locals_max_string: int = 80,
-        log_time_format: Union[str, FormatTimeCallable] = "[%x %X]",
-        keywords: Optional[List[str]] = None,
+        log_time_format: str | FormatTimeCallable = "[%x %X]",
+        keywords: list[str] | None = None,
     ) -> None:
         super().__init__(level=level)
         self.console = console or get_console()
@@ -216,14 +216,14 @@ class RichHandler(Handler):
         self,
         *,
         record: LogRecord,
-        traceback: Optional[Traceback],
+        traceback: Traceback | None,
         message_renderable: ConsoleRenderable,
     ) -> ConsoleRenderable:
         """Render log for display.
 
         Args:
             record (LogRecord): logging Record.
-            traceback (Optional[Traceback]): Traceback instance or None for no Traceback.
+            traceback (Traceback | None): Traceback instance or None for no Traceback.
             message_renderable (ConsoleRenderable): Renderable (typically Text) containing log message contents.
 
         Returns:

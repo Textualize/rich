@@ -1,16 +1,14 @@
-from typing import Optional
+from inspect import Parameter
 
 import pytest
 
 import rich.repr
 from rich.console import Console
 
-from inspect import Parameter
-
 
 @rich.repr.auto
 class Foo:
-    def __init__(self, foo: str, bar: Optional[int] = None, egg: int = 1):
+    def __init__(self, foo: str, bar: int | None = None, egg: int = 1):
         self.foo = foo
         self.bar = bar
         self.egg = egg
@@ -24,7 +22,7 @@ class Foo:
 
 @rich.repr.auto
 class Egg:
-    def __init__(self, foo: str, bar: Optional[int] = None, egg: int = 1):
+    def __init__(self, foo: str, bar: int | None = None, egg: int = 1):
         self.foo = foo
         self.bar = bar
         self.egg = egg
@@ -32,7 +30,7 @@ class Egg:
 
 @rich.repr.auto
 class BrokenEgg:
-    def __init__(self, foo: str, *, bar: Optional[int] = None, egg: int = 1):
+    def __init__(self, foo: str, *, bar: int | None = None, egg: int = 1):
         self.foo = foo
         self.fubar = bar
         self.egg = egg
@@ -40,7 +38,7 @@ class BrokenEgg:
 
 @rich.repr.auto(angular=True)
 class AngularEgg:
-    def __init__(self, foo: str, *, bar: Optional[int] = None, egg: int = 1):
+    def __init__(self, foo: str, *, bar: int | None = None, egg: int = 1):
         self.foo = foo
         self.bar = bar
         self.egg = egg

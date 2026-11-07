@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .console import (
@@ -13,7 +13,7 @@ from .measure import Measurement
 from .segment import Segment
 from .style import Style
 
-PaddingDimensions = Union[int, Tuple[int], Tuple[int, int], Tuple[int, int, int, int]]
+PaddingDimensions = int | tuple[int] | tuple[int, int] | tuple[int, int, int, int]
 
 
 class Padding(JupyterMixin):
@@ -24,9 +24,9 @@ class Padding(JupyterMixin):
 
     Args:
         renderable (RenderableType): String or other renderable.
-        pad (Union[int, Tuple[int]]): Padding for top, right, bottom, and left borders.
+        pad (int | tuple[int]): Padding for top, right, bottom, and left borders.
             May be specified with 1, 2, or 4 integers (CSS style).
-        style (Union[str, Style], optional): Style for padding characters. Defaults to "none".
+        style (str | Style, optional): Style for padding characters. Defaults to "none".
         expand (bool, optional): Expand padding to fit available width. Defaults to True.
     """
 
@@ -35,7 +35,7 @@ class Padding(JupyterMixin):
         renderable: "RenderableType",
         pad: "PaddingDimensions" = (0, 0, 0, 0),
         *,
-        style: Union[str, Style] = "none",
+        style: str | Style = "none",
         expand: bool = True,
     ):
         self.renderable = renderable
@@ -58,7 +58,7 @@ class Padding(JupyterMixin):
         return Padding(renderable, pad=(0, 0, 0, level), expand=False)
 
     @staticmethod
-    def unpack(pad: "PaddingDimensions") -> Tuple[int, int, int, int]:
+    def unpack(pad: "PaddingDimensions") -> tuple[int, int, int, int]:
         """Unpack padding specified in CSS style."""
         if isinstance(pad, int):
             return (pad, pad, pad, pad)
@@ -105,7 +105,7 @@ class Padding(JupyterMixin):
             if self.right
             else [_Segment.line()]
         )
-        blank_line: Optional[List[Segment]] = None
+        blank_line: list[Segment] | None = None
         if self.top:
             blank_line = [_Segment(f'{" " * width}\n', style)]
             yield from blank_line * self.top
