@@ -1,4 +1,4 @@
-from typing import Any, cast, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     from rich.console import RenderableType
@@ -26,7 +26,7 @@ def rich_cast(renderable: object) -> "RenderableType":
     """
     from rich.console import RenderableType
 
-    rich_visited_set: Set[type] = set()  # Prevent potential infinite loop
+    rich_visited_set: set[type] = set()  # Prevent potential infinite loop
     while hasattr(renderable, "__rich__") and not isinstance(renderable, type):
         # Detect object which claim to have all the attributes
         if hasattr(renderable, _GIBBERISH):

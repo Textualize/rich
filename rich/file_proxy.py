@@ -1,5 +1,5 @@
 import io
-from typing import IO, TYPE_CHECKING, Any, List
+from typing import IO, TYPE_CHECKING, Any
 
 from .ansi import AnsiDecoder
 from .text import Text
@@ -14,7 +14,7 @@ class FileProxy(io.TextIOBase):
     def __init__(self, console: "Console", file: IO[str]) -> None:
         self.__console = console
         self.__file = file
-        self.__buffer: List[str] = []
+        self.__buffer: list[str] = []
         self.__ansi_decoder = AnsiDecoder()
 
     @property
@@ -29,7 +29,7 @@ class FileProxy(io.TextIOBase):
         if not isinstance(text, str):
             raise TypeError(f"write() argument must be str, not {type(text).__name__}")
         buffer = self.__buffer
-        lines: List[str] = []
+        lines: list[str] = []
         while text:
             line, new_line, text = text.partition("\n")
             if new_line:

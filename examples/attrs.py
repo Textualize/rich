@@ -1,5 +1,3 @@
-from typing import List
-
 try:
     import attr
 except ImportError:
@@ -25,7 +23,7 @@ class Triangle:
 @attr.define
 class Model:
     name: str
-    triangles: List[Triangle] = attr.Factory(list)
+    triangles: list[Triangle] = attr.Factory(list)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Sequence
+from typing import TYPE_CHECKING, Any, Iterable, Sequence
 
 if TYPE_CHECKING:
     from rich.console import ConsoleRenderable
@@ -24,7 +24,7 @@ class JupyterRenderable:
 
     def _repr_mimebundle_(
         self, include: Sequence[str], exclude: Sequence[str], **kwargs: Any
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         data = {"text/plain": self.text, "text/html": self.html}
         if include:
             data = {k: v for (k, v) in data.items() if k in include}
@@ -43,7 +43,7 @@ class JupyterMixin:
         include: Sequence[str],
         exclude: Sequence[str],
         **kwargs: Any,
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         console = get_console()
         segments = list(console.render(self, console.options))
         html = _render_segments(segments)
@@ -61,7 +61,7 @@ def _render_segments(segments: Iterable[Segment]) -> str:
         """Escape html."""
         return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
-    fragments: List[str] = []
+    fragments: list[str] = []
     append_fragment = fragments.append
     theme = DEFAULT_TERMINAL_THEME
     for text, style, control in Segment.simplify(segments):

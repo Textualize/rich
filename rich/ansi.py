@@ -1,7 +1,7 @@
 import re
 import sys
 from contextlib import suppress
-from typing import Iterable, NamedTuple, Optional
+from typing import Iterable, NamedTuple
 
 from .color import Color
 from .style import Style
@@ -21,8 +21,8 @@ class _AnsiToken(NamedTuple):
     """Result of ansi tokenized string."""
 
     plain: str = ""
-    sgr: Optional[str] = ""
-    osc: Optional[str] = ""
+    sgr: str | None = ""
+    osc: str | None = ""
 
 
 def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
@@ -36,8 +36,8 @@ def _ansi_tokenize(ansi_text: str) -> Iterable[_AnsiToken]:
     """
 
     position = 0
-    sgr: Optional[str]
-    osc: Optional[str]
+    sgr: str | None
+    osc: str | None
     for match in re_ansi.finditer(ansi_text):
         start, end = match.span(0)
         osc, sgr = match.groups()

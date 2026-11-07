@@ -1,7 +1,7 @@
 from collections import defaultdict
 from itertools import chain
 from operator import itemgetter
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Iterable
 
 from .align import Align, AlignMethod
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
@@ -30,16 +30,16 @@ class Columns(JupyterMixin):
 
     def __init__(
         self,
-        renderables: Optional[Iterable[RenderableType]] = None,
+        renderables: Iterable[RenderableType] | None = None,
         padding: PaddingDimensions = (0, 1),
         *,
-        width: Optional[int] = None,
+        width: int | None = None,
         expand: bool = False,
         equal: bool = False,
         column_first: bool = False,
         right_to_left: bool = False,
-        align: Optional[AlignMethod] = None,
-        title: Optional[TextType] = None,
+        align: AlignMethod | None = None,
+        title: TextType | None = None,
     ) -> None:
         self.renderables = list(renderables or [])
         self.width = width
@@ -48,7 +48,7 @@ class Columns(JupyterMixin):
         self.equal = equal
         self.column_first = column_first
         self.right_to_left = right_to_left
-        self.align: Optional[AlignMethod] = align
+        self.align: AlignMethod | None = align
         self.title = title
 
     def add_renderable(self, renderable: RenderableType) -> None:
@@ -72,7 +72,7 @@ class Columns(JupyterMixin):
         _top, right, _bottom, left = Padding.unpack(self.padding)
         width_padding = max(left, right)
         max_width = options.max_width
-        widths: Dict[int, int] = defaultdict(int)
+        widths: dict[int, int] = defaultdict(int)
         column_count = len(renderables)
 
         get_measurement = Measurement.get
@@ -85,12 +85,12 @@ class Columns(JupyterMixin):
 
         def iter_renderables(
             column_count: int,
-        ) -> Iterable[Tuple[int, Optional[RenderableType]]]:
+        ) -> Iterable[tuple[int, RenderableType | None]]:
             item_count = len(renderables)
             if self.column_first:
                 width_renderables = list(zip(renderable_widths, renderables))
 
-                column_lengths: List[int] = [item_count // column_count] * column_count
+                column_lengths: list[int] = [item_count // column_count] * column_count
                 for col_no in range(item_count % column_count):
                     column_lengths[col_no] += 1
 

@@ -20,20 +20,13 @@ from typing import (
     BinaryIO,
     Callable,
     ContextManager,
-    Deque,
-    Dict,
     Generic,
     Iterable,
-    List,
     Literal,
     NamedTuple,
     NewType,
-    Optional,
     TextIO,
-    Tuple,
-    Type,
     TypeVar,
-    Union,
 )
 
 if TYPE_CHECKING:
@@ -93,9 +86,9 @@ class _TrackThread(Thread):
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         self.done.set()
         self.join()
@@ -104,12 +97,12 @@ class _TrackThread(Thread):
 def track(
     sequence: Iterable[ProgressType],
     description: str = "Working...",
-    total: Optional[float] = None,
+    total: float | None = None,
     completed: int = 0,
     auto_refresh: bool = True,
-    console: Optional[Console] = None,
+    console: Console | None = None,
     transient: bool = False,
-    get_time: Optional[Callable[[], float]] = None,
+    get_time: Callable[[], float] | None = None,
     refresh_per_second: float = 10,
     style: StyleType = "bar.back",
     complete_style: StyleType = "bar.complete",
@@ -144,7 +137,7 @@ def track(
 
     """
 
-    columns: List["ProgressColumn"] = (
+    columns: list["ProgressColumn"] = (
         [TextColumn("[progress.description]{task.description}")] if description else []
     )
     columns.extend(
@@ -201,9 +194,9 @@ class _Reader(RawIOBase, BinaryIO):
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         self.close()
 
@@ -247,7 +240,7 @@ class _Reader(RawIOBase, BinaryIO):
         self.progress.advance(self.task, advance=len(block))
         return block
 
-    def readinto(self, b: Union[bytearray, memoryview, mmap]):  # type: ignore[no-untyped-def, override]
+    def readinto(self, b: bytearray | memoryview | mmap):  # type: ignore[no-untyped-def, override]
         n = self.handle.readinto(b)  # type: ignore[attr-defined]
         self.progress.advance(self.task, advance=n)
         return n
@@ -257,7 +250,7 @@ class _Reader(RawIOBase, BinaryIO):
         self.progress.advance(self.task, advance=len(line))
         return line
 
-    def readlines(self, hint: int = -1) -> List[bytes]:
+    def readlines(self, hint: int = -1) -> list[bytes]:
         lines = self.handle.readlines(hint)
         self.progress.advance(self.task, advance=sum(map(len, lines)))
         return lines
@@ -295,9 +288,9 @@ class _ReadContext(ContextManager[_I], Generic[_I]):
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         self.progress.stop()
         self.reader.__exit__(exc_type, exc_val, exc_tb)
@@ -309,9 +302,9 @@ def wrap_file(
     *,
     description: str = "Reading...",
     auto_refresh: bool = True,
-    console: Optional[Console] = None,
+    console: Console | None = None,
     transient: bool = False,
-    get_time: Optional[Callable[[], float]] = None,
+    get_time: Callable[[], float] | None = None,
     refresh_per_second: float = 10,
     style: StyleType = "bar.back",
     complete_style: StyleType = "bar.complete",
@@ -322,7 +315,7 @@ def wrap_file(
     """Read bytes from a file while tracking progress.
 
     Args:
-        file (Union[str, PathLike[str], BinaryIO]): The path to the file to read, or a file-like object in binary mode.
+        file (str | PathLike[str] | BinaryIO): The path to the file to read, or a file-like object in binary mode.
         total (int): Total number of bytes to read.
         description (str, optional): Description of task show next to progress bar. Defaults to "Reading".
         auto_refresh (bool, optional): Automatic refresh, disable to force a refresh after each iteration. Default is True.
@@ -339,7 +332,7 @@ def wrap_file(
 
     """
 
-    columns: List["ProgressColumn"] = (
+    columns: list["ProgressColumn"] = (
         [TextColumn("[progress.description]{task.description}")] if description else []
     )
     columns.extend(
@@ -370,19 +363,19 @@ def wrap_file(
 
 @typing.overload
 def open(
-    file: Union[str, "PathLike[str]", bytes],
-    mode: Union[Literal["rt"], Literal["r"]],
+    file: "str | PathLike[str] | bytes",
+    mode: Literal["rt"] | Literal["r"],
     buffering: int = -1,
-    encoding: Optional[str] = None,
-    errors: Optional[str] = None,
-    newline: Optional[str] = None,
+    encoding: str | None = None,
+    errors: str | None = None,
+    newline: str | None = None,
     *,
-    total: Optional[int] = None,
+    total: int | None = None,
     description: str = "Reading...",
     auto_refresh: bool = True,
-    console: Optional[Console] = None,
+    console: Console | None = None,
     transient: bool = False,
-    get_time: Optional[Callable[[], float]] = None,
+    get_time: Callable[[], float] | None = None,
     refresh_per_second: float = 10,
     style: StyleType = "bar.back",
     complete_style: StyleType = "bar.complete",
@@ -395,19 +388,19 @@ def open(
 
 @typing.overload
 def open(
-    file: Union[str, "PathLike[str]", bytes],
+    file: "str | PathLike[str] | bytes",
     mode: Literal["rb"],
     buffering: int = -1,
-    encoding: Optional[str] = None,
-    errors: Optional[str] = None,
-    newline: Optional[str] = None,
+    encoding: str | None = None,
+    errors: str | None = None,
+    newline: str | None = None,
     *,
-    total: Optional[int] = None,
+    total: int | None = None,
     description: str = "Reading...",
     auto_refresh: bool = True,
-    console: Optional[Console] = None,
+    console: Console | None = None,
     transient: bool = False,
-    get_time: Optional[Callable[[], float]] = None,
+    get_time: Callable[[], float] | None = None,
     refresh_per_second: float = 10,
     style: StyleType = "bar.back",
     complete_style: StyleType = "bar.complete",
@@ -419,30 +412,30 @@ def open(
 
 
 def open(
-    file: Union[str, "PathLike[str]", bytes],
-    mode: Union[Literal["rb"], Literal["rt"], Literal["r"]] = "r",
+    file: "str | PathLike[str] | bytes",
+    mode: Literal["rb"] | Literal["rt"] | Literal["r"] = "r",
     buffering: int = -1,
-    encoding: Optional[str] = None,
-    errors: Optional[str] = None,
-    newline: Optional[str] = None,
+    encoding: str | None = None,
+    errors: str | None = None,
+    newline: str | None = None,
     *,
-    total: Optional[int] = None,
+    total: int | None = None,
     description: str = "Reading...",
     auto_refresh: bool = True,
-    console: Optional[Console] = None,
+    console: Console | None = None,
     transient: bool = False,
-    get_time: Optional[Callable[[], float]] = None,
+    get_time: Callable[[], float] | None = None,
     refresh_per_second: float = 10,
     style: StyleType = "bar.back",
     complete_style: StyleType = "bar.complete",
     finished_style: StyleType = "bar.finished",
     pulse_style: StyleType = "bar.pulse",
     disable: bool = False,
-) -> Union[ContextManager[BinaryIO], ContextManager[TextIO]]:
+) -> ContextManager[BinaryIO] | ContextManager[TextIO]:
     """Read bytes from a file while tracking progress.
 
     Args:
-        path (Union[str, PathLike[str], BinaryIO]): The path to the file to read, or a file-like object in binary mode.
+        path (str | PathLike[str] | BinaryIO): The path to the file to read, or a file-like object in binary mode.
         mode (str): The mode to use to open the file. Only supports "r", "rb" or "rt".
         buffering (int): The buffering strategy to use, see :func:`io.open`.
         encoding (str, optional): The encoding to use when reading in text mode, see :func:`io.open`.
@@ -466,7 +459,7 @@ def open(
 
     """
 
-    columns: List["ProgressColumn"] = (
+    columns: list["ProgressColumn"] = (
         [TextColumn("[progress.description]{task.description}")] if description else []
     )
     columns.extend(
@@ -507,12 +500,12 @@ def open(
 class ProgressColumn(ABC):
     """Base class for a widget to use in progress display."""
 
-    max_refresh: Optional[float] = None
+    max_refresh: float | None = None
 
-    def __init__(self, table_column: Optional[Column] = None) -> None:
+    def __init__(self, table_column: Column | None = None) -> None:
         self._table_column = table_column
-        self._renderable_cache: Dict[TaskID, Tuple[float, RenderableType]] = {}
-        self._update_time: Optional[float] = None
+        self._renderable_cache: dict[TaskID, tuple[float, RenderableType]] = {}
+        self._update_time: float | None = None
 
     def get_table_column(self) -> Column:
         """Get a table column, used to build tasks table."""
@@ -554,7 +547,7 @@ class RenderableColumn(ProgressColumn):
     """
 
     def __init__(
-        self, renderable: RenderableType = "", *, table_column: Optional[Column] = None
+        self, renderable: RenderableType = "", *, table_column: Column | None = None
     ):
         self.renderable = renderable
         super().__init__(table_column=table_column)
@@ -576,10 +569,10 @@ class SpinnerColumn(ProgressColumn):
     def __init__(
         self,
         spinner_name: str = "dots",
-        style: Optional[StyleType] = "progress.spinner",
+        style: StyleType | None = "progress.spinner",
         speed: float = 1.0,
         finished_text: TextType = " ",
-        table_column: Optional[Column] = None,
+        table_column: Column | None = None,
     ):
         self.spinner = Spinner(spinner_name, style=style, speed=speed)
         self.finished_text = (
@@ -592,14 +585,14 @@ class SpinnerColumn(ProgressColumn):
     def set_spinner(
         self,
         spinner_name: str,
-        spinner_style: Optional[StyleType] = "progress.spinner",
+        spinner_style: StyleType | None = "progress.spinner",
         speed: float = 1.0,
     ) -> None:
         """Set a new spinner.
 
         Args:
             spinner_name (str): Spinner name, see python -m rich.spinner.
-            spinner_style (Optional[StyleType], optional): Spinner style. Defaults to "progress.spinner".
+            spinner_style (StyleType | None, optional): Spinner style. Defaults to "progress.spinner".
             speed (float, optional): Speed factor of spinner. Defaults to 1.0.
         """
         self.spinner = Spinner(spinner_name, style=spinner_style, speed=speed)
@@ -622,8 +615,8 @@ class TextColumn(ProgressColumn):
         style: StyleType = "none",
         justify: JustifyMethod = "left",
         markup: bool = True,
-        highlighter: Optional[Highlighter] = None,
-        table_column: Optional[Column] = None,
+        highlighter: Highlighter | None = None,
+        table_column: Column | None = None,
     ) -> None:
         self.text_format = text_format
         self.justify: JustifyMethod = justify
@@ -647,7 +640,7 @@ class BarColumn(ProgressColumn):
     """Renders a visual progress bar.
 
     Args:
-        bar_width (Optional[int], optional): Width of bar or None for full width. Defaults to 40.
+        bar_width (int | None, optional): Width of bar or None for full width. Defaults to 40.
         style (StyleType, optional): Style for the bar background. Defaults to "bar.back".
         complete_style (StyleType, optional): Style for the completed bar. Defaults to "bar.complete".
         finished_style (StyleType, optional): Style for a finished bar. Defaults to "bar.finished".
@@ -656,12 +649,12 @@ class BarColumn(ProgressColumn):
 
     def __init__(
         self,
-        bar_width: Optional[int] = 40,
+        bar_width: int | None = 40,
         style: StyleType = "bar.back",
         complete_style: StyleType = "bar.complete",
         finished_style: StyleType = "bar.finished",
         pulse_style: StyleType = "bar.pulse",
-        table_column: Optional[Column] = None,
+        table_column: Column | None = None,
     ) -> None:
         self.bar_width = bar_width
         self.style = style
@@ -706,8 +699,8 @@ class TaskProgressColumn(TextColumn):
         style (StyleType, optional): Style of output. Defaults to "none".
         justify (JustifyMethod, optional): Text justification. Defaults to "left".
         markup (bool, optional): Enable markup. Defaults to True.
-        highlighter (Optional[Highlighter], optional): Highlighter to apply to output. Defaults to None.
-        table_column (Optional[Column], optional): Table Column to use. Defaults to None.
+        highlighter (Highlighter | None, optional): Highlighter to apply to output. Defaults to None.
+        table_column (Column | None, optional): Table Column to use. Defaults to None.
         show_speed (bool, optional): Show speed if total is unknown. Defaults to False.
     """
 
@@ -718,8 +711,8 @@ class TaskProgressColumn(TextColumn):
         style: StyleType = "none",
         justify: JustifyMethod = "left",
         markup: bool = True,
-        highlighter: Optional[Highlighter] = None,
-        table_column: Optional[Column] = None,
+        highlighter: Highlighter | None = None,
+        table_column: Column | None = None,
         show_speed: bool = False,
     ) -> None:
         self.text_format_no_percentage = text_format_no_percentage
@@ -734,7 +727,7 @@ class TaskProgressColumn(TextColumn):
         )
 
     @classmethod
-    def render_speed(cls, speed: Optional[float]) -> Text:
+    def render_speed(cls, speed: float | None) -> Text:
         """Render the speed in iterations per second.
 
         Args:
@@ -784,7 +777,7 @@ class TimeRemainingColumn(ProgressColumn):
         self,
         compact: bool = False,
         elapsed_when_finished: bool = False,
-        table_column: Optional[Column] = None,
+        table_column: Column | None = None,
     ):
         self.compact = compact
         self.elapsed_when_finished = elapsed_when_finished
@@ -847,7 +840,7 @@ class MofNCompleteColumn(ProgressColumn):
         separator (str, optional): Text to separate completed and total values. Defaults to "/".
     """
 
-    def __init__(self, separator: str = "/", table_column: Optional[Column] = None):
+    def __init__(self, separator: str = "/", table_column: Column | None = None):
         self.separator = separator
         super().__init__(table_column=table_column)
 
@@ -870,7 +863,7 @@ class DownloadColumn(ProgressColumn):
     """
 
     def __init__(
-        self, binary_units: bool = False, table_column: Optional[Column] = None
+        self, binary_units: bool = False, table_column: Column | None = None
     ) -> None:
         self.binary_units = binary_units
         super().__init__(table_column=table_column)
@@ -946,8 +939,8 @@ class Task:
     description: str
     """str: Description of the task."""
 
-    total: Optional[float]
-    """Optional[float]: Total number of steps in this task."""
+    total: float | None
+    """float | None: Total number of steps in this task."""
 
     completed: float
     """float: Number of steps completed"""
@@ -955,25 +948,25 @@ class Task:
     _get_time: GetTimeCallable
     """Callable to get the current time."""
 
-    finished_time: Optional[float] = None
+    finished_time: float | None = None
     """float: Time task was finished."""
 
     visible: bool = True
     """bool: Indicates if this task is visible in the progress display."""
 
-    fields: Dict[str, Any] = field(default_factory=dict)
+    fields: dict[str, Any] = field(default_factory=dict)
     """dict: Arbitrary fields passed in via Progress.update."""
 
-    start_time: Optional[float] = field(default=None, init=False, repr=False)
-    """Optional[float]: Time this task was started, or None if not started."""
+    start_time: float | None = field(default=None, init=False, repr=False)
+    """float | None: Time this task was started, or None if not started."""
 
-    stop_time: Optional[float] = field(default=None, init=False, repr=False)
-    """Optional[float]: Time this task was stopped, or None if not stopped."""
+    stop_time: float | None = field(default=None, init=False, repr=False)
+    """float | None: Time this task was stopped, or None if not stopped."""
 
-    finished_speed: Optional[float] = None
-    """Optional[float]: The last speed for a finished task."""
+    finished_speed: float | None = None
+    """float | None: The last speed for a finished task."""
 
-    _progress: Deque[ProgressSample] = field(
+    _progress: deque[ProgressSample] = field(
         default_factory=lambda: deque(maxlen=1000), init=False, repr=False
     )
 
@@ -990,15 +983,15 @@ class Task:
         return self.start_time is not None
 
     @property
-    def remaining(self) -> Optional[float]:
-        """Optional[float]: Get the number of steps remaining, if a non-None total was set."""
+    def remaining(self) -> float | None:
+        """float | None: Get the number of steps remaining, if a non-None total was set."""
         if self.total is None:
             return None
         return self.total - self.completed
 
     @property
-    def elapsed(self) -> Optional[float]:
-        """Optional[float]: Time elapsed since task was started, or ``None`` if the task hasn't started."""
+    def elapsed(self) -> float | None:
+        """float | None: Time elapsed since task was started, or ``None`` if the task hasn't started."""
         if self.start_time is None:
             return None
         if self.stop_time is not None:
@@ -1020,8 +1013,8 @@ class Task:
         return completed
 
     @property
-    def speed(self) -> Optional[float]:
-        """Optional[float]: Get the estimated speed in steps per second."""
+    def speed(self) -> float | None:
+        """float | None: Get the estimated speed in steps per second."""
         if self.start_time is None:
             return None
         with self._lock:
@@ -1038,8 +1031,8 @@ class Task:
             return speed
 
     @property
-    def time_remaining(self) -> Optional[float]:
-        """Optional[float]: Get estimated time to completion, or ``None`` if no data."""
+    def time_remaining(self) -> float | None:
+        """float | None: Get estimated time to completion, or ``None`` if no data."""
         if self.finished:
             return 0.0
         speed = self.speed
@@ -1076,15 +1069,15 @@ class Progress(JupyterMixin):
 
     def __init__(
         self,
-        *columns: Union[str, ProgressColumn],
-        console: Optional[Console] = None,
+        *columns: str | ProgressColumn,
+        console: Console | None = None,
         auto_refresh: bool = True,
         refresh_per_second: float = 10,
         speed_estimate_period: float = 30.0,
         transient: bool = False,
         redirect_stdout: bool = True,
         redirect_stderr: bool = True,
-        get_time: Optional[GetTimeCallable] = None,
+        get_time: GetTimeCallable | None = None,
         disable: bool = False,
         expand: bool = False,
     ) -> None:
@@ -1095,7 +1088,7 @@ class Progress(JupyterMixin):
 
         self.disable = disable
         self.expand = expand
-        self._tasks: Dict[TaskID, Task] = {}
+        self._tasks: dict[TaskID, Task] = {}
         self._task_index: TaskID = TaskID(0)
         self.live = Live(
             console=console or get_console(),
@@ -1111,7 +1104,7 @@ class Progress(JupyterMixin):
         self.log = self.console.log
 
     @classmethod
-    def get_default_columns(cls) -> Tuple[ProgressColumn, ...]:
+    def get_default_columns(cls) -> tuple[ProgressColumn, ...]:
         """Get the default columns used for a new Progress instance:
            - a text column for the description (TextColumn)
            - the bar itself (BarColumn)
@@ -1146,13 +1139,13 @@ class Progress(JupyterMixin):
         return self.live.console
 
     @property
-    def tasks(self) -> List[Task]:
+    def tasks(self) -> list[Task]:
         """Get a list of Task instances."""
         with self._lock:
             return list(self._tasks.values())
 
     @property
-    def task_ids(self) -> List[TaskID]:
+    def task_ids(self) -> list[TaskID]:
         """A list of task IDs."""
         with self._lock:
             return list(self._tasks.keys())
@@ -1183,18 +1176,18 @@ class Progress(JupyterMixin):
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         self.stop()
 
     def track(
         self,
         sequence: Iterable[ProgressType],
-        total: Optional[float] = None,
+        total: float | None = None,
         completed: int = 0,
-        task_id: Optional[TaskID] = None,
+        task_id: TaskID | None = None,
         description: str = "Working...",
         update_period: float = 0.1,
     ) -> Iterable[ProgressType]:
@@ -1237,9 +1230,9 @@ class Progress(JupyterMixin):
     def wrap_file(
         self,
         file: BinaryIO,
-        total: Optional[int] = None,
+        total: int | None = None,
         *,
-        task_id: Optional[TaskID] = None,
+        task_id: TaskID | None = None,
         description: str = "Reading...",
     ) -> BinaryIO:
         """Track progress file reading from a binary file.
@@ -1257,7 +1250,7 @@ class Progress(JupyterMixin):
             ValueError: When no total value can be extracted from the arguments or the task.
         """
         # attempt to recover the total from the task
-        total_bytes: Optional[float] = None
+        total_bytes: float | None = None
         if total is not None:
             total_bytes = total
         elif task_id is not None:
@@ -1279,15 +1272,15 @@ class Progress(JupyterMixin):
     @typing.overload
     def open(
         self,
-        file: Union[str, "PathLike[str]", bytes],
+        file: "str | PathLike[str] | bytes",
         mode: Literal["rb"],
         buffering: int = -1,
-        encoding: Optional[str] = None,
-        errors: Optional[str] = None,
-        newline: Optional[str] = None,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
         *,
-        total: Optional[int] = None,
-        task_id: Optional[TaskID] = None,
+        total: int | None = None,
+        task_id: TaskID | None = None,
         description: str = "Reading...",
     ) -> BinaryIO:
         pass
@@ -1295,36 +1288,36 @@ class Progress(JupyterMixin):
     @typing.overload
     def open(
         self,
-        file: Union[str, "PathLike[str]", bytes],
-        mode: Union[Literal["r"], Literal["rt"]],
+        file: "str | PathLike[str] | bytes",
+        mode: Literal["r"] | Literal["rt"],
         buffering: int = -1,
-        encoding: Optional[str] = None,
-        errors: Optional[str] = None,
-        newline: Optional[str] = None,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
         *,
-        total: Optional[int] = None,
-        task_id: Optional[TaskID] = None,
+        total: int | None = None,
+        task_id: TaskID | None = None,
         description: str = "Reading...",
     ) -> TextIO:
         pass
 
     def open(
         self,
-        file: Union[str, "PathLike[str]", bytes],
-        mode: Union[Literal["rb"], Literal["rt"], Literal["r"]] = "r",
+        file: "str | PathLike[str] | bytes",
+        mode: Literal["rb"] | Literal["rt"] | Literal["r"] = "r",
         buffering: int = -1,
-        encoding: Optional[str] = None,
-        errors: Optional[str] = None,
-        newline: Optional[str] = None,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
         *,
-        total: Optional[int] = None,
-        task_id: Optional[TaskID] = None,
+        total: int | None = None,
+        task_id: TaskID | None = None,
         description: str = "Reading...",
-    ) -> Union[BinaryIO, TextIO]:
+    ) -> BinaryIO | TextIO:
         """Track progress while reading from a binary file.
 
         Args:
-            path (Union[str, PathLike[str]]): The path to the file to read.
+            path (str | PathLike[str]): The path to the file to read.
             mode (str): The mode to use to open the file. Only supports "r", "rb" or "rt".
             buffering (int): The buffering strategy to use, see :func:`io.open`.
             encoding (str, optional): The encoding to use when reading in text mode, see :func:`io.open`.
@@ -1418,11 +1411,11 @@ class Progress(JupyterMixin):
         self,
         task_id: TaskID,
         *,
-        total: Optional[float] = None,
-        completed: Optional[float] = None,
-        advance: Optional[float] = None,
-        description: Optional[str] = None,
-        visible: Optional[bool] = None,
+        total: float | None = None,
+        completed: float | None = None,
+        advance: float | None = None,
+        description: str | None = None,
+        visible: bool | None = None,
         refresh: bool = False,
         **fields: Any,
     ) -> None:
@@ -1480,10 +1473,10 @@ class Progress(JupyterMixin):
         task_id: TaskID,
         *,
         start: bool = True,
-        total: Optional[float] = None,
+        total: float | None = None,
         completed: int = 0,
-        visible: Optional[bool] = None,
-        description: Optional[str] = None,
+        visible: bool | None = None,
+        description: str | None = None,
         **fields: Any,
     ) -> None:
         """Reset a task so completed is 0 and the clock is reset.
@@ -1601,7 +1594,7 @@ class Progress(JupyterMixin):
         self,
         description: str,
         start: bool = True,
-        total: Optional[float] = 100.0,
+        total: float | None = 100.0,
         completed: int = 0,
         visible: bool = True,
         **fields: Any,

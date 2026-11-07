@@ -1,5 +1,4 @@
-from typing import TYPE_CHECKING, Iterable, List, Literal
-
+from typing import TYPE_CHECKING, Iterable, Literal
 
 from ._loop import loop_last
 
@@ -96,13 +95,13 @@ class Box:
         """Get the top of a simple box.
 
         Args:
-            widths (List[int]): Widths of columns.
+            widths (list[int]): Widths of columns.
 
         Returns:
             str: A string of box characters.
         """
 
-        parts: List[str] = []
+        parts: list[str] = []
         append = parts.append
         append(self.top_left)
         for last, width in loop_last(widths):
@@ -121,7 +120,7 @@ class Box:
         """Get the top of a simple box.
 
         Args:
-            width (List[int]): Widths of columns.
+            width (list[int]): Widths of columns.
 
         Returns:
             str: A string of box characters.
@@ -149,7 +148,7 @@ class Box:
         else:
             raise ValueError("level must be 'head', 'row' or 'foot'")
 
-        parts: List[str] = []
+        parts: list[str] = []
         append = parts.append
         if edge:
             append(left)
@@ -165,13 +164,13 @@ class Box:
         """Get the bottom of a simple box.
 
         Args:
-            widths (List[int]): Widths of columns.
+            widths (list[int]): Widths of columns.
 
         Returns:
             str: A string of box characters.
         """
 
-        parts: List[str] = []
+        parts: list[str] = []
         append = parts.append
         append(self.bottom_left)
         for last, width in loop_last(widths):

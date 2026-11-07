@@ -1,6 +1,6 @@
-from math import sqrt
 from functools import lru_cache
-from typing import Sequence, Tuple, TYPE_CHECKING
+from math import sqrt
+from typing import TYPE_CHECKING, Sequence
 
 from .color_triplet import ColorTriplet
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class Palette:
     """A palette of available colors."""
 
-    def __init__(self, colors: Sequence[Tuple[int, int, int]]):
+    def __init__(self, colors: Sequence[tuple[int, int, int]]):
         self._colors = colors
 
     def __getitem__(self, number: int) -> ColorTriplet:
@@ -20,8 +20,8 @@ class Palette:
     def __rich__(self) -> "Table":
         from rich.color import Color
         from rich.style import Style
-        from rich.text import Text
         from rich.table import Table
+        from rich.text import Text
 
         table = Table(
             "index",
@@ -42,11 +42,11 @@ class Palette:
 
     # This is somewhat inefficient and needs caching
     @lru_cache(maxsize=1024)
-    def match(self, color: Tuple[int, int, int]) -> int:
+    def match(self, color: tuple[int, int, int]) -> int:
         """Find a color from a palette that most closely matches a given color.
 
         Args:
-            color (Tuple[int, int, int]): RGB components in range 0 > 255.
+            color (tuple[int, int, int]): RGB components in range 0 > 255.
 
         Returns:
             int: Index of closes matching color.
@@ -75,6 +75,7 @@ class Palette:
 if __name__ == "__main__":  # pragma: no cover
     import colorsys
     from typing import Iterable
+
     from rich.color import Color
     from rich.console import Console, ConsoleOptions
     from rich.segment import Segment

@@ -1,7 +1,7 @@
 """Rich text and beautiful formatting in the terminal."""
 
 import os
-from typing import IO, TYPE_CHECKING, Any, Callable, Optional, Union
+from typing import IO, TYPE_CHECKING, Any, Callable
 
 from ._extension import load_ipython_extension  # noqa: F401
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from .console import Console
 
 # Global console used by alternative print
-_console: Optional["Console"] = None
+_console: "Console | None" = None
 
 try:
     _IMPORT_CWD = os.path.abspath(os.getcwd())
@@ -54,7 +54,7 @@ def print(
     *objects: Any,
     sep: str = " ",
     end: str = "\n",
-    file: Optional[IO[str]] = None,
+    file: IO[str] | None = None,
     flush: bool = False,
 ) -> None:
     r"""Print object(s) supplied via positional arguments.
@@ -75,16 +75,16 @@ def print(
 
 
 def print_json(
-    json: Optional[str] = None,
+    json: str | None = None,
     *,
     data: Any = None,
-    indent: Union[None, int, str] = 2,
+    indent: None | int | str = 2,
     highlight: bool = True,
     skip_keys: bool = False,
     ensure_ascii: bool = False,
     check_circular: bool = True,
     allow_nan: bool = True,
-    default: Optional[Callable[[Any], Any]] = None,
+    default: Callable[[Any], Any] | None = None,
     sort_keys: bool = False,
 ) -> None:
     """Pretty prints JSON. Output will be valid JSON.
@@ -120,8 +120,8 @@ def print_json(
 def inspect(
     obj: Any,
     *,
-    console: Optional["Console"] = None,
-    title: Optional[str] = None,
+    console: "Console | None" = None,
+    title: str | None = None,
     help: bool = False,
     methods: bool = False,
     docs: bool = True,

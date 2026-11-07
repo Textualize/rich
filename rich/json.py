@@ -1,9 +1,9 @@
+from json import dumps, loads
 from pathlib import Path
-from json import loads, dumps
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable
 
-from .text import Text
 from .highlighter import JSONHighlighter, NullHighlighter
+from .text import Text
 
 
 class JSON:
@@ -11,7 +11,7 @@ class JSON:
 
     Args:
         json (str): JSON encoded data.
-        indent (Union[None, int, str], optional): Number of characters to indent by. Defaults to 2.
+        indent (None | int | str, optional): Number of characters to indent by. Defaults to 2.
         highlight (bool, optional): Enable highlighting. Defaults to True.
         skip_keys (bool, optional): Skip keys not of a basic type. Defaults to False.
         ensure_ascii (bool, optional): Escape all non-ascii characters. Defaults to False.
@@ -25,13 +25,13 @@ class JSON:
     def __init__(
         self,
         json: str,
-        indent: Union[None, int, str] = 2,
+        indent: None | int | str = 2,
         highlight: bool = True,
         skip_keys: bool = False,
         ensure_ascii: bool = False,
         check_circular: bool = True,
         allow_nan: bool = True,
-        default: Optional[Callable[[Any], Any]] = None,
+        default: Callable[[Any], Any] | None = None,
         sort_keys: bool = False,
     ) -> None:
         data = loads(json)
@@ -54,20 +54,20 @@ class JSON:
     def from_data(
         cls,
         data: Any,
-        indent: Union[None, int, str] = 2,
+        indent: None | int | str = 2,
         highlight: bool = True,
         skip_keys: bool = False,
         ensure_ascii: bool = False,
         check_circular: bool = True,
         allow_nan: bool = True,
-        default: Optional[Callable[[Any], Any]] = None,
+        default: Callable[[Any], Any] | None = None,
         sort_keys: bool = False,
     ) -> "JSON":
         """Encodes a JSON object from arbitrary data.
 
         Args:
             data (Any): An object that may be encoded in to JSON
-            indent (Union[None, int, str], optional): Number of characters to indent by. Defaults to 2.
+            indent (None | int | str, optional): Number of characters to indent by. Defaults to 2.
             highlight (bool, optional): Enable highlighting. Defaults to True.
             default (Callable, optional): Optional callable which will be called for objects that cannot be serialized. Defaults to None.
             skip_keys (bool, optional): Skip keys not of a basic type. Defaults to False.

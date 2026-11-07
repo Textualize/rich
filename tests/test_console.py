@@ -4,7 +4,6 @@ import os
 import subprocess
 import sys
 import tempfile
-from typing import Optional, Tuple, Type, Union
 from unittest import mock
 
 import pytest
@@ -155,13 +154,13 @@ def test_size() -> None:
 def test_size_can_fall_back_to_std_descriptors(
     get_terminal_size_mock: mock.MagicMock,
     is_windows: bool,
-    no_descriptor_size: Union[Tuple[int, int], Type[ValueError]],
-    stdin_size: Union[Tuple[int, int], Type[ValueError]],
-    stdout_size: Union[Tuple[int, int], Type[ValueError]],
-    stderr_size: Union[Tuple[int, int], Type[ValueError]],
-    expected_size: Tuple[int, int],
+    no_descriptor_size: tuple[int, int] | type[ValueError],
+    stdin_size: tuple[int, int] | type[ValueError],
+    stdout_size: tuple[int, int] | type[ValueError],
+    stderr_size: tuple[int, int] | type[ValueError],
+    expected_size: tuple[int, int],
 ) -> None:
-    def get_terminal_size_mock_impl(fileno: int = None) -> Tuple[int, int]:
+    def get_terminal_size_mock_impl(fileno: int = None) -> tuple[int, int]:
         value = {
             None: no_descriptor_size,
             sys.__stdin__.fileno(): stdin_size,
@@ -628,7 +627,7 @@ def test_bell() -> None:
 def test_pager() -> None:
     console = Console(_environ={})
 
-    pager_content: Optional[str] = None
+    pager_content: str | None = None
 
     def mock_pager(content: str) -> None:
         nonlocal pager_content

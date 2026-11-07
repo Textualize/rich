@@ -4,7 +4,7 @@ import sys
 from array import array
 from collections import UserDict, defaultdict, deque
 from dataclasses import dataclass, field
-from typing import Any, List, NamedTuple
+from typing import Any, NamedTuple
 
 import attr
 import pytest
@@ -166,7 +166,7 @@ class ExampleDataclass:
     foo: int
     bar: str
     ignore: int = field(repr=False)
-    baz: List[str] = field(default_factory=list)
+    baz: list[str] = field(default_factory=list)
     last: int = field(default=1, repr=False)
 
 
@@ -205,7 +205,7 @@ class StockKeepingUnit(NamedTuple):
     description: str
     price: float
     category: str
-    reviews: List[str]
+    reviews: list[str]
 
 
 def test_pretty_namedtuple() -> None:

@@ -1,4 +1,4 @@
-from typing import Iterator, List, Optional, Tuple
+from typing import Iterator
 
 from ._loop import loop_first, loop_last
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
@@ -8,7 +8,7 @@ from .segment import Segment
 from .style import Style, StyleStack, StyleType
 from .styled import Styled
 
-GuideType = Tuple[str, str, str, str]
+GuideType = tuple[str, str, str, str]
 
 
 class Tree(JupyterMixin):
@@ -16,7 +16,7 @@ class Tree(JupyterMixin):
 
     Attributes:
         ASCII_GUIDES (GuideType): Guide lines used when Console.ascii_only is True.
-        TREE_GUIDES (List[GuideType, GuideType, GuideType]): Default guide lines.
+        TREE_GUIDES (list[GuideType, GuideType, GuideType]): Default guide lines.
 
     Args:
         label (RenderableType): The renderable or str for the tree label.
@@ -47,7 +47,7 @@ class Tree(JupyterMixin):
         self.label = label
         self.style = style
         self.guide_style = guide_style
-        self.children: List[Tree] = []
+        self.children: list[Tree] = []
         self.expanded = expanded
         self.highlight = highlight
         self.hide_root = hide_root
@@ -56,10 +56,10 @@ class Tree(JupyterMixin):
         self,
         label: RenderableType,
         *,
-        style: Optional[StyleType] = None,
-        guide_style: Optional[StyleType] = None,
+        style: StyleType | None = None,
+        guide_style: StyleType | None = None,
         expanded: bool = True,
-        highlight: Optional[bool] = False,
+        highlight: bool | None = False,
     ) -> "Tree":
         """Add a child tree.
 
@@ -68,7 +68,7 @@ class Tree(JupyterMixin):
             style (StyleType, optional): Style of this tree. Defaults to "tree".
             guide_style (StyleType, optional): Style of the guide lines. Defaults to "tree.line".
             expanded (bool, optional): Also display children. Defaults to True.
-            highlight (Optional[bool], optional): Highlight renderable (if str). Defaults to False.
+            highlight (bool | None, optional): Highlight renderable (if str). Defaults to False.
 
         Returns:
             Tree: A new child Tree, which may be further modified.
@@ -86,7 +86,7 @@ class Tree(JupyterMixin):
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "RenderResult":
-        stack: List[Iterator[Tuple[bool, Tree]]] = []
+        stack: list[Iterator[tuple[bool, Tree]]] = []
         pop = stack.pop
         push = stack.append
         new_line = Segment.line()
@@ -107,7 +107,7 @@ class Tree(JupyterMixin):
                 line = self.TREE_GUIDES[0 if options.legacy_windows else guide][index]
             return _Segment(line, style)
 
-        levels: List[Segment] = [make_guide(CONTINUE, guide_style)]
+        levels: list[Segment] = [make_guide(CONTINUE, guide_style)]
         push(iter(loop_last([self])))
 
         guide_style_stack = StyleStack(get_style(self.guide_style))
@@ -176,7 +176,7 @@ class Tree(JupyterMixin):
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
     ) -> "Measurement":
-        stack: List[Iterator[Tree]] = [iter([self])]
+        stack: list[Iterator[Tree]] = [iter([self])]
         pop = stack.pop
         push = stack.append
         minimum = 0

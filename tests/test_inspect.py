@@ -1,7 +1,7 @@
 import io
 import sys
 from types import ModuleType
-from typing import Sequence, Type
+from typing import Sequence
 
 import pytest
 
@@ -475,7 +475,7 @@ def test_can_handle_special_characters_in_docstrings(
         [FooSubclass, (FooSubclass, Foo, object)],
     ),
 )
-def test_object_types_mro(obj: object, expected_result: Sequence[Type]):
+def test_object_types_mro(obj: object, expected_result: Sequence[type]):
     assert get_object_types_mro(obj) == expected_result
 
 

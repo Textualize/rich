@@ -1,11 +1,12 @@
+from typing import NamedTuple
+
 import pytest
-from typing import NamedTuple, Optional
 
 from rich._ratio import ratio_reduce, ratio_resolve
 
 
 class Edge(NamedTuple):
-    size: Optional[int] = None
+    size: int | None = None
     ratio: int = 1
     minimum_size: int = 1
 

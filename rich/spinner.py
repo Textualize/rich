@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Optional, Union, cast
+from typing import TYPE_CHECKING, cast
 
 from ._spinners import SPINNERS
 from .measure import Measurement
@@ -28,20 +28,20 @@ class Spinner:
         name: str,
         text: "RenderableType" = "",
         *,
-        style: Optional["StyleType"] = None,
+        style: "StyleType | None" = None,
         speed: float = 1.0,
     ) -> None:
         try:
             spinner = SPINNERS[name]
         except KeyError:
             raise KeyError(f"no spinner called {name!r}")
-        self.text: "Union[RenderableType, Text]" = (
+        self.text: "RenderableType | Text" = (
             Text.from_markup(text) if isinstance(text, str) else text
         )
         self.name = name
-        self.frames = cast(List[str], spinner["frames"])[:]
+        self.frames = cast(list[str], spinner["frames"])[:]
         self.interval = cast(float, spinner["interval"])
-        self.start_time: Optional[float] = None
+        self.start_time: float | None = None
         self.style = style
         self.speed = speed
         self.frame_no_offset: float = 0.0
@@ -96,8 +96,8 @@ class Spinner:
         self,
         *,
         text: "RenderableType" = "",
-        style: Optional["StyleType"] = None,
-        speed: Optional[float] = None,
+        style: "StyleType | None" = None,
+        speed: float | None = None,
     ) -> None:
         """Updates attributes of a spinner after it has been started.
 

@@ -11,21 +11,7 @@ from dataclasses import dataclass, fields, is_dataclass
 from inspect import isclass
 from itertools import islice
 from types import MappingProxyType
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    DefaultDict,
-    Deque,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Callable, Iterable, Sequence
 
 from rich.repr import RichReprResult
 
@@ -112,15 +98,15 @@ def _has_default_namedtuple_repr(obj: object) -> bool:
 
 def _ipy_display_hook(
     value: Any,
-    console: Optional["Console"] = None,
+    console: "Console | None" = None,
     overflow: "OverflowMethod" = "ignore",
     crop: bool = False,
     indent_guides: bool = False,
-    max_length: Optional[int] = None,
-    max_string: Optional[int] = None,
-    max_depth: Optional[int] = None,
+    max_length: int | None = None,
+    max_string: int | None = None,
+    max_depth: int | None = None,
     expand_all: bool = False,
-) -> Union[str, None]:
+) -> str | None:
     # needed here to prevent circular import:
     from .console import ConsoleRenderable
 
@@ -158,9 +144,7 @@ def _ipy_display_hook(
     return capture.get().rstrip("\n")
 
 
-def _safe_isinstance(
-    obj: object, class_or_tuple: Union[type, Tuple[type, ...]]
-) -> bool:
+def _safe_isinstance(obj: object, class_or_tuple: type | tuple[type, ...]) -> bool:
     """isinstance can fail in rare cases, for example types with no __class__"""
     try:
         return isinstance(obj, class_or_tuple)
@@ -169,21 +153,21 @@ def _safe_isinstance(
 
 
 def install(
-    console: Optional["Console"] = None,
+    console: "Console | None" = None,
     overflow: "OverflowMethod" = "ignore",
     crop: bool = False,
     indent_guides: bool = False,
-    max_length: Optional[int] = None,
-    max_string: Optional[int] = None,
-    max_depth: Optional[int] = None,
+    max_length: int | None = None,
+    max_string: int | None = None,
+    max_depth: int | None = None,
     expand_all: bool = False,
 ) -> None:
     """Install automatic pretty printing in the Python REPL.
 
     Args:
         console (Console, optional): Console instance or ``None`` to use global console. Defaults to None.
-        overflow (Optional[OverflowMethod], optional): Overflow method. Defaults to "ignore".
-        crop (Optional[bool], optional): Enable cropping of long lines. Defaults to False.
+        overflow (OverflowMethod | None, optional): Overflow method. Defaults to "ignore".
+        crop (bool | None, optional): Enable cropping of long lines. Defaults to False.
         indent_guides (bool, optional): Enable indentation guides. Defaults to False.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
@@ -259,7 +243,7 @@ class Pretty(JupyterMixin):
         indent_size (int, optional): Number of spaces in indent. Defaults to 4.
         justify (JustifyMethod, optional): Justify method, or None for default. Defaults to None.
         overflow (OverflowMethod, optional): Overflow method, or None for default. Defaults to None.
-        no_wrap (Optional[bool], optional): Disable word wrapping. Defaults to False.
+        no_wrap (bool | None, optional): Disable word wrapping. Defaults to False.
         indent_guides (bool, optional): Enable indentation guides. Defaults to False.
         max_length (int, optional): Maximum length of containers before abbreviating, or None for no abbreviation.
             Defaults to None.
@@ -273,16 +257,16 @@ class Pretty(JupyterMixin):
     def __init__(
         self,
         _object: Any,
-        highlighter: Optional["HighlighterType"] = None,
+        highlighter: "HighlighterType | None" = None,
         *,
         indent_size: int = 4,
-        justify: Optional["JustifyMethod"] = None,
-        overflow: Optional["OverflowMethod"] = None,
-        no_wrap: Optional[bool] = False,
+        justify: "JustifyMethod | None" = None,
+        overflow: "OverflowMethod | None" = None,
+        no_wrap: bool | None = False,
         indent_guides: bool = False,
-        max_length: Optional[int] = None,
-        max_string: Optional[int] = None,
-        max_depth: Optional[int] = None,
+        max_length: int | None = None,
+        max_string: int | None = None,
+        max_depth: int | None = None,
         expand_all: bool = False,
         margin: int = 0,
         insert_line: bool = False,
@@ -290,8 +274,8 @@ class Pretty(JupyterMixin):
         self._object = _object
         self.highlighter = highlighter or ReprHighlighter()
         self.indent_size = indent_size
-        self.justify: Optional["JustifyMethod"] = justify
-        self.overflow: Optional["OverflowMethod"] = overflow
+        self.justify: "JustifyMethod | None" = justify
+        self.overflow: "OverflowMethod | None" = overflow
         self.no_wrap = no_wrap
         self.indent_guides = indent_guides
         self.max_length = max_length
@@ -354,7 +338,7 @@ class Pretty(JupyterMixin):
         return Measurement(text_width, text_width)
 
 
-def _get_braces_for_defaultdict(_object: DefaultDict[Any, Any]) -> Tuple[str, str, str]:
+def _get_braces_for_defaultdict(_object: defaultdict[Any, Any]) -> tuple[str, str, str]:
     return (
         f"defaultdict({_object.default_factory!r}, {{",
         "})",
@@ -362,7 +346,7 @@ def _get_braces_for_defaultdict(_object: DefaultDict[Any, Any]) -> Tuple[str, st
     )
 
 
-def _get_braces_for_deque(_object: Deque[Any]) -> Tuple[str, str, str]:
+def _get_braces_for_deque(_object: deque[Any]) -> tuple[str, str, str]:
     if _object.maxlen is None:
         return ("deque([", "])", "deque()")
     return (
@@ -372,11 +356,11 @@ def _get_braces_for_deque(_object: Deque[Any]) -> Tuple[str, str, str]:
     )
 
 
-def _get_braces_for_array(_object: "array[Any]") -> Tuple[str, str, str]:
+def _get_braces_for_array(_object: "array[Any]") -> tuple[str, str, str]:
     return (f"array({_object.typecode!r}, [", "])", f"array({_object.typecode!r})")
 
 
-_BRACES: Dict[type, Callable[[Any], Tuple[str, str, str]]] = {
+_BRACES: dict[type, Callable[[Any], tuple[str, str, str]]] = {
     os._Environ: lambda _object: ("environ({", "})", "environ({})"),
     array: _get_braces_for_array,
     defaultdict: _get_braces_for_defaultdict,
@@ -417,7 +401,7 @@ class Node:
     last: bool = False
     is_tuple: bool = False
     is_namedtuple: bool = False
-    children: Optional[List["Node"]] = None
+    children: list["Node"] | None = None
     key_separator: str = ": "
     separator: str = ", "
 
@@ -494,9 +478,9 @@ class Node:
 class _Line:
     """A line in repr output."""
 
-    parent: Optional["_Line"] = None
+    parent: "_Line | None" = None
     is_root: bool = False
-    node: Optional[Node] = None
+    node: Node | None = None
     text: str = ""
     suffix: str = ""
     whitespace: str = ""
@@ -579,9 +563,9 @@ def _is_namedtuple(obj: Any) -> bool:
 
 def traverse(
     _object: Any,
-    max_length: Optional[int] = None,
-    max_string: Optional[int] = None,
-    max_depth: Optional[int] = None,
+    max_length: int | None = None,
+    max_string: int | None = None,
+    max_depth: int | None = None,
 ) -> Node:
     """Traverse object and generate a tree.
 
@@ -614,7 +598,7 @@ def traverse(
                 obj_repr = f"<repr-error {str(error)!r}>"
         return obj_repr
 
-    visited_ids: Set[int] = set()
+    visited_ids: set[int] = set()
     push_visited = visited_ids.add
     pop_visited = visited_ids.remove
 
@@ -627,10 +611,10 @@ def traverse(
             return Node(value_repr="...")
 
         obj_type = type(obj)
-        children: List[Node]
+        children: list[Node]
         reached_max_depth = max_depth is not None and depth >= max_depth
 
-        def iter_rich_args(rich_args: Any) -> Iterable[Union[Any, Tuple[str, Any]]]:
+        def iter_rich_args(rich_args: Any) -> Iterable[Any | tuple[str, Any]]:
             for arg in rich_args:
                 if _safe_isinstance(arg, tuple):
                     if len(arg) == 3:
@@ -653,7 +637,7 @@ def traverse(
         except Exception:
             fake_attributes = False
 
-        rich_repr_result: Optional[RichReprResult] = None
+        rich_repr_result: RichReprResult | None = None
         if not fake_attributes:
             try:
                 if hasattr(obj, "__rich_repr__") and not isclass(obj):
@@ -729,7 +713,7 @@ def traverse(
                     )
 
                     def iter_attrs() -> (
-                        Iterable[Tuple[str, Any, Optional[Callable[[Any], str]]]]
+                        Iterable[tuple[str, Any, Callable[[Any], str] | None]]
                     ):
                         """Iterate over attr fields and values."""
                         for attr in attr_fields:
@@ -880,9 +864,9 @@ def pretty_repr(
     *,
     max_width: int = 80,
     indent_size: int = 4,
-    max_length: Optional[int] = None,
-    max_string: Optional[int] = None,
-    max_depth: Optional[int] = None,
+    max_length: int | None = None,
+    max_string: int | None = None,
+    max_depth: int | None = None,
     expand_all: bool = False,
 ) -> str:
     """Prettify repr string by expanding on to new lines to fit within a given width.
@@ -918,11 +902,11 @@ def pretty_repr(
 def pprint(
     _object: Any,
     *,
-    console: Optional["Console"] = None,
+    console: "Console | None" = None,
     indent_guides: bool = True,
-    max_length: Optional[int] = None,
-    max_string: Optional[int] = None,
-    max_depth: Optional[int] = None,
+    max_length: int | None = None,
+    max_string: int | None = None,
+    max_depth: int | None = None,
     expand_all: bool = False,
 ) -> None:
     """A convenience function for pretty printing.
@@ -966,7 +950,7 @@ if __name__ == "__main__":  # pragma: no cover
         description: str
         price: float
         category: str
-        reviews: List[str]
+        reviews: list[str]
 
     d = defaultdict(int)
     d["foo"] = 5

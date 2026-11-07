@@ -2,8 +2,6 @@
 Basic example to show how to print an traceback of an exception
 """
 
-from typing import List, Tuple
-
 from rich.console import Console
 
 console = Console()
@@ -16,7 +14,7 @@ def divide_by(number: float, divisor: float) -> float:
     return result
 
 
-def divide_all(divides: List[Tuple[float, float]]) -> None:
+def divide_all(divides: list[tuple[float, float]]) -> None:
     """Do something impossible every day."""
 
     for number, divisor in divides:

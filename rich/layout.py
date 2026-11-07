@@ -2,17 +2,7 @@ from abc import ABC, abstractmethod
 from itertools import islice
 from operator import itemgetter
 from threading import RLock
-from typing import (
-    TYPE_CHECKING,
-    Dict,
-    Iterable,
-    List,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Tuple,
-    Union,
-)
+from typing import TYPE_CHECKING, Iterable, NamedTuple, Sequence
 
 from ._ratio import ratio_resolve
 from .align import Align
@@ -33,11 +23,11 @@ class LayoutRender(NamedTuple):
     """An individual layout render."""
 
     region: Region
-    render: List[List[Segment]]
+    render: list[list[Segment]]
 
 
-RegionMap = Dict["Layout", Region]
-RenderMap = Dict["Layout", LayoutRender]
+RegionMap = dict["Layout", Region]
+RenderMap = dict["Layout", LayoutRender]
 
 
 class LayoutError(Exception):
@@ -89,7 +79,7 @@ class Splitter(ABC):
     @abstractmethod
     def divide(
         self, children: Sequence["Layout"], region: Region
-    ) -> Iterable[Tuple["Layout", Region]]:
+    ) -> Iterable[tuple["Layout", Region]]:
         """Divide a region amongst several child layouts.
 
         Args:
@@ -108,7 +98,7 @@ class RowSplitter(Splitter):
 
     def divide(
         self, children: Sequence["Layout"], region: Region
-    ) -> Iterable[Tuple["Layout", Region]]:
+    ) -> Iterable[tuple["Layout", Region]]:
         x, y, width, height = region
         render_widths = ratio_resolve(width, children)
         offset = 0
@@ -128,7 +118,7 @@ class ColumnSplitter(Splitter):
 
     def divide(
         self, children: Sequence["Layout"], region: Region
-    ) -> Iterable[Tuple["Layout", Region]]:
+    ) -> Iterable[tuple["Layout", Region]]:
         x, y, width, height = region
         render_heights = ratio_resolve(height, children)
         offset = 0
@@ -155,10 +145,10 @@ class Layout:
 
     def __init__(
         self,
-        renderable: Optional[RenderableType] = None,
+        renderable: RenderableType | None = None,
         *,
-        name: Optional[str] = None,
-        size: Optional[int] = None,
+        name: str | None = None,
+        size: int | None = None,
         minimum_size: int = 1,
         ratio: int = 1,
         visible: bool = True,
@@ -170,7 +160,7 @@ class Layout:
         self.name = name
         self.visible = visible
         self.splitter: Splitter = self.splitters["column"]()
-        self._children: List[Layout] = []
+        self._children: list[Layout] = []
         self._render_map: RenderMap = {}
         self._lock = RLock()
 
@@ -186,7 +176,7 @@ class Layout:
         return self if self._children else self._renderable
 
     @property
-    def children(self) -> List["Layout"]:
+    def children(self) -> list["Layout"]:
         """Gets (visible) layout children."""
         return [child for child in self._children if child.visible]
 
@@ -195,14 +185,14 @@ class Layout:
         """Get a map of the last render."""
         return self._render_map
 
-    def get(self, name: str) -> Optional["Layout"]:
+    def get(self, name: str) -> "Layout | None":
         """Get a named layout, or None if it doesn't exist.
 
         Args:
             name (str): Name of layout.
 
         Returns:
-            Optional[Layout]: Layout instance or None if no layout was found.
+            Layout | None: Layout instance or None if no layout was found.
         """
         if self.name == name:
             return self
@@ -260,14 +250,14 @@ class Layout:
 
     def split(
         self,
-        *layouts: Union["Layout", RenderableType],
-        splitter: Union[Splitter, str] = "column",
+        *layouts: "Layout | RenderableType",
+        splitter: Splitter | str = "column",
     ) -> None:
         """Split the layout in to multiple sub-layouts.
 
         Args:
             *layouts (Layout): Positional arguments should be (sub) Layout instances.
-            splitter (Union[Splitter, str]): Splitter instance or name of splitter.
+            splitter (Splitter | str): Splitter instance or name of splitter.
         """
         _layouts = [
             layout if isinstance(layout, Layout) else Layout(layout)
@@ -283,11 +273,11 @@ class Layout:
             raise NoSplitter(f"No splitter called {splitter!r}")
         self._children[:] = _layouts
 
-    def add_split(self, *layouts: Union["Layout", RenderableType]) -> None:
+    def add_split(self, *layouts: "Layout | RenderableType") -> None:
         """Add a new layout(s) to existing split.
 
         Args:
-            *layouts (Union[Layout, RenderableType]): Positional arguments should be renderables or (sub) Layout instances.
+            *layouts (Layout | RenderableType): Positional arguments should be renderables or (sub) Layout instances.
 
         """
         _layouts = (
@@ -296,7 +286,7 @@ class Layout:
         )
         self._children.extend(_layouts)
 
-    def split_row(self, *layouts: Union["Layout", RenderableType]) -> None:
+    def split_row(self, *layouts: "Layout | RenderableType") -> None:
         """Split the layout in to a row (layouts side by side).
 
         Args:
@@ -304,7 +294,7 @@ class Layout:
         """
         self.split(*layouts, splitter="row")
 
-    def split_column(self, *layouts: Union["Layout", RenderableType]) -> None:
+    def split_column(self, *layouts: "Layout | RenderableType") -> None:
         """Split the layout in to a column (layouts stacked on top of each other).
 
         Args:
@@ -344,10 +334,10 @@ class Layout:
 
     def _make_region_map(self, width: int, height: int) -> RegionMap:
         """Create a dict that maps layout on to Region."""
-        stack: List[Tuple[Layout, Region]] = [(self, Region(0, 0, width, height))]
+        stack: list[tuple[Layout, Region]] = [(self, Region(0, 0, width, height))]
         push = stack.append
         pop = stack.pop
-        layout_regions: List[Tuple[Layout, Region]] = []
+        layout_regions: list[tuple[Layout, Region]] = []
         append_layout_region = layout_regions.append
         while stack:
             append_layout_region(pop())
@@ -381,7 +371,7 @@ class Layout:
             for layout, region in region_map.items()
             if not layout.children
         ]
-        render_map: Dict["Layout", "LayoutRender"] = {}
+        render_map: dict["Layout", "LayoutRender"] = {}
         render_lines = console.render_lines
         update_dimensions = options.update_dimensions
 
@@ -400,7 +390,7 @@ class Layout:
             height = options.height or console.height
             render_map = self.render(console, options.update_dimensions(width, height))
             self._render_map = render_map
-            layout_lines: List[List[Segment]] = [[] for _ in range(height)]
+            layout_lines: list[list[Segment]] = [[] for _ in range(height)]
             _islice = islice
             for region, lines in render_map.values():
                 _x, y, _layout_width, layout_height = region
