@@ -211,7 +211,7 @@ def test_inline_code_in_table_cells() -> None:
         inline_code_lexer="python",
     )
     result = render(markdown)
-    expected = "\n\x1b[36m                 \x1b[0m\n\x1b[36m \x1b[0m\x1b[36mCol\x1b[0m\x1b[1m            \x1b[0m\x1b[36m \x1b[0m\n\x1b[36m ─────────────── \x1b[0m\n\x1b[36m \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mprint\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m(\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34m'\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34mhello\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34m'\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m)\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m;\x1b[0m\x1b[36m \x1b[0m\n\x1b[36m                 \x1b[0m\n"
+    expected = "\n\x1b[36m                 \x1b[0m\n\x1b[36m \x1b[0m\x1b[36mCol\x1b[0m\x1b[1m            \x1b[0m\x1b[36m \x1b[0m\n\x1b[36m ─────────────── \x1b[0m\n\x1b[36m \x1b[0m\x1b[38;2;166;226;46;48;2;39;40;34mprint\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m(\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34m'\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34mhello\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34m'\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m)\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m;\x1b[0m\x1b[36m \x1b[0m\n\x1b[36m                 \x1b[0m\n"
     assert result == expected
 
 

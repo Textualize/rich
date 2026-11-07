@@ -27,7 +27,6 @@ from typing import (
     Tuple,
     Type,
     Union,
-    cast,
     runtime_checkable,
 )
 
@@ -1539,7 +1538,7 @@ class Console:
         if justify in ("left", "center", "right"):
 
             def align_append(renderable: RenderableType) -> None:
-                _append(Align(renderable, cast(AlignMethod, justify)))
+                _append(Align(renderable, justify))
 
             append = align_append
 

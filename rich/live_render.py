@@ -65,7 +65,7 @@ class LiveRender:
                         (ControlType.ERASE_IN_LINE, 2),
                     )
                     * (height - 1)
-                )
+                ),
             )
         return Control()
 
@@ -79,7 +79,7 @@ class LiveRender:
             _, height = self._shape
             return Control(
                 ControlType.CARRIAGE_RETURN,
-                *((ControlType.CURSOR_UP, 1), (ControlType.ERASE_IN_LINE, 2)) * height
+                *((ControlType.CURSOR_UP, 1), (ControlType.ERASE_IN_LINE, 2)) * height,
             )
         return Control()
 
