@@ -37,7 +37,7 @@ Changelog = "https://github.com/Textualize/rich/blob/master/CHANGELOG.md"
 [dependency-groups]
 dev = [
     "attrs>=21.4.0",
-    "black>=23.11,<24",
+    "black>=26",
     "mypy>=1.11",
     "pre-commit>=2.17.0",
     "pytest>=7.0.0",
