@@ -458,9 +458,7 @@ def test_can_handle_special_characters_in_docstrings(
 │         Multiline docstring                    │
 │         with %s should be handled              │
 ╰────────────────────────────────────────────────╯
-""" % (
-        expected_replacement
-    )
+""" % (expected_replacement)
     assert render(Something, methods=True) == expected
 
 

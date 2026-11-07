@@ -335,7 +335,7 @@ class Layout:
         with self._lock:
             layout = self[layout_name]
             region, _lines = self._render_map[layout]
-            (x, y, width, height) = region
+            x, y, width, height = region
             lines = console.render_lines(
                 layout, console.options.update_dimensions(width, height)
             )

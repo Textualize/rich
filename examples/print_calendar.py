@@ -5,12 +5,13 @@ python print_calendar.py [YEAR]
 Example:
 python print_calendar.py 2021
 """
+
 import argparse
 import calendar
 from datetime import datetime
 
-from rich.align import Align
 from rich import box
+from rich.align import Align
 from rich.columns import Columns
 from rich.console import Console
 from rich.table import Table

@@ -1,6 +1,7 @@
 """
 A very minimal `cp` clone that displays a progress bar.
 """
+
 import os
 import shutil
 import sys

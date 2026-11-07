@@ -1,5 +1,5 @@
 """
-Demonstration of Console.screen() 
+Demonstration of Console.screen()
 """
 
 from time import sleep

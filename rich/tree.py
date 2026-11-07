@@ -227,14 +227,12 @@ class Segment(NamedTuple):
 """
     syntax = Syntax(code, "python", theme="monokai", line_numbers=True)
 
-    markdown = Markdown(
-        """\
+    markdown = Markdown("""\
 ### example.md
 > Hello, World!
 >
 > Markdown _all_ the things
-"""
-    )
+""")
 
     root = Tree("🌲 [b green]Rich Tree", highlight=True, hide_root=True)
 

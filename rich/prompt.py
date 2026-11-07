@@ -89,8 +89,7 @@ class PromptBase(Generic[PromptType]):
         show_choices: bool = True,
         default: DefaultType,
         stream: Optional[TextIO] = None,
-    ) -> Union[DefaultType, PromptType]:
-        ...
+    ) -> Union[DefaultType, PromptType]: ...
 
     @classmethod
     @overload
@@ -105,8 +104,7 @@ class PromptBase(Generic[PromptType]):
         show_default: bool = True,
         show_choices: bool = True,
         stream: Optional[TextIO] = None,
-    ) -> PromptType:
-        ...
+    ) -> PromptType: ...
 
     @classmethod
     def ask(
@@ -268,14 +266,12 @@ class PromptBase(Generic[PromptType]):
         """Hook to display something before the prompt."""
 
     @overload
-    def __call__(self, *, stream: Optional[TextIO] = None) -> PromptType:
-        ...
+    def __call__(self, *, stream: Optional[TextIO] = None) -> PromptType: ...
 
     @overload
     def __call__(
         self, *, default: DefaultType, stream: Optional[TextIO] = None
-    ) -> Union[PromptType, DefaultType]:
-        ...
+    ) -> Union[PromptType, DefaultType]: ...
 
     def __call__(self, *, default: Any = ..., stream: Optional[TextIO] = None) -> Any:
         """Run the prompt loop.

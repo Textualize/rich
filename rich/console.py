@@ -2537,12 +2537,9 @@ class Console:
                 x += cell_len(text)
 
         line_offsets = [line_no * line_height + 1.5 for line_no in range(y)]
-        lines = "\n".join(
-            f"""<clipPath id="{unique_id}-line-{line_no}">
+        lines = "\n".join(f"""<clipPath id="{unique_id}-line-{line_no}">
     {make_tag("rect", x=0, y=offset, width=char_width * width, height=line_height + 0.25)}
-            </clipPath>"""
-            for line_no, offset in enumerate(line_offsets)
-        )
+            </clipPath>""" for line_no, offset in enumerate(line_offsets))
 
         styles = "\n".join(
             f".{unique_id}-r{rule_no} {{ {css} }}" for css, rule_no in classes.items()

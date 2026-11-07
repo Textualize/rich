@@ -223,16 +223,13 @@ def test_pretty_namedtuple() -> None:
     result = pretty_repr(example_namedtuple)
 
     print(result)
-    assert (
-        result
-        == """StockKeepingUnit(
+    assert result == """StockKeepingUnit(
     name='Sparkling British Spring Water',
     description='Carbonated spring water',
     price=0.9,
     category='water',
     reviews=['its amazing!', 'its terrible!']
 )"""
-    )
 
 
 def test_pretty_namedtuple_length_one_no_trailing_comma() -> None:

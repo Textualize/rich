@@ -1,4 +1,5 @@
 """Tests for the highlighter classes."""
+
 import json
 from typing import List
 

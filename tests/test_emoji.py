@@ -27,11 +27,11 @@ def test_render():
 def test_variant():
     print(repr(Emoji.replace(":warning:")))
     assert Emoji.replace(":warning:") == "⚠"
-    assert Emoji.replace(":warning-text:") == "⚠" + "\uFE0E"
-    assert Emoji.replace(":warning-emoji:") == "⚠" + "\uFE0F"
+    assert Emoji.replace(":warning-text:") == "⚠" + "\ufe0e"
+    assert Emoji.replace(":warning-emoji:") == "⚠" + "\ufe0f"
     assert Emoji.replace(":warning-foo:") == ":warning-foo:"
 
 
 def test_variant_non_default():
     render_result = render(Emoji("warning", variant="emoji"))
-    assert render_result == "⚠" + "\uFE0F"
+    assert render_result == "⚠" + "\ufe0f"
