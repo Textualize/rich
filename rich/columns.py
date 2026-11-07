@@ -6,11 +6,11 @@ from typing import Dict, Iterable, List, Optional, Tuple
 from .align import Align, AlignMethod
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
 from .constrain import Constrain
+from .jupyter import JupyterMixin
 from .measure import Measurement
 from .padding import Padding, PaddingDimensions
 from .table import Table
 from .text import TextType
-from .jupyter import JupyterMixin
 
 
 class Columns(JupyterMixin):
@@ -148,9 +148,11 @@ class Columns(JupyterMixin):
         ]
         if self.equal:
             _renderables = [
-                None
-                if renderable is None
-                else Constrain(renderable, renderable_widths[0])
+                (
+                    None
+                    if renderable is None
+                    else Constrain(renderable, renderable_widths[0])
+                )
                 for renderable in _renderables
             ]
         if self.align:

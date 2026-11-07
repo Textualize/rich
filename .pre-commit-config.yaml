@@ -29,11 +29,15 @@ repos:
     hooks:
       - id: pycln
         args: [--all]
-  - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 23.11.0
+  - repo: local
     hooks:
       - id: black
+        name: black
+        entry: uv run --frozen black
+        language: system
+        types_or: [python, pyi]
         exclude: ^benchmarks/
+        require_serial: true
   - repo: https://github.com/PyCQA/isort
     rev: 5.12.0
     hooks:

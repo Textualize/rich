@@ -968,8 +968,7 @@ foo
 
 
 def test_indentation_guides():
-    text = Text(
-        """\
+    text = Text("""\
 for a in range(10):
     print(a)
 
@@ -980,8 +979,7 @@ foo = [
     }
 ]
 
-"""
-    )
+""")
     result = text.with_indent_guides()
     print(result.plain)
     print(repr(result.plain))

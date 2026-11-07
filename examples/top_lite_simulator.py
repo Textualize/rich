@@ -1,14 +1,15 @@
 """Lite simulation of the top linux command."""
+
 import datetime
 import random
 import time
 from dataclasses import dataclass
+from typing import Literal
 
 from rich import box
 from rich.console import Console
 from rich.live import Live
 from rich.table import Table
-from typing import Literal
 
 
 @dataclass

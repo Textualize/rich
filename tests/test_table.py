@@ -241,22 +241,19 @@ def test_section():
         (
             False,
             False,
-            dedent(
-                """
+            dedent("""
                 abbbbbcbbbbbbbbbcbbbbcbbbbbd
                 1Dec  2Skywalker2275M2375M 3
                 4May  5Solo     5275M5393M 6
                 ijjjjjkjjjjjjjjjkjjjjkjjjjjl
                 7Dec  8Last Jedi8262M81333M9
                 qrrrrrsrrrrrrrrrsrrrrsrrrrrt
-                """
-            ).lstrip(),
+                """).lstrip(),
         ),
         (
             True,
             False,
-            dedent(
-                """
+            dedent("""
                 abbbbbcbbbbbbbbbcbbbbcbbbbbd
                 1Month2Nickname 2Cost2Gross3
                 efffffgfffffffffgffffgfffffh
@@ -265,14 +262,12 @@ def test_section():
                 ijjjjjkjjjjjjjjjkjjjjkjjjjjl
                 7Dec  8Last Jedi8262M81333M9
                 qrrrrrsrrrrrrrrrsrrrrsrrrrrt
-                """
-            ).lstrip(),
+                """).lstrip(),
         ),
         (
             False,
             True,
-            dedent(
-                """
+            dedent("""
                 abbbbbcbbbbbbbbbcbbbbcbbbbbd
                 1Dec  2Skywalker2275M2375M 3
                 4May  5Solo     5275M5393M 6
@@ -281,14 +276,12 @@ def test_section():
                 mnnnnnonnnnnnnnnonnnnonnnnnp
                 7MONTH8NICKNAME 8COST8GROSS9
                 qrrrrrsrrrrrrrrrsrrrrsrrrrrt
-                """
-            ).lstrip(),
+                """).lstrip(),
         ),
         (
             True,
             True,
-            dedent(
-                """
+            dedent("""
                 abbbbbcbbbbbbbbbcbbbbcbbbbbd
                 1Month2Nickname 2Cost2Gross3
                 efffffgfffffffffgffffgfffffh
@@ -299,8 +292,7 @@ def test_section():
                 mnnnnnonnnnnnnnnonnnnonnnnnp
                 7MONTH8NICKNAME 8COST8GROSS9
                 qrrrrrsrrrrrrrrrsrrrrsrrrrrt
-                """
-            ).lstrip(),
+                """).lstrip(),
         ),
     ],
 )
