@@ -27,7 +27,6 @@ from typing import (
     Tuple,
     Type,
     Union,
-    cast,
     runtime_checkable,
 )
 
@@ -1539,7 +1538,7 @@ class Console:
         if justify in ("left", "center", "right"):
 
             def align_append(renderable: RenderableType) -> None:
-                _append(Align(renderable, cast(AlignMethod, justify)))
+                _append(Align(renderable, justify))
 
             append = align_append
 
@@ -1908,7 +1907,7 @@ class Console:
     @staticmethod
     def _caller_frame_info(
         offset: int, currentframe: Optional[Callable[[], Optional[FrameType]]] = None
-    ) -> Tuple[str, int, Dict[str, Any]]:
+    ) -> Tuple[str, int, Mapping[str, Any]]:
         """Get caller frame information.
 
         Args:

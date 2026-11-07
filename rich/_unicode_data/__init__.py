@@ -2,13 +2,7 @@ from __future__ import annotations
 
 import bisect
 import os
-import sys
-
-if sys.version_info[:2] >= (3, 9):
-    from functools import cache
-else:
-    from functools import lru_cache as cache  # pragma: no cover
-
+from functools import cache
 from importlib import import_module
 from typing import TYPE_CHECKING, cast
 
