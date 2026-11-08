@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for Python 3.15
 - Switched from Poetry to uv for packaging and development
 
+### Added
+
+- Added `IterationSpeedColumn` to display iteration speed (e.g. `1.2 it/s`), with tqdm-style inversion for slow tasks (e.g. `2.0 s/it`), and an optional `unit` parameter for custom labels.
+- Enhanced `TaskProgressColumn.render_speed` with slow-task inversion and a `style` parameter.
+
 ## [15.0.0] - 2026-04-12
 
 ### Changed

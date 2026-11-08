@@ -39,6 +39,7 @@ The following people have contributed to the development of Rich:
 - [Hugo van Kemenade](https://github.com/hugovk)
 - [Andrew Kettmann](https://github.com/akettmann)
 - [Alexander Krasnikov](https://github.com/askras)
+- [Pierre Lapolla](https://github.com/PierreLapolla)
 - [Martin Larralde](https://github.com/althonos)
 - [Hedy Li](https://github.com/hedythedev)
 - [Henry Mai](https://github.com/tanducmai)
