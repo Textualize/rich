@@ -4,7 +4,7 @@ import sys
 from array import array
 from collections import UserDict, defaultdict, deque
 from dataclasses import dataclass, field
-from typing import Any, List, NamedTuple
+from typing import Any, NamedTuple
 
 import attr
 import pytest
@@ -41,6 +41,10 @@ skip_py313 = pytest.mark.skipif(
 skip_py314 = pytest.mark.skipif(
     sys.version_info.minor == 14 and sys.version_info.major == 3,
     reason="rendered differently on py3.14",
+)
+skip_py315 = pytest.mark.skipif(
+    sys.version_info.minor == 15 and sys.version_info.major == 3,
+    reason="rendered differently on py3.15",
 )
 
 
@@ -162,7 +166,7 @@ class ExampleDataclass:
     foo: int
     bar: str
     ignore: int = field(repr=False)
-    baz: List[str] = field(default_factory=list)
+    baz: list[str] = field(default_factory=list)
     last: int = field(default=1, repr=False)
 
 
@@ -201,7 +205,7 @@ class StockKeepingUnit(NamedTuple):
     description: str
     price: float
     category: str
-    reviews: List[str]
+    reviews: list[str]
 
 
 def test_pretty_namedtuple() -> None:
@@ -219,16 +223,13 @@ def test_pretty_namedtuple() -> None:
     result = pretty_repr(example_namedtuple)
 
     print(result)
-    assert (
-        result
-        == """StockKeepingUnit(
+    assert result == """StockKeepingUnit(
     name='Sparkling British Spring Water',
     description='Carbonated spring water',
     price=0.9,
     category='water',
     reviews=['its amazing!', 'its terrible!']
 )"""
-    )
 
 
 def test_pretty_namedtuple_length_one_no_trailing_comma() -> None:
@@ -643,6 +644,7 @@ def test_attrs_empty() -> None:
 @skip_py311
 @skip_py312
 @skip_py313
+@skip_py315
 @skip_py314
 def test_attrs_broken() -> None:
     @attr.define

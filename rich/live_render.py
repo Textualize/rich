@@ -1,4 +1,4 @@
-from typing import Literal, Optional, Tuple
+from typing import Literal
 
 from ._loop import loop_last
 from .console import Console, ConsoleOptions, RenderableType, RenderResult
@@ -27,7 +27,7 @@ class LiveRender:
         self.renderable = renderable
         self.style = style
         self.vertical_overflow = vertical_overflow
-        self._shape: Optional[Tuple[int, int]] = None
+        self._shape: tuple[int, int] | None = None
 
     @property
     def last_render_height(self) -> int:
@@ -65,7 +65,7 @@ class LiveRender:
                         (ControlType.ERASE_IN_LINE, 2),
                     )
                     * (height - 1)
-                )
+                ),
             )
         return Control()
 
@@ -79,7 +79,7 @@ class LiveRender:
             _, height = self._shape
             return Control(
                 ControlType.CARRIAGE_RETURN,
-                *((ControlType.CURSOR_UP, 1), (ControlType.ERASE_IN_LINE, 2)) * height
+                *((ControlType.CURSOR_UP, 1), (ControlType.ERASE_IN_LINE, 2)) * height,
             )
         return Control()
 

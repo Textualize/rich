@@ -1,14 +1,5 @@
 from itertools import zip_longest
-from typing import (
-    TYPE_CHECKING,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import TYPE_CHECKING, Iterable, Iterator, TypeVar, overload
 
 if TYPE_CHECKING:
     from .console import (
@@ -30,10 +21,8 @@ T = TypeVar("T")
 class Renderables:
     """A list subclass which renders its contents to the console."""
 
-    def __init__(
-        self, renderables: Optional[Iterable["RenderableType"]] = None
-    ) -> None:
-        self._renderables: List["RenderableType"] = (
+    def __init__(self, renderables: Iterable["RenderableType"] | None = None) -> None:
+        self._renderables: list["RenderableType"] = (
             list(renderables) if renderables is not None else []
         )
 
@@ -67,7 +56,7 @@ class Lines:
     """A list subclass which can render to the console."""
 
     def __init__(self, lines: Iterable["Text"] = ()) -> None:
-        self._lines: List["Text"] = list(lines)
+        self._lines: list["Text"] = list(lines)
 
     def __repr__(self) -> str:
         return f"Lines({self._lines!r})"
@@ -76,14 +65,12 @@ class Lines:
         return iter(self._lines)
 
     @overload
-    def __getitem__(self, index: int) -> "Text":
-        ...
+    def __getitem__(self, index: int) -> "Text": ...
 
     @overload
-    def __getitem__(self, index: slice) -> List["Text"]:
-        ...
+    def __getitem__(self, index: slice) -> list["Text"]: ...
 
-    def __getitem__(self, index: Union[slice, int]) -> Union["Text", List["Text"]]:
+    def __getitem__(self, index: slice | int) -> "Text | list[Text]":
         return self._lines[index]
 
     def __setitem__(self, index: int, value: "Text") -> "Lines":
@@ -154,7 +141,7 @@ class Lines:
                         spaces[len(spaces) - index - 1] += 1
                         num_spaces += 1
                         index = (index + 1) % len(spaces)
-                tokens: List[Text] = []
+                tokens: list[Text] = []
                 for index, (word, next_word) in enumerate(
                     zip_longest(words, words[1:])
                 ):

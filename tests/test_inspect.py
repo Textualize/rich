@@ -1,7 +1,7 @@
 import io
 import sys
 from types import ModuleType
-from typing import Sequence, Type
+from typing import Sequence
 
 import pytest
 
@@ -46,6 +46,10 @@ skip_py313 = pytest.mark.skipif(
 skip_py314 = pytest.mark.skipif(
     sys.version_info.minor == 14 and sys.version_info.major == 3,
     reason="rendered differently on py3.14",
+)
+skip_py315 = pytest.mark.skipif(
+    sys.version_info.minor == 15 and sys.version_info.major == 3,
+    reason="rendered differently on py3.15",
 )
 
 
@@ -145,6 +149,7 @@ def test_inspect_empty_dict():
     assert render({}).startswith(expected)
 
 
+@skip_py315
 @skip_py314
 @skip_py313
 @skip_py312
@@ -169,6 +174,7 @@ def test_inspect_builtin_function_except_python311():
 @pytest.mark.skipif(
     sys.version_info < (3, 11), reason="print builtin signature only available on 3.11+"
 )
+@skip_py315
 @skip_pypy3
 def test_inspect_builtin_function_only_python311():
     # On 3.11, the print builtin *does* have a signature, unlike in prior versions
@@ -226,6 +232,7 @@ def test_inspect_integer_with_value():
 @skip_py311
 @skip_py312
 @skip_py313
+@skip_py315
 @skip_py314
 def test_inspect_integer_with_methods_python38_and_python39():
     expected = (
@@ -265,6 +272,7 @@ def test_inspect_integer_with_methods_python38_and_python39():
 @skip_py311
 @skip_py312
 @skip_py313
+@skip_py315
 @skip_py314
 def test_inspect_integer_with_methods_python310only():
     expected = (
@@ -308,6 +316,7 @@ def test_inspect_integer_with_methods_python310only():
 @skip_py310
 @skip_py312
 @skip_py313
+@skip_py315
 @skip_py314
 def test_inspect_integer_with_methods_python311():
     # to_bytes and from_bytes methods on int had minor signature change -
@@ -449,9 +458,7 @@ def test_can_handle_special_characters_in_docstrings(
 │         Multiline docstring                    │
 │         with %s should be handled              │
 ╰────────────────────────────────────────────────╯
-""" % (
-        expected_replacement
-    )
+""" % (expected_replacement)
     assert render(Something, methods=True) == expected
 
 
@@ -468,7 +475,7 @@ def test_can_handle_special_characters_in_docstrings(
         [FooSubclass, (FooSubclass, Foo, object)],
     ),
 )
-def test_object_types_mro(obj: object, expected_result: Sequence[Type]):
+def test_object_types_mro(obj: object, expected_result: Sequence[type]):
     assert get_object_types_mro(obj) == expected_result
 
 

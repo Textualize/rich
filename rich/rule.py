@@ -1,5 +1,3 @@
-from typing import Union
-
 from .align import AlignMethod
 from .cells import cell_len, set_cell_size
 from .console import Console, ConsoleOptions, RenderResult
@@ -13,7 +11,7 @@ class Rule(JupyterMixin):
     """A console renderable to draw a horizontal rule (line).
 
     Args:
-        title (Union[str, Text], optional): Text to render in the rule. Defaults to "".
+        title (str | Text, optional): Text to render in the rule. Defaults to "".
         characters (str, optional): Character(s) used to draw the line. Defaults to "─".
         style (StyleType, optional): Style of Rule. Defaults to "rule.line".
         end (str, optional): Character at end of Rule. defaults to "\\\\n"
@@ -22,10 +20,10 @@ class Rule(JupyterMixin):
 
     def __init__(
         self,
-        title: Union[str, Text] = "",
+        title: str | Text = "",
         *,
         characters: str = "─",
-        style: Union[str, Style] = "rule.line",
+        style: str | Style = "rule.line",
         end: str = "\n",
         align: AlignMethod = "center",
     ) -> None:

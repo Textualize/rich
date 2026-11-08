@@ -5,30 +5,30 @@
 [![Rich blog](https://img.shields.io/badge/blog-rich%20news-yellowgreen)](https://www.willmcgugan.com/tag/rich/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/willmcgugan.svg?style=social)](https://twitter.com/willmcgugan)
 
-![Logo](https://github.com/textualize/rich/raw/master/imgs/logo.svg)
+![Logo](https://github.com/textualize/rich/raw/main/imgs/logo.svg)
 
-[English readme](https://github.com/textualize/rich/blob/master/README.md)
- • [简体中文 readme](https://github.com/textualize/rich/blob/master/README.cn.md)
- • [正體中文 readme](https://github.com/textualize/rich/blob/master/README.zh-tw.md)
- • [Lengua española readme](https://github.com/textualize/rich/blob/master/README.es.md)
- • [Deutsche readme](https://github.com/textualize/rich/blob/master/README.de.md)
- • [Läs på svenska](https://github.com/textualize/rich/blob/master/README.sv.md)
- • [日本語 readme](https://github.com/textualize/rich/blob/master/README.ja.md)
- • [한국어 readme](https://github.com/textualize/rich/blob/master/README.kr.md)
- • [Français readme](https://github.com/textualize/rich/blob/master/README.fr.md)
- • [Schwizerdütsch readme](https://github.com/textualize/rich/blob/master/README.de-ch.md)
- • [हिन्दी readme](https://github.com/textualize/rich/blob/master/README.hi.md)
- • [Português brasileiro readme](https://github.com/textualize/rich/blob/master/README.pt-br.md)
- • [Русский readme](https://github.com/textualize/rich/blob/master/README.ru.md)
-  • [فارسی readme](https://github.com/textualize/rich/blob/master/README.fa.md)
- • [Türkçe readme](https://github.com/textualize/rich/blob/master/README.tr.md)
- • [Polskie readme](https://github.com/textualize/rich/blob/master/README.pl.md)
+[English readme](https://github.com/textualize/rich/blob/main/README.md)
+ • [简体中文 readme](https://github.com/textualize/rich/blob/main/README.cn.md)
+ • [正體中文 readme](https://github.com/textualize/rich/blob/main/README.zh-tw.md)
+ • [Lengua española readme](https://github.com/textualize/rich/blob/main/README.es.md)
+ • [Deutsche readme](https://github.com/textualize/rich/blob/main/README.de.md)
+ • [Läs på svenska](https://github.com/textualize/rich/blob/main/README.sv.md)
+ • [日本語 readme](https://github.com/textualize/rich/blob/main/README.ja.md)
+ • [한국어 readme](https://github.com/textualize/rich/blob/main/README.kr.md)
+ • [Français readme](https://github.com/textualize/rich/blob/main/README.fr.md)
+ • [Schwizerdütsch readme](https://github.com/textualize/rich/blob/main/README.de-ch.md)
+ • [हिन्दी readme](https://github.com/textualize/rich/blob/main/README.hi.md)
+ • [Português brasileiro readme](https://github.com/textualize/rich/blob/main/README.pt-br.md)
+ • [Русский readme](https://github.com/textualize/rich/blob/main/README.ru.md)
+  • [فارسی readme](https://github.com/textualize/rich/blob/main/README.fa.md)
+ • [Türkçe readme](https://github.com/textualize/rich/blob/main/README.tr.md)
+ • [Polskie readme](https://github.com/textualize/rich/blob/main/README.pl.md)
 
 Rich é uma biblioteca Python para _rich_ text e formatação de estilos no terminal.
 
 A [API do Rich](https://rich.readthedocs.io/en/latest/) permite adicionar cores e estilos no output do terminal de forma fácil. Rich também permite formataçao de tabelas, barra de progresso, markdown, highlight de sintaxe de código fonte, rastreio de erros (traceback) e muito mais.
 
-![Funcões](https://github.com/textualize/rich/raw/master/imgs/features.png)
+![Funcões](https://github.com/textualize/rich/raw/main/imgs/features.png)
 
 Para mais detalhes, veja um vídeo de introdução so Rich em [calmcode.io](https://calmcode.io/rich/introduction.html) por [@fishnets88](https://twitter.com/fishnets88).
 
@@ -64,7 +64,7 @@ from rich import print
 print("Hello, [bold magenta]World[/bold magenta]!", ":vampire:", locals())
 ```
 
-![Hello World](https://github.com/textualize/rich/raw/master/imgs/print.png)
+![Hello World](https://github.com/textualize/rich/raw/main/imgs/print.png)
 
 ## REPL do Rich
 
@@ -75,7 +75,7 @@ O Rich pode ser instalado no REPL do Python fazendo com que qualquer estrutura d
 >>> pretty.install()
 ```
 
-![REPL](https://github.com/textualize/rich/raw/master/imgs/repl.png)
+![REPL](https://github.com/textualize/rich/raw/main/imgs/repl.png)
 
 ## Usando o Console
 
@@ -103,7 +103,7 @@ console.print("Hello", "World!", style="bold red")
 
 O resultado vai ser algo como:
 
-![Hello World](https://github.com/textualize/rich/raw/master/imgs/hello_world.png)
+![Hello World](https://github.com/textualize/rich/raw/main/imgs/hello_world.png)
 
 Isso funciona bem para formatar cada linha do texto individualmente. Para maior controle sobre a formatação, o Rich renderiza um markup especial com uma sintaxe similar ao [bbcode](https://en.wikipedia.org/wiki/BBCode). Veja o exemplo a seguir:
 
@@ -111,7 +111,7 @@ Isso funciona bem para formatar cada linha do texto individualmente. Para maior 
 console.print("Where there is a [bold cyan]Will[/bold cyan] there [u]is[/u] a [i]way[/i].")
 ```
 
-![Console Markup](https://github.com/textualize/rich/raw/master/imgs/where_there_is_a_will.png)
+![Console Markup](https://github.com/textualize/rich/raw/main/imgs/where_there_is_a_will.png)
 
 Voce pode usar o objeto do Console para gerar facilmente uma saída para o terminal sofisticada. Veja a documentação da [API do Console](https://rich.readthedocs.io/en/latest/console.html) para mais detalhes.
 
@@ -125,7 +125,7 @@ O Rich tem uma função [inspect](https://rich.readthedocs.io/en/latest/referenc
 >>> inspect(my_list, methods=True)
 ```
 
-![Log](https://github.com/textualize/rich/raw/master/imgs/inspect.png)
+![Log](https://github.com/textualize/rich/raw/main/imgs/inspect.png)
 
 Confira a [documentação do inspect](https://rich.readthedocs.io/en/latest/reference/init.html#rich.inspect) para mais detalhes.
 
@@ -165,7 +165,7 @@ test_log()
 
 O código acima vai produzir algo parecido com:
 
-![Log](https://github.com/textualize/rich/raw/master/imgs/log.png)
+![Log](https://github.com/textualize/rich/raw/main/imgs/log.png)
 
 Note o argumento `log_locals` que imprime uma tabela com as variáveis locais no contexto em que o método `log()` foi chamado.
 
@@ -177,7 +177,7 @@ O método `log()` pode ser usado para logar no terminal em aplicações de proce
 
 Você também pode usar a [classe Handler](https://rich.readthedocs.io/en/latest/logging.html) nativa para formatar e colorir o output do módulo `logging` do Python. Veja aqui um exemplo do output:
 
-![Logging](https://github.com/textualize/rich/raw/master/imgs/logging.png)
+![Logging](https://github.com/textualize/rich/raw/main/imgs/logging.png)
 
 </details>
 
@@ -200,9 +200,9 @@ Por favor use esse recurso com sabedoria.
 
 O Rich pode imprimir [tables](https://rich.readthedocs.io/en/latest/tables.html) flexíveis usando caracteres unicode como bordas. Existem várias opções de formatação de bordas, estilos, alinhamento das celulas, etc.
 
-![table movie](https://github.com/textualize/rich/raw/master/imgs/table_movie.gif)
+![table movie](https://github.com/textualize/rich/raw/main/imgs/table_movie.gif)
 
-A animação acima foi gerada com o arquivo [table_movie.py](https://github.com/textualize/rich/blob/master/examples/table_movie.py) da pasta de exemplos.
+A animação acima foi gerada com o arquivo [table_movie.py](https://github.com/textualize/rich/blob/main/examples/table_movie.py) da pasta de exemplos.
 
 Veja um exemplo mais simples:
 
@@ -238,13 +238,13 @@ console.print(table)
 
 Que gera o seguinte resultado:
 
-![table](https://github.com/textualize/rich/raw/master/imgs/table.png)
+![table](https://github.com/textualize/rich/raw/main/imgs/table.png)
 
 Observe que o markup é renderizado da mesma que em `print()` e `log()`. Na verdade, tudo que é renderizável pelo Rich pode ser incluído nos cabeçalhos ou linhas (até mesmo outras tabelas).
 
 A classe `Table` é inteligente o suficiente para ajustar o tamanho das colunas para caber na largura do terminal, quebrando o texto em novas linhas quando necessário. Veja o mesmo exemplo a seguir, só que desta vez com um terminal menor do que o tamanho original da tabela:
 
-![table2](https://github.com/textualize/rich/raw/master/imgs/table2.png)
+![table2](https://github.com/textualize/rich/raw/main/imgs/table2.png)
 
 </details>
 
@@ -264,13 +264,13 @@ for step in track(range(100)):
 
 Adicionar múltiplas barras de progresso também é simples. Veja outro exemplo que existe na documentação:
 
-![progress](https://github.com/textualize/rich/raw/master/imgs/progress.gif)
+![progress](https://github.com/textualize/rich/raw/main/imgs/progress.gif)
 
 As colunas podem ser configuradas pra mostrar qualquer detalho necessário. As colunas nativas incluem a porcentagem completa, tamanho de arquivo, velocidade do arquivo e tempo restante. O exemplo a seguir mostra o progresso de um download:
 
-![progress](https://github.com/textualize/rich/raw/master/imgs/downloader.gif)
+![progress](https://github.com/textualize/rich/raw/main/imgs/downloader.gif)
 
-Para testar isso no seu terminal, use o arquivo [examples/downloader.py](https://github.com/textualize/rich/blob/master/examples/downloader.py) para fazer o download de múltiplas URLs simultaneamente, exibindo o progresso de cada download.
+Para testar isso no seu terminal, use o arquivo [examples/downloader.py](https://github.com/textualize/rich/blob/main/examples/downloader.py) para fazer o download de múltiplas URLs simultaneamente, exibindo o progresso de cada download.
 
 </details>
 
@@ -295,7 +295,7 @@ with console.status("[bold green]Working on tasks...") as status:
 
 Este código resultará no seguinte output no terminal:
 
-![status](https://github.com/textualize/rich/raw/master/imgs/status.gif)
+![status](https://github.com/textualize/rich/raw/main/imgs/status.gif)
 
 As animações do "spinner" foram emprestadas do [cli-spinners](https://www.npmjs.com/package/cli-spinners). É possível escolher um estilo de "spinner" usando o parametro `spinner`. Execute o comando a seguir para ver todos os tipos de "spinner" disponíveis.
 
@@ -305,7 +305,7 @@ python -m rich.spinner
 
 O comando acima deve exibir o seguinte no seu terminal:
 
-![spinners](https://github.com/textualize/rich/raw/master/imgs/spinners.gif)
+![spinners](https://github.com/textualize/rich/raw/main/imgs/spinners.gif)
 
 </details>
 
@@ -322,9 +322,9 @@ python -m rich.tree
 
 Isso gera o seguinte resultado:
 
-![markdown](https://github.com/textualize/rich/raw/master/imgs/tree.png)
+![markdown](https://github.com/textualize/rich/raw/main/imgs/tree.png)
 
-Veja o exemplo em [tree.py](https://github.com/textualize/rich/blob/master/examples/tree.py) de um código que gera uma árvore de exibição de um dicionário, semelhante ao comando `tree` do linux.
+Veja o exemplo em [tree.py](https://github.com/textualize/rich/blob/main/examples/tree.py) de um código que gera uma árvore de exibição de um dicionário, semelhante ao comando `tree` do linux.
 
 </details>
 
@@ -344,9 +344,9 @@ directory = os.listdir(sys.argv[1])
 print(Columns(directory))
 ```
 
-O screenshot a seguir é do resultado do [exemplo de colunas](https://github.com/textualize/rich/blob/master/examples/columns.py) formatando em colunas os dados extraídos de uma API:
+O screenshot a seguir é do resultado do [exemplo de colunas](https://github.com/textualize/rich/blob/main/examples/columns.py) formatando em colunas os dados extraídos de uma API:
 
-![columns](https://github.com/textualize/rich/raw/master/imgs/columns.png)
+![columns](https://github.com/textualize/rich/raw/main/imgs/columns.png)
 
 </details>
 
@@ -369,7 +369,7 @@ console.print(markdown)
 
 Isso produzirá um resultado como:
 
-![markdown](https://github.com/textualize/rich/raw/master/imgs/markdown.png)
+![markdown](https://github.com/textualize/rich/raw/main/imgs/markdown.png)
 
 </details>
 
@@ -404,7 +404,7 @@ console.print(syntax)
 
 Este código gerará o seguinte resultado:
 
-![syntax](https://github.com/textualize/rich/raw/master/imgs/syntax.png)
+![syntax](https://github.com/textualize/rich/raw/main/imgs/syntax.png)
 
 </details>
 
@@ -415,7 +415,7 @@ O Rich renderiza [tracebacks formatados](https://rich.readthedocs.io/en/latest/t
 
 Veja o resultado disso no OSX (resultados semelhantes no Linux):
 
-![traceback](https://github.com/textualize/rich/raw/master/imgs/traceback.png)
+![traceback](https://github.com/textualize/rich/raw/main/imgs/traceback.png)
 
 </details>
 

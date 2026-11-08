@@ -6,20 +6,7 @@ import sys
 import textwrap
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    Iterable,
-    List,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Iterable, NamedTuple, Sequence
 
 from pygments.lexer import Lexer
 from pygments.lexers import get_lexer_by_name, guess_lexer_for_filename
@@ -54,7 +41,7 @@ from .segment import Segment, Segments
 from .style import Style, StyleType
 from .text import Text
 
-TokenType = Tuple[str, ...]
+TokenType = tuple[str, ...]
 
 WINDOWS = sys.platform == "win32"
 DEFAULT_THEME = "monokai"
@@ -62,7 +49,7 @@ DEFAULT_THEME = "monokai"
 # The following styles are based on https://github.com/pygments/pygments/blob/master/pygments/formatters/terminal.py
 # A few modifications were made
 
-ANSI_LIGHT: Dict[TokenType, Style] = {
+ANSI_LIGHT: dict[TokenType, Style] = {
     Token: Style(),
     Whitespace: Style(color="white"),
     Comment: Style(dim=True),
@@ -91,7 +78,7 @@ ANSI_LIGHT: Dict[TokenType, Style] = {
     Error: Style(color="red", underline=True),
 }
 
-ANSI_DARK: Dict[TokenType, Style] = {
+ANSI_DARK: dict[TokenType, Style] = {
     Token: Style(),
     Whitespace: Style(color="bright_black"),
     Comment: Style(dim=True),
@@ -141,8 +128,8 @@ class SyntaxTheme(ABC):
 class PygmentsSyntaxTheme(SyntaxTheme):
     """Syntax theme that delegates to Pygments theme."""
 
-    def __init__(self, theme: Union[str, Type[PygmentsStyle]]) -> None:
-        self._style_cache: Dict[TokenType, Style] = {}
+    def __init__(self, theme: str | type[PygmentsStyle]) -> None:
+        self._style_cache: dict[TokenType, Style] = {}
         if isinstance(theme, str):
             try:
                 self._pygments_style_class = get_style_by_name(theme)
@@ -183,11 +170,11 @@ class PygmentsSyntaxTheme(SyntaxTheme):
 class ANSISyntaxTheme(SyntaxTheme):
     """Syntax theme to use standard colors."""
 
-    def __init__(self, style_map: Dict[TokenType, Style]) -> None:
+    def __init__(self, style_map: dict[TokenType, Style]) -> None:
         self.style_map = style_map
         self._missing_style = Style.null()
         self._background_style = Style.null()
-        self._style_cache: Dict[TokenType, Style] = {}
+        self._style_cache: dict[TokenType, Style] = {}
 
     def get_style_for_token(self, token_type: TokenType) -> Style:
         """Look up style in the style map."""
@@ -213,7 +200,7 @@ class ANSISyntaxTheme(SyntaxTheme):
         return self._background_style
 
 
-SyntaxPosition = Tuple[int, int]
+SyntaxPosition = tuple[int, int]
 
 
 class _SyntaxHighlightRange(NamedTuple):
@@ -232,7 +219,7 @@ class _SyntaxHighlightRange(NamedTuple):
 class PaddingProperty:
     """Descriptor to get and set padding."""
 
-    def __get__(self, obj: Syntax, objtype: Type[Syntax]) -> Tuple[int, int, int, int]:
+    def __get__(self, obj: Syntax, objtype: type[Syntax]) -> tuple[int, int, int, int]:
         """Space around the Syntax."""
         return obj._padding
 
@@ -250,9 +237,9 @@ class Syntax(JupyterMixin):
         dedent (bool, optional): Enable stripping of initial whitespace. Defaults to False.
         line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
         start_line (int, optional): Starting number for line numbers. Defaults to 1.
-        line_range (Tuple[int | None, int | None], optional): If given should be a tuple of the start and end line to render.
+        line_range (tuple[int | None, int | None], optional): If given should be a tuple of the start and end line to render.
             A value of None in the tuple indicates the range is open in that direction.
-        highlight_lines (Set[int]): A set of line numbers to highlight.
+        highlight_lines (set[int]): A set of line numbers to highlight.
         code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
         tab_size (int, optional): Size of tabs. Defaults to 4.
         word_wrap (bool, optional): Enable word wrapping.
@@ -261,11 +248,11 @@ class Syntax(JupyterMixin):
         padding (PaddingDimensions): Padding to apply around the syntax. Defaults to 0 (no padding).
     """
 
-    _pygments_style_class: Type[PygmentsStyle]
+    _pygments_style_class: type[PygmentsStyle]
     _theme: SyntaxTheme
 
     @classmethod
-    def get_theme(cls, name: Union[str, SyntaxTheme]) -> SyntaxTheme:
+    def get_theme(cls, name: str | SyntaxTheme) -> SyntaxTheme:
         """Get a syntax theme instance."""
         if isinstance(name, SyntaxTheme):
             return name
@@ -279,18 +266,18 @@ class Syntax(JupyterMixin):
     def __init__(
         self,
         code: str,
-        lexer: Union[Lexer, str],
+        lexer: Lexer | str,
         *,
-        theme: Union[str, SyntaxTheme] = DEFAULT_THEME,
+        theme: str | SyntaxTheme = DEFAULT_THEME,
         dedent: bool = False,
         line_numbers: bool = False,
         start_line: int = 1,
-        line_range: Optional[Tuple[Optional[int], Optional[int]]] = None,
-        highlight_lines: Optional[Set[int]] = None,
-        code_width: Optional[int] = None,
+        line_range: tuple[int | None, int | None] | None = None,
+        highlight_lines: set[int] | None = None,
+        code_width: int | None = None,
         tab_size: int = 4,
         word_wrap: bool = False,
-        background_color: Optional[str] = None,
+        background_color: str | None = None,
         indent_guides: bool = False,
         padding: PaddingDimensions = 0,
     ) -> None:
@@ -312,7 +299,7 @@ class Syntax(JupyterMixin):
         self._padding = Padding.unpack(padding)
 
         self._theme = self.get_theme(theme)
-        self._stylized_ranges: List[_SyntaxHighlightRange] = []
+        self._stylized_ranges: list[_SyntaxHighlightRange] = []
 
     padding = PaddingProperty()
 
@@ -321,17 +308,17 @@ class Syntax(JupyterMixin):
         cls,
         path: str,
         encoding: str = "utf-8",
-        lexer: Optional[Union[Lexer, str]] = None,
-        theme: Union[str, SyntaxTheme] = DEFAULT_THEME,
+        lexer: Lexer | str | None = None,
+        theme: str | SyntaxTheme = DEFAULT_THEME,
         dedent: bool = False,
         line_numbers: bool = False,
-        line_range: Optional[Tuple[int, int]] = None,
+        line_range: tuple[int, int] | None = None,
         start_line: int = 1,
-        highlight_lines: Optional[Set[int]] = None,
-        code_width: Optional[int] = None,
+        highlight_lines: set[int] | None = None,
+        code_width: int | None = None,
         tab_size: int = 4,
         word_wrap: bool = False,
-        background_color: Optional[str] = None,
+        background_color: str | None = None,
         indent_guides: bool = False,
         padding: PaddingDimensions = 0,
     ) -> "Syntax":
@@ -345,8 +332,8 @@ class Syntax(JupyterMixin):
             dedent (bool, optional): Enable stripping of initial whitespace. Defaults to True.
             line_numbers (bool, optional): Enable rendering of line numbers. Defaults to False.
             start_line (int, optional): Starting number for line numbers. Defaults to 1.
-            line_range (Tuple[int, int], optional): If given should be a tuple of the start and end line to render.
-            highlight_lines (Set[int]): A set of line numbers to highlight.
+            line_range (tuple[int, int], optional): If given should be a tuple of the start and end line to render.
+            highlight_lines (set[int]): A set of line numbers to highlight.
             code_width: Width of code to render (not including line numbers), or ``None`` to use all available width.
             tab_size (int, optional): Size of tabs. Defaults to 4.
             word_wrap (bool, optional): Enable word wrapping of code.
@@ -380,7 +367,7 @@ class Syntax(JupyterMixin):
         )
 
     @classmethod
-    def guess_lexer(cls, path: str, code: Optional[str] = None) -> str:
+    def guess_lexer(cls, path: str, code: str | None = None) -> str:
         """Guess the alias of the Pygments lexer to use based on a path and an optional string of code.
         If code is supplied, it will use a combination of the code and the filename to determine the
         best lexer to use. For example, if the file is ``index.html`` and the file contains Django
@@ -396,7 +383,7 @@ class Syntax(JupyterMixin):
         Returns:
             str: The name of the Pygments lexer that best matches the supplied path/code.
         """
-        lexer: Optional[Lexer] = None
+        lexer: Lexer | None = None
         lexer_name = "default"
         if code:
             try:
@@ -426,20 +413,20 @@ class Syntax(JupyterMixin):
         default_style = self._theme.get_background_style() + self.background_style
         return default_style
 
-    def _get_token_color(self, token_type: TokenType) -> Optional[Color]:
+    def _get_token_color(self, token_type: TokenType) -> Color | None:
         """Get a color (if any) for the given token.
 
         Args:
             token_type (TokenType): A token type tuple from Pygments.
 
         Returns:
-            Optional[Color]: Color from theme, or None for no color.
+            Color | None: Color from theme, or None for no color.
         """
         style = self._theme.get_style_for_token(token_type)
         return style.color
 
     @property
-    def lexer(self) -> Optional[Lexer]:
+    def lexer(self) -> Lexer | None:
         """The lexer for this syntax, or None if no lexer was found.
 
         Tries to find the lexer by name if a string was passed to the constructor.
@@ -470,13 +457,13 @@ class Syntax(JupyterMixin):
     def highlight(
         self,
         code: str,
-        line_range: Optional[Tuple[Optional[int], Optional[int]]] = None,
+        line_range: tuple[int | None, int | None] | None = None,
     ) -> Text:
         """Highlight code and return a Text instance.
 
         Args:
             code (str): Code to highlight.
-            line_range(Tuple[int, int], optional): Optional line range to highlight.
+            line_range(tuple[int, int], optional): Optional line range to highlight.
 
         Returns:
             Text: A text instance containing highlighted syntax.
@@ -505,7 +492,7 @@ class Syntax(JupyterMixin):
                 # This speeds up further operations as there are less spans to process
                 line_start, line_end = line_range
 
-                def line_tokenize() -> Iterable[Tuple[Any, str]]:
+                def line_tokenize() -> Iterable[tuple[Any, str]]:
                     """Split tokens to one per line."""
                     assert lexer  # required to make MyPy happy - we know lexer is not None at this point
 
@@ -514,7 +501,7 @@ class Syntax(JupyterMixin):
                             line_token, new_line, token = token.partition("\n")
                             yield token_type, line_token + new_line
 
-                def tokens_to_spans() -> Iterable[Tuple[str, Optional[Style]]]:
+                def tokens_to_spans() -> Iterable[tuple[str, Style | None]]:
                     """Convert tokens to spans."""
                     tokens = iter(line_tokenize())
                     line_no = 0
@@ -565,8 +552,8 @@ class Syntax(JupyterMixin):
 
         Args:
             style (StyleType): The style to apply.
-            start (Tuple[int, int]): The start of the range, in the form `[line number, column index]`.
-            end (Tuple[int, int]): The end of the range, in the form `[line number, column index]`.
+            start (tuple[int, int]): The start of the range, in the form `[line number, column index]`.
+            end (tuple[int, int]): The end of the range, in the form `[line number, column index]`.
             style_before (bool): Apply the style before any existing styles.
         """
         self._stylized_ranges.append(
@@ -599,7 +586,7 @@ class Syntax(JupyterMixin):
             )
         return column_width
 
-    def _get_number_styles(self, console: Console) -> Tuple[Style, Style, Style]:
+    def _get_number_styles(self, console: Console) -> tuple[Style, Style, Style]:
         """Get background, number, and highlight styles for line numbers."""
         background_style = self._get_base_style()
         if background_style.transparent_background:
@@ -708,7 +695,7 @@ class Syntax(JupyterMixin):
         line_offset = 0
         if start_line:
             line_offset = max(0, start_line - 1)
-        lines: Union[List[Text], Lines] = text.split("\n", allow_blank=ends_on_nl)
+        lines: list[Text] | Lines = text.split("\n", allow_blank=ends_on_nl)
         if self.line_range:
             if line_offset > len(lines):
                 return
@@ -820,7 +807,7 @@ class Syntax(JupyterMixin):
                 else:
                     text.stylize(stylized_range.style, start, end)
 
-    def _process_code(self, code: str) -> Tuple[bool, str]:
+    def _process_code(self, code: str) -> tuple[bool, str]:
         """
         Applies various processing to a raw code string
         (normalises it so it always ends with a line return, dedents it if necessary, etc.)
@@ -829,7 +816,7 @@ class Syntax(JupyterMixin):
             code (str): The raw code string to process
 
         Returns:
-            Tuple[bool, str]: the boolean indicates whether the raw code ends with a line return,
+            tuple[bool, str]: the boolean indicates whether the raw code ends with a line return,
                 while the string is the processed code.
         """
         ends_on_nl = code.endswith("\n")
@@ -843,7 +830,7 @@ class Syntax(JupyterMixin):
 
 def _get_code_index_for_syntax_position(
     newlines_offsets: Sequence[int], position: SyntaxPosition
-) -> Optional[int]:
+) -> int | None:
     """
     Returns the index of the code string for the given positions.
 
@@ -852,7 +839,7 @@ def _get_code_index_for_syntax_position(
         position (SyntaxPosition): The position to search for.
 
     Returns:
-        Optional[int]: The index of the code string for this position, or `None`
+        int | None: The index of the code string for this position, or `None`
             if the given position's line number is out of range (if it's the column that is out of range
             we silently clamp its value so that it reaches the end of the line)
     """

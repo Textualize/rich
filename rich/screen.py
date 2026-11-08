@@ -1,18 +1,11 @@
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
+from ._loop import loop_last
 from .segment import Segment
 from .style import StyleType
-from ._loop import loop_last
-
 
 if TYPE_CHECKING:
-    from .console import (
-        Console,
-        ConsoleOptions,
-        RenderResult,
-        RenderableType,
-        Group,
-    )
+    from .console import Console, ConsoleOptions, RenderableType, RenderResult
 
 
 class Screen:
@@ -28,7 +21,7 @@ class Screen:
     def __init__(
         self,
         *renderables: "RenderableType",
-        style: Optional[StyleType] = None,
+        style: StyleType | None = None,
         application_mode: bool = False,
     ) -> None:
         from rich.console import Group

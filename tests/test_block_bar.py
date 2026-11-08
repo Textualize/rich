@@ -3,7 +3,6 @@ from rich.console import Console
 
 from .render import render
 
-
 expected = [
     "\x1b[39;49m     ▐█████████████████████████                   \x1b[0m\n",
     "\x1b[39;49m      ██████████████████████▌                     \x1b[0m\n",

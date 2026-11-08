@@ -1,6 +1,5 @@
 import re
 from io import StringIO
-from typing import List
 
 import pytest
 
@@ -825,7 +824,7 @@ def test_tabs_to_spaces():
     ],
 )
 def test_tabs_to_spaces_spans(
-    markup: str, tab_size: int, expected_text: str, expected_spans: List[Span]
+    markup: str, tab_size: int, expected_text: str, expected_spans: list[Span]
 ):
     """Test spans are correct after expand_tabs"""
     text = Text.from_markup(markup)
@@ -968,8 +967,7 @@ foo
 
 
 def test_indentation_guides():
-    text = Text(
-        """\
+    text = Text("""\
 for a in range(10):
     print(a)
 
@@ -980,8 +978,7 @@ foo = [
     }
 ]
 
-"""
-    )
+""")
     result = text.with_indent_guides()
     print(result.plain)
     print(repr(result.plain))

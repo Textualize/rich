@@ -1,6 +1,5 @@
 # encoding=utf-8
 import time
-from typing import Optional
 
 # import pytest
 from rich.console import Console
@@ -9,7 +8,7 @@ from rich.text import Text
 
 
 def create_capture_console(
-    *, width: int = 60, height: int = 80, force_terminal: Optional[bool] = True
+    *, width: int = 60, height: int = 80, force_terminal: bool | None = True
 ) -> Console:
     return Console(
         width=width,

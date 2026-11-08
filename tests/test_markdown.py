@@ -117,8 +117,7 @@ def test_inline_code():
 
 
 def test_markdown_table():
-    markdown = Markdown(
-        """\
+    markdown = Markdown("""\
 | Year |                      Title                       | Director          |  Box Office (USD) |
 |------|:------------------------------------------------:|:------------------|------------------:|
 | 1982 |            *E.T. the Extra-Terrestrial*          | Steven Spielberg  |    $792.9 million |
@@ -126,8 +125,7 @@ def test_markdown_table():
 | 1983 |    Star Wars: Episode VI – Return of the Jedi    | Richard Marquand  |    $475.1 million |
 | 1981 |             Raiders of the Lost Ark              | Steven Spielberg  |    $389.9 million |
 | 1984 |       Indiana Jones and the Temple of Doom       | Steven Spielberg  |    $333.1 million |
-"""
-    )
+""")
     result = render(markdown)
     expected = "\n\x1b[36m                                                                                          \x1b[0m\n\x1b[36m \x1b[0m\x1b[36mYear\x1b[0m\x1b[1m \x1b[0m\x1b[36m \x1b[0m\x1b[1m                    \x1b[0m\x1b[36mTitle\x1b[0m\x1b[1m                     \x1b[0m\x1b[1m \x1b[0m\x1b[36m \x1b[0m\x1b[36mDirector\x1b[0m\x1b[1m        \x1b[0m\x1b[1m \x1b[0m\x1b[36m \x1b[0m\x1b[36mBox Office (USD)\x1b[0m\x1b[36m \x1b[0m\n\x1b[36m ──────────────────────────────────────────────────────────────────────────────────────── \x1b[0m\n\x1b[36m \x1b[0m1982 \x1b[36m \x1b[0m          \x1b[3mE.T. the Extra-Terrestrial\x1b[0m           \x1b[36m \x1b[0mSteven Spielberg \x1b[36m \x1b[0m  $792.9 million\x1b[36m \x1b[0m\n\x1b[36m \x1b[0m1980 \x1b[36m \x1b[0mStar Wars: Episode V – The Empire Strikes Back \x1b[36m \x1b[0mIrvin Kershner   \x1b[36m \x1b[0m  $538.4 million\x1b[36m \x1b[0m\n\x1b[36m \x1b[0m1983 \x1b[36m \x1b[0m  Star Wars: Episode VI – Return of the Jedi   \x1b[36m \x1b[0mRichard Marquand \x1b[36m \x1b[0m  $475.1 million\x1b[36m \x1b[0m\n\x1b[36m \x1b[0m1981 \x1b[36m \x1b[0m           Raiders of the Lost Ark             \x1b[36m \x1b[0mSteven Spielberg \x1b[36m \x1b[0m  $389.9 million\x1b[36m \x1b[0m\n\x1b[36m \x1b[0m1984 \x1b[36m \x1b[0m     Indiana Jones and the Temple of Doom      \x1b[36m \x1b[0mSteven Spielberg \x1b[36m \x1b[0m  $333.1 million\x1b[36m \x1b[0m\n\x1b[36m                                                                                          \x1b[0m\n"
     assert result == expected
@@ -135,14 +133,12 @@ def test_markdown_table():
 
 def test_inline_styles_in_table():
     """Regression test for https://github.com/Textualize/rich/issues/3115"""
-    markdown = Markdown(
-        """\
+    markdown = Markdown("""\
 | Year | This **column** displays _the_ movie _title_ ~~description~~ | Director          |  Box Office (USD) |
 |------|:----------------------------------------------------------:|:------------------|------------------:|
 | 1982 | *E.T. the Extra-Terrestrial* ([Wikipedia article](https://en.wikipedia.org/wiki/E.T._the_Extra-Terrestrial)) | Steven Spielberg  |    $792.9 million |
 | 1980 |  Star Wars: Episode V – The *Empire* **Strikes** ~~Back~~  | Irvin Kershner    |    $538.4 million |
-"""
-    )
+""")
     result = render(markdown)
     expected = "\n\x1b[36m                                                                                            \x1b[0m\n\x1b[36m \x1b[0m\x1b[36mYear\x1b[0m\x1b[1m \x1b[0m\x1b[36m \x1b[0m\x1b[36mThis \x1b[0m\x1b[36mcolumn\x1b[0m\x1b[36m displays \x1b[0m\x1b[3;36mthe\x1b[0m\x1b[36m movie \x1b[0m\x1b[3;36mtitle\x1b[0m\x1b[36m \x1b[0m\x1b[9;36mdescription\x1b[0m\x1b[1m \x1b[0m\x1b[36m \x1b[0m\x1b[36mDirector\x1b[0m\x1b[1m        \x1b[0m\x1b[1m \x1b[0m\x1b[36m \x1b[0m\x1b[36mBox Office (USD)\x1b[0m\x1b[36m \x1b[0m\n\x1b[36m ────────────────────────────────────────────────────────────────────────────────────────── \x1b[0m\n\x1b[36m \x1b[0m1982 \x1b[36m \x1b[0m \x1b[3mE.T. the Extra-Terrestrial\x1b[0m (\x1b]8;id=0;foo\x1b\\\x1b[4;34mWikipedia article\x1b[0m\x1b]8;;\x1b\\)  \x1b[36m \x1b[0mSteven Spielberg \x1b[36m \x1b[0m  $792.9 million\x1b[36m \x1b[0m\n\x1b[36m \x1b[0m1980 \x1b[36m \x1b[0m Star Wars: Episode V – The \x1b[3mEmpire\x1b[0m \x1b[1mStrikes\x1b[0m \x1b[9mBack\x1b[0m  \x1b[36m \x1b[0mIrvin Kershner   \x1b[36m \x1b[0m  $538.4 million\x1b[36m \x1b[0m\n\x1b[36m                                                                                            \x1b[0m\n"
     assert result == expected
@@ -154,13 +150,11 @@ def test_inline_styles_with_justification():
     In particular, this tests the interaction between the change that was made to fix
     #3115 and column text justification.
     """
-    markdown = Markdown(
-        """\
+    markdown = Markdown("""\
 | left | center | right |
 | :- | :-: | -: |
 | This is a long row | because it contains | a fairly long sentence. |
-| a*b* _c_ ~~d~~ e | a*b* _c_ ~~d~~ e | a*b* _c_ ~~d~~ e |"""
-    )
+| a*b* _c_ ~~d~~ e | a*b* _c_ ~~d~~ e | a*b* _c_ ~~d~~ e |""")
     result = render(markdown)
     expected = "\n\x1b[36m                                                                  \x1b[0m\n\x1b[36m \x1b[0m\x1b[36mleft\x1b[0m\x1b[1m              \x1b[0m\x1b[1m \x1b[0m\x1b[36m \x1b[0m\x1b[1m      \x1b[0m\x1b[36mcenter\x1b[0m\x1b[1m       \x1b[0m\x1b[1m \x1b[0m\x1b[36m \x1b[0m\x1b[1m                  \x1b[0m\x1b[36mright\x1b[0m\x1b[36m \x1b[0m\n\x1b[36m ──────────────────────────────────────────────────────────────── \x1b[0m\n\x1b[36m \x1b[0mThis is a long row \x1b[36m \x1b[0mbecause it contains \x1b[36m \x1b[0ma fairly long sentence.\x1b[36m \x1b[0m\n\x1b[36m \x1b[0ma\x1b[3mb\x1b[0m \x1b[3mc\x1b[0m \x1b[9md\x1b[0m e           \x1b[36m \x1b[0m     a\x1b[3mb\x1b[0m \x1b[3mc\x1b[0m \x1b[9md\x1b[0m e       \x1b[36m \x1b[0m               a\x1b[3mb\x1b[0m \x1b[3mc\x1b[0m \x1b[9md\x1b[0m e\x1b[36m \x1b[0m\n\x1b[36m                                                                  \x1b[0m\n"
     assert result == expected
@@ -178,22 +172,18 @@ def test_table_with_empty_cells() -> None:
     """Test a table with empty cells is rendered without extra newlines above.
     Regression test for #3027 https://github.com/Textualize/rich/issues/3027
     """
-    complete_table = Markdown(
-        """\
+    complete_table = Markdown("""\
 | First Header  | Second Header |
 | ------------- | ------------- |
 | Content Cell  | Content Cell  |
 | Content Cell  | Content Cell  |
-"""
-    )
-    table_with_empty_cells = Markdown(
-        """\
+""")
+    table_with_empty_cells = Markdown("""\
 | First Header  |               |
 | ------------- | ------------- |
 | Content Cell  | Content Cell  |
 |               | Content Cell  |
-"""
-    )
+""")
     result = len(render(table_with_empty_cells).splitlines())
     expected = len(render(complete_table).splitlines())
     assert result == expected
@@ -211,7 +201,7 @@ def test_inline_code_in_table_cells() -> None:
         inline_code_lexer="python",
     )
     result = render(markdown)
-    expected = "\n\x1b[36m                 \x1b[0m\n\x1b[36m \x1b[0m\x1b[36mCol\x1b[0m\x1b[1m            \x1b[0m\x1b[36m \x1b[0m\n\x1b[36m ─────────────── \x1b[0m\n\x1b[36m \x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34mprint\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m(\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34m'\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34mhello\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34m'\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m)\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m;\x1b[0m\x1b[36m \x1b[0m\n\x1b[36m                 \x1b[0m\n"
+    expected = "\n\x1b[36m                 \x1b[0m\n\x1b[36m \x1b[0m\x1b[36mCol\x1b[0m\x1b[1m            \x1b[0m\x1b[36m \x1b[0m\n\x1b[36m ─────────────── \x1b[0m\n\x1b[36m \x1b[0m\x1b[38;2;166;226;46;48;2;39;40;34mprint\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m(\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34m'\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34mhello\x1b[0m\x1b[38;2;230;219;116;48;2;39;40;34m'\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m)\x1b[0m\x1b[38;2;248;248;242;48;2;39;40;34m;\x1b[0m\x1b[36m \x1b[0m\n\x1b[36m                 \x1b[0m\n"
     assert result == expected
 
 

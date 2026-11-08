@@ -1,5 +1,5 @@
 import sys
-from typing import TYPE_CHECKING, Literal, Optional, Union
+from typing import TYPE_CHECKING, Literal
 
 from ._emoji_replace import _emoji_replace
 from .jupyter import JupyterMixin
@@ -25,14 +25,14 @@ class Emoji(JupyterMixin):
     def __init__(
         self,
         name: str,
-        style: Union[str, Style] = "none",
-        variant: Optional[EmojiVariant] = None,
+        style: str | Style = "none",
+        variant: EmojiVariant | None = None,
     ) -> None:
         """A single emoji character.
 
         Args:
             name (str): Name of emoji.
-            style (Union[str, Style], optional): Optional style. Defaults to None.
+            style (str | Style, optional): Optional style. Defaults to None.
 
         Raises:
             NoEmoji: If the emoji doesn't exist.

@@ -1,17 +1,17 @@
 from fractions import Fraction
 from math import ceil
-from typing import cast, List, Optional, Sequence, Protocol
+from typing import Protocol, Sequence, cast
 
 
 class Edge(Protocol):
     """Any object that defines an edge (such as Layout)."""
 
-    size: Optional[int] = None
+    size: int | None = None
     ratio: int = 1
     minimum_size: int = 1
 
 
-def ratio_resolve(total: int, edges: Sequence[Edge]) -> List[int]:
+def ratio_resolve(total: int, edges: Sequence[Edge]) -> list[int]:
     """Divide total space to satisfy size, ratio, and minimum_size, constraints.
 
     The returned list of integers should add up to total in most cases, unless it is
@@ -22,10 +22,10 @@ def ratio_resolve(total: int, edges: Sequence[Edge]) -> List[int]:
 
     Args:
         total (int): Total number of characters.
-        edges (List[Edge]): Edges within total space.
+        edges (list[Edge]): Edges within total space.
 
     Returns:
-        List[int]: Number of characters for each edge.
+        list[int]: Number of characters for each edge.
     """
     # Size of edge or None for yet to be determined
     sizes = [(edge.size or None) for edge in edges]
@@ -69,29 +69,29 @@ def ratio_resolve(total: int, edges: Sequence[Edge]) -> List[int]:
                 sizes[index] = size
             break
     # Sizes now contains integers only
-    return cast(List[int], sizes)
+    return cast(list[int], sizes)
 
 
 def ratio_reduce(
-    total: int, ratios: List[int], maximums: List[int], values: List[int]
-) -> List[int]:
+    total: int, ratios: list[int], maximums: list[int], values: list[int]
+) -> list[int]:
     """Divide an integer total in to parts based on ratios.
 
     Args:
         total (int): The total to divide.
-        ratios (List[int]): A list of integer ratios.
-        maximums (List[int]): List of maximums values for each slot.
-        values (List[int]): List of values
+        ratios (list[int]): A list of integer ratios.
+        maximums (list[int]): List of maximums values for each slot.
+        values (list[int]): List of values
 
     Returns:
-        List[int]: A list of integers guaranteed to sum to total.
+        list[int]: A list of integers guaranteed to sum to total.
     """
     ratios = [ratio if _max else 0 for ratio, _max in zip(ratios, maximums)]
     total_ratio = sum(ratios)
     if not total_ratio:
         return values[:]
     total_remaining = total
-    result: List[int] = []
+    result: list[int] = []
     append = result.append
     for ratio, maximum, value in zip(ratios, maximums, values):
         if ratio and total_ratio > 0:
@@ -105,17 +105,17 @@ def ratio_reduce(
 
 
 def ratio_distribute(
-    total: int, ratios: List[int], minimums: Optional[List[int]] = None
-) -> List[int]:
+    total: int, ratios: list[int], minimums: list[int] | None = None
+) -> list[int]:
     """Distribute an integer total in to parts based on ratios.
 
     Args:
         total (int): The total to divide.
-        ratios (List[int]): A list of integer ratios.
-        minimums (List[int]): List of minimum values for each slot.
+        ratios (list[int]): A list of integer ratios.
+        minimums (list[int]): List of minimum values for each slot.
 
     Returns:
-        List[int]: A list of integers guaranteed to sum to total.
+        list[int]: A list of integers guaranteed to sum to total.
     """
     if minimums:
         ratios = [ratio if _min else 0 for ratio, _min in zip(ratios, minimums)]
@@ -123,7 +123,7 @@ def ratio_distribute(
     assert total_ratio > 0, "Sum of ratios must be > 0"
 
     total_remaining = total
-    distributed_total: List[int] = []
+    distributed_total: list[int] = []
     append = distributed_total.append
     if minimums is None:
         _minimums = [0] * len(ratios)
@@ -145,7 +145,7 @@ if __name__ == "__main__":
 
     @dataclass
     class E:
-        size: Optional[int] = None
+        size: int | None = None
         ratio: int = 1
         minimum_size: int = 1
 

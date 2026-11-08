@@ -6,19 +6,7 @@ from dataclasses import dataclass, field
 from itertools import islice
 from traceback import walk_tb
 from types import ModuleType, TracebackType
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import Any, Callable, Iterable, Sequence
 
 from pygments.lexers import guess_lexer_for_filename
 from pygments.token import Comment, Keyword, Name, Number, Operator, String
@@ -33,8 +21,8 @@ from .console import (
     Console,
     ConsoleOptions,
     ConsoleRenderable,
-    OverflowMethod,
     Group,
+    OverflowMethod,
     RenderResult,
     group,
 )
@@ -55,7 +43,7 @@ LOCALS_MAX_STRING = 80
 
 def _iter_syntax_lines(
     start: SyntaxPosition, end: SyntaxPosition
-) -> Iterable[Tuple[int, int, int]]:
+) -> Iterable[tuple[int, int, int]]:
     """Yield start and end positions per line.
 
     Args:
@@ -83,34 +71,34 @@ def _iter_syntax_lines(
 
 def install(
     *,
-    console: Optional[Console] = None,
-    width: Optional[int] = 100,
-    code_width: Optional[int] = 88,
+    console: Console | None = None,
+    width: int | None = 100,
+    code_width: int | None = 88,
     extra_lines: int = 3,
-    theme: Optional[str] = None,
+    theme: str | None = None,
     word_wrap: bool = False,
     show_locals: bool = False,
     locals_max_length: int = LOCALS_MAX_LENGTH,
     locals_max_string: int = LOCALS_MAX_STRING,
-    locals_max_depth: Optional[int] = None,
+    locals_max_depth: int | None = None,
     locals_hide_dunder: bool = True,
-    locals_hide_sunder: Optional[bool] = None,
-    locals_overflow: Optional[OverflowMethod] = None,
+    locals_hide_sunder: bool | None = None,
+    locals_overflow: OverflowMethod | None = None,
     indent_guides: bool = True,
-    suppress: Iterable[Union[str, ModuleType]] = (),
+    suppress: Iterable[str | ModuleType] = (),
     max_frames: int = 100,
-) -> Callable[[Type[BaseException], BaseException, Optional[TracebackType]], Any]:
+) -> Callable[[type[BaseException], BaseException, TracebackType | None], Any]:
     """Install a rich traceback handler.
 
     Once installed, any tracebacks will be printed with syntax highlighting and rich formatting.
 
 
     Args:
-        console (Optional[Console], optional): Console to write exception to. Default uses internal Console instance.
-        width (Optional[int], optional): Width (in characters) of traceback. Defaults to 100.
-        code_width (Optional[int], optional): Code width (in characters) of traceback. Defaults to 88.
+        console (Console | None, optional): Console to write exception to. Default uses internal Console instance.
+        width (int | None, optional): Width (in characters) of traceback. Defaults to 100.
+        code_width (int | None, optional): Code width (in characters) of traceback. Defaults to 88.
         extra_lines (int, optional): Extra lines of code. Defaults to 3.
-        theme (Optional[str], optional): Pygments theme to use in traceback. Defaults to ``None`` which will pick
+        theme (str | None, optional): Pygments theme to use in traceback. Defaults to ``None`` which will pick
             a theme appropriate for the platform.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
         show_locals (bool, optional): Enable display of local variables. Defaults to False.
@@ -122,7 +110,7 @@ def install(
         locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
         locals_overflow (OverflowMethod, optional): How to handle overflowing locals, or None to disable. Defaults to None.
         indent_guides (bool, optional): Enable indent guides in code and locals. Defaults to True.
-        suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+        suppress (Sequence[str | ModuleType]): Optional sequence of modules or paths to exclude from traceback.
 
     Returns:
         Callable: The previous exception handler that was replaced.
@@ -137,9 +125,9 @@ def install(
     )
 
     def excepthook(
-        type_: Type[BaseException],
+        type_: type[BaseException],
         value: BaseException,
-        traceback: Optional[TracebackType],
+        traceback: TracebackType | None,
     ) -> None:
         exception_traceback = Traceback.from_exception(
             type_,
@@ -181,7 +169,7 @@ def install(
             exc_tuple = ip._get_exc_info()
 
             # do not display trace on syntax error
-            tb: Optional[TracebackType] = None if is_syntax else exc_tuple[2]
+            tb: TracebackType | None = None if is_syntax else exc_tuple[2]
 
             # determine correct tb_offset
             compiled = tb_data.get("running_compiled_code", False)
@@ -224,8 +212,8 @@ class Frame:
     lineno: int
     name: str
     line: str = ""
-    locals: Optional[Dict[str, pretty.Node]] = None
-    last_instruction: Optional[Tuple[Tuple[int, int], Tuple[int, int]]] = None
+    locals: dict[str, pretty.Node] | None = None
+    last_instruction: tuple[tuple[int, int], tuple[int, int]] | None = None
 
 
 @dataclass
@@ -235,24 +223,24 @@ class _SyntaxError:
     line: str
     lineno: int
     msg: str
-    notes: List[str] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)
 
 
 @dataclass
 class Stack:
     exc_type: str
     exc_value: str
-    syntax_error: Optional[_SyntaxError] = None
+    syntax_error: _SyntaxError | None = None
     is_cause: bool = False
-    frames: List[Frame] = field(default_factory=list)
-    notes: List[str] = field(default_factory=list)
+    frames: list[Frame] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)
     is_group: bool = False
-    exceptions: List["Trace"] = field(default_factory=list)
+    exceptions: list["Trace"] = field(default_factory=list)
 
 
 @dataclass
 class Trace:
-    stacks: List[Stack]
+    stacks: list[Stack]
 
 
 class PathHighlighter(RegexHighlighter):
@@ -265,8 +253,8 @@ class Traceback:
     Args:
         trace (Trace, optional): A `Trace` object produced from `extract`. Defaults to None, which uses
             the last exception.
-        width (Optional[int], optional): Number of characters used to traceback. Defaults to 100.
-        code_width (Optional[int], optional): Number of code characters used to traceback. Defaults to 88.
+        width (int | None, optional): Number of characters used to traceback. Defaults to 100.
+        code_width (int | None, optional): Number of code characters used to traceback. Defaults to 88.
         extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
         theme (str, optional): Override pygments theme used in traceback.
         word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
@@ -279,7 +267,7 @@ class Traceback:
         locals_hide_dunder (bool, optional): Hide locals prefixed with double underscore. Defaults to True.
         locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
         locals_overflow (OverflowMethod, optional): How to handle overflowing locals, or None to disable. Defaults to None.
-        suppress (Sequence[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+        suppress (Sequence[str | ModuleType]): Optional sequence of modules or paths to exclude from traceback.
         max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
 
     """
@@ -294,22 +282,22 @@ class Traceback:
 
     def __init__(
         self,
-        trace: Optional[Trace] = None,
+        trace: Trace | None = None,
         *,
-        width: Optional[int] = 100,
-        code_width: Optional[int] = 88,
+        width: int | None = 100,
+        code_width: int | None = 88,
         extra_lines: int = 3,
-        theme: Optional[str] = None,
+        theme: str | None = None,
         word_wrap: bool = False,
         show_locals: bool = False,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
-        locals_max_depth: Optional[int] = None,
+        locals_max_depth: int | None = None,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
-        locals_overlow: Optional[OverflowMethod] = None,
+        locals_overlow: OverflowMethod | None = None,
         indent_guides: bool = True,
-        suppress: Iterable[Union[str, ModuleType]] = (),
+        suppress: Iterable[str | ModuleType] = (),
         max_frames: int = 100,
     ):
         if trace is None:
@@ -352,34 +340,34 @@ class Traceback:
     @classmethod
     def from_exception(
         cls,
-        exc_type: Type[Any],
+        exc_type: type[Any],
         exc_value: BaseException,
-        traceback: Optional[TracebackType],
+        traceback: TracebackType | None,
         *,
-        width: Optional[int] = 100,
-        code_width: Optional[int] = 88,
+        width: int | None = 100,
+        code_width: int | None = 88,
         extra_lines: int = 3,
-        theme: Optional[str] = None,
+        theme: str | None = None,
         word_wrap: bool = False,
         show_locals: bool = False,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
-        locals_max_depth: Optional[int] = None,
+        locals_max_depth: int | None = None,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
-        locals_overflow: Optional[OverflowMethod] = None,
+        locals_overflow: OverflowMethod | None = None,
         indent_guides: bool = True,
-        suppress: Iterable[Union[str, ModuleType]] = (),
+        suppress: Iterable[str | ModuleType] = (),
         max_frames: int = 100,
     ) -> "Traceback":
         """Create a traceback from exception info
 
         Args:
-            exc_type (Type[BaseException]): Exception type.
+            exc_type (type[BaseException]): Exception type.
             exc_value (BaseException): Exception value.
             traceback (TracebackType): Python Traceback object.
-            width (Optional[int], optional): Number of characters used to traceback. Defaults to 100.
-            code_width (Optional[int], optional): Number of code characters used to traceback. Defaults to 88.
+            width (int | None, optional): Number of characters used to traceback. Defaults to 100.
+            code_width (int | None, optional): Number of code characters used to traceback. Defaults to 88.
             extra_lines (int, optional): Additional lines of code to render. Defaults to 3.
             theme (str, optional): Override pygments theme used in traceback.
             word_wrap (bool, optional): Enable word wrapping of long lines. Defaults to False.
@@ -392,7 +380,7 @@ class Traceback:
             locals_hide_dunder (bool, optional): Hide locals prefixed with double underscore. Defaults to True.
             locals_hide_sunder (bool, optional): Hide locals prefixed with single underscore. Defaults to False.
             locals_overflow (OverflowMethod, optional): How to handle overflowing locals, or None to disable. Defaults to None.
-            suppress (Iterable[Union[str, ModuleType]]): Optional sequence of modules or paths to exclude from traceback.
+            suppress (Iterable[str | ModuleType]): Optional sequence of modules or paths to exclude from traceback.
             max_frames (int): Maximum number of frames to show in a traceback, 0 for no maximum. Defaults to 100.
 
         Returns:
@@ -432,22 +420,22 @@ class Traceback:
     @classmethod
     def extract(
         cls,
-        exc_type: Type[BaseException],
+        exc_type: type[BaseException],
         exc_value: BaseException,
-        traceback: Optional[TracebackType],
+        traceback: TracebackType | None,
         *,
         show_locals: bool = False,
         locals_max_length: int = LOCALS_MAX_LENGTH,
         locals_max_string: int = LOCALS_MAX_STRING,
-        locals_max_depth: Optional[int] = None,
+        locals_max_depth: int | None = None,
         locals_hide_dunder: bool = True,
         locals_hide_sunder: bool = False,
-        _visited_exceptions: Optional[Set[BaseException]] = None,
+        _visited_exceptions: set[BaseException] | None = None,
     ) -> Trace:
         """Extract traceback information.
 
         Args:
-            exc_type (Type[BaseException]): Exception type.
+            exc_type (type[BaseException]): Exception type.
             exc_value (BaseException): Exception value.
             traceback (TracebackType): Python Traceback object.
             show_locals (bool, optional): Enable display of local variables. Defaults to False.
@@ -462,14 +450,14 @@ class Traceback:
             Trace: A Trace instance which you can use to construct a `Traceback`.
         """
 
-        stacks: List[Stack] = []
+        stacks: list[Stack] = []
         is_cause = False
 
         from rich import _IMPORT_CWD
 
-        notes: List[str] = getattr(exc_value, "__notes__", None) or []
+        notes: list[str] = getattr(exc_value, "__notes__", None) or []
 
-        grouped_exceptions: Set[BaseException] = (
+        grouped_exceptions: set[BaseException] = (
             set() if _visited_exceptions is None else _visited_exceptions
         )
 
@@ -522,8 +510,8 @@ class Traceback:
             append = stack.frames.append
 
             def get_locals(
-                iter_locals: Iterable[Tuple[str, object]],
-            ) -> Iterable[Tuple[str, object]]:
+                iter_locals: Iterable[tuple[str, object]],
+            ) -> Iterable[tuple[str, object]]:
                 """Extract locals from an iterator of key pairs."""
                 if not (locals_hide_dunder or locals_hide_sunder):
                     yield from iter_locals
@@ -538,7 +526,7 @@ class Traceback:
             for frame_summary, line_no in walk_tb(traceback):
                 filename = frame_summary.f_code.co_filename
 
-                last_instruction: Optional[Tuple[Tuple[int, int], Tuple[int, int]]]
+                last_instruction: tuple[tuple[int, int], tuple[int, int]] | None
                 last_instruction = None
                 if sys.version_info >= (3, 11):
                     instruction_index = frame_summary.f_lasti // 2
@@ -699,7 +687,7 @@ class Traceback:
 
             if stack.is_group:
                 for group_no, group_exception in enumerate(stack.exceptions, 1):
-                    grouped_exceptions: List[Group] = []
+                    grouped_exceptions: list[Group] = []
                     for group_last, group_stack in loop_last(group_exception.stacks):
                         grouped_exceptions.append(render_stack(group_stack, group_last))
                     yield ""
@@ -781,7 +769,7 @@ class Traceback:
                     overflow=self.locals_overflow,
                 )
 
-        exclude_frames: Optional[range] = None
+        exclude_frames: range | None = None
         if self.max_frames != 0:
             exclude_frames = range(
                 self.max_frames // 2,

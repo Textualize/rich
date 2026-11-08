@@ -1,6 +1,6 @@
 """Tests for the highlighter classes."""
+
 import json
-from typing import List
 
 import pytest
 
@@ -158,7 +158,7 @@ highlight_tests = [
 
 
 @pytest.mark.parametrize("test, spans", highlight_tests)
-def test_highlight_regex(test: str, spans: List[Span]):
+def test_highlight_regex(test: str, spans: list[Span]):
     """Tests for the regular expressions used in ReprHighlighter."""
     text = Text(test)
     highlighter = ReprHighlighter()
@@ -454,7 +454,7 @@ iso8601_highlight_tests = [
 
 
 @pytest.mark.parametrize("test, spans", iso8601_highlight_tests)
-def test_highlight_iso8601_regex(test: str, spans: List[Span]):
+def test_highlight_iso8601_regex(test: str, spans: list[Span]):
     """Tests for the regular expressions used in ISO8601Highlighter."""
     text = Text(test)
     highlighter = ISO8601Highlighter()

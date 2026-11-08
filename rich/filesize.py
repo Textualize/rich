@@ -12,7 +12,7 @@ See Also:
 
 __all__ = ["decimal"]
 
-from typing import Iterable, List, Optional, Tuple
+from typing import Iterable
 
 
 def _to_str(
@@ -20,8 +20,8 @@ def _to_str(
     suffixes: Iterable[str],
     base: int,
     *,
-    precision: Optional[int] = 1,
-    separator: Optional[str] = " ",
+    precision: int | None = 1,
+    separator: str | None = " ",
 ) -> str:
     if size == 1:
         return "1 byte"
@@ -40,7 +40,7 @@ def _to_str(
     )
 
 
-def pick_unit_and_suffix(size: int, suffixes: List[str], base: int) -> Tuple[int, str]:
+def pick_unit_and_suffix(size: int, suffixes: list[str], base: int) -> tuple[int, str]:
     """Pick a suffix and base for the given size."""
     for i, suffix in enumerate(suffixes):
         unit = base**i
@@ -52,8 +52,8 @@ def pick_unit_and_suffix(size: int, suffixes: List[str], base: int) -> Tuple[int
 def decimal(
     size: int,
     *,
-    precision: Optional[int] = 1,
-    separator: Optional[str] = " ",
+    precision: int | None = 1,
+    separator: str | None = " ",
 ) -> str:
     """Convert a filesize in to a string (powers of 1000, SI prefixes).
 

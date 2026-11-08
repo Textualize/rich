@@ -1,9 +1,9 @@
-import json
 import io
+import json
 from time import time
+
 from rich.console import Console
 from rich.pretty import Pretty
-
 
 console = Console(file=io.StringIO(), color_system="truecolor", width=100)
 

@@ -4,7 +4,7 @@ from itertools import count
 from operator import attrgetter
 from pickle import dumps, loads
 from random import getrandbits
-from typing import Any, Dict, Iterable, List, Optional, Type, Union, cast
+from typing import Any, Iterable, Union, cast
 
 from . import errors
 from .color import Color, ColorParseError, ColorSystem, blend_rgb
@@ -30,7 +30,7 @@ class _Bit:
     def __init__(self, bit_no: int) -> None:
         self.bit = 1 << bit_no
 
-    def __get__(self, obj: "Style", objtype: Type["Style"]) -> Optional[bool]:
+    def __get__(self, obj: "Style", objtype: type["Style"]) -> bool | None:
         if obj._set_attributes & self.bit:
             return obj._attributes & self.bit != 0
         return None
@@ -45,8 +45,8 @@ class Style:
     (``True``), off (``False``), or not set (``None``).
 
     Args:
-        color (Union[Color, str], optional): Color of terminal text. Defaults to None.
-        bgcolor (Union[Color, str], optional): Color of terminal background. Defaults to None.
+        color (Color | str, optional): Color of terminal text. Defaults to None.
+        bgcolor (Color | str, optional): Color of terminal background. Defaults to None.
         bold (bool, optional): Enable bold text. Defaults to None.
         dim (bool, optional): Enable dim text. Defaults to None.
         italic (bool, optional): Enable italic text. Defaults to None.
@@ -64,13 +64,13 @@ class Style:
 
     """
 
-    _color: Optional[Color]
-    _bgcolor: Optional[Color]
+    _color: Color | None
+    _bgcolor: Color | None
     _attributes: int
     _set_attributes: int
-    _hash: Optional[int]
+    _hash: int | None
     _null: bool
-    _meta: Optional[bytes]
+    _meta: bytes | None
 
     __slots__ = [
         "_color",
@@ -131,28 +131,28 @@ class Style:
     def __init__(
         self,
         *,
-        color: Optional[Union[Color, str]] = None,
-        bgcolor: Optional[Union[Color, str]] = None,
-        bold: Optional[bool] = None,
-        dim: Optional[bool] = None,
-        italic: Optional[bool] = None,
-        underline: Optional[bool] = None,
-        blink: Optional[bool] = None,
-        blink2: Optional[bool] = None,
-        reverse: Optional[bool] = None,
-        conceal: Optional[bool] = None,
-        strike: Optional[bool] = None,
-        underline2: Optional[bool] = None,
-        frame: Optional[bool] = None,
-        encircle: Optional[bool] = None,
-        overline: Optional[bool] = None,
-        link: Optional[str] = None,
-        meta: Optional[Dict[str, Any]] = None,
+        color: Color | str | None = None,
+        bgcolor: Color | str | None = None,
+        bold: bool | None = None,
+        dim: bool | None = None,
+        italic: bool | None = None,
+        underline: bool | None = None,
+        blink: bool | None = None,
+        blink2: bool | None = None,
+        reverse: bool | None = None,
+        conceal: bool | None = None,
+        strike: bool | None = None,
+        underline2: bool | None = None,
+        frame: bool | None = None,
+        encircle: bool | None = None,
+        overline: bool | None = None,
+        link: str | None = None,
+        meta: dict[str, Any] | None = None,
     ):
-        self._ansi: Optional[str] = None
-        self._style_definition: Optional[str] = None
+        self._ansi: str | None = None
+        self._style_definition: str | None = None
 
-        def _make_color(color: Union[Color, str]) -> Color:
+        def _make_color(color: Color | str) -> Color:
             return color if isinstance(color, Color) else Color.parse(color)
 
         self._color = None if color is None else _make_color(color)
@@ -201,7 +201,7 @@ class Style:
         self._link_id = (
             f"{next(_id_generator)}{hash(self._meta)}" if (link or meta) else ""
         )
-        self._hash: Optional[int] = None
+        self._hash: int | None = None
         self._null = not (self._set_attributes or color or bgcolor or link or meta)
 
     @classmethod
@@ -211,13 +211,13 @@ class Style:
 
     @classmethod
     def from_color(
-        cls, color: Optional[Color] = None, bgcolor: Optional[Color] = None
+        cls, color: Color | None = None, bgcolor: Color | None = None
     ) -> "Style":
         """Create a new style with colors and no attributes.
 
         Returns:
-            color (Optional[Color]): A (foreground) color, or None for no color. Defaults to None.
-            bgcolor (Optional[Color]): A (background) color, or None for no color. Defaults to None.
+            color (Color | None): A (foreground) color, or None for no color. Defaults to None.
+            bgcolor (Color | None): A (background) color, or None for no color. Defaults to None.
         """
         style: Style = cls.__new__(Style)
         style._ansi = None
@@ -234,11 +234,11 @@ class Style:
         return style
 
     @classmethod
-    def from_meta(cls, meta: Optional[Dict[str, Any]]) -> "Style":
+    def from_meta(cls, meta: dict[str, Any] | None) -> "Style":
         """Create a new style with meta data.
 
         Returns:
-            meta (Optional[Dict[str, Any]]): A dictionary of meta data. Defaults to None.
+            meta (dict[str, Any] | None): A dictionary of meta data. Defaults to None.
         """
         style: Style = cls.__new__(Style)
         style._ansi = None
@@ -255,14 +255,14 @@ class Style:
         return style
 
     @classmethod
-    def on(cls, meta: Optional[Dict[str, Any]] = None, **handlers: Any) -> "Style":
+    def on(cls, meta: dict[str, Any] | None = None, **handlers: Any) -> "Style":
         """Create a blank style with meta information.
 
         Example:
             style = Style.on(click=self.on_click)
 
         Args:
-            meta (Optional[Dict[str, Any]], optional): An optional dict of meta information.
+            meta (dict[str, Any] | None, optional): An optional dict of meta information.
             **handlers (Any): Keyword arguments are translated in to handlers.
 
         Returns:
@@ -294,7 +294,7 @@ class Style:
     def __str__(self) -> str:
         """Re-generate style definition from attributes."""
         if self._style_definition is None:
-            attributes: List[str] = []
+            attributes: list[str] = []
             append = attributes.append
             bits = self._set_attributes
             if bits & 0b0000000001111:
@@ -352,7 +352,7 @@ class Style:
         """
 
         if self._ansi is None:
-            sgr: List[str] = []
+            sgr: list[str] = []
             append = sgr.append
             _style_map = self._style_map
             attributes = self._attributes & self._set_attributes
@@ -402,7 +402,7 @@ class Style:
             return style.strip().lower()
 
     @classmethod
-    def pick_first(cls, *values: Optional[StyleType]) -> StyleType:
+    def pick_first(cls, *values: StyleType | None) -> StyleType:
         """Pick first non-None style."""
         for value in values:
             if value is not None:
@@ -445,17 +445,17 @@ class Style:
         return self._hash
 
     @property
-    def color(self) -> Optional[Color]:
+    def color(self) -> Color | None:
         """The foreground color or None if it is not set."""
         return self._color
 
     @property
-    def bgcolor(self) -> Optional[Color]:
+    def bgcolor(self) -> Color | None:
         """The background color or None if it is not set."""
         return self._bgcolor
 
     @property
-    def link(self) -> Optional[str]:
+    def link(self) -> str | None:
         """Link text, if set."""
         return self._link
 
@@ -470,9 +470,9 @@ class Style:
         return Style(bgcolor=self.bgcolor)
 
     @property
-    def meta(self) -> Dict[str, Any]:
+    def meta(self) -> dict[str, Any]:
         """Get meta information (can not be changed after construction)."""
-        return {} if self._meta is None else cast(Dict[str, Any], loads(self._meta))
+        return {} if self._meta is None else cast(dict[str, Any], loads(self._meta))
 
     @property
     def without_color(self) -> "Style":
@@ -511,10 +511,10 @@ class Style:
             return cls.null()
 
         STYLE_ATTRIBUTES = cls.STYLE_ATTRIBUTES
-        color: Optional[str] = None
-        bgcolor: Optional[str] = None
-        attributes: Dict[str, Optional[Any]] = {}
-        link: Optional[str] = None
+        color: str | None = None
+        bgcolor: str | None = None
+        attributes: dict[str, Any | None] = {}
+        link: str | None = None
 
         words = iter(style_definition.split())
         for original_word in words:
@@ -561,10 +561,10 @@ class Style:
         return style
 
     @lru_cache(maxsize=1024)
-    def get_html_style(self, theme: Optional[TerminalTheme] = None) -> str:
+    def get_html_style(self, theme: TerminalTheme | None = None) -> str:
         """Get a CSS style rule."""
         theme = theme or DEFAULT_TERMINAL_THEME
-        css: List[str] = []
+        css: list[str] = []
         append = css.append
 
         color = self.color
@@ -668,7 +668,7 @@ class Style:
         style._meta = None
         return style
 
-    def update_link(self, link: Optional[str] = None) -> "Style":
+    def update_link(self, link: str | None = None) -> "Style":
         """Get a copy with a different value for link.
 
         Args:
@@ -695,14 +695,14 @@ class Style:
         self,
         text: str = "",
         *,
-        color_system: Optional[ColorSystem] = ColorSystem.TRUECOLOR,
+        color_system: ColorSystem | None = ColorSystem.TRUECOLOR,
         legacy_windows: bool = False,
     ) -> str:
         """Render the ANSI codes for the style.
 
         Args:
             text (str, optional): A string to style. Defaults to "".
-            color_system (Optional[ColorSystem], optional): Color system to render to. Defaults to ColorSystem.TRUECOLOR.
+            color_system (ColorSystem | None, optional): Color system to render to. Defaults to ColorSystem.TRUECOLOR.
 
         Returns:
             str: A string containing ANSI style codes.
@@ -717,20 +717,20 @@ class Style:
             )
         return rendered
 
-    def test(self, text: Optional[str] = None) -> None:
+    def test(self, text: str | None = None) -> None:
         """Write text with style directly to terminal.
 
         This method is for testing purposes only.
 
         Args:
-            text (Optional[str], optional): Text to style or None for style name.
+            text (str | None, optional): Text to style or None for style name.
 
         """
         text = text or str(self)
         sys.stdout.write(f"{self.render(text)}\n")
 
     @lru_cache(maxsize=1024)
-    def _add(self, style: Optional["Style"]) -> "Style":
+    def _add(self, style: "Style | None") -> "Style":
         if style is None or style._null:
             return self
         if self._null:
@@ -754,7 +754,7 @@ class Style:
         new_style._hash = None
         return new_style
 
-    def __add__(self, style: Optional["Style"]) -> "Style":
+    def __add__(self, style: "Style | None") -> "Style":
         combined_style = self._add(style)
         return combined_style.copy() if combined_style.link else combined_style
 
@@ -768,7 +768,7 @@ class StyleStack:
     __slots__ = ["_stack"]
 
     def __init__(self, default_style: "Style") -> None:
-        self._stack: List[Style] = [default_style]
+        self._stack: list[Style] = [default_style]
 
     def __repr__(self) -> str:
         return f"<stylestack {self._stack!r}>"

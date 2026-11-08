@@ -1,5 +1,4 @@
 from types import TracebackType
-from typing import Optional, Type
 
 from .console import Console, RenderableType
 from .jupyter import JupyterMixin
@@ -24,7 +23,7 @@ class Status(JupyterMixin):
         self,
         status: RenderableType,
         *,
-        console: Optional[Console] = None,
+        console: Console | None = None,
         spinner: str = "dots",
         spinner_style: StyleType = "status.spinner",
         speed: float = 1.0,
@@ -52,19 +51,19 @@ class Status(JupyterMixin):
 
     def update(
         self,
-        status: Optional[RenderableType] = None,
+        status: RenderableType | None = None,
         *,
-        spinner: Optional[str] = None,
-        spinner_style: Optional[StyleType] = None,
-        speed: Optional[float] = None,
+        spinner: str | None = None,
+        spinner_style: StyleType | None = None,
+        speed: float | None = None,
     ) -> None:
         """Update status.
 
         Args:
-            status (Optional[RenderableType], optional): New status renderable or None for no change. Defaults to None.
-            spinner (Optional[str], optional): New spinner or None for no change. Defaults to None.
-            spinner_style (Optional[StyleType], optional): New spinner style or None for no change. Defaults to None.
-            speed (Optional[float], optional): Speed factor for spinner animation or None for no change. Defaults to None.
+            status (RenderableType | None, optional): New status renderable or None for no change. Defaults to None.
+            spinner (str | None, optional): New spinner or None for no change. Defaults to None.
+            spinner_style (StyleType | None, optional): New spinner style or None for no change. Defaults to None.
+            speed (float | None, optional): Speed factor for spinner animation or None for no change. Defaults to None.
         """
         if status is not None:
             self.status = status
@@ -99,9 +98,9 @@ class Status(JupyterMixin):
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         self.stop()
 

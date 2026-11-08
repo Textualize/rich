@@ -44,13 +44,18 @@ if sys.platform == "win32":
             cursor_info.dwSize = CURSOR_SIZE
             cursor_info.bVisible = True
 
-        with mock.patch.object(
-            _win32_console,
-            "GetConsoleScreenBufferInfo",
-            return_value=StubScreenBufferInfo,
-        ) as GetConsoleScreenBufferInfo, mock.patch.object(
-            _win32_console, "GetConsoleCursorInfo", side_effect=stub_console_cursor_info
-        ) as GetConsoleCursorInfo:
+        with (
+            mock.patch.object(
+                _win32_console,
+                "GetConsoleScreenBufferInfo",
+                return_value=StubScreenBufferInfo,
+            ) as GetConsoleScreenBufferInfo,
+            mock.patch.object(
+                _win32_console,
+                "GetConsoleCursorInfo",
+                side_effect=stub_console_cursor_info,
+            ) as GetConsoleCursorInfo,
+        ):
             yield {
                 "GetConsoleScreenBufferInfo": GetConsoleScreenBufferInfo,
                 "GetConsoleCursorInfo": GetConsoleCursorInfo,
@@ -324,9 +329,9 @@ if sys.platform == "win32":
         cursor_at_end_of_line = StubScreenBufferInfo(
             dwCursorPosition=COORD(SCREEN_WIDTH - 1, CURSOR_Y)
         )
-        win32_console_getters[
-            "GetConsoleScreenBufferInfo"
-        ].return_value = cursor_at_end_of_line
+        win32_console_getters["GetConsoleScreenBufferInfo"].return_value = (
+            cursor_at_end_of_line
+        )
         term = LegacyWindowsTerm(sys.stdout)
         term.move_cursor_forward()
 
@@ -361,9 +366,9 @@ if sys.platform == "win32":
         cursor_at_start_of_line = StubScreenBufferInfo(
             dwCursorPosition=COORD(0, CURSOR_Y)
         )
-        win32_console_getters[
-            "GetConsoleScreenBufferInfo"
-        ].return_value = cursor_at_start_of_line
+        win32_console_getters["GetConsoleScreenBufferInfo"].return_value = (
+            cursor_at_start_of_line
+        )
         term = LegacyWindowsTerm(sys.stdout)
         term.move_cursor_backward()
         SetConsoleCursorPosition.assert_called_once_with(

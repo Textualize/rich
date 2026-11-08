@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from functools import lru_cache
 from operator import itemgetter
-from typing import Callable, NamedTuple, Sequence, Tuple
+from typing import Callable, NamedTuple, Sequence
 
 from rich._unicode_data import load as load_cell_table
 
-CellSpan = Tuple[int, int, int]
+CellSpan = tuple[int, int, int]
 
 _span_get_cell_len = itemgetter(2)
 

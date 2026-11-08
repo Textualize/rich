@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, Optional, Tuple
+from typing import TYPE_CHECKING, Any
 
 from .highlighter import ReprHighlighter
 from .panel import Panel
@@ -14,13 +14,13 @@ if TYPE_CHECKING:
 def render_scope(
     scope: "Mapping[str, Any]",
     *,
-    title: Optional[TextType] = None,
+    title: TextType | None = None,
     sort_keys: bool = True,
     indent_guides: bool = False,
-    max_length: Optional[int] = None,
-    max_string: Optional[int] = None,
-    max_depth: Optional[int] = None,
-    overflow: Optional["OverflowMethod"] = None,
+    max_length: int | None = None,
+    max_string: int | None = None,
+    max_depth: int | None = None,
+    overflow: "OverflowMethod | None" = None,
 ) -> "ConsoleRenderable":
     """Render python variables in a given scope.
 
@@ -42,7 +42,7 @@ def render_scope(
     items_table = Table.grid(padding=(0, 1), expand=False)
     items_table.add_column(justify="right")
 
-    def sort_items(item: Tuple[str, Any]) -> Tuple[bool, str]:
+    def sort_items(item: tuple[str, Any]) -> tuple[bool, str]:
         """Sort special variables first, then alphabetically."""
         key, _ = item
         return (not key.startswith("__"), key.lower())

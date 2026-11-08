@@ -1,5 +1,5 @@
 from operator import itemgetter
-from typing import TYPE_CHECKING, Callable, NamedTuple, Optional, Sequence
+from typing import TYPE_CHECKING, Callable, NamedTuple, Sequence
 
 from . import errors
 from .protocol import is_renderable, rich_cast
@@ -57,7 +57,7 @@ class Measurement(NamedTuple):
         return Measurement(max(minimum, width), max(maximum, width))
 
     def clamp(
-        self, min_width: Optional[int] = None, max_width: Optional[int] = None
+        self, min_width: int | None = None, max_width: int | None = None
     ) -> "Measurement":
         """Clamp a measurement within the specified range.
 
@@ -101,9 +101,9 @@ class Measurement(NamedTuple):
             )
         renderable = rich_cast(renderable)
         if is_renderable(renderable):
-            get_console_width: Optional[
-                Callable[["Console", "ConsoleOptions"], "Measurement"]
-            ] = getattr(renderable, "__rich_measure__", None)
+            get_console_width: (
+                Callable[["Console", "ConsoleOptions"], "Measurement"] | None
+            ) = getattr(renderable, "__rich_measure__", None)
             if get_console_width is not None:
                 render_width = (
                     get_console_width(console, options)

@@ -3,7 +3,7 @@ import sys
 from colorsys import rgb_to_hls
 from enum import IntEnum
 from functools import lru_cache
-from typing import TYPE_CHECKING, NamedTuple, Optional, Tuple
+from typing import TYPE_CHECKING, NamedTuple
 
 from ._palettes import EIGHT_BIT_PALETTE, STANDARD_PALETTE, WINDOWS_PALETTE
 from .color_triplet import ColorTriplet
@@ -307,9 +307,9 @@ class Color(NamedTuple):
     """The name of the color (typically the input to Color.parse)."""
     type: ColorType
     """The type of the color."""
-    number: Optional[int] = None
+    number: int | None = None
     """The color number, if a standard color, or None."""
-    triplet: Optional[ColorTriplet] = None
+    triplet: ColorTriplet | None = None
     """A triplet of color components, if an RGB color."""
 
     def __rich__(self) -> "Text":
@@ -347,7 +347,7 @@ class Color(NamedTuple):
         return self.type == ColorType.DEFAULT
 
     def get_truecolor(
-        self, theme: Optional["TerminalTheme"] = None, foreground: bool = True
+        self, theme: "TerminalTheme | None" = None, foreground: bool = True
     ) -> ColorTriplet:
         """Get an equivalent color triplet for this color.
 
@@ -482,7 +482,7 @@ class Color(NamedTuple):
             return cls(color, ColorType.TRUECOLOR, triplet=triplet)
 
     @lru_cache(maxsize=1024)
-    def get_ansi_codes(self, foreground: bool = True) -> Tuple[str, ...]:
+    def get_ansi_codes(self, foreground: bool = True) -> tuple[str, ...]:
         """Get the ANSI escape codes for this color."""
         _type = self.type
         if _type == ColorType.DEFAULT:

@@ -37,7 +37,7 @@ def render(panel, width=50) -> str:
     return result
 
 
-@pytest.mark.parametrize("panel,expected", zip(tests, expected))
+@pytest.mark.parametrize("panel,expected", list(zip(tests, expected)))
 def test_render_panel(panel, expected) -> None:
     assert render(panel) == expected
 

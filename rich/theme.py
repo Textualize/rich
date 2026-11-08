@@ -1,4 +1,4 @@
-from typing import IO, Dict, List, Mapping, Optional
+from typing import IO, Mapping
 
 from .default_styles import DEFAULT_STYLES
 from .style import Style, StyleType
@@ -8,14 +8,14 @@ class Theme:
     """A container for style information, used by :class:`~rich.console.Console`.
 
     Args:
-        styles (Dict[str, Style], optional): A mapping of style names on to styles. Defaults to None for a theme with no styles.
+        styles (dict[str, Style], optional): A mapping of style names on to styles. Defaults to None for a theme with no styles.
         inherit (bool, optional): Inherit default styles. Defaults to True.
     """
 
-    styles: Dict[str, Style]
+    styles: dict[str, Style]
 
     def __init__(
-        self, styles: Optional[Mapping[str, StyleType]] = None, inherit: bool = True
+        self, styles: Mapping[str, StyleType] | None = None, inherit: bool = True
     ):
         self.styles = DEFAULT_STYLES.copy() if inherit else {}
         if styles is not None:
@@ -36,7 +36,7 @@ class Theme:
 
     @classmethod
     def from_file(
-        cls, config_file: IO[str], source: Optional[str] = None, inherit: bool = True
+        cls, config_file: IO[str], source: str | None = None, inherit: bool = True
     ) -> "Theme":
         """Load a theme from a text mode file.
 
@@ -58,7 +58,7 @@ class Theme:
 
     @classmethod
     def read(
-        cls, path: str, inherit: bool = True, encoding: Optional[str] = None
+        cls, path: str, inherit: bool = True, encoding: str | None = None
     ) -> "Theme":
         """Read a theme from a path.
 
@@ -86,7 +86,7 @@ class ThemeStack:
     """
 
     def __init__(self, theme: Theme) -> None:
-        self._entries: List[Dict[str, Style]] = [theme.styles]
+        self._entries: list[dict[str, Style]] = [theme.styles]
         self.get = self._entries[-1].get
 
     def push_theme(self, theme: Theme, inherit: bool = True) -> None:
@@ -96,7 +96,7 @@ class ThemeStack:
             theme (Theme): A Theme instance.
             inherit (boolean, optional): Inherit styles from current top of stack.
         """
-        styles: Dict[str, Style]
+        styles: dict[str, Style]
         styles = (
             {**self._entries[-1], **theme.styles} if inherit else theme.styles.copy()
         )

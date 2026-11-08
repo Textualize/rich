@@ -1,21 +1,10 @@
 from functools import partial
-from typing import (
-    Any,
-    Callable,
-    Iterable,
-    List,
-    Optional,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import Any, Callable, Iterable, TypeVar, overload
 
 T = TypeVar("T")
 
 
-Result = Iterable[Union[Any, Tuple[Any], Tuple[str, Any], Tuple[str, Any, Any]]]
+Result = Iterable[Any | tuple[Any] | tuple[str, Any] | tuple[str, Any, Any]]
 RichReprResult = Result
 
 
@@ -24,24 +13,22 @@ class ReprError(Exception):
 
 
 @overload
-def auto(cls: Optional[Type[T]]) -> Type[T]:
-    ...
+def auto(cls: type[T] | None) -> type[T]: ...
 
 
 @overload
-def auto(*, angular: bool = False) -> Callable[[Type[T]], Type[T]]:
-    ...
+def auto(*, angular: bool = False) -> Callable[[type[T]], type[T]]: ...
 
 
 def auto(
-    cls: Optional[Type[T]] = None, *, angular: Optional[bool] = None
-) -> Union[Type[T], Callable[[Type[T]], Type[T]]]:
+    cls: type[T] | None = None, *, angular: bool | None = None
+) -> type[T] | Callable[[type[T]], type[T]]:
     """Class decorator to create __repr__ from __rich_repr__"""
 
-    def do_replace(cls: Type[T], angular: Optional[bool] = None) -> Type[T]:
+    def do_replace(cls: type[T], angular: bool | None = None) -> type[T]:
         def auto_repr(self: T) -> str:
             """Create repr string from __rich_repr__"""
-            repr_str: List[str] = []
+            repr_str: list[str] = []
             append = repr_str.append
 
             angular: bool = getattr(self.__rich_repr__, "angular", False)  # type: ignore[attr-defined]
@@ -64,7 +51,7 @@ def auto(
             else:
                 return f"{self.__class__.__name__}({', '.join(repr_str)})"
 
-        def auto_rich_repr(self: Type[T]) -> Result:
+        def auto_rich_repr(self: type[T]) -> Result:
             """Auto generate __rich_rep__ from signature of __init__"""
             try:
                 import inspect
@@ -103,18 +90,16 @@ def auto(
 
 
 @overload
-def rich_repr(cls: Optional[Type[T]]) -> Type[T]:
-    ...
+def rich_repr(cls: type[T] | None) -> type[T]: ...
 
 
 @overload
-def rich_repr(*, angular: bool = False) -> Callable[[Type[T]], Type[T]]:
-    ...
+def rich_repr(*, angular: bool = False) -> Callable[[type[T]], type[T]]: ...
 
 
 def rich_repr(
-    cls: Optional[Type[T]] = None, *, angular: bool = False
-) -> Union[Type[T], Callable[[Type[T]], Type[T]]]:
+    cls: type[T] | None = None, *, angular: bool = False
+) -> type[T] | Callable[[type[T]], type[T]]:
     if cls is None:
         return auto(angular=angular)
     else:

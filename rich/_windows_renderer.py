@@ -1,4 +1,4 @@
-from typing import Iterable, Sequence, Tuple, cast
+from typing import Iterable, Sequence, cast
 
 from rich._win32_console import LegacyWindowsTerm, WindowsCoordinates
 from rich.segment import ControlCode, ControlType, Segment
@@ -22,7 +22,7 @@ def legacy_windows_render(buffer: Iterable[Segment], term: LegacyWindowsTerm) ->
             for control_code in control_codes:
                 control_type = control_code[0]
                 if control_type == ControlType.CURSOR_MOVE_TO:
-                    _, x, y = cast(Tuple[ControlType, int, int], control_code)
+                    _, x, y = cast(tuple[ControlType, int, int], control_code)
                     term.move_cursor_to(WindowsCoordinates(row=y - 1, col=x - 1))
                 elif control_type == ControlType.CARRIAGE_RETURN:
                     term.write_text("\r")
@@ -37,14 +37,14 @@ def legacy_windows_render(buffer: Iterable[Segment], term: LegacyWindowsTerm) ->
                 elif control_type == ControlType.CURSOR_BACKWARD:
                     term.move_cursor_backward()
                 elif control_type == ControlType.CURSOR_MOVE_TO_COLUMN:
-                    _, column = cast(Tuple[ControlType, int], control_code)
+                    _, column = cast(tuple[ControlType, int], control_code)
                     term.move_cursor_to_column(column - 1)
                 elif control_type == ControlType.HIDE_CURSOR:
                     term.hide_cursor()
                 elif control_type == ControlType.SHOW_CURSOR:
                     term.show_cursor()
                 elif control_type == ControlType.ERASE_IN_LINE:
-                    _, mode = cast(Tuple[ControlType, int], control_code)
+                    _, mode = cast(tuple[ControlType, int], control_code)
                     if mode == 0:
                         term.erase_end_of_line()
                     elif mode == 1:
@@ -52,5 +52,5 @@ def legacy_windows_render(buffer: Iterable[Segment], term: LegacyWindowsTerm) ->
                     elif mode == 2:
                         term.erase_line()
                 elif control_type == ControlType.SET_WINDOW_TITLE:
-                    _, title = cast(Tuple[ControlType, str], control_code)
+                    _, title = cast(tuple[ControlType, str], control_code)
                     term.set_title(title)

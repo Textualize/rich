@@ -10,9 +10,9 @@ See also [AI_POLICY.md](https://github.com/Textualize/rich/blob/master/AI_POLICY
 
 ## Prerequisites
 
-Rich uses [poetry](https://python-poetry.org/docs/) for packaging and
-dependency management. To start developing with Rich, install Poetry
-using the [recommended method](https://python-poetry.org/docs/#installation).
+Rich uses [uv](https://docs.astral.sh/uv/) for packaging, dependency management,
+and to install Python itself. To start developing with Rich, install uv using the
+[recommended method](https://docs.astral.sh/uv/getting-started/installation/).
 
 Next, you'll need to create a _fork_ (your own personal copy) of the Rich repository, and clone that fork
 on to your local machine. GitHub offers a great tutorial for this process [here](https://docs.github.com/en/get-started/quickstart/fork-a-repo).
@@ -20,17 +20,18 @@ After following this guide, you'll have a local copy of the Rich project install
 
 Enter the directory containing your copy of Rich (`cd rich`).
 
-Next create and activate a [virtual environment](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#create-and-use-virtual-environments) for Rich.
-
-Now we can install the dependencies of Rich into the virtual environment:
+Now we can create a virtual environment and install the dependencies of Rich into it:
 
 ```
-poetry install
+uv sync
 ```
 
-The rest of this guide assumes you're inside the virtual environment.
-If you're having difficulty running any of the commands that follow,
-ensure you're inside the virtual environment by running `poetry shell`.
+This downloads the Python version in `.python-version` if you don't already have it,
+creates a `.venv` directory, and installs Rich along with its development dependencies.
+
+The rest of this guide runs commands with `uv run`, which uses the virtual environment automatically.
+If you prefer to activate the virtual environment yourself, run `source .venv/bin/activate`
+(or `.venv\Scripts\activate` on Windows) and then drop the `uv run` prefix.
 
 ## Developing
 
@@ -60,7 +61,7 @@ make test
 Or if you don't have `make`, run the following:
 
 ```
-pytest --cov-report term-missing --cov=rich tests/ -vv
+uv run pytest --cov-report term-missing --cov=rich tests/ -vv
 ```
 
 New code should ideally have tests and not break existing tests.
@@ -81,7 +82,7 @@ make typecheck
 Or if you don't have `make`:
 
 ```
-mypy -p rich --config-file= --ignore-missing-imports --no-implicit-optional --warn-unreachable
+uv run mypy -p rich --no-incremental
 ```
 
 Please add type annotations for all new code, and ensure that type checking succeeds before creating a pull request.
@@ -102,7 +103,7 @@ There are some additional dependencies required to build the documentation.
 These dependencies can be installed by running (from the `docs` directory):
 
 ```
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 After updating the documentation, you can build them (from the project root directory) by running:

@@ -1,6 +1,5 @@
 from datetime import datetime
-from typing import Iterable, List, Optional, TYPE_CHECKING, Union, Callable
-
+from typing import TYPE_CHECKING, Callable, Iterable
 
 from .text import Text, TextType
 
@@ -17,9 +16,9 @@ class LogRender:
         show_time: bool = True,
         show_level: bool = False,
         show_path: bool = True,
-        time_format: Union[str, FormatTimeCallable] = "[%x %X]",
+        time_format: str | FormatTimeCallable = "[%x %X]",
         omit_repeated_times: bool = True,
-        level_width: Optional[int] = 8,
+        level_width: int | None = 8,
     ) -> None:
         self.show_time = show_time
         self.show_level = show_level
@@ -27,18 +26,18 @@ class LogRender:
         self.time_format = time_format
         self.omit_repeated_times = omit_repeated_times
         self.level_width = level_width
-        self._last_time: Optional[Text] = None
+        self._last_time: Text | None = None
 
     def __call__(
         self,
         console: "Console",
         renderables: Iterable["ConsoleRenderable"],
-        log_time: Optional[datetime] = None,
-        time_format: Optional[Union[str, FormatTimeCallable]] = None,
+        log_time: datetime | None = None,
+        time_format: str | FormatTimeCallable | None = None,
         level: TextType = "",
-        path: Optional[str] = None,
-        line_no: Optional[int] = None,
-        link_path: Optional[str] = None,
+        path: str | None = None,
+        line_no: int | None = None,
+        link_path: str | None = None,
     ) -> "Table":
         from .containers import Renderables
         from .table import Table
@@ -52,7 +51,7 @@ class LogRender:
         output.add_column(ratio=1, style="log.message", overflow="fold")
         if self.show_path and path:
             output.add_column(style="log.path")
-        row: List["RenderableType"] = []
+        row: list["RenderableType"] = []
         if self.show_time:
             log_time = log_time or console.get_datetime()
             time_format = time_format or self.time_format

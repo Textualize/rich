@@ -15,7 +15,7 @@ else:
 
 import time
 from ctypes import Structure, byref, wintypes
-from typing import IO, NamedTuple, Type, cast
+from typing import IO, NamedTuple, cast
 
 from rich.color import ColorSystem
 from rich.style import Style
@@ -119,7 +119,7 @@ _FillConsoleOutputCharacterW.argtypes = [
     wintypes.HANDLE,
     ctypes.c_char,
     wintypes.DWORD,
-    cast(Type[COORD], WindowsCoordinates),
+    cast(type[COORD], WindowsCoordinates),
     ctypes.POINTER(wintypes.DWORD),
 ]
 _FillConsoleOutputCharacterW.restype = wintypes.BOOL
@@ -160,7 +160,7 @@ _FillConsoleOutputAttribute.argtypes = [
     wintypes.HANDLE,
     wintypes.WORD,
     wintypes.DWORD,
-    cast(Type[COORD], WindowsCoordinates),
+    cast(type[COORD], WindowsCoordinates),
     ctypes.POINTER(wintypes.DWORD),
 ]
 _FillConsoleOutputAttribute.restype = wintypes.BOOL
@@ -244,7 +244,7 @@ def GetConsoleScreenBufferInfo(
 _SetConsoleCursorPosition = windll.kernel32.SetConsoleCursorPosition
 _SetConsoleCursorPosition.argtypes = [
     wintypes.HANDLE,
-    cast(Type[COORD], WindowsCoordinates),
+    cast(type[COORD], WindowsCoordinates),
 ]
 _SetConsoleCursorPosition.restype = wintypes.BOOL
 

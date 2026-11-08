@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 from .color import Color
 from .console import Console, ConsoleOptions, RenderResult
 from .jupyter import JupyterMixin
@@ -22,8 +20,8 @@ class Bar(JupyterMixin):
         begin (float): Begin point (between 0 and size, inclusive).
         end (float): End point (between 0 and size, inclusive).
         width (int, optional): Width of the bar, or ``None`` for maximum width. Defaults to None.
-        color (Union[Color, str], optional): Color of the bar. Defaults to "default".
-        bgcolor (Union[Color, str], optional): Color of bar background. Defaults to "default".
+        color (Color | str, optional): Color of the bar. Defaults to "default".
+        bgcolor (Color | str, optional): Color of bar background. Defaults to "default".
     """
 
     def __init__(
@@ -32,9 +30,9 @@ class Bar(JupyterMixin):
         begin: float,
         end: float,
         *,
-        width: Optional[int] = None,
-        color: Union[Color, str] = "default",
-        bgcolor: Union[Color, str] = "default",
+        width: int | None = None,
+        color: Color | str = "default",
+        bgcolor: Color | str = "default",
     ):
         self.size = size
         self.begin = max(begin, 0)

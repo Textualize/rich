@@ -1,6 +1,6 @@
 import re
 from abc import ABC, abstractmethod
-from typing import ClassVar, Sequence, Union
+from typing import ClassVar, Sequence
 
 from .text import Span, Text
 
@@ -17,11 +17,11 @@ def _combine_regex(*regexes: str) -> str:
 class Highlighter(ABC):
     """Abstract base class for highlighters."""
 
-    def __call__(self, text: Union[str, Text]) -> Text:
+    def __call__(self, text: str | Text) -> Text:
         """Highlight a str or Text instance.
 
         Args:
-            text (Union[str, ~Text]): Text to highlight.
+            text (str | ~Text): Text to highlight.
 
         Raises:
             TypeError: If not called with text or str.

@@ -1,7 +1,4 @@
-from typing import Optional
-
-
-def pick_bool(*values: Optional[bool]) -> bool:
+def pick_bool(*values: bool | None) -> bool:
     """Pick the first non-none bool or return the last value.
 
     Args:

@@ -1,5 +1,5 @@
 import time
-from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Union, Final
+from typing import TYPE_CHECKING, Callable, Final, Iterable
 
 from .segment import ControlCode, ControlType, Segment
 
@@ -25,7 +25,7 @@ CONTROL_ESCAPE: Final = {
     13: "\\r",
 }
 
-CONTROL_CODES_FORMAT: Dict[int, Callable[..., str]] = {
+CONTROL_CODES_FORMAT: dict[int, Callable[..., str]] = {
     ControlType.BELL: lambda: "\x07",
     ControlType.CARRIAGE_RETURN: lambda: "\r",
     ControlType.HOME: lambda: "\x1b[H",
@@ -55,8 +55,8 @@ class Control:
 
     __slots__ = ["segment"]
 
-    def __init__(self, *codes: Union[ControlType, ControlCode]) -> None:
-        control_codes: List[ControlCode] = [
+    def __init__(self, *codes: ControlType | ControlCode) -> None:
+        control_codes: list[ControlCode] = [
             (code,) if isinstance(code, ControlType) else code for code in codes
         ]
         _format_map = CONTROL_CODES_FORMAT
@@ -179,7 +179,7 @@ class Control:
 
 
 def strip_control_codes(
-    text: str, _translate_table: Dict[int, None] = _CONTROL_STRIP_TRANSLATE
+    text: str, _translate_table: dict[int, None] = _CONTROL_STRIP_TRANSLATE
 ) -> str:
     """Remove control codes from text.
 
@@ -194,7 +194,7 @@ def strip_control_codes(
 
 def escape_control_codes(
     text: str,
-    _translate_table: Dict[int, str] = CONTROL_ESCAPE,
+    _translate_table: dict[int, str] = CONTROL_ESCAPE,
 ) -> str:
     """Replace control codes with their "escaped" equivalent in the given text.
     (e.g. "\b" becomes "\\b")

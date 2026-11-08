@@ -19,15 +19,13 @@ def test_rule_in_unexpanded_table(expand_kwarg):
     table.add_row("COL1", Rule())
     table.add_row("COL1", "COL2")
     console.print(table)
-    expected = dedent(
-        """\
+    expected = dedent("""\
         +-------------+
         | COL1 | COL2 |
         | COL1 | ──── |
         | COL1 | COL2 |
         +-------------+
-        """
-    )
+        """)
     result = console.file.getvalue()
     assert result == expected
 
@@ -41,15 +39,13 @@ def test_rule_in_expanded_table():
     table.add_row("COL1", Rule(style=None))
     table.add_row("COL1", "COL2")
     console.print(table)
-    expected = dedent(
-        """\
+    expected = dedent("""\
         +------------------------------+
         | COL1          | COL2         |
         | COL1          | ──────────── |
         | COL1          | COL2         |
         +------------------------------+
-        """
-    )
+        """)
     result = console.file.getvalue()
     assert result == expected
 
@@ -63,14 +59,12 @@ def test_rule_in_ratio_table():
     table.add_row("COL1", Rule(style=None))
     table.add_row("COL1", "COL2")
     console.print(table)
-    expected = dedent(
-        """\
+    expected = dedent("""\
         +------------------------------+
         | COL1                  | COL2 |
         | COL1                  | ──── |
         | COL1                  | COL2 |
         +------------------------------+
-        """
-    )
+        """)
     result = console.file.getvalue()
     assert result == expected

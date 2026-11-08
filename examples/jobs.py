@@ -1,7 +1,7 @@
 from time import sleep
+
 from rich.panel import Panel
 from rich.progress import Progress
-
 
 JOBS = [100, 150, 25, 70, 110, 90]
 
