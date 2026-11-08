@@ -296,8 +296,10 @@ def test_divide_edge_2():
         ),
     ],
 )
-def test_split_cells_emoji(text, split, result):
-    assert Segment(text).split_cells(split) == result
+def test_split_cells(text: str, split: int, result: tuple) -> None:
+    """Check that _split_cells produces the correct result."""
+    segment = Segment(text)
+    assert Segment._split_cells(segment, split) == result
 
 
 @pytest.mark.parametrize(
@@ -324,6 +326,30 @@ def test_split_cells_mixed(segment: Segment) -> None:
         )  # Sanity check there aren't any sneaky control codes
         assert cell_len(left.text) == position
         assert cell_len(right.text) == segment.cell_length - position
+
+
+def test_split_cells_emoji():
+    """Regression test for #3299 — non-unit chars in _split_cells."""
+    # cut=3 falls inside fox2 (cells 2-3), so fox2 becomes two spaces
+    s = Segment("🦊🦊🦊\n\n\n\n\n\n")
+    left, right = Segment._split_cells(s, 3)
+    assert left.text == "🦊 "  # one fox + padding space
+    assert left.cell_length == 3  # emoji(2) + space(1)
+    assert right.text.startswith(" ")  # padding space on right side
+    assert right.text.count("🦊") == 1  # fox3 still on right
+
+    # cut=3 inside fox2 again, abcdef goes to right
+    s = Segment("🦊🦊🦊abcdef")
+    left, right = Segment._split_cells(s, 3)
+    assert left.text == "🦊 "
+    assert "abcdef" in right.text
+    assert right.text.count("🦊") == 1
+
+    # Sanity: cut on exact boundary (after fox1, cell=2)
+    s = Segment("🦊🦊🦊abcdef")
+    left, right = Segment._split_cells(s, 2)
+    assert left.text == "🦊"
+    assert right.text == "🦊🦊abcdef"
 
 
 def test_split_cells_doubles() -> None:
