@@ -94,6 +94,54 @@ class SyntaxWrappingSuite:
         self.console.print(self.syntax, width)
 
 
+class SyntaxLineNumbersWrappingSuite:
+    def setup(self):
+        self.console = Console(
+            file=StringIO(), color_system="truecolor", legacy_windows=False
+        )
+        self.syntax = Syntax(
+            code=snippets.PYTHON_SNIPPET * 120,
+            lexer="python",
+            word_wrap=True,
+            line_numbers=True,
+        )
+
+    def time_text_thin_terminal_heavy_wrapping(self):
+        self.console.print(self.syntax, width=30)
+
+
+class SyntaxLargeWrappingSuite:
+    def setup(self):
+        self.console = Console(
+            file=StringIO(), color_system="truecolor", legacy_windows=False
+        )
+        self.syntax = Syntax(
+            code=snippets.PYTHON_SNIPPET * 120,
+            lexer="python",
+            word_wrap=True,
+            line_numbers=False,
+        )
+
+    def time_text_thin_terminal_heavy_wrapping(self):
+        self.console.print(self.syntax, width=30)
+
+
+class SyntaxLargeNoWrapSuite:
+    def setup(self):
+        self.console = Console(
+            file=StringIO(), color_system="truecolor", legacy_windows=False
+        )
+        self.syntax = Syntax(
+            code=snippets.PYTHON_SNIPPET * 120,
+            lexer="python",
+            word_wrap=False,
+            line_numbers=False,
+        )
+
+    def time_text_wide_terminal_no_wrapping(self):
+        self.console.print(self.syntax, width=80)
+
+
 class TableSuite:
     def time_table_no_wrapping(self):
         self._print_table(width=100)
