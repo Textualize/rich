@@ -684,6 +684,12 @@ def test_task_progress_column_speed() -> None:
     assert speed_text.plain == "8.9×10⁶ it/s"
 
 
+def test_percentage_completed_with_no_total():
+    """Test that percentage_completed returns None if total is None."""
+    bar = ProgressBar(total=None)
+    assert bar.percentage_completed is None
+
+
 if __name__ == "__main__":
     _render = render_progress()
     print(_render)
