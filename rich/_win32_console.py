@@ -21,6 +21,7 @@ from rich.color import ColorSystem
 from rich.style import Style
 
 STDOUT = -11
+STDERR = -12
 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4
 
 COORD = wintypes._COORD
