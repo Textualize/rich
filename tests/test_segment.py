@@ -134,6 +134,18 @@ def test_remove_color():
     ]
 
 
+def test_remove_color_preserves_link_id():
+    first_link = Style(color="red", link="https://example.com")
+    second_link = Style(color="red", link="https://example.com")
+    segments = [
+        Segment("foo", first_link),
+        Segment("bar", Style(color="blue", link="https://example.com") + first_link),
+        Segment("baz", second_link),
+    ]
+    link_ids = [segment.style.link_id for segment in Segment.remove_color(segments)]
+    assert link_ids == [first_link.link_id, first_link.link_id, second_link.link_id]
+
+
 def test_is_control():
     assert Segment("foo", Style(bold=True)).is_control == False
     assert Segment("foo", Style(bold=True), []).is_control == True
