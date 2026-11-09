@@ -35,8 +35,6 @@ The [Rich API](https://rich.readthedocs.io/en/latest/) makes it easy to add colo
 
 For a video introduction to Rich see [calmcode.io](https://calmcode.io/rich/introduction.html) by [@fishnets88](https://twitter.com/fishnets88).
 
-See what [people are saying about Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
-
 ## Compatibility
 
 Rich works with Linux, macOS and Windows. True color / emoji works with new Windows Terminal, classic terminal is limited to 16 colors. Rich requires Python 3.8 or later.
