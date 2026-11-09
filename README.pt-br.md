@@ -87,7 +87,7 @@ from rich.console import Console
 console = Console()
 ```
 
-Objetos do tipo Console tem um metodo `print` que tem a interface intencionalmente similar à função `print` nativa. Veja a seguir um exeplo de uso:
+Objetos do tipo Console tem um metodo `print` que tem a interface intencionalmente similar à função `print` nativa. Veja a seguir um exemplo de uso:
 
 ```python
 console.print("Hello", "World!")
@@ -95,7 +95,7 @@ console.print("Hello", "World!")
 
 Como esperado, este comando vai imprimir `"Hello World!"` no terminal. Porém, observe que, diferente da função `print` nativa, o Rich vai quebrar a linha entre palavras (word-wrap) no seu texto para caber na largura do terminal.
 
-Existem algumas formas de adicionar cores e estilos nos outputs. É possivel aplicar um estilo para todo output adicionando o argumento nomeado `style`. Por exemplo:
+Existem algumas formas de adicionar cores e estilos nos outputs. É possível aplicar um estilo para todo output adicionando o argumento nomeado `style`. Por exemplo:
 
 ```python
 console.print("Hello", "World!", style="bold red")
@@ -411,7 +411,7 @@ Este código gerará o seguinte resultado:
 <details>
 <summary>Rastreio de Erros (tracebacks)</summary>
 
-O Rich renderiza [tracebacks formatados](https://rich.readthedocs.io/en/latest/traceback.html) que são fáceis de ler e mostra mais código do que os tracebacks padrão do Python. É possivel configurar o Rich como o gerenciador padrão de tracebacks para que todas as excessões inesperadas sejam renderizadas pelo Rich.
+O Rich renderiza [tracebacks formatados](https://rich.readthedocs.io/en/latest/traceback.html) que são fáceis de ler e mostra mais código do que os tracebacks padrão do Python. É possível configurar o Rich como o gerenciador padrão de tracebacks para que todas as exceções inesperadas sejam renderizadas pelo Rich.
 
 Veja o resultado disso no OSX (resultados semelhantes no Linux):
 
