@@ -97,6 +97,12 @@ def test_from_markup():
     assert text._spans == [Span(7, 13, "bold")]
 
 
+def test_markup_round_trip():
+    src = "[red]foo[/red][blue]bar[/blue][yellow]baz[/yellow]"
+    text = Text.from_markup(src)
+    assert text.markup == src
+
+
 def test_from_ansi():
     text = Text.from_ansi("Hello, \033[1mWorld!\033[0m")
     assert str(text) == "Hello, World!"
