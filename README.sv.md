@@ -32,7 +32,6 @@ Rich är ett Python bibliotek för _rich_ text och vacker formattering i termina
 
 För en video demonstration av Rich kolla [calmcode.io](https://calmcode.io/rich/introduction.html) av [@fishnets88](https://twitter.com/fishnets88).
 
-Se vad [folk pratar om Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
 ## Kompatibilitet
 

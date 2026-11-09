@@ -33,7 +33,6 @@ Rich는 터미널에서 _풍부한(rich)_ 텍스트와 아름다운 서식을 �
 
 Rich에 대한 동영상 설명을 보시려면 [@fishnets88](https://twitter.com/fishnets88)의 [calmcode.io](https://calmcode.io/rich/introduction.html)를 확인 바랍니다.
 
-[사람들의 Rich에 대한 의견](https://www.willmcgugan.com/blog/pages/post/rich-tweets/)을 확인해보세요.
 
 ## 호환성
 

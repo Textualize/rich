@@ -33,7 +33,6 @@ Rich это Python библиотека, позволяющая отобража
 
 Смотрите видеоинструкцию  [calmcode.io](https://calmcode.io/rich/introduction.html) от [@fishnets88](https://twitter.com/fishnets88).
 
-Посмотрите [что люди думают о Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
 ## Cовместимость
 

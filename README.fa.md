@@ -42,7 +42,6 @@
 
 برای معرفی ویدئویی ریچ این ویدئو را ببینید [calmcode.io](https://calmcode.io/rich/introduction.html) توسط [@fishnets88](https://twitter.com/fishnets88).
 
-ببینید [مردم در مورد ریچ چه میگویند](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
 ## سازگاری
 

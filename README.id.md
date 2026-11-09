@@ -34,7 +34,6 @@ Rich adalah library Python yang membantu _memperindah_ tampilan output suatu pro
 
 Sebagai pengenalan Rich saksikan video berikut [calmcode.io](https://calmcode.io/rich/introduction.html) oleh [@fishnets88](https://twitter.com/fishnets88).
 
-Lihat pendapat [pengguna yang telah menggunakan Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
 ## Kompabilitas
 

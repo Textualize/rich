@@ -33,7 +33,6 @@ Die [Rich API](https://rich.readthedocs.io/en/latest/) erleichtert das Hinzufüg
 
 Eine Video-Einführung in Rich findest du unter [quietcode.io](https://calmcode.io/rich/introduction.html) von [@ fishnets88](https://twitter.com/fishnets88).
 
-Schau hier, was [andere über Rich sagen](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
 ## Kompatibilität
 

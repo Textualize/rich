@@ -34,7 +34,6 @@ Le [Rich API](https://rich.readthedocs.io/en/latest/) permettono di aggiungere f
 
 Per una video-introduzione di Rich puoi vedere [calmcode.io](https://calmcode.io/rich/introduction.html) by [@fishnets88](https://twitter.com/fishnets88).
 
-Guarda cosa [le persone dicono su Rich](https://www.willmcgugan.com/blog/pages/post/rich-tweets/).
 
 ## Compatibilità
 
